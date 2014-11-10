@@ -45,12 +45,12 @@ describe 'Account Notification API', type: :request do
                            :end_at => @end_at.iso8601,
                            :message => 'This is a notification',
                            :icon => 'information'}})
-      json.keys.should include 'start_at'
-      json.keys.should include 'end_at'
-      json['subject'].should == 'New global notification'
-      json['message'].should == 'This is a notification'
-      json['icon'].should == 'information'
-      json['roles'].should == []
+      expect(json.keys).to include 'start_at'
+      expect(json.keys).to include 'end_at'
+      expect(json['subject']).to eq 'New global notification'
+      expect(json['message']).to eq 'This is a notification'
+      expect(json['icon']).to eq 'information'
+      expect(json['roles']).to eq []
     end
 
     it 'should default icon to warning' do
@@ -61,7 +61,7 @@ describe 'Account Notification API', type: :request do
                            :end_at => @end_at.iso8601,
                            :message => 'This is a notification'}})
 
-      json['icon'].should == 'warning'
+      expect(json['icon']).to eq 'warning'
     end
 
     it 'should create an account notification for specific roles' do
@@ -75,33 +75,31 @@ describe 'Account Notification API', type: :request do
 
       notification = AccountNotification.last
       roles = notification.account_notification_roles
-      roles.count.should == 1
-      roles.first.role_type.should == 'StudentEnrollment'
-      json['roles'].should == ["StudentEnrollment"]
+      expect(roles.count).to eq 1
+      expect(roles.first.role_type).to eq 'StudentEnrollment'
+      expect(json['roles']).to eq ["StudentEnrollment"]
     end
 
     it 'should return not authorized for non admin user' do
       user = user_with_managed_pseudonym
-      begin
-        json = api_call_as_user(user, :post, @path, @api_params,
+      api_call_as_user(user, :post, @path, @api_params,
                         { :account_notification_roles => ['StudentEnrollment'],
                           :account_notification => {
                             :subject => 'New global notification',
                             :start_at => @start_at.iso8601,
                             :end_at => @end_at.iso8601,
-                            :message => 'This is a notification'}})
-      rescue => e
-        e.message.should include 'unauthorized'
-      end
+                            :message => 'This is a notification'}},
+                        {},
+                        expected_status: 401)
     end
 
     it 'should return an error for missing required params' do
       missing = ['subject', 'message', 'start_at', 'end_at']
       raw_api_call(:post, @path, @api_params, { :account_notification => { :icon => 'warning'} })
-      response.code.should eql '400'
+      expect(response.code).to eql '400'
       json = JSON.parse(response.body)
       errors = json['errors'].keys
-      (missing - errors).should be_blank
+      expect(missing - errors).to be_blank
     end
 
     it 'should return an error for malformed dates' do
@@ -112,7 +110,7 @@ describe 'Account Notification API', type: :request do
                        :end_at => 'invalid_date',
                        :message => 'This is a notification',
                        :icon => 'information'}})
-      response.code.should eql '400'
+      expect(response.code).to eql '400'
     end
 
     it 'should not allow an end date to be before a start date' do
@@ -123,9 +121,9 @@ describe 'Account Notification API', type: :request do
                        :end_at => @start_at.iso8601,
                        :message => 'This is a notification',
                        :icon => 'information'}})
-      response.code.should eql '400'
+      expect(response.code).to eql '400'
       errors = JSON.parse(response.body)
-      errors['errors'].keys.should include 'end_at'
+      expect(errors['errors'].keys).to include 'end_at'
     end
   end
 

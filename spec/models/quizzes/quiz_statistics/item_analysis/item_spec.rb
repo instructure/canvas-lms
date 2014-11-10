@@ -2,15 +2,19 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Item do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe ".from" do
     it "should create an item for a supported question type" do
       qq = {:question_type => "true_false_question", :answers => []}
-      Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq).should_not be_nil
+      expect(Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq)).not_to be_nil
     end
 
     it "should not create an item for an unsupported question type" do
       qq = {:question_type => "essay_question"}
-      Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq).should be_nil
+      expect(Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq)).to be_nil
     end
   end
 
@@ -24,28 +28,28 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
 
   describe "#num_respondents" do
     it "should return all respondents" do
-      item.num_respondents.should == 3 # one guy didn't answer
+      expect(item.num_respondents).to eq 3 # one guy didn't answer
     end
 
     it "should return correct respondents" do
-      item.num_respondents(:correct).should == 2
+      expect(item.num_respondents(:correct)).to eq 2
     end
 
     it "should return incorrect respondents" do
-      item.num_respondents(:incorrect).should == 1
+      expect(item.num_respondents(:incorrect)).to eq 1
     end
 
     it "should return respondents in a certain bucket" do
-      item.num_respondents(:top).should == 1
-      item.num_respondents(:middle).should == 2
-      item.num_respondents(:bottom).should == 0 # there is a guy, but he didn't answer this question
+      expect(item.num_respondents(:top)).to eq 1
+      expect(item.num_respondents(:middle)).to eq 2
+      expect(item.num_respondents(:bottom)).to eq 0 # there is a guy, but he didn't answer this question
     end
 
     it "should correctly evaluate multiple filters" do
-      item.num_respondents(:top, :correct).should == 1
-      item.num_respondents(:top, :incorrect).should == 0
-      item.num_respondents(:middle, :correct).should == 1
-      item.num_respondents(:middle, :incorrect).should == 1
+      expect(item.num_respondents(:top, :correct)).to eq 1
+      expect(item.num_respondents(:top, :incorrect)).to eq 0
+      expect(item.num_respondents(:middle, :correct)).to eq 1
+      expect(item.num_respondents(:middle, :incorrect)).to eq 1
     end
   end
 
@@ -55,7 +59,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
       # > v <- c(1, 1, 0)
       # > var(v)*2/3
       # [1] 0.2222222
-      item.variance.should be_approximately 0.2222222
+      expect(item.variance).to be_approximately 0.2222222
     end
   end
 
@@ -65,13 +69,13 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
       # > v <- c(1, 1, 0)
       # > sqrt(var(v)/3*2)
       # [1] 0.4714045
-      item.standard_deviation.should be_approximately 0.4714045
+      expect(item.standard_deviation).to be_approximately 0.4714045
     end
   end
 
   describe "#difficulty_index" do
     it "should return the ratio of correct to incorrect" do
-      item.difficulty_index.should be_approximately 0.6666667
+      expect(item.difficulty_index).to be_approximately 0.6666667
     end
   end
 
@@ -82,7 +86,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
     # > cor(x,c(0,0,1))
     # [1] -0.5
     it "should match R's output" do
-      item.point_biserials.should be_approximately [0.5, -0.5, nil, nil]
+      expect(item.point_biserials).to be_approximately [0.5, -0.5, nil, nil]
     end
   end
 end

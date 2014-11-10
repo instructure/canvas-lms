@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Quizzes::QuizStatisticsSerializer do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -61,7 +65,7 @@ describe Quizzes::QuizStatisticsSerializer do
     includes_all_versions generated_at
   ].each do |attr|
     it "serializes #{attr}" do
-      @json.should have_key(attr)
+      expect(@json).to have_key(attr)
     end
   end
 
@@ -72,7 +76,7 @@ describe Quizzes::QuizStatisticsSerializer do
     statistics.item_analysis.stubs(created_at: oldest + 1.days)
 
     @json = subject.as_json[:quiz_statistics].stringify_keys
-    @json['generated_at'].should == oldest
+    expect(@json['generated_at']).to eq oldest
   end
 
   it 'de-scopifies submission statistic keys' do
@@ -89,16 +93,16 @@ describe Quizzes::QuizStatisticsSerializer do
       user_ids
     ]
 
-    (@json['submission_statistics'].keys.map(&:to_s).sort & keys).should == keys
+    expect(@json['submission_statistics'].keys.map(&:to_s).sort & keys).to eq keys
   end
 
   it 'serializes url' do
-    @json['url'].should == 'http://example.com/api/v1/courses/1/quizzes/1/statistics'
+    expect(@json['url']).to eq 'http://example.com/api/v1/courses/1/quizzes/1/statistics'
   end
 
   it 'serializes quiz url' do
-    @json['links'].should be_present
-    @json['links']['quiz'].should == 'http://example.com/api/v1/courses/1/quizzes/1'
+    expect(@json['links']).to be_present
+    expect(@json['links']['quiz']).to eq 'http://example.com/api/v1/courses/1/quizzes/1'
   end
 
   it 'stringifies question_statistics ids' do
@@ -107,8 +111,8 @@ describe Quizzes::QuizStatisticsSerializer do
     })
 
     json = subject.as_json[:quiz_statistics]
-    json[:question_statistics].should be_present
-    json[:question_statistics][0][:id].should == "5"
+    expect(json[:question_statistics]).to be_present
+    expect(json[:question_statistics][0][:id]).to eq "5"
   end
 
   it 'munges item_analysis with question_statistics' do
@@ -121,7 +125,7 @@ describe Quizzes::QuizStatisticsSerializer do
     ])
 
     json = subject.as_json[:quiz_statistics]
-    json[:question_statistics].should be_present
-    json[:question_statistics][0][:foo].should == "bar"
+    expect(json[:question_statistics]).to be_present
+    expect(json[:question_statistics][0][:foo]).to eq "bar"
   end
 end

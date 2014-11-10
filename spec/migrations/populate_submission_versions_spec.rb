@@ -23,17 +23,17 @@ describe DataFixup::PopulateSubmissionVersions do
   it "should not migrate a non-submission version" do
     wiki_page_model
     version = Version.create(:versionable => @page, :yaml => @page.attributes.to_yaml)
-    lambda{
+    expect{
       DataFixup::PopulateSubmissionVersions.run
-    }.should_not change(SubmissionVersion, :count)
+    }.not_to change(SubmissionVersion, :count)
   end
 
   it "should not migrate a submission version already having a submission_version" do
     course_with_student
     submission = @user.submissions.create(:assignment => @course.assignments.create!)
-    lambda{
+    expect{
       DataFixup::PopulateSubmissionVersions.run
-    }.should_not change(SubmissionVersion, :count)
+    }.not_to change(SubmissionVersion, :count)
   end
 
   it "should migrate all submission version rows without submission_versions" do
@@ -41,11 +41,11 @@ describe DataFixup::PopulateSubmissionVersions do
     course_with_student
     submission = @user.submissions.build(:assignment => @course.assignments.create!)
     submission.without_versioning{ submission.save! }
-    submission.versions.exists?.should be_false
+    expect(submission.versions.exists?).to be_falsey
     n.times { |x| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
-    lambda{
+    expect{
       DataFixup::PopulateSubmissionVersions.run
-    }.should change(SubmissionVersion, :count).by(n)
+    }.to change(SubmissionVersion, :count).by(n)
   end
 
   it "should skip submission version rows without a corresponding submission object" do
@@ -55,11 +55,11 @@ describe DataFixup::PopulateSubmissionVersions do
     Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml)
 
     submission.reload
-    submission.versions.exists?.should be_true
+    expect(submission.versions.exists?).to be_truthy
     submission.delete
 
-    lambda{
+    expect{
       DataFixup::PopulateSubmissionVersions.run
-    }.should_not change(SubmissionVersion, :count)
+    }.not_to change(SubmissionVersion, :count)
   end
 end

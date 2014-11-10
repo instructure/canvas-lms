@@ -1,0 +1,14 @@
+%mimeClassIconBase {
+  display: block;
+  width: 36px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+@each $mimeClass in audio, code, doc, flash, folder, html, image, pdf, ppt, text, video, xls, zip, file {
+  .mimeClass-#{$mimeClass} {
+    @extend %mimeClassIconBase;
+    background-image: url('/images/mimeClassIcons/#{$mimeClass}.svg');
+  }
+}

@@ -30,13 +30,13 @@ describe "/wiki_page_revisions/show" do
   it "should say imported for no user edit" do
     assigns[:revision] = assigns[:page].versions.first
     render "wiki_page_revisions/show"
-    response.body.should =~ /Imported:/
+    expect(response.body).to match /Imported:/
   end
   it "should say username of editor" do
     assigns[:page].update_attributes(:body => "oi", :user_id => @user.id)
     assigns[:revision] = assigns[:page].versions[0]
     render "wiki_page_revisions/show"
-    response.body.should =~ /Saved: .* by #{@user.name}/
+    expect(response.body).to match /Saved: .* by #{@user.name}/
   end
 end
 

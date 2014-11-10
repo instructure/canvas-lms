@@ -28,7 +28,7 @@ describe "/profile/_sms_select" do
     assigns[:sms_channels] = []
 
     render :partial => "profile/sms_select", :object => cc
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

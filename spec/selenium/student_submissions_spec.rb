@@ -39,7 +39,7 @@ describe "submissions" do
       driver.execute_script("window.mediaCommentCallback([{entryId:1, entryType:1}]);")
 
       # see if the confirmation element shows up
-      f('#media_media_recording_ready').should be_displayed
+      expect(f('#media_media_recording_ready')).to be_displayed
 
       # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
       submit_form('#submit_media_recording_form')
@@ -51,7 +51,7 @@ describe "submissions" do
 
       create_assignment_and_go_to_page 'media_recording'
       f(".submit_assignment_link").click
-      f('#media_comment_submit_button').should have_attribute('disabled', 'true')
+      expect(f('#media_comment_submit_button')).to have_attribute('disabled', 'true')
       # leave so the "are you sure?!" message doesn't freeze up selenium
       f('#section-tabs .home').click
       driver.switch_to.alert.accept
@@ -69,13 +69,13 @@ describe "submissions" do
       expect_new_page_load { f('#submit_file_button').click }
 
       keep_trying_until do
-        f('#sidebar_content .header').should include_text "Turned In!"
-        f('.details .file-big').should include_text "testfile1"
+        expect(f('#sidebar_content .header')).to include_text "Turned In!"
+        expect(f('.details .file-big')).to include_text "testfile1"
       end
       @submission = @assignment.reload.submissions.find_by_user_id(@student.id)
-      @submission.submission_type.should == 'online_upload'
-      @submission.attachments.length.should == 1
-      @submission.workflow_state.should == 'submitted'
+      expect(@submission.submission_type).to eq 'online_upload'
+      expect(@submission.attachments.length).to eq 1
+      expect(@submission.workflow_state).to eq 'submitted'
     end
 
     it "should not allow a user to submit a file-submission assignment without attaching a file" do
@@ -88,7 +88,7 @@ describe "submissions" do
       wait_for_ajaximations
       f('#submit_file_button').click
       wait_for_ajaximations
-      flash_message_present?(:error).should be_true
+      expect(flash_message_present?(:error)).to be_truthy
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -112,7 +112,7 @@ describe "submissions" do
       f('.submission_attachment input').send_keys(fullpath)
 
       # Check that the error is being reported
-      (f('.bad_ext_msg').text() =~ /This\sfile\stype\sis\snot\sallowed/).should be_truthy
+      expect(f('.bad_ext_msg').text() =~ /This\sfile\stype\sis\snot\sallowed/).to be_truthy
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -128,8 +128,8 @@ describe "submissions" do
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
-      f('#sidebar_content .details').should include_text "Not Turned In!"
-      f('#sidebar_content a.submit_assignment_link').text.should == "Submit Assignment"
+      expect(f('#sidebar_content .details')).to include_text "Not Turned In!"
+      expect(f('#sidebar_content a.submit_assignment_link').text).to eq "Submit Assignment"
     end
 
     it "should not show as turned in or not turned in when assignment doesnt expect a submission" do
@@ -139,9 +139,9 @@ describe "submissions" do
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
-      f('#sidebar_content .details').should_not include_text "Turned In!"
-      f('#sidebar_content .details').should_not include_text "Not Turned In!"
-      f('#sidebar_content a.submit_assignment_link').should be_nil
+      expect(f('#sidebar_content .details')).not_to include_text "Turned In!"
+      expect(f('#sidebar_content .details')).not_to include_text "Not Turned In!"
+      expect(f('#sidebar_content a.submit_assignment_link')).to be_nil
     end
 
     it "should not allow blank submissions for text entry" do
@@ -156,15 +156,15 @@ describe "submissions" do
       wait_for_ajaximations
 
       # it should not actually submit and pop up an error message
-      ff('.error_box')[1].should include_text('Required')
+      expect(ff('.error_box')[1]).to include_text('Required')
 
-      Submission.count.should == 0
+      expect(Submission.count).to eq 0
 
       # now make sure it works
       type_in_tiny('#submission_body', 'now it is not blank')
       submit_form(assignment_form)
       wait_for_ajaximations
-      Submission.count.should == 1
+      expect(Submission.count).to eq 1
     end
 
     it "should not allow a submission with only comments" do
@@ -176,8 +176,8 @@ describe "submissions" do
       submit_form("#submit_online_text_entry_form")
 
       # it should not actually submit and pop up an error message
-      ff('.error_box')[1].should include_text('Required')
-      Submission.count.should == 0
+      expect(ff('.error_box')[1]).to include_text('Required')
+      expect(Submission.count).to eq 0
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -227,26 +227,25 @@ describe "submissions" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}"
       in_frame('preview_frame') do
-        ff('.turnitin_score_container').should be_empty
+        expect(ff('.turnitin_score_container')).to be_empty
       end
     end
 
 
     it "should submit an assignment and validate confirmation information" do
-      pending "BUG 6783 - Coming Up assignments update error" do
-        @assignment.update_attributes(:submission_types => 'online_url')
-        @submission = @assignment.submit_homework(@student)
-        @submission.submission_type = "online_url"
-        @submission.save!
+      skip "BUG 6783 - Coming Up assignments update error"
+      @assignment.update_attributes(:submission_types => 'online_url')
+      @submission = @assignment.submit_homework(@student)
+      @submission.submission_type = "online_url"
+      @submission.save!
 
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        f('.details .header').should include_text('Turned In!')
-        get "/courses/#{@course.id}"
-        driver.execute_script("$('.tooltip_text').css('visibility', 'visible')")
-        tooltip_text_elements = ff('.tooltip_text > span')
-        f('.tooltip_text').should be_displayed
-        tooltip_text_elements[1].text.should == 'submitted'
-      end
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f('.details .header')).to include_text('Turned In!')
+      get "/courses/#{@course.id}"
+      driver.execute_script("$('.tooltip_text').css('visibility', 'visible')")
+      tooltip_text_elements = ff('.tooltip_text > span')
+      expect(f('.tooltip_text')).to be_displayed
+      expect(tooltip_text_elements[1].text).to eq 'submitted'
     end
 
     describe 'uploaded files for submission' do
@@ -293,7 +292,7 @@ describe "submissions" do
           keep_trying_until do
             f('#uploaded_files > ul > li.folder > .sign').click
             wait_for_ajaximations
-            f('#uploaded_files > ul > li.folder .file .name').should be_displayed
+            expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
           end
           f('#uploaded_files > ul > li.folder .file .name').click
           wait_for_ajaximations
@@ -308,8 +307,8 @@ describe "submissions" do
         expect_new_page_load { f('#submit_file_button').click }
 
         keep_trying_until do
-          f('.details .header').should include_text "Turned In!"
-          f('.details .file-big').should include_text "html-editing-test.html"
+          expect(f('.details .header')).to include_text "Turned In!"
+          expect(f('.details .file-big')).to include_text "html-editing-test.html"
         end
       end
 
@@ -342,7 +341,7 @@ describe "submissions" do
             f('#uploaded_files > ul > li.folder > .sign').click
             wait_for_ajaximations
             # How does it know which name we're looking for?
-            f('#uploaded_files > ul > li.folder .file .name').should be_displayed
+            expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
           end
           f('#uploaded_files > ul > li.folder .file .name').click
           wait_for_ajaximations
@@ -356,7 +355,7 @@ describe "submissions" do
         end
 
         # Make sure the flash message is being displayed
-        flash_message_present?(:error).should be_truthy
+        expect(flash_message_present?(:error)).to be_truthy
 
         # navigate off the page and dismiss the alert box to avoid problems
         # with other selenium tests

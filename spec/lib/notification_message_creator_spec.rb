@@ -61,8 +61,8 @@ describe NotificationMessageCreator do
       u2.communication_channels.create(:path => "user2@example.com")
       @a = Assignment.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => [u1, u2]).create_message
-      messages.length.should eql(2)
-      messages.map(&:to).should be_include('dashboard')
+      expect(messages.length).to eql(2)
+      expect(messages.map(&:to)).to be_include('dashboard')
     end
 
     it "should only send messages to active communication channels" do
@@ -81,26 +81,25 @@ describe NotificationMessageCreator do
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       paths = messages.collect{ |message| message.to }
-      paths.should include(a.path)
-      paths.should include(b.path)
-      paths.should include(c.path)
-      paths.should_not include(d.path)
+      expect(paths).to include(a.path)
+      expect(paths).to include(b.path)
+      expect(paths).to include(c.path)
+      expect(paths).not_to include(d.path)
     end
-    
+
     it "should use the default channel if no policies apply" do
       assignment_model
       user_model(:workflow_state => 'registered')
       a = communication_channel_model(:workflow_state => 'active')
       b = communication_channel_model(:path => "path2@example.com")
       c = communication_channel_model(:path => "path3@example.com")
-      a.should be_active
-      a.should 
-      
+      expect(a).to be_active
+
       @n = Notification.create(:name => "New Notification")
       a.notification_policies.create!(:notification => @n, :frequency => Notification::FREQ_IMMEDIATELY)
       messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
-      messages.count.should eql(1)
-      messages.first.communication_channel.should eql(@user.communication_channel)
+      expect(messages.count).to eql(1)
+      expect(messages.first.communication_channel).to eql(@user.communication_channel)
     end
 
     it "should not use the default if a policy does apply" do
@@ -113,14 +112,14 @@ describe NotificationMessageCreator do
       @n = Notification.create!(:name => "New notification", :category => 'TestImmediately')
       messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
       channels = messages.collect(&:communication_channel)
-      channels.should include(a)
-      channels.should_not include(b)
-      
+      expect(channels).to include(a)
+      expect(channels).not_to include(b)
+
       b.notification_policies.create!(:notification => @n, :frequency => 'immediately')
       messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
       channels = messages.collect(&:communication_channel)
-      channels.should include(b)
-      channels.should_not include(a)
+      expect(channels).to include(b)
+      expect(channels).not_to include(a)
     end
 
     it "should not send dispatch messages for pre-registered users" do
@@ -129,15 +128,15 @@ describe NotificationMessageCreator do
       u1.communication_channels.create(:path => "user2@example.com").confirm!
       @a = Assignment.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
-      messages.should be_empty
+      expect(messages).to be_empty
     end
 
     it "should send registration messages for pre-registered users" do
       notification_set(:user_opts => {:workflow_state => "pre_registered"}, :notification_opts => {:category => "Registration"})
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.should_not be_empty
-      messages.length.should eql(1)
-      messages.first.to.should eql(@communication_channel.path)
+      expect(messages).not_to be_empty
+      expect(messages.length).to eql(1)
+      expect(messages.first.to).to eql(@communication_channel.path)
     end
 
     it "should send registration messages to the communication channels in the to list" do
@@ -145,25 +144,25 @@ describe NotificationMessageCreator do
       cc = @user.communication_channels.create(:path => 'user1@example.com')
       @user.communication_channels.create(:path => 'user2@example.com').confirm!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => [cc]).create_message
-      messages.length.should eql(1)
-      messages[0].to.should eql(cc.path)
+      expect(messages.length).to eql(1)
+      expect(messages[0].to).to eql(cc.path)
     end
-    
+
     it "should send dashboard and dispatch messages for registered users based on default policies" do
       notification_model(:category => 'TestImmediately')
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       u1.communication_channels.create(:path => "user1@example.com").confirm!
       @a = Assignment.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
-      messages.should_not be_empty
-      messages.length.should eql(2)
-      messages[0].to.should eql("user1@example.com")
-      messages[1].to.should eql("dashboard")
+      expect(messages).not_to be_empty
+      expect(messages.length).to eql(2)
+      expect(messages[0].to).to eql("user1@example.com")
+      expect(messages[1].to).to eql("dashboard")
     end
 
     it "should not dispatch non-immediate message based on default policies" do
       notification_model(:category => 'TestDaily', :name => "Show In Feed")
-      @notification.default_frequency.should eql("daily")
+      expect(@notification.default_frequency).to eql("daily")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
 
       # make the first channel retired, to verify that it'll get an active one
@@ -173,15 +172,15 @@ describe NotificationMessageCreator do
 
       @a = assignment_model
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
-      messages.should_not be_empty
-      messages.length.should eql(1)
-      messages[0].to.should eql("dashboard")
-      DelayedMessage.all.should_not be_empty
-      DelayedMessage.last.should_not be_nil
-      DelayedMessage.last.notification_id.should eql(@notification.id)
-      DelayedMessage.last.communication_channel_id.should eql(cc.id)
-      DelayedMessage.last.root_account_id.should eql Account.default.id
-      DelayedMessage.last.send_at.should > Time.now.utc
+      expect(messages).not_to be_empty
+      expect(messages.length).to eql(1)
+      expect(messages[0].to).to eql("dashboard")
+      expect(DelayedMessage.all).not_to be_empty
+      expect(DelayedMessage.last).not_to be_nil
+      expect(DelayedMessage.last.notification_id).to eql(@notification.id)
+      expect(DelayedMessage.last.communication_channel_id).to eql(cc.id)
+      expect(DelayedMessage.last.root_account_id).to eql Account.default.id
+      expect(DelayedMessage.last.send_at).to be > Time.now.utc
     end
 
     it "should make a delayed message for each user policy with a delayed frequency" do
@@ -221,31 +220,31 @@ describe NotificationMessageCreator do
                                 :frequency => 'immediately')
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
     end
-  
+
     it "should send dashboard (but not dispatch messages) for registered users based on default policies" do
       notification_model(:category => 'TestNever', :name => "Show In Feed")
-      @notification.default_frequency.should eql("never")
+      expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       u1.communication_channels.create(:path => "user1@example.com").confirm!
       @a = Assignment.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
-      messages.should_not be_empty
-      messages.length.should eql(1)
-      messages[0].to.should eql("dashboard")
+      expect(messages).not_to be_empty
+      expect(messages.length).to eql(1)
+      expect(messages[0].to).to eql("dashboard")
     end
-    
+
     it "should not send dashboard messages for non-feed or non-dashboard messages" do
       notification_model(:category => 'TestNever', :name => "Don't Show In Feed")
-      @notification.default_frequency.should eql("never")
+      expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       u1.communication_channels.create(:path => "user1@example.com").confirm!
       @a = Assignment.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
-      messages.should be_empty
+      expect(messages).to be_empty
       @notification.name = "Show In Feed"
       @notification.category = "Summaries"
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
-      messages.should be_empty
+      expect(messages).to be_empty
     end
 
     it "should replace messages when a similar notification occurs" do
@@ -254,58 +253,58 @@ describe NotificationMessageCreator do
       all_messages = []
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       all_messages += messages
-      messages.length.should eql(2)
+      expect(messages.length).to eql(2)
       m1 = messages.first
       m2 = messages.last
 
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       all_messages += messages
-      messages.should_not be_empty
-      messages.length.should eql(2)
+      expect(messages).not_to be_empty
+      expect(messages.length).to eql(2)
 
-      all_messages.select {|m| 
+      expect(all_messages.select {|m|
         m.to == m1.to and m.notification == m1.notification and m.communication_channel == m1.communication_channel
-      }.length.should eql(2)
+      }.length).to eql(2)
 
-      all_messages.select {|m| 
+      expect(all_messages.select {|m|
         m.to == m2.to and m.notification == m2.notification and m.communication_channel == m2.communication_channel
-      }.length.should eql(2)
+      }.length).to eql(2)
     end
 
     it "should create stream items" do
       notification_set(:notification_opts => {:name => "Show In Feed"})
-      @user.stream_item_instances.count.should == 0
+      expect(@user.stream_item_instances.count).to eq 0
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      @user.stream_item_instances.count.should == 1
+      expect(@user.stream_item_instances.count).to eq 1
       si = @user.stream_item_instances.first.stream_item
-      si.asset_type.should == 'Message'
-      si.asset_id.should be_nil
+      expect(si.asset_type).to eq 'Message'
+      expect(si.asset_id).to be_nil
     end
 
     it "should not get confused with nil values in the to list" do
       notification_set
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => nil).create_message
-      messages.should be_empty
+      expect(messages).to be_empty
     end
 
     it "should not send messages after the user's limit" do
       notification_set
-      NotificationPolicy.count.should == 1
+      expect(NotificationPolicy.count).to eq 1
       Rails.cache.delete(['recent_messages_for', @user.id].cache_key)
       User.stubs(:max_messages_per_day).returns(1)
-      User.max_messages_per_day.times do 
+      User.max_messages_per_day.times do
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-        messages.select{|m| m.to != 'dashboard'}.should_not be_empty
+        expect(messages.select{|m| m.to != 'dashboard'}).not_to be_empty
       end
-      DelayedMessage.count.should eql(0)
+      expect(DelayedMessage.count).to eql(0)
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.select{|m| m.to != 'dashboard'}.should be_empty
-      DelayedMessage.count.should eql(1)
-      NotificationPolicy.count.should == 2
+      expect(messages.select{|m| m.to != 'dashboard'}).to be_empty
+      expect(DelayedMessage.count).to eql(1)
+      expect(NotificationPolicy.count).to eq 2
       # should not create more dummy policies
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.select{|m| m.to != 'dashboard'}.should be_empty
-      NotificationPolicy.count.should == 2
+      expect(messages.select{|m| m.to != 'dashboard'}).to be_empty
+      expect(NotificationPolicy.count).to eq 2
     end
 
     it "should not send to bouncing channels" do
@@ -313,12 +312,12 @@ describe NotificationMessageCreator do
       @communication_channel.bounce_count = 1
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.select{|m| m.to == 'value for path'}.size.should == 1
+      expect(messages.select{|m| m.to == 'value for path'}.size).to eq 1
 
       @communication_channel.bounce_count = 100
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.select{|m| m.to == 'value for path'}.size.should == 0
+      expect(messages.select{|m| m.to == 'value for path'}.size).to eq 0
     end
 
     it "should not use notification policies for unconfirmed communication channels" do
@@ -326,8 +325,8 @@ describe NotificationMessageCreator do
       cc = communication_channel_model(:workflow_state => 'unconfirmed', :path => "nope")
       notification_policy_model(:communication_channel_id => cc.id, :notification_id => @notification.id)
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.size.should == 2
-      messages.map(&:to).sort.should == ['dashboard', 'value for path']
+      expect(messages.size).to eq 2
+      expect(messages.map(&:to).sort).to eq ['dashboard', 'value for path']
     end
 
     it "should force certain categories to send immediately" do
@@ -353,7 +352,7 @@ describe NotificationMessageCreator do
       }.to change(DelayedMessage, :count).by 0
     end
  end
-  
+
   context "localization" do
     before(:each) do
       notification_set
@@ -362,7 +361,7 @@ describe NotificationMessageCreator do
 
     it "should translate ERB in the notification" do
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.each {|m| m.subject.should eql("This is 5!")}
+      messages.each {|m| expect(m.subject).to eql("This is 5!")}
     end
 
     it "should respect browser locales" do
@@ -370,8 +369,8 @@ describe NotificationMessageCreator do
         @user.browser_locale = 'piglatin'
         @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-        messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
-        I18n.locale.should eql(:en)
+        messages.each {|m| expect(m.subject).to eql("Isthay isay ivefay!")}
+        expect(I18n.locale).to eql(:en)
       end
     end
 
@@ -380,8 +379,8 @@ describe NotificationMessageCreator do
         @user.locale = 'shouty'
         @user.save(validate: false)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-        messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
-        I18n.locale.should eql(:en)
+        messages.each {|m| expect(m.subject).to eql("THIS IS *5*!!!!?!11eleventy1")}
+        expect(I18n.locale).to eql(:en)
       end
     end
 
@@ -391,8 +390,8 @@ describe NotificationMessageCreator do
         @course.enroll_teacher(@user).accept!
         @course.update_attribute(:locale, 'es')
         messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
-        messages.each { |m| m.subject.should eql('El Tigre Chino') }
-        I18n.locale.should eql(:en)
+        messages.each { |m| expect(m.subject).to eql('El Tigre Chino') }
+        expect(I18n.locale).to eql(:en)
       end
     end
 
@@ -402,8 +401,8 @@ describe NotificationMessageCreator do
         @course.account.update_attribute(:default_locale, 'es')
         @course.enroll_teacher(@user).accept!
         messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
-        messages.each { |m| m.subject.should eql('El Tigre Chino') }
-        I18n.locale.should eql(:en)
+        messages.each { |m| expect(m.subject).to eql('El Tigre Chino') }
+        expect(I18n.locale).to eql(:en)
       end
     end
   end
@@ -418,8 +417,8 @@ describe NotificationMessageCreator do
         account = Account.create!
         user_with_pseudonym(:active_all => 1, :account => account)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-        messages.length.should >= 1
-        messages.each { |m| m.shard.should == @shard1 }
+        expect(messages.length).to be >= 1
+        messages.each { |m| expect(m.shard).to eq @shard1 }
       end
     end
 
@@ -431,11 +430,11 @@ describe NotificationMessageCreator do
       end
       notification_model(category: 'TestWeekly')
       Message.any_instance.stubs(:get_template).returns('template')
-      @cc.notification_policies.should be_empty
-      @cc.delayed_messages.should be_empty
+      expect(@cc.notification_policies).to be_empty
+      expect(@cc.delayed_messages).to be_empty
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
-      @cc.notification_policies.reload.should_not be_empty
-      @cc.delayed_messages.reload.should_not be_empty
+      expect(@cc.notification_policies.reload).not_to be_empty
+      expect(@cc.delayed_messages.reload).not_to be_empty
 
     end
 
@@ -451,9 +450,9 @@ describe NotificationMessageCreator do
         )
       end
       Message.any_instance.stubs(:get_template).returns('template')
-      @cc.notification_policies.reload.count.should == 1
+      expect(@cc.notification_policies.reload.count).to eq 1
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
-      @cc.notification_policies.reload.count.should == 1
+      expect(@cc.notification_policies.reload.count).to eq 1
     end
   end
 end

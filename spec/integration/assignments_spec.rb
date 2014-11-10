@@ -45,8 +45,8 @@ describe "assignments" do
     course_with_teacher_logged_in(:course => @course, :active_all => true)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-    response.should be_success
-    Nokogiri::HTML(response.body).at_css('.graded_count').text.should match(/0 out of 2/)
+    expect(response).to be_success
+    expect(Nokogiri::HTML(response.body).at_css('.graded_count').text).to match(/0 out of 2/)
   end
 
   it "should correctly list ungraded and total submissions for ta" do
@@ -59,8 +59,8 @@ describe "assignments" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-    response.should be_success
-    Nokogiri::HTML(response.body).at_css('.graded_count').text.should match(/0 out of 1/)
+    expect(response).to be_success
+    expect(Nokogiri::HTML(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
   end
 
   it "should show student view student submission as needing grading" do
@@ -71,8 +71,8 @@ describe "assignments" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-    response.should be_success
-    Nokogiri::HTML(response.body).at_css('.graded_count').text.should match(/0 out of 1/)
+    expect(response).to be_success
+    expect(Nokogiri::HTML(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
   end
 
   describe "due date overrides" do
@@ -90,8 +90,8 @@ describe "assignments" do
       get "courses/#{@course.id}/assignments/#{@assignment.id}"
 
       doc = Nokogiri::HTML(response.body)
-      doc.css(".assignment_dates").text.should include "Everyone"
-      doc.css(".assignment_dates").text.should_not include "Everyone else"
+      expect(doc.css(".assignment_dates").text).to include "Everyone"
+      expect(doc.css(".assignment_dates").text).not_to include "Everyone else"
     end
 
     it "should show 'Everyone else' when some sections have due date overrides" do
@@ -101,7 +101,7 @@ describe "assignments" do
       get "courses/#{@course.id}/assignments/#{@assignment.id}"
 
       doc = Nokogiri::HTML(response.body)
-      doc.css(".assignment_dates").text.should include "Everyone else"
+      expect(doc.css(".assignment_dates").text).to include "Everyone else"
     end
 
     it "should not show 'Everyone else' when all sections have due date overrides" do
@@ -112,7 +112,7 @@ describe "assignments" do
       get "courses/#{@course.id}/assignments/#{@assignment.id}"
 
       doc = Nokogiri::HTML(response.body)
-      doc.css(".assignment_dates").text.should_not include "Everyone"
+      expect(doc.css(".assignment_dates").text).not_to include "Everyone"
     end
   end
 end
@@ -139,20 +139,20 @@ describe "download submissions link" do
   it "should not show download submissions button with no submissions" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#download_submission_button').should be_nil
+    expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
   it "should show download submissions button with submission not graded" do
 
     @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
-    @submission.state.should eql(:submitted)
+    expect(@submission.state).to eql(:submitted)
     @submission.save!
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#download_submission_button').should_not be_nil
+    expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
   it "should show download submissions button with a submission graded" do
@@ -161,13 +161,13 @@ describe "download submissions link" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    @submission.state.should eql(:graded)
+    expect(@submission.state).to eql(:graded)
     @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
     @submission2.save!
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#download_submission_button').should_not be_nil
+    expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
   it "should show download submissions button with all submissions graded" do
@@ -176,28 +176,28 @@ describe "download submissions link" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    @submission.state.should eql(:graded)
+    expect(@submission.state).to eql(:graded)
     @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
     @submission2.grade_it
     @submission2.score = 5
     @submission2.save!
-    @submission2.state.should eql(:graded)
+    expect(@submission2.state).to eql(:graded)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#download_submission_button').should_not be_nil
+    expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
   it "should not show download submissions button to students" do
 
     @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
-    @submission.state.should eql(:submitted)
+    expect(@submission.state).to eql(:submitted)
     @submission.save!
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#download_submission_button').should be_nil
+    expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
 end
@@ -224,23 +224,23 @@ describe "ratio of submissions graded" do
   it "should not show ratio of submissions graded with no submissions" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#ratio_of_submissions_graded').should be_nil
+    expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
   end
 
   it "should show ratio of submissions graded with submission not graded" do
 
     @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
     @submission.save!
-    @submission.state.should eql(:submitted)
+    expect(@submission.state).to eql(:submitted)
     @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
-    @submission2.state.should eql(:submitted)
+    expect(@submission2.state).to eql(:submitted)
     @submission2.save!
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#ratio_of_submissions_graded').text.strip.should == "0 out of 2 Submissions Graded"
+    expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "0 out of 2 Submissions Graded"
   end
 
   it "should show ratio of submissions graded with a submission graded" do
@@ -249,14 +249,14 @@ describe "ratio of submissions graded" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    @submission.state.should eql(:graded)
+    expect(@submission.state).to eql(:graded)
     @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
-    @submission2.state.should eql(:submitted)
+    expect(@submission2.state).to eql(:submitted)
     @submission2.save!
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#ratio_of_submissions_graded').text.strip.should == "1 out of 2 Submissions Graded"
+    expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "1 out of 2 Submissions Graded"
   end
 
   it "should show ratio of submissions graded with all submissions graded" do
@@ -266,28 +266,28 @@ describe "ratio of submissions graded" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    @submission.state.should eql(:graded)
+    expect(@submission.state).to eql(:graded)
     @submission2 = Submission.new(:assignment => @assignment, :user => @student2, :submission_type => 'online_url')
     @submission2.grade_it
     @submission2.score = 5
     @submission2.save!
-    @submission2.state.should eql(:graded)
+    expect(@submission2.state).to eql(:graded)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#ratio_of_submissions_graded').text.strip.should == "2 out of 2 Submissions Graded"
+    expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "2 out of 2 Submissions Graded"
   end
 
   it "should not show ratio of submissions graded to students" do
 
     @submission = Submission.new(:assignment => @assignment, :user => @student, :submission_type => 'online_url')
-    @submission.state.should eql(:submitted)
+    expect(@submission.state).to eql(:submitted)
     @submission.save!
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    response.should be_success
+    expect(response).to be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('#ratio_of_submissions_graded').should be_nil
+    expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
   end
 
 end

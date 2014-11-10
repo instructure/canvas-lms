@@ -5,7 +5,7 @@ describe "manage groups students" do
   include_examples "in-process server selenium tests"
 
   before (:each) do
-    pending
+    skip
 		#course_with_teacher_logged_in
     #Account.default.settings[:enable_manage_groups2] = false
     #Account.default.save!
@@ -18,7 +18,7 @@ describe "manage groups students" do
       f(".add_category_link").click
       form = f("#add_category_form")
       form.find_element(:css, ".self_signup_help_link").click
-      f("#self_signup_help_dialog").should be_displayed
+      expect(f("#self_signup_help_dialog")).to be_displayed
     end
 
     it "should move students from a deleted group back to unassigned" do
@@ -29,16 +29,16 @@ describe "manage groups students" do
 
       get "/courses/#{@course.id}/groups"
       category = fj(".group_category:visible")
-      category.find_elements(:css, ".group_blank .user_id_#{student.id}").should be_empty
+      expect(category.find_elements(:css, ".group_blank .user_id_#{student.id}")).to be_empty
 
       driver.execute_script("$('#group_#{group.id} .delete_group_link').hover().click()") #move_to occasionally breaks in the hudson build
       keep_trying_until do
-        driver.switch_to.alert.should_not be_nil
+        expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
         true
       end
       wait_for_ajaximations
-      category.find_elements(:css, ".group_blank .user_id_#{student.id}").should_not be_empty
+      expect(category.find_elements(:css, ".group_blank .user_id_#{student.id}")).not_to be_empty
     end
 
     it "should list all sections a student belongs to" do
@@ -55,10 +55,10 @@ describe "manage groups students" do
       wait_for_ajaximations
 
       sections = f(".user_id_#{@student.id} .section_code")
-      sections.should include_text(@course.default_section.name)
-      sections.should include_text(@other_section.name)
+      expect(sections).to include_text(@course.default_section.name)
+      expect(sections).to include_text(@other_section.name)
 
-      f("#category_#{gc1.id} .group_blank .user_count").should include_text("1")
+      expect(f("#category_#{gc1.id} .group_blank .user_count")).to include_text("1")
     end
 
     it "should not show sections for students when managing from an account" do
@@ -71,8 +71,8 @@ describe "manage groups students" do
       get "/accounts/#{@account.id}/groups"
       wait_for_ajaximations
 
-      f(".group_blank .user_id_#{@student.id} .name").should include_text @student.sortable_name
-      f(".group_blank .user_id_#{@student.id} .section_code").text.should be_blank
+      expect(f(".group_blank .user_id_#{@student.id} .name")).to include_text @student.sortable_name
+      expect(f(".group_blank .user_id_#{@student.id} .section_code").text).to be_blank
     end
 
     it "should paginate and count users correctly" do
@@ -95,15 +95,15 @@ describe "manage groups students" do
       category = f(".group_category")
       unassigned_div = category.find_element(:css, ".group_blank")
 
-      unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
-      unassigned_div.find_elements(:css, ".student").length.should == 15
+      expect(unassigned_div.find_element(:css, ".user_count")).to include_text(students_count.to_s)
+      expect(unassigned_div.find_elements(:css, ".student").length).to eq 15
       # 15 comes from window.contextGroups.autoLoadGroupThreshold
 
       f(".next_page").click
       wait_for_ajaximations
 
-      unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
-      unassigned_div.find_elements(:css, ".student").length.should == 5
+      expect(unassigned_div.find_element(:css, ".user_count")).to include_text(students_count.to_s)
+      expect(unassigned_div.find_elements(:css, ".student").length).to eq 5
     end
 
     it "should not include student view student in the unassigned student list at the course level" do
@@ -113,7 +113,7 @@ describe "manage groups students" do
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
-      ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+      expect(ffj(".group_category:visible .user_id_#{@fake_student.id}")).to be_empty
     end
 
     it "should not include student view student in the unassigned student list at the account level" do
@@ -125,7 +125,7 @@ describe "manage groups students" do
       get "/accounts/#{@account.id}/groups"
       wait_for_ajaximations
 
-      ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+      expect(ffj(".group_category:visible .user_id_#{@fake_student.id}")).to be_empty
     end
   end
 
@@ -140,26 +140,26 @@ describe "manage groups students" do
       unassigned_div = category.find_element(:css, ".group_blank")
       group1_div = category.find_element(:css, "#group_#{groups[0].id}")
       group2_div = category.find_element(:css, "#group_#{groups[1].id}")
-      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(unassigned_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
 
       # from unassigned to group1
       # drag_and_drop version doesn't work for some reason
       # driver.action.drag_and_drop(john_li, group1_div).perform
       simulate_group_drag(student.id, "blank", groups[0].id)
-      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
-      group1_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(unassigned_div.find_elements(:css, ".user_id_#{student.id}")).to be_empty
+      expect(group1_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
 
       # from group1 to group2
       # driver.action.drag_and_drop(john_li, group2_div).perform
       simulate_group_drag(student.id, groups[0].id, groups[1].id)
-      group1_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
-      group2_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(group1_div.find_elements(:css, ".user_id_#{student.id}")).to be_empty
+      expect(group2_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
 
       # from group2 to unassigned
       # driver.action.drag_and_drop(john_li, unassigned_div).perform
       simulate_group_drag(student.id, groups[1].id, "blank")
-      group2_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
-      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(group2_div.find_elements(:css, ".user_id_#{student.id}")).to be_empty
+      expect(unassigned_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
     end
 
     it "should not remove a user from the old group if the category is student organized unless dragging to unassigned" do
@@ -173,26 +173,26 @@ describe "manage groups students" do
       unassigned_div = category.find_element(:css, ".group_blank")
       group1_div = category.find_element(:css, "#group_#{groups[0].id}")
       group2_div = category.find_element(:css, "#group_#{groups[1].id}")
-      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(unassigned_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
 
       # from unassigned to group1
       # drag_and_drop version doesn't work for some reason
       # driver.action.drag_and_drop(john_li, group1_div).perform
       simulate_group_drag(student.id, "blank", groups[0].id)
-      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
-      group1_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(unassigned_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
+      expect(group1_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
 
       # from group1 to group2
       # driver.action.drag_and_drop(john_li, group2_div).perform
       simulate_group_drag(student.id, groups[0].id, groups[1].id)
-      group1_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
-      group2_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(group1_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
+      expect(group2_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
 
       # from group2 to unassigned
       # driver.action.drag_and_drop(john_li, unassigned_div).perform
       simulate_group_drag(student.id, groups[1].id, "blank")
-      group2_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
-      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      expect(group2_div.find_elements(:css, ".user_id_#{student.id}")).to be_empty
+      expect(unassigned_div.find_elements(:css, ".user_id_#{student.id}")).not_to be_empty
     end
 
     it "should check all user sections for a section specific group" do
@@ -224,24 +224,24 @@ describe "manage groups students" do
       wait_for_ajaximations
 
       3.times { |i| groups[i].reload }
-      groups[0].users.length.should == 2
-      groups[1].users.length.should == 1
-      groups[2].users.length.should == 1
+      expect(groups[0].users.length).to eq 2
+      expect(groups[1].users.length).to eq 1
+      expect(groups[2].users.length).to eq 1
 
       simulate_group_drag(students[3].id, groups[0].id, groups[1].id)
       wait_for_ajaximations
 
       3.times { |i| groups[i].reload }
-      groups[0].users.length.should == 1
-      groups[1].users.length.should == 2
-      groups[2].users.length.should == 1
+      expect(groups[0].users.length).to eq 1
+      expect(groups[1].users.length).to eq 2
+      expect(groups[2].users.length).to eq 1
       simulate_group_drag(students[3].id, groups[1].id, groups[2].id)
       wait_for_ajaximations
 
       3.times { |i| groups[i].reload }
-      groups[0].users.length.should == 1
-      groups[1].users.length.should == 2
-      groups[2].users.length.should == 1
+      expect(groups[0].users.length).to eq 1
+      expect(groups[1].users.length).to eq 2
+      expect(groups[2].users.length).to eq 1
     end
 
     it "should prevent you from loading a paginated group list page that would be empty" do
@@ -262,7 +262,7 @@ describe "manage groups students" do
       f(".unassigned_members_pagination .next_page").click
       wait_for_ajaximations
 
-      ff(".group_blank .student").length.should == 15
+      expect(ff(".group_blank .student").length).to eq 15
     end
   end
 
@@ -277,15 +277,15 @@ describe "manage groups students" do
       driver.execute_script("$('.delete_category_link').click()")
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
-      ff(".left_side .group").should be_empty
+      expect(ff(".left_side .group")).to be_empty
       wait_for_ajaximations
-      @course.group_categories.all.count.should == 0
+      expect(@course.group_categories.all.count).to eq 0
     end
 
     it "should edit an individual group" do
       get "/courses/#{@course.id}/groups"
       group = add_group_to_category(@courses_group_category, "group 1")
-      group.should_not be_nil
+      expect(group).not_to be_nil
       f("#group_#{group.id}").click
       wait_for_ajaximations
       f("#group_#{group.id} .edit_group_link").click
@@ -295,7 +295,7 @@ describe "manage groups students" do
       submit_form("#edit_group_form")
       wait_for_ajaximations
       group = @course.groups.find_by_name(name)
-      group.should_not be_nil
+      expect(group).not_to be_nil
     end
 
 
@@ -307,7 +307,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajaximations
-      ff(".left_side .group").should be_empty
+      expect(ff(".left_side .group")).to be_empty
       @course.group_categories.last.groups.last.workflow_state =='deleted'
     end
   end
@@ -315,12 +315,12 @@ describe "manage groups students" do
   context "assign_students_link" do
     def assign_students(category)
       assign_students = fj("#category_#{category.id} .assign_students_link:visible")
-      assign_students.should_not be_nil
+      expect(assign_students).not_to be_nil
       assign_students.click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajax_requests
-      keep_trying_until { f('.right_side .group .user_count').text.should == '0 students' }
+      keep_trying_until { expect(f('.right_side .group .user_count').text).to eq '0 students' }
     end
 
     before (:each) do
@@ -331,33 +331,33 @@ describe "manage groups students" do
 
     it "should be visible iff category is not restricted self signup" do
       new_category = add_category(@course, "Unrestricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => false)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
+      expect(fj("#category_#{new_category.id} .assign_students_link:visible")).not_to be_nil
 
       edit_category(:restrict_self_signup => true)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
+      expect(fj("#category_#{new_category.id} .assign_students_link:visible")).to be_nil
 
       new_category = add_category(@course, "Restricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => true)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
+      expect(fj("#category_#{new_category.id} .assign_students_link:visible")).to be_nil
 
       edit_category(:restrict_self_signup => false)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
+      expect(fj("#category_#{new_category.id} .assign_students_link:visible")).not_to be_nil
     end
 
     it "should assign students in DB and in UI" do
       expected_display_name = 'Doe, John'
-      keep_trying_until { f('.right_side .student_list .student .name').should include_text(expected_display_name) }
-      @student.groups.should be_empty
+      keep_trying_until { expect(f('.right_side .student_list .student .name')).to include_text(expected_display_name) }
+      expect(@student.groups).to be_empty
 
       assign_students(@category)
 
       @student.reload
-      keep_trying_until { @student.groups.size.should == 1 }
+      keep_trying_until { expect(@student.groups.size).to eq 1 }
       group = @student.groups.first
 
-      f('.right_side .student_list').should_not include_text(expected_display_name)
+      expect(f('.right_side .student_list')).not_to include_text(expected_display_name)
       group_element = fj("#category_#{@category.id} #group_#{group.id} .user_id_#{@student.id}")
-      group_element.should_not be_nil
-      group_element.should include_text(expected_display_name)
+      expect(group_element).not_to be_nil
+      expect(group_element).to include_text(expected_display_name)
     end
 
     it "should give 'Nothing to do.' error flash if no unassigned students" do
@@ -374,7 +374,7 @@ describe "manage groups students" do
     it "should give Assigning Students... visual feedback" do
       #pending "causes whatever spec follows this to fail even in different files"
       assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
-      assign_students.should_not be_nil
+      expect(assign_students).not_to be_nil
       assign_students.click
       # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
       lock = Mutex.new
@@ -383,7 +383,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
-      loading.text.should == 'Assigning Students...'
+      expect(loading.text).to eq 'Assigning Students...'
       lock.unlock
       UsersController._process_action_callbacks.pop
 

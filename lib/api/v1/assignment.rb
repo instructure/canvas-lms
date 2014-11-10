@@ -133,6 +133,7 @@ module Api::V1::Assignment
 
     if assignment.quiz
       hash['quiz_id'] = assignment.quiz.id
+      hash['hide_download_submissions_button'] = !assignment.quiz.has_file_upload_question?
       hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
     end
 
@@ -200,11 +201,11 @@ module Api::V1::Assignment
       hash['unpublishable'] = assignment.can_unpublish?
     end
 
-    if assignment.context.feature_enabled?(:differentiated_assignments)
+    if opts[:differentiated_assignments_enabled] || (opts[:differentiated_assignments_enabled] != false && assignment.context.feature_enabled?(:differentiated_assignments))
       hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
 
       if opts[:include_visibility]
-        hash['assignment_visibility'] = assignment.students_with_visibility.pluck(:id).uniq
+        hash['assignment_visibility'] = opts[:assignment_visibilities] || assignment.students_with_visibility.pluck(:id).uniq
       end
     end
 

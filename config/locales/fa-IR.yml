@@ -1123,6 +1123,11 @@ fa-IR:
         one: "%{file_size} *از%{count} فایل*"
         other: "%{file_size} *از%{count} فایل*"
       uploaded_file_storage_header: "ذخیره فایل بارگذاری شده"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "درس های دارای تکلیف های غیرفعال ممکن است نمره های موجود در این گزارش را به طور دقیق نمایش ندهند."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2584,6 +2589,7 @@ fa-IR:
     messages_sent: "پیام ها ارسال شدند"
     missing_due_date_dialog: 
       buttons: 
+        continue: ادامه
         goBack: بازگشت
         noDueDate: "تاریخ مهلت موجود نیست"
       modal: 
@@ -4035,30 +4041,13 @@ fa-IR:
       unstar_conversation: "برداشتن ستاره گفتگو"
     message_deleted: "پیام حذف شد!"
     message_detail: 
+      delete: حذف
+      forward: "ارسال به دیگری"
+      message_actions: "عملکردهای پیام"
+      more_options: "گزینه‌های دیگر"
       no_subject: "موضوع موجود نیست"
-    message_form: 
-      buttons: 
-        reply: پاسخ
-        reply_all: "پاسخ به همه"
-        send_message: ارسال
-      headings: 
-        new_message: "پیام جدید"
-      inbox_actions: 
-        add_people: "افزودن افراد"
-      labels: 
-        add_to_faculty_journal: "افزودن به عنوان ورودی ژورنال هیأت علمی"
-        group_conversation: "یک گفتگوی گروهی است. شرکت کنندگان پاسخ همه را می بینند"
-        message: "پیام:"
-        to: "گیرنده:"
-      links: 
-        add_attachment: پیوست
-        media_comment: "ضبط کردن"
-      media_comment: "نظر رسانه ای"
-      titles: 
-        add_attachment: "افزودن پیوست"
-        media_comment: "نظر رسانه ای ضبط شده"
-        record_media_comment: "ضبط یک نظر صوتی یا تصویری"
-        remove_media_comment: "حذف نظر رسانه ای"
+      reply: پاسخ
+      reply_all: "پاسخ به همه"
     message_form_dialog: 
       body: "متن اصلی"
       headings: 
@@ -4109,7 +4098,6 @@ fa-IR:
     other_recipients: 
       one: "و %{count} نفر دیگر"
       other: "و %{count} نفر دیگر"
-    search_category: "جستجوی  %{category}"
     star: "ستاره دار کردن"
     star_conversation: "ستاره دار کردن گفتگو"
     titles: 
@@ -4124,6 +4112,9 @@ fa-IR:
     batch_update_message: 
       one: "%{count} درس پردازش شد"
       other: "%{count} درس پردازش شد"
+    course_format: 
+      not_set: "تعیین نشده"
+      online: آنلاین
     course_not_found: "درس مورد نظر یافت نشد"
     csv: 
       comments: نظرها
@@ -4697,6 +4688,7 @@ fa-IR:
         allow_student_organized_groups: "اجازه دادن به دانشجویان برای سازماندهی گروه های خود"
         conclude_at: "پایان در"
         course_code: "رمز درس"
+        course_format: قالب
         course_lock_all_announcements: "غیر فعال سازی نظرها در اطلاعیه ها"
         course_name: نام
         course_section_name: "افزودن یک بخش جدید"
@@ -5011,8 +5003,6 @@ fa-IR:
       student: 
         count: "تعداد دانشجویانی که اشتباه پاسخ داده اند"
         ratio: "نسبت دانشجویانی که اشتباه پاسخ داده اند"
-  current_uploads: 
-    close: بستن
   curve_grades_dialog: 
     average_score: "میانگین نمره"
     buttons: 
@@ -6221,6 +6211,13 @@ fa-IR:
     post_grades: "ارسال نمره ها به سامانه اطلاعات دانشجو"
     student_groups: "صفحه جدید گروه های دانشجو"
     student_outcome_gradebook: "دفتر نمره تسلط یادگیری دانشجو"
+  file_preview: 
+    file_preview_headerbutton_close: بستن
+    file_preview_hide: "مخفی کردن"
+    file_preview_infotable_name: نام
+    file_preview_show: نمایش
+  file_rename_form: 
+    name: نام
   filebrowserview: 
     course_files: "فایل های درس"
     group_files: "فایل های گروه"
@@ -6255,6 +6252,7 @@ fa-IR:
       uploading_zip: "خطاهایی در هنگام بارگذاری فایل فشرده رخ داد."
     fields: 
       file: فایل
+    files_page_title: "فایل ها"
     full_index: 
       alts: 
         file_locked: "قفل شده"
@@ -6438,6 +6436,7 @@ fa-IR:
       no_students_in_groups_close: "متأسفانه موردهای ارسالی این تکلیف را نمی توان در برنامه نمره گذاری سریع نمره گذاری کرد، زیرا کاربری به آن تخصیص داده نشده است. لطفا کاربران را به این مجموعه گروه تخصیص دهید و دوباره سعی کنید. روی دکمه 'تایید' کلیک کنید تا این پنجره بسته شود."
       no_students_in_section: "هیچ دانشجویی در این بخش یافت نشد، در حال بازگشت برای نشان دادن همه بخش ها."
     buttons: 
+      dialog_buttons: لغو
       saving_settings: "در حال ذخیره سازی تنظیمات..."
       submit_comment: "ارسال نظر"
       submitting: "درحال ارسال..."
@@ -6471,7 +6470,6 @@ fa-IR:
     student: دانشجو
     student_mute_notification: "استاد روی نمره ها کار می کند"
     titles: 
-      click_to_record: "برای ضبط نظرهای خود، روی میکروفن کلیک کنید"
       dropped_assignment_no_total: "این تکلیف در محاسبه کل در نظر گرفته نخواهد شد"
       hypothetical_score: "این نمره، یک نمره احتمالی است"
     turnitin: 
@@ -6713,7 +6711,6 @@ fa-IR:
         out_of: از
         score: نمره
       icons: 
-        rubric_results: "مشاهده نتایج دستورالعمل ارزیابی"
         turnitin_results: "مشاهده نتایج Turnitin"
       labels: 
         final_grade_hidden: "محاسبه نمره کل غیر فعال شده است"
@@ -7168,6 +7165,11 @@ fa-IR:
         assign_user_to_group: "تخصیص دادن کاربر به این گروه"
         assign_user_to_group_name: "تخصیص دادن کاربر به گروه %{name}"
         no_groups_created: "قبل از این که بتوان کاربران را اضافه کرد، گروه ها باید ایجاد شوند."
+      auto_leadership_controls: 
+        auto_first_group_leader: "قرار دادن اولین دانشجو برای پیوستن به عنوان سرگروه"
+        auto_group_leader: "تخصیص دادن خودکار یک سرگروه دانشجویی"
+        auto_random_group_leader: "تعیین یک دانشجوی تصادفی به عنوان سرگروه"
+        leadership: ریاست
       edit_group_assignment: 
         all_available_groups_full: "ظرفیت همه گروه های موجود تکمیل است."
         all_groups_full_suggestion: "حداکثر ظرفیت گروه را تغییر دهید یا گروه های بیشتر اضافه کنید."
@@ -7192,15 +7194,11 @@ fa-IR:
         search_users: "جستجوی کاربران"
       group_category_create: 
         allow_self_signup: "اجازه دادن برای ثبت نام شخصی"
-        auto_first_group_leader: "قرار دادن اولین دانشجو برای پیوستن به عنوان سرگروه"
-        auto_group_leader: "تخصیص دادن خودکار یک سرگروه دانشجویی"
-        auto_random_group_leader: "تعیین یک دانشجوی تصادفی به عنوان سرگروه"
         cancel: لغو
         create_groups: "اکنون %h{num_groups} گروه ایجاد شود"
         create_groups_manually: "گروه ها را به طور دستی ایجاد خواهم کرد"
         group_set_name: "نام مجموعه گروه"
         group_structure: "ساختار گروه"
-        leadership: ریاست
         leave_group_limit_blank: "برای عدم محدودیت، خالی بگذارید"
         limit_group_size: "محدود کردن گروه ها به داشتن %h{group_limit} عضو"
         require_same_section: "نیازمند این است که اعضای گروه در بخش یکسانی باشند"
@@ -7777,7 +7775,6 @@ fa-IR:
       media_contribution: "ارائه رسانه ای"
       play_comment: "پخش نظر رسانه ای"
       record_upload_media_comment: "ضبط/بارگذاری نظر رسانه ای"
-    track_uploaded_successfully: "شیار با موفقیت بارگذاری شد، صفحه را تازه سازی کنید تا آن را ببینید."
     upload: بارگذاری
     uploading: "درحال بارگذاری..."
   menu: 
@@ -10073,6 +10070,15 @@ fa-IR:
     : خیر
     ? "yes"
     : بله
+  orbis_report_header_assignment_id: "شناسه تکلیف"
+  orbis_report_header_assignment_title: "عنوان تکلیف"
+  orbis_report_header_canvas_course_id: "شناسه درس"
+  orbis_report_header_course_name: "نام درس"
+  orbis_report_header_course_sis_id: "شناسه درس در سامانه اطلاعات دانشجو"
+  orbis_report_header_points_possible: "امتیازهای ممکن"
+  orbis_report_header_student_canvas_id: "شناسه کاربری کانواس"
+  orbis_report_header_student_name: "نام دانشجو"
+  orbis_report_header_submission_score: "نمره مورد ارسالی"
   outcome_groups: 
     invalid_file: "فایل گروه نتیجه معتبر نیست"
   outcome_groups_api: 
@@ -11921,14 +11927,11 @@ fa-IR:
           save: "ذخیره سازی"
         end_quiz_reference_time_current_end: "زمان پایان فعلی"
         end_quiz_reference_time_now: اکنون
-        end_quiz_when: "پایان دادن به آزمون در %{n} دقیقه از %{reference_time}"
         extended_quiz_time_explanation: "می توانید به این دانشجو برای آزمون فعلی زمان اضافی بدهید. چقدر می خواهید به آنها زمان بدهید؟"
         finished_in: "تکمیل شده در %{duration}"
-        global_extra_attempts: "همه از قبل %{n} می گیرند"
         headers: 
           attempt: تلاش
           attempts_left: "تلاش های باقیمانده"
-          extended_quiz_time: "تمدید مهلت آزمون"
           score: نمره
           student: دانشجو
           student_extensions: "تمدید زمان دانشجویان"
@@ -11937,15 +11940,14 @@ fa-IR:
         labels: 
           ending: "در حال اتمام"
           extra_attempts: "تلاش های اضافی "
-          extra_time_per_attempt: "زمان اضافی برای هر تلاش"
           manually_unlock: "قفل گشایی دستی آزمون برای تلاش بعدی"
           reset_has_seen_results: "اجازه داده شود که دانشجو نتایج را یک بار دیگر مشاهده کند"
           started: "شروع شده"
         minutes: دقیقه
         moderate_page_title: "%{title}: تعدیل سازی"
         page_title: "تعدیل سازی آزمون"
-        student_gets_extra_time: "*%{student_name}* **%{extra_time}دقیقه ی اضافی برای هر تلاش می گیرد**"
         student_n: "دانشجو %{n}"
+        submitting: "در حال ارسال..."
         titles: 
           change_user_extensions: "تغییر دادن تمدید زمان کاربر"
           manually_unlocked: "قفل گشایی شده به طور دستی"
@@ -12457,8 +12459,8 @@ fa-IR:
   react_files: 
     add_folder: "افزودن پوشه"
     cancel: لغو
-    confirm_delete: "مطمئنید که می خواهید %{name} حذف شود؟"
     created_at_short: "ایجاد شده"
+    delete: حذف
     errors: 
       no_match: 
         keywords: "واژه های کلیدی دیگری را امتحان کنید."
@@ -12467,6 +12469,7 @@ fa-IR:
         three_chars: "حداقل 3 حرف را در کادر جستجو وارد کنید."
         your_search: "جستجوی شما - \"%{search_term}\" - با هیچ فایلی مطابقت نداشت."
     files: "فایل ها"
+    files_heading: "فایل ها"
     loading_more_results: "در حال بارگذاری نتایج بیشتر..."
     name: نام
     search_for_files: "جستجوی فایل ها"
@@ -12535,8 +12538,7 @@ fa-IR:
       cancel: لغو
       update: "بهنگام سازی"
     label: 
-      availableFrom: از
-      availableUntil: تا
+      availableUntil: "قفل کردن تا تاریخ"
     options: 
       publish: 
         description: انتشار

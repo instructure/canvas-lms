@@ -34,7 +34,7 @@ describe "Sessions Timeout" do
       before do 
         user_with_pseudonym({:active_user => true})
         login_as
-        f('.user_name').text.should == @user.primary_pseudonym.unique_id
+        expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
       end
 
       it "logs the user out after 3 seconds" do

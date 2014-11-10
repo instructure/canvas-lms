@@ -29,12 +29,12 @@ module BroadcastPolicies
 
       describe "#should_dispatch_assignment_created?" do
         it 'is true when an assignment is published' do
-          policy.should_dispatch_assignment_created?.should be_true
+          expect(policy.should_dispatch_assignment_created?).to be_truthy
         end
 
         def wont_send_when
           yield
-          policy.should_dispatch_assignment_created?.should be_false
+          expect(policy.should_dispatch_assignment_created?).to be_falsey
         end
 
         specify {
@@ -50,12 +50,12 @@ module BroadcastPolicies
 
     describe "#should_dispatch_assignment_created?" do
       it 'is true when an assignment is created' do
-        policy.should_dispatch_assignment_created?.should be_true
+        expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
 
       def wont_send_when
         yield
-        policy.should_dispatch_assignment_created?.should be_false
+        expect(policy.should_dispatch_assignment_created?).to be_falsey
       end
 
       specify { wont_send_when { context.stubs(:available?).returns false } }
@@ -69,12 +69,12 @@ module BroadcastPolicies
       end
 
       it 'is true when the dependent inputs are true' do
-        policy.should_dispatch_assignment_due_date_changed?.should be_true
+        expect(policy.should_dispatch_assignment_due_date_changed?).to be_truthy
       end
 
       def wont_send_when
         yield
-        policy.should_dispatch_assignment_due_date_changed?.should be_false
+        expect(policy.should_dispatch_assignment_due_date_changed?).to be_falsey
       end
 
       specify { wont_send_when { context.stubs(:available?).returns false } }
@@ -91,12 +91,12 @@ module BroadcastPolicies
       end
 
       it 'is true when the dependent inputs are true' do
-        policy.should_dispatch_assignment_changed?.should be_true
+        expect(policy.should_dispatch_assignment_changed?).to be_truthy
       end
 
       def wont_send_when
         yield
-        policy.should_dispatch_assignment_changed?.should be_false
+        expect(policy.should_dispatch_assignment_changed?).to be_falsey
       end
 
       specify { wont_send_when { context.stubs(:available?).returns false } }

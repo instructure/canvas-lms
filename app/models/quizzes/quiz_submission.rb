@@ -60,12 +60,19 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   before_create :assign_validation_token
 
   has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :events, class_name: 'Quizzes::QuizSubmissionEvent', dependent: :destroy
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
   # has graded the essays.
-  trigger.after(:update).where("NEW.submission_id IS NOT NULL AND OLD.workflow_state <> NEW.workflow_state AND NEW.workflow_state = 'complete'") do
-    "UPDATE submissions SET workflow_state = 'graded' WHERE id = NEW.submission_id"
+  after_update :grade_submission!, if: :just_completed?
+
+  def just_completed?
+    submission_id? && workflow_state_changed? && completed?
+  end
+
+  def grade_submission!
+    submission.update_attribute(:workflow_state, "graded")
   end
 
   serialize :quiz_data
@@ -221,6 +228,20 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
+  def self.needs_grading
+     resp = where("(
+         quiz_submissions.workflow_state = 'untaken'
+         AND quiz_submissions.end_at < :time
+       ) OR
+       (
+         quiz_submissions.workflow_state = 'completed'
+         AND quiz_submissions.submission_data IS NOT NULL
+       )", {time: Time.now})
+     resp.select! { |qs| qs.needs_grading? }
+     resp
+   end
+
+  # There is also a needs_grading scope which needs to replicate this logic
   def needs_grading?(strict=false)
     if strict && self.untaken? && self.overdue?(true)
       true
@@ -549,6 +570,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     self.mark_completed
     Quizzes::SubmissionGrader.new(self).grade_submission
     self
+  end
+
+  def graded?
+    self.submission_data.is_a?(Array)
   end
 
   # Updates a simply_versioned version instance in-place.  We want

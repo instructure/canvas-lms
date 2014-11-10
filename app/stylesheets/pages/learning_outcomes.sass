@@ -136,6 +136,8 @@ h5, .h5
   min-height: 1em
   &.total
     font-weight: bold
+    @if $use_high_contrast
+      color: $textColor
 
 table.criterion .edit
   display: none
@@ -159,7 +161,11 @@ table.criterion .insert
   right: -22px
   cursor: pointer
   a
-    color: $grayLight
+    @if $use_high_contrast
+      color: $textColor
+    @else
+      color: $grayLight
+
     text-decoration: none
   &:hover
     a
@@ -174,8 +180,13 @@ table.criterion .insert
   margin: 0 11px
   border-right: 5px solid transparent
   border-left:  5px solid transparent
-  border-top:   5px solid $grayLight
+  border-top-width: 5px
+  border-top-style: solid
   display: block
+  @if $use_high_contrast
+    border-top-color: $textColor
+  @else
+    border-top-color: $grayLight
 
 .outcomes-points-label
   font-size: 11px

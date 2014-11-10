@@ -8,17 +8,17 @@ describe ContentZipper do
   # This really needs to get refactored at some point.
   def grab_zip
     expect { yield }.to change(Delayed::Job, :count).by(1)
-    response.should be_success
+    expect(response).to be_success
     attachment_id = json_parse['attachment']['id']
-    attachment_id.should be_present
+    expect(attachment_id).to be_present
 
     a = Attachment.find attachment_id
-    a.should be_to_be_zipped
+    expect(a).to be_to_be_zipped
 
     # a second query should just return status
     expect { yield }.to change(Delayed::Job, :count).by(0)
-    response.should be_success
-    json_parse['attachment']['id'].should == a.id
+    expect(response).to be_success
+    expect(json_parse['attachment']['id']).to eq a.id
   end
 
   context "submission zips" do

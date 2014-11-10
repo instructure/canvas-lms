@@ -5,13 +5,13 @@ describe "Converting respondus QTI" do
     manifest_node=get_manifest_node('multiple_choice')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == RespondusExpected::MULTIPLE_CHOICE
+    expect(hash).to eq RespondusExpected::MULTIPLE_CHOICE
   end
   
   it "should find correct answer for multiple choice with zero point weights" do
     hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', false, :flavor => Qti::Flavors::RESPONDUS)
-    hash[:import_error].should == nil
-    hash[:answers].first[:weight].should == 100
+    expect(hash[:import_error]).to eq nil
+    expect(hash[:answers].first[:weight]).to eq 100
   end
 
   it "should convert algorithm question as multiple choice question" do
@@ -19,28 +19,28 @@ describe "Converting respondus QTI" do
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
     hash.delete :question_text #Because it's ugly html that we don't really care about.
-    hash.should == RespondusExpected::ALGORITHM_QUESTION
+    expect(hash).to eq RespondusExpected::ALGORITHM_QUESTION
   end
 
   it "should convert true false" do
     manifest_node=get_manifest_node('true_false')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == RespondusExpected::TRUE_FALSE
+    expect(hash).to eq RespondusExpected::TRUE_FALSE
   end
 
   it "should convert multiple response" do
     manifest_node=get_manifest_node('multiple_response')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == RespondusExpected::MULTIPLE_ANSWER
+    expect(hash).to eq RespondusExpected::MULTIPLE_ANSWER
   end
 
   it "should convert multiple response with partial credit" do
     manifest_node=get_manifest_node('multiple_response_partial')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == RespondusExpected::MULTIPLE_ANSWER2
+    expect(hash).to eq RespondusExpected::MULTIPLE_ANSWER2
   end
 
   it "should convert matching" do
@@ -50,12 +50,12 @@ describe "Converting respondus QTI" do
     matches = {}
     hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
     hash[:answers].each do |a|
-      matches[a[:match_id]].should == a[:text].upcase
+      expect(matches[a[:match_id]]).to eq a[:text].upcase
     end
     # compare everything else without the ids
     hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
     hash[:matches].each { |m| m.delete(:match_id) }
-    hash.should == RespondusExpected::MATCHING
+    expect(hash).to eq RespondusExpected::MATCHING
   end
 
   it "should convert matching with choiceInteraction interaction type" do
@@ -65,32 +65,32 @@ describe "Converting respondus QTI" do
     matches = {}
     hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
     hash[:answers].each do |a|
-      matches[a[:match_id]].should == a[:text].upcase
+      expect(matches[a[:match_id]]).to eq a[:text].upcase
     end
     # compare everything else without the ids
     hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
     hash[:matches].each { |m| m.delete(:match_id) }
-    hash.should == RespondusExpected::MATCHING
+    expect(hash).to eq RespondusExpected::MATCHING
   end
 
   it "should convert essay" do
     manifest_node=get_manifest_node('essay')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
-    hash.should == RespondusExpected::ESSAY
+    expect(hash).to eq RespondusExpected::ESSAY
   end
 
   it "should convert fill in the blank (short answer)" do
     manifest_node=get_manifest_node('fill_in_the_blank')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == RespondusExpected::FILL_IN_THE_BLANK
+    expect(hash).to eq RespondusExpected::FILL_IN_THE_BLANK
   end
 
   it "should convert the assessment into a quiz" do
     manifest_node=get_manifest_node('assessment', :quiz_type => 'Test')
     a = Qti::AssessmentTestConverter.new(manifest_node, respondus_question_dir)
     a.create_instructure_quiz
-    a.quiz.should == RespondusExpected::ASSESSMENT
+    expect(a.quiz).to eq RespondusExpected::ASSESSMENT
   end
 
 

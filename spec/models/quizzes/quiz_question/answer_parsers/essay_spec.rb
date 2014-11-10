@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerParsers::Essay do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe "#parse" do
     let(:raw_answers) do
       [
@@ -37,7 +41,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Essay do
       essay = Quizzes::QuizQuestion::AnswerParsers::Essay.new(raw_answers)
       question = Quizzes::QuizQuestion::QuestionData.new({})
       essay.parse(question)
-      question[:comments].should == raw_answers[0][:answer_comments]
+      expect(question[:comments]).to eq raw_answers[0][:answer_comments]
     end
   end
 end

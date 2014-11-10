@@ -24,12 +24,12 @@ describe 'DataFixup::SetAccountLtiOpaqueIds' do
     it "should work" do
       root_account = Account.default
       original_guid = root_account.lti_guid
-      original_guid.should_not be_empty
+      expect(original_guid).not_to be_empty
 
       DataFixup::SetAccountLtiOpaqueIds.run
 
       root_account.reload
-      root_account.lti_guid.should_not == original_guid
+      expect(root_account.lti_guid).not_to eq original_guid
     end
   end
 end

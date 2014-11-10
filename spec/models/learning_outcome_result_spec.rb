@@ -35,18 +35,18 @@ describe LearningOutcomeResult do
 
   describe '.association_type' do
     it 'returns the correct representation of a quiz' do
-      learning_outcome_result.association_type.should == 'Quizzes::Quiz'
+      expect(learning_outcome_result.association_type).to eq 'Quizzes::Quiz'
 
       learning_outcome_result.association_type = 'Quiz'
       learning_outcome_result.send(:save_without_callbacks)
 
-      LearningOutcomeResult.first.association_type.should == 'Quizzes::Quiz'
+      expect(LearningOutcomeResult.first.association_type).to eq 'Quizzes::Quiz'
     end
 
     it 'returns the association type attribute if not a quiz' do
       learning_outcome_result.association_object = assignment_model
       learning_outcome_result.send(:save_without_callbacks)
-      learning_outcome_result.association_type.should == 'Assignment'
+      expect(learning_outcome_result.association_type).to eq 'Assignment'
     end
   end
 
@@ -56,29 +56,29 @@ describe LearningOutcomeResult do
 
       learning_outcome_result.artifact = sub
       learning_outcome_result.save
-      learning_outcome_result.artifact_type.should == 'Quizzes::QuizSubmission'
+      expect(learning_outcome_result.artifact_type).to eq 'Quizzes::QuizSubmission'
 
       LearningOutcomeResult.where(id: learning_outcome_result).update_all(association_type: 'QuizSubmission')
 
-      LearningOutcomeResult.find(learning_outcome_result.id).artifact_type.should == 'Quizzes::QuizSubmission'
+      expect(LearningOutcomeResult.find(learning_outcome_result.id).artifact_type).to eq 'Quizzes::QuizSubmission'
     end
   end
 
   describe '.associated_asset_type' do
     it 'returns the correct representation of a quiz' do
-      learning_outcome_result.associated_asset_type.should == 'Quizzes::Quiz'
+      expect(learning_outcome_result.associated_asset_type).to eq 'Quizzes::Quiz'
 
       learning_outcome_result.associated_asset_type = 'Quiz'
       learning_outcome_result.send(:save_without_callbacks)
 
-      LearningOutcomeResult.first.associated_asset_type.should == 'Quizzes::Quiz'
+      expect(LearningOutcomeResult.first.associated_asset_type).to eq 'Quizzes::Quiz'
     end
 
     it 'returns the associated asset type attribute if not a quiz' do
       learning_outcome_result.associated_asset = assignment_model
       learning_outcome_result.send(:save_without_callbacks)
 
-      learning_outcome_result.associated_asset_type.should == 'Assignment'
+      expect(learning_outcome_result.associated_asset_type).to eq 'Assignment'
     end
   end
 

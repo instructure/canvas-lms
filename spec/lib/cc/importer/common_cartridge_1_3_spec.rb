@@ -28,12 +28,12 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import assignments" do
-      @course.assignments.count.should == 1
+      expect(@course.assignments.count).to eq 1
       a = @course.assignments.first
-      a.title.should == 'Cool Assignment'
-      a.points_possible.should == 11
-      att = @course.attachments.find_by_migration_id("extensionresource1")
-      a.description.gsub("\n", '').should == "<p>You should turn this in for points.</p><ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
+      expect(a.title).to eq 'Cool Assignment'
+      expect(a.points_possible).to eq 11
+      att = @course.attachments.where(migration_id: "extensionresource1").first
+      expect(a.description.gsub("\n", '')).to eq "<p>You should turn this in for points.</p><ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
       a.submission_types = "online_upload,online_text_entry,online_url"
     end
 
@@ -64,25 +64,25 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import assignments" do
-      @course.assignments.count.should == 1
+      expect(@course.assignments.count).to eq 1
       a = @course.assignments.first
-      a.title.should == 'Cool Assignment'
+      expect(a.title).to eq 'Cool Assignment'
     end
 
     it "should import links into the module" do
       m = @course.context_modules.first
       url = m.content_tags[2]
-      url.should_not be_nil
-      url.url.should == "http://www.open2.net/sciencetechnologynature/"
+      expect(url).not_to be_nil
+      expect(url.url).to eq "http://www.open2.net/sciencetechnologynature/"
     end
 
     it "should import external tools" do
-      @course.context_external_tools.count.should == 1
+      expect(@course.context_external_tools.count).to eq 1
 
       m = @course.context_modules.first
       url = m.content_tags[3]
-      url.should_not be_nil
-      url.url.should == "http://www.imsglobal.org/developers/BLTI/tool.php"
+      expect(url).not_to be_nil
+      expect(url.url).to eq "http://www.imsglobal.org/developers/BLTI/tool.php"
     end
 
   end
@@ -111,27 +111,27 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import supported variant" do
-      @course.assignments.find_by_migration_id('Resource1').should_not be_nil
-      @course.assignments.count.should == 1
+      expect(@course.assignments.where(migration_id: 'Resource1')).to be_exists
+      expect(@course.assignments.count).to eq 1
     end
 
     it "should ignore non-preferred variant" do
-      @course.discussion_topics.find_by_migration_id('Resource2').should be_nil
-      @course.discussion_topics.find_by_migration_id('Resource10').should be_nil
-      @course.discussion_topics.count.should == 2
+      expect(@course.discussion_topics.where(migration_id: 'Resource2')).not_to be_exists
+      expect(@course.discussion_topics.where(migration_id: 'Resource10')).not_to be_exists
+      expect(@course.discussion_topics.count).to eq 2
     end
 
     it "should reference preferred variant in module" do
       m = @course.context_modules.first
-      m.content_tags[0].content.migration_id.should == 'Resource1'
-      m.content_tags[1].content.migration_id.should == 'Resource3' # also tests "should follow variant chain to end"
-      m.content_tags[2].url.should == "https://example.com/3" # also tests "should ignore not-supported preferred variant"
-      m.content_tags[3].content.migration_id.should == 'Resource8'
+      expect(m.content_tags[0].content.migration_id).to eq 'Resource1'
+      expect(m.content_tags[1].content.migration_id).to eq 'Resource3' # also tests "should follow variant chain to end"
+      expect(m.content_tags[2].url).to eq "https://example.com/3" # also tests "should ignore not-supported preferred variant"
+      expect(m.content_tags[3].content.migration_id).to eq 'Resource8'
     end
 
     it "should not loop on circular references" do
       m = @course.context_modules.first
-      m.content_tags[4].url.should =~ /loop(1|2)/
+      expect(m.content_tags[4].url).to match /loop(1|2)/
       # also, the import finished executing. :)
     end
 
@@ -142,7 +142,7 @@ describe "Standard Common Cartridge importing" do
       if Qti.qti_enabled?
         archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_inline_qti.zip")
         unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-        @export_folder = File.join(File.dirname(archive_file_path), "cc_inline_qti")
+        @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_inline_qti")
         @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
         @converter.export
         @course_data = @converter.course.with_indifferent_access
@@ -167,14 +167,14 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import assessments from qti inside the manifest" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
 
-      @migration.migration_issues.count.should == 0
+      expect(@migration.migration_issues.count).to eq 0
 
-      @course.quizzes.count.should == 1
+      expect(@course.quizzes.count).to eq 1
       q = @course.quizzes.first
-      q.title.should == "Pretest"
-      q.quiz_questions.count.should == 11
+      expect(q.title).to eq "Pretest"
+      expect(q.quiz_questions.count).to eq 11
     end
   end
 end

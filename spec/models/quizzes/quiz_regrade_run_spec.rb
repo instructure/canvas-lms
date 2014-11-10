@@ -1,10 +1,13 @@
 require 'spec_helper'
 
 describe Quizzes::QuizRegradeRun do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
 
   it "validates presence of quiz_regrade_id" do
-    Quizzes::QuizRegradeRun.new(quiz_regrade_id: 1).should be_valid
-    Quizzes::QuizRegradeRun.new(quiz_regrade_id: nil).should_not be_valid
+    expect(Quizzes::QuizRegradeRun.new(quiz_regrade_id: 1)).to be_valid
+    expect(Quizzes::QuizRegradeRun.new(quiz_regrade_id: nil)).not_to be_valid
   end
 
   describe "#perform" do
@@ -17,15 +20,15 @@ describe Quizzes::QuizRegradeRun do
     end
 
     it "creates a new quiz regrade run" do
-      Quizzes::QuizRegradeRun.first.should be_nil
+      expect(Quizzes::QuizRegradeRun.first).to be_nil
 
       Quizzes::QuizRegradeRun.perform(@regrade) do
         # noop
       end
 
       run = Quizzes::QuizRegradeRun.first
-      run.started_at.should_not be_nil
-      run.finished_at.should_not be_nil
+      expect(run.started_at).not_to be_nil
+      expect(run.finished_at).not_to be_nil
     end
   end
 end

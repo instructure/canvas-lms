@@ -76,7 +76,7 @@ module Lti
     def current_account_enrollments()
       unless @current_account_enrollments
         if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
-          @current_account_enrollments = @canvas_user.account_users.find_all_by_account_id(@canvas_context.account_chain).uniq
+          @current_account_enrollments = @canvas_user.account_users.where(account_id: @canvas_context.account_chain).uniq.to_a
         else
           @current_account_enrollments = []
         end

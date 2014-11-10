@@ -44,20 +44,20 @@ describe AssessmentQuestionBank do
     end
 
     it "should return the desired count of questions" do
-      @bank.select_for_submission(0).length.should == 0
-      @bank.select_for_submission(2).length.should == 2
-      @bank.select_for_submission(4).length.should == 4
-      @bank.select_for_submission(11).length.should == 10
+      expect(@bank.select_for_submission(0).length).to eq 0
+      expect(@bank.select_for_submission(2).length).to eq 2
+      expect(@bank.select_for_submission(4).length).to eq 4
+      expect(@bank.select_for_submission(11).length).to eq 10
     end
 
     it "should exclude specified questions" do
       original = [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
       selected_ids = @bank.select_for_submission(10, [@q1.id, @q10.id]).map {|q| q.id }
 
-      selected_ids.include?(@q1.id).should be_false
-      selected_ids.include?(@q10.id).should be_false
-      selected_ids.include?(@q2.id).should be_true
-      selected_ids.include?(@q9.id).should be_true
+      expect(selected_ids.include?(@q1.id)).to be_falsey
+      expect(selected_ids.include?(@q10.id)).to be_falsey
+      expect(selected_ids.include?(@q2.id)).to be_truthy
+      expect(selected_ids.include?(@q9.id)).to be_truthy
     end
 
     it "should return the questions in a random order" do
@@ -71,15 +71,15 @@ describe AssessmentQuestionBank do
       is_shuffled2 = (original != selected2)
 
       # it's possible but unlikely that shuffled version is same as original
-      (is_shuffled1 || is_shuffled2).should be_true
+      expect(is_shuffled1 || is_shuffled2).to be_truthy
     end
   end
 
   it "should allow user read access through question bank users" do
     user
     @bank.assessment_question_bank_users.create!(:user => user)
-    @course.grants_right?(@user, :manage_assignments).should be_false
-    @bank.grants_right?(@user, :read).should be_true
+    expect(@course.grants_right?(@user, :manage_assignments)).to be_falsey
+    expect(@bank.grants_right?(@user, :read)).to be_truthy
   end
 
   it "should remove outcome alignments when deleted" do
@@ -87,17 +87,17 @@ describe AssessmentQuestionBank do
     @bank.alignments = { @outcome.id => 0.5 }
 
     @bank.reload
-    @bank.learning_outcome_alignments.should be_present
-    @bank.learning_outcome_alignments.first.learning_outcome_id.should == @outcome.id
+    expect(@bank.learning_outcome_alignments).to be_present
+    expect(@bank.learning_outcome_alignments.first.learning_outcome_id).to eq @outcome.id
 
     # regular save shouldn't mess with alignments
     @bank.save!
     @bank.reload
-    @bank.learning_outcome_alignments.should be_present
-    @bank.learning_outcome_alignments.first.learning_outcome_id.should == @outcome.id
+    expect(@bank.learning_outcome_alignments).to be_present
+    expect(@bank.learning_outcome_alignments.first.learning_outcome_id).to eq @outcome.id
 
     @bank.destroy
     @bank.reload
-    @bank.learning_outcome_alignments.should be_empty
+    expect(@bank.learning_outcome_alignments).to be_empty
   end
 end

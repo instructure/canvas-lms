@@ -6,7 +6,8 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/FileBrowserView'
   '../modules/customPropTypes'
-], (I18n, $, React, withReactDOM, preventDefault, FileBrowserView, customPropTypes) ->
+  '../utils/moveStuff'
+], (I18n, $, React, withReactDOM, preventDefault, FileBrowserView, customPropTypes, moveStuff) ->
 
   MoveDialog = React.createClass
     displayName: 'MoveDialog'
@@ -39,17 +40,9 @@ define [
       @setState(destinationFolder: folder)
 
     submit: ->
-      promises = @props.thingsToMove.map (thing) => thing.moveTo(@state.destinationFolder)
-      $(@refs.form.getDOMNode()).disableWhileLoading $.when(promises...).then =>
-        @props.closeDialog()
-        $.flashMessage(I18n.t('move_success', {
-          one: "%{item} moved to %{destinationFolder}",
-          other: "%{count} items moved to %{destinationFolder}"
-        }, {
-          count: @props.thingsToMove.length
-          item: @props.thingsToMove[0]?.displayName()
-          destinationFolder: @state.destinationFolder.displayName()
-        }))
+      promise = moveStuff(@props.thingsToMove, @state.destinationFolder)
+      promise.then(@props.closeDialog)
+      $(@refs.form.getDOMNode()).disableWhileLoading(promise)
 
 
     render: withReactDOM ->

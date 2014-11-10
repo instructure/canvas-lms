@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::QuizSubmissionsController do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     @teacher_enrollment = @enrollment
@@ -36,7 +40,7 @@ describe Quizzes::QuizSubmissionsController do
     it "should allow previewing" do
       user_session(@teacher)
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :preview => 1
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     it "should not break trying to sanitize parameters of an already submitted quiz" do
@@ -47,7 +51,7 @@ describe Quizzes::QuizSubmissionsController do
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       Quizzes::SubmissionGrader.new(@submission).grade_submission
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     it "clears the access code key in user's session" do
@@ -58,15 +62,15 @@ describe Quizzes::QuizSubmissionsController do
       session[access_code_key] = true
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token
-      session.has_key?(access_code_key).should == false
+      expect(session.has_key?(access_code_key)).to eq false
     end
 
     it "should reject a submission when the validation token does not match" do
       user_session(@student)
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => "xxx"
-      response.should be_redirect
-      flash[:error].should_not be_blank
+      expect(response).to be_redirect
+      expect(flash[:error]).not_to be_blank
     end
   end
   
@@ -80,9 +84,9 @@ describe Quizzes::QuizSubmissionsController do
     it "should allow updating scores if the teacher is logged in" do
       user_session(@teacher)
       put 'update', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2"
-      response.should be_redirect
-      assigns[:submission].should_not be_nil
-      assigns[:submission].submission_data[0][:points].should == 2
+      expect(response).to be_redirect
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission].submission_data[0][:points]).to eq 2
     end
     
     it "should not allow updating if the course is concluded" do
@@ -104,7 +108,7 @@ describe Quizzes::QuizSubmissionsController do
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
       assert_status(401)
 
-      @qs.reload.submission_data[:a].should be_nil
+      expect(@qs.reload.submission_data[:a]).to be_nil
     end
 
     it "should backup to the user's quiz submission" do
@@ -112,9 +116,9 @@ describe Quizzes::QuizSubmissionsController do
       Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
-      response.should be_success
+      expect(response).to be_success
 
-      @qs.reload.submission_data[:a].should == 'test'
+      expect(@qs.reload.submission_data[:a]).to eq 'test'
     end
 
     it "should return the time left to finish a quiz" do
@@ -126,8 +130,8 @@ describe Quizzes::QuizSubmissionsController do
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => submission.validation_token
       json = JSON.parse(response.body)
 
-      json.should have_key('time_left')
-      json['time_left'].should be_close(60 * 60, 5.0)
+      expect(json).to have_key('time_left')
+      expect(json['time_left']).to be_within(5.0).of(60 * 60)
     end
 
   end
@@ -144,7 +148,7 @@ describe Quizzes::QuizSubmissionsController do
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
       assert_status(401)
 
-      @qsub.reload.submission_data[:a].should be_nil
+      expect(@qsub.reload.submission_data[:a]).to be_nil
     end
 
     it "should record the user's submission" do
@@ -154,14 +158,14 @@ describe Quizzes::QuizSubmissionsController do
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
       assert_status(401)
 
-      @qsub.reload.submission_data[:a].should be_nil
+      expect(@qsub.reload.submission_data[:a]).to be_nil
     end
 
     it "should redirect back to quiz after login if unauthorized" do
       controller.request.env['HTTP_REFERER'] = 'http://test.host/'
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
       assert_unauthorized
-      session[:return_to].should_not be_nil
+      expect(session[:return_to]).not_to be_nil
     end
   end
 
@@ -172,8 +176,8 @@ describe Quizzes::QuizSubmissionsController do
         user_session(@teacher)
         quiz = course_quiz !!:active
         ContentZipper.expects(:send_later_enqueue_args).with {|first_arg,second_arg|
-          first_arg.should == :process_attachment
-          second_arg.should == {priority: Delayed::LOW_PRIORITY, max_attempts: 1}
+          expect(first_arg).to eq :process_attachment
+          expect(second_arg).to eq({priority: Delayed::LOW_PRIORITY, max_attempts: 1})
         }
         get 'index', quiz_id: quiz.id, zip: '1', course_id: @course
       end
@@ -187,20 +191,20 @@ describe Quizzes::QuizSubmissionsController do
         user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse(response.body)
-        json.should have_key('extra_attempts')
-        json['extra_attempts'].should == 1
+        expect(json).to have_key('extra_attempts')
+        expect(json['extra_attempts']).to eq 1
       end
 
       it "should be able to reset the result lockdown flag" do
         user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse(response.body)
-        json.should have_key('has_seen_results')
-        json['has_seen_results'].should == false
+        expect(json).to have_key('has_seen_results')
+        expect(json['has_seen_results']).to eq false
       end
     end
   end

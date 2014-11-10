@@ -31,12 +31,12 @@ describe Polling::PollSession do
 
   context "creating a poll session" do
     it "requires an associated poll" do
-      lambda { Polling::PollSession.create!(course: @course, course_section: @section) }.should raise_error(ActiveRecord::RecordInvalid,
+      expect { Polling::PollSession.create!(course: @course, course_section: @section) }.to raise_error(ActiveRecord::RecordInvalid,
                                                                                                             /Poll can't be blank/)
     end
 
     it "requires an associated course" do
-      lambda { Polling::PollSession.create!(poll: @poll, course_section: @section) }.should raise_error(ActiveRecord::RecordInvalid,
+      expect { Polling::PollSession.create!(poll: @poll, course_section: @section) }.to raise_error(ActiveRecord::RecordInvalid,
                                                                                                         /Course can't be blank/)
     end
 
@@ -45,26 +45,26 @@ describe Polling::PollSession do
       new_course = course
 
       section = new_course.course_sections.create!(name: "Alien Section")
-      lambda { Polling::PollSession.create!(poll: @poll, course: old_course, course_section: section) }.should raise_error(ActiveRecord::RecordInvalid,
+      expect { Polling::PollSession.create!(poll: @poll, course: old_course, course_section: section) }.to raise_error(ActiveRecord::RecordInvalid,
                                                                                                                            /That course section does not belong to the existing course/)
     end
 
     it "allows a session to be created without a section" do
       @session = Polling::PollSession.new(poll: @poll, course: @course)
       @session.save
-      @session.should be_valid
+      expect(@session).to be_valid
     end
 
     it "doesn't allow public results to be displayed by default" do
       @session = Polling::PollSession.new(poll: @poll, course: @course, course_section: @section)
       @session.save
-      @session.has_public_results.should be_false
+      expect(@session.has_public_results).to be_falsey
     end
 
     it "saves successfully" do
       @session = Polling::PollSession.new(poll: @poll, course: @course, course_section: @section)
       @session.save
-      @session.should be_valid
+      expect(@session).to be_valid
     end
   end
 
@@ -89,17 +89,17 @@ describe Polling::PollSession do
           student1_sessions << Polling::PollSession.create(poll: @poll1, course: @course1)
         end
 
-        Polling::PollSession.available_for(@student1).size.should == 3
-        Polling::PollSession.available_for(@student2).size.should == 0
-        Polling::PollSession.available_for(@student1).should == student1_sessions
+        expect(Polling::PollSession.available_for(@student1).size).to eq 3
+        expect(Polling::PollSession.available_for(@student2).size).to eq 0
+        expect(Polling::PollSession.available_for(@student1)).to eq student1_sessions
 
         2.times do |n|
           student2_sessions << Polling::PollSession.create(poll: @poll2, course: @course2)
         end
 
-        Polling::PollSession.available_for(@student1).size.should == 3
-        Polling::PollSession.available_for(@student2).size.should == 2
-        Polling::PollSession.available_for(@student2).should == student2_sessions
+        expect(Polling::PollSession.available_for(@student1).size).to eq 3
+        expect(Polling::PollSession.available_for(@student2).size).to eq 2
+        expect(Polling::PollSession.available_for(@student2)).to eq student2_sessions
     end
   end
 
@@ -113,11 +113,11 @@ describe Polling::PollSession do
     it "returns true if the provided user has submitted to the session" do
       @session.poll_submissions.create!(poll: @poll, poll_choice: @choice, user: @student)
 
-      @session.has_submission_from?(@student).should be_true
+      expect(@session.has_submission_from?(@student)).to be_truthy
     end
 
     it "returns false if the provided user hasn't submitted to the session" do
-      @session.has_submission_from?(@student).should be_false
+      expect(@session.has_submission_from?(@student)).to be_falsey
     end
   end
 end

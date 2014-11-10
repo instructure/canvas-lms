@@ -28,9 +28,9 @@ describe 'appointment_canceled_by_user.twitter' do
                      :data => {:updating_user => user,
                                        :cancel_reason => "just because"})
 
-    @message.body.should include('some title')
-    @message.body.should include(user.name)
-    @message.main_link.should be_present
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include(user.name)
+    expect(@message.main_link).to be_present
   end
 
   it "should render for groups" do
@@ -45,8 +45,8 @@ describe 'appointment_canceled_by_user.twitter' do
                      :data => {:updating_user => user,
                                        :cancel_reason => "just because"})
 
-    @message.body.should include('some title')
-    @message.body.should include(user.name)
-    @message.main_link.should be_present
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include(user.name)
+    expect(@message.main_link).to be_present
   end
 end

@@ -30,8 +30,8 @@ describe "manage groups" do
         wait_for_ajaximations
 
         # yay, added
-        f('#group_categories_tabs .collectionViewItems').text.should include('Everyone')
-        f('#group_categories_tabs .collectionViewItems').text.should include('zomg')
+        expect(f('#group_categories_tabs .collectionViewItems').text).to include('Everyone')
+        expect(f('#group_categories_tabs .collectionViewItems').text).to include('zomg')
 
         run_jobs
 
@@ -40,7 +40,7 @@ describe "manage groups" do
           groups = ff('.collectionViewItems > .group')
           groups.present?
         }
-        groups.size.should == 2
+        expect(groups.size).to eq 2
       end
     end
 
@@ -61,9 +61,9 @@ describe "manage groups" do
       wait_for_ajaximations
 
       # verify the group set tab is created
-      fj("#group_categories_tabs li[role='tab']:nth-child(2)").text.should == 'Group Set 1'
+      expect(fj("#group_categories_tabs li[role='tab']:nth-child(2)").text).to eq 'Group Set 1'
       # verify has the two created but unassigned students
-      ff("div[data-view='unassignedUsers'] .group-user-name").length.should == 2
+      expect(ff("div[data-view='unassignedUsers'] .group-user-name").length).to eq 2
 
       # click the first visible "Add Group" button
       fj(".add-group:visible:first").click
@@ -73,13 +73,13 @@ describe "manage groups" do
       wait_for_ajaximations
 
       # Add user to the group
-      fj(".group-summary:visible:first").text.should == "0 students"
+      expect(fj(".group-summary:visible:first").text).to eq "0 students"
       ff("div[data-view='unassignedUsers'] .assign-to-group").first.click
       wait_for_animations
       ff(".assign-to-group-menu .set-group").first.click
       wait_for_ajaximations
-      fj(".group-summary:visible:first").text.should == "1 student"
-      ff("div[data-view='unassignedUsers'] .assign-to-group").length.should == 1
+      expect(fj(".group-summary:visible:first").text).to eq "1 student"
+      expect(ff("div[data-view='unassignedUsers'] .assign-to-group").length).to eq 1
 
       # Remove added user from the group
       fj(".groups .group .toggle-group:first").click
@@ -88,9 +88,9 @@ describe "manage groups" do
       wait_for_ajaximations
       fj(".remove-from-group:first").click
       wait_for_ajaximations
-      fj(".group-summary:visible:first").text.should == "0 students"
+      expect(fj(".group-summary:visible:first").text).to eq "0 students"
       # should re-appear in unassigned
-      ff("div[data-view='unassignedUsers'] .assign-to-group").length.should == 2
+      expect(ff("div[data-view='unassignedUsers'] .assign-to-group").length).to eq 2
     end
 
     it "should allow a teacher to drag and drop a student among groups" do
@@ -118,27 +118,27 @@ describe "manage groups" do
       group2_users_selector = "#{group2_selector} #{group_user_selector}"
 
       # assert all 5 students are in unassigned
-      ff(unassigned_users_selector).size.should == 5
-      ff(group1_users_selector).size.should == 0
-      ff(group2_users_selector).size.should == 0
+      expect(ff(unassigned_users_selector).size).to eq 5
+      expect(ff(group1_users_selector).size).to eq 0
+      expect(ff(group2_users_selector).size).to eq 0
 
       drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
       drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
       # assert there are 3 students in unassigned
       # assert there is 2 student in group 0
       # assert there is still 0 students in group 1
-      ff(unassigned_users_selector).size.should == 3
-      ff(group1_users_selector).size.should == 2
-      ff(group2_users_selector).size.should == 0
+      expect(ff(unassigned_users_selector).size).to eq 3
+      expect(ff(group1_users_selector).size).to eq 2
+      expect(ff(group2_users_selector).size).to eq 0
 
       drag_and_drop_element( fj(first_group1_user), fj(unassigned_group_selector) )
       drag_and_drop_element( fj(first_group1_user), fj(group2_selector) )
       # assert there are 4 students in unassigned
       # assert there are 0 students in group 0
       # assert there is 1 student in group 1
-      ff(unassigned_users_selector).size.should == 4
-      ff(group1_users_selector).size.should == 0
-      ff(group2_users_selector).size.should == 1
+      expect(ff(unassigned_users_selector).size).to eq 4
+      expect(ff(group1_users_selector).size).to eq 0
+      expect(ff(group2_users_selector).size).to eq 1
     end
 
     it "should support student-organized groups" do
@@ -152,16 +152,16 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
-      f('.group-category-actions .al-trigger').should be_nil # can't edit/delete etc.
+      expect(f('.group-category-actions .al-trigger')).to be_nil # can't edit/delete etc.
 
       # user never leaves "Everyone" list, only gets added to a group once
       2.times do
-        f('.unassigned-users-heading').text.should == "Everyone (2)"
+        expect(f('.unassigned-users-heading').text).to eq "Everyone (2)"
         ff("div[data-view='unassignedUsers'] .assign-to-group").first.click
         wait_for_animations
         ff(".assign-to-group-menu .set-group").first.click
         wait_for_ajaximations
-        fj(".group-summary:visible:first").text.should == "1 student"
+        expect(fj(".group-summary:visible:first").text).to eq "1 student"
       end
     end
 
@@ -177,13 +177,13 @@ describe "manage groups" do
       expand_group(groups[1].id)
 
       # Add an unassigned user to the first group
-      fj(".group-summary:visible:first").text.should == "0 students"
+      expect(fj(".group-summary:visible:first").text).to eq "0 students"
       ff("div[data-view='unassignedUsers'] .assign-to-group").first.click
       wait_for_animations
       ff(".assign-to-group-menu .set-group").first.click
       wait_for_ajaximations
-      fj(".group-summary:visible:first").text.should == "1 student"
-      fj(".group-summary:visible:last").text.should == "0 students"
+      expect(fj(".group-summary:visible:first").text).to eq "1 student"
+      expect(fj(".group-summary:visible:last").text).to eq "0 students"
 
 
       # Move the user from one group into the other
@@ -195,8 +195,8 @@ describe "manage groups" do
       wait_for_ajaximations
       fj('.set-group:first').click
       wait_for_ajaximations
-      fj(".group-summary:visible:first").text.should == "0 students"
-      fj(".group-summary:visible:last").text.should == "1 student"
+      expect(fj(".group-summary:visible:first").text).to eq "0 students"
+      expect(fj(".group-summary:visible:last").text).to eq "1 student"
 
       # Move the user back
       fj(".groups .group .group-user .group-user-actions").click
@@ -207,8 +207,8 @@ describe "manage groups" do
       wait_for_ajaximations
       fj('.set-group:last').click
       wait_for_ajaximations
-      fj(".group-summary:visible:first").text.should == "1 student"
-      fj(".group-summary:visible:last").text.should == "0 students"
+      expect(fj(".group-summary:visible:first").text).to eq "1 student"
+      expect(fj(".group-summary:visible:last").text).to eq "0 students"
     end
 
     it "should give a teacher the option to assign unassigned students to groups" do
@@ -225,8 +225,8 @@ describe "manage groups" do
       # category menu should show unassigned-member options
       fj(actions_button).click
       wait_for_ajaximations
-      fj([actions_button, message_users].join(" + ")).should be
-      fj([actions_button, randomly_assign_users].join(" + ")).should be
+      expect(fj([actions_button, message_users].join(" + "))).to be
+      expect(fj([actions_button, randomly_assign_users].join(" + "))).to be
 
       # assign the last unassigned member
       draggable_user = fj(".unassigned-students .group-user:first")
@@ -237,8 +237,8 @@ describe "manage groups" do
       # now the menu should not show unassigned-member options
       fj(actions_button).click
       wait_for_ajaximations
-      fj([actions_button, message_users].join(" + ")).should be_nil
-      fj([actions_button, randomly_assign_users].join(" + ")).should be_nil
+      expect(fj([actions_button, message_users].join(" + "))).to be_nil
+      expect(fj([actions_button, randomly_assign_users].join(" + "))).to be_nil
     end
   end
 
@@ -257,10 +257,10 @@ describe "manage groups" do
       create_new_set_groups(@course.account, group_categories[0], group_categories[1], group_categories[1], group_categories[2])
       get "/courses/#{@course.id}/groups"
       group_divs = ff(".group_category")
-      group_divs.size.should == 4 # three groups + blank
+      expect(group_divs.size).to eq 4 # three groups + blank
       ids = group_divs.map { |div| div.attribute(:id) }
-      group_categories.each { |category| ids.should include("category_#{category.id}") }
-      ids.should include("category_template")
+      group_categories.each { |category| expect(ids).to include("category_#{category.id}") }
+      expect(ids).to include("category_template")
     end
 
     it "should flag div.group_category for student organized categories with student_organized class" do
@@ -269,9 +269,9 @@ describe "manage groups" do
       group_category2 = @course.group_categories.create(:name => "Other Groups")
       create_new_set_groups(@course.account, group_category1, group_category1, group_category2)
       get "/courses/#{@course.id}/groups"
-      ff(".group_category").size.should == 3
-      ff(".group_category.student_organized").size.should == 1
-      f(".group_category.student_organized").should have_attribute(:id, "category_#{group_category1.id}")
+      expect(ff(".group_category").size).to eq 3
+      expect(ff(".group_category.student_organized").size).to eq 1
+      expect(f(".group_category.student_organized")).to have_attribute(:id, "category_#{group_category1.id}")
     end
 
     it "should show one li.category per category" do
@@ -280,9 +280,9 @@ describe "manage groups" do
       create_new_set_groups(@course.account, group_categories[0], group_categories[1], group_categories[1], group_categories[2])
       get "/courses/#{@course.id}/groups"
       group_divs = ffj("li.category")
-      group_divs.size.should == 3 # three groups, no blank on this one
+      expect(group_divs.size).to eq 3 # three groups, no blank on this one
       labels = group_divs.map { |div| div.find_element(:css, "a").text }
-      group_categories.each { |category| labels.should include category.name }
+      group_categories.each { |category| expect(labels).to include category.name }
     end
 
     it "should flag li.category for student organized categories with student_organized class" do
@@ -293,9 +293,9 @@ describe "manage groups" do
       @course.groups.create(:name => "Group 2", :group_category => group_category1)
       @course.groups.create(:name => "Group 3", :group_category => group_category2)
       get "/courses/#{@course.id}/groups"
-      ffj("li.category").size.should == 2
-      ffj("li.category.student_organized").size.should == 1
-      fj("li.category.student_organized a").text.should == group_category1.name
+      expect(ffj("li.category").size).to eq 2
+      expect(ffj("li.category.student_organized").size).to eq 1
+      expect(fj("li.category.student_organized a").text).to eq group_category1.name
     end
 
     it "should add new categories at the end of the tabs" do
@@ -303,11 +303,11 @@ describe "manage groups" do
       group_category = @course.group_categories.create(:name => "Existing Category")
       @course.groups.create(:name => "Group 1", :group_category => group_category)
       get "/courses/#{@course.id}/groups"
-      ff("#category_list li").size.should == 1
+      expect(ff("#category_list li").size).to eq 1
       # submit new category form
       add_category(@course, 'New Category')
-      ff("#category_list li").size.should == 2
-      ff("#category_list li a").last.text.should == "New Category"
+      expect(ff("#category_list li").size).to eq 2
+      expect(ff("#category_list li a").last.text).to eq "New Category"
     end
 
     it "should keep the student organized category after any new categories" do
@@ -316,26 +316,26 @@ describe "manage groups" do
       @course.groups.create(:name => "Group 1", :group_category => group_category)
 
       get "/courses/#{@course.id}/groups"
-      ff("#category_list li").size.should == 1
+      expect(ff("#category_list li").size).to eq 1
       # submit new category form
       add_category(@course, 'New Category')
-      ff("#category_list li").size.should == 2
-      ff("#category_list li a").first.text.should == "New Category"
-      ff("#category_list li a").last.text.should == group_category.name
+      expect(ff("#category_list li").size).to eq 2
+      expect(ff("#category_list li a").first.text).to eq "New Category"
+      expect(ff("#category_list li a").last.text).to eq group_category.name
     end
 
     it "should remove tab and sidebar entries for deleted category" do
       groups_student_enrollment 3
       group_category = @course.group_categories.create(:name => "Some Category")
       get "/courses/#{@course.id}/groups"
-      f("#category_#{group_category.id}").should be_displayed
-      f("#sidebar_category_#{group_category.id}").should be_displayed
+      expect(f("#category_#{group_category.id}")).to be_displayed
+      expect(f("#sidebar_category_#{group_category.id}")).to be_displayed
       f("#category_#{group_category.id} .delete_category_link").click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       keep_trying_until do
-        fj("#category_#{group_category.id}").should be_nil
-        fj("#sidebar_category_#{group_category.id}").should be_nil
+        expect(fj("#category_#{group_category.id}")).to be_nil
+        expect(fj("#sidebar_category_#{group_category.id}")).to be_nil
       end
     end
 
@@ -344,14 +344,14 @@ describe "manage groups" do
       group_category = @course.group_categories.create(:name => "Existing Category")
       group = @course.groups.create(:name => "Group 1", :group_category => group_category)
       get "/courses/#{@course.id}/groups"
-      f("#sidebar_category_#{group_category.id}").should be_displayed
-      f("#sidebar_category_#{group_category.id} #sidebar_group_#{group.id}").should be_displayed
+      expect(f("#sidebar_category_#{group_category.id}")).to be_displayed
+      expect(f("#sidebar_category_#{group_category.id} #sidebar_group_#{group.id}")).to be_displayed
       # submit new category form
       new_category = add_category(@course, 'New Category', :group_count => '1')
-      new_category.groups.size.should == 1
+      expect(new_category.groups.size).to eq 1
       new_group = new_category.groups.first
-      f("#sidebar_category_#{new_category.id}").should be_displayed
-      f("#sidebar_category_#{new_category.id} #sidebar_group_#{new_group.id}").should be_displayed
+      expect(f("#sidebar_category_#{new_category.id}")).to be_displayed
+      expect(f("#sidebar_category_#{new_category.id} #sidebar_group_#{new_group.id}")).to be_displayed
     end
 
     it "should honor enable_self_signup when adding a category" do
@@ -359,8 +359,8 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       # submit new category form
       new_category = add_category(@course, 'New Category', :enable_self_signup => true)
-      new_category.should be_self_signup
-      new_category.should be_unrestricted_self_signup
+      expect(new_category).to be_self_signup
+      expect(new_category).to be_unrestricted_self_signup
     end
 
     it "should honor restrict_self_signup when adding a self signup category" do
@@ -368,8 +368,8 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       # submit new category form
       new_category = add_category(@course, 'New Category', :enable_self_signup => true, :restrict_self_signup => true)
-      new_category.should be_self_signup
-      new_category.should be_restricted_self_signup
+      expect(new_category).to be_self_signup
+      expect(new_category).to be_restricted_self_signup
     end
 
     it "should honor create_group_count when adding a self signup category" do
@@ -377,7 +377,7 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       # submit new category form
       new_category = add_category(@course, 'New Category', :enable_self_signup => true, :group_count => '2')
-      new_category.groups.size.should == 2
+      expect(new_category.groups.size).to eq 2
     end
 
     it "should honor group_limit when adding a self signup category" do
@@ -385,7 +385,7 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       # submit new category form
       new_category = add_category(@course, 'New Category', :enable_self_signup => true, :group_limit => '2')
-      new_category.group_limit.should == 2
+      expect(new_category.group_limit).to eq 2
     end
 
     it "should preserve group to category association when editing a group" do
@@ -393,25 +393,25 @@ describe "manage groups" do
       group_category = @course.group_categories.create(:name => "Existing Category")
       group = @course.groups.create(:name => "Group 1", :group_category => group_category)
       get "/courses/#{@course.id}/groups"
-      f("#category_#{group_category.id} #group_#{group.id}").should be_displayed
+      expect(f("#category_#{group_category.id} #group_#{group.id}")).to be_displayed
       # submit new category form
       driver.execute_script("$('#group_#{group.id} .edit_group_link').hover().click()") #move_to occasionally breaks in the hudson build
       form = f("#edit_group_form")
       replace_content(form.find_element(:css, "input[type=text]"), "New Name")
       submit_form(form)
-      f("#category_#{group_category.id} #group_#{group.id}").should be_displayed
+      expect(f("#category_#{group_category.id} #group_#{group.id}")).to be_displayed
     end
 
     it "should not show the Make a New Set of Groups button if there are no students in the course" do
       get "/courses/#{@course.id}/groups"
-      f('.add_category_link').should be_nil
-      f('#no_students_message').should be_displayed
+      expect(f('.add_category_link')).to be_nil
+      expect(f('#no_students_message')).to be_displayed
     end
     it "should show the Make a New Set of Groups button if there are students in the course" do
       student_in_course
       get "/courses/#{@course.id}/groups"
-      f('.add_category_link').should be_displayed
-      f('#no_students_message').should be_nil
+      expect(f('.add_category_link')).to be_displayed
+      expect(f('#no_students_message')).to be_nil
     end
 
     it "should let you message students not in a group" do
@@ -423,18 +423,18 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
-      ff(".group_category").size.should == 3
+      expect(ff(".group_category").size).to eq 3
       keep_trying_until { !f("#category_#{group_category1.id} .right_side .loading_members").displayed? }
-      f('.group_category .student_links').should be_displayed
-      f('.group_category .message_students_link').should_not be_displayed # only self signup can do it
+      expect(f('.group_category .student_links')).to be_displayed
+      expect(f('.group_category .message_students_link')).not_to be_displayed # only self signup can do it
       ff('.ui-tabs-anchor')[1].click
 
       keep_trying_until { !f("#category_#{group_category2.id} .right_side .loading_members").displayed? }
       message_students_link =  ff('.group_category .message_students_link')[1]
-      message_students_link.should be_displayed
+      expect(message_students_link).to be_displayed
       message_students_link.click
 
-      keep_trying_until{ f('.message-students-dialog').should be_displayed }
+      keep_trying_until{ expect(f('.message-students-dialog')).to be_displayed }
     end
 
     context "data validation" do
@@ -444,7 +444,7 @@ describe "manage groups" do
         @form = keep_trying_until do
           f('.add_category_link').click
           @form = f('#add_category_form')
-          @form.should be_displayed
+          expect(@form).to be_displayed
           @form
         end
       end
@@ -455,7 +455,7 @@ describe "manage groups" do
         replace_content(f('#add_category_form input[name="category[name]"]'), max_length_name)
         submit_form(@form)
         wait_for_ajaximations
-        GroupCategory.find_by_name(max_length_name).should be_present
+        expect(GroupCategory.find_by_name(max_length_name)).to be_present
       end
 
       it "should not create a new group category if the generated group names will exceed 255 characters" do
@@ -463,22 +463,22 @@ describe "manage groups" do
         f('#category_split_groups').click
         submit_form(@form)
         wait_for_ajaximations
-        ff('.error_box').last.text.should == 'Enter a shorter category name'
-        GroupCategory.find_by_name(max_length_name).should_not be_present
-        @form.should be_displayed
+        expect(ff('.error_box').last.text).to eq 'Enter a shorter category name'
+        expect(GroupCategory.find_by_name(max_length_name)).not_to be_present
+        expect(@form).to be_displayed
       end
 
       it "should validate split groups radio button adds a 1 to the input" do
         f('#category_split_groups').click
-        f('#category_split_group_count').should have_attribute(:value, '1')
+        expect(f('#category_split_group_count')).to have_attribute(:value, '1')
       end
 
       it "should validate create groups manually radio button clears the input" do
         f('#category_split_groups').click
         group_count = f('#category_split_group_count')
-        group_count.should have_attribute(:value, '1')
+        expect(group_count).to have_attribute(:value, '1')
         f('#category_no_groups').click
-        f('#category_split_group_count').should have_attribute(:value, '')
+        expect(f('#category_split_group_count')).to have_attribute(:value, '')
       end
     end
   end

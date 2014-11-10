@@ -31,11 +31,13 @@ def assignment_override_valid_attributes
   { :title => "Some Title" }
 end
 
-def create_section_override_for_assignment(assignment, opts={})
-  ao = assignment.assignment_overrides.build
+def create_section_override_for_assignment(assignment_or_quiz, opts={})
+  ao = assignment_or_quiz.assignment_overrides.build
   ao.due_at = 2.days.from_now
   ao.set_type = "CourseSection"
-  ao.set = opts[:course_section] || assignment.context.default_section
+  ao.set = opts[:course_section] || assignment_or_quiz.context.default_section
   ao.title = "test override"
   ao.save!
 end
+alias :create_section_override_for_quiz :create_section_override_for_assignment
+

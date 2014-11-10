@@ -80,11 +80,11 @@ class ConversationMessage < ActiveRecord::Base
       Shackles.activate(:slave) do
         ret = where(base_conditions).
           joins('JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id').
-          distinct_on(['conversation_id', 'user_id'],
-            :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags",
-            :order => 'conversation_id DESC, user_id DESC, created_at DESC')
-        map = Hash[ret.map{ |m| [[m.conversation_id, m.user_id.to_i], m]}]
-        backmap = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
+          select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags").
+          order('conversation_id DESC, user_id DESC, created_at DESC').
+          distinct_on(:conversation_id, :user_id).to_a
+        map = Hash[ret.map{ |m| [[m.conversation_id, m.user_id], m]}]
+        backmap = Hash[ret.map{ |m| [m.conversation_participant_id, m]}]
         if author
           shard_participants.each{ |cp| cp.last_authored_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
         else

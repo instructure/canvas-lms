@@ -26,19 +26,19 @@ describe ContextModulesHelper do
     let_once(:t_module) { t_course.context_modules.create! name: "test module" }
 
     it "should return true for a nil item" do
-      module_item_unpublishable?(nil).should be_true
+      expect(module_item_unpublishable?(nil)).to be_truthy
     end
 
     it "should return true for an itemless item like a subheader" do
       item = t_module.add_item(type: 'context_module_sub_header')
-      module_item_unpublishable?(item).should be_true
+      expect(module_item_unpublishable?(item)).to be_truthy
     end
 
     it "should return true for an item that doesn't respond to can_unpublish?" do
       tag = t_module.content_tags.build
       tag.tag_type = 'context_module'
       tag.content = Thumbnail.new
-      module_item_unpublishable?(tag).should be_true
+      expect(module_item_unpublishable?(tag)).to be_truthy
     end
 
     it "should return the content's can_unpublish?" do
@@ -46,9 +46,9 @@ describe ContextModulesHelper do
       topic.workflow_state = 'active'
       topic.save!
       item = t_module.add_item(type: 'discussion_topic', id: topic.id)
-      module_item_unpublishable?(item).should be_true
+      expect(module_item_unpublishable?(item)).to be_truthy
       topic.discussion_entries.create!
-      module_item_unpublishable?(item).should be_false
+      expect(module_item_unpublishable?(item)).to be_falsey
     end
   end
 end

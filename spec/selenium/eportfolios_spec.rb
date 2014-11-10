@@ -11,20 +11,20 @@ describe "eportfolios" do
     f("#eportfolio_public").click if is_public
     expect_new_page_load { f("#eportfolio_submit").click }
     eportfolio = Eportfolio.find_by_name("student content")
-    eportfolio.should be_valid
-    eportfolio.public.should be_true if is_public
-    f('#content h2').should include_text(I18n.t('headers.welcome', "Welcome to Your ePortfolio"))
+    expect(eportfolio).to be_valid
+    expect(eportfolio.public).to be_truthy if is_public
+    expect(f('#content h2')).to include_text(I18n.t('headers.welcome', "Welcome to Your ePortfolio"))
   end
 
   def entry_verifier(opts={})
     @eportfolio.eportfolio_entries.count > 0
     entry= @eportfolio.eportfolio_entries.first
     if opts[:section_type]
-      entry.content.first[:section_type].should == opts[:section_type]
+      expect(entry.content.first[:section_type]).to eq opts[:section_type]
     end
 
     if opts[:content]
-      entry.content.first[:content].should include_text(opts[:content])
+      expect(entry.content.first[:content]).to include_text(opts[:content])
     end
   end
 
@@ -48,17 +48,17 @@ describe "eportfolios" do
     it "should start the download of ePortfolio contents" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".download_eportfolio_link").click
-      keep_trying_until { f("#export_progress").should be_displayed }
+      keep_trying_until { expect(f("#export_progress")).to be_displayed }
     end
 
     it "should display and hide eportfolio wizard" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".wizard_popup_link").click
       wait_for_animations
-      f("#wizard_box").should be_displayed
+      expect(f("#wizard_box")).to be_displayed
       f(".close_wizard_link").click
       wait_for_animations
-      f("#wizard_box").should_not be_displayed
+      expect(f("#wizard_box")).not_to be_displayed
     end
 
     it "should add a section" do
@@ -67,7 +67,7 @@ describe "eportfolios" do
       f("#section_list_manage .add_section_link").click
       f("#section_list input").send_keys("test section name", :return)
       wait_for_ajax_requests
-      fj("#section_list li:last-child .name").text.should == "test section name"
+      expect(fj("#section_list li:last-child .name").text).to eq "test section name"
     end
 
     it "should edit ePortfolio settings" do
@@ -78,31 +78,31 @@ describe "eportfolios" do
       submit_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
-      @eportfolio.name.should == "new ePortfolio name"
+      expect(@eportfolio.name).to eq "new ePortfolio name"
     end
 
     it "should have a working flickr search dialog" do
       get "/eportfolios/#{@eportfolio.id}"
       f("#page_list a.page_url").click
       keep_trying_until {
-        f("#page_list a.page_url").should be_displayed
+        expect(f("#page_list a.page_url")).to be_displayed
       }
       f("#page_sidebar .edit_content_link").click
       keep_trying_until {
-        f('.add_content_link.add_rich_content_link').should be_displayed
+        expect(f('.add_content_link.add_rich_content_link')).to be_displayed
       }
       f('.add_content_link.add_rich_content_link').click
       wait_for_tiny(f('textarea.edit_section'))
       keep_trying_until {
-        f('a.mce_instructure_image').should be_displayed
+        expect(f('a.mce_instructure_image')).to be_displayed
       }
       f('a.mce_instructure_image').click
       keep_trying_until {
-        f('a[href="#tabFlickr"]').should be_displayed
+        expect(f('a[href="#tabFlickr"]')).to be_displayed
       }
       f('a[href="#tabFlickr"]').click
       keep_trying_until {
-        f('form.FindFlickrImageView').should be_displayed
+        expect(f('form.FindFlickrImageView')).to be_displayed
       }
     end
 
@@ -113,8 +113,8 @@ describe "eportfolios" do
       @submission.save!
       get "/eportfolios/#{@eportfolio.id}"
       f(".submission").click
-      f("#add_submission_form").should be_displayed
-      ff('#category_select option').map(&:text).should_not include("New Section")
+      expect(f("#add_submission_form")).to be_displayed
+      expect(ff('#category_select option').map(&:text)).not_to include("New Section")
     end
 
 
@@ -125,10 +125,10 @@ describe "eportfolios" do
       submit_form("#delete_eportfolio_form")
       fj("#wrapper-container .eportfolios").click
       keep_trying_until {
-        f("#whats_an_eportfolio .add_eportfolio_link").should be_displayed
-        f("#portfolio_#{@eportfolio.id}").should be_nil
+        expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
+        expect(f("#portfolio_#{@eportfolio.id}")).to be_nil
       }
-      Eportfolio.first.workflow_state.should == 'deleted'
+      expect(Eportfolio.first.workflow_state).to eq 'deleted'
     end
 
     describe "add content box" do
@@ -144,7 +144,7 @@ describe "eportfolios" do
 
       it "should click on the How Do I..? button" do
         f(".wizard_popup_link").click
-        keep_trying_until { f("#wizard_box .wizard_options_list").should be_displayed }
+        keep_trying_until { expect(f("#wizard_box .wizard_options_list")).to be_displayed }
       end
 
       it "should add rich text content" do
@@ -153,29 +153,29 @@ describe "eportfolios" do
         submit_form(".form_content")
         wait_for_ajax_requests
         entry_verifier ({:section_type => "rich_text", :content => "hello student"})
-        f("#page_content .section_content").should include_text("hello student")
+        expect(f("#page_content .section_content")).to include_text("hello student")
       end
 
       it "should add a user file" do
-        keep_trying_until { f('.add_file_link').should be_displayed } 
+        keep_trying_until { expect(f('.add_file_link')).to be_displayed } 
         f('.add_file_link').click
         wait_for_ajaximations
         fj('.file_list:visible .sign:visible').click
         wait_for_ajaximations# my files
         file = fj('li.file .text:visible')
-        file.should include_text @attachment.filename
+        expect(file).to include_text @attachment.filename
         wait_for_ajaximations
         file.click
         f('.upload_file_button').click
         wait_for_ajaximations
         download = fj('.eportfolio_download:visible')
-        download.should be_present
-        download.should include_text @attachment.filename
+        expect(download).to be_present
+        expect(download).to include_text @attachment.filename
         submit_form('.form_content')
         wait_for_ajaximations
-        f('.section.read_only').should include_text @attachment.filename
+        expect(f('.section.read_only')).to include_text @attachment.filename
         refresh_page
-        f('.section.read_only').should include_text @attachment.filename
+        expect(f('.section.read_only')).to include_text @attachment.filename
       end
 
       context "adding html content" do
@@ -190,27 +190,27 @@ describe "eportfolios" do
           submit_form(".form_content")
           #driver.execute_script("$('.form_content .btn-primary').click()")
           wait_for_ajaximations
-          f(".section_content b").text.should == "student"
+          expect(f(".section_content b").text).to eq "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
         end
 
         def put_comment_in_html
           allow_comments = "#eportfolio_entry_allow_comments"
           f(allow_comments).click
-          is_checked(allow_comments).should be_true
+          expect(is_checked(allow_comments)).to be_truthy
           comment_public="#eportfolio_entry_show_comments"
           f(comment_public).click
-          is_checked(comment_public).should be_true
+          expect(is_checked(comment_public)).to be_truthy
           submit_form(".form_content")
           wait_for_ajaximations
-          f(".section_content b").text.should == "student"
+          expect(f(".section_content b").text).to eq "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
           refresh_page
           f("#page_comment_message").send_keys("hi student")
           submit_form("#add_page_comment_form")
           wait_for_ajax_requests
-          f("#page_comments .message").should include_text("hi student")
-          @eportfolio_entry.page_comments[0].message.should == "hi student"
+          expect(f("#page_comments .message")).to include_text("hi student")
+          expect(@eportfolio_entry.page_comments[0].message).to eq "hi student"
         end
 
         it "should verify that the html is there" do
@@ -229,8 +229,8 @@ describe "eportfolios" do
           wait_for_ajaximations
           submit_form(".form_content")
           wait_for_ajaximations
-          @eportfolio.eportfolio_entries.first.content[0].should == "No Content Added Yet"
-          f("#edit_page_section_1").should be_nil
+          expect(@eportfolio.eportfolio_entries.first.content[0]).to eq "No Content Added Yet"
+          expect(f("#edit_page_section_1")).to be_nil
         end
 
         it "should delete html comment" do
@@ -239,16 +239,16 @@ describe "eportfolios" do
           f(".delete_comment_link").click
           driver.switch_to.alert.accept
           wait_for_ajaximations
-          f("#page_comments .message").should be_nil
-          PageComment.count.should == 0
+          expect(f("#page_comments .message")).to be_nil
+          expect(PageComment.count).to eq 0
         end
       end
 
       it "should add a course submission" do
-        pending('fragile')
+        skip('fragile')
         f(".add_submission_link").click
         wait_for_ajaximations
-        keep_trying_until { f(".submission_list").should include_text(@assignment.title) }
+        keep_trying_until { expect(f(".submission_list")).to include_text(@assignment.title) }
         f(".select_submission_button").click
         submit_form(".form_content")
       end
@@ -267,14 +267,14 @@ describe "eportfolios" do
       options_text.each do |option, text|
         f(option).click
         wait_for_animations
-        f('.wizard_details .details').text.should include_text text
+        expect(f('.wizard_details .details').text).to include_text text
       end
     end
 
     it "should be viewable with a shared link" do
       destroy_session false
       get "/eportfolios/#{@eportfolio.id}?verifier=#{@eportfolio.uuid}"
-      f('#content h2').text.should == "page"
+      expect(f('#content h2').text).to eq "page"
     end
   end
 end
@@ -308,8 +308,8 @@ describe "eportfolios file upload" do
     submit_form(".form_content")
     wait_for_ajax_requests
     download = f("a.eportfolio_download")
-    download.should be_displayed
-    download.attribute('href').should_not be_nil
+    expect(download).to be_displayed
+    expect(download.attribute('href')).not_to be_nil
     #cannot test downloading the file, will check in the future
     #check_file(download)
   end

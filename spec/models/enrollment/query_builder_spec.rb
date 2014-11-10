@@ -69,7 +69,7 @@ describe "Enrollment::QueryBuilder" do
           options[:enforce_course_workflow_state] = true
 
           result = enrollments.where(conditions)
-          result.should be_empty
+          expect(result).to be_empty
         end
       end
     end
@@ -92,7 +92,7 @@ describe "Enrollment::QueryBuilder" do
 
         it "should return sensible defaults" do
           result = enrollments.where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{active           available StudentEnrollment},
             %w{active           available TeacherEnrollment},
             %w{active           claimed   TeacherEnrollment}
@@ -102,7 +102,7 @@ describe "Enrollment::QueryBuilder" do
         it "should return active enrollments in available courses" do
           options[:course_workflow_state] = 'available'
           result = enrollments('available').where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{active           available StudentEnrollment},
             %w{active           available TeacherEnrollment}
           ]
@@ -111,14 +111,14 @@ describe "Enrollment::QueryBuilder" do
         it "should return visible enrollments in unpublished courses" do
           options[:course_workflow_state] = 'claimed'
           result = enrollments('claimed').where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{active           claimed   TeacherEnrollment}
           ]
         end
 
         it "should return nothing for other course workflow states" do
           options[:course_workflow_state] = 'deleted'
-          conditions.should be_nil
+          expect(conditions).to be_nil
         end
       end
 
@@ -127,7 +127,7 @@ describe "Enrollment::QueryBuilder" do
 
         it "should return sensible defaults" do
           result = enrollments.where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{active           available StudentEnrollment},
             %w{active           available TeacherEnrollment},
             %w{active           claimed   StudentEnrollment},
@@ -137,13 +137,13 @@ describe "Enrollment::QueryBuilder" do
 
         it "should not return anything if the course is deleted" do
           options[:course_workflow_state] = 'deleted'
-          conditions.should be_nil
+          expect(conditions).to be_nil
         end
 
         it "should return all active enrollments in non-deleted courses" do
           options[:course_workflow_state] = 'claimed' # not enforcing state, so we get both claimed and available
           result = enrollments.where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{active           available StudentEnrollment},
             %w{active           available TeacherEnrollment},
             %w{active           claimed   StudentEnrollment},
@@ -177,7 +177,7 @@ describe "Enrollment::QueryBuilder" do
 
         it "should return sensible defaults" do
           result = enrollments.where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{invited          available StudentEnrollment},
             %w{invited          available TeacherEnrollment},
             %w{invited          claimed   TeacherEnrollment}
@@ -187,7 +187,7 @@ describe "Enrollment::QueryBuilder" do
         it "should return invitations in published courses" do
           options[:course_workflow_state] = 'available'
           result = enrollments('available').where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{invited          available StudentEnrollment},
             %w{invited          available TeacherEnrollment}
           ]
@@ -196,14 +196,14 @@ describe "Enrollment::QueryBuilder" do
         it "should return invitations for admins in unpublished courses" do
           options[:course_workflow_state] = 'claimed'
           result = enrollments('claimed').where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{invited          claimed   TeacherEnrollment}
           ]
         end
 
         it "should not return anything if the course is deleted" do
           options[:course_workflow_state] = 'deleted'
-          conditions.should be_nil
+          expect(conditions).to be_nil
         end
       end
 
@@ -213,7 +213,7 @@ describe "Enrollment::QueryBuilder" do
         it "should return sensible defaults" do
           options[:course_workflow_state] = 'available'
           result = enrollments.where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{creation_pending available StudentEnrollment},
             %w{creation_pending available TeacherEnrollment},
             %w{creation_pending claimed   StudentEnrollment},
@@ -227,13 +227,13 @@ describe "Enrollment::QueryBuilder" do
 
         it "should not return anything if the course is deleted" do
           options[:course_workflow_state] = 'deleted'
-          conditions.should be_nil
+          expect(conditions).to be_nil
         end
 
         it "should return all invitation enrollments in non-deleted courses" do
           options[:course_workflow_state] = 'available'
           result = enrollments.where(conditions)
-          matches_for(result).should == [
+          expect(matches_for(result)).to eq [
             %w{creation_pending available StudentEnrollment},
             %w{creation_pending available TeacherEnrollment},
             %w{creation_pending claimed   StudentEnrollment},
@@ -260,8 +260,8 @@ describe "Enrollment::QueryBuilder" do
           )
 
           result = enrollments.where(conditions)
-          result.should be_present
-          matches_for(result).should == [
+          expect(result).to be_present
+          expect(matches_for(result)).to eq [
             [state.to_s, "available", "StudentEnrollment"]
           ]
         end
@@ -287,7 +287,7 @@ describe "Enrollment::QueryBuilder" do
         )
 
         result = enrollments.where(conditions)
-        matches_for(result).should == [
+        expect(matches_for(result)).to eq [
           %w{active           available StudentEnrollment},
           %w{active           available TeacherEnrollment},
           %w{active           claimed   TeacherEnrollment},
@@ -315,7 +315,7 @@ describe "Enrollment::QueryBuilder" do
         )
 
         result = enrollments.where(conditions)
-        matches_for(result).should == [
+        expect(matches_for(result)).to eq [
           %w{active           available StudentEnrollment},
           %w{active           available TeacherEnrollment},
           %w{active           claimed   StudentEnrollment}, # students can see that they have an active enrollment in an unpublished course
@@ -341,7 +341,7 @@ describe "Enrollment::QueryBuilder" do
         )
 
         result = enrollments.where(conditions)
-        matches_for(result).should == [
+        expect(matches_for(result)).to eq [
           %w{active           available StudentEnrollment},
           %w{active           available TeacherEnrollment},
           %w{active           claimed   TeacherEnrollment},

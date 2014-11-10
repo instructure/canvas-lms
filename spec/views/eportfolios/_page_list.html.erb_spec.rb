@@ -26,7 +26,7 @@ describe "/eportfolios/_page_list" do
     assigns[:category] = @portfolio.eportfolio_categories.create!(:name => "some category")
     assigns[:page] = @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => assigns[:category])
     render :partial => "eportfolios/page_list"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

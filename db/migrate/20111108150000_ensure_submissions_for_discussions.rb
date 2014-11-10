@@ -59,7 +59,7 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
         SQL
         group_id = group && group.id
 
-        homework = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment.id, entry.user_id)
+        homework = Submission.where(assignment_id: assignment.id, user_id: entry.user_id).first_or_initialize
         homework.grade_matches_current_submission = homework.score ? false : true
         homework.attributes = {
           :attachment => nil,

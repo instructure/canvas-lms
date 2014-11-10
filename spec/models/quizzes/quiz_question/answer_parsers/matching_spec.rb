@@ -20,7 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerParsers::Matching do
-  context "#parse" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+ context "#parse" do
     let(:raw_answers) do
       [
         {
@@ -99,10 +103,10 @@ describe Quizzes::QuizQuestion::AnswerParsers::Matching do
       @answer_data = question.answers
 
       # usually match_ids are different
-      @answer_data[0][:match_id].should_not eql @answer_data[1][:match_id]
+      expect(@answer_data[0][:match_id]).not_to eql @answer_data[1][:match_id]
 
       # but 2nd & 3rd are both "California" and should have the same :match_id
-      @answer_data[1][:match_id].should eql @answer_data[2][:match_id]
+      expect(@answer_data[1][:match_id]).to eql @answer_data[2][:match_id]
     end
 
   end

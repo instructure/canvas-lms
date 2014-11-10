@@ -7,17 +7,17 @@ describe Canvas::APISerializer do
   let(:serializer) { Canvas::APISerializer.new({}, options) }
 
   it "aliases user to options[:scope]" do
-    serializer.user.should == options[:scope]
+    expect(serializer.user).to eq options[:scope]
   end
 
   it "aliases current_user to user" do
-    serializer.user.should == serializer.current_user
+    expect(serializer.user).to eq serializer.current_user
   end
 
   [:stringify_json_ids?, :accepts_jsonapi?, :session, :context].each do |method|
 
     it "delegates #{method} to controller" do
-      controller.send(method).should == serializer.send(method)
+      expect(controller.send(method)).to eq serializer.send(method)
     end
   end
 
@@ -25,7 +25,7 @@ describe Canvas::APISerializer do
     class FooSerializer < Canvas::APISerializer
     end
 
-    FooSerializer.new({}, options).foo.should == {}
+    expect(FooSerializer.new({}, options).foo).to eq({})
 
     Object.send(:remove_const, :FooSerializer)
   end
@@ -54,20 +54,20 @@ describe Canvas::APISerializer do
       object = Foo.new(1, 'Alice')
       serializer = FooSerializer.new(object, {root: nil, controller: con})
       serializer.expects(:stringify_ids?).returns false
-      serializer.as_json(root: nil).should == {
+      expect(serializer.as_json(root: nil)).to eq({
         id: 1,
         name: 'Alice'
-      }
+      })
     end
 
     it "stringifies ids if jsonapi or stringids requested" do
       con = ActiveModel::FakeController.new(accepts_jsonapi: true, stringify_json_ids: true)
       object = Foo.new(1, 'Alice')
       serializer = FooSerializer.new(object, {root: nil, controller: con})
-      serializer.as_json(root: nil).should == {
+      expect(serializer.as_json(root: nil)).to eq({
         id: '1',
         name: 'Alice'
-      }
+      })
     end
 
     it "uses urls for embed: :ids, include: false" do
@@ -80,7 +80,7 @@ describe Canvas::APISerializer do
       url = "http://example.com/api/v1/bar/1"
       serializer = FooSerializer.new(object, {root: nil, controller: con})
       serializer.expects(:bar_url).returns(url)
-      serializer.as_json(root: nil)['links']['bar'].should == url
+      expect(serializer.as_json(root: nil)['links']['bar']).to eq url
     end
 
     it "uses ids for embed: :ids, embed_in_root: true" do
@@ -95,7 +95,7 @@ describe Canvas::APISerializer do
       object.expects(:bar).returns Foo.new(1, 'Alice')
       url = "http://example.com/api/v1/bar/1"
       serializer = FooSerializer.new(object, {root: nil, controller: con})
-      serializer.as_json(root: nil)['links']['bar'].should == "1"
+      expect(serializer.as_json(root: nil)['links']['bar']).to eq "1"
       Object.send(:remove_const, :BarSerializer)
     end
 
@@ -143,9 +143,9 @@ describe Canvas::APISerializer do
         end
 
         subject.as_json(root: nil).stringify_keys.tap do |json|
-          json['links'].should_not be_present
-          json['bar'].should be_present
-          json['bar'].should == [{ id: 1, name: 'Alice' }]
+          expect(json['links']).not_to be_present
+          expect(json['bar']).to be_present
+          expect(json['bar']).to eq [{ id: 1, name: 'Alice' }]
         end
       end
 
@@ -155,10 +155,10 @@ describe Canvas::APISerializer do
         end
 
         subject.as_json(root: nil).stringify_keys.tap do |json|
-          json['links'].should_not be_present
-          json['bar'].should_not be_present
-          json['adooken'].should be_present
-          json['adooken'].should == [{ id: 1, name: 'Alice' }]
+          expect(json['links']).not_to be_present
+          expect(json['bar']).not_to be_present
+          expect(json['adooken']).to be_present
+          expect(json['adooken']).to eq [{ id: 1, name: 'Alice' }]
         end
       end
 
@@ -168,9 +168,9 @@ describe Canvas::APISerializer do
         end
 
         subject.as_json(root: nil).stringify_keys.tap do |json|
-          json['links'].should_not be_present
-          json['bar'].should be_present
-          json['bar'].should == { id: 1, name: 'Alice' }
+          expect(json['links']).not_to be_present
+          expect(json['bar']).to be_present
+          expect(json['bar']).to eq({ id: 1, name: 'Alice' })
         end
       end
     end

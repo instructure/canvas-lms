@@ -20,61 +20,61 @@ describe "external tool buttons" do
 
     add_button = keep_trying_until do
       add_button = f('.btn-primary')
-      add_button.should_not be_nil
+      expect(add_button).not_to be_nil
       add_button
     end
     expect_new_page_load { add_button.click }
     external_tool_button = f(".instructure_external_tool_button")
-    external_tool_button.should be_displayed
+    expect(external_tool_button).to be_displayed
     external_tool_button.click
     wait_for_ajax_requests
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    html.should == ""
+    expect(html).to eq ""
 
-    fj("#external_tool_button_dialog").should be_displayed
+    expect(fj("#external_tool_button_dialog")).to be_displayed
 
     in_frame('external_tool_button_frame') do
       f(element).click
       wait_for_ajax_requests
     end
-    keep_trying_until { !f("#external_tool_button_dialog").should_not be_displayed }
+    keep_trying_until { !expect(f("#external_tool_button_dialog")).not_to be_displayed }
   end
 
   it "should allow inserting oembed content from external tool buttons" do
     load_selection_test_tool("#oembed_link")
 
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    html.should match(/ZB8T0193/)
+    expect(html).to match(/ZB8T0193/)
   end
 
   it "should allow inserting basic lti links from external tool buttons" do
     load_selection_test_tool("#basic_lti_link")
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    html.should match(/example/)
-    html.should match(/lti link/)
-    html.should match(/lti embedded link/)
+    expect(html).to match(/example/)
+    expect(html).to match(/lti link/)
+    expect(html).to match(/lti embedded link/)
   end
 
   it "should allow inserting iframes from external tool buttons" do
     load_selection_test_tool("#iframe_link")
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    html.should match(/iframe/)
+    expect(html).to match(/iframe/)
   end
 
   it "should allow inserting images from external tool buttons" do
     load_selection_test_tool("#image_link")
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    html.should match(/delete\.png/)
+    expect(html).to match(/delete\.png/)
   end
 
   it "should allow inserting links from external tool buttons" do
     load_selection_test_tool("#link_link")
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    html.should match(/delete link/)
+    expect(html).to match(/delete link/)
   end
 
   it "should show limited number of external tool buttons" do
-    pending('fragile')
+    skip('fragile')
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
@@ -90,19 +90,19 @@ describe "external tool buttons" do
     get "/courses/#{@course.id}/discussion_topics"
     expect_new_page_load { f('.btn-primary').click }
     # find things whose id *ends* with instructure_external_button_...
-    fj("[id$='instructure_external_button_#{tools[0].id}']").should be_displayed
-    fj("[id$='instructure_external_button_#{tools[1].id}']").should be_displayed
-    fj("[id$='instructure_external_button_#{tools[2].id}']").should be_nil
-    fj("[id$='instructure_external_button_#{tools[3].id}']").should be_nil
-    f(".mce_instructure_external_button_clump").should be_displayed
+    expect(fj("[id$='instructure_external_button_#{tools[0].id}']")).to be_displayed
+    expect(fj("[id$='instructure_external_button_#{tools[1].id}']")).to be_displayed
+    expect(fj("[id$='instructure_external_button_#{tools[2].id}']")).to be_nil
+    expect(fj("[id$='instructure_external_button_#{tools[3].id}']")).to be_nil
+    expect(f(".mce_instructure_external_button_clump")).to be_displayed
     f(".mce_instructure_external_button_clump").click
 
-    f("#instructure_dropdown_list").should be_displayed
-    ff("#instructure_dropdown_list .option").length.should == 2
+    expect(f("#instructure_dropdown_list")).to be_displayed
+    expect(ff("#instructure_dropdown_list .option").length).to eq 2
   end
 
   it "should load external tool if selected from the dropdown" do
-    pending('failing')
+    skip('failing')
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
@@ -117,24 +117,24 @@ describe "external tool buttons" do
 
     get "/courses/#{@course.id}/discussion_topics"
     expect_new_page_load { f('.btn-primary').click }
-    keep_trying_until { fj(".mce_instructure_external_button_clump").should be_displayed }
+    keep_trying_until { expect(fj(".mce_instructure_external_button_clump")).to be_displayed }
     f(".mce_instructure_external_button_clump").click
 
-    f("#instructure_dropdown_list").should be_displayed
-    ff("#instructure_dropdown_list .option").length.should == 2
+    expect(f("#instructure_dropdown_list")).to be_displayed
+    expect(ff("#instructure_dropdown_list .option").length).to eq 2
     ff("#instructure_dropdown_list .option").last.click
 
-    keep_trying_until { fj("#external_tool_button_dialog iframe:visible").should be_displayed }
+    keep_trying_until { expect(fj("#external_tool_button_dialog iframe:visible")).to be_displayed }
 
     in_frame('external_tool_button_frame') do
-      keep_trying_until { fj(".link:visible").should be_displayed }
+      keep_trying_until { expect(fj(".link:visible")).to be_displayed }
       f("#oembed_link").click
       wait_for_ajax_requests
     end
 
     wait_for_ajax_requests
-    f("#external_tool_button_dialog").should_not be_displayed
+    expect(f("#external_tool_button_dialog")).not_to be_displayed
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    html.should match(/ZB8T0193/)
+    expect(html).to match(/ZB8T0193/)
   end
 end

@@ -20,10 +20,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/statistics" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render with non-nil submission statistics" do
     course_with_student
     view_context
-    assigns[:quiz] = q = @course.quizzes.create!(:quiz_type => 'assignment').tap{|q| q.should be_graded }
+    assigns[:quiz] = q = @course.quizzes.create!(:quiz_type => 'assignment').tap{|q| expect(q).to be_graded }
     assigns[:submitted_users] = []
     assigns[:statistics] = { :submission_score_high => 20,
                              :submission_count => 3,
@@ -40,8 +44,8 @@ describe "/quizzes/quizzes/statistics" do
                              :unique_submission_count => 3}
 
     render "quizzes/quizzes/statistics"
-    response.should_not be_nil
-    content_for(:right_side).should_not be_nil
+    expect(response).not_to be_nil
+    expect(content_for(:right_side)).not_to be_nil
     kv = {}
     page = Nokogiri::HTML(content_for(:right_side))
     page.css('#statistics_summary').first.children.each do |row|
@@ -50,7 +54,7 @@ describe "/quizzes/quizzes/statistics" do
       next if row.size != 2
       kv[row[0].text] = row[1].text
     end
-    kv.should == {
+    expect(kv).to eq({
       "Low Score:" => "15",
       "Average Time:" => "less than a minute",
       "Average Incorrect:" => "2",
@@ -58,7 +62,7 @@ describe "/quizzes/quizzes/statistics" do
       "High Score:" => "20",
       "Mean Score:" => "17.33",
       "Average Correct:" => "3"
-    }
+    })
   end
 
   it "should render with nil submission statistics" do
@@ -69,8 +73,8 @@ describe "/quizzes/quizzes/statistics" do
                              :questions => [] }
     assigns[:submitted_users] = []
     render "quizzes/quizzes/statistics"
-    response.should_not be_nil
-    content_for(:right_side).should_not be_nil
+    expect(response).not_to be_nil
+    expect(content_for(:right_side)).not_to be_nil
     kv = {}
     page = Nokogiri::HTML(content_for(:right_side))
     page.css('#statistics_summary').first.children.each do |row|
@@ -79,7 +83,7 @@ describe "/quizzes/quizzes/statistics" do
       next if row.size != 2
       kv[row[0].text] = row[1].text
     end
-    kv.should == {
+    expect(kv).to eq({
       "Low Score:" => "_",
       "Average Time:" => "less than a minute",
       "Average Incorrect:" => "_",
@@ -87,6 +91,6 @@ describe "/quizzes/quizzes/statistics" do
       "High Score:" => "_",
       "Mean Score:" => "_",
       "Average Correct:" => "_"
-    }
+    })
   end
 end

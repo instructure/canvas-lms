@@ -22,7 +22,7 @@ require 'db/migrate/20140530195059_remove_course_id_from_content_exports.rb'
 describe 'AddContextToContentExports' do
   describe "up" do
     it "should populate all content exports with course context type and context id" do
-      pending("PostgreSQL specific") unless ContentExport.connection.adapter_name == 'PostgreSQL'
+      skip("PostgreSQL specific") unless ContentExport.connection.adapter_name == 'PostgreSQL'
       course1 = course
       course2 = course
 
@@ -37,10 +37,10 @@ describe 'AddContextToContentExports' do
 
       ce1 = course1.content_exports.first
       ce2 = course2.content_exports.first
-      ce1.context_type.should == 'Course'
+      expect(ce1.context_type).to eq 'Course'
       ce1.context_id = course1.id
-      ce2.context_type.should == 'Course'
-      ce2.context_id.should == course2.id
+      expect(ce2.context_type).to eq 'Course'
+      expect(ce2.context_id).to eq course2.id
     end
   end
 end

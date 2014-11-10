@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/submission_versions" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render" do
     course_with_teacher(:active_all => true)
     course_quiz
@@ -29,6 +33,6 @@ describe "/quizzes/quizzes/submission_versions" do
     assigns[:versions] = []
 
     render "quizzes/quizzes/submission_versions"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end

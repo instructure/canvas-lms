@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Quizzes::QuizSubmissionsController do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   before do
     course_with_student_logged_in(:active_all => true)
     quiz_model(:course => @course)
@@ -40,19 +44,19 @@ describe Quizzes::QuizSubmissionsController do
   def record_answer_1
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
          :question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token
-    response.should be_redirect
+    expect(response).to be_redirect
   end
 
   def backup_answer_1
     put  "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/backup",
          :question_1 => 'blah_overridden', :validation_token => @qs.validation_token
-    response.should be_success
+    expect(response).to be_success
   end
 
   def record_answer_2
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
          :question_2 => 'M&Ms', :last_question_id => 2, :validation_token => @qs.validation_token
-    response.should be_redirect
+    expect(response).to be_redirect
   end
 
   describe "record_answer / backup" do
@@ -60,26 +64,26 @@ describe Quizzes::QuizSubmissionsController do
       @quiz.update_attribute :cant_go_back, true
       record_answer_1
       backup_answer_1
-      @qs.reload.submission_data[:question_1].should == 'blah'
+      expect(@qs.reload.submission_data[:question_1]).to eq 'blah'
     end
 
     it "should allow overwriting answers otherwise" do
       record_answer_1
       backup_answer_1
-      @qs.reload.submission_data[:question_1].should == 'blah_overridden'
+      expect(@qs.reload.submission_data[:question_1]).to eq 'blah_overridden'
     end
 
     it "should redirect back to take quiz if the user loses connection" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
          :question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
 
   def submit_quiz
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/",
          :question_1 => 'password', :attempt => 1, :validation_token => @qs.validation_token
-    response.should be_redirect
+    expect(response).to be_redirect
   end
 
   describe "submit quiz" do
@@ -90,14 +94,14 @@ describe Quizzes::QuizSubmissionsController do
       record_answer_1
       submit_quiz
 
-      @qs.reload.submission_data[0][:correct].should be_true
+      expect(@qs.reload.submission_data[0][:correct]).to be_truthy
     end
 
     it "allows overwriting answers otherwise" do
       record_answer_1
       submit_quiz
 
-      @qs.reload.submission_data[0][:correct].should be_false
+      expect(@qs.reload.submission_data[0][:correct]).to be_falsey
     end
 
     context "with a symbol in an answer" do
@@ -105,7 +109,7 @@ describe Quizzes::QuizSubmissionsController do
         record_answer_2
         submit_quiz
 
-        @qs.reload.submission_data[1][:correct].should be_true
+        expect(@qs.reload.submission_data[1][:correct]).to be_truthy
       end
     end
   end

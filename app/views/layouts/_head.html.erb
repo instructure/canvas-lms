@@ -9,7 +9,7 @@
 <!--[if !(IE)]><!--> <html class="not-ie scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title><%= yield :page_title || t('default_page_title', "Canvas LMS") %></title>
+  <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
   <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
 
   <%= yield :auto_discovery %>

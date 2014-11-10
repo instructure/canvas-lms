@@ -21,6 +21,7 @@ define [
       @validationFn = options.validationFn
       @labelFn      = options.labelFn or @defaultLabelFn
       @success      = options.success
+      @da_enabled   = options.da_enabled
 
     defaultLabelFn: (input) ->
       $("label[for=#{$(input).attr('id')}]").text()
@@ -52,7 +53,7 @@ define [
         count: @invalidSectionNames.length
       })
 
-      tpl = template(description: description, sections: @invalidSectionNames)
+      tpl = template(description: description,da_enabled: @da_enabled, sections: @invalidSectionNames)
       @$dialog = $(tpl).dialog
         dialogClass: 'dialog-warning'
         draggable  : false
@@ -65,9 +66,9 @@ define [
 
     onAction: (e) =>
       if $(e.currentTarget).hasClass('btn-primary')
-        @cancel(@invalidFields, @sectionNames)
-      else
         @success(@$dialog)
+      else
+        @cancel(@invalidFields, @sectionNames)
 
     cancel: (e) =>
       @$dialog.dialog('close').remove()

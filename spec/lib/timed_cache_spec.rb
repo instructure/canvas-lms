@@ -26,13 +26,13 @@ describe "TimedCache" do
         cleared += 1
       end
 
-      cache.clear.should == false
-      cleared.should == 0
+      expect(cache.clear).to eq false
+      expect(cleared).to eq 0
 
       Timecop.travel(70.seconds)
 
-      cache.clear.should == true
-      cleared.should == 1
+      expect(cache.clear).to eq true
+      expect(cleared).to eq 1
     end
   end
 end

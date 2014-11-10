@@ -23,18 +23,18 @@ describe ClonedItem do
   describe '.original_item_type' do
     it 'returns the correct representation of a quiz' do
       cloned_item = ClonedItem.create! original_item: quiz_model
-      cloned_item.original_item_type.should == 'Quizzes::Quiz'
+      expect(cloned_item.original_item_type).to eq 'Quizzes::Quiz'
 
       cloned_item.original_item_type = 'Quiz'
       cloned_item.send(:save_without_callbacks)
 
-      ClonedItem.first.original_item_type.should == 'Quizzes::Quiz'
+      expect(ClonedItem.first.original_item_type).to eq 'Quizzes::Quiz'
     end
 
     it 'returns the original item type attribute if not a quiz' do
       cloned_item = ClonedItem.create! original_item: assignment_model
 
-      cloned_item.original_item_type.should == 'Assignment'
+      expect(cloned_item.original_item_type).to eq 'Assignment'
     end
   end
 

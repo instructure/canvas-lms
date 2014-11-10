@@ -8,33 +8,24 @@ define [
   './RestrictedDialogForm'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
+  '../utils/deleteStuff'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, customPropTypes, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, $) ->
+], (I18n, React, withReactDOM, preventDefault, customPropTypes, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) ->
 
   ItemCog = React.createClass
-    # === React Functions === #
     displayName: 'ItemCog'
 
     propTypes:
       model: customPropTypes.filesystemObject
-
-    # === Custom Functions === #
-
-    deleteItem: ->
-      message = I18n.t('confirm_delete', 'Are you sure you want to delete %{name}?', {
-        name: @props.model.displayName()
-      })
-      if confirm message
-        @props.model.destroy()
 
 
     render: withReactDOM ->
       wrap = (fn) =>
         preventDefault (event)=>
           fn([@props.model], {
-            contextType: @props.model.collection.parentFolder.get('context_type').toLowerCase() + 's'
-            contextId: @props.model.collection.parentFolder.get('context_id')
+            contextType: @props.model.collection?.parentFolder.get('context_type').toLowerCase() + 's'
+            contextId: @props.model.collection?.parentFolder.get('context_id')
             returnFocusTo: event.target
           })
 
@@ -61,12 +52,24 @@ define [
           if @props.userCanManageFilesForContext
             [
               li {},
-                a href:'#', onClick: preventDefault(@props.startEditingName), ref: 'editName',
+                a {
+                  href:'#'
+                  onClick: preventDefault(@props.startEditingName)
+                  ref: 'editName'
+                },
                   I18n.t('edit_name', 'Edit Name')
               li {},
-                a href:'#', onClick: wrap(openMoveDialog), ref: 'move',
+                a {
+                  href:'#'
+                  onClick: wrap(openMoveDialog)
+                  ref: 'move'
+                },
                   I18n.t('move', 'Move')
               li {},
-                a href:'#', onClick: preventDefault(@deleteItem), ref: 'deleteLink',
+                a {
+                  href:'#'
+                  onClick: wrap(deleteStuff)
+                  ref: 'deleteLink'
+                },
                   I18n.t('delete', 'Delete')
             ]

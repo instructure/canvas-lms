@@ -16,6 +16,7 @@ define [
     @optionProperty 'nestingLevel'
     @optionProperty 'onlyShowFolders'
     @optionProperty 'onClick'
+    @optionProperty 'dndOptions'
     @optionProperty 'href'
 
     
@@ -61,7 +62,7 @@ define [
       @$label ||= do =>
         @$labelInner = $('<span>').click (event) => @onClick?(event, @model)
 
-        $("""
+        $label = $("""
           <a
             class="folderLabel"
             role="presentation"
@@ -71,6 +72,19 @@ define [
             <i class="icon-folder"></i>
           </a>
         """).append(@$labelInner).prependTo(@$el)
+
+        if @dndOptions
+          toggleActive = (makeActive) ->
+            return -> $label.toggleClass('activeDragTarget', makeActive)
+          $label.on
+            'dragenter dragover': (event) =>
+              @dndOptions.onItemDragEnterOrOver(event.originalEvent, toggleActive(true))
+            'dragleave dragend': (event) =>
+              @dndOptions.onItemDragLeaveOrEnd(event.originalEvent, toggleActive(false))
+            'drop': (event) =>
+              @dndOptions.onItemDrop(event.originalEvent, @model, toggleActive(false))
+
+        return $label
 
       @$labelInner.text(@title_text())
       @$label
@@ -90,6 +104,7 @@ define [
               nestingLevel: @nestingLevel+1
               onlyShowFolders: @onlyShowFolders
               onClick: @onClick
+              dndOptions: @dndOptions
               href: @href
             tagName: 'li'
             className: 'folders'

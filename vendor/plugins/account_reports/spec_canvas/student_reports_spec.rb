@@ -22,8 +22,8 @@ describe 'Student reports' do
   include ReportSpecHelper
 
   before do
-    Notification.find_or_create_by_name('Report Generated')
-    Notification.find_or_create_by_name('Report Generation Failed')
+    Notification.where(name: "Report Generated").first_or_create
+    Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @course1 = course(:course_name => 'English 101', :account => @account,
                       :active_course => true)
@@ -96,23 +96,23 @@ describe 'Student reports' do
       parameters['include_enrollment_state'] = true
       parameters['enrollment_state'] = ['all']
       parsed = read_report(@type, {params: parameters, order: [1,8]})
-      parsed.length.should == 4
+      expect(parsed.length).to eq 4
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
                            'completed']
-      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101', 'invited']
-      parsed[2].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[2]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
                            'rejected']
-      parsed[3].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[3]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101', 'deleted']
@@ -127,14 +127,14 @@ describe 'Student reports' do
       parameters['include_enrollment_state'] = true
       parameters['enrollment_state'] = ['invited', 'completed']
       parsed = read_report(@type, {params: parameters, order: [1,8]})
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
                            'completed']
-      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101', 'invited']
@@ -149,9 +149,9 @@ describe 'Student reports' do
       parameters['include_enrollment_state'] = true
       parameters['enrollment_state'] = 'active'
       parsed = read_report(@type, params: parameters)
-      parsed.length.should == 1
+      expect(parsed.length).to eq 1
 
-      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[0]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
@@ -163,13 +163,13 @@ describe 'Student reports' do
       parameters['start_at'] = 45.days.ago
       parameters['end_at'] = 35.days.ago
       parsed = read_report(@type, {params: parameters, order: 1})
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
@@ -178,23 +178,23 @@ describe 'Student reports' do
     it 'should find users that have not submitted anything in the past 2 weeks' do
       parsed = read_report(@type, {order: [1,8]})
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
-      parsed[2].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[2]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[3].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[3]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
-      parsed.length.should == 4
+      expect(parsed.length).to eq 4
     end
 
     it 'should adjust date range to 2 weeks' do
@@ -209,15 +209,15 @@ describe 'Student reports' do
       parameters['enrollment_term'] = @term1.id
       parsed = read_report(@type, {params: parameters, order: 1})
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
     end
 
     it 'should find users that have not submitted under a sub account' do
@@ -227,15 +227,15 @@ describe 'Student reports' do
       @course2.save
       parsed = read_report(@type, {account: sub_account, order: 1})
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
     end
 
@@ -245,15 +245,15 @@ describe 'Student reports' do
       parameters['include_enrollment_state'] = true
       parsed = read_report(@type, {params: parameters, order: 1})
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101', 'active']
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101', 'active']
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
     end
   end
 
@@ -286,12 +286,12 @@ describe 'Student reports' do
       param = {}
       param['course'] = @course1.id
       parsed = read_report(@type, {params: param, order: 1})
-      parsed.length.should == 2
-      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed.length).to eq 2
+      expect(parsed[0]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[1].should == [@user3.id.to_s, 'user_sis_id_03',
+      expect(parsed[1]).to eq [@user3.id.to_s, 'user_sis_id_03',
                            @user3.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
@@ -307,12 +307,12 @@ describe 'Student reports' do
       param = {}
       param['enrollment_term'] = 'sis_term_id:fall12'
       parsed = read_report(@type, {params: param, order: 1})
-      parsed.length.should == 2
-      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed.length).to eq 2
+      expect(parsed[0]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[1].should == [@user3.id.to_s, 'user_sis_id_03',
+      expect(parsed[1]).to eq [@user3.id.to_s, 'user_sis_id_03',
                            @user3.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
@@ -320,20 +320,20 @@ describe 'Student reports' do
 
     it 'should run the zero activity report with no params' do
       report = run_report
-      report.parameters["extra_text"].should ==  "Term: All Terms;"
+      expect(report.parameters["extra_text"]).to eq  "Term: All Terms;"
       parsed = parse_report(report, {order: 1})
 
-      parsed.length.should == 3
+      expect(parsed.length).to eq 3
 
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[2].should == [@user3.id.to_s, 'user_sis_id_03',
+      expect(parsed[2]).to eq [@user3.id.to_s, 'user_sis_id_03',
                            @user3.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
@@ -345,8 +345,8 @@ describe 'Student reports' do
       @course2.save!
 
       parsed = read_report(@type, {account: sub_account})
-      parsed.length.should == 1
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed.length).to eq 1
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
@@ -358,22 +358,22 @@ describe 'Student reports' do
       parameter = {}
       parameter['start_at'] = 3.days.ago
       report = run_report(@type, {params: parameter})
-      (report.parameters["extra_text"].include? "Start At:").should == true
+      expect(report.parameters["extra_text"].include? "Start At:").to eq true
       parsed = parse_report(report, {order: [1,5]})
-      parsed.length.should == 4
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed.length).to eq 4
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
+      expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
-      parsed[2].should == [@user2.id.to_s, 'user_sis_id_02',
+      expect(parsed[2]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
-      parsed[3].should == [@user3.id.to_s, 'user_sis_id_03',
+      expect(parsed[3]).to eq [@user3.id.to_s, 'user_sis_id_03',
                            @user3.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
@@ -401,10 +401,10 @@ describe 'Student reports' do
 
     it 'should run the last user access report' do
       parsed = read_report(@type, {order: 1})
-      parsed.length.should == 3
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
-      parsed[2].should == [@user3.id.to_s, 'user_sis_id_03', 'Astley, Rick', @last_login_time2.iso8601, @p3.current_login_ip]
+      expect(parsed.length).to eq 3
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      expect(parsed[2]).to eq [@user3.id.to_s, 'user_sis_id_03', 'Astley, Rick', @last_login_time2.iso8601, @p3.current_login_ip]
     end
 
     it 'should run the last user access report for a term' do
@@ -416,18 +416,18 @@ describe 'Student reports' do
       param = {}
       param['enrollment_term'] = @term1.id
       parsed = read_report(@type, {params: param, order: 1})
-      parsed.length.should == 2
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      expect(parsed.length).to eq 2
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
     end
 
     it 'should run the last user access report for a course' do
       param = {}
       param['course'] = @course.id
       parsed = read_report(@type, {params: param, order: 1})
-      parsed.length.should == 2
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      expect(parsed.length).to eq 2
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
     end
 
     it 'should not include a user multiple times for multiple enrollments' do
@@ -441,11 +441,11 @@ describe 'Student reports' do
       param['enrollment_term'] = term1.id
 
       parsed = read_report(@type, {params: param, order: 1})
-      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
                            @last_login_time2.iso8601, @p1.current_login_ip]
-      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
                            @last_login_time.iso8601, @p2.current_login_ip]
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
     end
 
     it 'should include each pseudonym for users' do
@@ -465,15 +465,15 @@ describe 'Student reports' do
       param['enrollment_term'] = term1.id
 
       report = run_report(@type, {params: param})
-      report.parameters["extra_text"].should == "Term: Fall;"
+      expect(report.parameters["extra_text"]).to eq "Term: Fall;"
       parsed = parse_report(report, {order: 1})
-      parsed[0].should == [@user1.id.to_s, 'secondSIS', 'Clair, John St.',
+      expect(parsed[0]).to eq [@user1.id.to_s, 'secondSIS', 'Clair, John St.',
                            @last_login_time.iso8601, p1b.current_login_ip]
-      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
+      expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
                            @last_login_time2.iso8601, @p1.current_login_ip]
-      parsed[2].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
+      expect(parsed[2]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
                            @last_login_time.iso8601, @p2.current_login_ip]
-      parsed.length.should == 3
+      expect(parsed.length).to eq 3
     end
   end
 end

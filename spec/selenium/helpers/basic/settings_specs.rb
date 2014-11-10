@@ -13,15 +13,15 @@ shared_examples_for "settings basic tests" do
       f("textarea.user_list").send_keys(address)
       f(".verify_syntax_button").click
       wait_for_ajax_requests
-      f("#user_lists_processed_people .person").text.should == address
+      expect(f("#user_lists_processed_people .person").text).to eq address
       f(".add_users_button").click
       wait_for_ajax_requests
-      user = User.find_by_name(address)
-      user.should be_present
-      admin = AccountUser.find_by_user_id(user.id)
-      admin.should be_present
-      admin.membership_type.should == "AccountAdmin"
-      f("#enrollment_#{admin.id} .email").text.should == address
+      user = User.where(name: address).first
+      expect(user).to be_present
+      admin = AccountUser.where(user_id: user).first
+      expect(admin).to be_present
+      expect(admin.membership_type).to eq "AccountAdmin"
+      expect(f("#enrollment_#{admin.id} .email").text).to eq address
       admin.id
     end
 
@@ -39,7 +39,7 @@ shared_examples_for "settings basic tests" do
       f("#enrollment_#{admin_id} .remove_account_user_link").click
       driver.switch_to.alert.accept
       wait_for_ajax_requests
-      AccountUser.find_by_id(admin_id).should be_nil
+      expect(AccountUser.where(id: admin_id)).not_to be_exists
     end
   end
 
@@ -61,8 +61,8 @@ shared_examples_for "settings basic tests" do
       replace_content(f("#account_name"), new_account_name)
       click_submit
       account.reload
-      account.name.should == new_account_name
-      f("#account_name").should have_value(new_account_name)
+      expect(account.name).to eq new_account_name
+      expect(f("#account_name")).to have_value(new_account_name)
     end
 
     it "should change the default quotas" do
@@ -71,15 +71,15 @@ shared_examples_for "settings basic tests" do
       # update the quotas
       course_quota = account.default_storage_quota_mb
       course_quota_input = f('[name="default_storage_quota_mb"]')
-      course_quota_input.should have_value(course_quota.to_s)
+      expect(course_quota_input).to have_value(course_quota.to_s)
 
       user_quota = account.default_user_storage_quota_mb
       user_quota_input = f('[name="default_user_storage_quota_mb"]')
-      user_quota_input.should have_value(user_quota.to_s)
+      expect(user_quota_input).to have_value(user_quota.to_s)
 
       group_quota = account.default_group_storage_quota_mb
       group_quota_input = f('[name="default_group_storage_quota_mb"]')
-      group_quota_input.should have_value(group_quota.to_s)
+      expect(group_quota_input).to have_value(group_quota.to_s)
 
       course_quota += 25
       replace_content(course_quota_input, course_quota.to_s)
@@ -93,18 +93,18 @@ shared_examples_for "settings basic tests" do
 
       # ensure the account was updated properly
       account.reload
-      account.default_storage_quota_mb.should == course_quota
-      account.default_storage_quota.should == course_quota * 1048576
+      expect(account.default_storage_quota_mb).to eq course_quota
+      expect(account.default_storage_quota).to eq course_quota * 1048576
       account.default_user_storage_quota_mb == user_quota
-      account.default_user_storage_quota.should == user_quota * 1048576
+      expect(account.default_user_storage_quota).to eq user_quota * 1048576
       account.default_group_storage_quota_mb == group_quota
-      account.default_group_storage_quota.should == group_quota * 1048576
+      expect(account.default_group_storage_quota).to eq group_quota * 1048576
 
       # ensure the new value is reflected after a refresh
       get account_settings_url
-      fj('[name="default_storage_quota_mb"]').should have_value(course_quota.to_s) # fj to avoid selenium caching
-      fj('[name="default_user_storage_quota_mb"]').should have_value(user_quota.to_s) # fj to avoid selenium caching
-      fj('[name="default_group_storage_quota_mb"]').should have_value(group_quota.to_s) # fj to avoid selenium caching
+      expect(fj('[name="default_storage_quota_mb"]')).to have_value(course_quota.to_s) # fj to avoid selenium caching
+      expect(fj('[name="default_user_storage_quota_mb"]')).to have_value(user_quota.to_s) # fj to avoid selenium caching
+      expect(fj('[name="default_group_storage_quota_mb"]')).to have_value(group_quota.to_s) # fj to avoid selenium caching
     end
 
     it "should manually change a course quota" do
@@ -119,10 +119,10 @@ shared_examples_for "settings basic tests" do
       wait_for_ajaximations
 
       link = f('#manual_quotas_link')
-      link.should include_text(@course.name)
+      expect(link).to include_text(@course.name)
 
       quota_input = f('#manual_quotas_quota')
-      quota_input.should have_value(@course.storage_quota_mb.to_s)
+      expect(quota_input).to have_value(@course.storage_quota_mb.to_s)
       replace_content(quota_input, '42')
 
       f('#manual_quotas_submit_button').click
@@ -131,7 +131,7 @@ shared_examples_for "settings basic tests" do
 
       # ensure the account was updated properly
       @course.reload
-      @course.storage_quota_mb.should == 42
+      expect(@course.storage_quota_mb).to eq 42
     end
 
     it "should manually change a group quota" do
@@ -146,10 +146,10 @@ shared_examples_for "settings basic tests" do
       wait_for_ajaximations
 
       link = f('#manual_quotas_link')
-      link.should include_text(@group.name)
+      expect(link).to include_text(@group.name)
 
       quota_input = f('#manual_quotas_quota')
-      quota_input.should have_value(@group.storage_quota_mb.to_s)
+      expect(quota_input).to have_value(@group.storage_quota_mb.to_s)
       replace_content(quota_input, '42')
 
       f('#manual_quotas_submit_button').click
@@ -158,15 +158,15 @@ shared_examples_for "settings basic tests" do
 
       # ensure the account was updated properly
       @group.reload
-      @group.storage_quota_mb.should == 42
+      expect(@group.storage_quota_mb).to eq 42
     end
 
     it "should change the default language to spanish" do
       f("#account_default_locale option[value='es']").click
       click_submit
       account.reload
-      account.default_locale.should == "es"
-      get_value('#account_default_locale').should == 'es'
+      expect(account.default_locale).to eq "es"
+      expect(get_value('#account_default_locale')).to eq 'es'
     end
   end
 end

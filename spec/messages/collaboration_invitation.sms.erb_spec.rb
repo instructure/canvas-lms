@@ -24,9 +24,9 @@ describe 'collaboration_invitation.sms' do
     course_with_student
     @collaboration = @course.collaborations.create!(:user => @user, :title => "my collab")
     @object = @collaboration.collaborators.create!(:user => @user)
-    @object.collaboration.should_not be_nil
-    @object.collaboration.context.should_not be_nil
-    @object.user.should_not be_nil
+    expect(@object.collaboration).not_to be_nil
+    expect(@object.collaboration.context).not_to be_nil
+    expect(@object.user).not_to be_nil
     generate_message(:collaboration_invitation, :sms, @object)
   end
 end

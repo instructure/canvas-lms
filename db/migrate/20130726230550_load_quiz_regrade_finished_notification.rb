@@ -11,6 +11,6 @@ class LoadQuizRegradeFinishedNotification < ActiveRecord::Migration
 
   def self.down
     return unless Shard.current == Shard.default
-    Notification.find_by_name('Quiz Regrade Finished').destroy
+    Notification.where(name: 'Quiz Regrade Finished').delete_all
   end
 end

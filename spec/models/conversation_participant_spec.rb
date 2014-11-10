@@ -25,10 +25,10 @@ describe ConversationParticipant do
     convo = sender.initiate_conversation([recipient])
     convo.add_message('test')
 
-    sender.conversations.should == [convo]
-    convo.participants.size.should == 2
-    convo.conversation.participants.size.should == 2
-    convo.messages.size.should == 1
+    expect(sender.conversations).to eq [convo]
+    expect(convo.participants.size).to eq 2
+    expect(convo.conversation.participants.size).to eq 2
+    expect(convo.messages.size).to eq 1
   end
 
   it "should correctly manage messages" do
@@ -38,29 +38,29 @@ describe ConversationParticipant do
     convo.add_message('test')
     convo.add_message('another')
     rconvo = recipient.conversations.first
-    convo.messages.size.should == 2
-    rconvo.messages.size.should == 2
+    expect(convo.messages.size).to eq 2
+    expect(rconvo.messages.size).to eq 2
 
     convo.remove_messages(convo.messages.last)
     convo.messages.reload
-    convo.messages.size.should == 1
-    convo.all_messages.size.should == 2
+    expect(convo.messages.size).to eq 1
+    expect(convo.all_messages.size).to eq 2
     # the recipient's messages are unaffected, since removing a message
     # only sets workflow state on the join table.
-    rconvo.messages.size.should == 2
+    expect(rconvo.messages.size).to eq 2
 
     convo.remove_messages(:all)
-    convo.messages.size.should == 0
-    convo.all_messages.size.should == 2
+    expect(convo.messages.size).to eq 0
+    expect(convo.all_messages.size).to eq 2
     rconvo.reload
-    rconvo.messages.size.should == 2
+    expect(rconvo.messages.size).to eq 2
 
     convo.delete_messages(:all)
-    convo.all_messages.size.should == 0
+    expect(convo.all_messages.size).to eq 0
 
     rconvo.delete_messages(rconvo.messages.last)
-    rconvo.messages.size.should == 1
-    rconvo.all_messages.size.should == 1
+    expect(rconvo.messages.size).to eq 1
+    expect(rconvo.all_messages.size).to eq 1
   end
 
   it "should update the updated_at stamp of its user on workflow_state change" do
@@ -69,7 +69,7 @@ describe ConversationParticipant do
     updated_at   = sender.updated_at
     conversation = sender.initiate_conversation([recipient])
     conversation.update_attribute(:workflow_state, 'unread')
-    sender.reload.updated_at.should_not eql updated_at
+    expect(sender.reload.updated_at).not_to eql updated_at
   end
 
   it "should support starred/starred=" do
@@ -80,12 +80,12 @@ describe ConversationParticipant do
     conversation.starred = true
     conversation.save
     conversation.reload
-    conversation.starred.should be_true
+    expect(conversation.starred).to be_truthy
 
     conversation.starred = false
     conversation.save
     conversation.reload
-    conversation.starred.should be_false
+    expect(conversation.starred).to be_falsey
   end
 
   it "should support :starred in update_attributes" do
@@ -96,12 +96,12 @@ describe ConversationParticipant do
     conversation.update_attributes(:starred => true)
     conversation.save
     conversation.reload
-    conversation.starred.should be_true
+    expect(conversation.starred).to be_truthy
 
     conversation.update_attributes(:starred => false)
     conversation.save
     conversation.reload
-    conversation.starred.should be_false
+    expect(conversation.starred).to be_falsey
   end
 
   context "tagged scope" do
@@ -128,39 +128,39 @@ describe ConversationParticipant do
     end
 
     it "should return conversations that match the given course" do
-      @me.conversations.tagged("course_1").sort_by(&:id).should eql [@c1, @c2, @c8]
+      expect(@me.conversations.tagged("course_1").sort_by(&:id)).to eql [@c1, @c2, @c8]
     end
 
     it "should return conversations that match any of the given courses" do
-      @me.conversations.tagged("course_1", "course_2").sort_by(&:id).should eql [@c1, @c2, @c3, @c8]
+      expect(@me.conversations.tagged("course_1", "course_2").sort_by(&:id)).to eql [@c1, @c2, @c3, @c8]
     end
 
     it "should return conversations that match all of the given courses" do
-      @me.conversations.tagged("course_1", "course_2", :mode => :and).sort_by(&:id).should eql [@c2]
+      expect(@me.conversations.tagged("course_1", "course_2", :mode => :and).sort_by(&:id)).to eql [@c2]
     end
 
     it "should return conversations that match the given group" do
-      @me.conversations.tagged("group_1").sort_by(&:id).should eql [@c4]
+      expect(@me.conversations.tagged("group_1").sort_by(&:id)).to eql [@c4]
     end
 
     it "should return conversations that match the given user" do
-      @me.conversations.tagged(@u1.asset_string).sort_by(&:id).should eql [@c5, @c7, @c8]
+      expect(@me.conversations.tagged(@u1.asset_string).sort_by(&:id)).to eql [@c5, @c7, @c8]
     end
 
     it "should return conversations that match any of the given users" do
-      @me.conversations.tagged(@u1.asset_string, @u2.asset_string).sort_by(&:id).should eql [@c5, @c6, @c7, @c8]
+      expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string).sort_by(&:id)).to eql [@c5, @c6, @c7, @c8]
     end
 
     it "should return conversations that match all of the given users" do
-      @me.conversations.tagged(@u1.asset_string, @u2.asset_string, :mode => :and).sort_by(&:id).should eql [@c7]
+      expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string, :mode => :and).sort_by(&:id)).to eql [@c7]
     end
 
     it "should return conversations that match either the given course or user" do
-      @me.conversations.tagged(@u1.asset_string, "course_1").sort_by(&:id).should eql [@c1, @c2, @c5, @c7, @c8]
+      expect(@me.conversations.tagged(@u1.asset_string, "course_1").sort_by(&:id)).to eql [@c1, @c2, @c5, @c7, @c8]
     end
 
     it "should return conversations that match both the given course and user" do
-      @me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id).should eql [@c8]
+      expect(@me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id)).to eql [@c8]
     end
 
     context "sharding" do
@@ -171,7 +171,7 @@ describe ConversationParticipant do
           @u3 = user
           @c9 = conversation_for(@u3)
         end
-        @me.conversations.tagged(@u3.asset_string).map(&:conversation).should == [@c9.conversation]
+        expect(@me.conversations.tagged(@u3.asset_string).map(&:conversation)).to eq [@c9.conversation]
       end
     end
   end
@@ -205,14 +205,14 @@ describe ConversationParticipant do
       Account.site_admin.account_users.create!(user: @admin_user)
       Account.site_admin.stubs(:grants_right?).with(@admin_user, :become_user).returns(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
-      convos.size.should eql 4
-      convos.should == @target_user.conversations.to_a
+      expect(convos.size).to eql 4
+      expect(convos).to eq @target_user.conversations.to_a
     end
 
     it "should limit others to their associated root accounts" do
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
-      convos.size.should eql 2
-      convos.sort_by(&:id).should eql [@c1, @c2]
+      expect(convos.size).to eql 2
+      expect(convos.sort_by(&:id)).to eql [@c1, @c2]
     end
   end
 
@@ -235,31 +235,31 @@ describe ConversationParticipant do
     it "should not include shared contexts by default" do
       users = @convo.reload.participants
       users.each do |user|
-        user.common_groups.should be_empty
-        user.common_courses.should be_empty
+        expect(user.common_groups).to be_empty
+        expect(user.common_courses).to be_empty
       end
     end
 
     it "should not include forwarded participants by default" do
       users = @convo.reload.participants
-      users.map(&:id).sort.should eql [@me.id, @u1.id, @u2.id, @u3.id]
+      expect(users.map(&:id).sort).to eql [@me.id, @u1.id, @u2.id, @u3.id]
     end
 
     it "should include shared contexts if requested" do
       users = @convo.reload.participants(:include_participant_contexts => true)
       users.each do |user|
-        user.common_groups.should == {}
+        expect(user.common_groups).to eq({})
         if [@me.id, @u3.id].include? user.id
-          user.common_courses.should == {}
+          expect(user.common_courses).to eq({})
         else
-          user.common_courses.should == {@course.id => ["StudentEnrollment"]}
+          expect(user.common_courses).to eq({@course.id => ["StudentEnrollment"]})
         end
       end
     end
 
     it "should include include forwarded participants if requested" do
       users = @convo.reload.participants(:include_indirect_participants => true)
-      users.map(&:id).sort.should eql [@me.id, @u1.id, @u2.id, @u3.id, @u4.id]
+      expect(users.map(&:id).sort).to eql [@me.id, @u1.id, @u2.id, @u3.id, @u4.id]
     end
   end
 
@@ -276,10 +276,10 @@ describe ConversationParticipant do
 
       c.move_to_user @user2
 
-      c.reload.user_id.should eql @user2.id
-      c.conversation.participants.map(&:id).should_not include(@user1.id)
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
+      expect(c.reload.user_id).to eql @user2.id
+      expect(c.conversation.participants.map(&:id)).not_to include(@user1.id)
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
     it "should clean up group conversations having both users" do
@@ -287,18 +287,18 @@ describe ConversationParticipant do
       c.add_message("hello")
       c.update_attribute(:workflow_state, 'unread')
       rconvo = c.conversation
-      rconvo.participants.size.should eql 4
+      expect(rconvo.participants.size).to eql 4
 
       c.move_to_user @user2
 
-      lambda{ c.reload }.should raise_error # deleted
+      expect{ c.reload }.to raise_error # deleted
 
       rconvo.reload
-      rconvo.participants.size.should eql 3
-      rconvo.participants.map(&:id).should_not include(@user1.id)
-      rconvo.participants.map(&:id).should include(@user2.id)
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
+      expect(rconvo.participants.size).to eql 3
+      expect(rconvo.participants.map(&:id)).not_to include(@user1.id)
+      expect(rconvo.participants.map(&:id)).to include(@user2.id)
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
     it "should move a private conversation to the new user" do
@@ -310,12 +310,12 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      c.reload.user_id.should eql @user2.id
+      expect(c.reload.user_id).to eql @user2.id
       rconvo.reload
-      rconvo.participants.size.should eql 2
-      rconvo.private_hash.should_not eql old_hash
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
+      expect(rconvo.participants.size).to eql 2
+      expect(rconvo.private_hash).not_to eql old_hash
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
     it "should merge a private conversation into the existing private conversation" do
@@ -328,17 +328,17 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      lambda{ c.reload }.should raise_error # deleted
-      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+      expect{ c.reload }.to raise_error # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
 
-      c2.reload.messages.size.should eql 2
-      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
-      c2.message_count.should eql 2
-      c2.user_id.should eql @user2.id
-      c2.conversation.participants.size.should eql 2
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
-      other_guy.reload.unread_conversations_count.should eql 1
+      expect(c2.reload.messages.size).to eql 2
+      expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
+      expect(c2.message_count).to eql 2
+      expect(c2.user_id).to eql @user2.id
+      expect(c2.conversation.participants.size).to eql 2
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(other_guy.reload.unread_conversations_count).to eql 1
     end
 
     it "should change a private conversation between the two users into a monologue" do
@@ -351,12 +351,12 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      lambda{ c.reload }.should raise_error # deleted
+      expect{ c.reload }.to raise_error # deleted
       rconvo.reload
-      rconvo.participants.size.should eql 1
-      rconvo.private_hash.should_not eql old_hash
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
+      expect(rconvo.participants.size).to eql 1
+      expect(rconvo.private_hash).not_to eql old_hash
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
     it "should merge a private conversations between the two users into the existing monologue" do
@@ -369,16 +369,16 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      lambda{ c.reload }.should raise_error # deleted
-      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+      expect{ c.reload }.to raise_error # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
 
-      c2.reload.messages.size.should eql 2
-      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
-      c2.message_count.should eql 2
-      c2.user_id.should eql @user2.id
-      c2.conversation.participants.size.should eql 1
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
+      expect(c2.reload.messages.size).to eql 2
+      expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
+      expect(c2.message_count).to eql 2
+      expect(c2.user_id).to eql @user2.id
+      expect(c2.conversation.participants.size).to eql 1
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
     it "should merge a monologue into the existing monologue" do
@@ -390,16 +390,16 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      lambda{ c.reload }.should raise_error # deleted
-      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+      expect{ c.reload }.to raise_error # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
 
-      c2.reload.messages.size.should eql 2
-      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
-      c2.message_count.should eql 2
-      c2.user_id.should eql @user2.id
-      c2.conversation.participants.size.should eql 1
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
+      expect(c2.reload.messages.size).to eql 2
+      expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
+      expect(c2.message_count).to eql 2
+      expect(c2.user_id).to eql @user2.id
+      expect(c2.conversation.participants.size).to eql 1
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
     it "should not be adversely affected by an outer scope" do
@@ -415,17 +415,17 @@ describe ConversationParticipant do
         c.move_to_user @user2
       end
 
-      lambda{ c.reload }.should raise_error # deleted
-      lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
+      expect{ c.reload }.to raise_error # deleted
+      expect{ Conversation.find(c.conversation_id) }.to raise_error # deleted
 
-      c2.reload.messages.size.should eql 2
-      c2.messages.map(&:author_id).should eql [@user2.id, @user2.id]
-      c2.message_count.should eql 2
-      c2.user_id.should eql @user2.id
-      c2.conversation.participants.size.should eql 2
-      @user1.reload.unread_conversations_count.should eql 0
-      @user2.reload.unread_conversations_count.should eql 1
-      other_guy.reload.unread_conversations_count.should eql 1
+      expect(c2.reload.messages.size).to eql 2
+      expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
+      expect(c2.message_count).to eql 2
+      expect(c2.user_id).to eql @user2.id
+      expect(c2.conversation.participants.size).to eql 2
+      expect(@user1.reload.unread_conversations_count).to eql 0
+      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(other_guy.reload.unread_conversations_count).to eql 1
     end
 
     context "sharding" do
@@ -438,10 +438,10 @@ describe ConversationParticipant do
           u2 = User.create!
           cp.move_to_user(u2)
           cp.reload
-          cp.user.should == u2
+          expect(cp.user).to eq u2
           cp2 = u2.all_conversations.first
-          cp2.should_not == cp
-          cp2.shard.should == @shard1
+          expect(cp2).not_to eq cp
+          expect(cp2.shard).to eq @shard1
         end
       end
     end

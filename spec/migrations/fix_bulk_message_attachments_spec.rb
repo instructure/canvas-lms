@@ -34,9 +34,9 @@ describe 'DataFixup::FixBulkMessageAttachments' do
       DataFixup::FixBulkMessageAttachments.run
 
       # yay
-      AttachmentAssociation.count.should eql 21
+      expect(AttachmentAssociation.count).to eql 21
       ConversationMessage.all.each do |message|
-        message.attachments.should == root_message.attachments
+        expect(message.attachments).to eq root_message.attachments
       end
     end
   end

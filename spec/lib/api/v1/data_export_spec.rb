@@ -12,13 +12,13 @@ describe Api::V1::DataExport do
     end
 
     it "should return data export hash" do
-      data_exports_json([@de], @user, @session).size.should == 1
+      expect(data_exports_json([@de], @user, @session).size).to eq 1
     
       json = data_export_json(@de, @user, @session).symbolize_keys
-      json.keys.sort.should == [:created_at, :id, :workflow_state]
-      json[:id].should == @de.id
-      json[:created_at].should == @de.created_at
-      json[:workflow_state].should == @de.workflow_state
+      expect(json.keys.sort).to eq [:created_at, :id, :workflow_state]
+      expect(json[:id]).to eq @de.id
+      expect(json[:created_at]).to eq @de.created_at
+      expect(json[:workflow_state]).to eq @de.workflow_state
     end
   end
 

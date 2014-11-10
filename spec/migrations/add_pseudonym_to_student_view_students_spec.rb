@@ -39,18 +39,18 @@ describe "AddPseudonymToStudentViewStudents" do
     @fake2.pseudonym.destroy!
     @fake3.pseudonym.destroy!
 
-    @fake1.reload.pseudonym.should_not be_nil
-    @fake2.reload.pseudonym.should be_nil
-    @fake3.reload.pseudonym.should be_nil
+    expect(@fake1.reload.pseudonym).not_to be_nil
+    expect(@fake2.reload.pseudonym).to be_nil
+    expect(@fake3.reload.pseudonym).to be_nil
 
     DataFixup::AddPseudonymToStudentViewStudents.run
 
-    @fake1.reload.pseudonyms.count.should eql 1
-    @fake2.reload.pseudonyms.count.should eql 1
-    @fake3.reload.pseudonyms.count.should eql 1
+    expect(@fake1.reload.pseudonyms.count).to eql 1
+    expect(@fake2.reload.pseudonyms.count).to eql 1
+    expect(@fake3.reload.pseudonyms.count).to eql 1
 
-    @fake1.reload.pseudonym.unique_id.should eql Canvas::Security.hmac_sha1("Test Student_#{@fake1.id}")
-    @fake2.reload.pseudonym.unique_id.should eql Canvas::Security.hmac_sha1("Test Student_#{@fake2.id}")
-    @fake3.reload.pseudonym.unique_id.should eql Canvas::Security.hmac_sha1("Test Student_#{@fake3.id}")
+    expect(@fake1.reload.pseudonym.unique_id).to eql Canvas::Security.hmac_sha1("Test Student_#{@fake1.id}")
+    expect(@fake2.reload.pseudonym.unique_id).to eql Canvas::Security.hmac_sha1("Test Student_#{@fake2.id}")
+    expect(@fake3.reload.pseudonym.unique_id).to eql Canvas::Security.hmac_sha1("Test Student_#{@fake3.id}")
   end
 end

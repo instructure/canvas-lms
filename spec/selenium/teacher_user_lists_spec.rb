@@ -31,12 +31,12 @@ eolist
       browser_text = ["user1@example.com\nuser1@example.com\nuser1@example.com", "sagat, bob\nbob sagat\nbob@thesagatfamily.name", "user, login_name\nlogin_name user\nA124123"] if include_short_name
       browser_text = ["user1@example.com\nuser1@example.com", "sagat, bob\nbob@thesagatfamily.name", "user, login_name\nA124123"] unless include_short_name
       enrollments = Enrollment.where("(workflow_state='invited' OR workflow_state='creation_pending') AND type=?", enrollment_type).all
-      (enrollments.count > 2).should be_true
+      expect(enrollments.count > 2).to be_truthy
       unique_ids.each do |id|
         enrollment = find_enrollment_by_id(enrollments, id)
-        enrollment.should be_present
+        expect(enrollment).to be_present
         selector = use_user_id ? "#user_#{enrollment.user_id}" : "#enrollment_#{enrollment.id}"
-        f(selector).text.should include(browser_text.shift)
+        expect(f(selector).text).to include(browser_text.shift)
       end
     end
 

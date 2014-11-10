@@ -28,7 +28,19 @@ describe "/groups/index" do
     assigns[:memberships] = []
     assigns[:groups] = []
     render "groups/index"
-    response.should_not be_nil
+    expect(response).not_to be_nil
+  end
+
+  it "should show context name under group name" do
+    course_with_student
+    group_with_user(:user => @user, :group_context => @course)
+    view_context
+    assigns[:categories] = []
+    assigns[:students] = [@user]
+    assigns[:memberships] = []
+    assigns[:groups] = [@group]
+    render "groups/index"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css('ul.context_list li:first span.subtitle').text).to eq @course.name
   end
 end
-

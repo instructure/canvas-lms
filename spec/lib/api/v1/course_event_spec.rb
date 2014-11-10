@@ -38,7 +38,7 @@ describe Api::V1::CourseEvent do
   end
 
   before do
-    pending("needs auditors cassandra keyspace configured") unless Auditors::Course::Stream.available?
+    skip("needs auditors cassandra keyspace configured") unless Auditors::Course::Stream.available?
 
     @request_id = CanvasUUID.generate
     RequestContextGenerator.stubs( :request_id => @request_id )
@@ -73,53 +73,53 @@ describe Api::V1::CourseEvent do
   it "should be formatted as a course content event hash" do
     event = course_event_json(@event, @student, @session)
 
-    event[:id].should == @event.id
-    event[:created_at].should == @event.created_at.in_time_zone
-    event[:event_type].should == @event.event_type
-    event[:event_data].should == @event.event_data
-    event[:event_source].should == @event.event_source
+    expect(event[:id]).to eq @event.id
+    expect(event[:created_at]).to eq @event.created_at.in_time_zone
+    expect(event[:event_type]).to eq @event.event_type
+    expect(event[:event_data]).to eq @event.event_data
+    expect(event[:event_source]).to eq @event.event_source
 
-    event[:links].keys.sort.should == [:course, :page_view, :sis_batch, :user]
+    expect(event[:links].keys.sort).to eq [:course, :page_view, :sis_batch, :user]
 
-    event[:links][:course].should == Shard.relative_id_for(@course, Shard.current, Shard.current)
-    event[:links][:page_view].should == @page_view.id
-    event[:links][:user].should == Shard.relative_id_for(@teacher, Shard.current, Shard.current)
+    expect(event[:links][:course]).to eq Shard.relative_id_for(@course, Shard.current, Shard.current)
+    expect(event[:links][:page_view]).to eq @page_view.id
+    expect(event[:links][:user]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current)
   end
 
   it "should be formatted as an array of course content event hashes" do
-    course_events_json(@events, @student, @session).size.should eql(@events.size)
+    expect(course_events_json(@events, @student, @session).size).to eql(@events.size)
   end
 
   it "should be formatted as an array of compound course content event hashes" do
     json_hash = course_events_compound_json(@events, @user, @session)
 
-    json_hash.keys.sort.should == [:events, :linked, :links]
+    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
 
-    json_hash[:links].should == {
+    expect(json_hash[:links]).to eq({
       "events.course" => "#{url_root}/api/v1/courses/{events.course}",
       "events.user" => nil,
       "events.sis_batch" => nil
-    }
+    })
 
-    json_hash[:events].should == course_events_json(@events, @user, @session)
+    expect(json_hash[:events]).to eq course_events_json(@events, @user, @session)
 
     linked = json_hash[:linked]
-    linked.keys.sort.should == [:courses, :page_views, :users]
-    linked[:courses].size.should eql(1)
-    linked[:users].size.should eql(1)
-    linked[:page_views].size.should eql(1)
+    expect(linked.keys.sort).to eq [:courses, :page_views, :users]
+    expect(linked[:courses].size).to eql(1)
+    expect(linked[:users].size).to eql(1)
+    expect(linked[:page_views].size).to eql(1)
   end
 
   it "should handle an empty result set" do
     json_hash = course_events_compound_json([], @user, @session)
 
-    json_hash.keys.sort.should == [:events, :linked, :links]
-    json_hash[:events].should == course_events_json([], @user, @session)
+    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
+    expect(json_hash[:events]).to eq course_events_json([], @user, @session)
 
     linked = json_hash[:linked]
-    linked.keys.sort.should == [:courses, :page_views, :users]
-    linked[:courses].size.should be_zero
-    linked[:users].size.should be_zero
-    linked[:page_views].size.should be_zero
+    expect(linked.keys.sort).to eq [:courses, :page_views, :users]
+    expect(linked[:courses].size).to be_zero
+    expect(linked[:users].size).to be_zero
+    expect(linked[:page_views].size).to be_zero
   end
 end

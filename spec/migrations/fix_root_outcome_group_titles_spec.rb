@@ -31,7 +31,7 @@ describe DataFixup::FixRootOutcomeGroupTitles do
     @course.account.reload
 
     # verify the results
-    @course.learning_outcome_groups.first.title.should == @course.name
-    @course.account.learning_outcome_groups.first.title.should == 'ROOT'
+    expect(@course.learning_outcome_groups.first.title).to eq @course.name
+    expect(@course.account.learning_outcome_groups.first.title).to eq 'ROOT'
   end
 end

@@ -31,7 +31,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/wiki/#{title}"
       wait_for_ajax_requests
 
-      f('.ui-state-error').should include_text(expected_error)
+      expect(f('.ui-state-error')).to include_text(expected_error)
     end
 
     it "should not allow students to edit if marked for only teachers can edit" do
@@ -44,7 +44,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/wiki/#{title}"
       wait_for_ajax_requests
 
-      f('.edit_link').should be_nil
+      expect(f('.edit_link')).to be_nil
     end
 
     it "should allow students to edit wiki if any option but teachers is selected" do
@@ -57,7 +57,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/wiki/#{title}"
       wait_for_ajax_requests
 
-      f('.edit_link').should be_displayed
+      expect(f('.edit_link')).to be_displayed
 
       #vars for 2nd wiki page with different permissions
       title2 = "test_page2"
@@ -68,7 +68,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/wiki/#{title2}"
       wait_for_ajax_requests
 
-      f('.edit_link').should be_displayed
+      expect(f('.edit_link')).to be_displayed
     end
 
     it "should notify users when wiki page gets changed" do
@@ -87,11 +87,11 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       update_wiki_attr(days_old, notify, body, p)
 
       #validation that the update to the body triggered a notification to the @user as expected
-      p.messages_sent.should_not be_nil
-      p.messages_sent.should_not be_empty
-      p.messages_sent["Updated Wiki Page"].should_not be_nil
-      p.messages_sent["Updated Wiki Page"].should_not be_empty
-      p.messages_sent["Updated Wiki Page"].map(&:user).should be_include(@user)
+      expect(p.messages_sent).not_to be_nil
+      expect(p.messages_sent).not_to be_empty
+      expect(p.messages_sent["Updated Wiki Page"]).not_to be_nil
+      expect(p.messages_sent["Updated Wiki Page"]).not_to be_empty
+      expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@user)
     end
 
     it "should not notify users when wiki page gets changed" do
@@ -110,7 +110,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       update_wiki_attr(days_old, notify, body, p)
 
       #validation that the update to the body did not trigger a notification to the @user as expected
-      p.messages_sent.should be_empty
+      expect(p.messages_sent).to be_empty
     end
   end
 end

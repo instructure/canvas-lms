@@ -278,7 +278,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && self.discussion_topic.available_for?(user) }
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.discussion_topic.closed_for_comment_for?(user) }
     can :reply and can :create and can :read
 
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
@@ -287,13 +287,13 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_right?(user, session, :post_to_forum) && discussion_topic.available_for?(user) }
     can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) && !self.discussion_topic.closed_for_comment_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given { |user, session| !self.discussion_topic.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) && !self.discussion_topic.closed_for_comment_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) }

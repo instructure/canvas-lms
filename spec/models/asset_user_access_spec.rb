@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,33 +30,40 @@ describe AssetUserAccess do
   end
 
   it "should update existing records that have bad display names" do
-    @asset.display_name.should == "My Assignment"
+    expect(@asset.display_name).to eq "My Assignment"
+  end
+
+  it "should update existing records that have changed display names" do
+    @assignment.title = 'My changed Assignment'
+    @assignment.save!
+    @asset.log @course, { :level => 'view' }
+    expect(@asset.display_name).to eq 'My changed Assignment'
   end
 
   describe "for_user" do
     it "should work with a User object" do
-      AssetUserAccess.for_user(@user).should == [@asset]
+      expect(AssetUserAccess.for_user(@user)).to eq [@asset]
     end
 
     it "should work with a list of User objects" do
-      AssetUserAccess.for_user([@user]).should == [@asset]
+      expect(AssetUserAccess.for_user([@user])).to eq [@asset]
     end
 
     it "should work with a User id" do
-      AssetUserAccess.for_user(@user.id).should == [@asset]
+      expect(AssetUserAccess.for_user(@user.id)).to eq [@asset]
     end
 
     it "should work with a list of User ids" do
-      AssetUserAccess.for_user([@user.id]).should == [@asset]
+      expect(AssetUserAccess.for_user([@user.id])).to eq [@asset]
     end
 
     it "should with with an empty list" do
-      AssetUserAccess.for_user([]).should == []
+      expect(AssetUserAccess.for_user([])).to eq []
     end
 
     it "should not find unrelated accesses" do
-      AssetUserAccess.for_user(User.create!).should == []
-      AssetUserAccess.for_user(@user.id + 1).should == []
+      expect(AssetUserAccess.for_user(User.create!)).to eq []
+      expect(AssetUserAccess.for_user(@user.id + 1)).to eq []
     end
   end
 
@@ -70,23 +77,59 @@ describe AssetUserAccess do
       describe 'with nil scores' do
         describe 'view level' do
           before { asset.log_action 'view' }
-          its(:view_score) { should == 1 }
-          its(:participate_score) { should be_nil }
-          its(:action_level) { should == 'view' }
+
+          describe '#view_score' do
+            subject { super().view_score }
+            it { is_expected.to eq 1 }
+          end
+
+          describe '#participate_score' do
+            subject { super().participate_score }
+            it { is_expected.to be_nil }
+          end
+
+          describe '#action_level' do
+            subject { super().action_level }
+            it { is_expected.to eq 'view' }
+          end
         end
 
         describe 'participate level' do
           before { asset.log_action 'participate' }
-          its(:view_score) { should == 1 }
-          its(:participate_score) { should == 1 }
-          its(:action_level) { should == 'participate' }
+
+          describe '#view_score' do
+            subject { super().view_score }
+            it { is_expected.to eq 1 }
+          end
+
+          describe '#participate_score' do
+            subject { super().participate_score }
+            it { is_expected.to eq 1 }
+          end
+
+          describe '#action_level' do
+            subject { super().action_level }
+            it { is_expected.to eq 'participate' }
+          end
         end
 
         describe 'submit level' do
           before { asset.log_action 'submit' }
-          its(:view_score) { should be_nil }
-          its(:participate_score) { should == 1 }
-          its(:action_level) { should == 'participate' }
+
+          describe '#view_score' do
+            subject { super().view_score }
+            it { is_expected.to be_nil }
+          end
+
+          describe '#participate_score' do
+            subject { super().participate_score }
+            it { is_expected.to eq 1 }
+          end
+
+          describe '#action_level' do
+            subject { super().action_level }
+            it { is_expected.to eq 'participate' }
+          end
         end
       end
 
@@ -95,23 +138,59 @@ describe AssetUserAccess do
 
         describe 'view level' do
           before { asset.log_action 'view' }
-          its(:view_score) { should == 4 }
-          its(:participate_score) { should == 3 }
-          its(:action_level) { should == 'view' }
+
+          describe '#view_score' do
+            subject { super().view_score }
+            it { is_expected.to eq 4 }
+          end
+
+          describe '#participate_score' do
+            subject { super().participate_score }
+            it { is_expected.to eq 3 }
+          end
+
+          describe '#action_level' do
+            subject { super().action_level }
+            it { is_expected.to eq 'view' }
+          end
         end
 
         describe 'participate level' do
           before { asset.log_action 'participate' }
-          its(:view_score) { should == 4 }
-          its(:participate_score) { should == 4 }
-          its(:action_level) { should == 'participate' }
+
+          describe '#view_score' do
+            subject { super().view_score }
+            it { is_expected.to eq 4 }
+          end
+
+          describe '#participate_score' do
+            subject { super().participate_score }
+            it { is_expected.to eq 4 }
+          end
+
+          describe '#action_level' do
+            subject { super().action_level }
+            it { is_expected.to eq 'participate' }
+          end
         end
 
         describe 'submit level' do
           before { asset.log_action 'submit' }
-          its(:view_score) { should == 3 }
-          its(:participate_score) { should == 4 }
-          its(:action_level) { should == 'participate' }
+
+          describe '#view_score' do
+            subject { super().view_score }
+            it { is_expected.to eq 3 }
+          end
+
+          describe '#participate_score' do
+            subject { super().participate_score }
+            it { is_expected.to eq 4 }
+          end
+
+          describe '#action_level' do
+            subject { super().action_level }
+            it { is_expected.to eq 'participate' }
+          end
         end
       end
     end
@@ -121,19 +200,19 @@ describe AssetUserAccess do
 
       it 'gets overridden by participate' do
         asset.log_action 'participate'
-        asset.action_level.should == 'participate'
+        expect(asset.action_level).to eq 'participate'
       end
 
       it 'gets overridden by submit' do
         asset.log_action 'submit'
-        asset.action_level.should == 'participate'
+        expect(asset.action_level).to eq 'participate'
       end
     end
 
     it 'does not overwrite the participate level with view' do
       asset.action_level = 'participate'
       asset.log_action 'view'
-      asset.action_level.should == 'participate'
+      expect(asset.action_level).to eq 'participate'
     end
   end
 
@@ -148,10 +227,10 @@ describe AssetUserAccess do
       def it_sets_if_nil( attribute, hash_key = nil)
         hash_key ||= attribute
         access.log(context, { hash_key => 'value' })
-        access.send(attribute).should == 'value'
+        expect(access.send(attribute)).to eq 'value'
         access.send("#{attribute}=", 'other')
         access.log(context, { hash_key => 'value' })
-        access.send(attribute).should == 'other'
+        expect(access.send(attribute)).to eq 'other'
       end
 
       specify { it_sets_if_nil( :asset_category, :category ) }
@@ -161,12 +240,36 @@ describe AssetUserAccess do
 
     describe 'interally set or calculated attribute values' do
       before { access.log context, { :level => 'view' } }
-      its(:context) { should == context }
-      its(:summarized_at) { should be_nil }
-      its(:last_access) { should_not be_nil }
-      its(:view_score) { should == 1 }
-      its(:participate_score) { should be_nil }
-      its(:action_level) { should == 'view' }
+
+      describe '#context' do
+        subject { super().context }
+        it { is_expected.to eq context }
+      end
+
+      describe '#summarized_at' do
+        subject { super().summarized_at }
+        it { is_expected.to be_nil }
+      end
+
+      describe '#last_access' do
+        subject { super().last_access }
+        it { is_expected.not_to be_nil }
+      end
+
+      describe '#view_score' do
+        subject { super().view_score }
+        it { is_expected.to eq 1 }
+      end
+
+      describe '#participate_score' do
+        subject { super().participate_score }
+        it { is_expected.to be_nil }
+      end
+
+      describe '#action_level' do
+        subject { super().action_level }
+        it { is_expected.to eq 'view' }
+      end
     end
 
   end
@@ -177,14 +280,14 @@ describe AssetUserAccess do
       subject.participate_score = 4
       subject.asset_group_code = 'quizzes'
 
-      subject.corrected_view_score.should == 6
+      expect(subject.corrected_view_score).to eq 6
     end
 
     it 'should return the normal view score for anything but a quiz' do
       subject.view_score = 10
       subject.participate_score = 4
 
-      subject.corrected_view_score.should == 10
+      expect(subject.corrected_view_score).to eq 10
     end
 
     it 'should not complain if there is no current score' do
@@ -192,7 +295,7 @@ describe AssetUserAccess do
       subject.participate_score = 4
       subject.stubs(:asset_group_code).returns('quizzes')
 
-      subject.corrected_view_score.should == -4
+      expect(subject.corrected_view_score).to eq -4
     end
   end
 end

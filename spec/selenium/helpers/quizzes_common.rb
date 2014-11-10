@@ -24,7 +24,7 @@ shared_examples_for "quizzes selenium tests" do
     type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
-    answers.length.should == 4
+    expect(answers.length).to eq 4
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
     set_answer_comment(0, "Good job!")
     replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
@@ -49,7 +49,7 @@ shared_examples_for "quizzes selenium tests" do
     type_in_tiny '.question:visible textarea.question_content', 'This is not a true/false question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
-    answers.length.should == 2
+    expect(answers.length).to eq 2
     answers[1].find_element(:css, ".select_answer_link").click # false - get it?
     set_answer_comment(1, "Good job!")
 
@@ -96,9 +96,9 @@ shared_examples_for "quizzes selenium tests" do
     submit_form(question)
     wait_for_ajaximations
     questions = ffj(".question_holder:visible")
-    questions.length.should == @question_count
+    expect(questions.length).to eq @question_count
     click_settings_tab
-    f(".points_possible").text.should == @points_total.to_s
+    expect(f(".points_possible").text).to eq @points_total.to_s
   end
 
   def quiz_with_new_questions(goto_edit=true)
@@ -225,7 +225,7 @@ shared_examples_for "quizzes selenium tests" do
       driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
 
       keep_trying_until do
-        f('.quiz-submission .quiz_score .score_value').should be_displayed
+        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
       end
     end
   end
@@ -397,11 +397,11 @@ shared_examples_for "quizzes selenium tests" do
   def group_should_contain_question(group, question)
     # check active record
     question.reload
-    question.quiz_group_id.should == group.id
+    expect(question.quiz_group_id).to eq group.id
 
     # check the interface
     questions = get_question_data_for_group group.id
-    questions.detect { |item| item[:id] == question.id }.should_not be_nil
+    expect(questions.detect { |item| item[:id] == question.id }).not_to be_nil
   end
 
   ##

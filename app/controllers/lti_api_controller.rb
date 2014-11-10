@@ -53,23 +53,45 @@ class LtiApiController < ApplicationController
     render :text => e.to_s, :status => 401
   end
 
-  def xapi
-    verify_oauth
+  # examples: https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
+  #
+  # {
+  #   id: "12345678-1234-5678-1234-567812345678",
+  #   actor: {
+  #     account: {
+  #       homePage: "http://www.instructure.com/",
+  #       name: "uniquenameofsomekind"
+  #     }
+  #   },
+  #   verb: {
+  #     id: "http://adlnet.gov/expapi/verbs/interacted",
+  #     display: {
+  #       "en-US" => "interacted"
+  #     }
+  #   },
+  #   object: {
+  #     id: "http://example.com/"
+  #   },
+  #   result: {
+  #     duration: "PT10M0S"
+  #   }
+  # }
+  #
+  # * object.id will be logged as url
+  # * result.duration must be an ISO 8601 duration if supplied
+  def xapi_service
+    token = Lti::XapiService::Token.parse_and_validate(params[:token])
+    verify_oauth(token.tool)
 
     if request.content_type != "application/json"
       return render :text => '', :status => 415
     end
 
-    source_id = params[:actor]['account']['name']
-    course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
-
-    duration = params[:result]['duration']
-    seconds = duration.match(/PT(\d+)S/)[1].to_i
-
-    # TODO: This should create an asset user access and page view as well.
-    course.enrollments.where(:user_id => user).update_all(['total_activity_time = total_activity_time + ?', seconds])
+    Lti::XapiService.log_page_view(token, params)
 
     return render :text => '', :status => 200
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
+    return render :text => e, :status => 401
   end
 
   def logout_service

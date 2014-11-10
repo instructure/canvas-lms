@@ -39,77 +39,77 @@ describe "Converting Blackboard Vista qti" do
 
   it "should have matching ids for assessments and questions" do
     @assessment[:questions].each do |question|
-      get_question(question[:migration_id], false).should_not be_nil
+      expect(get_question(question[:migration_id], false)).not_to be_nil
     end
   end
 
   it "should mock the manifest node correctly" do
     manifest_node=get_manifest_node('multiple_choice', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Calculated')
-    manifest_node.at_css("instructureMetadata").should == manifest_node
-    manifest_node['identifier'].should == nil
-    manifest_node['href'].should == 'multiple_choice.xml'
+    expect(manifest_node.at_css("instructureMetadata")).to eq manifest_node
+    expect(manifest_node['identifier']).to eq nil
+    expect(manifest_node['href']).to eq 'multiple_choice.xml'
     if title = manifest_node.at_css('title langstring')
-      title.text.should == nil
+      expect(title.text).to eq nil
     end
     if type = manifest_node.at_css('interactiontype')
-      type.text.downcase.should == 'extendedtextinteraction'
+      expect(type.text.downcase).to eq 'extendedtextinteraction'
     end
     if type = manifest_node.at_css('instructureMetadata instructureField[name=quiz_type]')
-      type['value'].downcase.should == 'calculated'
+      expect(type['value'].downcase).to eq 'calculated'
     end
     if type = manifest_node.at_css('instructureField[name=bb8_assessment_type]')
-      type['value'].downcase.should == 'calculated'
+      expect(type['value'].downcase).to eq 'calculated'
     end
   end
 
   it "should convert multiple choice" do
     hash = get_question("ID_4609865476341")
-    hash.should == VistaExpected::MULTIPLE_CHOICE
+    expect(hash).to eq VistaExpected::MULTIPLE_CHOICE
   end
 
   it "should not fail with missing response identifier" do
-    lambda {
+    expect {
       hash = get_question_hash(vista_question_dir, 'no_response_id', delete_answer_ids=true, opts={})
-    }.should_not raise_error
+    }.not_to raise_error
   end
 
   it "should convert images correctly" do
     manifest_node=get_manifest_node('true_false', :interaction_type => 'choiceInteraction')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>vista_question_dir).with_indifferent_access
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == VistaExpected::TRUE_FALSE2
+    expect(hash).to eq VistaExpected::TRUE_FALSE2
   end
   
   it "should convert image reference" do 
     hash = get_question_hash(vista_question_dir, 'mc', delete_answer_ids=true, opts={})
-    hash[:question_text].should =~ %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
+    expect(hash[:question_text]).to match %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
   end
 
   it "should convert short answer questions with multiple required answers to fimb" do
     hash = get_question_hash(vista_question_dir, 'short_to_fimb', delete_answer_ids=true, opts={})
-    hash[:question_type].should == "fill_in_multiple_blanks_question"
-    hash[:question_text].should include("[SA01]")
-    hash[:question_text].should include("[SA02]")        
+    expect(hash[:question_type]).to eq "fill_in_multiple_blanks_question"
+    expect(hash[:question_text]).to include("[SA01]")
+    expect(hash[:question_text]).to include("[SA02]")
   end
 
   it "should convert true/false questions" do
     hash = get_question("ID_4609865577341")
-    hash.should == VistaExpected::TRUE_FALSE
+    expect(hash).to eq VistaExpected::TRUE_FALSE
   end
   
   it "should convert multiple choice questions with multiple correct answers (multiple answer)" do
     hash = get_question("ID_4609865392341")
-    hash.should == VistaExpected::MULTIPLE_ANSWER
+    expect(hash).to eq VistaExpected::MULTIPLE_ANSWER
   end
 
   it "should convert essay questions" do
     hash = get_question("ID_4609842537341")
-    hash.should == VistaExpected::ESSAY
+    expect(hash).to eq VistaExpected::ESSAY
   end
 
   it "should convert short answer questions" do
     hash = get_question("ID_4609865550341")
-    hash.should == VistaExpected::SHORT_ANSWER
+    expect(hash).to eq VistaExpected::SHORT_ANSWER
   end
 
   it "should convert matching questions" do
@@ -118,62 +118,62 @@ describe "Converting Blackboard Vista qti" do
     matches = {}
     hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
     hash[:answers].each do |a|
-      matches[a[:match_id]].should == a[:text].sub('left', 'right')
+      expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
     end
 
     # compare everything else without the ids
     hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
     hash[:matches].each { |m| m.delete(:match_id) }
-    hash.should == VistaExpected::MATCHING
+    expect(hash).to eq VistaExpected::MATCHING
   end
 
   it "should convert the assessments into quizzes" do
-    @assessment.should == VistaExpected::ASSESSMENT
+    expect(@assessment).to eq VistaExpected::ASSESSMENT
   end
 
   it "should convert simple calculated questions" do
     hash = get_question("ID_4609842344341")
-    hash.should == VistaExpected::CALCULATED_SIMPLE
+    expect(hash).to eq VistaExpected::CALCULATED_SIMPLE
   end
 
   it "should convert complex calculated questions" do
     hash = get_question("ID_4609823478341")
-    hash.should == VistaExpected::CALCULATED_COMPLEX
+    expect(hash).to eq VistaExpected::CALCULATED_COMPLEX
   end
 
   it "should convert combination to multiple choice" do
     hash = get_question("ID_4609885376341")
-    hash.should == VistaExpected::COMBINATION
+    expect(hash).to eq VistaExpected::COMBINATION
   end
   
   it "should convert fill in multiple blanks questions" do
     hash = get_question("ID_4609842630341")
-    hash.should == VistaExpected::FILL_IN_MULTIPLE_BLANKS
+    expect(hash).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
   end
 
   it "should mark jumbled sentence as not supported" do
     hash = get_question("ID_4609842882341")
-    hash.should == VistaExpected::JUMBLED_SENTENCE
+    expect(hash).to eq VistaExpected::JUMBLED_SENTENCE
   end
 
   it "should correctly reference associated files" do
     import_into_course
 
     q = @course.assessment_questions.find_by_migration_id("ID_81847332876966484848484950729496134337732113114455")
-    q.should_not be_nil
-    q.attachments.count.should == 3
+    expect(q).not_to be_nil
+    expect(q.attachments.count).to eq 3
 
     a = q.attachments.find_by_display_name("f11g1_r.jpg")
-    a.file_state.should == 'available'
-    q.question_data[:question_text].should =~ %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
+    expect(a.file_state).to eq 'available'
+    expect(q.question_data[:question_text]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
     
     a = q.attachments.find_by_display_name("f11g2_r.jpg")
-    a.file_state.should == 'available'
-    q.question_data[:answers][0][:html].should =~ %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
+    expect(a.file_state).to eq 'available'
+    expect(q.question_data[:answers][0][:html]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
 
     a = q.attachments.find_by_display_name("f11g3_r.jpg")
-    a.file_state.should == 'available'
-    q.question_data[:answers][1][:html].should =~ %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
+    expect(a.file_state).to eq 'available'
+    expect(q.question_data[:answers][1][:html]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
   end
 
 

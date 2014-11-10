@@ -40,14 +40,14 @@ describe AcademicBenchmark::Api do
     mock_api_call(200,
                   '{"status":"ok", "itm":[{"test":"yep"}]}',
                   "http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=0")
-    @api.browse_authority("CC", :levels => 0).should == [{"test" => "yep"}]
+    expect(@api.browse_authority("CC", :levels => 0)).to eq [{"test" => "yep"}]
   end
 
   it "should get guid" do
     mock_api_call(200,
                   '{"status":"ok", "itm":[{"test":"yep"}]}',
                   "http://example.com/browse?api_key=oioioi&format=json&guid=gggggg&levels=0")
-    @api.browse_guid("gggggg", :levels => 0).should == [{"test" => "yep"}]
+    expect(@api.browse_guid("gggggg", :levels => 0)).to eq [{"test" => "yep"}]
   end
 
   it "should get available authorities" do
@@ -55,7 +55,7 @@ describe AcademicBenchmark::Api do
                   File.read(@authority_list),
                   "http://example.com/browse?api_key=oioioi&format=json&levels=2")
 
-    @api.list_available_authorities.should == [{"chld" => "1", "guid" => "AAA", "title" => "NGA Center/CCSSO", "type" => "authority"},
+    expect(@api.list_available_authorities).to eq [{"chld" => "1", "guid" => "AAA", "title" => "NGA Center/CCSSO", "type" => "authority"},
                                                {"chld" => "2", "guid" => "CCC", "title" => "South Carolina", "type" => "authority"},
                                                {"chld" => "3", "guid" => "BBB", "title" => "Louisiana", "type" => "authority"},
                                                {"chld" => "2", "guid" => "111", "title" => "Good Standards", "type" => "authority"},

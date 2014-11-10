@@ -48,14 +48,14 @@ define [
     clearSelectedItems: ->
       @setState selectedItems: []
 
-    toggleItemSelected: (item, event={}) ->
-      return if $(event.target).closest(@multiselectIgnoredElements).length
-      event.preventDefault()
+    toggleItemSelected: (item, event) ->
+      return if event and $(event.target).closest(@multiselectIgnoredElements).length
+      event?.preventDefault()
 
-      return @selectRange(item) if event.shiftKey
+      return @selectRange(item) if event?.shiftKey
 
       itemIsSelected = item in @state.selectedItems
-      leaveOthersAlone = (event.metaKey or event.ctrlKey) or event.target.type is 'checkbox'
+      leaveOthersAlone = (event?.metaKey or event?.ctrlKey) or event?.target.type is 'checkbox'
 
       if leaveOthersAlone and itemIsSelected
         selectedItems = _.without(@state.selectedItems, item)

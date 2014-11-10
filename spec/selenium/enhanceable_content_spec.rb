@@ -76,48 +76,48 @@ describe "enhanceable_content" do
     # need to wait for the content to get enhanced (it happens in instructure.js in a setTimeout of 1000 ms)
     keep_trying_until {
       f("#link1").click
-      dialog.should be_displayed
-      dialog.should have_class('ui-dialog')
+      expect(dialog).to be_displayed
+      expect(dialog).to have_class('ui-dialog')
     }
     f(".ui-dialog .ui-dialog-titlebar-close").click
-    dialog.should_not be_displayed
+    expect(dialog).not_to be_displayed
 
-    f(".enhanceable_content.draggable").should have_class('ui-draggable')
-    f(".enhanceable_content.resizable").should have_class('ui-resizable')
+    expect(f(".enhanceable_content.draggable")).to have_class('ui-draggable')
+    expect(f(".enhanceable_content.resizable")).to have_class('ui-resizable')
 
     ul = f(".enhanceable_content.sortable")
-    ul.should be_displayed
-    ul.should have_class('ui-sortable')
+    expect(ul).to be_displayed
+    expect(ul).to have_class('ui-sortable')
 
     accordion = f(".enhanceable_content.accordion")
-    accordion.should have_class('ui-accordion')
+    expect(accordion).to have_class('ui-accordion')
     headers = accordion.find_elements(:css, ".ui-accordion-header")
-    headers.length.should == 3
+    expect(headers.length).to eq 3
     divs = accordion.find_elements(:css, ".ui-accordion-content")
-    divs.length.should == 3
-    headers[0].should have_class('ui-state-active')
-    divs[0].should be_displayed
-    divs[1].should_not be_displayed
+    expect(divs.length).to eq 3
+    expect(headers[0]).to have_class('ui-state-active')
+    expect(divs[0]).to be_displayed
+    expect(divs[1]).not_to be_displayed
     headers[1].click
     wait_for_ajaximations
-    headers[0].should have_class('ui-state-default')
-    headers[1].should have_class('ui-state-active')
-    divs[0].should_not be_displayed
-    divs[1].should be_displayed
+    expect(headers[0]).to have_class('ui-state-default')
+    expect(headers[1]).to have_class('ui-state-active')
+    expect(divs[0]).not_to be_displayed
+    expect(divs[1]).to be_displayed
 
 
     tabs = f(".enhanceable_content.tabs")
-    tabs.should have_class('ui-tabs')
+    expect(tabs).to have_class('ui-tabs')
     headers = tabs.find_elements(:css, ".ui-tabs-nav li")
-    headers.length.should == 3
+    expect(headers.length).to eq 3
     divs = tabs.find_elements(:css, ".ui-tabs-panel")
-    divs.length.should == 3
-    headers[0].should have_class('ui-state-active')
-    headers[1].should have_class('ui-state-default')
-    divs[0].should be_displayed
-    divs[1].should_not be_displayed
+    expect(divs.length).to eq 3
+    expect(headers[0]).to have_class('ui-state-active')
+    expect(headers[1]).to have_class('ui-state-default')
+    expect(divs[0]).to be_displayed
+    expect(divs[1]).not_to be_displayed
 
-    f('#media_comment_0_deadbeef span.media_comment_thumbnail').should_not be_nil
+    expect(f('#media_comment_0_deadbeef span.media_comment_thumbnail')).not_to be_nil
   end
 end
 

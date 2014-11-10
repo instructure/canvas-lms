@@ -35,7 +35,7 @@ class StreamItem < ActiveRecord::Base
 
   attr_accessible :context, :asset
   after_destroy :destroy_stream_item_instances
-  attr_accessor :unread
+  attr_accessor :unread, :participant
 
   def self.reconstitute_ar_object(type, data)
     return nil unless data
@@ -293,8 +293,8 @@ class StreamItem < ActiveRecord::Base
 
   def self.prepare_object_for_unread(object)
     case object
-    when DiscussionTopic
-      DiscussionTopic.send(:preload_associations, object, :discussion_topic_participants)
+      when DiscussionTopic
+        ActiveRecord::Associations::Preloader.new(object, :discussion_topic_participants).run
     end
   end
 
@@ -383,7 +383,7 @@ class StreamItem < ActiveRecord::Base
     case res
     when DiscussionTopic, Announcement
       if res.require_initial_post
-        res.write_attribute(:user_has_posted, true)
+        res.user_has_posted = true
         if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id)
           original_res = res
           res = original_res.clone

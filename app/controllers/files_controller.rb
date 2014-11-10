@@ -319,31 +319,28 @@ class FilesController < ApplicationController
   end
 
   def ember_app
-    raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
-    @body_classes << 'full-width padless-content'
-    js_bundle :react_files
-    jammit_css :ember_files
-
-    @contexts = [@context]
-    get_all_pertinent_contexts(include_groups: true) if @context == @current_user
-    files_contexts = @contexts.map { |context|
-      # TODO: it would be a LOT better if we didn't have to go fetch all these root folders just so
-      # we can go fetch them again in ajax API requests. if we can figure out :read_contents permissions
-      # I can get by without the root_folder_id prop as well.
-      root_folder = Folder.root_folders(context).first
-      {
-        asset_string: context.asset_string,
-        name: context == @current_user ? t('my_files', 'My Files') : context.name,
-        root_folder_id: root_folder.id,
-        permissions: {
-          # TODO: make sure these permision checks are sufficient and fast
-          manage_files: context.grants_right?(@current_user, session, :manage_files),
-          read_contents: root_folder.grants_right?(@current_user, session, :read_contents)
+    raise ActiveRecord::RecordNotFound unless (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
+    if tab_enabled?(@context.class::TAB_FILES)
+      @contexts = [@context]
+      get_all_pertinent_contexts(include_groups: true) if @context == @current_user
+      files_contexts = @contexts.map do |context|
+        {
+          asset_string: context.asset_string,
+          name: context == @current_user ? t('my_files', 'My Files') : context.name,
+          permissions: {
+            manage_files: context.grants_right?(@current_user, session, :manage_files),
+          }
         }
-      }
-    }
-    js_env :FILES_CONTEXTS => files_contexts
-    render :text => "".html_safe, :layout => true
+      end
+
+      @page_title = t('files_page_title', 'Files')
+      @body_classes << 'full-width padless-content'
+      js_bundle :react_files
+      jammit_css :ember_files
+      js_env :FILES_CONTEXTS => files_contexts
+
+      render :text => "".html_safe, :layout => true
+    end
   end
 
 
@@ -473,8 +470,12 @@ class FilesController < ApplicationController
     params[:download] ||= params[:preview]
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
-      return render_unauthorized_action unless @attachment.user_id == @current_user.id
-      flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
+      unless @attachment.user_id == @current_user.id
+        @not_found_message = t('could_not_find_file', "This file has been deleted")
+        render status: 404, template: "shared/errors/404_message"
+        return
+      end
+      flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", display_name: @attachment.display_name
       if params[:preview] && @attachment.mime_class == 'image'
         redirect_to '/images/blank.png'
       elsif request.format == :json

@@ -25,7 +25,7 @@ describe "/files/index" do
     view_context
     assigns[:attachment] = @course.attachments.create!(:uploaded_data => default_uploaded_data)
     render "files/new"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

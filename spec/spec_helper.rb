@@ -22,7 +22,7 @@ rescue LoadError
 end
 
 RSpec.configure do |c|
-  c.treat_symbols_as_metadata_keys_with_true_values = true
+  c.raise_errors_for_deprecations!
   c.color = true
 
   c.around(:each) do |example|
@@ -129,11 +129,11 @@ module RSpec::Rails
         end
       end
 
-      def failure_message_for_should
+      def failure_message
         @msg
       end
 
-      def failure_message_for_should_not
+      def failure_message_when_negated
         @msg
       end
     end
@@ -165,7 +165,7 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 
 def pend_with_bullet
   if defined?(Bullet) && Bullet.enable?
-    pending ('PENDING: Bullet')
+    skip ('PENDING: Bullet')
   end
 end
 
@@ -699,7 +699,7 @@ RSpec.configure do |config|
     course = opts[:course] || @course || course(opts)
     @fake_student = course.student_view_student
     post "/users/#{@fake_student.id}/masquerade"
-    session[:become_user_id].should == @fake_student.id.to_s
+    expect(session[:become_user_id]).to eq @fake_student.id.to_s
   end
 
   def account_notification(opts={})
@@ -741,8 +741,7 @@ RSpec.configure do |config|
 
   def custom_role(base, name, opts={})
     account = opts[:account] || @account
-    role = account.roles.find_by_name(name)
-    role ||= account.roles.create :name => name
+    role = account.roles.where(name: name).first_or_initialize
     role.base_role_type = base
     role.save!
     role
@@ -795,7 +794,7 @@ RSpec.configure do |config|
                       "pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password
     assert_response :success
-    request.fullpath.should eql("/?login_success=1")
+    expect(request.fullpath).to eq "/?login_success=1"
   end
 
   def assignment_quiz(questions, opts={})
@@ -806,7 +805,7 @@ RSpec.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
@@ -831,7 +830,7 @@ RSpec.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @quiz.anonymous_submissions = true
     @quiz.quiz_type = "graded_survey"
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
@@ -983,13 +982,12 @@ RSpec.configure do |config|
   end
 
   def assert_status(status=500)
-    response.status.to_i.should eql(status)
+    expect(response.status.to_i).to eq status
   end
 
   def assert_unauthorized
     assert_status(401) #unauthorized
-    #    response.headers['Status'].should eql('401 Unauthorized')
-    response.should render_template("shared/unauthorized")
+    expect(response).to render_template("shared/unauthorized")
   end
 
   def assert_page_not_found(&block)
@@ -998,8 +996,8 @@ RSpec.configure do |config|
   end
 
   def assert_require_login
-    response.should be_redirect
-    flash[:warning].should eql("You must be logged in to access this page")
+    expect(response).to be_redirect
+    expect(flash[:warning]).to eq "You must be logged in to access this page"
   end
 
   def fixture_file_upload(path, mime_type=nil, binary=false)
@@ -1050,8 +1048,8 @@ RSpec.configure do |config|
 
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
-    importer.errors.should == []
-    importer.warnings.should == []
+    expect(importer.errors).to eq []
+    expect(importer.warnings).to eq []
   end
 
   def enable_cache(new_cache=:memory_store)
@@ -1200,11 +1198,11 @@ RSpec.configure do |config|
       AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
     else
       if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
-        pending "Please put valid S3 credentials in config/amazon_s3.yml"
+        skip "Please put valid S3 credentials in config/amazon_s3.yml"
       end
     end
-    Attachment.s3_storage?.should eql(true)
-    Attachment.local_storage?.should eql(false)
+    expect(Attachment.s3_storage?).to be true
+    expect(Attachment.local_storage?).to be false
   end
 
   def local_storage!
@@ -1216,9 +1214,8 @@ RSpec.configure do |config|
       model.stubs(:local_storage?).returns(true)
     end
 
-    Attachment.local_storage?.should eql(true)
-    Attachment.s3_storage?.should eql(false)
-    Attachment.local_storage?.should eql(true)
+    expect(Attachment.local_storage?).to be true
+    expect(Attachment.s3_storage?).to be false
   end
 
   def run_job(job)
@@ -1247,7 +1244,7 @@ RSpec.configure do |config|
     track_jobs do
       yield
     end
-    created_jobs.count { |j| j.tag == tag }.should == count
+    expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 
   # send a multipart post request in an integration spec post_params is
@@ -1287,16 +1284,16 @@ RSpec.configure do |config|
 
   def verify_post_matches(post_lines, expected_post_lines)
     # first lines should match
-    post_lines[0].should == expected_post_lines[0]
+    expect(post_lines[0]).to eq expected_post_lines[0]
 
     # now extract the headers
     post_headers = post_lines[1..post_lines.index("")]
     expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
     expected_post_headers << "User-Agent: Ruby"
-    post_headers.sort.should == expected_post_headers.sort
+    expect(post_headers.sort).to eq expected_post_headers.sort
 
     # now check payload
-    post_lines[post_lines.index(""), -1].should ==
+    expect(post_lines[post_lines.index(""), -1]).to eq
         expected_post_lines[expected_post_lines.index(""), -1]
   end
 
@@ -1312,9 +1309,9 @@ RSpec.configure do |config|
       end
     else
       if actual.is_a?(Fixnum) || actual.is_a?(Float)
-        actual.should == expected
+        expect(actual).to eq expected
       else
-        actual.to_json.should == expected.to_json
+        expect(actual.to_json).to eq expected.to_json
       end
     end
   end

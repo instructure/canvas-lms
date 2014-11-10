@@ -14,6 +14,6 @@ describe DataFixup::RemoveOrphanedContextModuleProgressions do
     DataFixup::RemoveOrphanedContextModuleProgressions.run
 
     cmp1.reload
-    lambda { cmp2.reload }.should raise_error(ActiveRecord::RecordNotFound)
+    expect { cmp2.reload }.to raise_error(ActiveRecord::RecordNotFound)
   end
 end

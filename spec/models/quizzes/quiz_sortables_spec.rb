@@ -18,6 +18,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSortables do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe ".initialize" do
     before do
     end
@@ -26,7 +30,7 @@ describe Quizzes::QuizSortables do
       quiz = Quizzes::Quiz.new
       sortables = Quizzes::QuizSortables.new(:quiz => quiz, :order => [])
 
-      sortables.quiz.should == quiz
+      expect(sortables.quiz).to eq quiz
     end
 
     it "should assign the group and quiz" do
@@ -35,8 +39,8 @@ describe Quizzes::QuizSortables do
 
       sortables = Quizzes::QuizSortables.new(:group => group, :order => [])
 
-      sortables.group.should == group
-      sortables.quiz.should  == quiz
+      expect(sortables.group).to eq group
+      expect(sortables.quiz).to  eq quiz
     end
 
     it "should build the list of items" do
@@ -54,7 +58,7 @@ describe Quizzes::QuizSortables do
                {"type" => "question", "id" => "123"}]
 
       sortables = Quizzes::QuizSortables.new(:quiz => quiz, :order => order)
-      sortables.items.should == [group, question]
+      expect(sortables.items).to eq [group, question]
     end
 
     it "should ignore items that dont have valid ids" do
@@ -67,7 +71,7 @@ describe Quizzes::QuizSortables do
                {"type" => "question", "id" => "123"}]
 
       sortables = Quizzes::QuizSortables.new(:quiz => quiz, :order => order)
-      sortables.items.should == []
+      expect(sortables.items).to eq []
     end
   end
 

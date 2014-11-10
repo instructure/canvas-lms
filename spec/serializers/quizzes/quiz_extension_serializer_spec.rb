@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Quizzes::QuizExtensionSerializer do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -51,7 +55,7 @@ describe Quizzes::QuizExtensionSerializer do
     user_id quiz_id user_id extra_attempts extra_time manually_unlocked end_at
   ].each do |attr|
     it "serializes #{attr}" do
-      @json.should have_key(attr)
+      expect(@json).to have_key(attr)
     end
   end
 end

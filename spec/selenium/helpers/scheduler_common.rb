@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def fill_out_appointment_group_form(new_appointment_text, opts = {})
     f('.create_link').click
     edit_form = f('#edit_appointment_form')
-    keep_trying_until { edit_form.should be_displayed }
+    keep_trying_until { expect(edit_form).to be_displayed }
     replace_content(fj('input[name="title"]'), new_appointment_text)
     f('.ag_contexts_selector').click
     f('.ag_sections_toggle').click
@@ -52,7 +52,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     expect {
       fill_out_appointment_group_form(opts[:new_appointment_text], opts)
       submit_appointment_group_form(opts[:publish])
-      f('.view_calendar_link').text.should == opts[:new_appointment_text]
+      expect(f('.view_calendar_link').text).to eq opts[:new_appointment_text]
     }.to change(AppointmentGroup, :count).by(1)
   end
 
@@ -63,14 +63,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def click_appointment_link
     f('.view_calendar_link').click
-    f('.scheduler-mode').should be_displayed
+    expect(f('.scheduler-mode')).to be_displayed
     wait_for_ajaximations
   end
 
   def click_al_option(option_selector, offset=0)
     ffj('.al-trigger')[offset].click
     options = ffj('.al-options')[offset]
-    options.should be_displayed
+    expect(options).to be_displayed
     options.find_element(:css, option_selector).click
   end
 
@@ -80,13 +80,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def edit_appointment_group(appointment_name = 'edited appointment', location_name = 'edited location')
-    f('#edit_appointment_form').should be_displayed
+    expect(f('#edit_appointment_form')).to be_displayed
     replace_content(fj('input[name="title"]'), appointment_name)
     replace_content(fj('input[name="location"]'), location_name)
     driver.execute_script("$('.ui-dialog-buttonset .btn-primary').trigger('click')")
     wait_for_ajaximations
-    f('.view_calendar_link').text.should == appointment_name
-    f('.ag-location').should include_text(location_name)
+    expect(f('.view_calendar_link').text).to eq appointment_name
+    expect(f('.ag-location')).to include_text(location_name)
   end
 
   def open_edit_dialog

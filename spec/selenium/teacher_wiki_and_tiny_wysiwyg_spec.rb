@@ -38,7 +38,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       save_wiki
 
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce a').should be_nil
+        expect(f('#tinymce a')).to be_nil
       end
     end
 
@@ -46,7 +46,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup
 
       in_frame "wiki_page_body_ifr" do
-        ff("#tinymce p").length.should == 3
+        expect(ff("#tinymce p").length).to eq 3
       end
     end
 
@@ -60,7 +60,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('.mce_bullist').click
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce li').should be_nil
+        expect(f('#tinymce li')).to be_nil
       end
     end
 
@@ -74,7 +74,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('.mce_numlist').click
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce li').should be_nil
+        expect(f('#tinymce li')).to be_nil
       end
     end
 
@@ -171,18 +171,18 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
 
       f('#new_page_link').click
-      keep_trying_until { f('#new_page_name').should be_displayed }
+      keep_trying_until { expect(f('#new_page_name')).to be_displayed }
       f('#new_page_name').send_keys(title)
       submit_form("#new_page_drop_down")
 
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce p a').attribute('href').should include_text title
+        expect(f('#tinymce p a').attribute('href')).to include_text title
       end
 
       select_all_wiki
       f('.mce_unlink').click
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce p a').should be_nil
+        expect(f('#tinymce p a')).to be_nil
       end
     end
 
@@ -192,7 +192,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f("#wiki_page_body_formatselect_open").click
       f('#menu_wiki_page_body_wiki_page_body_formatselect_menu .mce_pre').click
       in_frame "wiki_page_body_ifr" do
-        ff('#tinymce pre').length.should == 3
+        expect(ff('#tinymce pre').length).to eq 3
     end
   end
 
@@ -206,14 +206,14 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     type_in_tiny('#wiki_page_body', first_text)
     in_frame "wiki_page_body_ifr" do
-      f('#tinymce').should include_text(first_text)
+      expect(f('#tinymce')).to include_text(first_text)
     end
     #make sure each view uses the proper format
     fj('.wiki_switch_views_link:visible').click
-    driver.execute_script("return $('#wiki_page_body').val()").should include '<em><strong>'
+    expect(driver.execute_script("return $('#wiki_page_body').val()")).to include '<em><strong>'
     fj('.wiki_switch_views_link:visible').click
     in_frame "wiki_page_body_ifr" do
-      f('#tinymce').should_not include_text('<p>')
+      expect(f('#tinymce')).not_to include_text('<p>')
     end
 
     submit_form('#new_wiki_page')
@@ -221,16 +221,16 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
 
-    driver.page_source.should match(/<em><strong>This is my text\./)
+    expect(driver.page_source).to match(/<em><strong>This is my text\./)
   end
 
   it "should add an equation to the rce by using equation buttons" do
-    pending "check_image broken"
+    skip "check_image broken"
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click
     wait_for_ajaximations
-    f('.mathquill-editor').should be_displayed
+    expect(f('.mathquill-editor')).to be_displayed
     misc_tab = f('.mathquill-tab-bar > li:last-child a')
     misc_tab.click
     f('#Misc_tab li:nth-child(35) a').click
@@ -240,7 +240,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     f('.ui-dialog-buttonset .btn-primary').click
     keep_trying_until do
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce img.equation_image').should be_displayed
+        expect(f('#tinymce img.equation_image')).to be_displayed
       end
     end
 
@@ -258,7 +258,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     get "/courses/#{@course.id}/wiki"
     f('#wiki_page_body_instructure_equation').click
     wait_for_ajaximations
-    f('.mathquill-editor').should be_displayed
+    expect(f('.mathquill-editor')).to be_displayed
     textarea = f('.mathquill-editor .textarea textarea')
     3.times do
       textarea.send_keys(:backspace)
@@ -267,7 +267,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     # "paste" some text
     driver.execute_script "$('.mathquill-editor .textarea textarea').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
     # make sure it renders correctly (inclding the medium space)
-    f('.mathquill-editor').text.should include "yay math stuff: \nd\n\dx\n"
+    expect(f('.mathquill-editor').text).to include "yay math stuff: \nd\n\dx\n"
 
     # type and click a bit
     textarea.send_keys "d/dx"
@@ -291,7 +291,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     f('.ui-dialog-buttonset .btn-primary').click
     wait_for_ajax_requests
     in_frame "wiki_page_body_ifr" do
-      keep_trying_until { f('.equation_image').attribute('title').should == equation_text }
+      keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
 
       # currently there's an issue where the equation is double-escaped in the
       # src, though it's correct after the redirect to codecogs. here we just
@@ -299,21 +299,21 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       # spec should still pass.
       src = f('.equation_image').attribute('src')
       response = Net::HTTP.get_response(URI.parse(src))
-      response.code.should == "302"
-      response.header['location'].should include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      expect(response.code).to eq "302"
+      expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     end
   end
 
   it "should add an equation to the rce by using equation buttons in advanced view" do
-    pending('broken')
+    skip('broken')
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click
     wait_for_ajaximations
-    f('.mathquill-editor').should be_displayed
+    expect(f('.mathquill-editor')).to be_displayed
     f('a.math-toggle-link').click
     wait_for_ajaximations
-    f('#mathjax-editor').should be_displayed
+    expect(f('#mathjax-editor')).to be_displayed
     misc_tab = f('#mathjax-view .mathquill-tab-bar > li:last-child a')
     misc_tab.click
     f('#misc_tab li:nth-child(35) a').click
@@ -323,7 +323,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     f('.ui-dialog-buttonset .btn-primary').click
     keep_trying_until do
       in_frame "wiki_page_body_ifr" do
-        f('#tinymce img.equation_image').should be_displayed
+        expect(f('#tinymce img.equation_image')).to be_displayed
       end
     end
 
@@ -341,10 +341,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     get "/courses/#{@course.id}/wiki"
     f('#wiki_page_body_instructure_equation').click
     wait_for_ajaximations
-    f('.mathquill-editor').should be_displayed
+    expect(f('.mathquill-editor')).to be_displayed
     f('a.math-toggle-link').click
     wait_for_ajaximations
-    f('#mathjax-editor').should be_displayed
+    expect(f('#mathjax-editor')).to be_displayed
     textarea = f('#mathjax-editor')
     3.times do
       textarea.send_keys(:backspace)
@@ -361,7 +361,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     f('.ui-dialog-buttonset .btn-primary').click
     wait_for_ajax_requests
     in_frame "wiki_page_body_ifr" do
-      keep_trying_until { f('.equation_image').attribute('title').should == equation_text }
+      keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
 
       # currently there's an issue where the equation is double-escaped in the
       # src, though it's correct after the redirect to codecogs. here we just
@@ -369,8 +369,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       # spec should still pass.
       src = f('.equation_image').attribute('src')
       response = Net::HTTP.get_response(URI.parse(src))
-      response.code.should == "302"
-      response.header['location'].should include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      expect(response.code).to eq "302"
+      expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     end
   end
 
@@ -381,11 +381,11 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       get "/courses/#{@course.id}/wiki"
 
     f('.mce_instructure_record').click
-    keep_trying_until { f('#record_media_tab').should be_displayed }
+    keep_trying_until { expect(f('#record_media_tab')).to be_displayed }
     f('#media_comment_dialog a[href="#upload_media_tab"]').click
-    f('#media_comment_dialog #audio_upload').should be_displayed
+    expect(f('#media_comment_dialog #audio_upload')).to be_displayed
     close_visible_dialog
-    f('#media_comment_dialog').should_not be_displayed
+    expect(f('#media_comment_dialog')).not_to be_displayed
   end
 
   it "should handle table borders correctly" do
@@ -401,7 +401,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       # the iframe will be created with an id of mce_<some number>_ifr
       table_iframe_id = keep_trying_until { ff('iframe').map { |f| f['id'] }.detect { |w| w =~ /mce_\d+_ifr/ } }
-      table_iframe_id.should_not be_nil
+      expect(table_iframe_id).not_to be_nil
       in_frame(table_iframe_id) do
         attributes.each do |attribute, value|
           tab_to_show = attribute == :bordercolor ? 'advanced' : 'general'
@@ -416,7 +416,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       in_frame "wiki_page_body_ifr" do
         table = f('#tinymce table')
         attributes.each do |attribute, value|
-          (table[attribute].should == value.to_s) if (value && (attribute != :bordercolor))
+          (expect(table[attribute]).to eq value.to_s) if (value && (attribute != :bordercolor))
         end
         [:width, :color].each do |part|
           [:top, :right, :bottom, :left].each do |side|
@@ -425,7 +425,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
               expected_value = 1 if expected_value == 0
               expected_value = "#{expected_value}px"
             end
-            table.style("border-#{side}-#{part}").should == expected_value
+            expect(table.style("border-#{side}-#{part}")).to eq expected_value
           end
         end
       end

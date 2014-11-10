@@ -45,10 +45,10 @@ describe Polling::PollChoicesController, type: :request do
     it "returns all existing poll choices" do
       json = get_index
       poll_choices_json = json['poll_choices']
-      poll_choices_json.size.should == 5
+      expect(poll_choices_json.size).to eq 5
 
       poll_choices_json.each_with_index do |pc, i|
-        pc['text'].should == "Poll Choice #{i+1}"
+        expect(pc['text']).to eq "Poll Choice #{i+1}"
       end
     end
 
@@ -57,7 +57,7 @@ describe Polling::PollChoicesController, type: :request do
       poll_choices_json = json['poll_choices']
 
       poll_choices_json.each_with_index do |pc, i|
-        pc['position'].should == i+1
+        expect(pc['position']).to eq i+1
       end
     end
 
@@ -65,15 +65,15 @@ describe Polling::PollChoicesController, type: :request do
     it "paginates to the jsonapi standard if requested" do
       json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
       poll_choices_json = json['poll_choices']
-      poll_choices_json.size.should == 5
+      expect(poll_choices_json.size).to eq 5
 
       poll_choices_json.each_with_index do |pc, i|
-        pc['text'].should == "Poll Choice #{i+1}"
+        expect(pc['text']).to eq "Poll Choice #{i+1}"
       end
 
-      json.should have_key('meta')
-      json['meta'].should have_key('pagination')
-      json['meta']['primaryCollection'].should == 'poll_choices'
+      expect(json).to have_key('meta')
+      expect(json['meta']).to have_key('pagination')
+      expect(json['meta']['primaryCollection']).to eq 'poll_choices'
     end
 
     context "as a student" do
@@ -83,7 +83,7 @@ describe Polling::PollChoicesController, type: :request do
 
       it "is unauthorized if there are no open sessions" do
         get_index(true)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
 
       it "doesn't display is_correct within the poll choices" do
@@ -94,7 +94,7 @@ describe Polling::PollChoicesController, type: :request do
         poll_choices_json = json['poll_choices']
 
         poll_choices_json.each do |poll_choice|
-          poll_choice.should_not have_key('is_correct')
+          expect(poll_choice).not_to have_key('is_correct')
         end
       end
     end
@@ -120,8 +120,8 @@ describe Polling::PollChoicesController, type: :request do
       json = get_show
       poll_choice_json = json['poll_choices'].first
 
-      poll_choice_json['text'].should == 'A Poll Choice'
-      poll_choice_json['is_correct'].should be_true
+      expect(poll_choice_json['text']).to eq 'A Poll Choice'
+      expect(poll_choice_json['is_correct']).to be_truthy
     end
 
     context "as a student" do
@@ -131,13 +131,13 @@ describe Polling::PollChoicesController, type: :request do
 
       it "is unauthorized if there are no existing sessions" do
         get_show(true)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
 
       it "is authorized if there are existing sessions" do
         Polling::PollSession.create!(course: @course, poll: @poll)
         get_show(true)
-        response.code.should == '200'
+        expect(response.code).to eq '200'
       end
 
       context "with opened sessions" do
@@ -147,7 +147,7 @@ describe Polling::PollChoicesController, type: :request do
           json = get_show
           poll_choice_json = json['poll_choices'].first
 
-          poll_choice_json.should_not have_key('is_correct')
+          expect(poll_choice_json).not_to have_key('is_correct')
         end
       end
 
@@ -161,7 +161,7 @@ describe Polling::PollChoicesController, type: :request do
           json = get_show
           poll_choice_json = json['poll_choices'].first
 
-          poll_choice_json.should have_key('is_correct')
+          expect(poll_choice_json).to have_key('is_correct')
         end
       end
 
@@ -186,14 +186,14 @@ describe Polling::PollChoicesController, type: :request do
     context "as a teacher" do
       it "creates a poll choice successfully" do
         post_create(text: 'Poll Choice 1', is_correct: false, position: 1)
-        @poll.poll_choices.first.text.should == 'Poll Choice 1'
-        @poll.poll_choices.first.position.should == 1
+        expect(@poll.poll_choices.first.text).to eq 'Poll Choice 1'
+        expect(@poll.poll_choices.first.position).to eq 1
       end
 
       it "sets is_correct to false if is_correct is provided but blank" do
         post_create(text: 'is correct poll choice', is_correct: '', position: 1)
-        @poll.poll_choices.first.text.should == 'is correct poll choice'
-        @poll.poll_choices.first.is_correct.should be_false
+        expect(@poll.poll_choices.first.text).to eq 'is correct poll choice'
+        expect(@poll.poll_choices.first.is_correct).to be_falsey
       end
     end
 
@@ -201,7 +201,7 @@ describe Polling::PollChoicesController, type: :request do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
         post_create({text: 'Poll Choice 1'}, true)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
     end
   end
@@ -227,7 +227,7 @@ describe Polling::PollChoicesController, type: :request do
     context "as a teacher" do
       it "updates a poll choice successfully" do
         put_update(text: 'New Poll Choice Text')
-        @poll_choice.reload.text.should == 'New Poll Choice Text'
+        expect(@poll_choice.reload.text).to eq 'New Poll Choice Text'
       end
 
       it "sets is_correct to the poll choice's original value if is_correct is provided but blank" do
@@ -235,7 +235,7 @@ describe Polling::PollChoicesController, type: :request do
 
         put_update(is_correct: '')
         @poll_choice.reload
-        @poll_choice.is_correct.should == original
+        expect(@poll_choice.is_correct).to eq original
       end
     end
 
@@ -243,7 +243,7 @@ describe Polling::PollChoicesController, type: :request do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
         put_update({text: 'New Text'}, true)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
     end
   end
@@ -269,8 +269,8 @@ describe Polling::PollChoicesController, type: :request do
       it "deletes a poll choice successfully" do
         delete_destroy
 
-        response.code.should == '204'
-        Polling::PollChoice.find_by_id(@poll_choice.id).should be_nil
+        expect(response.code).to eq '204'
+        expect(Polling::PollChoice.where(id: @poll_choice)).not_to be_exists
       end
     end
 
@@ -279,8 +279,8 @@ describe Polling::PollChoicesController, type: :request do
         student_in_course(:active_all => true, :course => @course)
         delete_destroy
 
-        response.code.should == '401'
-        Polling::PollChoice.find_by_id(@poll_choice.id).should == @poll_choice
+        expect(response.code).to eq '401'
+        expect(Polling::PollChoice.where(id: @poll_choice).first).to eq @poll_choice
       end
     end
   end

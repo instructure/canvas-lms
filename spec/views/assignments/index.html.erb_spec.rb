@@ -30,7 +30,7 @@ describe "/assignments/index" do
     assigns[:groups] = [g]
     assigns[:assignment_groups] = assigns[:groups]
     render 'assignments/index'
-    response.should have_tag('div#groups')
+    expect(response).to have_tag('div#groups')
   end
 end
 

@@ -11,7 +11,8 @@ define [
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
+  './FilePreview'
+], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreview) ->
 
 
   SearchResults = React.createClass
@@ -50,23 +51,24 @@ define [
     componentDidMount: ->
       # this setTimeout is to handle a race condition with the setTimeout in the componentWillUnmount method of ShowFolder
       setTimeout =>
-        @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null, showingSearchResults: true})
+        @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null, showingSearchResults: true, searchResultCollection: @state.collection})
 
     render: withReactDOM ->
-      div {
-        className:'ef-directory'
-        role: 'grid'
-        'aria-label': I18n.t('search_results', 'Search results')
-      },
+      div role: 'grid',
         ColumnHeaders {
           to: 'search'
-          subject: @state.collection
           query: @props.query
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
         }
         @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
-          FolderChild key:child.cid, model: child, userCanManageFilesForContext: @props.userCanManageFilesForContext
+          FolderChild
+            key: child.cid
+            model: child
+            isSelected: child in @props.selectedItems
+            toggleSelected: @props.toggleItemSelected.bind(null, child)
+            userCanManageFilesForContext: @props.userCanManageFilesForContext
+            dndOptions: @props.dndOptions
         LoadingIndicator isLoading: !@state.collection.loadedAll
         if @state.collection.loadedAll and (@state.collection.length is 0)
           div ref: 'noResultsFound',
@@ -76,3 +78,11 @@ define [
               li {}, I18n.t('errors.no_match.spelled', 'Make sure all words are spelled correctly.')
               li {}, I18n.t('errors.no_match.keywords', 'Try different keywords.')
               li {}, I18n.t('errors.no_match.three_chars', 'Enter at least 3 letters in the search box.')
+
+        # Prepare and render the FilePreview if needed.
+        # As long as ?preview is present in the url.
+        if @props.query.preview? and @state.collection.length
+          FilePreview
+            params: @props.params
+            query: @props.query
+            collection: @state.collection

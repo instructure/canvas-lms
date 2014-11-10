@@ -44,7 +44,7 @@ describe "shared files tests" do
       add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
                @course, "html-editing-test.html")
       get "/courses/#{@course.id}/files"
-      keep_trying_until { fj('.file').should be_displayed }
+      keep_trying_until { expect(fj('.file')).to be_displayed }
       make_folder_actions_visible
     end
 
@@ -58,7 +58,7 @@ describe "shared files tests" do
       file_name.send_keys(:return)
       wait_for_ajaximations
       last_file = Folder.last.attachments.last
-      f('#files_content').should include_text(last_file.display_name)
+      expect(f('#files_content')).to include_text(last_file.display_name)
     end
 
     it "should allow you to delete a file" do
@@ -67,36 +67,36 @@ describe "shared files tests" do
       wait_for_ajaximations
       last_file = Folder.last.attachments.last
       last_file.file_state == 'deleted'
-      f('#files_content').should_not include_text(last_file.display_name)
+      expect(f('#files_content')).not_to include_text(last_file.display_name)
     end
 
     it "should allow you to lock a file" do
       fj('.file .lock_item_link:visible').click
       lock_form = f('#lock_attachment_form')
-      lock_form.should be_displayed
+      expect(lock_form).to be_displayed
       wait_for_ajaximations
       submit_form(lock_form)
       wait_for_ajaximations
-      fj('.file .item_icon:visible').should have_attribute('alt', 'Locked File')
-      Folder.last.attachments.last.locked.should be_true
+      expect(fj('.file .item_icon:visible')).to have_attribute('alt', 'Locked File')
+      expect(Folder.last.attachments.last.locked).to be_truthy
     end
 
     context 'tinyMCE html editing' do
 
       before (:each) do
         link = keep_trying_until { f("li.editable_folder_item div.header a.download_url") }
-        link.should be_displayed
-        link.text.should == "html-editing-test.html"
+        expect(link).to be_displayed
+        expect(link.text).to eq "html-editing-test.html"
       end
 
       def click_edit_link(page_refresh = true)
         get "/courses/#{@course.id}/files" if page_refresh
         link = keep_trying_until { f("li.editable_folder_item div.header a.edit_item_content_link") }
-        link.should be_displayed
-        link.text.should == "edit content"
+        expect(link).to be_displayed
+        expect(link.text).to eq "edit content"
         link.click
         wait_for_ajaximations
-        keep_trying_until { fj("#edit_content_dialog").should be_displayed }
+        keep_trying_until { expect(fj("#edit_content_dialog")).to be_displayed }
       end
 
       def switch_html_edit_views
@@ -116,7 +116,7 @@ describe "shared files tests" do
           driver.execute_script("$('#edit_content_textarea')[0].value = '#{new_content}';")
           current_content = new_content
           f(".ui-dialog .btn-primary").click
-          f("#edit_content_dialog").should_not be_displayed
+          expect(f("#edit_content_dialog")).not_to be_displayed
         end
       end
 
@@ -127,11 +127,11 @@ describe "shared files tests" do
         f('.mce_bold').click
         type_in_tiny('#edit_content_textarea', 'this is bold')
         fj('.switch_views:visible').click
-        driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<strong>this is bold<\/strong>/
+        expect(driver.execute_script("return $('#edit_content_textarea')[0].value;")).to match /<strong>this is bold<\/strong>/
         driver.execute_script("return $('#edit_content_textarea')[0].value = '<fake>lol</fake>';")
         fj('.switch_views:visible').click
         fj('.switch_views:visible').click
-        driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<fake>lol<\/fake>/
+        expect(driver.execute_script("return $('#edit_content_textarea')[0].value;")).to match /<fake>lol<\/fake>/
       end
 
       it "should save changes from HTML view" do
@@ -142,7 +142,7 @@ describe "shared files tests" do
         save_html_content
         wait_for_ajaximations
         click_edit_link
-        keep_trying_until { f('#edit_content_textarea')[:value].should =~ /I am typing/ }
+        keep_trying_until { expect(f('#edit_content_textarea')[:value]).to match /I am typing/ }
       end
 
       it "should save changes from code view" do
@@ -154,19 +154,19 @@ describe "shared files tests" do
         wait_for_ajaximations
         click_edit_link
         wait_for_ajaximations
-        keep_trying_until { f('#edit_content_textarea')[:value].should =~ /I am typing/ }
+        keep_trying_until { expect(f('#edit_content_textarea')[:value]).to match /I am typing/ }
       end
 
       it "should allow you to open and close the dialog and switch views" do
         click_edit_link
-        keep_trying_until { driver.execute_script("return $('#edit_content_textarea').is(':visible');").should == true }
+        keep_trying_until { expect(driver.execute_script("return $('#edit_content_textarea').is(':visible');")).to eq true }
         switch_html_edit_views
-        driver.execute_script("return $('#edit_content_textarea').is(':hidden');").should == true
+        expect(driver.execute_script("return $('#edit_content_textarea').is(':hidden');")).to eq true
         close_visible_dialog
         click_edit_link(false)
-        keep_trying_until { driver.execute_script("return $('#edit_content_textarea').is(':visible');").should == true }
+        keep_trying_until { expect(driver.execute_script("return $('#edit_content_textarea').is(':visible');")).to eq true }
         switch_html_edit_views
-        driver.execute_script("return $('#edit_content_textarea').is(':hidden');").should == true
+        expect(driver.execute_script("return $('#edit_content_textarea').is(':hidden');")).to eq true
       end
     end
   end
@@ -203,7 +203,7 @@ describe "zip file uploads" do
     end
 
     it "should allow unzipping into a folder from drag-and-drop courses" do
-      pending("drag and drop issues")
+      skip("drag and drop issues")
       get @files_url
       next unless driver.execute_script("return $.handlesHTML5Files;") == true
       unzip_into_folder_drag_and_drop

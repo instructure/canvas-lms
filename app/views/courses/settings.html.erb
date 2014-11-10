@@ -298,6 +298,19 @@ TEXT
           </div>
         </td>
       </tr><tr>
+        <td class="form-label"><label><%= before_label('course_format', %{Format}) %></label></td>
+        <% format_options = [[t('#course.course_format.not_set', 'Not Set'), ''],
+          [t('#course.course_format.on_campus', "On-Campus"), "on_campus"],
+          [t('#course.course_format.online', "Online"), "online"]] %>
+        <td>
+          <span class="course_form">
+            <%= f.select :course_format, format_options %>
+          </span>
+          <span class="course_info">
+            <%= (format_options.detect{|arr| arr[1] == @context.course_format.to_s} || format_options.first).first %>
+          </span>
+        </td>
+      </tr><tr>
         <td></td>
         <td colspan="3">
           <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? %>">

@@ -1,5 +1,6 @@
 <%
-   group = question_group || nil
+   question_group ||= nil
+   group = question_group
    if group && hash_get(group, :assessment_question_bank_id)
      question_bank = @banks_hash[hash_get(group, :assessment_question_bank_id)]
    end

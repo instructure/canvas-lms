@@ -25,6 +25,10 @@ RSpec::Matchers.define :have_question_field do |expected|
 end
 
 describe Quizzes::QuizQuestion::QuestionData do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   let(:question_data_params) do
     {
       answers: [],
@@ -43,57 +47,57 @@ describe Quizzes::QuizQuestion::QuestionData do
     it "returns an instance of QuestionData" do
       question = Quizzes::QuizQuestion::QuestionData.generate
 
-      question.should be_kind_of(Quizzes::QuizQuestion::QuestionData)
+      expect(question).to be_kind_of(Quizzes::QuizQuestion::QuestionData)
     end
 
     it "defaults to text_only_question if a type isn't given" do
       question = Quizzes::QuizQuestion::QuestionData.generate
 
-      question[:question_type].should == 'text_only_question'
-      question.is_type?(:text_only).should be_true
+      expect(question[:question_type]).to eq 'text_only_question'
+      expect(question.is_type?(:text_only)).to be_truthy
     end
 
     context "on any question type" do
       let(:question_data) { Quizzes::QuizQuestion::QuestionData.generate }
       context "it seeds QuestionData with" do
         it "regrade_option" do
-          question_data.should have_question_field :regrade_option
+          expect(question_data).to have_question_field :regrade_option
         end
 
         it "points_possible" do
-          question_data.should have_question_field :points_possible
+          expect(question_data).to have_question_field :points_possible
         end
 
         it "correct_comments" do
-          question_data.should have_question_field :correct_comments
+          expect(question_data).to have_question_field :correct_comments
         end
 
         it "incorrect_comments" do
-          question_data.should have_question_field :incorrect_comments
+          expect(question_data).to have_question_field :incorrect_comments
         end
 
         it "neutral_comments" do
-          question_data.should have_question_field :neutral_comments
+          expect(question_data).to have_question_field :neutral_comments
         end
 
         it "question_type" do
-          question_data.should have_question_field :question_type
+          expect(question_data).to have_question_field :question_type
         end
 
         it "question_name" do
-          question_data.should have_question_field :question_name
+          expect(question_data).to have_question_field :question_name
         end
 
         it "question_text" do
-          question_data.should have_question_field :question_text
+          expect(question_data).to have_question_field :question_text
         end
 
         it "answers" do
-          question_data.should have_question_field :answers
+          expect(question_data).to have_question_field :answers
         end
 
         it "text_after_answers" do
-          question_data.should have_question_field :text_after_answers
+          expect(question_data).to have_question_field :text_after_answers
         end
       end
     end
@@ -102,19 +106,19 @@ describe Quizzes::QuizQuestion::QuestionData do
       let(:question_data) { Quizzes::QuizQuestion::QuestionData.generate(question_type: 'calculated_question') }
       context "it seeds QuestionData with" do
         it "formulas" do
-          question_data.should have_question_field :formulas
+          expect(question_data).to have_question_field :formulas
         end
 
         it "variables" do
-          question_data.should have_question_field :variables
+          expect(question_data).to have_question_field :variables
         end
 
         it "answer_tolerance" do
-          question_data.should have_question_field :answer_tolerance
+          expect(question_data).to have_question_field :answer_tolerance
         end
 
         it "formula_decimal_places" do
-          question_data.should have_question_field :formula_decimal_places
+          expect(question_data).to have_question_field :formula_decimal_places
         end
       end
     end
@@ -123,11 +127,11 @@ describe Quizzes::QuizQuestion::QuestionData do
       let(:question_data) { Quizzes::QuizQuestion::QuestionData.generate(question_type: 'matching_question') }
       context "it seeds QuestionData with" do
         it "matching_answer_incorrect_matches" do
-          question_data.should have_question_field :matching_answer_incorrect_matches
+          expect(question_data).to have_question_field :matching_answer_incorrect_matches
         end
 
         it "matches" do
-          question_data.should have_question_field :matches
+          expect(question_data).to have_question_field :matches
         end
       end
     end
@@ -139,7 +143,7 @@ describe Quizzes::QuizQuestion::QuestionData do
     it "returns an indifferent hash" do
       question = Quizzes::QuizQuestion::QuestionData.generate
 
-      question.to_hash.should be_kind_of(HashWithIndifferentAccess)
+      expect(question.to_hash).to be_kind_of(HashWithIndifferentAccess)
     end
   end
 
@@ -147,62 +151,62 @@ describe Quizzes::QuizQuestion::QuestionData do
     context "returns the relevant parser for" do
       it "calculated questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'calculated_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::Calculated
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::Calculated
       end
 
       it "essay questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'essay_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::Essay
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::Essay
       end
 
       it "fill in multiple blanks questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'fill_in_multiple_blanks_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::FillInMultipleBlanks
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::FillInMultipleBlanks
       end
 
       it "matching questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'matching_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::Matching
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::Matching
       end
 
       it "missing word questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'missing_word_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::MissingWord
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::MissingWord
       end
 
       it "multiple answer questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'multiple_answers_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::MultipleAnswers
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::MultipleAnswers
       end
 
       it "multiple choice questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'multiple_choice_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::MultipleChoice
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::MultipleChoice
       end
 
       it "multiple dropdown questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'multiple_dropdowns_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::MultipleDropdowns
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::MultipleDropdowns
       end
 
       it "numerical questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'numerical_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::Numerical
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::Numerical
       end
 
       it "short answer questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'short_answer_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::ShortAnswer
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::ShortAnswer
       end
 
       it "text only questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'text_only_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::TextOnly
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::TextOnly
       end
 
       it "true/false questions" do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'true_false_question')
-        question.answer_parser.should == Quizzes::QuizQuestion::AnswerParsers::TrueFalse
+        expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::TrueFalse
       end
 
     end

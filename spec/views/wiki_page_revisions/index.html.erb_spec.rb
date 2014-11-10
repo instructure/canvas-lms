@@ -28,8 +28,8 @@ describe "/wiki_page_revisions/index" do
     assigns[:page].save!
     assigns[:page].update_attributes(:body => "oi", :user_id => @user.id)
     render "wiki_page_revisions/index"
-    response.body.should =~ /Content Importer/
-    response.body.should =~ %r{/users/#{@user.id}}
+    expect(response.body).to match /Content Importer/
+    expect(response.body).to match %r{/users/#{@user.id}}
   end
 end
 

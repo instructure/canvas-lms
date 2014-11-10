@@ -1,5 +1,5 @@
 <select class="twitter_select contact_select" name="channel_id" style="display: none;">
-  <% twitter = @current_user.communication_channels.unretired.find_by_path_type('twitter') %>
+  <% twitter = @current_user.communication_channels.unretired.where(path_type: 'twitter').first %>
   <% if twitter && feature_and_service_enabled?(:twitter) %>
     <option class="channel_option_<%= twitter.id %>" value="<%= twitter.id %>" selected><%= t(:twitter, "Twitter") %></option>
   <% end %>

@@ -40,7 +40,7 @@ describe "/assignments/student_index" do
     assigns[:overdue_assignments] = []
     assigns[:submissions] = []
     render 'assignments/student_index'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

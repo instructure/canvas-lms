@@ -70,14 +70,14 @@ describe "discussions" do
     yield if block_given?
     expect_new_page_load { submit_form('.form-actions') }
     wait_for_ajaximations
-    f('.zip').should include_text(filename)
+    expect(f('.zip')).to include_text(filename)
   end
 
   def edit(title, message)
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }
-    f('#discussion_topic .discussion-title').text.should == title
+    expect(f('#discussion_topic .discussion-title').text).to eq title
   end
 
   context "on the index page" do
@@ -91,8 +91,8 @@ describe "discussions" do
       get url
       wait_for_ajaximations
       checkboxes = ff('.discussion .al-trigger')
-      checkboxes.length.should == number_of_checkboxes
-      ff('.discussion-list li.discussion').length.should == DiscussionTopic.count
+      expect(checkboxes.length).to eq number_of_checkboxes
+      expect(ff('.discussion-list li.discussion').length).to eq DiscussionTopic.count
     end
 
     context "as anyone" do # we actually use a student, but the idea is that it would work the same for a teacher or anyone else
@@ -112,7 +112,7 @@ describe "discussions" do
         it "should display empty version of view if there are no topics" do
           get url
           wait_for_ajaximations
-          ff('.no-content').each { |div| div.should be_displayed }
+          ff('.no-content').each { |div| expect(div).to be_displayed }
         end
 
         it "should display empty version of view if all pages are empty" do
@@ -126,7 +126,7 @@ describe "discussions" do
 
           get url
           wait_for_ajaximations
-          ff('.no-content').each { |div| div.should be_displayed }
+          ff('.no-content').each { |div| expect(div).to be_displayed }
         end
 
         it "should display topics even if first page is blank but later pages have data" do
@@ -147,7 +147,7 @@ describe "discussions" do
           end
           get url
           wait_for_ajaximations
-          f('.btn-large').should be_nil
+          expect(f('.btn-large')).to be_nil
         end
       end
 
@@ -156,14 +156,14 @@ describe "discussions" do
           topic.unsubscribe(somebody)
           get(url)
           wait_for_ajaximations
-          f('.icon-discussion').should be_displayed
+          expect(f('.icon-discussion')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion').should be_nil
-          f('.icon-discussion-check').should be_displayed
+          expect(f('.icon-discussion')).to be_nil
+          expect(f('.icon-discussion-check')).to be_displayed
           topic.reload
-          topic.subscribed?(somebody).should be_true
+          expect(topic.subscribed?(somebody)).to be_truthy
         end
 
         it "should allow unsubscribing from a topic" do
@@ -171,14 +171,14 @@ describe "discussions" do
           get(url)
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion-check').should be_displayed
+          expect(f('.icon-discussion-check')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion-check').should be_nil
-          f('.icon-discussion').should be_displayed
+          expect(f('.icon-discussion-check')).to be_nil
+          expect(f('.icon-discussion')).to be_displayed
           topic.reload
-          topic.subscribed?(somebody).should be_false
+          expect(topic.subscribed?(somebody)).to be_falsey
         end
       end
 
@@ -186,7 +186,7 @@ describe "discussions" do
         topic.reply_from(user: somebody, text: 'entry')
 
         get url
-        f('.total-items').text.should == '1'
+        expect(f('.total-items').text).to eq '1'
       end
 
       it "should exclude deleted entries from unread and total reply count" do
@@ -196,8 +196,8 @@ describe "discussions" do
         entry.destroy
 
         get url
-        f('.new-items').text.should == '1'
-        f('.total-items').text.should == '1'
+        expect(f('.new-items').text).to eq '1'
+        expect(f('.total-items').text).to eq '1'
       end
 
       describe 'filtering' do
@@ -241,37 +241,37 @@ describe "discussions" do
 
         it "should filter by assignments" do
           filter(only_graded: true)
-          index_is_showing?(@graded_unread_topic, @graded_read_topic).should be_true
+          expect(index_is_showing?(@graded_unread_topic, @graded_read_topic)).to be_truthy
         end
 
         it "should filter by unread" do
           filter(only_unread: true)
-          index_is_showing?(@graded_unread_topic, @unread_topic).should be_true
+          expect(index_is_showing?(@graded_unread_topic, @unread_topic)).to be_truthy
         end
 
         it "should filter by unread and assignments" do
           filter(only_unread: true, only_graded: true)
-          index_is_showing?(@graded_unread_topic).should be_true
+          expect(index_is_showing?(@graded_unread_topic)).to be_truthy
         end
 
         it "should search by title" do
           filter(term: 'ungraded unread topic title')
-          index_is_showing?(@unread_topic).should be_true
+          expect(index_is_showing?(@unread_topic)).to be_truthy
         end
 
         it "should search by body" do
           filter(term: 'ungraded read topic message')
-          index_is_showing?(@read_topic).should be_true
+          expect(index_is_showing?(@read_topic)).to be_truthy
         end
 
         it "should search by author" do
           filter(term: 'student')
-          index_is_showing?(@read_topic, @unread_topic).should be_true
+          expect(index_is_showing?(@read_topic, @unread_topic)).to be_truthy
         end
 
         it "should return multiple items in the search" do
           filter(term: ' read')
-          index_is_showing?(@read_topic, @graded_read_topic).should be_true
+          expect(index_is_showing?(@read_topic, @graded_read_topic)).to be_truthy
         end
       end
     end
@@ -291,7 +291,7 @@ describe "discussions" do
         submit_form('.dialogFormView')
         wait_for_ajax_requests
         course.reload
-        course.allow_student_discussion_topics.should == false
+        expect(course.allow_student_discussion_topics).to eq false
       end
 
       describe "publish icon" do
@@ -308,27 +308,27 @@ describe "discussions" do
         it "should allow publishing a discussion" do
           topic.unpublish!
           click_publish_icon topic
-          topic.reload.published?.should be_true
+          expect(topic.reload.published?).to be_truthy
         end
 
         it "should allow unpublishing a discussion without replies" do
           topic.publish!
           click_publish_icon topic
-          topic.reload.published?.should be_false
+          expect(topic.reload.published?).to be_falsey
         end
 
         it "should not allow unpublishing a discussion with replies" do
           topic.publish!
           topic.reply_from(user: student, text: 'student reply')
           click_publish_icon topic
-          topic.reload.published?.should be_true
+          expect(topic.reload.published?).to be_truthy
         end
 
         it "should not allow unpublishing a graded discussion with a submission" do
           assignment_topic.publish!
           assignment_topic.reply_from(user: student, text: 'student reply submission')
           click_publish_icon assignment_topic
-          assignment_topic.reload.published?.should be_true
+          expect(assignment_topic.reload.published?).to be_truthy
         end
       end
 
@@ -347,9 +347,9 @@ describe "discussions" do
           f('.open.discussion-list .al-trigger').click
           fj('.icon-pin:visible').click
           wait_for_ajaximations
-          topic.reload.should be_pinned
-          topic.position.should_not be_nil
-          ffj('.pinned.discussion-list li.discussion:visible').length.should == 1
+          expect(topic.reload).to be_pinned
+          expect(topic.position).not_to be_nil
+          expect(ffj('.pinned.discussion-list li.discussion:visible').length).to eq 1
         end
 
         it "should allow a teacher to unpin a topic" do
@@ -361,8 +361,8 @@ describe "discussions" do
           f('.pinned.discussion-list .al-trigger').click
           fj('.icon-pin:visible').click
           wait_for_ajaximations
-          assignment_topic.reload.should_not be_pinned
-          ffj('.open.discussion-list li.discussion:visible').length.should == 1
+          expect(assignment_topic.reload).not_to be_pinned
+          expect(ffj('.open.discussion-list li.discussion:visible').length).to eq 1
         end
 
         it "should allow pinning of all pages of topics" do
@@ -371,14 +371,14 @@ describe "discussions" do
                                     title: "Discussion Topic #{n+1}")
           end
           topic = DiscussionTopic.where(context_id: course.id).order('id DESC').last
-          topic.should_not be_pinned
+          expect(topic).not_to be_pinned
           get(url)
           wait_for_ajaximations
           keep_trying_until { fj(".al-trigger") }
           fj("[data-id=#{topic.id}] .al-trigger").click
           fj('.icon-pin:visible').click
           wait_for_ajaximations
-          topic.reload.should be_pinned
+          expect(topic.reload).to be_pinned
         end
 
         it "should allow locking a pinned topic" do
@@ -391,7 +391,7 @@ describe "discussions" do
           fj('.icon-lock:visible').click
           wait_for_ajaximations
           f('.locked.discussion-list .al-trigger').click
-          fj('.icon-pin:visible').should include_text('Pin')
+          expect(fj('.icon-pin:visible')).to include_text('Pin')
         end
 
         it "should allow pinning a locked topic" do
@@ -403,11 +403,11 @@ describe "discussions" do
           fj('.icon-pin:visible').click
           wait_for_ajaximations
           f('.pinned.discussion-list .al-trigger').click
-          fj('.icon-lock:visible').should include_text('Open')
+          expect(fj('.icon-lock:visible')).to include_text('Open')
           fj('.icon-lock:visible').click
           wait_for_ajaximations
           f('.pinned.discussion-list .al-trigger').click
-          fj('.icon-lock:visible').should include_text('Close')
+          expect(fj('.icon-lock:visible')).to include_text('Close')
         end
 
         it "should delete a topic" do
@@ -418,8 +418,8 @@ describe "discussions" do
           fj('.icon-trash:visible').click
           driver.switch_to.alert.accept
           wait_for_ajaximations
-          topic.reload.workflow_state.should == 'deleted'
-          f('.discussion-list li.discussion').should be_nil
+          expect(topic.reload.workflow_state).to eq 'deleted'
+          expect(f('.discussion-list li.discussion')).to be_nil
         end
 
         it "should allow moving a topic" do
@@ -427,7 +427,7 @@ describe "discussions" do
             DiscussionTopic.create!(context: course, user: teacher,
               title: "Discussion Topic #{n+1}", pinned: true)
           end
-          topics.map(&:position).should == [1, 2, 3]
+          expect(topics.map(&:position)).to eq [1, 2, 3]
           topic = topics[0]
           get url
 
@@ -437,7 +437,7 @@ describe "discussions" do
           fj('.ui-dialog:visible .btn-primary').click
           wait_for_ajaximations
           topics.each &:reload
-          topics.map(&:position).should == [2, 1, 3]
+          expect(topics.map(&:position)).to eq [2, 1, 3]
         end
       end
     end
@@ -463,7 +463,7 @@ describe "discussions" do
         course.save!
         get url
         wait_for_ajax_requests
-        f('#new-discussion-btn').should be_nil
+        expect(f('#new-discussion-btn')).to be_nil
       end
 
       describe "gear menu" do
@@ -476,7 +476,7 @@ describe "discussions" do
           student_topic
           get(url)
           fj("[data-id=#{topic.id}] .al-trigger").click
-          ffj('.icon-pin:visible').length.should == 0
+          expect(ffj('.icon-pin:visible').length).to eq 0
         end
 
         it "should not allow a student to delete/edit topics if they didn't create any" do
@@ -500,7 +500,7 @@ describe "discussions" do
           user_session(section_student)
           get url
           wait_for_ajaximations
-          f('#locked-discussions .collectionViewItems .discussion').should_not be_nil
+          expect(f('#locked-discussions .collectionViewItems .discussion')).not_to be_nil
         end
       end
 
@@ -511,14 +511,14 @@ describe "discussions" do
           teacher_topic.save!
           get url
           wait_for_ajaximations
-          f('.icon-discussion').should be_displayed
+          expect(f('.icon-discussion')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion-check').should be_nil
-          f('.icon-discussion').should be_displayed
+          expect(f('.icon-discussion-check')).to be_nil
+          expect(f('.icon-discussion')).to be_displayed
           teacher_topic.reload
-          teacher_topic.subscribed?(student).should be_false
+          expect(teacher_topic.subscribed?(student)).to be_falsey
         end
 
         it "should allow subscribing after an initial post" do
@@ -529,12 +529,12 @@ describe "discussions" do
           get url
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion').should be_displayed
+          expect(f('.icon-discussion')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion-check').should be_displayed
-          teacher_topic.reload.subscribed?(student).should be_true
+          expect(f('.icon-discussion-check')).to be_displayed
+          expect(teacher_topic.reload.subscribed?(student)).to be_truthy
         end
 
         it "should display subscription action icons on hover" do
@@ -542,24 +542,24 @@ describe "discussions" do
           get url
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion-check').should be_displayed
+          expect(f('.icon-discussion-check')).to be_displayed
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
-          f('.icon-discussion-check').should be_nil
-          f('.icon-discussion-x').should be_displayed
+          expect(f('.icon-discussion-check')).to be_nil
+          expect(f('.icon-discussion-x')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
-          f('.icon-discussion-x').should be_nil
-          f('.icon-discussion').should be_displayed
+          expect(f('.icon-discussion-x')).to be_nil
+          expect(f('.icon-discussion')).to be_displayed
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          f('.icon-discussion').should be_displayed
+          expect(f('.icon-discussion')).to be_displayed
           teacher_topic.reload
           teacher_topic.require_initial_post = true
           teacher_topic.save!
           get url
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
-          f('.icon-discussion').should be_nil
-          f('.icon-discussion-x').should be_displayed
+          expect(f('.icon-discussion')).to be_nil
+          expect(f('.icon-discussion-x')).to be_displayed
         end
       end
     end
@@ -579,16 +579,16 @@ describe "discussions" do
         entry
         get url
         wait_for_ajax_requests
-        f('.headerBar .admin-links').should_not be_nil
-        f('.mark_all_as_read').should_not be_nil
+        expect(f('.headerBar .admin-links')).not_to be_nil
+        expect(f('.mark_all_as_read')).not_to be_nil
         #f('.mark_all_as_unread').should_not be_nil
-        f('.delete_discussion').should be_nil
-        f('.discussion_locked_toggler').should be_nil
+        expect(f('.delete_discussion')).to be_nil
+        expect(f('.discussion_locked_toggler')).to be_nil
       end
 
       it "should validate a group assignment discussion" do
         get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
-        f('.entry-content').should include_text('This is a graded discussion')
+        expect(f('.entry-content')).to include_text('This is a graded discussion')
       end
 
       context "teacher topic" do
@@ -601,9 +601,9 @@ describe "discussions" do
           get url
           wait_for_ajax_requests
           new_student_entry_text = "'ello there"
-          f('#content').should_not include_text(new_student_entry_text)
+          expect(f('#content')).not_to include_text(new_student_entry_text)
           add_reply new_student_entry_text
-          f('#content').should include_text(new_student_entry_text)
+          expect(f('#content')).to include_text(new_student_entry_text)
         end
 
         it "should display the subscribe button after an initial post" do
@@ -613,25 +613,25 @@ describe "discussions" do
 
           get url
           wait_for_ajaximations
-          f('.topic-unsubscribe-button').should_not be_displayed
-          f('.topic-subscribe-button').should_not be_displayed
+          expect(f('.topic-unsubscribe-button')).not_to be_displayed
+          expect(f('.topic-subscribe-button')).not_to be_displayed
 
           f('.discussion-reply-action').click
           wait_for_ajaximations
           type_in_tiny 'textarea', 'initial post text'
           submit_form('.discussion-reply-form')
           wait_for_ajaximations
-          f('.topic-unsubscribe-button').should be_displayed
+          expect(f('.topic-unsubscribe-button')).to be_displayed
         end
 
         it "should validate that a student can see it and reply to a discussion" do
           new_student_entry_text = 'new student entry'
           get url
           wait_for_ajax_requests
-          f('.message_wrapper').should include_text('teacher')
-          f('#content').should_not include_text(new_student_entry_text)
+          expect(f('.message_wrapper')).to include_text('teacher')
+          expect(f('#content')).not_to include_text(new_student_entry_text)
           add_reply new_student_entry_text
-          f('#content').should include_text(new_student_entry_text)
+          expect(f('#content')).to include_text(new_student_entry_text)
         end
 
         it "should let students post to a post-first discussion" do
@@ -642,13 +642,13 @@ describe "discussions" do
           get url
           wait_for_ajax_requests
           # shouldn't see the existing entry until after posting
-          f('#content').should_not include_text("new entry from teacher")
+          expect(f('#content')).not_to include_text("new entry from teacher")
           add_reply new_student_entry_text
           # now they should see the existing entry, and their entry
           entries = get_all_replies
-          entries.length.should == 2
-          entries[0].should include_text("teacher entry")
-          entries[1].should include_text(new_student_entry_text)
+          expect(entries.length).to eq 2
+          expect(entries[0]).to include_text("teacher entry")
+          expect(entries[1]).to include_text(new_student_entry_text)
         end
       end
     end
@@ -676,7 +676,7 @@ describe "discussions" do
           new_points = get_value(".criterion_points")
           dialog = fj(".ui-dialog:visible")
           
-          keep_trying_until { fj(".grading_rubric_checkbox:visible").should be_displayed }
+          keep_trying_until { expect(fj(".grading_rubric_checkbox:visible")).to be_displayed }
           set_value fj(".grading_rubric_checkbox:visible", dialog), true
 
           fj(".save_button:visible", dialog).click
@@ -688,7 +688,7 @@ describe "discussions" do
           fj(".save_button:visible", dialog).click
           wait_for_ajaximations
 
-          fj(".discussion-title").should include_text(new_points)
+          expect(fj(".discussion-title")).to include_text(new_points)
         end
       end
 
@@ -696,14 +696,14 @@ describe "discussions" do
         get url
         message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
         add_reply(message, 'graded.png')
-        @last_entry.find_element(:css, '.message').text.should == message
+        expect(@last_entry.find_element(:css, '.message').text).to eq message
       end
 
       it "should reply as a student and validate teacher can see reply" do
-        pending "figure out delayed jobs"
+        skip "figure out delayed jobs"
         entry = topic.discussion_entries.create!(:user => student, :message => 'new entry from student')
         get url
-        f("#entry-#{entry.id}").should include_text('new entry from student')
+        expect(f("#entry-#{entry.id}")).to include_text('new entry from student')
       end
 
       it "should clear lock_at when manually triggering unlock" do
@@ -719,25 +719,25 @@ describe "discussions" do
         expect_new_page_load { f(".discussion_locked_toggler").click }
 
         topic.reload
-        topic.lock_at.should be_nil
-        topic.active?.should be_true
-        topic.locked?.should be_false
+        expect(topic.lock_at).to be_nil
+        expect(topic.active?).to be_truthy
+        expect(topic.locked?).to be_falsey
       end
 
       it "should allow publishing and unpublishing from a topic's page" do
         Account.default.enable_feature!(:draft_state)
         topic.workflow_state = 'unpublished'
         topic.save!
-        topic.published?.should be_false
+        expect(topic.published?).to be_falsey
         get url
         f('#topic_publish_button').click
         wait_for_ajaximations
         topic.reload
-        topic.published?.should be_true
+        expect(topic.published?).to be_truthy
         f('#topic_publish_button').click
         wait_for_ajaximations
         topic.reload
-        topic.published?.should be_false
+        expect(topic.published?).to be_falsey
       end
 
       it "should edit a topic" do
@@ -752,9 +752,9 @@ describe "discussions" do
         get url
         f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
-        f('.discussion-fyi').text.should == 'This topic is closed for comments'
-        ff('.discussion-reply-action').should be_empty
-        DiscussionTopic.last.locked?.should be_true
+        expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments'
+        expect(ff('.discussion-reply-action')).to be_empty
+        expect(DiscussionTopic.last.locked?).to be_truthy
       end
 
       it "should validate reopening the discussion for comments" do
@@ -762,9 +762,9 @@ describe "discussions" do
         get url
         f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
-        ff('.discussion-reply-action').should_not be_empty
-        DiscussionTopic.last.workflow_state.should == 'active'
-        DiscussionTopic.last.locked?.should be_false
+        expect(ff('.discussion-reply-action')).not_to be_empty
+        expect(DiscussionTopic.last.workflow_state).to eq 'active'
+        expect(DiscussionTopic.last.locked?).to be_falsey
       end
 
       context "graded" do
@@ -776,7 +776,7 @@ describe "discussions" do
           get url
 
           f('.al-trigger').click
-          f('.al-options').text.should_not match(/Speed Grader/)
+          expect(f('.al-options').text).not_to match(/Speed Grader/)
         end
       end
 
@@ -784,9 +784,9 @@ describe "discussions" do
         it "should allow student view student to read/post" do
           enter_student_view
           get url
-          get_all_replies.count.should == 0
+          expect(get_all_replies.count).to eq 0
           add_reply
-          get_all_replies.count.should == 1
+          expect(get_all_replies.count).to eq 1
         end
 
         # note: this isn't desirable, but it's the way it is for this release
@@ -797,7 +797,7 @@ describe "discussions" do
 
           get url
           wait_for_ajaximations
-          get_all_replies.first.should include_text fake_student.name
+          expect(get_all_replies.first).to include_text fake_student.name
         end
       end
     end
@@ -820,18 +820,18 @@ describe "discussions" do
 
           # make sure everything looks unread
           get url
-          ff('.discussion_entry.unread').length.should == reply_count
-          f('.new-and-total-badge .new-items').text.should == reply_count.to_s
+          expect(ff('.discussion_entry.unread').length).to eq reply_count
+          expect(f('.new-and-total-badge .new-items').text).to eq reply_count.to_s
 
           #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
           driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
-          keep_trying_until { ff('.discussion_entry.unread').should be_empty }
-          ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
+          keep_trying_until { expect(ff('.discussion_entry.unread')).to be_empty }
+          expect(ff('.discussion_entry.read').length).to eq reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
           # refresh page and make sure nothing is unread and everthing is .read
           get url
-          ff(".discussion_entry.unread").should be_empty
-          f('.new-and-total-badge .new-items').text.should == ''
+          expect(ff(".discussion_entry.unread")).to be_empty
+          expect(f('.new-and-total-badge .new-items').text).to eq ''
 
           # Mark one as unread manually, and create a new reply. The new reply
           # should be automarked as read, but the manual one should not.
@@ -841,13 +841,13 @@ describe "discussions" do
           topic.create_materialized_view
 
           get url
-          ff(".discussion_entry.unread").size.should == 2
-          f('.new-and-total-badge .new-items').text.should == '2'
+          expect(ff(".discussion_entry.unread").size).to eq 2
+          expect(f('.new-and-total-badge .new-items').text).to eq '2'
 
           driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
           keep_trying_until { ff('.discussion_entry.unread').size < 2 }
           wait_for_ajaximations
-          ff(".discussion_entry.unread").size.should == 1
+          expect(ff(".discussion_entry.unread").size).to eq 1
         end
 
         it "should mark all as read" do
@@ -864,14 +864,14 @@ describe "discussions" do
 
           get url
 
-          ff('.discussion-entries .unread').length.should == reply_count
-          ff('.discussion-entries .read').length.should == 0
+          expect(ff('.discussion-entries .unread').length).to eq reply_count
+          expect(ff('.discussion-entries .read').length).to eq 0
 
           f("#discussion-managebar .al-trigger").click
           f('.mark_all_as_read').click
           wait_for_ajaximations
-          ff('.discussion-entries .unread').length.should == 0
-          ff('.discussion-entries .read').length.should == reply_count
+          expect(ff('.discussion-entries .unread').length).to eq 0
+          expect(ff('.discussion-entries .read').length).to eq reply_count
         end
       end
 
@@ -882,15 +882,15 @@ describe "discussions" do
 
           get url
           wait_for_ajaximations
-          f('.topic-unsubscribe-button').should be_displayed
-          f('.topic-subscribe-button').should_not be_displayed
+          expect(f('.topic-unsubscribe-button')).to be_displayed
+          expect(f('.topic-subscribe-button')).not_to be_displayed
 
           topic.unsubscribe(somebody)
           topic.update_materialized_view
           get url
           wait_for_ajaximations
-          f('.topic-unsubscribe-button').should_not be_displayed
-          f('.topic-subscribe-button').should be_displayed
+          expect(f('.topic-unsubscribe-button')).not_to be_displayed
+          expect(f('.topic-subscribe-button')).to be_displayed
         end
 
         it "should unsubscribe from topic" do
@@ -902,7 +902,7 @@ describe "discussions" do
           f('.topic-unsubscribe-button').click
           wait_for_ajaximations
           topic.reload
-          topic.subscribed?(somebody).should == false
+          expect(topic.subscribed?(somebody)).to eq false
         end
 
         it "should subscribe to topic" do
@@ -914,7 +914,7 @@ describe "discussions" do
           f('.topic-subscribe-button').click
           wait_for_ajaximations
           topic.reload
-          topic.subscribed?(somebody).should == true
+          expect(topic.subscribed?(somebody)).to eq true
         end
 
         it "should prevent subscribing when a student post is required first" do
@@ -924,13 +924,13 @@ describe "discussions" do
           get url
           wait_for_ajax_requests
           # shouldn't see subscribe button until after posting
-          f('.topic-subscribe-button').should_not be_displayed
+          expect(f('.topic-subscribe-button')).not_to be_displayed
           add_reply new_student_entry_text
           # now the subscribe button should be available.
           get url
           wait_for_ajax_requests
           # already subscribed because they posted
-          f('.topic-unsubscribe-button').should be_displayed
+          expect(f('.topic-unsubscribe-button')).to be_displayed
         end
 
         context "someone else's topic" do
@@ -938,9 +938,9 @@ describe "discussions" do
 
           it "should update subscribed button when user posts to a topic" do
             get url
-            f('.topic-subscribe-button').should be_displayed
+            expect(f('.topic-subscribe-button')).to be_displayed
             add_reply "student posting"
-            f('.topic-unsubscribe-button').should be_displayed
+            expect(f('.topic-unsubscribe-button')).to be_displayed
           end
         end
       end
@@ -950,22 +950,22 @@ describe "discussions" do
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
         wait_for_ajax_requests
-        f('#content object').should_not be_present
+        expect(f('#content object')).not_to be_present
         iframe = f('#content iframe.user_content_iframe')
-        iframe.should be_present
+        expect(iframe).to be_present
         # the sizing isn't exact due to browser differences
-        iframe.size.width.should be_between(405, 445)
-        iframe.size.height.should be_between(330, 370)
+        expect(iframe.size.width).to be_between(405, 445)
+        expect(iframe.size.height).to be_between(330, 370)
         form = f('form.user_content_post_form')
-        form.should be_present
-        form['target'].should == iframe['name']
+        expect(form).to be_present
+        expect(form['target']).to eq iframe['name']
         in_frame(iframe) do
           keep_trying_until do
             src = driver.page_source
             doc = Nokogiri::HTML::DocumentFragment.parse(src)
             obj = doc.at_css('body object')
-            obj.name.should == 'object'
-            obj['data'].should == "http://www.example.com/swf/software/flash/about/flash_animation.swf"
+            expect(obj.name).to eq 'object'
+            expect(obj['data']).to eq "http://www.example.com/swf/software/flash/about/flash_animation.swf"
           end
         end
       end
@@ -976,29 +976,29 @@ describe "discussions" do
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
         wait_for_ajax_requests
-        f('#content object').should_not be_present
-        f('#content embed').should_not be_present
+        expect(f('#content object')).not_to be_present
+        expect(f('#content embed')).not_to be_present
         iframe = f('#content iframe.user_content_iframe')
-        iframe.should be_present
+        expect(iframe).to be_present
         forms = ff('form.user_content_post_form')
-        forms.size.should == 1
+        expect(forms.size).to eq 1
         form = forms.first
-        form['target'].should == iframe['name']
+        expect(form['target']).to eq iframe['name']
       end
 
       it "should still show entries without users" do
         topic.discussion_entries.create!(:user => nil, :message => 'new entry from nobody')
         get url
         wait_for_ajax_requests
-        f('#content').should include_text('new entry from nobody')
+        expect(f('#content')).to include_text('new entry from nobody')
       end
 
       it "should display the current username when adding a reply" do
         get url
-        get_all_replies.count.should == 0
+        expect(get_all_replies.count).to eq 0
         add_reply
-        get_all_replies.count.should == 1
-        @last_entry.find_element(:css, '.author').text.should == somebody.name
+        expect(get_all_replies.count).to eq 1
+        expect(@last_entry.find_element(:css, '.author').text).to eq somebody.name
       end
 
       it "should show attachments after showing hidden replies" do
@@ -1012,10 +1012,10 @@ describe "discussions" do
         end
         topic.create_materialized_view
         get url
-        ffj('.comment_attachments').count.should == 10
+        expect(ffj('.comment_attachments').count).to eq 10
         fj('.showMore').click
         wait_for_ajaximations
-        ffj('.comment_attachments').count.should == replies.count
+        expect(ffj('.comment_attachments').count).to eq replies.count
       end
 
       context "side comments" do
@@ -1032,10 +1032,10 @@ describe "discussions" do
           wait_for_ajaximations
 
           last_entry = DiscussionEntry.last
-          last_entry.depth.should == 2
-          last_entry.message.should include_text(side_comment_text)
+          expect(last_entry.depth).to eq 2
+          expect(last_entry.message).to include_text(side_comment_text)
           keep_trying_until do
-            f("#entry-#{last_entry.id}").should include_text(side_comment_text)
+            expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
           end
         end
 
@@ -1044,12 +1044,12 @@ describe "discussions" do
           side_comment_number.times { |i| topic.discussion_entries.create!(:user => student, :message => "new side comment #{i} from student", :parent_entry => entry) }
           get url
           wait_for_ajaximations
-          DiscussionEntry.last.depth.should == 2
+          expect(DiscussionEntry.last.depth).to eq 2
           keep_trying_until do
-            ff('.discussion-entries .entry').count.should == 12 # +1 because of the initial entry
+            expect(ff('.discussion-entries .entry').count).to eq 12 # +1 because of the initial entry
           end
           f('.showMore').click
-          ff('.discussion-entries .entry').count.should == (side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
+          expect(ff('.discussion-entries .entry').count).to eq(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
         end
 
         it "should delete a side comment" do
@@ -1063,7 +1063,7 @@ describe "discussions" do
           edit_text = 'this has been edited '
           text = "new side comment from somebody"
           entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)
-          topic.discussion_entries.last.message.should == text
+          expect(topic.discussion_entries.last.message).to eq text
           get url
           keep_trying_until do
             validate_entry_text(entry, text)
@@ -1123,7 +1123,7 @@ describe "discussions" do
           click_option("#assignment_group_id", assign_group_2.name)
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
-          topic.reload.assignment.assignment_group_id.should == assign_group_2.id
+          expect(topic.reload.assignment.assignment_group_id).to eq assign_group_2.id
         end
 
         it "should allow editing the grading type" do
@@ -1133,7 +1133,7 @@ describe "discussions" do
           click_option("#assignment_grading_type", "Letter Grade")
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
-          topic.reload.assignment.grading_type.should == "letter_grade"
+          expect(topic.reload.assignment.grading_type).to eq "letter_grade"
         end
 
         it "should allow editing the group category" do
@@ -1145,7 +1145,7 @@ describe "discussions" do
           click_option("#assignment_group_category_id", group_cat.name)
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
-          topic.reload.group_category_id.should == group_cat.id
+          expect(topic.reload.group_category_id).to eq group_cat.id
         end
 
         it "should allow editing the peer review" do
@@ -1155,7 +1155,7 @@ describe "discussions" do
           f("#assignment_peer_reviews").click
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
-          topic.reload.assignment.peer_reviews.should == true
+          expect(topic.reload.assignment.peer_reviews).to eq true
         end
 
         it "should allow editing the due dates" do
@@ -1174,9 +1174,9 @@ describe "discussions" do
           expect_new_page_load { f('.form-actions button[type=submit]').click }
 
           a = DiscussionTopic.last.assignment
-          a.due_at.strftime('%b %-d, %y').should == due_at.to_date.strftime('%b %-d, %y')
-          a.unlock_at.strftime('%b %-d, %y').should == unlock_at.to_date.strftime('%b %-d, %y')
-          a.lock_at.strftime('%b %-d, %y').should == lock_at.to_date.strftime('%b %-d, %y')
+          expect(a.due_at.strftime('%b %-d, %y')).to eq due_at.to_date.strftime('%b %-d, %y')
+          expect(a.unlock_at.strftime('%b %-d, %y')).to eq unlock_at.to_date.strftime('%b %-d, %y')
+          expect(a.lock_at.strftime('%b %-d, %y')).to eq lock_at.to_date.strftime('%b %-d, %y')
         end
 
         it "should add an attachment to a graded topic" do
@@ -1186,7 +1186,7 @@ describe "discussions" do
             # should correctly save changes to the assignment
             set_value f('#discussion_topic_assignment_points_possible'), '123'
           end
-          Assignment.last.points_possible.should == 123
+          expect(Assignment.last.points_possible).to eq 123
         end
       end
 
@@ -1198,11 +1198,11 @@ describe "discussions" do
           get url
           wait_for_ajaximations
 
-          f('input[type=checkbox][name=threaded]')[:checked].should == checkbox_state
-          f('input[type=checkbox][name=require_initial_post]')[:checked].should == checkbox_state
-          f('input[type=checkbox][name=podcast_enabled]')[:checked].should == checkbox_state
-          f('input[type=checkbox][name=podcast_has_student_posts]')[:checked].should == checkbox_state
-          f('input[type=checkbox][name="assignment[set_assignment]"]')[:checked].should == checkbox_state
+          expect(f('input[type=checkbox][name=threaded]')[:checked]).to eq checkbox_state
+          expect(f('input[type=checkbox][name=require_initial_post]')[:checked]).to eq checkbox_state
+          expect(f('input[type=checkbox][name=podcast_enabled]')[:checked]).to eq checkbox_state
+          expect(f('input[type=checkbox][name=podcast_has_student_posts]')[:checked]).to eq checkbox_state
+          expect(f('input[type=checkbox][name="assignment[set_assignment]"]')[:checked]).to eq checkbox_state
         end
 
         def toggle(state)
@@ -1227,9 +1227,9 @@ describe "discussions" do
       it "should toggle checkboxes when clicking their labels" do
         get url
         wait_for_ajaximations
-        is_checked('input[type=checkbox][name=threaded]').should_not be_true
+        expect(is_checked('input[type=checkbox][name=threaded]')).not_to be_truthy
         driver.execute_script(%{$('input[type=checkbox][name=threaded]').parent().click()})
-        is_checked('input[type=checkbox][name=threaded]').should be_true
+        expect(is_checked('input[type=checkbox][name=threaded]')).to be_truthy
       end
 
       context "locking" do
@@ -1241,7 +1241,7 @@ describe "discussions" do
 
           get url
 
-          keep_trying_until { f('input[type=text][name="delayed_post_at"]').should be_displayed }
+          keep_trying_until { expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed }
 
           f('input[type=text][name="delayed_post_at"]').clear
           f('input[type=text][name="lock_at"]').clear
@@ -1249,10 +1249,10 @@ describe "discussions" do
           expect_new_page_load { f('.form-actions button[type=submit]').click }
 
           topic.reload
-          topic.delayed_post_at.should be_nil
-          topic.lock_at.should be_nil
-          topic.active?.should be_true
-          topic.locked?.should be_false
+          expect(topic.delayed_post_at).to be_nil
+          expect(topic.lock_at).to be_nil
+          expect(topic.active?).to be_truthy
+          expect(topic.locked?).to be_falsey
         end
 
         it "should be locked when delayed_post_at and lock_at are in past" do
@@ -1275,9 +1275,9 @@ describe "discussions" do
           wait_for_ajaximations
 
           topic.reload
-          topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
-          topic.lock_at.strftime(date_format).should == lock_at.strftime(date_format)
-          topic.locked?.should be_true
+          expect(topic.delayed_post_at.strftime(date_format)).to eq delayed_post_at.strftime(date_format)
+          expect(topic.lock_at.strftime(date_format)).to eq lock_at.strftime(date_format)
+          expect(topic.locked?).to be_truthy
         end
 
         it "should set workflow to active when delayed_post_at in past and lock_at in future" do
@@ -1300,9 +1300,9 @@ describe "discussions" do
           wait_for_ajaximations
 
           topic.reload
-          topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
-          topic.active?.should be_true
-          topic.locked?.should be_false
+          expect(topic.delayed_post_at.strftime(date_format)).to eq delayed_post_at.strftime(date_format)
+          expect(topic.active?).to be_truthy
+          expect(topic.locked?).to be_falsey
         end
       end
 
@@ -1322,7 +1322,7 @@ describe "discussions" do
         get url
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
-        DiscussionTopic.find_by_title(topic_title).attachment_id.should be_present
+        expect(DiscussionTopic.find_by_title(topic_title).attachment_id).to be_present
       end
 
       it "should create a podcast enabled topic" do
@@ -1335,7 +1335,7 @@ describe "discussions" do
         #get "/courses/#{course.id}/discussion_topics"
         # TODO: talk to UI, figure out what to display here
         # f('.discussion-topic .icon-rss').should be_displayed
-        DiscussionTopic.last.podcast_enabled.should be_true
+        expect(DiscussionTopic.last.podcast_enabled).to be_truthy
       end
 
       context "graded" do
@@ -1364,11 +1364,11 @@ describe "discussions" do
           topic = DiscussionTopic.last
 
           overrides = topic.assignment.assignment_overrides
-          overrides.count.should == 2
+          expect(overrides.count).to eq 2
           default_override = overrides.detect { |o| o.set_id == default_section.id }
-          default_override.due_at.strftime('%b %-d, %y').should == due_at1.to_date.strftime('%b %-d, %y')
+          expect(default_override.due_at.strftime('%b %-d, %y')).to eq due_at1.to_date.strftime('%b %-d, %y')
           other_override = overrides.detect { |o| o.set_id == new_section.id }
-          other_override.due_at.strftime('%b %-d, %y').should == due_at2.to_date.strftime('%b %-d, %y')
+          expect(other_override.due_at.strftime('%b %-d, %y')).to eq due_at2.to_date.strftime('%b %-d, %y')
         end
 
         it "should validate that a group category is selected" do
@@ -1384,7 +1384,7 @@ describe "discussions" do
 
           errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
           visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-          visBoxes.first.text.should == "Please select a group set for this assignment"
+          expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
         end
       end
     end
@@ -1397,13 +1397,13 @@ describe "discussions" do
       it "should not show file attachment if allow_student_forum_attachments is not true" do
         # given
         get url
-        f('#disussion_attachment_uploaded_data').should be_nil
+        expect(f('#disussion_attachment_uploaded_data')).to be_nil
         # when
         course.allow_student_forum_attachments = true
         course.save!
         # expect
         get url
-        f('#discussion_attachment_uploaded_data').should_not be_nil
+        expect(f('#discussion_attachment_uploaded_data')).not_to be_nil
       end
 
       context "in a group" do
@@ -1412,13 +1412,13 @@ describe "discussions" do
         it "should not show file attachment if allow_student_forum_attachments is not true" do
           # given
           get url
-          f('label[for=discussion_attachment_uploaded_data]').should be_nil
+          expect(f('label[for=discussion_attachment_uploaded_data]')).to be_nil
           # when
           course.allow_student_forum_attachments = true
           course.save!
           # expect
           get url
-          f('label[for=discussion_attachment_uploaded_data]').should be_displayed
+          expect(f('label[for=discussion_attachment_uploaded_data]')).to be_displayed
         end
       end
     end
@@ -1442,9 +1442,9 @@ describe "discussions" do
       gear = fj("##{@topic.id}_discussion_content .al-trigger")
       gear.click
       link = fj("##{@topic.id}_discussion_content li a.menu_tool_link")
-      link.should be_displayed
-      link.text.should match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
-      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
+      expect(link).to be_displayed
+      expect(link.text).to match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
+      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
     end
 
     it "should show tool launch links in the gear for items on the show page" do
@@ -1454,9 +1454,9 @@ describe "discussions" do
       gear = f("#discussion-managebar .al-trigger")
       gear.click
       link = f("#discussion-managebar li a.menu_tool_link")
-      link.should be_displayed
-      link.text.should match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
-      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
+      expect(link).to be_displayed
+      expect(link.text).to match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
+      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
     end
   end
 end

@@ -27,7 +27,7 @@ class Course < ActiveRecord::Base
   include TimeZoneHelper
 
   attr_accessor :teacher_names
-  attr_writer :student_count
+  attr_writer :student_count, :primary_enrollment, :primary_enrollment_rank, :primary_enrollment_state, :invitation
 
   attr_accessible :name,
                   :section,
@@ -70,6 +70,7 @@ class Course < ActiveRecord::Base
                   :hide_distribution_graphs,
                   :lock_all_announcements,
                   :public_syllabus,
+                  :course_format,
                   :time_zone
 
   EXPORTABLE_ATTRIBUTES = [
@@ -305,16 +306,14 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    if self.grants_right?(user, :manage_content)
+    if user_is_teacher = self.grants_right?(user, :manage_content)
       tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
     else
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
 
     if self.feature_enabled?(:differentiated_assignments)
-      tags = AssignmentStudentVisibility.filter_for_differentiated_assignments(tags, user, self) do |tags, user_ids|
-        tags.visible_to_students_with_da_enabled(user_ids)
-      end
+      tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
     end
 
     tags
@@ -414,7 +413,7 @@ class Course < ActiveRecord::Base
 
       if courses_or_course_ids.first.is_a? Course
         courses = courses_or_course_ids
-        Course.send(:preload_associations, courses, :course_sections => :nonxlist_course)
+        ActiveRecord::Associations::Preloader.new(courses, :course_sections => :nonxlist_course).run
         course_ids = courses.map(&:id)
       else
         course_ids = courses_or_course_ids
@@ -710,7 +709,7 @@ class Course < ActiveRecord::Base
     self.tab_configuration ||= [] unless self.tab_configuration == []
     self.name = nil if self.name && self.name.strip.empty?
     self.name ||= t('missing_name', "Unnamed Course")
-    self.course_code = nil if self.course_code == "" || (self.name_changed? && self.course_code && self.name_was && self.name_was.start_with?(self.course_code))
+    self.course_code = nil if self.course_code == ''
     if !self.course_code && self.name
       res = []
       split = self.name.split(/\s/)
@@ -733,6 +732,7 @@ class Course < ActiveRecord::Base
     self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
+    self.course_format = nil if self.course_format && !['on_campus', 'online'].include?(self.course_format)
     true
   end
 
@@ -2522,6 +2522,7 @@ class Course < ActiveRecord::Base
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
+  add_setting :course_format
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -2757,7 +2758,11 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def student_count
-    read_attribute(:student_count) || @student_count
+  %w{student_count primary_enrollment primary_enrollment_rank primary_enrollment_state invitation}.each do |method|
+    class_eval <<-RUBY
+      def #{method}
+        read_attribute(:#{method}) || @#{method}
+      end
+    RUBY
   end
 end

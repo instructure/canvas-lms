@@ -44,6 +44,7 @@ module I18nUtilities
 end
 
 ActionView::Base.send(:include, I18nUtilities)
+ActionView::Helpers::FormHelper.send(:include, I18nUtilities)
 ActionView::Helpers::FormHelper.module_eval do
   # a convenience method to put the ":" after the label text (or do whatever
   # the selected locale dictates)
@@ -64,6 +65,7 @@ ActionView::Helpers::FormHelper.module_eval do
 end
 
 ActionView::Helpers::InstanceTag.send(:include, I18nUtilities)
+ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
 ActionView::Helpers::FormTagHelper.class_eval do
   def label_tag_with_symbol_translation(method, text = nil, options = {})
     text, options = _label_symbol_translation(method, text, options)
@@ -264,7 +266,7 @@ ActiveRecord::Base.class_eval do
         end
       end
       args.each do |field|
-        validates_inclusion_of field, options.merge(:in => LOCALE_LIST)
+        validates_inclusion_of field, options.merge(:in => LOCALE_LIST, :if => :"#{field}_changed?")
       end
     end
   end

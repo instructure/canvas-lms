@@ -27,10 +27,10 @@ describe Lti::Asset do
 
   describe "opaque_identifier_for" do
     it "should create lti_context_id for asset" do
-      @course.lti_context_id.should == nil
+      expect(@course.lti_context_id).to eq nil
       context_id = described_class.opaque_identifier_for(@course)
       @course.reload
-      @course.lti_context_id.should == context_id
+      expect(@course.lti_context_id).to eq context_id
     end
 
     it "should not create new lti_context for asset if exists" do
@@ -38,7 +38,7 @@ describe Lti::Asset do
       @course.save!
       described_class.opaque_identifier_for(@course)
       @course.reload
-      @course.lti_context_id.should == 'dummy_context_id'
+      expect(@course.lti_context_id).to eq 'dummy_context_id'
     end
   end
 

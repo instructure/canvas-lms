@@ -279,7 +279,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   def add_questions
     find_bank(params[:assessment_question_bank_id]) do
-      @assessment_questions = @bank.assessment_questions.active.find_all_by_id(params[:assessment_questions_ids].split(",")).compact
+      @assessment_questions = @bank.assessment_questions.active.where(id: params[:assessment_questions_ids].split(",")).to_a
       @group = @quiz.quiz_groups.where(id: params[:quiz_group_id]).first if params[:quiz_group_id].to_i > 0
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
 

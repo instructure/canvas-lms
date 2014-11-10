@@ -27,7 +27,7 @@ describe "/groups/_student" do
     view_context(@user, @group)
     
     render :partial => "groups/student", :object => @user
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

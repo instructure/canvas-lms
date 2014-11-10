@@ -28,8 +28,8 @@ describe 'appointment_group_deleted.facebook' do
     generate_message(:appointment_group_deleted, :facebook, @appointment_group,
                      :user => @user, :data => {:cancel_reason => "because"})
 
-    @message.body.should include('some title')
-    @message.body.should include('because')
-    @message.body.should include(@course.name)
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include('because')
+    expect(@message.body).to include(@course.name)
   end
 end

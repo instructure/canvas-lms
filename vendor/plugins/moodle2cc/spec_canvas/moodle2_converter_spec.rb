@@ -24,66 +24,66 @@ describe Moodle::Converter do
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
                         "There are 3 Formula questions in this bank that will need to have their possible answers regenerated",
                         "Missing links found in imported content"]
-    @cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}.should == true
+    expect(@cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}).to eq true
   end
 
   context "discussion topics" do
     it "should convert discussion topics" do
-      @course.discussion_topics.count.should == 2
+      expect(@course.discussion_topics.count).to eq 2
 
       dt = @course.discussion_topics.first
-      dt.title.should == "Hidden Forum"
-      dt.message.should == "<p>Description of hidden forum</p>"
-      dt.unpublished?.should == true
+      expect(dt.title).to eq "Hidden Forum"
+      expect(dt.message).to eq "<p>Description of hidden forum</p>"
+      expect(dt.unpublished?).to eq true
 
       dt2 = @course.discussion_topics.last
-      dt2.title.should == "News forum"
-      dt2.message.should == "<p>General news and announcements</p>"
+      expect(dt2.title).to eq "News forum"
+      expect(dt2.message).to eq "<p>General news and announcements</p>"
     end
   end
 
   context "assignments" do
     it "should convert assignments" do
-      @course.assignments.count.should == 2
+      expect(@course.assignments.count).to eq 2
 
       assignment2 = @course.assignments.find_by_title 'Hidden Assignmnet'
-      assignment2.description.should == "<p>This is a hidden assignment</p>"
-      assignment2.unpublished?.should == true
+      expect(assignment2.description).to eq "<p>This is a hidden assignment</p>"
+      expect(assignment2.unpublished?).to eq true
     end
   end
 
   context "wiki pages" do
     it "should convert wikis" do
       wiki = @course.wiki
-      wiki.should_not be_nil
-      wiki.wiki_pages.count.should == 12
+      expect(wiki).not_to be_nil
+      expect(wiki.wiki_pages.count).to eq 12
 
       page1 = wiki.wiki_pages.find_by_title 'Hidden Section'
-      page1.body.should == '<p>This is a Hidden Section, with hidden items</p>'
-      page1.unpublished?.should == true
+      expect(page1.body).to eq '<p>This is a Hidden Section, with hidden items</p>'
+      expect(page1.unpublished?).to eq true
     end
   end
 
   context "quizzes" do
     before(:each) do
-      pending if !Qti.qti_enabled?
+      skip if !Qti.qti_enabled?
     end
 
     it "should convert quizzes" do
-      @course.quizzes.count.should == 2
+      expect(@course.quizzes.count).to eq 2
     end
 
     it "should convert Moodle Quiz module to a quiz" do
       quiz = @course.quizzes.find_by_title "Quiz Name"
-      quiz.description.should match /Quiz Description/
-      quiz.quiz_questions.count.should == 11
+      expect(quiz.description).to match /Quiz Description/
+      expect(quiz.quiz_questions.count).to eq 11
     end
 
     it "should convert Moodle Questionnaire module to a quiz" do
       quiz = @course.quizzes.find_by_title "Questionnaire Name"
-      quiz.description.should match /Sumary/
-      quiz.quiz_type.should == 'survey'
-      quiz.quiz_questions.count.should == 10
+      expect(quiz.description).to match /Sumary/
+      expect(quiz.quiz_type).to eq 'survey'
+      expect(quiz.quiz_questions.count).to eq 10
     end
   end
 end

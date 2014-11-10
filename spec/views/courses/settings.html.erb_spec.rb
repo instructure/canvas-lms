@@ -36,8 +36,8 @@ describe "courses/settings.html.erb" do
       view_context(@course, @user)
       assigns[:current_user] = @user
       render
-      response.should have_tag("span.sis_source_id", @course.sis_source_id)
-      response.should_not have_tag("input#course_sis_source_id")
+      expect(response).to have_tag("span.sis_source_id", @course.sis_source_id)
+      expect(response).not_to have_tag("input#course_sis_source_id")
     end
 
     it "should show to sis admin" do
@@ -45,7 +45,7 @@ describe "courses/settings.html.erb" do
       view_context(@course, admin)
       assigns[:current_user] = admin
       render
-      response.should have_tag("input#course_sis_source_id")
+      expect(response).to have_tag("input#course_sis_source_id")
     end
 
     it "should not show to non-sis admin" do
@@ -53,7 +53,7 @@ describe "courses/settings.html.erb" do
       view_context(@course, admin)
       assigns[:current_user] = admin
       render
-      response.should_not have_tag("input#course_sis_source_id")
+      expect(response).not_to have_tag("input#course_sis_source_id")
     end
 
     it "should show grade export when enabled" do
@@ -62,8 +62,8 @@ describe "courses/settings.html.erb" do
       view_context(@course, admin)
       assigns[:current_user] = admin
       render
-      response.body.should =~ /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
-      response.body.should =~ /<div id="tab-grade-publishing">/
+      expect(response.body).to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
+      expect(response.body).to match /<div id="tab-grade-publishing">/
     end
 
     it "should not show grade export when disabled" do
@@ -72,8 +72,8 @@ describe "courses/settings.html.erb" do
       view_context(@course, admin)
       assigns[:current_user] = admin
       render
-      response.body.should_not =~ /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
-      response.body.should_not =~ /<div id="tab-grade-publishing">/
+      expect(response.body).not_to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
+      expect(response.body).not_to match /<div id="tab-grade-publishing">/
     end
   end
 
@@ -87,7 +87,7 @@ describe "courses/settings.html.erb" do
 
       it "should show quota input box" do
         render
-        response.should have_tag "input#course_storage_quota_mb"
+        expect(response).to have_tag "input#course_storage_quota_mb"
       end
     end
 
@@ -100,7 +100,7 @@ describe "courses/settings.html.erb" do
 
       it "should not show quota input box" do
         render
-        response.should_not have_tag "input#course_storage_quota_mb"
+        expect(response).not_to have_tag "input#course_storage_quota_mb"
       end
     end
   end
@@ -117,17 +117,17 @@ describe "courses/settings.html.erb" do
       @course.save!
 
       @user = account_admin_user(:account => subaccount, :active_user => true)
-      root_account.grants_right?(@user, :manage_courses).should be_false
+      expect(root_account.grants_right?(@user, :manage_courses)).to be_falsey
       view_context(@course, @user)
 
       render
       doc = Nokogiri::HTML(response.body)
       select = doc.at_css("select#course_account_id")
-      select.should_not be_nil
+      expect(select).not_to be_nil
       #select.children.count.should == 3
 
       option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i rescue c.to_s}
-      option_ids.sort.should == [subaccount.id, sub_subaccount1.id, sub_subaccount2.id].sort
+      expect(option_ids.sort).to eq [subaccount.id, sub_subaccount1.id, sub_subaccount2.id].sort
     end
 
     it "should let site admins see all accounts within their root account as options" do
@@ -146,11 +146,11 @@ describe "courses/settings.html.erb" do
       render
       doc = Nokogiri::HTML(response.body)
       select = doc.at_css("select#course_account_id")
-      select.should_not be_nil
+      expect(select).not_to be_nil
       all_accounts = [root_account] + root_account.all_accounts
 
       option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i}
-      option_ids.sort.should == all_accounts.map(&:id).sort
+      expect(option_ids.sort).to eq all_accounts.map(&:id).sort
     end
   end
 end

@@ -57,7 +57,7 @@ describe AssignmentGroupsController, type: :request do
           { :controller => 'assignment_groups', :action => 'index',
             :format => 'json', :course_id => @course.id.to_s })
 
-    json.should == [
+    expect(json).to eq [
       {
         'id' => group2.id,
         'name' => 'group2',
@@ -153,7 +153,7 @@ describe AssignmentGroupsController, type: :request do
             :include => ['assignments'] })
 
       json.each do |ag_json|
-        ag_json["assignments"].length.should == 1
+        expect(ag_json["assignments"].length).to eq 1
       end
 
       @course.disable_feature!(:differentiated_assignments)
@@ -165,7 +165,7 @@ describe AssignmentGroupsController, type: :request do
             :include => ['assignments'] })
 
       json.each do |ag_json|
-        ag_json["assignments"].length.should == 2
+        expect(ag_json["assignments"].length).to eq 2
       end
     end
 
@@ -183,7 +183,7 @@ describe AssignmentGroupsController, type: :request do
               :include => ['assignments'] })
 
         json.each do |ag_json|
-          ag_json["assignments"].length.should == 2
+          expect(ag_json["assignments"].length).to eq 2
         end
       end
     end
@@ -201,7 +201,7 @@ describe AssignmentGroupsController, type: :request do
       )
       json.each do |ag|
         ag["assignments"].each do |a|
-          a.has_key?("assignment_visibility").should == true
+          expect(a.has_key?("assignment_visibility")).to eq true
         end
       end
     end
@@ -219,7 +219,7 @@ describe AssignmentGroupsController, type: :request do
             :format => 'json', :course_id => @course.id.to_s,
             :include => %w[assignments module_ids]})
     assignment_json = json.first["assignments"].first
-    assignment_json["module_ids"].sort.should == mods.map(&:id).sort
+    expect(assignment_json["module_ids"].sort).to eq mods.map(&:id).sort
   end
 
   it "should not include all dates " do
@@ -321,9 +321,9 @@ describe AssignmentGroupsController, type: :request do
             :include => ['assignments'] })
 
     group = json.first
-    group.should be_present
-    group['assignments'].size.should == 1
-    group['assignments'].first['name'].should == 'test1'
+    expect(group).to be_present
+    expect(group['assignments'].size).to eq 1
+    expect(group['assignments'].first['name']).to eq 'test1'
   end
 
   it "should return weights that aren't being applied" do
@@ -336,7 +336,7 @@ describe AssignmentGroupsController, type: :request do
                     { :controller => 'assignment_groups', :action => 'index',
                       :format => 'json', :course_id => @course.to_param })
 
-    json.each { |group| group['group_weight'].should == 50 }
+    json.each { |group| expect(group['group_weight']).to eq 50 }
   end
 
   it "should not explode on assignments with <objects> with percentile widths" do
@@ -363,7 +363,7 @@ describe AssignmentGroupsController, type: :request do
       a.points_possible = 10
       a.workflow_state = "unpublished"
     end
-    assignment.should be_unpublished
+    expect(assignment).to be_unpublished
 
     json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
                     :controller => 'assignment_groups',
@@ -371,7 +371,7 @@ describe AssignmentGroupsController, type: :request do
                     :format => 'json',
                     :course_id => @course.id.to_s,
                     :include => ['assignments'])
-    json.first['assignments'].should be_empty
+    expect(json.first['assignments']).to be_empty
   end
 end
 
@@ -418,7 +418,7 @@ describe AssignmentGroupsApiController, type: :request do
         :assignment_group_id => @group.id.to_s,
         :include => ['assignments'])
 
-      json['assignments'].should_not be_empty
+      expect(json['assignments']).not_to be_empty
     end
 
     it "should include assignment_visibility when requested and with DA on" do
@@ -435,7 +435,7 @@ describe AssignmentGroupsApiController, type: :request do
         :include => ['assignments', 'assignment_visibility']
       )
       json['assignments'].each do |a|
-        a.has_key?("assignment_visibility").should == true
+        expect(a.has_key?("assignment_visibility")).to eq true
       end
     end
 
@@ -450,7 +450,7 @@ describe AssignmentGroupsApiController, type: :request do
         {},
         { 'Accept' => 'application/json+canvas-string-ids' })
 
-      json['rules'].should == rules
+      expect(json['rules']).to eq rules
     end
 
     it 'should return never_drop rules as ints without Accept header' do
@@ -463,7 +463,7 @@ describe AssignmentGroupsApiController, type: :request do
         :assignment_group_id => @group.id.to_s}
         )
 
-      json['rules'].should == rules
+      expect(json['rules']).to eq rules
     end
 
   end
@@ -474,14 +474,14 @@ describe AssignmentGroupsApiController, type: :request do
 
     it 'should create an assignment_group' do
       params = {'name' => 'Some group', 'position' => 1}
-      lambda {
+      expect {
         api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
           :controller => 'assignment_groups_api',
           :action => 'create',
           :format => 'json',
           :course_id => @course.id.to_s},
           params)
-      }.should change(AssignmentGroup, :count).by(1)
+      }.to change(AssignmentGroup, :count).by(1)
     end
   end
 
@@ -501,9 +501,9 @@ describe AssignmentGroupsApiController, type: :request do
         :assignment_group_id => @assignment_group.id.to_s},
         params)
 
-      json['name'].should == 'A different name'
+      expect(json['name']).to eq 'A different name'
       @assignment_group.reload
-      @assignment_group.name.should == 'A different name'
+      expect(@assignment_group.name).to eq 'A different name'
     end
 
     it 'should update rules properly' do
@@ -519,9 +519,9 @@ describe AssignmentGroupsApiController, type: :request do
         params,
         { 'Accept' => 'application/json+canvas-string-ids' })
 
-      json['rules'].should == rules
+      expect(json['rules']).to eq rules
       @assignment_group.reload
-      @assignment_group.rules.should == rules_in_db
+      expect(@assignment_group.rules).to eq rules_in_db
     end
   end
 
@@ -540,7 +540,7 @@ describe AssignmentGroupsApiController, type: :request do
         :course_id => @course.id.to_s,
         :assignment_group_id => @assignment_group.id.to_s)
 
-      @assignment_group.reload.workflow_state.should == 'deleted'
+      expect(@assignment_group.reload.workflow_state).to eq 'deleted'
     end
 
     it 'should destroy assignments' do
@@ -554,9 +554,9 @@ describe AssignmentGroupsApiController, type: :request do
         :course_id => @course.id.to_s,
         :assignment_group_id => @assignment_group.id.to_s)
 
-      @assignment_group.reload.workflow_state.should == 'deleted'
-      a1.reload.workflow_state.should == 'deleted'
-      a2.reload.workflow_state.should == 'deleted'
+      expect(@assignment_group.reload.workflow_state).to eq 'deleted'
+      expect(a1.reload.workflow_state).to eq 'deleted'
+      expect(a2.reload.workflow_state).to eq 'deleted'
     end
 
     it 'should move assignments to a specified assignment group' do
@@ -577,8 +577,8 @@ describe AssignmentGroupsApiController, type: :request do
         {:move_assignments_to => group3.id})
 
       group3.reload
-      group3.assignments.count.should == 4
-      @assignment_group.reload.workflow_state.should == 'deleted'
+      expect(group3.assignments.count).to eq 4
+      expect(@assignment_group.reload.workflow_state).to eq 'deleted'
     end
   end
 

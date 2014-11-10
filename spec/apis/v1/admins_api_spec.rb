@@ -36,9 +36,9 @@ describe "Admins API", type: :request do
         { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
         { :user_id => @new_user.id })
       @new_user.reload
-      @new_user.account_users.size.should == 1
+      expect(@new_user.account_users.size).to eq 1
       admin = @new_user.account_users.first
-      admin.account.should == @admin.account
+      expect(admin.account).to eq @admin.account
     end
 
     it "should default the role of the admin association to AccountAdmin" do
@@ -47,7 +47,7 @@ describe "Admins API", type: :request do
         { :user_id => @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
-      admin.membership_type.should == 'AccountAdmin'
+      expect(admin.membership_type).to eq 'AccountAdmin'
     end
 
     it "should respect the provided role, if any" do
@@ -56,7 +56,7 @@ describe "Admins API", type: :request do
         { :user_id => @new_user.id, :role => "CustomAccountUser" })
       @new_user.reload
       admin = @new_user.account_users.first
-      admin.membership_type.should == 'CustomAccountUser'
+      expect(admin.membership_type).to eq 'CustomAccountUser'
     end
 
     it "should return json of the new admin association" do
@@ -65,7 +65,7 @@ describe "Admins API", type: :request do
         { :user_id => @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
-      json.should == {
+      expect(json).to eq({
         "id" => admin.id,
         "role" => admin.membership_type,
         "user" => {
@@ -75,7 +75,7 @@ describe "Admins API", type: :request do
           "sortable_name" => @new_user.sortable_name,
           "login_id" => "user",
         }
-      }
+      })
     end
 
     it "should not send a notification email if passed a valid 'send_confirmation' value" do
@@ -106,7 +106,7 @@ describe "Admins API", type: :request do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                    { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
                    { :user_id => @new_user.id })
-      response.code.should == '404'
+      expect(response.code).to eq '404'
     end
   end
   
@@ -135,21 +135,20 @@ describe "Admins API", type: :request do
     context "with AccountAdmin membership" do
       before :once do
         @au = @account.account_users.create! :user => @new_user
-        @account.account_users.find_by_user_id(@new_user.id).should_not be_nil
       end
 
       it "should remove AccountAdmin membership implicitly" do
         json = api_call(:delete, @path, @path_opts)
-        json['user']['id'].should == @new_user.id
-        json['id'].should == @au.id
-        json['role'].should == 'AccountAdmin'
-        json['status'].should == 'deleted'
-        @account.account_users.find_by_user_id(@new_user.id).should be_nil
+        expect(json['user']['id']).to eq @new_user.id
+        expect(json['id']).to eq @au.id
+        expect(json['role']).to eq 'AccountAdmin'
+        expect(json['status']).to eq 'deleted'
+        expect(@account.account_users.where(user_id: @new_user)).not_to be_exists
       end
 
       it "should remove AccountAdmin membership explicitly" do
         api_call(:delete, @path + "?role=AccountAdmin", @path_opts.merge(:role => "AccountAdmin"))
-        @account.account_users.find_by_user_id(@new_user.id).should be_nil
+        expect(@account.account_users.where(user_id: @new_user)).not_to be_exists
       end
 
       it "should 404 if the user doesn't exist" do
@@ -163,7 +162,7 @@ describe "Admins API", type: :request do
       it "should work by sis user id" do
         api_call(:delete, @base_path + "sis_user_id:badmin",
                  @path_opts.merge(:user_id => "sis_user_id:badmin"))
-        @account.account_users.find_by_user_id(@new_user.id).should be_nil
+        expect(@account.account_users.where(user_id: @new_user)).not_to be_exists
       end
     end
 
@@ -174,17 +173,17 @@ describe "Admins API", type: :request do
 
       it "should remove a custom membership from a user" do
         api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(:role => "CustomAdmin"))
-        @account.account_users.find_by_user_id_and_membership_type(@new_user.id, 'CustomAdmin').should be_nil
+        expect(@account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin')).not_to be_exists
       end
 
       it "should 404 if the membership type doesn't exist" do
         api_call(:delete, @path + "?role=Blah", @path_opts.merge(:role => "Blah"), {}, {}, :expected_status => 404)
-        @account.account_users.find_by_user_id_and_membership_type(@new_user.id, 'CustomAdmin').should_not be_nil
+        expect(@account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin')).to be_exists
       end
 
       it "should 404 if the membership type isn't specified" do
         api_call(:delete, @path, @path_opts, {}, {}, :expected_status => 404)
-        @account.account_users.find_by_user_id_and_membership_type(@new_user.id, 'CustomAdmin').should_not be_nil
+        expect(@account.account_users.where(user_id: @new_user, membership_type: 'CustomAdmin')).to be_exists
       end
     end
 
@@ -196,17 +195,17 @@ describe "Admins API", type: :request do
 
       it "should leave the AccountAdmin membership alone when deleting the custom membership" do
         api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(:role => "CustomAdmin"))
-        @account.account_users.find_all_by_user_id(@new_user.id).map(&:membership_type).should == ["AccountAdmin"]
+        expect(@account.account_users.where(user_id: @new_user).pluck(:membership_type)).to eq ["AccountAdmin"]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership implicitly" do
         api_call(:delete, @path, @path_opts)
-        @account.account_users.find_all_by_user_id(@new_user.id).map(&:membership_type).should == ["CustomAdmin"]
+        expect(@account.account_users.where(user_id: @new_user).pluck(:membership_type)).to eq ["CustomAdmin"]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership explicitly" do
         api_call(:delete, @path + "?role=AccountAdmin", @path_opts.merge(:role => "AccountAdmin"))
-        @account.account_users.find_all_by_user_id(@new_user.id).map(&:membership_type).should == ["CustomAdmin"]
+        expect(@account.account_users.where(user_id: @new_user).pluck(:membership_type)).to eq ["CustomAdmin"]
       end
     end
   end
@@ -240,7 +239,7 @@ describe "Admins API", type: :request do
 
       it "should return the correct format" do
         json = api_call(:get, @path, @path_opts)
-        json.should be_include({"id"=>@admin.account_users.first.id,
+        expect(json).to be_include({"id"=>@admin.account_users.first.id,
                                 "role"=>"AccountAdmin",
                                 "user"=>
                                     {"id"=>@admin.id,
@@ -252,7 +251,7 @@ describe "Admins API", type: :request do
 
       it "should scope the results to the user_id if given" do
         json = api_call(:get, @path, @path_opts.merge(user_id: @admin.id))
-        json.should ==[{"id"=>@admin.account_users.first.id,
+        expect(json).to eq [{"id"=>@admin.account_users.first.id,
                         "role"=>"AccountAdmin",
                         "user"=>
                             {"id"=>@admin.id,
@@ -264,7 +263,7 @@ describe "Admins API", type: :request do
 
       it "should scope the results to the array of user_ids if given" do
         json = api_call(:get, @path, @path_opts.merge(user_id: [@admin.id, @another_admin.id]))
-        json.should ==[{"id"=>@admin.account_users.first.id,
+        expect(json).to eq [{"id"=>@admin.account_users.first.id,
                         "role"=>"AccountAdmin",
                         "user"=>
                             {"id"=>@admin.id,
@@ -283,14 +282,14 @@ describe "Admins API", type: :request do
 
       it "should paginate" do
         json = api_call(:get, @path + "?per_page=2", @path_opts.merge(:per_page => '2'))
-        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        json.map{ |au| { :user => au['user']['name'], :role => au['role'] } }.should == [
+        expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
+        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'] } }).to eq [
             { :user => @admin.name, :role => 'AccountAdmin' },
             { :user => "User 0", :role => "MT 0" },
         ]
         json = api_call(:get, @path + "?per_page=2&page=2", @path_opts.merge(:per_page => '2', :page => '2'))
-        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        json.map{ |au| { :user => au['user']['name'], :role => au['role'] } }.should == [
+        expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
+        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'] } }).to eq [
             { :user => "User 1", :role => "MT 1" }
         ]
       end

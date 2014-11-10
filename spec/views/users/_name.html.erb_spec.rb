@@ -27,7 +27,7 @@ describe "/users/name" do
     assigns[:user] = @student
     assigns[:enrollments] = []
     render :partial => "users/name"
-    response.body.should =~ /Delete from #{Account.default.name}/
+    expect(response.body).to match /Delete from #{Account.default.name}/
   end
 
   it "should allow deletes for managaged pseudonyms with correct privileges" do
@@ -38,7 +38,7 @@ describe "/users/name" do
     assigns[:user] = @student
     assigns[:enrollments] = []
     render :partial => "users/name"
-    response.body.should =~ /Delete from #{Account.default.name}/
+    expect(response.body).to match /Delete from #{Account.default.name}/
   end
 
   it "should not allow deletes for managed pseudonyms without correct privileges" do
@@ -49,7 +49,7 @@ describe "/users/name" do
     assigns[:user] = @student
     assigns[:enrollments] = []
     render :partial => "users/name"
-    response.body.should_not =~ /Delete from #{Account.default.name}/
+    expect(response.body).not_to match /Delete from #{Account.default.name}/
   end
 
   it "should not allow deletes for unmanaged pseudonyms without correct privileges" do
@@ -59,6 +59,6 @@ describe "/users/name" do
     assigns[:user] = @student
     assigns[:enrollments] = []
     render :partial => "users/name"
-    response.body.should_not =~ /Delete from #{Account.default.name}/
+    expect(response.body).not_to match /Delete from #{Account.default.name}/
   end
 end

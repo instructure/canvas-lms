@@ -29,10 +29,10 @@ describe Reporting::CountsReport do
 
     it "should create a detailed report for each account" do
       Reporting::CountsReport.process
-      @account1.report_snapshots.detailed.first.should_not be_nil
+      expect(@account1.report_snapshots.detailed.first).not_to be_nil
       snapshot = @account2.report_snapshots.detailed.first
-      snapshot.should_not be_nil
-      snapshot.shard.should == @shard1
+      expect(snapshot).not_to be_nil
+      expect(snapshot.shard).to eq @shard1
     end
   end
 
@@ -49,7 +49,7 @@ describe Reporting::CountsReport do
         course(:account => @account1, :active_all => 1)
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data['courses'].should == 1
+        expect(@snapshot.data['courses']).to eq 1
       end
 
       it "should not count non-available courses" do
@@ -57,12 +57,12 @@ describe Reporting::CountsReport do
         @course2 = course_model(:account => @account1)
         @course2.destroy
 
-        @course1.workflow_state.should == 'claimed'
-        @course2.workflow_state.should == 'deleted'
+        expect(@course1.workflow_state).to eq 'claimed'
+        expect(@course2.workflow_state).to eq 'deleted'
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data['courses'].should == 0
+        expect(@snapshot.data['courses']).to eq 0
       end
     end
 
@@ -70,7 +70,7 @@ describe Reporting::CountsReport do
       it "should count users that recently logged in" do
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 1
+        expect(@snapshot.data[datum]).to eq 1
       end
 
       it "should not count users whose enrollment is deleted" do
@@ -78,7 +78,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 0
+        expect(@snapshot.data[datum]).to eq 0
       end
 
       it "should not count users whose pseudonym is deleted" do
@@ -86,7 +86,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 0
+        expect(@snapshot.data[datum]).to eq 0
       end
 
       it "should not count users who haven't recently logged in" do
@@ -96,7 +96,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 0
+        expect(@snapshot.data[datum]).to eq 0
       end
     end
 
@@ -135,7 +135,7 @@ describe Reporting::CountsReport do
       it "should include tas" do
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 1
+        expect(@snapshot.data[datum]).to eq 1
       end
 
       it "should include teachers" do
@@ -145,7 +145,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 2
+        expect(@snapshot.data[datum]).to eq 2
       end
 
       it "should include students" do
@@ -155,7 +155,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 2
+        expect(@snapshot.data[datum]).to eq 2
       end
 
       it "should include designers" do
@@ -165,7 +165,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 2
+        expect(@snapshot.data[datum]).to eq 2
       end
 
       it "should include observers" do
@@ -175,7 +175,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 2
+        expect(@snapshot.data[datum]).to eq 2
       end
 
       it "should not include student view users" do
@@ -185,7 +185,7 @@ describe Reporting::CountsReport do
 
         Reporting::CountsReport.process
         @snapshot = @account1.report_snapshots.detailed.first
-        @snapshot.data[datum].should == 1
+        expect(@snapshot.data[datum]).to eq 1
       end
     end
   end

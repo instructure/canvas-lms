@@ -191,7 +191,7 @@ class Notification < ActiveRecord::Base
       FREQ_NEVER
     when 'Announcement'
       FREQ_IMMEDIATELY
-    when 'Announcement Created'
+    when 'Announcement Created By You'
       FREQ_NEVER
     when 'Calendar'
       FREQ_NEVER
@@ -362,8 +362,6 @@ class Notification < ActiveRecord::Base
     case category
       when 'Announcement'
         t(:announcement_display, 'Announcement')
-      when 'Announcement Reply'
-        t(:announcement_reply_display, 'Announcement Reply')
       when 'Announcement Created By You'
         t(:announcement_created_by_you_display, 'Announcement Created By You')
       when 'Course Content'
@@ -419,8 +417,6 @@ class Notification < ActiveRecord::Base
     case category
     when 'Announcement'
       t(:announcement_description, 'New Announcement in your course')
-    when 'Announcement Reply'
-      t(:announcement_reply, 'Replies to Announcements you create')
     when 'Announcement Created By You'
       mt(:announcement_created_by_you_description, <<-EOS)
 * Announcements created by you

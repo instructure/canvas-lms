@@ -28,7 +28,7 @@ module Lti
 
       substitutions = {
           '$Canvas.api.domain' => -> { HostUrl.context_host(@domain_root_account, request.host) },
-          '$Canvas.xapi.url' => -> { lti_xapi_url(@tool) },
+          '$Canvas.api.baseUrl' => -> { "#{request.scheme}://#{HostUrl.context_host(@domain_root_account, request.host)}"},
           '$Canvas.account.id' => account.id,
           '$Canvas.account.name' => account.name,
           '$Canvas.account.sisSourceId' => account.sis_source_id,
@@ -52,6 +52,8 @@ module Lti
             '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
             #This is a list of IMS LIS roles should have a different key
             '$Canvas.membership.concludedRoles' => -> { lti_helper.concluded_lis_roles },
+            '$Canvas.course.previousContextIds' => -> { lti_helper.previous_lti_context_ids },
+            '$Canvas.course.previousCourseIds' => -> { lti_helper.previous_course_ids }
           }
         )
       end
@@ -66,15 +68,31 @@ module Lti
                 '$Person.email.primary' => @current_user.email,
                 '$Person.address.timezone' => Time.zone.tzinfo.name,
                 '$User.image' => -> { @current_user.avatar_url },
+                '$User.id' => @current_user.id,
                 '$Canvas.user.id' => @current_user.id,
-                '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
-                '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,
                 '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
             }
         )
         if pseudonym
-          substitutions.merge!({'$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) }})
+          substitutions.merge!(
+              {
+                  '$User.username' => pseudonym.unique_id,
+                  '$Canvas.user.loginId' => pseudonym.unique_id,
+                  '$Canvas.user.sisSourceId' => pseudonym.sis_user_id,
+                  '$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) },
+              }
+          )
         end
+
+        substitutions.merge!( '$Canvas.masqueradingUser.id' => logged_in_user.id ) if logged_in_user != @current_user
+      end
+
+      if @current_user && @context.is_a?(Course)
+        substitutions.merge!(
+              {
+                 '$Canvas.xapi.url' => -> { lti_xapi_url(Lti::XapiService.create_token(@tool, @current_user, @context)) }
+              }
+        )
       end
 
       substitutions

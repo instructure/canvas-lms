@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
 
   it "should deserialize its json data" do
     answers = [{'id' => 1}, {'id' => 2}]
@@ -27,17 +31,17 @@ describe Quizzes::QuizQuestion do
     bank = @course.assessment_question_banks.create!
     a = bank.assessment_questions.create!
     q = Quizzes::QuizQuestion.create(:question_data => qd, :assessment_question => a)
-    q.question_data.should_not be_nil
-    q.question_data.class.should == Quizzes::QuizQuestion::QuestionData
-    q.assessment_question_id.should eql(a.id)
+    expect(q.question_data).not_to be_nil
+    expect(q.question_data.class).to eq Quizzes::QuizQuestion::QuestionData
+    expect(q.assessment_question_id).to eql(a.id)
     q.question_data == qd
 
     data = q.data
-    data[:assessment_question_id].should eql(a.id)
-    data[:answers].should_not be_empty
-    data[:answers].length.should eql(2)
-    data[:answers][0][:weight].should == 100
-    data[:answers][1][:weight].should eql(0.0)
+    expect(data[:assessment_question_id]).to eql(a.id)
+    expect(data[:answers]).not_to be_empty
+    expect(data[:answers].length).to eql(2)
+    expect(data[:answers][0][:weight]).to eq 100
+    expect(data[:answers][1][:weight]).to eql(0.0)
   end
 
   describe "#question_data=" do
@@ -58,7 +62,7 @@ describe Quizzes::QuizQuestion do
     end
 
     it "should save regrade if passed in regrade option in data hash" do
-      Quizzes::QuizQuestionRegrade.first.should be_nil
+      expect(Quizzes::QuizQuestionRegrade.first).to be_nil
 
       Quizzes::QuizRegrade.create(quiz_id: @quiz.id, user_id: @user.id, quiz_version: @quiz.version_number)
       @question.question_data = @data.merge(:regrade_option => 'full_credit',
@@ -66,8 +70,8 @@ describe Quizzes::QuizQuestion do
       @question.save
 
       question_regrade = Quizzes::QuizQuestionRegrade.first
-      question_regrade.should be
-      question_regrade.regrade_option.should == 'full_credit'
+      expect(question_regrade).to be
+      expect(question_regrade.regrade_option).to eq 'full_credit'
     end
   end
 
@@ -90,7 +94,7 @@ describe Quizzes::QuizQuestion do
       before = question_positions(group)
 
       Quizzes::QuizQuestion.update_all_positions!([], group)
-      before.should == question_positions(group)
+      expect(before).to eq question_positions(group)
     end
 
     it "should update positions for quiz questions within a group" do
@@ -102,7 +106,7 @@ describe Quizzes::QuizQuestion do
       @question2.position = 3
 
       Quizzes::QuizQuestion.update_all_positions!([@question3, @question1, @question2], group)
-      question_positions(group).should == [@question3.id, @question1.id, @question2.id]
+      expect(question_positions(group)).to eq [@question3.id, @question1.id, @question2.id]
     end
 
     it "should update positions for quiz questions outside a group" do
@@ -114,7 +118,7 @@ describe Quizzes::QuizQuestion do
       @question2.position = 3
 
       Quizzes::QuizQuestion.update_all_positions!([@question3, @question1, @question2], group)
-      question_positions(group).should == [@question3.id, @question1.id, @question2.id]
+      expect(question_positions(group)).to eq [@question3.id, @question1.id, @question2.id]
     end
 
     it "should update positions for quiz without a group" do
@@ -123,7 +127,7 @@ describe Quizzes::QuizQuestion do
       @question2.position = 3
 
       Quizzes::QuizQuestion.update_all_positions!([@question3, @question1, @question2])
-      question_positions(@quiz).should == [@question3.id, @question1.id, @question2.id]
+      expect(question_positions(@quiz)).to eq [@question3.id, @question1.id, @question2.id]
     end
   end
 
@@ -137,8 +141,8 @@ describe Quizzes::QuizQuestion do
       question.destroy
       question = Quizzes::QuizQuestion.find(question.id)
 
-      question.should_not be_nil
-      question.should be_deleted
+      expect(question).not_to be_nil
+      expect(question).to be_deleted
     end
   end
 end

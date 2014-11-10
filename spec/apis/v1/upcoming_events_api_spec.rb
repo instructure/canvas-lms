@@ -40,7 +40,7 @@ describe UsersController, type: :request do
       json = api_call(:get, "/api/v1/users/self/upcoming_events",
                       :controller => "users", :action => "upcoming_events",
                       :format => "json")
-      json.should == []
+      expect(json).to eq []
     end
 
     context "having a calendar event on the user" do
@@ -54,7 +54,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         :controller => "users", :action => "upcoming_events",
                         :format => "json")
-        json.map{ |e| e['title'] }.should == ["Upcoming Event"]
+        expect(json.map{ |e| e['title'] }).to eq ["Upcoming Event"]
       end
     end
 
@@ -73,7 +73,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         :controller => "users", :action => "upcoming_events",
                         :format => "json")
-        json.map{ |e| e['title'] }.should == [
+        expect(json.map{ |e| e['title'] }).to eq [
           "Upcoming Course Event",
           "Upcoming Assignment"
         ]

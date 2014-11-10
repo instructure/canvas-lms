@@ -5,8 +5,8 @@ describe "course copy" do
 
   def validate_course_main_page
     header = f('#section-tabs-header')
-    header.should be_displayed
-    header.text.should == @course.course_code
+    expect(header).to be_displayed
+    expect(header.text).to eq @course.course_code
   end
 
   def upload_helper
@@ -17,11 +17,11 @@ describe "course copy" do
     expect_new_page_load { Delayed::Job.last.invoke_job }
     validate_course_main_page
     folder = Folder.root_folders(@course).first
-    folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
-    folder.sub_folders.active.count.should == 1
+    expect(folder.attachments.active.map(&:display_name)).to eq ["first_entry.txt"]
+    expect(folder.sub_folders.active.count).to eq 1
     sub = folder.sub_folders.active.first
-    sub.name.should == "adir"
-    sub.attachments.active.map(&:display_name).should == ["second_entry.txt"]
+    expect(sub.name).to eq "adir"
+    expect(sub.attachments.active.map(&:display_name)).to eq ["second_entry.txt"]
   end
 
   describe "course copy through course copying" do
@@ -39,14 +39,14 @@ describe "course copy" do
       keep_trying_until { f('div.progressStatus span').text == 'Completed' }
 
       @new_course = Course.last
-      @new_course.syllabus_body.should == @course.syllabus_body
-      @new_course.tab_configuration.should == @course.tab_configuration
-      @new_course.default_view.should == @course.default_view
-      @new_course.wiki.wiki_pages.count.should == 1
+      expect(@new_course.syllabus_body).to eq @course.syllabus_body
+      expect(@new_course.tab_configuration).to eq @course.tab_configuration
+      expect(@new_course.default_view).to eq @course.default_view
+      expect(@new_course.wiki.wiki_pages.count).to eq 1
     end
 
     it "should copy the course with different settings" do
-      pending("killing thread with intermittent failures")
+      skip("killing thread with intermittent failures")
       enable_cache do
         course_with_admin_logged_in
         5.times { |i| @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}") }
@@ -60,12 +60,12 @@ describe "course copy" do
 
         keep_trying_until { Canvas::Migration::Worker::CourseCopyWorker.new.perform(ContentMigration.last)}
 
-        keep_trying_until { f('#copy_results > h2').should include_text('Copy Succeeded') }
+        keep_trying_until { expect(f('#copy_results > h2')).to include_text('Copy Succeeded') }
 
         @new_course = Course.last
         get "/courses/#{@new_course.id}"
-        f(".no-recent-messages").should include_text("No Recent Messages")
-        @new_course.wiki.wiki_pages.count.should == 5
+        expect(f(".no-recent-messages")).to include_text("No Recent Messages")
+        expect(@new_course.wiki.wiki_pages.count).to eq 5
       end
     end
 
@@ -82,8 +82,8 @@ describe "course copy" do
       expect_new_page_load { f('button[type="submit"]').click }
 
       new_course = Course.last
-      new_course.name.should == "course name of testing"
-      new_course.course_code.should == "course code of testing"
+      expect(new_course.name).to eq "course name of testing"
+      expect(new_course.course_code).to eq "course code of testing"
     end
 
     it "should adjust the dates" do
@@ -107,14 +107,14 @@ describe "course copy" do
       expect_new_page_load { f('button[type="submit"]').click }
 
       opts = ContentMigration.last.migration_settings["date_shift_options"]
-      opts['shift_dates'].should == '1'
-      opts['day_substitutions'].should == {"1" => "2"}
+      expect(opts['shift_dates']).to eq '1'
+      expect(opts['day_substitutions']).to eq({"1" => "2"})
       expected = {
           "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
           "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
-        Date.parse(opts[k].to_s).should == Date.parse(v)
+        expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
       end
     end
 
@@ -128,14 +128,14 @@ describe "course copy" do
       expect_new_page_load { f('button[type="submit"]').click }
 
       opts = ContentMigration.last.migration_settings["date_shift_options"]
-      opts['remove_dates'].should == '1'
+      expect(opts['remove_dates']).to eq '1'
     end
   end
 
   describe "course file imports" do
 
     before (:each) do
-      pending('193')
+      skip('193')
       course_with_teacher_logged_in(:course_code => 'first files course')
       @second_course = Course.create!(:name => 'second files course')
       @second_course.offer!

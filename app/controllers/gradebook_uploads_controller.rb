@@ -78,7 +78,7 @@ class GradebookUploadsController < ApplicationController
         end
 
         if da_enabled = @context.feature_enabled?(:differentiated_assignments)
-          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id)
+          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: @students.map{|s| s["previous_id"].to_i})
         end
 
         @submissions = @students.inject([]) do |list, student_record|

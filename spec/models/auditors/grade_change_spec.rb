@@ -50,11 +50,11 @@ describe Auditors::GradeChange do
 
   context "nominal cases" do
     it "should include event" do
-      @event.created_at.should == @event_time
-      Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5).should include(@event)
-      Auditors::GradeChange.for_course(@course).paginate(:per_page => 5).should include(@event)
-      Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5).should include(@event)
-      Auditors::GradeChange.for_root_account_grader(@account, @teacher).paginate(:per_page => 5).should include(@event)
+      expect(@event.created_at).to eq @event_time
+      expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_grader(@account, @teacher).paginate(:per_page => 5)).to include(@event)
     end
 
     it "should include event for nil grader" do
@@ -63,9 +63,9 @@ describe Auditors::GradeChange do
       @submission = @assignment.grade_student(@student, grade: 6).first
       @event = Auditors::GradeChange.record(@submission)
 
-      Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5).should include(@event)
-      Auditors::GradeChange.for_course(@course).paginate(:per_page => 5).should include(@event)
-      Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5).should include(@event)
+      expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5)).to include(@event)
     end
 
     it "should include event for auto grader" do
@@ -75,13 +75,13 @@ describe Auditors::GradeChange do
       @submission.grader_id = -1
       @event = Auditors::GradeChange.record(@submission)
 
-      Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5).should include(@event)
-      Auditors::GradeChange.for_course(@course).paginate(:per_page => 5).should include(@event)
-      Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5).should include(@event)
+      expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5)).to include(@event)
     end
 
     it "should set request_id" do
-      @event.request_id.should == request_id.to_s
+      expect(@event.request_id).to eq request_id.to_s
     end
   end
 
@@ -96,38 +96,38 @@ describe Auditors::GradeChange do
 
     it "should recognize :oldest" do
       page = Auditors::GradeChange.for_assignment(@assignment, oldest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event)
-      page.should_not include(@event2)
+      expect(page).to include(@event)
+      expect(page).not_to include(@event2)
 
       page = Auditors::GradeChange.for_course(@course, oldest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event)
-      page.should_not include(@event2)
+      expect(page).to include(@event)
+      expect(page).not_to include(@event2)
 
       page = Auditors::GradeChange.for_root_account_student(@account, @student, oldest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event)
-      page.should_not include(@event2)
+      expect(page).to include(@event)
+      expect(page).not_to include(@event2)
 
       page = Auditors::GradeChange.for_root_account_grader(@account, @teacher, oldest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event)
-      page.should_not include(@event2)
+      expect(page).to include(@event)
+      expect(page).not_to include(@event2)
     end
 
     it "should recognize :newest" do
       page = Auditors::GradeChange.for_assignment(@assignment, newest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event2)
-      page.should_not include(@event)
+      expect(page).to include(@event2)
+      expect(page).not_to include(@event)
 
       page = Auditors::GradeChange.for_course(@course, newest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event2)
-      page.should_not include(@event)
+      expect(page).to include(@event2)
+      expect(page).not_to include(@event)
 
       page = Auditors::GradeChange.for_root_account_student(@account, @student, newest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event2)
-      page.should_not include(@event)
+      expect(page).to include(@event2)
+      expect(page).not_to include(@event)
 
       page = Auditors::GradeChange.for_root_account_grader(@account, @teacher, newest: 12.hours.ago).paginate(:per_page => 2)
-      page.should include(@event2)
-      page.should_not include(@event)
+      expect(page).to include(@event2)
+      expect(page).not_to include(@event)
     end
   end
 end

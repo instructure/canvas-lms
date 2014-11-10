@@ -41,11 +41,11 @@ class BeApproximately
     (target - expected).abs <= @tolerance
   end
 
-  def failure_message_for_should
+  def failure_message
     "expected #{@target.inspect} to be approximately #{@expected}"
   end
 
-  def failure_message_for_should_not
+  def failure_message_when_negated
     "expected #{@target.inspect} not to be approximately #{@expected}"
   end
 end

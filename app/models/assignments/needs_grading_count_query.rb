@@ -13,7 +13,7 @@ module Assignments
         Rails.cache.fetch(['assignment_user_grading_count', assignment, user].cache_key) do
           case visibility_level
           when :full, :limited
-            assignment.needs_grading_count
+            da_enabled? ? manual_count : assignment.needs_grading_count
           when :sections
             section_filtered_submissions.count(:id, distinct: true)
           else
@@ -40,13 +40,21 @@ module Assignments
       end
     end
 
+    def manual_count
+      assignment.shard.activate do
+        Rails.cache.fetch(['assignment_user_grading_manual_count', assignment, user].cache_key) do
+          all_submissions.count
+        end
+      end
+    end
+
     private
     def section_filtered_submissions
       all_submissions.where('e.course_section_id in (?)', visible_section_ids)
     end
 
     def all_submissions
-      joined_submissions.where(<<-SQL, assignment, course)
+      string = <<-SQL
         submissions.assignment_id = ?
           AND e.course_id = ?
           AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
@@ -56,6 +64,13 @@ module Assignments
             OR (submissions.workflow_state = 'submitted'
               AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
         SQL
+
+      if da_enabled?
+        string += <<-SQL
+          AND EXISTS (SELECT * FROM assignment_student_visibilities asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
+        SQL
+      end
+      joined_submissions.where(string, assignment, course)
     end
 
     def joined_submissions
@@ -76,6 +91,10 @@ module Assignments
 
     def course
       assignment.context
+    end
+
+    def da_enabled?
+      course.feature_enabled?(:differentiated_assignments)
     end
   end
 end

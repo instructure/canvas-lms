@@ -30,7 +30,7 @@ describe EportfolioCategoriesController do
   describe "GET 'index'" do
     it "should redirect" do
       get 'index', :eportfolio_id => @portfolio.id
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
   
@@ -44,21 +44,21 @@ describe EportfolioCategoriesController do
     it "should assign variables" do
       user_session(@user)
       get 'show', :eportfolio_id => @portfolio.id, :id => @category.id
-      response.should be_success
-      assigns[:portfolio].should_not be_nil
-      assigns[:portfolio].should eql(@portfolio)
-      assigns[:category].should_not be_nil
-      assigns[:category].should eql(@category)
+      expect(response).to be_success
+      expect(assigns[:portfolio]).not_to be_nil
+      expect(assigns[:portfolio]).to eql(@portfolio)
+      expect(assigns[:category]).not_to be_nil
+      expect(assigns[:category]).to eql(@category)
     end
     
     it "should responsd to named category request" do
       user_session(@user)
       get 'show', :eportfolio_id => @portfolio.id, :category_name => @category.slug
-      response.should be_success
-      assigns[:portfolio].should_not be_nil
-      assigns[:portfolio].should eql(@portfolio)
-      assigns[:category].should_not be_nil
-      assigns[:category].should eql(@category)
+      expect(response).to be_success
+      expect(assigns[:portfolio]).not_to be_nil
+      expect(assigns[:portfolio]).to eql(@portfolio)
+      expect(assigns[:category]).not_to be_nil
+      expect(assigns[:category]).to eql(@category)
     end
   end
   
@@ -71,9 +71,9 @@ describe EportfolioCategoriesController do
     it "should create eportfolio category" do
       user_session(@user)
       post 'create', :eportfolio_id => @portfolio.id, :eportfolio_category => {:name => "some category"}
-      response.should be_redirect
-      assigns[:category].should_not be_nil
-      assigns[:category].name.should eql("some category")
+      expect(response).to be_redirect
+      expect(assigns[:category]).not_to be_nil
+      expect(assigns[:category].name).to eql("some category")
     end
   end
   
@@ -87,8 +87,8 @@ describe EportfolioCategoriesController do
     it "should update eportfolio category" do
       user_session(@user)
       put 'update', :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => {:name => "new name" }
-      assigns[:category].should_not be_nil
-      assigns[:category].should eql(@category)
+      expect(assigns[:category]).not_to be_nil
+      expect(assigns[:category]).to eql(@category)
     end
   end
   
@@ -102,7 +102,7 @@ describe EportfolioCategoriesController do
     it "should delete eportfolio category" do
       user_session(@user)
       delete 'destroy', :eportfolio_id => @portfolio.id, :id => @category.id
-      assigns[:category].should be_frozen
+      expect(assigns[:category]).to be_frozen
     end
   end
 end

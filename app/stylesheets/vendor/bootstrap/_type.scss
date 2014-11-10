@@ -68,7 +68,8 @@ cite {
 
 // Utility classes
 .muted {
-  color: $grayLight;
+  @if $use_high_contrast { color: darken($grayLight, 20%); }
+  @else { color: $grayLight; }
 }
 .text-warning { color: $warningText; }
 a.text-warning:hover { color: darken($warningText, 10%); }

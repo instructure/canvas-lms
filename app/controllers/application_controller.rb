@@ -47,7 +47,6 @@ class ApplicationController < ActionController::Base
   before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :set_page_view
-  before_filter :refresh_cas_ticket
   before_filter :require_reacceptance_of_terms
   before_filter :clear_policy_cache
   after_filter :log_page_view
@@ -266,7 +265,7 @@ class ApplicationController < ActionController::Base
     if context.is_a?(UserProfile)
       name = name.to_s.sub(/context/, "profile")
     else
-      klass = context.class.base_ar_class
+      klass = context.class.base_class
       name = name.to_s.sub(/context/, klass.name.underscore)
       opts.unshift(context)
     end
@@ -792,12 +791,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def refresh_cas_ticket
-    if session[:cas_session] && @current_pseudonym
-      @current_pseudonym.claim_cas_ticket(session[:cas_session])
-    end
-  end
-
   def require_reacceptance_of_terms
     if session[:require_terms] && !api_request? && request.get?
       render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
@@ -1180,6 +1173,7 @@ class ApplicationController < ActionController::Base
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module
+      log_asset_access(@tag, "external_urls", "external_urls")
       tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
@@ -1199,7 +1193,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
-        return unless require_user
+        log_asset_access(@tool, "external_tools", "external_tools")
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
         @lti_launch = Lti::Launch.new
@@ -1235,6 +1229,7 @@ class ApplicationController < ActionController::Base
         end
 
         if @assignment
+          return unless require_user
           add_crumb(@resource_title)
           @prepend_template = 'assignments/description'
           @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
@@ -1341,7 +1336,7 @@ class ApplicationController < ActionController::Base
         opts[:inline] = 1
       end
 
-      if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
+      if @context && Attachment.relative_context?(@context.class.base_class) && @context == attachment.context
         # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
         # it, so we're setting :download=>1 *because* we want to display inline.
         opts[:download] = 1 unless download
@@ -1657,7 +1652,7 @@ class ApplicationController < ActionController::Base
         flash.delete(:info)
         notices << {:type => 'info', :content => info, :icon => 'info'}
       end
-      if notice = (flash[:html_notice] ? flash[:html_notice].html_safe : flash[:notice])
+      if notice = (flash[:html_notice] ? {html: flash[:html_notice]} : flash[:notice])
         if flash[:html_notice]
           flash.delete(:html_notice)
         else
@@ -1804,5 +1799,9 @@ class ApplicationController < ActionController::Base
     else
       return Twitter::Connection.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])
     end
+  end
+
+  def self.region
+    nil
   end
 end

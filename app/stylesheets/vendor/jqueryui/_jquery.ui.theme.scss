@@ -288,7 +288,10 @@
 .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
 
 .ui-icon-radio-off { background: none !important; }
-.ui-icon-radio-on { background: url(/images/jqueryui/ui-icon-radio-on.png) 0 0 no-repeat !important; }
+.ui-icon-radio-on { 
+  background: url(/images/icon-checkmark.svg) 0 50% no-repeat !important;
+  background-size: 14px;
+}
 .ui-icon-sections { background: url(/images/jqueryui/ui-icon-sections.png) 0 0 no-repeat !important; }
 .ui-icon-cog { background: url(/images/jqueryui/ui-icon-cog.png) 0 0 no-repeat !important; }
 

@@ -32,16 +32,16 @@ describe WebConference do
 
   context "broken_plugin" do
     it "should return false on valid_config? if no matching config" do
-      WebConference.new.should_not be_valid_config
+      expect(WebConference.new).not_to be_valid_config
       conf = WebConference.new
       conf.conference_type = 'bad_type'
-      conf.should_not be_valid_config
+      expect(conf).not_to be_valid_config
     end
 
     it "should return false on valid_config? if plugin subclass is broken/missing" do
       conf = WebConference.new
       conf.conference_type = "broken_plugin"
-      conf.should_not be_valid_config
+      expect(conf).not_to be_valid_config
     end
   end
 
@@ -54,7 +54,7 @@ describe WebConference do
       email = "email@email.com"
       @user.stubs(:email).returns(email)
       conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course)
-      conference.user_settings.should be_empty
+      expect(conference.user_settings).to be_empty
     end
 
     it "should not expose internal settings to users" do
@@ -64,7 +64,7 @@ describe WebConference do
       conference.settings = {:record => true, :not => :for_user}
       conference.save
       conference.reload
-      conference.user_settings.should eql({:record => true})
+      expect(conference.user_settings).to eql({:record => true})
     end
 
   end
@@ -84,34 +84,34 @@ describe WebConference do
     end
 
     it "should not set start and end times by default" do
-      conference.start_at.should be_nil
-      conference.end_at.should be_nil
-      conference.started_at.should be_nil
-      conference.ended_at.should be_nil
+      expect(conference.start_at).to be_nil
+      expect(conference.end_at).to be_nil
+      expect(conference.started_at).to be_nil
+      expect(conference.ended_at).to be_nil
     end
     
     it "should set start and end times when a paricipant is added" do
       conference.add_attendee(@user)
-      conference.start_at.should_not be_nil
-      conference.end_at.should eql(conference.start_at + conference.duration_in_seconds)
-      conference.started_at.should eql(conference.start_at)
-      conference.ended_at.should be_nil
+      expect(conference.start_at).not_to be_nil
+      expect(conference.end_at).to eql(conference.start_at + conference.duration_in_seconds)
+      expect(conference.started_at).to eql(conference.start_at)
+      expect(conference.ended_at).to be_nil
     end
     
     it "should not set ended_at if the conference is still active" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
-      conference.ended_at.should be_nil
-      conference.should be_active
-      conference.ended_at.should be_nil
+      expect(conference.ended_at).to be_nil
+      expect(conference).to be_active
+      expect(conference.ended_at).to be_nil
     end
     
     it "should not set ended_at if the conference is no longer active but end_at has not passed" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
-      conference.ended_at.should be_nil
-      conference.active?(true).should eql(false)
-      conference.ended_at.should be_nil
+      expect(conference.ended_at).to be_nil
+      expect(conference.active?(true)).to eql(false)
+      expect(conference.ended_at).to be_nil
     end
     
     it "should set ended_at if the conference is no longer active and end_at has passed" do
@@ -120,30 +120,30 @@ describe WebConference do
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
       conference.save!
-      conference.ended_at.should be_nil
-      conference.active?(true).should eql(false)
-      conference.ended_at.should_not be_nil
-      conference.ended_at.should < Time.now
+      expect(conference.ended_at).to be_nil
+      expect(conference.active?(true)).to eql(false)
+      expect(conference.ended_at).not_to be_nil
+      expect(conference.ended_at).to be < Time.now
     end
     
     it "should set ended_at if it's more than 15 minutes past end_at" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
-      conference.ended_at.should be_nil
+      expect(conference.ended_at).to be_nil
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
       conference.save!
-      conference.active?(true).should eql(false)
-      conference.conference_status.should eql(:active)
-      conference.ended_at.should_not be_nil
-      conference.ended_at.should < Time.now
+      expect(conference.active?(true)).to eql(false)
+      expect(conference.conference_status).to eql(:active)
+      expect(conference.ended_at).not_to be_nil
+      expect(conference.ended_at).to be < Time.now
     end
     
     it "should be restartable if end_at has not passed" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
-      conference.should_not be_finished
-      conference.should be_restartable
+      expect(conference).not_to be_finished
+      expect(conference).to be_restartable
     end
     
     it "should not be restartable if end_at has passed" do
@@ -152,8 +152,8 @@ describe WebConference do
       conference.end_at = 20.minutes.ago
       conference.save!
       conference.stubs(:conference_status).returns(:active)
-      conference.should be_finished
-      conference.should_not be_restartable
+      expect(conference).to be_finished
+      expect(conference).not_to be_restartable
     end
 
     it "should not be restartable if it's long running" do
@@ -162,8 +162,8 @@ describe WebConference do
       conference.start_at = 30.minutes.ago
       conference.close
       conference.stubs(:conference_status).returns(:active)
-      conference.should be_finished
-      conference.should_not be_restartable
+      expect(conference).to be_finished
+      expect(conference).not_to be_restartable
     end
   end
 
@@ -178,7 +178,7 @@ describe WebConference do
       conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
       conference.add_attendee(@student)
       conference.save!
-      conference.messages_sent['Web Conference Invitation'].should_not be_empty
+      expect(conference.messages_sent['Web Conference Invitation']).not_to be_empty
     end
 
     it "should not send notifications to inactive users" do
@@ -189,7 +189,7 @@ describe WebConference do
       conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
       conference.add_attendee(@student)
       conference.save!
-      conference.messages_sent['Web Conference Invitation'].should be_blank
+      expect(conference.messages_sent['Web Conference Invitation']).to be_blank
     end
   end
 
@@ -201,17 +201,17 @@ describe WebConference do
 
     it "has a start date" do
       @conference.start_at = Time.now
-      @conference.scheduled?.should be_false
+      expect(@conference.scheduled?).to be_falsey
     end
 
     it "has a schduled date in the past" do
       @conference.stubs(:scheduled_date).returns(Time.now - 10.days)
-      @conference.scheduled?.should be_false
+      expect(@conference.scheduled?).to be_falsey
     end
 
     it "has a schduled date in the future" do
       @conference.stubs(:scheduled_date).returns(Time.now + 10.days)
-      @conference.scheduled?.should be_true
+      expect(@conference.scheduled?).to be_truthy
     end
 
   end

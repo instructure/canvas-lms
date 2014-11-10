@@ -45,12 +45,12 @@ define [
       areAllItemsSelected: React.PropTypes.func.isRequired
       splat: React.PropTypes.string
 
-    queryParamsFor: (property) ->
-      order = if ((@props.query.sort || 'name') is property) and (@props.query.order is 'desc')
+    queryParamsFor: (query, property) ->
+      order = if ((query.sort || 'name') is property) and (query.order is 'desc')
         'asc'
       else
         'desc'
-      _.defaults({sort: property, order: order}, @props.query)
+      _.defaults({sort: property, order: order}, query)
 
     render: withReactDOM ->
       sort = @props.query.sort or 'name'
@@ -73,7 +73,7 @@ define [
             'aria-sort': {asc: 'ascending', desc: 'descending'}[isSortedCol and order] or 'none'
           },
             ReactRouter.Link _.defaults({
-              query: @queryParamsFor(column.property)
+              query: @queryParamsFor(@props.query, column.property)
               className: 'ef-plain-link'
             }, @props),
 

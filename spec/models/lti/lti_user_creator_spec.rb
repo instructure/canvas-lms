@@ -45,19 +45,19 @@ describe Lti::LtiUserCreator do
       user_factory = Lti::LtiUserCreator.new(canvas_user, root_account, tool, sub_account)
       lti_user = user_factory.convert
 
-      lti_user.class.should == LtiOutbound::LTIUser
+      expect(lti_user.class).to eq LtiOutbound::LTIUser
 
-      lti_user.email.should == 'user@email.com'
-      lti_user.first_name.should == 'Shorty'
-      lti_user.last_name.should == 'McLongishname'
-      lti_user.name.should == 'Shorty McLongishname'
-      lti_user.sis_source_id.should == 'sis id!'
-      lti_user.opaque_identifier.should == 'this is opaque'
+      expect(lti_user.email).to eq 'user@email.com'
+      expect(lti_user.first_name).to eq 'Shorty'
+      expect(lti_user.last_name).to eq 'McLongishname'
+      expect(lti_user.name).to eq 'Shorty McLongishname'
+      expect(lti_user.sis_source_id).to eq 'sis id!'
+      expect(lti_user.opaque_identifier).to eq 'this is opaque'
 
-      lti_user.avatar_url.should include 'https://secure.gravatar.com/avatar/'
-      lti_user.login_id.should == 'login_id'
-      lti_user.id.should == canvas_user.id
-      lti_user.timezone.should == 'my/zone'
+      expect(lti_user.avatar_url).to include 'https://secure.gravatar.com/avatar/'
+      expect(lti_user.login_id).to eq 'login_id'
+      expect(lti_user.id).to eq canvas_user.id
+      expect(lti_user.timezone).to eq 'my/zone'
     end
 
     context 'the user does not have a pseudonym' do
@@ -66,13 +66,13 @@ describe Lti::LtiUserCreator do
       it 'does not have a login_id' do
         lti_user = user_creator.convert
 
-        lti_user.login_id.should == nil
+        expect(lti_user.login_id).to eq nil
       end
 
       it 'does not have a sis_user_id' do
         lti_user = user_creator.convert
 
-        lti_user.sis_source_id.should == nil
+        expect(lti_user.sis_source_id).to eq nil
       end
     end
 
@@ -88,7 +88,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
         end
 
         it "collects current active student view enrollments" do
@@ -96,7 +96,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
         end
 
         it "collects current active teacher enrollments" do
@@ -104,7 +104,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR]
         end
 
         it "collects current active ta enrollments" do
@@ -112,7 +112,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT]
         end
 
         it "collects current active course designer enrollments" do
@@ -120,7 +120,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER]
         end
 
         it "collects current active account user enrollments from an account" do
@@ -128,7 +128,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = account_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::Institution::ADMIN]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::Institution::ADMIN]
         end
 
         it "collects current active account user enrollments from a course" do
@@ -136,7 +136,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::Institution::ADMIN]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::Institution::ADMIN]
         end
 
         it "collects current active account user enrollments for the root account of a course" do
@@ -144,7 +144,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::Institution::ADMIN]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::Institution::ADMIN]
         end
 
         it "does not include enrollments from other courses" do
@@ -154,7 +154,7 @@ describe Lti::LtiUserCreator do
           teacher_in_course(user: canvas_user, course: other_course, active_enrollment: true)
 
           enrollments = course_user_creator.convert.current_roles
-          enrollments.size.should == 1
+          expect(enrollments.size).to eq 1
         end
 
         it "does not include the same role multiple times" do
@@ -163,7 +163,7 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.size.should == 1
+          expect(enrollments.size).to eq 1
         end
 
         it "collects all valid enrollments at once" do
@@ -173,13 +173,13 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.current_roles
 
-          enrollments.size.should == 3
+          expect(enrollments.size).to eq 3
         end
 
         it "does not return any course enrollments when the context is an account" do
           canvas_account.stubs(:id).returns(canvas_course.id)
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
-          account_user_creator.convert.current_roles.should == ["urn:lti:sysrole:ims/lis/None"]
+          expect(account_user_creator.convert.current_roles).to eq ["urn:lti:sysrole:ims/lis/None"]
         end
       end
 
@@ -187,7 +187,7 @@ describe Lti::LtiUserCreator do
         it "returns true if the user has any currently active course enrollments" do
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
 
-          course_user_creator.convert.currently_active_in_course.should == true
+          expect(course_user_creator.convert.currently_active_in_course).to eq true
         end
 
         it "returns false if the user has current enrollments that are all inactive" do
@@ -196,12 +196,12 @@ describe Lti::LtiUserCreator do
           enrollment.end_at = 2.days.ago
           enrollment.save
 
-          course_user_creator.convert.currently_active_in_course.should == false
+          expect(course_user_creator.convert.currently_active_in_course).to eq false
         end
 
         it "returns nil if the context is not a course" do
           account_admin_user(user: canvas_user, account: canvas_course.account)
-          account_user_creator.convert.currently_active_in_course.should == nil
+          expect(account_user_creator.convert.currently_active_in_course).to eq nil
         end
       end
 
@@ -213,13 +213,13 @@ describe Lti::LtiUserCreator do
 
           enrollments = course_user_creator.convert.concluded_roles
 
-          enrollments.should == [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
+          expect(enrollments).to eq [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
         end
 
         it "does not return any course enrollments when the context is an account" do
           canvas_account.stubs(:id).returns(canvas_course.id)
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
-          account_user_creator.convert.concluded_roles.size.should == 0
+          expect(account_user_creator.convert.concluded_roles.size).to eq 0
         end
       end
     end

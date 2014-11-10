@@ -8,6 +8,6 @@ describe "error reporting" do
     4.times do
       driver.execute_script("window.onerror('Throwing a test error', ''+document.location, 12)")
     end
-    driver.execute_script("return $('body > img[src^=\"'+ INST.errorURL +'\"]').length").should == 1
+    expect(driver.execute_script("return $('body > img[src^=\"'+ INST.errorURL +'\"]').length")).to eq 1
   end
 end

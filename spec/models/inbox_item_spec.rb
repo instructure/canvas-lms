@@ -23,6 +23,6 @@ describe InboxItem do
     long_subject = ' Re: Re: ' + (0..299).map { 'a' }.join('')
     inbox_item   = InboxItem.new(:subject => long_subject)
     inbox_item.valid?
-    inbox_item.subject.should match(/^a{255}$/)
+    expect(inbox_item.subject).to match(/^a{255}$/)
   end
 end
