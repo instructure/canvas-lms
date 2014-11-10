@@ -467,8 +467,16 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    joins("LEFT JOIN assignment_student_visibilities ON assignment_student_visibilities.assignment_id = discussion_topics.assignment_id").
-    where("discussion_topics.assignment_id IS NULL OR (discussion_topics.assignment_id = assignment_student_visibilities.assignment_id AND assignment_student_visibilities.user_id IN (?))",user_ids).
+    user_ids = Array.wrap(user_ids).join(',')
+    course_ids = Array.wrap(course_ids).join(',')
+    scope = joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
+      LEFT JOIN assignment_student_visibilities
+        ON (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
+            AND assignment_student_visibilities.user_id IN (%s)
+            AND assignment_student_visibilities.course_id IN (%s)
+        )
+      SQL
+    scope.where("discussion_topics.assignment_id IS NULL OR assignment_student_visibilities.assignment_id IS NOT NULL").
     where("discussion_topics.context_id IN (?)",course_ids)
    }
 

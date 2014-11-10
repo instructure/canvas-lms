@@ -1956,6 +1956,20 @@ describe User do
           assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
           expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
         end
+
+        it "should not return the assignments without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
+        end
+
+        it "should return the assignments in both types of courses" do
+          assignment0 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
+          assignment1 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          assignment2 = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment0)).to be_truthy
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment1)).to be_falsey
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment2)).to be_truthy
+        end
       end
 
       context "feature flag off" do

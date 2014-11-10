@@ -1110,6 +1110,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
 
+  # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda {|student_ids, course_ids|
     joins(:quiz_student_visibilities).
     where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })

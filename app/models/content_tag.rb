@@ -417,19 +417,57 @@ class ContentTag < ActiveRecord::Base
   scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
   scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
 
+  # Scopes For Differentiated Assignment Filtering:
+
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    joins("LEFT JOIN discussion_topics ON discussion_topics.id = content_tags.content_id AND content_type = 'DiscussionTopic'").
-    joins("LEFT JOIN quiz_student_visibilities ON quiz_student_visibilities.quiz_id = content_tags.content_id AND content_type IN ('Quiz','Quizzes::Quiz')").
-    joins("LEFT JOIN assignment_student_visibilities ON ((assignment_student_visibilities.assignment_id = content_tags.content_id AND content_type = 'Assignment')
-                OR (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id AND content_type = 'DiscussionTopic'))").
-    where("content_tags.content_type NOT IN ('Assignment','DiscussionTopic', ? )
-           OR ((discussion_topics.id IS NOT NULL AND discussion_topics.assignment_id IS NULL)
-               OR (assignment_student_visibilities.assignment_id IS NOT NULL AND assignment_student_visibilities.user_id IN (?))
-               OR (quiz_student_visibilities.quiz_id IS NOT NULL AND quiz_student_visibilities.user_id IN (?))
-              )",Quizzes::Quiz.class_names, user_ids, user_ids).
-    where("content_tags.context_id IN (?)",course_ids).
+    # keep content tags that:
+    # - arent a discussion/quiz/assignment
+    # - or are a discussion without an assignment
+    # - or have an assignment/quiz visibility
+    # - and are in the proper course(s)
+    scope = includes_assignment_and_discussion_visibilities(user_ids, course_ids).
+    includes_quiz_visibilities(user_ids, course_ids).
+    where(<<-SQL, Quizzes::Quiz.class_names)
+      content_tags.content_type NOT IN ('Assignment','DiscussionTopic', ? )
+      OR (
+        (discussion_topics.id IS NOT NULL AND discussion_topics.assignment_id IS NULL)
+        OR (assignment_student_visibilities.assignment_id IS NOT NULL)
+        OR (quiz_student_visibilities.quiz_id IS NOT NULL))
+    SQL
+    scope.where("content_tags.context_id IN (?)",course_ids).
     uniq
    }
+
+  # must join with ON's (rather than where's) to avoid sequence scans
+  scope :includes_assignment_and_discussion_visibilities, lambda { |user_ids, course_ids|
+    user_ids = Array.wrap(user_ids).join(',')
+    course_ids = Array.wrap(course_ids).join(',')
+    joins("LEFT JOIN discussion_topics ON discussion_topics.id = content_tags.content_id AND content_type = 'DiscussionTopic'").
+    joins(sanitize_sql_array([<<-SQL, user_ids, course_ids, user_ids, course_ids]))
+      LEFT JOIN assignment_student_visibilities
+        ON ((assignment_student_visibilities.assignment_id = content_tags.content_id
+              AND assignment_student_visibilities.user_id IN (%s)
+              AND assignment_student_visibilities.course_id IN (%s)
+              AND content_type = 'Assignment')
+        OR (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
+              AND assignment_student_visibilities.user_id IN (%s)
+              AND assignment_student_visibilities.course_id IN (%s)
+              AND content_type = 'DiscussionTopic'))
+    SQL
+  }
+
+  # must join with ON's (rather than where's) to avoid sequence scans
+  scope :includes_quiz_visibilities, lambda { |user_ids, course_ids|
+    user_ids = Array.wrap(user_ids).join(',')
+    course_ids = Array.wrap(course_ids).join(',')
+    joins(sanitize_sql_array([<<-SQL, user_ids, course_ids]))
+      LEFT JOIN quiz_student_visibilities
+        ON (quiz_student_visibilities.quiz_id = content_tags.content_id
+          AND quiz_student_visibilities.user_id IN (%s)
+          AND quiz_student_visibilities.course_id IN (%s)
+          AND content_type IN ('Quiz','Quizzes::Quiz'))
+    SQL
+  }
 
   # only intended for learning outcome links
   def self.outcome_title_order_by_clause

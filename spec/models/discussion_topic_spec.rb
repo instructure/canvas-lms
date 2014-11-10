@@ -848,6 +848,33 @@ describe DiscussionTopic do
     end
   end
 
+  context "visible_to_students_in_course_with_da" do
+    before :once do
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+      @assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @topic.assignment_id = @assignment.id
+      @topic.save!
+      @section = @course.course_sections.create!(name: "test section")
+      @student = create_users(1, return_type: :record).pop
+      student_in_section(@section, user: @student)
+    end
+    it "returns discussions that have assignment and visibility" do
+      create_section_override_for_assignment(@topic.assignment, {course_section: @section})
+      expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id],[@course.id])).to include(@topic)
+    end
+    it "returns discussions that have no assignment" do
+      @topic.assignment_id = nil
+      @topic.save!
+      expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id],[@course.id])).to include(@topic)
+    end
+    it "does not return discussions that have an assignment and no visibility" do
+      expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id],[@course.id])).not_to include(@topic)
+    end
+  end
+
   context "posters" do
     before :once do
       @context = @course
