@@ -62,7 +62,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       if @submission.preview? || (@submission.untaken? && @submission.attempt == sanitized_params[:attempt].to_i)
         @submission.mark_completed
         hash = {}
-        hash = @submission.submission_data if @submission.submission_data.is_a?(Hash) && @submission.submission_data[:attempt] == @submission.attempt
+        hash = @submission.submission_data if !@submission.graded? && @submission.submission_data[:attempt] == @submission.attempt
         params_hash = hash.deep_merge(sanitized_params) rescue sanitized_params
         @submission.submission_data = params_hash unless @submission.overdue?
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?

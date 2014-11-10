@@ -6,7 +6,7 @@ namespace :canvas do
       quiz_submission_ids = Quizzes::QuizSubmission.where(quiz_id: quiz_id)
 
       model = Quizzes::QuizSubmissionEvent
-      parser = Quizzes::QuizAuditing::SnapshotEventParser.new(optimize: true)
+      parser = Quizzes::LogAuditing::SnapshotScraper.new
 
       model.transaction do
         snapshots = Quizzes::QuizSubmissionSnapshot.
@@ -14,25 +14,8 @@ namespace :canvas do
           includes(:quiz_submission).
           reject { |snapshot| snapshot.quiz_submission.nil? }
 
-        events = parser.events_from_snapshots(snapshots)
-
-        puts "Generating #{events.length} events..."
-
-        events.each do |event|
-          model.connection.execute <<-SQL
-            INSERT INTO quiz_submission_events
-              (attempt, event_data, created_at, event_type, quiz_submission_id)
-              VALUES
-              (
-                #{event.attempt},
-                '#{event.event_data.to_json}',
-                '#{event.created_at}',
-                '#{event.event_type}',
-                #{event.quiz_submission_id}
-              )
-          SQL
-        end # events loop
-
+        puts "Generating #{snapshots.length} events..."
+        parser.events_from_snapshots(snapshots).map(&:save!)
         puts "#{events.length} events were generated."
       end # model.transaction
     end # task :generate_events_from_snapshots
@@ -42,7 +25,10 @@ namespace :canvas do
       require 'json'
       require 'benchmark'
 
-      out_path = args[:out] || STDOUT
+      unless out_path = args[:out]
+        raise "Missing path to output file."
+      end
+
       events = nil
 
       puts '*' * 80
@@ -50,10 +36,13 @@ namespace :canvas do
       puts "Extracting events from snapshots of quiz submission #{args[:quiz_submission_id]}..."
 
       elapsed = Benchmark.realtime do
-        parser = Quizzes::QuizAuditing::SnapshotEventParser.new(optimize: true)
+        parser = Quizzes::LogAuditing::SnapshotScraper.new
+        quiz_submission = Quizzes::QuizSubmission.find(args[:quiz_submission_id])
         snapshots = Quizzes::QuizSubmissionSnapshot.where({
-          quiz_submission_id: Array(args[:quiz_submission_id])
+          quiz_submission_id: quiz_submission.id,
+          attempt: quiz_submission.attempt
         })
+
         events = parser.events_from_snapshots(snapshots)
       end
 

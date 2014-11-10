@@ -73,8 +73,22 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc
     end
 
-    # @note blanks that were not answered are not included in the output
-    def deserialize(submission_data)
+    # @return [Hash{String => String}]
+    #   Map of each blank to the text the student filled in.
+    #   Value will be null in case the student left the blank empty.
+    #
+    # @example output for filling in the blank "color" with the text "red"
+    #   {
+    #     "color": "red"
+    #   }
+    # 
+    # @example output for leaving the blank "color" empty, and filling in the
+    #          blank "size" with "XL":
+    #   {
+    #     "color": null,
+    #     "size": "XL"
+    #   }
+    def deserialize(submission_data, full=false)
       answers.each_with_object({}) do |answer_record, out|
         blank = answer_record[:blank_id]
         blank_key = answer_blank_key(blank)
@@ -82,6 +96,8 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
         if blank_answer.present?
           out[blank] = deserialize_blank_answer blank_answer
+        elsif full
+          out[blank] = nil
         end
       end
     end

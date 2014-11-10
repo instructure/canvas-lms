@@ -212,6 +212,27 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe '#backup_submission_data' do
+    it 'records an event with the answers' do
+      event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
+
+      qq1 = @quiz.quiz_questions.create!({ question_data: multiple_choice_question_data })
+      qq2 = @quiz.quiz_questions.create!({ question_data: true_false_question_data })
+
+      @quiz.publish!
+
+      quiz_submission = @quiz.generate_submission(user)
+      quiz_submission.backup_submission_data({
+        "question_#{qq1.id}" => "1",
+        "question_#{qq2.id}" => "",
+        "question_#{qq1.id}_marked" => false,
+        "question_#{qq2.id}_marked" => false
+      })
+
+      expect(quiz_submission.events.where(event_type: event_type).count).to eq 1
+    end
+  end
+
   it "should not allowed grading on an already-graded submission" do
     q = @quiz.quiz_submissions.create!
     q.workflow_state = "complete"
