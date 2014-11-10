@@ -29,16 +29,22 @@ define [
     startEditingName: ->
       @setState editing: true, @focusNameInput
 
+    focusPreviousElement: ->
+      @previouslyFocusedElement?.focus()
+      return if document.activeElement ==  @previouslyFocusedElement
+      @refs.nameLink.getDOMNode().focus()
+
     focusNameInput: ->
+      @previouslyFocusedElement = document.activeElement
       @refs.newName.getDOMNode().focus()
 
     saveNameEdit: ->
       @props.model.save(name: @refs.newName.getDOMNode().value)
-      @setState(editing: false)
+      @setState editing: false, => @refs.nameLink.getDOMNode().focus()
 
     cancelEditingName: ->
       @props.model.collection.remove(@props.model) if @props.model.isNew()
-      @setState(editing: false)
+      @setState editing: false, @focusPreviousElement
 
     getAttributesForRootNode: ->
       attrs =
@@ -98,6 +104,7 @@ define [
                 i className: 'icon-x'
           else if @props.model instanceof Folder
             Link {
+              ref: 'nameLink'
               to: 'folder'
               className: 'media'
               params: {splat: @props.model.urlPath()}
@@ -107,7 +114,11 @@ define [
               span className: 'media-body',
                 @props.model.displayName()
           else
-            a href: @props.model.get('url'), className: 'media',
+            a {
+              href: @props.model.get('url')
+              className: 'media'
+              ref: 'nameLink'
+            },
               span className: 'pull-left',
                 FilesystemObjectThumbnail(model: @props.model)
               span className: 'media-body',
