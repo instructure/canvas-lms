@@ -3,7 +3,7 @@ define (require) ->
   $ = require('jquery')
   _ = require('underscore')
 
-  {throttle, extend} = _
+  {throttle, extend, uniqueId} = _
 
   # An event tracker installs code to capture quiz events and submits them for
   # delivery.
@@ -33,6 +33,7 @@ define (require) ->
       @priority ||= K.EVT_PRIORITY_LOW
 
       @_options = extend({}, this.options, options)
+      @uid = "#{this.eventType}_#{uniqueId()}"
 
     # Start capturing events. This is where we get to install window event
     # listeners and setup any necessary tracker context.

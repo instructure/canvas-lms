@@ -4,6 +4,7 @@ define (require) ->
   $ = require('jquery')
   inViewport = require('compiled/jquery/expressions/in_viewport')
   debugConsole = require('compiled/util/debugConsole')
+  parseQuestionId = require('../util/parse_question_id')
 
   class QuestionViewed extends EventTracker
     eventType: K.EVT_QUESTION_VIEWED
@@ -34,5 +35,4 @@ define (require) ->
       $('.question[id]:visible')
         .filter(':in_viewport')
         .toArray()
-        .map (questionEl) ->
-          questionEl.id.replace(/^question_/, '')
+        .map parseQuestionId

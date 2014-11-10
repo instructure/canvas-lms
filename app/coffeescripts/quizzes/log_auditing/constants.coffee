@@ -2,6 +2,7 @@ define {
   EVT_PAGE_FOCUSED: 'page_focused'
   EVT_PAGE_BLURRED: 'page_blurred'
   EVT_QUESTION_VIEWED: 'question_viewed'
+  EVT_QUESTION_FLAGGED: 'question_flagged'
 
   EVT_PRIORITY_LOW: 0
   EVT_PRIORITY_HIGH: 100
