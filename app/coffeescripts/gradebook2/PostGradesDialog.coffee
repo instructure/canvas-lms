@@ -29,9 +29,9 @@ define [
       )
       model.bind('change:assignments_with_errors_count', =>
         $(".assignment-error-count").html(model.get('assignments_with_errors_count'))
+        @saveAssignments()
         if @model.get('assignments_with_errors_count') == 0
           $('#assignment-error-text').hide()
-          @saveAssignments()
           @page = "postSummary"
           @render()
         else
