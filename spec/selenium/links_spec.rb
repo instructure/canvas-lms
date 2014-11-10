@@ -115,11 +115,6 @@ describe "links", :priority => "2" do
         expect(driver.current_url).to eq f('#header-logo').attribute('href')
       end
 
-      it "should navigate user to assignments page after assignments link is clicked" do
-        skip "broke spec"
-        validate_breadcrumb_link(f('#assignments_menu_item a'), 'Assignments')
-      end
-
       it "should navigate user to gradebook page after grades link is clicked" do
         validate_breadcrumb_link(f('#grades_menu_item a'), 'Grades')
       end
