@@ -117,8 +117,10 @@ define [
               params: {splat: @props.currentFolder?.urlPath()}
               className: 'ui-button btn-view'
               title: I18n.t('view', 'View')
+              role: 'button'
               'aria-label': I18n.t('view', 'View')
               'data-tooltip': ''
+              tabIndex: -1 unless showingButtons # This is to make it okay for keyboard-nav when hidden.
             },
             i className: 'icon-eye'
 
