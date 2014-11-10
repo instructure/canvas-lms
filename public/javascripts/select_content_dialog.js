@@ -236,7 +236,9 @@ $(document).ready(function() {
       });
     }
   });
-  $("#context_external_tools_select .tools").delegate('.tool', 'click', function() {
+  $("#context_external_tools_select .tools").delegate('.tool', 'click', function(e) {
+    e.preventDefault();
+
     var $tool = $(this);
     if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) { 
       $(this).removeClass('selected'); 
