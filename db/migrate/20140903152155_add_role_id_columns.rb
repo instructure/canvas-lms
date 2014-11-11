@@ -168,7 +168,8 @@ class AddRoleIdColumns < ActiveRecord::Migration
     end
 
     applicable_account_ids = {} # includes ids for self and all sub_accounts
-    Role.active.for_accounts.find_each do |role|
+    Role.for_accounts.find_each do |role|
+      next if role.built_in?
       applicable_account_ids[role.account_id] ||= Account.sub_account_ids_recursive(role.account_id) + [role.account_id]
       while AccountNotificationRole.where("role_id IS NULL AND role_type = ? AND (SELECT account_id FROM
          account_notifications WHERE id = account_notification_roles.account_notification_id LIMIT 1) IN (?)", role.name,
@@ -180,7 +181,8 @@ class AddRoleIdColumns < ActiveRecord::Migration
     end
 
     course_ids = {}
-    Role.active.for_courses.find_each do |role|
+    Role.for_courses.find_each do |role|
+      next if role.built_in?
       applicable_account_ids[role.account_id] ||= Account.sub_account_ids_recursive(role.account_id) + [role.account_id]
       course_ids[role.account_id] ||= Course.where(:account_id => applicable_account_ids[role.account_id]).pluck(:id)
 
@@ -197,6 +199,7 @@ class AddRoleIdColumns < ActiveRecord::Migration
     end
 
     while AccountNotificationRole.where("role_id IS NULL AND role_type <> 'NilEnrollment'").limit(1000).update_all(:role_id => Role.get_built_in_role(Role::NULL_ROLE_TYPE).id) > 0; end
+    while Enrollment.where("role_name IS NOT NULL AND role_id IS NULL").limit(1000).update_all(:role_id => Role.get_built_in_role(Role::NULL_ROLE_TYPE).id) > 0; end
   end
 
   def down
