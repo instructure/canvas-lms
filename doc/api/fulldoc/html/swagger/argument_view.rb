@@ -130,6 +130,10 @@ class ArgumentView < HashView
     @name.include?('[]')
   end
 
+  def builtin?(type)
+    ["string", "integer"].include?(type)
+  end
+
   def to_swagger
     swagger = {
       "paramType" => swagger_param_type,
@@ -140,7 +144,16 @@ class ArgumentView < HashView
       "required" => required?,
     }
     swagger['enum'] = enums unless enums.empty?
-    swagger['tags'] = {"type" => "array"} if array?
+    if array?
+      swagger["type"] = "array"
+      items = {}
+      if builtin?(swagger_type)
+        items["type"] = swagger_type
+      else
+        items["$ref"] = swagger_type
+      end
+      swagger["items"] = items
+    end
     swagger
   end
 
