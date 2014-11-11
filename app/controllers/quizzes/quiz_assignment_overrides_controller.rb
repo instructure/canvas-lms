@@ -39,6 +39,21 @@
 #       }
 #     }
 #
+# @model QuizAssignmentOverrideSetContainer
+#     {
+#       "id": "QuizAssignmentOverrideSetContainer",
+#       "description": "Container for set of assignment-overridden dates for a quiz.",
+#       "properties": {
+#         "quiz_assignment_overrides": {
+#           "description": "The QuizAssignmentOverrideSet",
+#           "type": "array",
+#           "items": {
+#             "$ref": "QuizAssignmentOverrideSet"
+#           }
+#         }
+#       }
+#     }
+#
 # @model QuizAssignmentOverride
 #     {
 #       "id": "QuizAssignmentOverride",
@@ -105,7 +120,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
   #        }]
   #     }
   #
-  # @returns [QuizAssignmentOverrideSet]
+  # @returns QuizAssignmentOverrideSetContainer
   def index
     can_manage = is_authorized_action?(@course, @current_user, :manage_assignments)
 
