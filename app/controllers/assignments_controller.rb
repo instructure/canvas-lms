@@ -512,15 +512,13 @@ class AssignmentsController < ApplicationController
 
   def get_assignment_group(assignment_params)
     return unless assignment_params
-    if (group_id = assignment_params.delete(:assignment_group_id)).present?
-      group = @context.assignment_groups.find(group_id)
+    if (group_id = assignment_params[:assignment_group_id]).present?
+      @context.assignment_groups.find(group_id)
     end
   end
 
   def normalize_title_param
-    if title = params.delete(:name)
-      params[:title] = title
-    end
+    params[:title] ||= params[:name]
   end
 
   def index_edit_params
