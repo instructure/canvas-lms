@@ -13,7 +13,7 @@ describe "login logout test", :priority => "2" do
     expected_url = app_host + "/login"
     user_with_pseudonym({:active_user => true})
     login_as
-    expect_new_page_load { f('.logout > a').click }
+    expect_new_page_load { f('.logout a').click }
     expect(driver.current_url).to eq expected_url
     expected_url
   end
@@ -57,7 +57,6 @@ describe "login logout test", :priority => "2" do
   end
 
   it "should prompt must be logged in message when accessing permission based pages while not logged in" do
-    skip("broke spec")
     expected_url = verify_logout
     get "/grades"
     assert_flash_warning_message /You must be logged in to access this page/
