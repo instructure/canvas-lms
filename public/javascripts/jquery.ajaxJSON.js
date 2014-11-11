@@ -131,12 +131,12 @@ define([
       return false;
     }
 
-    var json_data = {};
+    var json_data;
     try {
-      json_data = $.parseJSON(text);
+      json_data = $.parseJSON(xhr.responseText);
     } catch(e) {}
 
-    return json_data.status == 'unauthenticated';
+    return !!json_data && json_data.status == 'unauthenticated';
   };
 
   // Defines a default error for all ajax requests.  Will always be called
@@ -148,7 +148,7 @@ define([
       var inProduction = (INST.environment == "production");
       var unhandled = ($.inArray(request, $.ajaxJSON.unhandledXHRs) != -1);
       var ignore = ($.inArray(request, $.ajaxJSON.ignoredXHRs) != -1);
-      if((!inProduction || unhandled || $.ajaxJSON.isUnauthenitcated(request)) && !ignore) {
+      if((!inProduction || unhandled || $.ajaxJSON.isUnauthenticated(request)) && !ignore) {
         $.ajaxJSON.unhandledXHRs = $.grep($.ajaxJSON.unhandledXHRs, function(xhr, i) {
           return xhr != request;
         });
