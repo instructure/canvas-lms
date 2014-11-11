@@ -119,6 +119,7 @@ describe 'AddRoleIdColumns' do
 
     it "should convert enrollment role_name column to role_id" do
       @user = user
+      @course_role2.update_attribute(:workflow_state, "inactive")
       ssa1_course = course(:account => @sub_sub_account)
       sa2_course = course(:account => @sub_account2)
 
