@@ -693,7 +693,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       #backcompat limit param
-      params[:per_page] ||= params.delete(:limit)
+      params[:per_page] ||= params[:limit]
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type)
       search_term = search_params[:search_term].presence
@@ -706,7 +706,7 @@ class CoursesController < ApplicationController
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.
       # We delete it from params so that it is not maintained in pagination links.
-      user_id = params.delete(:user_id)
+      user_id = params[:user_id]
       if user_id.present? && user = users.where(:users => { :id => user_id }).first
         position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
         position = position_scope.count(:select => "users.id", :distinct => true)
@@ -1662,7 +1662,7 @@ class CoursesController < ApplicationController
       @content_migration = @course.content_migrations.build(:user => @current_user, :source_course => @context, :context => @course, :migration_type => 'course_copy_importer', :initiated_source => api_request? ? :api : :manual)
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.workflow_state = 'created'
-      if (adjust_dates = params.delete(:adjust_dates)) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
+      if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = '1'
       end
       @content_migration.set_date_shift_options(params[:date_shift_options])
