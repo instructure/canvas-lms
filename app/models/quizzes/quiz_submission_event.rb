@@ -51,13 +51,14 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     # Set of answers to all quiz questions at the time the event was
     # recorded. See the relevant object for what's inside the :answer
     # field.
-    # 
+    #
     # This is present only for EVT_QUESTION_ANSWERED events.
     :answers,
   ]
 
   # An event describing the student choosing an answer to a question.
-  EVT_QUESTION_ANSWERED = 'question_answered'.freeze
+  EVT_QUESTION_ANSWERED = "question_answered".freeze
+  EVT_QUESTION_FLAGGED = "question_flagged".freeze
 
   belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
 
