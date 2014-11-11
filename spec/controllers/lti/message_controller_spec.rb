@@ -137,8 +137,16 @@ module Lti
           expect(params['custom_tool_proxy.custom.url']).to include('api/lti/tool_settings/')
         end
 
-        it 'uses the correct binding' do
+        it 'returns the roles' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['roles']).to eq ["http://purl.imsglobal.org/vocab/lis/v2/person#None"]
+        end
 
+        it 'returns the locale' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['launch_presentation_locale']).to eq :en
         end
 
       end

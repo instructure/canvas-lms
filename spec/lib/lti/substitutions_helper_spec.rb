@@ -128,6 +128,28 @@ module Lti
       end
     end
 
+    describe '#lti2_roles' do
+      it 'converts multiple roles' do
+        subject.stubs(:course_enrollments).returns([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
+        user.stubs(:roles).returns(['user', 'student', 'teacher', 'admin'])
+        roles = subject.lti2_roles
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant'
+      end
+
+      it "returns none if no user" do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.lti2_roles).to eq ['http://purl.imsglobal.org/vocab/lis/v2/person#None']
+      end
+    end
+
     describe '#course_enrollments' do
       it 'returns an empty array if the context is not a course' do
         helper = SubstitutionsHelper.new(account, root_account, user)

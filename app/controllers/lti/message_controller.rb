@@ -38,7 +38,7 @@ module Lti
       if message_handler = MessageHandler.find(params[:message_handler_id])
         resource_handler = message_handler.resource_handler
         tool_proxy = resource_handler.tool_proxy
-        #TODO create scoped method for query
+        #TODO create scope for query
         if tool_proxy.workflow_state == 'active'
           message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(
             launch_url: message_handler.launch_path,
@@ -47,6 +47,8 @@ module Lti
             resource_link_id: build_resource_link_id(tool_proxy),
             context_id: Lti::Asset.opaque_identifier_for(@context),
             tool_consumer_instance_guid: @context.root_account.lti_guid,
+            launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
+            roles: Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user).lti2_roles,
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           )
           @active_tab = message_handler.asset_string
