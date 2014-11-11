@@ -38,7 +38,8 @@
 #           "type": "boolean"
 #         },
 #         "answer": {
-#           "description": "The provided answer (if any) for this question. The format of this parameter depends on the type of the question, see the Appendix for more information."
+#           "description": "The provided answer (if any) for this question. The format of this parameter depends on the type of the question, see the Appendix for more information.",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -121,7 +122,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
-  # @argument quiz_questions [[QuizSubmissionQuestion]]
+  # @argument quiz_questions[] [QuizSubmissionQuestion]
   #   Set of question IDs and the answer value.
   #
   #   See {Appendix: Question Answer Formats} for the accepted answer formats

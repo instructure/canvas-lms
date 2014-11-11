@@ -20,7 +20,7 @@
 # @model FileAttachment
 #     {
 #       "id": "FileAttachment",
-#       "description": "",
+#       "description": "A file attachment",
 #       "properties": {
 #         "content-type": {
 #           "example": "unknown/unknown",
@@ -43,8 +43,8 @@
 #
 # @model DiscussionTopic
 #     {
-#       "id": "",
-#       "description": "",
+#       "id": "DiscussionTopic",
+#       "description": "A discussion topic",
 #       "properties": {
 #         "id": {
 #           "description": "The ID of this topic.",
@@ -246,6 +246,8 @@ class DiscussionTopicsController < ApplicationController
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [DiscussionTopic]
   def index
     return unless authorized_action(@context.discussion_topics.scoped.new, @current_user, :read)
     return child_topic if is_child_topic?

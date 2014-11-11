@@ -73,15 +73,24 @@
 #         },
 #         "properties": {
 #           "description": "Additional conversation flags (last_author, attachments, media_objects). Each listed property means the flag is set to true (i.e. the current user is the most recent author, there are attachments, or there are media objects)",
-#           "type": "[string]"
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
 #         },
 #         "audience": {
 #           "description": "Array of user ids who are involved in the conversation, ordered by participation level, then alphabetical. Excludes current user, unless this is a monologue.",
-#           "type": "[integer]"
+#           "type": "array",
+#           "items": {
+#             "type": "integer"
+#           }
 #         },
 #         "audience_contexts": {
 #           "description": "Most relevant shared contexts (courses and groups) between current user and other participants. If there is only one participant, it will also include that user's enrollment(s)/ membership type(s) in each course/group.",
-#           "type": "[string]"
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
 #         },
 #         "avatar_url": {
 #           "description": "URL to appropriate icon for this conversation (custom, individual or group avatar, depending on audience).",
@@ -90,7 +99,10 @@
 #         },
 #         "participants": {
 #           "description": "Array of users (id, name) participating in the conversation. Includes current user.",
-#           "type": "[string]"
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
 #         },
 #         "visible": {
 #           "description": "indicates whether the conversation is visible under the current scope and filter. This attribute is always true in the index API response, and is primarily useful in create/update responses so that you can know if the record should be displayed in the UI. The default scope is assumed, unless a scope or filter is passed to the create/update API call.",

@@ -25,6 +25,112 @@
 # All submission actions can be performed with either the course id, or the
 # course section id. SIS ids can be used, prefixed by "sis_course_id:" or
 # "sis_section_id:" as described in the API documentation on SIS IDs.
+#
+# @model Submission
+#     {
+#       "id": "Submission",
+#       "description": "",
+#       "properties": {
+#         "assignment_id": {
+#           "description": "The submission's assignment id",
+#           "example": 23,
+#           "type": "integer"
+#         },
+#         "assignment": {
+#           "description": "The submission's assignment (see the assignments API) (optional)",
+#           "example": "Assignment",
+#           "type": "string"
+#         },
+#         "course": {
+#           "description": "The submission's course (see the course API) (optional)",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "attempt": {
+#           "description": "This is the submission attempt number.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "body": {
+#           "description": "The content of the submission, if it was submitted directly in a text field.",
+#           "example": "There are three factors too...",
+#           "type": "string"
+#         },
+#         "grade": {
+#           "description": "The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).",
+#           "example": "A-",
+#           "type": "string"
+#         },
+#         "grade_matches_current_submission": {
+#           "description": "A boolean flag which is false if the student has re-submitted since the submission was last graded.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "html_url": {
+#           "description": "URL to the submission. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134",
+#           "type": "string"
+#         },
+#         "preview_url": {
+#           "description": "URL to the submission preview. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
+#           "type": "string"
+#         },
+#         "score": {
+#           "description": "The raw score",
+#           "example": 13.5,
+#           "type": "float"
+#         },
+#         "submission_comments": {
+#           "description": "Associated comments for a submission (optional)",
+#           "type": "array",
+#           "items": { "$ref": "SubmissionComment" }
+#         },
+#         "submission_type": {
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "example": "online_text_entry",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "online_text_entry",
+#               "online_url",
+#               "online_upload",
+#               "media_recording"
+#             ]
+#           }
+#         },
+#         "submitted_at": {
+#           "description": "The timestamp when the assignment was submitted",
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "url": {
+#           "description": "The URL of the submission (for 'online_url' submissions).",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The id of the user who created the submission",
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "grader_id": {
+#           "description": "The id of the user who graded the submission",
+#           "example": 86,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "The submissions user (see user API) (optional)",
+#           "example": "User",
+#           "type": "string"
+#         },
+#         "late": {
+#           "description": "Whether the submission was made after the applicable due date",
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
+#     }
+#
 class SubmissionsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
   batch_jobs_in_actions :only => :update, :batch => { :priority => Delayed::LOW_PRIORITY }
@@ -50,6 +156,8 @@ class SubmissionsApiController < ApplicationController
   # @response_field preview_url Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
   # @response_field url If the submission was made as a URL.
   # @response_field late Whether the submission was made after the applicable due date.
+  #
+  # @returns [Submission]
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
