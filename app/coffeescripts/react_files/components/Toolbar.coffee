@@ -41,9 +41,7 @@ define [
 
     componentDidUpdate: (prevProps) ->
       if prevProps.selectedItems.length isnt @props.selectedItems.length
-        $.screenReaderFlashMessage(I18n.t('count_items_selected', '%{count} items selected', {
-          count: @props.selectedItems.length
-        }))
+        $.screenReaderFlashMessage(I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: @props.selectedItems.length}))
 
     getPreviewQuery: ->
       return unless @props.selectedItems.length
@@ -177,7 +175,7 @@ define [
               i className: 'icon-trash'
 
           span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13},
-            I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
+            I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: @props.selectedItems.length})
 
         if @props.userCanManageFilesForContext
           div className: 'text-right',
