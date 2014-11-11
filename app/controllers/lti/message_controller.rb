@@ -21,14 +21,16 @@ module Lti
     before_filter :require_context
 
     def registration
-      @lti_launch = Launch.new
-      @lti_launch.resource_url = params[:tool_consumer_url]
-      message = RegistrationRequestService.create_request(tool_consumer_profile_url, registration_return_url)
-      @lti_launch.params = message.post_params
-      @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
-      @lti_launch.launch_type = message.launch_presentation_document_target
+      if authorized_action(@context, @current_user, :update)
+        @lti_launch = Launch.new
+        @lti_launch.resource_url = params[:tool_consumer_url]
+        message = RegistrationRequestService.create_request(tool_consumer_profile_url, registration_return_url)
+        @lti_launch.params = message.post_params
+        @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
+        @lti_launch.launch_type = message.launch_presentation_document_target
 
-      render template: 'lti/framed_launch'
+        render template: 'lti/framed_launch'
+      end
     end
 
 
@@ -115,9 +117,9 @@ module Lti
         binding = ToolProxyBinding.where(context_type: 'Course', context: @context.id, tool_proxy_id: tool_proxy.id)
         return binding if binding
       end
-      account_ids = @context.account_chain.map{ |a| a.id }
+      account_ids = @context.account_chain.map { |a| a.id }
       bindings = ToolProxyBinding.where(context_type: 'Account', context_id: account_ids, tool_proxy_id: tool_proxy.id)
-      binding_lookup = bindings.each_with_object({}) {|binding, hash| hash[binding.context_id] = binding }
+      binding_lookup = bindings.each_with_object({}) { |binding, hash| hash[binding.context_id] = binding }
       sorted_bindings = account_ids.map { |account_id| binding_lookup[account_id] }
       sorted_bindings.first
     end
@@ -129,13 +131,13 @@ module Lti
     end
 
     def lti2_variable_substitutions(parameters, tool_proxy, resource_link_id)
-      substitutions = common_variable_substitutions.inject({}) { |hash, (k,v)| hash[k.gsub(/\A\$/, '')] = v ; hash}
+      substitutions = common_variable_substitutions.inject({}) { |hash, (k, v)| hash[k.gsub(/\A\$/, '')] = v; hash }
       substitutions.merge!(prep_tool_settings(parameters, tool_proxy, resource_link_id))
       substitutions
     end
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
-      if parameters && (parameters.map {|p| p['variable']}.compact & (%w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ))).any?
+      if parameters && (parameters.map { |p| p['variable'] }.compact & (%w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ))).any?
         link = ToolSetting.first_or_create(tool_proxy: tool_proxy, context: @context, resource_link_id: resource_link_id)
         binding = ToolSetting.first_or_create(tool_proxy: tool_proxy, context: @context, resource_link_id: nil)
         proxy = ToolSetting.first_or_create(tool_proxy: tool_proxy, context: nil, resource_link_id: nil)

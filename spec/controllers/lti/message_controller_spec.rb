@@ -38,12 +38,19 @@ module Lti
           account_tp_url_stub = course_tool_consumer_profile_url(@course, 'abc123').gsub('abc123', '')
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
+
+        it "doesn't allow student to register an app" do
+          course_with_student_logged_in(active_all:true)
+          get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
+          expect(response.code).to eq '401'
+        end
+
       end
 
       context 'account' do
         it 'initiates a tool proxy registration request' do
-          course_with_teacher_logged_in(:active_all => true)
-          get 'registration', account_id: @course.root_account.id, tool_consumer_url: 'http://tool.consumer.url'
+          user_session(account_admin_user)
+          get 'registration', account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
@@ -52,9 +59,15 @@ module Lti
           expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
-          account_tp_url_stub = account_tool_consumer_profile_url(@course.root_account, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = account_tool_consumer_profile_url(Account.default, 'abc123').gsub('abc123', '')
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
+
+        it "doesn't allow non admin to register an app" do
+          get 'registration', account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'
+          expect(response.code).to eq '401'
+        end
+
       end
 
     end
