@@ -76,10 +76,10 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       AccountUser.reset_column_information
-      expect(AccountUser.find(plain_au.id).membership_type).to eq "AccountAdmin"
-      expect(AccountUser.find(role1_au.id).membership_type).to eq "accountrole1"
-      expect(AccountUser.find(role2_au.id).membership_type).to eq "accountrole2"
-      expect(AccountUser.find(lookalike_au.id).membership_type).to eq "accountrole2"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{plain_au.id}")).to eq "AccountAdmin"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{role1_au.id}")).to eq "accountrole1"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{role2_au.id}")).to eq "accountrole2"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{lookalike_au.id}")).to eq "accountrole2"
 
       @pre_migration.up
       AccountUser.reset_column_information
@@ -135,10 +135,10 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       Enrollment.reset_column_information
-      expect(Enrollment.find(plain_enrollment.id).role_name).to be_nil
-      expect(Enrollment.find(role1_enrollment.id).role_name).to eq "courserole1"
-      expect(Enrollment.find(role2_enrollment.id).role_name).to eq "courserole2"
-      expect(Enrollment.find(lookalike_enrollment.id).role_name).to eq "courserole2"
+      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{plain_enrollment.id}")).to be_nil
+      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{role1_enrollment.id}")).to eq "courserole1"
+      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{role2_enrollment.id}")).to eq "courserole2"
+      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{lookalike_enrollment.id}")).to eq "courserole2"
 
       @pre_migration.up
       Enrollment.reset_column_information
@@ -197,10 +197,10 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       RoleOverride.reset_column_information
-      expect(RoleOverride.find(plain_ro.id).enrollment_type).to eq "TeacherEnrollment"
-      expect(RoleOverride.find(role1_ro.id).enrollment_type).to eq "accountrole1"
-      expect(RoleOverride.find(role2_ro.id).enrollment_type).to eq "accountrole2"
-      expect(RoleOverride.find(lookalike_ro.id).enrollment_type).to eq "accountrole2"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{plain_ro.id}")).to eq "TeacherEnrollment"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{role1_ro.id}")).to eq "accountrole1"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{role2_ro.id}")).to eq "accountrole2"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{lookalike_ro.id}")).to eq "accountrole2"
 
       @pre_migration.up
       RoleOverride.reset_column_information
@@ -252,8 +252,8 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       AccountNotificationRole.reset_column_information
-      expect(AccountNotificationRole.where(:account_notification_id => an1.id).map(&:role_type).sort).to eq ["accountrole2", "TeacherEnrollment"].sort
-      expect(AccountNotificationRole.where(:account_notification_id => an2.id).map(&:role_type).sort).to eq ["accountrole2", "NilEnrollment"].sort
+      expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM account_notification_roles WHERE account_notification_id=#{an1.id}").sort).to eq ["accountrole2", "TeacherEnrollment"].sort
+      expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM account_notification_roles WHERE account_notification_id=#{an2.id}").sort).to eq ["accountrole2", "NilEnrollment"].sort
 
       @pre_migration.up
       AccountNotificationRole.reset_column_information
