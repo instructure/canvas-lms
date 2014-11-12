@@ -2510,7 +2510,12 @@ describe User do
     end
 
     describe ":reset_mfa" do
-      let(:account1) { Account.default }
+      let(:account1) {
+        a = Account.default
+        a.settings[:admins_can_view_notifications] = true
+        a.save!
+        a
+      }
       let(:account2) { Account.create! }
 
       let(:sally) { account_admin_user(
@@ -2578,7 +2583,12 @@ describe User do
     end
 
     describe ":merge" do
-      let(:account1) { Account.default }
+      let(:account1) {
+        a = Account.default
+        a.settings[:admins_can_view_notifications] = true
+        a.save!
+        a
+      }
       let(:account2) { Account.create! }
 
       let(:sally) { account_admin_user(

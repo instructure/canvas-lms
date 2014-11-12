@@ -404,6 +404,15 @@ describe RoleOverride do
         end
         expect(RoleOverride.permission_for(@account, :become_user, admin_role)[:enabled]).to eq nil
       end
+
+      it "should find site-admin role overrides on a non-current shard" do
+        role = custom_account_role("custom", :account => Account.site_admin)
+        Account.site_admin.role_overrides.create!(:permission => 'become_user', :enabled => true, :role => role)
+        @shard1.activate do
+          @account = Account.create!
+        end
+        expect(RoleOverride.permission_for(@account, :become_user, role)[:enabled]).to eq [:self, :descendants]
+      end
     end
   end
 
