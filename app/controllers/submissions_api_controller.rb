@@ -313,8 +313,10 @@ class SubmissionsApiController < ApplicationController
         seen_users << student.id
         hash = { :user_id => student.id, :section_id => enrollment.course_section_id, :submissions => [] }
 
-        if pseudonym = student.sis_pseudonym_for(context)
+        pseudonym = student.sis_pseudonym_for(context)
+        if pseudonym && context.grants_any_right?(@current_user, :read_sis, :manage_sis)
           hash[:integration_id] = pseudonym.integration_id
+          hash[:sis_user_id] = pseudonym.sis_user_id
         end
 
         student_submissions = submissions_for_user[student.id] || []
