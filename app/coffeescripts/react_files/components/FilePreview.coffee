@@ -147,7 +147,7 @@ define [
         @state.otherItems[goToItemIndex]
       if (@state.otherItemsString)
         @props.params.only_preview = @state.otherItemsString
-      div {className: 'col-xs-1 ef-file-align-center'},
+      div {className: 'ef-file-align-center'},
         ReactRouter.Link {
           to: @getRouteIdentifier()
           query: (@getNavigationParams(id: goToItem.id) if goToItem)
@@ -184,35 +184,30 @@ define [
       ReactModal {isOpen: true, onRequestClose: @closeModal, closeTimeoutMS: 10},
         div {className: 'ef-file-preview-overlay'},
           div {className: 'ef-file-preview-header'},
-            div {className: 'grid-row middle-xs'},
-              div {className: 'col-xs-6'},
-                div {className: 'ef-file-preview-header-filename-container'},
-                  h1 {className: 'ef-file-preview-header-filename'},
-                    @state.initialItem?.displayName()
-              div {className: 'col-xs end-xs'},
-                div {className: 'ef-file-preview-header-buttons'},
-                  a {
-                    className: 'ef-file-preview-header-download ef-file-preview-button'
-                    href: @state.displayedItem?.get('url')
-                    style: {'border-right': '1px solid #8c8c8c'} if @state.showInfoPanel
-                  },
-                    i {className: 'icon-download'} #Replace with actual icon
-                    " " + I18n.t('file_preview_headerbutton_download', 'Download')
-                  button {
-                    className: if @state.showInfoPanel then 'ef-file-preview-button--active btn-link ef-file-preview-header-info ef-file-preview-button' else 'btn-link ef-file-preview-header-info ef-file-preview-button'
-                    onClick: @toggle('showInfoPanel')
-                  },
-                    i {className: 'icon-info'}
-                    ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
-                  ReactRouter.Link {
-                    to: @getRouteIdentifier(),
-                    query: @getNavigationParams(except: 'only_preview'),
-                    params: @props.params,
-                    className: 'ef-file-preview-header-close ef-file-preview-button',
-                    style: {'border-left': '1px solid #8c8c8c'} if @state.showInfoPanel
-                  },
-                    i {className: 'icon-end'}
-                    ' ' + I18n.t('file_preview_headerbutton_close', 'Close')
+            h1 {className: 'ef-file-preview-header-filename'},
+              @state.initialItem?.displayName()
+            div {className: 'ef-file-preview-header-buttons'},
+              a {
+                className: 'ef-file-preview-header-download ef-file-preview-button'
+                href: @state.displayedItem?.get('url')
+              },
+                i {className: 'icon-download'} #Replace with actual icon
+                " " + I18n.t('file_preview_headerbutton_download', 'Download')
+              a {
+                className: if @state.showInfoPanel then 'ef-file-preview-button--active ef-file-preview-header-info ef-file-preview-button' else 'ef-file-preview-header-info ef-file-preview-button'
+                role: 'button'
+                onClick: @toggle('showInfoPanel')
+              },
+                i {className: 'icon-info'}
+                ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
+              ReactRouter.Link {
+                to: @getRouteIdentifier(),
+                query: @getNavigationParams(except: 'only_preview'),
+                params: @props.params,
+                className: 'ef-file-preview-header-close ef-file-preview-button',
+              },
+                i {className: 'icon-end'}
+                ' ' + I18n.t('file_preview_headerbutton_close', 'Close')
 
 
           div {className: 'ef-file-preview-stretch'},
@@ -231,7 +226,6 @@ define [
               if @state.showInfoPanel
                 FilePreviewInfoPanel
                   displayedItem: @state.displayedItem
-
                   getStatusMessage: @getStatusMessage
 
           div {className: 'ef-file-preview-footer'},

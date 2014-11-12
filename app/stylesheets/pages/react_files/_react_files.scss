@@ -84,7 +84,7 @@ $ef-thumbnail-size: 36px;
 .ef-directory{
   position: relative;
   margin: 10px;
-  flex: 3 3 0;
+  flex: 3;
   display: flex;
   flex-direction: column;
 
@@ -93,6 +93,7 @@ $ef-thumbnail-size: 36px;
   display: flex;
   padding: 5px;
   border-bottom: 1px solid $base-border-color;
+  align-items: center;
 }
 
 .ef-plain-link, .ef-plain-link:hover { color: $base-font-color-dark; }
@@ -130,35 +131,41 @@ $ef-thumbnail-size: 36px;
   }
 }
 
+.ef-hidden-flex {
+  flex: 0 0 0;
+  visibility: hidden;
+  height: 0; width: 0;
+  overflow: hidden;
+}
+
 .ef-name-col{
-  flex: 8 8 0;
+  flex: 8;
 }
 
 .ef-date-created-col{
-  flex: 3 3 0;
+  flex: 3;
   @include hideForPhone;
 }
 
 .ef-date-modified-col{
-  flex: 3 3 0;
+  flex: 3;
   @include hideForPhone;
 }
 
 .ef-modified-by-col{
-  flex: 3 3 0;
+  flex: 3;
   @include hideForPhone;
 }
 
 .ef-size-col{
-  flex: 2 2 0;
+  flex: 2;
   @include hideForPhone;
 }
 
 .ef-links-col{
   display: flex;
-  width: 63px;
+  flex: 0 0 63px;
 }
-
 
 .ef-thumbnail {
   width: $ef-thumbnail-size;

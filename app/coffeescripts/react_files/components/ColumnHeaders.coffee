@@ -14,7 +14,7 @@ define [
   ,
     displayName: I18n.t('kind', 'Kind')
     property: 'content-type'
-    className: 'screenreader-only'
+    className: 'ef-hidden-flex'
   ,
     displayNameShort: I18n.t('created_at_short', 'Created')
     displayName: I18n.t('created_at', 'Date Created')
@@ -58,7 +58,7 @@ define [
       order = @props.query.order or 'asc'
 
       header className:'ef-directory-header', role: 'row',
-        label className: 'screenreader-only', role: 'columnheader',
+        label className: 'ef-hidden-flex', role: 'columnheader',
           input {
             type: 'checkbox'
             checked: @props.areAllItemsSelected()
