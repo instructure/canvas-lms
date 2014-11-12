@@ -366,6 +366,24 @@ TEXT
           <% end %>
         </fieldset>
 
+        <% if !@account.site_admin? &&
+                @account.root_account? &&
+                @account.feature_enabled?(:post_grades) &&
+                @account.grants_right?(@current_user, :manage_site_settings) %>
+            <fieldset id="add_sis_app_token">
+              <legend><%= t("SIS Token Authentication") %></legend>
+              <p style="font-size: 0.9em;"><%= t("This will allow you to authenticate Canvas for posting grades to SIS") %></p>
+              <%= f.fields_for :settings do |settings| %>
+                  <table class="formtable">
+                    <tr>
+                      <td><%= settings.blabel :sis_app_token, :en => "SIS Token" %></td>
+                      <td><%= settings.text_field :sis_app_token, :value => @account.settings[:sis_app_token] %></td>
+                    </tr>
+                  </table>
+              <% end %>
+            </fieldset>
+        <% end %>
+
         <% if @account.root_account? && !@account.site_admin? && Setting.get("show_feedback_link", "false") == "true"  %>
           <fieldset>
             <legend><%= t(:custom_links_to_include_in_the_help_dialog_popup, "Custom Links to include in the help dialog popup") %></legend>
