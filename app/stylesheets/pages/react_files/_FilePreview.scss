@@ -58,8 +58,8 @@ $preview-header-height: 9vh;
 ////////////////////////////////
 .ef-file-preview-header {
   height: $preview-header-height;
-  color: $preview-font-color;  
-  font-weight: 300; 
+  color: $preview-font-color;
+  font-weight: 300;
   flex: 0 0 $preview-header-height;
   display: flex;
   align-items: center;
@@ -85,7 +85,7 @@ $preview-header-height: 9vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   .ef-file-preview-not-available {
     padding: 100px 0;
   }
@@ -103,7 +103,7 @@ $preview-header-height: 9vh;
 
 .ef-file-preview-button {
   transition: all 0.2s;
-  color: darken($preview-font-color, 45);  
+  color: darken($preview-font-color, 45);
   cursor: pointer;
   padding: 0 12px;
   font-size: 14px;
@@ -117,7 +117,7 @@ $preview-header-height: 9vh;
   &:hover, &:focus { color: $canvas-light; text-decoration: none;}
   [class^=icon-] { margin-right: 3px; }
 
-  &:hover, &:focus { 
+  &:hover, &:focus {
     background: rgba(white, 0.1);
     border-bottom-color: lighten($canvas-primary, 15%);
   }
@@ -154,10 +154,10 @@ $preview-header-height: 9vh;
   border-radius: 6px;
   padding: 20px 10px 24px;
   text-align: center;
-  &:hover, &:focus { 
-    border-color: lighten($canvas-primary, 15%); 
+  &:hover, &:focus {
+    border-color: lighten($canvas-primary, 15%);
     background: transparent;
-  } 
+  }
   i {
     width: auto;
     font-size: 30px;
@@ -189,8 +189,8 @@ $preview-header-height: 9vh;
 // Information Tab
 ////////////////////////////////
 .ef-file-preview-information-container {
-  background: $preview-info-bg;   
-  border-left: 1px solid $preview-border-color; 
+  background: $preview-info-bg;
+  border-left: 1px solid $preview-border-color;
   padding: 24px;
 }
 .ef-file-preview-infotable {
@@ -221,4 +221,8 @@ $preview-header-height: 9vh;
 .ef-file-preview-not-available {
   color: #fff;
   padding: 40px;
+}
+
+.FilePreviewInfoPanel__usageRights {
+  vertical-align: top;
 }

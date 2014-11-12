@@ -56,4 +56,13 @@ define [
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_datecreated', 'Date Created')
               td {},
-                FriendlyDatetime datetime: @props.displayedItem.get('created_at')
+                FriendlyDatetime datetime: @props.displayedItem?.get('created_at')
+            if (@props.usageRightsRequiredForContext)
+              tr {className: 'FilePreviewInfoPanel__usageRights'},
+                th {scope: 'row'},
+                  I18n.t('Usage Rights')
+                td {},
+                  div {},
+                    @props.displayedItem?.get('usage_rights')?.license_name
+                  div {},
+                    @props.displayedItem?.get('usage_rights')?.legal_copyright

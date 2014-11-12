@@ -95,6 +95,7 @@ define [
             params: @props.params
             toggleAllSelected: @props.toggleAllSelected
             areAllItemsSelected: @props.areAllItemsSelected
+            usageRightsRequiredForContext: @props.usageRightsRequiredForContext
           }
           @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
             FolderChild
@@ -103,6 +104,7 @@ define [
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
               userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
               externalToolsForContext: @props.externalToolsForContext
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
@@ -115,3 +117,4 @@ define [
               params: @props.params
               query: @props.query
               collection: @state.collection
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext

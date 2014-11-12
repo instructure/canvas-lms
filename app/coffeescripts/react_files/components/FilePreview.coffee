@@ -189,3 +189,4 @@ define [
               FilePreviewInfoPanel
                 displayedItem: @state.displayedItem
                 getStatusMessage: @getStatusMessage
+                usageRightsRequiredForContext: @props.usageRightsRequiredForContext

@@ -123,6 +123,7 @@ define [
         # As long as ?preview is present in the url.
         if @props.query.preview?
           FilePreview
+            usageRightsRequiredForContext: @props.usageRightsRequiredForContext
             currentFolder: @props.currentFolder
             params: @props.params
             query: @props.query
