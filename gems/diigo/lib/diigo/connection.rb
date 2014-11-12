@@ -17,46 +17,55 @@
 #
 
 module Diigo
+  class Error < ::Exception; end
+  class TooManyRedirectsError < Diigo::Error; end
+
   class Connection
-    def self.diigo_generate_request(url, method, user_name, password)
-      url = URI.parse url
-      http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true
-      request = nil
-      if method == 'GET'
-        path = url.path
-        path += "?" + url.query if url.query
-        request = Net::HTTP::Get.new(path)
-      else
-        request = Net::HTTP::Post.new(url.path)
-      end
-      request.basic_auth user_name, password
-      [http,request]
+    def self.diigo_url(service)
+      "https://www.diigo.com/api/v2/bookmarks?key=#{CGI.escape(key)}&user=#{CGI.escape(service.service_user_name)}"
     end
 
-    def self.diigo_get_bookmarks(service, cnt=10)
-      http,request = diigo_generate_request("https://secure.diigo.com/api/v2/bookmarks?key=#{CGI.escape(self.key)}&user=#{CGI.escape(service.service_user_name)}",
-                                            'GET', service.service_user_name, service.decrypted_password)
-      response = http.request(request)
-      case response
+    def self.diigo_generate_request(url, method, user_name, password, form_data=nil)
+      redirect_limit = 3
+      loop do
+        raise(TooManyRedirectsError) if redirect_limit <= 0
+
+        url = URI.parse url
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+        path = url.path
+        path += "?" + url.query if url.query
+
+        if method == 'GET'
+          request = Net::HTTP::Get.new(path)
+        else
+          request = Net::HTTP::Post.new(path)
+        end
+        request.set_form_data(form_data) if form_data
+        request.basic_auth user_name, password
+        response = http.request(request)
+
+        case response
         when Net::HTTPSuccess
-          return ActiveSupport::JSON.decode(response.body)
+          return response
+        when Net::HTTPRedirection
+          url = response['Location']
+          redirect_limit -= 1
         else
           response.error!
+        end
       end
+    end
+
+    def self.diigo_get_bookmarks(service)
+      response = diigo_generate_request(diigo_url(service), 'GET', service.service_user_name, service.decrypted_password)
+      ActiveSupport::JSON.decode(response.body)
     end
 
     def self.diigo_post_bookmark(service, url, title, desc, tags)
-      http,request = diigo_generate_request("https://secure.diigo.com/api/v2/bookmarks?key=#{CGI.escape(self.key)}&user=#{CGI.escape(service.service_user_name)}",
-                                            'POST', service.service_user_name, service.decrypted_password)
-      request.set_form_data({:title => title, :url => url, :tags => tags.join(","), :desc => desc})
-      response = http.request(request)
-      case response
-        when Net::HTTPSuccess
-          return ActiveSupport::JSON.decode(response.body)
-        else
-          response.error!
-      end
+      form_data = {:title => title, :url => url, :tags => tags.join(","), :desc => desc}
+      response = diigo_generate_request(diigo_url(service), 'POST', service.service_user_name, service.decrypted_password, form_data)
+      ActiveSupport::JSON.decode(response.body)
     end
 
     def self.key(key=nil)
