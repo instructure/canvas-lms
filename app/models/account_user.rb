@@ -134,7 +134,7 @@ class AccountUser < ActiveRecord::Base
   end
 
   def is_subset_of?(user)
-    needed_permissions = RoleOverride.permissions.keys.inject({}) do |result, permission|
+    needed_permissions = RoleOverride.manageable_permissions(account).keys.inject({}) do |result, permission|
       result[permission] = enabled_for?(account, permission)
       result
     end

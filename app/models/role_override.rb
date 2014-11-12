@@ -838,9 +838,15 @@ class RoleOverride < ActiveRecord::Base
     overrides = @@role_override_chain[permissionless_key] ||= begin
       context.shard.activate do
         accounts = context.account_chain
-        accounts << Account.site_admin unless accounts.include?(Account.site_admin)
+        overrides = RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
+
+        unless accounts.include?(Account.site_admin)
+          accounts << Account.site_admin
+          overrides += Account.site_admin.role_overrides.where(:role_id => role)
+        end
+
         accounts.reverse!
-        overrides = RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role.id).group_by(&:permission)
+        overrides = overrides.group_by(&:permission)
 
         # every context has to be represented so that we can't miss role_context below
         overrides.each_key do |permission|
