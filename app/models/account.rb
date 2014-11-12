@@ -162,6 +162,7 @@ class Account < ActiveRecord::Base
 
   # these settings either are or could be easily added to
   # the account settings page
+  add_setting :sis_app_token, :root_only => true
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :global_javascript, :condition => :allow_global_includes
   add_setting :global_stylesheet, :condition => :allow_global_includes
