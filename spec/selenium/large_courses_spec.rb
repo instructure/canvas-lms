@@ -1,13 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/content_migrations_spec')
 
 describe "large courses", :priority => "2" do
   include_examples "in-process server selenium tests"
 
   def assignments_creation
-      500.times do |i|
-        @course.assignments.create!(:name => "assignment_#{i}")
-      end
+    @course.require_assignment_group
+    create_assignments([@course.id], 20, assignment_group_id: @course.assignment_groups.first.id)
   end
 
   before (:each) do
@@ -23,7 +21,7 @@ describe "large courses", :priority => "2" do
       keep_trying_until { f('div.progressStatus span').text == 'Completed' }
 
       @new_course = Course.last
-      expect(@new_course.assignments.count).to eq 500
+      expect(@new_course.assignments.count).to eq 20
     end
 
     it "should export large course content" do

@@ -1515,7 +1515,7 @@ RSpec.configure do |config|
   def create_assignments(course_ids, count_per_course = 1, fields = {})
     course_ids = Array(course_ids)
     course_ids *= count_per_course
-    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", workflow_state: 'published'}.merge(fields)})
+    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", grading_type: "points", submission_types: "none", workflow_state: 'published'}.merge(fields)})
   end
 end
 
