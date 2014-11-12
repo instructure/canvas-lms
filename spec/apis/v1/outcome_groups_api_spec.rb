@@ -174,26 +174,43 @@ describe "Outcome Groups API", type: :request do
   end
 
   describe "link_index" do
-    before :each do
+    before :once do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
+      @links = (1..3).map{ create_outcome }
     end
 
     it "should return active links" do
-      @links = (1..3).map{ create_outcome }
       link = @links.pop
       link.workflow_state = 'deleted'
       link.save!
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
-        controller: 'outcome_groups_api', action: 'link_index', account_id: @account.id, format: 'json')
+                      controller: 'outcome_groups_api',
+                        action: 'link_index',
+                        account_id: @account.id,
+                        format: 'json')
       expected_outcome_ids = @links.map(&:content).map(&:id).sort
       expected_group_ids = @links.map(&:associated_asset).map(&:id).sort
       expect(json.map {|j| j['outcome']['id']}.sort).to eq expected_outcome_ids
       expect(json.map {|j| j['outcome_group']['id']}.sort).to eq expected_group_ids
     end
 
+    it "should return links ordered by id when paginated" do
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links?per_page=2",
+                      controller: 'outcome_groups_api',
+                      action: 'link_index',
+                      account_id: @account.id,
+                      per_page: "2",
+                      format: 'json')
+
+      # intentionally not manually sorting either the expected or returned:
+      # - expected should be sorted by id because of creation time
+      # - returned should be sorted by id because of pagination ordering
+      expected_outcome_ids = @links.take(2).map(&:content).map(&:id)
+      expect(json.map {|j| j['outcome']['id']}).to eq expected_outcome_ids
+    end
   end
 
   describe "show" do
