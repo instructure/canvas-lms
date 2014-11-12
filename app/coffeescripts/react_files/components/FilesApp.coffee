@@ -116,5 +116,5 @@ define [
           unless filesEnv.showingAllContexts
             div className: 'col-xs',
               div {},
-                a className: 'pull-right', href: '/files?show_all_contexts=1',
+                a className: 'pull-right', href: '/files',
                   I18n.t('all_my_files', 'All My Files')

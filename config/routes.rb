@@ -693,7 +693,6 @@ CanvasRails::Application.routes.draw do
   # Thought this idea of having dashboard-scoped urls was a good idea at the
   # time... now I'm not as big a fan.
   resource :dashboard, only: [] do
-    resources :files, only: :index
     resources :content_exports, path: :data_exports
   end
 

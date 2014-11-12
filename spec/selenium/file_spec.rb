@@ -230,10 +230,10 @@ describe "zip file uploads" do
     end
   end
 
-  context "profile" do
+  context "user" do
     before do
       course_with_student_logged_in
-      @files_url = "/dashboard/files"
+      @files_url = "/files"
       @files_import_url = "/users/#{@user.id}/imports/files"
       @context = @user
     end
