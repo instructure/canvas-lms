@@ -741,14 +741,14 @@ acknowledge that you have read and agreed to the
                 <%= t :announcement_sent_to_roles, "Send only to the following types of users:" %>
                 <ul>
                   <% announcement.account_notification_roles.each do |r| %>
-                    <% @enrollment_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
+                    <% @enrollment_types.select {|rt| rt[:name] == r.role_name }.each do |rt| %>
                       <li><%= rt[:plural_label][] %></li>
                     <% end %>
                     <% # NilEnrollment is a special case %>
-                    <% if r.role_type == "NilEnrollment" %>
+                    <% if r.role_name == "NilEnrollment" %>
                       <li><%= t :no_enrollment_roles, "Unenrolled users" %></li>
                     <% end %>
-                    <% @role_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
+                    <% @role_types.select {|rt| rt[:name] == r.role_name }.each do |rt| %>
                       <% # no plural_label :( %>
                       <li><%= rt[:label]  %></li>
                     <% end %>
