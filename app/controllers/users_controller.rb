@@ -418,22 +418,39 @@ class UsersController < ApplicationController
   end
 
   def cached_upcoming_events(user)
-    Rails.cache.fetch(['cached_user_upcoming_events', user].cache_key,
-      :expires_in => 3.minutes) do
-      user.upcoming_events :contexts => ([user] + user.cached_contexts)
-    end
+    # SFU MOD 2014-11-10
+    # Dashboard sidebar loading is failing with  _dump_data is defined for class Proc error
+    # Disabling caching the upcoming_events data as a workaround while we investigate
+
+    # Rails.cache.fetch(['cached_user_upcoming_events', user].cache_key,
+    #   :expires_in => 3.minutes) do
+    #   user.upcoming_events :contexts => ([user] + user.cached_contexts)
+    # end
+    user.upcoming_events :contexts => ([user] + user.cached_contexts)
+    # END SFU MOD
   end
 
   def cached_submissions(user, upcoming_events)
-    Rails.cache.fetch(['cached_user_submissions', user].cache_key,
-      :expires_in => 3.minutes) do
-      assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
-      Shard.partition_by_shard(assignments) do |shard_assignments|
-        Submission.
-          select([:id, :assignment_id, :score, :workflow_state]).
-          where(:assignment_id => shard_assignments, :user_id => user)
-      end
+    # SFU MOD 2014-11-10
+    # Dashboard sidebar loading is failing with  _dump_data is defined for class Proc error
+    # Disabling caching the user_submissions data as a workaround while we investigate
+
+    # Rails.cache.fetch(['cached_user_submissions', user].cache_key,
+    #   :expires_in => 3.minutes) do
+    #   assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
+    #   Shard.partition_by_shard(assignments) do |shard_assignments|
+    #     Submission.
+    #       select([:id, :assignment_id, :score, :workflow_state]).
+    #       where(:assignment_id => shard_assignments, :user_id => user)
+    #   end
+    # end
+    assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
+    Shard.partition_by_shard(assignments) do |shard_assignments|
+      Submission.
+        select([:id, :assignment_id, :score, :workflow_state]).
+        where(:assignment_id => shard_assignments, :user_id => user)
     end
+    # END SFU MOD
   end
 
   def prepare_current_user_dashboard_items
