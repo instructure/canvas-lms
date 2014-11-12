@@ -856,7 +856,7 @@ class UsersController < ApplicationController
         when 'delicious'
           delicious_get_last_posted(service)
         when 'diigo'
-          Diigo::Connection.diigo_get_bookmarks(service, 1)
+          Diigo::Connection.diigo_get_bookmarks(service)
         when 'skype'
           true
         when 'yo'

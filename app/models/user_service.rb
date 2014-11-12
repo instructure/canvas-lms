@@ -229,7 +229,7 @@ class UserService < ActiveRecord::Base
     when 'delicious'
       'http://delicious.com/'
     when 'diigo'
-      'https://secure.diigo.com/sign-up'
+      'https://www.diigo.com/sign-up'
     when 'linked_in'
       'https://www.linkedin.com/reg/join'
     when 'skype'
