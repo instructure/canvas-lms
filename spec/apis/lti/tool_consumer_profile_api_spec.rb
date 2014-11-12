@@ -28,7 +28,7 @@ module Lti
       it 'renders "application/json"' do
         tool_consumer_profile_id = 'a_made_up_id'
         get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}", tool_consumer_profile_id: tool_consumer_profile_id, account_id: account.id
-        expect(response.content_type).to eq 'application/json'
+        expect(response.content_type.to_s).to eq 'application/vnd.ims.lti.v2.toolconsumerprofile+json'
       end
 
       it 'returns the consumer profile JSON' do

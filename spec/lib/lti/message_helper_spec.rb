@@ -103,6 +103,11 @@ module Lti
           expect(subject.common_variable_substitutions['$Canvas.course.id']).to eq 123
         end
 
+        it 'has substitution for $CourseSection.sourcedId' do
+          course.sis_source_id = 'course1'
+          expect(subject.common_variable_substitutions['$CourseSection.sourcedId']).to eq 'course1'
+        end
+
         it 'has substitution for $Canvas.course.sisSourceId' do
           course.sis_source_id = 'course1'
           expect(subject.common_variable_substitutions['$Canvas.course.sisSourceId']).to eq 'course1'
@@ -192,6 +197,18 @@ module Lti
           expect(subject.common_variable_substitutions['$Canvas.user.id']).to eq 456
         end
 
+        it 'has substitution for $Canvas.xuser.allRoles' do
+          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          substitution_helper.stubs(:all_roles).returns('Admin,User')
+          expect(subject.common_variable_substitutions['$Canvas.xuser.allRoles'].call).to eq 'Admin,User'
+        end
+
+        it 'has substitution for $Membership.role' do
+          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          substitution_helper.stubs(:lis2_roles).returns('Admin,User')
+          expect(subject.common_variable_substitutions['$Membership.role'].call).to eq 'Admin,User'
+        end
+
         it 'has substitution for $User.id' do
           user.stubs(:id).returns(456)
           expect(subject.common_variable_substitutions['$User.id']).to eq 456
@@ -209,6 +226,7 @@ module Lti
           end
         end
 
+
         context 'pseudonym' do
           let(:pseudonym) { Pseudonym.new }
 
@@ -220,6 +238,12 @@ module Lti
             pseudonym.sis_user_id = '1a2b3c'
             expect(subject.common_variable_substitutions['$Canvas.user.sisSourceId']).to eq '1a2b3c'
           end
+
+          it 'has substitution for $Person.sourcedId' do
+            pseudonym.sis_user_id = '1a2b3c'
+            expect(subject.common_variable_substitutions['$Person.sourcedId']).to eq '1a2b3c'
+          end
+
 
           it 'has substitution for $Canvas.user.loginId' do
             pseudonym.unique_id = 'username'

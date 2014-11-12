@@ -18,7 +18,9 @@
 
 module Lti
   class MessageController < ApplicationController
-    before_filter :require_context
+    before_filter :require_context, except: :registration_return
+    skip_before_filter :require_user, only: :registration_return
+    skip_before_filter :load_user, only: :registration_return
 
     def registration
       if authorized_action(@context, @current_user, :update)
@@ -69,6 +71,11 @@ module Lti
       not_found
     end
 
+    def registration_return
+      #params['lti_log']
+      @message = params['lti_errormsg'] || params['lti_msg']
+    end
+
     private
 
     def module_sequence(message_handler)
@@ -109,9 +116,9 @@ module Lti
     def registration_return_url
       case context
         when Course
-          course_settings_url(context)
+          course_registration_return_url(context)
         when Account
-          account_settings_url(context)
+          account_registration_return_url(context)
         else
           raise "Unsupported context"
       end

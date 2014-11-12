@@ -286,7 +286,7 @@ CanvasRails::Application.routes.draw do
 
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
-
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return', as: :registration_return
 
     resources :submissions
     resources :calendar_events
@@ -547,7 +547,7 @@ CanvasRails::Application.routes.draw do
 
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
-
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return', as: :registration_return
 
     get 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', as: :user_outcomes_results
     resources :outcomes do

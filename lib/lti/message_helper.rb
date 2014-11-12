@@ -47,6 +47,7 @@ module Lti
         substitutions.merge!(
           {
             '$Canvas.course.id' => @context.id,
+            '$CourseSection.sourcedId' => @context.sis_source_id,
             '$Canvas.course.sisSourceId' => @context.sis_source_id,
             '$Canvas.enrollment.enrollmentState' => -> { lti_helper.enrollment_state },
             '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
@@ -73,6 +74,8 @@ module Lti
                 '$User.id' => @current_user.id,
                 '$Canvas.user.id' => @current_user.id,
                 '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
+                '$Membership.role' => -> { lti_helper.lis2_roles },
+                '$Canvas.xuser.allRoles' => -> { lti_helper.all_roles}
             }
         )
         if sis_pseudonym
@@ -84,6 +87,7 @@ module Lti
                   '$User.username' => sis_pseudonym.unique_id,
                   '$Canvas.user.loginId' => sis_pseudonym.unique_id,
                   '$Canvas.user.sisSourceId' => sis_pseudonym.sis_user_id,
+                  '$Person.sourcedId' => sis_pseudonym.sis_user_id,
               }
           )
         end

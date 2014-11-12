@@ -87,11 +87,11 @@ module LtiOutbound
       if tool.public?
         hash['user_image'] = user.avatar_url
         hash['custom_canvas_user_id'] = '$Canvas.user.id'
-        hash['lis_person_sourcedid'] = user.sis_source_id if user.sis_source_id
+        hash['lis_person_sourcedid'] = '$Person.sourcedId' if user.sis_source_id
         hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'
         if context.is_a?(LTICourse)
           hash['custom_canvas_course_id'] = '$Canvas.course.id'
-          hash['lis_course_offering_sourcedid'] = context.sis_source_id if context.sis_source_id
+          hash['lis_course_offering_sourcedid'] = '$CourseSection.sourcedId' if context.sis_source_id
         elsif context.is_a?(LTIAccount) || context.is_a?(LTIUser)
           hash['custom_canvas_account_id'] = '$Canvas.account.id'
           hash['custom_canvas_account_sis_id'] = '$Canvas.account.sisSourceId'
