@@ -8,6 +8,7 @@ define [
 
     propTypes:
       progress: React.PropTypes.number.isRequired
+      'aria-label': React.PropTypes.string #Used as an override if needed.
 
     render: withReactDOM ->
       almostDone = ''
@@ -20,5 +21,6 @@ define [
           'aria-valuenow': @props.progress
           'aria-valuemin': 0
           'aria-valuemax': 100
+          'aria-label': @props['aria-label'] if @props['aria-label']
           style:
             width: @props.progress + '%'

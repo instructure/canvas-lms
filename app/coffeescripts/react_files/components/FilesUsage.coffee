@@ -5,7 +5,8 @@ define [
   'compiled/react/shared/utils/withReactDOM'
   './ProgressBar'
   '../modules/customPropTypes'
-], (I18n, React, friendlyBytes, withReactDOM, ProgressBar, customPropTypes) ->
+  '../utils/toFixedDecimal'
+], (I18n, React, friendlyBytes, withReactDOM, ProgressBar, customPropTypes, toFixedDecimal) ->
 
   FilesUsage = React.createClass
     displayName: 'FilesUsage'
@@ -30,7 +31,11 @@ define [
         if @state
           div className: 'grid-row ef-quota-usage',
             div className: 'col-xs',
-              ProgressBar({progress: @state.quota_used / @state.quota * 100}),
+              ProgressBar({
+                progress: toFixedDecimal(@state.quota_used / @state.quota * 100, 2),
+                'aria-label': I18n.t('Using %{percent}% of storage quota.',
+                                    {percent: toFixedDecimal(@state.quota_used / @state.quota * 100, 2)})
+              }),
             div className: 'col-xs',
               I18n.t 'usage_details', '%{quota_used} of %{quota}',
                 quota_used: friendlyBytes(@state?.quota_used)
