@@ -905,7 +905,6 @@ fr:
         help_link_text: "Texte à afficher pour le lien"
         help_link_url: URL
         login_handle_name: "Libellé de connexion"
-        membership_type: Ajouter
         message: Message
         mfa_settings: "Authentification multifacteur"
         name: "Nom du compte"
@@ -916,6 +915,7 @@ fr:
         prevent_course_renaming_by_teachers: "Ne laissez pas les enseignants renommer leurs cours"
         restrict_quiz_questions: "Empêcher les étudiants de voir les questions des questionnaires après la date de fin du cours"
         restrict_student_future_view: "Empêcher les étudiants de voir les cours avant la date de début"
+        role_id: Ajouter
         self_enrollment: "Autoriser l’auto-inscription"
         self_registration: Auto-inscription
         self_registration_type_all: "Tous les types de compte"
@@ -1242,6 +1242,8 @@ fr:
     add_page_to: "Ajouter une page à %{module}"
     add_quiz_to: "Ajouter un questionnaire à %{module}"
     add_topic_to: "Ajouter des sujets de discussion à %{module}"
+  after_date_981cd41b: "Après le %{date}"
+  after_last_attempt_c9168da2: "Après la dernière tentative"
   ajax_errors: 
     error_heading: "Erreur Ajax : %{status_code}"
     errors: 
@@ -1294,8 +1296,11 @@ fr:
       criteria_required: "Un déclencheur au moins est requis"
       recipients_required: "Un destinataire au moins est requis"
       threshold_should_be_numeric: "Le nombre indiqué doit être positif"
+  all_students_have_taken_the_quiz_b558f8b4: "Tous les étudiants ont répondu au questionnaire"
+  all_students_have_taken_the_survey_494f9f42: "Tous les étudiants ont répondu à l’enquête"
   allow_lor_tools: "Autoriser les utilisateurs à voir et utiliser des outils externes configurés pour LOR."
   allow_opt_out_of_inbox: "Permet aux utilisateurs de sortir de la boîte de réception des conversations. Cela aura les conséquences suivantes : tous les messages et notifications des conversations seront envoyés sous forme d’alertes ASAP à l’adresse e-mail principale de l’utilisateur, et le symbole des messages non lus de la boîte de réception des conversations et les préférences de notification seront masqués."
+  always_3a59e701: Toujours
   analytics: 
     course: 
       analytics: Analyse
@@ -1799,7 +1804,6 @@ fr:
     grading_type_selector: 
       display_grade_as: "Afficher la note en tant que"
       gpa_scale_explainer: "Le GPA, système de notation américain, est conçu pour les établissements qui utilisent l’échelle 4.0 (ou 5.0/6.0) pour tous les travaux. Il équivaut au système de notation avec les lettres, mais avec des différences importantes :"
-      gpa_scale_input_explainer: "Les notes sont calculées selon l’échelle 4.0. Par exemple, si un travail est sur 100 points, attribuer 4.0 donne 100 %, 3.0 donne 87 %, etc."
       gpa_scale_letters_explainer: "Des lettres peuvent être utilisées en plus des chiffres pour les notes."
       gpa_scale_percentage_explainer: "Vous ne pouvez pas attribuer directement des points, mais vous pouvez indiquer des pourcentages. Par exemple, pour un travail noté sur 50 points, vous ne pouvez pas inscrire 40, vous devez indiquer 80 %."
       gpa_scale_recommendation: "À moins que votre établissement utilise l'échelle 4.0 (ou 5.0/6.0) pour la notation, Canvas conseille d’afficher les notes sous forme de lettres."
@@ -1923,6 +1927,8 @@ fr:
       one: 1 devoir
       other: "%{count} tâches"
     other_assignments: "Autres tâches"
+    overdue_assignments: "Tâches en retard"
+    past_assignments: "Tâches antérieures"
     peer_review_assignment: 
       titles: 
         remind_reviewer: "Rappeler à %{user} les évaluations"
@@ -2161,8 +2167,8 @@ fr:
         originality_report_visible_after_due_date: "Après la date d’échéance"
         originality_report_visible_after_grading: "Une fois la tâche notée"
         originality_report_visible_immediately: Immédiatement
-        settings_exclude_fewer_than_count: "Moins de %h{wordsInput} mots"
-        settings_exclude_less_than_percent: "Moins de %h{percentInput} du document"
+    undated_assignments: "Tâches non datées"
+    upcoming_assignments: "Prochaines tâches"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: Supprimer la tâche"
@@ -2468,7 +2474,6 @@ fr:
       scheduler_explanation_teacher_paragraph_1: "Voici l’outil de planification. Vous pouvez l’utiliser pour créer des groupes de rendez-vous auxquels vos étudiants peuvent s’inscrire."
       scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le travail sur table de la mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
       scheduler_explanation_teacher_paragraph_3: "Les étudiants seront avisés et verront qu’ils doivent s’inscrire à l’une des tranches horaires indiquées. Un calendrier avec les tranches horaires disponibles s’affichera au-dessus de toutes les activités de leurs autres calendriers pour qu’ils choisissent un horaire qui leur convient."
-      scheduler_explanation_teacher_paragraph_4: "*Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous » proposé à droite. *"
       signed_up_for: "Vous êtes inscrit pour"
       x_groups_have_signed_up: "%{participant_count} groupes se sont inscrits"
       x_people_have_signed_up: "%{participant_count} personnes se sont inscrites"
@@ -2643,7 +2648,10 @@ fr:
     screenreader_date_suggestion: "%{date}. Appuyez sur Entrée pour valider."
     time_block_errors: "Il y a des erreurs dans vos sélections de plages horaires."
     time_block_row: 
+      date_label: Date
       delete_link: "Supprimer l’intervalle de temps"
+      end_time_label: "Heure de fin"
+      start_time_label: "Heure de début"
     titles: 
       edit_appointment_group: "Modifier un groupe de rendez-vous"
       edit_event: "Modifier l’événement"
@@ -3096,7 +3104,6 @@ fr:
     type_disabled_error: "Ce type de conférence n’est plus disponible sur le site Canvas"
   confirm_dialog: 
     cancel: Annuler
-    ok: OK
     submit: Envoyer
   confirm_dialog_component: 
     ok: OK
@@ -4060,6 +4067,7 @@ fr:
       sent: Envoyées
       settings: Paramètres
       starred: "Avec un astérisque"
+      submission_comments: "Commentaires de l’envoi"
       titles: 
         conversations: Conversations
       unread: "Non lues"
@@ -4138,6 +4146,8 @@ fr:
     result_status: "La fonction de saisie automatique comporte %{results} entrées. Utilisez les flèches vers le haut et vers le bas pour les parcourir, puis appuyez sur Entrée pour ajouter la personne dans le champ À."
     star: "Marquer d’un astérisque"
     star_conversation: "Marquer la conversation d’une étoile"
+    submission_comment_form_dialog: 
+      body: "Corps du texte"
     titles: 
       rss_feed: "Flux de conversations"
     unarchive: Désarchiver
@@ -4145,6 +4155,15 @@ fr:
     unstar: "Supprimer l’astérisque"
     unstar_conversation: "Retirer l’étoile de la conversation"
   correct_answer: "Réponse correcte."
+  correct_answers_are_available_until_date_df01cc5f: "Les réponses correctes seront disponibles jusqu’au %{date}."
+  correct_answers_are_hidden_5d0a0009: "Les réponses correctes sont masquées."
+  correct_answers_are_no_longer_available_c67dfc28: "Les réponses correctes ne sont plus disponibles."
+  correct_answers_will_be_available_from_to_5762e8c6: "Les réponses correctes seront disponibles du %{from} au %{to}."
+  correct_answers_will_be_available_on_date_48137: "Les réponses correctes seront disponibles le %{date}."
+  count_minutes_a6eeeacb: 
+    one: "1 minute"
+    other: "%{count} minutes"
+    zero: "moins d’1 minute"
   course: 
     access_denied: "Accès refusé"
     batch_update_message: 
@@ -4492,6 +4511,9 @@ fr:
         tas: "Ajouter des AE au cours"
         title: 
           bookmark: "Copier ou ajouter ce lien aux favoris"
+    description: 
+      links: 
+        join_course: "Rejoindre ce cours"
     edit_profile: 
       about: "À propos de"
       about_related_id: "identifiant partagé utilisé pour relier les cours/sections connexes"
@@ -4617,8 +4639,6 @@ fr:
         duplicates_removed: "Certains doublons ont été supprimés."
         email: E-mail
         email_field_label: "Indiquez les adresses e-mail des utilisateurs que vous souhaitez ajouter, en les séparant par des virgules"
-        email_field_place_holder: "\"Exemple\" &lt;student@example.com&gt;, \"Nom, Prénom\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
-        example_formats: "Exemples : utilisateur@exemple.com, « Prénom Nom »  &lt;utilisateur@exemple.com&gt; , « Nom, Prénom »  &lt;utilisateur@exemple.com&gt ;"
         form_instructions: "Saisissez ou collez la liste des adresses e-mail ci-dessous :"
         go_back: Recommencer
         have_been_enrolled: "Les utilisateurs suivants ont été inscrits"
@@ -4696,7 +4716,6 @@ fr:
       course_open_enrollment_without_code: "L’inscription libre est possible pour ce cours. Les étudiants pourront s’y inscrire dès que vous leur aurez communiqué cette URL : *%{url}*"
       course_overrides_term: "Cette action remplacera les paramètres de disponibilité du trimestre."
       course_settings_title: "Paramètres du cours"
-      date_restricted: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates."
       deatils: 
         move_course: "Sélectionnez un nouveau compte racine pour ce cours. Après avoir déplacé le cours, vous devez également spécifier un nouveau département pour ce cours."
       drag_details: "La désactivation de la plupart des pages entraînera la redirection des étudiants qui consultent ces pages vers la page d’accueil du cours."
@@ -4704,8 +4723,6 @@ fr:
       enrollment_count: 
         one: 1 utilisateur
         other: "%{count} utilisateurs"
-      grading_standard_currently_set: "Actuellement défini"
-      grading_standard_not_set: "Non défini"
       headings: 
         details: "Informations du cours"
         grade_publishing: "Publication des notes"
@@ -4719,7 +4736,6 @@ fr:
         alt: 
           delete: Supprimer
           edit: Modifier
-      indexed_course: "Inclus dans l’index de cours public"
       keycode_descriptions: 
         next_navigation_link: "Sélectionner le prochain lien de navigation"
         previous_navigation_link: "Sélectionner le précédent lien de navigation"
@@ -4736,6 +4752,7 @@ fr:
         allow_student_organized_groups: "Laisser les étudiants organiser leurs propres groupes"
         conclude_at: "Se termine à"
         course_code: "Code du cours"
+        course_description: Description
         course_format: Format
         course_lock_all_announcements: "Désactiver les commentaires dans les annonces"
         course_name: Nom
@@ -4755,6 +4772,7 @@ fr:
         open_enrollment: "Ajouter un lien Rejoindre ce cours à la page d’accueil du cours"
         public_syllabus: "Rendre public le programme de ce cours"
         restrict_enrollments_to_course_dates: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates"
+        root_account: "Compte racine"
         root_account_id: "Compte racine"
         sis_source_id: "ID SIS"
         start_at: "Débute à"
@@ -4763,7 +4781,6 @@ fr:
         turnitin_comments: "Soumission à Turnitin - Commentaires"
       language_overrides_preferences: "Les paramètres linguistiques des utilisateurs/du système seront remplacés. Cette option est recommandée uniquement pour les cours en langue étrangère"
       links: 
-        edit_course: "Modifier les informations du cours"
         more_options: "autres options"
         move_course: "Déplacer dans un autre compte"
         title: 
@@ -4778,13 +4795,9 @@ fr:
         before: Avant
         or: OU
       nav_items_keyboard_drag_and_drop: "Avertissement : pour une meilleure accessibilité lors de la réorganisation des éléments de la section Navigation dans les cours, utilisez l’option Accéder à la boîte de dialogue figurant dans le menu."
-      no_date: "Aucune date définie"
       no_language_preference: "Non définie (paramétrable par l’utilisateur, %{language} par défaut)"
       none: Aucun
-      not_date_restricted: "Ces dates ne modifieront pas la disponibilité du cours."
       page_title: "Informations du cours"
-      private_course: Privé
-      public_course: Public
       section_sis_id: "ID SIS : %{section_sis}"
       self_enrollment: "Permettre aux étudiants de s’inscrire librement en leur communiquant un code secret ou une URL secrète"
       self_enrollment_without_code: "Permettre aux étudiants de s’inscrire librement en leur communiquant une URL secrète"
@@ -5167,10 +5180,6 @@ fr:
       - Décembre
   dates: 
     no_date: "Aucune date"
-  dates_available_component: 
-    available: Disponible
-    due: Échéance
-    multiple_dates: "Plusieurs dates"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -5217,6 +5226,8 @@ fr:
   default_conference_title: "Conférence %{course_name}"
   default_question_name: Question
   default_question_text: "Texte de la question"
+  delete_quiz_142b8099: "Supprimer le questionnaire"
+  delete_survey_56fddbbd: "Supprimer l’enquête"
   demos: 
     _register: 
       add_site: "Ajouter un site"
@@ -5417,6 +5428,7 @@ fr:
       page_header_title: "Nouvelle discussion"
       points_possible: "Points possibles"
       post_at: "Publié à"
+      remove_attachment_ceae0973: "Supprimer la pièce jointe"
       save: Enregistrer
       saving: "Enregistrement en cours..."
       topic_title: "Titre du sujet"
@@ -5509,7 +5521,6 @@ fr:
       edit_current_message: "Modifier le message actuel"
       edited_by: "Ce sujet a été modifié par %{user}"
       expand_replies: "Développer les réponses"
-      filter_replies: "Filtrer les réponses par terme recherché"
       from_context: "De *%{context_name}*"
       initial_post_required: "Les réponses sont visibles uniquement par ceux qui ont publié au moins une réponse."
       links: 
@@ -5638,6 +5649,7 @@ fr:
     no_due_date: "échéance : Pas d’échéance"
   ecollege_file_description: Ecollege
   ecollege_name: "Convertisseur Ecollege"
+  edit_quiz_ededddd8: "Modifier le questionnaire"
   edit_rubric: 
     buttons: 
       create_rubric: "Créer un barème"
@@ -5656,6 +5668,7 @@ fr:
     titles: 
       criterion_long_description: "Description longue du critère"
       find_existing_rubric: "Chercher un barème existant"
+  edit_survey_b0d6890d: "Modifier l’enquête"
   editor: 
     alt_text: "Texte de remplacement :"
     based_on_type: "D’après %{base_type}"
@@ -5673,6 +5686,11 @@ fr:
     equation_editor_title: "Utilisez les barres d’outils ou passez en mode d’affichage avancé pour taper/coller le contenu au format LaTeX."
     image_not_found: "Image introuvable. Essayez avec une autre URL."
     instructions: "Collez ou saisissez l’URL de l’image à incorporer :"
+    keyboard_shortcuts: 
+      dialog_title: "Raccourcis clavier"
+      keybindings: 
+        open_dialog: "Ouvrir cette fenêtre d’aide"
+        open_toolbar: "Ouvrir la barre d’outils de l’éditeur"
     loading: Chargement...
     mathjax_text_entry_field_label: "Spécifiez l’équation au format LaTeX."
     more_external_tools: "Plus d’outils externes"
@@ -6002,6 +6020,7 @@ fr:
       submissions: 
         body1: "Vous avez peut-être remarqué en bas de cette page la liste des envois récents de vos classes (%{showme}). Vous pouvez rapidement ajouter des envois aux nouvelles pages de votre portefeuille à partir de cette page. Cliquez simplement sur l’envoi à ajouter pour afficher une boîte de dialogue."
         body2: "Bien. À présent, pour terminer d’ajouter l’envoi, vous devez choisir la section à laquelle l’ajouter et donner un nom à la page. Après avoir cliqué sur Ajouter une page, vous serez dirigé vers la nouvelle page afin de la modifier avec plus de précision si vous le souhaitez."
+  error_message_2b9d12ee: "Erreur : %{message}"
   errors: 
     bad_navigation_config: "Configuration d’onglet de cours non valide"
     blank: Requis
@@ -6168,7 +6187,6 @@ fr:
       all: Tous
       app_headder: "Applications externes"
       external_tools_note: "Les applications permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas. Elles peuvent être ajoutées à des cours individuels ou à tous les cours d’un compte. Une fois qu’elles sont configurées, vous pouvez créer un lien vers elles via les modules des cours et créer des activités pour les outils d‘évaluation."
-      external_tools_references: "*Découvrez quelques outils LTI* qui fonctionnent très bien avec Canvas. Vous pouvez également consulter les **sujets abordés au sein de la communauté Canvas au sujet des outils LTI**."
       installed: Installés
       not_installed: "Non installés"
       search_filter: "Filtrer par nom"
@@ -6274,7 +6292,6 @@ fr:
     learning_mastery_gradebook: "Relevé de notes pour la maîtrise de l’apprentissage "
     lor: "Outils externes LOR"
     multiple_grading_periods: "Plusieurs périodes de notation"
-    new_quiz_moderate: "Nouvelle page de questionnaire modéré"
     new_quiz_statistics: "Nouvelle page de statistiques de questionnaire"
     new_styles: "Utiliser les nouveaux styles"
     post_grades: "Publier les notes sur SIS"
@@ -6309,6 +6326,11 @@ fr:
     prompt: "Remplacer %{name} par"
     rename_title: Copier
     replace: Remplacer
+  file_status: 
+    hidden_status: "Masqué. Disponible via un lien"
+    published_status: Publié
+    restricted_status: "Disponible du %{from_date} au %{until_date}"
+    unpublished_status: "Non publié"
   filebrowserview: 
     course_files: "Fichiers du cours"
     group_files: "Fichiers du groupe"
@@ -6473,6 +6495,7 @@ fr:
     upload_error: "Erreur lors du téléchargement du fichier"
     warnings: 
       file_uploaded_without_response: "Le fichier est peut-être téléchargé mais le serveur n’a pas répondu. Retéléchargez la page pour confirmer."
+  fill_in_the_blank_read_surrounding_text_1a6c73c7: "Remplissez les espaces vides en vous aidant du texte autour"
   find_flickr_image_view: 
     find_cc_on_flickr: "Trouver des images Creative Commons sur Flickr"
     search: Rechercher
@@ -6502,6 +6525,7 @@ fr:
     no_deleting_root: "Impossible de supprimer le dossier racine"
     only_one_folder: "Impossible de définir le chemin et l’ID du dossier"
   for: pour
+  from_from_to_to_e31f6422: "Du %{from} au %{to}"
   global_message_icons: 
     announcement: annonce
     calendar: calendrier
@@ -6554,10 +6578,8 @@ fr:
     graded_by_me: "%{graded_time} par moi"
     graded_then_resubmitted: "noté, puis renvoyé (%{when})"
     gradee_index_of_total: "%{gradee} %{x} sur %{y}"
-    grading_in_progress: "L’instructeur travaille sur les notes"
     group: Groupe
     hide_all_details_button: "Masquer tous les détails"
-    mic_blocked_message: "Impossible d’utiliser le microphone faute d’autorisation. Pour changer ce paramètre, accédez à chrome://settings/contentExceptions\\#media-stream"
     mute_assignment: "Tâche silencieuse"
     new_assessment: "[Nouvelle évaluation]"
     no_submission_time: "aucune heure d’envoi"
@@ -7020,6 +7042,8 @@ fr:
       submissions_upload: "Téléchargement des envois de %{assignment}"
     titles: 
       total: Total
+  graded_quiz_7fabdf1f: "Questionnaire noté"
+  graded_survey_c0f0c395: "Enquête notée"
   grading_box: 
     out_of_points_possible: "sur %{assignment.points_possible}"
   grading_cell: 
@@ -7303,17 +7327,14 @@ fr:
       group_category_create: 
         allow_self_signup: "Autoriser l’inscription libre"
         cancel: Annuler
-        create_groups: "Créer %h{num_groups} groupes maintenant"
         create_groups_manually: "Je crée les groupes manuellement"
         group_set_name: "Nom de l’ensemble de groupes"
         group_structure: "Structure de groupe"
         leave_group_limit_blank: "Laisser vide s’il n’y a pas de limite"
-        limit_group_size: "Limiter les groupes à %h{group_limit} membres"
         require_same_section: "Nécessite le groupement des membres dans la même section"
         save: Enregistrer
         saving: Enregistrement...
         self_signup: "Inscription libre"
-        split_into_groups: "Répartir les étudiants en %h{num_groups} groupes égaux"
       group_category_detail: 
         add_group: "Ajouter un groupe"
         category_settings: Paramètres
@@ -7334,7 +7355,6 @@ fr:
         group_limit_override: "Changer ce paramètre aura pour effet de remplacer toutes les limites de groupe définies individuellement"
         group_set_name: "Nom de l’ensemble de groupes"
         leave_group_limit_blank: "Laisser vide s’il n’y a pas de limite"
-        limit_group_size: "Limiter les groupes à %h{group_limit} membres"
         require_same_section: "Nécessite le groupement des membres dans la même section"
         save: Enregistrer
         saving: Enregistrement...
@@ -7502,6 +7522,7 @@ fr:
   high_contrast_description: |-
       Si vous préférez une version de l’interface Canvas avec un contraste plus élevé, activez cette option.
       Cela peut être utile pour les malvoyants ou les personnes ayant des difficultés à lire.
+  highest_28ad71e6: "La plus élevée"
   html5_first_videos_description: "Par défaut, Canvas essaiera d’utiliser Flash en premier pour lire les vidéos. Activez cette option pour essayer d’utiliser HTML5 d’abord, avant de revenir à Flash."
   ic_actions: 
     manage: gérer
@@ -7519,6 +7540,7 @@ fr:
     invalid_file_size: "La taille du fichier d’image est trop grande (max %{max} octets au lieu de %{actual})"
     invalid_file_type: "Type de fichier %{type} non valide. Les types suivants sont autorisés : %{type_list}"
     not_an_image: "Le fichier sélectionné n’est pas une image"
+  immediately_c128ede6: Immédiatement
   importers/assignment_importer: 
     errors: 
       import: 
@@ -7688,6 +7710,7 @@ fr:
   labels: 
     lock_module_until: "Verrouiller le module jusqu’à une date donnée"
   last_user_access_title: "Dernier accès utilisateur"
+  latest_f604a75: "La dernière"
   layouts: 
     application: 
       bouncing_communication_channels: "Il y a apparemment un problème avec un de vos modes de contact. Vérifiez votre *Page des paramètres*."
@@ -7899,8 +7922,6 @@ fr:
     my_courses: "Mes cours"
   message: 
     default_subject: "Alerte Canvas"
-  message_dialog_component: 
-    ok: OK
   message_students: 
     buttons: 
       send_message: "Envoyer le message"
@@ -9892,19 +9913,68 @@ fr:
     quiz: Questionnaire
     sub_header: Sous-titre
   modules: 
+    add: 
+      header: 
+        cancel: Annuler
+      link: 
+        cancel: Annuler
+      tool: 
+        cancel: Annuler
+    add_item: 
+      assignment: Travail
+      content_page: "Page de contenu"
+      discussion: Discussion
+      external_tool: "Outil externe"
+      external_url: "URL externe"
+      file: Fichier
+      page: "Page de contenu"
+      quiz: Questionnaire
+      text_header: "Texte de l’en-tête"
     add_module_item_dialog: 
       item_type: "Type :"
     add_module_item_dialog_wrapper: 
       Save: Enregistrer
       cancel: Annuler
       creating: Création...
+    create: 
+      assignment: 
+        cancel: Annuler
+        create: Créer
+      discussion: 
+        cancel: Annuler
+      file: 
+        cancel: Annuler
+        upload: "Mettre en ligne"
+      header: 
+        cancel: Annuler
+      link: 
+        cancel: Annuler
+      page: 
+        cancel: Annuler
+      quiz: 
+        cancel: Annuler
+      tool: 
+        cancel: Annuler
     dialog_title: "Ajouter un élément à %{moduleName}"
+    item: 
+      cancel: Annuler
+      points_possible: pts
+      save: Enregistrer
+    module: 
+      header: 
+        delete: Supprimer
+        drag_to_reorder: "Faire glisser les modules pour les réorganiser"
+        edit: Modifier
     module_collection_view: 
       button: 
         preview: Aperçu
       course_modules: "Modules du cours"
       header: 
         module: Module
+    module_edit: 
+      Create: Créer
+      cancel: Annuler
+      module_name: "Nom du module"
     module_item_view: 
       button: 
         delete: Supprimer
@@ -9967,13 +10037,14 @@ fr:
     sure_you_want_to_mute: "Voulez-vous vraiment mettre cette tâche en mode silencieux ? Tant qu’elle sera en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications ni ne peuvent afficher :"
   name: "Outil d’importation Academic Benchmarks"
   new_facebook_message: "Vous avez un nouveau message de Canvas"
-  new_quiz_moderate_desc: "Lorsque le mode Brouillon et les statistiques des questionnaires sont autorisés/activés, cela rend possible la nouvelle page de questionnaire modéré pour un compte."
-  new_quiz_statistics_desc: "Activez la nouvelle page de statistiques de questionnaire pour un compte."
   new_styles_description: |-
       Nous sommes en train de revoir l’interface utilisateur de Canvas. Activez cette option
       pour afficher la nouvelle interface, offrant un aspect et un fonctionnement simplifiés.
       Il s’agit d’une fonctionnalité en plein développement qui ne doit pas encore être activée dans un environnement de production.
+  no_e16d9132: Non
   no_migration_file: "Fichier requis pour la migration de ce contenu."
+  no_students_have_taken_the_quiz_yet_e667644b: "Aucun étudiant n’a encore répondu au questionnaire"
+  no_students_have_taken_the_survey_yet_d378cd35: "Aucun étudiant n’a encore répondu à l’enquête"
   not_a_number: "doit être un nombre positif"
   notification: 
     added_to_conversation_description: "Vous êtes ajouté à une conversation"
@@ -10443,7 +10514,6 @@ fr:
     save_button: Enregistrer
     saving_button: Enregistrement...
     warnings: 
-      overwrite_changes: "Vous êtes sur le point d’écraser d’autres changements qui ont été effectués depuis que vous avez commencé vos propres modifications.\\n\\nRemplacer ces changements ?"
       unsaved_changes: "Des changements n’ont pas été enregistrés. Voulez-vous continuer sans enregistrer ?"
   paginated_collection: 
     no_items: "Aucun élément"
@@ -10510,6 +10580,11 @@ fr:
       description: "Ce plug-in s’intègre à Crocodoc pour fournir un mode de prévisualisation de document HTML5 qui permet aux enseignants et aux élèves d’annoter les documents."
       labels: 
         api_key: "Clé API Crocodoc "
+    diigo: 
+      name: Diigo
+    diigo_settings: 
+      labels: 
+        api_key: "Clé API"
     dim_dim_settings: 
       description: "Vous devrez avoir accès à une instance DimDim."
       labels: 
@@ -10697,6 +10772,9 @@ fr:
         username: "Nom d’utilisateur pour l’authentification"
     notices: 
       settings_updated: "Les paramètres de module d’extension ont été mis à jour."
+    panda_pub_settings: 
+      labels: 
+        base_url: "URL de base"
     qti_converter_settings: 
       labels: 
         enabled: Activés
@@ -10770,16 +10848,6 @@ fr:
         domain: Domaine
         password: "Mot de passe"
         username: "Nom d’utilisateur"
-    wiziq: 
-      description: "Salle de classe virtuelle Wiziq"
-      name: Wiziq
-    wiziq_settings: 
-      api_url_description: "(p. ex. http://class.api.wiziq.com/)"
-      description: "Vous aurez besoin d’accéder à un compte [Wiziq](%{url})."
-      labels: 
-        access_key: "Touche d’accès rapide"
-        api_url: "URL de l’api"
-        secret_key: "Clé secrète"
   polling: 
     poll_sessions: 
       errors: 
@@ -10795,6 +10863,7 @@ fr:
       L’option Publier les notes permet aux enseignants de renvoyer les notes sur les systèmes SIS activés : 
       Powerschool, Aspire (SIS2000), JMC et tout autre système SIS acceptant les éléments SIF GradingCategory,
       , GradingAssignment, GradingAssignmentScore.
+  practice_quiz_19a8505d: "Questionnaire d’entraînement"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Conditions requises de la réalisation"
@@ -11120,7 +11189,7 @@ fr:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest envoyée au fournisseur d’identités"
-      logout_redirect_from_idp: "LogoutResponse reçue du fournisseur d’identités"
+      logout_response_redirect_from_idp: "LogoutResponse reçue du fournisseur d’identités"
       redirect_from_idp: "LoginResponse reçue du fournisseur d’identités"
     default_app_name: "Application tierce"
     errors: 
@@ -11240,93 +11309,6 @@ fr:
       publishing: "Publication en cours..."
       unpublish: "Annuler la publication"
       unpublishing: "Annulation de la publication..."
-  publish_grades: 
-    assignment_group_list: 
-      no_assignment_groups: "Aucun groupe de travaux trouvé"
-    assignment_group_list_item: 
-      group_weight: "%{groupWeight}% du total"
-      manage: Gérer
-    assignment_list_item: 
-      assignment_edit: "Modifier le travail"
-      module: Module
-      multiple_modules: "Plusieurs modules"
-      no_points_possible: "Aucun point possible"
-      points_possible: "%{pointsPossible} points"
-      points_possible_screen_reader: "%{pointsPossible} points possibles"
-      settings: "Modifier le travail"
-    assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "Ce travail ne sera pas noté."
-      assignment_not_yet_graded_screenreader: "Travail pas encore noté. %{pointsPossible} points possibles."
-      empty_points_possible: "-/%{pointsPossible} pts"
-      no_submission: "Aucun envoi"
-      no_submission_for_assignment_screenreader: "Pas d’envoi pour ce travail. %{pointsPossible} points possibles."
-      not_yet_graded: "*Pas encore noté*"
-      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
-      score_with_points_possible_screenreader: "Résultat : %{score} sur %{pointsPossible} points."
-    assignment_settings: 
-      cancel: Annuler
-      save: Enregistrer
-      validating: Enregistrement...
-      weight_groups: "Pondérer la note finale en fonction des groupes de travaux"
-    available_date_description: 
-      available_until: "Disponibles jusqu’au"
-      closed: Fermés
-      not_available_until: "Pas disponibles jusqu’au"
-    create_assignment: 
-      assignment: Travail
-      assignment_due_at: "Échéance :"
-      assignment_name: "Nom :"
-      assignment_points: "Points :"
-      assignment_type: "Type :"
-      cancel: Annuler
-      discussion_type: Discussion
-      external_tool_type: "Outil externe"
-      more: "Accéder à %{objectType}"
-      multiple_due_dates: "Plusieurs dates d’échéance"
-      not_graded_type: "Non noté"
-      quiz_type: Questionnaire
-      save: Enregistrer
-      saving: Enregistrement...
-    date_available_column_view: 
-      available: Disponibles
-      multiple_dates: "Plusieurs dates"
-    date_due_column_view: 
-      due: Échéance
-      due_date: Échéance
-      multiple_dates: "Plusieurs dates"
-    due_date_view: 
-      overrides: 
-        remove_these_dates: "Supprimer ces dates"
-    edit_header_view: 
-      buttons: 
-        not_published: "Non publiés"
-        published: Publiés
-      manage: Gérer
-      titles: 
-        delete: Supprimer
-    group_category_selector: 
-      grade_group_students_individually: "Attribuer les notes individuellement à chaque étudiant"
-      group_assignment_header: "Travail de groupe"
-      group_category_options: "Nouvelle catégorie de groupe"
-      group_set: "Ensemble de groupes"
-      is_group_assignment: "Ceci est un travail pour un groupe"
-      students_already_submitted_warning: "Les envois individuels précédents ne seront pas comptés comme envois de groupe et ne s’afficheront pas correctement dans SpeedGrader."
-    index_view: 
-      add_group: "Publier les notes des travaux"
-      assignments: Travaux
-      search_for_assignment: "Rechercher un travail"
-      title_add_group: "Ajouter un groupe de travaux"
-    never_drop: 
-      remove_rule: "Supprimer la règle"
-    never_drop_collection: 
-      add_another_assignment: "Ajouter un autre travail"
-      add_first_assignment: "Ajouter un travail"
-    no_assignments_list_item: 
-      no_assignments_in_this_group: "Pas de travaux dans ce groupe"
-    no_assignments_search: 
-      aria_assignments: Travaux
-      assignments: Travaux
-      no_assignments_found: "Aucun travail trouvé"
   publish_icon_component: 
     publish: Publier
     publish_click: "publié, cliquez pour annuler la publication"
@@ -11461,16 +11443,6 @@ fr:
     quick_start_bar_view: 
       new: "Nouveau :"
   quiz: 
-    cancel: Annuler
-    cant_take_unpublished_quiz: "Vous ne pouvez pas répondre à un questionnaire avant qu’il soit publié"
-    cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
-    delete: Supprimer
-    delete_quiz: "Supprimer le questionnaire"
-    no_more_allowed_quiz_attempts: "Il ne vous reste plus aucune tentative sur ce questionnaire."
-    now_on_moderate: "Ces informations se trouvent désormais dans l’onglet Modéré."
-    quiz_regraded_your_score_not_affected: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
-    quiz_successfully_deleted: "Questionnaire supprimé !"
-    quiz_successfully_updated: "Questionnaire mis  à jour !"
     regrade: 
       give_everyone_full_credit: "Accordez tous les points à tous pour cette question."
       no_scores_reduced: "Attribuez des points pour les réponses qui ont été rectifiées et celles qui étaient correctes (*les notes ne pourront pas baisser*)"
@@ -11478,137 +11450,58 @@ fr:
       regrade_options: "Options de recalcul de la note *(pour les étudiants qui ont déjà répondu à cette question) :*"
       some_scores_reduced: "Attribuez des points uniquement pour la réponse correcte (*la note de certains étudiants pourra baisser*)"
       update_question_without_regrading: "Actualiser la question sans reclassement"
-    regrade_count_affected: "La note de ce questionnaire a été recalculée et votre nouveau résultat tient compte des %{num} questions concernées."
-    regrade_score_affected: "La note de ce questionnaire a été recalculée. Votre résultat a changé."
-    resume_the_quiz: "Reprendre le questionnaire"
-    resume_the_survey: "Reprendre l’enquête"
-    take_the_quiz: "Compléter le questionnaire"
-    take_the_quiz_again: "Compléter à nouveau le questionnaire"
-    take_the_survey: "Compléter l’enquête"
-    take_the_survey_again: "Compléter à nouveau l’enquête"
-    there_are_no_files_to_download: "Il n’y a aucun fichier à télécharger."
-    there_are_no_submissions_to_grade: "Il n’y a pas d’envois à noter."
-    time_limit_minutes: "%{limit} minutes"
-    warning: Avertissement
-    you_cannot_message_unpublished: "Vous ne pouvez pas envoyer de message aux étudiants tant que ce questionnaire n’est pas publié. "
-  quiz_extend_time: 
-    ending_time: "Heure de fin"
-    extend_time: "Prolonger le délai"
-    extensions_student: "Délai supplémentaire pour %{student}"
-    extensions_successfully_added: "Délais supplémentaires ajoutés"
-    now: maintenant
-  quiz_extensions: 
-    everyone_gets_attempts: "tout le monde a déjà %{num}"
-    everyone_gets_time: "tout le monde a déjà %{num} minutes"
-    extensions_num_students: "Délais supplémentaires pour %{num} étudiants"
-    extensions_student: "Délais supplémentaires pour %{student}"
-    extensions_successfully_added: "Délais supplémentaires ajoutés"
-    student_extensions: "Délais supplémentaires pour l’étudiant"
-  quiz_index_row: 
-    cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
-    confirms: 
-      delete_quiz: "Voulez-vous vraiment supprimer ce questionnaire ?"
-    delete_quiz: "Supprimer le questionnaire"
-    edit_quiz: "Modifier le questionnaire"
-    points: 
-      one: "1 point"
-      other: "%{count} points"
-    questions: 
-      one: "1 question"
-      other: "%{count} questions"
-  quiz_message_students: 
-    and_num_more_students: "et %{num} étudiants supplémentaires"
-    message_not_sent_because_empty: "Message non envoyé car il était vide"
-    message_sent_successfully: "Message envoyé"
-    message_students_who: "Envoyer un message aux étudiants qui..."
-    student_who_have_not_taken_the_quiz: "Étudiants n’ayant pas répondu au questionnaire"
-    students_who_have_taken_the_quiz: "Étudiants ayant répondu au questionnaire"
-  quiz_model: 
-    everyone: Tous
-    everyone_else: "Tous les autres"
-    graded_quiz: "Questionnaire noté"
-    graded_survey: "Enquête notée"
-    keep_highest: "La plus élevée"
-    keep_latest: "La dernière"
-    practice_quiz: "Questionnaire d’entraînement"
-    survey: Enquête
-  quiz_moderate: 
-    change_extension_for: "Changer le délai supplémentaire pour %{num} étudiants"
-    students_have_taken: "%{complete} sur %{total} étudiants ont terminé ce questionnaire"
-  quiz_moderate_route: 
-    moderate: Modéré
-  quiz_overview_route: 
-    overview: "Vue d’ensemble"
   quiz_reports: 
+    generatable: "Le rapport n’a jamais été généré."
+    generating: "Rapport en cours de création..."
     quiz_report_generator: 
       download_report_name: "Télécharger %{report_name}"
       generate_report_name: "Générer %{report_name}"
       generated_at_date_time: "Généré le %{dateAndTime}"
       generating_report_name: "Génération de %{report_name}..."
       item_analysis_not_available: "L’analyse des éléments n’est pas possible pour les enquêtes"
-  quiz_results_protected: "Les résultats relatifs à ce questionnaire sont protégés et les étudiants ne peuvent pas les voir."
-  quiz_results_protected_after_first_glimpse: "Les résultats de ce questionnaire sont protégés et peuvent être vus une seule fois juste après l’envoi."
-  quiz_results_protected_until_last_attempt: "Les résultats relatifs à ce questionnaire sont protégés et les étudiants ne peuvent pas les voir tant qu’ils n’ont pas validé leur dernière tentative."
-  quiz_route: 
-    that_quiz_doesnt_exist: "Ce questionnaire n’existe pas"
-    that_quiz_has_been_deleted: "Ce questionnaire a été supprimé"
-  quiz_show: 
-    time_limit_minutes: "%{limit} minutes"
+  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Les résultats relatifs à ce questionnaire sont protégés et les étudiants ne peuvent pas les voir."
+  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Les résultats relatifs à ce questionnaire sont protégés et les étudiants ne peuvent pas les voir tant qu’ils n’ont pas validé leur dernière tentative."
+  quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Les résultats de ce questionnaire sont protégés et peuvent être vus une seule fois juste après l’envoi."
   quiz_statistics: 
+    answer_bars_chart: 
+      response_count: 
+        one: "%{count} étudiants"
+        other: "%{count} étudiants"
     attempts: "Tentatives : %{count} sur %{total}"
     correct_essay_student_ratio: "%{ratio}% de vos étudiants ont obtenu tous les points pour cette question."
     correct_multiple_response_ratio: "%{ratio}% de vos étudiants ont répondu correctement."
     correct_response_ratio: "%{ratio}% de vos étudiants ont correctement répondu à cette question."
-    discrimination_index_help_dialog_title: "L’indice de discrimination "
-    errors: 
-      stats_empty: 
-        header: "Rien à voir ici."
-        info: "Aucun de vos étudiants n’a encore répondu à ce questionnaire."
-      stats_too_large: 
-        header: "Trop de choses se passent ici."
-        info: "Ce questionnaire est trop grand pour pouvoir être affiché."
+    discrimination_index: 
+      discrimination_index_dialog_title: "L’indice de discrimination "
+    download_submissions: "Télécharger tous les fichiers"
+    duration_in_minutes: 
+      one: "%{count} minutes"
+      other: "%{count} minutes"
     essay_score: "Résultat : %{score}"
-    generatable: "Le rapport n’a jamais été généré."
-    generated: "Le rapport est prêt."
-    generated_at: "Générées le %{date}"
-    generating: "Rapport en cours de création..."
-    generation_failed: "Un problème s’est produit, veuillez réessayer ultérieurement."
-    item_analysis: "Analyse - élément"
     no_answer: "Aucune réponse"
-    sort_by_discrimination_index: "Trier par discrimination"
-    sort_by_position: "Trier par position"
-    stats_error: 
-      image_alt: "Les statistiques du questionnaire ne sont pas encore disponibles."
-    student_analysis: "Analyse - étudiant"
-    unknown: 
-      header: "Un problème s’est produit."
-      info: "Une erreur inattendue s’est produite."
+    response_student_count: 
+      one: "%{count} étudiants"
+      other: "%{count} étudiants"
+    summary: 
+      avg_time: "Temps moyen"
+      high_score: "Bonne note"
+      low_score: "Note faible"
+      mean: "Note moyenne"
+      not_available_abbrev: NA
+      stdev: Écart-type
+    title: "Statistiques du questionnaire"
     unknown_answer: "Autre chose"
-  quiz_statistics_route: 
-    quiz_statistics: Statistiques
-  quiz_submission_arrows: 
-    answers: 
-      correct: "Correct !"
-      correct_answers: "Réponses correctes"
-      incorrect: Incorrect
-      partial: Partiel
-      right: "Bonne réponse"
-      unanswered: "Sans réponse"
-      you_answered: "Vous avez répondu"
   quizzes: 
-    after_last_attempt: "Après la dernière tentative"
     alerts: 
       no_valid_combinations: "Le système ne parvient pas à générer une combinaison valide pour les paramètres donnés."
       only_n_valid_combinations: 
         one: "Le système a pu générer une seule combinaison valide pour les paramètres donnés."
         other: "Le système a généré seulement %{count} combinaisons valides pour les paramètres donnés."
-    always: Toujours
     answer_comments: "Commentaires pour la réponse"
     answer_text: "Texte de la réponse"
     assignment_points_possible: 
       one: "1 point"
       other: "%{count} points"
-    assignments_label: "Questionnaires sur les travaux – Afficher/masquer les questionnaires"
     at_the_bottom: "-- en bas --"
     before_quiz_item: "avant %{name}"
     buttons: 
@@ -11631,11 +11524,6 @@ fr:
       delete_question: "Voulez-vous vraiment supprimer cette question ?"
       delete_quiz: "Voulez-vous vraiment supprimer ce questionnaire ?"
       scrap_and_restart: "Abandonner ce questionnaire et reprendre au début ?"
-    correct_answers_no_longer_available: "Les réponses correctes ne sont plus disponibles."
-    correct_answers_protected: "Les réponses correctes sont masquées."
-    correct_answers_shown_after: "Les réponses correctes seront disponibles le %{date}."
-    correct_answers_shown_between: "Les réponses correctes seront disponibles du %{from} au %{to}."
-    correct_answers_shown_until: "Les réponses correctes seront disponibles jusqu’au %{date}."
     default_answer_comments: "Réponse si l’étudiant choisi cette réponse"
     default_answer_comments_on_match: "Réponse si l’étudiant trouve cette réponse"
     default_comments_on_wrong_match: "Réponse si l’utilisateur ne trouve pas cette correspondance"
@@ -11645,12 +11533,6 @@ fr:
     default_response_to_essay: "Réponse à afficher après l’envoi d’une réponse par l’étudiant."
     default_response_to_file_upload: "Réponse à afficher après l’envoi d’une réponse par l’étudiant"
     download_all_quiz_file_upload_submissions: "Télécharger tous les envois de chargement de fichiers de questionnaire"
-    editor: 
-      keyboard_shortcuts: 
-        dialog_title: "Raccourcis clavier"
-        keybindings: 
-          open_dialog: "Ouvrir cette fenêtre d’aide"
-          open_toolbar: "Ouvrir la barre d’outils de l’éditeur"
     enter_answer_variable_above: "[ Entrez ci-dessus les variables de réponses ]"
     errors: 
       adding_questions_failed: "L’ajout des questions a échoué, veuillez réessayer"
@@ -11677,34 +11559,10 @@ fr:
         file_successfully_uploaded: "Votre fichier a été chargé."
         files_removed: "%{display_name} a été supprimé."
     final_answer: "Réponse finale"
-    graded_quiz: "Questionnaire noté"
-    graded_survey: "Enquête notée"
     headers: 
       assignment_quizzes: "Questionnaires pour un travail"
       practice_quizzes: "Questionnaires d’entraînement"
-      submitted_students_quiz_title: 
-        one: "Étudiants ayant répondu au questionnaire (%{count})"
-        other: "Étudiants ayant répondu au questionnaire (%{count})"
-        zero: "Étudiants ayant répondu au questionnaire"
-      submitted_students_survey_title: 
-        one: "Étudiants ayant répondu à l’enquête (%{count})"
-        other: "Étudiants ayant répondu à l’enquête (%{count})"
-        zero: "Étudiants ayant répondu à l’enquête"
       surveys: Enquêtes
-      unsubmitted_students_quiz_title: 
-        one: "Étudiants n’ayant pas répondu au questionnaire (%{count})"
-        other: "Étudiants n’ayant pas répondu au questionnaire (%{count})"
-        zero: "Étudiant n’ayant pas répondu au questionnaire"
-      unsubmitted_students_survey_title: 
-        one: "Étudiants n’ayant pas répondu à l’enquête (%{count})"
-        other: "Étudiants n’ayant pas répondu à l’enquête (%{count})"
-        zero: "Étudiant n’ayant pas répondu à l’enquête"
-    helpers: 
-      duration_in_minutes: 
-        one: "1 minute"
-        other: "%{count} minutes"
-        zero: "moins d’1 minute"
-      score_out_of_points_possible: "%{score} sur %{points_possible}"
     index: 
       buttons: 
         publishing_quizzes: "Publication des questionnaires..."
@@ -11721,8 +11579,6 @@ fr:
       quizzes_title: Questionnaires
       search_for_quiz: "Rechercher un questionnaire"
       title_add_quiz: "Ajouter un questionnaire"
-    keep_highest: "La plus élevée"
-    keep_latest: "La dernière"
     label: 
       answer: 
         text: "Texte de la réponse, zone de texte enrichi"
@@ -11736,7 +11592,6 @@ fr:
       comments_on_question: "Commentaires pour cette question"
       comments_on_wrong_match: "Commentaires si l’utilisateur utilise cette mauvaise correspondance"
       message_text: "Texte du message"
-      multiple_blanks_question: "Remplissez les espaces vides en vous aidant du texte autour"
       other_incorrect_matches: "Autres options de correspondance incorrecte"
       possible_answer: "Réponse possible"
     ldb_login_popup: 
@@ -11746,26 +11601,12 @@ fr:
       password: "Mot de passe"
       titles: 
         log_in: "Veuillez vous connecter"
-    links: 
-      resume_quiz: "Reprendre le questionnaire"
-      resume_survey: "Reprendre l’enquête"
-      take_the_quiz: "Compléter le questionnaire"
-      take_the_quiz_again: "Compléter à nouveau le questionnaire"
-      take_the_survey: "Compléter l’enquête"
-      take_the_survey_again: "Compléter à nouveau l’enquête"
-      will_keep_highest_score: "Votre note la plus élevée sera conservée"
-      will_keep_latest_score: "Votre dernière note sera conservée"
     loading_more_questions: "chargement en cours des questions supplémentaires..."
     loading_question: "Chargement de la question..."
     loading_question_banks: "Chargement des banques de questions..."
     loading_questions: "Chargement des questions..."
     message_students: "Envoyer un message aux étudiants"
     message_students_for_context: "Envoyer un message aux étudiants pour %{context}"
-    messages: 
-      no_submitted_students_quiz: "Aucun étudiant n’a encore répondu au questionnaire"
-      no_submitted_students_survey: "Aucun étudiant n’a encore répondu à l’enquête"
-      no_unsubmitted_students_quiz: "Tous les étudiants ont répondu au questionnaire"
-      no_unsubmitted_students_survey: "Tous les étudiants ont répondu à l’enquête"
     moderate: 
       buttons: 
         extend_time: "Prolonger la durée"
@@ -11803,13 +11644,10 @@ fr:
       no_quizzes: "Aucun questionnaire disponible"
     notices: 
       message_sent: "Message envoyé !"
-    practice_quiz: "Questionnaire d’entraînement"
-    practices_label: "Questionnaires d’entraînement – Afficher/masquer les questionnaires"
     question_colon: "Question :"
     question_count: 
       one: "1 question"
       other: "%{count} questions"
-    question_limit_reached: "Vous avez atteint le nombre maximum de questions autorisées pour un quizz (%{count}/%{limit}).\\n\\nPour contourner ce problème, vous pouvez répartir le contenu sur plusieurs quizz."
     quiz: 
       current_filter: "Filtre actuel"
       default_question_input: "[ Sélectionner ]"
@@ -12270,6 +12108,7 @@ fr:
         score_to_keep: "Note de questionnaire à conserver"
         show_correct_answers: "Laisser les étudiants voir les réponses correctes"
         show_correct_answers_at: "Afficher les réponses correctes à"
+        show_correct_answers_last_attempt: "Uniquement après la dernière tentative"
         shuffle_answers: "Permuter les réponses"
         students_cannot_view_responses_after_course_concludes: "Les étudiants ne peuvent pas voir les questions des questionnaires après la fin du cours"
         time_limit: "Combien de minutes ?"
@@ -12536,8 +12375,7 @@ fr:
         survey_all_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en tenant compte de toutes les tentatives de tous les utilisateurs."
         survey_latest_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en tenant compte de la dernière tentative de chaque utilisateur."
       statistics_cqs: 
-        page_title: "Statistiques CQS"
-      statistics_cqs_crumb: "Statistiques CQS"
+        page_title: Statistiques
       statistics_crumb: Statistiques
       submission_version: 
         attempt_number: "Tentative %{att_no}"
@@ -12588,7 +12426,6 @@ fr:
       loading: Chargement...
       titles: 
         details: "Informations du barème des tâches"
-    search_placeholder: "Rechercher un questionnaire"
     show: 
       answers: 
         correct: "Correct !"
@@ -12613,10 +12450,6 @@ fr:
         show_student_survey_results: "Afficher les résultats de l’enquête pour l’étudiant"
       students_who_have_not_taken_the_quiz: "Étudiants qui n’ont PAS complété le questionnaire"
       students_who_have_taken_the_quiz: "Étudiants qui ont complété le questionnaire"
-    show_and_hide_correct_answers: "Du %{from} au %{to}"
-    show_correct_answers_after: "Après le %{date}"
-    show_correct_answers_immediately: Immédiatement
-    show_correct_answers_until: "Jusqu’au %{date}"
     statistics: 
       count_attempts: 
         one: 1 tentative
@@ -12626,8 +12459,6 @@ fr:
       uncounted_submissions: 
         one: "1 autre envoi"
         other: "%{count} autres envois"
-    survey: Enquête
-    surveys_label: "Enquêtes – Afficher/masquer les questionnaires"
     take_quiz: 
       confirms: 
         cant_go_back_blank: "Vous ne pouvez pas revenir à cette question avant d’avoir cliqué sur Suivant. Voulez-vous vraiment laisser le champ vide ?"
@@ -12687,7 +12518,6 @@ fr:
       labels: 
         time_elapsed: "Temps écoulé"
         time_remaining: "Temps restant"
-    title_add_quiz: "Ajouter un questionnaire"
     titles: 
       add_questions_as_group: "Ajouter des questions dans un groupe"
       click_to_enter_comments_on_answer: "Cliquez pour ajouter un commentaire si l’étudiant choisit cette réponse"
@@ -12703,18 +12533,6 @@ fr:
     top_level: "-- Haut --"
     ? "true"
     : Vrai
-    ungraded_survey: "Enquête non notée"
-    warnings: 
-      draft_state_unsaved_changes: "*Vous avez modifié les questions de ce questionnaire.* Ces changements ne seront visibles pour les étudiants que lorsque vous aurez enregistré le questionnaire."
-      unpublished_changes: "*Vous avez modifié ce questionnaire et vos changements ne sont pas publiés.* Publiez ou republiez ce questionnaire pour que les étudiants puissent voir les modifications."
-      unpublished_quiz: "*Ce questionnaire n’est pas publié.* Seuls les enseignants pourront le voir tant qu’il n’est pas publié."
-  quizzes_redirects: 
-    no_access: "Accès refusé. Redirection vers une page à laquelle vous avez accès."
-  quizzes_route: 
-    quizzes_route_title: Questionnaires
-  quizzez_submission_row: 
-    gets_extra_minutes: "a %{num} minutes supplémentaires pour chaque tentative"
-    unlimited: "Sans limite"
   re_upload_submissions_form: 
     buttons: 
       upload: "Charger des fichiers"
@@ -12725,8 +12543,6 @@ fr:
     add_folder: "Ajouter un dossier"
     all_my_files: "Tous mes fichiers"
     cancel: Annuler
-    cancel_button: 
-      label: "Annuler la mise en ligne de %{fileName} "
     confirm_delete: 
       one: "Voulez-vous vraiment supprimer %{name} ?"
       other: "Voulez-vous vraiment supprimer ces %{count} éléments ?"
@@ -12773,6 +12589,7 @@ fr:
     progress_error: "Une erreur s’est produite lors de la préparation du téléchargement. Veuillez réessayer."
     progress_message: "Préparation du téléchargement : %{percent}% effectués"
     restrict_access: "Limiter l’accès "
+    retry: Réessayer
     search_for_files: "Rechercher des fichiers"
     search_results_for: "résultats de recherche pour « %{search_term} »"
     select_all: "Sélectionner tout"
@@ -12813,7 +12630,6 @@ fr:
       remember_me: "Se souvenir de moi"
       sign_in: "Se connecter"
     parent_dialog: 
-      agree_to_terms_and_pp: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       buttons: 
         start_participating: "Commencer à participer"
       labels: 
@@ -12822,7 +12638,6 @@ fr:
         password: "Mot de passe de l’enfant"
         username: "Nom d’utilisateur de l’enfant"
     student_dialog: 
-      agree_to_terms_and_pp: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       buttons: 
         start_learning: "Commencer à apprendre"
       labels: 
@@ -12867,7 +12682,8 @@ fr:
       description: "Planifier la disponibilité des étudiants"
     title: 
       default_title: Dialogue
-      limit_student_access: Autorisations
+  resume_quiz_afeceb87: "Reprendre le questionnaire"
+  resume_survey_58dce775: "Reprendre l’enquête"
   retrieve_timeout: "impossible de récupérer la configuration, le délai d’attente de la réponse du serveur a expiré"
   role_override: 
     permission: 
@@ -12963,7 +12779,6 @@ fr:
     site_admin_permissions: "Autorisations de l’administrateur du site"
     update_failed_notice: "Échec de la création de rôle"
   roles: 
-    account_admin: "Administrateur de compte"
     new_role: 
       add: Ajouter
       add_role: "Ajouter un rôle"
@@ -13049,7 +12864,63 @@ fr:
         are_you_sure_delete: "Voulez-vous vraiment supprimer ce barème ? Toute zone utilisant actuellement le barème continuera d’avoir accès, mais personne d’autre ne pourra l’utiliser."
         are_you_sure_remove: "Voulez-vous vraiment supprimer ce barème de la liste ?"
       remove_rubric: "Supprimer ce barème de votre liste"
+  score_out_of_points_possible_88f370fd: "%{score} sur %{points_possible}"
+  screenreader_gradebook: 
+    assignment_information: 
+      actions: 
+        curve_grades: "Courbe des notes"
+        message_students: "Envoyer un message aux étudiants qui..."
+      details: 
+        avg_score: "Note moyenne"
+        high_score: "Bonne note"
+        low_score: "Note faible"
+        no_points: "Aucun point possible"
+        points_possible: "Points possibles"
+      index: 
+        warning: Avertissement
+    grading: 
+      grading: Notation
+      submission_details: "Informations sur l’envoi"
+    header: 
+      gradebook_individual_view: "Relevé de notes : Vue individuelle"
+    learning_mastery: 
+      hide_student_names_label: "Masquer les noms des étudiants"
+      result: Résultats
+    outcome_information: 
+      avg_score: "Note moyenne"
+      high_score: "Bonne note"
+      low_score: "Note faible"
+    screenreader_gradebook: 
+      assignments: Travaux
+      learning_mastery: "Maîtrise de l’apprentissage"
+    settings: 
+      assignment_toggles_and_actions: 
+        download_scores: "Télécharger les notes (.csv)"
+        grading_history: "Afficher l’historique de notation"
+        hide_student_names_label: "Masquer les noms des étudiants"
+        include_ungraded_assignments: "Considérer les travaux non notés comme ayant la note 0"
+        set_group_weights: "Définir les coefficients de groupe"
+        show_concluded_enrollments_label: "Afficher les inscriptions terminées"
+        sis_export: "Publier les notes sur SIS"
+      mastery_toggles_and_actions: 
+        hide_student_names_label: "Masquer les noms des étudiants"
+    student_information: 
+      assignment_groups: 
+        ag_group_grade: Note
+        ag_group_name: "Groupe de travaux"
+        ag_letter_grade: "Notation par lettre"
+      index: 
+        grades: Notes
   search: 
+    all_courses: 
+      name: Nom
+      search: Rechercher
+      titles: 
+        all_courses: "Tous les cours"
+    all_courses_inner: 
+      join_course: "Rejoindre ce cours"
+      next: Suivant
+      previous: Précédent
     course_sections: "Sections du cours"
     enrollments_observers: Observateurs
     enrollments_students: Étudiants
@@ -13277,6 +13148,9 @@ fr:
     canvas-user-nav: 
       navigation: 
         user_menu: "Menu utilisateur"
+    components: 
+      ic_submission-download-dialog: 
+        click_to_download: "Cliquez ici pour télécharger"
     conference: 
       buttons: 
         delete: "Supprimer une conférence"
@@ -14011,20 +13885,23 @@ fr:
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} à %{upper_bound}"
     no_answer: "Aucune réponse"
-  status_dates: 
-    available: Disponible
-    available_until: "Disponible jusqu’au"
-    closed: Fermés
-    due: Échéance
-    not_available: "Disponible le"
-    pending: "Pas disponible jusqu’au"
   step: Étape
   student_assignment_outcome_map_title: "Compétence de l’étudiant"
   student_groups: 
     group_join: "A rejoint le groupe %{group_name}"
     group_leave: "A quitté le groupe %{group_name}"
     group_name: "%{group_name} de %{group_category}"
+    new_group: 
+      group_explanation: "Les groupes sont un bon endroit pour collaborer à des projets ou pour concevoir des calendriers de sessions d’étude par exemple. Chaque groupe contient un calendrier, une page Wiki, des discussions et un espace minimum pour stocker des fichiers. Les groupes peuvent collaborer à la création de documents ou programmer des conférences sur le Web. C’est un peu comme un minicours où vous pouvez travailler avec un nombre inférieur d’étudiants sur un sujet plus précis."
+      joining: Adhésion
+      name: "Nom du groupe"
     search_groups_placeholder: "Rechercher des groupes ou des personnes"
+    student_groups: 
+      full: Complet
+      group: Groupe
+      student_groups_join: Rejoindre
+      student_groups_tabs_everyone: Tous
+      student_groups_tabs_groups: Groupes
     student_groups_filter_description: "Au fur et à mesure que vous remplissez ce champ, la liste des groupes est filtrée automatiquement pour inclure uniquement les noms correspondant aux caractères tapés."
     students_count: 
       one: "1 étudiant"
@@ -14042,6 +13919,22 @@ fr:
   student_summary: 
     student_summary_table_ascending: "Tableau récapitulatif des étudiants trié par ordre croissant par %{sortText}"
     student_summary_table_descending: "Tableau récapitulatif des étudiants trié par ordre décroissant par %{sortText}"
+  students_who_have_taken_the_quiz_count_69dbbda0: 
+    one: "Étudiants ayant répondu au questionnaire (%{count})"
+    other: "Étudiants ayant répondu au questionnaire (%{count})"
+    zero: "Étudiants qui ont complété le questionnaire"
+  students_who_have_taken_the_survey_count_ef9e6492: 
+    one: "Étudiants ayant répondu à l’enquête (%{count})"
+    other: "Étudiants ayant répondu à l’enquête (%{count})"
+    zero: "Étudiants ayant répondu à l’enquête"
+  students_who_haven_t_taken_the_quiz_count_9966e994: 
+    one: "Étudiants n’ayant pas répondu au questionnaire (%{count})"
+    other: "Étudiants n’ayant pas répondu au questionnaire (%{count})"
+    zero: "Étudiant n’ayant pas répondu au questionnaire"
+  students_who_haven_t_taken_the_survey_count_c03f4d80: 
+    one: "Étudiants n’ayant pas répondu à l’enquête (%{count})"
+    other: "Étudiants n’ayant pas répondu à l’enquête (%{count})"
+    zero: "Étudiant n’ayant pas répondu à l’enquête"
   students_with_no_submissions_title: "Étudiants n’ayant rien envoyé"
   sub_accounts: 
     alerts: 
@@ -14206,6 +14099,7 @@ fr:
       curriculum_assessment_errata_description: "Consultez les erreurs déjà signalées pour le programme et l’évaluation. Recherchez « errata »."
       networking_academy_description: "Consultez les réponses de Cisco aux questions les plus fréquentes."
       networking_academy_faqs: "FAQ Networking Academy"
+  syllabus: "Programme du cours"
   table_headings: 
     name: Nom
     total: Total
@@ -14234,6 +14128,10 @@ fr:
     syllabus: Programme
     tab_location_error: "L’emplacement de cet onglet n’est pas valide"
     tab_unmanagable_error: "%{css_class} n’est pas gérable"
+  take_the_quiz_87214d7e: "Compléter le questionnaire"
+  take_the_quiz_again_8ea51a6c: "Compléter à nouveau le questionnaire"
+  take_the_survey_ada59508: "Compléter l’enquête"
+  take_the_survey_again_24ce22c2: "Compléter à nouveau l’enquête"
   terms: 
     index: 
       date: 
@@ -14290,6 +14188,7 @@ fr:
         term_start: "début du trimestre"
         unspecified: "peu importe"
       timespan: "%{start_at} *à* %{end_at}"
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Ce questionnaire n’est pas publié.* Seuls les enseignants pourront le voir tant qu’il n’est pas publié."
   time: 
     am: matin
     count_hours_ago: 
@@ -14485,12 +14384,8 @@ fr:
     announcements: Annonces
     assignments: Devoirs
     come_back_later: "Vous avez marqué cette question pour y revenir ultérieurement"
-    delete_quiz: "Supprimer le questionnaire"
-    delete_survey: "Supprimer l’enquête"
     discussion: Discussion
     discussions: Discussions
-    edit_quiz: "Modifier le questionnaire"
-    edit_survey: "Modifier l’enquête"
     error_reports: "Rapports d’erreur"
     learning_outcomes: "Résultats d’apprentissage"
     messages: Messages
@@ -14524,11 +14419,13 @@ fr:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Renvoyer à Turnitin"
+  ungraded_survey_ad7de790: "Enquête non notée"
   unknown: Inconnu
   unknown_question_bank: "Banque de questions inconnue"
   unknown_quiz: "Questionnaire inconnu"
   unpublished_courses_title: "Cours non publiés"
   unsupported_package: "Package de contenu non pris en charge"
+  until_date_949017c4: "Jusqu’au %{date}"
   unused_courses_title: "Cours non utilisés"
   upload_button: 
     upload: "Mettre en ligne"
@@ -14852,7 +14749,6 @@ fr:
       create_a_canvas_account: "Créer un compte Canvas"
       privacy_policy: "Politique de confidentialité"
       terms_of_use: "Conditions d’utilisation"
-    no_deleting_sis_user: "Impossible de supprimer un utilisateur généré par le système"
     no_self_registration: "L’enregistrement libre n’a pas été activé pour ce compte"
     oauth_fail: "Échec de la demande OAuth Impossible de trouver une demande valide"
     recaptcha_settings: 
@@ -15181,25 +15077,14 @@ fr:
     cannot_update_published: "Vous ne pouvez pas changer l’état « publié » de cette page Wiki"
     cannot_update_title: "Vous ne pouvez pas actualiser le titre de cette page Wiki"
     invalid_editing_roles: "Les rôles de modification fournis ne sont pas valides."
-  will_paginate: 
-    next_label: "&#8594; suivante"
-    page_entries_info: 
-      multi_page: "Afficher les %{model} de %{from} à %{to} sur un total de %{count} "
-      multi_page_html: "Afficher les %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> sur un total de <b>%{count}</b> "
-      single_page: 
-        one: "Afficher 1 %{model}"
-        other: "Afficher les %{count} %{model}"
-        zero: "Aucun %{model} trouvé"
-      single_page_html: 
-        one: "Afficher <b>1</b> %{model}"
-        other: "Afficher les <b>all&nbsp;%{count}</b> %{model}"
-        zero: "Aucun %{model} trouvé"
-    page_gap: "&hellip;"
-    previous_label: "&#8592; précédente"
+  will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Votre note la plus élevée sera conservée"
+  will_keep_the_latest_of_all_your_scores_431d23f9: "Votre dernière note sera conservée"
   wimba_conference: 
     external_urls: 
       archive: Archiver
       archive_link: "Afficher les archives"
+  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Vous avez modifié les questions de ce questionnaire.* Ces changements ne seront visibles pour les étudiants que lorsque vous aurez enregistré le questionnaire."
+  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Vous avez modifié ce questionnaire et vos changements ne sont pas publiés.* Publiez ou republiez ce questionnaire pour que les étudiants puissent voir les modifications."
   zero_activity_title: "Aucune activité"
   zip_argument_error: "Un chargement .zip nécessite un dossier de destination."
   zip_file_description: "Plug-in de migration pour décompresser les archives .zip et obtenir des fichiers de cours, groupe ou utilisateur "
