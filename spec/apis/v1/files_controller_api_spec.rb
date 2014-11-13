@@ -293,6 +293,22 @@ describe "Files API", type: :request do
       ]
     end
 
+    it "should include usage_rights if requested" do
+      @a1.usage_rights = @course.usage_rights.create! legal_copyright: '(C) 2014 Initech', use_justification: 'used_by_permission'
+      @a1.save!
+      json = api_call(:get, @files_path + "?include[]=usage_rights", @files_path_options.merge(include: ['usage_rights']))
+      expect(json.map{|f|f['usage_rights']}).to eql [
+          nil,
+          nil,
+          {
+              "legal_copyright" => '(C) 2014 Initech',
+              "use_justification" => 'used_by_permission',
+              "license" => "private",
+              "license_name" => "Private (Copyrighted)"
+          }
+      ]
+    end
+
     it "should include user even for user files" do
       my_root_folder = Folder.root_folders(@user).first
       my_file = Attachment.create! :filename => 'ztest.txt',
@@ -600,6 +616,18 @@ describe "Files API", type: :request do
         "display_name" => @user.short_name,
         "avatar_image_url" => User.avatar_fallback_url,
         "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+      })
+    end
+
+    it "should return usage_rights if requested" do
+      @att.usage_rights = @course.usage_rights.create! legal_copyright: '(C) 2012 Initrode', use_justification: 'creative_commons', license: 'cc_by_sa'
+      @att.save!
+      json = api_call(:get, @file_path + "?include[]=usage_rights", @file_path_options.merge(include: ['usage_rights']))
+      expect(json['usage_rights']).to eql({
+          "legal_copyright" => "(C) 2012 Initrode",
+          "use_justification" => "creative_commons",
+          "license" => "cc_by_sa",
+          "license_name" => "CC Attribution Share Alike"
       })
     end
   end

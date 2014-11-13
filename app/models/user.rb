@@ -140,6 +140,7 @@ class User < ActiveRecord::Base
   has_many :sis_batches
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
+  has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile

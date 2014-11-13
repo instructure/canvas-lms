@@ -224,6 +224,7 @@ class FilesController < ApplicationController
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content
+  #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
   # @argument sort [String, "name"|"size"|"created_at"|"updated_at"|"content_type"|"user"]
   #   Sort results by this field. Defaults to 'name'. Note that `sort=user` implies `include[]=user`.
@@ -270,6 +271,7 @@ class FilesController < ApplicationController
         end
       end
       scope = scope.includes(:user) if params[:include].include? 'user' && params[:sort] != 'user'
+      scope = scope.includes(:usage_rights) if params[:include].include? 'usage_rights'
       scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
 
       order_clause = case params[:sort]
@@ -436,6 +438,7 @@ class FilesController < ApplicationController
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content
+  #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
   # @example_request
   #

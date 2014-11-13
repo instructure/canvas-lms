@@ -1580,6 +1580,16 @@ CanvasRails::Application.routes.draw do
         delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
       end
     end
+
+    scope(controller: :usage_rights) do
+      %w(course group user).each do |context|
+        content_prefix = "#{context.pluralize}/:#{context}_id"
+        put "#{content_prefix}/usage_rights", action: :set_usage_rights
+        delete "#{content_prefix}/usage_rights", action: :remove_usage_rights
+        get "#{content_prefix}/content_licenses", action: :licenses
+      end
+    end
+
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

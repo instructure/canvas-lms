@@ -62,6 +62,7 @@ class Group < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
+  has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
   belongs_to :avatar_attachment, :class_name => "Attachment"
   belongs_to :leader, :class_name => "User"
 

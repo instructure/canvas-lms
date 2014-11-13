@@ -63,6 +63,7 @@ class Attachment < ActiveRecord::Base
   has_many :thumbnails, :foreign_key => "parent_id"
   has_one :crocodoc_document
   has_one :canvadoc
+  belongs_to :usage_rights
 
   before_save :infer_display_name
   before_save :default_values
