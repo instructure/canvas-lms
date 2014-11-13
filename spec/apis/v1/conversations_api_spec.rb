@@ -873,7 +873,7 @@ describe ConversationsController, type: :request do
                 headers={},
                 {expected_status: 400})
         expect(json[0]["attribute"]).to eql "recipients"
-        expect(json[0]["message"]).to eql "invalid"
+        expect(json[0]["message"]).to eql "restricted by role"
       end
 
       it "should send bulk group messages" do
