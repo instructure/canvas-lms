@@ -18,12 +18,12 @@ html, body {
 .ReactModal__Overlay {
   z-index: 100;
   &.ReactModal__Overlay--after-open {
-    background-color: rgba($preview-bg, 0.9);  
+    background-color: rgba($preview-bg, 0.9);
   }
 }
 /// __File Preview Layout
 ////////////////////////////////
-// Since this was a slightly complex layout I've separated this into 
+// Since this was a slightly complex layout I've separated this into
 // it's on area in the stylesheet to help break it out
 
 .ef-file-preview-overlay {
@@ -44,12 +44,12 @@ html, body {
 }
 .ef-file-preview-stretch {
   flex: 1;
-  
+
   display: flex;
   flex-direction: row;
-  justify-content: center; // align items in Main Axis 
-  align-items: stretch; // align items in Cross Axis 
-  align-content: stretch; // Extra space in Cross Axis 
+  justify-content: center; // align items in Main Axis
+  align-items: stretch; // align items in Cross Axis
+  align-content: stretch; // Extra space in Cross Axis
 }
 
 /// Second container: Image/Info Area
@@ -76,9 +76,9 @@ html, body {
 ////////////////////////////////
 .ef-file-preview-header {
   background-color: $preview-bg;
-  color: $preview-font-color;  
+  color: $preview-font-color;
   font-weight: 300;
-  border-bottom: 1px solid $preview-border-color;  
+  border-bottom: 1px solid $preview-border-color;
 }
 .ef-file-preview-header-filename {
   font-size: 18px;
@@ -87,7 +87,7 @@ html, body {
   margin: 0;
 }
 .ef-file-preview-button {
-  color: darken($preview-font-color, 45);  
+  color: darken($preview-font-color, 45);
   cursor: pointer;
   display: inline-block;
   padding: 25px 30px;
@@ -116,7 +116,7 @@ html, body {
 .ef-file-align-center {
   align-self: center;
 }
-.ef-file-preview-item {  
+.ef-file-preview-item {
   padding: 10px;
 }
 .ef-file-preview-container-arrow-link {
@@ -128,14 +128,14 @@ html, body {
   border: 1px solid $preview-border-color;
   border-radius: 5px;
   padding: 20px 10px 25px 10px;
-  text-align: center;    
+  text-align: center;
   i {
     width: auto;
     font-size: 30px;
     line-height: normal;
     color: $preview-font-color;
     &:before {
-      font-size: inherit;      
+      font-size: inherit;
       width: auto;
     }
   }
@@ -144,7 +144,7 @@ html, body {
   height: 50px;
 }
 .ef-file-preview-viewer-content {
-  
+
   .ef-file-preview-not-available {
     padding: 100px 0;
   }
@@ -155,8 +155,8 @@ html, body {
 // Information Tab
 ////////////////////////////////
 .ef-file-preview-information-container {
-  background: $preview-info-bg;   
-  border-left: 1px solid $preview-border-color; 
+  background: $preview-info-bg;
+  border-left: 1px solid $preview-border-color;
   padding: 30px;
 }
 .ef-file-preview-infotable {
@@ -164,7 +164,7 @@ html, body {
 
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;    
+  table-layout: fixed;
   td, th {
     text-align: left;
     color: $preview-font-color;
@@ -184,7 +184,7 @@ html, body {
   bottom: 0;
   left: 25px;
   background: $preview-bg;
-  display: inline-block;    
+  display: inline-block;
   border-top: $preview-toggle-border;
   border-right: $preview-toggle-border;
   border-left: $preview-toggle-border;
@@ -201,9 +201,9 @@ html, body {
   }
 }
 
-.ef-file-preview-footer {  
+.ef-file-preview-footer {
   border-top: 1px solid $preview-border-color;
-  background: $preview-bg;  
+  background: $preview-bg;
 }
 .ef-file-preview-list-container {
   height: $preview-footer-height;
@@ -255,10 +255,10 @@ html, body {
 }
 
 .ef-file-preview-footer-image {
-  width: 100px;
-  height: 100px;
+  width: 100px !important;
+  height: 100px !important;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   background-position: center center;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 }

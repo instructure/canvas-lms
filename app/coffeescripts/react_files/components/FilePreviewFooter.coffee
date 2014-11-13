@@ -4,7 +4,8 @@ define [
   'i18n!file_preview'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/customPropTypes'
-], (React, ReactRouter, I18n, withReactDOM, customPropTypes) ->
+  './FilesystemObjectThumbnail'
+], (React, ReactRouter, I18n, withReactDOM, customPropTypes, FilesystemObjectThumbnail) ->
 
   FilePreviewFooter = React.createClass
 
@@ -22,12 +23,12 @@ define [
         li {className: 'ef-file-preview-footer-list-item', key: file.id},
           figure {className: 'ef-file-preview-footer-item'},
             ReactRouter.Link {to: @props.to, params: {splat: @props.splat}, query: @props.query(id: file.id)},
-            div {
-              className: if file.displayName() is @props.displayedItem?.displayName() then 'ef-file-preview-footer-image ef-file-preview-footer-active' else 'ef-file-preview-footer-image'
-              style: {'background-image': 'url(' + file.get('thumbnail_url') + ')'}
-            }
-            figcaption {},
-              file.displayName()
+              FilesystemObjectThumbnail({
+                model: file
+                className: "ef-file-preview-footer-image #{ 'ef-file-preview-footer-active' if file.displayName() is @props.displayedItem?.displayName()}"
+              })
+              figcaption {className: 'ellipsis'},
+                file.displayName()
 
     render: withReactDOM ->
       div {className: 'ef-file-preview-footer grid-row'},
