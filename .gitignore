@@ -22,7 +22,7 @@
 /db/*.sqlite*
 /db/*sql
 /exports/
-Gemfile.lock
+#Gemfile.lock # Commenting out and checking in Gemfile.lock to get Capistrano deploys working.  It runs bundle install --deployment which requires this to be checked in.
 Gemfile.lock3
 /log/
 /public/app/
