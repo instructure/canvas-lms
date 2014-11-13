@@ -1,10 +1,5 @@
-require 'capistrano/ext/multistage'
-
 # config valid only for Capistrano 3.1
 lock '3.2.1'
-
-set :stages, ["staging", "production"]
-set :default_stage, "staging"
 
 set :application, 'canvas'
 set :repo_url, 'git@github.com:beyond-z/canvas-lms.git'
