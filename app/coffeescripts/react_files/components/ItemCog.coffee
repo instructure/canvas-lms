@@ -36,6 +36,7 @@ define [
           className: 'al-trigger al-trigger-gray btn btn-link'
           'aria-label': I18n.t('settings', 'Settings')
           'data-popup-within' : "#wrapper"
+          'data-append-to-body' : true
         },
           i className:'icon-settings',
           i className:'icon-mini-arrow-down'
