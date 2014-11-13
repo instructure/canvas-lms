@@ -110,6 +110,7 @@ describe "context_modules" do
       item1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
       item2 = modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
       get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
       #setting gui drag icons to pass to driver.action.drag_and_drop
       selector1 = "#context_module_item_#{item1.id} .move_item_link"
       selector2 = "#context_module_item_#{item2.id} .move_item_link"
@@ -130,6 +131,7 @@ describe "context_modules" do
       item1_mod1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
       item1_mod2 = modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
       get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
       #setting gui drag icons to pass to driver.action.drag_and_drop
       selector1 = "#context_module_item_#{item1_mod1.id} .move_item_link"
       selector2 = "#context_module_item_#{item1_mod2.id} .move_item_link"
@@ -397,6 +399,7 @@ describe "context_modules" do
       tag2 = mod.add_item(title: 'Second text header', type: 'sub_header')
 
       get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
       item2 = f("#context_module_item_#{tag2.id}")
       edit_module_item(item2) do |edit_form|
         replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
@@ -413,6 +416,7 @@ describe "context_modules" do
       tag2 = mod.add_item(title: 'B', type: 'external_tool', id: tool.id, url: 'http://what.example.org/B')
 
       get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
       item2 = f("#context_module_item_#{tag2.id}")
       edit_module_item(item2) do |edit_form|
         replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
@@ -1083,6 +1087,7 @@ describe "context_modules" do
 
     it "should add links to newly created modules" do
       get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
       wait_for_ajaximations
 
       f(".add_module_link").click
@@ -1105,6 +1110,7 @@ describe "context_modules" do
 
     it "should add links to newly created module items" do
       get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
       wait_for_ajaximations
 
       f("#context_module_#{@module1.id} .add_module_item_link").click
@@ -1138,6 +1144,7 @@ describe "context_modules" do
 
     it "should not show add links to newly created module items if not exportable" do
       get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
       wait_for_ajaximations
 
       f("#context_module_#{@module1.id} .add_module_item_link").click
@@ -1184,5 +1191,11 @@ describe "context_modules" do
       add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
       verify_persistence('New Page Title')
     end
+  end
+
+  def wait_for_modules_ui
+    # context_modules.js has some setTimeout(..., 1000) calls
+    # before it adds click handlers and drag/drop ಠ_ಠ
+    sleep 2
   end
 end

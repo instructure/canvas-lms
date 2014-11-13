@@ -82,6 +82,7 @@ module SeleniumTestsHelperMethods
     caps = Selenium::WebDriver::Remote::Capabilities.ie
     caps.version = "10"
     caps.platform = :WINDOWS
+    caps[:unexpectedAlertBehaviour] = 'ignore'
 
     Selenium::WebDriver.for(
         :remote,
@@ -92,16 +93,14 @@ module SeleniumTestsHelperMethods
 
   def firefox_driver
     puts "using FIREFOX driver"
-    options = {}
     profile = firefox_profile
-    options[:profile] = profile
-    caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
-    caps.native_events = true
+    caps = Selenium::WebDriver::Remote::Capabilities.firefox(:unexpectedAlertBehaviour => 'ignore')
 
     if SELENIUM_CONFIG[:host_and_port]
+      caps.firefox_profile = profile
       stand_alone_server_firefox_driver(caps)
     else
-      ruby_firefox_driver(options)
+      ruby_firefox_driver(profile: profile, desired_capabilities: caps)
     end
   end
 
@@ -438,7 +437,7 @@ shared_examples_for "all selenium tests" do
       logout_link = f('#identity .logout a')
       if logout_link
         if logout_link.displayed?
-          expect_new_page_load { logout_link.click() }
+          expect_new_page_load(:accept_alert) { logout_link.click() }
         else
           get '/'
           destroy_session(true)
@@ -499,10 +498,17 @@ shared_examples_for "all selenium tests" do
     wait_for_ajaximations
   end
 
-  def expect_new_page_load
+  def expect_new_page_load(accept_alert = false)
     driver.execute_script("INST.still_on_old_page = true;")
     yield
-    keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
+    keep_trying_until do
+      begin
+        driver.execute_script("return INST.still_on_old_page;") == nil
+      rescue Selenium::WebDriver::Error::UnhandledAlertError
+        raise unless accept_alert
+        driver.switch_to.alert.accept
+      end
+    end
     wait_for_ajaximations
   end
 
@@ -853,18 +859,14 @@ shared_examples_for "all selenium tests" do
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
     #handles any modals prompted by navigating from the current page
-    try_to_close_modal
+    close_modal_if_present
     wait_for_ajaximations if waitforajaximations
   end
 
-  def try_to_close_modal
-    begin
-      driver.switch_to.alert.accept
-      expect(driver.switch_to.alert).to be nil
-      true
-    rescue Exception => e
-      return false
-    end
+  def close_modal_if_present
+    driver.title # if an alert is present, this will trigger the error below
+  rescue Selenium::WebDriver::Error::UnhandledAlertError
+    driver.switch_to.alert.accept
   end
 
   def refresh_page
@@ -1088,7 +1090,7 @@ shared_examples_for "all selenium tests" do
         default_url_options[:host] = $app_host_and_port
         retry unless (tries -= 1).zero?
       else
-        raise('spec run time crashed')
+        raise # preserve original error
       end
     end
   end
@@ -1096,6 +1098,7 @@ shared_examples_for "all selenium tests" do
   append_before (:all) do
     $selenium_driver ||= setup_selenium
     default_url_options[:host] = $app_host_and_port
+    close_modal_if_present
     resize_screen_to_normal
   end
 
