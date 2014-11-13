@@ -196,6 +196,10 @@ class GroupCategory < ActiveRecord::Base
     groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
   end
 
+  def is_member?(user)
+    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).any?
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     # TODO: this is kinda redundant with the :dependent => :destroy on the

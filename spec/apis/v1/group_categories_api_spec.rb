@@ -33,7 +33,8 @@ describe "Group Categories API", type: :request do
       'unassigned_users_count' => category.unassigned_users.count,
       'protected' => false,
       'allows_multiple_memberships' => false,
-      'auto_leader' => category.auto_leader
+      'auto_leader' => category.auto_leader,
+      'is_member' => false
     }
   end
 

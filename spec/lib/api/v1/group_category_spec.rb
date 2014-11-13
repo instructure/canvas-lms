@@ -21,7 +21,7 @@ describe "Api::V1::GroupCategory" do
       end
 
       it 'is not present without the includes' do
-        category.stubs(groups: stub(active: stub(size: 3)))
+        category.stubs(:groups => stub(active: stub(size: 3)), :is_member? => false)
         json = CategoryHarness.new.group_category_json(category, nil, nil, {:include => ['groups_count']})
         expect(json["groups_count"]).to eq(3)
       end
