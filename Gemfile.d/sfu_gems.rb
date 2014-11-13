@@ -1,3 +1,5 @@
+gem 'newrelic_rpm'
+
 group :development do
   gem 'capistrano', '~> 3.0', require: false
   gem 'capistrano-rails',   '~> 1.1', require: false
