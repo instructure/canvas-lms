@@ -1,19 +1,4 @@
-require 'spec_helper'
-require 'fixtures/zoo'
-require 'fixtures/animal'
-
 describe CanvasPartman::Concerns::Partitioned do
-  Zoo = CanvasPartmanTest::Zoo
-  Animal = CanvasPartmanTest::Animal
-
-  before :all do
-    [ Zoo, Animal ].each(&:create_schema)
-  end
-
-  after :all do
-    [ Zoo, Animal ].each(&:drop_schema)
-  end
-
   subject { CanvasPartman::PartitionManager.new(Animal) }
 
   describe 'creating records' do
@@ -33,9 +18,9 @@ describe CanvasPartman::Concerns::Partitioned do
 
       expect(Animal.count).to eq 3
 
-      expect(find_records(table: 'partman_animals').length).to eq 3
-      expect(find_records(table: 'partman_animals_2014_11').length).to eq 2
-      expect(find_records(table: 'partman_animals_2014_12').length).to eq 1
+      expect(count_records('partman_animals')).to eq 3
+      expect(count_records('partman_animals_2014_11')).to eq 2
+      expect(count_records('partman_animals_2014_12')).to eq 1
     end
 
     context 'via an association scope' do
@@ -45,15 +30,19 @@ describe CanvasPartman::Concerns::Partitioned do
 
         zoo = Zoo.create!
 
-        monkey = zoo.animals.create!({ race: 'monkey' })
+        monkey = zoo.animals.create!({
+          race: 'monkey',
+          created_at: Time.new(2014, 11, 5)
+        })
+
         parrot = zoo.animals.create({
           race: 'parrot',
           created_at: Time.new(2014, 12, 5)
         })
 
-        expect(find_records(table: 'partman_animals').length).to eq 2
-        expect(find_records(table: 'partman_animals_2014_11').length).to eq 1
-        expect(find_records(table: 'partman_animals_2014_12').length).to eq 1
+        expect(count_records('partman_animals')).to eq 2
+        expect(count_records('partman_animals_2014_11')).to eq 1
+        expect(count_records('partman_animals_2014_12')).to eq 1
 
         expect(zoo.animals.count).to eq 2
         expect(monkey.zoo).to eq zoo

@@ -1,5 +1,3 @@
-require 'canvas_partman/migration'
-
 module CanvasPartman
   class PartitionManager
     attr_reader :base_class
@@ -17,27 +15,17 @@ module CanvasPartman
 
     # Create a new partition table.
     #
-    # @argument [Symbol, :months] precision
-    #   The date "precision" by which to partition the table. Currently only
-    #   month partitioning is supported.
-    #
-    #   Allowed values: [:months, :years]
-    #
-    # @argument [Proc] &block
-    #  If you pass a block, it will be called with an instance of a migration
-    #  runner that you can use to customize the schema of the partition table.
-    #
-    #  This is the place to define indices and constraints.
-    #
-    #  The DSL is similar to what you use in regular AR migrations.
+    # @param [Hash] options
+    # @param [Boolean] options[:graceful]
+    #   Do nothing if the partition table already exists.
     #
     # @return [String]
     #  The name of the newly created partition table.
-    def create_partition(date, opts={}, &block)
+    def create_partition(date, options={})
       master_table = base_class.table_name
       partition_table = generate_name_for_partition(date)
 
-      if opts[:graceful] == true
+      if options[:graceful] == true
         return if partition_exists?(partition_table)
       end
 
@@ -59,9 +47,10 @@ module CanvasPartman
           INHERITS (#{master_table});
         SQL
 
-        if schema_builder = (block || base_class.partitioning_schema_builder)
-          migration = CanvasPartman::Migration.new(partition_table, schema_builder)
-          migration.exec_migration(base_class.connection, :up)
+        find_and_load_migrations(master_table).each do |migration|
+          migration.restrict_to_partition(partition_table) do
+            migration.migrate(:up)
+          end
         end
 
         partition_table
@@ -112,6 +101,22 @@ module CanvasPartman
           Only [:months,:years] are currently supported as a partitioning
           interval.
         ERROR
+      end
+    end
+
+    def find_and_load_migrations(master_table)
+      ActiveRecord::Migrator.migrations(CanvasPartman.migrations_path).reduce([]) do |migrations, proxy|
+        if proxy.scope == CanvasPartman.migrations_scope
+          require(File.expand_path(proxy.filename))
+
+          migration_klass = proxy.name.constantize
+
+          if migration_klass.master_table == master_table
+            migrations << migration_klass.new
+          end
+        end
+
+        migrations
       end
     end
 

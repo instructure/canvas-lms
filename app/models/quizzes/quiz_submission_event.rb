@@ -64,18 +64,6 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
 
   serialize :event_data, JSON
 
-  partitioned do |t, table_name|
-    index_ns = table_name.sub('quiz_submission_events', 'qse')
-
-    t.index :created_at,
-      name: "#{index_ns}_idx_on_created_at"
-
-    t.index [ :quiz_submission_id, :attempt, :created_at ],
-      name: "#{index_ns}_predecessor_locator_idx"
-
-    t.foreign_key :quiz_submissions
-  end
-
   # for a more meaningful API when dealing with EVT_QUESTION_ANSWERED events:
   alias_attribute :answers, :event_data
 

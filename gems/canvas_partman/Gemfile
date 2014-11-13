@@ -7,4 +7,8 @@ platforms :ruby_19 do
   gem 'debugger'
 end
 
+platforms :ruby_21 do
+  gem 'byebug', require: false
+end
+
 gemspec

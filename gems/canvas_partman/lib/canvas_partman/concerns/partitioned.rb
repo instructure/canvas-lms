@@ -9,9 +9,24 @@ module CanvasPartman::Concerns
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do
+        # @attr [String] partitioning_field
+        #  Name of the database column which contains the data we'll use to
+        #  locate the correct partition for the records.
+        #
+        #  This should point to a Time field of some sorts.
+        #
+        #  Default value is "created_at".
         cattr_accessor :partitioning_field
+
+        # @attr [Symbol] partitioning_interval
+        #  A time interval to partition the table over.
+        #  Allowed values are one of: [ :months, :years ]
+        #
+        #  Default value is :months.
+        #
+        #  Note that only :months has been officially tested, YMMV for other
+        #  intervals.
         cattr_accessor :partitioning_interval
-        cattr_accessor :partitioning_schema_builder
 
         self.partitioning_field = 'created_at'
         self.partitioning_interval = :months
@@ -19,13 +34,19 @@ module CanvasPartman::Concerns
     end
 
     module ClassMethods
-      def partitioned(opts={}, &schema_builder)
-        self.partitioning_field = opts[:on].to_s if opts[:on]
-        self.partitioning_interval = opts[:over].to_sym if opts[:over]
-
-        if schema_builder.present?
-          self.partitioning_schema_builder = schema_builder
-        end
+      # Convenience method for configuring a Partitioned model.
+      #
+      # @param [Hash] options
+      #   Partitioned options.
+      #
+      # @param [String] options[:on]
+      #   Partitioning field.
+      #
+      # @param [Symbol] options[:over]
+      #   Partitioning interval.
+      def partitioned(options={})
+        self.partitioning_field = options[:on].to_s if options[:on]
+        self.partitioning_interval = options[:over].to_sym if options[:over]
       end
 
       # :nodoc:

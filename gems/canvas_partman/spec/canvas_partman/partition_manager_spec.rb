@@ -1,19 +1,4 @@
-require 'spec_helper'
-require 'fixtures/zoo'
-require 'fixtures/animal'
-
 describe CanvasPartman::PartitionManager do
-  Zoo = CanvasPartmanTest::Zoo
-  Animal = CanvasPartmanTest::Animal
-
-  before :all do
-    [ Zoo, Animal ].each(&:create_schema)
-  end
-
-  after :all do
-    [ Zoo, Animal ].each(&:drop_schema)
-  end
-
   subject { described_class.new(Animal) }
 
   describe '#initialize' do
@@ -41,40 +26,27 @@ describe CanvasPartman::PartitionManager do
         expect(SchemaHelper.table_exists?('partman_animals_2014_11')).to be true
         expect(SchemaHelper.table_exists?('partman_animals_2014_12')).to be true
       end
-    end # precision = :months
+    end
 
-    describe '#schema_builder' do
-      it 'yields the adapter table and the table name' do
-        subject.create_partition(Time.new(2014, 11)) do |t, table_name|
-          expect(t).to respond_to(:integer)
-          expect(t).to respond_to(:datetime)
-          expect(t).to respond_to(:index)
+    describe 'building schema' do
+      require 'fixtures/db/20141103000000_add_foo_to_partman_animals'
+      require 'fixtures/db/20141103000001_add_bar_to_partman_animals'
+      require 'fixtures/db/20141103000002_remove_foo_from_partman_animals'
 
-          expect(table_name).to eq 'partman_animals_2014_11'
-        end
-      end
+      it 'should apply all migrations' do
+        expect(CanvasPartman).to receive(:migrations_path)
+          .at_least(:once)
+          .and_return('spec/fixtures/db')
 
-      it 'allows modification of partition tables' do
-        subject.create_partition(Time.new(2014, 11, 8)) do |t|
-          t.index :created_at, name: 'partman_animals_created_at'
-        end
+        expect(CanvasPartman).to receive(:migrations_scope)
+          .at_least(:once)
+          .and_return('')
 
-        index = find_index({
-          name: 'partman_animals_created_at',
-          table: 'partman_animals_2014_11'
-        })
+        subject.create_partition(Time.new(2014, 11, 5))
 
-        expect(index).to be_present
-      end
-
-      it 'has no side-effects if the schema builder fails' do
-        expect {
-          subject.create_partition(Time.new(2014, 11)) do |t|
-            raise 'something'
-          end
-        }.to raise_error
-
-        expect(find_tables('partman_animals_2014_11').length).to be 0
+        expect(
+          connection.column_exists?('partman_animals_2014_11', 'bar')
+        ).to be_truthy
       end
     end
   end
