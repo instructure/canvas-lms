@@ -499,9 +499,7 @@ define([
 
   function initCommentBox(){
     //initialize the auto height resizing on the textarea
-    $('#add_a_comment textarea').elastic({
-      callback: EG.resizeFullHeight
-    });
+    $('#add_a_comment textarea').elastic();
 
     $(".media_comment_link").click(function(event) {
       event.preventDefault();
@@ -511,7 +509,6 @@ define([
       }, function() {
         EG.revertFromFormSubmit();
       }, true);
-      EG.resizeFullHeight();
     });
 
     $("#media_recorder_container a").live('click', hideMediaRecorderContainer);
@@ -643,7 +640,6 @@ define([
 
   function hideMediaRecorderContainer(){
     $("#media_media_recording").hide().removeData('comment_id').removeData('comment_type');
-    EG.resizeFullHeight();
   }
 
   function isAssessmentEditableByMe(assessment){
@@ -674,7 +670,6 @@ define([
     $rubric_assessments_select.change(function(){
       var selectedAssessment = getSelectedAssessment();
       rubricAssessment.populateRubricSummary($("#rubric_summary_holder .rubric_summary"), selectedAssessment, isAssessmentEditableByMe(selectedAssessment));
-      EG.resizeFullHeight();
     });
 
     $rubric_full_resizer_handle.draggable({
@@ -695,7 +690,6 @@ define([
             windowWidth = $window.width();
         $rubric_full.width(windowWidth - offset.left);
         $rubric_full_resizer_handle.css("left","0");
-        EG.resizeFullHeight();
       },
       stop: function(event, ui) {
         event.stopImmediatePropagation();
@@ -785,92 +779,6 @@ define([
     $("#submission_group_comment").prop({checked: true, disabled: true});
   }
 
-  function resizingFunction(){
-    var windowHeight = $window.height(),
-        delta,
-        deltaRemaining,
-        headerOffset = $right_side.offset().top,
-        fixedBottomHeight = $fixed_bottom.height(),
-        fullHeight = Math.max(minimumWindowHeight, windowHeight) - headerOffset - fixedBottomHeight,
-        resizableElements = [
-          { element: $submission_files_list,    data: { newHeight: 0 } },
-          { element: $rubric_summary_container, data: { newHeight: 0 } },
-          { element: $comments,                 data: { newHeight: 0 } }
-        ],
-        visibleResizableElements = $.grep(resizableElements, function(e, i){
-          return e && e.element.is(':visible');
-        });
-    $rubric_full.css({ 'maxHeight': fullHeight - 50, 'overflow': 'auto' });
-
-    $.each(visibleResizableElements, function(){
-      this.data.autoHeight = this.element.height("auto").height();
-      this.element.height(0);
-    });
-
-    var spaceLeftForResizables = fullHeight - $rightside_inner.height("auto").height() - $add_a_comment.outerHeight();
-
-    $full_height.height(fullHeight);
-    delta = deltaRemaining = spaceLeftForResizables;
-    var step = 1;
-    var didNothing;
-    if (delta > 0) { //the page got bigger
-      while(deltaRemaining > 0){
-        didNothing = true;
-        var shortestElementHeight = 10000000;
-        var shortestElement = null;
-        $.each(visibleResizableElements, function(){
-          if (this.data.newHeight < shortestElementHeight && this.data.newHeight < this.data.autoHeight) {
-            shortestElement = this;
-            shortestElementHeight = this.data.newHeight;
-          }
-        });
-        if (shortestElement) {
-          shortestElement.data.newHeight = shortestElementHeight + step;
-          deltaRemaining = deltaRemaining - step;
-          didNothing = false;
-        }
-        if (didNothing) {
-          break;
-        }
-      }
-    }
-    else { //the page got smaller
-      var tallestElementHeight, tallestElement;
-      while(deltaRemaining < 0){
-        didNothing = true;
-        tallestElementHeight = 0;
-        tallestElement = null;
-        $.each(visibleResizableElements, function(){
-          if (this.data.newHeight > 30 > tallestElementHeight && this.data.newHeight >= this.data.autoHeight ) {
-            tallestElement = this;
-            tallestElementHeight = this.data.newHeight;
-          }
-        });
-        if (tallestElement) {
-          tallestElement.data.newHeight = tallestElementHeight - step;
-          deltaRemaining = deltaRemaining + step;
-          didNothing = false;
-        }
-        if (didNothing) {
-          break;
-        }
-      }
-    }
-
-    $.each(visibleResizableElements, function(){
-      this.element.height(this.data.newHeight);
-    });
-
-    if (deltaRemaining > 0) {
-      $comments.height( windowHeight - Math.floor($comments.offset().top) - $add_a_comment.outerHeight() );
-    }
-    // This will cause the page to flicker in firefox if there is a scrollbar in both the comments and the rubric summary.
-    // I would like it not to, I tried setTimeout(function(){ $comments.scrollTop(1000000); }, 800); but that still doesnt work
-    if(!INST.browser.ff && $comments.height() > 100) {
-      $comments.scrollTop(1000000);
-    }
-  }
-
   $.extend(INST, {
     refreshGrades: function(){
       var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
@@ -923,9 +831,6 @@ define([
     currentStudent: null,
 
     domReady: function(){
-      //attach to window resize and
-      $window.bind('resize orientationchange', EG.resizeFullHeight).resize();
-
       function makeFullWidth(){
         $full_width_container.addClass("full_width");
         $left_side.css("width",'');
@@ -967,7 +872,6 @@ define([
             $left_side.width("0%" );
             $right_side.width('100%');
           }
-          EG.resizeFullHeight();
         },
         stop: function(event, ui) {
           event.stopImmediatePropagation();
@@ -1066,13 +970,6 @@ define([
       return studentName + " " + submissionStatus.formatted;
     },
 
-    resizeFullHeight: function(){
-      if (resizeTimeOut) {
-        clearTimeout(resizeTimeOut);
-      }
-      resizeTimeOut = setTimeout(resizingFunction, 0);
-    },
-
     toggleFullRubric: function(force){
       // if there is no rubric associated with this assignment, then the edit
       // rubric thing should never be shown.  the view should make sure that
@@ -1083,7 +980,6 @@ define([
       if ($rubric_full.filter(":visible").length || force === "close") {
         $("#grading").height("auto").children().show();
         $rubric_full.fadeOut();
-        this.resizeFullHeight();
         $(".toggle_full_rubric").focus()
       } else {
         $rubric_full.fadeIn();
@@ -1099,7 +995,6 @@ define([
 
       rubricAssessment.populateRubric($rubric_full.find(".rubric"), getSelectedAssessment() );
       $("#grading").height($rubric_full.height());
-      this.resizeFullHeight();
     },
 
     handleFragmentChange: function(){
@@ -1162,6 +1057,7 @@ define([
         "student_id": this.currentStudent.id
       }));
 
+      $rightside_inner.scrollTo(0);
       this.showGrade();
       this.showDiscussion();
       this.showRubric();
@@ -1316,7 +1212,6 @@ define([
         $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
         // if the submission was after the due date, mark it as late
-        this.resizeFullHeight();
         $submission_late_notice.showIf(submission['late']);
       } catch(e) {
         INST.log_error({
@@ -1446,14 +1341,12 @@ define([
         if (attachment) {
           var previewOptions = {
             height: '100%',
+            id: "speedgrader_iframe",
             mimeType: attachment.content_type,
             attachment_id: attachment.id,
             submission_id: this.currentStudent.submission.id,
             attachment_view_inline_ping_url: attachment.view_inline_ping_url,
-            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing',
-            ready: function(){
-              EG.resizeFullHeight();
-            }
+            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
           };
         }
 
@@ -1624,7 +1517,6 @@ define([
 
     revertFromFormSubmit: function() {
         EG.showDiscussion();
-        EG.resizeFullHeight();
         $add_a_comment_textarea.val("");
         // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
         // type it the textarea after you do that.  but I put it in a setTimeout it works.  so this is a hack for webkit,
@@ -1668,6 +1560,9 @@ define([
           EG.setOrUpdateSubmission(this.submission);
         });
         EG.revertFromFormSubmit();
+        window.setTimeout(function() {
+          $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500);
+        });
       }
       if($add_a_comment.find("input[type='file']:visible").length) {
         $.ajaxJSONFiles(url + ".text", method, formData, $add_a_comment.find("input[type='file']:visible"), formSuccess);
@@ -1800,12 +1695,10 @@ define([
         $attachment.find("input").attr('name', 'attachments[' + fileIndex + '][uploaded_data]');
         fileIndex++;
         $("#comment_attachments").append($attachment.show());
-        EG.resizeFullHeight();
       });
       $comment_attachment_input_blank.find("a").click(function(event) {
         event.preventDefault();
         $(this).parents(".comment_attachment_input").remove();
-        EG.resizeFullHeight();
       });
       $right_side.delegate(".play_comment_link", 'click', function() {
         if($(this).data('media_comment_id')) {

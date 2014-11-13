@@ -1,7 +1,15 @@
 @import base/environment
 @import components/ui.selectmenu
+@import vendor/_xflex.scss
+
 #content
   padding: 0
+
+$gradebook_header_height: 40px
+
+#gradebook_header_container
+  height: $gradebook_header_height
+  overflow: hidden
 
 #gradebook_header a.ui-selectmenu:hover,
 #gradebook_header a.ui-selectmenu:focus
@@ -13,6 +21,7 @@
 #speed_grader_loading
   padding: 5px
   font-size: 24px
+$gradebook_header_height: 40px
 #gradebook_header
   form
     margin: 0
@@ -99,7 +108,15 @@
     display: inline-block
     vertical-align: top
 
+#main
+  position: static
+
 #full_width_container
+  position: absolute
+  top: $gradebook_header_height
+  bottom: 0
+  left: 0
+  right: 0
   min-width: 960px
 
 .full_width
@@ -128,9 +145,12 @@
     width: 329px
 
 #left_side
-  width: 75%
-  float: left
-  position: relative
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 0
+  right: 25%
+
   #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay
     height: 100%
     width: 100%
@@ -150,23 +170,29 @@
 
 
 #width_resizer
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 0
   background: #bbb url('/images/splitpane_handle-ew.gif') no-repeat scroll 50% 50%
   cursor: pointer
-  height: 100%
   width: 7px
-  float: left
   border-right: 1px solid #838383
-  position: relative
   z-index: 2
   &.highlight
     background-color: #FBEC88
 
+#speedgrader_iframe
+  display: block
+
 #right_side
+  width: 25%
+  position: absolute
+  top: 0
+  bottom: 0
+  right: 0
   background-color: #f0f0f0
   color: #444
-  width: 25%
-  float: left
-  position: relative
   font-size: 12px
   a
     color: #124B87
@@ -224,12 +250,18 @@
 
 
   #rightside_inner
-    position: relative
-    margin-left: 8px !important
-    // overflow-y: hidden
-    // .webkit &
-      margin-left: 0 /*for some reason webkit leaves a gap next to the scroll bar if this has margin-left: 8px but it works fine without it */
+    @extend %flex-1
+    overflow-y: auto
 
+
+.right_side_content
+  @extend %flex
+  @extend %flex-column
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 8px
+  right: 0
 
 #rubric_full h2, #rubric_full .h2, #grading h2, #grading .h2
   margin-top: 0 !important
@@ -286,11 +318,7 @@
 #add_a_comment
   background-color: #f0f0f0
   border-top: 1px solid #ccc
-  padding: 0 0.5% 2px
-  width: 99%
-  position: absolute
-  bottom: 0
-  // reverse the effect that the padding on #add_a_comment has so that #media_media_recording can take up the whole width
+  margin-bottom: 2px
   #media_media_recording
     margin: 0 -2px
   .hidden
