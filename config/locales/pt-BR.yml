@@ -907,7 +907,6 @@ pt-BR:
         help_link_text: "Texto disponibilizado para o Link"
         help_link_url: URL
         login_handle_name: "Rótulo de login"
-        membership_type: "Adicionar mais"
         message: Mensagem
         mfa_settings: "Autenticação Multifator"
         name: "Nome da conta"
@@ -918,6 +917,7 @@ pt-BR:
         prevent_course_renaming_by_teachers: "Não permitir que os professores renomeiem seus cursos"
         restrict_quiz_questions: "Restringir os alunos de visualizar as perguntas do teste após a data de término do curso"
         restrict_student_future_view: "Restringir alunos de ver os cursos antes da data de início"
+        role_id: "Adicionar mais"
         self_enrollment: "Permitir auto-inscrição"
         self_registration: Autorregistro
         self_registration_type_all: "Todos os tipos de conta"
@@ -1244,6 +1244,8 @@ pt-BR:
     add_page_to: "Adicionar páginas ao %{module}"
     add_quiz_to: "Adicionar quizzes ao %{module}"
     add_topic_to: "Adicionar tópicos de discussão ao %{module}"
+  after_date_981cd41b: "Após %{date}"
+  after_last_attempt_c9168da2: "Após a última tentativa"
   ajax_errors: 
     error_heading: "Erro Ajax: %{status_code}"
     errors: 
@@ -1296,8 +1298,11 @@ pt-BR:
       criteria_required: "É obrigatório pelo menos um disparador"
       recipients_required: "É obrigatório pelo menos um destinatário"
       threshold_should_be_numeric: "Este valor deve ser um número positivo."
+  all_students_have_taken_the_quiz_b558f8b4: "Todos os alunos fizeram o teste"
+  all_students_have_taken_the_survey_494f9f42: "Todos os alunos fizeram o questionário"
   allow_lor_tools: "Permitir que usuários visualizem e usem as ferramentas externas para LOR."
   allow_opt_out_of_inbox: "Permitir que usuários optem fora da caixa de entrada Conversa. Isso fará com que todas as mensagens de conversas e notificações sejam enviadas como notificações ASAP para o email principal do usuário, ocultem os emblemas de mensagens não lidas da caixa de entrada de Conversas na Caixa de entrada e ocultem as preferências de notificação da Conversa."
+  always_3a59e701: Sempre
   analytics: 
     course: 
       analytics: Análise
@@ -1802,7 +1807,6 @@ pt-BR:
     grading_type_selector: 
       display_grade_as: "Exibir nota como"
       gpa_scale_explainer: "A atribuição de notas na escala GPA foi criada para as escolas que usam uma escala de 4,0 (ou 5,0/6,0) para todas as tarefas. Este sistema de notas é semelhante à exibição de Nota em letra, mas apresenta algumas diferenças importantes:"
-      gpa_scale_input_explainer: "As notas são inseridas na escala de 4,0. Por exemplo, se uma tarefa for de 100 pontos, inserir 4,0 resulta em 100%, 3,0 resulta em 87%, etc."
       gpa_scale_letters_explainer: "As notas em letra podem ser usadas com as notas em número."
       gpa_scale_percentage_explainer: "Não é possível inserir pontos diretamente, mas você pode inserir percentagens. Por exemplo, se uma atribuição for de 50 pontos, inserir \"40\" não funciona, mas \"80%\" funciona."
       gpa_scale_recommendation: "A menos que sua escola use uma escala de 4,0 (ou 5,0/6,0) para atribuição de notas, o Canvas recomenda a exibição das notas como Nota em letra."
@@ -1926,6 +1930,8 @@ pt-BR:
       one: "1 tarefa"
       other: "%{count} tarefas"
     other_assignments: "Outras tarefas"
+    overdue_assignments: "Tarefas vencidas"
+    past_assignments: "Tarefas passadas"
     peer_review_assignment: 
       titles: 
         remind_reviewer: "Lembrar %{user} sobre a tarefa"
@@ -2165,8 +2171,8 @@ pt-BR:
         originality_report_visible_after_due_date: "Após a data de entrega"
         originality_report_visible_after_grading: "Após a avaliação da tarefa"
         originality_report_visible_immediately: Imediatamente
-        settings_exclude_fewer_than_count: "Menos que %h{wordsInput} palavras"
-        settings_exclude_less_than_percent: "Menos que %h{percentInput} do documento"
+    undated_assignments: "Tarefas sem data"
+    upcoming_assignments: "Tarefas futuras"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: Excluir a tarefa"
@@ -2472,7 +2478,6 @@ pt-BR:
       scheduler_explanation_teacher_paragraph_1: "Esta é o Agendador. Você pode usá-lo para criar grupos de compromisso para seus alunos se inscreverem."
       scheduler_explanation_teacher_paragraph_2: "Por exemplo, digamos que você queira rever os trabalhos de meio de período com cada um dos alunos no seu curso. Você criaria um novo grupo de compromisso, especificaria as datas e as horas que você tem disponíveis, dividiria aquele horário em blocos de 15 minutos e permitiria apenas um aluno por bloco."
       scheduler_explanation_teacher_paragraph_3: "Então, os alunos seriam notificados e veriam que precisam se inscrever em um dos blocos especificados. Eles veriam um calendário com os blocos especificados sobrepostos na parte superior de tudo em seus outros calendários para que possam escolher um horário que seja bom para eles."
-      scheduler_explanation_teacher_paragraph_4: "*Comece agora clicando no botão \"Criar um grupo de compromisso\" à direita.*"
       signed_up_for: "Você está inscrito para "
       x_groups_have_signed_up: "%{participant_count} grupos se inscreveram"
       x_people_have_signed_up: "%{participant_count} pessoas se inscreveram"
@@ -2647,7 +2652,10 @@ pt-BR:
     screenreader_date_suggestion: "%{date}. Pressione enter para aceitar."
     time_block_errors: "Há erros nas suas seleções de bloco de horário"
     time_block_row: 
+      date_label: Data
       delete_link: "Excluir intervalo de tempo"
+      end_time_label: "Hora de término"
+      start_time_label: "Hora de início"
     titles: 
       edit_appointment_group: "Editar grupo de compromisso"
       edit_event: "Editar evento"
@@ -3106,7 +3114,6 @@ pt-BR:
     type_disabled_error: "Este tipo de conferência não está mais ativada para este site do Canvas"
   confirm_dialog: 
     cancel: Cancelar
-    ok: OK
     submit: Enviar
   confirm_dialog_component: 
     ok: OK
@@ -4070,6 +4077,7 @@ pt-BR:
       sent: Enviada
       settings: Configurações
       starred: "Marcada como favorita"
+      submission_comments: "Comentários dos envios"
       titles: 
         conversations: Conversas
       unread: "Não lido"
@@ -4148,6 +4156,8 @@ pt-BR:
     result_status: "A conclusão automática tem %{results} entradas listadas, use as teclas de seta para cima e para baixo para navegar para uma listagem, depois pressione para adicionar pessoa ao campo Para."
     star: "Adicionar aos favoritos"
     star_conversation: "Adicionar conversa aos favoritos"
+    submission_comment_form_dialog: 
+      body: Corpo
     titles: 
       rss_feed: "Feed de conversas"
     unarchive: Desarquivar
@@ -4155,6 +4165,15 @@ pt-BR:
     unstar: "Remover dos favoritos"
     unstar_conversation: "Remover conversa dos favoritos"
   correct_answer: "Essa era a resposta correta."
+  correct_answers_are_available_until_date_df01cc5f: "As respostas corretas estão disponíveis até %{date}."
+  correct_answers_are_hidden_5d0a0009: "As respostas corretas estão ocultas."
+  correct_answers_are_no_longer_available_c67dfc28: "As respostas corretas não estão mais disponíveis."
+  correct_answers_will_be_available_from_to_5762e8c6: "As respostas corretas estarão disponíveis de %{from} a %{to}."
+  correct_answers_will_be_available_on_date_48137: "As respostas corretas estarão disponíveis em %{date}."
+  count_minutes_a6eeeacb: 
+    one: "1 minuto"
+    other: "%{count} minutos"
+    zero: "Menos de 1 minuto"
   course: 
     access_denied: "Acesso foi negado"
     batch_update_message: 
@@ -4501,6 +4520,9 @@ pt-BR:
         tas: "Adicionar assistentes ao curso"
         title: 
           bookmark: "Copiar este link ou colocá-lo nos favoritos"
+    description: 
+      links: 
+        join_course: "Participar deste curso"
     edit_profile: 
       about: Sobre
       about_related_id: "Identificador compartilhado usado para vincular seções/cursos"
@@ -4626,8 +4648,6 @@ pt-BR:
         duplicates_removed: "Algumas duplicações foram removidas."
         email: Email
         email_field_label: "Insira os endereços de email dos usuários que você gostaria de adicionar, separados por vírgulas"
-        email_field_place_holder: "\"Aluno exemplo\" &lt;student@example.com&gt;, \"Sobrenome, Nome\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
-        example_formats: "Exemplos: usuário@exemplo.com, \"Primeiro Último\" &lt;usuário@exemplo.com&gt;, \"Último, Primeiro\" &lt;usuário@exemplo.com&gt;"
         form_instructions: "Digite ou cole a lista de endereços de e-mail abaixo:"
         go_back: Reiniciar
         have_been_enrolled: "Os usuários abaixo foram inscritos"
@@ -4705,7 +4725,6 @@ pt-BR:
       course_open_enrollment_without_code: "Este curso ativou a abertura das inscrições. Os alunos podem se inscreverem no curso depois que você compartilhar com eles este URL: *%{url}*"
       course_overrides_term: "Isto substituirá qualquer configuração de disponibilidade de período."
       course_settings_title: "Configurações do curso"
-      date_restricted: "Os usuários podem participar apenas no curso entre estas datas"
       deatils: 
         move_course: "Selecione uma nova conta raiz para este curso. Após mover o curso, você pode também especificar um novo departamento para o curso."
       drag_details: "Desativar a maioria das páginas faz com que os alunos que as visitarem sejam redirecionados para a página inicial do curso."
@@ -4713,8 +4732,6 @@ pt-BR:
       enrollment_count: 
         one: "1 usuário"
         other: "%{count} usuários"
-      grading_standard_currently_set: "Atualmente definido"
-      grading_standard_not_set: "Não definido"
       headings: 
         details: "Detalhes do curso"
         grade_publishing: "Publicação de notas"
@@ -4728,7 +4745,6 @@ pt-BR:
         alt: 
           delete: excluir
           edit: editar
-      indexed_course: "Incluído no índice público do curso"
       keycode_descriptions: 
         next_navigation_link: "Selecionar próximo link de navegação"
         previous_navigation_link: "Selecionar link de navegação anterior"
@@ -4745,6 +4761,7 @@ pt-BR:
         allow_student_organized_groups: "Permitir aos alunos organizar seus próprios grupos"
         conclude_at: Termina
         course_code: "Código do curso"
+        course_description: Descrição
         course_format: Formato
         course_lock_all_announcements: "Desativar comentários nos anúncios"
         course_name: Nome
@@ -4764,6 +4781,7 @@ pt-BR:
         open_enrollment: "Adicionar um link \"Participe deste curso\" na página inicial do curso"
         public_syllabus: "Torne o programa para este curso publicamente visível"
         restrict_enrollments_to_course_dates: "Os usuários podem participar apenas no curso entre estas datas"
+        root_account: "Conta raiz"
         root_account_id: "Conta raiz"
         sis_source_id: "ID do SIS"
         start_at: "Inicia em"
@@ -4772,7 +4790,6 @@ pt-BR:
         turnitin_comments: "Comentários de envio do Turnitin"
       language_overrides_preferences: "Isto substituirá qualquer preferência de idioma do usuário/sistema. Isto é recomendado apenas para cursos em idioma estrangeiro"
       links: 
-        edit_course: "Editar detalhes do curso"
         more_options: "mais opções"
         move_course: "Mover para outra conta"
         title: 
@@ -4787,13 +4804,9 @@ pt-BR:
         before: Antes
         or: OU
       nav_items_keyboard_drag_and_drop: "Aviso: para melhorar a acessibilidade ao reclassificar os elementos de Navegação do curso, use a opção de diálogo Mover para localizada no menu."
-      no_date: "Nenhuma data definida"
       no_language_preference: "Não definido (configurado pelo usuário, padrão em %{language})"
       none: Nenhum
-      not_date_restricted: "Estas datas não afetarão a disponibilidade do curso"
       page_title: "Detalhes do curso"
-      private_course: Privado
-      public_course: Público
       section_sis_id: "ID do SIS: %{section_sis}"
       self_enrollment: "Permitir que os alunos se inscrevam, compartilhando com eles o URL secreto"
       self_enrollment_without_code: "Permita que os alunos se inscrevam compartilhando com eles o URL secreto"
@@ -5176,10 +5189,6 @@ pt-BR:
       - Dezembro
   dates: 
     no_date: "Nenhuma data"
-  dates_available_component: 
-    available: Disponível
-    due: Vencimento
-    multiple_dates: "Várias datas"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -5226,6 +5235,8 @@ pt-BR:
   default_conference_title: "Conferência %{course_name}"
   default_question_name: Pergunta
   default_question_text: "Texto da pergunta"
+  delete_quiz_142b8099: "Excluir teste"
+  delete_survey_56fddbbd: "Excluir questionário"
   demos: 
     _register: 
       add_site: "Adicionar site"
@@ -5388,7 +5399,7 @@ pt-BR:
       graded_discussion: "Discussão avaliada:"
       last_post_date: "Última publicação %{display_last_reply_at}"
       manage: Gerenciar
-      move: "Mover para &hellip;"
+      move: "Mover para..."
       no_due_date: "Sem data de entrega"
       open_to_comments: "Abrir para comentários"
       pin: Fixar
@@ -5426,6 +5437,7 @@ pt-BR:
       page_header_title: "Nova discussão"
       points_possible: "Pontos possíveis"
       post_at: "Publicar em"
+      remove_attachment_ceae0973: "Remover anexo"
       save: Salvar
       saving: Salvando...
       topic_title: "Título do tópico"
@@ -5518,7 +5530,6 @@ pt-BR:
       edit_current_message: "Editar mensagem atual"
       edited_by: "Este tópico foi editado por %{user}"
       expand_replies: "Expandir respostas"
-      filter_replies: "Filtrar respostas por termo de pesquisa"
       from_context: "De *%{context_name}*"
       initial_post_required: "As respostas são visíveis apenas àqueles que publicaram pelo menos uma resposta."
       links: 
@@ -5648,6 +5659,7 @@ pt-BR:
     no_due_date: "vencimento: Sem data de entrega"
   ecollege_file_description: ECollege
   ecollege_name: "Conversor ECollege"
+  edit_quiz_ededddd8: "Editar teste"
   edit_rubric: 
     buttons: 
       create_rubric: "Criar protocolo"
@@ -5666,6 +5678,7 @@ pt-BR:
     titles: 
       criterion_long_description: "Descrição longa do critério"
       find_existing_rubric: "Localizar protocolo existente"
+  edit_survey_b0d6890d: "Editar questionário"
   editor: 
     alt_text: "Alternar texto:"
     based_on_type: "Baseado em %{base_type}"
@@ -5683,6 +5696,11 @@ pt-BR:
     equation_editor_title: "Utilizar as barras de tarefas aqui ou alterne a exibição para Avançado para digitar/colar no LaTeX"
     image_not_found: "Imagem não encontrada. Tente uma nova URL."
     instructions: "Cole ou digite a URL da imagem que você gostaria de incorporar:"
+    keyboard_shortcuts: 
+      dialog_title: "Atalhos de teclado"
+      keybindings: 
+        open_dialog: "Abrir esse diálogo de ajuda"
+        open_toolbar: "Abrir a barra de ferramentas do editor"
     loading: Carregando...
     mathjax_text_entry_field_label: "Inserir a equação como LaTeX"
     more_external_tools: "Mais ferramentas externas"
@@ -6012,6 +6030,7 @@ pt-BR:
       submissions: 
         body1: "Você deve ter notado que na parte inferior desta página existe uma lista de envios recentes de suas aulas (%{showme}). É possível adicionar envios rapidamente a novas páginas em seu portfólio, a partir desta página. É só clicar no envio que desejar adicionar e um diálogo simples aparecerá como popup."
         body2: "Ótimo! Agora para concluir a adição do envio é necessário escolher a qual seção você gostaria que ela fosse adicionada e dar um nome à página. Após clicar em \"Adicionar página\", você será conduzido à nova página para que possa editá-la em mais detalhes, se desejar."
+  error_message_2b9d12ee: "Erro: %{message}"
   errors: 
     bad_navigation_config: "Configuração de guia de curso inválida"
     blank: Obrigatório
@@ -6178,7 +6197,6 @@ pt-BR:
       all: Todos
       app_headder: "Aplicativos externos"
       external_tools_note: "Os aplicativos são uma maneira fácil de adicionar novos recursos ao Canvas. Eles podem ser adicionados aos cursos individuais ou a todos os cursos de uma conta. Uma vez configurado, você pode conectar-se a eles através dos módulos dos cursos e criar tarefas para as ferramentas de avaliação."
-      external_tools_references: "*Veja algumas ferramentas LTI* que funcionam muito bem com o Canvas. Você também pode examinar os tópicos da  **Comunidade Canvas sobre as ferramentas LTI**"
       installed: Instalado
       not_installed: "Não instalado"
       search_filter: "Filtrar por nome"
@@ -6284,7 +6302,6 @@ pt-BR:
     learning_mastery_gradebook: "Livro de Notas de Domínio do Aprendizado"
     lor: "Ferramentas externas LOR"
     multiple_grading_periods: "Vários períodos de pontuação"
-    new_quiz_moderate: "Nova página moderada do teste"
     new_quiz_statistics: "Página de novas estatísticas do teste"
     new_styles: "Use novos estilos"
     post_grades: "Postar notas no SIS"
@@ -6319,6 +6336,11 @@ pt-BR:
     prompt: "Alterar \"%{name}\" para"
     rename_title: Copiar
     replace: Substituir
+  file_status: 
+    hidden_status: "Secreto. Disponível em um link."
+    published_status: Publicado
+    restricted_status: "Disponível de %{from_date} até %{until_date}"
+    unpublished_status: "Não publicado"
   filebrowserview: 
     course_files: "Arquivos do curso"
     group_files: "Arquivos de grupo"
@@ -6483,6 +6505,7 @@ pt-BR:
     upload_error: "Ocorreu um erro durante o envio do seu arquivo"
     warnings: 
       file_uploaded_without_response: "O upload do arquivo foi realizado, mas o servidor não responde.  Recarregue a página para confirmar."
+  fill_in_the_blank_read_surrounding_text_1a6c73c7: "Preencha a lacuna, leia o texto ao redor"
   find_flickr_image_view: 
     find_cc_on_flickr: "Localizar imagens Creative Commons no Flickr"
     search: Pesquisar
@@ -6512,6 +6535,7 @@ pt-BR:
     no_deleting_root: "Não é possível excluir um diretório raiz"
     only_one_folder: "Não é possível definir um caminho de pasta e uma ID de pasta"
   for: para
+  from_from_to_to_e31f6422: "De %{from} a %{to}"
   global_message_icons: 
     announcement: anúncio
     calendar: calendário
@@ -6568,10 +6592,8 @@ pt-BR:
     graded_by_me: "%{graded_time} por mim"
     graded_then_resubmitted: "avaliado, depois reenviado (%{when})"
     gradee_index_of_total: "%{gradee} %{x} de %{y}"
-    grading_in_progress: "O instrutor está trabalhando na avaliação"
     group: Grupo
     hide_all_details_button: "Ocultar todos os detalhes"
-    mic_blocked_message: "A permissão para usar microfone está bloqueada. Para alterar, vá para chrome://settings/contentExceptions\\#media-stream"
     mute_assignment: "Silenciar tarefa"
     new_assessment: "[Nova avaliação]"
     no_submission_time: "Sem hora de envio"
@@ -7034,6 +7056,8 @@ pt-BR:
       submissions_upload: "%{assignment} Upload de envios"
     titles: 
       total: Total
+  graded_quiz_7fabdf1f: "Teste avaliado"
+  graded_survey_c0f0c395: "Questionário avaliado"
   grading_box: 
     out_of_points_possible: "de %{assignment.points_possible}"
   grading_cell: 
@@ -7320,17 +7344,14 @@ pt-BR:
       group_category_create: 
         allow_self_signup: "Permitir auto-inscrição"
         cancel: Cancelar
-        create_groups: "Criar %h{num_groups} grupos agora"
         create_groups_manually: "Eu vou criar os grupos manualmente"
         group_set_name: "Nome do conjunto de grupo"
         group_structure: "Estrutura do grupo"
         leave_group_limit_blank: "Deixar em branco para sem limite"
-        limit_group_size: "Limitar grupos a %h{group_limit} membros"
         require_same_section: "Os membros do grupo devem estar na mesma seção"
         save: Salvar
         saving: Salvando...
         self_signup: Auto-inscrição
-        split_into_groups: "Dividir alunos em %h{num_groups} grupos iguais"
       group_category_detail: 
         add_group: "Adicionar grupo"
         category_settings: Configurações
@@ -7351,7 +7372,6 @@ pt-BR:
         group_limit_override: "Alterar isso substituirá quaisquer limites de grupo individualmente definidos"
         group_set_name: "Nome do conjunto de grupo"
         leave_group_limit_blank: "Deixar em branco para sem limite"
-        limit_group_size: "Limitar grupos a %h{group_limit} membros"
         require_same_section: "Os membros do grupo devem estar na mesma seção"
         save: Salvar
         saving: Salvando...
@@ -7519,6 +7539,7 @@ pt-BR:
   high_contrast_description: |-
       Se preferir uma versão de maior contraste da interface do usuário Canvas, habilite essa.
       Isso pode ser útil para pessoas com deficiência visual ou dificuldade de leitura.
+  highest_28ad71e6: Maior
   html5_first_videos_description: |-
       Por padrão, o Canvas tentará usar primeiro o Flash para reproduzir vídeos. Ative-o para tentar usar primeiro o HTML5,
       em seguida, volte ao Flash.
@@ -7538,6 +7559,7 @@ pt-BR:
     invalid_file_size: "Tamanho do arquivo de imagem grande demais (máx. %{max} bytes, obtido %{actual})"
     invalid_file_type: "Tipo de arquivo %{type} inválido. Tipos permitidos incluem: %{type_list}"
     not_an_image: "O arquivo selecionado não é uma imagem"
+  immediately_c128ede6: Imediatamente
   importers/assignment_importer: 
     errors: 
       import: 
@@ -7705,6 +7727,7 @@ pt-BR:
   labels: 
     lock_module_until: "Travar módulo até a data fornecida"
   last_user_access_title: "Último acesso do usuário"
+  latest_f604a75: "Mais recente"
   layouts: 
     application: 
       bouncing_communication_channels: "Parece haver um problema com um de seus métodos de contato. Verifique sua *Página de configurações*."
@@ -7915,8 +7938,6 @@ pt-BR:
     my_courses: "Meus cursos"
   message: 
     default_subject: "Alerta do Canvas"
-  message_dialog_component: 
-    ok: OK
   message_students: 
     buttons: 
       send_message: "Enviar mensagem"
@@ -8077,7 +8098,7 @@ pt-BR:
         html: 
           body: "%{user} publicou um novo comentário no anúncio: %{discussion_topic} para %{course}:"
           discussion_entry_reply_message: "Junte-se à conversa usando o link abaixo, ou comente respondendo a essa mensagem."
-          link: "Clique aqui para unir-se à visualização do anúncio."
+          link: "Clique aqui para unir-se à visualização do anúncio"
           subject: "Novo comentário no anúncio %{discussion_topic}: %{course}"
         subject: "Novo comentário no anúncio %{discussion_topic}: %{course}"
       facebook: 
@@ -9922,19 +9943,68 @@ pt-BR:
     quiz: Teste
     sub_header: Subcabeçalho
   modules: 
+    add: 
+      header: 
+        cancel: Cancelar
+      link: 
+        cancel: Cancelar
+      tool: 
+        cancel: Cancelar
+    add_item: 
+      assignment: Tarefa
+      content_page: "Página de conteúdo"
+      discussion: Discussão
+      external_tool: "Ferramentas externas"
+      external_url: "URL externa"
+      file: Arquivo
+      page: "Página de conteúdo"
+      quiz: Teste
+      text_header: "Cabeçalho de texto"
     add_module_item_dialog: 
       item_type: "Tipo:"
     add_module_item_dialog_wrapper: 
       Save: Salvar
       cancel: Cancelar
       creating: Criando...
+    create: 
+      assignment: 
+        cancel: Cancelar
+        create: Criar
+      discussion: 
+        cancel: Cancelar
+      file: 
+        cancel: Cancelar
+        upload: Upload
+      header: 
+        cancel: Cancelar
+      link: 
+        cancel: Cancelar
+      page: 
+        cancel: Cancelar
+      quiz: 
+        cancel: Cancelar
+      tool: 
+        cancel: Cancelar
     dialog_title: "Adicionar item a %{moduleName}"
+    item: 
+      cancel: Cancelar
+      points_possible: pts
+      save: Salvar
+    module: 
+      header: 
+        delete: Excluir
+        drag_to_reorder: "Arrastar para reordenar os módulos"
+        edit: Editar
     module_collection_view: 
       button: 
         preview: Visualizar
       course_modules: "Módulos do curso"
       header: 
         module: Módulo
+    module_edit: 
+      Create: Criar
+      cancel: Cancelar
+      module_name: "Nome de módulo"
     module_item_view: 
       button: 
         delete: Excluir
@@ -9994,13 +10064,14 @@ pt-BR:
     sure_you_want_to_mute: "Tem certeza que deseja silenciar esta tarefa? Enquanto esta tarefa estiver silenciada, os alunos não receberão novas notificações sobre ela, nem poderão ver:"
   name: "Importador do Academic Benchmark"
   new_facebook_message: "Você tem uma nova mensagem do Canvas"
-  new_quiz_moderate_desc: "Quando o Estado de rascunho e as Estatísticas de teste são permitidas/ativados, isso permite a nova página moderada de teste para uma conta."
-  new_quiz_statistics_desc: "Ativar a nova página de estatísticas do teste para uma conta."
   new_styles_description: |-
       Estamos trabalhando em uma melhoria da IU do Canvas. Ative isso para optar por ver
       a aparência atualizada e simplificada da interface do Canvas. Esse é um recurso de "Trabalho em andamento"
       e não deve ser usado em produção por usuários reais ainda.
+  no_e16d9132: Não
   no_migration_file: "Arquivo necessário para migração de conteúdo."
+  no_students_have_taken_the_quiz_yet_e667644b: "Nenhum aluno fez ainda o teste"
+  no_students_have_taken_the_survey_yet_d378cd35: "Nenhum aluno fez ainda o questionário"
   not_a_number: "deve ser um número positivo"
   notification: 
     added_to_conversation_description: "Você foi adicionado em uma conversa"
@@ -10433,7 +10504,7 @@ pt-BR:
       everyone_else: "Todos os demais"
     unlock_date_after_due_date: "A data de desbloqueio não pode ser posterior à data de entrega"
     unlock_date_after_lock_date: "A data de desbloqueio não pode ser posterior à data de bloqueio"
-    unlock_date_before_course_start: "A data de desbloqueio não pode antes do início do curso"
+    unlock_date_before_course_start: "A data de desbloqueio não pode ser antes do início do curso"
   page_comment: 
     default_user_name: Anônimo
   page_comments: 
@@ -10470,7 +10541,6 @@ pt-BR:
     save_button: Salvar
     saving_button: Salvando...
     warnings: 
-      overwrite_changes: "Você está prestes a sobrescrever outras alterações que foram feitas desde quando você começou a editar.\\n\\nSobrescrever essas alterações?"
       unsaved_changes: "Você tem alterações não salvas. Você deseja continuar sem salvar essas alterações?"
   paginated_collection: 
     no_items: "Nenhum item."
@@ -10537,6 +10607,11 @@ pt-BR:
       description: "Este plugin integra com Crocdoc para fornecer um pré-visualizador de documento HTML5 que dá a professores e alunos a capacidade de anotar documentos."
       labels: 
         api_key: "Chave de API do Crocdoc"
+    diigo: 
+      name: Diigo
+    diigo_settings: 
+      labels: 
+        api_key: "Chave API"
     dim_dim_settings: 
       description: "Será necessário acessar uma instância do Dim Dim."
       labels: 
@@ -10723,6 +10798,9 @@ pt-BR:
         username: "Nome de usuário para autenticação"
     notices: 
       settings_updated: "Atualização das configurações de plugin bem sucedida."
+    panda_pub_settings: 
+      labels: 
+        base_url: "URL Base"
     qti_converter_settings: 
       labels: 
         enabled: Ativado
@@ -10796,16 +10874,6 @@ pt-BR:
         domain: Domínio
         password: Senha
         username: "Nome de Usuário"
-    wiziq: 
-      description: "Sala de aula virtual Wiziq"
-      name: Wiziq
-    wiziq_settings: 
-      api_url_description: "(por exemplo, http://class.api.wiziq.com/)"
-      description: "Você precisará acessar uma conta [Wiziq](%{url})."
-      labels: 
-        access_key: "Chave de acesso"
-        api_url: "URL do API"
-        secret_key: "Chave secreta"
   polling: 
     poll_sessions: 
       errors: 
@@ -10821,6 +10889,7 @@ pt-BR:
       Postar notas permite aos professores postarem notas de volta aos sistemas SIS ativados:  Powerschool,
       Aspire (SIS2000), JMC, e qualquer outro SIS ativado por SIF que aceita os elementos SIF GradingCategory,
       GradingAssignment, GradingAssignmentScore.
+  practice_quiz_19a8505d: "Praticar teste"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Prerrequisitos de conclusão"
@@ -11145,7 +11214,7 @@ pt-BR:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest enviado para IdP"
-      logout_redirect_from_idp: "LogoutResponse recebido de IdP"
+      logout_response_redirect_from_idp: "LogoutResponse recebido de IdP"
       redirect_from_idp: "LoginResponse recebido de IdP"
     default_app_name: "Aplicativo de terceiro"
     errors: 
@@ -11265,93 +11334,6 @@ pt-BR:
       publishing: Publicando
       unpublish: "Retirar da publicação"
       unpublishing: "Cancelando publicação..."
-  publish_grades: 
-    assignment_group_list: 
-      no_assignment_groups: "Nenhum grupo de tarefas encontrado"
-    assignment_group_list_item: 
-      group_weight: "%{groupWeight}% do total"
-      manage: Gerenciar
-    assignment_list_item: 
-      assignment_edit: "Editar tarefa"
-      module: Módulo
-      multiple_modules: "Módulos múltiplos"
-      no_points_possible: "Nenhum ponto possível"
-      points_possible: "%{pointsPossible} pts"
-      points_possible_screen_reader: "%{pointsPossible} pontos possíveis"
-      settings: "Editar tarefa"
-    assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "Esta tarefa não receberá uma nota."
-      assignment_not_yet_graded_screenreader: "Tarefa não avaliada ainda. %{pointsPossible} pontos possíveis."
-      empty_points_possible: "-/%{pointsPossible} pts"
-      no_submission: "Sem envio"
-      no_submission_for_assignment_screenreader: "Nenhum envio para esta tarefa. %{pointsPossible} pontos possíveis."
-      not_yet_graded: "*Não avaliado ainda*"
-      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
-      score_with_points_possible_screenreader: "Pontuação: %{score} de %{pointsPossible} pontos."
-    assignment_settings: 
-      cancel: Cancelar
-      save: Salvar
-      validating: Salvando...
-      weight_groups: "Pondere a nota final com base nos grupos de tarefa"
-    available_date_description: 
-      available_until: "Disponível até"
-      closed: Fechado
-      not_available_until: "Não disponível até"
-    create_assignment: 
-      assignment: Tarefa
-      assignment_due_at: "Vencimento:"
-      assignment_name: "Nome:"
-      assignment_points: "Pontos:"
-      assignment_type: "Tipo:"
-      cancel: Cancelar
-      discussion_type: Discussão
-      external_tool_type: "Ferramentas externas"
-      more: "Ir para %{objectType}"
-      multiple_due_dates: "Várias datas de entrega"
-      not_graded_type: "Sem nota"
-      quiz_type: Teste
-      save: Salvar
-      saving: Salvando...
-    date_available_column_view: 
-      available: Disponível
-      multiple_dates: "Várias datas"
-    date_due_column_view: 
-      due: Vencimento
-      due_date: Vencimento
-      multiple_dates: "Várias datas"
-    due_date_view: 
-      overrides: 
-        remove_these_dates: "Remover essas datas"
-    edit_header_view: 
-      buttons: 
-        not_published: "Não publicado"
-        published: Publicado
-      manage: Gerenciar
-      titles: 
-        delete: Excluir
-    group_category_selector: 
-      grade_group_students_individually: "Atribuir notas para cada aluno individualmente"
-      group_assignment_header: "Tarefa em grupo"
-      group_category_options: "Nova categoria de grupo"
-      group_set: "Conjunto de grupo"
-      is_group_assignment: "Esta é uma tarefa em grupo"
-      students_already_submitted_warning: "Envios individuais anteriores não serão contados como envios de grupo e aparecerão incorretamente no Speedgrader."
-    index_view: 
-      add_group: "Publicar notas de tarefas"
-      assignments: Tarefas
-      search_for_assignment: "Pesquisar tarefa"
-      title_add_group: "Adicionar grupo de tarefa"
-    never_drop: 
-      remove_rule: "Remover regra"
-    never_drop_collection: 
-      add_another_assignment: "Adicionar outro teste"
-      add_first_assignment: "Adicionar uma tarefa"
-    no_assignments_list_item: 
-      no_assignments_in_this_group: "Nenhum teste neste grupo"
-    no_assignments_search: 
-      aria_assignments: Tarefas
-      assignments: Tarefas
-      no_assignments_found: "Nenhuma tarefa encontrada"
   publish_icon_component: 
     publish: Publicar
     publish_click: "Publicação efetuada. Clique para cancelar."
@@ -11486,16 +11468,6 @@ pt-BR:
     quick_start_bar_view: 
       new: "Nova:"
   quiz: 
-    cancel: Cancelar
-    cant_take_unpublished_quiz: "Você não pode realizar um teste até que o mesmo seja publicado"
-    cant_unpublish_when_students_submit: "Não é possível remover publicação se houver envios dos alunos"
-    delete: Excluir
-    delete_quiz: "Excluir teste"
-    no_more_allowed_quiz_attempts: "Você não pode fazer mais nenhuma tentativa nesse teste."
-    now_on_moderate: "Essas informações não são localizadas na guia Moderado."
-    quiz_regraded_your_score_not_affected: "O teste foi reavaliado; sua pontuação não foi afetada."
-    quiz_successfully_deleted: "O teste foi excluído com êxito!"
-    quiz_successfully_updated: "O teste foi atualizado com êxito!"
     regrade: 
       give_everyone_full_credit: "Dê a todos crédito total para esta pergunta."
       no_scores_reduced: "Pontos de recompensa para respostas previamente corretas e corrigidas (*nenhuma pontuação será reduzida*)"
@@ -11503,137 +11475,58 @@ pt-BR:
       regrade_options: "Opções de reavaliação *(para alunos que responderam esta pergunta):*"
       some_scores_reduced: "Somente dê pontos para a resposta correta (*algumas pontuações de alunos podem ser reduzidas*)"
       update_question_without_regrading: "Atualizar pergunta sem reavaliar"
-    regrade_count_affected: "Esse teste foi reavaliado; sua nova pontuação reflete o %{num} de questões que foram afetadas."
-    regrade_score_affected: "Esse teste foi reavaliado; sua pontuação foi afetada."
-    resume_the_quiz: "Retomar o teste"
-    resume_the_survey: "Retomar o questionário"
-    take_the_quiz: "Fazer o teste"
-    take_the_quiz_again: "Fazer o teste novamente"
-    take_the_survey: "Fazer o questionário"
-    take_the_survey_again: "Fazer o questionário novamente"
-    there_are_no_files_to_download: "Não há arquivos a serem baixados."
-    there_are_no_submissions_to_grade: "Não há envios para pontuar."
-    time_limit_minutes: "%{limit} minutos"
-    warning: Aviso
-    you_cannot_message_unpublished: "Não é possível enviar uma mensagem aos alunos até que o teste seja publicado."
-  quiz_extend_time: 
-    ending_time: "hora de término"
-    extend_time: "Estender tempo"
-    extensions_student: "Estender horário para %{student}"
-    extensions_successfully_added: "As extensões foram adicionadas com êxito "
-    now: agora
-  quiz_extensions: 
-    everyone_gets_attempts: "todos já tem %{num}"
-    everyone_gets_time: "todos já tem %{num} minutos"
-    extensions_num_students: "Extensões para %{num} alunos"
-    extensions_student: "Extensões para %{student}"
-    extensions_successfully_added: "As extensões foram incluídas com êxito"
-    student_extensions: "Extensões do aluno"
-  quiz_index_row: 
-    cant_unpublish_when_students_submit: "Não é possível remover publicação se houver envios dos alunos"
-    confirms: 
-      delete_quiz: "Tem certeza que deseja excluir este teste?"
-    delete_quiz: "Excluir teste"
-    edit_quiz: "Editar teste"
-    points: 
-      one: "1 ponto"
-      other: "%{count} pts"
-    questions: 
-      one: "1 Pergunta"
-      other: "%{count} Questions"
-  quiz_message_students: 
-    and_num_more_students: "e mais %{num} estudantes"
-    message_not_sent_because_empty: "A mensagem não pode ser enviada pois foi deixada vazia"
-    message_sent_successfully: "A mensagem foi enviada com êxito"
-    message_students_who: "Enviar mensagem aos alunos que..."
-    student_who_have_not_taken_the_quiz: "Alunos que não fizeram o teste"
-    students_who_have_taken_the_quiz: "Alunos que fizeram o teste"
-  quiz_model: 
-    everyone: Todos
-    everyone_else: "Todos os demais"
-    graded_quiz: "Teste avaliado"
-    graded_survey: "Questionário avaliado"
-    keep_highest: Maior
-    keep_latest: "Mais recente"
-    practice_quiz: "Praticar teste"
-    survey: Questionário
-  quiz_moderate: 
-    change_extension_for: "Alterar a extensão para %{num} alunos"
-    students_have_taken: "%{complete} de %{total} alunos concluíram esse teste"
-  quiz_moderate_route: 
-    moderate: Moderado
-  quiz_overview_route: 
-    overview: "Visão Geral"
   quiz_reports: 
+    generatable: "O relatório nunca foi gerado."
+    generating: "O relatório está sendo gerado..."
     quiz_report_generator: 
       download_report_name: "Baixar %{report_name}"
       generate_report_name: "Gerar %{report_name}"
       generated_at_date_time: "Gerado em %{dateAndTime}"
       generating_report_name: "Gerando %{report_name}..."
       item_analysis_not_available: "A análise do item não está disponível para questionários"
-  quiz_results_protected: "Os resultados do teste são protegidos para esse teste e não estão visíveis aos alunos."
-  quiz_results_protected_after_first_glimpse: "Os resultados do teste são protegidos para esse teste e podem ser visualizados uma única vez imediatamente após o envio."
-  quiz_results_protected_until_last_attempt: "Os resultados do teste são protegidos para esse teste e não são visíveis aos alunos até que tenham enviado sua última tentativa."
-  quiz_route: 
-    that_quiz_doesnt_exist: "Esse teste não existe"
-    that_quiz_has_been_deleted: "Este teste foi excluído"
-  quiz_show: 
-    time_limit_minutes: "%{limit} minutos"
+  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Os resultados do teste são protegidos para esse teste e não estão visíveis aos alunos."
+  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Os resultados do teste são protegidos para esse teste e não são visíveis aos alunos até que tenham enviado sua última tentativa."
+  quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Os resultados do teste são protegidos para esse teste e podem ser visualizados uma única vez imediatamente após o envio."
   quiz_statistics: 
+    answer_bars_chart: 
+      response_count: 
+        one: "%{count} students"
+        other: "%{count} students"
     attempts: "Tentativas: %{count} de %{total}"
     correct_essay_student_ratio: "%{ratio}% dos alunos receberam crédito total para essa questão."
     correct_multiple_response_ratio: "%{ratio}% de seus alunos responderam corretamente."
     correct_response_ratio: "%{ratio}% de seus alunos responderam corretamente a essa questão."
-    discrimination_index_help_dialog_title: "O gráfico do índice de discriminação"
-    errors: 
-      stats_empty: 
-        header: "Não há nada para ver aqui, pessoal."
-        info: "Nenhum de seus alunos ainda fez esse teste."
-      stats_too_large: 
-        header: "Muitas coisas acontecendo aqui, pessoal."
-        info: "Esse teste é muito grande para ser exibido."
+    discrimination_index: 
+      discrimination_index_dialog_title: "O gráfico do índice de discriminação"
+    download_submissions: "Baixar todos os arquivos"
+    duration_in_minutes: 
+      one: "%{count} minutos"
+      other: "%{count} minutos"
     essay_score: "Pontuação: %{score}"
-    generatable: "O relatório nunca foi gerado."
-    generated: "O relatório está pronto."
-    generated_at: "Gerado em %{date}"
-    generating: "O relatório está sendo gerado..."
-    generation_failed: "Algo saiu errado, tente novamente mais tarde."
-    item_analysis: "Análise de itens"
     no_answer: "Sem resposta"
-    sort_by_discrimination_index: "Ordenar por descriminação"
-    sort_by_position: "Ordenar por posição"
-    stats_error: 
-      image_alt: "As estatísticas do teste ainda não estão disponíveis."
-    student_analysis: "Análise do aluno"
-    unknown: 
-      header: "Algo saiu errado."
-      info: "Ocorreu um erro inesperado."
+    response_student_count: 
+      one: "%{count} students"
+      other: "%{count} students"
+    summary: 
+      avg_time: "Tempo médio"
+      high_score: "Pontuação mais alta"
+      low_score: "Pontuação mais baixa"
+      mean: "Pontuação média"
+      not_available_abbrev: ND
+      stdev: "Desvio padrão"
+    title: "Estatísticas do teste"
     unknown_answer: Outro
-  quiz_statistics_route: 
-    quiz_statistics: Estatísticas
-  quiz_submission_arrows: 
-    answers: 
-      correct: Correto!
-      correct_answers: "Respostas corretas"
-      incorrect: Incoreto
-      partial: Parcial
-      right: "Resposta correta"
-      unanswered: "Não respondida"
-      you_answered: "Você respondeu"
   quizzes: 
-    after_last_attempt: "Após a última tentativa"
     alerts: 
       no_valid_combinations: "O sistema não conseguiu gerar nenhuma combinação válida dos parâmetros fornecidos"
       only_n_valid_combinations: 
         one: "O sistema conseguiu gerar apenas 1 combinação válida dos parâmetros fornecidos"
         other: "O sistema conseguiu gerar apenas %{count} combinações válidas dos parâmetros fornecidos"
-    always: Sempre
     answer_comments: "Comentários da resposta"
     answer_text: "Texto da resposta"
     assignment_points_possible: 
       one: "1 pt"
       other: "%{count} pts"
-    assignments_label: "Os testes de tarefa ligam a visibilidade do teste"
     at_the_bottom: "-- em posição baixa --"
     before_quiz_item: "antes de %{name}"
     buttons: 
@@ -11656,11 +11549,6 @@ pt-BR:
       delete_question: "Tem certeza que deseja excluir esta pergunta?"
       delete_quiz: "Tem certeza que deseja excluir este teste?"
       scrap_and_restart: "Descartar este teste e começar do zero?"
-    correct_answers_no_longer_available: "As respostas corretas não estão mais disponíveis."
-    correct_answers_protected: "As respostas corretas estão ocultas."
-    correct_answers_shown_after: "As respostas corretas estarão disponíveis em %{date}."
-    correct_answers_shown_between: "As respostas corretas estarão disponíveis de %{from} a %{to}."
-    correct_answers_shown_until: "As respostas corretas estão disponíveis até %{date}."
     default_answer_comments: "Réplica se o aluno escolher esta resposta"
     default_answer_comments_on_match: "Resposta se o aluno acertar esta resposta"
     default_comments_on_wrong_match: "Resposta se o usuário errar"
@@ -11670,12 +11558,6 @@ pt-BR:
     default_response_to_essay: "Resposta a ser exibida aos alunos após o envio da resposta"
     default_response_to_file_upload: "Resposta a ser exibida aos alunos após o envio da resposta"
     download_all_quiz_file_upload_submissions: "Baixar todos os envios de upload de arquivo do teste"
-    editor: 
-      keyboard_shortcuts: 
-        dialog_title: "Atalhos de teclado"
-        keybindings: 
-          open_dialog: "Abrir esse diálogo de ajuda"
-          open_toolbar: "Abrir a barra de ferramentas do editor"
     enter_answer_variable_above: "[ Inserir variáveis de resposta acima ]"
     errors: 
       adding_questions_failed: "Falha ao adicionar perguntas, tente novamente"
@@ -11702,34 +11584,10 @@ pt-BR:
         file_successfully_uploaded: "Seu arquivo foi enviado com sucesso."
         files_removed: "%{display_name} foi removido."
     final_answer: "Resposta final"
-    graded_quiz: "Teste avaliado"
-    graded_survey: "Questionário avaliado"
     headers: 
       assignment_quizzes: "Testes da tarefa"
       practice_quizzes: "Testes práticos"
-      submitted_students_quiz_title: 
-        one: "Alunos que fizeram o teste (%{count})"
-        other: "Alunos que fizeram o teste (%{count})"
-        zero: "Alunos que fizeram o teste"
-      submitted_students_survey_title: 
-        one: "Alunos que responderam ao questionário (%{count})"
-        other: "Alunos que responderam ao questionário (%{count})"
-        zero: "Alunos que fizeram o questionário"
       surveys: Questionários
-      unsubmitted_students_quiz_title: 
-        one: "Alunos que ainda não fizeram o teste (%{count})"
-        other: "Alunos que ainda não fizeram o teste (%{count})"
-        zero: "Alunos que ainda não fizeram o teste"
-      unsubmitted_students_survey_title: 
-        one: "Alunos que não responderam ao questionário (%{count})"
-        other: "Alunos que não responderam ao questionário (%{count})"
-        zero: "Alunos que não responderam ao questionário"
-    helpers: 
-      duration_in_minutes: 
-        one: "1 minuto"
-        other: "%{count} minutos"
-        zero: "Menos de 1 minuto"
-      score_out_of_points_possible: "%{score} de %{points_possible}"
     index: 
       buttons: 
         publishing_quizzes: "Publicando testes..."
@@ -11746,8 +11604,6 @@ pt-BR:
       quizzes_title: Testes
       search_for_quiz: "Pesquisar um teste"
       title_add_quiz: "Adicionar teste"
-    keep_highest: Maior
-    keep_latest: "Mais recente"
     label: 
       answer: 
         text: "Texto de resposta, área de rich text"
@@ -11761,7 +11617,6 @@ pt-BR:
       comments_on_question: "Comentários desta pergunta"
       comments_on_wrong_match: "Comentários se o usuário errar a resposta"
       message_text: "Texto da Mensagem"
-      multiple_blanks_question: "Preencha a lacuna, leia o texto ao redor"
       other_incorrect_matches: "Outras opções de respostas incorretas"
       possible_answer: "Possível resposta"
     ldb_login_popup: 
@@ -11771,26 +11626,12 @@ pt-BR:
       password: Senha
       titles: 
         log_in: "Faça o login"
-    links: 
-      resume_quiz: "Retomar teste"
-      resume_survey: "Retomar questionário"
-      take_the_quiz: "Fazer o teste"
-      take_the_quiz_again: "Fazer o teste novamente"
-      take_the_survey: "Fazer o questionário"
-      take_the_survey_again: "Fazer o questionário novamente"
-      will_keep_highest_score: "Será mantida sua pontuação mais alta"
-      will_keep_latest_score: "Será mantida sua pontuação mais recente"
     loading_more_questions: "carregando mais perguntas..."
     loading_question: "Carregando pergunta..."
     loading_question_banks: "Carregando bancos de perguntas..."
     loading_questions: "Carregando perguntas..."
     message_students: "Enviar mensagem de alunos"
     message_students_for_context: "Enviar mensagem aos alunos para %{context}"
-    messages: 
-      no_submitted_students_quiz: "Nenhum aluno fez ainda o teste"
-      no_submitted_students_survey: "Nenhum aluno fez ainda o questionário"
-      no_unsubmitted_students_quiz: "Todos os alunos fizeram o teste"
-      no_unsubmitted_students_survey: "Todos os alunos fizeram o questionário"
     moderate: 
       buttons: 
         extend_time: "Estender tempo"
@@ -11828,13 +11669,10 @@ pt-BR:
       no_quizzes: "Nenhum teste disponível"
     notices: 
       message_sent: "Mensagem enviada!"
-    practice_quiz: "Praticar teste"
-    practices_label: "Testes práticos ligam a visibilidade do teste"
     question_colon: "Pergunta:"
     question_count: 
       one: "1 pergunta"
       other: "%{count} perguntas"
-    question_limit_reached: "Você alcançou o número máximo de perguntas permitidas para um teste (%{count}/%{limit}).\\n\\nPara contornar o problema, considere dividir o material em vários testes."
     quiz: 
       current_filter: "Filtro atual"
       default_question_input: "[ Selecionar ]"
@@ -12302,6 +12140,7 @@ pt-BR:
         score_to_keep: "Pontuação do teste para manter"
         show_correct_answers: "Permitir que os alunos vejam as respostas corretas"
         show_correct_answers_at: "Exibir as respostas corretas em"
+        show_correct_answers_last_attempt: "Somente após sua última tentativa"
         shuffle_answers: "Embaralhar as respostas"
         students_cannot_view_responses_after_course_concludes: "Os alunos não podem visualizar as respostas do teste depois de concluir o curso"
         time_limit: "Quantos minutos?"
@@ -12568,8 +12407,7 @@ pt-BR:
         survey_all_version_disclaimer: "Este relatório está mostrando as estatísticas do questionário baseando-se em todas as tentativas de todos os usuários."
         survey_latest_version_disclaimer: "Este relatório está mostrando as estatísticas do questionário baseando-se na tentativa mais recente de cada usuário."
       statistics_cqs: 
-        page_title: " Estatísticas CQS"
-      statistics_cqs_crumb: "Estatísticas CQS"
+        page_title: Estatísticas
       statistics_crumb: Estatísticas
       submission_version: 
         attempt_number: "Tentativa %{att_no}"
@@ -12620,7 +12458,6 @@ pt-BR:
       loading: Carregando...
       titles: 
         details: "Detalhe do protocolo da tarefa"
-    search_placeholder: "Pesquisar um teste"
     show: 
       answers: 
         correct: Correto!
@@ -12645,10 +12482,6 @@ pt-BR:
         show_student_survey_results: "Exibir resultados do questionário do aluno"
       students_who_have_not_taken_the_quiz: "Alunos que NÃO fizeram o teste"
       students_who_have_taken_the_quiz: "Alunos que fizeram o teste"
-    show_and_hide_correct_answers: "De %{from} a %{to}"
-    show_correct_answers_after: "Após %{date}"
-    show_correct_answers_immediately: Imediatamente
-    show_correct_answers_until: "Até %{date}"
     statistics: 
       count_attempts: 
         one: "1 tentativa"
@@ -12658,8 +12491,6 @@ pt-BR:
       uncounted_submissions: 
         one: "1 outro envio"
         other: "%{count} outros envios"
-    survey: Questionário
-    surveys_label: "Os questionários ligam a visibilidade do teste"
     take_quiz: 
       confirms: 
         cant_go_back_blank: "Você não pode voltar para esta pergunta depois que passar para a outra. Tem certeza deseja deixá-la em branco?"
@@ -12719,7 +12550,6 @@ pt-BR:
       labels: 
         time_elapsed: "Tempo transcorrido"
         time_remaining: "Tempo restante"
-    title_add_quiz: "Adicionar teste"
     titles: 
       add_questions_as_group: "Adicionar perguntas como um grupo"
       click_to_enter_comments_on_answer: "Clique para inserir comentários para os alunos, se eles escolherem esta resposta"
@@ -12735,18 +12565,6 @@ pt-BR:
     top_level: "-- Nível máximo --"
     ? "true"
     : Verdadeiro
-    ungraded_survey: "Questionário sem avaliação"
-    warnings: 
-      draft_state_unsaved_changes: "*Você fez alterações nas perguntas deste teste.* Essas alterações não aparecerão para alunos até você salvar o teste."
-      unpublished_changes: "*Você fez alterações não publicadas para este teste.* Estas alterações não aparecem para os alunos até que você publique ou republique o teste."
-      unpublished_quiz: "*Este teste não foi publicado.* Apenas os professores podem ver o teste até que seja publicado."
-  quizzes_redirects: 
-    no_access: "Acesso negado. Redirecionado para uma página à qual você tem acesso."
-  quizzes_route: 
-    quizzes_route_title: Testes
-  quizzez_submission_row: 
-    gets_extra_minutes: "obtém %{num} minutos extras em cada tentativa"
-    unlimited: llimitado
   re_upload_submissions_form: 
     buttons: 
       upload: "Enviar arquivos (upload)"
@@ -12757,8 +12575,6 @@ pt-BR:
     add_folder: "Adicionar pasta"
     all_my_files: "Todos os meus arquivos"
     cancel: Cancelar
-    cancel_button: 
-      label: "Cancelar o upload de %{fileName}"
     confirm_delete: 
       one: "Tem certeza de que deseja excluir %{name}?"
       other: "Tem certeza de que deseja excluir esses %{count} itens?"
@@ -12805,6 +12621,7 @@ pt-BR:
     progress_error: "Ocorreu um erro ao tentar preparar o download, tente novamente."
     progress_message: "Preparando o download: %{percent}% concluído"
     restrict_access: "Restringir acesso"
+    retry: "Tentar novamente"
     search_for_files: "Pesquisar arquivos"
     search_results_for: "pesquisar resultados para \"%{search_term}\""
     select_all: "Selecionar tudo"
@@ -12845,7 +12662,6 @@ pt-BR:
       remember_me: Lembre-me
       sign_in: Conectar
     parent_dialog: 
-      agree_to_terms_and_pp: "Você concorda com os *termos de uso* e reconhece a **política de privacidade**."
       buttons: 
         start_participating: "Começar a participar"
       labels: 
@@ -12854,7 +12670,6 @@ pt-BR:
         password: "Senha do filho"
         username: "Nome de usuário do filho"
     student_dialog: 
-      agree_to_terms_and_pp: "Você concorda com os *termos de uso* e reconhece a **política de privacidade**."
       buttons: 
         start_learning: "Comece a aprender"
       labels: 
@@ -12899,7 +12714,8 @@ pt-BR:
       description: "Agendar disponibilidade do aluno"
     title: 
       default_title: Diálogo
-      limit_student_access: Permissões
+  resume_quiz_afeceb87: "Retomar teste"
+  resume_survey_58dce775: "Retomar questionário"
   retrieve_timeout: "Não foi possível recuperar a configuração. O tempo de resposta do servidor expirou."
   role_override: 
     permission: 
@@ -12995,7 +12811,6 @@ pt-BR:
     site_admin_permissions: "Permissões do administrador do site"
     update_failed_notice: "Role creation failed"
   roles: 
-    account_admin: "Administrador de conta"
     new_role: 
       add: Adicionar
       add_role: "Adicionar função"
@@ -13081,7 +12896,62 @@ pt-BR:
         are_you_sure_delete: "Tem certeza que deseja excluir este protocolo?  O protocolo ainda será acessível a todos que estiverem usando, mas ninguém mais poderá usá-lo."
         are_you_sure_remove: "Tem certeza que deseja remover este protocolo da sua lista?"
       remove_rubric: "Remover este protocolo da minha lista"
+  score_out_of_points_possible_88f370fd: "%{score} de %{points_possible}"
+  screenreader_gradebook: 
+    assignment_information: 
+      actions: 
+        curve_grades: "Relativizar as notas de acordo com a curva"
+        message_students: "Enviar mensagem aos alunos que..."
+      details: 
+        avg_score: "Pontuação média"
+        high_score: "Pontuação mais alta"
+        low_score: "Pontuação mais baixa"
+        no_points: "Nenhum ponto possível"
+      index: 
+        warning: Aviso
+    grading: 
+      grading: Pontuação
+      submission_details: "Detalhes do envio"
+    header: 
+      gradebook_individual_view: "Livro de notas: visualização individual"
+    learning_mastery: 
+      hide_student_names_label: "Ocultar nomes dos alunos"
+      result: Resultado
+    outcome_information: 
+      avg_score: "Pontuação média"
+      high_score: "Pontuação mais alta"
+      low_score: "Pontuação mais baixa"
+    screenreader_gradebook: 
+      assignments: Tarefas
+      learning_mastery: "Aprendendo domínio"
+    settings: 
+      assignment_toggles_and_actions: 
+        download_scores: "Baixar pontuação (.csv)"
+        grading_history: "Exibir histórico de avaliação"
+        hide_student_names_label: "Ocultar nomes dos alunos"
+        include_ungraded_assignments: "Incluir tarefas sem nota"
+        set_group_weights: "Definir ponderação de grupo"
+        show_concluded_enrollments_label: "Exibir inscrições concluídas"
+        sis_export: "Publicar notas no SIS"
+      mastery_toggles_and_actions: 
+        hide_student_names_label: "Ocultar nomes dos alunos"
+    student_information: 
+      assignment_groups: 
+        ag_group_grade: Nota
+        ag_group_name: "Grupo de tarefa"
+        ag_letter_grade: "Nota por letra"
+      index: 
+        grades: Notas
   search: 
+    all_courses: 
+      name: Nome
+      search: Pesquisar
+      titles: 
+        all_courses: "Todos os cursos"
+    all_courses_inner: 
+      join_course: "Participar deste curso"
+      next: Avançar
+      previous: Voltar
     course_sections: "Seções do curso"
     enrollments_observers: Observadores
     enrollments_students: Alunos
@@ -13309,6 +13179,9 @@ pt-BR:
     canvas-user-nav: 
       navigation: 
         user_menu: "Menu do usuário"
+    components: 
+      ic_submission-download-dialog: 
+        click_to_download: "Clique aqui para baixar"
     conference: 
       buttons: 
         delete: "Excluir conferência"
@@ -14044,20 +13917,23 @@ pt-BR:
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} para %{upper_bound}"
     no_answer: "Sem resposta"
-  status_dates: 
-    available: Disponível
-    available_until: "Disponível até"
-    closed: Fechado
-    due: Vencimento
-    not_available: "Disponível em"
-    pending: "Não disponível até"
   step: Etapa
   student_assignment_outcome_map_title: "Competência do aluno"
   student_groups: 
     group_join: "Grupo inserido %{group_name}"
     group_leave: "Grupo retirado %{group_name}"
     group_name: "%{group_name} em %{group_category}"
+    new_group: 
+      group_explanation: "Grupos são bons locais para colaborar em projetos ou para descobrir agendas para sessões de estudo e coisas do tipo. Cada grupo tem um calendário, um wiki, discussões e um pouco de espaço de armazenamento de arquivos. Os grupos podem colaborar nos documentos ou mesmo agendar webconferências. É como um mini-curso de verdade, onde é possível trabalhar com um número menor de alunos em um projeto mais focado."
+      joining: Entrando
+      name: "Nome de grupo"
     search_groups_placeholder: "Pesquisar Grupos ou Pessoas"
+    student_groups: 
+      full: Cheio
+      group: Grupo
+      student_groups_join: Participar
+      student_groups_tabs_everyone: Todos
+      student_groups_tabs_groups: Grupos
     student_groups_filter_description: "Conforme você digitou nesse campo, a lista de grupos que serão automaticamente filtrados para apenas incluir àqueles cujos nomes correspondem a sua entrada."
     students_count: 
       one: "1 aluno"
@@ -14073,6 +13949,22 @@ pt-BR:
   student_summary: 
     student_summary_table_ascending: "Tabela de resumo do aluno classificada em ordem crescente por %{sortText}"
     student_summary_table_descending: "Tabela de resumo do aluno classificada em ordem decrescente por %{sortText}"
+  students_who_have_taken_the_quiz_count_69dbbda0: 
+    one: "Alunos que fizeram o teste (%{count})"
+    other: "Alunos que fizeram o teste (%{count})"
+    zero: "Alunos que fizeram o teste"
+  students_who_have_taken_the_survey_count_ef9e6492: 
+    one: "Alunos que responderam ao questionário (%{count})"
+    other: "Alunos que responderam ao questionário (%{count})"
+    zero: "Alunos que fizeram o questionário"
+  students_who_haven_t_taken_the_quiz_count_9966e994: 
+    one: "Alunos que ainda não fizeram o teste (%{count})"
+    other: "Alunos que ainda não fizeram o teste (%{count})"
+    zero: "Alunos que ainda não fizeram o teste"
+  students_who_haven_t_taken_the_survey_count_c03f4d80: 
+    one: "Alunos que não responderam ao questionário (%{count})"
+    other: "Alunos que não responderam ao questionário (%{count})"
+    zero: "Alunos que não responderam ao questionário"
   students_with_no_submissions_title: "Alunos sem nenhum envio"
   sub_accounts: 
     alerts: 
@@ -14237,6 +14129,7 @@ pt-BR:
       curriculum_assessment_errata_description: "Exibir erros de avaliação e currículo já relatados. Pesquise por \"errata\"."
       networking_academy_description: "Exibir as respostas da Cisco para as perguntas mais comuns."
       networking_academy_faqs: "Perguntas frequentes da Networking Academy"
+  syllabus: "Programa do curso"
   table_headings: 
     name: Nome
     total: Total
@@ -14265,6 +14158,10 @@ pt-BR:
     syllabus: Programa
     tab_location_error: "O local dessa guia é inválido"
     tab_unmanagable_error: "%{css_class} não é gerenciável"
+  take_the_quiz_87214d7e: "Fazer o teste"
+  take_the_quiz_again_8ea51a6c: "Fazer o teste novamente"
+  take_the_survey_ada59508: "Fazer o questionário"
+  take_the_survey_again_24ce22c2: "Fazer o questionário novamente"
   terms: 
     index: 
       date: 
@@ -14321,6 +14218,7 @@ pt-BR:
         term_start: "início do período"
         unspecified: sempre
       timespan: "%{start_at} *para* %{end_at}"
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Este teste não foi publicado.* Apenas os professores podem ver o teste até que seja publicado."
   time: 
     am: am
     count_hours_ago: 
@@ -14516,12 +14414,8 @@ pt-BR:
     announcements: Anúncios
     assignments: Tarefas
     come_back_later: "Você marcou esta pergunta para voltar mais tarde"
-    delete_quiz: "Excluir teste"
-    delete_survey: "Excluir questionário"
     discussion: Discussão
     discussions: Discussões
-    edit_quiz: "Editar teste"
-    edit_survey: "Editar questionário"
     error_reports: "Relatórios de erros"
     learning_outcomes: "Resultados de aprendizado"
     messages: Mensagens
@@ -14555,11 +14449,13 @@ pt-BR:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Reenviar para Turnitin"
+  ungraded_survey_ad7de790: "Questionário sem avaliação"
   unknown: Desconhecido
   unknown_question_bank: "Banco de perguntas desconhecido"
   unknown_quiz: "Teste desconhecido"
   unpublished_courses_title: "Cursos não publicados"
   unsupported_package: "Pacote de conteúdo não suportado"
+  until_date_949017c4: "Até %{date}"
   unused_courses_title: "Cursos não utilizados"
   upload_button: 
     upload: Upload
@@ -14883,7 +14779,6 @@ pt-BR:
       create_a_canvas_account: "Criar uma conta Canvas"
       privacy_policy: "Política de privacidade"
       terms_of_use: "Termos de Uso"
-    no_deleting_sis_user: "Não é possível excluir um usuário gerado pelo sistema"
     no_self_registration: "O autorregistro não foi ativado para esta conta"
     oauth_fail: "Falha na solicitação OAuth. Não foi possível encontrar uma solicitação válida"
     recaptcha_settings: 
@@ -15215,25 +15110,14 @@ pt-BR:
     cannot_update_published: "Você não tem permissão para atualizar o estado publicado desta página Wiki"
     cannot_update_title: "Você não tem permissão para atualizar o título desta página Wiki"
     invalid_editing_roles: "As funções de edição fornecidas são inválidas"
-  will_paginate: 
-    next_label: "Próximo &#8594;"
-    page_entries_info: 
-      multi_page: "Exibindo %{model} %{from} - %{to} of %{count} no total"
-      multi_page_html: "Exibindo %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> de <b>%{count}</b> no total"
-      single_page: 
-        one: "Exibindo 1 %{model}"
-        other: "Exibindo todos %{count} %{model}"
-        zero: "Nenhum %{model} localizado"
-      single_page_html: 
-        one: "Exibindo <b>1</b> %{model}"
-        other: "Exibindo <b>all&nbsp;%{count}</b> %{model}"
-        zero: "Nenhum %{model} localizado"
-    page_gap: "&hellip;"
-    previous_label: "&#8592; Anterior"
+  will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Será mantida sua pontuação mais alta"
+  will_keep_the_latest_of_all_your_scores_431d23f9: "Será mantida sua pontuação mais recente"
   wimba_conference: 
     external_urls: 
       archive: Arquivar
       archive_link: "Exibir arquivo(s)"
+  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Você fez alterações nas perguntas deste teste.* Essas alterações não aparecerão para alunos até você salvar o teste."
+  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Você fez alterações não publicadas para este teste.* Estas alterações não aparecem para os alunos até que você publique ou republique o teste."
   zero_activity_title: "Zero atividade"
   zip_argument_error: "Para fazer upload de um .zip é preciso uma pasta para recebê-lo."
   zip_file_description: "Plugin de migração para descompactar arquivos .zip em arquivos de usuário, grupo e curso"
