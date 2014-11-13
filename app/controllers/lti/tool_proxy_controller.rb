@@ -23,6 +23,10 @@ module Lti
     skip_before_filter :require_user, only: [:create, :show]
     skip_before_filter :load_user, only: [:create, :show]
 
+    rescue_from 'Lti::ToolProxyService::InvalidToolProxyError', only: :create do |exception|
+      render json: {error: exception.message}, status: 400
+    end
+
     def show
       tool_proxy = ToolProxy.where(guid: params['tool_proxy_guid']).first
       if tool_proxy && oauth_authenticated_request?(tool_proxy.shared_secret)

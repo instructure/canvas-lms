@@ -62,6 +62,17 @@ module Lti
         expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid"]
       end
 
+      it 'returns an error message' do
+        course_with_teacher_logged_in(:active_all => true)
+        tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
+        headers = { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+        response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tp.to_json, headers
+        expect(response).to eq 400
+        expect(JSON.parse(body)).to eq({"error"=>"Invalid Capabilities"})
+      end
+
       context "navigation tabs caching" do
 
         it 'clears the cache for apps that have navigation placements' do

@@ -50,7 +50,7 @@ gem 'i18nema', '0.0.8', :platforms => [:mri_20, :mri_21]
 gem 'i18nema19', '0.0.8', :platform => :mri_19
 gem 'i18nliner', '0.0.9'
 gem 'icalendar', '1.5.4'
-gem 'ims-lti', '2.0.0.beta.13'
+gem 'ims-lti', '2.0.0.beta.14'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'

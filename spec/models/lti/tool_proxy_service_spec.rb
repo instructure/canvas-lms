@@ -80,8 +80,8 @@ module Lti
         mh = resource_handler.message_handlers.first
         expect(mh.message_type).to eq 'basic-lti-launch-request'
         expect(mh.launch_path).to eq 'https://acme.example.com/handler/launchRequest'
-        expect(mh.capabilities).to eq [ "Result.autocreate" ]
-        expect(mh.parameters).to eq [{'name' => 'result_url', 'variable' => 'Result.url'}, {'name' => 'discipline', 'fixed' => 'chemistry'}]
+        expect(mh.capabilities).to eq [ ]
+        expect(mh.parameters).to eq [{'name' => 'discipline', 'fixed' => 'chemistry'}]
       end
 
       it "creates default message handlers" do
@@ -93,8 +93,8 @@ module Lti
         mh = resource_handler.message_handlers.first
         expect(mh.message_type).to eq 'basic-lti-launch-request'
         expect(mh.launch_path).to eq 'https://acme.example.com/handler/launchRequest'
-        expect(mh.capabilities).to eq [ "Result.autocreate" ]
-        expect(mh.parameters).to eq [{'name' => 'result_url', 'variable' => 'Result.url'}, {'name' => 'discipline', 'fixed' => 'chemistry'}]
+        expect(mh.capabilities).to eq [ ]
+        expect(mh.parameters).to eq [{'name' => 'discipline', 'fixed' => 'chemistry'}]
       end
 
       it 'creates a tool proxy biding' do
@@ -158,6 +158,31 @@ module Lti
 
       end
 
+
+      it 'rejects tool proxies that have extra capabilities' do
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
+        expect { subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid Capabilities') do |exception|
+          expect(JSON.parse(exception.to_json)).to eq({"invalid_capabilities"=>["extra_capability"], "error"=>"Invalid Capabilities"})
+        end
+
+      end
+
+      it 'rejects tool proxies that have extra services' do
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.security_contract.services.first.action = ['DELETE']
+        expect { subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid Services') do |exception|
+          expect(JSON.parse(exception.to_json)).to eq({"invalid_services"=>[{"id"=>"ToolProxy.collection", "actions"=>["DELETE"]}], "error"=>"Invalid Services"})
+        end
+      end
+
+      it 'rejects tool proxies that have extra variables' do
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.tool_profile.resource_handlers.first.messages.first.parameter = [IMS::LTI::Models::Parameter.new(name:'extra_test', variable: 'Custom.Variable')]
+        expect { subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid Capabilities')do |exception|
+          expect(JSON.parse(exception.to_json)).to eq({"invalid_capabilities"=>["Custom.Variable"], "error"=>"Invalid Capabilities"})
+        end
+      end
 
     end
 

@@ -18,9 +18,25 @@
 module Lti
   class ToolProxyService
 
+    class InvalidToolProxyError < RuntimeError
+
+      def initialize(message = nil, json = {})
+        super(message)
+        @message = message
+        @json = json
+        end
+
+        def to_json
+          @json[:error] = @message if @message
+          @json.to_json
+        end
+
+    end
+
     def process_tool_proxy_json(json, context, guid)
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
+      validate_proxy!(tp)
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account)
@@ -134,10 +150,53 @@ module Lti
       end
     end
 
-    private
-
     def create_json(obj)
       obj.kind_of?(Array) ? obj.map(&:as_json) : obj.as_json
+    end
+
+    def validate_proxy!(tp)
+      invalid_services = validate_services(tp)
+      invalid_capabilities = validate_capabilities(tp)
+      if invalid_services.present? || invalid_capabilities.present?
+        json = {}
+        messages = []
+        if invalid_services.present?
+          json[:invalid_services] = invalid_services
+          messages << 'Services'
+        end
+        if invalid_capabilities.present?
+          json[:invalid_capabilities] = invalid_capabilities
+          messages << 'Capabilities'
+        end
+        last_message = messages.pop if messages.size > 1
+        message = "Invalid #{messages.join(', ')}"
+        message + " and #{last_message}" if last_message
+        raise InvalidToolProxyError.new(message, json)
+      end
+
+    end
+
+    def validate_services(tp)
+      allowed_services = ToolConsumerProfileCreator::SERVICES.each_with_object({}) { |s, h| h[s[:id]] = s[:action]  }
+      invalid_services = []
+      tp.security_contract.services.each do |service|
+        id = service.service.split('#').last
+        invalid_actions = service.actions - allowed_services[id]
+        invalid_services << {id: id, actions: invalid_actions} if invalid_actions.present?
+      end
+      invalid_services
+
+    end
+
+    def validate_capabilities(tp)
+      requested_caps = []
+       tp.tool_profile.resource_handlers.each do |rh|
+         rh.messages.each do  |mh|
+           requested_caps.push(*mh.enabled_capabilities)
+           mh.parameters.each { |p| requested_caps << p.variable unless p.fixed?}
+         end
+       end
+      requested_caps - ToolConsumerProfileCreator::CAPABILITIES
     end
 
   end
