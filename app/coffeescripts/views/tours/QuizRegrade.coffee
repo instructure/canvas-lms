@@ -9,7 +9,7 @@ define [
 
     template: template
 
-    attach: ->
+    attachTour: ->
       $(document).one 'click', '.select_answer_link', =>
         setTimeout =>
           @tour.start()
