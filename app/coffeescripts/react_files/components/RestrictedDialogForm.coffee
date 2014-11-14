@@ -135,6 +135,7 @@ define [
           style: 
             'margin-left': '20px', 
             display: (if  @state.selectedOption in ['link_only', 'date_range'] then 'block' else 'none')
+          'aria-hidden': (if  @state.selectedOption in ['link_only', 'date_range'] then 'false' else 'true')
         },
           div className: "radio",
             label {},
@@ -163,6 +164,7 @@ define [
             className: 'control-group'
             style: 
               display: (if @state.selectedOption is 'date_range' then 'block' else 'none')
+            'aria-hidden': (if @state.selectedOption is 'date_range' then 'false' else 'true')
           },
             label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableFrom', 'Lock From')
               div className: 'controls dateSelectInputContainer',
