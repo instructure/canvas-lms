@@ -43,26 +43,6 @@ define [
       if prevProps.selectedItems.length isnt @props.selectedItems.length
         $.screenReaderFlashMessage(I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: @props.selectedItems.length}))
 
-    getPreviewQuery: ->
-      return unless @props.selectedItems.length
-      retObj =
-        preview: @props.selectedItems[0].id
-      unless @props.selectedItems.length is 1
-        retObj.only_preview = @props.selectedItems.map((item) -> item.id).join(',')
-      if @props.query?.search_term
-        retObj.search_term = @props.query.search_term
-      retObj
-
-    getPreviewRoute: ->
-      if @props.query?.search_term
-        'search'
-      else if @props.currentFolder?.urlPath()
-        'folder'
-      else
-        'rootFolder'
-
-
-
     # Function Summary
     # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
     # dialog window. This allows us to do react things inside of this already rendered
@@ -109,9 +89,9 @@ define [
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
 
 
-          Router.Link  {
-              to: @getPreviewRoute()
-              query: @getPreviewQuery()
+          Router.Link {
+              to: @props.getPreviewRoute()
+              query: @props.getPreviewQuery()
               params: {splat: @props.currentFolder?.urlPath()}
               className: 'ui-button btn-view'
               title: I18n.t('view', 'View')

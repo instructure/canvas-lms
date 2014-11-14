@@ -116,6 +116,7 @@ define [
           else
             a {
               href: @props.model.get('url')
+              onClick: preventDefault(@props.previewItem)
               className: 'media'
               ref: 'nameLink'
             },

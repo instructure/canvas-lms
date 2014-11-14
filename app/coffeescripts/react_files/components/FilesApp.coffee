@@ -1,5 +1,6 @@
 define [
   'react'
+  'react-router'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/str/splitAssetString'
@@ -10,7 +11,7 @@ define [
   '../mixins/MultiselectableMixin'
   '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
+], (React, ReactRouter, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   FilesApp = React.createClass
     displayName: 'FilesApp'
@@ -31,7 +32,7 @@ define [
         selectedItems: undefined
       }
 
-    mixins: [MultiselectableMixin, dndMixin]
+    mixins: [MultiselectableMixin, dndMixin, ReactRouter.Navigation]
 
     # for MultiselectableMixin
     selectables: ->
@@ -39,6 +40,29 @@ define [
         @state.searchResultCollection.models
       else
         @state.currentFolder.children(@props.query)
+
+    getPreviewQuery: ->
+      retObj =
+        preview: @state.selectedItems[0]?.id or true
+      if @state.selectedItems.length > 1
+        retObj.only_preview = @state.selectedItems.map((item) -> item.id).join(',')
+      if @props.query?.search_term
+        retObj.search_term = @props.query.search_term
+      retObj
+
+    getPreviewRoute: ->
+      if @props.query?.search_term
+        'search'
+      else if @state.currentFolder?.urlPath()
+        'folder'
+      else
+        'rootFolder'
+
+    previewItem: (item) ->
+      @clearSelectedItems()
+      @toggleItemSelected item, null, =>
+        params = {splat: @props.currentFolder?.urlPath()}
+        @transitionTo(@getPreviewRoute(), params, @getPreviewQuery())
 
     render: withReactDOM ->
       if @state.currentFolder # when showing a folder
@@ -69,6 +93,8 @@ define [
           contextType: contextType
           contextId: contextId
           userCanManageFilesForContext: userCanManageFilesForContext
+          getPreviewQuery: @getPreviewQuery
+          getPreviewRoute: @getPreviewRoute
         })
 
         div className: 'ef-main',
@@ -100,6 +126,7 @@ define [
               toggleAllSelected: @toggleAllSelected
               areAllItemsSelected: @areAllItemsSelected
               userCanManageFilesForContext: userCanManageFilesForContext
+              previewItem: @previewItem
               dndOptions:
                 onItemDragStart: @onItemDragStart
                 onItemDragEnterOrOver: @onItemDragEnterOrOver

@@ -48,7 +48,7 @@ define [
     clearSelectedItems: ->
       @setState selectedItems: []
 
-    toggleItemSelected: (item, event) ->
+    toggleItemSelected: (item, event, cb) ->
       return if event and $(event.target).closest(@multiselectIgnoredElements).length
       event?.preventDefault()
 
@@ -67,5 +67,6 @@ define [
       else
         selectedItems = [item]
 
-      @setState selectedItems: selectedItems
+      @setState {selectedItems: selectedItems}, ->
+        cb?()
 
