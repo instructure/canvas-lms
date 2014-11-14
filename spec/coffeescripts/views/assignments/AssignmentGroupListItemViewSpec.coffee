@@ -5,11 +5,12 @@ define [
   'compiled/models/Assignment'
   'compiled/views/assignments/AssignmentGroupListItemView'
   'compiled/views/assignments/AssignmentListItemView'
+  'compiled/views/assignments/AssignmentGroupListView'
   'jquery'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
   'compiled/behaviors/elementToggler'
-], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $, fakeENV) ->
+], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, AssignmentGroupListView, $, fakeENV) ->
   fixtures = $('#fixtures')
 
   assignment1 = ->
@@ -110,6 +111,21 @@ define [
 
     view
 
+  createCollectionView = () ->
+    model = group3()
+    options = $.extend {canManage: true}, options
+    ENV.PERMISSIONS = { manage: options.canManage }
+    sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
+    groupCollection = new AssignmentGroupCollection([model])
+    assignmentGroupsView = new AssignmentGroupListView
+      collection: groupCollection
+      sortURL: "http://localhost:3000/courses/1/assignments/"
+      assignment_sort_base_url:"http://localhost:3000/courses/1/assignments/"
+      course: new Backbone.Model(id: 1)
+    assignmentGroupsView.$el.appendTo $('#fixtures')
+    assignmentGroupsView.render()
+    assignmentGroupsView
+
   module 'AssignmentGroupListItemView',
     setup: ->
       fakeENV.setup()
@@ -123,6 +139,16 @@ define [
   test "initializes collection", ->
     view = createView(@model)
     ok view.collection
+
+  test "drags icon not being overridden on drag", ->
+    view = createCollectionView()
+    assignmentGroups = {
+      item: view.$el.find('.search_show'),
+    };
+    view.$el.find('#assignment_1').trigger('sortstart', assignmentGroups)
+    dragHandle = view.$("#assignment_1").find("i").attr('class')
+    equal dragHandle, "icon-drag-handle"
+
 
   test "does not parse response with multiple due dates", ->
     models = @model.get("assignments").models
