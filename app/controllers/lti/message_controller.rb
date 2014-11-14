@@ -48,7 +48,7 @@ module Lti
             context_id: Lti::Asset.opaque_identifier_for(@context),
             tool_consumer_instance_guid: @context.root_account.lti_guid,
             launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
-            roles: Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user).lti2_roles,
+            roles: Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user).all_roles('lis2'),
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           )
           @active_tab = message_handler.asset_string

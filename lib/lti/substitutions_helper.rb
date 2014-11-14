@@ -79,29 +79,25 @@ module Lti
       enrollments.map { |enrollment| Lti::LtiUserCreator::ENROLLMENT_MAP[enrollment.class] }.uniq
     end
 
-    def all_roles
-      if @user
-        context_roles = course_enrollments.map { |enrollment| LIS_ROLE_MAP[enrollment.class] }
-        institution_roles = @user.roles(@root_account).map { |role| LIS_ROLE_MAP[role] }
-        if Account.site_admin.account_users_for(@user).present?
-          institution_roles << LIS_ROLE_MAP['siteadmin']
-        end
-        (context_roles + institution_roles).uniq.sort.join(',')
-      else
-        [LtiOutbound::LTIRoles::System::NONE]
+    def all_roles(version = 'lis1')
+      case version
+        when 'lis2'
+          role_map = LIS_V2_ROLE_MAP
+          role_none = LIS_V2_ROLE_NONE
+        else
+          role_map = LIS_ROLE_MAP
+          role_none = LtiOutbound::LTIRoles::System::NONE
       end
-    end
 
-    def lti2_roles
       if @user
-        context_roles = course_enrollments.map { |enrollment| LIS_V2_ROLE_MAP[enrollment.class] }
-        institution_roles = @user.roles(@root_account).map { |role| LIS_V2_ROLE_MAP[role] }
+        context_roles = course_enrollments.map { |enrollment| role_map[enrollment.class] }
+        institution_roles = @user.roles(@root_account).map { |role| role_map[role] }
         if Account.site_admin.account_users_for(@user).present?
-          institution_roles << LIS_V2_ROLE_MAP['siteadmin']
+          institution_roles << role_map['siteadmin']
         end
         (context_roles + institution_roles).uniq.sort.join(',')
       else
-        [LIS_V2_ROLE_NONE]
+        [role_none]
       end
     end
 
