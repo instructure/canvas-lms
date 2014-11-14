@@ -403,6 +403,8 @@ class StreamItem < ActiveRecord::Base
   public
   def destroy_stream_item_instances
     self.stream_item_instances.with_each_shard do |scope|
+      StreamItemCache.send_later_if_production_enqueue_args(:invalidate_all_recent_stream_items,
+        { :priority => Delayed::LOW_PRIORITY }, scope.pluck(:user_id), self.context_type, self.context_id)
       scope.delete_all
       nil
     end
