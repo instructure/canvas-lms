@@ -154,7 +154,9 @@ define [
               type: 'button'
               disabled: !showingButtons
               className: 'ui-button btn-delete'
-              onClick: => deleteStuff(@props.selectedItems)
+              onClick: =>
+                @props.clearSelectedItems()
+                deleteStuff(@props.selectedItems)
               title: I18n.t('delete', 'Delete')
               'aria-label': I18n.t('delete', 'Delete')
               'data-tooltip': ''
