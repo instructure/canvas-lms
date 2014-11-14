@@ -24,8 +24,9 @@ define [
   'compiled/util/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
-  'compiled/gradebook2/PostGradesDialog'
-  'compiled/gradebook2/PostGradesModel'
+  # 'compiled/gradebook2/PostGradesDialog'
+  'jsx/gradebook/SISGradePassback/PostGradesStore'
+  'jsx/gradebook/SISGradePassback/PostGradesApp'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
@@ -43,7 +44,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesDialog, PostGradesModel, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradebookKeyboardNav) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesStore, PostGradesApp, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradebookKeyboardNav) ->
 
   class Gradebook
     columnWidths =
@@ -134,6 +135,8 @@ define [
         @assignment_visibility() if ENV.GRADEBOOK_OPTIONS.differentiated_assignments_enabled
 
       @showCustomColumnDropdownOption()
+      @initPostGradesStore()
+      @showPostGradesButton()
 
     assignment_visibility: ->
       all_students_ids = _.keys @students
@@ -179,30 +182,6 @@ define [
           @grid.invalidateRow(student.row)
         @grid.render()
 
-
-    initPostGrades: () ->
-
-      $("#post-grades-button").click (event) =>
-        event.preventDefault()
-
-        pg = {
-          assignments: @assignments
-          course_id: ENV.GRADEBOOK_OPTIONS.context_id
-        }
-        if @sectionToShow
-          pg.integration_section_id = @sections[@sectionToShow].integration_id
-        else
-          pg.integration_course_id = ENV.GRADEBOOK_OPTIONS.context_integration_id
-
-        postGradesModel = new PostGradesModel(pg)
-
-        postGradesDialog = new PostGradesDialog(postGradesModel,
-          ENV.GRADEBOOK_OPTIONS.sis_app_url,
-          ENV.GRADEBOOK_OPTIONS.sis_app_token)
-        postGradesModel.reset_ignored_assignments()
-        postGradesDialog.render().show()
-        open = $('#post-grades-container').dialog('isOpen')
-
     doSlickgridStuff: =>
       @initGrid()
       @buildRows()
@@ -227,14 +206,18 @@ define [
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
 
+      @postGradesStore.setGradeBookAssignments @assignments
+
     gotSections: (sections) =>
       @sections = {}
       for section in sections
         htmlEscape(section)
         @sections[section.id] = section
-      @displayPostGradesButton(@sectionToShow)
+
       @sections_enabled = sections.length > 1
       @hasSections.resolve()
+
+      @postGradesStore.setSections @sections
 
     gotChunkOfStudents: (studentEnrollments) =>
       for studentEnrollment in studentEnrollments
@@ -806,26 +789,24 @@ define [
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
-      @displayPostGradesButton(section)
+      @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
 
-    displayPostGradesButton: (section) =>
-      if section?
-        is_integration_section = @sections[section] && @sections[section].integration_id
-      else
-        is_integration_course = ENV.GRADEBOOK_OPTIONS.context_integration_id
+    initPostGradesStore: ->
+      @postGradesStore = PostGradesStore
+        course:
+          id:     ENV.GRADEBOOK_OPTIONS.context_id
+          sis_id: ENV.GRADEBOOK_OPTIONS.context_sis_id
 
-      if is_integration_section or is_integration_course
-        @showPostGradesButton()
-      else
-        @hidePostGradesButton()
+      @postGradesStore.setSelectedSection @sectionToShow
 
-    hidePostGradesButton: ->
-      $('#post-grades-button').closest('.gradebook-navigation').addClass('hidden')
 
     showPostGradesButton: ->
-      $('#post-grades-button').closest('.gradebook-navigation').removeClass('hidden')
+      app = new PostGradesApp store: @postGradesStore
+      $placeholder = $('.post-grades-placeholder')
+      if ($placeholder.length > 0)
+        React.renderComponent(app, $placeholder[0])
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
@@ -864,7 +845,6 @@ define [
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @initPostGrades()
       @setDownloadCsvUrl()
       @renderTotalHeader()
 

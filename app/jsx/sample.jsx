@@ -2,7 +2,7 @@
 
 // first person to actually save a .jsx file, please delete this file.
 
-define(['React'], function(React) {
+define(['react'], function(React) {
 
   var Thing = React.createClass({
     render () {

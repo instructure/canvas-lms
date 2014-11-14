@@ -296,9 +296,9 @@ namespace :js do
     source = Rails.root + 'app/jsx'
     dest = Rails.root + 'public/javascripts/jsx'
     if Rails.env == 'production'
-      `node_modules/.bin/jsx -x jsx --harmony #{source} #{dest}`
+      `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest}`
     else
-      `node_modules/.bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest}`
+      `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest}`
     end
   end
 
