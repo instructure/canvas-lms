@@ -121,6 +121,7 @@ define [
       @$('form').toJSON()
 
     remove: ->
+      @_cleanUpTiny() if @tinymceExists()
       @$el.hideErrors()
       @model.destroy() if @state is 'add' and @model.isNew()
       super arguments...
@@ -178,7 +179,7 @@ define [
     # Called from subclasses in render.
     readyForm: ->
       setTimeout =>
-        @$('textarea').editorBox() # tinymce
+        @$('textarea').editorBox() # tinymce initializer
         @setupTinyMCEViewSwitcher()
         @addTinyMCEKeyboardShortcuts()
         @$('input:first').focus()
@@ -188,3 +189,6 @@ define [
 
     updateTitle: (e) =>
       @model.set 'title', e.currentTarget.value
+
+    tinymceExists: =>
+      return @$el.find('[name="description"]').length > 0 and @$el.find('[name="description"]').editorBox('exists?')
