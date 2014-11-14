@@ -219,7 +219,7 @@ module SIS
               enrollment.root_account = @root_account
             end
             enrollment.user = user
-            enrollment.sis_source_id = [course_id, user_id, role, @section.name].compact.join(":")[0..254]
+            enrollment.sis_source_id = [course_id, user_id, role.id, @section.name].compact.join(":")[0..254]
             enrollment.type = type
             enrollment.associated_user_id = associated_enrollment.try(:user_id)
             enrollment.role = role

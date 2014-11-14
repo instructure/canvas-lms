@@ -130,6 +130,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.tas.first.name).to eq "User Tres"
     expect(course.observers.first.name).to eq "User Quatro"
     expect(course.observer_enrollments.first.associated_user_id).to eq course.students.first.id
+    expect(course.observer_enrollments.first.sis_source_id).to eq "test_1:user_5:#{observer_role.id}:Sec1"
     expect(course.designers.first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil
