@@ -1115,7 +1115,7 @@ class ApplicationController < ActionController::Base
   end
 
   def form_authenticity_token
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies)
+    masked_authenticity_token
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
