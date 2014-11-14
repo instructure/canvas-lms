@@ -17,7 +17,7 @@ module Guard
       ::Guard::UI.info "Compiling JSX"
       source = 'app/jsx'
       dest = 'public/javascripts/jsx'
-      `node_modules/.bin/jsx -x jsx --harmony #{source} #{dest}`
+      `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest}`
     end
 
   end

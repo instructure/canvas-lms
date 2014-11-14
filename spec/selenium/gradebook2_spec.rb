@@ -804,20 +804,15 @@ describe "gradebook2" do
 
     it "should not be visible by default" do
       get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 0
+      expect(ff('.post-grades-placeholder').length).to eq 0
     end
 
-    it "should be visible when enabled" do
+    it "should be visible when enabled on course with sis_source_id" do
       Account.default.set_feature_flag!('post_grades', 'on')
-      @course.integration_id = 'xyz'
+      @course.sis_source_id = 'xyz'
       @course.save
       get "/courses/#{@course.id}/gradebook2"
-
-      wait_for_ajaximations
-      expect(ff('.gradebook-navigation').length).to eq 2
-      f('#post-grades-button').click
-      wait_for_ajaximations
-      expect(f('#post-grades-container')).not_to be_nil
+      expect(ff('.post-grades-placeholder').length).to eq 1
     end
   end
 end
