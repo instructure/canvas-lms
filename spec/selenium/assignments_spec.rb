@@ -90,9 +90,12 @@ describe "assignments" do
       get "/calendar2#view_name=month&view_start=#{due_date.to_date.to_s}"
 
       wait_for_ajaximations
-      f('.assignment').click
-      wait_for_ajaximations
-      f('.edit_event_link').click
+      keep_trying_until do # we might click on it before it has a handler
+        f('.assignment').click
+        wait_for_ajaximations
+        f('.edit_event_link').click
+        true
+      end
       wait_for_ajaximations
       f('.more_options_link').click
       wait_for_ajaximations
