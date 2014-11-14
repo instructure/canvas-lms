@@ -49,7 +49,14 @@ define [
     # jQueryUI widget
     openRestrictedDialog: ->
       $dialog = $('<div>').dialog
-        title: I18n.t("title.permissions", "Editing permissions for %{count} items", {count: @props.selectedItems.length})
+        title: I18n.t({
+            one: "Edit permissions for: %{itemName}", 
+            other: "Edit permissions for %{count} items"
+          }, {
+            count: @props.selectedItems.length
+            itemName: @props.selectedItems[0].displayName()
+          })
+
         width: 400
         close: ->
           React.unmountComponentAtNode this
