@@ -66,6 +66,12 @@
         <a class="dismiss_alert close" href="#">×</a>
         <%= t :crocodoc_pending, "Crocodoc is still processing this document." %>
       </div>
+      <div id="comment_submitted" class="alert alert-success speedgrader_alert">
+        <button aria-label="Close" class="dismiss_alert close">×</button>
+        <div id="comment_submitted_message">
+          <%= t :comment_submitted, "Your comment has been submitted." %>
+        </div>
+      </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
           <h3>

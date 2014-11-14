@@ -119,6 +119,8 @@ define([
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
       $no_annotation_warning = $('#no_annotation_warning'),
+      $comment_submitted = $('#comment_submitted'),
+      $comment_submitted_message = $('#comment_submitted_message'),
       $selectmenu = null,
       browserableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -1528,10 +1530,13 @@ define([
           disableGroupCommentCheckbox();
         }
 
+        $comment_submitted.show();
+        $comment_submitted_message.attr("tabindex",-1).focus();
         $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
     },
 
     handleCommentFormSubmit: function(){
+      $comment_submitted.hide();
       if (
         !$.trim($add_a_comment_textarea.val()).length &&
         !$("#media_media_recording").data('comment_id') &&
