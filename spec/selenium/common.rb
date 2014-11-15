@@ -313,7 +313,50 @@ module SeleniumTestsHelperMethods
       use Rails::Rack::Debugger unless Rails.env.test?
       run CanvasRails::Application
     end.to_app
-    return app
+
+    lambda do |env|
+      nope = [503, {}, [""]]
+      return nope unless allow_requests?
+
+      # wrap request in a mutex so we can ensure it doesn't span spec
+      # boundaries (see clear_requests!)
+      result = request_mutex.synchronize { app.call(env) }
+
+      # check if the spec just finished while we ran, and if so prevent
+      # side effects like redirects (and thus moar requests)
+      if allow_requests?
+        result
+      else
+        # make sure we clean up the body of requests we throw away
+        # https://github.com/rack/rack/issues/658#issuecomment-38476120
+        result.last.close if result.last.respond_to?(:close)
+        nope
+      end
+    end
+  end
+
+  class << self
+    def disallow_requests!
+      # ensure the current in-flight request (if any, AJAX or otherwise)
+      # finishes up its work, and prevent any subsequent requests before the
+      # next spec gets underway. otherwise race conditions can cause sadness
+      # with our shared conn and transactional fixtures (e.g. special
+      # accounts and their caching)
+      @allow_requests = false
+      request_mutex.synchronize { }
+    end
+
+    def allow_requests!
+      @allow_requests = true
+    end
+
+    def allow_requests?
+      @allow_requests
+    end
+
+    def request_mutex
+      @request_mutex ||= Mutex.new
+    end
   end
 
   def self.start_in_process_thin_server
@@ -1050,15 +1093,6 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
-  after(:each) do
-    begin
-      wait_for_ajax_requests
-    rescue Selenium::WebDriver::Error::WebDriverError
-      # we want to ignore selenium errors when attempting to wait here
-    end
-    truncate_all_tables unless self.use_transactional_fixtures
-  end
-
   unless EncryptedCookieStore.respond_to?(:test_secret)
     EncryptedCookieStore.class_eval do
       cattr_accessor :test_secret
@@ -1102,8 +1136,23 @@ shared_examples_for "all selenium tests" do
     resize_screen_to_normal
   end
 
+  prepend_before :all do
+    SeleniumTestsHelperMethods.allow_requests!
+  end
+
+  prepend_before :each do
+    SeleniumTestsHelperMethods.allow_requests!
+  end
+
   after(:each) do
     clear_timers!
+    begin # while disallow_requests! would generally get these, there's a small window between the ajax request starting up and the middleware actually processing it
+      wait_for_ajax_requests
+    rescue Selenium::WebDriver::Error::WebDriverError
+      # we want to ignore selenium errors when attempting to wait here
+    end
+    SeleniumTestsHelperMethods.disallow_requests!
+    truncate_all_tables unless self.use_transactional_fixtures
   end
 
   def clear_timers!
