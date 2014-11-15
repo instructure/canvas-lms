@@ -34,6 +34,7 @@ define([
   'compiled/str/TextHelper',
   'compiled/views/editor/KeyboardShortcuts',
   'INST', // safari sniffing for VO workarounds
+  'quiz_formula_solution',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -55,7 +56,7 @@ define([
             wikiSidebar, DueDateListView, DueDateOverrideView, Quiz,
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper,
-            RCEKeyboardShortcuts, INST){
+            RCEKeyboardShortcuts, INST, QuizFormulaSolution){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -3677,13 +3678,13 @@ define([
           });
           $question.find(".supercalc").superCalc('recalculate', true);
           var result = $status.attr('data-res');
+          var solution = new QuizFormulaSolution(result);
           var combination = [];
           $variable_values.each(function() {
             combination.push($(this).attr('data-value'));
           });
-          var val = parseFloat(result.substring(1), 10);
           if (!existingCombinations[combination] || true) {
-            if (result.match(/^=/) && result != "= NaN" && result != "= Infinity" && val) {
+            if (solution.isValid()) {
               var $result = $("<tr/>");
               $variable_values.each(function() {
                 var $td = $("<td/>");
@@ -3692,7 +3693,7 @@ define([
               });
               var $td = $("<td/>");
               $td.addClass('final_answer');
-              var text = $.trim(result.substring(1));
+              var text = solution.rawText();
               var tolerance = answer_tolerance;
               if (tolerance) {
                 text += " <span style='font-size: 0.8em;'>+/-</span> " + tolerance;
