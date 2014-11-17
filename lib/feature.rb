@@ -295,6 +295,14 @@ END
       applies_to: 'Course',
       state: 'allowed',
       development: true
+    },
+    'usage_rights_required' =>
+    {
+      display_name: -> { I18n.t('Require usage rights for uploaded files') },
+      description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published') },
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true
     }
   )
 
