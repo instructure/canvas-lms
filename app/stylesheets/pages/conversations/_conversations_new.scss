@@ -32,7 +32,7 @@
 }
 
 .conversations .panel {
-  background: #f2f2f2;
+  background: #f1f1f1;
   border-bottom: 1px solid #acacac;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
   box-sizing: border-box;
@@ -162,19 +162,18 @@
   .list-header {
     background: #f3f3f3;
     border-bottom: 1px solid #bfbfbf;
-    color: #7f7f7f;
+    color: darken($canvas-neutral, 50);;
     padding: 3px 12px;
   }
 
   .current-context-code {
     color: #f3f3f3;
-    background-color: #7f7f7f;
+    background-color: $canvas-neutral;
     padding: 0 10px;
   }
 
   .messages > li {
-    background: #fff;
-    background: linear-gradient(to bottom, #fff, #fafafa);
+    background: #fff;    
     box-sizing: border-box;
     border-bottom: 1px solid #bfbfbf;
     cursor: pointer;
@@ -183,7 +182,7 @@
     position: relative;
 
     &.active {
-      background: #e5f3ff;
+      background: lighten($canvas-neutral, 10);
     }
 
     &:hover .message-actions a, .message-actions a:focus {
@@ -201,7 +200,7 @@
   }
 
   .date {
-    color: #2571bd;
+    color: $canvas-primary;
   }
 
   .summary {
@@ -243,6 +242,8 @@
   position: absolute;
   right: 13px;
   top: 43%;
+  background-color: $canvas-secondary;
+  text-shadow: none;
 }
 
 .message-actions {
@@ -259,7 +260,7 @@
   }
 
   .read-state {
-    background: #4aaefb;
+    background: $canvas-secondary;
     border-radius: 5px;
     box-sizing: border-box;
     display: inline-block;
@@ -268,18 +269,23 @@
     width: 10px;
 
     &.read {
-      background: #fff;
-      border: 1px solid #8c8d8d;
+      background: $canvas-primary;
+      border: 1px solid darken($canvas-primary, 10);
+      @if $use_high_contrast {
+        background: $canvas-light;
+        border: 1px solid $canvas-dark;
+      }
       left: -9999px;
     }
 
     &:focus {
-      border: 1px solid #333;
+      border: 1px solid $canvas-dark;
+      box-shadow: none;
     }
   }
 
   .star-btn {
-    color: #999;
+    color: $canvas-secondary;
     display: inline-block;
     font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
     font-size: 16px;
@@ -303,7 +309,7 @@
         position: absolute;
       }
       &:before {
-        color: #fed676;
+        color: $canvas-alert;
         content: "\2605";
       }
       &:focus {
@@ -416,7 +422,7 @@
     }
 
     .context {
-      color: #7f7f7f;
+      color: darken($canvas-neutral, 50);
       display: block;
     }
 
@@ -430,7 +436,7 @@
   }
 
   .date {
-    color: #7f7f7f;
+    color: darken($canvas-neutral, 50);
     position: absolute;
     right: 10px;
     top: 0;
@@ -452,7 +458,7 @@
 
   .message-detail-actions li a,
   .actions li a {
-    color: #7f7f7f;
+    color: darken($canvas-neutral, 50);;
 
     &:hover, &:focus {
       color: #333;

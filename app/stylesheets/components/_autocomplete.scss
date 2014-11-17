@@ -166,6 +166,9 @@ ul[class*=ac-] {
 
   &:hover {
     background: #bccef4;
+    @if $use-high-contrast {
+      background: $canvas-light;  
+    }
     border-color: #6f94e6;
   }
 
@@ -186,7 +189,19 @@ ul[class*=ac-] {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, .4);
 	}
 }
-
+// This styles the 'x' better when a new recipient is added
+// to a new conversation
+i[class*=icon-].icon-messageRecipient--cancel {
+  &:before {
+    background: $canvas-primary;
+    border-radius: 10px;
+    padding: 2px;
+    font-size: 9px;
+    line-height: 9px;
+    top: 0;
+    text-shadow: none;
+  }
+}
 .ac-result-wrapper {
   display: none;
 
