@@ -27,7 +27,7 @@ class Course < ActiveRecord::Base
   include TimeZoneHelper
 
   attr_accessor :teacher_names
-  attr_writer :student_count, :primary_enrollment, :primary_enrollment_rank, :primary_enrollment_state, :invitation
+  attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :invitation
 
   attr_accessible :name,
                   :section,
@@ -2768,7 +2768,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  %w{student_count primary_enrollment primary_enrollment_rank primary_enrollment_state invitation}.each do |method|
+  %w{student_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state invitation}.each do |method|
     class_eval <<-RUBY
       def #{method}
         read_attribute(:#{method}) || @#{method}

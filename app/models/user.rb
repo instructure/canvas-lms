@@ -1606,7 +1606,7 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment ||= {}
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = self.shard.activate do
-        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options, ApplicationController.region].cache_key, :expires_in => 15.minutes) do
+        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment2', association, options, ApplicationController.region].cache_key, :expires_in => 15.minutes) do
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
@@ -1627,7 +1627,7 @@ class User < ActiveRecord::Base
             scope = scope.shard(in_region_associated_shards)
           end
 
-          courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+          courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
               order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
               distinct_on(:id).to_a
 
@@ -1658,7 +1658,8 @@ class User < ActiveRecord::Base
           ActiveRecord::Associations::Preloader.new(pending_enrollments, :course).run
           res.concat(pending_enrollments.map do |e|
             c = e.course
-            c.primary_enrollment = e.type
+            c.primary_enrollment_type = e.type
+            c.primary_enrollment_role_id = e.role_id
             c.primary_enrollment_rank = e.rank_sortable.to_s
             c.primary_enrollment_state = e.workflow_state
             c.invitation = e.uuid
