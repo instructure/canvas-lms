@@ -68,7 +68,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("html_url")
-      hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, user.id)
+      hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
     end
 
     if includes.include?("user")
@@ -203,4 +203,3 @@ module Api::V1::Submission
     attachment
   end
 end
-

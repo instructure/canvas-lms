@@ -20,6 +20,7 @@ define [
       if data.type == 'Submission'
         data.for_submission = true
         data.subject = "#{data.course.name} - #{data.title}"
+        data.subject_url = data.html_url
         data.messages = data.submission_comments
         data.messages.reverse()
         _.each data.messages, (message) ->
