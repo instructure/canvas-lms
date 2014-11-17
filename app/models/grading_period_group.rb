@@ -9,6 +9,7 @@ class GradingPeriodGroup < ActiveRecord::Base
     can :read
 
     given do |user, http_session|
+      return false unless (course || account).root_account.feature_enabled?(:multiple_grading_periods)
       if course
         course.grants_right?(user, http_session, :update)
       elsif account
