@@ -979,8 +979,11 @@ class DiscussionTopicsController < ApplicationController
       if hash[:assignment].nil? && @context.respond_to?(:assignments) && @context.assignments.scoped.new.grants_right?(@current_user, session, :create)
         hash[:assignment] ||= {}
       end
+
       if !hash[:assignment].nil?
-        hash[:assignment][:due_at] = params[:due_at].to_date if params[:due_at]
+        if params[:due_at]
+          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null"  ? nil : params[:due_at].to_date
+        end
         hash[:assignment][:points_possible] = params[:points_possible] if params[:points_possible]
         hash[:assignment][:assignment_group_id] = params[:assignment_group_id] if params[:assignment_group_id]
       end

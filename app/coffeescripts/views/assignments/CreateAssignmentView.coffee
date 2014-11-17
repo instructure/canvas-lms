@@ -48,9 +48,8 @@ define [
 
       dataParams = {}
       _.each data, (value, key) ->
-        if value and _.contains(valid, key) and value != ""
+        if _.contains(valid, key)
           dataParams[key] = value
-
       url = if @assignmentGroup then @newAssignmentUrl() else @model.htmlEditUrl()
 
       @redirectTo("#{url}?#{$.param(dataParams)}")

@@ -96,11 +96,9 @@ describe "assignments" do
         override.due_at = 1.day.ago
         override.due_at_overridden = true
       end
-
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
       driver.execute_script "$('.edit_assignment').first().hover().click()"
-
       expect(fj('.form-dialog .ui-datepicker-trigger:visible')).to be_nil
       expect(f('.multiple_due_dates input').attribute('disabled')).to be_present
       assignment_title = f("#assign_#{@assignment.id}_assignment_name")
@@ -128,7 +126,6 @@ describe "assignments" do
         expect_new_page_load { f('.more_options').click }
         f("#assignment_name").send_keys(expected_text)
         click_option('#assignment_submission_type', 'No Submission')
-
         assignment_points_possible = f("#assignment_points_possible")
         replace_content(assignment_points_possible, "5")
         submit_assignment_form
@@ -137,6 +134,38 @@ describe "assignments" do
         expect(f('.assignment')).to include_text(expected_text)
         group.reload
         expect(group.updated_at.to_i).not_to eq first_stamp
+      end
+    end
+
+
+    it "should keep erased field on more options click" do
+      enable_cache do
+        middle_number = '15'
+        expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
+        @assignment = @course.assignments.create!(
+            :title => "Test Assignment",
+            :points_possible => 10,
+            :due_at => expected_date
+        )
+        section = @course.course_sections.create!(:name => "new section")
+        @assignment.assignment_overrides.create! do |override|
+          override.set = section
+          override.title = "All"
+        end
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        driver.execute_script "$('.edit_assignment').first().hover().click()"
+        assignment_title = f("#assign_#{@assignment.id}_assignment_name")
+        assignment_points_possible = f("#assign_#{@assignment.id}_assignment_points")
+        replace_content(assignment_title, "")
+        replace_content(assignment_points_possible, "")
+        wait_for_ajaximations
+        expect_new_page_load { fj('.more_options:eq(1)').click }
+        expect(f("#assignment_name").text).to match ""
+        expect(f("#assignment_points_possible").text).to match ""
+        expect(fj('.due-date-row:first div').text).to match ""
+        expect(fj('.due-date-row:last div').text).to match expected_date
       end
     end
 
