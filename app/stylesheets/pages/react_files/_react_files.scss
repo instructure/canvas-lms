@@ -263,3 +263,9 @@ $ef-thumbnail-size: 36px;
 // Hack, Hack, Hack!
 // to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files
 #footer { min-height: 80px }
+
+.form-controls {
+  .btn {
+    margin: 0 0 0 5px;
+  }
+}
