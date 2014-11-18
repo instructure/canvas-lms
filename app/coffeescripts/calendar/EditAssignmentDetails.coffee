@@ -107,6 +107,7 @@ define [
         dueAt = @form.find("#assignment_due_at").data('date')
       params = {
         'assignment[name]': @form.find("#assignment_title").val()
+        'assignment[published]': @form.find("#assignment_published").val() if @form.find("#assignment_published").is(':checked')
         'assignment[due_at]': if dueAt then $.unfudgeDateForProfileTimezone(dueAt).toISOString() else ''
         'assignment[assignment_group_id]': @form.find(".assignment_group").val()
       }
