@@ -63,6 +63,7 @@ define [
       @model.get('custom_name') || @model.get('name')
 
     renderSelf: ->
+      return if @model.isNew()
       @$el.attr @attributes()
       @$label ||= do =>
         @$labelInner = $('<span>').click (event) =>

@@ -145,12 +145,13 @@ class Folder < ActiveRecord::Base
   def infer_full_name
     # TODO i18n
     t :default_folder_name, 'folder'
-    self.name ||= "folder"
+    self.name = 'folder' if self.name.blank?
     self.name = self.name.gsub(/\//, "_")
     folder = self
     @update_sub_folders = false
     self.parent_folder_id = nil if !self.parent_folder || self.parent_folder.context != self.context || self.parent_folder_id == self.id
     self.context = self.parent_folder.context if self.parent_folder
+    self.prevent_duplicate_name
     self.full_name = self.full_name(true)
     if self.parent_folder_id_changed? || !self.parent_folder_id || self.full_name_changed? || self.name_changed?
       @update_sub_folders = true
@@ -158,6 +159,34 @@ class Folder < ActiveRecord::Base
     @folder_id = self.id
   end
   protected :infer_full_name
+
+  def prevent_duplicate_name
+    return unless self.parent_folder
+
+    existing_folders = self.parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(self.name)}(\\s\\d)?$", self.id.to_i).pluck(:name)
+
+    return unless existing_folders.include?(self.name)
+
+    iterations, usable_iterator, candidate = [], nil, 2
+
+    existing_folders.each do |folder_name|
+      iterator = folder_name.split.last.to_i
+      iterations.push(iterator) if iterator > 1
+    end
+
+    iterations.sort.each do |i|
+      if candidate < i
+        usable_iterator = candidate
+        break
+      else
+        candidate = i + 1
+      end
+    end
+
+    usable_iterator ||= existing_folders.size + 1
+    self.name = "#{self.name} #{usable_iterator}"
+  end
+  protected :prevent_duplicate_name
 
   def update_sub_folders
     return unless @update_sub_folders
