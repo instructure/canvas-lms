@@ -109,7 +109,7 @@ module SIS
           while !@enrollment_batch.empty? && tx_end_time > Time.now
             enrollment = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment.inspect}")
-            course_id, section_id, user_id, role_name, status, start_date, end_date, associated_user_id, root_account_sis_id = enrollment
+            course_id, section_id, user_id, role_name, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment
 
             last_section = @section
             # reset the cached course/section if they don't match this row
@@ -177,7 +177,7 @@ module SIS
             # commit pending incremental account associations
             incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
 
-            associated_enrollment = nil
+            associated_user_id = nil
             role = @course_roles_by_account_id[@course.account_id].detect{|r| r.name == role_name}
             type = if role
               role.base_role_type
@@ -189,14 +189,9 @@ module SIS
               elsif role_name =~ /\Ata\z/i
                 'TaEnrollment'
               elsif role_name =~ /\Aobserver\z/i
-                if associated_user_id
-                  pseudo = root_account.pseudonyms.where(sis_user_id: associated_user_id).first
-                  if status =~ /\Aactive/i
-                    associated_enrollment = pseudo && @course.student_enrollments.where(user_id: pseudo.user_id).first
-                  else
-                    # the observed user may have already been concluded
-                    associated_enrollment = pseudo && @course.all_student_enrollments.where(user_id: pseudo.user_id).first
-                  end
+                if associated_sis_user_id
+                  pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).first
+                  associated_user_id = pseudo.user_id
                 end
                 'ObserverEnrollment'
               elsif role_name =~ /\Adesigner\z/i
@@ -209,10 +204,10 @@ module SIS
             end
 
             role ||= Role.get_built_in_role(type)
-            enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_id => role.id).first
+            enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_user_id, :role_id => role.id).first
 
             # TODO can remove after enrollment role ids are populated
-            enrollment ||= @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_id => nil).first if role.built_in?
+            enrollment ||= @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_user_id, :role_id => nil).first if role.built_in?
 
             unless enrollment
               enrollment = Enrollment.typed_enrollment(type).new
@@ -221,7 +216,7 @@ module SIS
             enrollment.user = user
             enrollment.sis_source_id = [course_id, user_id, role.id, @section.name].compact.join(":")[0..254]
             enrollment.type = type
-            enrollment.associated_user_id = associated_enrollment.try(:user_id)
+            enrollment.associated_user_id = associated_user_id
             enrollment.role = role
             enrollment.course = @course
             enrollment.course_section = @section
