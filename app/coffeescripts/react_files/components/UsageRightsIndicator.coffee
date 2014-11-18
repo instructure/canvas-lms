@@ -33,7 +33,7 @@ define [
           when 'public_domain' then 'icon-files-public-domain'
           when 'used_by_permission' then 'icon-files-obtained-permission'
           when 'fair_use' then 'icon-files-fair-use'
-          when 'creative_commmons' then 'icon-files-creative-commons'
+          when 'creative_commons' then 'icon-files-creative-commons'
         span {
           title: @props.model.get('usage_rights').license_name
           'data-tooltip': 'top'

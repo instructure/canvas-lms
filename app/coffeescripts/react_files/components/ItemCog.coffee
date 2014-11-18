@@ -8,11 +8,12 @@ define [
   'compiled/models/Folder'
   './RestrictedDialogForm'
   '../utils/openMoveDialog'
+  '../utils/openUsageRightsDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) ->
+], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, Folder, RestrictedDialogForm, openMoveDialog, openUsageRightsDialog, downloadStuffAsAZip, deleteStuff, $) ->
 
   ItemCog = React.createClass
     displayName: 'ItemCog'
@@ -73,6 +74,13 @@ define [
                   ref: 'move'
                 },
                   I18n.t('move', 'Move')
+              li {},
+                a {
+                  href: '#'
+                  onClick: wrap(openUsageRightsDialog)
+                  ref: 'usageRights'
+                },
+                  I18n.t('Manage Usage Rights')
               li {},
                 a {
                   href:'#'

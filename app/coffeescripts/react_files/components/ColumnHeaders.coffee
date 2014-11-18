@@ -84,7 +84,7 @@ define [
 
               span className: ('visible-desktop' if column.displayNameShort),
                 if (column.property == 'usage_rights')
-                  i {className: 'icon-license'},
+                  i {className: 'icon-files-copyright'},
                     span {className: 'screenreader-only'},
                       I18n.t('Usage Rights')
                 else

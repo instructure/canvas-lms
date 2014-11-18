@@ -6,13 +6,14 @@ define [
   'compiled/react/shared/utils/withReactDOM'
   './UploadButton'
   '../utils/openMoveDialog'
+  '../utils/openUsageRightsDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
   '../modules/customPropTypes'
   './RestrictedDialogForm'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
+], (_, I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, openUsageRightsDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
@@ -166,6 +167,23 @@ define [
               'data-tooltip': ''
             },
               i className: 'icon-copy-course'
+
+          if @props.userCanManageFilesForContext
+            button {
+              type: 'button'
+              disabled: !showingButtons
+              className: 'ui-button btn-rights'
+              onClick: (event) =>
+                openUsageRightsDialog(@props.selectedItems, {
+                  contextType: @props.contextType
+                  contextId: @props.contextId
+                  returnFocusTo: event.target
+                })
+              title: I18n.t('Manage Usage Rights')
+              'aria-label': I18n.t('Manage Usage Rights')
+              'data-tooltip': ''
+            },
+              i className: 'icon-files-copyright'
 
           if @props.userCanManageFilesForContext
             button {
