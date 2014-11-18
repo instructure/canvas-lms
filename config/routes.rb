@@ -534,7 +534,7 @@ CanvasRails::Application.routes.draw do
     get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
     get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
     get 'test_ldap_searches' => 'account_authorization_configs#test_ldap_search'
-    get 'test_ldap_logins' => 'account_authorization_configs#test_ldap_login'
+    match 'test_ldap_logins' => 'account_authorization_configs#test_ldap_login', via: [:get, :post]
     get 'saml_testing' => 'account_authorization_configs#saml_testing'
     get 'saml_testing_stop' => 'account_authorization_configs#saml_testing_stop'
 
