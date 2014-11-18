@@ -36,8 +36,8 @@ define [
                 'aria-label': I18n.t('Using %{percent}% of storage quota.',
                                     {percent: toFixedDecimal(@state.quota_used / @state.quota * 100, 2)})
               }),
-            div className: 'col-xs',
-              I18n.t 'usage_details', '%{quota_used} of %{quota}',
-                quota_used: friendlyBytes(@state?.quota_used)
+            div className: 'col-xs-6', style: 'padding-left': '0px',
+              I18n.t 'usage_details', '%{percent}% of %{quota} used',
+                percent: Math.ceil(@state.quota_used / @state.quota * 100)
                 quota: friendlyBytes(@state?.quota)
 

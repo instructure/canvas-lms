@@ -136,7 +136,7 @@ define [
         div className: 'ef-footer grid-row',
           if userCanManageFilesForContext
             FilesUsage({
-              className: 'col-xs-3'
+              className: 'col-xs-4'
               contextType: contextType
               contextId: contextId
             })
