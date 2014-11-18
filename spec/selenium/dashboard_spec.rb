@@ -362,6 +362,13 @@ describe "dashboard" do
 
         #verify assignment is in to do list
         expect(f('.to-do-list > li')).to include_text('Grade ' + assignment.title)
+
+        student.enrollments.first.destroy
+
+        get "/"
+
+        #verify todo list is updated
+        expect(f('.to-do-list > li')).to be_nil
       end
     end
 

@@ -67,6 +67,7 @@ class Enrollment < ActiveRecord::Base
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
   after_save :update_cached_due_dates
+  after_save :touch_graders_if_needed
 
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
@@ -1063,5 +1064,13 @@ class Enrollment < ActiveRecord::Base
 
   def total_activity_time
     self.read_attribute(:total_activity_time).to_i
+  end
+
+  def touch_graders_if_needed
+    if !active_student? && active_student?(:was) && self.course.submissions.where(:user_id => self.user_id).exists?
+      connection.after_transaction_commit do
+        User.where(id: self.course.admins).touch_all
+      end
+    end
   end
 end
