@@ -1,0 +1,36 @@
+@import "./ic_quiz_inspector/events";
+@import "./ic_quiz_inspector/question_inspector";
+@import "./ic_quiz_inspector/question_listing";
+@import "./ic_quiz_inspector/session";
+
+#ic-QuizInspector {
+  padding: $whitespace;
+}
+
+.ic-QuizInspector__QuestionAnchors {
+  display: inline-block;
+}
+
+.ic-QuizInspector__QuestionAnchor {
+  margin-left: $whitespace / 2;
+
+  &:visited {
+    color: $visitedLinkFg;
+  }
+}
+
+.ic-QuizInspector__Header {
+  border-bottom: $borderColor 1px solid;
+  position: relative;
+}
+
+.ic-QuizInspector__HeaderControls {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 12px;
+
+  .icon-refresh:before {
+    font-size: 10px;
+  }
+}

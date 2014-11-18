@@ -1,12 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
 
-describe Quizzes::QuizSubmissionEventsController, type: :request do
+describe Quizzes::QuizSubmissionEventsApiController, type: :request do
   require File.expand_path(File.dirname(__FILE__) + '/../../../quiz_spec_helper.rb')
 
   def api_create(options={}, data={})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/events"
-    params = { controller: 'quizzes/quiz_submission_events',
+    params = { controller: 'quizzes/quiz_submission_events_api',
                action: 'create',
                format: 'json',
                course_id: @course.id.to_s,

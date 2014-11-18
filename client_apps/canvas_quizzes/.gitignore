@@ -1,0 +1,23 @@
+# autogen
+/.sublime-project.sublime-workspace
+/.jshint.html
+/doc/api
+/doc/coverage
+/tests.html
+
+# build
+/tmp
+/dist
+npm-debug.log
+
+# assets
+exclude
+*.zip
+*.gz
+
+# env
+/.ruby-version
+/.grunt/
+/node_modules
+development_local.js
+*.swp

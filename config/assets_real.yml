@@ -162,7 +162,7 @@ stylesheets:
   external_tool_full_width:
     - public/stylesheets/compiled/pages/external_tools/full_width.css
   # Client Apps:
-  canvas_quiz_statistics:
-    - public/stylesheets/compiled/client_apps/canvas_quiz_statistics.css
+  canvas_quizzes:
+    - public/stylesheets/compiled/client_apps/canvas_quizzes.css
 
   <%= plugin_assets.anchors_yml %>

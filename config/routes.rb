@@ -288,6 +288,7 @@ CanvasRails::Application.routes.draw do
           get :record_answer
           post :record_answer
         end
+        resources :events, controller: 'quizzes/quiz_submission_events', path: :log
       end
 
       post 'extensions/:user_id' => 'quizzes/quiz_submissions#extensions', as: :extensions
@@ -1356,8 +1357,9 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/quiz_extensions', action: :create
     end
 
-    scope(controller: "quizzes/quiz_submission_events") do
-      post "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :create, as: 'course_quiz_submission_events'
+    scope(controller: "quizzes/quiz_submission_events_api") do
+      get "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :index, as: 'course_quiz_submission_events'
+      post "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :create, as: 'create_quiz_submission_events'
     end
 
     scope(controller: 'quizzes/quiz_submission_questions') do

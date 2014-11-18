@@ -16,74 +16,47 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API QuizSubmissionEvent
-# @model QuizSubmissionEvent
-#     {
-#       "id": "QuizSubmissionEvent",
-#       "description": "An event passed from the Quiz Submission take page",
-#       "properties": {
-#         "created_at": {
-#           "description": "a timestamp record of creation time",
-#           "example": "2014-10-08T19:29:58Z",
-#           "type": "datetime"
-#         },
-#         "event_type": {
-#           "description": "the type of event being sent",
-#           "example": "question_answered",
-#           "type": "string"
-#         },
-#         "event_data": {
-#           "description": "custom contextual data for the specific event type",
-#           "example": {"answer": "42"},
-#           "type": "object"
-#         }
-#       }
-#     }
 class Quizzes::QuizSubmissionEventsController < ApplicationController
   include Filters::Quizzes
   include Filters::QuizSubmissions
 
-  before_filter :require_user
-  before_filter :require_quiz_submission, :only => [ :create ]
+  before_filter :require_user, :require_context
+  before_filter :require_quiz, :only => [ :index ]
+  before_filter :require_quiz_submission, :only => [ :index ]
 
-  # @API Submit captured events
-  # @beta
-  #
-  # Store a set of events which were captured during a quiz taking session.
-  #
-  # On success, the response will be 204 No Content with an empty body.
-  #
-  # @argument quiz_submission_events[] [Required, Array]
-  #  The submission events to be recorded
-  #
-  # @example_request
-  #  {
-  #    "quiz_submission_events":
-  #    [
-  #      {
-  #       "created_at": "2014-10-08T19:29:58Z",
-  #       "event_type": "question_answered",
-  #       "event_data" : {"answer": "42"}
-  #      }, {
-  #       "created_at": "2014-10-08T19:30:17Z",
-  #       "event_type": "question_flagged",
-  #       "event_data" : { "question_id": "1", "flagged": true }
-  #     }
-  #   ]
-  #  }
-  #
-  def create
-    if authorized_action(@quiz_submission, @current_user, :record_events)
-      params["quiz_submission_events"].each do |datum|
-        Quizzes::QuizSubmissionEvent.create do |event|
-          event.quiz_submission_id = @quiz_submission.id
-          event.event_type = datum["event_type"]
-          event.event_data = datum["event_data"]
-          event.created_at = datum["created_at"]
-          event.attempt = @quiz_submission.attempt
-        end
-      end
-      head :no_content
+  protect_from_forgery :only => [ :index ]
+
+  def index
+    authorized_action(@quiz_submission, @current_user, :read)
+
+    unless @context.feature_enabled?(:quiz_log_auditing)
+      flash[:error] = t('errors.quiz_log_auditing_required',
+      "The quiz log auditing feature needs to be enabled for this course.")
+
+      return redirect_to named_context_url(@context, :context_quiz_history_url,
+        @quiz.id,
+        user_id: @quiz_submission.user_id)
     end
+
+    dont_show_user_name = @quiz.anonymous_submissions || (!@quiz_submission.user || @quiz_submission.user == @current_user)
+
+    add_crumb(t('#crumbs.quizzes', "Quizzes"), named_context_url(@context, :context_quizzes_url))
+    add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+
+    submission_crumb = if dont_show_user_name
+      t(:default_submission_crumb, "Submission %{id}", { id: @quiz_submission.id })
+    else
+      @quiz_submission.user.name
+    end
+
+    add_crumb(submission_crumb, named_context_url(@context, :context_quiz_quiz_submission_url, @quiz, @quiz_submission))
+    add_crumb(t(:log_crumb, "Log"), course_quiz_quiz_submission_events_url(@context, @quiz, @quiz_submission))
+
+    js_env({
+      quiz_url: api_v1_course_quiz_url(@context, @quiz),
+      questions_url: api_v1_course_quiz_questions_url(@context, @quiz),
+      submission_url: api_v1_course_quiz_submission_url(@context, @quiz, @quiz_submission),
+      events_url: api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission)
+    })
   end
 end

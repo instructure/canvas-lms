@@ -1,0 +1,63 @@
+#ic-QuizInspector__QuestionInspector {
+}
+
+#ic-QuestionInspector__Answers {
+  list-style-type: none;
+  counter-reset: answers;
+  padding: 0;
+  margin: 0;
+
+  td, th {
+    border: 1px solid $borderColor;
+    padding: $whitespace/2;
+  }
+}
+
+.ic-QuestionInspector__Answer {
+  $counter-w: 32px;
+  $counter-h: 28px;
+
+  padding-left: $counter-w + $whitespace;
+  min-height: $counter-h;
+  margin: $whitespace*2 0;
+  line-height: $counter-h;
+
+  &:before {
+    counter-increment: answers;
+    content: counter(answers);
+    position: absolute;
+    background-color: $inactiveBg;
+    color: $inactiveFg;
+    padding: $whitespace/2 0;
+    margin-left: -$counter-w -$whitespace;
+    width: $counter-w;
+    text-align: center;
+    line-height: 1.4;
+  }
+}
+
+.ic-QuestionInspector__Answer--is-active {
+  &:before {
+    background-color: $activeBg;
+    color: $activeFg;
+  }
+}
+
+.ic-QuestionInspector__QuestionText {
+  margin: $whitespace 0;
+}
+
+.ic-QuestionInspector__QuestionHeader {
+  position: relative;
+}
+
+.ic-QuestionInspector__QuestionId {
+  font-size: 12px;
+  position: absolute;
+  right: 0;
+}
+
+.ic-QuestionInspector__QuestionType {
+  color: $muteFg;
+  margin-left: $whitespace/2;
+}
