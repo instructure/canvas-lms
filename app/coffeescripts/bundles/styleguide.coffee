@@ -50,7 +50,8 @@ require [
   $(".accordion").accordion header: "h3"
 
   # Tabs
-  $("#tabs").tabs()
+  $("#styleguide-tabs-demo-regular").tabs()
+  $("#styleguide-tabs-demo-minimal").tabs()
 
   # Datepicker
   # $("#datepicker").datepicker().children().show()

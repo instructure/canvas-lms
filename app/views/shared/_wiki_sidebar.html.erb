@@ -1,7 +1,7 @@
 <% @context ||= @current_user %>
 <% cache(['wiki_sidebar_render_3', @context.cache_key, @current_user].cache_key.to_s) do %>
 <% load_wiki_sidebar %>
-<div id="editor_tabs" style="display: none;">
+<div id="editor_tabs" class="ui-tabs--mini" style="display: none;">
 
   <span class="wiki-sidebar-header" role="heading" aria-level="2"><%= t('headings.insert_content', %{Insert Content into the Page}) %></span>
   <ul>
