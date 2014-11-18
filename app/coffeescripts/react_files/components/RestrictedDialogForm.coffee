@@ -63,7 +63,7 @@ define [
 
     # Function Summary
     #
-    # Event though you can technically set each of these fields independently, since we 
+    # Event though you can technically set each of these fields independently, since we
     # are using them with a radio button we will grab all of the values and treat it as
     # a state based on the input fields.
 
@@ -87,8 +87,8 @@ define [
 
     render: withReactDOM ->
       form {
-        ref: 'dialogForm', 
-        onSubmit: @handleSubmit, 
+        ref: 'dialogForm',
+        onSubmit: @handleSubmit,
         className: 'form-horizontal form-dialog permissions-dialog-form',
       },
         div className: "radio",
@@ -121,7 +121,7 @@ define [
               ref: 'permissionsInput'
               type: 'radio'
               name: 'permissions'
-              checked: @state.selectedOption in ['link_only', 'date_range'] 
+              checked: @state.selectedOption in ['link_only', 'date_range']
               onChange: (event) =>
                   @setState selectedOption: if @state.unlock_at
                                               'date_range'
@@ -130,10 +130,10 @@ define [
             },
             I18n.t("options.restrictedAccess.description", "Restricted Access")
 
- 
+
         div {
-          style: 
-            'margin-left': '20px', 
+          style:
+            'margin-left': '20px',
             display: (if  @state.selectedOption in ['link_only', 'date_range'] then 'block' else 'none')
           'aria-hidden': (if  @state.selectedOption in ['link_only', 'date_range'] then 'false' else 'true')
         },
@@ -155,37 +155,37 @@ define [
                  type: 'radio',
                  name: 'restrict_options',
                  checked: @state.selectedOption is 'date_range',
-                 onChange: (event) => 
+                 onChange: (event) =>
                    @setState({selectedOption: 'date_range'})
                }
                I18n.t("options_2.description", "Schedule student availability")
-     
+
           div {
             className: 'control-group'
-            style: 
+            style:
               display: (if @state.selectedOption is 'date_range' then 'block' else 'none')
             'aria-hidden': (if @state.selectedOption is 'date_range' then 'false' else 'true')
           },
-            label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableFrom', 'Lock From')
+            label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('Available From')
               div className: 'controls dateSelectInputContainer',
                 input
                   ref: 'unlock_at'
                   defaultValue: $.datetimeString(@state.unlock_at) if @state.unlock_at,
                   className: 'form-control dateSelectInput',
                   type: 'text',
-                  'aria-label': I18n.t('aria_label.availableFrom', 'From')
+                  'aria-label': I18n.t('Available From')
             div className: 'control-group',
-              label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('label.availableUntil', 'Lock Until')
+              label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('Available Until')
                 div className: 'controls dateSelectInputContainer',
                 input
                   ref: 'lock_at'
                   defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at,
                   className: 'form-control dateSelectInput',
                   type: 'text'
-                  'aria-label': I18n.t('aria_label.availableUntil', 'Until')
+                  'aria-label': I18n.t('Available Until')
 
         div className:"form-controls",
-          button { 
+          button {
             type: 'button',
             onClick: @props.closeDialog,
             className: "btn",
