@@ -92,7 +92,8 @@ define([
 
       postGrades() {
         var assignments = assignmentUtils.notIgnored(this.getState().assignments)
-        assignmentUtils.postGradesThroughCanvas(assignments)
+        var selected = this.getState().selected
+        assignmentUtils.postGradesThroughCanvas(selected, assignments)
       },
 
       getPage () {

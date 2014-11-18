@@ -76,9 +76,26 @@ define([
     // Sends a post-grades request to Canvas that is then forwarded to SIS App.
     // Expects a list of assignments that will later be queried for grades via
     // SIS App's workers
-    postGradesThroughCanvas (assignments) {
-      console.error("not yet implemented: postAssignmentsThroughCanvas")
-      console.log('assignments', assignments)
+    postGradesThroughCanvas (selected, assignments) {
+      var url = "/api/v1/" + selected.type + "s/" + selected.id + "/post_grades/"
+      var data = { assignments: _.map(assignments, (assignment) => assignment.id) }
+      $.ajax(url, {
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        success: (msg) =>{
+          if (msg.error){
+            $.flashError(msg.error)
+          }else{
+            $.flashMessage(msg.message)
+          }
+        },
+        error: (err) => {
+          var msg = 'An error occurred posting grades for (' + selected.type + ' : ' + selected.id +'). '
+          msg += "HTTP Error " + data.status + " : " + data.statusText
+          $.flashError(msg)
+        }
+      })
     }
 
   };

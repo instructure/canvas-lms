@@ -36,8 +36,9 @@ define([
       this.props.store.setState({ pleaseShowSummaryPage: true })
     },
 
-    postGrades () {
+    postGrades (e) {
       this.props.store.postGrades()
+      this.props.closeDialog(e)
     },
 
     render () {
