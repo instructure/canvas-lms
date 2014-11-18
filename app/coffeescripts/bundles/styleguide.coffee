@@ -1,15 +1,17 @@
 require [
   'jquery'
   'underscore'
+  'react'
   'compiled/fn/preventDefault'
   'compiled/views/PublishButtonView'
   'compiled/views/PublishIconView'
+  'jsx/styleguide/ReactModalExample'
   'jqueryui/accordion'
   'jqueryui/tabs'
   'jqueryui/button'
   'jqueryui/tooltip'
   'jquery.instructure_date_and_time'
-], ($, _, preventDefault, PublishButtonView, PublishIconView) ->
+], ($, _, React, preventDefault, PublishButtonView, PublishIconView, ReactModalExample) ->
 
   do ->
     dialog = $('#dialog-buttons-dialog').dialog({
@@ -18,6 +20,22 @@ require [
     }).data('dialog')
     $('#show-dialog-buttons-dialog').click -> dialog.open()
 
+
+    # React Modal
+    React.renderComponent(
+      ReactModalExample
+        className: 'ReactModal__Content--canvas'
+        overlayClassName: 'ReactModal__Overlay--canvas'
+    , document.getElementById('react-modal-example')
+    );
+
+    React.renderComponent(
+      ReactModalExample
+        label: 'Trigger Confirm Dialog'
+        className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal'
+        overlayClassName: 'ReactModal__Overlay--canvas'
+    , document.getElementById('react-modal-confirm-example')
+    )
 
   ## OLD STYLEGUIDE ##
 

@@ -181,7 +181,7 @@ define [
         @setState(newState)
 
     render: withReactDOM ->
-      ReactModal {isOpen: true, onRequestClose: @closeModal, closeTimeoutMS: 10},
+      ReactModal {isOpen: true, onRequestClose: @closeModal, className: 'ReactModal__Content--ef-file-preview', overlayClassName: 'ReactModal__Overlay--ef-file-preview', closeTimeoutMS: 10},
         div {className: 'ef-file-preview-overlay'},
           div {className: 'ef-file-preview-header'},
             h1 {className: 'ef-file-preview-header-filename'},

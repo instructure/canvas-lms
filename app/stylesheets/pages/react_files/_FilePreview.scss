@@ -9,15 +9,11 @@ $spacing-width: 0;
 $preview-footer-height: 140px;
 $preview-header-height: 70px;
 
-// Make sure that ReactModal gets above everything else
-.ReactModal__Overlay {
-  z-index: 100;
-  &.ReactModal__Overlay--after-open {
-    background-color: rgba($preview-bg, 0.9);
-  }
+.ReactModal__Overlay.ReactModal__Overlay--ef-file-preview {
+  background: rgba(black, 0.9);
 }
 
-.ReactModal__Content {
+.ReactModal__Content.ReactModal__Content--ef-file-preview {
   height: 100%;
   display: flex;
 }

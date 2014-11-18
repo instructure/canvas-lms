@@ -19,6 +19,6 @@
     "ic-sortable": "0.0.2",
     "react": "0.11.0",
     "react-router": "0.9.3",
-    "react-modal": "~0.0.2"
+    "react-modal": "0.0.6"
   }
 }
