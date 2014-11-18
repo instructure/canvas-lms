@@ -272,7 +272,7 @@ END
 Enable multiple grading periods management in the account admin, and use in the Gradebook.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
+      state: 'hidden',
       development: true
     },
     'course_catalog' =>
