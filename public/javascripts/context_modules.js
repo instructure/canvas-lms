@@ -428,6 +428,9 @@ define([
           width: 600,
           close: function() {
             modules.hideEditModule(true);
+          },
+          open: function(){
+            $(this).find('input[type=text],textarea,select').first().focus();
           }
         }).fixDialogButtons().dialog('option', {title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
         $module.removeClass('dont_remove');
@@ -896,7 +899,10 @@ define([
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
       $("#edit_item_form").dialog({
-        title: I18n.t('titles.edit_item', "Edit Item Details")
+        title: I18n.t('titles.edit_item', "Edit Item Details"),
+        open: function(){
+          $(this).find('input[type=text],textarea,select').first().focus();
+        }
       }).fixDialogButtons();
     });
     $("#edit_item_form .cancel_button").click(function(event) {
