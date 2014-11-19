@@ -119,7 +119,10 @@ $ef-thumbnail-size: 36px;
     opacity: 1
   }
 
-  .btn-link { border-width: 0 }
+  .btn-link {
+    border-width: 0;
+    &.restricted { color: $canvas-alert;}
+  }
 }
 
 
