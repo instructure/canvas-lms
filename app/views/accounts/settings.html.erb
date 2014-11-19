@@ -10,7 +10,8 @@
       'default_storage_quota_mb' => @context.default_storage_quota_mb,
       'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
       'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb,
-      'site_admin' => @account.site_admin?
+      'site_admin' => @account.site_admin?,
+      'root_account' => @account.root_account?
     }
   end
 %>

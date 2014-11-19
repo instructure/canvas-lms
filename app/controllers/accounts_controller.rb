@@ -334,7 +334,7 @@ class AccountsController < ApplicationController
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
             next unless quota_settings.has_key?(quota_type)
 
-            quota_value = quota_settings[quota_type].strip
+            quota_value = quota_settings[quota_type].to_s.strip
             if INTEGER_REGEX !~ quota_value.to_s
               @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
             else

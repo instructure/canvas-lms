@@ -568,6 +568,27 @@ describe Group do
       @group.reload
       expect(@group.quota).to eq 10.megabytes
     end
+
+    it "should inherit from a parent account's default_group_storage_quota" do
+      enable_cache do
+        account = account_model
+        subaccount = account.sub_accounts.create!
+
+        account.default_group_storage_quota = 10.megabytes
+        account.save!
+
+        course(:account => subaccount)
+        @group = group(:group_context => @course)
+
+        expect(@group.quota).to eq 10.megabytes
+
+        # should reload
+        account.default_group_storage_quota = 20.megabytes
+        account.save!
+
+        expect(@group.quota).to eq 20.megabytes
+      end
+    end
   end
 
   describe "#feature_enabled?" do
