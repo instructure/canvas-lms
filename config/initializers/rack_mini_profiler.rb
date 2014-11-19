@@ -6,8 +6,11 @@ Permissions.register :app_profiling,
   :available_to => %w(AccountAdmin AccountMembership),
   :true_for => %w(AccountAdmin AccountMembership)
 
+# manually initialize mini-profiler, because initialize! sets up some bad
+# defaults.
 Rack::MiniProfiler.config.tap do |c|
   c.pre_authorize_cb = lambda { |env| !Rails.env.test? }
+  c.logger = Rails.logger
   c.skip_schema_queries =  !Rails.env.production?
   c.backtrace_includes =  [/^\/?(app|config|lib|test)/]
   c.authorization_mode = :whitelist
@@ -27,9 +30,12 @@ Rack::MiniProfiler.config.tap do |c|
   end
 end
 
-begin
-  Rack::MiniProfilerRails.initialize!(Rails.application)
-rescue Errno::EACCES
-  # don't care if we couldn't create the temp directory
-  # just means we can't profile
+Rails.configuration.middleware.insert(0, ::Rack::MiniProfiler)
+
+ActiveSupport.on_load(:action_controller) do
+  ::Rack::MiniProfiler.profile_method(ActionController::Base, :process) {|action| "Executing action: #{action}"}
 end
+ActiveSupport.on_load(:action_view) do
+  ::Rack::MiniProfiler.profile_method(ActionView::Template, :render) {|x,y| "Rendering: #{@virtual_path}"}
+end
+
