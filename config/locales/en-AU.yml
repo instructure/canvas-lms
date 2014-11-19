@@ -535,7 +535,7 @@ en-AU:
         message_date_to: "To Date"
       grade_change_logging_content: 
         find: Find
-        grade_change_activity: "Grade Change Activity"
+        grade_change_activity: "Mark Change Activity"
         message_assignment_id: "Assignment Id"
         message_course_id: "Course Id"
       grade_change_logging_item: 
@@ -555,7 +555,7 @@ en-AU:
       logging_content_pane: 
         authentication: "Login / Logout Activity"
         course: "Course Activity"
-        grade_change: "Grade Change Activity"
+        grade_change: "Mark Change Activity"
         select_default: "Select a Log type"
         select_label: "Select a log type to search."
       page_title: "Admin Tools for %{account}"
@@ -621,7 +621,7 @@ en-AU:
           filter_online: 
             check_box: "Online classes only"
     confirm_delete_user: 
-      confirm_delete: "Are you sure you want to delete this user from the account %{account}? This will remove the user's data (including grades) from all courses and groups. This process cannot be undone."
+      confirm_delete: "Are you sure you want to delete this user from the account %{account}? This will remove the user's data (including marks) from all courses and groups. This process cannot be undone."
       delete_button: "Delete %{user}"
       page_title: "Confirm Delete"
       title: "Confirm Delete %{user} from %{account}"
@@ -691,7 +691,7 @@ en-AU:
       account_reports: 
         default: 
           description: 
-            text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
+            text: "This report shows the student final mark results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final mark that is displayed in the course gradebook."
     group_type: group
     include_deleted_parameter: 
       account_reports: 
@@ -964,7 +964,7 @@ en-AU:
         external_services_warning: "Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system."
         external_services_warning_label: "Pop-up Message Content:"
         from: From
-        sample_subject: "Grade Changed: Check In Survey, Testing Course"
+        sample_subject: "Mark Changed: Check In Survey, Testing Course"
         subject: Subject
       open_registration_delegated_warning_message: "An external identity provider is enabled, and users created via open registration may not be able to log in unless the external identity provider's login form has a link back to %{url}."
       open_registration_delegated_warning_tooltip: "An External Identity Provider is Enabled"
@@ -1285,12 +1285,12 @@ en-AU:
       the_student: "The Student"
       the_teacher: "The Teacher"
       title: "Days since a teacher has interacted with the student"
-      ungraded_count_description: "More than %{count} submissions have not been graded"
-      ungraded_count_option: "Ungraded Submissions (Count)"
-      ungraded_count_title: "Number of submissions that have not been graded"
-      ungraded_timespan_description: "A submission has been left ungraded for %{count} days"
-      ungraded_timespan_option: "Ungraded Submissions (Time)"
-      ungraded_timespan_title: "Days that a submission has been left ungraded"
+      ungraded_count_description: "More than %{count} submissions have not been marked"
+      ungraded_count_option: "Unmarked Submissions (Count)"
+      ungraded_count_title: "Number of submissions that have not been marked"
+      ungraded_timespan_description: "A submission has been left unmarked for %{count} days"
+      ungraded_timespan_option: "Unmarked Submissions (Time)"
+      ungraded_timespan_title: "Days that a submission has been left unmarked"
       usernote_description: "No faculty journal entry has been added for %{count} days"
       usernote_option: "No Faculty Journal Entry"
       usernote_title: "Days since a faculty journal has been added"
@@ -1471,18 +1471,18 @@ en-AU:
       gpa_scale_explainer: "What is GPA Scale Grading?"
       grading_scheme_info: "View/Edit Grading Scheme"
   assignment_details: 
-    no_graded_submissions: "No graded submissions"
+    no_graded_submissions: "No marked submissions"
   assignment_details_dialog: 
     average_score: "Average Score:"
     count_of_submissions: "%{cnt} submissions"
-    grading_statistics_for_assignment: "Grade statistics for: %{assignment.name}"
+    grading_statistics_for_assignment: "Mark statistics for: %{assignment.name}"
     high_score: "High Score:"
     low_score: "Low Score:"
     no_one_scored_higher: "No one scored higher than %{max}"
     no_one_scored_lower: "No one scored lower than %{min}"
     scores_higher_than_the_average: "Scores higher than the average of %{average}"
     scores_lower_than_the_average: "Scores lower than the average of %{average}"
-    total_graded_submissions: "Total Graded Submissions:"
+    total_graded_submissions: "Total Marked Submissions:"
   assignment_group: 
     default_name: Assignments
     default_title: Assignments
@@ -1492,7 +1492,7 @@ en-AU:
     titles: 
       assignment_group_weights: "Manage assignment group weighting"
       total: Total
-    weight_final: "Weight final grade based on groups"
+    weight_final: "Weight final mark based on groups"
   assignment_groups: 
     errors: 
       cannot_delete_group: "You can not delete a group with a locked assignment."
@@ -1508,7 +1508,7 @@ en-AU:
     muting_assignment: "Muting Assignment..."
     unmute_assignment: "Unmute Assignment"
     unmute_button: "Unmute Assignment"
-    unmute_dialog: "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"
+    unmute_dialog: "This assignment is currently muted. That means students can't see their marks and feedback. Would you like to unmute now?"
     unmuting_assignment: "Unmuting Assignment..."
   assignments: 
     add_assignment_form: 
@@ -1526,7 +1526,7 @@ en-AU:
         attendance: Attendance
         discussion: Discussion
         external_tool: "External Tool"
-        not_graded: "Not Graded"
+        not_graded: "Not Marked"
         quiz: Quiz
       tooltips: 
         assignment_is_quiz: "This assignment is a quiz, so points possible comes from the questions and can't be set manually."
@@ -1545,7 +1545,7 @@ en-AU:
         never_drop: "Never Drop"
         no_assignments: "[No Assignments]"
         weighted_by_points: "Weighted By Points"
-      percent_of_total_grade: "% of total grade"
+      percent_of_total_grade: "% of total mark"
     assignment_count: 
       one: "1 Assignment"
       other: "%{count} Assignments"
@@ -1592,12 +1592,12 @@ en-AU:
       points_possible_screen_reader: "%{pointsPossible} Points Possible"
       settings: Settings
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "This assignment will not be assigned a grade."
-      assignment_not_yet_graded_screenreader: "Assignment not yet graded. %{pointsPossible} points possible."
+      assignment_grading_type_is_not_graded: "This assignment will not be assigned a mark."
+      assignment_not_yet_graded_screenreader: "Assignment not yet marked. %{pointsPossible} points possible."
       empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "No Submission"
       no_submission_for_assignment_screenreader: "No submission for this assignment. %{pointsPossible} points possible."
-      not_yet_graded: "*Not Yet Graded*"
+      not_yet_graded: "*Not Yet Marked*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Score: %{score} out of %{pointsPossible} points."
     assignment_locked: 
@@ -1608,7 +1608,7 @@ en-AU:
       cancel: Cancel
       save: Save
       validating: Saving...
-      weight_groups: "Weight final grade based on assignment groups"
+      weight_groups: "Weight final mark based on assignment groups"
     assignment_sidebar: 
       links: 
         submit: "Submit Assignment"
@@ -1616,7 +1616,7 @@ en-AU:
       buttons: 
         delete_group: "Delete Group"
       labels: 
-        class_weighting_policy: "Weight the final grade based on assignment groups"
+        class_weighting_policy: "Weight the final mark based on assignment groups"
         delete_assignments_in_group: "Delete assignments in this group"
         move_assignments_to: "Move assignments from this group to"
       options: 
@@ -1629,7 +1629,7 @@ en-AU:
         delete_assignment_group: "The assignment group %{group} has %{assignment_count} in it. You can either delete these assignments or move them to another assignment group."
     assignments_list_content: 
       assignments: 
-        graded: "This assignment has been graded"
+        graded: "This assignment has been marked"
         needs_grading_count: "%{needs_grading_count} submissions for this assignment still need grading"
         overdue: "This assignment is overdue"
       no_assignments: "No Assignments created for this course."
@@ -1639,14 +1639,14 @@ en-AU:
         overdue_assignments: "Overdue Assignments"
         past_assignments: "Past Assignments"
         undated_assignments: "Undated Assignments"
-        ungraded_assignments: "Ungraded Assignments"
+        ungraded_assignments: "Unmarked Assignments"
         upcoming_assignments: "Upcoming Assignments"
     assignments_list_right_side: 
       links: 
         group_assignments_by_type: "Group Assignments by Type"
         just_show_assignment_list: "Just Show the Assignment List"
         manage_assignments: "Manage Assignments"
-        see_current_grades: "See my grades so far"
+        see_current_grades: "See my marks so far"
       titles: 
         show_only_assignments_from: "Show Only Assignments from"
         upcoming_assignments: "Upcoming Assignments"
@@ -1683,7 +1683,7 @@ en-AU:
       external_tool_type: "External Tool"
       more: "More Options"
       multiple_due_dates: "Multiple due dates"
-      not_graded_type: "Not Graded"
+      not_graded_type: "Not Marked"
       quiz_type: Quiz
       save: Save
       saving: Saving...
@@ -1694,7 +1694,7 @@ en-AU:
       example_group_name: "e.g., Essay Group 1"
       group_name: "Group Name:"
       never_drop: "Never Drop:"
-      percent_of_total: "% of total grade"
+      percent_of_total: "% of total mark"
       save: Save
       saving: Saving...
     create_new_crumb: "Create new"
@@ -1782,14 +1782,14 @@ en-AU:
     grade_assignment: 
       buttons: 
         upload_files: "Upload Files"
-      graded_count: "%{graded_count} *out of* %{total} Submissions Graded"
+      graded_count: "%{graded_count} *out of* %{total} Submissions Marked"
       links: 
         download_submissions: "Download Submissions"
         peer_reviews: "Peer Reviews"
         reupload_submissions: "Re-Upload Submissions"
       resubmission_count: 
-        one: "1 Ungraded Re-submission"
-        other: "%{count} Ungraded Re-submissions"
+        one: "1 Unmarked Re-submission"
+        other: "%{count} Unmarked Re-submissions"
       reupload_instructions: |-
           If you made changes to the student submission files you downloaded
           before, just zip them back up and upload the zip with the form below.
@@ -1799,30 +1799,30 @@ en-AU:
       speed_grader: SpeedGrader™
       titles: 
         related_items: "Related Items"
-    grade_gpa_scale_screenreader: "Grade: %{grade}"
-    grade_letter_grade_screenreader: "Grade: %{grade}"
-    grade_pass_fail_screenreader: "Grade: %{grade}"
+    grade_gpa_scale_screenreader: "Mark: %{grade}"
+    grade_letter_grade_screenreader: "Mark: %{grade}"
+    grade_pass_fail_screenreader: "Mark: %{grade}"
     grade_percent: "%{grade}%"
-    grade_percent_screenreader: "Grade: %{grade}%"
+    grade_percent_screenreader: "Mark: %{grade}%"
     grading_type_selector: 
-      display_grade_as: "Display Grade as"
+      display_grade_as: "Display Mark as"
       gpa_scale_explainer: "GPA Scale Grading is designed for schools that use a 4.0 scale (or 5.0/6.0) for all assignments. This grading scheme is similar to the Letter Grade display but features some important differences:"
-      gpa_scale_letters_explainer: "Letter grades can be used in addition to number grades."
+      gpa_scale_letters_explainer: "Letter marks can be used in addition to number marks."
       gpa_scale_percentage_explainer: "You cannot input points directly, but can input percentages. For instance, if an assignment is out of 50 points, inputting \"40\" will not work, but \"80%\" will."
-      gpa_scale_recommendation: "Unless your school uses a 4.0 scale (or 5.0/6.0) for grading, Canvas recommends displaying grades as Letter Grade."
+      gpa_scale_recommendation: "Unless your school uses a 4.0 scale (or 5.0/6.0) for grading, Canvas recommends displaying marks as Letter Grade."
       gpa_scale_scores_explainer: "The only scores allowed are predefined in the grading scheme."
       gpa_scale_title: "\"What is GPA Scale Grading?\""
       grading_type_options: 
         gpa_scale: "GPA Scale"
         letter_grade: "Letter Grade"
-        not_graded: "Not Graded"
+        not_graded: "Not Marked"
         pass_fail: Complete/Incomplete
         percent: Percentage
         points: Points
       view_grading_scheme: "View Grading Scheme"
     group_category_selector: 
       differentiated_groups_warning: "Differentiated group assignments may yield unexpected results."
-      grade_group_students_individually: "Assign Grades to Each Student Individually"
+      grade_group_students_individually: "Assign Marks to Each Student Individually"
       group_assignment_header: "Group Assignment"
       group_category_locked_explanation: "Students have already submitted homework on this assignment, so group settings cannot be changed."
       group_category_options: "New Group Category"
@@ -2026,7 +2026,7 @@ en-AU:
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
-        grade: "Grade: %{grade} *(%{points_possible} pts possible)*"
+        grade: "Mark: %{grade} *(%{points_possible} pts possible)*"
         none_assigned: "None Assigned"
       links: 
         resubmit: "Re-submit Assignment"
@@ -2169,7 +2169,7 @@ en-AU:
         originality_report_never: Never
         originality_report_visibility: "Students Can See the Originality Report"
         originality_report_visible_after_due_date: "After the Due Date"
-        originality_report_visible_after_grading: "After the assignment is graded"
+        originality_report_visible_after_grading: "After the assignment is marked"
         originality_report_visible_immediately: Immediately
     undated_assignments: "Undated Assignments"
     upcoming_assignments: "Upcoming Assignments"
@@ -2185,8 +2185,8 @@ en-AU:
         wizard: 
           details: "There's a lot more that goes into an assignment than due dates and points. If you want to type up a description of the assignment, allow file uploads, change the grading type or a bunch of other things, click the assignment's name or click the %{edit_icon} icon and then \"more options\"."
           group: 
-            screenreader_step1: "Assignment groups are used to organise assignments. You provide a name for each group. If you choose to weight the final grade based on groups then you can also set a percentage score for each group. Click \"Add Assignment Group\" to create a group."
-            step1: "Assignment groups are used to organize assignments. You provide a name for each group. If you choose to weight the final grade based on groups (*where?*) then you can also set a percentage score for each group. Click \"Add Assignment Group\" to create a group."
+            screenreader_step1: "Assignment groups are used to organise assignments. You provide a name for each group. If you choose to weight the final mark based on groups then you can also set a percentage score for each group. Click \"Add Assignment Group\" to create a group."
+            step1: "Assignment groups are used to organize assignments. You provide a name for each group. If you choose to weight the final mark based on groups (*where?*) then you can also set a percentage score for each group. Click \"Add Assignment Group\" to create a group."
           overview: "This page is for setting up your course at a high level. You can add assignments, group them and then weight those groups. The idea is to get yourself organized first, dive into the specifics second. Even still, there's a lot you can do from here."
           quizzes: "Quizzes are special types of assignments. You can create or import quizzes by clicking the \"Quizzes\" link on the left sidebar."
           screenreader_details: "There's a lot more that goes into an assignment than due dates and points. If you want to type up a description of the assignment, allow file uploads, change the grading type or a bunch of other things, click the assignment's name or click the edit icon and then \"more options\"."
@@ -2201,7 +2201,7 @@ en-AU:
         edit_assignment_in_detail: "Edit Assignments in Detail"
         screenreader_show_me_add_assignment: "Take me to the add assignment button"
         screenreader_show_me_add_assignment_group: "Take me to the add assignment group button"
-        screenreader_show_me_weight_final_grade: "Take me to the weight final grade checkbox"
+        screenreader_show_me_weight_final_grade: "Take me to the weight final mark checkbox"
         show_me_where: "Show Me Where"
       subtitles: 
         edit_assignment_in_detail: "(allow uploads, edit description, etc.)"
@@ -2331,7 +2331,7 @@ en-AU:
     only_one_bulk_migration: "Only one bulk course migration can be run at a time."
   button: 
     go_back: "Go Back"
-    post: "Post Grades"
+    post: "Post Marks"
     submit_assignment: "Submit Assignment"
   buttons: 
     add_item: "Add Item"
@@ -3408,7 +3408,7 @@ en-AU:
         title: 
           enrollment_sis_defined: "This enrollment was defined by the university, and can't be deleted"
         user_account_details: "User Account Details"
-        user_grades: "Grades for %{user}"
+        user_grades: "Marks for %{user}"
         user_only_view_section: "limit this user to only see fellow section users"
         user_outcomes: "Outcomes for %{user}"
         user_view_all_sections: "let this user see all course users"
@@ -3474,7 +3474,7 @@ en-AU:
         title: 
           enrollment_sis_defined: "This enrollment was defined by the university, and can't be deleted"
         user_account_details: "User Account Details"
-        user_grades: Grades
+        user_grades: Marks
         user_only_view_section: "limit this user to only see fellow section users"
         user_outcomes: Outcomes
         user_view_all_sections: "let this user see all course users"
@@ -3617,7 +3617,7 @@ en-AU:
         modules: 
           before_students_view: "Before students can view this module"
         new_tab: "Load in a new tab"
-        publish_final_grade: "publish final grade for the student when this module is completed"
+        publish_final_grade: "publish final mark for the student when this module is completed"
         require_sequential_progress: "Students must move through requirements in this module in sequential order"
         sort_by: "Sort By"
         title: Title
@@ -3731,7 +3731,7 @@ en-AU:
         modules: 
           before_students_view: "Before students can view this module"
         new_tab: "Load in a new tab"
-        publish_final_grade: "Publish final grade for the student when this module is completed"
+        publish_final_grade: "Publish final mark for the student when this module is completed"
         require_sequential_progress: "Students must move through requirements in this module in sequential order"
         sort_by: "Sort By"
         title: Title
@@ -4187,7 +4187,7 @@ en-AU:
     csv: 
       comments: Comments
       current_score: "Current Score"
-      final_grade: "Final Grade"
+      final_grade: "Final Mark"
       final_score: "Final Score"
       id: ID
       points_possible: "Points Possible"
@@ -4318,7 +4318,7 @@ en-AU:
       grading_standard_id: "Grading Standard Id"
       group_weighting_scheme: "Group Weighting Scheme"
       hide_distribution_graphs: "Hide Distribution Graphs"
-      hide_final_grade: "Hide Final Grade"
+      hide_final_grade: "Hide Final Mark"
       indexed: Indexed
       integration_id: "Integration Id"
       is_public: "Is Public"
@@ -4366,8 +4366,8 @@ en-AU:
     cancel: Cancel
     confirm: 
       delete_section: "Are you sure you want to delete this section?"
-      publish_grades: "Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized."
-      re_publish_grades: "Are you sure you want to republish these grades to the student information system?"
+      publish_grades: "Are you sure you want to publish these marks to the student information system? You should only do this if all your marks have been finalized."
+      re_publish_grades: "Are you sure you want to republish these marks to the student information system?"
     course_dates_enforced: "Users can only participate in the course between these dates"
     course_dates_unenforced: "These dates will not affect course availability"
     edit_sections_placeholder: "Enter a section name"
@@ -4375,7 +4375,7 @@ en-AU:
     errors: 
       invalid_sis_status: "Invalid SIS publish status"
       invitation: "Invitation Failed.  Please try again."
-      publish_grades: "Something went wrong when trying to publish grades to the student information system. Please try again later."
+      publish_grades: "Something went wrong when trying to publish marks to the student information system. Please try again later."
       re_send_all: "Send Failed, Please Try Again"
       section: "Add Section Failed, Please Try Again"
     flash: 
@@ -4393,11 +4393,11 @@ en-AU:
     links: 
       fewer_options: "fewer options"
       more_options: "more options"
-      publish: "Publish grades to SIS"
-      publishing: "Publishing grades to SIS..."
+      publish: "Publish marks to SIS"
+      publishing: "Publishing marks to SIS..."
       re_send_all: "Re-Send All Unaccepted Invitations"
       re_sending_invitation: "Re-Sending Invitation..."
-      republish: "Republish grades to SIS"
+      republish: "Republish marks to SIS"
     private_course: Private
     public_course: Public
     re_send_invitation: "Re-Send Invitation"
@@ -4415,7 +4415,7 @@ en-AU:
   courses: 
     assignments_needing_grading: 
       headings: 
-        grade: "Grade %{assignment}"
+        grade: "Mark %{assignment}"
         to_do: "To Do"
       images: 
         alt: 
@@ -4442,8 +4442,8 @@ en-AU:
         conclude_course: "Conclude Course"
         delete_course: "Delete Course"
       details: 
-        conclude_alt_text: "If you would like to retain the ability to change grades while limiting student access to the course, please utilise the course dates settings. You can learn about course date settings in our guides *here*"
-        confirm_conclude: "Warning: Concluding the course will prevent you from modifying grades and accessing course content."
+        conclude_alt_text: "If you would like to retain the ability to change marks while limiting student access to the course, please utilise the course dates settings. You can learn about course date settings in our guides *here*"
+        confirm_conclude: "Warning: Concluding the course will prevent you from modifying marks and accessing course content."
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*."
         confirm_delete_addendum: "If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course."
       headings: 
@@ -4505,7 +4505,7 @@ en-AU:
               Publishing will allow the users to begin participating in the course.
           not_registered: "This course is claimed and ready, but you'll need to finish the registration process before you can publish the course. You should have received an email from Canvas with a link to finish the process. Be sure to check your spam box."
         students: "You'll definitely want some of these. What's the fun of teaching a course if nobody's even listening?"
-        tas: "You may want to assign some TAs to help you with the course. TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you."
+        tas: "You may want to assign some TAs to help you with the course. TAs can mark student submissions, help moderate the discussions and even update due dates and assignment details for you."
       headings: 
         next_steps: "Next Steps"
       links: 
@@ -4604,7 +4604,7 @@ en-AU:
       buttons: 
         link: "Link to Student"
       details: |-
-          When an observer is linked to a student, they have access to that student's grades and course interactions. *Right now this observer is linked to the student, %{student}.*
+          When an observer is linked to a student, they have access to that student's marks and course interactions. *Right now this observer is linked to the student, %{student}.*
           
           To link the course observer %{user} to a student, select the student's name from the list below.
       labels: 
@@ -4625,7 +4625,7 @@ en-AU:
       unconcluded: "Course un-concluded"
       updated: "Course was successfully updated."
     recent_event: 
-      all_graded: "all graded"
+      all_graded: "all marked"
       due: due
       needs_grading: "needs grading"
       no_new_submissions: "no new submissions"
@@ -4634,7 +4634,7 @@ en-AU:
       submission_score: "%{score} *out of %{points_possible}*"
     recent_feedback: 
       comments: "Comments: %{count}"
-      not_graded: "not graded"
+      not_graded: "not marked"
       submission_points: 
         with_score: "Score: %{score} *out of %{points_possible}*"
         without_score: "out of %{points_possible}"
@@ -4644,7 +4644,7 @@ en-AU:
         add_these_users: "Add Users"
         adding: Adding...
         adding_n_users: "Validated and ready to add %{users.length} users:"
-        can_only_grade_students_in_section: "Can grade students in their section only"
+        can_only_grade_students_in_section: "Can mark students in their section only"
         close: Done
         duplicates_removed: "Some duplicates were removed."
         email: Email
@@ -4677,7 +4677,7 @@ en-AU:
         student_invitation_unaccepted_unavailable: "%{name} was added to the course: %{time}"
       link_to_students_view: 
         link_student_action: "To link the course observer *%{name}* to a student, select the student's name from the list below."
-        link_student_desc: "When an observer is linked to a student, they have access to that student's grades and course interactions."
+        link_student_desc: "When an observer is linked to a student, they have access to that student's marks and course interactions."
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} invitations haven't been accepted."
         re_send_invitations: Resend
@@ -4735,7 +4735,7 @@ en-AU:
         other: "%{count} Users"
       headings: 
         details: "Course Details"
-        grade_publishing: "Grade Publishing"
+        grade_publishing: "Mark Publishing"
         move_course: "Move the course to another root account"
         navigation: "Course Navigation"
         sections: "Course Sections"
@@ -4773,8 +4773,8 @@ en-AU:
         enrollment_term_id: Term
         grading_scheme: "Grading Scheme"
         grading_standard_enabled: "Enable course grading scheme"
-        hide_distribution_graphs: "Hide grade distribution graphs from students"
-        hide_final_grades: "Hide totals in student grades summary"
+        hide_distribution_graphs: "Hide mark distribution graphs from students"
+        hide_final_grades: "Hide totals in student marks summary"
         indexed: "Include this course in the public course index"
         is_public: "Make this course publicly visible"
         language: Language
@@ -4820,14 +4820,14 @@ en-AU:
         alerts: Alerts
         details: "Course Details"
         feature_options: "Feature Options"
-        grade_publishing: "Grade Publishing"
+        grade_publishing: "Mark Publishing"
         navigation: Navigation
         sections: Sections
         tools: Apps
       titles: 
         edit_navigation: "Edit Course Navigation"
       tooltips: 
-        cannot_unpublish_course: "You cannot unpublish this course if there are graded student submissions"
+        cannot_unpublish_course: "You cannot unpublish this course if there are marked student submissions"
       transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
       turnitin: "these comments will be shown to students when submitting a Turnitin-enabled assignment"
       view_grading_scheme: "view grading scheme"
@@ -4988,14 +4988,14 @@ en-AU:
   create_module_item_quiz: 
     discussion_name: "Discussion Name"
     file_to_upload: "File to upload"
-    graded_quiz: "Graded Quiz"
-    graded_survey: "Graded Survey"
+    graded_quiz: "Marked Quiz"
+    graded_survey: "Marked Survey"
     header_name: "Header Name"
     link_title: "Link Title"
     page_name: "Page Name"
     practice_quiz: "Practice Quiz"
     quiz_name: "Quiz Name"
-    ungrded_survey: "Ungraded Survey"
+    ungrded_survey: "Unmarked Survey"
     url: URL
   create_users_view: 
     required: "Please enter some email addresses"
@@ -5012,7 +5012,7 @@ en-AU:
     eportfolio_welcome: "Welcome to Your ePortfolio"
     error_reports: "Error Reports"
     files: Files
-    grades: Grades
+    grades: Marks
     grading_schemes: "Grading Schemes"
     groups: Groups
     jobs: Jobs
@@ -5083,14 +5083,14 @@ en-AU:
   curve_grades_dialog: 
     average_score: "Average Score"
     buttons: 
-      curve_grades: "Curve Grades"
-      curving_grades: "Curving Grades..."
-    curve_average: "Enter an average grade for the curve for *%{assignment.name}*. The chart shows a best attempt at curving the grades based on current student scores."
-    curve_grade_for_assignment: "Curve Grade for %{assignment.name}"
+      curve_grades: "Curve Marks"
+      curving_grades: "Curving Marks..."
+    curve_average: "Enter an average mark for the curve for *%{assignment.name}*. The chart shows a best attempt at curving the marks based on current student scores."
+    curve_grade_for_assignment: "Curve Mark for %{assignment.name}"
     labels: 
       assign_blanks: "Assign zeroes to unsubmitted students"
     out_of_points_possible: "out of %{assignment.points_possible}"
-    this_is_permanent: "Grade curving cannot be undone. Pre-curved grade histories will be available, but the curving action is irreversible."
+    this_is_permanent: "Mark curving cannot be undone. Pre-curved mark histories will be available, but the curving action is irreversible."
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip format"
   d2l_name: "D2L Converter"
@@ -5354,7 +5354,7 @@ en-AU:
     saving: Saving...
   differentiated_assignments_description: |-
       Differentiated Assignments is a *beta* feature that enables choosing which section(s) an assignment applies to.
-      Sections that are not given an assignment will not see it in their course content and their final grade will be
+      Sections that are not given an assignment will not see it in their course content and their final mark will be
       calculated without those points.
   discussion_entries: 
     created_entry_notice: "Entry was successfully created."
@@ -5379,8 +5379,8 @@ en-AU:
       due_date: "due %{date}"
       for: For
       graded_discussion_and_points: 
-        one: "This is a graded discussion: *1 point possible*"
-        other: "This is a graded discussion: *%{count} points possible*"
+        one: "This is a marked discussion: *1 point possible*"
+        other: "This is a marked discussion: *%{count} points possible*"
       show_due_dates: "Show Due Dates"
       until: Until
     cannot_unpublish_with_replies: "Can't unpublish if there are replies"
@@ -5397,7 +5397,7 @@ en-AU:
       close_for_comments: "Close for comments"
       delete: Delete
       due: Due
-      graded_discussion: "Graded discussion:"
+      graded_discussion: "Marked discussion:"
       last_post_date: "Last post %{display_last_reply_at}"
       manage: Manage
       move: "Move To…"
@@ -5443,7 +5443,7 @@ en-AU:
       saving: Saving...
       topic_title: "Topic Title"
       until: Until
-      use_for_grading: Graded
+      use_for_grading: Marked
       users_must_post_before_seeing_replies: "Users must post before seeing replies"
     entry: 
       authors_name: "Author's name"
@@ -5651,7 +5651,7 @@ en-AU:
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
   draft_state_description: |-
       This beta feature redesigns many parts of Canvas and allows content to exist in
-      a new unpublished state that is invisible to students and excluded from grade
+      a new unpublished state that is invisible to students and excluded from mark
       calculations. Caution--disabling this feature may delete newly created or edited
       content from the teacher's view.
   due_dates: 
@@ -5740,7 +5740,7 @@ en-AU:
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations."
-  enable_multiple_grading_periods: "Enable multiple grading periods management in the account admin, and use in the Gradebook."
+  enable_multiple_grading_periods: "Enable multiple grading periods management in the account admin, and use in the Markbook."
   enrollment: 
     default_course_name: Course
     default_email: "No Email"
@@ -6230,7 +6230,7 @@ en-AU:
       learn_more: "Learn More at instructure.com"
       more_information: "More information at %{domain_list}"
       no_messages_notice: "As things happen in the course you'll start seeing notifications show up here letting you know about things happening in your Canvas account."
-      notification_about: "The Canvas Facebook app is here to give you easier access to the interactions going on inside your courses. You can set it to send you notifications when your assignments are graded, when due dates change, etc. Your private data will still stay private at Canvas."
+      notification_about: "The Canvas Facebook app is here to give you easier access to the interactions going on inside your courses. You can set it to send you notifications when your assignments are marked, when due dates change, etc. Your private data will still stay private at Canvas."
       notification_settings: "Notification Settings"
       notifications_notice: "Below you can see a list of your most recent notifications from Canvas. You can see the number of new Canvas notifications from your Facebook home page if you bookmark this application."
       welcome: "Welcome back, %{name}!"
@@ -6300,14 +6300,14 @@ en-AU:
     high_contrast: "Use High Contrast Styles"
     html5_first_videos: "Prefer HTML5 for video playback"
     k12: "K-12 specific features"
-    learning_mastery_gradebook: "Learning Mastery Gradebook"
+    learning_mastery_gradebook: "Learning Mastery Markbook"
     lor: "LOR External Tools"
     multiple_grading_periods: "Multiple Grading Periods"
     new_quiz_statistics: "New Quiz Statistics Page"
     new_styles: "Use New Styles"
-    post_grades: "Post Grades to SIS"
+    post_grades: "Post Marks to SIS"
     student_groups: "New Student Groups Page"
-    student_outcome_gradebook: "Student Learning Mastery Gradebook"
+    student_outcome_gradebook: "Student Learning Mastery Markbook"
   file_browser_view: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose the selected item."
   file_preview: 
@@ -6554,7 +6554,7 @@ en-AU:
     grade_display_warning: 
       checkbox: "Don't show for this course again."
       warning: Warning
-  grade_export_title: "Grade Export"
+  grade_export_title: "Mark Export"
   grade_summary: 
     graph_title: "Mean %{mean}, High %{high}, Low %{low}"
     outcome: 
@@ -6562,8 +6562,8 @@ en-AU:
   gradebook: 
     alerts: 
       no_active_students: "Sorry, there are either no active students in the course or none are gradable by you."
-      no_students_in_groups_back: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
-      no_students_in_groups_close: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
+      no_students_in_groups_back: "Sorry, submissions for this assignment cannot be marked in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
+      no_students_in_groups_close: "Sorry, submissions for this assignment cannot be marked in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
       no_students_in_section: "Could not find any students in that section, falling back to showing all sections."
     allow_message: "Click the \"Allow\" button to begin recording."
     begin_record_prompt: "Click the \"Record\" button to begin."
@@ -6589,9 +6589,9 @@ en-AU:
     edit_view_rubric: "View Rubric"
     errors: 
       select_an_option: "Please select an option"
-    graded: graded
+    graded: marked
     graded_by_me: "%{graded_time} by me"
-    graded_then_resubmitted: "graded, then resubmitted (%{when})"
+    graded_then_resubmitted: "marked, then resubmitted (%{when})"
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
     group: Group
     hide_all_details_button: "Hide All Details"
@@ -6599,15 +6599,15 @@ en-AU:
     new_assessment: "[New Assessment]"
     no_submission_time: "no submission time"
     nodetect_message: "No speech was detected. You may need to adjust your microphone settings."
-    not_graded: "not graded"
+    not_graded: "not marked"
     not_submitted: "not submitted"
     nth_student: "Student %{n}"
-    portion_graded: "%{x} / %{y} Graded"
+    portion_graded: "%{x} / %{y} Marked"
     recording_expired_message: "Speech recognition has expired due to inactivity. Click the \"Stop\" button to use current text for comment or \"Cancel\" to discard."
     recording_message: Recording...
     show_all_details_button: "Show All Details"
     student: Student
-    student_mute_notification: "Instructor is working on grades"
+    student_mute_notification: "Instructor is working on marks"
     titles: 
       click_to_record: "Speech to Text"
       dropped_assignment_no_total: "This assignment will not be considered in the total calculation"
@@ -6632,7 +6632,7 @@ en-AU:
       assignment_options: "Assignment Options"
       points_out_of: "Out of %{assignment.points_possible}"
       this_assignment_is_muted: "This assignment is muted"
-      zero_point_assignment: "Assignments in this group have no points possible and cannot be included in grade calculation"
+      zero_point_assignment: "Assignments in this group have no points possible and cannot be included in mark calculation"
     concluded_course_error_message: "This is a concluded course, so only concluded enrollments are available."
     course_average: "Course average"
     course_median: "Course median"
@@ -6647,15 +6647,15 @@ en-AU:
     grade_display_warning: 
       cancel: Cancel
       continue: Continue
-      percent_text: "Students will also see their final grade as a percentage. Are you sure you want to continue?"
-      points_text: "Students will also see their final grade as points. Are you sure you want to continue?"
+      percent_text: "Students will also see their final mark as a percentage. Are you sure you want to continue?"
+      points_text: "Students will also see their final mark as points. Are you sure you want to continue?"
     gradebook_header_menu: 
       assignment_details: "Assignment Details"
-      curve_grades: "Curve Grades"
+      curve_grades: "Curve Marks"
       download_submissions: "Download Submissions"
       message_students_who: "Message Students Who..."
       re_upload_submissions: "Re-Upload Submissions"
-      set_default_grade: "Set Default Grade"
+      set_default_grade: "Set Default Mark"
       speedgrader: SpeedGrader
     header_filter: 
       course_average: "Course average"
@@ -6691,10 +6691,10 @@ en-AU:
       mastery_set_at: "Mastery set at"
       no_results: "(no results)"
       view_more_details: "view more details"
-    percent_of_grade: "%{percentage} of grade"
+    percent_of_grade: "%{percentage} of mark"
     points_out_of: "out of %{points_possible}"
     remedial: remedial
-    resubmitted: "Resubmitted since last graded"
+    resubmitted: "Resubmitted since last marked"
     row_student_name: 
       student_placeholder: Student
     secondary_id: "Secondary ID"
@@ -6705,9 +6705,9 @@ en-AU:
     show_student_names: "Show Student Names"
     student_name: "Student Name"
     students_who: 
-      havent_been_graded: "Haven't been graded"
+      havent_been_graded: "Haven't been marked"
       havent_submitted_yet: "Haven't submitted yet"
-      no_grade_for: "No grade for %{assignment}"
+      no_grade_for: "No mark for %{assignment}"
       no_submission_for: "No submission for %{assignment}"
       not_submitted_yet: "Haven't submitted yet"
       scored_less_than: "Scored less than"
@@ -6736,7 +6736,7 @@ en-AU:
     ungraded: "Not factored into grading"
   gradebook_uploads: 
     errors: 
-      invalid_file: "Invalid csv file, grades could not be updated"
+      invalid_file: "Invalid csv file, marks could not be updated"
       upload_failed: "File could not be uploaded."
     form: 
       labels: 
@@ -6745,7 +6745,7 @@ en-AU:
         upload_form: "Choose a CSV file to upload"
     new: 
       titles: 
-        new_upload: "Upload Gradebook"
+        new_upload: "Upload Markbook"
     notices: 
       updated: 
         one: "Successfully updated 1 submission."
@@ -6768,11 +6768,11 @@ en-AU:
       labels: 
         points_possible: "Points Possible"
       links: 
-        back: "Go back to Gradebook"
+        back: "Go back to Markbook"
       new_assignment_option: "A new assignment"
       notices: 
-        unchanged: "Note: You uploaded some assignments that had no grade changes detected. They have been hidden."
-      page_title: Gradebook
+        unchanged: "Note: You uploaded some assignments that had no mark changes detected. They have been hidden."
+      page_title: Markbook
       student_answer: "This person is really"
       student_example: "Some Guy"
       student_question: "Student in question"
@@ -6839,16 +6839,16 @@ en-AU:
         other: "%{count} comments"
       comment_count_screenreader: "Read comments"
       comments: Comments
-      disabled_for_student_view: "Test Student scores are not included in grade statistics."
+      disabled_for_student_view: "Test Student scores are not included in mark statistics."
       expand: "Expand all learning mastery outcome groups."
       expand_title: Expand
       faculty_journal: "Faculty Journal for %{user}"
       for_course: "For the course,"
-      grading_in_progress: "Instructor is working on grades"
+      grading_in_progress: "Instructor is working on marks"
       headers: 
         details: Details
         due: Due
-        grades: "Grades For %{student}"
+        grades: "Marks For %{student}"
         name: Name
         out_of: "Out of"
         score: Score
@@ -6859,7 +6859,7 @@ en-AU:
         high: High
         low: Low
         mean: Mean
-        only_graded: "Calculate based only on graded assignments"
+        only_graded: "Calculate based only on marked assignments"
         total: Total
         your_score: "Your Score"
       learning_outcomes: "Learning Mastery"
@@ -6870,16 +6870,16 @@ en-AU:
         show_details: "Show All Details"
       media_comment: "This is a media comment,"
       not_official: "*NOTE*: This is NOT your official score."
-      page_title: "Grades for %{student}"
-      print_grades: "Print grades"
+      page_title: "Marks for %{student}"
+      print_grades: "Print marks"
       score_details: "Score Details"
       see_rubric_results: "See rubric results"
       see_rubric_results_screenreader: "See rubric results"
       see_scoring_details: "See scoring details"
       see_scoring_details_screenreader: "See scoring details"
       see_turnitin_results: "See Turnitin results"
-      student_mute_legend: "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable."
-      student_mute_notification: "Instructor is working on grades"
+      student_mute_legend: "Your instructor is working on marks. While your instructor is working on marks, mark and comment information is unavailable."
+      student_mute_notification: "Instructor is working on marks"
       submission_score: "*%{score}* out of %{possible}"
       titles: 
         enter_score: "Enter a score to test"
@@ -6889,19 +6889,19 @@ en-AU:
         view_scoring_details: "View Scoring Details"
       total: Total
     gradebook2: 
-      accessibility_warning: "Warning: The Gradebook Grid View is not accessible. Click here to use the Individual View instead."
+      accessibility_warning: "Warning: The Markbook Grid View is not accessible. Click here to use the Individual View instead."
       arrange_columns_by_due_date: "Arrange columns by due date"
       arrange_columns_by_group: "Arrange columns by assignment group"
       download_scores: "Download Scores (.csv)"
       filter_by_student: "Filter by student name or secondary ID"
-      grades: Grades
+      grades: Marks
       hide_student_names: "Hide Student Names"
-      include_ungraded: "Treat Ungraded as 0"
+      include_ungraded: "Treat Unmarked as 0"
       individual_view: "Switch to Individual View"
       learning_mastery: "Learning Mastery"
-      page_header_title: Gradebook
-      post_grades: "Post Grades"
-      publish_to_sis: "Publish grades to SIS"
+      page_header_title: Markbook
+      post_grades: "Post Marks"
+      publish_to_sis: "Publish marks to SIS"
       set_group_weights: "Set Group Weights"
       show_attendance_columns: "Show Attendance Columns"
       show_concluded_enrollments: "Show Concluded Enrollments"
@@ -6910,18 +6910,18 @@ en-AU:
     grades: 
       complete: Complete
       incomplete: Incomplete
-    grades_filename: Grades
+    grades_filename: Marks
     history: 
-      graded_on_submission: "Graded on submission"
-      grades_for_date: "Grades for Date"
+      graded_on_submission: "Marked on submission"
+      grades_for_date: "Marks for Date"
       headers: 
         after: After
         before: Before
         current: Current
         student: Student
-      page_title: "Gradebook History"
+      page_title: "Markbook History"
       regraded: Regraded
-      revert: "Revert to this grade"
+      revert: "Revert to this mark"
       submission_count: 
         one: "1 change"
         other: "%{count} changes"
@@ -6941,7 +6941,7 @@ en-AU:
     out_of_final: "%{weight} of Final"
     out_of_points_possible: "out of %{points_possible}"
     screenreader: 
-      page_titles: "Gradebook: Individual View"
+      page_titles: "Markbook: Individual View"
     speed_grader: 
       all_sections: "All Sections"
       attach: Attach
@@ -6966,7 +6966,7 @@ en-AU:
         media_comment: "Media Comment"
         speech_recognition: "Speech Recognition"
       keycode_descriptions: 
-        change_grade: "Change Grade"
+        change_grade: "Change Mark"
         leave_comment: "Leave Comment"
         next_student: "Next Student"
         previous_student: "Previous Student"
@@ -6980,8 +6980,8 @@ en-AU:
       labels: 
         add_comment: "Add a Comment"
         average: Avg
-        grade: Grade
-        grade_by_question_beta: "Grade by question (beta)"
+        grade: Mark
+        grade_by_question_beta: "Mark by question (beta)"
         group_comment: "Send Comment to the Whole Group"
         hide_names: "Hide student names in the SpeedGrader"
         show_assessment_by: "Show Assessment By"
@@ -6992,13 +6992,13 @@ en-AU:
         click_to_view: "click here to view"
         course_home: "Course Home"
         download_file: "Download File"
-        gradebook: Gradebook
+        gradebook: Markbook
         next: Next
         previous: Previous
         remove_attachment: "Remove Attachment"
         settings: Settings
         show_all_sections: "Show all sections"
-        submit_same_score: "Use this same grade for the resubmission"
+        submit_same_score: "Use this same mark for the resubmission"
       loading: loading...
       new_assessment_option: "[New Assessment]"
       no_annotation: "Annotations are not available for this document"
@@ -7028,7 +7028,7 @@ en-AU:
         no_attendance: Attendance
         student_attendance: "Attendance for %{user}"
       links: 
-        grades: "Grades for %{user}"
+        grades: "Marks for %{user}"
         message_user: "Message %{user}"
       no_attendance_assignments: "No attendance assignments have been created."
       page_title: "Attendance for %{user}"
@@ -7051,20 +7051,20 @@ en-AU:
         attached_files: "Attached files to the following user submissions"
       links: 
         back_to_assignment: "Back to Assignment Page"
-        back_to_gradebook: "Back to Gradebook"
+        back_to_gradebook: "Back to Markbook"
       no_comments_added: "No Comments Added"
       renamed_file: "renamed from %{filename}"
       submissions_upload: "%{assignment} Submissions Upload"
     titles: 
       total: Total
-  graded_quiz_7fabdf1f: "Graded Quiz"
-  graded_survey_c0f0c395: "Graded Survey"
+  graded_quiz_7fabdf1f: "Marked Quiz"
+  graded_survey_c0f0c395: "Marked Survey"
   grading_box: 
     out_of_points_possible: "out of %{assignment.points_possible}"
   grading_cell: 
     grade_complete: Complete
     grade_incomplete: Incomplete
-    grade_ungraded: Ungraded
+    grade_ungraded: Unmarked
     out_of: "(out of %{points})"
     out_of_nil: "No points possible"
     out_of_with_score: "(%{score} out of %{points})"
@@ -7199,7 +7199,7 @@ en-AU:
         one: "1 student"
         other: "%{count} students"
       warnings: 
-        studend_groups: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments."
+        studend_groups: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for marked assignments."
     confirm: 
       assign_students: "This will randomly assign all unassigned students as evenly as possible among the existing student groups"
       delete_group: "Are you sure you want to delete this group?"
@@ -7364,7 +7364,7 @@ en-AU:
         message_all_unassigned_option: "Message All Unassigned Students"
         randomly_assign_students_option: "Randomly Assign Students"
         restricted_self_signup_blurb: "All students in a group are required to be in the same section."
-        self_organized_warning: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments."
+        self_organized_warning: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for marked assignments."
         self_signup_blurb: "Self sign-up is enabled for these groups."
         settings: Settings
         uncategorized_groups: "These groups are not associated to any particular group set. Because they were imported via SIS, they can only be updated or deleted via SIS."
@@ -7765,8 +7765,8 @@ en-AU:
     mobile_auth: 
       log_in_to_canvas: "Log In To Canvas"
   learning_mastery_gradebook_description: |-
-      Learning Mastery Gradebook provides a way for teachers to quickly view student and course
-      progress on course learning outcomes. Outcomes are presented in a Gradebook-like
+      Learning Mastery Markbook provides a way for teachers to quickly view student and course
+      progress on course learning outcomes. Outcomes are presented in a Markbook-like
       format and student progress is displayed both as a numerical score and as mastered/near
       mastery/remedial.
   learning_outcome: 
@@ -7792,7 +7792,7 @@ en-AU:
     basic_lti: 
       bad_score: "Score is not between 0 and 1"
       no_points_comment: |-
-          An external tool attempted to grade this assignment as %{grade}, but was unable
+          An external tool attempted to mark this assignment as %{grade}, but was unable
           to because the assignment has no points possible.
       no_points_possible: "Assignment has no points possible."
       no_score: "No score given"
@@ -8029,14 +8029,14 @@ en-AU:
             other: "An alert has been triggered for you because the following conditions have been met:"
           interaction_description: "No student/teacher interaction for %{count} days"
           subject: "Alert: %{user_name}"
-          ungraded_count_description: "%{count} or more submissions have not been graded"
-          ungraded_timespan_description: "A submission has been left ungraded for %{count} days"
+          ungraded_count_description: "%{count} or more submissions have not been marked"
+          ungraded_timespan_description: "A submission has been left unmarked for %{count} days"
           usernote_description: "No faculty journal entries for %{count} days"
           view_here: "You can view it here"
         interaction_description: "No student/teacher interaction for %{count} days"
         subject: "Alert: %{user_name}"
-        ungraded_count_description: "%{count} or more submissions have not been graded"
-        ungraded_timespan_description: "A submission has been left ungraded for %{count} days"
+        ungraded_count_description: "%{count} or more submissions have not been marked"
+        ungraded_timespan_description: "A submission has been left unmarked for %{count} days"
         usernote_description: "No faculty journal entries for %{count} days"
       facebook: 
         body: 
@@ -8049,11 +8049,11 @@ en-AU:
           one: "No student/teacher interaction for one day"
           other: "No student/teacher interaction for %{count} or more days"
         ungraded_count_description: 
-          one: "One or more assignments have not been graded"
-          other: "%{count} or more assignments have not been graded"
+          one: "One or more assignments have not been marked"
+          other: "%{count} or more assignments have not been marked"
         ungraded_timespan_description: 
-          one: "One or more submissions have been left ungraded for one or more days"
-          other: "One or more submissions have been left ungraded for %{count} or more days"
+          one: "One or more submissions have been left unmarked for one or more days"
+          other: "One or more submissions have been left unmarked for %{count} or more days"
         usernote_description: 
           one: "No faculty journal entries for a day or more"
           other: "No faculty journal entries for %{count} or more days"
@@ -8073,11 +8073,11 @@ en-AU:
           other: "No student/teacher interaction for %{count} or more days"
         subject: "Alert: %{user_name}"
         ungraded_count_description: 
-          one: "One or more assignments have not been graded"
-          other: "%{count} or more assignments have not been graded"
+          one: "One or more assignments have not been marked"
+          other: "%{count} or more assignments have not been marked"
         ungraded_timespan_description: 
-          one: "One or more submissions have been left ungraded for one or more days"
-          other: "One or more submissions have been left ungraded for %{count} or more days"
+          one: "One or more submissions have been left unmarked for one or more days"
+          other: "One or more submissions have been left unmarked for %{count} or more days"
         usernote_description: 
           one: "No faculty journal entries for a day or more"
           other: "No faculty journal entries for %{count} or more days"
@@ -8522,24 +8522,24 @@ en-AU:
         no_due_date: "due: No Due Date"
     assignment_graded: 
       email: 
-        assignment_graded: "Assignment Graded: %{assignment_name}, %{course_name}"
+        assignment_graded: "Assignment Marked: %{assignment_name}, %{course_name}"
         html: 
-          assignment_graded: "Assignment Graded: %{assignment_name}, %{course_name}"
+          assignment_graded: "Assignment Marked: %{assignment_name}, %{course_name}"
           link: "Click here to view the assignment"
-          the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
+          the_assignment_is_graded: "The assignment, %{assignment_name}, has been marked."
         labels: 
           view_here: "You can view it here"
-        the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
+        the_assignment_is_graded: "The assignment, %{assignment_name}, has been marked."
       facebook: 
-        the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
+        the_assignment_is_graded: "The assignment, %{assignment_name}, has been marked."
       sms: 
-        assignment_is_graded: "%{assignment_name}, %{course_name} has been graded."
+        assignment_is_graded: "%{assignment_name}, %{course_name} has been marked."
         more_info_at: "More info at %{web_address}"
       summary: 
-        assignment_graded: "Assignment Graded: %{assignment_name}, %{course_name}"
-        the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
+        assignment_graded: "Assignment Marked: %{assignment_name}, %{course_name}"
+        the_assignment_is_graded: "The assignment, %{assignment_name}, has been marked."
       twitter: 
-        assignment_graded: "Canvas Alert - Graded: %{assignment_name}, %{course_name}"
+        assignment_graded: "Canvas Alert - Marked: %{assignment_name}, %{course_name}"
     assignment_locked: "This assignment is currently locked."
     assignment_locked_at: "This assignment was locked %{at}."
     assignment_locked_module: "This assignment is part of the module *%{module}* and hasn't been unlocked yet."
@@ -8611,22 +8611,22 @@ en-AU:
     assignment_unmuted: 
       email: 
         body: |-
-            Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+            Your instructor has released mark changes and new comments for %{title}. These changes are now viewable.
             
             Your can view it here:
             %{url}
         html: 
-          body: "Your instructor has released grade changes and new comments for %{title}. These changes are now viewable."
+          body: "Your instructor has released mark changes and new comments for %{title}. These changes are now viewable."
           link: "You can view it here"
           subject: "Assignment Unmuted: %{title}, %{course}"
         subject: "Assignment Unmuted: %{title}, %{course}"
       sms: 
         body: |-
-            Your instructor has released grades and comments for %{title}, %{course}.
+            Your instructor has released marks and comments for %{title}, %{course}.
             
             More info at %{website}
       summary: 
-        subject: "Grades and comments released for: %{title}, %{course}"
+        subject: "Marks and comments released for: %{title}, %{course}"
     assignment_unpublished_module: "This assignment is part of an unpublished module and is not available yet."
     collaboration_invitation: 
       email: 
@@ -9127,12 +9127,12 @@ en-AU:
           grading_based_on_points: "Grading is based on total points for all assignments."
           labels: 
             grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
-            subject: "Grade Weight Changed"
+            subject: "Mark Weight Changed"
           see_details: "You can see details here"
         labels: 
           grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
           now_see_here: "You can see details here"
-          subject: "Grade Weight Changed"
+          subject: "Mark Weight Changed"
       facebook: 
         grading_based_on_points: "Grading is based on total points for all assignments."
         grading_policy_changed: "The grading policy for **[%{course_name}](%{course_url})** has changed."
@@ -9146,7 +9146,7 @@ en-AU:
         grading_based_on_points: "Grading is based on total points for all assignments."
         labels: 
           grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
-          subject: "Grade Weight Changed"
+          subject: "Mark Weight Changed"
       twitter: 
         grade_changed: "Canvas Alert - Grading Policy Changed: %{course_name}"
     group_assignment_submitted_late: 
@@ -9727,98 +9727,98 @@ en-AU:
         tweet: "Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}."
     submission_grade_changed: 
       email: 
-        body: "The grade on your assignment, %{assignment_title} has been changed."
+        body: "The mark on your assignment, %{assignment_title} has been changed."
         html: 
-          body: "The grade on your assignment, %{assignment_title} has been changed."
+          body: "The mark on your assignment, %{assignment_title} has been changed."
           link_message: "You can review the assignment here"
           no_date_set: "No Date Set"
           not_applicable: N/A
-          regraded_date: "re-graded: %{date}"
+          regraded_date: "re-marked: %{date}"
           score: "score: %{score} out of %{total}"
           score_pending: "score pending review by the teacher"
-          subject: "Grade Changed: %{assignment}, %{context}"
+          subject: "Mark Changed: %{assignment}, %{context}"
         link_message: "You can review the assignment here:"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        regraded_date: "re-graded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
-        subject: "Grade Changed: %{assignment}, %{context}"
+        subject: "Mark Changed: %{assignment}, %{context}"
       facebook: 
-        body: "The grade on your assignment, *%{title}* has been changed."
+        body: "The mark on your assignment, *%{title}* has been changed."
         no_date_set: "No Date Set"
         not_applicable: N/A
-        regraded_date: "re-graded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score: %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
       sms: 
-        body_sms: "Your grade for %{title}, %{context} just changed."
+        body_sms: "Your mark for %{title}, %{context} just changed."
         more_info: "More info at %{url}"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        regraded_date: "re-graded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
       summary: 
         no_date_set: "No Date Set"
         not_applicable: N/A
-        regraded_date: "re-graded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
-        subject: "Grade Changed: %{title}, %{context}"
+        subject: "Mark Changed: %{title}, %{context}"
       twitter: 
         no_date_set: "No Date Set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending: "(pending review)"
-        tweet: "Canvas Alert - Grade Change: %{date}"
+        tweet: "Canvas Alert - Mark Change: %{date}"
     submission_graded: 
       email: 
-        body: "Your assignment, %{assignment}, has been graded."
-        graded_date: "graded: %{date}"
+        body: "Your assignment, %{assignment}, has been marked."
+        graded_date: "marked: %{date}"
         html: 
-          body: "Your assignment, %{assignment}, has been graded."
-          graded_date: "graded: %{date}"
+          body: "Your assignment, %{assignment}, has been marked."
+          graded_date: "marked: %{date}"
           link_message: "You can review the assignment here"
           no_date_set: "No Date Set"
           not_applicable: N/A
           score: "score: %{score} out of %{total}"
           score_pending_review: "score pending review by the teacher"
-          subject: "Assignment Graded: %{assignment}, %{context}"
+          subject: "Assignment Marked: %{assignment}, %{context}"
         link_message: "You can review the assignment here:"
         no_date_set: "No Date Set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
-        subject: "Assignment Graded: %{assignment}, %{context}"
+        subject: "Assignment Marked: %{assignment}, %{context}"
       facebook: 
-        body: "Your assignment, *%{title}*, has been graded."
-        graded_date: "graded: %{date}"
+        body: "Your assignment, *%{title}*, has been marked."
+        graded_date: "marked: %{date}"
         no_date_set: "No Date Set"
         not_applicable: N/A
         score: "score: %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
       sms: 
-        graded_date: "graded: %{date}"
+        graded_date: "marked: %{date}"
         more_info: "More info at %{url}"
         no_date_set: "No Date Set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
-        sms_body: "%{assignment}, %{context} has been graded."
+        sms_body: "%{assignment}, %{context} has been marked."
       summary: 
-        graded_date: "graded: %{date}"
+        graded_date: "marked: %{date}"
         no_date_set: "No Date Set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
-        subject: "Assignment Graded: %{assignment}, %{context}"
+        subject: "Assignment Marked: %{assignment}, %{context}"
       twitter: 
         no_date_set: "No Date Set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "(pending review)"
-        tweet: "Canvas Alert - Graded: %{assignment}, %{context}"
+        tweet: "Canvas Alert - Marked: %{assignment}, %{context}"
     submission_needs_grading: 
       email: 
         body: "%{user_name} has completed the quiz %{quiz_title}, and it requires manual grading."
@@ -9834,11 +9834,11 @@ en-AU:
         body: "%{user_name} has completed the quiz %{quiz_title}, and it requires manual grading."
         submitted_date: "submitted: %{date}"
       sms: 
-        body_sms: "Your grade for %{title}, %{context} just changed."
+        body_sms: "Your mark for %{title}, %{context} just changed."
         more_info: "More info at %{url}"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        regraded_date: "re-graded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
       summary: 
@@ -10018,7 +10018,7 @@ en-AU:
       module: 
         prerequisites: Prerequisites
         published: Published
-    post_grades_dialog_title: "Post Grades to SIS"
+    post_grades_dialog_title: "Post Marks to SIS"
     progression_module_collection: 
       module_progress_for: "Module Progress for *%{student.name}*"
       module_progress_for_student: "Module Progress for %{student.name}"
@@ -10057,11 +10057,11 @@ en-AU:
     move_to_end: "-- At the bottom --"
   mute_dialog: 
     curving_assignments: "Curving assignments"
-    grade_change_notifications: "Grade change notifications"
+    grade_change_notifications: "Mark change notifications"
     how_to_unmute: "Once you have muted this assignment, you can begin sending notifications again by clicking the \"Unmute Assignment\" link."
     mute_assignment: "Mute Assignment"
     score_change_notifications: "Score change notifications"
-    see_grade: "Their grade for the assignment"
+    see_grade: "Their mark for the assignment"
     students_will_see: "Students will be able to see that this assignment is muted."
     submission_comments: "Submission comments"
     sure_you_want_to_mute: "Are you sure you want to mute this assignment? While this assignment is muted, students will not receive new notifications about or be able to see:"
@@ -10147,16 +10147,16 @@ en-AU:
     grading_description: |-
         Includes:
         
-        * Assignment/submission grade entered/changed
-        * Un-muted assignment grade
-        * Grade weight changed
+        * Assignment/submission mark entered/changed
+        * Un-muted assignment mark
+        * Mark weight changed
         
         ​
         
-        Check 'Include scores when alerting about grade changes' if you want to see your grades in the notifications.
+        Check 'Include scores when alerting about mark changes' if you want to see your marks in the notifications.
         If your email is not an institution email this means sensitive content will be sent outside of the institution.
     grading_display: Grading
-    grading_notify_include_grade: "Include scores when alerting about grade changes."
+    grading_notify_include_grade: "Include scores when alerting about mark changes."
     grading_policies_description: "Course grading policy change"
     grading_policies_display: "Grading Policies"
     invitation_description: |-
@@ -10199,7 +10199,7 @@ en-AU:
       assignment_created: "Assignment Created"
       assignment_due_date_changed: "Assignment Due Date Changed"
       assignment_due_date_override_changed: "Assignment Due Date Override Changed"
-      assignment_graded: "Assignment Graded"
+      assignment_graded: "Assignment Marked"
       assignment_resubmitted: "Assignment Resubmitted"
       assignment_submitted: "Assignment Submitted"
       assignment_submitted_late: "Assignment Submitted Late"
@@ -10217,7 +10217,7 @@ en-AU:
       enrollment_registration: "Enrollment Registration"
       event_date_changed: "Event Date Changed"
       forgot_password: "Forgot Password"
-      grade_weight_changed: "Grade Weight Changed"
+      grade_weight_changed: "Mark Weight Changed"
       group_assignment_submitted_late: "Group Assignment Submitted Late"
       group_membership_accepted: "Group Membership Accepted"
       group_membership_rejected: "Group Membership Rejected"
@@ -10245,8 +10245,8 @@ en-AU:
       rubric_association_created: "Rubric Association Created"
       submission_comment: "Submission Comment"
       submission_comment_for_teacher: "Submission Comment For Teacher"
-      submission_grade_changed: "Submission Grade Changed"
-      submission_graded: "Submission Graded"
+      submission_grade_changed: "Submission Mark Changed"
+      submission_graded: "Submission Marked"
       submission_needs_grading: "Submission Needs Grading"
       summaries: Summaries
       updated_wiki_page: "Updated Wiki Page"
@@ -10418,7 +10418,7 @@ en-AU:
       instructions: 
         main: 
           manage: 
-            description: "*Outcomes are created here to track mastery in a course. To get started, checkout the menu bar along the top. Click on the New button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.* *More importantly, Canvas allows you to add outcomes to your grading rubrics so that you can evaluate mastery as you grade assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for grading.*"
+            description: "*Outcomes are created here to track mastery in a course. To get started, checkout the menu bar along the top. Click on the New button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.* *More importantly, Canvas allows you to add outcomes to your grading rubrics so that you can evaluate mastery as you mark assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for grading.*"
             title: "Setting up Outcomes"
     mastery: Mastery
     mastery_error: "Must be greater than or equal to 0"
@@ -10694,8 +10694,8 @@ en-AU:
         api_key: "OAuth Consumer Key"
         secret_key: "OAuth Consumer Secret"
     grade_export: 
-      description: "Grade Export for SIS"
-      name: "Grade Export"
+      description: "Mark Export for SIS"
+      name: "Mark Export"
     grade_export_settings: 
       labels: 
         format_type: "Output format type"
@@ -10890,7 +10890,7 @@ en-AU:
         poll_is_published: "This poll session is not open for submissions."
         user_and_poll_session_uniqueness: "can only submit one choice per poll session."
   post_grades_description: |-
-      Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
+      Post Marks allows teachers to post marks back to enabled SIS systems: Powerschool,
       Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
       GradingAssignment, GradingAssignmentScore.
   practice_quiz_19a8505d: "Practice Quiz"
@@ -11771,7 +11771,7 @@ en-AU:
           delete_question: "Delete this Question"
           edit_question: "Edit this Question"
           move_copy_question: "move/copy question to another bank"
-        not_yet_graded: "Not yet graded"
+        not_yet_graded: "Not yet marked"
         original_score: "Original Score:"
         points_possible: "%{points_possible} pts"
         regraded_score: "Regraded Score:"
@@ -11938,7 +11938,7 @@ en-AU:
           other: "%{user} has %{count} attempts left"
         default_quiz_name: "Quiz %{course_name}"
         default_survey_name: "Survey %{course_name}"
-        grade_by_question_warning: "The grade by question feature is affected by questions that are shuffled in a group."
+        grade_by_question_warning: "The mark by question feature is affected by questions that are shuffled in a group."
         headers: 
           quiz_submissions: "Quiz Submissions"
           survey_submissions: "Survey Submissions"
@@ -12038,7 +12038,7 @@ en-AU:
         minutes: minutes
         minutes_from: "minutes from"
         moderate_page_title: "%{title}: Moderate"
-        outstanding_autosubmission_description: "These quiz submissions are outstanding, likely because a student left the quiz page prior to submission. If you would like to grade them, please press 'Submit' below."
+        outstanding_autosubmission_description: "These quiz submissions are outstanding, likely because a student left the quiz page prior to submission. If you would like to mark them, please press 'Submit' below."
         outstanding_quiz_submissions_found: "There are outstanding quiz submissions."
         page_title: "Moderate Quiz"
         reload_student_table: "Reload student table"
@@ -12223,7 +12223,7 @@ en-AU:
           preview_quiz_again: "Preview the Quiz Again"
           preview_survey_again: "Preview the Survey Again"
         no_more_attempts: "No More Attempts available"
-        questions_not_graded: "Some questions not yet graded"
+        questions_not_graded: "Some questions not yet marked"
         score_set_manually: "This score was set by the teacher"
         unlimited_attempts: "Unlimited Attempts"
         view_previous_attempts: "View Previous Attempts"
@@ -12273,7 +12273,7 @@ en-AU:
           survey_score: "Survey Score"
         links: 
           click_to_view_results: "Click here to view the results."
-        questions_not_graded: "Some questions not yet graded"
+        questions_not_graded: "Some questions not yet marked"
         quiz_fudged_negative: "This quiz score has been manually adjusted by %{fudge} points."
         quiz_fudged_positive: "This quiz score has been manually adjusted by +%{fudge} points."
         quiz_not_yet_taken: "The quiz hasn't been taken yet."
@@ -12306,7 +12306,7 @@ en-AU:
         quiz_points_possible: 
           one: "1 Point"
           other: "%{count} Points"
-        student_mute_notification: "Instructor is working on grades"
+        student_mute_notification: "Instructor is working on marks"
         unlimited_attempts: "Unlimited Attempts"
       read_only: 
         default_page_title: "New Quiz"
@@ -12347,7 +12347,7 @@ en-AU:
           show_student_survey_results: "Show Student Survey Results"
           survey_statistics: "Survey Statistics"
         manage: Manage
-        only_registered_users: "Only registered, enrolled users can take graded quizzes"
+        only_registered_users: "Only registered, enrolled users can take marked quizzes"
         quiz_regraded_your_score_affected: 
           one: "This quiz has been regraded; your score was affected."
           other: "This quiz has been regraded; your new score reflects %{count} questions that were affected."
@@ -12400,7 +12400,7 @@ en-AU:
       submission_versions: 
         attempt: Attempt
         attempt_history: "Attempt History"
-        questions_not_graded: "Some questions not yet graded"
+        questions_not_graded: "Some questions not yet marked"
         quiz_attempt_history_description: "A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top."
         regraded: Regraded
         score: Score
@@ -12727,7 +12727,7 @@ en-AU:
       manage_files: "Manage (add / edit / delete) course files"
       manage_frozen_assignment: "Manage (edit / delete) frozen assignments"
       manage_global_outcomes: "Manage global learning outcomes"
-      manage_grades: "Edit grades (includes assessing rubrics)"
+      manage_grades: "Edit marks (includes assessing rubrics)"
       manage_groups: "Manage (create / edit / delete) groups"
       manage_interaction_alerts: "Manage alerts"
       manage_links: "Manage role and trust links"
@@ -12757,11 +12757,11 @@ en-AU:
       send_messages_all: "Send messages to the entire class"
       suspend_accounts: "Suspend accounts"
       undelete_courses: "Undelete courses"
-      view_all_grades: "View all grades"
+      view_all_grades: "View all marks"
       view_analytics: "View analytics pages"
       view_course_changes: "View Course Change Logs"
       view_error_reports: "View error reports"
-      view_grade_changes: "View Grade Change Logs"
+      view_grade_changes: "View Mark Change Logs"
       view_group_pages: "View the group pages of all student groups"
       view_jobs: "View background jobs"
       view_notifications: "View notifications"
@@ -12884,8 +12884,9 @@ en-AU:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
-        curve_grades: "Curve Grades"
+        curve_grades: "Curve Marks"
         message_students: "Message students who..."
+        set_default_grade: "Set default mark"
       details: 
         avg_score: "Average Score"
         high_score: "High Score"
@@ -12895,10 +12896,15 @@ en-AU:
       index: 
         warning: Warning
     grading: 
+      empty_submission_selection: "Select a student and an assignment to view and edit marks."
       grading: Grading
+      is_dropped: "This mark is currently dropped for this student."
       submission_details: "Submission Details"
+      was_resubmitted: "This assignment has been resubmitted since it was graded last."
     header: 
-      gradebook_individual_view: "Gradebook: Individual View"
+      gradebook_individual_view: "Markbook: Individual View"
+      save_instructions: "Note: Marks and notes will be saved automatically after moving out of the field."
+      switch_to_gradebook2: "Switch to Default Markbook"
     learning_mastery: 
       hide_student_names_label: "Hide Student Names"
       result: Result
@@ -12914,19 +12920,21 @@ en-AU:
         download_scores: "Download Scores (.csv)"
         grading_history: "View Grading History"
         hide_student_names_label: "Hide Student Names"
-        include_ungraded_assignments: "Treat Ungraded as 0"
+        include_ungraded_assignments: "Treat Unmarked as 0"
         set_group_weights: "Set Group Weights"
         show_concluded_enrollments_label: "Show Concluded Enrollments"
-        sis_export: "Publish grades to SIS"
+        show_total_as_points: "Show Totals as Points on Student Mark Page"
+        sis_export: "Publish marks to SIS"
       mastery_toggles_and_actions: 
         hide_student_names_label: "Hide Student Names"
     student_information: 
       assignment_groups: 
-        ag_group_grade: Grade
+        ag_group_grade: Mark
         ag_group_name: "Assignment Group"
+        ag_group_percent_grade: "% of Mark"
         ag_letter_grade: "Letter Grade"
       index: 
-        grades: Grades
+        grades: Marks
   search: 
     all_courses: 
       name: Name
@@ -12992,7 +13000,7 @@ en-AU:
         other: "%{count} Completed Enrollments"
       crosslist_description: "Cross-listing allows you to create a section in one account and then move it to a course on a different account. To cross-list this course, you'll need to find the course you want to move it to, either using the search tool or by entering the course's ID."
       decrosslist_description: "This will move the section back to its original course, **%{course_name}**."
-      decrosslist_long_description: "All grades for students in this course will no longer be visible. You can retrieve the grades later by re-cross-listing the course, but in the mean time the grades for these students will come from the original course."
+      decrosslist_long_description: "All marks for students in this course will no longer be visible. You can retrieve the marks later by re-cross-listing the course, but in the mean time the marks for these students will come from the original course."
       labels: 
         end_at: Ends
         enter_course_id: "Or Enter the Course's ID"
@@ -13093,11 +13101,11 @@ en-AU:
   services_api: 
     must_be_logged_in: "You must be logged in to use Kaltura"
   set_default_grade_dialog: 
-    default_grades: "Give all students the same grade for *%{assignment.name}* by entering and submitting a grade value below:"
-    dialog_title: "Default grade for %{assignment.name}"
-    overwrite: "Overwrite already-entered grades"
-    set_grades_button: "Set Default Grade"
-    set_grades_button_loading: "Setting Grades..."
+    default_grades: "Give all students the same mark for *%{assignment.name}* by entering and submitting a mark value below:"
+    dialog_title: "Default mark for %{assignment.name}"
+    overwrite: "Overwrite already-entered marks"
+    set_grades_button: "Set Default Mark"
+    set_grades_button_loading: "Setting Marks..."
   shared: 
     account_notification: 
       close: close
@@ -13124,18 +13132,18 @@ en-AU:
       labels: 
         group_weight: Weight
         name: Name
-      percent_of_grade: "%{percent} % of grade"
+      percent_of_grade: "%{percent} % of mark"
     assignment: 
       due_at: "%{date} at %{time}"
-      graded_count: "%{graded_count} Graded"
+      graded_count: "%{graded_count} Marked"
       links: 
         delete_assignment: "Delete Assignment"
         edit_assignment: "Edit Assignment"
         submission_comments: "Submission Comments"
         view_rubric_evaluation: "View Rubric Evaluation"
       points_out_of: "%{points} out of %{possible}"
-      student_mute_notification: "Instructor is working on grades"
-      submitted_and_graded_count: "%{submitted_count} Submitted, %{graded_count} Graded"
+      student_mute_notification: "Instructor is working on marks"
+      submitted_and_graded_count: "%{submitted_count} Submitted, %{graded_count} Marked"
       submitted_count: "%{submitted_count} Submitted"
       tiles: 
         sort_or_move: "Sort Assignments or Move to Another Group"
@@ -13147,7 +13155,7 @@ en-AU:
         move: Move
       defaults: 
         group_name: "Course Assignments"
-      group_weight: "*%{percent}% of total grade"
+      group_weight: "*%{percent}% of total mark"
       links: 
         add_an_assignment: "Add an Assignment"
         edit_group_details: "Edit Group Details"
@@ -13156,7 +13164,7 @@ en-AU:
         reorder_groups: "Reorder Groups"
       no_assignments: "No assignments yet"
       titles: 
-        percent_of_final_grade: "Percent of Final Grade"
+        percent_of_final_grade: "Percent of Final Mark"
     assignment_rubric_dialog: 
       links: 
         add_rubric: "Add Rubric"
@@ -13394,7 +13402,7 @@ en-AU:
           is muted, students will not receive new notifications about or be
           able to see:
           
-          *  Grade change notifications
+          *  Mark change notifications
           *  Submission comments
           *  Curving assignments
           *  Score change notifications
@@ -13435,7 +13443,7 @@ en-AU:
         inbox: Inbox
       menu: 
         calendar: Calendar
-        grades: Grades
+        grades: Marks
       navigation: 
         main: "Main Navigation"
     profile: 
@@ -13716,7 +13724,7 @@ en-AU:
         discussions: "Click to insert a link to this topic"
         discussions_page: "Click to insert a link to the discussions page"
         files_page: "Click to insert a link to the files page"
-        grades_page: "Click to insert a link to the grades page"
+        grades_page: "Click to insert a link to the marks page"
         modules: "Click to insert a link to this module"
         modules_page: "Click to insert a link to the modules page"
         quizzes: "Click to insert a link to this quiz"
@@ -13736,7 +13744,7 @@ en-AU:
         discussions_page: "Discussions Index"
         files_page: "Files Index"
         find_on_flickr: "Find images on flickr creative commons"
-        grades_page: Grades
+        grades_page: Marks
         modules: "Modules List"
         modules_page: Modules
         new_page: "Link to a New Page"
@@ -13853,7 +13861,7 @@ en-AU:
       forward: Forward
   speed_grader: 
     submissions_dropdown: 
-      grade: "(grade: %{grade})"
+      grade: "(mark: %{grade})"
       loud_late: LATE
       see_all_quiz_attempts: "See all quiz attempts"
       submission_to_view: "Submission to view:"
@@ -13929,8 +13937,8 @@ en-AU:
   student_id: "Student ID"
   student_name: "Student name"
   student_outcome_gradebook_description: |-
-      Student Learning Mastery Gradebook provides a way for students to quickly view progress
-      on course learning outcomes. Outcomes are presented in a Gradebook-like
+      Student Learning Mastery Markbook provides a way for students to quickly view progress
+      on course learning outcomes. Outcomes are presented in a Markbook-like
       format and progress is displayed both as a numerical score and as mastered/near
       mastery/remedial.
   student_summary: 
@@ -13988,7 +13996,7 @@ en-AU:
     attached_files_comment: "See attached files."
     media_comment: "This is a media comment."
     state: 
-      graded: graded
+      graded: marked
       submitted: submitted
       unsubmitted: unsubmitted
   submission_comment: 
@@ -14000,7 +14008,7 @@ en-AU:
   submission_details_dialog: 
     add_a_comment: "Add a comment"
     comments: Comments
-    grade_form_label: "Grade:"
+    grade_form_label: "Mark:"
     labels: 
       group_comment: "Send Comment to the Whole Group"
     late: LATE
@@ -14011,7 +14019,7 @@ en-AU:
     post_comment: "Post Comment"
     submitted: "Submitted:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Submitted multiple times, choose which to view:"
-    update_grade: "Update Grade"
+    update_grade: "Update Mark"
     view_rubric_assessment_in_the_speedgrader: "View Rubric Assessment in the SpeedGrader"
   submissions: 
     assignment_submit_success: "Assignment successfully submitted."
@@ -14035,7 +14043,7 @@ en-AU:
     gathering_files: "Gathering Files (%{progress})..."
     gathering_files_progress: "Gathering Files (%{progress})..."
     notices: 
-      submission_doesnt_count: "This assignment will no longer count towards your grade."
+      submission_doesnt_count: "This assignment will no longer count towards your mark."
     resubmitted_to_turnitin: "Successfully resubmitted to turnitin."
     see_attached_files: "See attached files"
     show: 
@@ -14048,7 +14056,7 @@ en-AU:
       hide_rubric_button: "Hide Rubric"
       labels: 
         add_a_comment: "Add a Comment"
-        grade: Grade
+        grade: Mark
         show_assessment_by: "Show Assessment By"
       late_submission: (late)
       links: 
@@ -14056,7 +14064,7 @@ en-AU:
         submit: "Submit Assignment"
       media_comment: "Media Comment"
       media_comment_link: "This is a media comment, *click here to view*."
-      only_see_your_own_comments_muted: "You may not see all comments right now because the assignment is currently being graded"
+      only_see_your_own_comments_muted: "You may not see all comments right now because the assignment is currently being marked"
       only_see_your_own_comments_peer: "As a peer reviewing student, you will only see comments written by you."
       options: 
         new_assessment: "[New Assessment]"
@@ -14068,7 +14076,7 @@ en-AU:
       sent_to_whole_group: "Send Comment to the Whole Group"
       show_rubric: "Show Rubric"
       speedgrader: SpeedGrader™
-      student_mute_notification: "Grades are unavailable because the instructor is working on them."
+      student_mute_notification: "Marks are unavailable because the instructor is working on them."
       submission_details: "Submission Details"
       submitted_at: "submitted %{submit_date}"
       teachers_notified_of_comments: "Teachers and submitter will be notified of all comments."
@@ -14127,12 +14135,12 @@ en-AU:
     collaborations: Collaborations
     conferences: Conferences
     course_assignments: "Course Assignments"
-    course_grades: "Course Grades"
+    course_grades: "Course Marks"
     course_settings: "Course Settings"
     discussions: Discussions
     eportfolios: ePortfolios
     files: Files
-    grades: Grades
+    grades: Marks
     home: Home
     modules: Modules
     observees: Observing
@@ -14436,7 +14444,7 @@ en-AU:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Resubmit to Turnitin"
-  ungraded_survey_ad7de790: "Ungraded Survey"
+  ungraded_survey_ad7de790: "Unmarked Survey"
   unknown: Unknown
   unknown_question_bank: "Unknown question bank"
   unknown_quiz: "Unknown quiz"
@@ -14659,14 +14667,14 @@ en-AU:
         other: "average for %{count} students"
       course: Course
       crumbs: 
-        grades: Grades
+        grades: Marks
       current_teacher_courses: "Courses I'm Teaching"
       linked_student_accounts: "Linked Student Accounts"
       links: 
         teacher_activity: "Student Interactions Report"
-      no_grade: "no grade"
-      no_grades: "no grades"
-      page_title: Grades
+      no_grade: "no mark"
+      no_grades: "no marks"
+      page_title: Marks
       percent: Percent
       send_teacher_message: "Send a Message to the Teacher"
       show_previous_courses: "Show Previous Courses"
@@ -14819,7 +14827,7 @@ en-AU:
         last_journal_entry: "Last Faculty Journal Entry"
         student_name: Student
         teacher_activity: "Teacher Activity Report for %{teacher}"
-        ungraded: "Ungraded Assignments"
+        ungraded: "Unmarked Assignments"
       last_time: 
         one: "1 day ago"
         other: "%{count} days ago"
