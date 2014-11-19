@@ -60,6 +60,7 @@ zh:
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
+      yo: Yo
     ask_canvas_network: "询问 Canvas 网络社区"
     default_account_name: 默认帐户
     default_site_administrator_account_name: 网站管理员
@@ -1302,6 +1303,7 @@ zh:
   allow_lor_tools: "允许用户查看和使用针对 LOR 配置的外部工具。"
   allow_opt_out_of_inbox: "允许用户选择退出 Conversation 的收件箱。这将导致所有会话邮件和通知以紧急通知的形式发送到用户的主电子邮件，在收件箱上隐藏 Conversation 邮件箱的未读邮件标识，并且隐藏 Conversation 的通知首选项。"
   always_3a59e701: 始终
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: 发生未知的服务器错误。请重试。
   analytics: 
     course: 
       analytics: 分析
@@ -1367,6 +1369,7 @@ zh:
     podcast_feed_description_course: "任何与课程 \"%{course}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_description_group: "任何与小组 \"%{group}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_name: "%{course} 通告播客动态消息"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最后一次尝试后将显示答案
   application: 
     errors: 
       feed_not_found: 找不到馈送。
@@ -1806,6 +1809,7 @@ zh:
     grading_type_selector: 
       display_grade_as: 计分显示为
       gpa_scale_explainer: "GPA 等级评分面向使用 4.0（或 5.0/6.0）等级评定所有作业的学校而设计。这一评分方案类似于字母评分显示，但存在一些重要的差别："
+      gpa_scale_input_explainer: "根据 4.0 等级来输入分数。例如，如果作业总共为 100 点，输入 4.0 则结果为 100%，输入 3.0 则结果为 87% 等等。"
       gpa_scale_letters_explainer: 除了数字评分以外，还可以使用字母评分。
       gpa_scale_percentage_explainer: "您不能直接输入分数，但可以输入百分比。例如，如果作业总共为 50 分，输入“40”则无效，而输入“80%”则有效。"
       gpa_scale_recommendation: "除非您的学校使用 4.0（或 5.0/6.0）等级进行评分，否则 Canvas 建议以字母评分方式显示评分。"
@@ -2170,6 +2174,8 @@ zh:
         originality_report_visible_after_due_date: 在截止时间之后
         originality_report_visible_after_grading: 在作业计分之后
         originality_report_visible_immediately: 立即
+        settings_exclude_fewer_than_count: "少于 %{wordsInput} 个字"
+        settings_exclude_less_than_percent: "少于文档的 %{percentInput}"
     undated_assignments: 更新的作业
     upcoming_assignments: 即将到来的作业
     wizard_box: 
@@ -2477,6 +2483,7 @@ zh:
       scheduler_explanation_teacher_paragraph_1: "这是计划程序工具。 您可以利用它为学生创建要注册的约会组。"
       scheduler_explanation_teacher_paragraph_2: "比方说，您想与参加您课程的每个学生单独讨论期中论文作业。您可以新建一个约会组， 指定对您方便的日期和时间，并将该时间分成多个时间块（每个块 15 分钟），每个时间块仅允许一个学生参与。"
       scheduler_explanation_teacher_paragraph_3: 然后，学生将收到通知，并了解需要注册一个指定的时间块。在随后显示的日历中，可用时间块覆盖在日历的上部，这样学生就可选择一个合适的时间。
+      scheduler_explanation_teacher_paragraph_4: "* 单击右侧的“创建约会组”按钮，即可创建。*"
       signed_up_for: 您已报名参加
       x_groups_have_signed_up: "已注册 %{participant_count} 小组"
       x_people_have_signed_up: "已注册 %{participant_count} 人员"
@@ -2523,6 +2530,7 @@ zh:
         warning: 警告
     edit_appointment_group: 
       affect_reservations: 这将如何影响预订?
+      appointments_per_participant_label: 参与者可参加约会的最大次数
       appt_group_options_help1: 一些现有预订已经超过您添加的限制。此更改只会限制新预订，而不会影响已有预定。
       appt_group_options_help2: 不过，您可以手动删除现有预订。
       calendar: 日历
@@ -2532,6 +2540,8 @@ zh:
       group_signup: 让学生按学习小组登录。
       location: 位置
       name: 姓名
+      participants_per_appointment_label: 每次约会的最大用户/小组数
+      slot_duration_label: 每时段的分钟数
       time_range: 时间范围
     edit_appt_calendar_event: 
       description: "说明:"
@@ -2984,6 +2994,7 @@ zh:
     body: "您的 Canvas 验证码为 %{verification_code}"
     default_facebook_account: "Facebook 帐户"
     default_twitter_handle: "Twitter 处理"
+    default_yo_name: "Yo 名称"
   communication_channels: 
     confirm: 
       buttons: 
@@ -4588,6 +4599,7 @@ zh:
         status_link: 导入状态
         text: 当前正在导入一个或多个项目。一旦可用，这些项目将显示在下面的课程中。
     index: 
+      browse_more_courses: 浏览更多课程
       headings: 
         future_enrollments: 未来的注册情况
         my_courses: 我的课程
@@ -4647,6 +4659,8 @@ zh:
         duplicates_removed: 删除了一些重复项。
         email: 电子邮件
         email_field_label: 输入您希望添加的用户电子邮件地址，以逗号隔开
+        email_field_place_holder: "\"示例学生\" <student@example.com>, \"姓, 名\" <firstlast@example.com>, justAnEmailAddress@example.com"
+        example_formats: "示例：user@example.com, \"名, 姓\" <user@example.com>, \"姓, 名\" <user@example.com>"
         form_instructions: 键入或粘贴下面的电子邮件地址列表：
         go_back: 重新开始
         have_been_enrolled: 以下用户已注册
@@ -5422,6 +5436,7 @@ zh:
       new_quiz: 新测验
     edit_crumb: 编辑
     edit_view: 
+      add_attachment_93868828: 添加附件
       allow_threaded_replies: 允许将回复信息按话题组织
       attachment: 附件
       available_from: 开始时间
@@ -5647,6 +5662,7 @@ zh:
     unsubscribe: 取消订阅此主题
     unsubscribed: 取消订阅
     unsubscribed_hint: 您未订阅此主题。单击可订阅。
+  display_course_catalog: 启用“在公共课程索引中包含此课程”标记的情况下，在此根帐户中显示一个可搜索的课程列表。
   draft_state_description: |-
       此测试版功能重新设计了 Canvas 的许多部分，
       内容可以在学生不可见的的新的未发布状态下
@@ -6030,6 +6046,7 @@ zh:
         body1: "您可能已经注意到，此页的底部是班级 (%{showme}) 最近提交的文件列表。您可以在此页中快速添加提交文件到学习档案中的新页面。只需单击要添加的提交的作业，就会弹出一个简单的对话框。"
         body2: "很好！现在要完成添加提交文件的操作，您需要选择要添加到的班级，并指定页面名称。单击 \"添加页面\" 之后，您将会转到新页面，以便能够根据需要进行详细编辑。"
   error_message_2b9d12ee: "错误: %{message}"
+  error_uploading_file_e2d31b56: 上传文件时出错。
   errors: 
     bad_navigation_config: 课程标签配置无效
     blank: 必需
@@ -6281,6 +6298,7 @@ zh:
   features: 
     allow_opt_out_of_inbox: 允许用户选择退出收件箱
     better_file_browsing: 更好的文件浏览功能
+    course_catalog: 课程目录
     differentiated_assignments: 差异化作业
     differentiated_assignments_account_disable_warning: |-
         关闭此功能将影响现有的课程。有关禁用此功能的帮助，请联系
@@ -6593,6 +6611,7 @@ zh:
     gradee_index_of_total: "%{gradee} %{x} / %{y}"
     group: 小组
     hide_all_details_button: 隐藏所有详细信息
+    mic_blocked_message: "使用麦克风的权限已被阻止。要更改，请转至 chrome://settings/contentExceptions#media-stream"
     mute_assignment: 屏蔽作业
     new_assessment: "[新测验]"
     no_submission_time: 无提交时间
@@ -6605,6 +6624,7 @@ zh:
     recording_message: 正在录音...
     show_all_details_button: 显示所有详细信息
     student: 学生
+    student_index: "学生 %{index}"
     student_mute_notification: 教师正在进行评分
     titles: 
       click_to_record: 语音到文本
@@ -6947,6 +6967,7 @@ zh:
         save: 保存
         save_settings: 保存设置
         submit_comment: 提交评论
+      crocodoc_pending: "Crocodoc 仍在处理此文档。"
       gradebook: 
         mute_assignment: 屏蔽作业
         unmute_assignment: 取消屏蔽作业
@@ -7337,14 +7358,17 @@ zh:
       group_category_create: 
         allow_self_signup: 允许自行注册
         cancel: 取消
+        create_groups: "立即创建 %{num_groups} 个小组"
         create_groups_manually: 我将手动创建小组
         group_set_name: 小组集名称
         group_structure: 小组结构
         leave_group_limit_blank: 留为空白以便没有限制
+        limit_group_size: "小组仅限 %{group_limit} 个成员"
         require_same_section: 要求小组成员在相同的班级中
         save: 保存
         saving: 正在保存...
         self_signup: 自行注册
+        split_into_groups: "将学生分为 %{num_groups} 个相等的小组"
       group_category_detail: 
         add_group: 添加小组
         category_settings: 设置
@@ -7365,6 +7389,7 @@ zh:
         group_limit_override: 更改此项将覆盖任何单独设置的组限制
         group_set_name: 小组集名称
         leave_group_limit_blank: 留为空白以便没有限制
+        limit_group_size: "小组仅限 %{group_limit} 个成员"
         require_same_section: 要求小组成员在相同的班级中
         save: 保存
         saving: 正在保存...
@@ -9931,13 +9956,27 @@ zh:
     sub_header: 副标题
   modules: 
     add: 
+      assignment: 
+        add_assignments: 添加作业
+        loading_assignments: 正在加载作业...
+      discussion: 
+        add_topics: 添加讨论主题
+      file: 
+        add_files: 添加文件
       header: 
         cancel: 取消
+        create_header: 创建标题
       link: 
+        add_link: 添加链接
         cancel: 取消
+      page: 
+        add_pages: 添加页面
+      quiz: 
+        add_quizzes: 添加测验
       tool: 
         cancel: 取消
     add_item: 
+      add_new_item: 添加新项目
       assignment: 作业
       content_page: 内容页面
       discussion: 讨论
@@ -9959,24 +9998,32 @@ zh:
         create: 创建
       discussion: 
         cancel: 取消
+        create_discussion: 创建讨论
       file: 
         cancel: 取消
         upload: 上传
       header: 
         cancel: 取消
+        create_header: 创建标题
       link: 
+        add_link: 添加链接
         cancel: 取消
       page: 
         cancel: 取消
+        creat_page: 创建页面
       quiz: 
         cancel: 取消
+        create_quiz: 创建测验
       tool: 
         cancel: 取消
     dialog_title: "添加项目到 %{moduleName}"
     item: 
       cancel: 取消
+      edit_item: 编辑单元项目
+      item_title: 单元项目标题
       points_possible: 得分
       save: 保存
+      saving: 正在保存...
     module: 
       header: 
         delete: 删除
@@ -9991,7 +10038,10 @@ zh:
     module_edit: 
       Create: 创建
       cancel: 取消
+      has_unlock_date: 锁定单元至指定日期
+      lock_datea: 锁定日期
       module_name: 模块名称
+      new_module: 创建新单元
     module_item_view: 
       button: 
         delete: 删除
@@ -10054,6 +10104,7 @@ zh:
     sure_you_want_to_mute: "是否确定要静音此作业?此作业静音时，学生将不会收到关于以下内容的新通知或无法看到:"
   name: 学术基准导入器
   new_facebook_message: "您有来自 Canvas 的新消息"
+  new_quiz_statistics_desc: 启用某课程的新测验统计页面。
   new_styles_description: |-
       我们正在改进 Canvas 的 UI 界面。启用此项可选择查看
       更新的简化外观并感受 Canvas 界面。这是一项“正在进行中”的功能，
@@ -10270,6 +10321,8 @@ zh:
         display: 手机号码
       twitter: 
         display: Twitter
+      yo: 
+        display: Yo
     frequencies: 
       daily: 每天
       immediately: 尽快
@@ -10530,6 +10583,10 @@ zh:
     save_button: 保存
     saving_button: 正在保存...
     warnings: 
+      overwrite_changes: |-
+          您即将覆盖自您开始编辑后已经进行的其他更改。
+          
+          是否确实要覆盖这些更改？
       unsaved_changes: 您有未保存的更改。是否要继续操作而不保存这些更改？
   paginated_collection: 
     no_items: 没有项目。
@@ -10595,8 +10652,13 @@ zh:
       labels: 
         api_key: "Crocodoc API 密钥"
     diigo: 
+      description: "Diigo 集成"
       name: Diigo
     diigo_settings: 
+      description: |-
+          您将需要注册 [new app on Diigo](%{diigo_url})。
+          
+          * 当您保存您的应用程序后，请记下 API 密钥
       labels: 
         api_key: "API 密钥"
     dim_dim_settings: 
@@ -10787,8 +10849,15 @@ zh:
     notices: 
       settings_updated: 插件设置已成功更新。
     panda_pub_settings: 
+      description: "PandaPub 是一项发布/订阅服务，当配置后，可让 Canvas 的某些部分在浏览器中接收事件通知，而不必轮询更改。"
       labels: 
+        application_id: "应用程序 ID"
         base_url: "库 URL"
+        key_id: "密钥 ID"
+        key_secret: 密钥加密
+    pandapub: 
+      description: 发布/订阅服务
+      name: PandaPub
     qti_converter_settings: 
       labels: 
         enabled: 已启用
@@ -10862,6 +10931,13 @@ zh:
         domain: 域
         password: 密码
         username: 用户名
+    yo: 
+      description: "Just Yo"
+      name: Yo
+    yo_settings: 
+      description: "您将需要 [来自 Yo 的 api 令牌](%{yo_url})。"
+      labels: 
+        api_token: "Api 令牌"
   polling: 
     poll_sessions: 
       errors: 
@@ -10961,6 +11037,7 @@ zh:
         register_linkedin_account: "注册您的 LinkedIn 帐户"
         save_login: 保存登录信息
         save_skype_name: "保存 Skype 名称"
+        save_yo_name: "保存 Yo 名称"
         select_image: 选择图像
         update_settings: 更新设置
       confirm_email_instructions: "在编辑个人资料之前，您需要确认电子邮件地址 (%{email})，方法是单击我们给您发送的电子邮件中的链接。如果您没有看到电子邮件，*单击以重新发送电子邮件*，然后确保检查您的垃圾邮件箱。"
@@ -11000,6 +11077,7 @@ zh:
         users_profile: "%{user} 的个人资料"
         ways_to_log_in: 登录方式
         web_services: 网络服务
+        yo_login: "Yo 登录"
       hints: 
         expires_at: 留为空白以便不会过期
         language: 这将覆盖所有浏览器或帐户设置。
@@ -11034,6 +11112,7 @@ zh:
         token_last_used: 上次使用
         token_purpose: 用途
         user_name: 用户名
+        yo_name: "Yo 名称"
       linkedin_description: "LinkedIn 是一个优秀的业务网络资源，它可以在您完成学业很久以后一直有所帮助。如果您拥有 LinkedIn 帐户，可在此处进行注册。然后，如果您允许其它课程/小组成员查看您注册的服务，他们就可以轻松地邀请您与他们联系而不必在 LinkedIn 中搜索您的个人资料。"
       links: 
         add_account: 添加帐户
@@ -11053,6 +11132,7 @@ zh:
         upload_new_image: 上传新图像
         view_facebook_app: "查看 Facebook 应用程序"
         view_your_profile: 查看您的个人资料
+        yo: Yo
       loading_token_details: 正在加载令牌详细信息...
       no_approved_integrations: "第三方应用程序可以请求权限以代表您访问 Canvas 网站。当您开始授权应用程序后，您将看到它们在此处列出。"
       no_language_preference: "系统默认值 (%{language})"
@@ -11068,6 +11148,7 @@ zh:
         authorize_google_docs: "授权 Google Docs"
         authorize_linkedin: "授权 LinkedIn"
         authorize_twitter: "授权 Twitter"
+        authorize_yo: "Yo 登录"
         click_to_change_profile_pic: 单击以更改头像
         delicious_login: "Delicious 登录"
         diigo_login: "Diigo 登录"
@@ -11086,6 +11167,13 @@ zh:
           自己，并且将不会在公共流中出现。
       unknown_service: 未知
       web_services: "通过将 Canvas 绑定到您已经使用的网络工具，它可以让您的生活轻松许多。单击\"其它服务\"中的任何服务，了解此项功能。"
+      yo_description: |-
+          Yo 是一个单触式零字符通信工具。
+          如果您有 Yo 帐户，则可以在此处注册。然后，如果您允许
+          课程/小组同伴成员看到您已注册的服务，他们则可以
+          轻松地与您的 Yo 帐户联系。
+          
+          您也可以注册以便将通知发送到您的 Yo 帐户。
     purpose_required: 需要填写用途
     resending: 正在重新发送...
     secondary_nav: 
@@ -11162,6 +11250,8 @@ zh:
       validations: 
         should_be_10_digits: "应为 10 位数字"
     ways_to_contact_me: 我的联系方式
+    yo_select: 
+      yo: Yo
     you_have_no_services: 您尚未注册任何服务，您可以在*设置*页面添加一些服务。
   profiles: 
     avatar_dialog: 
@@ -11203,7 +11293,9 @@ zh:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "已向 IdP 发送 LogoutRequest"
+      logout_request_redirect_from_idp: "已从 IdP 收到 LogoutRequest"
       logout_response_redirect_from_idp: "已从 IdP 收到 LogoutResponse"
+      logout_response_redirect_to_idp: "正向 IdP 发送 LogoutResponse"
       redirect_from_idp: "已从 IdP 收到 LoginResponse"
     default_app_name: 第三方应用程序
     errors: 
@@ -11463,8 +11555,18 @@ zh:
       some_scores_reduced: 仅正确的回答可得分（*可能会扣除某些学生的分数*）
       update_question_without_regrading: 更新问题而不重新评分
   quiz_reports: 
+    download_item_analysis: " 下载项目分析报告。"
+    download_student_analysis: 下载学生分析报告。
     generatable: 从未生成报告。
+    generate_item_analysis_report: 生成项目分析报告。
+    generate_student_analysis_report: 生成学生分析报告。
+    generated_at: "生成日期：%{date}"
     generating: 正在生成报告...
+    generation_almost_done: 差不多完成了。
+    generation_complete: 已生成报告。
+    generation_halfway: 完成了不到一半。
+    generation_started: 正在生成报告。
+    non_generatable_report_notice: 无法针对调查测验生成报告。
     quiz_report_generator: 
       download_report_name: "下载 %{report_name}"
       generate_report_name: "生成 %{report_name}"
@@ -11476,14 +11578,30 @@ zh:
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: 此测验的测验结果受到保护，只能在提交后立即查看一次。
   quiz_statistics: 
     answer_bars_chart: 
+      audible_answer_position: "答案 %{position}："
+      audible_answer_response_count: 
+        one: 一条响应。
+        other: "%{count} 条响应。"
+        zero: 无响应。
+      audible_correct_answer_indicator: 这是正确答案。
+      audible_description: 此表列出了该问题的所有答案，及其收到的响应数目。
       response_count: 
-        one: "%{count} 名学生"
+        one: "1 个学生"
         other: "%{count} 名学生"
+        zero: 没有人
+    answer_details: 
+      hide: 隐藏答案详细信息
+      hide_all: 隐藏所有问题的答案详细信息
+      show: 显示答案详细信息
+      show_all: 显示所有问题的答案详细信息
     attempts: "尝试次数：%{count}，共 %{total} 次"
+    correct_answer: 正确答案
     correct_essay_student_ratio: "%{ratio}% 的学生获得了此问题的满分。"
     correct_multiple_response_ratio: "%{ratio}% 的学生回答正确。"
     correct_response_ratio: "%{ratio}% 的学生正确回答了此问题。"
     discrimination_index: 
+      audible_bottom_bracket: 底部括号：
+      audible_bracket_aced: 此括号中的所有学生已正确回答问题。
       discrimination_index_dialog_title: 鉴别指数图
     download_submissions: 下载所有文件
     duration_in_minutes: 
@@ -11492,8 +11610,9 @@ zh:
     essay_score: "分数：%{score}"
     no_answer: 无答案
     response_student_count: 
-      one: "%{count} 名学生"
+      one: "1 个学生"
       other: "%{count} 名学生"
+      zero: 没有人
     summary: 
       avg_time: 平均时间
       high_score: 高分
