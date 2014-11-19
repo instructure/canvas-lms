@@ -101,7 +101,7 @@ define [
               onChange: (event) =>
                 @setState { selectedOption: 'published'}
             },
-          I18n.t("options.publish.description", "Publish")
+            I18n.t("options.publish.description", "Publish")
 
         div className: "radio",
           label {},
