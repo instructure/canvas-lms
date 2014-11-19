@@ -61,6 +61,9 @@
         <% end %>
       <% end %>
     </h2>
+    <%= form_tag course_path(@context), :id => "course_reload_form", :method => :put do %>
+      <%= hidden_field_tag :continue_to, course_settings_url(@context) %>
+    <% end %>
     <%= form_for @context, :html => {:id => "course_form", :class => "formtable"} do |f| %>
     <table class="coursesettings">
       <tr>

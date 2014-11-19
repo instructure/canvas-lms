@@ -1893,14 +1893,16 @@ class CoursesController < ApplicationController
         @course.attributes = params[:course]
         changes = changed_settings(@course.changes, @course.settings, old_settings)
 
-        if @course.save
+        if !@course.changed? || @course.save
           Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
           @current_user.touch
           if params[:update_default_pages]
             @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
           end
-          flash[:notice] = t('notices.updated', 'Course was successfully updated.')
-          format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
+          format.html {
+            flash[:notice] = t('notices.updated', 'Course was successfully updated.')
+            redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to])
+          }
           format.json do
             if api_request?
               render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
