@@ -60,6 +60,7 @@ ja:
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
+      yo: Yo
     ask_canvas_network: "Canvas ネットワーク コミュニティに質問する"
     default_account_name: デフォルトのアカウント
     default_site_administrator_account_name: サイト管理者
@@ -1302,6 +1303,7 @@ ja:
   allow_lor_tools: "LOR 用に設定された外部ツールの表示および使用をユーザに許可します。"
   allow_opt_out_of_inbox: "ユーザは、会話の受信箱の受信を拒否 (オプトアウト) できます。オプトアウトすると、すべての会話メッセージとお知らせが ASAP のお知らせとしてユーザのメインの電子メール アドレスに送信されます。また、受信箱では会話の受信箱の未読メッセージ バッジが非表示になり、会話のお知らせの基本設定が非表示になります。"
   always_3a59e701: 常に
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: "不明なサーバ エラーが発生しました。もう一度やり直してください。"
   analytics: 
     course: 
       analytics: 分析
@@ -1367,6 +1369,7 @@ ja:
     podcast_feed_description_course: "\"%{course}\" コースのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_description_group: "\"%{group}\" グループのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_name: "%{course} アナウンスのポッドキャスト フィード"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最後の試行の後に回答が表示されます
   application: 
     errors: 
       feed_not_found: フィードが見つかりませんでした。
@@ -1806,6 +1809,7 @@ ja:
     grading_type_selector: 
       display_grade_as: 成績の表示方法
       gpa_scale_explainer: "GPA スケール採点は、すべての課題で 4.0 満点 (場合によっては 5.0 や 6.0 満点) のスケールを使用する学校のための採点法です。この採点スキームは、レター グレード表示と似ていますが、重要な相違点がいくつかあります。"
+      gpa_scale_input_explainer: "スコアは、4.0 満点のスケールで入力されます。たとえば、ある課題が 100 点満点の場合、4.0 の成績なら 100%、3.0 の成績なら 87% などとなります。"
       gpa_scale_letters_explainer: "数字の成績に加えて、レター グレードを使用することもできます。"
       gpa_scale_percentage_explainer: "点数をそのまま入力するのではなく、パーセンテージで入力します。たとえば、ある課題が 50 点満点の場合は、「40」ではなく「80%」と入力します。"
       gpa_scale_recommendation: "学校で成績に 4.0 満点 (または 5.0/6.0 満点) のスケールを使用していない場合は、成績をレター グレードで表示することをお勧めします。"
@@ -2170,6 +2174,8 @@ ja:
         originality_report_visible_after_due_date: 期日後
         originality_report_visible_after_grading: 課題の採点後
         originality_report_visible_immediately: 即時
+        settings_exclude_fewer_than_count: "%{wordsInput} 単語 (語) 未満"
+        settings_exclude_less_than_percent: "その文書の %{percentInput} パーセント未満"
     undated_assignments: 日付のない課題
     upcoming_assignments: 今後予定されている課題
     wizard_box: 
@@ -2477,6 +2483,7 @@ ja:
       scheduler_explanation_teacher_paragraph_1: "これはスケジューラ ツールです。講師はこのツールを使用して、受講生がサインアップする予定グループを作成できます。"
       scheduler_explanation_teacher_paragraph_2: "例えば、講師がコースの各受講生に中間筆記課題を出すものとします。そのような場合は、新しい予定グループを作成し、自分の都合の良い日時を指定し、その時間を 15 分のブロックに分割して、各時間ブロックで 1 人の受講生だけを受け付けるようにします。"
       scheduler_explanation_teacher_paragraph_3: その後、受講生向けに、指定の時間ブロックのいずれかにサインアップする必要があることを通知します。受講生のカレンダーには、利用できる時間ブロックが他のすべての予定と共に表示されるので、受講生は都合のよい時間を選択できます。
+      scheduler_explanation_teacher_paragraph_4: "* 今すぐ始めるには、右側の [予定グループを作成する] ボタンをクリックします。 *"
       signed_up_for: サインアップ先
       x_groups_have_signed_up: "%{participant_count} 個のグループがサインアップしています"
       x_people_have_signed_up: "%{participant_count} 人がサインアップしています"
@@ -2523,6 +2530,7 @@ ja:
         warning: 警告
     edit_appointment_group: 
       affect_reservations: このことは予約にどのように影響しますか?
+      appointments_per_participant_label: 参加者が出席できる予定の最大数
       appt_group_options_help1: 既存の一部の予約が、設定された上限を超えています。この変更は新しい予約にのみ適用され、既存の予約は影響を受けません。
       appt_group_options_help2: ただし、既存の予約を手動で削除することはできます。
       calendar: カレンダー
@@ -2532,6 +2540,8 @@ ja:
       group_signup: 受講生をグループにサインアップさせてください。
       location: 場所
       name: 名前
+      participants_per_appointment_label: 予定あたりの最大ユーザ/グループ数
+      slot_duration_label: "スロット当たりの時間 (分)"
       time_range: 時間の範囲
     edit_appt_calendar_event: 
       description: "説明:"
@@ -2985,6 +2995,7 @@ ja:
     body: "Canvas 検証コードは %{verification_code} です"
     default_facebook_account: "Facebook アカウント"
     default_twitter_handle: "Twitter ハンドルネーム"
+    default_yo_name: "Yo 名"
   communication_channels: 
     confirm: 
       buttons: 
@@ -4589,6 +4600,7 @@ ja:
         status_link: インポートの状況
         text: "1 つ以上のアイテムを現在インポート中です。これらのアイテムは、利用可能になった後、以下のコースに表示されます。"
     index: 
+      browse_more_courses: その他のコースを参照
       headings: 
         future_enrollments: 将来の登録
         my_courses: "マイ コース"
@@ -4648,6 +4660,8 @@ ja:
         duplicates_removed: 重複が削除されました。
         email: "電子メール アドレス"
         email_field_label: "追加するユーザの電子メール アドレスをカンマで区切って入力します"
+        email_field_place_holder: "\"受講生のサンプル\" <student@example.com>,  \"姓, 名\" <firstlast@example.com>, justAnEmailAddress@example.com"
+        example_formats: "例: user@example.com, \"名 姓\" <user@example.com>, \"姓, 名\" <user@example.com>"
         form_instructions: "以下に電子メール アドレスのリストを入力または貼り付け:"
         go_back: 最初からやり直し
         have_been_enrolled: 次のユーザが登録されました
@@ -5423,6 +5437,7 @@ ja:
       new_quiz: 新しいクイズ
     edit_crumb: 編集
     edit_view: 
+      add_attachment_93868828: 添付ファイルの追加
       allow_threaded_replies: スレッドでの返信を許可する
       attachment: 添付ファイル
       available_from: 次から使用可能
@@ -5648,6 +5663,7 @@ ja:
     unsubscribe: このトピックの購読を中止
     unsubscribed: 購読中止済み
     unsubscribed_hint: このトピックを購読していません。購読するにはクリックします。
+  display_course_catalog: "このルート アカウントの、[このコースを公開コース インデックスに含める] フラグが有効になっているコースの検索可能なリストを表示します。"
   draft_state_description: |-
       このベータ機能では、Canvas の多くの部分を再設計し、コンテンツを新しい未公開の状態に
       することができます。この状態では、コンテンツは受講生に表示されず、成績の計算からも除外され
@@ -6031,6 +6047,7 @@ ja:
         body1: "このページの最下部に、ご自分のクラスからの最近の提出物のリストが表示されていることに、既にお気付きかもしれません (%{showme})。ポートフォリオの新しいページへの課題追加も、このページから素早く行うことができます。追加する提出物をクリックすると、シンプルなダイアログがポップアップ表示されます。"
         body2: "OK です!それでは、課題の追加を完成させましょう。課題を追加するセクションを選び、そのページに名前を付ける必要があります。\"ページの追加\" をクリックすると、新しいページに移動します。必要であれば、より詳しく編集できます。"
   error_message_2b9d12ee: "エラー: %{message}"
+  error_uploading_file_e2d31b56: ファイルのアップロードでエラーが発生しました。
   errors: 
     bad_navigation_config: "無効なコース タブ構成です"
     blank: 必須
@@ -6282,6 +6299,7 @@ ja:
   features: 
     allow_opt_out_of_inbox: ユーザに受信箱のオプトアウトを許可
     better_file_browsing: 改善されたファイル参照機能
+    course_catalog: "コース カタログ"
     differentiated_assignments: 分化課題
     differentiated_assignments_account_disable_warning: |-
         この機能をオフにすると、既存のコースに影響があります。この機能を無効にする場合は、Canvas サクセス マネージャに
@@ -6593,6 +6611,7 @@ ja:
     gradee_index_of_total: "%{gradee} %{x}/%{y}"
     group: グループ
     hide_all_details_button: 詳細をすべて非表示
+    mic_blocked_message: "マイクの使用権限がブロックされています。変更するには、chrome://settings/contentExceptions#media-stream にアクセスしてください"
     mute_assignment: 課題をミュートにする
     new_assessment: "[新しいアセスメント]"
     no_submission_time: 提出の時間がない
@@ -6605,6 +6624,7 @@ ja:
     recording_message: 録音中...
     show_all_details_button: 詳細をすべて表示
     student: 受講生
+    student_index: "受講生 %{index}"
     student_mute_notification: インストラクタが採点中です
     titles: 
       click_to_record: 音声認識
@@ -6947,6 +6967,7 @@ ja:
         save: 保存
         save_settings: 設定の保存
         submit_comment: コメントの提出
+      crocodoc_pending: "Crocodoc はまだこの文書を処理しています。"
       gradebook: 
         mute_assignment: 課題をミュートにする
         unmute_assignment: 課題のミュート解除
@@ -7338,14 +7359,17 @@ ja:
       group_category_create: 
         allow_self_signup: "セルフ サインアップを許可"
         cancel: キャンセル
+        create_groups: "%{num_groups} つのグループを今すぐ作成"
         create_groups_manually: グループを手動で作成します
         group_set_name: "グループ セット名"
         group_structure: グループの構造
         leave_group_limit_blank: 制限がない場合は空白のまま
+        limit_group_size: "グループの定員: %{group_limit} 人"
         require_same_section: "グループ メンバーに、同じセクションに入ることを要求する"
         save: 保存
         saving: 保存しています...
         self_signup: "セルフ サインアップ"
+        split_into_groups: "%{num_groups} 個の均等なグループに受講生を分割"
       group_category_detail: 
         add_group: グループの追加
         category_settings: 設定
@@ -7366,6 +7390,7 @@ ja:
         group_limit_override: これを変更すると、個別に設定されたグループ制限が上書きされます
         group_set_name: "グループ セット名"
         leave_group_limit_blank: 制限がない場合は空白のまま
+        limit_group_size: "グループの定員: %{group_limit} 人"
         require_same_section: "グループ メンバーに、同じセクションに入ることを要求する"
         save: 保存
         saving: 保存しています...
@@ -9932,13 +9957,27 @@ ja:
     sub_header: "サブ ヘッダ"
   modules: 
     add: 
+      assignment: 
+        add_assignments: 課題の追加
+        loading_assignments: 課題を読み込んでいます...
+      discussion: 
+        add_topics: "ディスカッション トピックの追加"
+      file: 
+        add_files: ファイルの追加
       header: 
         cancel: キャンセル
+        create_header: ヘッダの作成
       link: 
+        add_link: リンクの追加
         cancel: キャンセル
+      page: 
+        add_pages: ページの追加
+      quiz: 
+        add_quizzes: クイズの追加
       tool: 
         cancel: キャンセル
     add_item: 
+      add_new_item: 新規アイテムの追加
       assignment: 課題
       content_page: "コンテンツ ページ"
       discussion: ディスカッション
@@ -9960,24 +9999,32 @@ ja:
         create: 作成
       discussion: 
         cancel: キャンセル
+        create_discussion: ディスカッションの作成
       file: 
         cancel: キャンセル
         upload: アップロード
       header: 
         cancel: キャンセル
+        create_header: ヘッダの作成
       link: 
+        add_link: リンクの追加
         cancel: キャンセル
       page: 
         cancel: キャンセル
+        creat_page: ページの作成
       quiz: 
         cancel: キャンセル
+        create_quiz: クイズの作成
       tool: 
         cancel: キャンセル
     dialog_title: "%{moduleName} へのアイテムの追加"
     item: 
       cancel: キャンセル
+      edit_item: "モジュール アイテムの編集"
+      item_title: "モジュール アイテムのタイトル"
       points_possible: 点
       save: 保存
+      saving: 保存しています...
     module: 
       header: 
         delete: 削除
@@ -9992,7 +10039,10 @@ ja:
     module_edit: 
       Create: 作成
       cancel: キャンセル
+      has_unlock_date: 指定された日付までモジュールをロック
+      lock_datea: ロック日付
       module_name: モジュール名
+      new_module: 新規モジュールの作成
     module_item_view: 
       button: 
         delete: 削除
@@ -10055,6 +10105,7 @@ ja:
     sure_you_want_to_mute: "この課題をミュートにしてもよろしいですか?この課題がミュートになっている間、受講生は以下について表示できず、新しいお知らせも受信しません:"
   name: "Academic Benchmark インポーター"
   new_facebook_message: "Canvas からの新しいメッセージがあります"
+  new_quiz_statistics_desc: コースに対して、新しいクイズ統計ページを有効にします。
   new_styles_description: |-
       現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい Canvas インターフェイス
       をご覧になりたい場合は、これをオンにしてください。新しいインターフェイスはまだ開発中であるため、
@@ -10272,6 +10323,8 @@ ja:
         display: 携帯電話番号
       twitter: 
         display: Twitter
+      yo: 
+        display: Yo
     frequencies: 
       daily: 毎日
       immediately: 可能な限り早く
@@ -10532,6 +10585,10 @@ ja:
     save_button: 保存
     saving_button: 保存しています...
     warnings: 
+      overwrite_changes: |-
+          編集開始後に行われた他の変更を上書きしようとしています。
+          
+          これらの変更を上書きしますか?
       unsaved_changes: 変更内容を保存していません。これらの変更内容を保存せずに続行しますか?
   paginated_collection: 
     no_items: アイテムがありません。
@@ -10597,6 +10654,7 @@ ja:
       labels: 
         api_key: "Crocodoc API 鍵"
     diigo: 
+      description: "Diigo 統合"
       name: Diigo
     diigo_settings: 
       labels: 
@@ -10781,8 +10839,15 @@ ja:
     notices: 
       settings_updated: プラグインの設定は正常に更新されました。
     panda_pub_settings: 
+      description: "PandaPub は出版/購読型サービスです。このサービスを設定すると、Canvas の一部で、変更内容をポーリングすることなく、ブラウザ内でイベント通知を受信することができます。"
       labels: 
+        application_id: "アプリケーション ID"
         base_url: "ベース URL"
+        key_id: "キー ID"
+        key_secret: "キー シークレット"
+    pandapub: 
+      description: 出版/購読型サービス
+      name: PandaPub
     qti_converter_settings: 
       labels: 
         enabled: 使用可能
@@ -10851,6 +10916,12 @@ ja:
         domain: ドメイン
         password: パスワード
         username: ユーザ名
+    yo: 
+      description: "Yo です"
+      name: Yo
+    yo_settings: 
+      labels: 
+        api_token: "API トークン"
   polling: 
     poll_sessions: 
       errors: 
@@ -10950,6 +11021,7 @@ ja:
         register_linkedin_account: "LinkedIn アカウントの登録"
         save_login: ログイン情報の保存
         save_skype_name: "Skype 名の保存"
+        save_yo_name: "Yo 名を保存"
         select_image: 画像の選択
         update_settings: 設定の更新
       confirm_email_instructions: "プロフィールを編集する前に、お送りした電子メールのリンクをクリックして、電子メール アドレス (%{email}) を確認してください。電子メールが見つからない場合は、*クリックして電子メールを再送信* し、スパム用の受信箱も確認してみてください"
@@ -10989,6 +11061,7 @@ ja:
         users_profile: "%{user} のプロフィール"
         ways_to_log_in: ログイン方法
         web_services: "Web サービス"
+        yo_login: "Yo ログイン"
       hints: 
         expires_at: 期限がない場合は空白のまま
         language: この設定は、ブラウザまたはアカウントのどの設定よりも優先されます。
@@ -11023,6 +11096,7 @@ ja:
         token_last_used: 最終使用日
         token_purpose: 目的
         user_name: ユーザ名
+        yo_name: "Yo 名"
       linkedin_description: "LinkedIn は、ビジネス ネットワークを構築するための素晴らしいリソースであり、教育を終えた後も長期にわたって役に立ちます。LinkedIn アカウントをお持ちであれば、ここでそのアカウントを登録できます。次に、仲間のコース/グループ メンバーに対して、ご自分が登録しているサービスの表示を許可すれば、仲間はLinkedIn の中からあなたのプロフィールを探さなくても、あなたとつながるための招待を簡単に送ることができます。"
       links: 
         add_account: アカウントの追加
@@ -11042,6 +11116,7 @@ ja:
         upload_new_image: 新しい画像をアップロードする
         view_facebook_app: "Facebook アプリを表示する"
         view_your_profile: 自分のプロフィールを表示する
+        yo: Yo
       loading_token_details: トークンの詳細を読み込んでいます...
       no_approved_integrations: "ご自分に代わって、サードパーティのアプリケーションが Canvas サイトにアクセスする権限を要求できます。認証の済んだアプリケーションは、順次ここにリストされます。"
       no_language_preference: "システム デフォルト (%{language})"
@@ -11057,6 +11132,7 @@ ja:
         authorize_google_docs: "Google ドキュメントの認証"
         authorize_linkedin: "LinkedIn の認証"
         authorize_twitter: "Twitter の認証"
+        authorize_yo: "Yo ログイン"
         click_to_change_profile_pic: クリックして、プロフィール画像を変更
         delicious_login: "Delicious へのログイン"
         diigo_login: "Diigo へのログイン"
@@ -11075,6 +11151,13 @@ ja:
           公開ストリームには表示されません。
       unknown_service: 不明
       web_services: "Canvas では、ご利用の Web ツールと結び付けることで、受講生活がはるかに便利になります。\"他のサービス\" で任意のサービスをクリックすると、詳細が表示されます。"
+      yo_description: |-
+          Yo は、タップするだけで文字入力が不要なコミュニケーション ツールです。
+          Yo のアカウントを持っている場合は、ここで登録できます。
+          仲間のコース/グループのメンバーに対して、登録済みのサービスの表示を許可している場合は、
+          それらのメンバーは Yo アカウントを使用して簡単にあなたに連絡できます。
+          
+          Yo アカウントにお知らせを送信するようにサインアップすることもできます。
     purpose_required: 目的が必要です
     resending: 再送信中...
     secondary_nav: 
@@ -11151,6 +11234,8 @@ ja:
       validations: 
         should_be_10_digits: "10 桁の数字にしてください"
     ways_to_contact_me: 連絡方法
+    yo_select: 
+      yo: Yo
     you_have_no_services: "どのサービスにも登録していません。*設定* ページで追加できます。"
   profiles: 
     avatar_dialog: 
@@ -11192,7 +11277,9 @@ ja:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest が IdP に送信されました"
+      logout_request_redirect_from_idp: "IdP から LogoutRequest を受信"
       logout_response_redirect_from_idp: "IdP から LogoutResponse を受け取りました"
+      logout_response_redirect_to_idp: "IdP に LogoutResponse を送信"
       redirect_from_idp: "IdP から LoginResponse を受け取りました"
     default_app_name: サードパーティのアプリケーション
     errors: 
@@ -11450,7 +11537,11 @@ ja:
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
   quiz_reports: 
+    download_item_analysis: アイテム分析レポートをダウンロードします。
+    download_student_analysis: 受講生分析レポートをダウンロードします。
     generatable: レポートは生成されていません。
+    generate_item_analysis_report: アイテム分析レポートを生成します。
+    generate_student_analysis_report: 受講生分析レポートを生成します。
     generating: レポートを生成しています...
     quiz_report_generator: 
       download_report_name: "%{report_name} のダウンロード"
