@@ -498,5 +498,37 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css("item[identifier=#{mig_id(tag2_1)}]")).not_to be_nil
     end
 
+    it "should export file copyright information" do
+      @att1 = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai1'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @att1.usage_rights = @course.usage_rights.create! use_justification: 'fair_use', legal_copyright: '(C) 2014 Sienar Fleet Systems'
+      @att1.save!
+
+      @att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohai2'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @att2.usage_rights = @course.usage_rights.create! use_justification: 'public_domain'
+      @att2.save!
+
+      @att3 = Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('ohai3'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @att3.usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', license: 'cc_by', legal_copyright: '(C) 2014 Corellian Engineering Corporation'
+      @att3.save!
+
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.save!
+      run_export
+
+      # copyright only
+      node1 = @manifest_doc.at_css('resource[href$="first.png"] lom|rights')
+      expect(node1.at_css('lom|copyrightAndOtherRestrictions > lom|value').text).to eq('yes')
+      expect(node1.at_css('lom|description > lom|string').text).to eq('(C) 2014 Sienar Fleet Systems')
+
+      # license only
+      node2 = @manifest_doc.at_css('resource[href$="second.jpg"] lom|rights')
+      expect(node2.at_css('lom|copyrightAndOtherRestrictions > lom|value').text).to eq('no')
+      expect(node2.at_css('lom|description > lom|string').text).to eq('Public Domain')
+
+      # copyright and license
+      node3 = @manifest_doc.at_css('resource[href$="third.jpg"] lom|rights')
+      expect(node3.at_css('lom|copyrightAndOtherRestrictions > lom|value').text).to eq('yes')
+      expect(node3.at_css('lom|description > lom|string').text).to eq('(C) 2014 Corellian Engineering Corporation\nCC Attribution')
+    end
   end
 end
