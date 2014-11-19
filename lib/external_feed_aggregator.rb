@@ -33,10 +33,14 @@ class ExternalFeedAggregator
     Shackles.activate(:slave) do
       start = Time.now.utc
       begin
-        feeds = ExternalFeed.to_be_polled(start).limit(1000).to_a
+        feeds = ExternalFeed.to_be_polled(start).limit(1000).preload(context: :root_account).to_a
         feeds.each do |feed|
-          next if !feed.context || feed.context.root_account.deleted?
           Shackles.activate(:master) do
+            if !feed.context || feed.context.root_account.deleted?
+              feed.update_attribute(:refresh_at, Time.now.utc + NO_ENTRIES_WAIT_SECONDS)
+              next
+            end
+
             process_feed(feed)
           end
         end
