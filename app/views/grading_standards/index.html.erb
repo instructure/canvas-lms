@@ -2,18 +2,4 @@
 <% jammit_css :grading_standards %>
 <% content_for :page_title, t(:title, "Grading Standards") %>
 
-<% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <a href="#" class="btn button-sidebar-wide add_standard_link"><i class="icon-add"></i> <%= t 'buttons.add', 'Add Grading Scheme' %></a>
-  </div>
-<% end %>
-<h1><%= t :heading_grading_schemes, 'Grading Schemes' %></h1>
-<div id="standards">
-  <% @standards.each do |standard| %>
-    <%= render :partial => 'shared/grading_standard', :object => standard, :locals => {:grading_standard_list => true} %>
-  <% end %>
-</div>
-<div style="display: none;">
-  <a href="<%= context_url(@context, :context_grading_standards_url) %>" id="create_grading_standard_url">&nbsp;</a>
-  <%= render :partial => 'shared/grading_standard', :object => nil, :locals => {:grading_standard_list => true} %>
-</div>
+<div id="react_grading_tabs"></div>

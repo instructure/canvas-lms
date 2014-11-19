@@ -9,46 +9,50 @@ describe "account admin grading schemes" do
 
   before (:each) do
     course_with_admin_logged_in
+    get url
   end
 
-  describe "grading schemes" do
+  context "without Multiple Grading Periods" do
 
-    it "should add a grading scheme" do
-      should_add_a_grading_scheme
+    describe "grading schemes" do
+
+      it "should add a grading scheme" do
+        should_add_a_grading_scheme
+      end
+
+      it "should edit a grading scheme" do
+        should_edit_a_grading_scheme(account, url)
+      end
+
+      it "should delete a grading scheme" do
+        should_delete_a_grading_scheme(account, url)
+      end
     end
 
-    it "should edit a grading scheme" do
-      should_edit_a_grading_scheme
-    end
+    describe "grading scheme items" do
 
-    it "should delete a grading scheme" do
-      should_delete_a_grading_scheme
+      before (:each) do
+        create_simple_standard_and_edit(account, url)
+      end
+
+      it "should add a grading scheme item" do
+        should_add_a_grading_scheme_item
+      end
+
+      it "should edit a grading scheme item" do
+        should_edit_a_grading_scheme_item
+      end
+
+      it "should delete a grading scheme item" do
+        should_delete_a_grading_scheme_item
+      end
     end
   end
 
-  describe "grading scheme items" do
+  context "with Multiple Grading Periods enabled" do
 
-    def grading_standard_rows
-      ff('.grading_standard_row')
-    end
-
-    before (:each) do
-      grading_standard_for(account)
-      @grading_standard = GradingStandard.last
-      get url
-      f('.edit_grading_standard_link').click
-    end
-
-    it "should add a grading scheme item" do
-      should_add_a_grading_scheme_item
-    end
-
-    it "should edit a grading scheme item" do
-      should_edit_a_grading_scheme_item
-    end
-
-    it "should delete a grading scheme item" do
-      should_delete_a_grading_scheme_item
+    it "should contain a tab for grading schemes and grading periods" do
+      should_contain_a_tab_for_grading_schemes_and_periods(url)
     end
   end
 end
