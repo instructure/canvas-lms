@@ -2069,6 +2069,13 @@ describe AssignmentsApiController, type: :request do
             :format => "json", :course_id => @course.id.to_s,
             :id => @assignment1.id.to_s }, {}, {}, {:expected_status => 401})
         end
+
+        it "should not include assignment_visibility data when requested" do
+          user_session @student1
+          @user = @student1
+          json = visibility_api_request @assignment1
+          expect(json.has_key?("assignment_visibility")).to eq false
+        end
       end
     end
   end

@@ -118,6 +118,8 @@ class AssignmentGroupsController < ApplicationController
         include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
         if include_visibility && da_enabled
           assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: all_visible_assignments.map(&:id))
+        else
+          params[:include].delete('assignment_visibility')
         end
 
         # because of a bug with including content_tags, we are preloading here rather than in

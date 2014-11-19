@@ -40,6 +40,7 @@ class AssignmentGroupsApiController < ApplicationController
     if authorized_action(@assignment_group, @current_user, :read)
       includes = Array(params[:include])
       override_dates = value_to_boolean(params[:override_assignment_dates] || true)
+      includes.delete('assignment_visibility') unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
       render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
         stringify_json_ids: stringify_json_ids?,
         override_dates: override_dates
