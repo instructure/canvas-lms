@@ -4,6 +4,7 @@ define [
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
+  '../modules/filesEnv'
   'compiled/models/Folder'
   './RestrictedDialogForm'
   '../utils/openMoveDialog'
@@ -11,7 +12,7 @@ define [
   '../utils/deleteStuff'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, customPropTypes, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) ->
+], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, Folder, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) ->
 
   ItemCog = React.createClass
     displayName: 'ItemCog'
@@ -19,13 +20,16 @@ define [
     propTypes:
       model: customPropTypes.filesystemObject
 
-
     render: withReactDOM ->
       wrap = (fn) =>
-        preventDefault (event)=>
+        preventDefault (event) =>
+          singularContextType = @props.model.collection?.parentFolder?.get('context_type').toLowerCase()
+          pluralContextType = singularContextType + 's' if singularContextType?
+          contextType = pluralContextType || filesEnv.contextType
+          contextId = @props.model.collection?.parentFolder?.get('context_id') || filesEnv.contextId
           fn([@props.model], {
-            contextType: @props.model.collection?.parentFolder.get('context_type').toLowerCase() + 's'
-            contextId: @props.model.collection?.parentFolder.get('context_id')
+            contextType: contextType
+            contextId: contextId
             returnFocusTo: event.target
           })
 
