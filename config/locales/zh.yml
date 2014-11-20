@@ -1298,8 +1298,8 @@ zh:
       criteria_required: 至少需要一个触发器
       recipients_required: 至少需要一个收件人
       threshold_should_be_numeric: 这应该是正数
-  all_students_have_taken_the_quiz_b558f8b4: 所有学生均已进行测验
-  all_students_have_taken_the_survey_494f9f42: 所有学生均已进行调查
+  all_students_have_taken_the_quiz_b558f8b4: 所有学生均已参加测验
+  all_students_have_taken_the_survey_494f9f42: 所有学生均已参加调查
   allow_lor_tools: "允许用户查看和使用针对 LOR 配置的外部工具。"
   allow_opt_out_of_inbox: "允许用户选择退出 Conversation 的收件箱。这将导致所有会话邮件和通知以紧急通知的形式发送到用户的主电子邮件，在收件箱上隐藏 Conversation 邮件箱的未读邮件标识，并且隐藏 Conversation 的通知首选项。"
   always_3a59e701: 始终
@@ -1809,7 +1809,7 @@ zh:
     grading_type_selector: 
       display_grade_as: 计分显示为
       gpa_scale_explainer: "GPA 等级评分面向使用 4.0（或 5.0/6.0）等级评定所有作业的学校而设计。这一评分方案类似于字母评分显示，但存在一些重要的差别："
-      gpa_scale_input_explainer: "根据 4.0 等级来输入分数。例如，如果作业总共为 100 点，输入 4.0 则结果为 100%，输入 3.0 则结果为 87% 等等。"
+      gpa_scale_input_explainer: "根据 4.0 等级来输入分数。例如，如果作业总共为 100 分，输入 4.0 则结果为 100%，输入 3.0 则结果为 87% 等等。"
       gpa_scale_letters_explainer: 除了数字评分以外，还可以使用字母评分。
       gpa_scale_percentage_explainer: "您不能直接输入分数，但可以输入百分比。例如，如果作业总共为 50 分，输入“40”则无效，而输入“80%”则有效。"
       gpa_scale_recommendation: "除非您的学校使用 4.0（或 5.0/6.0）等级进行评分，否则 Canvas 建议以字母评分方式显示评分。"
@@ -1934,7 +1934,7 @@ zh:
       other: "%{count} 份作业"
     other_assignments: 其它作业
     overdue_assignments: 逾期作业
-    past_assignments: 以前的作业
+    past_assignments: 以往作业
     peer_review_assignment: 
       titles: 
         remind_reviewer: "向 %{user} 用户提醒测验"
@@ -2176,8 +2176,8 @@ zh:
         originality_report_visible_immediately: 立即
         settings_exclude_fewer_than_count: "少于 %{wordsInput} 个字"
         settings_exclude_less_than_percent: "少于文档的 %{percentInput}"
-    undated_assignments: 更新的作业
-    upcoming_assignments: 即将到来的作业
+    undated_assignments: 无日期作业
+    upcoming_assignments: 即将布置的作业
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: 删除作业"
@@ -2483,7 +2483,7 @@ zh:
       scheduler_explanation_teacher_paragraph_1: "这是计划程序工具。 您可以利用它为学生创建要注册的约会组。"
       scheduler_explanation_teacher_paragraph_2: "比方说，您想与参加您课程的每个学生单独讨论期中论文作业。您可以新建一个约会组， 指定对您方便的日期和时间，并将该时间分成多个时间块（每个块 15 分钟），每个时间块仅允许一个学生参与。"
       scheduler_explanation_teacher_paragraph_3: 然后，学生将收到通知，并了解需要注册一个指定的时间块。在随后显示的日历中，可用时间块覆盖在日历的上部，这样学生就可选择一个合适的时间。
-      scheduler_explanation_teacher_paragraph_4: "* 单击右侧的“创建约会组”按钮，即可创建。*"
+      scheduler_explanation_teacher_paragraph_4: "* 单击右侧的“创建约会组”按钮，即可开始创建。*"
       signed_up_for: 您已报名参加
       x_groups_have_signed_up: "已注册 %{participant_count} 小组"
       x_people_have_signed_up: "已注册 %{participant_count} 人员"
@@ -4086,7 +4086,7 @@ zh:
       sent: 已发送
       settings: 设置
       starred: 已标记
-      submission_comments: 作业评论
+      submission_comments: 提交项评论
       titles: 
         conversations: 会话
       unread: 未读
@@ -4175,8 +4175,8 @@ zh:
     unstar_conversation: 取消标记会话
   correct_answer: 这是正确答案。
   correct_answers_are_available_until_date_df01cc5f: "正确答案到 %{date} 才提供。"
-  correct_answers_are_hidden_5d0a0009: 正确答案隐藏。
-  correct_answers_are_no_longer_available_c67dfc28: 不再提供正确的答案。
+  correct_answers_are_hidden_5d0a0009: 正确答案已隐藏。
+  correct_answers_are_no_longer_available_c67dfc28: 不再提供正确答案。
   correct_answers_will_be_available_from_to_5762e8c6: "正确答案将于 %{from} - %{to} 提供。"
   correct_answers_will_be_available_on_date_48137: "正确答案将于 %{date} 提供。"
   count_minutes_a6eeeacb: 
@@ -4532,7 +4532,7 @@ zh:
           bookmark: 复制此链接或制作其书签
     description: 
       links: 
-        join_course: 参与此课程
+        join_course: 加入此课程
     edit_profile: 
       about: 关于
       about_related_id: 共享用于将相关课程/班级链接到一起的标识符
@@ -5662,7 +5662,7 @@ zh:
     unsubscribe: 取消订阅此主题
     unsubscribed: 取消订阅
     unsubscribed_hint: 您未订阅此主题。单击可订阅。
-  display_course_catalog: 启用“在公共课程索引中包含此课程”标记的情况下，在此根帐户中显示一个可搜索的课程列表。
+  display_course_catalog: “在公共课程索引中包含此课程”标记启用的情况下，在此根帐户中显示一个可搜索的课程列表。
   draft_state_description: |-
       此测试版功能重新设计了 Canvas 的许多部分，
       内容可以在学生不可见的的新的未发布状态下
@@ -6045,7 +6045,7 @@ zh:
       submissions: 
         body1: "您可能已经注意到，此页的底部是班级 (%{showme}) 最近提交的文件列表。您可以在此页中快速添加提交文件到学习档案中的新页面。只需单击要添加的提交的作业，就会弹出一个简单的对话框。"
         body2: "很好！现在要完成添加提交文件的操作，您需要选择要添加到的班级，并指定页面名称。单击 \"添加页面\" 之后，您将会转到新页面，以便能够根据需要进行详细编辑。"
-  error_message_2b9d12ee: "错误: %{message}"
+  error_message_2b9d12ee: "错误：%{message}"
   error_uploading_file_e2d31b56: 上传文件时出错。
   errors: 
     bad_navigation_config: 课程标签配置无效
@@ -10111,8 +10111,8 @@ zh:
       在生产中还不应该为实际用户启用此功能。
   no_e16d9132: 否
   no_migration_file: 内容迁移需要文件
-  no_students_have_taken_the_quiz_yet_e667644b: 学生尚未进行测验
-  no_students_have_taken_the_survey_yet_d378cd35: 学生尚未进行调查
+  no_students_have_taken_the_quiz_yet_e667644b: 学生尚未参加测验
+  no_students_have_taken_the_survey_yet_d378cd35: 学生尚未参加调查
   not_a_number: 必须为正数
   notification: 
     added_to_conversation_description: 已将您添加到会话
@@ -10656,7 +10656,7 @@ zh:
       name: Diigo
     diigo_settings: 
       description: |-
-          您将需要注册 [new app on Diigo](%{diigo_url})。
+          您将需要注册 [Diigo 上的新应用程序](%{diigo_url})。
           
           * 当您保存您的应用程序后，请记下 API 密钥
       labels: 
@@ -10849,7 +10849,7 @@ zh:
     notices: 
       settings_updated: 插件设置已成功更新。
     panda_pub_settings: 
-      description: "PandaPub 是一项发布/订阅服务，当配置后，可让 Canvas 的某些部分在浏览器中接收事件通知，而不必轮询更改。"
+      description: "PandaPub 是一项发布/订阅服务，当配置后，可让 Canvas 的某些部分在浏览器中接收事件通知，而不轮询更改。"
       labels: 
         application_id: "应用程序 ID"
         base_url: "库 URL"
@@ -11580,14 +11580,14 @@ zh:
     answer_bars_chart: 
       audible_answer_position: "答案 %{position}："
       audible_answer_response_count: 
-        one: 一条响应。
-        other: "%{count} 条响应。"
-        zero: 无响应。
+        one: 一条回应。
+        other: "%{count} 条回应。"
+        zero: 无回应。
       audible_correct_answer_indicator: 这是正确答案。
       audible_description: 此表列出了该问题的所有答案，及其收到的响应数目。
       response_count: 
         one: "1 个学生"
-        other: "%{count} 名学生"
+        other: "%{count} 个学生"
         zero: 没有人
     answer_details: 
       hide: 隐藏答案详细信息
@@ -11602,24 +11602,58 @@ zh:
     discrimination_index: 
       audible_bottom_bracket: 底部括号：
       audible_bracket_aced: 此括号中的所有学生已正确回答问题。
+      audible_bracket_failed: 此类别中没有一个学生提供了正确答案。
+      audible_chart_description: "此表列出了该课堂中每个类别的学生如何回应此问题。学生类别根据其分数构成。顶类由分数最高的 27% 组成，中等类别由中间的 46% 组成，底类由分数最低的 27% 组成。"
+      audible_discrimination_index: "鉴别指数：%{number}。"
+      audible_middle_bracket: 中等类别：
+      audible_response_ratio_distribution: "此类别中 %{correct_ratio}% 的学生已正确回答问题。"
+      audible_top_bracket: 顶类：
+      discrimination_index: 鉴别指数
       discrimination_index_dialog_title: 鉴别指数图
+      discrimination_index_dialog_trigger: 详细了解鉴别指数。
     download_submissions: 下载所有文件
+    duration_in_hours: 
+      one: "%{count} 小时"
+      other: "%{count} 小时"
+    duration_in_hours_and_minutes: "%{hours} 和 %{minutes}"
     duration_in_minutes: 
       one: "%{count} 分钟"
       other: "%{count} 分钟"
+    duration_in_minutes_and_seconds: "%{minutes} 和 %{seconds}"
+    duration_in_seconds: 
+      one: "%{count} 秒"
+      other: "%{count} 秒"
+    empty_question_breakdown: 没有可用的问题统计。
     essay_score: "分数：%{score}"
+    loading_questions: 正在加载问题统计，请稍等。
     no_answer: 无答案
+    question_breakdown: 问题细分
+    question_header: "问题 %{position}"
     response_student_count: 
       one: "1 个学生"
-      other: "%{count} 名学生"
+      other: "%{count} 个学生"
       zero: 没有人
+    speedgrader: 在快速评分器中查看
     summary: 
+      audible_chart_description: "%{above_average} 的学生分数高于或等于平均分，而 %{below_average} 低于平均分。"
       avg_time: 平均时间
+      chart_brushing_tip: 提示：您可以通过光标选择来关注图表的特定部分。
+      chart_title: 百分位分数图
       high_score: 高分
       low_score: 低分
-      mean: 平均分数
+      mean: 平均分
       not_available_abbrev: 不适用
+      quiz_summary: 测验摘要
       stdev: 标准偏差
+      students_who_got_a_certain_score: 
+        one: "一个学生得分为 %{score}%。"
+        other: "%{count} 个学生得分为 %{score}%。"
+        zero: "没有学生得分为 %{score}%。"
+      students_who_scored_in_a_range: 
+        one: "一个学生得分在 %{start} 和 %{end}% 之间。"
+        other: "%{count} 个学生得分在 %{start} 和 %{end}% 之间。"
+        zero: "没有学生得分在 %{start} 和 %{end}% 之间。"
+      table_description: 所有已提交项的摘要统计
     title: 测验统计
     unknown_answer: 其他事情
   quizzes: 
@@ -11779,6 +11813,10 @@ zh:
     question_count: 
       one: "%{count} 个问题"
       other: "%{count} 个问题"
+    question_limit_reached: |-
+        您已经达到一个测验所允许的最大问题数 (%{count}/%{limit})。
+        
+        作为一种变通方法，您可考虑跨多个测验传播材料。
     quiz: 
       current_filter: 当前过滤器
       default_question_input: "[选择]"
@@ -12265,6 +12303,7 @@ zh:
         quizzes_unpublished: 
           one: "%{count} 个测验已成功取消发布!"
           other: "%{count} 个测验已成功取消发布!"
+        submission_doesnt_count: 此测验将不再计入您的评分。
       question_group: 
         buttons: 
           update: 更新
@@ -12446,6 +12485,7 @@ zh:
           republish: 重新发布
           unlock_quiz: 立即允许学生进行此测验
           unlock_survey: 立即允许学生进行此调查
+        course_concluded_notice: 因为课程已结束，不再提供此测验。
         labels: 
           available_until: 直到
           no_time_limit: 无时间限制
@@ -12723,6 +12763,7 @@ zh:
     progress_error: 尝试准备下载时出错，请重试。
     progress_message: "正在准备下载：%{percent}% 已完成"
     restrict_access: 限制访问
+    results_count: "显示 %{num_results} 个搜索结果"
     retry: 重试
     search_for_files: 搜索文件
     search_results_for: "\"%{search_term}\" 的搜索结果"
@@ -12902,6 +12943,8 @@ zh:
   role_overrides: 
     account_permissions: 帐户权限
     admin_tools_permissions: 管理工具
+    cannot_deactivate_inactive_role: 无法取消激活已处于非活动状态的角色
+    cannot_remove_built_in_role: 无法删除内置角色
     course_permissions: 课程和帐户权限
     index: 
       crumbs: 
@@ -13002,28 +13045,67 @@ zh:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
+        assignment_is_muted: 已静音？
         curve_grades: 曲线评分
-        message_students: 给相关学生发送信息
+        message_students: 给相关学生发送信息...
+        set_default_grade: 设置默认评分
       details: 
-        avg_score: 平均分数
+        avg_score: 平均分
+        graded_sub_count: 已评分的提交项：
         high_score: 高分
         low_score: 低分
         no_points: 无最高分
-        points_possible: 可能的分数
+        points_possible: 最高分
+        submission_types: 提交类型：
       index: 
+        assignment_in_speedgrader: 在快速评分器中查看此作业
+        assignment_info: 作业信息
+        empty_assignment_selection: 选择一项作业在此处查看其他信息。
+        no_points_possible_warning: 此小组中的作业没有最高分，无法包括在评分计算中。
         warning: 警告
+    components: 
+      final_grade: 
+        final_grade: 最终评分：
+    content_selection: 
+      assignment: 
+        select_assignment: 选择一项作业
+      header: 
+        content_selection: 内容选择
+      outcome: 
+        select_outcome: 选择一个结果
+      student: 
+        select_student: 选择一个学生
     grading: 
+      empty_submission_selection: 选择一个学生和一项作业以查看和编辑评分。
+      grade_for: "此人的分数：%{name}"
       grading: 评分
-      submission_details: 提交作业详细信息
+      is_dropped: 目前已为该学生去除此评分。
+      is_late: 此项提交延迟。
+      submission_details: 提交项详细信息
+      submission_hidden: 此作业不可用于该学生，将不会包括在其评分中。
+      was_resubmitted: 此作业已被重新提交，因为它最后评分。
     header: 
       gradebook_individual_view: 评分册：个人视图
+      save_instructions: 注：评分和备注将在移出该字段后自动保存。
+      switch_to_gradebook2: 切换到默认评分册
     learning_mastery: 
+      download_results: "下载结果 (.csv)"
+      empty_student_selection: 选择一个学生在此处查看其他信息。
+      empty_submission_selection: 选择一个学生和一个结果以查看结果。
       hide_student_names_label: 隐藏学生姓名
       result: 结果
+      result_for: 结果：
+      results_loading: 此学生的结果仍在加载...
+      select_a_section: 选择一个章节
+      select_student: 选择一个学生
+      student_info: 学生信息
     outcome_information: 
-      avg_score: 平均分数
+      avg_score: 平均分
+      empty_outcome_selection: 选择一个结果在此处查看其他信息。
       high_score: 高分
       low_score: 低分
+      outcome_info: 结果信息
+      result_sub_count: 结果总计：
     screenreader_gradebook: 
       assignments: 作业
       learning_mastery: 学习掌握程度
@@ -13035,24 +13117,44 @@ zh:
         include_ungraded_assignments: "将未评分的作业当作 0"
         set_group_weights: 设置组权重
         show_concluded_enrollments_label: 显示结业登记
+        show_notes: 在学生信息中显示备注
+        show_total_as_points: 在学生评分页面上显示总分
         sis_export: "发布评分到 SIS"
+        upload_scores: "上传分数 (.csv)"
+      header: 
+        global_settings: 全局设置
       mastery_toggles_and_actions: 
+        download_results: "下载结果 (.csv)"
         hide_student_names_label: 隐藏学生姓名
+      section_select: 
+        select_a_section: 选择一个章节
+      sort_select: 
+        sort_assignments: 排序作业
     student_information: 
       assignment_groups: 
         ag_group_grade: 评分
         ag_group_name: 作业小组
+        ag_group_percent_grade: "评分 %"
         ag_letter_grade: 书面评分
+      details: 
+        hidden: 已隐藏
+        secondary_id: "第二 ID："
+        sections: 章节：
       index: 
+        empty_student_selection: 选择一个学生在此处查看其他信息。
         grades: 评分
+        student_info: 学生信息
+        submissions_loading: 此学生的提交项仍在加载...
   search: 
     all_courses: 
       name: 名称
+      open_enrollment_only: 仅限开放式注册课程
+      public_only: 仅限公开课程
       search: 搜索
       titles: 
         all_courses: 所有课程
     all_courses_inner: 
-      join_course: 参与此课程
+      join_course: 加入此课程
       next: 下一页
       previous: 上一页
     course_sections: 课程班级
@@ -13285,6 +13387,9 @@ zh:
     components: 
       ic_submission-download-dialog: 
         click_to_download: 单击此处下载
+        download_message: "提交项将压缩成 zip 文件以供下载。这可能需要一些时间，具体取决于提交文件的大小和数量。"
+        download_message_intro: 正在收集您的学生提交项。
+        download_submissions: 下载所有提交项
     conference: 
       buttons: 
         delete: 删除会议
@@ -13472,6 +13577,7 @@ zh:
       crowdsourced_warning_title: 众包语言
     login: 
       back_to_login: 返回登录
+      browse_courses: 浏览课程
       buttons: 
         request_password: 请求密码
       coenrollment_banner: "*Canvas 用户的父级?* **单击此处以获得帐户**"
@@ -13706,9 +13812,11 @@ zh:
     select_content_dialog: 
       add_to_module: "添加 %{item} 到*单元*"
       assignment_item: 作业
+      assignment_item_select_label: 选择您要关联的作业，或者通过选择“新作业”来添加作业。
       assignment_notice: 选择您要与此*单元*关联的作业，或通过选择"新作业"添加一个作业。
       content_page_item: 内容页面
       discussion_item: 讨论
+      discussion_topic_select_label: 选择您要关联的主题，或者通过选择“新主题”来添加主题。
       domain_match_notice: "要使用此工具，域必须匹配 %{domain}"
       external_tool_item: 外部工具
       external_tool_notice: "从下面的列表中选择一个工具，或输入已知通过 Basic LTI 配置的外部工具的 URL，从而将指向它的链接添加到此*单元*。"
@@ -13716,6 +13824,7 @@ zh:
       external_url_notice: "输入一个 URL 和页面名称以将指向任何网站 URL 的链接添加到此*单元*。"
       file_item: 文件
       file_notice: 选择您要与此*单元*关联的文件，或通过选择"新文件"添加一个文件。
+      file_select_label: 选择您要关联的文件，或者通过选择“新文件”来添加文件。
       indent_level: 
         one: "*缩进 1 级*"
         other: "*缩进 %{count} 级*"
@@ -13742,10 +13851,13 @@ zh:
         assignments: 作业
       quiz_item: 测验
       quiz_notice: 选择您要与此*单元*关联的测验，或通过选择"新测验"添加一个新测验。
+      quiz_select_label: 选择您要关联的测验，或者通过选择“新测验”来添加新测验。
+      select_item_type_label: 选择要添加的内容类型。
       sub_header_notice: 键入您想要作为*单元*副标题添加的文本。
       text_header_item: 文本标题
       topic_notice: 选择您要与此*单元*关联的主题，或通过选择"新主题"添加一个主题。
       wiki_page_notice: 选择您要与此*单元*关联的维基页面，或通过选择"新页面"添加一个新页面。
+      wiki_page_select_label: 选择您要关联的维基页面，或者通过选择“新页面”来添加新页面。
     sequence_footer: 
       full_course_sequence: 查看完整课程序列
       next: 下一页
@@ -14021,22 +14133,30 @@ zh:
     inexact_answer: "%{lower_bound} 至 %{upper_bound}"
     no_answer: 无答案
   step: 步骤
+  stream_items_api: 
+    assessment_request_title: "%{title} 的同伴审阅"
   student_assignment_outcome_map_title: 学生能力
   student_groups: 
     group_join: "已加入组 %{group_name}"
     group_leave: "已离开组 %{group_name}"
     group_name: "%{group_category} 中的 %{group_name}"
     new_group: 
-      group_explanation: 学习小组是项目协作或安排学习时间的良好方式。每个学习小组使用一份日历和一个维基页面，共同讨论并共享一些存储文件的空间。各学习小组可协作处理文档，甚至安排网络会议。它就像一个小型班级，学生数量更少，可开展更有针对性的项目。
+      group_explanation: 小组是项目协作或安排学习时间之类活动的良好场所。每个小组都有一份日历、一个维基页面、若干讨论和存储文件用的一些空间。各小组可协作处理文档，甚至安排网络会议。它就像一个小型班级，学生数量更少，可开展更有针对性的项目。
       joining: 加入
       name: 小组名称
+      name_error: 需要小组名称
     search_groups_placeholder: 搜索组或人员
     student_groups: 
-      full: 完全
+      full: 已满
       group: 小组
+      group_full: 小组已满
+      invite_only: 仅限邀请
       student_groups_join: 加入
+      student_groups_leave: 离开
+      student_groups_switch: 切换至
       student_groups_tabs_everyone: 所有人
-      student_groups_tabs_groups: 组
+      student_groups_tabs_groups: 小组
+      visit: 访问
     student_groups_filter_description: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
     students_count: 
       one: "%{count} 名学生"
@@ -14057,11 +14177,11 @@ zh:
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "参加测验的学生 (%{count})"
     other: "参加测验的学生 (%{count})"
-    zero: 已进行测验的学生
+    zero: 参加测验的学生
   students_who_have_taken_the_survey_count_ef9e6492: 
     one: "参加调查的学生 (%{count})"
     other: "参加调查的学生 (%{count})"
-    zero: 已进行调查的学生
+    zero: 参加调查的学生
   students_who_haven_t_taken_the_quiz_count_9966e994: 
     one: "未参加测验的学生 (%{count})"
     other: "未参加测验的学生 (%{count})"
@@ -14192,6 +14312,7 @@ zh:
       teachers_notified_of_comments: 将通知教师和提交者所有评论
     show_preview: 
       discussion_submission_description: "此作业的提交文件在作业的讨论中发布。下面是 %{user} 的讨论发布，或者您可以*查看完整讨论*。"
+      discussion_submission_description_without_link: "此作业的提交项是作业讨论中的帖子。下面是 %{user} 的讨论帖子。"
       entry_no_image: 请记住，此页面自最初进行提交后可能已更改。
       entry_with_image: 我们包括了页面提交时所显示内容的快照。或者您可以单击以查看原始提交文件。
       external_url_submission: "此提交是指向外部页面的一个 URL。"
@@ -14199,6 +14320,7 @@ zh:
       group_discussion_submission_description: |-
           此作业的提交文件在该小组的作业讨论中发布。下面是 %{user} 的讨论帖
           ，或者您可以*查看完整的小组讨论*。
+      group_discussion_submission_description_without_link: "此作业的提交项是该小组作业讨论中的帖子。下面是 %{user} 的讨论帖子。"
       media_comment_link: 此提交是一个媒体录音。*单击此处查看。*
       no_files: 没有此提交上传的文件
       no_preview_available: 无可用预览
@@ -14266,9 +14388,9 @@ zh:
     tab_location_error: 该选项卡位置无效
     tab_unmanagable_error: "%{css_class} 不可管理"
   take_the_quiz_87214d7e: 进行测验
-  take_the_quiz_again_8ea51a6c: 再次进行测验
-  take_the_survey_ada59508: 进行调查
-  take_the_survey_again_24ce22c2: 再次进行调查
+  take_the_quiz_again_8ea51a6c: 再次参加测验
+  take_the_survey_ada59508: 参加调查
+  take_the_survey_again_24ce22c2: 再次参加调查
   terms: 
     index: 
       date: 
@@ -14563,6 +14685,7 @@ zh:
   unpublished_courses_title: 未发布的课程
   unsupported_package: 不受支持的内容包
   until_date_949017c4: "直到 %{date}"
+  untitled_assignment_59354b34: 无标题作业
   unused_courses_title: 未使用的课程
   upload_button: 
     upload: 上传
@@ -14702,6 +14825,7 @@ zh:
       linked_in: "LinkedIn 是一种业务网络资源。您在学校时建立的许多关系在您进入职场后仍然会有帮助。"
       skype: "Skype 是一个免费的在线语音和视频呼叫工具。"
       twitter: "Twitter 是一个优秀的课外通信资源。"
+      yo: "Yo 是一个单触式零字符通信工具。"
   users: 
     admin_merge: 
       buttons: 
@@ -15220,7 +15344,10 @@ zh:
       archive: 存档
       archive_link: 查看存档
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已对此测验中的问题进行了更改。* 这些更改将不会对学生显示，直到您保存测验。"
-  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*您已对此测验进行未发布的更改。* 这些更改将不会对学生显示，直到您发布或重新发布测验。"
+  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*您已对此测验进行了未发布的更改。* 这些更改将不会对学生显示，直到您发布或重新发布测验。"
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    one: 您的搜索遇到了以下错误：
+    other: 您的搜索遇到了以下错误：
   zero_activity_title: 零活动
   zip_argument_error: ".zip 上传需要目标上传文件夹。"
   zip_file_description: "用于将 .zip 归档文件解压为课程、组或用户文件的迁移插件"
