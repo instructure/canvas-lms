@@ -128,7 +128,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 
     # Setup specs for stats
     task :statsetup do
-      require 'code_statistics'
+      require 'rails/code_statistics'
       ::STATS_DIRECTORIES << %w(Model\ specs spec/models) if File.exist?('spec/models')
       ::STATS_DIRECTORIES << %w(Service\ specs spec/services) if File.exist?('spec/services')
       ::STATS_DIRECTORIES << %w(View\ specs spec/views) if File.exist?('spec/views')
