@@ -138,10 +138,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
     if !self.show_correct_answers
+      self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil
       self.hide_correct_answers_at = nil
     end
     self.allowed_attempts = 1 if self.allowed_attempts == nil
+    if self.allowed_attempts <= 1
+      self.show_correct_answers_last_attempt = false
+    end
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= self.lock_at if self.lock_at.present?
     self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?

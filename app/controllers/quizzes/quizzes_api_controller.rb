@@ -97,6 +97,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "show_correct_answers_last_attempt": {
+#           "description": "restrict the show_correct_answers option above to apply only to the last submitted attempt of a quiz that allows multiple attempts. only valid if show_correct_answers=true and allowed_attempts > 1",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "show_correct_answers_at": {
 #           "description": "when should the correct answers be visible by students? only valid if show_correct_answers=true",
 #           "example": "2013-01-23T23:59:00-07:00",
@@ -368,6 +373,12 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   Only valid if hide_results=null
   #   If false, hides correct answers from students when quiz results are viewed.
   #   Defaults to true.
+  #
+  # @argument quiz[show_correct_answers_last_attempt] [Boolean]
+  #   Only valid if show_correct_answers=true and allowed_attempts > 1
+  #   If true, hides correct answers from students when quiz results are viewed
+  #   until they submit the last attempt for the quiz.
+  #   Defaults to false.
   #
   # @argument quiz[show_correct_answers_at] [Timestamp]
   #   Only valid if show_correct_answers=true
