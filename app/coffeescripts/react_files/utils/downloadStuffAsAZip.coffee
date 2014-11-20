@@ -38,6 +38,10 @@ define [
       select:
         files:files
         folders: folders
+
+    $(window).on 'beforeunload', promptBeforeLeaving = ->
+      I18n.t('If you leave, the zip file download currently being prepared will be canceled.')
+
     $.post(url, data)
       .pipe (progressObject) ->
         new Progress(url: progressObject.progress_url).poll().progress(onProgress)
@@ -45,8 +49,10 @@ define [
         contentExportId = progressObject.context_id
         $.get("#{url}/#{contentExportId}")
       .pipe (response) ->
+        $(window).off('beforeunload', promptBeforeLeaving)
         window.location = response.attachment.url
       .fail ->
         $.flashError I18n.t('progress_error', 'An error occured trying to prepare download, please try again.')
       .always ->
+        $(window).off('beforeunload', promptBeforeLeaving)
         $progressIndicator.remove()

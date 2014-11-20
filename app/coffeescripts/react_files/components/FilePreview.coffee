@@ -189,13 +189,14 @@ define [
             div {className: 'ef-file-preview-header-buttons'},
               a {
                 className: 'ef-file-preview-header-download ef-file-preview-button'
+                download: true
                 href: @state.displayedItem?.get('url')
               },
-                i {className: 'icon-download'} #Replace with actual icon
-                " " + I18n.t('file_preview_headerbutton_download', 'Download')
-              a {
-                className: if @state.showInfoPanel then 'ef-file-preview-button--active ef-file-preview-header-info ef-file-preview-button' else 'ef-file-preview-header-info ef-file-preview-button'
-                role: 'button'
+                i {className: 'icon-download'}
+                ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
+              button {
+                type: 'button'
+                className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"
                 onClick: @toggle('showInfoPanel')
               },
                 i {className: 'icon-info'}
