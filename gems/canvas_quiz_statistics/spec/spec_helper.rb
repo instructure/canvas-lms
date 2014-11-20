@@ -1,11 +1,8 @@
-require 'simplecov'
-require 'simplecov-rcov'
-
-SimpleCov.use_merging
-SimpleCov.merge_timeout(10000)
-SimpleCov.command_name('canvas-quiz-statistics-gem')
-SimpleCov.start('test_frameworks') do
-  SimpleCov.coverage_dir(File.join(File.dirname(__FILE__), '..', 'coverage'))
+begin
+  require '../../spec/coverage.rb'
+  CoverageTool.start('canvas-quiz-statistics-gem')
+rescue LoadError => e
+  puts "Error: #{e} "
 end
 
 require 'canvas_quiz_statistics'
@@ -20,12 +17,12 @@ RSpec.configure do |config|
   File.join(File.dirname(__FILE__), 'canvas_quiz_statistics').tap do |cwd|
     # spec support in support/
     Dir.glob(File.join([
-      cwd, 'support', '**', '*.rb'
-    ])).each { |file| require file }
+                           cwd, 'support', '**', '*.rb'
+                       ])).each { |file| require file }
 
     # specs for shared metrics in analyzers/shared_metrics
     Dir.glob(File.join([
-      cwd, 'analyzers', 'shared_metrics', '**', '*.rb'
-    ])).each { |file| require file }
+                           cwd, 'analyzers', 'shared_metrics', '**', '*.rb'
+                       ])).each { |file| require file }
   end
 end

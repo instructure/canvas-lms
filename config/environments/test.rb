@@ -1,20 +1,11 @@
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
-  require 'simplecov'
-  require 'simplecov-rcov'
-
-  SimpleCov.use_merging
-  SimpleCov.merge_timeout(10000)
-
-  SimpleCov.command_name "RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}"
-  SimpleCov.start do
-    SimpleCov.at_exit {
-      SimpleCov.result
-      #SimpleCov.result.format! to get a coverage report without vendored_gems
-    }
+  begin
+    require '../../spec/coverage.rb'
+    CoverageTool.start("canvas")
+  rescue LoadError => e
+    puts "Error: #{e}"
   end
-else
-  puts "Code coverage not enabled"
 end
 
 environment_configuration(defined?(config) && config) do |config|

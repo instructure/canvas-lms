@@ -1,11 +1,8 @@
-require 'simplecov'
-require 'simplecov-rcov'
-
-SimpleCov.use_merging
-SimpleCov.merge_timeout(10000)
-SimpleCov.command_name('canvas-partman-gem')
-SimpleCov.start('test_frameworks') do
-  SimpleCov.coverage_dir(File.join(File.dirname(__FILE__), '..', 'coverage'))
+begin
+  require '../../spec/coverage.rb'
+  CoverageTool.start('canvas-partman-gem')
+rescue LoadError => e
+  puts "Error: #{e} "
 end
 
 module CanvasPartmanTest

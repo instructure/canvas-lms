@@ -22,17 +22,12 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
-require 'simplecov'
-require 'simplecov-rcov'
 
-SimpleCov.use_merging
-SimpleCov.merge_timeout(10000)
-SimpleCov.command_name('canvas-cassandra-gem')
-SimpleCov.start('test_frameworks') do
-  SimpleCov.coverage_dir('../../coverage')
-  SimpleCov.at_exit {
-    SimpleCov.result
-  }
+begin
+  require '../../spec/coverage.rb'
+  CoverageTool.start("canvas")
+rescue LoadError => e
+  puts "Error: #{e}"
 end
 
 require "canvas_cassandra"

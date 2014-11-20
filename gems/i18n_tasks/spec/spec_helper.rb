@@ -1,14 +1,9 @@
-require 'simplecov'
-require 'simplecov-rcov'
 
-SimpleCov.use_merging
-SimpleCov.merge_timeout(10000)
-SimpleCov.command_name('i18n-tasks-gem')
-SimpleCov.start('test_frameworks') do
-  SimpleCov.coverage_dir('../../coverage')
-  SimpleCov.at_exit {
-    SimpleCov.result
-  }
+begin
+  require '../../spec/coverage.rb'
+  CoverageTool.start('i18n-tasks-gem')
+rescue LoadError => e
+  puts "Error: #{e} "
 end
 
 require 'i18n_tasks'

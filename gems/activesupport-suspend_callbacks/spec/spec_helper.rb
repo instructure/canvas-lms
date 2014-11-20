@@ -4,18 +4,11 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
-
-require 'simplecov'
-require 'simplecov-rcov'
-
-SimpleCov.use_merging
-SimpleCov.merge_timeout(10000)
-SimpleCov.command_name('activesupport-suspend-callback-gem')
-SimpleCov.start do
-  SimpleCov.coverage_dir('../../coverage')
-  SimpleCov.at_exit {
-    SimpleCov.result
-  }
+begin
+  require '../../spec/coverage.rb'
+  CoverageTool.start("activesupport-suspend-callback-gem")
+rescue LoadError => e
+  puts "Error: #{e}"
 end
 
 require "active_support/callbacks/suspension"
