@@ -1369,7 +1369,7 @@ pl:
     podcast_feed_description_course: "W tym kanale informacyjnym zostaną zamieszczone wszystkie pliki multimedialne, do których łącza znajdują się w ogłoszeniach dla kursu \"%{course}\" lub które zostały do nich dołączone."
     podcast_feed_description_group: "W tym kanale informacyjnym zostaną zamieszczone wszystkie pliki multimedialne, do których łącza znajdują się w ogłoszeniach dla grupy \"%{group}\" lub które zostały do nich dołączone."
     podcast_feed_name: "Kanał informacyjny Podcast z ogłoszeniami dla kursu %{course}"
-  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Po ostatnim podejściu zostaną pokazane odpowiedzi."
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Po ostatnim podejściu zostaną pokazane odpowiedzi"
   application: 
     errors: 
       feed_not_found: "Nie można odnaleźć kanału informacyjnego."
@@ -1814,7 +1814,7 @@ pl:
     grading_type_selector: 
       display_grade_as: "Wyświetl ocenę jako"
       gpa_scale_explainer: "Ocenianie w skali GPA jest przeznaczone do szkół, w których stosuje się opis 4.0 (lub 5.0/6.0) do wszystkich zadań. Ten schemat oceniania jest podobny do schematu oceniania literami, jednak ma kilka istotnych różnic:"
-      gpa_scale_input_explainer: "Wyniki przedstawione są w 4-stopniowej skali. Jeśli na przykład do zdobycia jest 100 punktów, ocena 4.0 oznacza 100%, 3.0 oznacza 87% itd"
+      gpa_scale_input_explainer: "Wyniki przedstawione są w 4-stopniowej skali. Jeśli na przykład do zdobycia jest 100 punktów, ocena 4.0 oznacza 100%, 3.0 oznacza 87% itd."
       gpa_scale_letters_explainer: "Zamiast ocen cyfowych można stosować oceny literowe"
       gpa_scale_percentage_explainer: "Nie można bezpośrednio wprowadzać punktów, lecz procenty. Jeśli, na przykład, w zadaniu można uzyskać 50 punktów, wprowadzenie wartości „40” nie będzie poprawne, natomiast wartość procentowa „80%” będzie poprawna."
       gpa_scale_recommendation: "Jeśli szkoła nie korzysta ze skali oceniania 4.0 (lub 5.0/6.0), system Canvas zaleca wyświetlanie ocen literowych."
@@ -4671,7 +4671,7 @@ pl:
         email: "Adres e-mail"
         email_field_label: "Wpisz adresy e-mail (oddzielone przecinkiem) użytkowników, których chcesz dodać"
         email_field_place_holder: "\"Przykładowy uczestnik\" <uczestnik@przyklad.com>, \"Nazwisko, imię\" <imienazwisko@przyklad.com>, jedynieAdresEmail@przyklad.com"
-        example_formats: "Przykłądy: uzytkownik@przyklad.com, \"Imię Nazwisko\" <uzytkownik@przyklad.com>, \"Nazwisko, Imię\" <uzytkownik@przyklad.com>"
+        example_formats: "Przykłady: uzytkownik@przyklad.com, \"Imię Nazwisko\" <uzytkownik@przyklad.com>, \"Nazwisko, Imię\" <uzytkownik@przyklad.com>"
         form_instructions: "Poniżej wpisz lub wklej listę adresów e-mail:"
         go_back: "Rozpocznij ponownie"
         have_been_enrolled: "Następujący użytkownicy zostali zapisani"
@@ -5700,7 +5700,7 @@ pl:
     unsubscribe: "Anuluj subskrypcję do tego tematu"
     unsubscribed: "Brak subskrypcji"
     unsubscribed_hint: "Uczestnik nie ma subskrypcji do tego tematu. Kliknij, aby subskrybować."
-  display_course_catalog: "Pokaż listę kursów na tym koncie źródłowym z włączoną opcją „Dołącz do publicznego katalogu kursów”"
+  display_course_catalog: "Pokaż listę kursów na tym koncie źródłowym z włączoną opcją „Dołącz do publicznego katalogu kursów”."
   draft_state_description: |-
       Ta funkcja beta uwzględnia ponowne zaprojektowanie wielu elementów systemu Canvas i umożliwia przechowywanie treści w
       nowym nieopublikowanym stanie, która będzie niewidoczna dla uczestników i nie będzie miała wpływu
@@ -10944,14 +10944,14 @@ pl:
     notices: 
       settings_updated: "Ustawienia wtyczek zostały pomyślnie zaktualizowane."
     panda_pub_settings: 
-      description: "PandaPub to usługa pub/sub  która, po konfiguracji, umozliwia części systemu Canvas otrzymywanie powiadomień na temat wydarzeń w  przeglądarce i nie wymaga wprowadzania zmian."
+      description: "PandaPub to usługa typu pub/sub, która, po konfiguracji, umozliwia poszczególnym sekcjom systemu Canvas na otrzymywanie powiadomień na temat wydarzeń w  przeglądarce i nie wymaga wprowadzania zmian."
       labels: 
         application_id: "Identyfikator aplikacji"
         base_url: "Podstawowy adres URL"
         key_id: "Identyfikator klucza"
         key_secret: "Tajny klucz"
     pandapub: 
-      description: "Usługa Pub/Sub"
+      description: "Usługa typu Pub/Sub"
       name: PandaPub
     qti_converter_settings: 
       labels: 
@@ -11131,6 +11131,7 @@ pl:
         register_linkedin_account: "Zarejestruj konto w witrynie LinkedIn"
         save_login: "Zapisz nazwę logowania"
         save_skype_name: "Zapisz nazwę Skype"
+        save_yo_name: "Zapisz nazwę Yo"
         select_image: "Zaznacz obraz"
         update_settings: "Aktualizuj ustawienia"
       confirm_email_instructions: "Zanim będziesz mógł edytować profil, musisz potwierdzić adres email (%{email}) klikając na link w e-mailu, który otrzymałeś. Jeśli go nie widzisz, *wyślij ponownie email*, i upewnij się, że sprawdziłeś folder ze spamem."
@@ -11261,7 +11262,7 @@ pl:
       unknown_service: Nieznany
       web_services: "System Canvas można dla większej wygody połączyć z już używanymi narzędziami internetowymi. Kliknij dowolną pozycję pod nagłówkiem \"Inne usługi\", aby sprawdzić, co to oznacza."
       yo_description: |-
-          Yo to narzędzie komunikacji dostępne za pomocą jednego kliknięcia, w którym nie trzba wpisywać znaków.
+          Yo to narzędzie do komunikacji obsługiwane za pomocą pojedynczego kliknięcia, w którym nie trzeba wpisywać znaków.
           Jeśli masz konto Yo, możesz je zarejestrować tutaj. Następnie, jeśli pozwolisz
           innym uczestnikom kursu/grupy oglądać swoje zarejstrowane usługi, będą mogli
           bez problemu połączyć sie z twoim kontem Yo.
@@ -11676,7 +11677,7 @@ pl:
       generating_report_name: "Trwa generowanie raportu o nazwie %{report_name}..."
       item_analysis_not_available: "Analiza elementu nie jest dostępna w przypadku ankiet"
   quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Wyniki tego testu są chronione i nie są widoczne dla uczestników."
-  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Wyniki tego testu są chronione i nie są widoczne dla studentów do momentu przesłania ostatniego podejścia."
+  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Wyniki tego testu są chronione i nie są widoczne dla studentów do momentu ostatniego podejścia."
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Wyniki tego testu są chronione, można je wyświetlić tylko raz bezpośrednio po przesłaniu zadania."
   quiz_statistics: 
     answer_bars_chart: 
@@ -11705,8 +11706,8 @@ pl:
       audible_bottom_bracket: "Dolny nawias:"
       audible_bracket_aced: "Wszyscy uczestnicy znajdujący się w tym nawiasie udzielili poprawnej odpowiedzi."
       audible_bracket_failed: "Żaden z uczestników znajdujący się w tym nawiasie nie udzielił poprawnej odpowiedzi."
-      audible_chart_description: "W tabeli zamieszczono szczegóły na temat tego, jak uczestnicy znajdujący sie w nawiasie odpowiedzieli na pytanie. Nawiasy utworzono na podstawie wyniku. Górny nawias składa się z nawyższej wartości 27%, środkowy nawias ze średniej 46%, a dolny nawias z najniższej wartości 27%."
-      audible_discrimination_index: "Wykaz na podstawie dyskryminacji: %{number}."
+      audible_chart_description: "W tabeli zamieszczono szczegóły na temat tego, jak uczestnicy znajdujący sie w nawiasie odpowiedzieli na pytanie. Nawiasy utworzono na podstawie wyniku. Górny nawias składa się z nawyższej wartości 27%, środkowy nawias ze średniej wartości 46%, a dolny nawias z najniższej wartości 27%."
+      audible_discrimination_index: "Wykaz sporządzony na podstawie dyskryminacji: %{number}."
       audible_middle_bracket: "Środkowy nawias:"
       audible_response_ratio_distribution: "%{correct_ratio}% uczestników znajdujących się w tym nawiasie udzieliło poprawnej odpowiedzi."
       audible_top_bracket: "Górny nawias:"
@@ -11922,7 +11923,7 @@ pl:
       one: "1 pytanie"
       other: "Liczba pytań: %{count}"
     question_limit_reached: |-
-        Osiągnąłeś maksymalną liczbę pytań dostępną w teście (%{count}/%{limit}).
+        Osiągnięto maksymalną liczbę pytań dostępną w teście (%{count}/%{limit}).
         
         Aby obejść ten problem, rozważ podzielenie materiału na kilka testów.
     quiz: 
@@ -12673,7 +12674,7 @@ pl:
         survey_all_version_disclaimer: "Raport przedstawia statystyki ankiet oparte na wszystkich próbach wszystkich uczestników."
         survey_latest_version_disclaimer: "Raport przedstawia statystyki ankiet oparte na ostatnich próbach każdego z uczestników."
       statistics_cqs: 
-        page_title: Statystyki
+        page_title: Statystyka
       statistics_crumb: Statystyki
       submission_version: 
         attempt_number: "Próba nr %{att_no}"
@@ -13226,8 +13227,8 @@ pl:
       is_dropped: "Ta ocena nie jest obecnie przypisana dla tego uczestnika."
       is_late: "Zadanie zostało przesłane zbyt późno."
       submission_details: "Szczegółowe informacje dot. przesłanego zadania"
-      submission_hidden: "To zadanie nie jest dostępne dla tego uczestnika i nie będzie uwzglęniane podczas oceniania."
-      was_resubmitted: "Zadanie zostało przesłane ponownie oo momentu ostatniej oceny."
+      submission_hidden: "To zadanie nie jest dostępne dla tego uczestnika i nie będzie uwzględniane podczas oceniania."
+      was_resubmitted: "Zadanie zostało przesłane ponownie od momentu ostatniej oceny."
     header: 
       gradebook_individual_view: "Dzienniczek: Podgląd indywidualny"
       save_instructions: "Uwaga: Oceny i notatki zostaną automatycznie zapisane po przeniesieniu z pola."
@@ -14008,7 +14009,7 @@ pl:
       text_header_item: "Treść nagłówka"
       topic_notice: "Wybierz temat, który chcesz skojarzyć z danym *modułem* lub dodaj temat, zaznaczając opcję \"Nowy temat\"."
       wiki_page_notice: "Wybierz stronę typu Wiki, którą chcesz skojarzyć z danym *modułem* lub dodaj nową stronę, zaznaczając opcję \"Nowa strona\"."
-      wiki_page_select_label: "Wybierz stronę wiki, którą chcesz powiązać lub dodaj nową stronę, wybierając „Nowy strona”."
+      wiki_page_select_label: "Wybierz stronę wiki, którą chcesz powiązać lub dodaj nową stronę, wybierając „Nowa strona”."
     sequence_footer: 
       full_course_sequence: "wyświetl pełną sekwencje kursu"
       next: Dalej
@@ -14469,11 +14470,13 @@ pl:
       teachers_notified_of_comments: "Instruktorzy i przesyłający zadanie zostaną powiadomieni o wszystkich komentarzach"
     show_preview: 
       discussion_submission_description: "Wpisy w dyskusji zadania są traktowane jako przesłanie zadania. Poniżej znajdują się wpisy z dyskusji zamieszczone przez użytkownika %{user}, możesz też *wyświetlić całą dyskusję*."
+      discussion_submission_description_without_link: "Przesłane zadania do tego polecenia są wpisami w dyskusji o zadaniach. Poniżej znajdują się wpisy dyskusji dla użytkownika %{user}. "
       entry_no_image: "Pamiętaj, że strona mogła ulec zmianie od czasu przesłania zadania."
       entry_with_image: "Zamieściliśmy migawkę przedstawiająca stronę w momencie przesłania zadania. Możesz również kliknąć, aby wyświetlić oryginał przesłanego zadania."
       external_url_submission: "To przesłane zadanie było adresem URL do zewnętrznej strony."
       file_uploads_for_user: "Pliki przekazane przez użytkownika **%{user}**"
       group_discussion_submission_description: "Zaliczeniem tego zadania są wiadomości wysłane do grupy, w dyskusji do tego zadania. Poniżej znajdują się wiadomości użytkownika %{user}, lub możesz *przejrzeć dyskusję całej grupy*."
+      group_discussion_submission_description_without_link: "Przesłane zadania do tego polecenia są wpisami w dyskusji o zadaniach dla tej grupy. Poniżej znajdują się wpisy dyskusji dla użytkownika %{user}. "
       media_comment_link: "To przesłane zadanie jest nagraniem multimedialnym. *kliknij tutaj, aby wyświetlić*."
       no_files: "Nie przekazano żadnych plików, które byłyby częścią przesłanego zadania"
       no_preview_available: "Podgląd niedostępny"
@@ -14842,6 +14845,7 @@ pl:
   unpublished_courses_title: "Nieopublikowane kursy"
   unsupported_package: "Nieobsługiwany pakiet zawartości"
   until_date_949017c4: "Do %{date} "
+  untitled_assignment_59354b34: "Zadanie bez tytułu"
   unused_courses_title: "Nieużywane kursy"
   upload_button: 
     upload: Przekaż
@@ -14987,6 +14991,7 @@ pl:
       linked_in: "LinkedIn to narzędzie do nawiązywania kontaktów biznesowych.  Wiele ze znajomości nawiązanych w szkole może okazać się pomocnych po rozpoczęciu pracy zawodowej."
       skype: "Skype to darmowe narzędzie do prowadzenia rozmów głosowych i wideo w trybie on-line."
       twitter: "Twitter to doskonałe narzędzie do komunikowania się poza zajęciami kursowymi."
+      yo: "Yo to narzędzie do komunikacji, które obsługuje się pojedynczymi kliknięciami bez wpisywania znaków."
   users: 
     admin_merge: 
       buttons: 
@@ -15509,6 +15514,10 @@ pl:
       archive_link: "Pokaż archiwa"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Dokonano zmiany pytań w tym teście.* Zmiany te nie będą widoczne dla uczestników aż do zapisania testu."
   you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Dokonano nieopublikowanych zmian tego testu.* Zmiany te nie będą widoczne dla uczestników aż do opublikowania lub ponownego opublikowania testu."
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    few: "Podczas wyszukiwanie pojawiły się następujące błędy:"
+    one: "Podczas wyszukiwania pojawił się następujący błąd:"
+    other: "Podczas wyszukiwanie pojawiły się następujące błędy:"
   zero_activity_title: "Zerowa aktywność"
   zip_argument_error: "Do przekazania pliku .zip potrzebny jest folder, do którego plik zostanie przekazany."
   zip_file_description: "Wtyczka migracji w celu rozpakowania zwykłych plików .zip do kursu, grupy lub plików użytkownika"
