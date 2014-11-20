@@ -419,7 +419,7 @@ RSpec.configure do |config|
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb rescue nil
+      Canvas.redis.flushdb
     end
     Canvas.redis_used = false
   end
