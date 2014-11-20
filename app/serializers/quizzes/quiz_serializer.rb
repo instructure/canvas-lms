@@ -21,7 +21,7 @@ module Quizzes
                 # :takeable,
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
                 :assignment_id, :one_time_results, :only_visible_to_overrides,
-                :assignment_group_id
+                :assignment_group_id, :show_correct_answers_last_attempt
 
     def_delegators :@controller,
       # :api_v1_course_assignment_group_url,
