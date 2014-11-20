@@ -42,18 +42,18 @@ define [
       assignments = _.flatten(@assignmentGroups.map (ag) -> ag.get('assignments').models)
       dated = _.select assignments, (a) -> a.dueAt()?
       undated = _.difference assignments, dated
-
       past = []
       overdue = []
       upcoming = []
       _.each(dated, (a) ->
-        if new Date() > Date.parse(a.dueAt())
-          if a.expectsSubmission() && a.allowedToSubmit() && a.withoutGradedSubmission()
-            overdue.push a
-          else
-            past.push a
-        else
-          upcoming.push a
+        return upcoming.push a if new Date() < Date.parse(a.dueAt())
+
+        isOverdue = a.allowedToSubmit() && a.withoutGradedSubmission()
+        # only handles observer observing one student, this needs to change to handle multiple users in the future
+        canHaveOverdueAssignment = !ENV.current_user_has_been_observer_in_this_course || ENV.observed_student_ids?.length == 1
+
+        return overdue.push a if isOverdue && canHaveOverdueAssignment
+        past.push a
       )
 
       overdue_group = new AssignmentGroup({ id: 'overdue', name: I18n.t('overdue_assignments', 'Overdue Assignments'), assignments: overdue })

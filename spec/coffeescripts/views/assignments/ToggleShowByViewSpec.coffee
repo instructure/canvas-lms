@@ -95,3 +95,61 @@ define [
     assignments = upcoming.get("assignments").models
     equal assignments[0].get("due_at"), new Date(3013, 8, 20).toString()
     equal assignments[1].get("due_at"), new Date(3013, 8, 21).toString()
+
+
+  test 'observer view who are not observing a student', ->
+
+    #Regular observer view
+    ENV.current_user_has_been_observer_in_this_course = true
+    view = createView(false)
+    getGrades(view.assignmentGroups, @server)
+
+    past = view.assignmentGroups.findWhere id: "past"
+    assignments = past.get("assignments").models
+    equal assignments.length, 5
+
+    overdue = view.assignmentGroups.findWhere id: "overdue"
+    equal overdue, undefined
+
+    upcoming = view.assignmentGroups.findWhere id: "upcoming"
+    assignments = upcoming.get("assignments").models
+    equal assignments.length, 2
+
+
+  test 'observer view who are observing a student', ->
+
+    ENV.current_user_has_been_observer_in_this_course = true
+    ENV.observed_student_ids = ["1"]
+    view = createView(false)
+    getGrades(view.assignmentGroups, @server)
+
+    past = view.assignmentGroups.findWhere id: "past"
+    assignments = past.get("assignments").models
+    equal assignments.length, 3
+
+    overdue = view.assignmentGroups.findWhere id: "overdue"
+    assignments = overdue.get("assignments").models
+    equal assignments.length, 2
+
+    upcoming = view.assignmentGroups.findWhere id: "upcoming"
+    assignments = upcoming.get("assignments").models
+    equal assignments.length, 2
+
+  #This will change in the future from a basic observer with no observing students to
+  #way of selecting which student to observer for now though it defaults to a standard observer
+  test 'observer view who are observing multiple students', ->
+
+    ENV.observed_student_ids = ["1", "2"]
+    ENV.current_user_has_been_observer_in_this_course = true
+    view = createView(false)
+    getGrades(view.assignmentGroups, @server)
+    past = view.assignmentGroups.findWhere id: "past"
+    assignments = past.get("assignments").models
+    equal assignments.length, 5
+
+    overdue = view.assignmentGroups.findWhere id: "overdue"
+    equal overdue, undefined
+
+    upcoming = view.assignmentGroups.findWhere id: "upcoming"
+    assignments = upcoming.get("assignments").models
+    equal assignments.length, 2
