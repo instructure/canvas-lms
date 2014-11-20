@@ -1,9 +1,10 @@
-<% 
-  account = @context && (@context.is_a?(Account) ? @context : @context.account)
-  managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
-  can_manage_admin_users = managed_accounts.present?
-  account ||= managed_accounts.first
-  root_account = account.root_account if account
+<% unless @read_only
+    account = @context && (@context.is_a?(Account) ? @context : @context.account)
+    managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
+    can_manage_admin_users = managed_accounts.present?
+    account ||= managed_accounts.first
+    root_account = account.root_account if account
+  end
 %>
 <% js_bundle :user_name %>
   <fieldset id="name_and_email">
@@ -44,6 +45,7 @@
         <th><%= before_label('time_zone', 'Time Zone') %></th>
         <td class="time_zone"><%= @user.time_zone.try(:name) || t('none', "None") %></td>
       </tr>
+      <% unless @read_only %>
       <%# order important: the can_do(...) check filters out contexts that don't respond to root_account (e.g. User) %>
       <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && can_do(@context, @current_user, :manage_students) && !@user.sis_pseudonym_for(@context.root_account)) %>
         <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
@@ -66,8 +68,10 @@
           <% end %>
         </td>
       <% end %>
+      <% end %>
     </table>
   </fieldset>
+<% unless @read_only %>
 <div title="<%= t 'titles.edit_user_details', 'Edit User Details' %>" id="edit_student_dialog" style="display: none;">
   <p><%= t('update_instructions', "You can update some of this user's information, but they can change it back if they choose.") %></p>
   <%= form_for @user, :url => user_url(@user),
@@ -96,3 +100,4 @@
     </div>
   <% end %>
 </div>
+<% end %>
