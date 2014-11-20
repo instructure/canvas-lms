@@ -1369,7 +1369,7 @@ ja:
     podcast_feed_description_course: "\"%{course}\" コースのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_description_group: "\"%{group}\" グループのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_name: "%{course} アナウンスのポッドキャスト フィード"
-  answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最後の試行の後に回答が表示されます
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最後の試行の後に解答が表示されます
   application: 
     errors: 
       feed_not_found: フィードが見つかりませんでした。
@@ -1809,7 +1809,7 @@ ja:
     grading_type_selector: 
       display_grade_as: 成績の表示方法
       gpa_scale_explainer: "GPA スケール採点は、すべての課題で 4.0 満点 (場合によっては 5.0 や 6.0 満点) のスケールを使用する学校のための採点法です。この採点スキームは、レター グレード表示と似ていますが、重要な相違点がいくつかあります。"
-      gpa_scale_input_explainer: "スコアは、4.0 満点のスケールで入力されます。たとえば、ある課題が 100 点満点の場合、4.0 の成績なら 100%、3.0 の成績なら 87% などとなります。"
+      gpa_scale_input_explainer: "スコアは 4.0 満点のスケールで入力されます。たとえば 100 点満点の課題では、4.0 の成績なら 100%、3.0 の成績なら 87% となります。"
       gpa_scale_letters_explainer: "数字の成績に加えて、レター グレードを使用することもできます。"
       gpa_scale_percentage_explainer: "点数をそのまま入力するのではなく、パーセンテージで入力します。たとえば、ある課題が 50 点満点の場合は、「40」ではなく「80%」と入力します。"
       gpa_scale_recommendation: "学校で成績に 4.0 満点 (または 5.0/6.0 満点) のスケールを使用していない場合は、成績をレター グレードで表示することをお勧めします。"
@@ -1817,7 +1817,7 @@ ja:
       gpa_scale_title: "GPA スケール採点とは"
       grading_type_options: 
         gpa_scale: "GPA スケール"
-        letter_grade: 成績
+        letter_grade: "レター グレード"
         not_graded: 未採点
         pass_fail: 完了/未完了
         percent: 割合
@@ -2541,7 +2541,7 @@ ja:
       location: 場所
       name: 名前
       participants_per_appointment_label: 予定あたりの最大ユーザ/グループ数
-      slot_duration_label: "スロット当たりの時間 (分)"
+      slot_duration_label: "スロットあたりの時間 (分)"
       time_range: 時間の範囲
     edit_appt_calendar_event: 
       description: "説明:"
@@ -5663,7 +5663,7 @@ ja:
     unsubscribe: このトピックの購読を中止
     unsubscribed: 購読中止済み
     unsubscribed_hint: このトピックを購読していません。購読するにはクリックします。
-  display_course_catalog: "このルート アカウントの、[このコースを公開コース インデックスに含める] フラグが有効になっているコースの検索可能なリストを表示します。"
+  display_course_catalog: "このルート アカウントの中で、[このコースを公開コース インデックスに含める] フラグが有効になっているコースの検索可能なリストを表示します。"
   draft_state_description: |-
       このベータ機能では、Canvas の多くの部分を再設計し、コンテンツを新しい未公開の状態に
       することができます。この状態では、コンテンツは受講生に表示されず、成績の計算からも除外され
@@ -5715,8 +5715,8 @@ ja:
     keyboard_shortcuts: 
       dialog_title: "キーボード ショートカット"
       keybindings: 
-        open_dialog: "このヘルプ ダイアログを表示します"
-        open_toolbar: エディタのツールバーを表示します
+        open_dialog: "このヘルプ ダイアログを表示"
+        open_toolbar: エディタのツールバーを表示
     loading: 読み込んでいます...
     mathjax_text_entry_field_label: "方程式を LaTeX として入力します。"
     more_external_tools: その他の外部ツール
@@ -6967,7 +6967,7 @@ ja:
         save: 保存
         save_settings: 設定の保存
         submit_comment: コメントの提出
-      crocodoc_pending: "Crocodoc はまだこの文書を処理しています。"
+      crocodoc_pending: "Crocodoc はこの文書を処理中です。"
       gradebook: 
         mute_assignment: 課題をミュートにする
         unmute_assignment: 課題のミュート解除
@@ -7359,7 +7359,7 @@ ja:
       group_category_create: 
         allow_self_signup: "セルフ サインアップを許可"
         cancel: キャンセル
-        create_groups: "%{num_groups} つのグループを今すぐ作成"
+        create_groups: "%{num_groups} 個のグループを今すぐ作成"
         create_groups_manually: グループを手動で作成します
         group_set_name: "グループ セット名"
         group_structure: グループの構造
@@ -10039,7 +10039,7 @@ ja:
     module_edit: 
       Create: 作成
       cancel: キャンセル
-      has_unlock_date: 指定された日付までモジュールをロック
+      has_unlock_date: 指定した日付までモジュールをロック
       lock_datea: ロック日付
       module_name: モジュール名
       new_module: 新規モジュールの作成
@@ -10105,7 +10105,7 @@ ja:
     sure_you_want_to_mute: "この課題をミュートにしてもよろしいですか?この課題がミュートになっている間、受講生は以下について表示できず、新しいお知らせも受信しません:"
   name: "Academic Benchmark インポーター"
   new_facebook_message: "Canvas からの新しいメッセージがあります"
-  new_quiz_statistics_desc: コースに対して、新しいクイズ統計ページを有効にします。
+  new_quiz_statistics_desc: コースの新しいクイズ統計ページを有効にします。
   new_styles_description: |-
       現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい Canvas インターフェイス
       をご覧になりたい場合は、これをオンにしてください。新しいインターフェイスはまだ開発中であるため、
@@ -10839,7 +10839,7 @@ ja:
     notices: 
       settings_updated: プラグインの設定は正常に更新されました。
     panda_pub_settings: 
-      description: "PandaPub は出版/購読型サービスです。このサービスを設定すると、Canvas の一部で、変更内容をポーリングすることなく、ブラウザ内でイベント通知を受信することができます。"
+      description: "PandaPub は出版/購読型サービスです。このサービスを設定すると、Canvas の一部において、変更内容をポーリングすることなく、ブラウザ内でイベント通知を受信することができます。"
       labels: 
         application_id: "アプリケーション ID"
         base_url: "ベース URL"
@@ -11152,12 +11152,12 @@ ja:
       unknown_service: 不明
       web_services: "Canvas では、ご利用の Web ツールと結び付けることで、受講生活がはるかに便利になります。\"他のサービス\" で任意のサービスをクリックすると、詳細が表示されます。"
       yo_description: |-
-          Yo は、タップするだけで文字入力が不要なコミュニケーション ツールです。
+          Yo は、タップするだけの文字入力が不要なコミュニケーション ツールです。
           Yo のアカウントを持っている場合は、ここで登録できます。
-          仲間のコース/グループのメンバーに対して、登録済みのサービスの表示を許可している場合は、
-          それらのメンバーは Yo アカウントを使用して簡単にあなたに連絡できます。
+          あなたが自分の登録済みサービスを仲間のコース/グループ メンバーに公開する設定にしている場合は、
+          Yo アカウントを使用して彼らと簡単にコミュニケーションすることができます。
           
-          Yo アカウントにお知らせを送信するようにサインアップすることもできます。
+          新たにサインアップして、Yo アカウントで通知を受け取ることもできます。
     purpose_required: 目的が必要です
     resending: 再送信中...
     secondary_nav: 
@@ -11278,7 +11278,7 @@ ja:
     debug: 
       logout_redirect: "LogoutRequest が IdP に送信されました"
       logout_request_redirect_from_idp: "IdP から LogoutRequest を受信"
-      logout_response_redirect_from_idp: "IdP から LogoutResponse を受け取りました"
+      logout_response_redirect_from_idp: "IdP から LogoutResponse を受信"
       logout_response_redirect_to_idp: "IdP に LogoutResponse を送信"
       redirect_from_idp: "IdP から LoginResponse を受け取りました"
     default_app_name: サードパーティのアプリケーション
@@ -11542,7 +11542,13 @@ ja:
     generatable: レポートは生成されていません。
     generate_item_analysis_report: アイテム分析レポートを生成します。
     generate_student_analysis_report: 受講生分析レポートを生成します。
+    generated_at: "生成日: %{date}"
     generating: レポートを生成しています...
+    generation_almost_done: ほとんど完了しました。
+    generation_complete: レポートが生成されました。
+    generation_halfway: "50% 以上完了しました。"
+    generation_started: レポートを生成しています。
+    non_generatable_report_notice: "サーベイ クイズについてはレポートを生成できません。"
     quiz_report_generator: 
       download_report_name: "%{report_name} のダウンロード"
       generate_report_name: "%{report_name} の生成"
@@ -11554,31 +11560,82 @@ ja:
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "このクイズのクイズ結果は保護されており、提出直後に 1 回表示できます。"
   quiz_statistics: 
     answer_bars_chart: 
+      audible_answer_position: "解答 %{position}:"
+      audible_answer_response_count: 
+        one: "1 件の応答。"
+        other: "%{count} 件の応答。"
+        zero: 応答なし。
+      audible_correct_answer_indicator: これは正解です。
+      audible_description: この表には、質問に対するすべての解答、および受け取った応答の件数が一覧表示されます。
       response_count: 
-        one: "%{count} 人の受講生"
+        one: "1 人の受講生"
         other: "%{count} 人の受講生"
+        zero: 受講生なし
+    answer_details: 
+      hide: 解答の詳細を非表示
+      hide_all: すべての質問の解答の詳細を非表示
+      show: 解答の詳細を表示
+      show_all: すべての質問の解答の詳細を表示
     attempts: "試行: %{count} / %{total}"
+    correct_answer: 正解
     correct_essay_student_ratio: "受講生の %{ratio}% がこの問題で満点を獲得しました。"
     correct_multiple_response_ratio: "受講生の %{ratio}% が正しく回答しました。"
     correct_response_ratio: "受講生の %{ratio}% がこの問題で正しく回答しました。"
     discrimination_index: 
+      audible_bottom_bracket: "下位階層:"
+      audible_bracket_aced: この階層のすべての受講生が正しく回答しました。
+      audible_bracket_failed: この階層の受講生で正しく回答した人はいませんでした。
+      audible_chart_description: "この表には、クラスの各階層の受講生がこの質問にどのように回答したかが一覧表示されます。受講生の階層は、スコアに基づいて構成されます。上位階層は上位の 27%、中位階層は中位の 46%、下位階層は下位の 27% で構成されています。"
+      audible_discrimination_index: "識別指数: %{number}。"
+      audible_middle_bracket: "中位階層:"
+      audible_response_ratio_distribution: "この階層の受講生の  %{correct_ratio}% が正しく回答しました。"
+      audible_top_bracket: "上位階層:"
+      discrimination_index: 識別指数
       discrimination_index_dialog_title: 識別指数グラフ
+      discrimination_index_dialog_trigger: 識別指数についての詳細を確認します。
     download_submissions: すべてのファイルのダウンロード
+    duration_in_hours: 
+      one: "%{count} 時間"
+      other: "%{count} 時間"
+    duration_in_hours_and_minutes: "%{hours} 時間 %{minutes} 分"
     duration_in_minutes: 
       one: "%{count} 分"
       other: "%{count} 分"
+    duration_in_minutes_and_seconds: "%{minutes} 分 %{seconds} 秒"
+    duration_in_seconds: 
+      one: "%{count} 秒"
+      other: "%{count} 秒"
+    empty_question_breakdown: 利用できる質問の統計がありません。
     essay_score: "スコア: %{score}"
+    loading_questions: 質問の統計を読み込んでいます。しばらくお待ちください。
     no_answer: 解答なし
+    question_breakdown: 質問の分類
+    question_header: "質問  %{position}"
     response_student_count: 
-      one: "%{count} 人の受講生"
+      one: "1 人の受講生"
       other: "%{count} 人の受講生"
+      zero: 受講生なし
+    speedgrader: "SpeedGrader で表示"
     summary: 
+      audible_chart_description: "%{above_average} 人の受講生が平均点以上のスコアを記録し、%{below_average} 人が平均点未満でした。"
       avg_time: 平均時間
+      chart_brushing_tip: "ヒント: カーソルで選択すると、グラフの特定の部分に焦点を当てることができます。"
+      chart_title: スコアの百分位数グラフ
       high_score: 高スコア
       low_score: 低スコア
       mean: 平均スコア
       not_available_abbrev: N/A
+      quiz_summary: クイズの概要
       stdev: 標準偏差
+      students_who_got_a_certain_score: 
+        one: "1 人の受講生が %{score}% のスコアを獲得しています。"
+        other: "%{count} 人の受講生が %{score}% のスコアを獲得しています。"
+        zero: "%{score}% のスコアを獲得した受講生はいません。"
+      students_who_scored_in_a_range: 
+        one: "1 人の受講生が %{start} ～ %{end}% のスコアを獲得しています。"
+        other: "%{count} 人の受講生が %{start} ～ %{end}% のスコアを獲得しています。"
+        zero: "%{start} ～ %{end}% のスコアを獲得した受講生はいません。"
+      table_description: 提出済みのすべての提出物の概要統計
     title: クイズの統計情報
     unknown_answer: その他
   quizzes: 
@@ -11738,6 +11795,10 @@ ja:
     question_count: 
       one: "%{count} 件の問題"
       other: "%{count} 件の問題"
+    question_limit_reached: |-
+        クイズに追加できる問題数の上限 (%{count}/%{limit}) に達しました。
+        
+        問題数の制限を避けるには、複数のクイズに分けてください。
     quiz: 
       current_filter: 現在のフィルタ
       default_question_input: "[ 選択 ]"
@@ -12209,6 +12270,7 @@ ja:
         quizzes_unpublished: 
           one: "%{count} 個のクイズが正常に公開中止されました!"
           other: "%{count} 個のクイズが正常に公開中止されました!"
+        submission_doesnt_count: このクイズは成績に考慮されなくなります。
       question_group: 
         buttons: 
           update: 更新
@@ -12390,6 +12452,7 @@ ja:
           republish: 再公開
           unlock_quiz: 今すぐ受講生にこのクイズを答えさせる
           unlock_survey: 今すぐ受講生にこのサーベイを答えさせる
+        course_concluded_notice: コースが完了しているため、このクイズは利用できません。
         labels: 
           available_until: 次の日時まで
           no_time_limit: 時間制限なし
@@ -12667,6 +12730,7 @@ ja:
     progress_error: ダウンロードの準備中にエラーが発生しました。もう一度やり直してください。
     progress_message: "ダウンロードの準備中: %{percent}% 完了"
     restrict_access: アクセスを制限
+    results_count: "%{num_results} 件の検索結果を表示しています"
     retry: 再試行
     search_for_files: ファイルの検索
     search_results_for: "\"%{search_term}\" の検索結果"
@@ -12846,6 +12910,8 @@ ja:
   role_overrides: 
     account_permissions: アカウントの権限
     admin_tools_permissions: 管理ツール
+    cannot_deactivate_inactive_role: すでに非アクティブな役割を非アクティブ化することはできません
+    cannot_remove_built_in_role: 組み込みの役割を削除することはできません
     course_permissions: コースとアカウントの権限
     index: 
       crumbs: 
@@ -12942,56 +13008,115 @@ ja:
         are_you_sure_delete: この注釈を削除してもよろしいですか?注釈を削除しても、現在この注釈を使用している場所からは注釈にアクセスできますが、ほかの人はこの注釈を使用できなくなります。
         are_you_sure_remove: この注釈をリストから削除してもよろしいですか?
       remove_rubric: "この注釈をマイ リストから削除"
-  score_out_of_points_possible_88f370fd: "%{score} / 配点: %{points_possible}"
+  score_out_of_points_possible_88f370fd: "%{score} (配点 %{points_possible})"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
+        assignment_is_muted: ミュート?
         curve_grades: 分布曲線に基づいた評価
         message_students: 次の状態の受講生にメッセージを送る...
+        set_default_grade: デフォルトの成績の設定
       details: 
         avg_score: 平均スコア
+        graded_sub_count: "採点済みの提出物:"
         high_score: 高スコア
         low_score: 低スコア
         no_points: 配点なし
         points_possible: 配点
+        submission_types: "提出物のタイプ:"
       index: 
+        assignment_in_speedgrader: "この課題を SpeedGrader で表示"
+        assignment_info: 課題情報
+        empty_assignment_selection: 追加の情報を表示するには、課題を選択します。
+        no_points_possible_warning: このグループの課題には配点がないので、成績の計算に含めることができません。
         warning: 警告
+    components: 
+      final_grade: 
+        final_grade: "最終的な成績:"
+    content_selection: 
+      assignment: 
+        select_assignment: 課題の選択
+      header: 
+        content_selection: コンテンツの選択
+      outcome: 
+        select_outcome: 成果の選択
+      student: 
+        select_student: 受講生の選択
     grading: 
+      empty_submission_selection: 成績を表示および編集するには、受講生および課題を選択します。
+      grade_for: "成績: %{name}"
       grading: 採点
+      is_dropped: この成績は現在この受講生に対してドロップされています。
+      is_late: この提出物は提出が遅れました。
       submission_details: 提出物の詳細
+      submission_hidden: これはこの受講生が利用できない課題なので、成績に含めることができません。
+      was_resubmitted: この課題は、最後に採点された後に再提出されています。
     header: 
       gradebook_individual_view: "成績表: 個別ビュー"
+      save_instructions: "注意: 成績およびメモは、フィールドから移動すると自動的に保存されます。"
+      switch_to_gradebook2: デフォルトの成績表に切り替え
     learning_mastery: 
+      download_results: "結果のダウンロード (.csv)"
+      empty_student_selection: 追加の情報を表示するには、受講生を選択します。
+      empty_submission_selection: 結果を表示するには、受講生および成果を選択します。
       hide_student_names_label: 受講生の名前を非表示
       result: 結果
+      result_for: "結果:"
+      results_loading: この受講生の結果を読み込んでいます...
+      select_a_section: セクションの選択
+      select_student: 受講生の選択
+      student_info: 受講生情報
     outcome_information: 
       avg_score: 平均スコア
+      empty_outcome_selection: 追加の情報を表示するには、成果を選択します。
       high_score: 高スコア
       low_score: 低スコア
+      outcome_info: 成果情報
+      result_sub_count: "合計結果:"
     screenreader_gradebook: 
       assignments: 課題
       learning_mastery: 学習の達成度
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "スコア (.csv) のダウンロード"
+        download_scores: "スコアのダウンロード (.csv)"
         grading_history: 採点履歴の表示
         hide_student_names_label: 受講生の名前を非表示
         include_ungraded_assignments: "未採点を 0 として処理"
         set_group_weights: グループの重み付けの設定
         show_concluded_enrollments_label: 完了した登録の表示
+        show_notes: 受講生情報にメモを表示
+        show_total_as_points: 受講生の成績ページに合計を点数として表示
         sis_export: "成績表を SIS に公開"
+        upload_scores: "スコアのアップロード (.csv)"
+      header: 
+        global_settings: グローバル設定
       mastery_toggles_and_actions: 
+        download_results: "結果のダウンロード (.csv)"
         hide_student_names_label: 受講生の名前を非表示
+      section_select: 
+        select_a_section: セクションの選択
+      sort_select: 
+        sort_assignments: 課題の並べ替え
     student_information: 
       assignment_groups: 
         ag_group_grade: 成績
         ag_group_name: 課題グループ
-        ag_letter_grade: 成績
+        ag_group_percent_grade: "成績の %"
+        ag_letter_grade: "レター グレード"
+      details: 
+        hidden: 非表示
+        secondary_id: "セカンダリ ID:"
+        sections: "セクション:"
       index: 
+        empty_student_selection: 追加の情報を表示するには、受講生を選択します。
         grades: 成績
+        student_info: 受講生情報
+        submissions_loading: この受講生の提出物を読み込んでいます...
   search: 
     all_courses: 
       name: 名前
+      open_enrollment_only: 登録コースのみを開く
+      public_only: 公開コースのみ
       search: 検索
       titles: 
         all_courses: すべてのコース
@@ -13229,6 +13354,9 @@ ja:
     components: 
       ic_submission-download-dialog: 
         click_to_download: ここをクリックしてダウンロード
+        download_message: "提出物は、zip ファイルに圧縮されてダウンロードされます。提出物ファイルのサイズと数によっては、この処理に少し時間がかかることがあります。"
+        download_message_intro: 受講生の提出物を収集しています。
+        download_submissions: すべての提出物のダウンロード
     conference: 
       buttons: 
         delete: 会議の削除
@@ -13416,6 +13544,7 @@ ja:
       crowdsourced_warning_title: クラウドソーシングで翻訳された言語
     login: 
       back_to_login: ログインに戻る
+      browse_courses: コースの参照
       buttons: 
         request_password: パスワードの要求
       coenrollment_banner: "*Canvas ユーザの親ですか?* **アカウントはこちらをクリックしてください**"
@@ -13650,9 +13779,11 @@ ja:
     select_content_dialog: 
       add_to_module: "*モジュール*に %{item} を追加"
       assignment_item: 課題
+      assignment_item_select_label: "関連付ける課題を選択するか、または [新しい課題] を選択して課題を追加します。"
       assignment_notice: "この *モジュール* に関連付ける課題を選択するか、\"新しい課題\" を選択して課題を追加します。"
       content_page_item: "コンテンツ ページ"
       discussion_item: ディスカッション
+      discussion_topic_select_label: "関連付けるトピックを選択するか、または [新しいトピック] を選択してトピックを追加します。"
       domain_match_notice: "このツールを使用するには、ドメインが %{domain} と一致している必要があります"
       external_tool_item: 外部ツール
       external_tool_notice: "下のリストからツールを選択するか、または、Basic LTI で構成されている外部ツールの場合は、外部ツールの URL を入力して、その外部ツールへのリンクをこの *モジュール* に追加します。"
@@ -13660,6 +13791,7 @@ ja:
       external_url_notice: "Web サイトの URL へのリンクをこの *モジュール* に追加するには、URL とページ名を入力します。"
       file_item: ファイル
       file_notice: "この *モジュール* に関連付けるファイルを選択するか、\"新しいファイル\" を選択してファイルを追加します。"
+      file_select_label: "関連付けるファイルを選択するか、または [新しいファイル] を選択してファイルを追加します。"
       indent_level: 
         one: "*1 段階インデント*"
         other: "*%{count} 段階インデント*"
@@ -13686,10 +13818,13 @@ ja:
         assignments: 課題
       quiz_item: クイズ
       quiz_notice: "この *モジュール* に関連付けるクイズを選択するか、\"新しいクイズ\" を選択してクイズを追加します。"
+      quiz_select_label: "関連付けるクイズを選択するか、または [新しいクイズ] を選択して新しいクイズを追加します。"
+      select_item_type_label: 追加するコンテンツの種類を選択します。
       sub_header_notice: "*モジュール* のサブヘッダとして追加するテキストを入力します"
       text_header_item: "テキスト ヘッダ"
       topic_notice: "この *モジュール* に関連付けるトピックを選択するか、\"新しいトピック\" を選択してトピックを追加します。"
       wiki_page_notice: "この *モジュール* に関連付ける Wiki ページを選択するか、\"新しいページ\" を選択してページを追加します。"
+      wiki_page_select_label: "関連付ける Wiki ページを選択するか、または [新しいページ] を選択して新しいページを追加します。"
     sequence_footer: 
       full_course_sequence: コース全体の順序を表示
       next: 次へ
@@ -13965,22 +14100,30 @@ ja:
     inexact_answer: "%{lower_bound} 至 %{upper_bound}"
     no_answer: 解答なし
   step: 手順
+  stream_items_api: 
+    assessment_request_title: "%{title} のピア レビュー"
   student_assignment_outcome_map_title: 受講生の能力
   student_groups: 
     group_join: "グループ %{group_name} に参加しました"
     group_leave: "グループ %{group_name} を脱退しました"
     group_name: "%{group_category} の %{group_name}"
     new_group: 
-      group_explanation: "グループは、プロジェクトの共同作業を行ったり、勉強会などのスケジュールを立てたりするのに適した場所です。どのグループも、カレンダー、Wiki、ディスカッション、わずかながらファイルの保管場所も手に入れることができます。グループでは、文書を共同制作することや、Web 会議を計画することだってできます。まさにミニコースのようなもので、より焦点を絞ったプロジェクトで、少数の受講生と一緒に作業することができます。"
+      group_explanation: "グループは、プロジェクトの共同作業や、勉強会などのスケジュール設定に適した場所です。グループごとにカレンダー、Wiki、ディスカッションを使用でき、ファイルを保存できる場所もあります。グループでは、文書を共同で作成したり、Web 会議を計画することもできます。グループはコースの小型版のようなもので、限られた数の受講生とより狭い範囲のプロジェクトで学習を進めることができます。"
       joining: 参加しています
       name: グループ名
+      name_error: グループ名が必要です
     search_groups_placeholder: グループまたはメンバーを検索
     student_groups: 
       full: 満員
       group: グループ
+      group_full: グループは満員です
+      invite_only: 招待のみ
       student_groups_join: 参加
+      student_groups_leave: 退出
+      student_groups_switch: 移動
       student_groups_tabs_everyone: 全員
       student_groups_tabs_groups: グループ
+      visit: アクセス
     student_groups_filter_description: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
     students_count: 
       one: "%{count} 人の受講生"
@@ -14135,11 +14278,13 @@ ja:
       teachers_notified_of_comments: 講師と提出者には、すべてのコメントが通知されます
     show_preview: 
       discussion_submission_description: "この課題への提出物は、この課題のディスカッションにおける投稿です。%{user} さんのディスカッション投稿は以下のとおりです。*全ディスカッションを表示* することもできます。"
+      discussion_submission_description_without_link: "この課題の提出物は、課題のディスカッションへの投稿です。以下に、%{user} のディスカッションへの投稿を示します。"
       entry_no_image: このページは、最初に提出されたときから、変更されている可能性がありますので注意してください。
       entry_with_image: 提出された時点のページの内容をスナップショットにして含めてあります。または、クリックして元の提出物を表示することもできます。
       external_url_submission: "この提出物は、外部ページへの URL でした。"
       file_uploads_for_user: "**%{user}** さんのためのファイル アップロード"
       group_discussion_submission_description: "この課題への提出物は、このグループの課題のディスカッションに投稿されます。%{user} さんのディスカッション投稿は以下のとおりです。*全グループ ディスカッションを表示* することもできます。"
+      group_discussion_submission_description_without_link: "この課題の提出物は、このグループの課題のディスカッションへの投稿です。以下に、%{user} のディスカッションへの投稿を示します。"
       media_comment_link: この提出物はメディアに記録されたデータです。*ここをクリックして表示します*。
       no_files: この提出物に対してアップロードされたファイルはありません
       no_preview_available: プレビューは利用できません
@@ -14266,7 +14411,7 @@ ja:
         term_start: 期間の開始日
         unspecified: 指定なし
       timespan: "%{start_at} *至* %{end_at}"
-  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*このクイズは未公開です* 公開されるまでは、このクイズを表示できるのは講師のみです。"
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*このクイズは未公開です* 公開されるまでは、講師のみがこのクイズを表示できます。"
   time: 
     am: 午前
     count_hours_ago: 
@@ -14504,6 +14649,7 @@ ja:
   unpublished_courses_title: 未公開のコース
   unsupported_package: "サポートされていないコンテンツ パッケージ"
   until_date_949017c4: "%{date} まで"
+  untitled_assignment_59354b34: 無題の課題
   unused_courses_title: 未使用のコース
   upload_button: 
     upload: アップロード
@@ -14643,6 +14789,7 @@ ja:
       linked_in: "LinkedIn は、ビジネス ネットワークのためのリソースです学生時代に築いた人脈の多くは、仕事をするようになってからも役立つものです。"
       skype: "Skype は、インターネット経由で音声通話やビデオ通話を行なうための無料のツールです。"
       twitter: "Twitter は、クラス外コミュニケーションのための素晴らしいリソースです。"
+      yo: "Yo は、タップするだけの文字入力が不要なコミュニケーション ツールです。"
   users: 
     admin_merge: 
       buttons: 
@@ -15162,6 +15309,9 @@ ja:
       archive_link: アーカイブを表示
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*このクイズの問題は変更されています。*これらの変更内容は、クイズを保存するまで、受講生には表示されません。"
   you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*このクイズに加えた変更内容は未公開です。*これらの変更内容は、クイズを公開または再公開するまで、受講生には表示されません。"
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    one: "検索で以下のエラーが発生しました:"
+    other: "検索で以下のエラーが発生しました:"
   zero_activity_title: "ゼロ アクティビティ"
   zip_argument_error: ".zip をアップロードするには、アップロード先のフォルダが必要です。"
   zip_file_description: ".zip アーカイブをコース、グループ、またはユーザ ファイルに解凍するための移行プラグイン"
