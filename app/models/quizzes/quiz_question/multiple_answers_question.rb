@@ -53,6 +53,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
     return correct_answers
   end
 
+  # TODO: remove once new stats is on for everybody
   def stats(responses)
     answers = @question_data[:answers]
 
