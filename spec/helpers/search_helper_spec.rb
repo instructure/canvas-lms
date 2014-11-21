@@ -45,6 +45,15 @@ describe SearchHelper do
       expect(@contexts[:sections].count).to eq 1
     end
 
+    it "loads the section even with restricted privileges" do
+      course_with_teacher(:active_all => true, :limit_privileges_to_course_section => true)
+      @current_user = @teacher
+      load_all_contexts(context: @course.default_section)
+
+      expect(@contexts[:courses].count).to eq 1
+      expect(@contexts[:sections].count).to eq 1
+    end
+
     describe "sharding" do
       specs_require_sharding
 
