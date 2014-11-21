@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.1.1 (8761) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard" sketch:type="MSArtboardGroup">
+            <g id="icon-copyright" sketch:type="MSLayerGroup">
+                <g id="Page-1" sketch:type="MSShapeGroup">
+                    <g id="icon-copyright">
+                        <g id="Icons">
+                            <g id="Artboard-1">
+                                <g id="icon-copyright">
+                                    <g id="bg">
+                                        <circle id="Oval-5" fill="#000000" cx="30" cy="30" r="30"></circle>
+                                        <circle id="Oval-6" fill="#FFFFFF" cx="30" cy="30" r="24"></circle>
+                                    </g>
+                                    <path d="M38.0893544,24.432153 L33.9935271,26.5672869 C33.555951,25.6563347 33.019968,25.0164651 32.3836673,24.6515095 C31.7464113,24.2875118 31.1550147,24.104555 30.6085222,24.104555 C27.8798815,24.104555 26.5136504,25.9101753 26.5136504,29.5233315 C26.5136504,31.1651528 26.8595075,32.4774603 27.5502663,33.4631278 C28.2419806,34.4487953 29.2613992,34.942108 30.6085222,34.942108 C32.392266,34.942108 33.64767,34.0656398 34.3766451,32.3146192 L38.1428571,34.2303967 C37.3422266,35.7275767 36.2320443,36.9038641 34.8123104,37.7611745 C33.3944873,38.6194428 31.8285762,39.047619 30.1174433,39.047619 C27.3878472,39.047619 25.1846801,38.2094664 23.510808,36.5293296 C21.836936,34.8511086 21,32.5157759 21,29.5242894 C21,26.6046446 21.8464901,24.2884697 23.5385148,22.572891 C25.2305396,20.8582702 27.3687391,20.0000019 29.9540688,20.0000019 C33.7403444,19.9980861 36.4508324,21.4761084 38.0893544,24.432153 L38.0893544,24.432153 L38.0893544,24.432153 Z" id="Shape-2" fill="#000000"></path>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
