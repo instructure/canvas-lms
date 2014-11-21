@@ -523,16 +523,40 @@ describe Pseudonym do
           account1.save!
         end
 
-        it "should no longer grant admins :change_password for others on the account" do
-          expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
+        context "with canvas authentication enabled on the account" do
+          before do
+            account1.change_root_account_setting!(:canvas_authentication, true)
+          end
+
+          it "should still grant admins :change_password for others on the account" do
+            expect(managed_pseudonym(bob, account: account1)).to be_grants_right(sally, :change_password)
+          end
+
+          it "should still grant admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(sally, account: account1)).to be_grants_right(sally, :change_password)
+          end
+
+          it "should still grant non-admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
+          end
         end
 
-        it "should no longer grant admins :change_password for their own pseudonym" do
-          expect(managed_pseudonym(sally, account: account1)).not_to be_grants_right(sally, :change_password)
-        end
+        context "without canvas authentication enabled on the account" do
+          before do
+            account1.change_root_account_setting!(:canvas_authentication, false)
+          end
 
-        it "should no longer grant non-admins :change_password for their own pseudonym" do
-          expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(bob, :change_password)
+          it "should no longer grant admins :change_password for others on the account" do
+            expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
+          end
+
+          it "should no longer grant admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(sally, account: account1)).not_to be_grants_right(sally, :change_password)
+          end
+
+          it "should no longer grant non-admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(bob, :change_password)
+          end
         end
       end
     end
