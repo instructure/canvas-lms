@@ -1510,7 +1510,7 @@ ru:
     unmute_assignment: "Включить звук задания"
     unmute_button: "Включить звук задания"
     unmute_dialog: "В настоящий момент звук в данном задании отключен. Это означает, что студенты не могут просматривать свои оценки и отзывы. Включить звук сейчас?"
-    unmuting_assignment: "Включение звука задания..."
+    unmuting_assignment: "доступно заданиe..."
   assignments: 
     add_assignment_form: 
       assignment_name: "Название задания"
@@ -6673,7 +6673,7 @@ ru:
         one: "Оценки 1 студента были обновлены"
         other: "Оценки %{count} студентa/ов были обновлены"
     all_sections: "Все разделы"
-    assignment_muted: "Звук задания отключен"
+    assignment_muted: "заданиe скрыто"
     column_header: 
       assignment_options: "Опции задания"
       points_out_of: "Из %{assignment.points_possible}"
@@ -8688,8 +8688,8 @@ ru:
         html: 
           body: "Ваш инструктор опубликовал изменения в оценках и новые комментарии к %{title}. Данные изменения теперь доступны для просмотра."
           link: "Его можно просмотреть здесь"
-          subject: "Звук задания включен: %{title}, %{course}"
-        subject: "Звук задания включен: %{title}, %{course}"
+          subject: "заданиe доступно: %{title}, %{course}"
+        subject: "заданиe доступно: %{title}, %{course}"
       sms: 
         body: |-
             Ваш инструктор создал оценки и новые комментарии для %{title}, %{course}.
