@@ -32,8 +32,8 @@ define [
     """)
 
     $screenreader_node.appendTo($screenreader_holder)
-    # these aren't displayed, so removing them at a specified time is not critical
-    window.setTimeout((-> $screenreader_node.remove()), 20000)
+    # By not removing these in a timely manner, they can stack up and become repetitive
+    window.setTimeout((-> $screenreader_node.remove()), 1000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""

@@ -31,6 +31,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:quiz, :assessment_question, :quiz_group]
   TEXT_ONLY = 'text_only_question'
 
+  before_save :validate_blank_questions
   before_save :infer_defaults
   before_save :create_assessment_question
   before_destroy :delete_assessment_question
@@ -129,6 +130,15 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       self.assessment_question_id = self.assessment_question.id
       self.assessment_question_version = self.assessment_question.version_number rescue nil
     end
+    true
+  end
+
+  def validate_blank_questions
+    return if self.question_data && !(self.question_data.is_type?(:fill_in_multiple_blanks) || self.question_data.is_type?(:short_answer))
+    qd = self.question_data
+    qd.answers = qd.answers.select { |answer| !answer['text'].empty? }
+    self.question_data = qd
+    self.question_data_will_change!
     true
   end
 

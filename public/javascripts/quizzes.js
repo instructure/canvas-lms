@@ -2168,6 +2168,7 @@ define([
 
       var $ans = $(this).parents(".answer");
       var $ansHeader = $ans.closest('.question').find('.answers_header');
+      $(".errorBox").not("#error_box_template").remove();
       $ans.remove();
       $ansHeader.focus();
     });
@@ -2561,7 +2562,7 @@ define([
         }];
         answer_type = "short_answer";
         question_type = "short_answer_question";
-        answer_selection_type = "any_answer";
+        answer_selection_type = "blanks";
       } else if ($question.hasClass('essay_question')) {
         var answers = [{
           comments: I18n.t('default_response_to_essay', "Response to show student after they submit an answer")
@@ -2616,7 +2617,7 @@ define([
         }];
         answer_type = "short_answer";
         question_type = "fill_in_multiple_blanks_question";
-        answer_selection_type = "any_answer";
+        answer_selection_type = "blanks";
       }
       for(var i = 0; i < answers.length; i++) {
         var answer = answers[i];
@@ -2627,6 +2628,9 @@ define([
         $answer = makeFormAnswer(answer);
         if (answer_selection_type == "any_answer") {
           $answer.addClass('correct_answer');
+        } else if (answer_selection_type == "blanks") {
+          $answer.addClass("correct_answer");
+          $answer.addClass("fill_in_blank_answer");
         } else if (answer_selection_type == "matching") {
           $answer.removeClass('correct_answer');
         }
@@ -2647,6 +2651,7 @@ define([
       event.stopPropagation();
       var $displayQuestion = $(this).prev();
       var $form = $(this);
+      $(".errorBox").not("#error_box_template").remove();
       var $answers = $form.find(".answer");
       var $question = $(this).find(".question");
       var answers = [];
@@ -2670,6 +2675,28 @@ define([
           error_text = I18n.t('errors.no_answer', "Please add at least one answer");
         } else if ($answers.filter(".correct_answer").length === 0 && (questionData.question_type == "multiple_choice_question" || questionData.question_type == "true_false_question" || questionData.question_tyep == "missing_word_question")) {
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
+        }
+      } else if (questionData.question_type == "fill_in_multiple_blanks_question" || questionData.question_type == "short_answer_question") {
+        // Scan each answer for non-blank answers.
+        function checkForNotBlanks(elements) {
+          return elements.filter(function(i,element) {
+            return !!element.value;
+          }).length;
+        }
+        var $validAnswers = $answers.filter("div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer");
+        if (questionData.question_type == "fill_in_multiple_blanks_question") {
+          var multipleBlankCount = $form.find(".blank_id_select > option").length;
+          var checkEachBlankArray = []
+          for(var j=0; j < multipleBlankCount; j++) {checkEachBlankArray.push(j) }
+          $validAnswers.each(function(i, element) {
+            var $validInputs = $(element).find( $("input[name='answer_text']")).not(".disabled_answer")
+            var i = element.className.match(/answer_idx_(\d+)/)[1];
+            if (checkForNotBlanks($validInputs) > 0) {checkEachBlankArray.splice(parseInt(i-1),1)}
+          });
+          if(checkEachBlankArray.length > 0) {error_text = I18n.t("Please add at least one non-blank answer for each variable.");}
+        } else {
+          var $validInputs = $validAnswers.find( $("input[name='answer_text']")).not(".disabled_answer")
+          if (checkForNotBlanks($validInputs) == 0) {error_text = I18n.t("Please add at least one non-blank answer.");}
         }
       }
 
