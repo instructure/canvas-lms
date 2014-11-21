@@ -1076,10 +1076,11 @@ class Assignment < ActiveRecord::Base
     end
 
     if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment']))
+      uuid = CanvasSlug.generate_securish_uuid
       res = find_or_create_submissions(students) do |s|
         s.group = group
         s.save! if s.changed?
-        opts[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
+        opts[:group_comment_id] = uuid if group
         s.add_comment(opts)
         # this is lame, SubmissionComment updates the submission directly in the db
         # in an after_save, and of course Rails doesn't preload the reverse association
