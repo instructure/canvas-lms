@@ -1202,6 +1202,7 @@ class Account < ActiveRecord::Base
         :id => tool.asset_string,
         :label => tool.label_for(:account_navigation, opts[:language]),
         :css_class => tool.asset_string,
+        :visibility => tool.account_navigation(:visibility),
         :href => :account_external_tool_path,
         :external => true,
         :args => [self.id, tool.id]
@@ -1242,6 +1243,7 @@ class Account < ActiveRecord::Base
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
     tabs << { :id => TAB_ADMIN_TOOLS, :label => t('#account.tab_admin_tools', "Admin Tools"), :css_class => 'admin_tools', :href => :account_admin_tools_path } if can_see_admin_tools_tab?(user)
     tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }
+    tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, :manage)
     tabs
   end
 
