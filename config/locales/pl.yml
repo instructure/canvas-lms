@@ -6653,6 +6653,7 @@ pl:
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
     group: Grupa
     hide_all_details_button: "Ukryj wszystkie informacje szczegółowe"
+    mic_blocked_message: "Użycie mikrofonu jest zablokowane. Aby zmienić ustawienia, przejdź na stronę chrome://settings/contentExceptions#media-stream"
     mute_assignment: "Ukryj zadanie"
     new_assessment: "[Nowa ocena]"
     no_submission_time: "brak daty przesłania zadania"
