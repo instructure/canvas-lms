@@ -33,6 +33,10 @@ define [
     displayName: I18n.t('size', 'Size')
     property: 'size'
     className: 'ef-size-col'
+  ,
+    displayName: I18n.t('Usage Rights')
+    property: 'usage_rights'
+    className: 'ef-usage-rights-col'
   ]
 
   ColumnHeaders = React.createClass
@@ -79,7 +83,12 @@ define [
             }, @props),
 
               span className: ('visible-desktop' if column.displayNameShort),
-                column.displayName
+                if (column.property == 'usage_rights')
+                  i {className: 'icon-license'},
+                    span {className: 'screenreader-only'},
+                      I18n.t('Usage Rights')
+                else
+                  column.displayName
               if column.displayNameShort
                 span className: 'hidden-desktop',
                   column.displayNameShort

@@ -329,6 +329,7 @@ class FilesController < ApplicationController
         {
           asset_string: context.asset_string,
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
+          usage_rights_required: context.feature_enabled?(:usage_rights_required),
           permissions: {
             manage_files: context.grants_right?(@current_user, session, :manage_files),
           }
