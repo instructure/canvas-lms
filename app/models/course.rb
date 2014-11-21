@@ -2163,22 +2163,22 @@ class Course < ActiveRecord::Base
       else scope.none
     end
   end
-
+  
   def sections_visible_to(user, sections = active_course_sections)
     visibilities = section_visibilities_for(user)
+    visibility = enrollment_visibility_level_for(user, visibilities)
     section_ids = visibilities.map{ |s| s[:course_section_id] }
-    case enrollment_visibility_level_for(user, visibilities)
-    when :full, :limited
-      if visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
-        sections.where(:id => section_ids)
+    is_scope = sections.respond_to?(:where)
+
+    if [:full, :limited, :sections].include?(visibility)
+      if visibility == :sections || visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
+        is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
       else
         sections
       end
-    when :sections
-      sections.where(:id => section_ids)
     else
       # return an empty set, but keep it as a scope for downstream consistency
-      sections.none
+      is_scope ? sections.none : []
     end
   end
 
