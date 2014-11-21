@@ -47,7 +47,7 @@
             <% end %>
           </td>
           <% if !pseudonym || can_do(pseudonym, @current_user, :update) %>
-            <td class='links <%= 'passwordable' if pseudonym && can_do(pseudonym, @current_user, :change_password) %>'>
+            <td class='links <%= 'passwordable' if pseudonym && can_do(pseudonym, @current_user, :change_password) %> <%= 'delegated-auth' if pseudonym && !pseudonym.account.password_authentication? %>'>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link" data-account-id="<%= pseudonym.account.id if pseudonym %>"><i class="icon-edit standalone-icon"></i></a>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && !can_do(pseudonym, @current_user, :delete)) %>"><i class="icon-end standalone-icon"></i></a>
             </td>
@@ -79,11 +79,11 @@
     <table class="formtable" style="margin-top: 20px;">
       <tr>
         <td><%= f.blabel :unique_id, :en => "Login" %></td>
-        <td><%= f.text_field :unique_id, :style => "width: 150px;" %></td>
+        <td><%= f.text_field :unique_id %></td>
       </tr>
       <tr style="display:none;" class="sis_user_id">
         <td><%= f.blabel :sis_user_id, :en => "SIS ID" %></td>
-        <td><%= f.text_field :sis_user_id, :style => "width: 150px;" %></td>
+        <td><%= f.text_field :sis_user_id %></td>
       </tr>
       <% if can_do(Account.site_admin, @current_user, :manage_user_logins) %>
         <% js_env :PASSWORD_POLICIES => Hash[Account.root_accounts.active.map{ |a| [a.id, a.password_policy]}] %>
@@ -101,11 +101,25 @@
       <% end %>
       <tr class="password">
         <td><%= f.blabel :password, :en => "Password" %></td>
-        <td><%= f.password_field :password, :style => "width: 150px;" %></td>
+        <td><%= f.password_field :password %></td>
       </tr>
       <tr class="password">
         <td>&nbsp;</td>
-        <td><%= f.password_field :password_confirmation, :style => "width: 150px;" %></td>
+        <td><%= f.password_field :password_confirmation %></td>
+      </tr>
+      <!-- explicit width is sad, but the dialog auto width will make the
+           dialog crazy wide before wrapping the text otherwise -->
+      <tr class="delegated">
+        <td colspan="2" style="width: 300px;">
+          <div class="hint-text">
+            <%= t do %>
+              Note: This login's account uses delegated authentication, but
+              allows fallback Canvas password authentication. The password
+              fields in this form update the fallback Canvas password,
+              <b>not</b> the delegated authentication.
+            <% end %>
+          </div>
+        </td>
       </tr>
     </table>
 

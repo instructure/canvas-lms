@@ -252,30 +252,32 @@ class Pseudonym < ActiveRecord::Base
     end
     can :create and can :update
 
-    # any user (admin or not) can change their own non-managed password.
-    # managed passwords cannot be changed in Canvas.
+    # any user (admin or not) can change their own canvas password. if the
+    # pseudonym's account does not allow canvas authentication (i.e. it uses
+    # and requires delegated authentication), there is no canvas password to
+    # change.
     given do |user|
       self.user_id == user.try(:id) &&
-      !self.managed_password?
+      self.account.canvas_authentication?
     end
     can :change_password
 
-    # an admin can set the initial non-managed password on another user's new
-    # pseudonym.
+    # an admin can set the initial canvas password (if there is one, see above)
+    # on another user's new pseudonym.
     given do |user|
       self.new_record? &&
-      self.grants_right?(user, :create) &&
-      !self.managed_password?
+      self.account.canvas_authentication? &&
+      self.grants_right?(user, :create)
     end
     can :change_password
 
-    # an admin can only change another user's non-managed password on an
-    # existing pseudonym when :admins_can_change_passwords is enabled. managed
-    # passwords cannot be changed in Canvas, even by admins.
+    # an admin can only change another user's canvas password (if there is one,
+    # see above) on an existing pseudonym when :admins_can_change_passwords is
+    # enabled.
     given do |user|
       self.account.settings[:admins_can_change_passwords] &&
-      self.grants_right?(user, :update) &&
-      !self.managed_password?
+      self.account.canvas_authentication? &&
+      self.grants_right?(user, :update)
     end
     can :change_password
 
