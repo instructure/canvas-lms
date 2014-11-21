@@ -81,17 +81,17 @@ The publish button has two states on click (publish and published) and a hover s
 
 .publish-icon {
   display: inline-block;  
-  color: darken($canvas-neutral, 30%);
+  color: $ic-base-color-icon-disabled;
   
   cursor: pointer;
   &:focus { @include button-focus; }
 
   &.publish-icon-unpublish {
-    color: $btnDangerBackground;
+    color: $ic-base-color-icon-disabled;
   }
 
   &.publish-icon-published {
-    color: #35842c;
+    color: $canvas-success;
   }
 
   .publish-text {
@@ -102,11 +102,11 @@ The publish button has two states on click (publish and published) and a hover s
 .published-status {
   &.published {
     font-weight: bold;
-    color: #007711;
+    color: $canvas-success;
   }
 
   &.unpublished {
     font-weight: normal;
-    color: #999999;
+    color: $ic-base-color-icon-disabled;
   }
 }

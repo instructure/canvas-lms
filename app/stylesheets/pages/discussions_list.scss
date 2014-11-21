@@ -225,7 +225,7 @@
   }
 
   .discussion-status {
-    color: #bbb;
+    color: $ic-base-color-icon-disabled;
     width: 60px;
 
     .publish-icon {
@@ -244,11 +244,11 @@
     }
 
     .icon-discussion-check {
-      color: #35842c;
+      color: $canvas-success;
     }
 
     .icon-discussion-x {
-      color: $btnDangerBackground;
+      color: $canvas-danger;
     }
   }
 
@@ -259,10 +259,6 @@
 
   .discussion-actions {
     width: 45px;
-
-    a {
-      color: ensure-contrast(#bbb, #fff);
-    }
 
     .al-options a {
       color: #fff;

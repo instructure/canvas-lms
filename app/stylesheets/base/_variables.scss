@@ -102,6 +102,9 @@ $base-font-color--subdued: #696969;
 $base-border-color: $canvas-neutral;
 $base-list-item-background--hover: #eef7ff;
 $base-list-item-background--selected: #d9edf9;
+// To be used for any disabled icon states
+$ic-base-color-icon-disabled: darken($canvas-neutral, 40);
+@if $use_high_contrast {$ic-base-color-icon-disabled: darken($canvas-neutral, 60);}
 
 $announcements_disscussion-summary-color: $canvas-dark;
 
