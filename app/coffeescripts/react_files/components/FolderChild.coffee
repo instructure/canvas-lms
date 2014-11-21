@@ -32,15 +32,24 @@ define [
     focusPreviousElement: ->
       @previouslyFocusedElement?.focus()
       return if document.activeElement ==  @previouslyFocusedElement
-      @refs.nameLink.getDOMNode().focus()
+      @focusNameLink()
 
     focusNameInput: ->
       @previouslyFocusedElement = document.activeElement
-      @refs.newName.getDOMNode().focus()
+      setTimeout () =>
+        @refs.newName?.getDOMNode().focus()
+      , 0
+
+    focusNameLink: ->
+      setTimeout () =>
+        @refs.nameLink?.getDOMNode().focus()
+      , 0
 
     saveNameEdit: ->
-      @props.model.save(name: @refs.newName.getDOMNode().value)
-      @setState editing: false, => @refs.nameLink.getDOMNode().focus()
+      @setState editing: false, @focusNameLink
+      @props.model.save(name: @refs.newName.getDOMNode().value, {success: =>
+          @focusNameLink()
+      })
 
     cancelEditingName: ->
       @props.model.collection.remove(@props.model) if @props.model.isNew()
