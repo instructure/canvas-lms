@@ -1807,6 +1807,7 @@ fr:
     grading_type_selector: 
       display_grade_as: "Afficher la note en tant que"
       gpa_scale_explainer: "Le GPA, système de notation américain, est conçu pour les établissements qui utilisent l’échelle 4.0 (ou 5.0/6.0) pour tous les travaux. Il équivaut au système de notation avec les lettres, mais avec des différences importantes :"
+      gpa_scale_input_explainer: "Les notes sont calculées selon l’échelle 4.0. Par exemple, si un travail est sur 100 points, attribuer 4.0 donne 100 %, 3.0 donne 87 %, etc."
       gpa_scale_letters_explainer: "Des lettres peuvent être utilisées en plus des chiffres pour les notes."
       gpa_scale_percentage_explainer: "Vous ne pouvez pas attribuer directement des points, mais vous pouvez indiquer des pourcentages. Par exemple, pour un travail noté sur 50 points, vous ne pouvez pas inscrire 40, vous devez indiquer 80 %."
       gpa_scale_recommendation: "À moins que votre établissement utilise l'échelle 4.0 (ou 5.0/6.0) pour la notation, Canvas conseille d’afficher les notes sous forme de lettres."
@@ -4650,6 +4651,7 @@ fr:
         duplicates_removed: "Certains doublons ont été supprimés."
         email: E-mail
         email_field_label: "Indiquez les adresses e-mail des utilisateurs que vous souhaitez ajouter, en les séparant par des virgules"
+        email_field_place_holder: "\"Exemple\" <student@example.com>, \"Nom, Prénom\" <firstlast@example.com>, justAnEmailAddress@example.com"
         example_formats: "Exemples : user@example.com, « Prénom Nom » <user@example.com>, « Nom, Prénom » <user@example.com>"
         form_instructions: "Saisissez ou collez la liste des adresses e-mail ci-dessous :"
         go_back: Recommencer
@@ -5652,6 +5654,7 @@ fr:
     unsubscribe: "Se désabonner de ce sujet"
     unsubscribed: Désabonné
     unsubscribed_hint: "Vous n’êtes pas abonné à ce sujet. Cliquez pour vous abonner."
+  display_course_catalog: "Affichez une liste des cours consultable dans le compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
   draft_state_description: |-
       Cette fonction bêta remanie de nombreuses parties de Canvas et permet de mettre le contenu
       dans un nouveau mode, Non publié, ce qui le rend invisible pour les étudiants et l'exclut du calcul des
@@ -10639,6 +10642,10 @@ fr:
       description: "Intégration de Diigo "
       name: Diigo
     diigo_settings: 
+      description: |-
+          Vous devrez enregistrer une [nouvelle appli sur Diigo](%{diigo_url}).
+          
+          * Une fois l’appli enregistrée, notez la clé API.
       labels: 
         api_key: "Clé API"
     dim_dim_settings: 
@@ -10829,11 +10836,14 @@ fr:
     notices: 
       settings_updated: "Les paramètres de module d’extension ont été mis à jour."
     panda_pub_settings: 
+      description: "PandaPub est un service de publication/remplacement qui, une fois configuré, permet à certaines parties de Canvas de recevoir des notifications pour des événements à l’intérieur du navigateur, plutôt que de s’interroger sur les changements."
       labels: 
         application_id: "ID de l’application"
         base_url: "URL de base"
         key_id: "ID de la clé"
+        key_secret: "Secret par clé"
     pandapub: 
+      description: "Service de publication/remplacement"
       name: PandaPub
     qti_converter_settings: 
       labels: 
@@ -10912,6 +10922,7 @@ fr:
       description: "Juste Yo"
       name: Yo
     yo_settings: 
+      description: "Vous aurez besoin d’un [jeton API de Yo](%{yo_url})."
       labels: 
         api_token: "Jeton dApi"
   polling: 
@@ -11143,6 +11154,13 @@ fr:
           et le destinataire, et n’apparaîtront pas dans votre sphère publique.
       unknown_service: Inconnu
       web_services: "Canvas peut vous simplifier la vie en se jumelant aux outils Web que vous utilisez déjà. Cliquez sur un service dans Autres services pour le constater par vous-même."
+      yo_description: |-
+          Yo est un outil de communication à zéro caractère avec lequel une seule pression suffit.
+          Si vous avez un compte Yo, vous pouvez l’enregistrer ici. Ensuite, si vous autorisez
+          les autres membres du cours ou du groupe à voir les services que vous avez enregistrés, ils pourront 
+          facilement vous contacter via votre compte Yo.
+          
+          Vous pouvez également vous inscrire pour faire envoyer des notifications sur votre compte Yo.
     purpose_required: "La fonction doit être indiquée"
     resending: "renvoi en cours..."
     secondary_nav: 
@@ -11262,7 +11280,9 @@ fr:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest envoyée au fournisseur d’identités"
+      logout_request_redirect_from_idp: "LogoutRequest reçue du fournisseur d’identités"
       logout_response_redirect_from_idp: "LogoutResponse reçue du fournisseur d’identités"
+      logout_response_redirect_to_idp: "Envoi de LogoutResponse au fournisseur d’identités"
       redirect_from_idp: "LoginResponse reçue du fournisseur d’identités"
     default_app_name: "Application tierce"
     errors: 
@@ -11524,9 +11544,16 @@ fr:
       some_scores_reduced: "Attribuez des points uniquement pour la réponse correcte (*la note de certains étudiants pourra baisser*)"
       update_question_without_regrading: "Actualiser la question sans reclassement"
   quiz_reports: 
+    download_item_analysis: "Téléchargez un rapport d’analyse des éléments."
+    download_student_analysis: "Téléchargez un rapport d’analyse des étudiants."
     generatable: "Le rapport n’a jamais été généré."
+    generate_item_analysis_report: "Générez un rapport d’analyse des éléments."
+    generate_student_analysis_report: "Générez un rapport d’analyse des étudiants."
+    generated_at: "Générés : %{date}"
     generating: "Génération du rapport..."
+    generation_almost_done: "Opération presque terminée."
     generation_complete: "Le rapport a été généré."
+    generation_halfway: "Opération effectuée à plus de 50 %."
     generation_started: "Le rapport est en cours de création."
     non_generatable_report_notice: "Le rapport ne peut pas être généré pour les questionnaires d’enquête."
     quiz_report_generator: 
@@ -11546,6 +11573,7 @@ fr:
         other: "%{count} réponses."
         zero: "Pas de réponses."
       audible_correct_answer_indicator: "Cette réponse est correcte."
+      audible_description: "Ce tableau contient toutes les réponses aux questions, avec le nombre de réponses reçues."
       response_count: 
         one: "1 étudiant"
         other: "%{count} étudiants"
@@ -11561,7 +11589,13 @@ fr:
     correct_multiple_response_ratio: "%{ratio}% de vos étudiants ont répondu correctement."
     correct_response_ratio: "%{ratio}% de vos étudiants ont correctement répondu à cette question."
     discrimination_index: 
+      audible_bottom_bracket: "Tranche du bas :"
+      audible_bracket_aced: "Tous les étudiants situés dans cette tranche ont répondu correctement."
+      audible_bracket_failed: "Aucun des étudiants situés dans cette tranche n’a répondu correctement."
       audible_discrimination_index: "Indice de discrimination : %{number}."
+      audible_middle_bracket: "Tranche du milieu :"
+      audible_response_ratio_distribution: "%{correct_ratio}% des étudiants situés dans cette tranche ont répondu correctement."
+      audible_top_bracket: "Tranche du haut :"
       discrimination_index: "Indice de discrimination "
       discrimination_index_dialog_title: "L’indice de discrimination "
       discrimination_index_dialog_trigger: "Apprenez-en davantage sur l’indice de discrimination"
@@ -11579,6 +11613,7 @@ fr:
       other: "%{count} secondes"
     essay_score: "Résultat : %{score}"
     no_answer: "Aucune réponse"
+    question_breakdown: "Détails de la question"
     question_header: "Question %{position}"
     response_student_count: 
       one: "1 étudiant"
@@ -11591,7 +11626,16 @@ fr:
       low_score: "Note faible"
       mean: "Note moyenne"
       not_available_abbrev: NA
+      quiz_summary: "Synthèse du questionnaire"
       stdev: Écart-type
+      students_who_got_a_certain_score: 
+        one: "Un étudiant a reçu une note égale à %{score}%."
+        other: "%{count} étudiants ont reçu une note égale à %{score}%."
+        zero: "Aucun étudiant n’a reçu une note égale à %{score}%."
+      students_who_scored_in_a_range: 
+        one: "Un étudiant a reçu une note comprise entre %{start} et %{end}%."
+        other: "%{count} étudiants ont reçu une note comprise entre %{start} et %{end}%."
+        zero: "Aucun étudiant n’a reçu une note comprise entre %{start} et %{end}%."
     title: "Statistiques du questionnaire"
     unknown_answer: "Autre chose"
   quizzes: 
@@ -11751,6 +11795,10 @@ fr:
     question_count: 
       one: "1 question"
       other: "%{count} questions"
+    question_limit_reached: |-
+        Vous avez atteint le nombre maximum de questions autorisées pour un questionnaire (%{count}/%{limit}).
+        
+        Pour contourner cette limitation, vous pouvez les répartir dans plusieurs questionnaires.
     quiz: 
       current_filter: "Filtre actuel"
       default_question_input: "[ Sélectionner ]"
@@ -12416,6 +12464,7 @@ fr:
           republish: Republier
           unlock_quiz: "Autoriser les étudiants à compléter ce questionnaire"
           unlock_survey: "Autoriser les étudiants à compléter cette enquête"
+        course_concluded_notice: "Ce questionnaire n’est plus disponible car le cours a été terminé."
         labels: 
           available_until: Jusqu’au
           no_time_limit: "Aucune limite de temps"
@@ -12979,6 +13028,7 @@ fr:
         message_students: "Envoyer un message aux étudiants qui..."
       details: 
         avg_score: "Note moyenne"
+        graded_sub_count: "Envois notés :"
         high_score: "Bonne note"
         low_score: "Note faible"
         no_points: "Aucun point possible"
@@ -12999,6 +13049,7 @@ fr:
       student: 
         select_student: "Sélectionner un étudiant"
     grading: 
+      grade_for: "Note pour : %{name}"
       grading: Notation
       submission_details: "Informations sur l’envoi"
     header: 
@@ -13026,7 +13077,9 @@ fr:
         include_ungraded_assignments: "Considérer les travaux non notés comme ayant la note 0"
         set_group_weights: "Définir les coefficients de groupe"
         show_concluded_enrollments_label: "Afficher les inscriptions terminées"
+        show_total_as_points: "Afficher les totaux sous forme de points dans la page des notes de l’étudiant"
         sis_export: "Publier les notes sur SIS"
+        upload_scores: "Envoyer les notes (.csv)"
       header: 
         global_settings: "Paramètres généraux"
       mastery_toggles_and_actions: 
@@ -14046,6 +14099,7 @@ fr:
       student_groups_leave: Quitter
       student_groups_tabs_everyone: Tous
       student_groups_tabs_groups: Groupes
+      visit: Visiter
     student_groups_filter_description: "Au fur et à mesure que vous remplissez ce champ, la liste des groupes est filtrée automatiquement pour inclure uniquement les noms correspondant aux caractères tapés."
     students_count: 
       one: "1 étudiant"
@@ -14710,6 +14764,7 @@ fr:
       linked_in: "LinkedIn est une ressource d’entrée dans les réseaux professionnels. Bon nombre des relations que vous nouez pendant votre parcours scolaire pourront vous être utiles dans votre vie professionnelle."
       skype: "Skype est un outil gratuit d’appel vocal et vidéo en ligne."
       twitter: "Twitter est un excellent moyen de communication en dehors de la classe."
+      yo: "Yo est un outil de communication à zéro caractère, nécessitant une seule pression."
   users: 
     admin_merge: 
       buttons: 
