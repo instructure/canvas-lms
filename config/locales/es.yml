@@ -60,6 +60,7 @@ es:
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
+      yo: Yo
     ask_canvas_network: "Preguntar a la comunidad Canvas Network"
     default_account_name: "Cuenta Predeterminada"
     default_site_administrator_account_name: "Administrador del Sitio"
@@ -1297,6 +1298,7 @@ es:
   allow_lor_tools: "Permitir a los usuarios ver y utilizar herramientas externas configuradas para LOR."
   allow_opt_out_of_inbox: "Permitir a los usuarios prescindir de la bandeja de entrada de conversaciones. Esto supondrá que todos los mensajes y notificaciones sobre conversaciones se envíen como notificaciones ASAP al correo electrónico principal del usuario. Además se ocultará el símbolo de mensajes no leídos en la bandeja de entrada y también las preferencias de notificación de las conversaciones."
   always_3a59e701: Siempre
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: "Se produjo un error desconocido en el servidor. Inténtelo de nuevo."
   analytics: 
     course: 
       analytics: Análisis
@@ -1362,6 +1364,7 @@ es:
     podcast_feed_description_course: "Cualquier archivo de media desde o integrado en los anuncios en el curso \"%{course}\" aparecerá en este canal."
     podcast_feed_description_group: "Cualquier archivo de media enlazado desde o integrado dentro de los anuncios en el grupo \"%{group}\" aparecerá en este canal."
     podcast_feed_name: "%{course} Canal de Anuncios de Podcast"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Las respuestas se mostrarán tras su último intento"
   application: 
     errors: 
       feed_not_found: "No se pudo encontrar el canal."
@@ -1801,6 +1804,7 @@ es:
     grading_type_selector: 
       display_grade_as: "Mostrar calificación como"
       gpa_scale_explainer: "La calificación de escala GPA se ha diseñado para las escuelas que utilizan una escala de 4,0 (o 5,0/6,0) para todas las tareas. Este esquema de calificaciones es parecido a la calificación por letras pero presenta varias diferencias importantes:"
+      gpa_scale_input_explainer: "Las puntuaciones aparecen en la escala de 4.0. Por ejemplo, si a una tarea se le asignan 100 puntos, un 4.0 corresponderá al 100%, un 3.0 corresponderá a un 87%, etc."
       gpa_scale_letters_explainer: "Las calificaciones por letras se pueden utilizar como complemento a las calificaciones por números."
       gpa_scale_percentage_explainer: "No se pueden dar puntos directamente pero sí porcentajes. Por ejemplo, si una tarea tiene un valor de 50 puntos, no podrá poner \"40\", pero sí \"80%\"."
       gpa_scale_recommendation: "A menos que su centro utilice una escala de 4,0 (o 5,0/6,0) para calificar, Canvas recomienda que utilice la calificación por letras para mostrar la puntuación."
@@ -2165,6 +2169,8 @@ es:
         originality_report_visible_after_due_date: "Después de la fecha de vencimiento"
         originality_report_visible_after_grading: "Después de que la tarea se califique"
         originality_report_visible_immediately: Inmediatamente
+        settings_exclude_fewer_than_count: "Menos de %{wordsInput} palabras"
+        settings_exclude_less_than_percent: "Menos del %{percentInput} del documento"
     undated_assignments: "Tareas sin Fecha"
     upcoming_assignments: "Tareas próximas"
     wizard_box: 
@@ -2469,6 +2475,7 @@ es:
       scheduler_explanation_teacher_paragraph_1: "Esta es la herramienta de planificación. La puede usar para crear grupos de citas para que sus alumnos puedan inscribirse."
       scheduler_explanation_teacher_paragraph_2: "Por ejemplo, digamos que desea repasar una tarea  con cada uno de los alumnos de su curso. Crearía un nuevo grupo de citas, especificaría las fechas y horarios que tiene disponibles, le diría que puede separar ese tiempo en bloques de 15 minutos y asignar a cada estudiante un solo bloque."
       scheduler_explanation_teacher_paragraph_3: "Después, los alumnos recibirían una notificación en la que verán que deben inscribirse en uno de los bloques. Se les mostrará un calendario con los bloques disponibles resaltando sobre el resto de su calendario para que puedan seleccionar la hora que más les convenga."
+      scheduler_explanation_teacher_paragraph_4: "* Empiece ahora mismo haciendo clic en el botón \"Crear una cita de grupo\" que aparece a la derecha. *"
       signed_up_for: "Se ha inscrito en"
       x_groups_have_signed_up: "%{participant_count} grupos se han registrado"
       x_people_have_signed_up: "%{participant_count} personas se han registrado"
@@ -2515,6 +2522,7 @@ es:
         warning: Aviso
     edit_appointment_group: 
       affect_reservations: "¿Cómo afectará esto a las reservas?"
+      appointments_per_participant_label: "Cantidad máxima de citas a las que puede asistir un participante"
       appt_group_options_help1: "Algunas reservas existentes sobrepasan el límite que ha agregado. Estas no serán afectadas, este cambio solo previene que se hagan nuevas reservas."
       appt_group_options_help2: "No obstante, puede eliminar manualmente cualquier reserva existente"
       calendar: Calendario
@@ -2524,6 +2532,8 @@ es:
       group_signup: "Alumnos que se han registrado en grupo."
       location: Ubicación
       name: Nombre
+      participants_per_appointment_label: "Cantidad máxima de usuarios/grupos por cita"
+      slot_duration_label: "Minutos por intervalo"
       time_range: "Intervalo de tiempo"
     edit_appt_calendar_event: 
       description: "Descripción:"
@@ -2964,6 +2974,7 @@ es:
     body: "Su código de verificación de Canvas es %{verification_code}"
     default_facebook_account: "Cuenta de Facebook"
     default_twitter_handle: "Nombre de Twitter"
+    default_yo_name: "Nombre Yo"
   communication_channels: 
     confirm: 
       buttons: 
@@ -4563,6 +4574,7 @@ es:
         status_link: "Importar estado"
         text: "En este momento se están importando uno o varios elementos. Una vez que estén disponibles se mostrarán en el curso que aparece a continuación."
     index: 
+      browse_more_courses: "Explorar más cursos"
       headings: 
         future_enrollments: "Futuras matriculaciones"
         my_courses: "Mis Cursos"
@@ -4622,6 +4634,8 @@ es:
         duplicates_removed: "Se han eliminado algunos duplicados."
         email: "Correo electronico"
         email_field_label: "Introduzca las direcciones de correo electrónico de los usuarios que desea añadir, separadas por comas."
+        email_field_place_holder: "\"Alumno de ejemplo\" <alumno@ejemplo.com>, \"Apellido, Nombre\" <nombreapellido@ejemplo.com>, direccioncualquiera@ejemplo.com"
+        example_formats: "Ejemplos: usuario@ejemplo.com, \"Nombre Apellido\" <usuario@ejemplo.com>, \"Apellido, nombre\" <usuario@ejemplo.com>"
         form_instructions: "Teclee o pegue una lista de direcciones de correo electrónico a continuación:"
         go_back: "Volver a empezar"
         have_been_enrolled: "Se han inscrito los siguientes usuarios"
@@ -5397,6 +5411,7 @@ es:
       new_quiz: "Nueva evaluación"
     edit_crumb: Editar
     edit_view: 
+      add_attachment_93868828: "Agregar adjunto"
       allow_threaded_replies: "Permitir respuestas agrupadas"
       attachment: "Archivo adjunto"
       available_from: "Disponible desde"
@@ -5999,6 +6014,7 @@ es:
         body1: " Puede haber notado en el fondo de esta página una lista de envíos recientes de sus clases (%{showme}). Rápidamente puede agregar envíos a páginas nuevas en su portafolio desde esta página. Sólo haga click en el envío que quiere agregar y un diálogo simple aparecerá. "
         body2: " ¡Excelente! Ahora para terminar de agregar el envío, debe escoger qué sección quiere agregar y darle un nombre a la página. Después de hacer click en \"Agregar Página\" irá a la página nueva para poder editarla y agregarle detalles. "
   error_message_2b9d12ee: "Error: %{message}"
+  error_uploading_file_e2d31b56: "Error al cargar archivo."
   errors: 
     bad_navigation_config: "Configuración inválida de la pestaña del curso"
     blank: Obligatorio
@@ -6250,6 +6266,7 @@ es:
   features: 
     allow_opt_out_of_inbox: "Permitir a los usuarios prescindir de la bandeja de entrada"
     better_file_browsing: "Exploración de archivos mejorada"
+    course_catalog: "Catálogo del curso"
     differentiated_assignments: "Tareas diferenciadas"
     differentiated_assignments_account_disable_warning: "Deshabilitar esta función afectará a los cursos existentes. Para obtener asistencia para deshabilitar esta función, póngase en contacto con su Canvas Success Manager."
     differentiated_assignments_course_disable_warning: "Deshabilitar las tareas diferenciadas provocará que todas las tareas asignadas aparezcan como visibles para todos los alumnos."
@@ -6561,6 +6578,7 @@ es:
     recording_message: Grabando...
     show_all_details_button: "Mostrar todos los detalles"
     student: Estudiante
+    student_index: "Alumno %{index}"
     student_mute_notification: "El instructor está trabajando en las calificaciones"
     titles: 
       click_to_record: "Voz a texto"
@@ -6903,6 +6921,7 @@ es:
         save: Guardar
         save_settings: "Guardar las Configuraciones"
         submit_comment: "Enviar un Comentario"
+      crocodoc_pending: "Crocodoc todavía está procesando este documento."
       gradebook: 
         mute_assignment: "Obviar la Tarea"
         unmute_assignment: "Activar la Tarea"
@@ -7297,14 +7316,17 @@ es:
       group_category_create: 
         allow_self_signup: "Permitir la auto-inscripción"
         cancel: Cancelar
+        create_groups: "Crear %{num_groups} grupos ahora"
         create_groups_manually: "Crearé los grupos manualmente"
         group_set_name: "Nombre del conjunto de grupos"
         group_structure: "Estructura de los grupos"
         leave_group_limit_blank: "Dejar en blanco si no se establece un límite"
+        limit_group_size: "Limitar grupos a %{group_limit} miembros"
         require_same_section: "Hacer obligatorio que los miembros del grupo pertenezcan a la misma sección"
         save: Guardar
         saving: Guardando...
         self_signup: Auto-Inscripción
+        split_into_groups: "Dividir alumnos en %{num_groups} grupos iguales"
       group_category_detail: 
         add_group: "Agregar grupo"
         category_settings: Configuraciones
@@ -7325,6 +7347,7 @@ es:
         group_limit_override: "Si cambia esto reemplazará cualquier límite de grupo establecido individualmente"
         group_set_name: "Nombre del conjunto de grupos"
         leave_group_limit_blank: "Dejar en blanco si no se establece un límite"
+        limit_group_size: "Limitar grupos a %{group_limit} miembros"
         require_same_section: "Hacer obligatorio que los miembros de grupos pertenezcan a la misma sección"
         save: Guardar
         saving: Guardando...
@@ -9875,13 +9898,27 @@ es:
     sub_header: "Encabezado secundario"
   modules: 
     add: 
+      assignment: 
+        add_assignments: "Agregar tareas"
+        loading_assignments: "Cargando tareas..."
+      discussion: 
+        add_topics: "Agregar temas de debate"
+      file: 
+        add_files: "Agregar archivos"
       header: 
         cancel: Cancelar
+        create_header: "Crear encabezado"
       link: 
+        add_link: "Agregar enlace"
         cancel: Cancelar
+      page: 
+        add_pages: "Agregar páginas"
+      quiz: 
+        add_quizzes: "Agregar evaluaciones"
       tool: 
         cancel: Cancelar
     add_item: 
+      add_new_item: "Agregar nuevo elemento"
       assignment: Tarea
       content_page: "Página de Contenido"
       discussion: Debate
@@ -9903,24 +9940,32 @@ es:
         create: Crear
       discussion: 
         cancel: Cancelar
+        create_discussion: "Crear debate"
       file: 
         cancel: Cancelar
         upload: Cargar
       header: 
         cancel: Cancelar
+        create_header: "Crear encabezado"
       link: 
+        add_link: "Agregar enlace"
         cancel: Cancelar
       page: 
         cancel: Cancelar
+        creat_page: "Crear página"
       quiz: 
         cancel: Cancelar
+        create_quiz: "Crear evaluación"
       tool: 
         cancel: Cancelar
     dialog_title: "Agregar elemento a %{moduleName}"
     item: 
       cancel: Cancelar
+      edit_item: "Editar elemento del módulo"
+      item_title: "Título del elemento del módulo"
       points_possible: pts
       save: Guardar
+      saving: guardando...
     module: 
       header: 
         delete: Eliminar
@@ -9935,7 +9980,10 @@ es:
     module_edit: 
       Create: Crear
       cancel: Cancelar
+      has_unlock_date: "Bloquear módulos hasta una fecha determinada"
+      lock_datea: "Bloquear fecha"
       module_name: "Nombre del módulo"
+      new_module: "Crear nuevo módulo"
     module_item_view: 
       button: 
         delete: Borrar
@@ -9998,6 +10046,7 @@ es:
     sure_you_want_to_mute: "¿Está seguro que quiere obviar esta tarea? Mientras esta tarea está obviada, los estudiantes no recibirán nuevas notificaciones acerca o podrá ver:"
   name: "Importador de Academic Benchmark"
   new_facebook_message: "Tiene un mensaje nuevo de Canvas"
+  new_quiz_statistics_desc: "Habilitar la nueva página de estadísticas de evaluaciones para un curso,"
   new_styles_description: "Estamos trabajando en un lavado total de cara en Canvas. Habilite esta opción si desea participar en la visualización del aspecto actualizado y simplificado de la interfaz de Canvas. Esta función hace referencia a un trabajo muy \"en progreso\" y no se debería habilitar todavía para producción con los usuarios reales."
   no_e16d9132: "No"
   no_migration_file: "Archivo obligatorio para la migración de contenido."
@@ -10212,6 +10261,8 @@ es:
         display: "Número de Telefono Celular"
       twitter: 
         display: Twitter
+      yo: 
+        display: Yo
     frequencies: 
       daily: Diariamente
       immediately: "Lo antes posible"
@@ -10537,6 +10588,7 @@ es:
       labels: 
         api_key: "Clave API de Crocodoc"
     diigo: 
+      description: "Integración con Diigo"
       name: Diigo
     diigo_settings: 
       labels: 
@@ -10723,7 +10775,12 @@ es:
       settings_updated: "Configuraciones del complemento actualizado con éxito."
     panda_pub_settings: 
       labels: 
+        application_id: "ID de la aplicación"
         base_url: "URL base"
+        key_id: "ID clave"
+        key_secret: "Secreto de la clave"
+    pandapub: 
+      name: PandaPub
     qti_converter_settings: 
       labels: 
         enabled: Activado
@@ -10796,6 +10853,9 @@ es:
         domain: Dominio
         password: Contraseña
         username: "Nombre de Usuario"
+    yo: 
+      description: "Solo Yo"
+      name: Yo
   polling: 
     poll_sessions: 
       errors: 
@@ -10965,6 +11025,7 @@ es:
         token_last_used: "Usado por última vez"
         token_purpose: Propósito
         user_name: "Nombre de Usuario"
+        yo_name: "Nombre Yo"
       linkedin_description: " LinkedIn es un buen recurso para las redes de negocios, y puede ser muy útil después de que ha terminado su educación. Si tiene una cuenta de LinkedIn, puede registrarla aquí. Entonces después de permitir que los miembros con los que comparte cursos/grupos vean sus servicios registrados, fácilmente pueden invitarlo para enlazarse con ellos sin tener que buscar su perfil en LinkedIn. "
       links: 
         add_account: "Agregar Cuenta"
@@ -10984,6 +11045,7 @@ es:
         upload_new_image: "Cargar una nueva Imagen"
         view_facebook_app: "ver la aplicación de Facebook"
         view_your_profile: "ver su perfil"
+        yo: Yo
       loading_token_details: "Cargando los Detalles del Componente Léxico..."
       no_approved_integrations: "Aplicaciones de terceros pueden pedir permiso para tener acceso al sitio Canvas por su parte. Al autorizar aplicaciones, las verá listadas aquí. "
       no_language_preference: "Predeterminado del Sistema (%{language})"
@@ -11090,6 +11152,8 @@ es:
       validations: 
         should_be_10_digits: "debería ser un número de 10 dígitos"
     ways_to_contact_me: "Formas para contactarme"
+    yo_select: 
+      yo: Yo
     you_have_no_services: "No ha registrado ningún servicio, puede agregarlos en la página de *configuraciones*"
   profiles: 
     avatar_dialog: 
