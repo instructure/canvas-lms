@@ -123,3 +123,4 @@ define [
             currentFolder: @props.currentFolder
             params: @props.params
             query: @props.query
+

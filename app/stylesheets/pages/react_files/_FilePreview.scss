@@ -27,17 +27,20 @@ $preview-header-height: 70px;
 // Since this was a slightly complex layout I've separated this into
 // it's on area in the stylesheet to help break it out
 
+.ef-file-arrow_container {
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
 .ef-file-preview-overlay {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
-
 .ef-file-preview-stretch {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 /// Second container: Image/Info Area
@@ -54,15 +57,11 @@ $preview-header-height: 70px;
 .ef-file-preview-viewer-content {
   text-align: center;
 }
-.ef-file-preview-content {
-  display: flex;
-  flex: 1;
-  justify-content: center;
-}
 
 /// __File Preview Header
 ////////////////////////////////
 .ef-file-preview-header {
+  height: 70px;
   color: $preview-font-color;  
   font-weight: 300; 
   flex: 0 0 $preview-header-height;
@@ -70,6 +69,8 @@ $preview-header-height: 70px;
   align-items: center;
   box-sizing: border-box;
   * { box-sizing: border-box; }
+  border-bottom: 1px solid $preview-border-color;
+  background-color: $preview-bg;
 }
 .ef-file-preview-header-filename {
   font-size: 18px;
@@ -78,10 +79,9 @@ $preview-header-height: 70px;
   margin: 0;
   flex: 1 0 264px;
   height: $preview-header-height;
-  border-bottom: 1px solid $preview-border-color;
   display: flex;
   align-items: center;
-  background-color: $preview-bg;
+  border-bottom: 1px solid $preview-border-color;
 }
 
 .ef-file-preview-viewer-content {
@@ -101,6 +101,8 @@ $preview-header-height: 70px;
 .ef-file-preview-header-buttons {
   display: flex;
   height: $preview-header-height;
+  justify-content: flex-end;
+  border-bottom: 1px solid $preview-border-color;
 }
 
 .ef-file-preview-button {
@@ -110,7 +112,6 @@ $preview-header-height: 70px;
   padding: 0 12px;
   font-size: 14px;
   border: none;
-  border-bottom: 1px solid $preview-border-color;
   text-align: center;
   display: flex;
   align-items: center;
@@ -177,7 +178,14 @@ $preview-header-height: 70px;
 }
 
 .ef-file-preview-viewer-content {
-  .ef-file-preview-not-available { padding: 100px 0; }
+  .ef-file-preview-not-available {
+    padding: 100px 0;
+  }
+}
+.ef-file-preview-frame {
+  flex: 1 1 auto;
+  border: none;
+  height: 100%; // IE fix for main container height
 }
 
 .ef-file-preview-frame { border: none; }
@@ -258,6 +266,7 @@ $preview-header-height: 70px;
   list-style-type: none;
   white-space: nowrap;
   overflow-x: auto;
+  overflow-y: hidden;
   margin: 0;
   padding: 0;
   width: 100%;

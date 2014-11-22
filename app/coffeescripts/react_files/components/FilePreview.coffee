@@ -36,7 +36,7 @@ define [
 
     componentWillMount: ->
       items = @getItemsToView(@props)
-      @setState @stateProperties(items, @props)
+      @setState @stateProperties(items, @props), @scrollFooterToItem
 
     componentDidMount: ->
       $('.ReactModal__Overlay').on 'keydown', @handleKeyboardNavigation
@@ -147,7 +147,7 @@ define [
         @state.otherItems[goToItemIndex]
       if (@state.otherItemsString)
         @props.params.only_preview = @state.otherItemsString
-      div {className: 'ef-file-align-center'},
+      div {className: 'col-xs-1 ef-file-arrow_container'},
         ReactRouter.Link {
           to: @getRouteIdentifier()
           query: (@getNavigationParams(id: goToItem.id) if goToItem)
@@ -213,23 +213,20 @@ define [
 
 
           div {className: 'ef-file-preview-stretch'},
-            div {className: 'ef-file-preview-content'},
-              # We need to render out the left/right arrows
-              @renderArrowLink('left') if @state.otherItems?.length > 0
-              if @state.displayedItem
-                div {className: 'ef-file-preview-viewer-content'},
-                  #TODO - we need to figure out how to make this full height
-                  iframe {
-                    src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
-                    className: 'ef-file-preview-frame'
-                  }
-              @renderArrowLink('right') if @state.otherItems?.length > 0
+            # We need to render out the left/right arrows
+            @renderArrowLink('left') if @state.otherItems?.length > 0
+            if @state.displayedItem
+              iframe {
+                src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
+                className: 'ef-file-preview-frame'
+              }
+            @renderArrowLink('right') if @state.otherItems?.length > 0
 
-              if @state.showInfoPanel
-                FilePreviewInfoPanel
-                  displayedItem: @state.displayedItem
-                  getStatusMessage: @getStatusMessage
+            if @state.showInfoPanel
+              FilePreviewInfoPanel
+                displayedItem: @state.displayedItem
 
+                getStatusMessage: @getStatusMessage
           div {className: 'ef-file-preview-footer'},
             if @state.showFooterBtn
               button {
