@@ -1922,7 +1922,7 @@ nl:
       one: "1 opdracht"
       other: "%{count} opdrachten"
     other_assignments: "Andere opdrachten"
-    overdue_assignments: "Achterstalige opdrachten"
+    overdue_assignments: "Achterstallige opdrachten/Opdrachten die nog uitgevoerd moeten worden"
     past_assignments: "Oude opdrachten"
     peer_review_assignment: 
       titles: 
@@ -2162,8 +2162,8 @@ nl:
         originality_report_visible_after_due_date: "Na de inleverdatum"
         originality_report_visible_after_grading: "Na het beoordelen van de opdracht"
         originality_report_visible_immediately: Onmiddellijk
-    undated_assignments: "Ongedateerde opdrachten"
-    upcoming_assignments: "Aankomende opdrachten"
+    undated_assignments: "Ongedateerde opdrachten/Opdrachten zonder datum"
+    upcoming_assignments: "Aankomende opdrachten/Eerstvolgende opdrachten"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: De opdracht verwijderen"
@@ -4054,7 +4054,7 @@ nl:
       sent: Verzonden
       settings: Instellingen
       starred: "Met ster"
-      submission_comments: "Reacties op inzendingen"
+      submission_comments: "Reacties op inzendingen/Reacties op inzending"
       titles: 
         conversations: Gesprekken
       unread: Ongelezen
@@ -4134,7 +4134,7 @@ nl:
     star: Ster
     star_conversation: "Gesprek met ster"
     submission_comment_form_dialog: 
-      body: Inhoud
+      body: Inhoud/(Hoofd)tekst
     titles: 
       rss_feed: "Discussies feed"
     unarchive: "Uit het archief halen"
@@ -4144,8 +4144,8 @@ nl:
   correct_answer: "Dit is het juiste antwoord."
   correct_answers_are_available_until_date_df01cc5f: "Juiste antwoorden zijn beschikbaar tot %{date}"
   correct_answers_are_hidden_5d0a0009: "Juiste antwoorden zijn verborgen."
-  correct_answers_are_no_longer_available_c67dfc28: "De juiste antwoorden ziin niet meer beschikbaar."
-  correct_answers_will_be_available_from_to_5762e8c6: "De juiste antwoorden zullen beschikbaar zijn %{from} - %{to}."
+  correct_answers_are_no_longer_available_c67dfc28: "(De) juiste antwoorden zijn niet meer/langer beschikbaar."
+  correct_answers_will_be_available_from_to_5762e8c6: "(De) juiste antwoorden zullen beschikbaar zijn %{from} - %{to}."
   correct_answers_will_be_available_on_date_48137: "Juiste antwoorden zullen beschikbaar zijn op %{date}."
   count_minutes_a6eeeacb: 
     one: "1 minuut"
@@ -4500,7 +4500,7 @@ nl:
           bookmark: "De koppeling kopieëren of deze aan de bladwijzer toevoegen"
     description: 
       links: 
-        join_course: "Deze cursus volgen"
+        join_course: "Deze cursus volgen/Deelnemen aan deze cursus"
     edit_profile: 
       about: Over
       about_related_id: "gedeelde id gebruikt om gerelateerde cursussen/secties te linken"
@@ -5211,7 +5211,7 @@ nl:
   default_conference_title: "%{course_name}-vergadering"
   default_question_name: Vraag
   default_question_text: "Tekst van de vraag"
-  delete_quiz_142b8099: "Verwijder toets"
+  delete_quiz_142b8099: "Toets verwijderen"
   delete_survey_56fddbbd: "Enquête verwijderen"
   demos: 
     _register: 
@@ -5634,7 +5634,7 @@ nl:
     no_due_date: "inleverdatum: geen inleverdatum"
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Converter"
-  edit_quiz_ededddd8: "Bewerk toets"
+  edit_quiz_ededddd8: "Toets bewerken"
   edit_rubric: 
     buttons: 
       create_rubric: "Rubric maken"
@@ -5672,7 +5672,7 @@ nl:
     image_not_found: "Afbeelding niet gevonden, probeer een nieuwe URL"
     instructions: "De URL van de afbeelding die je wilt insluiten plakken of typen:"
     keyboard_shortcuts: 
-      dialog_title: Sneltoetsen
+      dialog_title: Sneltoetsen/Snelkoppelingen
       keybindings: 
         open_dialog: "Deze hulpdialoog openen"
         open_toolbar: "Werkbalk voor editor openen"
@@ -6308,7 +6308,7 @@ nl:
     rename_title: Kopiëren
     replace: Vervangen
   file_status: 
-    hidden_status: "Verborgen. Beschikbaar door koppeling "
+    hidden_status: "Verborgen. Beschikbaar door koppeling/Beschikbaar met een koppeling "
     published_status: Gepubliceerd
     restricted_status: "Beschikbaar van %{from_date} tot en met %{until_date}"
     unpublished_status: "Publicatie ongedaan gemaakt"
@@ -6476,7 +6476,7 @@ nl:
     upload_error: "Er is een fout opgetreden tijdens het uploaden van jouw bestand"
     warnings: 
       file_uploaded_without_response: "Bestand kan geüpload zijn, maar de server reageert niet. De pagina opnieuw laden om te bevestigen."
-  fill_in_the_blank_read_surrounding_text_1a6c73c7: "Lege velden invullen, omliggende tekst lezen"
+  fill_in_the_blank_read_surrounding_text_1a6c73c7: "Lege velden invullen, omliggende tekst lezen/tekst eromheen lezen"
   find_flickr_image_view: 
     find_cc_on_flickr: "Creative Commons-afbeeldingen op Flickr zoeken"
     search: Zoeken
@@ -9915,12 +9915,12 @@ nl:
         cancel: Annuleren
     add_item: 
       assignment: Opdracht
-      content_page: Inhoudspagina
+      content_page: "Inhoudspagina/inhoudsopgave/tabblad inhoud"
       discussion: Discussie
-      external_tool: "Extern tool"
+      external_tool: "Externe tool"
       external_url: "Externe URL"
       file: Bestand
-      page: Inhoudspagina
+      page: "Inhoudspagina/inhoudsopgave/tabblad inhoud"
       quiz: Toets
       text_header: Koptekst
     add_module_item_dialog: 
@@ -9932,7 +9932,7 @@ nl:
     create: 
       assignment: 
         cancel: Annuleren
-        create: Maken
+        create: (aan)Maken
       discussion: 
         cancel: Annuleren
       file: 
@@ -9956,7 +9956,7 @@ nl:
     module: 
       header: 
         delete: Verwijderen
-        drag_to_reorder: "Slepen om modules opnieuw te ordenen"
+        drag_to_reorder: "Slepen om modules opnieuw te ordenen/Slepen om volgorde van modules te wijzigen"
         edit: Bewerken
     module_collection_view: 
       button: 
@@ -9965,9 +9965,9 @@ nl:
       header: 
         module: Module
     module_edit: 
-      Create: Maken
+      Create: (aan)Maken
       cancel: Annuleren
-      module_name: Modulenaam
+      module_name: "Modulenaam/Naam van module"
     module_item_view: 
       button: 
         delete: Verwijderen
@@ -10033,8 +10033,8 @@ nl:
   new_styles_description: "We zijn bezig met de Canvas gebruikersinterface een facelift te geven. Dit inschakelen om de bijgewerkte, simpeler vormgeving en stijl van de Canvas gebruikersinterface te kunnen zien. Dit is een \"Work in Progress\" functie en moet nog niet ingeschakeld worden voor huidige gebruikers. "
   no_e16d9132: Nee
   no_migration_file: "Bestand nodig om inhoud te migreren."
-  no_students_have_taken_the_quiz_yet_e667644b: "Geen enkele cursist heeft de toets nog gemaakt"
-  no_students_have_taken_the_survey_yet_d378cd35: "Geen enkele cursist heeft de enquête nog ingevuld"
+  no_students_have_taken_the_quiz_yet_e667644b: "Geen enkele cursist heeft de toets nog gemaakt/De toets is nog door geen enkele cursist gemaakt"
+  no_students_have_taken_the_survey_yet_d378cd35: "Geen enkele cursist heeft de enquête nog ingevuld/De enquête is nog door geen enkele cursist ingevuld"
   not_a_number: "moet een positief getal zijn"
   notification: 
     added_to_conversation_description: "Je bent aan een gesprek  toegevoegd"
@@ -11427,16 +11427,16 @@ nl:
       update_question_without_regrading: "Vraag bijwerken zonder opnieuw te beoordelen"
   quiz_reports: 
     generatable: "Rapport was nooit gegenereerd."
-    generating: "Rapport wordt gegenereerd..."
+    generating: "Rapport wordt gegenereerd.../Bezig met genereren van rapport"
     quiz_report_generator: 
       download_report_name: "Downloaden %{report_name}"
       generate_report_name: "Genereren %{report_name}"
       generated_at_date_time: "%{dateAndTime} gegenereerd"
       generating_report_name: "%{report_name} Bezig met genereren..."
       item_analysis_not_available: "Analyse van item is niet voor enquêtes beschikbaar"
-  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten. "
-  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten totdat zij hun laatste poging hebben ingeleverd."
-  quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Toetsresultaten zijn voor deze toets beveiligd en kunnen meteen na inzending eenmalig bekeken worden."
+  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten/ Voor deze toets zijn (de)toetsresultaten beveiligd en voor cursisten niet zichtbaar. "
+  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten totdat zij hun laatste poging hebben ingeleverd./Voor deze toets zijn (de) toetsresultaten beveiligd en  voor cursisten pas zichtbaar als zij hun laatste poging hebben ingeleverd."
+  quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Toetsresultaten zijn voor deze toets beveiligd en kunnen meteen na inzending eenmalig bekeken worden/. Voor deze toets zijn (de) toetsresultaten beveiligd en kunnen meteen na inzending van de toets eenmalig bekeken worden."
   quiz_statistics: 
     answer_bars_chart: 
       response_count: 
@@ -11447,7 +11447,7 @@ nl:
     correct_multiple_response_ratio: "%{ratio}% hebben juist beantwoord."
     correct_response_ratio: "%{ratio}% van jouw cursisten hebben deze vraag juist beantwoord."
     discrimination_index: 
-      discrimination_index_dialog_title: "De disciminatie index grafiek"
+      discrimination_index_dialog_title: "De disciminatie indexgrafiek"
     download_submissions: "Alle bestanden downloaden"
     duration_in_minutes: 
       one: "%{count} minuten"
@@ -12068,7 +12068,7 @@ nl:
         score_to_keep: "Te behouden toetsscore"
         show_correct_answers: "Cursisten toestaan om de juiste antwoorden te bekijken"
         show_correct_answers_at: "Juiste antwoorden tonen op"
-        show_correct_answers_last_attempt: "Alleen na zijn/haar laatste poging"
+        show_correct_answers_last_attempt: "Alleen na zijn/haar laatste poging/Alleen na hun laatste poging"
         shuffle_answers: "Volgorde van antwoorden wisselen"
         students_cannot_view_responses_after_course_concludes: "Cursisten kunnen toetsantwoorden na het sluiten van cursus niet bekijken"
         time_limit: "Hoeveel minuten?"
@@ -12829,7 +12829,7 @@ nl:
     assignment_information: 
       actions: 
         curve_grades: "Cijfers bijstellen"
-        message_students: "Bericht sturen naar cursisten die..."
+        message_students: "Bericht sturen naar cursisten die.../Bericht naar cursisten sturen die....."
       details: 
         avg_score: "Gemiddelde score"
         high_score: "Hoogste score"
@@ -12852,13 +12852,13 @@ nl:
       low_score: "Laagste score"
     screenreader_gradebook: 
       assignments: Opdrachten
-      learning_mastery: "Bekwaam leren"
+      learning_mastery: "Bekwaam leren/leren beheersen????"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Download scores (.csv)"
-        grading_history: "Cijfergeschiedenis bekijken"
+        download_scores: "Scores (.csv) downloaden"
+        grading_history: "Cijfergeschiedenis/Historie van het cijfer bekijken"
         hide_student_names_label: "Namen van cursisten verbergen"
-        include_ungraded_assignments: "Behandel opdrachten die niet beoordeeld zijn als een 0"
+        include_ungraded_assignments: "Opdrachten die niet beoordeeld zijn behandelen als een 0"
         set_group_weights: "Groepswegingen instellen"
         show_concluded_enrollments_label: "Voltooide inschrijvingen tonen"
         sis_export: "Cijfers publiceren in SIS"
@@ -12878,7 +12878,7 @@ nl:
       titles: 
         all_courses: "Alle cursussen"
     all_courses_inner: 
-      join_course: "Deze cursus volgen"
+      join_course: "Deze cursus volgen/Deelnemen aan deze cursus"
       next: Volgende
       previous: Vorige
     course_sections: Cursussecties
@@ -13849,14 +13849,14 @@ nl:
     group_leave: "heeft group %{group_name} verlaten"
     group_name: "%{group_name} in %{group_category}"
     new_group: 
-      group_explanation: "Groepen zijn een goede plek om samen  aan projecten te werken of om schema's voor studiesessies en dergelijke uit te zoeken. Elke groep krijgt een kalender, een wiki, discussies en een beetje ruimte om bestanden op te slaan. Groepen kunnen samenwerken aan documenten of  zelfs webvergaderingen plannen. Het is echt als een mini-cursus waar je met een kleiner aantal cursisten aan een meer gericht project kunt werken."
-      joining: Deelnemen
+      group_explanation: "Groepen zijn een goede plek om samen  aan projecten te werken of om schema's voor studiesessies en dergelijke uit te zoeken. Elke groep krijgt een kalender, een wiki, discussies en een beetje ruimte om bestanden op te slaan. Groepen kunnen samenwerken aan documenten of  zelfs webvergaderingen plannen. Het is echt als een mini-cursus waar je met een kleiner aantal cursisten aan een meer gericht/gerichter project kunt werken."
+      joining: Deelnemen/Volgen
       name: Groepsnaam
     search_groups_placeholder: "Groepen of personen zoeken"
     student_groups: 
       full: Vol
       group: Groep
-      student_groups_join: Deelnemen
+      student_groups_join: Deelnemen/Volgen
       student_groups_tabs_everyone: Iedereen
       student_groups_tabs_groups: Groepen
     student_groups_filter_description: "Als je in dit veld typt zal de lijst met groepen automatisch gefilterd worden om alleen namen te bevatten van diegenen waarvan de namen met jouw invoer overeenkomen."
@@ -14053,7 +14053,7 @@ nl:
       curriculum_assessment_errata_description: "Reeds gerapporteerde beoordelings- en curriculumfouten bekijken. Zoeken op \"errata\"."
       networking_academy_description: "Het bekijken van Cisco-antwoorden op de meest gestelde vragen."
       networking_academy_faqs: "Networking Academy-FAQs"
-  syllabus: Cursussyllabus
+  syllabus: "Cursus syllabus/Syllabus van cursus"
   table_headings: 
     name: Naam
     total: Totaal
@@ -15037,7 +15037,7 @@ nl:
     external_urls: 
       archive: Archief
       archive_link: "Archief bekijken"
-  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Je hebt wijzigingen in de vragen van deze toets aangebracht.* Deze wijzigingen zullen voor cursisten pas verschijnen als je de toets hebt opgeslagen."
+  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Je hebt wijzigingen aangebracht  in de vragen van deze toets .* Deze wijzigingen zullen voor cursisten pas verschijnen als je de toets hebt opgeslagen."
   you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Je hebt wijzigingen in deze toets niet opgeslagen.*Deze wijzigingen zullen voor cursisten pas verschijnen als je de toets publiceert of opnieuw publiceert."
   zero_activity_title: "Geen activiteit"
   zip_argument_error: "Voor het uploaden van een zipbestand is een map nodig om te uploaden naar."
