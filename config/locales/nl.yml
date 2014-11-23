@@ -5675,7 +5675,7 @@ nl:
       dialog_title: Sneltoetsen/Snelkoppelingen
       keybindings: 
         open_dialog: "Deze hulpdialoog openen"
-        open_toolbar: "Werkbalk voor editor openen"
+        open_toolbar: "Werkbalk voor de editor openen"
     loading: "Bezig met laden..."
     mathjax_text_entry_field_label: "Voer de vergelijking in als LaTeX."
     more_external_tools: "Meerdere externe hulpprogrammas"
@@ -11163,7 +11163,7 @@ nl:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest verzonden naar IdP"
-      logout_response_redirect_from_idp: "LogoutReponse ontvangen van IdP"
+      logout_response_redirect_from_idp: "LogoutResponse ontvangen van IdP/Ontvangen LogoutResponse van IdP"
       redirect_from_idp: "LoginResponse ontvangen van IdP"
     default_app_name: "Applicatie van derden"
     errors: 
@@ -11434,8 +11434,8 @@ nl:
       generated_at_date_time: "%{dateAndTime} gegenereerd"
       generating_report_name: "%{report_name} Bezig met genereren..."
       item_analysis_not_available: "Analyse van item is niet voor enquêtes beschikbaar"
-  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten/ Voor deze toets zijn (de)toetsresultaten beveiligd en voor cursisten niet zichtbaar. "
-  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten totdat zij hun laatste poging hebben ingeleverd./Voor deze toets zijn (de) toetsresultaten beveiligd en  voor cursisten pas zichtbaar als zij hun laatste poging hebben ingeleverd."
+  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Toetsresultaten zijn voor deze toets beveiligd en niet zichtbaar voor cursisten/ Voor deze toets zijn (de)toetsresultaten beveiligd en voor cursisten niet zichtbaar. "
+  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Toetsresultaten zijn voor deze toets beveiligd en niet zichtbaar voor cursisten totdat zij hun laatste poging hebben ingeleverd./Voor deze toets zijn (de) toetsresultaten beveiligd en  voor cursisten pas zichtbaar als zij hun laatste poging hebben ingeleverd."
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Toetsresultaten zijn voor deze toets beveiligd en kunnen meteen na inzending eenmalig bekeken worden/. Voor deze toets zijn (de) toetsresultaten beveiligd en kunnen meteen na inzending van de toets eenmalig bekeken worden."
   quiz_statistics: 
     answer_bars_chart: 
@@ -13850,11 +13850,13 @@ nl:
     group_name: "%{group_name} in %{group_category}"
     new_group: 
       group_explanation: "Groepen zijn een goede plek om samen  aan projecten te werken of om schema's voor studiesessies en dergelijke uit te zoeken. Elke groep krijgt een kalender, een wiki, discussies en een beetje ruimte om bestanden op te slaan. Groepen kunnen samenwerken aan documenten of  zelfs webvergaderingen plannen. Het is echt als een mini-cursus waar je met een kleiner aantal cursisten aan een meer gericht/gerichter project kunt werken."
-      joining: Deelnemen/Volgen
+      joining: |-
+          Deelnemen/Volgen
+          Aan het deelnemen/aan het volgen
       name: Groepsnaam
     search_groups_placeholder: "Groepen of personen zoeken"
     student_groups: 
-      full: Vol
+      full: Vol/volledig
       group: Groep
       student_groups_join: Deelnemen/Volgen
       student_groups_tabs_everyone: Iedereen
