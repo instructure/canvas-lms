@@ -1370,7 +1370,7 @@ pt-BR:
     podcast_feed_description_course: "Qualquer arquivo de mídia com link nos anúncios no curso \"%{course}\" (ou incorporado nestes) aparecerá neste feed."
     podcast_feed_description_group: "Qualquer arquivo de mídia com link nos anúncios no grupo \"%{group}\" (ou incorporado nestes) aparecerá neste feed."
     podcast_feed_name: "%{course} Feed Podcast dos anúncios"
-  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "As respostas serão mostrados após a última tentativa"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "As respostas serão mostradas após a última tentativa"
   application: 
     errors: 
       feed_not_found: "Não foi possível encontrar o feed."
@@ -2528,7 +2528,7 @@ pt-BR:
         warning: Aviso
     edit_appointment_group: 
       affect_reservations: "Como isto afetará as reservas?"
-      appointments_per_participant_label: "O número máximo de nomeações participante pode participar"
+      appointments_per_participant_label: "O número máximo de compromissos dos quais um participante pode participar"
       appt_group_options_help1: "Algumas reservas existentes estão acima do limite que você adicionou. Elas não serão afetadas, esta alteração somente previne que novas reservas sejam feitas."
       appt_group_options_help2: "No entanto, você pode remover manualmente qualquer reserva existente"
       calendar: Calendário
@@ -2538,7 +2538,7 @@ pt-BR:
       group_signup: "Peça aos alunos para entrarem nos grupos."
       location: Local
       name: Nome
-      participants_per_appointment_label: "Usuários/grupos máx. por nomeação"
+      participants_per_appointment_label: "Usuários/grupos máx. por compromisso"
       slot_duration_label: "Minutos por slot"
       time_range: "Intervalo de tempo"
     edit_appt_calendar_event: 
@@ -2993,7 +2993,7 @@ pt-BR:
     body: "Seu código de verificação Canvas é  %{verification_code}"
     default_facebook_account: "Conta no Facebook"
     default_twitter_handle: "Nome do usuário (handle) do Twitter"
-    default_yo_name: "Nome Yo"
+    default_yo_name: "Seu nome"
   communication_channels: 
     confirm: 
       buttons: 
@@ -4597,7 +4597,7 @@ pt-BR:
         status_link: "Importar status"
         text: "Um ou mais itens estão atualmente sendo importados. Eles serão mostrados no curso abaixo assim que estiverem disponíveis."
     index: 
-      browse_more_courses: "Consulte mais cursos"
+      browse_more_courses: "Consultar mais cursos"
       headings: 
         future_enrollments: "Inscrições futuras"
         my_courses: "Meus cursos"
@@ -4657,7 +4657,7 @@ pt-BR:
         duplicates_removed: "Algumas duplicações foram removidas."
         email: Email
         email_field_label: "Insira os endereços de email dos usuários que você gostaria de adicionar, separados por vírgulas"
-        email_field_place_holder: "\"Exemplo Estudante\" <student@example.com>, \"Sobrenome, Nome\" <firstlast@example.com>, justAnEmailAddress@example.com"
+        email_field_place_holder: "\"Exemplo Estudante\" <estudante@exemplo.com>, \"Sobrenome, Nome\" <nomesobrenome@exemplo.com>, apenasUmEndereçodeEmail@exemplo.com"
         example_formats: "Exemplos: user@example.com, \"Nome Sobrenome\" <user@example.com>, \"Sobrenome, Nome\" <user@example.com>"
         form_instructions: "Digite ou cole a lista de endereços de e-mail abaixo:"
         go_back: Reiniciar
@@ -10663,7 +10663,7 @@ pt-BR:
       description: |-
           Você terá que registrar um [novo app no Diigo](%{diigo_url}).
           
-          * Depois de salvar seu aplicativo, anote a chave do API
+          * Depois de salvar seu aplicativo, anote a chave API
       labels: 
         api_key: "Chave API"
     dim_dim_settings: 
