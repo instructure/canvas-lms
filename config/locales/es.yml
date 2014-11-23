@@ -10856,6 +10856,9 @@ es:
     yo: 
       description: "Solo Yo"
       name: Yo
+    yo_settings: 
+      labels: 
+        api_token: "Token de API"
   polling: 
     poll_sessions: 
       errors: 
@@ -10955,6 +10958,7 @@ es:
         register_linkedin_account: "Registrar su Cuenta de LinkedIn"
         save_login: "Guardar Inicio de Sesión"
         save_skype_name: "Guardar Nombre de Skype"
+        save_yo_name: "Guardar nombre de Yo"
         select_image: "Seleccionar Imagen"
         update_settings: "Actualizar Configuraciones"
       confirm_email_instructions: "Antes de poder editar su perfil, es necesario que verifique su correo electrónico (%{email}) haciendo clic en el enlace del correo que le enviamos. Si no lo ve, *haga clic en renviar correo*, y asegúrese de revisar su bandeja de spam."
@@ -10991,6 +10995,7 @@ es:
         users_profile: "Perfil de %{user}"
         ways_to_log_in: "Manera para Iniciar la Sesión"
         web_services: "Servicios en línea"
+        yo_login: "Nombre de usuario de Yo"
       hints: 
         expires_at: "dejar en blanco para que no expire"
         language: "Esto anulará las configuraciones de cualquier navegador o cuenta."
@@ -11061,6 +11066,7 @@ es:
         authorize_google_docs: "Autorizar Google Docs"
         authorize_linkedin: "Autorizar LinkedIn"
         authorize_twitter: "Autorizar Twitter"
+        authorize_yo: "Nombre de usuario de Yo"
         click_to_change_profile_pic: "Haga click para cambiar su foto de perfil"
         delicious_login: "Inicio de Sesión de Delicious"
         diigo_login: "Inicio de sesión en Diigo"
@@ -11076,6 +11082,12 @@ es:
           yourself, and won't appear in your public stream.
       unknown_service: Desconocido
       web_services: "Canvas puede hacer su vida más fácil al unirse con las herramientas en línea que ya usa. Haga click en cualquiera de los servicios en \"Otros Servicios\" para ver lo que queremos decir. "
+      yo_description: |-
+          Yo es una herramienta de comunicación de cero caracteres y un solo punteo.
+          Si posee una cuenta Yo, puede registrarla aquí. Así, si permite
+          a sus compañeros de curso o de grupo ver sus servicios registrados, podrán conectarse fácilmente con su cuenta Yo.
+          
+          También puede inscribirse para recibir las notificaciones que se envíen a su cuenta Yo.
     purpose_required: "Es obligatorio escribir un motivo"
     resending: renviando...
     secondary_nav: 
@@ -11195,7 +11207,9 @@ es:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "Solicitud de cierre de sesión enviada a IdP"
+      logout_request_redirect_from_idp: "LogoutRequest recibido de IdP"
       logout_response_redirect_from_idp: "Se ha recibido una respuesta de cierre de sesión de IdP"
+      logout_response_redirect_to_idp: "Enviando LogoutResponse a IdP"
       redirect_from_idp: "Se ha recibido una respuesta de inicio de sesión de IdP"
     default_app_name: "Aplicación externa"
     errors: 
@@ -11453,8 +11467,18 @@ es:
       some_scores_reduced: "Solo conceder puntos a la respuesta correcta (*las puntuaciones de algunos estudiantes serán menores*)"
       update_question_without_regrading: "Actualizar pregunta sin cambio de calificación"
   quiz_reports: 
+    download_item_analysis: "Descargar Informe de análisis de elementos."
+    download_student_analysis: "Descargar infome de análisis de alumnos."
     generatable: "Nunca se ha generado el informe."
+    generate_item_analysis_report: "Generar informe de análisis de elementos."
+    generate_student_analysis_report: "Generar informe de análisis de alumnos."
+    generated_at: "Generado: %{date}"
     generating: "Se está generando el informe..."
+    generation_almost_done: "Casi terminado."
+    generation_complete: "Se ha generado el informe."
+    generation_halfway: "Queda menos de la mitad"
+    generation_started: "Se está generando el informe."
+    non_generatable_report_notice: "No se puede generar un informe para las evaluaciones de encuestas."
     quiz_report_generator: 
       download_report_name: "Descargar %{report_name}"
       generate_report_name: "Generar %{report_name}"
@@ -11466,31 +11490,82 @@ es:
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Los resultados de la evaluación están protegidos en este caso y se pueden ver una sola vez justo después del envío."
   quiz_statistics: 
     answer_bars_chart: 
+      audible_answer_position: "Respuesta %{position}:"
+      audible_answer_response_count: 
+        one: "Una respuesta."
+        other: "%{count} respuestas."
+        zero: "Ninguna respuesta."
+      audible_correct_answer_indicator: "Esta respuesta es correcta."
+      audible_description: "La tabla incluye todas las respuestas a la pregunta junto con el número de respuestas que han recibido."
       response_count: 
-        one: "%{count} alumnos"
+        one: "1 alumno"
         other: "%{count} alumnos"
+        zero: Nadie
+    answer_details: 
+      hide: "Ocultar los datos de la respuesta"
+      hide_all: "Ocultar los datos de la respuesta en todas las preguntas"
+      show: "Mostrar los datos de las respuestas"
+      show_all: "Mostrar los datos de las respuestas en todas las preguntas"
     attempts: "Intentos: %{count} de %{total}"
+    correct_answer: "Respuesta correcta"
     correct_essay_student_ratio: "%{ratio}% de sus alumnos recibió todos los puntos posibles en esta pregunta."
     correct_multiple_response_ratio: "%{ratio}% de sus alumnos respondió correctamente."
     correct_response_ratio: "%{ratio}% de sus alumnos respondió correctamente a esta pregunta."
     discrimination_index: 
+      audible_bottom_bracket: "Franja inferior:"
+      audible_bracket_aced: "Todos los alumnos de esta franja han respondido correctamente."
+      audible_bracket_failed: "Ningún alumno de esta franja ha proporcionado ninguna respuesta correcta."
+      audible_chart_description: "La tabla incluye de qué modo cada franja de alumnos de la clase ha respondido a esta pregunta. Las franjas de alumnos se forman en función de su puntuación. La franja superior incluye el 27% más alto; la franja media incluye el 46% medio, y la franja inferior incluye el 27% más bajo."
+      audible_discrimination_index: "Índice de discriminación: %{number}."
+      audible_middle_bracket: "Franja media:"
+      audible_response_ratio_distribution: "%{correct_ratio}% de los alumnos de esta franja han respondido correctamente."
+      audible_top_bracket: "Franja superior:"
+      discrimination_index: "Índice de discriminación"
       discrimination_index_dialog_title: "Gráfico de índice de discriminación"
+      discrimination_index_dialog_trigger: "Más información sobre el índice de discriminación."
     download_submissions: "Descargar todos los archivos"
+    duration_in_hours: 
+      one: "1 hora"
+      other: "%{count} horas"
+    duration_in_hours_and_minutes: "%{hours} y %{minutes}"
     duration_in_minutes: 
       one: "%{count} minutos"
       other: "%{count} minutos"
+    duration_in_minutes_and_seconds: "%{minutes} y %{seconds}"
+    duration_in_seconds: 
+      one: "1 segundo"
+      other: "%{count} segundos"
+    empty_question_breakdown: "No hay estadísticas de preguntas disponibles."
     essay_score: "Puntuación: %{score}"
+    loading_questions: "Se están cargando las estadísticas de la pregunta. Espere un momento."
     no_answer: "Sin respuesta"
+    question_breakdown: "Desglose de la pregunta"
+    question_header: "Pregunta %{position}"
     response_student_count: 
-      one: "%{count} alumnos"
+      one: "1 alumno"
       other: "%{count} alumnos"
+      zero: Nadie
+    speedgrader: "Ver en SpeedGrader"
     summary: 
+      audible_chart_description: "%{above_average} aluimnos obtuvieron una puntuación mayor o igual a la media, mientras que la de %{below_average} fue inferior."
       avg_time: "Tiempo promedio"
+      chart_brushing_tip: "Consejo: puede destacat un segmento específico en la tabla mediante una selección con su cursor."
+      chart_title: "Tabla de puntuación por porcentajes"
       high_score: "Calificación alta"
       low_score: "Calificación baja"
       mean: "Calificación Promedio"
       not_available_abbrev: N/D
+      quiz_summary: "Resumen de la evaluación"
       stdev: "Desviación estándar"
+      students_who_got_a_certain_score: 
+        one: "Un alumno ha obtenido una puntuación de %{score}%."
+        other: "%{count} alumnos han obtenido una puntuación de %{score}%."
+        zero: "Ningún alumno ha obtenido una puntuación de %{score}%."
+      students_who_scored_in_a_range: 
+        one: "Un alumno ha obtenido una puntuación de entre %{start} y %{end}%."
+        other: "%{count} alumnos han obtenido una puntuación de entre %{start} y %{end}%."
+        zero: "Ningún alumno ha obtenido una puntuación entre %{start} y %{end}%."
+      table_description: "Todos los resúmenes de estadisticas se han convertido en envíos"
     title: "Estadísticas de la evaluación"
     unknown_answer: Otro
   quizzes: 
@@ -11650,6 +11725,10 @@ es:
     question_count: 
       one: "1 pregunta"
       other: "%{count} preguntas"
+    question_limit_reached: |-
+        Ha alcanzado la cantidad máxima de preguntas permitidas para una evaluación (%{count}/%{limit}).
+        
+        Como solución alternativa, piense en dividir el material en diferentes evaluaciones.
     quiz: 
       current_filter: "Filtro actual"
       default_question_input: "[ Seleccionar ]"
@@ -12127,6 +12206,7 @@ es:
         quizzes_unpublished: 
           one: "Se ha ocultado 1 evaluación correctamente"
           other: "Se han ocultado %{count} evaluaciones correctamente"
+        submission_doesnt_count: "Esta evaluación ya no cuenta para su calificación."
       question_group: 
         buttons: 
           update: Actualizar
@@ -12308,6 +12388,7 @@ es:
           republish: "Volver a publicar"
           unlock_quiz: "Permitir que los alumnos realicen la evaluación ahora"
           unlock_survey: "Permitir que los alumnos participen en la encuesta ahora"
+        course_concluded_notice: "Esta evaluación ya no está disponible, debido a que el curso ha concluido."
         labels: 
           available_until: Hasta
           no_time_limit: "Sin tiempo límite"
@@ -12585,6 +12666,7 @@ es:
     progress_error: "Se produjo un error al intentar preparar la descarga. Inténtelo de nuevo."
     progress_message: "Preparando descarga:  %{percent}% completado"
     restrict_access: "Acceso restringido"
+    results_count: "Mostrando %{num_results} resultados de búsqueda"
     retry: "Inténtelo de nuevo"
     search_for_files: "Buscar archivos"
     search_results_for: "resultados de búsqueda para \"%{search_term}\""
@@ -12764,6 +12846,8 @@ es:
   role_overrides: 
     account_permissions: "Permisos para la cuenta"
     admin_tools_permissions: "Herramientas de administración"
+    cannot_deactivate_inactive_role: "No se puede desactivar una función que ya está inactiva"
+    cannot_remove_built_in_role: "No se puede eliminar una función integrada"
     course_permissions: "Permisos para el curso y la cuenta"
     index: 
       crumbs: 
@@ -12864,14 +12948,18 @@ es:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
+        assignment_is_muted: ¿Silenciado?
         curve_grades: "Aplicar Curva a Calificaciones"
         message_students: "Enviar un mensaje a estudiantes que..."
+        set_default_grade: "Establecer calificación predeterminada"
       details: 
         avg_score: "Calificación Promedio"
+        graded_sub_count: "Envíos calificados:"
         high_score: "Calificación alta"
         low_score: "Calificación baja"
         no_points: "Sin puntos posibles"
         points_possible: "Puntos posibles"
+        submission_types: "Tipos de envio:"
       index: 
         warning: Aviso
     grading: 
