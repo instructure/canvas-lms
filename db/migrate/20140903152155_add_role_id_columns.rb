@@ -198,8 +198,17 @@ class AddRoleIdColumns < ActiveRecord::Migration
                                applicable_account_ids[role.account_id]).limit(1000).update_all(:role_id => role.id) > 0; end
     end
 
-    while AccountNotificationRole.where("role_id IS NULL AND role_type <> 'NilEnrollment'").limit(1000).update_all(:role_id => Role.get_built_in_role(Role::NULL_ROLE_TYPE).id) > 0; end
-    while Enrollment.where("role_name IS NOT NULL AND role_id IS NULL").limit(1000).update_all(:role_id => Role.get_built_in_role(Role::NULL_ROLE_TYPE).id) > 0; end
+    while AccountNotificationRole.where("role_id IS NULL AND role_type <> 'NilEnrollment'").limit(1000).delete_all > 0; end
+
+    roleless_enrollments = Enrollment.connection.select_rows("SELECT DISTINCT ON (type, role_name) type, role_name FROM enrollments
+      WHERE role_id IS NULL AND role_name IS NOT NULL")
+    roleless_enrollments.each do |type, role_name|
+      role = Role.new(:name => role_name)
+      role.base_role_type = type
+      role.workflow_state = 'deleted'
+      role.save!
+      while Enrollment.where(:role_id => nil, :role_name => role_name, :type => type).limit(1000).update_all(:role_id => role.id) > 0; end
+    end
   end
 
   def down
