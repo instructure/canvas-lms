@@ -50,11 +50,11 @@ class Role < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [:id, :name, :base_role_type, :account_id, :workflow_state, :created_at, :updated_at, :deleted_at, :root_account_id]
   EXPORTABLE_ASSOCIATIONS = [:account, :root_account]
 
-  before_validation :infer_root_account_id, :unless => :built_in?
+  before_validation :infer_root_account_id, :if => :belongs_to_account?
 
-  validate :ensure_unique_name_for_account, :unless => :built_in?
+  validate :ensure_unique_name_for_account, :if => :belongs_to_account?
   validates_presence_of :name, :workflow_state
-  validates_presence_of :account_id, :unless => :built_in?
+  validates_presence_of :account_id, :if => :belongs_to_account?
 
   validates_inclusion_of :base_role_type, :in => BASE_TYPES, :message => 'is invalid'
   validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
@@ -95,6 +95,10 @@ class Role < ActiveRecord::Base
     end
     state :built_in # for previously built-in roles
     state :deleted
+  end
+
+  def belongs_to_account?
+    !built_in? && !deleted?
   end
 
   def self.ensure_built_in_roles!

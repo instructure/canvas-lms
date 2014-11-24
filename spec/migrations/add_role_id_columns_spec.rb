@@ -141,12 +141,22 @@ describe 'AddRoleIdColumns' do
       expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{role2_enrollment.id}")).to eq "courserole2"
       expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{lookalike_enrollment.id}")).to eq "courserole2"
 
+      @user2 = user
+      null_en_id = Enrollment.connection.insert("INSERT INTO enrollments(
+        course_id, course_section_id, root_account_id, user_id, type, workflow_state, created_at, updated_at, role_name)
+        VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},
+          'StudentEnrollment', 'active', '2014-07-07', '2014-07-07', 'NonExistentRole') RETURNING ID")
+
       @pre_migration.up
       Enrollment.reset_column_information
 
+      # preserve the unique index by migrating missing roles to their own no-op roles
+      null_role = Role.where(:name => 'NonExistentRole').first
+      expect(null_role.base_role_type).to eq 'StudentEnrollment'
+      expect(Enrollment.find(null_en_id).role_id).to eq null_role.id
+
       # make sure the triggers work while they need to
 
-      @user2 = user
       # with no role name
       id1 = Enrollment.connection.insert("INSERT INTO enrollments(
         course_id, course_section_id, root_account_id, user_id, type, workflow_state, created_at, updated_at)
@@ -256,8 +266,14 @@ describe 'AddRoleIdColumns' do
       expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM account_notification_roles WHERE account_notification_id=#{an1.id}").sort).to eq ["accountrole2", "TeacherEnrollment"].sort
       expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM account_notification_roles WHERE account_notification_id=#{an2.id}").sort).to eq ["accountrole2", "NilEnrollment"].sort
 
+      null_anr_id = AccountNotificationRole.connection.insert("INSERT INTO account_notification_roles(
+        account_notification_id, role_type)
+        VALUES(#{an1.id}, 'NonExistentRole') RETURNING ID")
+
       @pre_migration.up
       AccountNotificationRole.reset_column_information
+
+      expect(AccountNotificationRole.where(:id => null_anr_id).first).to be_nil
 
       # make sure the data fixes worked
       expect(AccountNotificationRole.where(:account_notification_id => an1.id).map(&:role_id).sort).to eq(
