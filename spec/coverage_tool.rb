@@ -9,7 +9,6 @@ class CoverageTool
       SimpleCov.coverage_dir("#{ENV['WORKSPACE']}/coverage") if ENV['WORKSPACE']
       SimpleCov.at_exit {
         SimpleCov.result
-        SimpleCov.result.format!
       }
     end
   end
