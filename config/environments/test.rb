@@ -2,7 +2,7 @@ if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   begin
     require 'spec/coverage_tool'
-    CoverageTool.start("canvas")
+    CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
   rescue LoadError => e
     puts "Error: #{e}"
   end
