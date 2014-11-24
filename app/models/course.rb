@@ -213,6 +213,8 @@ class Course < ActiveRecord::Base
   has_many :grading_period_groups, dependent: :destroy
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
+  has_many :sis_post_grades_statuses
+
   include Profile::Association
 
   before_save :assign_uuid

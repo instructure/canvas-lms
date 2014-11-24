@@ -49,6 +49,8 @@ class CourseSection < ActiveRecord::Base
   validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
 
+  has_many :sis_post_grades_statuses
+
   before_save :set_update_account_associations_if_changed
   before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
