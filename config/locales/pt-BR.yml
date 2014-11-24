@@ -11560,7 +11560,7 @@ pt-BR:
       some_scores_reduced: "Somente dê pontos para a resposta correta (*algumas pontuações de alunos podem ser reduzidas*)"
       update_question_without_regrading: "Atualizar pergunta sem reavaliar"
   quiz_reports: 
-    download_item_analysis: "Baixar item de relatório de análise."
+    download_item_analysis: "Baixar relatório de análise de item."
     download_student_analysis: "Baixar relatório de análise de estudante."
     generatable: "O relatório nunca foi gerado."
     generate_item_analysis_report: "Gerar relatório de análise de item."
@@ -11596,7 +11596,7 @@ pt-BR:
         zero: Ninguém
     answer_details: 
       hide: "Ocultar detalhes da resposta"
-      hide_all: "Ocultar detalhes da resposta para todos os alunos"
+      hide_all: "Ocultar detalhes da resposta para todas as perguntas"
       show: "Mostrar detalhes da resposta"
       show_all: "Mostrar detalhes da resposta para todas as perguntas"
     attempts: "Tentativas: %{count} de %{total}"
@@ -11623,7 +11623,7 @@ pt-BR:
       other: "%{count} horas"
     duration_in_hours_and_minutes: "%{hours} e %{minutes}"
     duration_in_minutes: 
-      one: "%{count} minutos"
+      one: "1 minuto"
       other: "%{count} minutos"
     duration_in_minutes_and_seconds: "%{minutes} e %{seconds}"
     duration_in_seconds: 
@@ -13069,7 +13069,7 @@ pt-BR:
         submission_types: "Tipos de envio:"
       index: 
         assignment_in_speedgrader: "Veja esta tarefa no speedgrader"
-        assignment_info: "Informação da tarefa"
+        assignment_info: "Informações da tarefa"
         empty_assignment_selection: "Selecione uma tarefa para visualizar informações adicionais aqui."
         no_points_possible_warning: "As tarefas neste grupo não têm pontos possíveis e não pode ser incluídas no cálculo de avaliação."
         warning: Aviso
@@ -13086,7 +13086,7 @@ pt-BR:
       student: 
         select_student: "Selecione um aluno"
     grading: 
-      empty_submission_selection: "Selecione um aluno e uma tarefa para visualizar e editar classes."
+      empty_submission_selection: "Selecione um aluno e uma tarefa para visualizar e editar notas."
       grade_for: "Nota para: %{name}"
       grading: Pontuação
       is_dropped: "Esta avaliação está descartada para esse aluno."
@@ -13096,7 +13096,7 @@ pt-BR:
       was_resubmitted: "Esta tarefa foi reenviada desde que foi avaliada pela última vez."
     header: 
       gradebook_individual_view: "Livro de notas: visualização individual"
-      save_instructions: "Nota: avaliações e notas serão salvas automaticamente após sair do campo."
+      save_instructions: "Observação: avaliações e notas serão salvas automaticamente após sair do campo."
       switch_to_gradebook2: "Mudar para Livro de nota padrão"
     learning_mastery: 
       download_results: "Baixar resultados (.csv)"
