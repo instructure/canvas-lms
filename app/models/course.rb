@@ -2170,7 +2170,7 @@ class Course < ActiveRecord::Base
     section_ids = visibilities.map{ |s| s[:course_section_id] }
     is_scope = sections.respond_to?(:where)
 
-    if [:full, :limited, :sections].include?(visibility)
+    if [:full, :limited, :restricted, :sections].include?(visibility)
       if visibility == :sections || visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
         is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
       else
