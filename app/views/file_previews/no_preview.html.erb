@@ -5,7 +5,7 @@
 <h2><%= @file.display_name %></h2>
 <div><%= t('file_previews.no_preview_available', 'No preview is available for this file.')%></div>
 <div>
-  <%= link_to(t('file_previews.download_file', 'Download *filename*', :wrapper => {'*' => @file.display_name}),
+  <%= link_to(t('file_previews.download_file', 'Download *filename*', :wrapper => {'*' => h(@file.display_name)}),
               context_url(@context, :context_file_download_url, @file.id, :download_frd => 1)) %>
   (<%= @file.readable_size %>)
 </div>
