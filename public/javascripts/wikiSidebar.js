@@ -109,7 +109,7 @@ define([
         $file = $tree1.find(".file_blank").clone(true);
         $file
           .attr('class', 'file')
-          .attr('title', file.display_name)
+          .attr('title', htmlEscape(file.display_name))
           .attr('data-tooltip', '')
           .attr('aria-level', children.data('level'))
           .attr('id', this.generateTreeItemID('file'))
