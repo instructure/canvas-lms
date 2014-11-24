@@ -60,6 +60,7 @@ nb:
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
+      yo: Yo
     ask_canvas_network: "Spør Canvas Network Community"
     default_account_name: Standardkonto
     default_site_administrator_account_name: Site-admin
@@ -1303,6 +1304,7 @@ nb:
   allow_lor_tools: "Tillat brukere for å vise og bruke eksterne verktøy som er konfigurert for LOR."
   allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra Samtalen innboks. Dette vil føre til at alle samtalemeldinger og varslinger som skal sendes som ASAP varsler til brukerens primære epost, skjule Samtale innboks uleste meldinger merket på innboksen, og skjule samtalen varslingsinnstillinger."
   always_3a59e701: Alltid
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: "En ukjent server feil oppstod. Vennligst prøv igjen."
   analytics: 
     course: 
       analytics: Analytics
@@ -1368,6 +1370,7 @@ nb:
     podcast_feed_description_course: "Alle mediefiler knyttet til eller innebygd i kunngjøringer i kurset \"%{course}\" vises i denne strømmen."
     podcast_feed_description_group: "Alle media filer knyttet til eller innebygd i kunngjøringer i gruppen \"%{group}\" vil være synlig i denne strømmen."
     podcast_feed_name: "%{course} Kunngjøringer som podkast-strøm"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svarene vil bli vist etter ditt siste forsøk"
   application: 
     errors: 
       feed_not_found: "Fant ikke strømmen."
@@ -1808,6 +1811,7 @@ nb:
     grading_type_selector: 
       display_grade_as: "Vis karakteren som"
       gpa_scale_explainer: "Tallkaraktersetting er laget for institusjoner som benytter en karakterskala med tall (for eks. 0-4.0, 0-5.0 eller 0-6.0) for alle innleveringer/oppgaver. Denne karaktersettingen er tilsvarende den for bokstavkarakterer, men har noen vesentlige forskjeller:"
+      gpa_scale_input_explainer: "Poeng er inngang på 4,0 skala. For eksempel, hvis et oppdrag er ut av 100 poeng, vil innskriving 4,0 resultater i 100%, 3,0 resultater i 87%, osv."
       gpa_scale_letters_explainer: "Bokstavkarakterer kan benyttes i tillegg til tallkarakterer."
       gpa_scale_percentage_explainer: "Du kan ikke legge inn poeng direkte, men prosenttall kan legges inn. For eksempel, hvis en oppgave totalt kan gi 50 poeng, hjelper det ikke å legge inn 40 poeng, men \"80%\" gjør susen."
       gpa_scale_recommendation: "Med unntak av de tilfeller der din institusjon benytter tallkarakterer (for eks. 0-4.0/0-5.0/0-6.0) anbefaler Canvas å vise karakterer som bokstavkarakterer."
@@ -2171,6 +2175,8 @@ nb:
         originality_report_visible_after_due_date: "Etter fristen"
         originality_report_visible_after_grading: "Etter at besvarelsen er rettet"
         originality_report_visible_immediately: Umiddelbart
+        settings_exclude_fewer_than_count: "Mindre enn %{wordsInput} ordene"
+        settings_exclude_less_than_percent: "Mindre enn %{percentInput} av dokumentet"
     undated_assignments: "Udaterte oppgaver"
     upcoming_assignments: "Kommende oppgaver"
     wizard_box: 
@@ -2478,6 +2484,7 @@ nb:
       scheduler_explanation_teacher_paragraph_1: "Dette er planleggingsverktøyet. Du kan benytte det for å legge til aktivitetsgrupper studentene kan melde seg på."
       scheduler_explanation_teacher_paragraph_2: "Et eksempel kan være at du vil gå gjennom en oppgaveinnlevering med hver av studentene i kurset ditt. Du lager en ny avtalegruppe, spesifiserer datoer og tidspunkt du er tilgjengelig for deretter å be systemet å dele tidsrommet i 15-minutters blokker og kun tillate en student pr \"tidsblokk\"."
       scheduler_explanation_teacher_paragraph_3: "Studentene vil så få beskjed og se at de må melde seg på en av de spesifiserte tidspunktene. De vil se en kalender med tilgjengelige tidspunkt som et \"overlegg\" på alt annet som ligger i deres kalender slik at de kan velge et tidspunkt som passer den enkelte."
+      scheduler_explanation_teacher_paragraph_4: "* Kom i gang nå ved å klikke på \"Opprett en avtale gruppe\" knappen til høyre. *"
       signed_up_for: "Du er meldt på"
       x_groups_have_signed_up: "%{participant_count} grupper har meldt seg på"
       x_people_have_signed_up: "%{participant_count} personer har meldt seg på"
@@ -2524,6 +2531,7 @@ nb:
         warning: Advarsel
     edit_appointment_group: 
       affect_reservations: "Hvordan vil dette påvirke reservasjoner?"
+      appointments_per_participant_label: "Maksimalt antall avtaler en deltaker kan delta"
       appt_group_options_help1: "Noen eksisterende reservasjoner er over grensen du la inn. Disse vil ikke bli påvirket; endringen hindrer bare at nye reservasjoner kan bli gjort."
       appt_group_options_help2: "Du kan imidlertid fjerne eksisterende reservasjoner manuelt."
       calendar: Kalender
@@ -2533,6 +2541,8 @@ nb:
       group_signup: "Få studenter til å melde seg på gruppevis."
       location: Sted
       name: Navn
+      participants_per_appointment_label: "Maks brukere/grupper pr avtale"
+      slot_duration_label: "Minutter pr spor"
       time_range: Tidintervall
     edit_appt_calendar_event: 
       description: "Beskrivelse:"
@@ -2985,6 +2995,7 @@ nb:
     body: "Bekreftelseskoden din for Canvas er %{verification_code}"
     default_facebook_account: "Facebook konto"
     default_twitter_handle: "Twitter Handle"
+    default_yo_name: "Yo Navn"
   communication_channels: 
     confirm: 
       buttons: 
@@ -4590,6 +4601,7 @@ nb:
         status_link: "Importere Status"
         text: "Ett eller flere elementer blir nå importert. De vil bli vist i kurset under en gang når de er tilgjengelige."
     index: 
+      browse_more_courses: "Bla gjennom flere kurs"
       headings: 
         future_enrollments: "Framtidige påmeldinger"
         my_courses: "Mine kurs"
@@ -4649,6 +4661,8 @@ nb:
         duplicates_removed: "Noen duplikater ble fjernet."
         email: Epost
         email_field_label: "Skriv inn epostadresser til brukerne som du ønsker å legge til, atskilt med komma"
+        email_field_place_holder: "\"Example Student\" <student@example.com>, \"Lastname, Firstname\" <firstlast@example.com>, justAnEmailAddress@example.com"
+        example_formats: "Examples: user@example.com, \"First Last\" <user@example.com>, \"Last, First\" <user@example.com>"
         form_instructions: "Skriv inn eller lim inn en liste over epostadresser nedenfor:"
         go_back: "Start på nytt"
         have_been_enrolled: "Følgende brukere har blitt påmeldt"
@@ -5424,6 +5438,7 @@ nb:
       new_quiz: "Ny prøve"
     edit_crumb: Rediger
     edit_view: 
+      add_attachment_93868828: "Legg til vedlegg"
       allow_threaded_replies: "Tillat trådede svar"
       attachment: Vedlegg
       available_from: "Tilgjengelig fra"
@@ -5649,6 +5664,7 @@ nb:
     unsubscribe: "Avslutt abonnement på dette temaet"
     unsubscribed: "Abonnument avsluttet"
     unsubscribed_hint: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
+  display_course_catalog: "Vis søkbar liste over kurs i dette root kontoen med \"Inkluder dette kurset i den offentlige kurset indeks\" flagg aktivert."
   draft_state_description: "Denne betafunksjonen redesigner mange deler av Canvas og lar innhold eksistere i en ny upublisert status som er usynlig for studenter og ekskluderes fra karakterberegninger. Advarsel – å slå av denne funksjonen kan føre til sletting av nylig opprettet eller redigert innhold fra foreleserens visning."
   due_dates: 
     due_at: "leveres innen: %{assignment_due_date_time}"
@@ -6028,6 +6044,7 @@ nb:
         body1: "Du har kanskje lagt merke til at det er en liste over nylige innleveringer for klassene dine nederst på siden (%{showme}). Du kan raskt legge til innleveringer på nye sider i porteføljen din fra denne siden. Bare klikk på innleveringen du ønsker å legge til, så vil en enkel dialogboks dukke opp."
         body2: "Flott! For å fullføre innleggingen av innleveringen må du velge hvilken seksjon du ønsker å legge den til på og gi siden et navn. Etter at du har klikket på \"Legg til side\" blir du ført den nye siden så du kan redigere den mer detaljert."
   error_message_2b9d12ee: "Feil: %{message}"
+  error_uploading_file_e2d31b56: "Feil opplasting fil."
   errors: 
     bad_navigation_config: "Ugyldig konfigurasjon av kursfane"
     blank: Obligatorisk
@@ -6194,6 +6211,7 @@ nb:
       all: Alle
       app_headder: "Eksterne apper"
       external_tools_note: "Apper er en enkel måte å legge til funksjoner i Canvas. De kan legges til individuelle kurs, eller til alle kurs i en konto. Når de er satt opp kan du lenke til dem fra kursmodulene og opprette oppgaver for vurderingsverktøy."
+      external_tools_references: "*Se noen LTI verktøy* som fungerer fint med Canvas. Du kan også sjekke ut ** Canvas Fellesskap emner om LTI verktøy**"
       installed: Installert
       not_installed: "Ikke installert"
       search_filter: "Filtrer etter navn"
@@ -6279,6 +6297,7 @@ nb:
   features: 
     allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra innboksen"
     better_file_browsing: "Bedre filsøk"
+    course_catalog: Kurskatalog
     differentiated_assignments: "Differensierte oppgaver"
     differentiated_assignments_account_disable_warning: "Å slå av denne funksjonen vil påvirke eksisterende kurs. For hjelp med å slå av denne funksjonen, kontakt din Canvasadmin."
     differentiated_assignments_course_disable_warning: "Deaktivering differensierte oppdrag vil gjøre alle publiserte oppdrag synlig for alle studenter."
@@ -6585,6 +6604,7 @@ nb:
     gradee_index_of_total: "%{gradee} %{x} eller %{y}"
     group: Gruppe
     hide_all_details_button: "Skjul alle detaljer"
+    mic_blocked_message: "Tillatelse til å bruke mikrofonen er blokkert. For å endre, kan du gå tilchrome://settings/contentExceptions#media-stream"
     mute_assignment: "Skjul oppgaven"
     new_assessment: "[Ny vurdering]"
     no_submission_time: "intet tidspunkt for innlevering"
@@ -6597,6 +6617,7 @@ nb:
     recording_message: Innspilling...
     show_all_details_button: "Vis alle detaljer"
     student: Student
+    student_index: "Student %{index}"
     student_mute_notification: "Læreren arbeider med karakterene"
     titles: 
       click_to_record: "Tale til tekst"
@@ -6939,6 +6960,7 @@ nb:
         save: Lagre
         save_settings: "Lagre innstillinger"
         submit_comment: "Send inn kommentar"
+      crocodoc_pending: "Crocodoc fortsatt behander dette dokumentet."
       gradebook: 
         mute_assignment: "Skjul oppgaven"
         unmute_assignment: "Vis oppgaven"
@@ -7336,14 +7358,17 @@ nb:
       group_category_create: 
         allow_self_signup: "Tillat egenpåmelding"
         cancel: Avbryt
+        create_groups: "Lag %{num_groups} grupper nå"
         create_groups_manually: "Jeg vil opprette grupper manuelt"
         group_set_name: Gruppesettnavn
         group_structure: Gruppestruktur
         leave_group_limit_blank: "La være tom for ingen grense"
+        limit_group_size: "Grense grupper til %{group_limit} medlemmer"
         require_same_section: "Gruppemedlemmer må være i samme klasse"
         save: Lagre
         saving: Lagrer...
         self_signup: Egenpåmelding
+        split_into_groups: "Split elevene inn %{num_groups} like grupper"
       group_category_detail: 
         add_group: "Legg til gruppe"
         category_settings: Innstillinger
@@ -7364,6 +7389,7 @@ nb:
         group_limit_override: "Endring av denne vil overstyre enhver individuelt innstilt gruppebegrensning"
         group_set_name: Gruppesettnavn
         leave_group_limit_blank: "La være tom for ingen grense"
+        limit_group_size: "Grense grupper til %{group_limit} medlemmer"
         require_same_section: "Gruppemedlemmer må være i samme klasse"
         save: Lagre
         saving: Lagrer...
@@ -9928,13 +9954,27 @@ nb:
     sub_header: Undertittel
   modules: 
     add: 
+      assignment: 
+        add_assignments: "Legg oppdrag"
+        loading_assignments: "Lasting oppdrag ..."
+      discussion: 
+        add_topics: "Legg Diskusjons Emner"
+      file: 
+        add_files: "Legg filer"
       header: 
         cancel: Avbryt
+        create_header: "Lag Topptekst"
       link: 
+        add_link: "Legg til lenke"
         cancel: Avbryt
+      page: 
+        add_pages: "Legg sider"
+      quiz: 
+        add_quizzes: "Legg quizer"
       tool: 
         cancel: Avbryt
     add_item: 
+      add_new_item: "Legg nytt element"
       assignment: Oppgave
       content_page: Innholdsside
       discussion: Diskusjon
@@ -9956,24 +9996,32 @@ nb:
         create: Lag
       discussion: 
         cancel: Avbryt
+        create_discussion: "Lag Diskusjon"
       file: 
         cancel: Avbryt
         upload: "Last opp"
       header: 
         cancel: Avbryt
+        create_header: "Lag Topptekst"
       link: 
+        add_link: "Legg til lenke"
         cancel: Avbryt
       page: 
         cancel: Avbryt
+        creat_page: "Opprett side"
       quiz: 
         cancel: Avbryt
+        create_quiz: "Lag Spørrekonkurranse"
       tool: 
         cancel: Avbryt
     dialog_title: "Legg til element til %{moduleName}"
     item: 
       cancel: Avbryt
+      edit_item: "Rediger Modul Element"
+      item_title: "Modul Element Tittel"
       points_possible: poeng
       save: Lagre
+      saving: Lagring...
     module: 
       header: 
         delete: Slette
@@ -9988,7 +10036,10 @@ nb:
     module_edit: 
       Create: Lag
       cancel: Avbryt
+      has_unlock_date: "Lås moduler inntil en gitt dato"
+      lock_datea: "Lås dato"
       module_name: Modulnavn
+      new_module: "Opprette ny modul"
     module_item_view: 
       button: 
         delete: Slett
@@ -10051,6 +10102,7 @@ nb:
     sure_you_want_to_mute: "Er du sikker på at du vil gjøre denne oppgaven utilgjengelig? Mens oppgaven er utilgjengelig, vil studentene ikke motta nye varsler om eller kunne se:"
   name: "Academic Benchmark-importør"
   new_facebook_message: "Du har en ny beskjed fra Canvas"
+  new_quiz_statistics_desc: "Aktivere den nye quizstatistikkside for et kurs."
   new_styles_description: |-
       Vi jobber med en UI ansiktsløft til lerret. Snu dette videre til for å melde seg til å se den
       oppdatert, forenklet utseendet og føles av lerretet grensesnittet. Dette er en svært "Arbeid pågår"
@@ -10268,6 +10320,8 @@ nb:
         display: Mobilnummer
       twitter: 
         display: Twitter
+      yo: 
+        display: Yo
     frequencies: 
       daily: Daglig
       immediately: "Så fort som mulig"
@@ -10528,6 +10582,10 @@ nb:
     save_button: Lagre
     saving_button: Lagrer...
     warnings: 
+      overwrite_changes: |-
+          Du er i ferd med å overskrive andre endringer som har blitt gjort siden du begynte å redigere.
+          
+          Overskrive disse endringene?
       unsaved_changes: "Du har ulagrede endringer. Vil du fortsette uten å lagre disse?"
   paginated_collection: 
     no_items: "Ingen elementer."
@@ -10595,8 +10653,13 @@ nb:
       labels: 
         api_key: "Crocodoc API-nøkkel"
     diigo: 
+      description: "Diigo integrering"
       name: Diigo
     diigo_settings: 
+      description: |-
+          Du trenger å registrere en [new app on Diigo](%{diigo_url}).
+          
+          * Når du har lagret din app, lage et notat av API Nøkkel
       labels: 
         api_key: "API Nøkkel"
     dim_dim_settings: 
@@ -10785,8 +10848,15 @@ nb:
     notices: 
       settings_updated: "Innstillinger for programtillegg ble oppdatert."
     panda_pub_settings: 
+      description: "PandaPub er en pub/sub tjeneste som, når det er konfigurert, kan noen deler av Canvas for å motta varslinger om hendelser i nettleseren, i stedet for polling for endringer."
       labels: 
+        application_id: "Applikasjon Id"
         base_url: Grunn-URL
+        key_id: "Nøkkel ID"
+        key_secret: "Nøkkel Hemmelige"
+    pandapub: 
+      description: "Pub/Sub tjenesten"
+      name: PandaPub
     qti_converter_settings: 
       labels: 
         enabled: "Slått på"
@@ -10860,6 +10930,13 @@ nb:
         domain: Domene
         password: Passord
         username: Brukernavn
+    yo: 
+      description: "Bare Yo"
+      name: Yo
+    yo_settings: 
+      description: "Du vil trenge en [api token from Yo](%{yo_url})."
+      labels: 
+        api_token: "Api pollett"
   polling: 
     poll_sessions: 
       errors: 
@@ -10959,6 +11036,7 @@ nb:
         register_linkedin_account: "Registrer LinkedIn-kontoen din"
         save_login: "Lagre innlogging"
         save_skype_name: "Lagre Skype-navn"
+        save_yo_name: "Lagre Yo Navn"
         select_image: "Velg bilde"
         update_settings: "Oppdater Innstillinger"
       confirm_email_instructions: "Før du kan redigere profilen din må du bekrefte epostadressen (%{email}) ved å klikke på lenken i eposten vi sendte deg. Om du ikke ser den, *klikk her for å sende eposten på nytt*. Husk å sjekk søppelpostboksen din."
@@ -10991,6 +11069,7 @@ nb:
         users_profile: "%{user}s innstillinger"
         ways_to_log_in: "Måter å logge inn"
         web_services: Web-tjenester
+        yo_login: "Yo Logg inn"
       hints: 
         expires_at: "la stå tom for å ikke ha noen utløpsdato"
         language: "Dette vil overstyre nettleser- eller kontoinnstillinger."
@@ -11025,6 +11104,7 @@ nb:
         token_last_used: "Sist brukt"
         token_purpose: Formål
         user_name: Brukernavn
+        yo_name: "Yo Navn"
       linkedin_description: "LinkedIn er en flott ressurs for nettverksbygging, og kan være nyttig lenge etter at du er ferdigutdannet. Om du har en LinkedIn-konto kan du registrere den her. Om du så tillater at andre kurs- og gruppemedlemmer kan se hvilke tjenester du har registrert, kan de enkelt legge deg til på LinkedIn uten å måtte søke etter deg."
       links: 
         add_account: "Legg til konto"
@@ -11044,6 +11124,7 @@ nb:
         upload_new_image: "Last opp et nytt bilde"
         view_facebook_app: "vis Facebook-appen"
         view_your_profile: "se profilen din"
+        yo: Yo
       loading_token_details: "Laster symboldetaljer…"
       no_approved_integrations: "Tredjepartsapplikasjoner kan etterspørre tilgang til Canvas-siden på dine vegne. Når du har autorisert applikasjoner vil de bli listet opp her."
       no_language_preference: "Systemstandard (%{language})"
@@ -11059,6 +11140,7 @@ nb:
         authorize_google_docs: "Godkjenn Google Docs"
         authorize_linkedin: "Godkjenn LinkedIn"
         authorize_twitter: "Godkjenn Twitter"
+        authorize_yo: "Yo Logg inn"
         click_to_change_profile_pic: "Klikk for å endre profilbilde"
         delicious_login: Delicious-innlogging
         diigo_login: Diigo-innlogging
@@ -11072,6 +11154,13 @@ nb:
           Du kan også registrere deg for å få varsler sendt til Twitter-kontoen din. Disse varslene vil bli sendt som direktebeskjeder til deg fra deg, og vil ikke dukke opp i den offentlige meldingslisten.
       unknown_service: Ukjent
       web_services: "Canvas kan gjøre livet ditt enklere ved å koble seg til de nettverktøyene du allerede bruker. Klikk på en tjeneste under \"Andre tjenester\" for å se hva vi mener."
+      yo_description: |-
+          Yo er en enkelt-tap null tegn kommunikasjons verktøy.
+          Hvis du har en Yo konto, kan du registrere den her. Så hvis du tillater
+          stipendiat kurs/gruppemedlemmer for å se dine registrerte tjenester, de kan
+          enkelt koble med din Yo konto.
+          
+          Du kan også registrere deg for å få varsler sendt til Yo konto.
     purpose_required: "Formål kreves"
     resending: "sender på nytt..."
     secondary_nav: 
@@ -11148,6 +11237,8 @@ nb:
       validations: 
         should_be_10_digits: "skal være et 10-sifret tall"
     ways_to_contact_me: "Måter å kontakte meg"
+    yo_select: 
+      yo: Yo
     you_have_no_services: "Du har ikke registrert noen tjenester; du kan legge til noen i *innstillingene*."
   profiles: 
     avatar_dialog: 
@@ -11189,7 +11280,9 @@ nb:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest sendt til IdP"
+      logout_request_redirect_from_idp: "Mottatt Logg ut Forespørsel fra IdP"
       logout_response_redirect_from_idp: "Mottok LogoutResponse fra IdP"
+      logout_response_redirect_to_idp: "Sender Logge av Respons til IdP"
       redirect_from_idp: "Mottok LoginResponse fra IdP"
     default_app_name: Tredjepartsapplikasjon
     errors: 
@@ -11447,8 +11540,18 @@ nb:
       some_scores_reduced: "Gi kun poeng til korrekte svar (*enkelte studenters resultater kan bli redusert*)"
       update_question_without_regrading: "Oppdater spørsmålet uten å sette karakter på nytt"
   quiz_reports: 
+    download_item_analysis: "Last ned element analyse rapporten."
+    download_student_analysis: "Last ned student analyserapport."
     generatable: "Rapporten har aldri blitt generert."
+    generate_item_analysis_report: "Generere element analyse rapporten."
+    generate_student_analysis_report: "Generere student analyserapport."
+    generated_at: "Generert: %{date}"
     generating: "Rapport blir generert..."
+    generation_almost_done: "Nesten ferdig."
+    generation_complete: "Rapporten har blitt generert."
+    generation_halfway: "Mindre enn halv veien å gå."
+    generation_started: "Rapporten genereres."
+    non_generatable_report_notice: "Rapporten kan ikke genereres for Survey Spørrekonkurranser."
     quiz_report_generator: 
       download_report_name: "Last ned %{report_name}"
       generate_report_name: "Generer %{report_name}"
@@ -11460,31 +11563,82 @@ nb:
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Quiz resultater er beskyttet for denne quizen og kan vises engang umiddelbart etter innlevering."
   quiz_statistics: 
     answer_bars_chart: 
+      audible_answer_position: "Svar %{position}:"
+      audible_answer_response_count: 
+        one: "En respons."
+        other: "%{count} responser."
+        zero: "Ingen responser."
+      audible_correct_answer_indicator: "Dette er et riktig svar."
+      audible_description: "Denne tabellen viser alle svarene på spørsmålet, sammen med antall svar de har mottatt."
       response_count: 
-        one: "%{count} studenter"
+        one: "1 student"
         other: "%{count} studenter"
+        zero: "ingen som"
+    answer_details: 
+      hide: "Skjul svar detaljer"
+      hide_all: "Skjule svar detaljer for alle spørsmålene"
+      show: "Vis svar detaljer"
+      show_all: "Vis svar detaljer for alle spørsmålene"
     attempts: "Forsøk: %{count} av %{total}"
+    correct_answer: "Rett svar"
     correct_essay_student_ratio: "%{ratio}% av dine studenter fikk full uttelling for dette spørsmålet."
     correct_multiple_response_ratio: "%{ratio}% av dine studenter responderte riktig."
     correct_response_ratio: "%{ratio}% av dine studenter svarte korrekt på dette spørsmålet."
     discrimination_index: 
+      audible_bottom_bracket: "Bunn braketten:"
+      audible_bracket_aced: "Alle studenter i dette klassen har svart riktig."
+      audible_bracket_failed: "Ikke en eneste student i denne braketten har gitt et riktig svar."
+      audible_chart_description: "Tabellen viser hvordan hver brakett av elevene i klassen har svart på dette spørsmålet. Student parentes er sammensatt basert på deres poengsum. Den øvre braketten består av høyeste 27%, mens den midterste braketten består av midten 46%, og krank består av den laveste 27%."
+      audible_discrimination_index: "Diskriminering indeks: %{number}."
+      audible_middle_bracket: "Midt konsoll:"
+      audible_response_ratio_distribution: "%{correct_ratio}% av studenter i dette klassen har svart riktig."
+      audible_top_bracket: "Topp brakett:"
+      discrimination_index: "Diskriminering Indeks"
       discrimination_index_dialog_title: "The Discrimination Index Chart"
+      discrimination_index_dialog_trigger: "Lær mer om Diskriminering Indeks."
     download_submissions: "Last ned alle filer"
+    duration_in_hours: 
+      one: "1 time"
+      other: "%{count} timer"
+    duration_in_hours_and_minutes: "%{hours} og %{minutes}"
     duration_in_minutes: 
       one: "%{count} minutter"
       other: "%{count} minutter"
+    duration_in_minutes_and_seconds: "%{minutes} og %{seconds}"
+    duration_in_seconds: 
+      one: "1 sekund"
+      other: "%{count} sekunder "
+    empty_question_breakdown: "Det er ingen tvil statistikk tilgjengelig."
     essay_score: "Resultat: %{score}"
+    loading_questions: "Spørsmåls statistikk blir lastet. Vennligst vent en stund."
     no_answer: "Intet svar"
+    question_breakdown: "Spørsmålet Smmenbrudd"
+    question_header: "Spørsmål %{position}"
     response_student_count: 
-      one: "%{count} studenter"
+      one: "1 student"
       other: "%{count} studenter"
+      zero: "ingen som"
+    speedgrader: "Vis i Hurtighet grader"
     summary: 
+      audible_chart_description: "%{above_average} studenter scoret over eller på gjennomsnittet, og %{below_average} nedenfor."
       avg_time: "Gjennomsnittlig tid"
+      chart_brushing_tip: "Tips: du kan fokusere et bestemt segment av diagrammet ved å gjøre et valg med markøren."
+      chart_title: "Poeng persentiler kart"
       high_score: "Høyeste resultat"
       low_score: "Laveste resultat"
       mean: "Gjennomsnittlig resultat"
       not_available_abbrev: N/A
+      quiz_summary: "Spørrekonkurranse Sammendrag"
       stdev: Standardavvik
+      students_who_got_a_certain_score: 
+        one: "En elev har fått en poeng på %{score}%."
+        other: "%{count} studentene har fått en poeng på %{score}%."
+        zero: "Ingen studenter har fått poeng på %{score}%."
+      students_who_scored_in_a_range: 
+        one: "En student har scoret mellom %{start} og %{end}%."
+        other: "%{count} studenter har scoret mellom %{start} og %{end}%."
+        zero: "Ingen studenter har scoret mellom %{start} og %{end}%."
+      table_description: "Sammendrag statistikk for alle slått i innleveringer"
     title: Prøvestatistikk
     unknown_answer: "Noe annet"
   quizzes: 
@@ -11644,6 +11798,7 @@ nb:
     question_count: 
       one: "1 spørsmål"
       other: "%{count} spørsmål"
+    question_limit_reached: "Du har oppnådd maksimalt antall spørsmål tillatt for en spørrekonkurranse (%{count}/%{limit})."
     quiz: 
       current_filter: "Gjeldende filter"
       default_question_input: "[ Velg ]"
@@ -12112,6 +12267,7 @@ nb:
         quizzes_unpublished: 
           one: "1 prøve ble fjernet fra publisering!"
           other: "%{count} prøver ble fjernet fra publisering!"
+        submission_doesnt_count: "Denne quizen vil ikke lenger telle mot din klasse."
       question_group: 
         buttons: 
           update: Oppdater
@@ -12293,6 +12449,7 @@ nb:
           republish: "Publiser på nytt"
           unlock_quiz: "La studentene ta prøven nå"
           unlock_survey: "La studentene ta undersøkelsen nå"
+        course_concluded_notice: "Denne quizen er ikke lenger tilgjengelig da kurset hadde blitt avsluttet."
         labels: 
           available_until: Til
           no_time_limit: "Ingen tidsbegrensning"
@@ -12570,6 +12727,7 @@ nb:
     progress_error: "Har oppstått en feil forsøker å forberede nedlasting, vennligst prøve igjen."
     progress_message: "Forbereder nedlasting: %{percent}% fullført"
     restrict_access: "Begrens tilgang"
+    results_count: "Viser %{num_results} søke resultater"
     retry: "Forsøk igjen"
     search_for_files: "Søk etter filer"
     search_results_for: "søkeresultater for \"%{search_term}\""
@@ -12749,6 +12907,8 @@ nb:
   role_overrides: 
     account_permissions: Kontotillatelser
     admin_tools_permissions: Administratorverktøy
+    cannot_deactivate_inactive_role: "Kan ikke deaktivere en allerede inaktiv rolle"
+    cannot_remove_built_in_role: "Kan ikke fjerne en innebygd rolle"
     course_permissions: "Kurs- og kontotillatelser"
     index: 
       crumbs: 
@@ -12849,27 +13009,67 @@ nb:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
+        assignment_is_muted: Dempet?
         curve_grades: "Korriger karakterer"
         message_students: "Send beskjed til studenter som…"
+        set_default_grade: "Sett standard klasse"
       details: 
         avg_score: "Gjennomsnittlig resultat"
+        graded_sub_count: "Gradert innleveringer:"
         high_score: "Høyeste resultat"
         low_score: "Laveste resultat"
         no_points: "Ingen oppnåelige poeng"
+        points_possible: "Poeng mulig"
+        submission_types: "Innlevering typer:"
       index: 
+        assignment_in_speedgrader: "Se dette oppdraget i hastighet grader"
+        assignment_info: "Oppdrag Informasjon"
+        empty_assignment_selection: "Velg et oppdrag for å vise mer informasjon her."
+        no_points_possible_warning: "Oppdrag i denne gruppen har ingen poeng mulig og kan ikke inkluderes i klasse grade beregning."
         warning: Advarsel
+    components: 
+      final_grade: 
+        final_grade: "Slutt Grade:"
+    content_selection: 
+      assignment: 
+        select_assignment: "Velg et oppdrag"
+      header: 
+        content_selection: "Innhold Utvalg"
+      outcome: 
+        select_outcome: "Velg et utfall"
+      student: 
+        select_student: "Velg en student"
     grading: 
+      empty_submission_selection: "Velg en student og en oppgave å vise og redigere karakterer."
+      grade_for: "Grade for: %{name}"
       grading: Karaktersetting
+      is_dropped: "Denne karakteren er for tiden droppet for denne studenten."
+      is_late: "Dette innlevering var sent."
       submission_details: "Detaljer om innlevering"
+      submission_hidden: "Dette oppdraget er ikke tilgjengelig for denne eleven, og vil ikke bli inkludert i sin karakter."
+      was_resubmitted: "Dette oppdraget har blitt sendt inn på nytt siden den ble gradert sist."
     header: 
       gradebook_individual_view: "Karakteroversikt: Individuell visning"
+      save_instructions: "Merk: Karakterer og notater vil bli lagret automatisk når du har flyttet ut av feltet."
+      switch_to_gradebook2: "Skifte til Standard karakterboken"
     learning_mastery: 
+      download_results: "Last ned resultater (.csv)"
+      empty_student_selection: "Velg en student for å se mer informasjon her."
+      empty_submission_selection: "Velg en student og et resultat å vise resultater."
       hide_student_names_label: "Skjul studentnavn"
       result: Resultat
+      result_for: "Resultat for:"
+      results_loading: "Resultater for denne studenten fortsatt laster ..."
+      select_a_section: "Velg en seksjon"
+      select_student: "Velg en student"
+      student_info: "Student Informasjon"
     outcome_information: 
       avg_score: "Gjennomsnittlig resultat"
+      empty_outcome_selection: "Velg et utfall for å se mer informasjon her."
       high_score: "Høyeste resultat"
       low_score: "Laveste resultat"
+      outcome_info: "Utfallet Informasjon"
+      result_sub_count: "Totalt resultater:"
     screenreader_gradebook: 
       assignments: "Oppgaverjavascript:;"
       learning_mastery: "Mestringsbasert læring"
@@ -12881,19 +13081,39 @@ nb:
         include_ungraded_assignments: "Behandle ikke karaktersatt som 0"
         set_group_weights: "Sett vekting for grupper"
         show_concluded_enrollments_label: "Vis fullførte påmeldinger"
+        show_notes: "Vis merknader i Student Info"
+        show_total_as_points: "Vis Totalt som punkter på Student Grade Side"
         sis_export: "Overfør karakterer til SIS"
+        upload_scores: "Last opp Scores (.csv)"
+      header: 
+        global_settings: "Globale Innstillinger"
       mastery_toggles_and_actions: 
+        download_results: "Last ned Resultater (.csv)"
         hide_student_names_label: "Skjul studentnavn"
+      section_select: 
+        select_a_section: "Velg en seksjon"
+      sort_select: 
+        sort_assignments: "Sorter oppdrag"
     student_information: 
       assignment_groups: 
         ag_group_grade: Karakter
         ag_group_name: Oppgavegruppe
+        ag_group_percent_grade: "% av Grade"
         ag_letter_grade: Bokstavkarakter
+      details: 
+        hidden: skjult
+        secondary_id: "Sekundært ID:"
+        sections: Seksjoner
       index: 
+        empty_student_selection: "Velg en student for å se mer informasjon her."
         grades: Karakterer
+        student_info: "Student Informasjon"
+        submissions_loading: "Innleveringer for denne studenten er fortsatt lasting..."
   search: 
     all_courses: 
       name: Navn
+      open_enrollment_only: "Åpen bare påmelding kurs"
+      public_only: "Kun offentlige kurs"
       search: Søk
       titles: 
         all_courses: "Alle kurs"
@@ -13131,6 +13351,9 @@ nb:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Klikk her for å laste ned"
+        download_message: "Innleveringer vil bli komprimert i en zip filen for nedlasting. Dette kan ta litt tid, avhengig av størrelsen og antall innlevering filer."
+        download_message_intro: "Ditt Student innleveringer blir samlet."
+        download_submissions: "Laste ned alle innleveringer"
     conference: 
       buttons: 
         delete: "Slett konferanse"
@@ -13318,6 +13541,7 @@ nb:
       crowdsourced_warning_title: "Crowdsourced språk"
     login: 
       back_to_login: "Tilbake til innlogging"
+      browse_courses: "Bla gjennom kurs"
       buttons: 
         request_password: "Spør om passord"
       coenrollment_banner: "*Forelder til en Canvas-bruker?* **Klikk her for en konto**"
@@ -13865,6 +14089,8 @@ nb:
     inexact_answer: "%{lower_bound} til %{upper_bound}"
     no_answer: "Intet svar"
   step: Trinn
+  stream_items_api: 
+    assessment_request_title: "Peer Gjennomgang for %{title}"
   student_assignment_outcome_map_title: "Studentens kompetanse"
   student_groups: 
     group_join: "Ble med i gruppen %{group_name}"
@@ -13874,13 +14100,19 @@ nb:
       group_explanation: "Grupper er et bra sted å samarbeide om prosjekter eller finne ut av timeplanen for kollokviegrupper og lignende. Hver gruppe får en kalender, en wiki, diskusjoner, og litt plass til å lagre filer. Grupper kan samarbeide om dokumenter eller sette opp nettkonferanser. Det er på en måte som et minikurs der du kan jobbe med færre studenter eller et mer fokusert prosjekt."
       joining: "Blir med"
       name: Gruppenavn
+      name_error: "Gruppenavn kreves"
     search_groups_placeholder: "Søk i grupper eller personer"
     student_groups: 
       full: Full
       group: Gruppe
+      group_full: "Gruppe er full"
+      invite_only: "Inviter Bare"
       student_groups_join: "Bli med"
+      student_groups_leave: Forlate
+      student_groups_switch: "Bytt til"
       student_groups_tabs_everyone: Alle
       student_groups_tabs_groups: Grupper
+      visit: Besøk
     student_groups_filter_description: "Etter hvert som du skriver tekst i dette feltet, vil listen over grupper bli automatisk filtrert til kun å inneholde de som har et navn som passer med det du skriver inn. "
     students_count: 
       one: "1 student"
@@ -14405,6 +14637,7 @@ nb:
   unpublished_courses_title: "Ikke publiserte kurs"
   unsupported_package: "Ustøttet innholdspakke"
   until_date_949017c4: "Til %{date}"
+  untitled_assignment_59354b34: "Uten tittel oppdrag"
   unused_courses_title: "Ikke benyttede kurs"
   upload_button: 
     upload: "Last opp"
@@ -14544,6 +14777,7 @@ nb:
       linked_in: "LinkedIn er en ressurs for å danne nettverk. Mange av relasjonene du etablerer under studiet kan komme til nytte senere."
       skype: "Skype er et gratis verktøy for stemme- og videosamtaler."
       twitter: "Twitter er en god ressurs for kommunikasjon utenfor klasserommet."
+      yo: "Yo er en enkelt-trykk null tegn kommunikasjonsverktøy."
   users: 
     admin_merge: 
       buttons: 
@@ -15057,6 +15291,9 @@ nb:
       archive_link: "Se arkiv(er)"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringer på spørsmål i denne prøven.* Disse endringene vil ikke vises for studentene før du lagrer prøven."
   you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Du har gjort upubliserte endringer i denne prøven.* Disse endringene vil ikke vises for studentene før du publiserer eller republiserer prøven."
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    one: "Søket ditt oppstått følgende feil:"
+    other: "Søket ditt oppstått følgende feilene:"
   zero_activity_title: "Null aktivitet"
   zip_argument_error: "Opplasting av en zip-fil krever en mappe å laste opp til."
   zip_file_description: "Flytte-programtillegg for å pakke ut .zip-arkiver til kurs-, gruppe-, eller brukerfiler"
