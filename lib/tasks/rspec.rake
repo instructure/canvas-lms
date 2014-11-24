@@ -87,9 +87,9 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
       t.send(spec_files_attr, ParallelExclude::AVAILABLE_FILES)
     end
 
-    klass.new(:selenium_non_parallel) do |t|
+    klass.new(:selenium_non_parallel, :test_files) do |t,test_files|
       t.rspec_opts = ["--format", "doc", "--tag non_parallel"]
-      t.send(spec_files_attr, FileList['spec/selenium/**/*_spec.rb'] + FileList['{gems,vendor}/plugins/*/spec_canvas/selenium/*_spec.rb'])
+      t.send(spec_files_attr, test_files)
     end
 
     desc "Print Specdoc for all specs (excluding plugin specs)"

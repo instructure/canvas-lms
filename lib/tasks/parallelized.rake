@@ -19,7 +19,6 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     task :selenium, :count, :build_section do |t, args|
       require "parallelized_specs"
       #used to split selenium builds when :build_section is set split it in two.
-      Rake::Task['spec:selenium_non_parallel'].execute
 
       test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['{gems,vendor}/plugins/*/spec_canvas/selenium/*_spec.rb']
 
@@ -57,11 +56,13 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       test_files.map! { |f| "#{Rails.root}/#{f}" }
       test_files.each { |f| puts f }
 
+      Rake::Task['spec:selenium_non_parallel'].execute(test_files)
+
       puts 'starting paralellized selenium spec runtime'
       Rake::Task['parallel:spec'].invoke(args[:count], '', '', test_files.join(' '))
     end
 
-    task :pattern, :count, :file_pattern do |t, args|
+    task(:pattern, :count, :file_pattern) do |t, args|
       require "parallelized_specs"
       count = args[:count]
       file_pattern = args[:file_pattern]
