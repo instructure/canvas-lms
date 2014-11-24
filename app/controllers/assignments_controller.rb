@@ -56,6 +56,7 @@ class AssignmentsController < ApplicationController
           :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
         :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)

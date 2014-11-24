@@ -37,15 +37,19 @@
         {{#t "assignment_due_at"}}Due:{{/t}}
       </label>
       <div class="controls">
-      {{#if multipleDueDates}}
+      {{#ifAny multipleDueDates isOnlyVisibleToOverrides}}
         <span class="datetime_field multiple_due_dates" title
               data-tooltip-selector="#vdd_tooltip_{{uniqLabel}}"
               aria-labelledby="vdd_tooltip_{{uniqLabel}}">
-          <input
-            class="input-medium"
-            type="text"
-            value="{{#t 'multiple_due_dates'}}Multiple due dates{{/t}}"
-            disabled="disabled" />
+            <input
+              class="input-medium"
+              type="text"
+              {{#if multipleDueDates}}
+                value="{{#t 'multiple_due_dates'}}Multiple due dates{{/t}}"
+              {{else}}
+                value="{{#t 'differentiated_due_dates'}}Differentiated due date{{/t}}"
+              {{/if}}
+              disabled="disabled" />
         </span>
 
         <div id="vdd_tooltip_{{uniqLabel}}" style="display:none;">
@@ -67,7 +71,7 @@
           name="due_at"
           value="{{datetimeFormatted dueAt false}}"
           {{disabledIfIncludes frozenAttributes "due_at"}}/>
-      {{/if}}
+      {{/ifAny}}
       </div>
     </div>
 
