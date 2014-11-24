@@ -766,7 +766,8 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit
-    Auditors::GradeChange.record(self) if self.grade_changed?
+    return true unless self.grade_changed?
+    connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
   include Workflow
