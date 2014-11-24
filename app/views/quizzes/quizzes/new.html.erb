@@ -162,6 +162,13 @@
               <div class="controls">
                 <p class="option-caption"><strong>Options</strong></p>
 
+                <% if @context.feature_enabled?(:post_grades) %>
+                  <label class="checkbox" for="post_quiz_to_sis">
+                    <%= check_box :assignment, :post_to_sis %>
+                    <%= t(:post_to_sis, "Post Grades to SIS") %>
+                  </label>
+                <% end %>
+
                 <label class="checkbox" for="quiz_shuffle_answers">
                   <%= check_box :quiz, :shuffle_answers %>
                   <%= t(:shuffle_answers, "Shuffle Answers") %>
