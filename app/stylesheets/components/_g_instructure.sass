@@ -533,7 +533,10 @@ ul.group_list
 
 
   .wizard_content
-    :background-color #eee
+    @if $use_high_contrast
+      :background-color #fff
+    @else
+      :background-color #eee
     :border-top 1px solid #888
     :padding 10px
     // :position relative
@@ -579,11 +582,17 @@ ul.group_list
         border-radius: 3px
 
         &:hover
-          :background-color #ddd
+          @if $use_high_contrast == false
+            :background-color $canvas-light
         &.completed a
           :color #aaa
         &.selected
-          :background-color #ccc
+          @if $use_high_contrast
+            a
+              :color $canvas-dark
+              :text-decoration none
+          @else
+            :background-color $canvas-light
 
         a[class*=icon-], a[class^=icon-]
 
