@@ -6,7 +6,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 begin
-  require '../../spec/coverage.rb'
+  require '../../spec/coverage_tool.rb'
   CoverageTool.start('lti_outbound-gem')
 rescue LoadError => e
   puts "Error: #{e} "

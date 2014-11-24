@@ -1,5 +1,5 @@
 begin
-  require '../../spec/coverage.rb'
+  require '../../spec/coverage_tool.rb'
   CoverageTool.start('canvas-quiz-statistics-gem')
 rescue LoadError => e
   puts "Error: #{e} "
