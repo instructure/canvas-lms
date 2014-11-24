@@ -55,6 +55,11 @@ nb:
   locales:
     nb: Norwegian (Bokmål)
   qualified_locale: nb-NO
+ko:
+  locales:
+    ko: 한국말 (crowd-sourced)
+  qualified_locale: ko-KR
+  crowdsourced: true
 en-GB:
   locales:
     en-GB: English (United Kingdom)
