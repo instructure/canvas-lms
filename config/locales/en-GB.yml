@@ -60,6 +60,7 @@ en-GB:
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
+      yo: Yo
     ask_canvas_network: "Ask the Canvas Network Community"
     default_account_name: "Default account"
     default_site_administrator_account_name: "Site admin"
@@ -1303,6 +1304,7 @@ en-GB:
   allow_lor_tools: "Allow users to view and use external tools configured for LOR."
   allow_opt_out_of_inbox: "Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences."
   always_3a59e701: Always
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: "An unknown server error occurred.  Please try again."
   analytics: 
     course: 
       analytics: Analytics
@@ -1368,6 +1370,7 @@ en-GB:
     podcast_feed_description_course: "Any media files linked from or embedded within announcements in the course \"%{course}\" will appear in this feed."
     podcast_feed_description_group: "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed."
     podcast_feed_name: "%{course} announcements podcast feed"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Answers will be shown after your last attempt"
   application: 
     errors: 
       feed_not_found: "Could not find feed."
@@ -1807,6 +1810,7 @@ en-GB:
     grading_type_selector: 
       display_grade_as: "Display Grade as"
       gpa_scale_explainer: "GPA Scale Grading is designed for schools that use a 4.0 scale (or 5.0/6.0) for all assignments. This grading scheme is similar to the Letter Grade display but features some important differences:"
+      gpa_scale_input_explainer: "Scores are input on the 4.0 scale. For instance, if an assignment is out of 100 points, inputting 4.0 results in 100%, 3.0 results in 87%, etc."
       gpa_scale_letters_explainer: "Letter grades can be used in addition to number grades."
       gpa_scale_percentage_explainer: "You cannot input points directly, but can input percentages. For instance, if an assignment is out of 50 points, inputting \"40\" will not work, but \"80%\" will."
       gpa_scale_recommendation: "Unless your school uses a 4.0 scale (or 5.0/6.0) for grading, Canvas recommends displaying grades as Letter Grade."
@@ -2169,6 +2173,8 @@ en-GB:
         originality_report_visible_after_due_date: "After the due date"
         originality_report_visible_after_grading: "After the assignment is graded"
         originality_report_visible_immediately: Immediately
+        settings_exclude_fewer_than_count: "Fewer than %{wordsInput} words"
+        settings_exclude_less_than_percent: "Less than %{percentInput} of the document"
     undated_assignments: "Undated assignments"
     upcoming_assignments: "Upcoming assignments"
     wizard_box: 
@@ -2476,6 +2482,7 @@ en-GB:
       scheduler_explanation_teacher_paragraph_1: "This is the scheduler tool. You can use it to create appointment groups for your students to sign up for."
       scheduler_explanation_teacher_paragraph_2: "For example, lets say you want to go over the midterm paper assignment with each of the students in your course. You would create a new appointment group, specify the dates and times that you're available, tell it to split that time into 15 minute blocks and only allow one student per time-block."
       scheduler_explanation_teacher_paragraph_3: "Then students would get notified and see that they need to sign up for one of the specified time blocks. They will be shown a calendar with the available time blocks overlaid on top of everything on their other calendars so they can pick a time that works for them."
+      scheduler_explanation_teacher_paragraph_4: "* Get started now by clicking the \"Create an appointment group\" button to the right. *"
       signed_up_for: "You're signed up for"
       x_groups_have_signed_up: "%{participant_count} groups have signed up"
       x_people_have_signed_up: "%{participant_count} people have signed up"
@@ -2522,6 +2529,7 @@ en-GB:
         warning: Warning
     edit_appointment_group: 
       affect_reservations: "How will this affect reservations?"
+      appointments_per_participant_label: "Maximum number of appointments a participant can attend"
       appt_group_options_help1: "Some existing reservations are over the limit you have added. These will not be affected, this change only prevents new reservations from being made."
       appt_group_options_help2: "You can, however, manually remove any existing reservations."
       calendar: Calendar
@@ -2531,6 +2539,8 @@ en-GB:
       group_signup: "Have students sign up in groups."
       location: Location
       name: Name
+      participants_per_appointment_label: "Max users/groups per appointment"
+      slot_duration_label: "Minutes per slot"
       time_range: "Time range"
     edit_appt_calendar_event: 
       description: "Description:"
@@ -2984,6 +2994,7 @@ en-GB:
     body: "Your Canvas verification code is %{verification_code}"
     default_facebook_account: "Facebook account"
     default_twitter_handle: "Twitter handle"
+    default_yo_name: "Yo Name"
   communication_channels: 
     confirm: 
       buttons: 
@@ -4588,6 +4599,7 @@ en-GB:
         status_link: "Import Status"
         text: "One or more items are currently being imported. They will be shown in the course below once they are available."
     index: 
+      browse_more_courses: "Browse more courses"
       headings: 
         future_enrollments: "Future enrolments"
         my_courses: "My courses"
@@ -4647,6 +4659,8 @@ en-GB:
         duplicates_removed: "Some duplicates were removed."
         email: Email
         email_field_label: "Enter the email addresses of the users you would like to add, seperated by commas"
+        email_field_place_holder: "\"Example Student\" <student@example.com>, \"Lastname, Firstname\" <firstlast@example.com>, justAnEmailAddress@example.com"
+        example_formats: "Examples: user@example.com, \"First Last\" <user@example.com>, \"Last, First\" <user@example.com>"
         form_instructions: "Type or paste a list of email addresses below:"
         go_back: "Start over"
         have_been_enrolled: "The following users have been enrolled"
@@ -5422,6 +5436,7 @@ en-GB:
       new_quiz: "New quiz"
     edit_crumb: Edit
     edit_view: 
+      add_attachment_93868828: "Add attachment"
       allow_threaded_replies: "Allow threaded replies"
       attachment: Attachment
       available_from: "Available from"
@@ -5436,7 +5451,7 @@ en-GB:
       page_header_title: "New discussion"
       points_possible: "Points possible"
       post_at: "Post At"
-      remove_attachment_ceae0973: "Remove Attachment"
+      remove_attachment_ceae0973: "Remove attachment"
       save: Save
       saving: Saving...
       topic_title: "Topic title"
@@ -5647,6 +5662,7 @@ en-GB:
     unsubscribe: "Unsubscribe from this topic"
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
+  display_course_catalog: "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled."
   draft_state_description: |-
       This beta feature redesigns many parts of Canvas and allows content to exist in
       a new unpublished state that is invisible to students and excluded from grade
@@ -6028,6 +6044,7 @@ en-GB:
         body1: "You may have noticed at the bottom of this page is a list of recent submissions from your classes (%{showme}). You can quickly add submissions to new pages in your portfolio from this page. Just click the submission you want to add and a simple dialogue will pop up."
         body2: "Great! Now to finish adding the submission, you need to choose which section you'd like to add it to and give the page a name. After you click \"Add page\" you'll be taken to the new page so you can edit it in more detail if you like."
   error_message_2b9d12ee: "Error: %{message}"
+  error_uploading_file_e2d31b56: "Error uploading file."
   errors: 
     bad_navigation_config: "Invalid course tab configuration"
     blank: Required
@@ -6194,6 +6211,7 @@ en-GB:
       all: All
       app_headder: "External Apps"
       external_tools_note: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools."
+      external_tools_references: "*See some LTI tools* that work great with Canvas. You can also check out the ** Canvas Community topics about LTI tools**"
       installed: Installed
       not_installed: "Not Installed"
       search_filter: "Filter by name"
@@ -6279,6 +6297,7 @@ en-GB:
   features: 
     allow_opt_out_of_inbox: "Allow users to opt out of the inbox"
     better_file_browsing: "Better File Browsing"
+    course_catalog: "Course catalogue"
     differentiated_assignments: "Differentiated Assignments"
     differentiated_assignments_account_disable_warning: |-
         Turning this feature off will impact existing courses. For assistance in disabling this feature, please contact
@@ -6591,6 +6610,7 @@ en-GB:
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
     group: Group
     hide_all_details_button: "Hide all details"
+    mic_blocked_message: "Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream"
     mute_assignment: "Mute assignment"
     new_assessment: "[New assessment]"
     no_submission_time: "no submission time"
@@ -6603,6 +6623,7 @@ en-GB:
     recording_message: Recording...
     show_all_details_button: "Show all details"
     student: Student
+    student_index: "Student %{index}"
     student_mute_notification: "Instructor is working on grades"
     titles: 
       click_to_record: "Speech to Text"
@@ -6945,6 +6966,7 @@ en-GB:
         save: Save
         save_settings: "Save settings"
         submit_comment: "Submit comment"
+      crocodoc_pending: "Crocodoc is still processing this document."
       gradebook: 
         mute_assignment: "Mute assignment"
         unmute_assignment: "Unmute assignment"
@@ -7342,14 +7364,17 @@ en-GB:
       group_category_create: 
         allow_self_signup: "Allow self sign-up"
         cancel: Cancel
+        create_groups: "Create %{num_groups} groups now"
         create_groups_manually: "I'll create groups manually"
         group_set_name: "Group Set Name"
         group_structure: "Group structure"
         leave_group_limit_blank: "Leave blank for no limit"
+        limit_group_size: "Limit groups to %{group_limit} members"
         require_same_section: "Require group members to be in the same section"
         save: Save
         saving: Saving...
         self_signup: "Self sign-up"
+        split_into_groups: "Split students into %{num_groups} equal groups"
       group_category_detail: 
         add_group: "Add group"
         category_settings: Settings
@@ -7370,6 +7395,7 @@ en-GB:
         group_limit_override: "Changing this will override any individually set group limits"
         group_set_name: "Group Set Name"
         leave_group_limit_blank: "Leave blank for no limit"
+        limit_group_size: "Limit groups to %{group_limit} members"
         require_same_section: "Require group members to be in the same section"
         save: Save
         saving: Saving...
@@ -9940,20 +9966,34 @@ en-GB:
     sub_header: "Sub header"
   modules: 
     add: 
+      assignment: 
+        add_assignments: "Add assignments"
+        loading_assignments: "Loading assignments..."
+      discussion: 
+        add_topics: "Add discussion topics"
+      file: 
+        add_files: "Add files"
       header: 
         cancel: Cancel
+        create_header: "Create header"
       link: 
+        add_link: "Add link"
         cancel: Cancel
+      page: 
+        add_pages: "Add pages"
+      quiz: 
+        add_quizzes: "Add quizzes"
       tool: 
         cancel: Cancel
     add_item: 
+      add_new_item: "Add new item"
       assignment: Assignment
-      content_page: "Content Page"
+      content_page: "Content page"
       discussion: Discussion
       external_tool: "External tool"
       external_url: "External URL"
       file: File
-      page: "Content Page"
+      page: "Content page"
       quiz: Quiz
       text_header: "Text header"
     add_module_item_dialog: 
@@ -9968,24 +10008,32 @@ en-GB:
         create: Create
       discussion: 
         cancel: Cancel
+        create_discussion: "Create discussion"
       file: 
         cancel: Cancel
         upload: Upload
       header: 
         cancel: Cancel
+        create_header: "Create header"
       link: 
+        add_link: "Add link"
         cancel: Cancel
       page: 
         cancel: Cancel
+        creat_page: "Create page"
       quiz: 
         cancel: Cancel
+        create_quiz: "Create quiz"
       tool: 
         cancel: Cancel
     dialog_title: "Add item to %{moduleName}"
     item: 
       cancel: Cancel
+      edit_item: "Edit module item"
+      item_title: "Module item title"
       points_possible: pts
       save: Save
+      saving: saving...
     module: 
       header: 
         delete: Delete
@@ -10000,7 +10048,10 @@ en-GB:
     module_edit: 
       Create: Create
       cancel: Cancel
+      has_unlock_date: "Lock modules until a given date"
+      lock_datea: "Lock date"
       module_name: "Module name"
+      new_module: "Create new module"
     module_item_view: 
       button: 
         delete: Delete
@@ -10063,6 +10114,7 @@ en-GB:
     sure_you_want_to_mute: "Are you sure you want to mute this assignment? While this assignment is muted, students will not receive new notifications about or be able to see:"
   name: "Academic Benchmark importer"
   new_facebook_message: "You have a new message from Canvas"
+  new_quiz_statistics_desc: "Enable the new quiz statistics page for a course."
   new_styles_description: |-
       We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
       updated, simplified look and feel of the Canvas interface. This is very much a "Work in progress"
@@ -10280,6 +10332,8 @@ en-GB:
         display: "Mobile number"
       twitter: 
         display: Twitter
+      yo: 
+        display: Yo
     frequencies: 
       daily: Daily
       immediately: ASAP
@@ -10540,6 +10594,10 @@ en-GB:
     save_button: Save
     saving_button: Saving...
     warnings: 
+      overwrite_changes: |-
+          You are about to overwrite other changes that have been made since you started editing.
+          
+          Overwrite these changes?
       unsaved_changes: "You have unsaved changes. Do you want to continue without saving these changes?"
   paginated_collection: 
     no_items: "No items."
@@ -10605,8 +10663,13 @@ en-GB:
       labels: 
         api_key: "Crocodoc API Key"
     diigo: 
+      description: "Diigo integration"
       name: Diigo
     diigo_settings: 
+      description: |-
+          You will need to register a [new app on Diigo](%{diigo_url}).
+          
+          * After you save your app, make a note of the API Key
       labels: 
         api_key: "API key"
     dim_dim_settings: 
@@ -10797,8 +10860,15 @@ en-GB:
     notices: 
       settings_updated: "Plugin settings successfully updated."
     panda_pub_settings: 
+      description: "PandaPub is a pub/sub service which, when configured, allows some parts of Canvas to receive notifications of events within the browser, rather than polling for changes."
       labels: 
+        application_id: "Application Id"
         base_url: "Base URL"
+        key_id: "Key ID"
+        key_secret: "Key secret"
+    pandapub: 
+      description: "Pub/Sub service"
+      name: PandaPub
     qti_converter_settings: 
       labels: 
         enabled: Enabled
@@ -10872,6 +10942,13 @@ en-GB:
         domain: Domain
         password: Password
         username: Username
+    yo: 
+      description: "Just Yo"
+      name: Yo
+    yo_settings: 
+      description: "You will need an [api token from Yo](%{yo_url})."
+      labels: 
+        api_token: "Api token"
   polling: 
     poll_sessions: 
       errors: 
@@ -10971,6 +11048,7 @@ en-GB:
         register_linkedin_account: "Register your LinkedIn account"
         save_login: "Save login"
         save_skype_name: "Save Skype name"
+        save_yo_name: "Save Yo Name"
         select_image: "Select image"
         update_settings: "Update settings"
       confirm_email_instructions: "Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to resend the email*, and make sure to check your spam folder."
@@ -11006,6 +11084,7 @@ en-GB:
         users_profile: "%{user}'s Settings"
         ways_to_log_in: "Ways to log in"
         web_services: "Web services"
+        yo_login: "Yo Login"
       hints: 
         expires_at: "leave blank for no expiration"
         language: "This will override any browser or account settings."
@@ -11040,6 +11119,7 @@ en-GB:
         token_last_used: "Last used"
         token_purpose: Purpose
         user_name: "User name"
+        yo_name: "Yo Name"
       linkedin_description: "LinkedIn is a great resources for business networking, and can be helpful long after you've finished your education. If you have a LinkedIn account, you can register it here. Then if you allow fellow course/group members to see your registered services, they can easily invite you to link with them without having to search LinkedIn for your profile."
       links: 
         add_account: "Add account"
@@ -11059,6 +11139,7 @@ en-GB:
         upload_new_image: "Upload a new image"
         view_facebook_app: "view the Facebook app"
         view_your_profile: "view your profile"
+        yo: Yo
       loading_token_details: "Loading token details..."
       no_approved_integrations: "Third-party applications can request permission to access the Canvas site on your behalf. As you begin authorising applications you will see them listed here."
       no_language_preference: "System default (%{language})"
@@ -11074,6 +11155,7 @@ en-GB:
         authorize_google_docs: "Authorise Google Docs"
         authorize_linkedin: "Authorise LinkedIn"
         authorize_twitter: "Authorise Twitter"
+        authorize_yo: "Yo Login"
         click_to_change_profile_pic: "Click to change profile pic"
         delicious_login: "Delicious login"
         diigo_login: "Diigo login"
@@ -11092,6 +11174,13 @@ en-GB:
           yourself, and won't appear in your public stream.
       unknown_service: Unknown
       web_services: "Canvas can make your life a lot easier by tying itself in with the web tools you already use. Click any of the services in \"Other services\" to see what we mean."
+      yo_description: |-
+          Yo is a single-tap zero character communication tool.
+          If you have a Yo account, you can register it here. Then if you allow
+          fellow course/group members to see your registered services, they can
+          easily connect with your Yo account.
+          
+          You can also sign up to have notifications sent to your Yo account.
     purpose_required: "Purpose is required"
     resending: resending...
     secondary_nav: 
@@ -11168,6 +11257,8 @@ en-GB:
       validations: 
         should_be_10_digits: "should be 10-digit number"
     ways_to_contact_me: "Ways to contact me"
+    yo_select: 
+      yo: Yo
     you_have_no_services: "You haven't registered any services, you can add some on the *settings* page."
   profiles: 
     avatar_dialog: 
@@ -11209,7 +11300,9 @@ en-GB:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest sent to IdP"
+      logout_request_redirect_from_idp: "Received LogoutRequest from IdP"
       logout_response_redirect_from_idp: "Received LogoutResponse from IdP"
+      logout_response_redirect_to_idp: "Sending LogoutResponse to IdP"
       redirect_from_idp: "Recieved LoginResponse from IdP"
     default_app_name: "Third-party application"
     errors: 
@@ -11469,8 +11562,18 @@ en-GB:
       some_scores_reduced: "Only award points for the correct answer (*some students' scores may be reduced*)"
       update_question_without_regrading: "Update question without regrading"
   quiz_reports: 
+    download_item_analysis: "Download item analysis report."
+    download_student_analysis: "Download student analysis report."
     generatable: "Report has never been generated."
+    generate_item_analysis_report: "Generate item analysis report."
+    generate_student_analysis_report: "Generate student analysis report."
+    generated_at: "Generated: %{date}"
     generating: "Report is being generated..."
+    generation_almost_done: "Almost done."
+    generation_complete: "Report has been generated."
+    generation_halfway: "Less than half-way to go."
+    generation_started: "Report is being generated."
+    non_generatable_report_notice: "Report cannot be generated for Survey Quizzes."
     quiz_report_generator: 
       download_report_name: "Download %{report_name}"
       generate_report_name: "Generate %{report_name}"
@@ -11482,31 +11585,82 @@ en-GB:
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Quiz results are protected for this quiz and can be viewed a single time immediately after submission."
   quiz_statistics: 
     answer_bars_chart: 
+      audible_answer_position: "Answer %{position}:"
+      audible_answer_response_count: 
+        one: "One response."
+        other: "%{count} responses."
+        zero: "No responses."
+      audible_correct_answer_indicator: "This is a correct answer."
+      audible_description: "This table lists all the answers to the question, along with the number of responses they have received."
       response_count: 
-        one: "%{count} students"
+        one: "1 student"
         other: "%{count} students"
+        zero: Nobody
+    answer_details: 
+      hide: "Hide answer details"
+      hide_all: "Hide answer details for all questions"
+      show: "Show answer details"
+      show_all: "Show answer details for all questions"
     attempts: "Attempts: %{count} out of %{total}"
+    correct_answer: "Correct answer"
     correct_essay_student_ratio: "%{ratio}% of your students received full credit for this question."
     correct_multiple_response_ratio: "%{ratio}% of your students responded correctly."
     correct_response_ratio: "%{ratio}% of your students correctly answered this question."
     discrimination_index: 
+      audible_bottom_bracket: "Bottom bracket:"
+      audible_bracket_aced: "All students in this bracket have answered correctly."
+      audible_bracket_failed: "Not a single student in this bracket has provided a correct answer."
+      audible_chart_description: "This table lists how each bracket of students in the class have responded to this question. Student brackets are composed based on their score. The top bracket consists of the highest 27%, while the middle bracket consists of the middle 46%, and the bottom bracket consists of the lowest 27%."
+      audible_discrimination_index: "Discrimination Index: %{number}."
+      audible_middle_bracket: "Middle bracket:"
+      audible_response_ratio_distribution: "%{correct_ratio}% of students in this bracket have answered correctly."
+      audible_top_bracket: "Top bracket:"
+      discrimination_index: "Discrimination Index"
       discrimination_index_dialog_title: "The Discrimination Index Chart"
+      discrimination_index_dialog_trigger: "Learn more about the Discrimination Index."
     download_submissions: "Download all files"
+    duration_in_hours: 
+      one: "1 hour"
+      other: "%{count} hours"
+    duration_in_hours_and_minutes: "%{hours} and %{minutes}"
     duration_in_minutes: 
       one: "%{count} minutes"
       other: "%{count} minutes"
+    duration_in_minutes_and_seconds: "%{minutes} and %{seconds}"
+    duration_in_seconds: 
+      one: "1 second"
+      other: "%{count} seconds"
+    empty_question_breakdown: "There are no question statistics available."
     essay_score: "Score: %{score}"
+    loading_questions: "Question statistics are being loaded. Please wait a while."
     no_answer: "No answer"
+    question_breakdown: "Question breakdown"
+    question_header: "Question %{position}"
     response_student_count: 
-      one: "%{count} students"
+      one: "1 student"
       other: "%{count} students"
+      zero: Nobody
+    speedgrader: "View in SpeedGrader"
     summary: 
+      audible_chart_description: "%{above_average} students scored above or at the average, and %{below_average} below."
       avg_time: "Average time"
+      chart_brushing_tip: "Tip: you can focus a specific segment of the chart by making a selection using your cursor."
+      chart_title: "Score percentiles chart"
       high_score: "High score"
       low_score: "Low score"
       mean: "Average score"
       not_available_abbrev: N/A
+      quiz_summary: "Quiz summary"
       stdev: "Standard deviation"
+      students_who_got_a_certain_score: 
+        one: "One student has received a score of %{score}%."
+        other: "%{count} students have received a score of %{score}%."
+        zero: "No students have received a score of %{score}%."
+      students_who_scored_in_a_range: 
+        one: "One student has scored between %{start} and %{end}%."
+        other: "%{count} students have scored between %{start} and %{end}%."
+        zero: "No students have scored between %{start} and %{end}%."
+      table_description: "Summary statistics for all turned in submissions"
     title: "Quiz statistics"
     unknown_answer: "Something else"
   quizzes: 
@@ -11666,6 +11820,10 @@ en-GB:
     question_count: 
       one: "1 Question"
       other: "%{count} questions"
+    question_limit_reached: |-
+        You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).
+        
+        As a workaround, consider spreading the material across multiple quizzes.
     quiz: 
       current_filter: "Current filter"
       default_question_input: "[ Select ]"
@@ -12134,6 +12292,7 @@ en-GB:
         quizzes_unpublished: 
           one: "1 quiz successfully unpublished!"
           other: "%{count} quizzes successfully unpublished!"
+        submission_doesnt_count: "This quiz will no longer count towards your grade."
       question_group: 
         buttons: 
           update: Update
@@ -12315,6 +12474,7 @@ en-GB:
           republish: Republish
           unlock_quiz: "Let students take this quiz now"
           unlock_survey: "Let students take this survey now"
+        course_concluded_notice: "This quiz is no longer available as the course had been concluded."
         labels: 
           available_until: Until
           no_time_limit: "No time limit"
@@ -12592,6 +12752,7 @@ en-GB:
     progress_error: "An error occured trying to prepare download, please try again."
     progress_message: "Preparing download: %{percent}% complete"
     restrict_access: "Restrict Access"
+    results_count: "Showing %{num_results} search results"
     retry: Retry
     search_for_files: "Search for files"
     search_results_for: "search results for \"%{search_term}\""
@@ -12771,6 +12932,8 @@ en-GB:
   role_overrides: 
     account_permissions: "Account permissions"
     admin_tools_permissions: "Admin tools"
+    cannot_deactivate_inactive_role: "Cannot deactivate an already inactive role"
+    cannot_remove_built_in_role: "Cannot remove a built-in role"
     course_permissions: "Course & account permissions"
     index: 
       crumbs: 
@@ -12871,52 +13034,111 @@ en-GB:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
+        assignment_is_muted: Muted?
         curve_grades: "Curve grades"
         message_students: "Message students who..."
+        set_default_grade: "Set default grade"
       details: 
         avg_score: "Average score"
+        graded_sub_count: "Graded submissions:"
         high_score: "High score"
         low_score: "Low score"
         no_points: "No points possible"
         points_possible: "Points possible"
+        submission_types: "Submission types:"
       index: 
+        assignment_in_speedgrader: "See this assignment in speedgrader"
+        assignment_info: "Assignment information"
+        empty_assignment_selection: "Select an assignment to view additional information here."
+        no_points_possible_warning: "Assignments in this group have no points possible and cannot be included in grade calculation."
         warning: Warning
+    components: 
+      final_grade: 
+        final_grade: "Final grade:"
+    content_selection: 
+      assignment: 
+        select_assignment: "Select an assignment"
+      header: 
+        content_selection: "Content selection"
+      outcome: 
+        select_outcome: "Select an outcome"
+      student: 
+        select_student: "Select a student"
     grading: 
+      empty_submission_selection: "Select a student and an assignment to view and edit grades."
+      grade_for: "Grade for: %{name}"
       grading: Grading
+      is_dropped: "This grade is currently dropped for this student."
+      is_late: "This submission was late."
       submission_details: "Submission details"
+      submission_hidden: "This assignment is not available to this student and will not be included in their grade."
+      was_resubmitted: "This assignment has been resubmitted since it was graded last."
     header: 
       gradebook_individual_view: "Gradebook: Individual View"
+      save_instructions: "Note: Grades and notes will be saved automatically after moving out of the field."
+      switch_to_gradebook2: "Switch to Default Gradebook"
     learning_mastery: 
+      download_results: "Download results (.csv)"
+      empty_student_selection: "Select a student to view additional information here."
+      empty_submission_selection: "Select a student and an outcome to view results."
       hide_student_names_label: "Hide student names"
       result: Result
+      result_for: "Result for:"
+      results_loading: "Results for this student are still loading..."
+      select_a_section: "Select a section"
+      select_student: "Select a student"
+      student_info: "Student information"
     outcome_information: 
       avg_score: "Average score"
+      empty_outcome_selection: "Select an outcome to view additional information here."
       high_score: "High score"
       low_score: "Low score"
+      outcome_info: "Outcome information"
+      result_sub_count: "Total results:"
     screenreader_gradebook: 
       assignments: Assignments
-      learning_mastery: "Learning Mastery"
+      learning_mastery: "Learning mastery"
     settings: 
       assignment_toggles_and_actions: 
         download_scores: "Download scores (.csv)"
         grading_history: "View grading history"
         hide_student_names_label: "Hide student names"
-        include_ungraded_assignments: "Treat Ungraded as 0"
+        include_ungraded_assignments: "Treat ungraded as 0"
         set_group_weights: "Set group weights"
         show_concluded_enrollments_label: "Show concluded enrolments"
+        show_notes: "Show notes in student info"
+        show_total_as_points: "Show totals as points on Student Grade Page"
         sis_export: "Publish grades to SIS"
+        upload_scores: "Upload scores (.csv)"
+      header: 
+        global_settings: "Global settings"
       mastery_toggles_and_actions: 
+        download_results: "Download results (.csv)"
         hide_student_names_label: "Hide student names"
+      section_select: 
+        select_a_section: "Select a section"
+      sort_select: 
+        sort_assignments: "Sort assignments"
     student_information: 
       assignment_groups: 
         ag_group_grade: Grade
         ag_group_name: "Assignment group"
+        ag_group_percent_grade: "% of grade"
         ag_letter_grade: "Letter grade"
+      details: 
+        hidden: hidden
+        secondary_id: "Secondary ID:"
+        sections: "Sections:"
       index: 
+        empty_student_selection: "Select a student to view additional information here."
         grades: Grades
+        student_info: "Student information"
+        submissions_loading: "Submissions for this student are still loading..."
   search: 
     all_courses: 
       name: Name
+      open_enrollment_only: "Open enrolment courses only"
+      public_only: "Public courses only"
       search: Search
       titles: 
         all_courses: "All courses"
@@ -13154,6 +13376,9 @@ en-GB:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Click here to download"
+        download_message: "The submissions will be compressed into a zip file for download. This may take some time, depending on the size and number of submission files."
+        download_message_intro: "Your student submissions are being gathered."
+        download_submissions: "Download all submissions"
     conference: 
       buttons: 
         delete: "Delete conference"
@@ -13341,6 +13566,7 @@ en-GB:
       crowdsourced_warning_title: "Crowdsourced language"
     login: 
       back_to_login: "Back to login"
+      browse_courses: "Browse courses"
       buttons: 
         request_password: "Request password"
       coenrollment_banner: "*Parent of a Canvas User?* **Click here for an account**"
@@ -13575,9 +13801,11 @@ en-GB:
     select_content_dialog: 
       add_to_module: "Add %{item} to *module*"
       assignment_item: Assignment
+      assignment_item_select_label: "Select the assignment you want to associate, or add an assignment by selecting \"New Assignment\"."
       assignment_notice: "Select the assignment you want to associate with this *module*, or add an assignment by selecting \"New Assignment\"."
       content_page_item: "Content Page"
       discussion_item: Discussion
+      discussion_topic_select_label: "Select the topic you want to associate, or add a topic by selecting \"New Topic\"."
       domain_match_notice: "to use this tool the domain must match %{domain}"
       external_tool_item: "External tool"
       external_tool_notice: "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*."
@@ -13585,6 +13813,7 @@ en-GB:
       external_url_notice: "Enter a URL and page name to add a link to any website URL to this *module*."
       file_item: File
       file_notice: "Select the file you want to associate with this *module*, or add a file by selecting \"New File\"."
+      file_select_label: "Select the file you want to associate, or add a file by selecting \"New File\"."
       indent_level: 
         one: "*Indent 1 Level*"
         other: "*Indent %{count} levels*"
@@ -13611,10 +13840,13 @@ en-GB:
         assignments: Assignments
       quiz_item: Quiz
       quiz_notice: "Select the quiz you want to associate with this *module*, or add a new one by selecting \"New quiz\"."
+      quiz_select_label: "Select the quiz you want to associate, or add a new one by selecting \"New Quiz\"."
+      select_item_type_label: "Select the type of content to add."
       sub_header_notice: "Type the text you'd like to add as a *module* subheader"
       text_header_item: "Text header"
       topic_notice: "Select the topic you want to associate with this *module*, or add a topic by selecting \"New topic\"."
       wiki_page_notice: "Select the wiki page you want to associate with this *module*, or add a new page by selecting \"New page\"."
+      wiki_page_select_label: "Select the wiki page you want to associate, or add a new page by selecting \"New Page\"."
     sequence_footer: 
       full_course_sequence: "see full course sequence"
       next: Next
@@ -13890,22 +14122,30 @@ en-GB:
     inexact_answer: "%{lower_bound} to %{upper_bound}"
     no_answer: "No answer"
   step: Step
+  stream_items_api: 
+    assessment_request_title: "Peer Review for %{title}"
   student_assignment_outcome_map_title: "Student Competency"
   student_groups: 
     group_join: "Joined Group %{group_name}"
     group_leave: "Left Group %{group_name}"
     group_name: "%{group_name} in %{group_category}"
     new_group: 
-      group_explanation: "Groups are a good place to collaborate on projects or to work out schedules for things like study sessions. Every group gets a calendar, a wiki, discussions, and a little bit of space to store files. Groups can collaborate on documents, or even schedule web conferences. It's really like a mini-course where you can work with a smaller number of students on a more focused project."
+      group_explanation: "Groups are a good place to collaborate on projects or to work out schedules for things like study sessions. Every group gets a calendar, a wiki, discussions, and a little bit of space to store files. Groups can collaborate on documents, or even schedule web conferences. It's really like a mini-course where you can work with a smaller number of students on a more focussed project."
       joining: Joining
       name: "Group name"
+      name_error: "Group name is required"
     search_groups_placeholder: "Search Groups or People"
     student_groups: 
       full: Full
       group: Group
+      group_full: "Group is full"
+      invite_only: "Invite Only"
       student_groups_join: Join
+      student_groups_leave: Leave
+      student_groups_switch: "Switch To"
       student_groups_tabs_everyone: Everyone
       student_groups_tabs_groups: Groups
+      visit: Visit
     student_groups_filter_description: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
     students_count: 
       one: "1 student"
@@ -14061,11 +14301,13 @@ en-GB:
       teachers_notified_of_comments: "Teachers and submitter will be notified of all comments."
     show_preview: 
       discussion_submission_description: "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*."
+      discussion_submission_description_without_link: "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}."
       entry_no_image: "Keep in mind that this page may have changed since the submission originally occurred."
       entry_with_image: "We've included a snapshot of what the page looked like when it was submitted. Or you can click to view the original submission."
       external_url_submission: "This submission was a URL to an external page."
       file_uploads_for_user: "File Uploads for **%{user}**"
       group_discussion_submission_description: "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*."
+      group_discussion_submission_description_without_link: "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}."
       media_comment_link: "This submission is a media recording. *click here to view*."
       no_files: "No files were uploaded for this submission"
       no_preview_available: "No preview available"
@@ -14430,6 +14672,7 @@ en-GB:
   unpublished_courses_title: "Unpublished courses"
   unsupported_package: "Unsupported content package"
   until_date_949017c4: "Until %{date}"
+  untitled_assignment_59354b34: "untitled assignment"
   unused_courses_title: "Unused courses"
   upload_button: 
     upload: Upload
@@ -14569,6 +14812,7 @@ en-GB:
       linked_in: "LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace."
       skype: "Skype is a free tool for online voice and video calls."
       twitter: "Twitter is a great resource for out-of-class communication."
+      yo: "Yo is a single-tap zero-character communication tool."
   users: 
     admin_merge: 
       buttons: 
@@ -15084,6 +15328,9 @@ en-GB:
       archive_link: "View archive(s)"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*You have made changes to the questions in this quiz.* These changes will not appear for students until you save the quiz."
   you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*You have made unpublished changes to this quiz.* These changes will not appear for students until you publish or republish the quiz."
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    one: "Your search encountered the following error:"
+    other: "Your search encountered the following errors:"
   zero_activity_title: "Zero Activity"
   zip_argument_error: "A .zip upload requires a folder to upload to."
   zip_file_description: "Migration plugin for unpacking .zip archives into course, group, or user files"
