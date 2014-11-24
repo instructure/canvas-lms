@@ -1367,7 +1367,7 @@ pt:
     podcast_feed_description_course: "Qualquer ficheiro de multimédia com ligação a partir dos anúncios na disciplina \"%{course}\" ou incorporado nos mesmos aparecerá neste feed."
     podcast_feed_description_group: "Qualquer arquivo de mídia com link nos anúncios no grupo \"%{group}\" (ou incorporado nestes) aparecerá neste feed."
     podcast_feed_name: "%{course} Feed Podcast dos anúncios"
-  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "As respostas serão mostradas apenas a última tentativa"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "As respostas serão mostradas após a última tentativa"
   application: 
     errors: 
       feed_not_found: "Não foi possível encontrar o feed."
@@ -11604,15 +11604,15 @@ pt:
       audible_response_ratio_distribution: "%{correct_ratio}% de alunos neste grupo responderam corretamente."
       audible_top_bracket: "Grupo superior:"
       discrimination_index: "Índice de discriminação"
-      discrimination_index_dialog_title: "Gráfico de índice de discriminação"
+      discrimination_index_dialog_title: "Gráfico do índice de discriminação"
       discrimination_index_dialog_trigger: "Saiba mais sobre o Índice de discriminação."
-    download_submissions: "Transferir todos os ficheiros"
+    download_submissions: "Descarregar todos os ficheiros"
     duration_in_hours: 
       one: "1 hora"
       other: "%{count} horas"
     duration_in_hours_and_minutes: "%{hours} e %{minutes}"
     duration_in_minutes: 
-      one: "%{count} minutos"
+      one: "1 minuto"
       other: "%{count} minutos"
     duration_in_minutes_and_seconds: "%{minutes} e %{seconds}"
     duration_in_seconds: 
@@ -11634,15 +11634,15 @@ pt:
       avg_time: "Tempo médio"
       chart_brushing_tip: "Dica: pode realçar um segmento específico do gráfico fazendo uma seleção com o cursor."
       chart_title: "Gráfico de percentis de pontuação"
-      high_score: "Pontuação mais alta"
-      low_score: "Pontuação mais baixa"
+      high_score: "Pontuação alta"
+      low_score: "Pontuação baixa"
       mean: "Pontuação média"
       not_available_abbrev: ND
       quiz_summary: "Resumo do teste"
       stdev: "Desvio padrão"
       students_who_got_a_certain_score: 
         one: "Um aluno recebeu uma pontuação de %{score}%."
-        other: "%{count} receberam uma pontuação de %{score}%."
+        other: "%{count} alunos receberam uma pontuação de %{score}%."
         zero: "Nenhum aluno recebeu uma pontuação de %{score}%."
       students_who_scored_in_a_range: 
         one: "Um aluno teve uma pontuação entre %{start} e %{end}%."
@@ -12269,7 +12269,7 @@ pt:
         score_to_keep: "Pontuação do teste para manter"
         show_correct_answers: "Permitir que os alunos vejam as respostas corretas"
         show_correct_answers_at: "Mostrar respostas corretas em"
-        show_correct_answers_last_attempt: "Apenas após a sua última tentativa"
+        show_correct_answers_last_attempt: "Apenas após a última tentativa deles"
         shuffle_answers: "Baralhar as respostas"
         students_cannot_view_responses_after_course_concludes: "Os alunos não podem ver respostas de testes após a conclusão da disciplina"
         time_limit: "Quantos minutos?"
@@ -13041,8 +13041,8 @@ pt:
       details: 
         avg_score: "Pontuação média"
         graded_sub_count: "Envios avaliados:"
-        high_score: "Pontuação mais alta"
-        low_score: "Pontuação mais baixa"
+        high_score: "Pontuação alta"
+        low_score: "Pontuação baixa"
         no_points: "Nenhum ponto possível"
         points_possible: "Pontos possíveis"
         submission_types: "Tipos de envio:"
@@ -13067,7 +13067,7 @@ pt:
     grading: 
       empty_submission_selection: "Selecione um aluno e uma tarefa para ver e editar notas."
       grade_for: "Nota de: %{name}"
-      grading: Pontuação
+      grading: Avaliação
       is_dropped: "Esta nota está eliminada para este aluno."
       is_late: "Este envio chegou atrasado."
       submission_details: "Detalhes do envio"
@@ -13091,8 +13091,8 @@ pt:
     outcome_information: 
       avg_score: "Pontuação média"
       empty_outcome_selection: "Selecione um objetivo para ver informação adicional aqui."
-      high_score: "Pontuação mais alta"
-      low_score: "Pontuação mais baixa"
+      high_score: "Pontuação alta"
+      low_score: "Pontuação baixa"
       outcome_info: "Informação sobre objetivo"
       result_sub_count: "Resultados totais:"
     screenreader_gradebook: 
@@ -13106,7 +13106,7 @@ pt:
         include_ungraded_assignments: "Tarefas sem nota como 0"
         set_group_weights: "Definir ponderação de grupo"
         show_concluded_enrollments_label: "Mostrar inscrições concluídas"
-        show_notes: "Mostrar comentários na informações sobre aluno"
+        show_notes: "Mostrar comentários na informação sobre aluno"
         show_total_as_points: "Mostrar totais como pontos na página de notas dos alunos"
         sis_export: "Publicar notas em SIS"
         upload_scores: "Carregar pontuações (.csv)"
@@ -13375,7 +13375,7 @@ pt:
         user_menu: "Menu de utilizador"
     components: 
       ic_submission-download-dialog: 
-        click_to_download: "Clique aqui para baixar"
+        click_to_download: "Clique aqui para descarregar"
         download_message: "Os envios serão comprimidos num ficheiro zip para transferência. Esta operação poderá demorar algum tempo, dependendo do tamanho e do número de ficheiros de envio."
         download_message_intro: "Os envios dos alunos estão a ser reunidos."
         download_submissions: "Descarregar todos os envios"
@@ -14130,7 +14130,7 @@ pt:
     group_leave: "Saiu do grupo %{group_name}"
     group_name: "%{group_name} em %{group_category}"
     new_group: 
-      group_explanation: "Grupos são bons locais para colaborar em projetos ou para descobrir agendas para sessões de estudo e coisas do tipo. Cada grupo tem um calendário, um wiki, discussões e um pouco de espaço de armazenamento de ficheiros. Os grupos podem colaborar nos documentos ou mesmo agendar conferências Web. É como uma mini-disciplina de verdade, onde é possível trabalhar com um número menor de alunos num projeto mais focado."
+      group_explanation: "Grupos são bons locais para colaborar em projetos ou para descobrir agendas para sessões de estudo e atividades semelhantes. Cada grupo tem um calendário, um wiki, discussões e um pouco de espaço de armazenamento de ficheiros. Os grupos podem colaborar em documentos ou mesmo agendar conferências Web. É como se fosse uma mini-disciplina, onde é possível trabalhar com um número menor de alunos num projeto mais focado."
       joining: "A aderir"
       name: "Nome do grupo"
       name_error: "É necessário o nome do grupo"
@@ -14164,7 +14164,7 @@ pt:
     student_summary_table_ascending: "Tabela de resumo de alunos ordenada por ordem crescente por %{sortText}"
     student_summary_table_descending: "Tabela de resumo de alunos ordenada por ordem decrescente por %{sortText}"
   students_who_have_taken_the_quiz_count_69dbbda0: 
-    one: "Alunos que não fizeram o teste (%{count})"
+    one: "Alunos que fizeram o teste (%{count})"
     other: "Alunos que não fizeram o teste (%{count})"
     zero: "Alunos que fizeram o teste"
   students_who_have_taken_the_survey_count_ef9e6492: 
