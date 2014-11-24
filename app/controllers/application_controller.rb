@@ -1543,6 +1543,7 @@ class ApplicationController < ActionController::Base
   end
 
   def destroy_session
+    logger.info "Destroying session: #{session[:session_id]}"
     @pseudonym_session.destroy rescue true
     reset_session
   end
