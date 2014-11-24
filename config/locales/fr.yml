@@ -2480,7 +2480,7 @@ fr:
       scheduler_explanation_teacher_paragraph_1: "Voici l’outil de planification. Vous pouvez l’utiliser pour créer des groupes de rendez-vous auxquels vos étudiants peuvent s’inscrire."
       scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le travail sur table de la mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
       scheduler_explanation_teacher_paragraph_3: "Les étudiants seront avisés et verront qu’ils doivent s’inscrire à l’une des tranches horaires indiquées. Un calendrier avec les tranches horaires disponibles s’affichera au-dessus de toutes les activités de leurs autres calendriers pour qu’ils choisissent un horaire qui leur convient."
-      scheduler_explanation_teacher_paragraph_4: "* Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous » proposé à droite. *"
+      scheduler_explanation_teacher_paragraph_4: "* Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous » sur la droite. *"
       signed_up_for: "Vous êtes inscrit pour"
       x_groups_have_signed_up: "%{participant_count} groupes se sont inscrits"
       x_people_have_signed_up: "%{participant_count} personnes se sont inscrites"
@@ -5654,7 +5654,7 @@ fr:
     unsubscribe: "Se désabonner de ce sujet"
     unsubscribed: Désabonné
     unsubscribed_hint: "Vous n’êtes pas abonné à ce sujet. Cliquez pour vous abonner."
-  display_course_catalog: "Affichez une liste des cours consultable dans le compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
+  display_course_catalog: "Affichez une liste des cours consultable dans ce compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
   draft_state_description: |-
       Cette fonction bêta remanie de nombreuses parties de Canvas et permet de mettre le contenu
       dans un nouveau mode, Non publié, ce qui le rend invisible pour les étudiants et l'exclut du calcul des
@@ -10924,7 +10924,7 @@ fr:
     yo_settings: 
       description: "Vous aurez besoin d’un [jeton API de Yo](%{yo_url})."
       labels: 
-        api_token: "Jeton dApi"
+        api_token: "Jeton API"
   polling: 
     poll_sessions: 
       errors: 
@@ -11157,8 +11157,7 @@ fr:
       yo_description: |-
           Yo est un outil de communication à zéro caractère avec lequel une seule pression suffit.
           Si vous avez un compte Yo, vous pouvez l’enregistrer ici. Ensuite, si vous autorisez
-          les autres membres du cours ou du groupe à voir les services que vous avez enregistrés, ils pourront 
-          facilement vous contacter via votre compte Yo.
+          les autres membres du cours ou du groupe à voir les services que vous avez enregistrés, ils pourront facilement vous contacter via votre compte Yo.
           
           Vous pouvez également vous inscrire pour faire envoyer des notifications sur votre compte Yo.
     purpose_required: "La fonction doit être indiquée"
@@ -11554,7 +11553,7 @@ fr:
     generation_almost_done: "Opération presque terminée."
     generation_complete: "Le rapport a été généré."
     generation_halfway: "Opération effectuée à plus de 50 %."
-    generation_started: "Le rapport est en cours de création."
+    generation_started: "Génération du rapport en cours."
     non_generatable_report_notice: "Le rapport ne peut pas être généré pour les questionnaires d’enquête."
     quiz_report_generator: 
       download_report_name: "Télécharger %{report_name}"
@@ -11589,16 +11588,17 @@ fr:
     correct_multiple_response_ratio: "%{ratio}% de vos étudiants ont répondu correctement."
     correct_response_ratio: "%{ratio}% de vos étudiants ont correctement répondu à cette question."
     discrimination_index: 
-      audible_bottom_bracket: "Tranche du bas :"
+      audible_bottom_bracket: "Dernière tranche :"
       audible_bracket_aced: "Tous les étudiants situés dans cette tranche ont répondu correctement."
-      audible_bracket_failed: "Aucun des étudiants situés dans cette tranche n’a répondu correctement."
+      audible_bracket_failed: "Aucun des étudiants situés dans cette tranche n’a fourni de réponse correcte."
+      audible_chart_description: "Ce tableau indique comment les étudiants de chaque tranche dans la classe ont répondu à cette question. Les tranches sont établies en fonction de leurs résultats. La première comprend les 27 % ayant donné la meilleure réponse, la tranche du milieu regroupe les 46 % intermédiaires et la dernière tranche comprend les 27 % restants."
       audible_discrimination_index: "Indice de discrimination : %{number}."
       audible_middle_bracket: "Tranche du milieu :"
       audible_response_ratio_distribution: "%{correct_ratio}% des étudiants situés dans cette tranche ont répondu correctement."
-      audible_top_bracket: "Tranche du haut :"
+      audible_top_bracket: "Première tranche :"
       discrimination_index: "Indice de discrimination "
       discrimination_index_dialog_title: "L’indice de discrimination "
-      discrimination_index_dialog_trigger: "Apprenez-en davantage sur l’indice de discrimination"
+      discrimination_index_dialog_trigger: "Apprenez-en davantage sur l’indice de discrimination."
     download_submissions: "Télécharger tous les fichiers"
     duration_in_hours: 
       one: "1 heure"
@@ -11611,7 +11611,9 @@ fr:
     duration_in_seconds: 
       one: "1 seconde"
       other: "%{count} secondes"
+    empty_question_breakdown: "Il n’y a pas de statistiques disponibles pour la question."
     essay_score: "Résultat : %{score}"
+    loading_questions: "Les statistiques de la question vont s’afficher. Veuillez patienter."
     no_answer: "Aucune réponse"
     question_breakdown: "Détails de la question"
     question_header: "Question %{position}"
@@ -11621,7 +11623,10 @@ fr:
       zero: Personne
     speedgrader: "Voir dans SpeedGrader"
     summary: 
+      audible_chart_description: "%{above_average} étudiants sont dans la moyenne ou au-dessus, et %{below_average} sont en dessous."
       avg_time: "Temps moyen"
+      chart_brushing_tip: "Conseil : vous pouvez vous intéresser à un segment spécifique du graphique en effectuant une sélection avec le curseur."
+      chart_title: "Graphique des centiles "
       high_score: "Bonne note"
       low_score: "Note faible"
       mean: "Note moyenne"
@@ -12464,7 +12469,7 @@ fr:
           republish: Republier
           unlock_quiz: "Autoriser les étudiants à compléter ce questionnaire"
           unlock_survey: "Autoriser les étudiants à compléter cette enquête"
-        course_concluded_notice: "Ce questionnaire n’est plus disponible car le cours a été terminé."
+        course_concluded_notice: "Ce questionnaire n’est plus disponible, car le cours a été terminé."
         labels: 
           available_until: Jusqu’au
           no_time_limit: "Aucune limite de temps"
@@ -12742,6 +12747,7 @@ fr:
     progress_error: "Une erreur s’est produite lors de la préparation du téléchargement. Veuillez réessayer."
     progress_message: "Préparation du téléchargement : %{percent}% effectués"
     restrict_access: "Limiter l’accès "
+    results_count: "Afficher %{num_results} résultats pour la recherche"
     retry: Réessayer
     search_for_files: "Rechercher des fichiers"
     search_results_for: "résultats de recherche pour « %{search_term} »"
@@ -13026,6 +13032,7 @@ fr:
         assignment_is_muted: Muet ?
         curve_grades: "Courbe des notes"
         message_students: "Envoyer un message aux étudiants qui..."
+        set_default_grade: "Définir la note par défaut"
       details: 
         avg_score: "Note moyenne"
         graded_sub_count: "Envois notés :"
@@ -13037,6 +13044,8 @@ fr:
       index: 
         assignment_in_speedgrader: "Voir ce travail dans SpeedGrader"
         assignment_info: "Informations sur le travail"
+        empty_assignment_selection: "Sélectionnez un travail pour afficher des informations complémentaires ici."
+        no_points_possible_warning: "Les travaux de ce groupe n’ont pas de points possibles et ne peuvent pas être inclus dans le calcul de la note."
         warning: Avertissement
     components: 
       final_grade: 
@@ -13046,26 +13055,41 @@ fr:
         select_assignment: "Sélectionner un travail"
       header: 
         content_selection: "Sélection de contenu"
+      outcome: 
+        select_outcome: "Sélectionner un résultat"
       student: 
         select_student: "Sélectionner un étudiant"
     grading: 
+      empty_submission_selection: "Sélectionnez un étudiant et un travail pour afficher et modifier les notes."
       grade_for: "Note pour : %{name}"
       grading: Notation
+      is_dropped: "Actuellement cette note est ignorée pour cet étudiant."
+      is_late: "Cet envoi a été effectué en retard."
       submission_details: "Informations sur l’envoi"
+      submission_hidden: "Ce travail n’est pas disponible pour cet étudiant et ne sera pas inclus dans sa note."
+      was_resubmitted: "Ce travail a été renvoyé depuis qu’il a été noté."
     header: 
       gradebook_individual_view: "Relevé de notes : vue individuelle"
+      save_instructions: "Remarque : les notes seront enregistrées automatiquement dès que le curseur quittera le champ."
+      switch_to_gradebook2: "Passer au relevé de notes par défaut"
     learning_mastery: 
       download_results: "Télécharger les résultats (.csv)"
+      empty_student_selection: "Sélectionnez un étudiant pour afficher des informations complémentaires ici."
+      empty_submission_selection: "Sélectionnez un étudiant et un résultat pour afficher les résultats."
       hide_student_names_label: "Masquer les noms des étudiants"
       result: Résultats
       result_for: "Résultat pour :"
+      results_loading: "Les résultats de cet étudiant sont toujours en train de se charger..."
       select_a_section: "Sélectionner une section"
       select_student: "Sélectionner un étudiant"
       student_info: "Informations sur l’étudiant"
     outcome_information: 
       avg_score: "Note moyenne"
+      empty_outcome_selection: "Sélectionnez un résultat pour afficher des informations complémentaires ici."
       high_score: "Bonne note"
       low_score: "Note faible"
+      outcome_info: "Informations sur le résultat"
+      result_sub_count: "Résultats globaux :"
     screenreader_gradebook: 
       assignments: Travaux
       learning_mastery: "Maîtrise de l’apprentissage"
@@ -13077,6 +13101,7 @@ fr:
         include_ungraded_assignments: "Considérer les travaux non notés comme ayant la note 0"
         set_group_weights: "Définir les coefficients de groupe"
         show_concluded_enrollments_label: "Afficher les inscriptions terminées"
+        show_notes: "Afficher les notes dans les informations relatives à l’étudiant"
         show_total_as_points: "Afficher les totaux sous forme de points dans la page des notes de l’étudiant"
         sis_export: "Publier les notes sur SIS"
         upload_scores: "Envoyer les notes (.csv)"
@@ -13097,13 +13122,17 @@ fr:
         ag_letter_grade: "Notation par lettre"
       details: 
         hidden: masqués
-        sections: "Sections:"
+        secondary_id: "Deuxième ID :"
+        sections: "Sections :"
       index: 
+        empty_student_selection: "Sélectionnez un étudiant pour voir des informations complémentaires ici."
         grades: Notes
         student_info: "Informations sur l’étudiant"
+        submissions_loading: "Les envois de cet étudiant sont toujours en train de se charger..."
   search: 
     all_courses: 
       name: Nom
+      open_enrollment_only: "Ouvrir seulement les cours correspondant à l’inscription "
       public_only: "Cours publics uniquement"
       search: Rechercher
       titles: 
@@ -13342,6 +13371,8 @@ fr:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Cliquez ici pour télécharger"
+        download_message: "Les envois seront compressés dans un fichier ZIP pour le téléchargement. Cela peut prendre un peu de temps, selon la taille et le nombre des fichiers envoyés."
+        download_message_intro: "Regroupement en cours de vos envois."
         download_submissions: "Télécharger tous les envois"
     conference: 
       buttons: 
@@ -13764,9 +13795,11 @@ fr:
     select_content_dialog: 
       add_to_module: "Ajouter %{item} au *module*"
       assignment_item: Tâche
+      assignment_item_select_label: "Sélectionnez le travail que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau travail »."
       assignment_notice: "Sélectionnez le travail que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant Nouvelle tâche."
       content_page_item: "Page de contenu"
       discussion_item: Discussion
+      discussion_topic_select_label: "Sélectionnez le sujet que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau sujet »."
       domain_match_notice: "pour utiliser cet outil, le domaine doit correspondre à %{domain}"
       external_tool_item: "Outil externe"
       external_tool_notice: "Dans la liste ci-dessous, sélectionnez un outil, ou entrez l’URL d’un outil externe dont vous savez qu’il est déjà configuré avec Basic LTI, afin de créer un lien entre l’outil et ce *module*."
@@ -13774,6 +13807,7 @@ fr:
       external_url_notice: "Entrez une URL et le nom d’une page pour ajouter un lien entre l’URL d’un site Web et ce *module*."
       file_item: Fichier
       file_notice: "Sélectionnez le fichier que vous souhaitez associer à ce *module*, ou ajoutez un fichier en sélectionnant Nouveau fichier."
+      file_select_label: "Sélectionnez le fichier que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau fichier »."
       indent_level: 
         one: "*Retrait 1 niveau*"
         other: "*Retrait %{count} niveaux*"
@@ -13800,11 +13834,13 @@ fr:
         assignments: Travaux
       quiz_item: Questionnaire
       quiz_notice: "Sélectionnez le questionnaire que vous souhaitez associer à ce *module*, ou ajoutez un nouveau questionnaire en sélectionnant Nouveau questionnaire."
+      quiz_select_label: "Sélectionnez le questionnaire que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau questionnaire »."
       select_item_type_label: "Sélectionnez le type de contenu à ajouter."
       sub_header_notice: "Tapez le texte du titre de paragraphe à ajouter pour le *module*"
       text_header_item: "Texte de l’en-tête"
       topic_notice: "Sélectionnez le sujet que vous souhaitez associer à ce *module*, ou ajoutez un sujet en sélectionnant Nouveau sujet."
       wiki_page_notice: "Sélectionnez la page Wiki que vous souhaitez associer à ce *module*, ou ajoutez une nouvelle page en sélectionnant Nouvelle page."
+      wiki_page_select_label: "Sélectionnez la page Wiki que vous souhaitez associer, ou ajoutez-en une en choisissant « Nouvelle page »."
     sequence_footer: 
       full_course_sequence: "voir la séquence complète du cours"
       next: Suivant
@@ -14080,6 +14116,8 @@ fr:
     inexact_answer: "%{lower_bound} à %{upper_bound}"
     no_answer: "Aucune réponse"
   step: Étape
+  stream_items_api: 
+    assessment_request_title: "Révision par les pairs pour %{title}"
   student_assignment_outcome_map_title: "Compétence de l’étudiant"
   student_groups: 
     group_join: "A rejoint le groupe %{group_name}"
@@ -14095,8 +14133,10 @@ fr:
       full: Complet
       group: Groupe
       group_full: "Groupe complet"
+      invite_only: "Inviter uniquement"
       student_groups_join: Rejoindre
       student_groups_leave: Quitter
+      student_groups_switch: "Passer dans"
       student_groups_tabs_everyone: Tous
       student_groups_tabs_groups: Groupes
       visit: Visiter
@@ -14255,11 +14295,13 @@ fr:
       teachers_notified_of_comments: "Les enseignants et les expéditeurs de l’envoi seront informés de tous les commentaires"
     show_preview: 
       discussion_submission_description: "Les envois pour cette tâche sont publiés dans la discussion la concernant. Ci-dessous se trouvent les billets de la discussion pour %{user}, mais vous pouvez aussi *afficher la discussion complète*."
+      discussion_submission_description_without_link: "Les envois concernant ce travail sont publiés dans la discussion associée. Ci-dessous figurent les contributions à la discussion publiées pour %{user}."
       entry_no_image: "Gardez à l’esprit que cette page peut avoir été modifiée depuis l’envoi d’origine."
       entry_with_image: "Nous avons inclus une image représentant la page au moment de l’envoi. Vous pouvez également cliquer pour afficher l’envoi d’origine."
       external_url_submission: "Cet envoi correspond à une URL vers une page externe."
       file_uploads_for_user: "Téléchargements de fichiers pour **%{user}**"
       group_discussion_submission_description: "Les envois relatifs à cette tâche sont publiés dans la discussion du groupe associé à cette tâche. Vous voyez ci-dessous les contributions destinées à  %{user}, mais vous pouvez aussi *afficher la discussion complète du groupe*."
+      group_discussion_submission_description_without_link: "Les envois concernant ce travail sont publiés dans la discussion associée et pour ce groupe. Ci-dessous figurent les contributions à la discussion publiées pour %{user}."
       media_comment_link: "Cet envoi est un enregistrement multimédia. *cliquez ici pour afficher*."
       no_files: "Aucun fichier n’a été téléchargé pour cet envoi"
       no_preview_available: "Aucun aperçu disponible"
@@ -15285,6 +15327,9 @@ fr:
       archive_link: "Afficher les archives"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Vous avez modifié les questions de ce questionnaire.* Ces changements ne seront visibles pour les étudiants que lorsque vous aurez enregistré le questionnaire."
   you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Vous avez modifié ce questionnaire et vos changements ne sont pas publiés.* Publiez ou republiez ce questionnaire pour que les étudiants puissent voir les modifications."
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    one: "L’erreur suivante s’est produite lors de votre recherche :"
+    other: "Les erreurs suivantes se sont produites lors de votre recherche :"
   zero_activity_title: "Aucune activité"
   zip_argument_error: "Un chargement .zip nécessite un dossier de destination."
   zip_file_description: "Plug-in de migration pour décompresser les archives .zip et obtenir des fichiers de cours, groupe ou utilisateur "
