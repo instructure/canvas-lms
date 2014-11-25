@@ -11659,7 +11659,7 @@ pt-BR:
         one: "Um aluno pontuou entre  %{start} e %{end}%."
         other: "%{count} alunos pontuaram entre %{start} e %{end}%."
         zero: "Nenhum aluno pontuou entre %{start} e %{end}%."
-      table_description: "Estatísticas de resumo para todos transformadas em apresentações"
+      table_description: "Estatísticas de resumo para todos transformadas em envios"
     title: "Estatísticas do teste"
     unknown_answer: Outro
   quizzes: 
@@ -13397,7 +13397,7 @@ pt-BR:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Clique aqui para baixar"
-        download_message: "Os envios serão compactados em um arquivo zip para download. Isso pode levar algum tempo, dependendo do tamanho e número de arquivos de envio."
+        download_message: "Os envios serão compactados em um arquivo zip para download. Isso pode levar algum tempo, dependendo do tamanho e do número de arquivos de envio."
         download_message_intro: "Os envios dos alunos estão sendo reunidos."
         download_submissions: "Baixar todos os envios"
     conference: 
@@ -13826,7 +13826,7 @@ pt-BR:
       assignment_notice: "Selecione a tarefa que deseja associar a este *módulo* ou adicione uma tarefa selecionando \"Nova tarefa\"."
       content_page_item: "Página de conteúdo"
       discussion_item: Discussão
-      discussion_topic_select_label: "Selecione o tópico que deseja associar ou adicione um tópico, selecionando \"Novo Tópico\"."
+      discussion_topic_select_label: "Selecione o tópico que você deseja associar ou adicione um tópico, selecionando \"Novo Tópico\"."
       domain_match_notice: "para usar esta ferramenta, o domínio deve ser igual a %{domain}"
       external_tool_item: "Ferramentas externas"
       external_tool_notice: "Selecione uma ferramenta na lista abaixo ou insira uma URL para uma ferramenta externa que você já sabe que está configurada com Basic LTI e adicione um link para ela para este *módulo*."
@@ -14325,7 +14325,7 @@ pt-BR:
       external_url_submission: "Este envio era um URL de uma página externa."
       file_uploads_for_user: "Uploads de arquivo de **%{user}**"
       group_discussion_submission_description: "Os envios desta tarefa são as publicações na discussão da tarefa para este grupo. Abaixo, encontram-se as publicações de discussão de %{user}, ou é possível *exibir toda a discussão do grupo*."
-      group_discussion_submission_description_without_link: "Os envios para esta tarefa são publicações em discussão da tarefa para este grupo. Abaixo estão as publicações de discussão para %{user}."
+      group_discussion_submission_description_without_link: "Os envios para esta tarefa são publicações na discussão da tarefa para este grupo. Abaixo estão as publicações de discussão para %{user}."
       media_comment_link: "Este envio é uma gravação de mídia. *clique aqui para exibir*."
       no_files: "Não foi feito nenhum upload de arquivo para este envio"
       no_preview_available: "Nenhuma visualização disponível"
@@ -14452,7 +14452,7 @@ pt-BR:
         term_start: "início do período"
         unspecified: sempre
       timespan: "%{start_at} *para* %{end_at}"
-  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Este teste não foi publicado.* Apenas os professores podem ver o teste até que seja publicado."
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Este teste não foi publicado.* Apenas os professores podem ver o teste até que ele seja publicado."
   time: 
     am: am
     count_hours_ago: 
@@ -15353,7 +15353,7 @@ pt-BR:
       archive: Arquivar
       archive_link: "Exibir arquivo(s)"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Você fez alterações nas perguntas deste teste.* Essas alterações não aparecerão para alunos até você salvar o teste."
-  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Você fez alterações não publicadas para este teste.* Estas alterações não aparecem para os alunos até que você publique ou republique o teste."
+  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Você fez alterações não publicadas neste teste.* Estas alterações não aparecem para os alunos até que você publique ou republique o teste."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Sua pesquisa encontrou o seguinte erro:"
     other: "Sua pesquisa encontrou os seguintes erros:"
