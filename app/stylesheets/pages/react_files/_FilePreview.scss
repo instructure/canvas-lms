@@ -194,7 +194,7 @@ $preview-header-height: 70px;
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  td, th {
+  td, th, a {
     text-align: left;
     color: $preview-font-color;
   }
