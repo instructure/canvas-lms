@@ -1338,6 +1338,10 @@ describe DiscussionTopic do
       Timecop.travel(Time.now + 20.seconds)
     end
 
+    after :each do
+      Timecop.return
+    end
+
     it "should return nil if the view has not been built yet, and schedule a job" do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       expect(@topic.materialized_view).to be_nil

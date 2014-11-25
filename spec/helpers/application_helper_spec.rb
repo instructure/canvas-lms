@@ -120,9 +120,10 @@ describe ApplicationHelper do
       end
 
       it 'crosses date boundaries appropriately' do
-        Timecop.freeze(Time.utc(2013,3,13,7,12))
-        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
+        Timecop.freeze(Time.utc(2013,3,13,7,12)) do
+          context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+          expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
+        end
       end
     end
 
