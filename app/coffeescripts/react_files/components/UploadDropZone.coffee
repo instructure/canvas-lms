@@ -1,10 +1,12 @@
 define [
+  'jquery'
   'i18n!upload_drop_zone'
   'react'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/FileOptionsCollection'
   'compiled/models/Folder'
-], (I18n, React, withReactDOM, FileOptionsCollection, Folder) ->
+  'compiled/jquery.rails_flash_notifications'
+], ($, I18n, React, withReactDOM, FileOptionsCollection, Folder) ->
 
   UploadDropZone = React.createClass
 
@@ -29,7 +31,7 @@ define [
       document.removeEventListener('drop', @killWindowDrop)
 
     onDragEnter: (e) ->
-      if @shouldAcceptDrop(e.dataTransfer.types)
+      if @shouldAcceptDrop(e.dataTransfer)
         if !this.state.active
           @setState({active: true})
         e.dataTransfer.dropEffect = 'copy'
@@ -43,9 +45,11 @@ define [
       @setState({active: false})
 
     onDrop: (e) ->
+      @setState({active: false})
+      unless @shouldAcceptDrop(e.dataTransfer, true)
+        return $.flashError I18n.t('Uploading folders is currently unsupported.')
       FileOptionsCollection.setFolder(@props.currentFolder)
       FileOptionsCollection.setOptionsFromFiles(e.dataTransfer.files, true)
-      @setState({active: false})
       e.preventDefault()
       e.stopPropagation()
       false
@@ -53,7 +57,7 @@ define [
     # when you drag a file over the parent, make drop zone active
     # remainder of drag-n-drop events happen on dropzone
     onParentDragEnter: (e)->
-      if @shouldAcceptDrop(e.dataTransfer.types)
+      if @shouldAcceptDrop(e.dataTransfer)
         if !this.state.active
           @setState({active: true})
 
@@ -64,18 +68,9 @@ define [
     killWindowDrop: (e) ->
       e.preventDefault()
 
-    shouldAcceptDrop: (types) ->
-      # event.dataTransfer.types doesn't respond to array methods in Firefox like
-      # the other browsers even though it has length, and array access?
-      i = 0
-      found = false
-      while i<types.length
-        type = types[i]
-        found = (type == 'Files')
-        if (found)
-          break
-        i++
-      found
+    shouldAcceptDrop: (dataTransfer, isDropEvent = false) ->
+      typesArr = [].slice.call(dataTransfer?.types, 0)
+      return 'Files' in typesArr and !!(if isDropEvent then dataTransfer?.files?.length and [].slice.call(dataTransfer?.files, 0).filter((item) -> item.type).length else true)
 
     getParent: ->
       @getDOMNode().parentElement
