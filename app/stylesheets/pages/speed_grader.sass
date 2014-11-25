@@ -74,7 +74,8 @@
       &:hover, &:focus
         :background-position     left -31px
       &:focus
-        @include button-focus
+        @if $use_high_contrast
+          @include button-focus
       &:active
         :background-position     bottom left
     .next

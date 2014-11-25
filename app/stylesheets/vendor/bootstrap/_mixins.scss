@@ -529,7 +529,6 @@
   }
 
   &:focus {
-    @include button-focus;
     color: $textColor;
     background: $endColor;
     text-decoration: none;
