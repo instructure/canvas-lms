@@ -139,15 +139,20 @@ define [
       @showPostGradesButton()
 
     assignment_visibility: ->
-      all_students_ids = _.keys @students
-      for assignment_id, a of @assignments
+      allStudentIds = _.keys @students
+      for assignmentId, a of @assignments
         if a.only_visible_to_overrides
-          hidden_student_ids = @hiddenStudentIdsForAssignment(all_students_ids, a)
-          for student_id in hidden_student_ids
-            @updateSubmission { assignment_id: assignment_id, user_id: student_id, hidden: true }
+          hiddenStudentIds = @hiddenStudentIdsForAssignment(allStudentIds, a)
+          for studentId in hiddenStudentIds
+            @updateSubmission { assignment_id: assignmentId, user_id: studentId, hidden: true }
 
-    hiddenStudentIdsForAssignment: (student_ids, assignment) ->
-      _.difference student_ids, assignment.assignment_visibility.map(String)
+    hiddenStudentIdsForAssignment: (studentIds, assignment) ->
+      _.difference studentIds, assignment.assignment_visibility.map(String)
+
+    updateAssignmentVisibilities: (hiddenSub) ->
+      assignment = @assignments[hiddenSub.assignment_id]
+      filteredVisibility = assignment.assignment_visibility.filter (id) -> "#{id}" != hiddenSub.user_id
+      assignment.assignment_visibility = filteredVisibility
 
     onShow: ->
       return if @startedInitializing
@@ -500,6 +505,7 @@ define [
           activeCell.cell is cell
         #check for DA visible
         submission["hidden"] = !submission.assignment_visible if submission.assignment_visible?
+        @updateAssignmentVisibilities(submission) if submission["hidden"]
         @updateSubmission(submission)
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive
