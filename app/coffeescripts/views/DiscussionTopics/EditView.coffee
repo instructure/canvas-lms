@@ -5,6 +5,7 @@ define [
   'compiled/views/assignments/GradingTypeSelector'
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/views/assignments/PeerReviewsSelector'
+  'compiled/views/assignments/PostToSisSelector'
   'underscore'
   'jst/DiscussionTopics/EditView'
   'wikiSidebar'
@@ -20,7 +21,7 @@ define [
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
-GroupCategorySelector, PeerReviewsSelector, _, template, wikiSidebar,
+GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, wikiSidebar,
 htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog) ->
 
   class EditView extends ValidatedFormView
@@ -104,6 +105,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@renderGradingTypeOptions)
       _.defer(@renderGroupCategoryOptions)
       _.defer(@renderPeerReviewOptions)
+      _.defer(@renderPostToSisOptions) if ENV.POST_GRADES
       _.defer(@watchUnload)
 
       @$(".datetime_field").datetime_field()
@@ -148,6 +150,14 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         nested: true
 
       @peerReviewSelector.render()
+
+    renderPostToSisOptions: =>
+      @postToSisSelector = new PostToSisSelector
+        el: '#post_to_sis_options'
+        parentModel: @assignment
+        nested: true
+
+      @postToSisSelector.render()
 
     getFormData: ->
       data = super
