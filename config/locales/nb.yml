@@ -13774,9 +13774,11 @@ nb:
     select_content_dialog: 
       add_to_module: "Legg til %{item} til *modul*"
       assignment_item: Oppgave
+      assignment_item_select_label: "Velg oppdraget du vil knytte til, eller legger til en oppdrag ved å velge \"Ny Oppdrag\"."
       assignment_notice: "Velg hvilken oppgave du vil assosiere med denne *modulen*, eller legg til en oppgave ved å velge \"Ny oppgave\"."
       content_page_item: Innholdsside
       discussion_item: Diskusjon
+      discussion_topic_select_label: "Velg tema du ønsker å assosiere, eller legge til et emne ved å velge \"Nytt Emne\"."
       domain_match_notice: "For å bruke dette verktøyet må domenet matche %{domain}"
       external_tool_item: "Eksternt verktøy"
       external_tool_notice: "Velg et verktøy fra lista nedenfor, eller skriv inn en URL for et eksternt verktøy som du vet allerede er satt opp med Basic LTI for å lenke til denne *modulen*."
@@ -13784,6 +13786,7 @@ nb:
       external_url_notice: "Skriv inn en URL og et sidenavn for å legge til en lenke til et nettsted til denne *modulen*."
       file_item: Fil
       file_notice: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til en fil ved å velge \"Ny fil\"."
+      file_select_label: "Velg filen du ønsker å assosiere, eller legge til en fil ved å velge \"Ny fil\"."
       indent_level: 
         one: "*rykk inn 1 nivå*"
         other: "*rykk inn %{count} nivåer*"
@@ -13810,10 +13813,13 @@ nb:
         assignments: Oppgaver
       quiz_item: Prøve
       quiz_notice: "Velg prøven du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge \"Ny prøve\"."
+      quiz_select_label: "Velg quiz du vil knytte til, eller legge til en ny side ved å velge \"Ny Quiz\"."
+      select_item_type_label: "Velg innhold type for å legge til."
       sub_header_notice: "Skriv inn teksten du vil legge til som en *modul* underoverskrift"
       text_header_item: Overskrift
       topic_notice: "Velg temaet du vil assosiere med denne *modulen*, eller legg til et nytt ved å velge \"Nytt tema\"."
       wiki_page_notice: "Velg wikisiden du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge \"Ny side\"."
+      wiki_page_select_label: "Velg wiki siden du ønsker å assosiere, eller legge til en ny side ved å velge \"Ny side\"."
     sequence_footer: 
       full_course_sequence: "se hele kurssekvensen"
       next: Neste
@@ -14268,11 +14274,13 @@ nb:
       teachers_notified_of_comments: "Faglærer og den som har levert vil få varsler om alle kommentarer."
     show_preview: 
       discussion_submission_description: "Innleveringene for denne oppgavene er poster i oppgavens diskusjon. Nedenfor er diskusjonspostene for %{user}. Du kan også *se hele diskusjonen*."
+      discussion_submission_description_without_link: "Innleveringer for dette oppdraget er innlegg i oppdragets diskusjon. Nedenfor er diskusjons innlegg for %{user}."
       entry_no_image: "Husk at denne siden kan ha endret seg siden innleveringen opprinnelig skjedde."
       entry_with_image: "Vi har inkludert et øyeblikksbilde av hva siden så ut som da den ble levert. Du kan også klikke for å se den opprinnelige innleveringen."
       external_url_submission: "Denne innleveringen var en URL til en ekstern side."
       file_uploads_for_user: "Filopplastinger for **%{user}**"
       group_discussion_submission_description: "Innleveringene for denne oppgaven er poster i oppgavens diskusjon for denne gruppen. Nedenfor er diskusjonspostene for %{user}. Du kan også *se hele gruppediskusjonen*."
+      group_discussion_submission_description_without_link: "Innleveringer for dette oppdraget er innlegg i oppdragets diskusjon for denne gruppen. Nedenfor er diskusjons innlegg for %{user}."
       media_comment_link: "Denne innleveringen er en medieinnspilling. *Klikk her for å se den.*"
       no_files: "Ingen filer ble lastet opp i denne innleveringen"
       no_preview_available: "Ingen forhåndsvisning tilgjengelig"
