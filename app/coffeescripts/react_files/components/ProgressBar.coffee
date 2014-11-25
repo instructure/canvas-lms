@@ -10,9 +10,6 @@ define [
       progress: React.PropTypes.number.isRequired
       'aria-label': React.PropTypes.string #Used as an override if needed.
 
-    barProgress: (progress) ->
-      return 100 if progress > 100
-      return progress
 
     render: withReactDOM ->
       almostDone = ''
@@ -22,9 +19,9 @@ define [
           ref: 'bar'
           className: 'progress-bar__bar' + almostDone
           role: 'progressbar'
-          'aria-valuenow': @barProgress(@props.progress)
+          'aria-valuenow': @props.progress
           'aria-valuemin': 0
           'aria-valuemax': 100
           'aria-label': @props['aria-label'] if @props['aria-label']
           style:
-            width: @barProgress(@props.progress) + '%'
+            width: Math.min(@props.progress, 100) + '%'

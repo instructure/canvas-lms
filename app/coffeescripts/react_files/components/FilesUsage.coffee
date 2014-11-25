@@ -29,15 +29,24 @@ define [
     render: withReactDOM ->
       @transferPropsTo div {},
         if @state
+
+          percentUsed = Math.round(@state.quota_used / @state.quota * 100)
+          label = I18n.t('%{percentUsed}% of %{bytesAvailable} used', {
+            percentUsed: percentUsed,
+            bytesAvailable: friendlyBytes(@state.quota)
+          })
+
           div className: 'grid-row ef-quota-usage',
-            div className: 'col-xs',
+            div className: 'col-xs-5',
               ProgressBar({
-                progress: toFixedDecimal(@state.quota_used / @state.quota * 100, 2),
-                'aria-label': I18n.t('Using %{percent}% of storage quota.',
-                                    {percent: toFixedDecimal(@state.quota_used / @state.quota * 100, 2)})
+                progress: percentUsed,
+                'aria-label': label
               }),
-            div className: 'col-xs-6', style: 'padding-left': '0px',
-              I18n.t 'usage_details', '%{percent}% of %{quota} used',
-                percent: Math.ceil(@state.quota_used / @state.quota * 100)
-                quota: friendlyBytes(@state?.quota)
+            div {
+              className: 'col-xs-7'
+              style: 'padding-left': '0px'
+              'aria-hidden': true
+            },
+              label
+
 

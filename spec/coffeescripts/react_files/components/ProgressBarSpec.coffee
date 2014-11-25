@@ -22,15 +22,3 @@ define [
     prog = React.renderComponent(ProgressBar(progress: 200), $('<div>').appendTo('body')[0])
     equal prog.refs.bar.getDOMNode().style.width, '100%'
     React.unmountComponentAtNode(prog.getDOMNode().parentNode)
-
-  module 'ProgressBar#barProgress',
-    setup: ->
-      @prog = React.renderComponent(ProgressBar(progress: 35), $('<div>').appendTo('body')[0])
-    teardown: ->
-      React.unmountComponentAtNode(@prog.getDOMNode().parentNode)
-
-  test 'never returns more than 100 even if the progress is more', ->
-    equal @prog.barProgress(200), 100, 'returns 100 if progress set in is over 100'
-  test 'returns passed in value if less than 100', ->
-    equal @prog.barProgress(45), 45, 'returns 45 if passed in value is 45'
-
