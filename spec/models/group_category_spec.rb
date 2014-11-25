@@ -148,12 +148,11 @@ describe GroupCategory do
   end
 
   context 'protected?' do
-    it "should be true iff the category has a role" do
+    it "should be true iff the category has a role other than 'imported'" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).to be_protected
       expect(account.group_categories.create(:name => 'Student Groups')).not_to be_protected
-      expect(GroupCategory.imported_for(course)).to be_protected
-      expect(GroupCategory.imported_for(course)).to be_protected
+      expect(GroupCategory.imported_for(course)).not_to be_protected
       expect(course.group_categories.create(:name => 'Random Category')).not_to be_protected
       expect(GroupCategory.communities_for(account)).to be_protected
     end

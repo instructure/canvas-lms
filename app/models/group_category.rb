@@ -151,7 +151,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def protected?
-    self.role.present?
+    self.role.present? && self.role != 'imported'
   end
 
   # Group categories generally restrict students to only be in one group per

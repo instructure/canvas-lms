@@ -260,7 +260,7 @@ class GroupCategoriesController < ApplicationController
 
   # @API Delete a Group Category
   # Deletes a group category and all groups under it. Protected group
-  # categories can not be deleted, i.e. "communities", "student_organized", and "imported".
+  # categories can not be deleted, i.e. "communities" and "student_organized".
   #
   # @example_request
   #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \
