@@ -162,9 +162,7 @@ define [
 
           div {
             className: 'control-group'
-            style:
-              display: (if @state.selectedOption is 'date_range' then 'block' else 'none')
-            'aria-hidden': (if @state.selectedOption is 'date_range' then 'false' else 'true')
+            hidden: @state.selectedOption isnt 'date_range'
           },
             label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('Available From')
               div className: 'controls dateSelectInputContainer',
@@ -174,15 +172,18 @@ define [
                   className: 'form-control dateSelectInput',
                   type: 'text',
                   'aria-label': I18n.t('Available From')
-            div className: 'control-group',
-              label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('Available Until')
-                div className: 'controls dateSelectInputContainer',
-                input
-                  ref: 'lock_at'
-                  defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at,
-                  className: 'form-control dateSelectInput',
-                  type: 'text'
-                  'aria-label': I18n.t('Available Until')
+          div {
+            className: 'control-group'
+            hidden: @state.selectedOption isnt 'date_range'
+          },
+            label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('Available Until')
+              div className: 'controls dateSelectInputContainer',
+              input
+                ref: 'lock_at'
+                defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at,
+                className: 'form-control dateSelectInput',
+                type: 'text'
+                'aria-label': I18n.t('Available Until')
 
         div className:"form-controls",
           button {
