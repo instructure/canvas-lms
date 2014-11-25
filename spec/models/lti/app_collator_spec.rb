@@ -44,6 +44,7 @@ module Lti
           :definition_type => mh.class.name,
           :definition_id => mh.id,
           :name => rh.name,
+          :description => rh.description,
           :domain => "samplelaunch",
           :placements => {
             :link_selection => {
@@ -73,6 +74,7 @@ module Lti
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
+          :description => tool.description,
           :domain => nil,
           :placements => {
             :link_selection => {
@@ -101,6 +103,7 @@ module Lti
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
+          :description => tool.description,
           :domain => nil,
           :placements => {
             :assignment_selection => {
@@ -182,7 +185,7 @@ module Lti
     end
 
     def create_resource_handler(tool_proxy, opts = {})
-      default_opts = {resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, tool_proxy: tool_proxy}
+      default_opts = {resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, description: 'foo', tool_proxy: tool_proxy}
       ResourceHandler.create(default_opts.merge(opts))
     end
 
@@ -192,9 +195,10 @@ module Lti
     end
 
     def new_valid_external_tool(context, resource_selection = false)
-      tool = context.context_external_tools.new(:name => (0...8).map { (65 + rand(26)).chr }.join,
-                                                :consumer_key => "key",
-                                                :shared_secret => "secret")
+      tool = context.context_external_tools.new(name: (0...8).map { (65 + rand(26)).chr }.join,
+                                                description: "foo",
+                                                consumer_key: "key",
+                                                shared_secret: "secret")
       tool.url = "http://www.example.com/basic_lti"
       tool.resource_selection = {:url => "http://example.com/selection_test", :selection_width => 500, :selection_height => 500} if resource_selection
       tool.save!

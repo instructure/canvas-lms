@@ -47,6 +47,7 @@ module Lti
         definition_type: tool.class.name,
         definition_id: tool.id,
         name: tool.name,
+        description: tool.description,
         domain: tool.domain,
         placements: {}
       }
@@ -71,6 +72,7 @@ module Lti
         definition_type: message_handler.class.name,
         definition_id: message_handler.id,
         name: message_handler.resource_handler.name,
+        description: message_handler.resource_handler.description,
         domain: URI(message_handler.launch_path).host,
         placements: self.lti2_placements(message_handler, placements)
       }

@@ -346,7 +346,7 @@ $(document).ready(function() {
             $tool.toggleClass('resource_selection', 'resource_selection' in tool.placements);
             $tool.fillTemplateData({
               data: tool,
-              dataValues: ['definition_type', 'definition_id', 'domain', 'name', 'placements']
+              dataValues: ['definition_type', 'definition_id', 'domain', 'name', 'placements', 'description']
             });
             $tool.data('tool', tool);
             $select.find(".tools").append($tool.show());
