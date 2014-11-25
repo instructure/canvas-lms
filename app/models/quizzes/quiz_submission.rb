@@ -170,6 +170,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     result.title = "#{user.name}, #{quiz.title}: #{cached_question[:name]}"
 
     result.assessed_at = Time.now
+    result.submitted_at = self.finished_at
+
     result.save_to_version(result.attempt)
     result
   end
