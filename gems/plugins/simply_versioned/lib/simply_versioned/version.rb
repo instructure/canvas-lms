@@ -15,6 +15,8 @@
 class Version < ActiveRecord::Base #:nodoc:
   belongs_to :versionable, :polymorphic => true
 
+  validates_presence_of :versionable_id, :versionable_type
+
   before_create :initialize_number
 
   attr_accessible :yaml, :versionable
@@ -64,7 +66,6 @@ class Version < ActiveRecord::Base #:nodoc:
 
   protected
   def initialize_number
-    return false unless versionable
     self.number = (versionable.versions.maximum( :number ) || 0) + 1
   end
 

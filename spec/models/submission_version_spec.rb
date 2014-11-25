@@ -102,4 +102,14 @@ describe SubmissionVersion do
       SubmissionVersion.index_versions([@version])
     }.not_to change(SubmissionVersion, :count)
   end
+
+  it "should not create a SubmissionVersion when the Version doesn't save" do
+    version = @submission.versions.build(yaml: {"assignment_id" => @submission.assignment_id}.to_yaml)
+    @submission.versions.expects(:create).returns(version)
+    expect do
+      @submission.with_versioning(explicit: true) do
+        @submission.send(:simply_versioned_create_version)
+      end
+    end.not_to change(SubmissionVersion, :count)
+  end
 end
