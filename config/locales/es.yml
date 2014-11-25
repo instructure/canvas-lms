@@ -1928,8 +1928,8 @@ es:
       one: "1 tarea"
       other: "%{count} tareas"
     other_assignments: "Otras Tareas"
-    overdue_assignments: "Tareas Atrasadas"
-    past_assignments: "Tareas Anteriores"
+    overdue_assignments: "Tareas atrasadas"
+    past_assignments: "Tareas anteriores"
     peer_review_assignment: 
       titles: 
         remind_reviewer: "Recuerde a %{user} acerca de la evaluación"
@@ -2171,7 +2171,7 @@ es:
         originality_report_visible_immediately: Inmediatamente
         settings_exclude_fewer_than_count: "Menos de %{wordsInput} palabras"
         settings_exclude_less_than_percent: "Menos del %{percentInput} del documento"
-    undated_assignments: "Tareas sin Fecha"
+    undated_assignments: "Tareas sin fecha"
     upcoming_assignments: "Tareas próximas"
     wizard_box: 
       descriptions: 
@@ -2655,7 +2655,7 @@ es:
     time_block_row: 
       date_label: Fecha
       delete_link: "Borrar intervalo de tiempo"
-      end_time_label: "Tiempo de finalización"
+      end_time_label: "Hora de finalización"
       start_time_label: "Hora de inicio"
     titles: 
       edit_appointment_group: "Editar grupo de cita"
@@ -4063,7 +4063,7 @@ es:
       sent: Enviado
       settings: Configuraciones
       starred: Señalado
-      submission_comments: "Comentarios del Envío"
+      submission_comments: "Comentarios del envío"
       titles: 
         conversations: Conversaciones
       unread: "No leído"
@@ -4507,7 +4507,7 @@ es:
           bookmark: "Copie o marque como favorito este enlace"
     description: 
       links: 
-        join_course: "Únase a este Curso"
+        join_course: "Únase a este curso"
     edit_profile: 
       about: Sobre
       about_related_id: "identificador compartido utilizado para enlazar cursos o secciones relacionados entre si"
@@ -4769,7 +4769,7 @@ es:
         open_enrollment: "Agregar un enlace de \"Unirse a este Curso\" a la página de inicio del curso"
         public_syllabus: "Hacer que el programa de estudios de este curso sea visible públicamente"
         restrict_enrollments_to_course_dates: "Los usuarios sólo pueden participar en el curso entre estas fechas"
-        root_account: "Cuenta Principal"
+        root_account: "Cuenta principal"
         root_account_id: "Cuenta Principal"
         sis_source_id: "ID de SIS"
         start_at: Comienza
@@ -5224,7 +5224,7 @@ es:
   default_question_name: Pregunta
   default_question_text: "Texto de la pregunta"
   delete_quiz_142b8099: "Eliminar la evaluación"
-  delete_survey_56fddbbd: "Borrar la Encuesta"
+  delete_survey_56fddbbd: "Borrar la encuesta"
   demos: 
     _register: 
       add_site: "Agregar sitio"
@@ -5426,7 +5426,7 @@ es:
       page_header_title: "Nuevo debate"
       points_possible: "Puntos posibles"
       post_at: "Publicar en"
-      remove_attachment_ceae0973: "Remover el Archivo Adjunto"
+      remove_attachment_ceae0973: "Eliminar el archivo adjunto"
       save: Guardar
       saving: Guardando...
       topic_title: "Título del Tema"
@@ -5664,7 +5664,7 @@ es:
     titles: 
       criterion_long_description: "Descripción Detallada de los Criterios"
       find_existing_rubric: "Encontrar Rúbrica Existente"
-  edit_survey_b0d6890d: "Editar la Encuesta"
+  edit_survey_b0d6890d: "Editar la encuesta"
   editor: 
     alt_text: "Texto Alternativo:"
     based_on_type: "Basado en %{base_type}"
@@ -9922,14 +9922,14 @@ es:
     add_item: 
       add_new_item: "Agregar nuevo elemento"
       assignment: Tarea
-      content_page: "Página de Contenido"
+      content_page: "Página de contenido"
       discussion: Debate
       external_tool: "Herramienta externa"
       external_url: "URL externa"
       file: Archivo
-      page: "Página de Contenido"
+      page: "Página de contenido"
       quiz: Evaluación
-      text_header: "Texto de Encabezado"
+      text_header: "Texto del encabezado"
     add_module_item_dialog: 
       item_type: "Tipo:"
     add_module_item_dialog_wrapper: 
@@ -10600,7 +10600,7 @@ es:
       description: |-
           Deberá registrar una [nueva aplicación en Diigo](%{diigo_url}).
           
-          * Una vez que guarde una aplicación, haga una anotación en el código API
+          * Una vez que guarde su aplicación, haga una anotación en el código API
       labels: 
         api_key: "Código API"
     dim_dim_settings: 
@@ -10789,7 +10789,7 @@ es:
         application_id: "ID de la aplicación"
         base_url: "URL base"
         key_id: "ID clave"
-        key_secret: "Secreto de la clave"
+        key_secret: "Secreto clave"
     pandapub: 
       description: "Servicio Pub/Sub"
       name: PandaPub
@@ -11480,7 +11480,7 @@ es:
       some_scores_reduced: "Solo conceder puntos a la respuesta correcta (*las puntuaciones de algunos estudiantes serán menores*)"
       update_question_without_regrading: "Actualizar pregunta sin cambio de calificación"
   quiz_reports: 
-    download_item_analysis: "Descargar Informe de análisis de elementos."
+    download_item_analysis: "Descargar informe de análisis de elementos."
     download_student_analysis: "Descargar infome de análisis de alumnos."
     generatable: "Nunca se ha generado el informe."
     generate_item_analysis_report: "Generar informe de análisis de elementos."
@@ -11489,7 +11489,7 @@ es:
     generating: "Se está generando el informe..."
     generation_almost_done: "Casi terminado."
     generation_complete: "Se ha generado el informe."
-    generation_halfway: "Queda menos de la mitad"
+    generation_halfway: "Queda menos de la mitad."
     generation_started: "Se está generando el informe."
     non_generatable_report_notice: "No se puede generar un informe para las evaluaciones de encuestas."
     quiz_report_generator: 
@@ -11562,11 +11562,11 @@ es:
     summary: 
       audible_chart_description: "%{above_average} aluimnos obtuvieron una puntuación mayor o igual a la media, mientras que la de %{below_average} fue inferior."
       avg_time: "Tiempo promedio"
-      chart_brushing_tip: "Consejo: puede destacat un segmento específico en la tabla mediante una selección con su cursor."
+      chart_brushing_tip: "Consejo: puede destacar un segmento específico en la tabla seleccionándolo con el cursor."
       chart_title: "Tabla de puntuación por porcentajes"
       high_score: "Calificación alta"
       low_score: "Calificación baja"
-      mean: "Calificación Promedio"
+      mean: "Calificación media"
       not_available_abbrev: N/D
       quiz_summary: "Resumen de la evaluación"
       stdev: "Desviación estándar"
@@ -11577,7 +11577,7 @@ es:
       students_who_scored_in_a_range: 
         one: "Un alumno ha obtenido una puntuación de entre %{start} y %{end}%."
         other: "%{count} alumnos han obtenido una puntuación de entre %{start} y %{end}%."
-        zero: "Ningún alumno ha obtenido una puntuación entre %{start} y %{end}%."
+        zero: "Ningún alumno ha obtenido una puntuación de entre %{start} y %{end}%."
       table_description: "Todos los resúmenes de estadisticas se han convertido en envíos"
     title: "Estadísticas de la evaluación"
     unknown_answer: Otro
@@ -12401,7 +12401,7 @@ es:
           republish: "Volver a publicar"
           unlock_quiz: "Permitir que los alumnos realicen la evaluación ahora"
           unlock_survey: "Permitir que los alumnos participen en la encuesta ahora"
-        course_concluded_notice: "Esta evaluación ya no está disponible, debido a que el curso ha concluido."
+        course_concluded_notice: "Esta evaluación ya no está disponible, ya que el curso ha concluido."
         labels: 
           available_until: Hasta
           no_time_limit: "Sin tiempo límite"
@@ -12962,11 +12962,11 @@ es:
     assignment_information: 
       actions: 
         assignment_is_muted: ¿Silenciado?
-        curve_grades: "Aplicar Curva a Calificaciones"
-        message_students: "Enviar un mensaje a estudiantes que..."
+        curve_grades: "Aplicar curva a calificaciones"
+        message_students: "Enviar un mensaje a los alumnos que..."
         set_default_grade: "Establecer calificación predeterminada"
       details: 
-        avg_score: "Calificación Promedio"
+        avg_score: "Calificación media"
         graded_sub_count: "Envíos calificados:"
         high_score: "Calificación alta"
         low_score: "Calificación baja"
@@ -13002,8 +13002,8 @@ es:
       was_resubmitted: "Esta tarea se ha enviado de nuevo desde la última vez que se calificó."
     header: 
       gradebook_individual_view: "Vista individual del libro de calificaciones"
-      save_instructions: "Nota: las calificaciones y las notas se guardarán automáticamente tras salir del campo."
-      switch_to_gradebook2: "Cambiar a Libro de calificaciones predeterminado"
+      save_instructions: "Nota: Las calificaciones y las notas se guardarán automáticamente tras salir del campo."
+      switch_to_gradebook2: "Cambiar a libro de calificaciones predeterminado"
     learning_mastery: 
       download_results: "Descargar resultados (.csv)"
       empty_student_selection: "Seleccionar un alumno para ver su información adicional aquí."
@@ -13016,7 +13016,7 @@ es:
       select_student: "Seleccione un alumno"
       student_info: "Información del alumno"
     outcome_information: 
-      avg_score: "Calificación Promedio"
+      avg_score: "Calificación media"
       empty_outcome_selection: "Seleccione un objetivo para ver la información adicional aquí."
       high_score: "Calificación alta"
       low_score: "Calificación baja"
@@ -13070,7 +13070,7 @@ es:
       titles: 
         all_courses: "Todos los cursos"
     all_courses_inner: 
-      join_course: "Únase a este Curso"
+      join_course: "Únase a este curso"
       next: Siguiente
       previous: Anterior
     course_sections: "Secciones del Curso"
@@ -13302,7 +13302,7 @@ es:
         user_menu: "Menú de usuario"
     components: 
       ic_submission-download-dialog: 
-        click_to_download: "Haga click aquí para descargar"
+        click_to_download: "Haga clic aquí para descargar"
         download_message: "Los envíos se comprimirán en un archivo zip para descarga. Esto puede tardar un poco, en función del tamaño y cantidad de los archivos que se envíen."
         download_message_intro: "Se están recopilando sus envíos de alumno."
         download_submissions: "Descargar todos los envíos"
@@ -14053,7 +14053,7 @@ es:
     group_leave: "Ha abandonado el grupo %{group_name}"
     group_name: "%{group_name} en %{group_category}"
     new_group: 
-      group_explanation: "Grupos son un buen lugar para colaborar en proyectos o para establecer calendarios para sesiones de estudio y otras. Todos los grupos tienen un calendario, un wiki, foros, y un poco de espacio para almacenar archivos. Grupos pueden colaborar en documentos, o programar conferencias en línea. En realidad es un mini-curso donde puede trabajar con un número más pequeño de estudiantes o en un proyecto más enfocado."
+      group_explanation: "Los grupos son un buen lugar para colaborar en proyectos o para establecer calendarios para sesiones de estudio y similares. Todos los grupos tienen un calendario, un wiki, foros y cierto espacio para almacenar archivos. Los grupos pueden colaborar en documentos o programar conferencias en línea. En realidad es un minicurso donde puede trabajar con un número más pequeño de alumnos o en un proyecto más concreto."
       joining: Unirse
       name: "Nombre del grupo"
       name_error: "El nombre del grupo es obligatorio"
@@ -14264,7 +14264,7 @@ es:
       curriculum_assessment_errata_description: "Ver errores de currículum/evaluación ya comunicados. Buscar \"erratas\"."
       networking_academy_description: "Ver las respuestas de Cisco a las preguntas más frecuentes."
       networking_academy_faqs: "Preguntas más frecuentes de Networking Academy"
-  syllabus: "Programa de Estudios del Curso"
+  syllabus: "Programa de estudios del curso"
   table_headings: 
     name: Nombre
     total: Total
@@ -14731,7 +14731,7 @@ es:
       linked_in: "LinkedIn es un recurso para redes de negocio. Muchas de las relaciones que crea durante su educación pueden ser útiles una vez que entra al campo laboral."
       skype: "Skype es una herramienta gratis para llamadas y videoconferencias en línea."
       twitter: "Twitter es un gran recurso para comunicación fuera de clases."
-      yo: "Yo es una herramienta de comunicación de cero caracteres y de un solo punteo"
+      yo: "Yo es una herramienta de comunicación de cero caracteres y un solo punteo"
   users: 
     admin_merge: 
       buttons: 
