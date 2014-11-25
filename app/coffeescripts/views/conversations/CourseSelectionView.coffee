@@ -120,8 +120,7 @@ define [
         course['truncated_name'] = truncated
 
     middle_truncate: (name) ->
-      # This implementation ignores non-BMP character encoding issues in favor of simplicity
       if name.length > 25
-        name.slice(0, 10) + "&hellip;" + name.slice(-10)
+        name.slice(0, 10) + "…" + name.slice(-10)
       else
         name
