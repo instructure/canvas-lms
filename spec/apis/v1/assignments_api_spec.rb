@@ -2046,10 +2046,10 @@ describe AssignmentsApiController, type: :request do
 
       it "assignment_visibility includes the correct user_ids" do
         json = visibility_api_request @assignment1
-        expect(json["assignment_visibility"].include?(@student1.id)).to eq true
+        expect(json["assignment_visibility"].include?("#{@student1.id}")).to eq true
         json = visibility_api_request @assignment2
-        expect(json["assignment_visibility"].include?(@student2.id)).to eq true
-        expect(json["assignment_visibility"].include?(@student3.id)).to eq true
+        expect(json["assignment_visibility"].include?("#{@student2.id}")).to eq true
+        expect(json["assignment_visibility"].include?("#{@student3.id}")).to eq true
       end
 
       context "as a student" do

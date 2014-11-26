@@ -336,7 +336,7 @@ define [
               published: true
               muted: false
               only_visible_to_overrides: true
-              assignment_visibility: [1]
+              assignment_visibility: ["1"]
             }
             {
               id: '2'
@@ -350,7 +350,7 @@ define [
               published: true
               muted: true
               only_visible_to_overrides: true
-              assignment_visibility: [2]
+              assignment_visibility: ["2"]
             }
             {
               id: '3'
@@ -363,7 +363,7 @@ define [
               assignment_group_id:'1'
               published: true
               muted: false
-              assignment_visibility: [1,2,3]
+              assignment_visibility: ["1","2","3"]
             }
           ]
         }

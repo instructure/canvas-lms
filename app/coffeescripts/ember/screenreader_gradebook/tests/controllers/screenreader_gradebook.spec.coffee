@@ -130,7 +130,7 @@ define [
   test 'updates assignment_visibility on an assignment', ->
     assignments = @srgb.get('assignments')
     assgn = assignments.objectAt(2)
-    @srgb.updateAssignmentVisibilities(assgn, 3)
+    @srgb.updateAssignmentVisibilities(assgn, '3')
     ok !assgn.assignment_visibility.contains('3')
 
   test 'studentsThatCanSeeAssignment doesnt return all students', ->

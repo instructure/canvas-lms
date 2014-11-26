@@ -208,7 +208,7 @@ define [
     updateAssignmentVisibilities: (assignment, userId) ->
       visibilities = get(assignment, 'assignment_visibility')
       filteredVisibilities = visibilities.filter (id) ->
-        "#{id}" != userId
+        id != userId
       set(assignment, 'assignment_visibility', filteredVisibilities)
 
     calculate: (submissionsArray) ->
@@ -458,7 +458,7 @@ define [
 
     differentiatedAssignmentVisibleToStudent: (assignment, student_id) ->
       return true unless assignment.only_visible_to_overrides
-      _.include(assignment.assignment_visibility, +student_id)
+      _.include(assignment.assignment_visibility, student_id)
 
     studentsThatCanSeeAssignment: (assignment) ->
       students = @studentsHash()

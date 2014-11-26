@@ -147,11 +147,11 @@ define [
             @updateSubmission { assignment_id: assignmentId, user_id: studentId, hidden: true }
 
     hiddenStudentIdsForAssignment: (studentIds, assignment) ->
-      _.difference studentIds, assignment.assignment_visibility.map(String)
+      _.difference studentIds, assignment.assignment_visibility
 
     updateAssignmentVisibilities: (hiddenSub) ->
       assignment = @assignments[hiddenSub.assignment_id]
-      filteredVisibility = assignment.assignment_visibility.filter (id) -> "#{id}" != hiddenSub.user_id
+      filteredVisibility = assignment.assignment_visibility.filter (id) -> id != hiddenSub.user_id
       assignment.assignment_visibility = filteredVisibility
 
     onShow: ->
