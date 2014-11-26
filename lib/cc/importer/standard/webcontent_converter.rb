@@ -24,8 +24,10 @@ module CC::Importer::Standard
         main_file = {}
         main_file[:migration_id] = res[:migration_id]
         main_file[:path_name] = res[:href]
-        # todo check for CC permissions on the file
-        
+        if res[:intended_user_role] == 'Instructor'
+          main_file[:locked] = true
+        end
+
         # add any extra files in this resource
         res[:files].each do |file_ref|
           next unless file_ref[:href]

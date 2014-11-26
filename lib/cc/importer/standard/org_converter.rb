@@ -121,6 +121,10 @@ module CC::Importer::Standard
             item[:linked_resource_id] = item_node['identifierref']
             item[:linked_resource_title] = get_node_val(item_node, 'title')
         end
+
+        if item && resource[:intended_user_role] == 'Instructor'
+          item[:workflow_state] = 'unpublished'
+        end
       end
       
       item
