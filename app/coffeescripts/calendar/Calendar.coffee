@@ -21,13 +21,14 @@ define [
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/CalendarDefaults'
   'compiled/util/deparam'
+  'str/htmlEscape'
 
   'vendor/fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam) ->
+], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam, htmlEscape) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -273,8 +274,8 @@ define [
         else
           I18n.t('event_event_title', 'Event Title:')
 
-      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
-      $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}"))
+      $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}</span>"))
       $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint} </span>"))
       $element.find('.fc-event-title').toggleClass('calendar__event--completed', event.isCompleted())
       element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
