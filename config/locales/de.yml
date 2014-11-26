@@ -60,6 +60,7 @@ de:
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
+      yo: Yo
     ask_canvas_network: "Frage in der Canvas-Network-Community stellen"
     default_account_name: Standardkonto
     default_site_administrator_account_name: Seitenadministrator
@@ -1293,6 +1294,7 @@ de:
   allow_lor_tools: "Benutzern die Anzeige und Verwendung externer für LOR konfigurierter Tools ermöglichen."
   allow_opt_out_of_inbox: "Benutzern ermöglichen, den Konversations-Posteingang zu deaktivieren. Dadurch werden alle Konversationsnachrichten und -benachrichtigungen so schnell wie möglich als Benachrichtigungen an die primäre E-Mail des Benutzers gesendet, und die Markierung für ungelesene Nachrichten im Konversations-Posteingang sowie die Benachrichtigungseinstellungen für die Konversation werden ausgeblendet."
   always_3a59e701: Immer
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
   analytics: 
     course: 
       analytics: Analysen
@@ -1358,6 +1360,7 @@ de:
     podcast_feed_description_course: "Alle verlinkten oder eingebetteten Multimedia-dateien innerhalb der Ankündigungen des Kurses \"%{course}\" werden in diesem Feed angezeigt."
     podcast_feed_description_group: "Alle verlinkten oder eingebetteten Multimedia-dateien innerhalb der Ankündigungen der Gruppe \"%{group}\" werden in diesem Feed angezeigt."
     podcast_feed_name: "%{course}-podcast-feed mit Ankündigungen"
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Antworten werden nach Ihrem letzten Versuch angezeigt"
   application: 
     errors: 
       feed_not_found: "Der Feed wurde nicht gefunden."
@@ -1796,6 +1799,7 @@ de:
     grading_type_selector: 
       display_grade_as: "Noten anzeigen als"
       gpa_scale_explainer: "Die Benotung nach GPA-Skala ist für Bildungseinrichtungen vorgesehen, die eine Skala von 4,0 (oder 5,0/6,0) für alle Aufgaben verwenden. Dieses Benotungssystem entspricht der Anzeige von Buchstabennoten, mit einigen wichtigen Ausnahmen:"
+      gpa_scale_input_explainer: "Punktzahlen werden auf einer Skala bis 4.0 eingegeben. Wenn eine Aufgabe beispielsweise insgesamt 100 Punkte hat, steht die Eingabe 4.0 für 100 %, 3.0 für 87 % etc."
       gpa_scale_letters_explainer: "Buchstabennoten können zusätzlich zu Zahlennoten verwendet werden."
       gpa_scale_percentage_explainer: "Punkte können nicht direkt eingegeben werden. Sie können jedoch Prozentsätze eingeben. Beispiel: Wenn für eine Aufgabe 50 Punkte vorgesehen sind, können Sie nicht \"40\" eingeben, sondern 80 %."
       gpa_scale_recommendation: "Canvas empfiehlt, Noten als Buchstabennoten anzuzeigen, es sei denn, Ihre Bildungseinrichtung verwenden die 4,0-Skala (oder 5,0/6,0) für die Benotung."
@@ -2157,6 +2161,8 @@ de:
         originality_report_visible_after_due_date: "Nach dem Abgabetermin"
         originality_report_visible_after_grading: "Nach der Benotung der Aufgabe"
         originality_report_visible_immediately: Sofort
+        settings_exclude_fewer_than_count: "Weniger als %{wordsInput} Wörter"
+        settings_exclude_less_than_percent: "Weniger als %{percentInput} des Dokuments"
     undated_assignments: "Undatierte Aufgaben"
     upcoming_assignments: "Bevorstehende Aufgaben"
     wizard_box: 
@@ -2464,6 +2470,7 @@ de:
       scheduler_explanation_teacher_paragraph_1: "Dies ist das  Terminplanertool. Sie können es nutzen, um Termingruppen zu erstellen, für die sich Ihre Studenten anmelden können"
       scheduler_explanation_teacher_paragraph_2: "Nehmen wir beispielsweise an, Sie wollen sich eine Aufsatzaufgabe mit jedem der Studenten Ihres Kurses genauer ansehen. Sie erstellen also eine neue Termingruppe, geben Tage und Uhrzeiten an, zu denen Sie verfügbar sind, lassen diese vom Programm in 15-minütige Blöcke aufteilen und lassen einen Studenten je Zeitblock zur Anmeldung zu."
       scheduler_explanation_teacher_paragraph_3: "Anschließend erhalten die Studenten eine Benachrichtigung darüber, dass sie sich für einen der Zeitblöcke anmelden sollen. Ihnen wird ein Kalender mit den verfügbaren Zeitblöcken über den restlichen Kalendern angezeigt, so dass sie eine für sich günstige Zeit auswählen können."
+      scheduler_explanation_teacher_paragraph_4: "* Beginnen Sie jetzt, indem Sie rechts auf die Schaltfläche \"Eine Termingruppe erstellen\" klicken. *"
       signed_up_for: "Sie sind angemeldet für"
       x_groups_have_signed_up: "%{participant_count} Gruppen haben sich registriert"
       x_people_have_signed_up: "%{participant_count} Personen haben sich registriert"
@@ -2510,6 +2517,7 @@ de:
         warning: Warnung
     edit_appointment_group: 
       affect_reservations: "Wie wirkt sich dies auf Reservierungen aus?"
+      appointments_per_participant_label: "Maximale Anzahl an Terminen, bei denen ein Teilnehmer anwesend sein kann"
       appt_group_options_help1: "Einige bestehende Reservierungen überschreiten das von Ihnen gesetzte Limit. Diese sind nicht betroffen, die Änderung verhindert nur das Erstellen neuer Reservierungen."
       appt_group_options_help2: "Sie können allerdings existierende Reservierungen manuell entfernen."
       calendar: Kalender
@@ -2519,6 +2527,8 @@ de:
       group_signup: "Studenten veranlassen, sich in Gruppen anzumelden"
       location: Ort
       name: Name
+      participants_per_appointment_label: "Max. Benutzer/Gruppen pro Termin"
+      slot_duration_label: "Minuten pro Block"
       time_range: Zeitraum
     edit_appt_calendar_event: 
       description: "Beschreibung:"
@@ -2961,6 +2971,7 @@ de:
     body: "Ihr Canvas-bestätigungscode ist %{verification_code}"
     default_facebook_account: Facebook-konto
     default_twitter_handle: Twitter-name
+    default_yo_name: Yo-Name
   communication_channels: 
     confirm: 
       buttons: 
@@ -4049,7 +4060,7 @@ de:
       sent: Gesendet
       settings: Einstellungen
       starred: "Mit Stern markiert"
-      submission_comments: Turnitin-einsendungskommentare
+      submission_comments: Einsendungskommentare
       titles: 
         conversations: Konversationen
       unread: Ungelesen
@@ -4141,7 +4152,7 @@ de:
   correct_answers_are_hidden_5d0a0009: "Die richtigen Antworten sind ausgeblendet."
   correct_answers_are_no_longer_available_c67dfc28: "Die richtigen Antworten sind nicht mehr verfügbar."
   correct_answers_will_be_available_from_to_5762e8c6: "Die richtigen Antworten stehen von %{from} bis %{to} zur Verfügung."
-  correct_answers_will_be_available_on_date_48137: "Die richtigen Antworten stehen am %{date} zu Verfügung."
+  correct_answers_will_be_available_on_date_48137: "Die richtigen Antworten stehen am %{date} zur Verfügung."
   count_minutes_a6eeeacb: 
     one: "1 Minute"
     other: "%{count} Minuten"
@@ -4560,6 +4571,7 @@ de:
         status_link: Importstatus
         text: "Derzeit wird/werden ein/mehrere Element/e importiert. Das/die Element/e wird/werden im Kurs unten angezeigt, sobald es/sie verfügbar ist/sind."
     index: 
+      browse_more_courses: "Mehr Kurse durchsuchen"
       headings: 
         future_enrollments: "Zukünftige Einschreibungen"
         my_courses: "Meine Kurse"
@@ -4619,6 +4631,8 @@ de:
         duplicates_removed: "Duplikate wurden entfernt."
         email: E-mail
         email_field_label: "Geben Sie die E-Mail-Adresse der hinzuzufügenden Benutzer durch Kommata getrennt ein"
+        email_field_place_holder: "\"Beispiel-Student\" <student@beispiel.com>, \"Nachname, Vorname\" <vornach@beispiel.com>, nureineE-Mail-Adresse@beispiel.com"
+        example_formats: "Beispiele: Benutzer@beispiel.com, \"Vorname Nachname\" <benutzer@beispiel.com>, \"Nachname, Vorname\" <benutzer@beispiel.com>"
         form_instructions: "Liste mit E-Mail-Adressen unten eingeben oder einfügen:"
         go_back: "Nochmals beginnen"
         have_been_enrolled: "Folgende Benutzer wurden eingeschrieben"
@@ -5393,6 +5407,7 @@ de:
       new_quiz: "Neues Quiz"
     edit_crumb: Bearbeiten
     edit_view: 
+      add_attachment_93868828: "Anhang hinzufügen"
       allow_threaded_replies: "Gelistete Antworten zulassen"
       attachment: Anhang
       available_from: "Verfügbar ab"
@@ -5618,6 +5633,7 @@ de:
     unsubscribe: "Für dieses Thema abmelden"
     unsubscribed: Abgemeldet
     unsubscribed_hint: "Sie haben sich nicht für dieses Thema angemeldet. Klicken Sie, um sich anzumelden."
+  display_course_catalog: "Zeigen Sie eine durchsuchbare Liste mit Kursen in diesem Stammkonto mit aktivierter Kennzeichnung \"Diesen Kurs in das öffentliche Kursverzeichnis aufnehmen\" an."
   draft_state_description: |-
       Diese Beta-Funktion gestaltet viele Bereiche von Canvas neu und ermöglicht, dass Inhalte
       als nicht veröffentlichte Inhalte vorhanden sind, die für Studenten nicht sichtbar und von
@@ -5998,6 +6014,7 @@ de:
         body1: "Am unteren Rand dieser Seite sehen Sie eine Liste der aktuellen Einsendungen für Ihren Unterricht (%{showme}). Von hier aus können Sie neuen Seiten Ihres Portfolios schnell und unkompliziert Einsendungen hinzufügen. Öffnen Sie zu diesem Zweck einen einfachen Dialog durch das Anklicken der Einsendung, die Sie hinzufügen möchten."
         body2: "Sehr gut! Nun müssen Sie noch den Abschnitt auswählen, dem die Einsendung hinzugefügt werden soll, und einen Namen für die Seite eingeben. Nach einem Klick auf \"Seite hinzufügen\" gelangen Sie auf die neue Seite, die Sie bei Bedarf weiter bearbeiten können."
   error_message_2b9d12ee: "Fehler: %{message}"
+  error_uploading_file_e2d31b56: "Fehler beim Hochladen der Datei."
   errors: 
     bad_navigation_config: "Ungültige Kursfensterkonfiguration"
     blank: Erforderlich
@@ -6164,6 +6181,7 @@ de:
       all: Alle
       app_headder: "Externe Apps"
       external_tools_note: "Mithilfe von Apps können auf einfache Weise neue Funktionen zu Canvas hinzugefügt werden. Sie können zu einzelnen Kursen oder zu allen Kursen eines Kontos hinzugefügt werden. Nach der Konfiguration der Tools können Sie Links zu diesen in Kursmodulen erstellen und Aufgaben für Leistungstest-Tools erstellen."
+      external_tools_references: "*Hier finden Sie LTI-Tools*, die Sie sehr gut zusammen mit Canvas verwenden können. Weitere Informationen finden Sie auch in den ** Canvas-Community-Themen zu LTI-Tools**."
       installed: Installiert
       not_installed: "Nicht installiert"
       search_filter: "Nach Name filtern"
@@ -6249,6 +6267,7 @@ de:
   features: 
     allow_opt_out_of_inbox: "Benutzern das Deaktivieren des Posteingangs ermöglichen"
     better_file_browsing: "Besseres Durchsuchen von Dateien"
+    course_catalog: Kurskatalog
     differentiated_assignments: "Differenzierte Aufgaben"
     differentiated_assignments_account_disable_warning: |-
         Die Deaktivierung dieser Funktion wirkt sich auf vorhandene Kurse aus. Um Hilfestellung bei der Deaktivierung
@@ -6560,6 +6579,7 @@ de:
     gradee_index_of_total: "%{gradee} %{x} von %{y}"
     group: Gruppe
     hide_all_details_button: "Alle Details ausblenden"
+    mic_blocked_message: "Die Berechtigung zur Nutzung des Mikrofons ist gesperrt. Um diese Einstellung zu ändern, gehen Sie zu chrome://settings/contentExceptions#media-stream"
     mute_assignment: "Aufgabe stummschalten"
     new_assessment: "[Neuer Leistungstest]"
     no_submission_time: "Keine Einsendungszeit"
@@ -6572,6 +6592,7 @@ de:
     recording_message: "Wird aufgezeichnet ..."
     show_all_details_button: "Alle Details anzeigen"
     student: Student
+    student_index: "Student %{index}"
     student_mute_notification: "Dozent arbeitet zurzeit an der Benotung"
     titles: 
       click_to_record: "Sprache als Text"
@@ -6914,6 +6935,7 @@ de:
         save: Speichern
         save_settings: "Einstellungen speichern,"
         submit_comment: "Kommentar absenden"
+      crocodoc_pending: "Dieses Dokument wird noch von Crocodoc verarbeitet."
       gradebook: 
         mute_assignment: "Aufgabe stummschalten"
         unmute_assignment: "Aufgabe lautschalten"
@@ -7302,14 +7324,17 @@ de:
       group_category_create: 
         allow_self_signup: "Selbstregistrierung zulassen"
         cancel: Abbrechen
+        create_groups: "Jetzt %{num_groups} Gruppen erstellen"
         create_groups_manually: "Ich erstelle Gruppen manuell"
         group_set_name: "Name des Gruppensatzes"
         group_structure: Gruppenstruktur
         leave_group_limit_blank: "Leer lassen, um kein Limit anzugeben"
+        limit_group_size: "Gruppen auf %{group_limit} Mitglieder beschränken"
         require_same_section: "Festlegen, dass Gruppenmitglieder zum selben Abschnitt gehören müssen"
         save: Speichern
         saving: "Wird gespeichert..."
         self_signup: Selbstregistrierung
+        split_into_groups: "Studenten in %{num_groups} gleich große Gruppen aufteilen"
       group_category_detail: 
         add_group: "Gruppe hinzufügen"
         category_settings: Einstellungen
@@ -7330,6 +7355,7 @@ de:
         group_limit_override: "Beim Ändern dieser Einstellung werden einzeln festgelegte Gruppenlimits überschrieben"
         group_set_name: "Name des Gruppensatzes"
         leave_group_limit_blank: "Leer lassen, um kein Limit anzugeben"
+        limit_group_size: "Gruppen auf %{group_limit} Mitglieder beschränken"
         require_same_section: "Festlegen, dass Gruppenmitglieder zum selben Abschnitt gehören müssen"
         save: Speichern
         saving: "Wird gespeichert..."
@@ -9871,13 +9897,27 @@ de:
     sub_header: Unterüberschrift
   modules: 
     add: 
+      assignment: 
+        add_assignments: "Aufgaben hinzufügen"
+        loading_assignments: "Aufgaben werden geladen..."
+      discussion: 
+        add_topics: "Diskussionsthemen hinzufügen"
+      file: 
+        add_files: "Dateien hinzufügen"
       header: 
         cancel: Abbrechen
+        create_header: "Überschrift erstellen"
       link: 
+        add_link: "Link hinzufügen"
         cancel: Abbrechen
+      page: 
+        add_pages: "Seiten hinzufügen"
+      quiz: 
+        add_quizzes: "Quiz hinzufügen"
       tool: 
         cancel: Abbrechen
     add_item: 
+      add_new_item: "Neues Element hinzufügen"
       assignment: Aufgabe
       content_page: Inhaltsseite
       discussion: Diskussion
@@ -9899,24 +9939,32 @@ de:
         create: Erstellen
       discussion: 
         cancel: Abbrechen
+        create_discussion: "Diskussion erstellen"
       file: 
         cancel: Abbrechen
         upload: Hochladen
       header: 
         cancel: Abbrechen
+        create_header: "Überschrift erstellen"
       link: 
+        add_link: "Link hinzufügen"
         cancel: Abbrechen
       page: 
         cancel: Abbrechen
+        creat_page: "Seite erstellen"
       quiz: 
         cancel: Abbrechen
+        create_quiz: "Quiz erstellen"
       tool: 
         cancel: Abbrechen
     dialog_title: "Element zu %{moduleName} hinzufügen"
     item: 
       cancel: Abbrechen
+      edit_item: "Modulelement bearbeiten"
+      item_title: "Titel des Modulelements"
       points_possible: Pkte.
       save: Speichern
+      saving: "Wird gespeichert..."
     module: 
       header: 
         delete: Löschen
@@ -9931,7 +9979,10 @@ de:
     module_edit: 
       Create: Erstellen
       cancel: Abbrechen
+      has_unlock_date: "Module bis zu einem bestimmten Datum sperren"
+      lock_datea: Sperrdatum
       module_name: Modulname
+      new_module: "Neues Modul erstellen"
     module_item_view: 
       button: 
         delete: Löschen
@@ -9994,6 +10045,7 @@ de:
     sure_you_want_to_mute: "Möchten Sie diese Aufgabe wirklich stummschalten? Solange diese Aufgabe stummgeschaltet ist, erhalten die Studenten keine neuen Benachrichtigungen und sehen keine Informationen im Zusammenhang mit:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "Sie haben eine neue Nachricht von Canvas"
+  new_quiz_statistics_desc: "Aktiviert die neue Seite mit Quizstatistiken für einen Kurs."
   new_styles_description: |-
       Wir gestalten die Benutzeroberfläche von Canvas um. Aktivieren Sie diese Option, um Zugriff auf die
       aktualisierte und vereinfachte Canvas-Oberfläche zu erhalten. Diese Funktion wird noch bearbeitet
@@ -10211,6 +10263,8 @@ de:
         display: Mobilnummer
       twitter: 
         display: Twitter
+      yo: 
+        display: Yo
     frequencies: 
       daily: Täglich
       immediately: "so schnell wie möglich"
@@ -10471,6 +10525,10 @@ de:
     save_button: Speichern
     saving_button: "Wird gespeichert..."
     warnings: 
+      overwrite_changes: |-
+          Sie sind im Begriff, die anderen Änderungen zu überschreiben, die Sie seit Beginn der Bearbeitung vorgenommen haben.
+          
+          Änderungen überschreiben?
       unsaved_changes: "Es liegen nicht gespeicherte Änderungen von Ihnen vor. Möchten Sie fortfahren, ohne die Änderungen zu speichern?"
   paginated_collection: 
     no_items: "Keine Elemente."
@@ -10536,8 +10594,13 @@ de:
       labels: 
         api_key: Crocodoc-API-Key
     diigo: 
+      description: Diigo-Integration
       name: Diigo
     diigo_settings: 
+      description: |-
+          Sie müssen eine [neue App bei Diigo](%{diigo_url}) registrieren.
+          
+          * Notieren Sie sich den API-Key, nachdem Sie die App gespeichert haben.
       labels: 
         api_key: API-Key
     dim_dim_settings: 
@@ -10724,8 +10787,15 @@ de:
     notices: 
       settings_updated: "Plugin-einstellungen erfolgreich aktualisiert."
     panda_pub_settings: 
+      description: "PandaPub ist ein Veröffentlichungs-/Unterdienst, mit dem einige Teile von Canvas Benachrichtigungen zu Ereignissen innerhalb des Browsers erhalten und Änderungen nicht mehr abgefragt werden müssen, sofern der Dienst konfiguriert wurde."
       labels: 
+        application_id: Anwendungs-ID
         base_url: Basis-URL
+        key_id: Key-ID
+        key_secret: Key-Secret
+    pandapub: 
+      description: Veröffentlichungs-/Unterdienst
+      name: PandaPub
     qti_converter_settings: 
       labels: 
         enabled: Aktiviert
@@ -10797,6 +10867,13 @@ de:
         domain: Domain
         password: Passwort
         username: Benutzername
+    yo: 
+      description: "Just Yo"
+      name: Yo
+    yo_settings: 
+      description: "Sie benötigen ein [API-Token von Yo](%{yo_url})."
+      labels: 
+        api_token: API-Token
   polling: 
     poll_sessions: 
       errors: 
@@ -10896,6 +10973,7 @@ de:
         register_linkedin_account: "Registrieren Sie Ihr LinkedIn-benutzerkonto"
         save_login: "Zugangskennung speichern"
         save_skype_name: "Skype-namen speichern"
+        save_yo_name: "Yo-Name speichern"
         select_image: "Bild auswählen"
         update_settings: "Einstellungen aktualisieren"
       confirm_email_instructions: "Bevor Sie Ihr Profil bearbeiten können, müssen Sie Ihre E-mailadresse (%{email}) bestätigen, indem Sie in der Ihnen zugesandten E-mail auf den Aktivierungslink klicken. Falls Sie diese E-mail nicht erhalten haben, *Klicken sie hier zum Neuversenden* und überprüfen Sie Ihren Spamordner."
@@ -10930,6 +11008,7 @@ de:
         users_profile: "%{user}s Profil"
         ways_to_log_in: Anmeldemöglichkeiten
         web_services: Webdienste
+        yo_login: Yo-Anmeldung
       hints: 
         expires_at: "freilassen, um auf Ablaufdatum zu verzichten"
         language: "Dies setzt alle Brower- und Kontoeinstellungen außer Kraft."
@@ -10964,6 +11043,7 @@ de:
         token_last_used: "Zuletzt verwendet"
         token_purpose: Zweck
         user_name: Benutzername
+        yo_name: Yo-Name
       linkedin_description: "LinkedIn ist eine umfangreiche Networkingressource zum Aufbau von beruflichen Kontakten und kann auch noch lange Zeit nach Abschluss Ihrer Ausbildung von großem Nutzen sein. Falls Sie über ein LinkedIn-benutzerkonto verfügen, können Sie es hier registrieren. Wenn Sie anderen Mitgliedern Ihres Kurses oder Ihrer Gruppe erlauben, Ihre registrierten Webdienste anzuzeigen, können diese auf einfache Weise mit Ihnen Kontakt aufnehmen, ohne Ihr Profil auf LinkedIn suchen zu müssen."
       links: 
         add_account: "Konto hinzufügen"
@@ -10983,6 +11063,7 @@ de:
         upload_new_image: "Neues Bild hochladen"
         view_facebook_app: "Facebook-applikation anzeigen"
         view_your_profile: "Ihr Profil anzeigen"
+        yo: Yo
       loading_token_details: "Token-details werden geladen..."
       no_approved_integrations: "Drittanbieter-anwendungen können die erforderliche Autorisierung anfordern, um in Ihrem Namen auf Canvas zugreifen zu können. Eine Liste der autorisierten Anwendungen wird an dieser Stelle angezeigt."
       no_language_preference: "Systemstandard (%{language})"
@@ -10998,6 +11079,7 @@ de:
         authorize_google_docs: "Google Docs autorisieren"
         authorize_linkedin: "LinkedIn autorisieren"
         authorize_twitter: "Twitter autorisieren"
+        authorize_yo: Yo-Anmeldung
         click_to_change_profile_pic: "Klicken, um Profilbild zu ändern"
         delicious_login: Delicious-anmeldung
         diigo_login: Diigo-anmeldung
@@ -11013,6 +11095,11 @@ de:
           und erscheinen nicht in Ihrem öffentlichen Stream.
       unknown_service: Unbekannt
       web_services: "Durch die Integration der Webtools, die Sie bereits nutzen, erleichtert Ihnen Canvas die Nutzung der Plattform erheblich. Klicken Sie auf einen beliebigen Webdienst unter \"Andere Webdienste\", um zu erfahren, was damit konkret gemeint ist."
+      yo_description: |-
+          Yo ist ein Kommunikationstool, das mit einer Tippbewegung und ohne Zeichen bedient wird.
+          Wenn Sie über ein Yo-Konto verfügen, können Sie es hier registrieren. Wenn Sie dann zulassen, dass andere Kurs- und Gruppenmitglieder Ihre registrierten Dienste sehen, können sie sich einfach mit Ihrem Yo-Konto verbinden.
+          
+          Sie können sich auch registrieren, damit Benachrichtigungen an Ihr Yo-Konto gesendet werden.
     purpose_required: "Zweck erforderlich"
     resending: "sendet erneut..."
     secondary_nav: 
@@ -11089,6 +11176,8 @@ de:
       validations: 
         should_be_10_digits: "muss eine 10-stellige Zahl sein"
     ways_to_contact_me: "Meine Kontaktmöglichkeiten"
+    yo_select: 
+      yo: Yo
     you_have_no_services: "Sie haben keine Dienste angemeldet; auf der *Einstellungen*-seite können Sie dies tun."
   profiles: 
     avatar_dialog: 
@@ -11130,7 +11219,9 @@ de:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest sent to IdP"
-      logout_response_redirect_from_idp: "Received LogoutResponse from IdP"
+      logout_request_redirect_from_idp: "LogoutRequest von IdP empfangen"
+      logout_response_redirect_from_idp: "LogoutResponse von IdP empfangen"
+      logout_response_redirect_to_idp: "LogoutResponse wird an IdP gesendet"
       redirect_from_idp: "Recieved LoginResponse from IdP"
     default_app_name: "externe Applikation"
     errors: 
@@ -11388,8 +11479,18 @@ de:
       some_scores_reduced: "Punkte nur für richtige Anwort vergeben (*die Punkte mancher Studenten werden möglicherweise reduziert*)"
       update_question_without_regrading: "Frage aktualisieren, ohne eine Neubenotung durchzuführen"
   quiz_reports: 
+    download_item_analysis: "Laden Sie den Elementanalysebericht herunter."
+    download_student_analysis: "Laden Sie den Studentenanalysebricht herunter."
     generatable: "Bericht wurde nie erstellt."
+    generate_item_analysis_report: "Erstellen Sie den Elementanalysebericht."
+    generate_student_analysis_report: "Erstellen Sie den Studentenanalysebericht."
+    generated_at: "Erstellt: %{date}"
     generating: "Bericht wird erstellt ..."
+    generation_almost_done: "Fast fertig!"
+    generation_complete: "Bericht wurde erstellt."
+    generation_halfway: "Mehr als die Hälfte ist schon geschafft."
+    generation_started: "Bericht wird erstellt."
+    non_generatable_report_notice: "Bericht kann nicht für Befragungsquiztests erstellt werden."
     quiz_report_generator: 
       download_report_name: "%{report_name} herunterladen"
       generate_report_name: "%{report_name} generieren"
@@ -11401,31 +11502,82 @@ de:
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Die Quizergebnisse für dieses Quiz sind geschützt und können nur einmal gleich nach der Einsendung angezeigt werden."
   quiz_statistics: 
     answer_bars_chart: 
+      audible_answer_position: "Antwort %{position}:"
+      audible_answer_response_count: 
+        one: "Eine Antwort."
+        other: "%{count} Antworten."
+        zero: "Keine Antworten."
+      audible_correct_answer_indicator: "Diese Antwort ist richtig."
+      audible_description: "In dieser Tabelle sind alle Antworten auf Fragen sowie die Anzahl der jeweils eingegangenen Antworten aufgeführt."
       response_count: 
-        one: "%{count} Studenten"
+        one: "1 Student"
         other: "%{count} Studenten"
+        zero: Niemand
+    answer_details: 
+      hide: "Antwortdetails ausblenden"
+      hide_all: "Antwortdetails für alle Fragen ausblenden"
+      show: "Antwortdetails anzeigen"
+      show_all: "Antwortdetails für alle Fragen anzeigen"
     attempts: "Versuche: %{count} von %{total}"
+    correct_answer: "Richtige Antwort"
     correct_essay_student_ratio: "%{ratio}% Ihrer Studenten haben die volle Punktzahl für diese Frage erhalten."
     correct_multiple_response_ratio: "%{ratio}% Ihrer Studenten haben richtig geantwortet."
     correct_response_ratio: "%{ratio}% Ihrer Studenten haben diese Frage richtig beantwortet."
     discrimination_index: 
+      audible_bottom_bracket: "Unterer Bereich:"
+      audible_bracket_aced: "Alle Studenten in diesem Bereich haben richtig geantwortet."
+      audible_bracket_failed: "Kein einziger Student in diesem Bereich hat eine richtige Antwort gegeben."
+      audible_chart_description: "In dieser Tabelle ist aufgeführt, wie die einzelnen Studentenbereiche in der Klasse auf diese Frage geantwortet haben. Die Studentenbereiche setzen sich anhand ihrer Punktzahl zusammen. Der obere Bereich besteht aus den besten 27 %, während der mittlere Bereich uas den mittleren 46 % und der untere Bereich aus den schlechtesten 27 % besteht."
+      audible_discrimination_index: "Unterscheidungsindex: %{number}."
+      audible_middle_bracket: "Mittlerer Bereich:"
+      audible_response_ratio_distribution: "%{correct_ratio}% der Studenten in diesem Bereich haben richtig geantwortet."
+      audible_top_bracket: "Oberer Bereich:"
+      discrimination_index: Unterscheidungsindex
       discrimination_index_dialog_title: "Das Unterscheidungsindex-Diagramm"
+      discrimination_index_dialog_trigger: "Erfahren Sie mehr über den Unterscheidungsindex."
     download_submissions: "Alle Dateien herunterladen"
+    duration_in_hours: 
+      one: "1 Stunde"
+      other: "%{count} Stunden"
+    duration_in_hours_and_minutes: "%{hours} und %{minutes}"
     duration_in_minutes: 
       one: "%{count} Minuten"
       other: "%{count} Minuten"
+    duration_in_minutes_and_seconds: "%{minutes} und %{seconds}"
+    duration_in_seconds: 
+      one: "1 Sekunde"
+      other: "%{count} Sekunden"
+    empty_question_breakdown: "Es sind keine Fragestatistiken verfügbar."
     essay_score: "Punktzahl: %{score}"
+    loading_questions: "Fragestatistiken werden geladen. Bitte warten Sie einen Moment."
     no_answer: "Keine Antwort"
+    question_breakdown: Frageverteilung
+    question_header: "Frage %{position}"
     response_student_count: 
-      one: "%{count} Studenten"
+      one: "1 Student"
       other: "%{count} Studenten"
+      zero: Niemand
+    speedgrader: "In SpeedGrader anzeigen"
     summary: 
+      audible_chart_description: "%{above_average} Studenten haben mehr Punkte als oder genauso viele wie der Durchschnitt errreicht und %{below_average} haben weniger Punkte erreicht."
       avg_time: "Durchschnittliche Zeit"
+      chart_brushing_tip: "Tipp: Sie können sich auf ein bestimmtes Segment des Diagramms konzentrieren, indem Sie mit dem Cursor eine Auswahl vornehmen."
+      chart_title: Punktzahlperzentildiagramm
       high_score: "Höchste Punktzahl"
       low_score: "Niedrigste Punktzahl"
       mean: Punktedurchschnitt
       not_available_abbrev: k. A.
+      quiz_summary: Quizzusammenfassung
       stdev: Standardabweichung
+      students_who_got_a_certain_score: 
+        one: "Ein Student hat eine Punktzahl von %{score}% erreicht."
+        other: "%{count} Studenten haben eine Punktzahl von %{score}% erreicht."
+        zero: "Kein Student hat eine Punktzahl von %{score}% erreicht."
+      students_who_scored_in_a_range: 
+        one: "Ein Student hat zwischen %{start} und %{end}% Punkte erreicht."
+        other: "%{count} Studenten haben zwischen %{start} und %{end}% Punkte erreicht."
+        zero: "Kein Student hat zwischen %{start} und %{end}% Punkte erreicht."
+      table_description: "Zusammenfassungsstatistik für alle eingegangenen Einsendungen"
     title: Quiz-Statistiken
     unknown_answer: "Etwas anderes"
   quizzes: 
@@ -11585,6 +11737,10 @@ de:
     question_count: 
       one: "1 Frage"
       other: "%{count} Fragen"
+    question_limit_reached: |-
+        Sie haben die maximale Fragenanzahl (%{count}/%{limit}) für ein Quiz erreicht.
+        
+        Notfalls können Sie Ihre Materialien auf mehrere Quiz verteilen.
     quiz: 
       current_filter: "Aktueller Filter"
       default_question_input: "[ Auswählen ]"
@@ -12055,6 +12211,7 @@ de:
         quizzes_unpublished: 
           one: "Veröffentlichung von 1 Quiz erfolgreich rückgängig gemacht"
           other: "Veröffentlichtung von %{count} Quiz erfolgreich rückgängig gemacht"
+        submission_doesnt_count: "Dieses Quiz wird nicht mehr für Ihre Note berücksichtigt."
       question_group: 
         buttons: 
           update: Aktualisieren
@@ -12236,6 +12393,7 @@ de:
           republish: "Erneut veröffentlichen"
           unlock_quiz: "Stellen Sie dieses Quiz jetzt für die Studenten bereit"
           unlock_survey: "Stellen Sie diese Befragung jetzt für die Studenten bereit"
+        course_concluded_notice: "Dieses Quiz ist nicht mehr verfügbar, da der Kurs abgeschlossen wurde."
         labels: 
           available_until: Bis
           no_time_limit: "Kein Zeitlimit"
@@ -12513,6 +12671,7 @@ de:
     progress_error: "Beim Vorbereiten des Herunterladevorgangs ist ein Fehler aufgetreten. Versuchen Sie es erneut."
     progress_message: "Herunterladevorgang wird vorbereitet: %{percent}% abgeschlossen"
     restrict_access: "Zugriff beschränken"
+    results_count: "%{num_results} Suchergebnisse werden angezeigt"
     retry: Wiederholen
     search_for_files: "Nach Dateien suchen"
     search_results_for: "Suchergebnisse für \"%{search_term}\""
@@ -12692,6 +12851,8 @@ de:
   role_overrides: 
     account_permissions: Kontoberechtigungen
     admin_tools_permissions: Verwaltungs-Tools
+    cannot_deactivate_inactive_role: "Eine bereits inaktive Rolle kann nicht deaktiviert werden."
+    cannot_remove_built_in_role: "Eine integrierte Rolle kann nicht entfernt werden."
     course_permissions: "Kurs- und Kontoberechtigungen"
     index: 
       crumbs: 
@@ -12792,28 +12953,67 @@ de:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
+        assignment_is_muted: Stummgeschaltet?
         curve_grades: "Noten anpassen"
         message_students: "Studenten benachrichtigen, auf die Folgendes zutrifft..."
+        set_default_grade: "Standardnote festlegen"
       details: 
         avg_score: Punktedurchschnitt
+        graded_sub_count: "Benotete Einsendungen:"
         high_score: "Höchste Punktzahl"
         low_score: "Niedrigste Punktzahl"
         no_points: "Keine Punkte möglich"
         points_possible: "Mögliche Punkte"
+        submission_types: "Einsendungstypen:"
       index: 
+        assignment_in_speedgrader: "Diese Aufgabe in SpeedGrader anzeigen"
+        assignment_info: "Informationen zur Aufgabe"
+        empty_assignment_selection: "Wählen Sie eine Aufgabe aus, um hier zusätzliche Informationen anzuzeigen."
+        no_points_possible_warning: "Die Aufgaben in dieser Gruppe haben keine möglichen Punkte und können bei der Notenberechnung nicht berücksichtigt werden."
         warning: Warnung
+    components: 
+      final_grade: 
+        final_grade: "Gesamtnote:"
+    content_selection: 
+      assignment: 
+        select_assignment: "Aufgabe auswählen"
+      header: 
+        content_selection: Inhaltsauswahl
+      outcome: 
+        select_outcome: "Resultat auswählen"
+      student: 
+        select_student: "Student auswählen"
     grading: 
+      empty_submission_selection: "Wählen Sie einen Studenten und eine Aufgabe aus, um Noten anzuzeigen und zu bearbeiten."
+      grade_for: "Note für: %{name}"
       grading: Benotung
+      is_dropped: "Diese Note wird für diesen Studenten gerade ausgeblendet."
+      is_late: "Diese Einsendung erfolgt spät."
       submission_details: "Details der Einsendung"
+      submission_hidden: "Diese Aufgabe ist für diesen Studenten nicht verfügbar und wird für seine Note nicht berücksichtigt."
+      was_resubmitted: "Diese Aufgabe wurde seit der letzten Benotung erneut eingesendet."
     header: 
       gradebook_individual_view: "Notenbuch: Einzelansicht"
+      save_instructions: "Anmerkung: Noten und Anmerkungen werden automatisch gespeichert, nachdem Sie das Feld verlassen haben."
+      switch_to_gradebook2: "Zum Standardnotenbuch wechseln"
     learning_mastery: 
+      download_results: "Ergebnisse herunterladen (.csv)"
+      empty_student_selection: "Wählen Sie einen Studenten aus, um hier zusätzliche Informationen anzuzeigen."
+      empty_submission_selection: "Wählen Sie einen Studenten und ein Resultat aus, um Ergebnisse anzuzeigen."
       hide_student_names_label: "Namen der Studenten ausblenden"
       result: Ergebnis
+      result_for: "Ergebnis für:"
+      results_loading: "Ergebnisse für diesen Studenten werden noch geladen..."
+      select_a_section: "Abschnitt auswählen"
+      select_student: "Student auswählen"
+      student_info: "Informationen zum Studenten"
     outcome_information: 
       avg_score: Punktedurchschnitt
+      empty_outcome_selection: "Wählen Sie ein Resultat aus, um hier zusätzliche Informationen anzuzeigen."
       high_score: "Höchste Punktzahl"
       low_score: "Niedrigste Punktzahl"
+      outcome_info: "Informationen zum Resultat"
+      result_sub_count: "Gesamtergebnisse:"
     screenreader_gradebook: 
       assignments: Aufgaben
       learning_mastery: "Leistungsziel erreicht"
@@ -12825,19 +13025,39 @@ de:
         include_ungraded_assignments: "Nicht benotete als 0 behandeln"
         set_group_weights: "Gruppengewichtungen festlegen"
         show_concluded_enrollments_label: "Abgeschlossene Einschreibungen anzeigen"
+        show_notes: "Anmerkungen in Informationen zum Studenten anzeigen"
+        show_total_as_points: "Gesamtergebnisse als Punkte auf der Notenseite des Studenten anzeigen"
         sis_export: "Noten im SIS veröffentlichen"
+        upload_scores: "Punktzahlen hochladen (.csv)"
+      header: 
+        global_settings: "Globale Einstellungen"
       mastery_toggles_and_actions: 
+        download_results: "Ergebnisse herunterladen (.csv)"
         hide_student_names_label: "Namen der Studenten ausblenden"
+      section_select: 
+        select_a_section: "Abschnitt auswählen"
+      sort_select: 
+        sort_assignments: "Aufgaben sortieren"
     student_information: 
       assignment_groups: 
         ag_group_grade: Note
         ag_group_name: Aufgabengruppe
+        ag_group_percent_grade: "% der Note"
         ag_letter_grade: Buchstaben-Note
+      details: 
+        hidden: ausgeblendet
+        secondary_id: "Sekundäre ID:"
+        sections: "Abschnitte:"
       index: 
+        empty_student_selection: "Wählen Sie einen Studenten aus, um hier zusätzliche Informationen anzuzeigen."
         grades: Noten
+        student_info: "Informationen zum Studenten"
+        submissions_loading: "Einsendungen für diesen Studenten werden noch geladen..."
   search: 
     all_courses: 
       name: Name
+      open_enrollment_only: "Nur Kurse mit offener Einschreibung"
+      public_only: "Nur öffentliche Kurse"
       search: Suchen
       titles: 
         all_courses: "Alle Kurse"
@@ -13075,6 +13295,9 @@ de:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Zum Herunterladen hier klicken"
+        download_message: "Die Einsendungen werden für den Download als ZIP-Datei komprimiert. Dies kann je nach Größe und Anzahl der Einsendungsdateien einige Zeit dauern."
+        download_message_intro: "Ihre Studenteneinsendungen werden gesammelt."
+        download_submissions: "Alle Einsendungen herunterladen"
     conference: 
       buttons: 
         delete: "Konferenz löschen"
@@ -13262,6 +13485,7 @@ de:
       crowdsourced_warning_title: "Per Crowdsourcing übersetzte Sprache"
     login: 
       back_to_login: "Zurück zur Anmeldung"
+      browse_courses: "Kurse durchsuchen"
       buttons: 
         request_password: "Passwort anfordern"
       coenrollment_banner: "*Übergeordneter Benutzer eines Canvas-Benutzers?* **Für ein Konto hier klicken**"
@@ -13493,9 +13717,11 @@ de:
     select_content_dialog: 
       add_to_module: "%{item} zum *Modul* hinzufügen"
       assignment_item: Aufgabe
+      assignment_item_select_label: "Wählen Sie die Aufgabe aus, die zugeordnet werden soll, oder fügen Sie eine Aufgabe hinzu, indem Sie \"Neue Aufgabe\" auswählen."
       assignment_notice: "Wählen Sie die Aufgabe aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf \"Neue Aufgabe\", um eine Aufgabe hinzuzufügen."
       content_page_item: Inhaltsseite
       discussion_item: Diskussion
+      discussion_topic_select_label: "Wählen Sie das Thema aus, das zugeordnet werden soll, oder fügen Sie ein Thema hinzu, indem Sie \"Neues Thema\" auswählen."
       domain_match_notice: "um dieses Tool zu verwenden, muss die Domain mit %{domain} übereinstimmen"
       external_tool_item: "Externes Tool"
       external_tool_notice: "Wählen Sie ein Tool aus folgender Liste aus oder geben Sie die URL eines externen Tools ein, das mit Basic LTI konfiguriert wurde, um einen Link zu diesem *Modul* hinzuzufügen."
@@ -13503,6 +13729,7 @@ de:
       external_url_notice: "Geben Sie eine URL und einen Seitennamen ein, um den Link einer beliebigen Webseite zu diesem *Modul* hinzuzufügen."
       file_item: Datei
       file_notice: "Wählen Sie die Datei aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf \"Neue Datei\", um eine Datei hinzuzufügen."
+      file_select_label: "Wählen Sie die Datei aus, die zugeordnet werden soll, oder fügen Sie eine Datei hinzu, indem Sie \"Neue Datei\" auswählen."
       indent_level: 
         one: "*1 Stufe einrücken*"
         other: "*%{count} Stufen einrücken*"
@@ -13529,10 +13756,13 @@ de:
         assignments: Aufgaben
       quiz_item: Quiz
       quiz_notice: "Wählen Sie das Quiz aus, das Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf \"Neues Quiz\", um ein neues Quiz hinzuzufügen."
+      quiz_select_label: "Wählen Sie das Quiz aus, das zugeordnet werden soll, oder fügen Sie ein Quiz hinzu, indem Sie \"Neues Quiz\" auswählen."
+      select_item_type_label: "Wählen Sie den Typ des hinzuzufügenden Inhalts aus."
       sub_header_notice: "Geben Sie den Text ein, den Sie als zweite Kopfzeile des *Moduls* hinzufügen möchten"
       text_header_item: Textüberschrift
       topic_notice: "Wählen Sie das Thema aus, das Sie diesem *Modul* zuordnen möchten oder klicken Sie auf \"Neues Thema\", um ein Thema hinzuzufügen."
       wiki_page_notice: "Wählen Sie die Wikiseite aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf \"Neue Seite\", um eine neue Seite hinzuzufügen."
+      wiki_page_select_label: "Wählen Sie die Wiki-Seite aus, die zugeordnet werden soll, oder fügen Sie eine neue Seite hinzu, indem Sie \"Neue Seite\" auswählen."
     sequence_footer: 
       full_course_sequence: "vollständige Kurssequenz zeigen"
       next: Weiter
@@ -13808,6 +14038,8 @@ de:
     inexact_answer: "%{lower_bound} bis %{upper_bound}"
     no_answer: "Keine Antwort"
   step: Schritt
+  stream_items_api: 
+    assessment_request_title: "Peer-Review für %{title}"
   student_assignment_outcome_map_title: Studentenwissen
   student_groups: 
     group_join: "Ist der Gruppe %{group_name} beigetreten"
@@ -13817,13 +14049,19 @@ de:
       group_explanation: "Gruppen eignen sich gut für die gemeinsame Arbeit an Projekten oder die Erstellung von Unterrichtsplänen und ähnlichem. Jede Gruppe erhält einen Kalender, ein Wiki, ein Diskussionsforum und etwas Speicherplatz für Dateien. Gruppen können gemeinsam an Dokumenten arbeiten oder einen Zeitplan für Webkonferenzen erstellen. Es handelt sich um eine Art \"Minikurs\", der die Zusammenarbeit einer kleineren Zahl Studenten an speziellen Projekten ermöglicht."
       joining: Beitreten
       name: Gruppenname
+      name_error: "Gruppenname ist erforderlich"
     search_groups_placeholder: "Gruppen oder Personen durchsuchen"
     student_groups: 
       full: Voll
       group: Gruppe
+      group_full: "Gruppe ist voll"
+      invite_only: "Nur einladen"
       student_groups_join: Beitreten
+      student_groups_leave: Verlassen
+      student_groups_switch: "Wechseln zu"
       student_groups_tabs_everyone: Alle
       student_groups_tabs_groups: Gruppen
+      visit: Besuchen
     student_groups_filter_description: "Wenn Sie etwas in dieses Feld eingeben, wird die Liste der Gruppen automatisch nach den Gruppen gefiltert, deren Namen mit Ihrer Eingabe übereinstimmen."
     students_count: 
       one: "1 Student"
@@ -13976,11 +14214,13 @@ de:
       teachers_notified_of_comments: "Dozenten und Einsender erhalten Benachrichtigungen für alle Kommentare"
     show_preview: 
       discussion_submission_description: "Die Einsendungen für diese Aufgabe sind eingestellte Beiträge der zugehörigen Diskussion. Unten werden die Diskussionsbeiträge für %{user} angezeigt. Alternativ können Sie *die ganze Diskussion aufrufen*."
+      discussion_submission_description_without_link: "Die Einsendungen für diese Aufgabe sind Beiträge in der Diskussion der Aufgabe. Unten finden Sie die Diskussionsbeiträge für %{user}."
       entry_no_image: "Bedenken Sie, dass diese Seite seit der erstmaligen Einsendung möglicherweise geändert wurde."
       entry_with_image: "Ein angehängter Snapshot zeigt, wie die Seite zum Zeitpunkt der Einsendung ausgesehen hat. Alternativ kann die ursprüngliche Einsendung durch Anklicken angezeigt werden."
       external_url_submission: "Diese Einsendung war eine URL zu einer externen Seite."
       file_uploads_for_user: "Dateiuploads für **%{user}**"
       group_discussion_submission_description: "Die Einsendungen für diese Aufgabe haben die Form von Beiträgen in der Aufgabendikussion der Gruppe. Unten sehen Sie die Beiträge von %{user}, Sie können auch *die komplette Gruppendiskussion ansehen*."
+      group_discussion_submission_description_without_link: "Die Einsendungen für diese Aufgabe sind Beiträge in der Diskussion der Aufgabe für diese Gruppe. Unten finden Sie die Diskussionsbeiträge für %{user}."
       media_comment_link: "Diese Einsendung ist eine Multimedia-Aufzeichnung. *Zum Anzeigen hier klicken.*"
       no_files: "Für diese Einsendung wurden keine Dateien hochgeladen"
       no_preview_available: "Keine Vorschau verfügbar"
@@ -14345,6 +14585,7 @@ de:
   unpublished_courses_title: "Nicht veröffentlichte Kurse"
   unsupported_package: "Nicht unterstütztes Inhaltspaket"
   until_date_949017c4: "Bis %{date}"
+  untitled_assignment_59354b34: "Aufgabe ohne Titel"
   unused_courses_title: "Nicht verwendete Kurse"
   upload_button: 
     upload: Hochladen
@@ -14484,6 +14725,7 @@ de:
       linked_in: "LinkedIn ist eine Networkingressource für Unternehmen.  Viele Kontakte, die Sie während Ihre Ausbildungszeit aufbauen, können Ihnen auch in der Arbeitswelt von großem Nutzen sein."
       skype: "Skype ist ein kostenloses Tool für Sprach- und Videoanrufe über das Internet."
       twitter: "Twitter ist eine bedeutende Ressource für die Kommunikation außerhalb des Unterrichts."
+      yo: "Yo ist ein Kommunikationstool, das mit einer Tippbewegung und ohne Zeichen bedient wird."
   users: 
     admin_merge: 
       buttons: 
@@ -15007,6 +15249,9 @@ de:
       archive_link: "Archiv(e) anzeigen"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Sie haben die Fragen in diesem Quiz geändert.* Diese Änderungen werden Studenten erst angezeigt, wenn Sie das Quiz speichern."
   you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Sie haben nicht veröffentlichte Änderungen an diesem Quiz vorgenommen.* Diese Änderungen werden den Studenten erst angezeigt, wenn Sie das Quiz veröffentlichen oder neu veröffentlichen."
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    one: "Bei Ihrer Suche ist folgender Fehler aufgetreten:"
+    other: "Bei Ihrer Suche sind folgende Fehler aufgetreten:"
   zero_activity_title: "Keine Aktivität"
   zip_argument_error: "Zum Hochladen einer ZIP-Datei ist ein Ordner erforderlich, in den die Datei hochgeladen wird."
   zip_file_description: "Migrations-Plug-in zum Entpacken von Standard-ZIP-Dateien in einen Kurs, eine Gruppe oder Benutzerdateien"
