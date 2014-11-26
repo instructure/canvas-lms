@@ -26,6 +26,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   include Workflow
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
+  attr_accessor :grader_id
 
   GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
 
@@ -423,7 +424,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.grade_matches_current_submission = true
       @assignment_submission.quiz_submission_id = self.id
       @assignment_submission.graded_at = [self.end_at, Time.zone.now].compact.min
-      @assignment_submission.grader_id = "-#{self.quiz_id}".to_i
+      @assignment_submission.grader_id = self.grader_id || "-#{self.quiz_id}".to_i
       @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
       @assignment_submission.user_id = self.user_id
       @assignment_submission.submission_type = "online_quiz"
@@ -639,6 +640,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_scores(params)
     params = (params || {}).with_indifferent_access
     self.manually_scored = false
+    self.grader_id = params[:grader_id]
+
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]

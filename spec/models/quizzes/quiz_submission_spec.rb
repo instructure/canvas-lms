@@ -210,6 +210,20 @@ describe Quizzes::QuizSubmission do
       expect(qs.score).to be_nil
       expect(qs.kept_score).to eq 3
     end
+
+    it "should assign a grader for a submission update" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "2405" }
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      # the default value for grader is a negative quiz_id... since forever
+      expect(qs.submission.grader_id).to eq "-#{qs.quiz_id}".to_i
+
+      qs.update_scores(:grader_id => @user.id, :fudge_points => 1, :question_score_1 => 0)
+
+      # now when a score is updated we have a real grader associated!
+      expect(qs.submission.reload.grader_id).to eq @user.id
+    end
   end
 
   describe '#backup_submission_data' do

@@ -158,7 +158,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   def update
     @submission = @quiz.quiz_submissions.find(params[:id])
     if authorized_action(@submission, @current_user, :update_scores)
-      @submission.update_scores(params)
+      @submission.update_scores(params.merge(:grader_id => @current_user.id))
       if params[:headless]
         redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1)
       else
