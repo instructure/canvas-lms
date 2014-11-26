@@ -512,11 +512,12 @@ describe DiscussionEntry do
       expect(msg.message).to eq "<p>html body</p>"
     end
 
-    it "should not allow replies to locked topics" do
+    it "should not allow students to reply to locked topics" do
       @entry = @topic.reply_from(:user => @teacher, :text => "topic")
       @topic.lock!
-      @topic.clear_permissions_cache(@teacher)
-      expect { @entry.reply_from(:user => @teacher, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+      @entry.reply_from(:user => @teacher, :text => "reply") # should not raise error
+      student_in_course(:course => @course)
+      expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
   end
 end

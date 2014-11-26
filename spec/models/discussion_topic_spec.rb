@@ -78,33 +78,52 @@ describe DiscussionTopic do
     expect(a).to be_deleted
   end
 
-  it "should not grant permissions if it is locked" do
-    @topic = @course.discussion_topics.create!(:user => @teacher)
-    relevant_permissions = [:read, :reply, :update, :delete]
-    expect((@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-    expect((@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
-    @topic.lock!
-    @topic.clear_permissions_cache(@user)
-    expect((@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'update', 'delete'].sort
-    expect((@topic.check_policy(@student) & relevant_permissions).map(&:to_s)).to eq ['read']
-    @topic.unlock!
-    @topic.clear_permissions_cache(@user)
-    expect((@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-    expect((@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
+  context "permissions" do
+    before :each do
+      @teacher1 = @teacher
+      @teacher2 = user
+      teacher_in_course(:course => @course, :user => @teacher2, :active_all => true)
 
-    @entry = @topic.discussion_entries.create!(:user => @teacher)
-    @entry.discussion_topic = @topic
-    @topic.clear_permissions_cache(@user)
-    expect((@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-    expect((@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
-    @topic.lock!
-    @topic.clear_permissions_cache(@user)
-    expect((@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'update', 'delete'].sort
-    expect((@entry.check_policy(@student) & relevant_permissions).map(&:to_s)).to eq ['read']
-    @topic.unlock!
-    @topic.clear_permissions_cache(@user)
-    expect((@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-    expect((@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
+      @topic = @course.discussion_topics.create!(:user => @teacher1)
+      @topic.unpublish!
+      @entry = @topic.discussion_entries.create!(:user => @teacher1)
+      @entry.discussion_topic = @topic
+
+      @relevant_permissions = [:read, :reply, :update, :delete]
+    end
+
+    it "should grant permissions if it not locked" do
+      @topic.publish!
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
+
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
+    end
+
+    it "should not grant reply permissions to students if it is locked" do
+      @topic.publish!
+      @topic.lock!
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s)).to eq ['read']
+
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s)).to eq ['read']
+    end
+
+    it "should not grant any permissions to students if it is unpublished" do
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq []
+
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq []
+    end
   end
 
   describe "visibility" do
@@ -325,23 +344,23 @@ describe DiscussionTopic do
     end
 
     it "should grant observers read permission by default" do
-      relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = [:read, :reply, :update, :delete]
 
       @topic = @course.discussion_topics.create!(:user => @teacher)
-      expect((@topic.check_policy(@observer) & relevant_permissions).map(&:to_s).sort).to eq ['read'].sort
+      expect((@topic.check_policy(@observer) & @relevant_permissions).map(&:to_s).sort).to eq ['read'].sort
       @entry = @topic.discussion_entries.create!(:user => @teacher)
-      expect((@entry.check_policy(@observer) & relevant_permissions).map(&:to_s).sort).to eq ['read'].sort
+      expect((@entry.check_policy(@observer) & @relevant_permissions).map(&:to_s).sort).to eq ['read'].sort
     end
 
     it "should not grant observers read permission when read_forum override is false" do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :role => observer_role, :enabled => false)
 
-      relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = [:read, :reply, :update, :delete]
       @topic = @course.discussion_topics.create!(:user => @teacher)
-      expect((@topic.check_policy(@observer) & relevant_permissions).map(&:to_s)).to be_empty
+      expect((@topic.check_policy(@observer) & @relevant_permissions).map(&:to_s)).to be_empty
       @entry = @topic.discussion_entries.create!(:user => @teacher)
-      expect((@entry.check_policy(@observer) & relevant_permissions).map(&:to_s)).to be_empty
+      expect((@entry.check_policy(@observer) & @relevant_permissions).map(&:to_s)).to be_empty
     end
   end
 
@@ -1400,10 +1419,12 @@ describe DiscussionTopic do
       expect(msg.message).to eq "<p>html body</p>"
     end
 
-    it "should not allow replies to locked topics" do
+    it "should not allow replies from students to locked topics" do
       discussion_topic_model
       @topic.lock!
-      expect { @topic.reply_from(:user => @teacher, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+      @topic.reply_from(:user => @teacher, :text => "reply") # should not raise error
+      student_in_course(:course => @course)
+      expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
   end

@@ -107,6 +107,10 @@ class Group < ActiveRecord::Base
       participating_users_association
   end
 
+  def all_real_students
+    self.context.all_real_students.where("users.id IN (?)", self.users.pluck(:id))
+  end
+
   def wiki_with_create
     Wiki.wiki_for_context(self)
   end

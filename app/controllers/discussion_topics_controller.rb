@@ -323,9 +323,10 @@ class DiscussionTopicsController < ApplicationController
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
       end
-
       format.json do
-        render json: discussion_topics_api_json(@topics, @context, @current_user, session)
+        student_ids = user_can_moderate ? @context.all_real_students.pluck(:id) : nil
+        render json: discussion_topics_api_json(@topics, @context, @current_user, session,
+                                                :student_ids => student_ids, :can_moderate => user_can_moderate)
       end
     end
   end
@@ -466,8 +467,8 @@ class DiscussionTopicsController < ApplicationController
 
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @locked ? false : @topic.grants_right?(@current_user, session, :reply),     # Can reply
-                :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
+                :CAN_REPLY      => @topic.grants_right?(@current_user, session, :reply),     # Can reply
+                :CAN_ATTACH     => @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
                 :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
                 :MODERATE       => user_can_moderate                                                        # Can moderate any topic
               },
