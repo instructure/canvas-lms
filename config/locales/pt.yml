@@ -6207,6 +6207,7 @@ pt:
       all: Todos
       app_headder: "Aplicativos externas"
       external_tools_note: "As aplicativos são uma forma fácil de adicionar novas funcionalidades ao Canvas. Podem ser adicionadas a disciplinas individuais ou a todas as disciplinas incluídas numa conta. Depois de configuradas, pode fazer ligações às aplicativos através de módulos de disciplinas e criar tarefas para ferramentas de avaliação."
+      external_tools_references: "*Veja algumas ferramentas LTI* que funcionam muito bem com o Canvas. Também pode consultar os ** tópicos da Comunidade Canvas relativos a ferramentas LTI**"
       installed: Instalado
       not_installed: "Não instalado"
       search_filter: "Filtrar por nome"
@@ -11606,6 +11607,7 @@ pt:
       discrimination_index: "Índice de discriminação"
       discrimination_index_dialog_title: "Gráfico do índice de discriminação"
       discrimination_index_dialog_trigger: "Saiba mais sobre o Índice de discriminação."
+    discrimination_index_help: "* Esta estatística permite medir a capacidade de uma única pergunta de fazer a distinção (ou discriminar) entre alunos que têm um bom resultado num exame e os que não têm um bom resultado. * ** Divide os alunos em três grupos com base na pontuação que têm em todo o teste e apresenta esses grupos segundo os que responderam à pergunta corretamente. ** *** **** Estão disponíveis mais informações aqui. **** ***"
     download_submissions: "Descarregar todos os ficheiros"
     duration_in_hours: 
       one: "1 hora"
