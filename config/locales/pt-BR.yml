@@ -2175,6 +2175,8 @@ pt-BR:
         originality_report_visible_after_due_date: "Após a data de entrega"
         originality_report_visible_after_grading: "Após a avaliação da tarefa"
         originality_report_visible_immediately: Imediatamente
+        settings_exclude_fewer_than_count: "Menos que %{wordsInput} palavras"
+        settings_exclude_less_than_percent: "Menos que %{percentInput} do documento"
     undated_assignments: "Tarefas sem data"
     upcoming_assignments: "Tarefas futuras"
     wizard_box: 
@@ -2482,6 +2484,7 @@ pt-BR:
       scheduler_explanation_teacher_paragraph_1: "Esta é o Agendador. Você pode usá-lo para criar grupos de compromisso para seus alunos se inscreverem."
       scheduler_explanation_teacher_paragraph_2: "Por exemplo, digamos que você queira rever os trabalhos de meio de período com cada um dos alunos no seu curso. Você criaria um novo grupo de compromisso, especificaria as datas e as horas que você tem disponíveis, dividiria aquele horário em blocos de 15 minutos e permitiria apenas um aluno por bloco."
       scheduler_explanation_teacher_paragraph_3: "Então, os alunos seriam notificados e veriam que precisam se inscrever em um dos blocos especificados. Eles veriam um calendário com os blocos especificados sobrepostos na parte superior de tudo em seus outros calendários para que possam escolher um horário que seja bom para eles."
+      scheduler_explanation_teacher_paragraph_4: "* Comece agora clicando no botão \"Criar um grupo de compromisso\" à direita. *"
       signed_up_for: "Você está inscrito para "
       x_groups_have_signed_up: "%{participant_count} grupos se inscreveram"
       x_people_have_signed_up: "%{participant_count} pessoas se inscreveram"
@@ -6211,6 +6214,7 @@ pt-BR:
       all: Todos
       app_headder: "Aplicativos externos"
       external_tools_note: "Os aplicativos são uma maneira fácil de adicionar novos recursos ao Canvas. Eles podem ser adicionados aos cursos individuais ou a todos os cursos de uma conta. Uma vez configurado, você pode conectar-se a eles através dos módulos dos cursos e criar tarefas para as ferramentas de avaliação."
+      external_tools_references: "*Veja algumas ferramentas LTI* que funcionam muito bem com o Canvas. Você também pode examinar os tópicos da ** Comunidade Canvas sobre as ferramentas LTI**"
       installed: Instalado
       not_installed: "Não instalado"
       search_filter: "Filtrar por nome"
@@ -6609,6 +6613,7 @@ pt-BR:
     gradee_index_of_total: "%{gradee} %{x} de %{y}"
     group: Grupo
     hide_all_details_button: "Ocultar todos os detalhes"
+    mic_blocked_message: "A permissão para usar microfone está bloqueada. Para alterar isso, vá para chrome://settings/contentExceptions#media-stream"
     mute_assignment: "Silenciar tarefa"
     new_assessment: "[Nova avaliação]"
     no_submission_time: "Sem hora de envio"
@@ -7361,14 +7366,17 @@ pt-BR:
       group_category_create: 
         allow_self_signup: "Permitir auto-inscrição"
         cancel: Cancelar
+        create_groups: "Criar %{num_groups} grupos agora"
         create_groups_manually: "Eu vou criar os grupos manualmente"
         group_set_name: "Nome do conjunto de grupo"
         group_structure: "Estrutura do grupo"
         leave_group_limit_blank: "Deixar em branco para sem limite"
+        limit_group_size: "Limitar grupos a %{group_limit} membros"
         require_same_section: "Os membros do grupo devem estar na mesma seção"
         save: Salvar
         saving: Salvando...
         self_signup: Auto-inscrição
+        split_into_groups: "Dividir alunos em %{num_groups} grupos iguais"
       group_category_detail: 
         add_group: "Adicionar grupo"
         category_settings: Configurações
@@ -7389,6 +7397,7 @@ pt-BR:
         group_limit_override: "Alterar isso substituirá quaisquer limites de grupo individualmente definidos"
         group_set_name: "Nome do conjunto de grupo"
         leave_group_limit_blank: "Deixar em branco para sem limite"
+        limit_group_size: "Limitar grupos a %{group_limit} membros"
         require_same_section: "Os membros do grupo devem estar na mesma seção"
         save: Salvar
         saving: Salvando...
@@ -10077,6 +10086,9 @@ pt-BR:
       student_progress: "Progresso do aluno"
   modules_item_controller: 
     max_score_complete: "pontuado com não mais de uma *pontuação*"
+    max_score_incomplete: "deve pontuar com não mais de uma *pontuação*"
+    min_score_complete: "pontuado pelo menos com uma *pontuação*"
+    min_score_incomplete: "deve pontuar pelo menos com uma *pontuação*"
     must_contribute_complete: "contribuiu com o conteúdo da página"
     must_contribute_incomplete: "deve contribuir com o conteúdo da página"
     must_submit_complete: "enviou a tarefa"
@@ -14320,6 +14332,7 @@ pt-BR:
       teachers_notified_of_comments: "Os professores e a pessoa que enviou serão notificados sobre todos os comentários"
     show_preview: 
       discussion_submission_description: "Os envios desta tarefa são as publicações na discussão da tarefa. Abaixo, encontram-se as publicações de discussão de %{user}, ou é possível *exibir toda a discussão*."
+      discussion_submission_description_without_link: "Os envios para esta tarefa são publicações em discussão da tarefa. Abaixo estão as publicações de discussão para %{user}."
       entry_no_image: "Tenha em mente que esta página pode ter sido alterada desde o envio original."
       entry_with_image: "Nós incluímos um snapshot da página quando ela foi enviada. Ou é possível clicar para exibir o envio original."
       external_url_submission: "Este envio era um URL de uma página externa."
