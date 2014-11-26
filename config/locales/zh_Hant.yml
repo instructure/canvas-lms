@@ -2156,6 +2156,7 @@ zh_Hant:
         originality_report_visible_after_due_date: 截止日期之後
         originality_report_visible_after_grading: 任務評分之後
         originality_report_visible_immediately: 立即
+        settings_exclude_fewer_than_count: "少於 %{wordsInput} 字"
         settings_exclude_less_than_percent: "少於文件的 %{percentInput}"
     undated_assignments: 未注日期的任務
     upcoming_assignments: 即將到來的任務
@@ -2461,6 +2462,7 @@ zh_Hant:
       scheduler_explanation_teacher_paragraph_1: 這是排程器工具。你可以用其建立您的學生可報名參加約會群組。
       scheduler_explanation_teacher_paragraph_2: "例如，假設您想瀏覽您課程中每個學生的期中論文任務。您將創建一個新的約會群組，指定您有空的日期和時間，讓其將該時間分成 15 分鐘的段，每個時間段只允許有一名學生。"
       scheduler_explanation_teacher_paragraph_3: 然後，學生們會得到通知，看看他們需要報名參加的指定的時間段之一。將會為他們顯示具有可用的時間段的日曆，其將覆蓋他們的其他日曆上的一切事項，以便他們可以選擇一個對他們有用的時間。
+      scheduler_explanation_teacher_paragraph_4: "* 按一下右邊的『建立約會群組』按鈕，將會馬上開始。*"
       signed_up_for: 你報名參加
       x_groups_have_signed_up: "%{participant_count} 個群組已報名"
       x_people_have_signed_up: "%{participant_count} 個人已報名"
@@ -2972,6 +2974,10 @@ zh_Hant:
         ? "yes"
         : 是
       details: 
+        account_exists: |-
+            已有與 %{email} 相關聯的使用者帳戶。
+            
+            **您是否是 %{name}？**
         account_needed: "您已被邀請參加 **%{course}**。要接受這個請求，則需要一個 Canvas 帳戶。按一下以下連結來建立一個 Canvas 帳戶。"
         add_email: 是否想將此電子郵件地址新增到您的當前帳戶？
         choose_login: 選擇您想登入之處。
@@ -5943,6 +5949,18 @@ zh_Hant:
       links: 
         create: 建立電子檔案袋
       page_title: 我的電子檔案袋
+      what: 
+        details1: |-
+            電子檔案袋可用於顯示和討論在您的學習過程中產生的重要意見和經驗。您可以使用電子檔案袋：
+            
+            * 不僅僅顯示您感到驕傲的檔案給您的導師  
+            * 談論您的班級意見書中的所有思想和工作 
+            * 收集您的教育經驗的概述作為一個整體  
+            * 與朋友、未來雇主等分享您的工作  
+            
+            電子檔案袋可以公開給大家看，或者私有，以便只有那些您允許的人可以看到，您可以在任何時間更改此設定。
+            
+            準備好開始了？按一下按鈕。
     wizard_box: 
       finish: 
         body: "準備好開始了？您可以透過按一下您看到的『%{help_link_text}』連結隨時從任何頁面返回此精靈。"
@@ -6144,6 +6162,7 @@ zh_Hant:
       all: 全部
       app_headder: 外部應用程式
       external_tools_note: "應用程式是新增新功能至 Canvas 的簡便方法。它們可以被新增至單獨的課程，或者一個帳戶中的所有課程。一旦設定，就可以透過課程模組連結到它們，並創建評估工具的任務。"
+      external_tools_references: "*查看一些 LTI 工具*，此類工具與 Canvas 配合很好。還可以查看 ** 有關 LTI 工具的 Canvas 社區話題**"
       installed: 已安裝
       not_installed: 未安裝
       search_filter: 按名稱篩選
@@ -6528,6 +6547,7 @@ zh_Hant:
     gradee_index_of_total: "%{y} 的 %{gradee} %{x}"
     group: 群組
     hide_all_details_button: 隱藏所有詳細資料
+    mic_blocked_message: "已屏蔽麥克風使用權限。前往 chrome://settings/contentExceptions#media-stream 修改權限"
     mute_assignment: 靜音任務
     new_assessment: "[新任務]"
     no_submission_time: 沒有提交時間
@@ -7280,10 +7300,12 @@ zh_Hant:
         group_set_name: 群組集合名稱
         group_structure: 群組結構
         leave_group_limit_blank: 為無限制留空
+        limit_group_size: "限制群組為 %{group_limit} 個成員"
         require_same_section: 要求群組成員必須在同一個章節
         save: 儲存
         saving: 正在儲存...
         self_signup: 自行註冊
+        split_into_groups: "將學生拆分成 %{num_groups} 個平等的群組"
       group_category_detail: 
         add_group: 新增群組
         category_settings: 設定
@@ -7304,6 +7326,7 @@ zh_Hant:
         group_limit_override: 更改這將覆寫任何單獨設定的群組限制
         group_set_name: 群組集合名稱
         leave_group_limit_blank: 為無限制留空
+        limit_group_size: "限制群組為 %{group_limit} 個成員"
         require_same_section: 要求群組成員必須在同一個章節
         save: 儲存
         saving: 正在儲存...
@@ -10040,6 +10063,12 @@ zh_Hant:
     conversation_created_display: 我建立的交談
     conversation_message_description: 新收件匣郵件
     conversation_message_display: 交談郵件
+    course_content_description: |-
+        課程內容的更改：
+        
+        * Wiki 頁面
+        * 測驗內容
+        * 任務內容
     course_content_display: 課程內容
     discussion_description: 您課程中的新討論主題
     discussion_display: 討論
@@ -10049,16 +10078,40 @@ zh_Hant:
     due_date_display: 截止日期
     files_description: 新增至您的課程的新檔案
     files_display: 檔案
+    grading_description: |-
+        包括：
+        
+        * 輸入/更改的任務/提交件成績
+        * 取消靜音的任務成绩
+        * 成績加權更改
+        
+        
+        
+        檢查如果您想看到您的成績通知，「包括當提示關於成績更改時的分數」。
+        如果您的電子郵件是不是一個機構電子郵件，這意味著敏感的內容將被傳送至該機構之外。
     grading_display: 評分
     grading_notify_include_grade: 包括當提示關於成績更改時的分數。
     grading_policies_description: 課程評分政策更改
     grading_policies_display: 評分政策
+    invitation_description: |-
+        針對以下的邀請：
+        
+        * 網路會議
+        * 群組
+        * 協作
+        * 课程
+        * 同行檢閱和提醒
     invitation_display: 邀請
     late_grading_description: |-
         *僅導師和管理員：*
         
         逾期任務提交
     late_grading_display: 逾期評分
+    membership_update_description: |-
+        *僅管理員：擱置註冊已啟動* 
+        
+        * 群組註冊	
+        * 已接受/已拒絕
     membership_update_display: 成員資格更新
     missing_description_description: "針對 %{category} 通知"
     missing_display_display: "針對 %{category} 通知"
@@ -10133,6 +10186,16 @@ zh_Hant:
       updated_wiki_page: "已更新的 Wiki 頁面"
       web_conference_invitation: 網路會議邀請
     no_subject: 無主旨
+    other_description: |-
+        *僅導師和管理員：*
+        
+        * 課程註冊 
+        * 已生成報告
+        * 內容匯出
+        * 遷移報告
+        * 新帳戶使用者 
+        * 新教師註冊
+        * 新學生群組
     other_display: 管理通知
     reminder_display: 提醒
     student_appointment_description: |-
@@ -10363,6 +10426,7 @@ zh_Hant:
       mastery: 最近的嘗試的精通情況
       no_mastery: 沒有最近的嘗試的精通情況
       outcomes_for: "%{user_name} 的成果"
+      score_out_of_possible: "%{score}* 超出  %{possible}*"
       short_title: 
         attempts: 嘗試
         average_percent: 平均百分比
@@ -10489,6 +10553,10 @@ zh_Hant:
       description: "Diigo 整合"
       name: Diigo
     diigo_settings: 
+      description: |-
+          您將需要註冊 [Diigo 新應用程序](%{diigo_url})。
+          
+          * 您在儲存應用程序后，請記錄 API 密鈅
       labels: 
         api_key: "API 金鑰"
     dim_dim_settings: 
@@ -10743,6 +10811,7 @@ zh_Hant:
       description: "只 Yo"
       name: Yo
     yo_settings: 
+      description: "您將需要 [Yo 的 API 令牌](%{yo_url})。"
       labels: 
         api_token: "API 令牌"
   polling: 
@@ -10852,6 +10921,7 @@ zh_Hant:
       error_loading_token_details: 載入權杖詳細資料時發生錯誤
       facebook_description: "如果您有一個 Facebook 帳戶，則可以安裝 Canvas 應用程式和接收您的個人檔案中的課程通知。您可以指定您想要的通知類型，以及您希望傳送它們的頻率。"
       feature_options: 功能選項
+      full_token_warning: "**現在就複製此權杖**。一旦您離開這個頁面，將無法再抓取完整權杖，您就必須重新生成一個以獲得一個新值。"
       generate_access_token_description: "存取權杖允許第三方應用程式代表您存取 Canvas 資源。這些權杖通常是根據需要自動為應用程式建立的，但如果[您正在開發一個新的或有限的專案](%{documentation_url})，您可以從此處生成權杖。"
       google_docs_description: "一旦您授權我們查看您的 Google Docs，您就可以直接從 Google Docs 提交您的任務，並建立和與您的班級成員共用文件。"
       headers: 
@@ -11969,6 +12039,9 @@ zh_Hant:
         outstanding_quiz_submissions_found: 發現未提交的測驗
         page_title: 中等測驗
         reload_student_table: 重新加載學生表
+        student_gets_extra_time: 
+          one: "*%{student_name}* **在每次嘗試中獲得 %{count} 分鐘的加時**"
+          other: "*%{student_name}* **在每次嘗試中獲得 %{count} 分鐘的加時**"
         student_n: "學生 %{n}"
         submitting: 正在提交...
         titles: 
@@ -12754,6 +12827,7 @@ zh_Hant:
     greater_than_three: 請輸入有三個或更多字元的搜尋字詞
     invitations_re_sent: 邀請已成功傳送
     nobody: 沒有人
+    observing_user: "觀察者：%{user_name}"
     unknown_error: 搜尋出錯了，請再試一次。
     updating: 正在更新...
   rubric: 
@@ -13380,6 +13454,19 @@ zh_Hant:
     mute_dialog: 
       gradebook: 
         mute_assignment: 靜音任務
+      mute_dialog: |-
+          是否確定想要靜音此任務？當此任務靜音時，
+          學生將不會收到相關新通知或看到：
+          
+          * 成績更改通知
+          * 提交件註解
+          * 繪製任務曲線
+          * 分數更改通知
+          
+          學生將能夠看到此任務是靜音的。
+          
+          一旦靜音了此任務，就可以透過按一下
+          『取消靜音任務』連結開始再次傳送通知。
     new_course_form: 
       cancel: 取消
       course_cose_explanation: 這將被顯示在具有較小空間的地方
@@ -14084,6 +14171,7 @@ zh_Hant:
       view_preview_button: 預覽
     still_zipping: 檔案壓縮仍在進行中...
     submission_download: 
+      download_message: "**正在收集您學生的提交件** 並壓縮成一個zip檔案。這可能需要一些時間，這取決於提交檔案的大小和數量。"
       gathering_files: 正在收集檔案...
   support: 
     array: 
