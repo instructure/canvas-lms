@@ -6182,6 +6182,7 @@ es:
       all: Todo
       app_headder: "Aplicaciones externas"
       external_tools_note: "Las aplicaciones permiten añadir nuevas funciones a Canvas de manera sencilla.  Se pueden incorporar a cursos individuales o a todos los cursos de una cuenta. Una vez que se ha configurado, puede enlazarlas a través de los módulos del curso y crear tareas para las herramientas de evaluación."
+      external_tools_references: "*Ver algunas de las herramientas LTI* que funcionan bien con Canvas. También puede consultar los ** Temas de la comunidad Canvas sobre herramientas LTI**"
       installed: Instalada
       not_installed: "No instalada"
       search_filter: "Filtrar por nombre"
