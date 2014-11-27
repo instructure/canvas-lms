@@ -1294,7 +1294,7 @@ de:
   allow_lor_tools: "Benutzern die Anzeige und Verwendung externer für LOR konfigurierter Tools ermöglichen."
   allow_opt_out_of_inbox: "Benutzern ermöglichen, den Konversations-Posteingang zu deaktivieren. Dadurch werden alle Konversationsnachrichten und -benachrichtigungen so schnell wie möglich als Benachrichtigungen an die primäre E-Mail des Benutzers gesendet, und die Markierung für ungelesene Nachrichten im Konversations-Posteingang sowie die Benachrichtigungseinstellungen für die Konversation werden ausgeblendet."
   always_3a59e701: Immer
-  an_unknown_server_error_occurred_please_try_again_f517eaf3: "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: "Ein unbekannter Serverfehler ist aufgetreten. Bitte versuchen Sie es erneut."
   analytics: 
     course: 
       analytics: Analysen
@@ -4632,7 +4632,7 @@ de:
         email: E-mail
         email_field_label: "Geben Sie die E-Mail-Adresse der hinzuzufügenden Benutzer durch Kommata getrennt ein"
         email_field_place_holder: "\"Beispiel-Student\" <student@beispiel.com>, \"Nachname, Vorname\" <vornach@beispiel.com>, nureineE-Mail-Adresse@beispiel.com"
-        example_formats: "Beispiele: Benutzer@beispiel.com, \"Vorname Nachname\" <benutzer@beispiel.com>, \"Nachname, Vorname\" <benutzer@beispiel.com>"
+        example_formats: "Beispiele: benutzer@beispiel.com, \"Vorname Nachname\" <benutzer@beispiel.com>, \"Nachname, Vorname\" <benutzer@beispiel.com>"
         form_instructions: "Liste mit E-Mail-Adressen unten eingeben oder einfügen:"
         go_back: "Nochmals beginnen"
         have_been_enrolled: "Folgende Benutzer wurden eingeschrieben"
@@ -9899,7 +9899,7 @@ de:
     add: 
       assignment: 
         add_assignments: "Aufgaben hinzufügen"
-        loading_assignments: "Aufgaben werden geladen..."
+        loading_assignments: "Aufgaben werden geladen ..."
       discussion: 
         add_topics: "Diskussionsthemen hinzufügen"
       file: 
@@ -9964,7 +9964,7 @@ de:
       item_title: "Titel des Modulelements"
       points_possible: Pkte.
       save: Speichern
-      saving: "Wird gespeichert..."
+      saving: "Wird gespeichert ..."
     module: 
       header: 
         delete: Löschen
@@ -10973,7 +10973,7 @@ de:
         register_linkedin_account: "Registrieren Sie Ihr LinkedIn-benutzerkonto"
         save_login: "Zugangskennung speichern"
         save_skype_name: "Skype-namen speichern"
-        save_yo_name: "Yo-Name speichern"
+        save_yo_name: "Yo-Namen speichern"
         select_image: "Bild auswählen"
         update_settings: "Einstellungen aktualisieren"
       confirm_email_instructions: "Bevor Sie Ihr Profil bearbeiten können, müssen Sie Ihre E-mailadresse (%{email}) bestätigen, indem Sie in der Ihnen zugesandten E-mail auf den Aktivierungslink klicken. Falls Sie diese E-mail nicht erhalten haben, *Klicken sie hier zum Neuversenden* und überprüfen Sie Ihren Spamordner."
@@ -11480,7 +11480,7 @@ de:
       update_question_without_regrading: "Frage aktualisieren, ohne eine Neubenotung durchzuführen"
   quiz_reports: 
     download_item_analysis: "Laden Sie den Elementanalysebericht herunter."
-    download_student_analysis: "Laden Sie den Studentenanalysebricht herunter."
+    download_student_analysis: "Laden Sie den Studentenanalysebericht herunter."
     generatable: "Bericht wurde nie erstellt."
     generate_item_analysis_report: "Erstellen Sie den Elementanalysebericht."
     generate_student_analysis_report: "Erstellen Sie den Studentenanalysebericht."
@@ -11527,7 +11527,7 @@ de:
       audible_bottom_bracket: "Unterer Bereich:"
       audible_bracket_aced: "Alle Studenten in diesem Bereich haben richtig geantwortet."
       audible_bracket_failed: "Kein einziger Student in diesem Bereich hat eine richtige Antwort gegeben."
-      audible_chart_description: "In dieser Tabelle ist aufgeführt, wie die einzelnen Studentenbereiche in der Klasse auf diese Frage geantwortet haben. Die Studentenbereiche setzen sich anhand ihrer Punktzahl zusammen. Der obere Bereich besteht aus den besten 27 %, während der mittlere Bereich uas den mittleren 46 % und der untere Bereich aus den schlechtesten 27 % besteht."
+      audible_chart_description: "In dieser Tabelle ist aufgeführt, wie die einzelnen Studentenbereiche in der Klasse auf diese Frage geantwortet haben. Die Studentenbereiche setzen sich anhand ihrer Punktzahl zusammen. Der obere Bereich besteht aus den besten 27 %, während der mittlere Bereich aus den mittleren 46 % und der untere Bereich aus den schlechtesten 27 % besteht."
       audible_discrimination_index: "Unterscheidungsindex: %{number}."
       audible_middle_bracket: "Mittlerer Bereich:"
       audible_response_ratio_distribution: "%{correct_ratio}% der Studenten in diesem Bereich haben richtig geantwortet."
@@ -12988,7 +12988,7 @@ de:
       grade_for: "Note für: %{name}"
       grading: Benotung
       is_dropped: "Diese Note wird für diesen Studenten gerade ausgeblendet."
-      is_late: "Diese Einsendung erfolgt spät."
+      is_late: "Diese Einsendung erfolgt zu spät."
       submission_details: "Details der Einsendung"
       submission_hidden: "Diese Aufgabe ist für diesen Studenten nicht verfügbar und wird für seine Note nicht berücksichtigt."
       was_resubmitted: "Diese Aufgabe wurde seit der letzten Benotung erneut eingesendet."
@@ -13003,7 +13003,7 @@ de:
       hide_student_names_label: "Namen der Studenten ausblenden"
       result: Ergebnis
       result_for: "Ergebnis für:"
-      results_loading: "Ergebnisse für diesen Studenten werden noch geladen..."
+      results_loading: "Ergebnisse für diesen Studenten werden noch geladen ..."
       select_a_section: "Abschnitt auswählen"
       select_student: "Student auswählen"
       student_info: "Informationen zum Studenten"
@@ -13052,7 +13052,7 @@ de:
         empty_student_selection: "Wählen Sie einen Studenten aus, um hier zusätzliche Informationen anzuzeigen."
         grades: Noten
         student_info: "Informationen zum Studenten"
-        submissions_loading: "Einsendungen für diesen Studenten werden noch geladen..."
+        submissions_loading: "Einsendungen für diesen Studenten werden noch geladen ..."
   search: 
     all_courses: 
       name: Name
