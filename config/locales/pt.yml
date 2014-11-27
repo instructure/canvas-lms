@@ -11607,7 +11607,6 @@ pt:
       discrimination_index: "Índice de discriminação"
       discrimination_index_dialog_title: "Gráfico do índice de discriminação"
       discrimination_index_dialog_trigger: "Saiba mais sobre o Índice de discriminação."
-    discrimination_index_help: "* Esta estatística permite medir a capacidade de uma única pergunta de fazer a distinção (ou discriminar) entre alunos que têm um bom resultado num exame e os que não têm um bom resultado. * ** Divide os alunos em três grupos com base na pontuação que têm em todo o teste e apresenta esses grupos segundo os que responderam à pergunta corretamente. ** *** **** Estão disponíveis mais informações aqui. **** ***"
     download_submissions: "Descarregar todos os ficheiros"
     duration_in_hours: 
       one: "1 hora"
