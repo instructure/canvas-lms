@@ -25,8 +25,8 @@ describe "/courses/_recent_event" do
     assignment = @course.assignments.create!(:title => 'my assignment')
     view_context
     render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
-    response.should_not be_nil
-    response.body.should =~ %r{<b>my assignment</b>}
+    expect(response).not_to be_nil
+    expect(response.body).to match %r{<b>my assignment</b>}
   end
 
   it "should render without a user" do
@@ -34,8 +34,8 @@ describe "/courses/_recent_event" do
     assignment = @course.assignments.create!(:title => 'my assignment')
     view_context
     render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
-    response.should_not be_nil
-    response.body.should =~ %r{<b>my assignment</b>}
+    expect(response).not_to be_nil
+    expect(response.body).to match %r{<b>my assignment</b>}
   end
 
   context "assignment muting and tooltips" do
@@ -47,7 +47,7 @@ describe "/courses/_recent_event" do
       @quiz.workflow_state = 'available'
       @quiz.published_at = Time.now
       @quiz.save
-      @quiz.assignment.should_not be_nil
+      expect(@quiz.assignment).not_to be_nil
 
       @quiz_submission = @quiz.generate_submission(@user)
       Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
@@ -58,13 +58,13 @@ describe "/courses/_recent_event" do
 
     it "should show the score for a non-muted assignment" do
       render :partial => "courses/recent_event", :object => @quiz.assignment, :locals => { :is_hidden => false, :submissions => [ @submission ] }
-      response.body.should =~ /#{@submission.score}/
+      expect(response.body).to match /#{@submission.score}/
     end
 
     it "should not show the score for a muted assignment" do
       @quiz.assignment.mute!
       render :partial => "courses/recent_event", :object => @quiz.assignment, :locals => { :is_hidden => false, :submissions => [ @submission ] }
-      response.body.should_not =~ /#{@submission.score}/
+      expect(response.body).not_to match /#{@submission.score}/
     end
   end
 end

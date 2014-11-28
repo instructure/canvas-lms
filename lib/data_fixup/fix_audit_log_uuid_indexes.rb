@@ -252,9 +252,13 @@ module DataFixup
             current_id, timestamp, key = extract_row_keys(index, row)
             event = events[current_id]
 
+            # An index record might exist without a related event.
+            # Just skip this for now.
+            next unless event
+
             # If the event is a corrupted event we have already fixed it so save
             # the mapping and move along.
-            if event.event_type == 'corrupted'
+            if event.event_type == CORRUPTED_EVENT_TYPE
               store_corrected_id(current_id, timestamp, current_id)
               next
             end

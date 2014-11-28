@@ -14,8 +14,8 @@ shared_examples_for "Quizzes::QuizStatistics::Report" do
     @quiz.statistics_csv(report_type, :async => true)
     run_jobs
     progress = @quiz.quiz_statistics.first.progress
-    progress.completion.should == 100
-    progress.should be_completed
+    expect(progress.completion).to eq 100
+    expect(progress).to be_completed
   end
 
 end

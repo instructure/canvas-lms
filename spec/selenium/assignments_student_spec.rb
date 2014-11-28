@@ -28,15 +28,15 @@ describe "assignments" do
     it "should not sort undated assignments first and it should order them by title" do
       get "/courses/#{@course.id}/assignments"
       titles = ff('.title')
-      titles[2].text.should == @second_assignment.title
-      titles[3].text.should == @third_assignment.title
+      expect(titles[2].text).to eq @second_assignment.title
+      expect(titles[3].text).to eq @third_assignment.title
     end
 
     it "should order upcoming assignments starting with first due" do
       get "/courses/#{@course.id}/assignments"
       titles = ff('.title')
-      titles[0].text.should == @fourth_assignment.title
-      titles[1].text.should == @assignment.title
+      expect(titles[0].text).to eq @fourth_assignment.title
+      expect(titles[1].text).to eq @assignment.title
     end
 
     it "should expand the comments box on click" do
@@ -49,10 +49,10 @@ describe "assignments" do
 
       f('.submit_assignment_link').click
       wait_for_ajaximations
-      driver.execute_script("return $('#submission_comment').height()").should == 20
+      expect(driver.execute_script("return $('#submission_comment').height()")).to eq 20
       driver.execute_script("$('#submission_comment').focus()")
       wait_for_ajaximations
-      driver.execute_script("return $('#submission_comment').height()").should == 72
+      expect(driver.execute_script("return $('#submission_comment').height()")).to eq 72
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -64,7 +64,7 @@ describe "assignments" do
     it "should highlight mini-calendar dates where stuff is due" do
       get "/courses/#{@course.id}/assignments/syllabus"
       wait_for_ajaximations
-      f(".mini_calendar_day.date_#{@due_date.strftime("%m_%d_%Y")}").should have_class('has_event')
+      expect(f(".mini_calendar_day.date_#{@due_date.strftime("%m_%d_%Y")}")).to have_class('has_event')
     end
 
     it "should not show submission data when muted" do
@@ -82,8 +82,8 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       details = f(".details")
-      details.should include_text('comment before muting')
-      details.should_not include_text('comment after muting')
+      expect(details).to include_text('comment before muting')
+      expect(details).not_to include_text('comment after muting')
     end
 
     it "should have group comment checkboxes for group assignments" do
@@ -97,7 +97,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      ffj('.formtable input[name="submission[group_comment]"]').size.should == 3
+      expect(ffj('.formtable input[name="submission[group_comment]"]').size).to eq 3
     end
 
     it "should not show assignments in an unpublished course" do
@@ -106,8 +106,8 @@ describe "assignments" do
       new_course.enroll_user(@user, 'StudentEnrollment')
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
-      f('.ui-state-error').should be_displayed
-      f('#assignment_show').should be_nil
+      expect(f('.ui-state-error')).to be_displayed
+      expect(f('#assignment_show')).to be_nil
     end
 
     it "should verify student creatable group creation" do
@@ -119,8 +119,8 @@ describe "assignments" do
       f('#group_name').send_keys(new_group_name)
       submit_form('#add_group_form')
       wait_for_ajaximations
-      f('.group_list').should include_text(new_group_name)
-      Group.find_by_name(new_group_name).should be_present
+      expect(f('.group_list')).to include_text(new_group_name)
+      expect(Group.find_by_name(new_group_name)).to be_present
     end
 
     it "should verify lock until date is enforced" do
@@ -129,28 +129,28 @@ describe "assignments" do
       locked_assignment = @course.assignments.create!(:name => assignment_name, :unlock_at => unlock_time)
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
-      f('#content').should include_text(unlock_time.strftime("%b %-d"))
+      expect(f('#content')).to include_text(unlock_time.strftime("%b %-d"))
       locked_assignment.update_attributes(:unlock_at => Time.now)
       refresh_page # to show the updated assignment
-      f('#content').should_not include_text('This assignment is locked until')
+      expect(f('#content')).not_to include_text('This assignment is locked until')
     end
 
     it "should verify due date is enforced" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
       driver.current_url
       get "/courses/#{@course.id}/assignments"
-      ffj('.assignment_list:visible').last.should include_text(due_date_assignment.title)
+      expect(ffj('.assignment_list:visible').last).to include_text(due_date_assignment.title)
       due_date_assignment.update_attributes(:due_at => 2.days.from_now)
       refresh_page # to show the updated assignment
-      ffj('.assignment_list:visible').first.should include_text(due_date_assignment.title)
+      expect(ffj('.assignment_list:visible').first).to include_text(due_date_assignment.title)
     end
 
     it "should validate an assignment created with the type of discussion" do
       @fourth_assignment.update_attributes(:submission_types => 'discussion_topic')
       get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
 
-      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-      f('h1.discussion-title').should include_text(@fourth_assignment.title)
+      expect(driver.current_url).to match %r{/courses/\d+/discussion_topics/\d+}
+      expect(f('h1.discussion-title')).to include_text(@fourth_assignment.title)
     end
 
     it "should validate an assignment created with the type of external tool" do
@@ -160,24 +160,24 @@ describe "assignments" do
       external_tool_assignment.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
       get "/courses/#{@course.id}/assignments/#{external_tool_assignment.id}"
 
-      f('#tool_content').should be_displayed
+      expect(f('#tool_content')).to be_displayed
     end
 
     it "should validate an assignment created with the type of not graded" do
       @fourth_assignment.update_attributes(:submission_types => 'not_graded')
       get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
 
-      f('.submit_assignment_link').should be_nil
+      expect(f('.submit_assignment_link')).to be_nil
     end
 
     it "should validate on paper submission assignment type" do
       update_assignment_attributes(@fourth_assignment, :submission_types, 'on_paper', false)
-      f('.submit_assignment_link').should be_nil
+      expect(f('.submit_assignment_link')).to be_nil
     end
 
     it "should validate no submission assignment type" do
       update_assignment_attributes(@fourth_assignment, :submission_types, nil, false)
-      f('.submit_assignment_link').should be_nil
+      expect(f('.submit_assignment_link')).to be_nil
     end
 
     context "overridden lock_at" do
@@ -191,7 +191,7 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
         expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
-        f('#content').should include_text "locked until #{expected_unlock}."
+        expect(f('#content')).to include_text "locked until #{expected_unlock}."
       end
 
       it "should allow submission when within override locks" do
@@ -233,29 +233,29 @@ describe "assignments" do
 
         keep_trying_until do
         submission_input.send_keys(fullpath_txt)
-        ext_error.should_not be_displayed
-        submit_file_button['disabled'].should be_nil
+        expect(ext_error).not_to be_displayed
+        expect(submit_file_button['disabled']).to be_nil
         submission_input.send_keys(fullpath_zip)
-        ext_error.should be_displayed
-        submit_file_button.should have_attribute(:disabled, "true")
+        expect(ext_error).to be_displayed
+        expect(submit_file_button).to have_attribute(:disabled, "true")
         end
       end
 
       it "should validate that website url submissions are allowed" do
         update_assignment_attributes(@fourth_assignment, :submission_types, 'online_url')
-        f('#submission_url').should be_displayed
+        expect(f('#submission_url')).to be_displayed
       end
 
       it "should validate that text entry submissions are allowed" do
         update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry')
-        f('.submit_online_text_entry_option').should be_displayed
+        expect(f('.submit_online_text_entry_option')).to be_displayed
       end
 
       it "should allow an assignment with all 3 online submission types" do
         update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry, online_url, online_upload')
-        f('.submit_online_text_entry_option').should be_displayed
-        f('.submit_online_url_option').should be_displayed
-        f('.submit_online_upload_option').should be_displayed
+        expect(f('.submit_online_text_entry_option')).to be_displayed
+        expect(f('.submit_online_url_option')).to be_displayed
+        expect(f('.submit_online_upload_option')).to be_displayed
       end
     end
 
@@ -272,42 +272,42 @@ describe "assignments" do
         ag = @course.assignment_groups.first
         f("#show_by_type").click
         ag_el = f("#assignment_group_#{ag.id}")
-        ag_el.should be_present
-        ag_el.text.should match @assignment.name
+        expect(ag_el).to be_present
+        expect(ag_el.text).to match @assignment.name
       end
 
       it "should not show add/edit/delete buttons" do
         ag = @course.assignment_groups.first
-        f('.new_assignment').should be_nil
-        f('#addGroup').should be_nil
-        f('.add_assignment').should be_nil
+        expect(f('.new_assignment')).to be_nil
+        expect(f('#addGroup')).to be_nil
+        expect(f('.add_assignment')).to be_nil
         f("#show_by_type").click
-        f("ag_#{ag.id}_manage_link").should be_nil
+        expect(f("ag_#{ag.id}_manage_link")).to be_nil
       end
 
       it "should default to grouping by date" do
-        is_checked('#show_by_date').should be_true
+        expect(is_checked('#show_by_date')).to be_truthy
 
         # assuming two undated and two future assignments created above
-        f('#assignment_group_upcoming').should_not be_nil
-        f('#assignment_group_undated').should_not be_nil
+        expect(f('#assignment_group_upcoming')).not_to be_nil
+        expect(f('#assignment_group_undated')).not_to be_nil
       end
 
       it "should allowing grouping by assignment group (and remember)" do
         ag = @course.assignment_groups.first
         f("#show_by_type").click
-        is_checked('#show_by_type').should be_true
-        f("#assignment_group_#{ag.id}").should_not be_nil
+        expect(is_checked('#show_by_type')).to be_truthy
+        expect(f("#assignment_group_#{ag.id}")).not_to be_nil
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
-        is_checked('#show_by_type').should be_true
+        expect(is_checked('#show_by_type')).to be_truthy
       end
 
       it "should not show empty date groups" do
         # assuming two undated and two future assignments created above
-        f('#assignment_group_overdue').should be_nil
-        f('#assignment_group_past').should be_nil
+        expect(f('#assignment_group_overdue')).to be_nil
+        expect(f('#assignment_group_past')).to be_nil
       end
 
       it "should not show empty assignment groups" do
@@ -317,7 +317,7 @@ describe "assignments" do
         wait_for_ajaximations
 
         f("#show_by_type").click
-        f("#assignment_group_#{empty_ag.id}").should be_nil
+        expect(f("#assignment_group_#{empty_ag.id}")).to be_nil
       end
 
       it "should show empty assignment groups if they have a weight" do
@@ -334,7 +334,7 @@ describe "assignments" do
         wait_for_ajaximations
 
         f("#show_by_type").click
-        f("#assignment_group_#{empty_ag.id}").should_not be_nil
+        expect(f("#assignment_group_#{empty_ag.id}")).not_to be_nil
       end
 
       it "should correctly categorize assignments be date" do
@@ -342,11 +342,11 @@ describe "assignments" do
         undated, upcoming = @course.assignments.partition{ |a| a.due_date.nil? }
 
         undated.each do |a|
-          f("#assignment_group_undated #assignment_#{a.id}").should_not be_nil
+          expect(f("#assignment_group_undated #assignment_#{a.id}")).not_to be_nil
         end
 
         upcoming.each do |a|
-          f("#assignment_group_upcoming #assignment_#{a.id}").should_not be_nil
+          expect(f("#assignment_group_upcoming #assignment_#{a.id}")).not_to be_nil
         end
       end
     end
@@ -375,7 +375,7 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
         expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
-        f('#content').should include_text "locked until #{expected_unlock}."
+        expect(f('#content')).to include_text "locked until #{expected_unlock}."
       end
 
       context "with multiple section enrollments in same course" do
@@ -386,7 +386,7 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
           expected_lock_at = datetime_string(@assignment.lock_at).gsub(/\s+/, ' ')   # later than section2
-          f('#content').should include_text "locked until #{expected_unlock}."
+          expect(f('#content')).to include_text "locked until #{expected_unlock}."
         end
       end
     end
@@ -403,7 +403,7 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
         expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
-        f('#content').should include_text "locked until #{expected_unlock}."
+        expect(f('#content')).to include_text "locked until #{expected_unlock}."
       end
 
       context "overridden lock_at" do
@@ -417,7 +417,7 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
           expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
-          f('#content').should include_text "locked until #{expected_unlock}."
+          expect(f('#content')).to include_text "locked until #{expected_unlock}."
         end
       end
     end

@@ -8,18 +8,20 @@ define [
   './FolderTree'
   './FilesUsage'
   '../mixins/MultiselectableMixin'
+  '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, filesEnv) ->
+], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   FilesApp = React.createClass
     displayName: 'FilesApp'
 
-    onResolvePath: ({currentFolder, rootTillCurrentFolder, showingSearchResults}) ->
+    onResolvePath: ({currentFolder, rootTillCurrentFolder, showingSearchResults, searchResultCollection}) ->
       @setState
         currentFolder: currentFolder
         rootTillCurrentFolder: rootTillCurrentFolder
         showingSearchResults: showingSearchResults
         selectedItems: []
+        searchResultCollection: searchResultCollection
 
     getInitialState: ->
       {
@@ -29,14 +31,16 @@ define [
         selectedItems: undefined
       }
 
-    mixins: [MultiselectableMixin]
+    mixins: [MultiselectableMixin, dndMixin]
 
     # for MultiselectableMixin
-    selectables: -> @state.currentFolder.children(@props.query)
+    selectables: ->
+      if @state.showingSearchResults
+        @state.searchResultCollection.models
+      else
+        @state.currentFolder.children(@props.query)
 
     render: withReactDOM ->
-      userCanManageFilesForContext = filesEnv.userHasPermission(@state.currentFolder, 'manage_files')
-
       if @state.currentFolder # when showing a folder
         contextType = @state.currentFolder.get('context_type').toLowerCase() + 's'
         contextId = @state.currentFolder.get('context_id')
@@ -44,8 +48,14 @@ define [
         contextType = filesEnv.contextType
         contextId = filesEnv.contextId
 
+      userCanManageFilesForContext = filesEnv.userHasPermission({contextType: contextType, contextId: contextId}, 'manage_files')
 
       div null,
+        # For whatever reason, VO in Safari didn't like just the h1 tag.
+        # Sometimes it worked, others it didn't, this makes it work always
+        header {},
+          h1 {className: 'screenreader-only'},
+              I18n.t('files_heading', "Files")
         Breadcrumbs({
           rootTillCurrentFolder: @state.rootTillCurrentFolder
           query: @props.query
@@ -70,17 +80,32 @@ define [
             FolderTree({
               rootTillCurrentFolder: @state.rootTillCurrentFolder
               rootFoldersToShow: filesEnv.rootFolders
+              dndOptions:
+                onItemDragEnterOrOver: @onItemDragEnterOrOver
+                onItemDragLeaveOrEnd: @onItemDragLeaveOrEnd
+                onItemDrop: @onItemDrop
             })
-          @props.activeRouteHandler
-            onResolvePath: @onResolvePath
-            currentFolder: @state.currentFolder
-            contextType: contextType
-            contextId: contextId
-            selectedItems: @state.selectedItems
-            toggleItemSelected: @toggleItemSelected
-            toggleAllSelected: @toggleAllSelected
-            areAllItemsSelected: @areAllItemsSelected
-            userCanManageFilesForContext: userCanManageFilesForContext
+          div {
+            className:'ef-directory'
+            role: 'region'
+            'aria-label' : I18n.t('file_list', 'File List')
+          },
+            @props.activeRouteHandler
+              onResolvePath: @onResolvePath
+              currentFolder: @state.currentFolder
+              contextType: contextType
+              contextId: contextId
+              selectedItems: @state.selectedItems
+              toggleItemSelected: @toggleItemSelected
+              toggleAllSelected: @toggleAllSelected
+              areAllItemsSelected: @areAllItemsSelected
+              userCanManageFilesForContext: userCanManageFilesForContext
+              dndOptions:
+                onItemDragStart: @onItemDragStart
+                onItemDragEnterOrOver: @onItemDragEnterOrOver
+                onItemDragLeaveOrEnd: @onItemDragLeaveOrEnd
+                onItemDrop: @onItemDrop
+
         div className: 'ef-footer grid-row',
           if userCanManageFilesForContext
             FilesUsage({

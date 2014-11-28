@@ -10,7 +10,7 @@ class AddFileNotifications < ActiveRecord::Migration
 
   def self.down
     # (try on each shard, because there may be duplicates due to the above)
-    Notification.find_by_name("New File Added").try(:destroy)
-    Notification.find_by_name("New Files Added").try(:destroy)
+    Notification.where(name: "New File Added").delete_all
+    Notification.where(name: "New Files Added").delete_all
   end
 end

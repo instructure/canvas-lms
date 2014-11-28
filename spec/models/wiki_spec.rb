@@ -26,7 +26,7 @@ describe Wiki do
 
   context "get_front_page_url" do
     it "should return default url if front_page_url is not set" do
-      @wiki.get_front_page_url.should == Wiki::DEFAULT_FRONT_PAGE_URL # 'front-page'
+      expect(@wiki.get_front_page_url).to eq Wiki::DEFAULT_FRONT_PAGE_URL # 'front-page'
     end
   end
 
@@ -34,8 +34,8 @@ describe Wiki do
     it "should unset front page" do
       @wiki.unset_front_page!
 
-      @wiki.has_front_page?.should == false
-      @wiki.front_page_url.should == nil
+      expect(@wiki.has_front_page?).to eq false
+      expect(@wiki.front_page_url).to eq nil
     end
   end
 
@@ -43,20 +43,20 @@ describe Wiki do
     it "should set front_page_url" do
       @wiki.unset_front_page!
       new_url = "ponies4ever"
-      @wiki.set_front_page_url!(new_url).should == true
+      expect(@wiki.set_front_page_url!(new_url)).to eq true
 
-      @wiki.has_front_page?.should == true
-      @wiki.front_page_url.should == new_url
+      expect(@wiki.has_front_page?).to eq true
+      expect(@wiki.front_page_url).to eq new_url
     end
   end
 
   context "front_page" do
     it "should build a default page if not found" do
-      @wiki.wiki_pages.count.should == 0
+      expect(@wiki.wiki_pages.count).to eq 0
 
       page = @wiki.front_page
-      page.new_record?.should == true
-      page.url.should == @wiki.get_front_page_url
+      expect(page.new_record?).to eq true
+      expect(page.url).to eq @wiki.get_front_page_url
     end
 
     it "should build a custom front page if not found" do
@@ -64,15 +64,15 @@ describe Wiki do
       @wiki.set_front_page_url!(new_url)
 
       page = @wiki.front_page
-      page.new_record?.should == true
-      page.url.should == new_url
+      expect(page.new_record?).to eq true
+      expect(page.url).to eq new_url
     end
 
     it "should find front_page by url" do
       page = @wiki.wiki_pages.create!(:title => "stuff and stuff")
 
       @wiki.set_front_page_url!(page.url)
-      page.should == @wiki.front_page
+      expect(page).to eq @wiki.front_page
     end
   end
 
@@ -85,17 +85,17 @@ describe Wiki do
     it 'should give read rights to public courses' do
       @course.is_public = true
       @course.save!
-      @course.wiki.grants_right?(@user, :read).should be_true
+      expect(@course.wiki.grants_right?(@user, :read)).to be_truthy
     end
 
     it 'should give manage rights to teachers' do
       course_with_teacher
-      @course.wiki.grants_right?(@teacher, :manage).should be_true
+      expect(@course.wiki.grants_right?(@teacher, :manage)).to be_truthy
     end
 
     it 'should give manage rights to admins' do
       account_admin_user
-      @course.wiki.grants_right?(@admin, :manage).should be_true
+      expect(@course.wiki.grants_right?(@admin, :manage)).to be_truthy
     end
 
     context 'allow student wiki edits' do
@@ -106,31 +106,31 @@ describe Wiki do
       end
 
       it 'should not give manage rights to students' do
-        @course.wiki.grants_right?(@user, :manage).should be_false
+        expect(@course.wiki.grants_right?(@user, :manage)).to be_falsey
       end
 
       it 'should not give update rights to students' do
-        @course.wiki.grants_right?(@user, :update).should be_false
+        expect(@course.wiki.grants_right?(@user, :update)).to be_falsey
       end
 
       it 'should give read rights to students' do
-        @course.wiki.grants_right?(@user, :read).should be_true
+        expect(@course.wiki.grants_right?(@user, :read)).to be_truthy
       end
 
       it 'should give create_page rights to students' do
-        @course.wiki.grants_right?(@user, :create_page).should be_true
+        expect(@course.wiki.grants_right?(@user, :create_page)).to be_truthy
       end
 
       it 'should not give delete_page rights to students' do
-        @course.wiki.grants_right?(@user, :delete_page).should be_false
+        expect(@course.wiki.grants_right?(@user, :delete_page)).to be_falsey
       end
 
       it 'should give update_page rights to students' do
-        @course.wiki.grants_right?(@user, :update_page).should be_true
+        expect(@course.wiki.grants_right?(@user, :update_page)).to be_truthy
       end
 
       it 'should give update_page_content rights to students' do
-        @course.wiki.grants_right?(@user, :update_page_content).should be_true
+        expect(@course.wiki.grants_right?(@user, :update_page_content)).to be_truthy
       end
     end
   end
@@ -140,7 +140,7 @@ describe Wiki do
 
     it "should find the wiki's context from another shard" do
       @shard1.activate do
-        @wiki.context.should == @course
+        expect(@wiki.context).to eq @course
       end
     end
   end

@@ -27,18 +27,18 @@ describe Polling::Poll do
 
   context "creating a poll" do
     it "requires an associated user" do
-      lambda { Polling::Poll.create!(question: 'A Test Poll') }.should raise_error(ActiveRecord::RecordInvalid,
+      expect { Polling::Poll.create!(question: 'A Test Poll') }.to raise_error(ActiveRecord::RecordInvalid,
                                                                         /User can't be blank/)
     end
 
     it "requires a question" do
       @poll = Polling::Poll.create(user: @teacher)
-      @poll.should_not be_valid
+      expect(@poll).not_to be_valid
     end
 
     it "saves successfully" do
       @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll', description: 'A test description.')
-      @poll.should be_valid
+      expect(@poll).to be_valid
     end
   end
 
@@ -49,7 +49,7 @@ describe Polling::Poll do
       session = poll.poll_sessions.create(course: @course)
       session.publish!
 
-      poll.closed_and_viewable_for?(student).should be_false
+      expect(poll.closed_and_viewable_for?(student)).to be_falsey
     end
 
     context "the latest poll session available to the user is closed" do
@@ -69,13 +69,13 @@ describe Polling::Poll do
         )
         @session.close!
 
-        @poll.closed_and_viewable_for?(@student).should be_true
+        expect(@poll.closed_and_viewable_for?(@student)).to be_truthy
       end
 
       it "returns false if the user hasn't submitted" do
         @session.publish!
         @session.close!
-        @poll.closed_and_viewable_for?(@student).should be_false
+        expect(@poll.closed_and_viewable_for?(@student)).to be_falsey
       end
     end
   end
@@ -121,11 +121,11 @@ describe Polling::Poll do
 
       @poll.reload
 
-      @poll.total_results.should == {
+      expect(@poll.total_results).to eq({
         @choice1.id => 3,
         @choice2.id => 1,
         @choice3.id => 2
-      }
+      })
     end
   end
 end

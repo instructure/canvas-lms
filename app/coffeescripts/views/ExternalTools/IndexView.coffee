@@ -113,7 +113,7 @@ define [
       @addAppView.remove() if @addAppView
       @editView.remove() if @editView
       @showExternalToolsView()
-      $.flashMessage(htmlEscape(I18n.t('app_saved_message', "%{app} saved successfully!", { app: model.get('name') })))
+      $.flashMessage(I18n.t('app_saved_message', "%{app} saved successfully!", { app: model.get('name') }))
 
     filterApps: (event) =>
       @appCenterView.filterText = @$appCenterFilter.val()

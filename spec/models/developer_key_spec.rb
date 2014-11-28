@@ -25,7 +25,7 @@ describe DeveloperKey do
 
       it "should always create the default key on the default shard" do
         @shard1.activate do
-          DeveloperKey.default.shard.should be_default
+          expect(DeveloperKey.default.shard).to be_default
         end
       end
 
@@ -33,12 +33,12 @@ describe DeveloperKey do
         # this test mirrors what happens in production when retrieving keys, but does not test it
         # directly because there's a short circuit clause in 'get_special_key' that pops out with a
         # different finder because of the transactions-in-test issue. this confirms that setting
-        # a key id does not translate it to a string and therefore can be used with 'find_by_id'
+        # a key id does not translate it to a string and therefore can be used with 'where(id: key_id)'
         # safely
         key = DeveloperKey.create!
         Setting.set('rspec_developer_key_id', key.id)
         key_id = Setting.get('rspec_developer_key_id', nil)
-        DeveloperKey.find_by_id(key_id).should == key
+        expect(DeveloperKey.where(id: key_id).first).to eq key
       end
     end
   end
@@ -46,19 +46,19 @@ describe DeveloperKey do
   describe "#redirect_domain_matches?" do
     it "should match domains exactly, and sub-domains" do
       key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
-      key.redirect_domain_matches?("http://example.com/a/b").should be_true
+      expect(key.redirect_domain_matches?("http://example.com/a/b")).to be_truthy
       # other paths on the same domain are ok
-      key.redirect_domain_matches?("http://example.com/other").should be_true
+      expect(key.redirect_domain_matches?("http://example.com/other")).to be_truthy
       # completely separate domain
-      key.redirect_domain_matches?("http://example2.com/a/b").should be_false
+      expect(key.redirect_domain_matches?("http://example2.com/a/b")).to be_falsey
       # not a sub-domain
-      key.redirect_domain_matches?("http://wwwexample.com/a/b").should be_false
-      key.redirect_domain_matches?("http://example.com.evil/a/b").should be_false
-      key.redirect_domain_matches?("http://www.example.com.evil/a/b").should be_false
+      expect(key.redirect_domain_matches?("http://wwwexample.com/a/b")).to be_falsey
+      expect(key.redirect_domain_matches?("http://example.com.evil/a/b")).to be_falsey
+      expect(key.redirect_domain_matches?("http://www.example.com.evil/a/b")).to be_falsey
       # sub-domains are ok
-      key.redirect_domain_matches?("http://www.example.com/a/b").should be_true
-      key.redirect_domain_matches?("http://a.b.example.com/a/b").should be_true
-      key.redirect_domain_matches?("http://a.b.example.com/other").should be_true
+      expect(key.redirect_domain_matches?("http://www.example.com/a/b")).to be_truthy
+      expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to be_truthy
+      expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to be_truthy
     end
   end
 end

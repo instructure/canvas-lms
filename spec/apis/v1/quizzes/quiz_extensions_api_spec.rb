@@ -19,6 +19,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizExtensionsController, type: :request do
   before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
+  before :once do
     course
     @quiz = @course.quizzes.create!(:title => 'quiz')
     @quiz.published_at = Time.now
@@ -65,7 +69,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
           {user_id: @student1.id, extra_attempts: 2}
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        res['quiz_extensions'][0]['extra_attempts'].should == 2
+        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
       it "should extend attempts for a new submission" do
@@ -73,7 +77,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
           {user_id: @student1.id, extra_attempts: 2}
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        res['quiz_extensions'][0]['extra_attempts'].should == 2
+        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
       it "should extend attempts for multiple students" do
@@ -82,8 +86,8 @@ describe Quizzes::QuizExtensionsController, type: :request do
           {user_id: @student2.id, extra_attempts: 3}
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        res['quiz_extensions'][0]['extra_attempts'].should == 2
-        res['quiz_extensions'][1]['extra_attempts'].should == 3
+        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
+        expect(res['quiz_extensions'][1]['extra_attempts']).to eq 3
       end
     end
   end

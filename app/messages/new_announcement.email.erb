@@ -1,5 +1,5 @@
 <% define_content :link do -%>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_ar_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/announcements/<%= asset.id %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/announcements/<%= asset.id %>
 <% end %>
 <% define_content :subject do -%>
   <%= before_label asset.title %> <%= asset.context.name %>
@@ -7,6 +7,6 @@
 <%= html_to_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
 
 <% if asset.attachment %><%= before_label :file_included, "File Included" %> <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_ar_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download<% end %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download<% end %>
 
 <%= content :link %>

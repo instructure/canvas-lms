@@ -169,11 +169,6 @@ class GroupCategory < ActiveRecord::Base
     self.save!
   end
 
-  def configure_auto_leader(enabled, auto_leader_type)
-    args = {enable_auto_leader: enabled, auto_leader_type: auto_leader_type}
-    self.auto_leader = GroupCategories::Params.new(args).auto_leader
-  end
-
   def self_signup?
     self.self_signup.present?
   end

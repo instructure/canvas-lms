@@ -28,7 +28,7 @@ describe "Importing Assignment Groups" do
 
         data[:assignment_groups_to_import] = {}
         expect {
-          Importers::AssignmentGroupImporter.import_from_migration(data, context).should be_nil
+          expect(Importers::AssignmentGroupImporter.import_from_migration(data, context)).to be_nil
         }.to change(AssignmentGroup, :count).by(0)
 
         data[:assignment_groups_to_import][data[:migration_id]] = true
@@ -36,9 +36,9 @@ describe "Importing Assignment Groups" do
           Importers::AssignmentGroupImporter.import_from_migration(data, context)
           Importers::AssignmentGroupImporter.import_from_migration(data, context)
         }.to change(AssignmentGroup, :count).by(1)
-        g = AssignmentGroup.find_by_migration_id(data[:migration_id])
+        g = AssignmentGroup.where(migration_id: data[:migration_id]).first
 
-        g.name.should == data[:title]
+        expect(g.name).to eq data[:title]
       end
     end
   end
@@ -52,7 +52,7 @@ describe "Importing Assignment Groups" do
 
     expect {
       ass = Importers::AssignmentImporter.import_from_migration(get_import_data('bb8', 'assignment'), context)
-      ass.assignment_group.name.should == data[:title]
+      expect(ass.assignment_group.name).to eq data[:title]
     }.to change(AssignmentGroup, :count).by(0)
   end
 

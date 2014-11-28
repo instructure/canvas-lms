@@ -32,7 +32,7 @@ describe CoursesController, type: :request do
       @course.reload
       user_session(ta)
       get "/courses/#{@course.id}"
-      response.should be_success
+      expect(response).to be_success
 
       # We do a page load before the test because something during the first load
       # will touch the course, invalidating the cache anyway and making this test
@@ -41,16 +41,16 @@ describe CoursesController, type: :request do
       original_course_updated_at = @course.reload.updated_at
 
       get "/courses/#{@course.id}"
-      response.should be_success
+      expect(response).to be_success
       page = Nokogiri::HTML(response.body)
-      page.css(".wizard_options_list li.publish_step").length.should == 0
+      expect(page.css(".wizard_options_list li.publish_step").length).to eq 0
 
       user_session(teacher)
       get "/courses/#{@course.id}"
-      response.should be_success
+      expect(response).to be_success
       page = Nokogiri::HTML(response.body)
-      page.css(".wizard_options_list li.publish_step").length.should == 1
-      @course.reload.updated_at.should == original_course_updated_at
+      expect(page.css(".wizard_options_list li.publish_step").length).to eq 1
+      expect(@course.reload.updated_at).to eq original_course_updated_at
     end
   end
 end

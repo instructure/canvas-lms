@@ -13,7 +13,7 @@ describe "Alerts" do
 
   it "should be able to create, then update, then delete" do
     get "/accounts/#{@context.id}/settings"
-    @alerts.length.should == 0
+    expect(@alerts.length).to eq 0
 
     f('#tab-alerts-link').click
     wait_for_ajaximations
@@ -28,10 +28,10 @@ describe "Alerts" do
     wait_for_ajaximations
     keep_trying_until do
       @alerts.reload
-      @alerts.length.should == 1
+      expect(@alerts.length).to eq 1
     end
 
-    @alerts.first.criteria.length.should == 1
+    expect(@alerts.first.criteria.length).to eq 1
 
     (edit = alert.find_element(:css, '.edit_link')).click
     add_criterion.click
@@ -41,11 +41,11 @@ describe "Alerts" do
 
     keep_trying_until do
       @alerts.first.criteria.reload
-      @alerts.first.criteria.length.should == 2
+      expect(@alerts.first.criteria.length).to eq 2
     end
 
     @alerts.reload
-    @alerts.length.should == 1
+    expect(@alerts.length).to eq 1
 
     wait_for_ajaximations
     edit.click
@@ -57,21 +57,21 @@ describe "Alerts" do
 
     keep_trying_until do
       @alerts.first.criteria.reload
-      @alerts.first.criteria.length.should == 1
+      expect(@alerts.first.criteria.length).to eq 1
     end
 
     @alerts.reload
-    @alerts.length.should == 1
+    expect(@alerts.length).to eq 1
 
     wait_for_ajaximations
     alert.find_element(:css, '.delete_link').click
 
     wait_for_ajaximations
-    f('.alert').should_not be_displayed
+    expect(f('.alert')).not_to be_displayed
 
     keep_trying_until do
       @alerts.reload
-      @alerts.length.should == 0
+      expect(@alerts.length).to eq 0
     end
   end
 
@@ -86,7 +86,7 @@ describe "Alerts" do
     keep_trying_until { fj("#edit_alert_#{alert.id}").blank? }
 
     @alerts.reload
-    @alerts.should be_empty
+    expect(@alerts).to be_empty
   end
 
   it "should remove non-created alerts by clicking delete link" do
@@ -98,9 +98,9 @@ describe "Alerts" do
     wait_for_ajaximations
     f('.alert.new .delete_link').click
     wait_for_ajaximations
-    keep_trying_until { ff(".alert.new").should be_empty }
+    keep_trying_until { expect(ff(".alert.new")).to be_empty }
 
-    @alerts.should be_empty
+    expect(@alerts).to be_empty
   end
 
   it "should remove non-created alerts by clicking cancel button" do
@@ -112,8 +112,8 @@ describe "Alerts" do
     wait_for_ajaximations
     f('.alert.new .cancel_button').click
     wait_for_ajaximations
-    keep_trying_until { ffj(".alert.new").should be_empty }
-    @alerts.should be_empty
+    keep_trying_until { expect(ffj(".alert.new")).to be_empty }
+    expect(@alerts).to be_empty
   end
 
   it "should validate the form" do
@@ -163,7 +163,7 @@ describe "Alerts" do
         link.click
         wait_for_ajaximations
       end
-      f('.alert.new .add_recipient_link').should_not be_displayed
+      expect(f('.alert.new .add_recipient_link')).not_to be_displayed
     end
 
     it "should not show the add link when all recipients are already there" do
@@ -175,24 +175,24 @@ describe "Alerts" do
       alertElement = f("#edit_alert_#{alert.id}")
       alertElement.find_element(:css, ".edit_link").click
       wait_for_ajaximations
-      fj("#edit_alert_#{alert.id} .add_recipient_link:visible").should be_blank
+      expect(fj("#edit_alert_#{alert.id} .add_recipient_link:visible")).to be_blank
 
       # Deleting a recipient should add it to the dropdown (which is now visible)
       alertElement.find_element(:css, '.recipients .delete_item_link').click
       wait_for_ajaximations
-      fj("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
-      alertElement.find_elements(:css, '.add_recipients_line select option').length.should == 1
+      expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
+      expect(alertElement.find_elements(:css, '.add_recipients_line select option').length).to eq 1
       keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 2 }
 
       # Do it again, with the same results
       alertElement.find_element(:css, '.recipients .delete_item_link').click
-      fj("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
-      alertElement.find_elements(:css, '.add_recipients_line select option').length.should == 2
+      expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
+      expect(alertElement.find_elements(:css, '.add_recipients_line select option').length).to eq 2
       keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 1 }
 
       # Clicking cancel should restore the LIs
       alertElement.find_element(:css, '.cancel_button').click
-      alertElement.find_elements(:css, '.recipients li').length.should == 3
+      expect(alertElement.find_elements(:css, '.recipients li').length).to eq 3
     end
   end
 end

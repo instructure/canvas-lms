@@ -6,27 +6,27 @@ describe "Converting D2L QTI" do
   end
 
   it "should convert multiple choice" do
-    get_question_hash(d2l_question_dir, 'multiple_choice', true, @opts).should == D2LExpected::MULTIPLE_CHOICE
+    expect(get_question_hash(d2l_question_dir, 'multiple_choice', true, @opts)).to eq D2LExpected::MULTIPLE_CHOICE
   end
 
   it "should convert true false" do
-    get_question_hash(d2l_question_dir, 'true_false', true, @opts).should == D2LExpected::TRUE_FALSE
+    expect(get_question_hash(d2l_question_dir, 'true_false', true, @opts)).to eq D2LExpected::TRUE_FALSE
   end
 
   it "should convert short answer" do
-    get_question_hash(d2l_question_dir, 'short_answer', true, @opts).should == D2LExpected::SHORT_ANSWER
+    expect(get_question_hash(d2l_question_dir, 'short_answer', true, @opts)).to eq D2LExpected::SHORT_ANSWER
   end
 
   it "should convert multi select" do
-    get_question_hash(d2l_question_dir, 'multi_select', true, @opts).should == D2LExpected::MULTI_SELECT
+    expect(get_question_hash(d2l_question_dir, 'multi_select', true, @opts)).to eq D2LExpected::MULTI_SELECT
   end
   
   it "should convert multiple short" do
-    get_question_hash(d2l_question_dir, 'multiple_short', true, @opts).should == D2LExpected::MULTIPLE_SHORT
+    expect(get_question_hash(d2l_question_dir, 'multiple_short', true, @opts)).to eq D2LExpected::MULTIPLE_SHORT
   end
   
   it "should convert fill in the blank with multiple blanks" do
-    get_question_hash(d2l_question_dir, 'fib', true, @opts).should == D2LExpected::FIB
+    expect(get_question_hash(d2l_question_dir, 'fib', true, @opts)).to eq D2LExpected::FIB
   end
   
   it "should convert matching" do
@@ -35,36 +35,36 @@ describe "Converting D2L QTI" do
     matches = {}
     hash[:matches].each {|m| matches[m[:match_id]] = m[:text]}
     hash[:answers].each do |a|
-      matches[a[:match_id]].should == a[:right]
+      expect(matches[a[:match_id]]).to eq a[:right]
     end
     # compare everything else without the ids
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
-    hash.should == D2LExpected::MATCHING
+    expect(hash).to eq D2LExpected::MATCHING
   end
   
   it "should flag ordering question as an error" do
-    get_question_hash(d2l_question_dir, 'ordering', true, @opts).should == D2LExpected::ORDERING
+    expect(get_question_hash(d2l_question_dir, 'ordering', true, @opts)).to eq D2LExpected::ORDERING
   end
   
   it "should convert math question" do
-    get_question_hash(d2l_question_dir, 'math', true, @opts).should == D2LExpected::MATH
+    expect(get_question_hash(d2l_question_dir, 'math', true, @opts)).to eq D2LExpected::MATH
   end
 
   it "should convert long answer" do
-    get_question_hash(d2l_question_dir, 'long_answer', true, @opts).should == D2LExpected::LONG_ANSWER
+    expect(get_question_hash(d2l_question_dir, 'long_answer', true, @opts)).to eq D2LExpected::LONG_ANSWER
   end
 
   it "should convert an item with a response condition with no condition" do
-    get_question_hash(d2l_question_dir, 'no_condition', true, @opts).should == D2LExpected::NO_CONDITION
+    expect(get_question_hash(d2l_question_dir, 'no_condition', true, @opts)).to eq D2LExpected::NO_CONDITION
   end
 
   it "should convert the assessment into a quiz" do
-    get_quiz_data(d2l_question_dir, 'assessment', @opts).last.first.should == D2LExpected::ASSESSMENT
+    expect(get_quiz_data(d2l_question_dir, 'assessment', @opts).last.first).to eq D2LExpected::ASSESSMENT
   end
 
   it "should convert the assessment into a quiz" do
-    get_quiz_data(d2l_question_dir, 'assessment_references', @opts).last.first.should == D2LExpected::ASSESSMENT_REFS
+    expect(get_quiz_data(d2l_question_dir, 'assessment_references', @opts).last.first).to eq D2LExpected::ASSESSMENT_REFS
   end
 
 end

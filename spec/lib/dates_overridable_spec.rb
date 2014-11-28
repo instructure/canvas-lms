@@ -43,18 +43,18 @@ shared_examples_for "an object whose dates are overridable" do
 
       it "returns a clone of the object with the relevant override(s) applied" do
         overridden = overridable.overridden_for(@student)
-        overridden.due_at.to_i.should == override.due_at.to_i
+        expect(overridden.due_at.to_i).to eq override.due_at.to_i
       end
 
       it "returns the same object when the user is nil (e.g. a guest)" do
-        overridable.overridden_for(nil).should == overridable
+        expect(overridable.overridden_for(nil)).to eq overridable
       end
     end
 
     context "with no overrides" do
       it "returns the original object" do
         @overridden = overridable.overridden_for(@student)
-        @overridden.due_at.to_i.should == overridable.due_at.to_i
+        expect(@overridden.due_at.to_i).to eq overridable.due_at.to_i
       end
     end
   end
@@ -64,11 +64,11 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when it does" do
       before { override }
-      it { should be_true }
+      it { is_expected.to be_truthy }
     end
 
     context "when it doesn't" do
-      it { should be_false }
+      it { is_expected.to be_falsey }
     end
 
   end
@@ -77,13 +77,13 @@ shared_examples_for "an object whose dates are overridable" do
     context "has active overrides" do
       before { override }
       it "returns true" do
-        overridable.has_active_overrides?.should == true
+        expect(overridable.has_active_overrides?).to eq true
       end
     end
     context "when it has deleted overrides" do
       it "returns false" do
         override.destroy
-        overridable.has_active_overrides?.should == false
+        expect(overridable.has_active_overrides?).to eq false
       end
     end
 
@@ -102,7 +102,7 @@ shared_examples_for "an object whose dates are overridable" do
     context "as a teacher" do
       it "only returns active overrides" do
         override.delete
-        overridable.all_dates_visible_to(@teacher).size.should == 2
+        expect(overridable.all_dates_visible_to(@teacher).size).to eq 2
       end
     end
 
@@ -110,7 +110,7 @@ shared_examples_for "an object whose dates are overridable" do
       it "only returns active overrides" do
         course_with_student({:course => course, :active_all => true})
         override.delete
-        overridable.all_dates_visible_to(@student).size.should == 1
+        expect(overridable.all_dates_visible_to(@student).size).to eq 1
       end
     end
 
@@ -123,21 +123,21 @@ shared_examples_for "an object whose dates are overridable" do
 
       it "only returns active overrides for a single student" do
         override.delete
-        overridable.all_dates_visible_to(@observer).size.should == 1
+        expect(overridable.all_dates_visible_to(@observer).size).to eq 1
       end
 
       it "returns all active overrides for 2+ students" do
         student2 = student_in_section(@section2, {:active_all => true})
         course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => student2.id})
         override.delete
-        overridable.all_dates_visible_to(@observer).size.should == 2
+        expect(overridable.all_dates_visible_to(@observer).size).to eq 2
       end
     end
 
     it "returns each override represented using its as_hash method" do
       all_dates = overridable.all_dates_visible_to(@user)
       overridable.active_assignment_overrides.map(&:as_hash).each do |o|
-        all_dates.should include o
+        expect(all_dates).to include o
       end
     end
 
@@ -147,7 +147,7 @@ shared_examples_for "an object whose dates are overridable" do
       overridable_hash =
         overridable.without_overrides.due_date_hash.merge(:base => true)
       overridable_hash.each do |k,v|
-        last_hash[k].should == v
+        expect(last_hash[k]).to eq v
       end
     end
   end
@@ -163,19 +163,19 @@ shared_examples_for "an object whose dates are overridable" do
     end
 
     it "only returns active overrides" do
-      overridable.dates_hash_visible_to(@teacher).size.should == 2
+      expect(overridable.dates_hash_visible_to(@teacher).size).to eq 2
     end
 
     it "includes the original date as a hash" do
       dates_hash = overridable.dates_hash_visible_to(@teacher)
-      dates_hash.size.should == 2
+      expect(dates_hash.size).to eq 2
 
       override = dates_hash[0]
       original = dates_hash[1]
 
       dates_hash.sort_by! {|d| d[:title].to_s }
-      dates_hash[0][:title].should be_nil
-      dates_hash[1][:title].should == "value for name"
+      expect(dates_hash[0][:title]).to be_nil
+      expect(dates_hash[1][:title]).to eq "value for name"
     end
 
     it "not include original dates if all sections are overriden" do
@@ -185,18 +185,18 @@ shared_examples_for "an object whose dates are overridable" do
       override2.save!
 
       dates_hash = overridable.dates_hash_visible_to(@teacher)
-      dates_hash.size.should == 2
+      expect(dates_hash.size).to eq 2
 
       dates_hash.sort_by! {|d| d[:title] }
-      dates_hash[0][:title].should == "Summer session"
-      dates_hash[1][:title].should == "value for name"
+      expect(dates_hash[0][:title]).to eq "Summer session"
+      expect(dates_hash[1][:title]).to eq "value for name"
     end
 
   end
 
   describe "without_overrides" do
     it "returns an object with no overrides applied" do
-      overridable.without_overrides.overridden.should be_false
+      expect(overridable.without_overrides.overridden).to be_falsey
     end
   end
 
@@ -208,11 +208,11 @@ shared_examples_for "an object whose dates are overridable" do
       if a.is_a?(Quizzes::Quiz)
         a.assignment = Assignment.new(due_params)
       end
-      a.due_date_hash[:due_at].should == due
-      a.due_date_hash[:lock_at].should == due
-      a.due_date_hash[:unlock_at].should == due
-      a.due_date_hash[:all_day].should == false
-      a.due_date_hash[:all_day_date].should == nil
+      expect(a.due_date_hash[:due_at]).to eq due
+      expect(a.due_date_hash[:lock_at]).to eq due
+      expect(a.due_date_hash[:unlock_at]).to eq due
+      expect(a.due_date_hash[:all_day]).to eq false
+      expect(a.due_date_hash[:all_day_date]).to eq nil
     end
 
   end
@@ -230,7 +230,7 @@ shared_examples_for "an object whose dates are overridable" do
       ObserverEnrollment.expects(:observed_students).returns({student1 => [], student2 => []})
 
       override_hashes = a.observed_student_due_dates(u)
-      override_hashes.should =~ [ { :student => '1' }, { :student => '2' } ]
+      expect(override_hashes).to match_array [ { :student => '1' }, { :student => '2' } ]
     end
   end
 
@@ -246,13 +246,13 @@ shared_examples_for "an object whose dates are overridable" do
     context "when the object has been overridden" do
       context "and it has multiple due dates" do
         it "returns true" do
-          overridable.overridden_for(@teacher).multiple_due_dates?.should == true
+          expect(overridable.overridden_for(@teacher).multiple_due_dates?).to eq true
         end
       end
 
       context "and it has one due date" do
         it "returns false" do
-          overridable.overridden_for(@student).multiple_due_dates?.should == false
+          expect(overridable.overridden_for(@student).multiple_due_dates?).to eq false
         end
       end
     end
@@ -265,7 +265,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when the object has been overridden for a guest" do
       it "returns false" do
-        overridable.overridden_for(nil).multiple_due_dates?.should == false
+        expect(overridable.overridden_for(nil).multiple_due_dates?).to eq false
       end
     end
   end
@@ -277,25 +277,25 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when overridden for the user" do
       it "returns true" do
-        overridable.overridden_for(@teacher).overridden_for?(@teacher).should be_true
+        expect(overridable.overridden_for(@teacher).overridden_for?(@teacher)).to be_truthy
       end
     end
 
     context "when overridden for a different user" do
       it "returns false" do
-        overridable.overridden_for(@teacher).overridden_for?(@student).should be_false
+        expect(overridable.overridden_for(@teacher).overridden_for?(@student)).to be_falsey
       end
     end
 
     context "when overridden for a nil user" do
       it "returns true" do
-        overridable.overridden_for(nil).overridden_for?(nil).should be_true
+        expect(overridable.overridden_for(nil).overridden_for?(nil)).to be_truthy
       end
     end
 
     context "when not overridden" do
       it "returns false" do
-        overridable.overridden_for?(nil).should be_false
+        expect(overridable.overridden_for?(nil)).to be_falsey
       end
     end
   end
@@ -307,7 +307,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when feature flag is off" do
       it "returns false" do
-        overridable.differentiated_assignments_applies?.should be_false
+        expect(overridable.differentiated_assignments_applies?).to be_falsey
       end
     end
 
@@ -320,21 +320,21 @@ shared_examples_for "an object whose dates are overridable" do
         if overridable_type == :quiz
           as = overridable.assignment
           overridable.assignment = nil # a survey quiz
-          overridable.differentiated_assignments_applies?.should be_false
+          expect(overridable.differentiated_assignments_applies?).to be_falsey
         end
       end
 
       it "returns the value of only_visible_to_overrides on the assignment" do
         if overridable_type == :quiz && overridable.try(:assignment) # not a survey quiz
           overridable.assignment.only_visible_to_overrides = true
-          overridable.differentiated_assignments_applies?.should be_true
+          expect(overridable.differentiated_assignments_applies?).to be_truthy
           overridable.assignment.only_visible_to_overrides = false
-          overridable.differentiated_assignments_applies?.should be_false
+          expect(overridable.differentiated_assignments_applies?).to be_falsey
         elsif overridable_type == :assignment
           overridable.only_visible_to_overrides = true
-          overridable.differentiated_assignments_applies?.should be_true
+          expect(overridable.differentiated_assignments_applies?).to be_truthy
           overridable.only_visible_to_overrides = false
-          overridable.differentiated_assignments_applies?.should be_false
+          expect(overridable.differentiated_assignments_applies?).to be_falsey
         end
       end
 

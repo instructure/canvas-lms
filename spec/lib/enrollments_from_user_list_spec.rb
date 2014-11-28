@@ -30,20 +30,20 @@ describe EnrollmentsFromUserList do
   context "initialized object" do
 
     it "should initialize with a course id" do
-      lambda{EnrollmentsFromUserList.new }.should raise_error(ArgumentError, /^wrong number of arguments/)
+      expect{EnrollmentsFromUserList.new }.to raise_error(ArgumentError, /^wrong number of arguments/)
       e = EnrollmentsFromUserList.new(@course)
-      e.course.should eql(@course)
+      expect(e.course).to eql(@course)
     end
     
     it "should process with an user list" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
-      enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
+      enrollments.all? {|e| expect(e).to be_is_a(StudentEnrollment)}
     end
     
     it "should process repeat addresses without creating new users" do
       @el = UserList.new(list_to_parse_with_repeats)
       enrollments = EnrollmentsFromUserList.process(@el, @course)
-      enrollments.length.should eql(3)
+      expect(enrollments.length).to eql(3)
     end
 
   end
@@ -51,7 +51,7 @@ describe EnrollmentsFromUserList do
   context "EnrollmentsFromUserList.process" do
     it "should be able to process from the class" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
-      enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
+      enrollments.all? {|e| expect(e).to be_is_a(StudentEnrollment)}
     end
   end
   

@@ -36,9 +36,9 @@ module Lti
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
-        definitions.count.should == 1
+        expect(definitions.count).to eq 1
         definition = definitions.first
-        definition.should == {
+        expect(definition).to eq({
           :definition_type => mh.class.name,
           :definition_id => mh.id,
           :name => rh.name,
@@ -50,7 +50,7 @@ module Lti
               :title => rh.name
             }
           }
-        }
+        })
 
       end
 
@@ -60,9 +60,9 @@ module Lti
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
-        definitions.count.should == 1
+        expect(definitions.count).to eq 1
         definition = definitions.first
-        definition.should == {
+        expect(definition).to eq({
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
@@ -73,7 +73,7 @@ module Lti
               :url => "http://www.example.com/basic_lti",
               :title => tool.name}
           }
-        }
+        })
       end
 
       it 'returns resource_selection tools' do
@@ -82,9 +82,9 @@ module Lti
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
-        definitions.count.should == 1
+        expect(definitions.count).to eq 1
         definition = definitions.first
-        definition.should == {
+        expect(definition).to eq({
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
@@ -100,7 +100,7 @@ module Lti
               :url => "http://example.com/selection_test",
               :title => tool.name}
           }
-        }
+        })
       end
 
       it 'returns an external tool and a message handler' do
@@ -114,11 +114,11 @@ module Lti
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
-        definitions.count.should == 2
+        expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:definition_type] == 'ContextExternalTool' }
         message_handler = definitions.find { |d| d[:definition_type] == 'Lti::MessageHandler' }
-        message_handler.should_not be nil
-        external_tool.should_not be nil
+        expect(message_handler).not_to be nil
+        expect(external_tool).not_to be nil
       end
 
       context 'pagination' do
@@ -136,9 +136,9 @@ module Lti
           per_page = 3
           page1 = collection.paginate(per_page: per_page)
           page2 = collection.paginate(page: page1.next_page, per_page: per_page)
-          page1.count.should == 3
-          page2.count.should == 3
-          page1.first.should_not == page2.first
+          expect(page1.count).to eq 3
+          expect(page2.count).to eq 3
+          expect(page1.first).not_to eq page2.first
         end
       end
 

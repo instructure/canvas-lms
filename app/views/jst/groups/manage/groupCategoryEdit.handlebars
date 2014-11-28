@@ -1,4 +1,4 @@
-<div class="form-dialog-content pad-box form-inline">
+<div class="form-dialog-content pad-box form-inline group-category-edit">
   <fieldset class="pad-box{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
     <label>
       {{#t "group_set_name"}}Group Set Name{{/t}} &nbsp;
@@ -6,7 +6,7 @@
     </label>
   </fieldset>
   {{#if ENV.allow_self_signup}}
-  <fieldset class="pad-box">
+  <fieldset class="pad-box dotted-separator">
     <div class="control-group">
       <label class="checkbox" for="enable_self_signup">
         {{checkbox "enable_self_signup" class="self-signup-toggle"}}
@@ -40,6 +40,7 @@
       </div>
     </div>
   </fieldset>
+  {{> [groups/manage/autoLeadershipControls]}}
   {{/if}}
 </div>
 <div class="form-controls">

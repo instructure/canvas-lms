@@ -23,7 +23,7 @@ describe 'enrollment_notification.email' do
   it "should render" do
     course_with_student(:active_all => true)
     @object = @enrollment
-    @enrollment.context.should_not be_nil
+    expect(@enrollment.context).not_to be_nil
     generate_message(:enrollment_notification, :email, @object)
   end
 
@@ -31,7 +31,7 @@ describe 'enrollment_notification.email' do
     course_with_student(:active_course => true, :active_enrollment => true)
     @student.communication_channels.create!(:path => 'jacob@instructure.com')
     @object = @enrollment
-    @enrollment.context.should_not be_nil
+    expect(@enrollment.context).not_to be_nil
     generate_message(:enrollment_notification, :email, @object)
   end
 end

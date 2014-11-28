@@ -24,8 +24,8 @@ describe 'new_account_user.email' do
     @account = Account.create!(:name => "some account", :settings => {:outgoing_email_default_name => "Custom From"})
     user_model
     account_user = @account.account_users.create!(user: @user)
-    account_user.account.should eql(@account)
-    account_user.user.should eql(@user)
+    expect(account_user.account).to eql(@account)
+    expect(account_user.user).to eql(@user)
     @object = account_user
   end
 
@@ -36,6 +36,6 @@ describe 'new_account_user.email' do
   it "should use the custom From: setting" do
     msg = generate_message(:new_account_user, :email, @object)
     msg.save
-    msg.from_name.should == "Custom From"
+    expect(msg.from_name).to eq "Custom From"
   end
 end

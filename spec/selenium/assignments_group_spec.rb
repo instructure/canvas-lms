@@ -19,8 +19,8 @@ describe "assignment groups" do
     f('#assignment_group_name').send_keys('test group')
     submit_form('#add_group_form')
     wait_for_ajaximations
-    f('#add_group_form').should_not be_displayed
-    f('#groups .assignment_group').should include_text('test group')
+    expect(f('#add_group_form')).not_to be_displayed
+    expect(f('#groups .assignment_group')).to include_text('test group')
   end
 
 
@@ -53,8 +53,8 @@ describe "assignment groups" do
 
     #verify grading rules
     f('.more_info_link').click
-    f('.assignment_group .rule_details').should include_text('2')
-    f('.assignment_group .rule_details').should include_text('assignment with rubric')
+    expect(f('.assignment_group .rule_details')).to include_text('2')
+    expect(f('.assignment_group .rule_details')).to include_text('assignment with rubric')
   end
 
   it "should edit assignment groups grade weights" do
@@ -68,7 +68,7 @@ describe "assignment groups" do
     f('input.weight').clear
     #need to wait for the total to update
     wait_for_ajaximations
-    keep_trying_until { fj('#group_weight_total').text.should == '50%' }
+    keep_trying_until { expect(fj('#group_weight_total').text).to eq '50%' }
   end
 
   it "should reorder assignment groups with drag and drop" do
@@ -76,7 +76,7 @@ describe "assignment groups" do
     4.times do |i|
       ags << @course.assignment_groups.create!(:name => "group_#{i}")
     end
-    ags.collect(&:position).should == [1,2,3,4]
+    expect(ags.collect(&:position)).to eq [1,2,3,4]
 
     get "/courses/#{@course.id}/assignments"
 
@@ -87,55 +87,53 @@ describe "assignment groups" do
     wait_for_ajaximations
 
     ags.each {|ag| ag.reload}
-    ags.collect(&:position).should == [1,3,2,4]
+    expect(ags.collect(&:position)).to eq [1,3,2,4]
   end
 
   it "should round assignment groups percentages to 2 decimal places" do
-    pending("bug 7387 - Assignment group weight should be rounded to 2 decimal places. Not 10") do
-      3.times do |i|
-        @course.assignment_groups.create!(:name => "group_#{i}")
-      end
-      get "/courses/#{@course.id}/assignments"
-
-      f('#class_weighting_policy').click
-      wait_for_ajaximations
-      group_weights = ff('.assignment_group .more_info_brief')
-      group_weights.each_with_index do |gw, i|
-        gw.text.should == "33.33%"
-      end
-      f('#group_weight_total').text.should == "99.99%"
+    skip("bug 7387 - Assignment group weight should be rounded to 2 decimal places. Not 10")
+    3.times do |i|
+      @course.assignment_groups.create!(:name => "group_#{i}")
     end
+    get "/courses/#{@course.id}/assignments"
+
+    f('#class_weighting_policy').click
+    wait_for_ajaximations
+    group_weights = ff('.assignment_group .more_info_brief')
+    group_weights.each_with_index do |gw, i|
+      expect(gw.text).to eq "33.33%"
+    end
+    expect(f('#group_weight_total').text).to eq "99.99%"
   end
 
   it "should not allow all assignment groups to be deleted" do
       get "/courses/#{@course.id}/assignments"
       assignment_groups = get_assignment_groups
-      assignment_groups.count.should == 1
-      assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
+      expect(assignment_groups.count).to eq 1
+      expect(assignment_groups[0].find_element(:css, '.delete_group_link')).not_to be_displayed
       refresh_page #refresh page to make sure the trashcan doesn't come back
-      get_assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
+      expect(get_assignment_groups[0].find_element(:css, '.delete_group_link')).not_to be_displayed
   end
 
   it "should add multiple assignment groups and not allow the last one to be deleted" do
-    pending("bug 7480 - User should not be permitted to delete all assignment groups") do
-      4.times do |i|
-        @course.assignment_groups.create!(:name => "group_#{i}")
-      end
-      get "/courses/#{@course.id}/assignments"
-
-      assignment_groups = get_assignment_groups
-      assignment_groups_count = (assignment_groups.count - 1)
-
-      assignment_groups_count.downto(1) do |i|
-        assignment_groups[i].find_element(:css, '.delete_group_link').click
-        driver.switch_to.alert.accept
-        wait_for_ajaximations
-        driver.switch_to.default_content
-      end
-      assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
-      refresh_page ##refresh page to make sure the trashcan doesn't come back
-      get_assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
+    skip("bug 7480 - User should not be permitted to delete all assignment groups")
+    4.times do |i|
+      @course.assignment_groups.create!(:name => "group_#{i}")
     end
+    get "/courses/#{@course.id}/assignments"
+
+    assignment_groups = get_assignment_groups
+    assignment_groups_count = (assignment_groups.count - 1)
+
+    assignment_groups_count.downto(1) do |i|
+      assignment_groups[i].find_element(:css, '.delete_group_link').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      driver.switch_to.default_content
+    end
+    expect(assignment_groups[0].find_element(:css, '.delete_group_link')).to_not be_displayed
+    refresh_page ##refresh page to make sure the trashcan doesn't come back
+    expect(get_assignment_groups[0].find_element(:css, '.delete_group_link')).to_not be_displayed
   end
 
   context "draft state" do
@@ -161,7 +159,7 @@ describe "assignment groups" do
       fj('.create_assignment:visible').click
       wait_for_ajaximations
 
-      fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text.should match "Disappear"
+      expect(fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text).to match "Disappear"
 
       f("#assignment_group_#{ag.id} .al-trigger").click
       f("#assignment_group_#{ag.id} .edit_group").click
@@ -171,7 +169,7 @@ describe "assignment groups" do
       fj('.create_group:visible').click
       wait_for_ajaximations
 
-      fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text.should match "Disappear"
+      expect(fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text).to match "Disappear"
     end
 
     #Because of the way this feature was made, i recommend we keep this one
@@ -193,10 +191,10 @@ describe "assignment groups" do
       wait_for_ajaximations
 
       # two id selectors to make sure it moved
-      fj("#assignment_group_#{@assignment_group.id} #assignment_#{@assignment.id}").should_not be_nil
+      expect(fj("#assignment_group_#{@assignment_group.id} #assignment_#{@assignment.id}")).not_to be_nil
 
       @assignment.reload
-      @assignment.assignment_group.should == @assignment_group
+      expect(@assignment.assignment_group).to eq @assignment_group
     end
 
     it "should reorder assignment groups with drag and drop" do
@@ -204,7 +202,7 @@ describe "assignment groups" do
       4.times do |i|
         ags << @course.assignment_groups.create!(:name => "group_#{i}")
       end
-      ags.collect(&:position).should == [1,2,3,4,5]
+      expect(ags.collect(&:position)).to eq [1,2,3,4,5]
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
@@ -212,7 +210,7 @@ describe "assignment groups" do
       wait_for_ajaximations
 
       ags.each {|ag| ag.reload}
-      ags.collect(&:position).should == [1,3,2,4,5]
+      expect(ags.collect(&:position)).to eq [1,3,2,4,5]
     end
 
   end

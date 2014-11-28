@@ -132,7 +132,7 @@ class Message < ActiveRecord::Base
   # Named scopes
   scope :for_asset_context_codes, lambda { |context_codes| where(:asset_context_code => context_codes) }
 
-  scope :for, lambda { |context| where(:context_type => context.class.base_ar_class.to_s, :context_id => context) }
+  scope :for, lambda { |context| where(:context_type => context.class.base_class.to_s, :context_id => context) }
 
   scope :after, lambda { |date| where("messages.created_at>?", date) }
 

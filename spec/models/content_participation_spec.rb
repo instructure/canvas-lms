@@ -55,7 +55,7 @@ describe ContentParticipation do
       }.to change(ContentParticipation, :count).by 0
 
       cp = ContentParticipation.where(:user_id => @student).first
-      cp.workflow_state.should == "unread"
+      expect(cp.workflow_state).to eq "unread"
     end
   end
 
@@ -75,7 +75,7 @@ describe ContentParticipation do
         :workflow_state => "unread",
       })
       cpc = ContentParticipationCount.where(:user_id => @student).first
-      cpc.unread_count.should == 1
+      expect(cpc.unread_count).to eq 1
     end
 
     it "should not update participation count if workflow_state doesn't change" do
@@ -93,7 +93,7 @@ describe ContentParticipation do
         :workflow_state => "read",
       })
       cpc = ContentParticipationCount.where(:user_id => @student).first
-      cpc.unread_count.should == 0
+      expect(cpc.unread_count).to eq 0
     end
   end
 end

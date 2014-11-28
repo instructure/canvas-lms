@@ -23,14 +23,14 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.discussion_topics.count.should == 1
+      expect(@copy_to.discussion_topics.count).to eq 1
       new_topic = @copy_to.discussion_topics.first
 
       attrs = ["title", "message", "discussion_type", "type", "pinned", "position", "require_initial_post"]
-      topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
+      expect(topic.attributes.slice(*attrs)).to eq new_topic.attributes.slice(*attrs)
 
-      new_topic.last_reply_at.to_i.should == new_topic.posted_at.to_i
-      topic.posted_at.to_i.should == new_topic.posted_at.to_i
+      expect(new_topic.last_reply_at.to_i).to eq new_topic.posted_at.to_i
+      expect(topic.posted_at.to_i).to eq new_topic.posted_at.to_i
     end
 
     it "should copy a discussion topic when assignment is selected" do
@@ -47,7 +47,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(@topic)).should_not be_nil
+      expect(@copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first).not_to be_nil
     end
 
     it "should properly copy selected delayed announcements" do
@@ -60,8 +60,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      to_ann = @copy_to.announcements.find_by_migration_id(mig_id(from_ann))
-      to_ann.workflow_state.should == "post_delayed"
+      to_ann = @copy_to.announcements.where(migration_id: mig_id(from_ann)).first
+      expect(to_ann.workflow_state).to eq "post_delayed"
     end
 
     it "should not copy announcements if not selected" do
@@ -74,7 +74,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.announcements.find_by_migration_id(mig_id(ann)).should be_nil
+      expect(@copy_to.announcements.where(migration_id: mig_id(ann)).first).to be_nil
     end
 
     it "should not copy deleted assignment attached to topic" do
@@ -83,12 +83,12 @@ describe ContentMigration do
       @assignment.save!
 
       @topic.reload
-      @topic.active?.should == true
+      expect(@topic.active?).to eq true
 
       run_course_copy
 
-      @copy_to.discussion_topics.find_by_migration_id(mig_id(@topic)).should_not be_nil
-      @copy_to.assignments.find_by_migration_id(mig_id(@assignment)).should be_nil
+      expect(@copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first).not_to be_nil
+      expect(@copy_to.assignments.where(migration_id: mig_id(@assignment)).first).to be_nil
     end
 
     it "should copy the assignment group and grading standard in selective copy" do
@@ -100,10 +100,10 @@ describe ContentMigration do
       @assignment.save!
       @cm.copy_options = { 'everything' => '0', 'discussion_topics' => { mig_id(@topic) => "1" } }
       run_course_copy
-      new_topic = @copy_to.discussion_topics.find_by_migration_id(mig_id(@topic))
-      new_topic.assignment.should be_present
-      new_topic.assignment.assignment_group.migration_id.should eql mig_id(group)
-      new_topic.assignment.grading_standard.migration_id.should eql mig_id(gs)
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
+      expect(new_topic.assignment).to be_present
+      expect(new_topic.assignment.assignment_group.migration_id).to eql mig_id(group)
+      expect(new_topic.assignment.grading_standard.migration_id).to eql mig_id(gs)
     end
 
     it "should not copy the assignment group and grading standard in selective export" do
@@ -121,12 +121,12 @@ describe ContentMigration do
       run_export_and_import do |export|
         export.selected_content = { 'discussion_topics' => { mig_id(@topic) => "1" } }
       end
-      new_topic = @copy_to.discussion_topics.find_by_migration_id(mig_id(@topic))
-      new_topic.assignment.should be_present
-      new_topic.assignment.grading_standard.should be_nil
-      new_topic.assignment.assignment_group.migration_id.should_not eql mig_id(@group)
-      decoy_gs.reload.title.should_not eql gs.title
-      decoy_ag.reload.name.should_not eql group.name
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
+      expect(new_topic.assignment).to be_present
+      expect(new_topic.assignment.grading_standard).to be_nil
+      expect(new_topic.assignment.assignment_group.migration_id).not_to eql mig_id(@group)
+      expect(decoy_gs.reload.title).not_to eql gs.title
+      expect(decoy_ag.reload.name).not_to eql group.name
     end
 
   end

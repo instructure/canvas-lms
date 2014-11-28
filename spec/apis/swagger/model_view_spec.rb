@@ -7,13 +7,13 @@ describe ModelView do
 
   it "is created from model" do
     view = ModelView.new_from_model(model)
-    view.name.should == "Example"
-    view.properties.should == []
+    expect(view.name).to eq "Example"
+    expect(view.properties).to eq []
   end
 
   it "generates a schema" do
     view = ModelView.new("Example", {"name" => {"type" => "string"}})
-    view.json_schema.should == {
+    expect(view.json_schema).to eq({
       "Example" => {
         "id" => "Example",
         "properties" => {
@@ -24,6 +24,6 @@ describe ModelView do
         "description" => "",
         "required" => []
       }
-    }
+    })
   end
 end

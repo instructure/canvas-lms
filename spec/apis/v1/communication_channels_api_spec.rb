@@ -36,7 +36,7 @@ describe 'CommunicationChannels API', type: :request do
         json = api_call(:get, @path, @path_options)
 
         cc = @someone.communication_channel
-        json.should eql [{
+        expect(json).to eql [{
           'id'       => cc.id,
           'address'  => cc.path,
           'type'     => cc.path_type,
@@ -50,7 +50,7 @@ describe 'CommunicationChannels API', type: :request do
       it 'should return 401' do
         user_with_pseudonym
         raw_api_call(:get, @path, @path_options)
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
 
       it "should not list channels for a teacher's students" do
@@ -59,7 +59,7 @@ describe 'CommunicationChannels API', type: :request do
         @user = @teacher
 
         raw_api_call(:get, @path, @path_options)
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
     end
   end
@@ -87,14 +87,14 @@ describe 'CommunicationChannels API', type: :request do
 
       @channel = CommunicationChannel.find(json['id'])
 
-      json.should == {
+      expect(json).to eq({
         'id' => @channel.id,
         'address' => 'new+api@example.com',
         'type' => 'email',
         'workflow_state' => 'active',
         'user_id' => @someone.id,
         'position' => 2
-      }
+      })
     end
 
     context 'a site admin' do
@@ -105,7 +105,7 @@ describe 'CommunicationChannels API', type: :request do
           :skip_confirmation => 1 }))
 
         @channel = CommunicationChannel.find(json['id'])
-        @channel.should be_active
+        expect(@channel).to be_active
       end
     end
 
@@ -117,14 +117,14 @@ describe 'CommunicationChannels API', type: :request do
 
         @channel = CommunicationChannel.find(json['id'])
 
-        json.should == {
+        expect(json).to eq({
           'id' => @channel.id,
           'address' => 'new+api@example.com',
           'type' => 'email',
           'workflow_state' => 'unconfirmed',
           'user_id' => @someone.id,
           'position' => 2
-        }
+        })
       end
 
       it 'should be able to create new channels for other users and auto confirm' do
@@ -132,14 +132,14 @@ describe 'CommunicationChannels API', type: :request do
 
         @channel = CommunicationChannel.find(json['id'])
 
-        json.should == {
+        expect(json).to eq({
           'id' => @channel.id,
           'address' => 'new+api@example.com',
           'type' => 'email',
           'workflow_state' => 'active',
           'user_id' => @someone.id,
           'position' => 2
-        }
+        })
       end
 
     end
@@ -157,7 +157,7 @@ describe 'CommunicationChannels API', type: :request do
         raw_api_call(:post, "/api/v1/users/#{@admin.id}/communication_channels",
           @path_options.merge(:user_id => @admin.to_param), @post_params)
 
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
 
       context 'push' do
@@ -166,7 +166,7 @@ describe 'CommunicationChannels API', type: :request do
         it 'should complain about sns not being configured' do
           raw_api_call(:post, @path, @path_options, @post_params)
 
-          response.code.should eql '400'
+          expect(response.code).to eql '400'
         end
 
         it "should work" do
@@ -183,8 +183,8 @@ describe 'CommunicationChannels API', type: :request do
           client.expects(:create_platform_endpoint).once.returns(response)
 
           json = api_call(:post, @path, @path_options, @post_params)
-          json['type'].should == 'push'
-          json['workflow_state'].should == 'active'
+          expect(json['type']).to eq 'push'
+          expect(json['workflow_state']).to eq 'active'
         end
       end
     end
@@ -211,14 +211,14 @@ describe 'CommunicationChannels API', type: :request do
       it "should be able to delete others' channels" do
         json = api_call(:delete, path, path_options)
 
-        json.should == {
+        expect(json).to eq({
           'position' => 1,
           'address' => channel.path,
           'id' => channel.id,
           'workflow_state' => 'retired',
           'user_id' => someone.id,
           'type' => 'email'
-        }
+        })
       end
     end
 
@@ -228,20 +228,20 @@ describe 'CommunicationChannels API', type: :request do
       it 'should be able to delete its own channels' do
         json = api_call(:delete, path, path_options)
 
-        json.should == {
+        expect(json).to eq({
           'position' => 1,
           'address' => channel.path,
           'id' => channel.id,
           'workflow_state' => 'retired',
           'user_id' => someone.id,
           'type' => 'email'
-        }
+        })
       end
 
       it "should 404 if already deleted" do
         api_call(:delete, path, path_options)
         raw_api_call(:delete, path, path_options)
-        response.code.should == '404'
+        expect(response.code).to eq '404'
       end
 
       it "should not be able to delete others' channels" do
@@ -249,7 +249,7 @@ describe 'CommunicationChannels API', type: :request do
         raw_api_call(:delete, "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
                      path_options.merge(:user_id => admin.to_param, :id => admin_channel.to_param))
 
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
 
       it "should be able to delete by path, instead of id" do
@@ -257,7 +257,7 @@ describe 'CommunicationChannels API', type: :request do
                  :controller => 'communication_channels',
                  :action => 'destroy', :user_id => someone.to_param, :format => 'json',
                  :type => channel.path_type, :address => channel.path)
-        CommunicationChannel.find(channel.id).should be_retired # for some reason, .reload on a let() bound model returns nil
+        expect(CommunicationChannel.find(channel.id)).to be_retired # for some reason, .reload on a let() bound model returns nil
       end
 
       it "should 404 if already deleted by path" do
@@ -269,7 +269,7 @@ describe 'CommunicationChannels API', type: :request do
                      :controller => 'communication_channels',
                      :action => 'destroy', :user_id => someone.to_param, :format => 'json',
                      :type => channel.path_type, :address => channel.path)
-        response.code.should == '404'
+        expect(response.code).to eq '404'
       end
     end
   end

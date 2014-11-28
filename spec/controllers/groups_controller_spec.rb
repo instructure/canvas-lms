@@ -46,11 +46,11 @@ describe GroupsController do
       g2 = @course.groups.create(:name => "some other group", :group_category => category1)
       g3 = @course.groups.create(:name => "some third group", :group_category => category2)
       get 'index', :course_id => @course.id
-      response.should be_success
-      assigns[:groups].should_not be_empty
-      assigns[:groups].length.should eql(3)
-      (assigns[:groups] - [g1,g2,g3]).should be_empty
-      assigns[:categories].length.should eql(2)
+      expect(response).to be_success
+      expect(assigns[:groups]).not_to be_empty
+      expect(assigns[:groups].length).to eql(3)
+      expect(assigns[:groups] - [g1,g2,g3]).to be_empty
+      expect(assigns[:categories].length).to eql(2)
     end
   end
 
@@ -67,14 +67,14 @@ describe GroupsController do
 
       it "should not paginate non-json" do
         get 'index', :per_page => 1
-        assigns[:groups].should == @student.current_groups.by_name
-        response.headers['Link'].should be_nil
+        expect(assigns[:groups]).to eq @student.current_groups.by_name
+        expect(response.headers['Link']).to be_nil
       end
 
       it "should paginate json" do
         get 'index', :format => 'json', :per_page => 1
-        assigns[:groups].should == [@student.current_groups.by_name.first]
-        response.headers['Link'].should_not be_nil
+        expect(assigns[:groups]).to eq [@student.current_groups.by_name.first]
+        expect(response.headers['Link']).not_to be_nil
       end
     end
   end
@@ -83,7 +83,7 @@ describe GroupsController do
     it "should require authorization" do
       @group = Account.default.groups.create!(:name => "some group")
       get 'show', :id => @group.id
-      assigns[:group].should eql(@group)
+      expect(assigns[:group]).to eql(@group)
       assert_unauthorized
     end
 
@@ -93,10 +93,10 @@ describe GroupsController do
       user_session(@user)
       @group.add_user(@user)
       get 'show', :id => @group.id
-      response.should be_success
-      assigns[:group].should eql(@group)
-      assigns[:context].should eql(@group)
-      assigns[:stream_items].should eql([])
+      expect(response).to be_success
+      expect(assigns[:group]).to eql(@group)
+      expect(assigns[:context]).to eql(@group)
+      expect(assigns[:stream_items]).to eql([])
     end
 
     it "should allow user to join self-signup groups" do
@@ -108,7 +108,7 @@ describe GroupsController do
 
       get 'show', :course_id => @course.id, :id => g1.id, :join => 1
       g1.reload
-      g1.users.map(&:id).should include @student.id
+      expect(g1.users.map(&:id)).to include @student.id
     end
 
     it "should allow user to leave self-signup groups" do
@@ -121,7 +121,7 @@ describe GroupsController do
 
       get 'show', :course_id => @course.id, :id => g1.id, :leave => 1
       g1.reload
-      g1.users.map(&:id).should_not include @student.id
+      expect(g1.users.map(&:id)).not_to include @student.id
     end
 
     it "should allow user to join student organized groups" do
@@ -131,7 +131,7 @@ describe GroupsController do
 
       get 'show', :course_id => @course.id, :id => g1.id, :join => 1
       g1.reload
-      g1.users.map(&:id).should include @student.id
+      expect(g1.users.map(&:id)).to include @student.id
     end
 
     it "should allow user to leave student organized groups" do
@@ -142,7 +142,7 @@ describe GroupsController do
 
       get 'show', :course_id => @course.id, :id => g1.id, :leave => 1
       g1.reload
-      g1.users.map(&:id).should_not include @student.id
+      expect(g1.users.map(&:id)).not_to include @student.id
     end
   end
 
@@ -166,9 +166,9 @@ describe GroupsController do
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @user = user(:active_all => true)
       post 'add_user', :group_id => @group.id, :user_id => @user.id
-      response.should be_success
-      assigns[:membership].should_not be_nil
-      assigns[:membership].user.should eql(@user)
+      expect(response).to be_success
+      expect(assigns[:membership]).not_to be_nil
+      expect(assigns[:membership].user).to eql(@user)
     end
 
     it "should check user section in restricted self-signup category" do
@@ -184,10 +184,10 @@ describe GroupsController do
       group.add_user(user1)
 
       post 'add_user', :group_id => group.id, :user_id => user2.id
-      response.should_not be_success
-      assigns[:membership].should_not be_nil
-      assigns[:membership].user.should eql(user2)
-      assigns[:membership].errors[:user_id].should_not be_nil
+      expect(response).not_to be_success
+      expect(assigns[:membership]).not_to be_nil
+      expect(assigns[:membership].user).to eql(user2)
+      expect(assigns[:membership].errors[:user_id]).not_to be_nil
     end
   end
 
@@ -205,9 +205,9 @@ describe GroupsController do
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @group.add_user(@user)
       delete 'remove_user', :group_id => @group.id, :user_id => @user.id, :id => @user.id
-      response.should be_success
+      expect(response).to be_success
       @group.reload
-      @group.users.should be_empty
+      expect(@group.users).to be_empty
     end
   end
 
@@ -220,34 +220,34 @@ describe GroupsController do
     it "should create new group" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :group => {:name => "some group"}
-      response.should be_redirect
-      assigns[:group].should_not be_nil
-      assigns[:group].name.should eql("some group")
+      expect(response).to be_redirect
+      expect(assigns[:group]).not_to be_nil
+      expect(assigns[:group].name).to eql("some group")
     end
 
     it "should honor group[group_category_id] when permitted" do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}
-      response.should be_redirect
-      assigns[:group].should_not be_nil
-      assigns[:group].group_category.should == group_category
+      expect(response).to be_redirect
+      expect(assigns[:group]).not_to be_nil
+      expect(assigns[:group].group_category).to eq group_category
     end
 
     it "should not honor group[group_category_id] when not permitted" do
       user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => group_category.id}
-      response.should be_redirect
-      assigns[:group].should_not be_nil
-      assigns[:group].group_category.should == GroupCategory.student_organized_for(@course)
+      expect(response).to be_redirect
+      expect(assigns[:group]).not_to be_nil
+      expect(assigns[:group].group_category).to eq GroupCategory.student_organized_for(@course)
     end
 
     it "should fail when group[group_category_id] would be honored but doesn't exist" do
       user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => 11235}
-      response.should_not be_success
+      expect(response).not_to be_success
     end
     
     describe "quota" do
@@ -262,7 +262,7 @@ describe GroupsController do
         
         it "should ignore the storage_quota_mb parameter" do
           post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
-          assigns[:group].storage_quota_mb.should == 11
+          expect(assigns[:group].storage_quota_mb).to eq 11
         end
       end
       
@@ -274,7 +274,7 @@ describe GroupsController do
         
         it "should set the storage_quota_mb parameter" do
           post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
-          assigns[:group].storage_quota_mb.should == 22
+          expect(assigns[:group].storage_quota_mb).to eq 22
         end
       end
     end
@@ -291,9 +291,9 @@ describe GroupsController do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => "new name"}
-      response.should be_redirect
-      assigns[:group].should eql(@group)
-      assigns[:group].name.should eql("new name")
+      expect(response).to be_redirect
+      expect(assigns[:group]).to eql(@group)
+      expect(assigns[:group].name).to eql("new name")
     end
 
     it "should honor group[group_category_id]" do
@@ -301,9 +301,9 @@ describe GroupsController do
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group")
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => group_category.id}
-      response.should be_redirect
-      assigns[:group].should eql(@group)
-      assigns[:group].group_category.should == group_category
+      expect(response).to be_redirect
+      expect(assigns[:group]).to eql(@group)
+      expect(assigns[:group].group_category).to eq group_category
     end
 
     it "should fail when group[group_category_id] doesn't exist" do
@@ -311,7 +311,7 @@ describe GroupsController do
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group", :group_category => group_category)
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}
-      response.should_not be_success
+      expect(response).not_to be_success
     end
     
     describe "quota" do
@@ -329,8 +329,8 @@ describe GroupsController do
         it "should ignore the quota parameter" do
           put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
           @group.reload
-          @group.name.should == 'the group'
-          @group.storage_quota_mb.should == 11
+          expect(@group.name).to eq 'the group'
+          expect(@group.storage_quota_mb).to eq 11
         end
       end
       
@@ -343,8 +343,8 @@ describe GroupsController do
         it "should update group quota" do
           put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
           @group.reload
-          @group.name.should == 'the group'
-          @group.storage_quota_mb.should == 22
+          expect(@group.name).to eq 'the group'
+          expect(@group.storage_quota_mb).to eq 22
         end
       end
     end
@@ -361,11 +361,11 @@ describe GroupsController do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
       delete 'destroy', :course_id => @course.id, :id => @group.id
-      assigns[:group].should eql(@group)
-      assigns[:group].should_not be_frozen
-      assigns[:group].should be_deleted
-      @course.groups.should be_include(@group)
-      @course.groups.active.should_not be_include(@group)
+      expect(assigns[:group]).to eql(@group)
+      expect(assigns[:group]).not_to be_frozen
+      expect(assigns[:group]).to be_deleted
+      expect(@course.groups).to be_include(@group)
+      expect(@course.groups.active).not_to be_include(@group)
     end
   end
 
@@ -381,11 +381,11 @@ describe GroupsController do
       group.add_user(u2)
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group.group_category.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_nil
-      data['users'].map{ |u| u['user_id'] }.sort.
-        should == [u1, u2, u3].map{ |u| u.id }.sort
+      expect(data).not_to be_nil
+      expect(data['users'].map{ |u| u['user_id'] }.sort).
+        to eq [u1, u2, u3].map{ |u| u.id }.sort
     end
 
     it "should include only users not in a group in the category otherwise" do
@@ -408,24 +408,24 @@ describe GroupsController do
       group3.add_user(u3)
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group1.group_category.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_nil
-      data['users'].map{ |u| u['user_id'] }.sort.
-        should == [u2, u3].map{ |u| u.id }.sort
+      expect(data).not_to be_nil
+      expect(data['users'].map{ |u| u['user_id'] }.sort).
+        to eq [u2, u3].map{ |u| u.id }.sort
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group2.group_category.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_nil
-      data['users'].map{ |u| u['user_id'] }.sort.
-        should == [u1, u3].map{ |u| u.id }.sort
+      expect(data).not_to be_nil
+      expect(data['users'].map{ |u| u['user_id'] }.sort).
+        to eq [u1, u3].map{ |u| u.id }.sort
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group3.group_category.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_nil
-      data['users'].map{ |u| u['user_id'] }.should == [ u1.id ]
+      expect(data).not_to be_nil
+      expect(data['users'].map{ |u| u['user_id'] }).to eq [ u1.id ]
     end
 
     it "should include the users' sections when available" do
@@ -438,8 +438,8 @@ describe GroupsController do
 
       get 'unassigned_members', :course_id => @course.id, :category_id => group.group_category.id
       data = json_parse
-      data['users'].first['sections'].first['section_id'].should == @course.default_section.id
-      data['users'].first['sections'].first['section_code'].should == @course.default_section.section_code
+      expect(data['users'].first['sections'].first['section_id']).to eq @course.default_section.id
+      expect(data['users'].first['sections'].first['section_code']).to eq @course.default_section.section_code
     end
   end
 
@@ -452,8 +452,8 @@ describe GroupsController do
 
       get 'context_group_members', :group_id => group.id
       data = json_parse
-      data.first['sections'].first['section_id'].should == @course.default_section.id
-      data.first['sections'].first['section_code'].should == @course.default_section.section_code
+      expect(data.first['sections'].first['section_id']).to eq @course.default_section.id
+      expect(data.first['sections'].first['section_code']).to eq @course.default_section.section_code
     end
 
     it "should require :read_roster permission" do
@@ -465,7 +465,7 @@ describe GroupsController do
       # u1 in the group has :read_roster permission
       user_session(u1)
       get 'context_group_members', :group_id => group.id
-      response.should be_success
+      expect(response).to be_success
 
       # u2 outside the group doesn't have :read_roster permission, since the
       # group isn't self-signup and is invitation only (clear controller
@@ -473,7 +473,7 @@ describe GroupsController do
       controller.instance_variable_set(:@context_all_permissions, nil)
       user_session(u2)
       get 'context_group_members', :group_id => group.id
-      response.should_not be_success
+      expect(response).not_to be_success
     end
   end
 
@@ -485,23 +485,23 @@ describe GroupsController do
 
     it "should require authorization" do
       get 'public_feed', :format => 'atom', :feed_code => @group.feed_code + 'x'
-      assigns[:problem].should match /The verification code is invalid/
+      expect(assigns[:problem]).to match /The verification code is invalid/
     end
 
     it "should include absolute path for rel='self' link" do
       get 'public_feed', :format => 'atom', :feed_code => @group.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
+      expect(feed).not_to be_nil
+      expect(feed.links.first.rel).to match(/self/)
+      expect(feed.links.first.href).to match(/http:\/\//)
     end
 
     it "should include an author for each entry" do
       get 'public_feed', :format => 'atom', :feed_code => @group.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
+      expect(feed).not_to be_nil
+      expect(feed.entries).not_to be_empty
+      expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
     end
   end
 
@@ -520,15 +520,15 @@ describe GroupsController do
     it "should successfully create invitations" do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid
       @group.reload
-      @group.has_member?(@user).should be_true
-      @group.group_memberships.where(:workflow_state => "invited").count.should == 0
+      expect(@group.has_member?(@user)).to be_truthy
+      expect(@group.group_memberships.where(:workflow_state => "invited").count).to eq 0
     end
 
     it "should reject an invalid invitation uuid" do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid + "x"
       @group.reload
-      @group.has_member?(@user).should be_false
-      @group.group_memberships.where(:workflow_state => "invited").count.should == 1
+      expect(@group.has_member?(@user)).to be_falsey
+      expect(@group.group_memberships.where(:workflow_state => "invited").count).to eq 1
     end
   end
 end

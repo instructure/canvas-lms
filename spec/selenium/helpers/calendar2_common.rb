@@ -30,7 +30,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def open_edit_event_dialog
     f('.fc-event').click
-    keep_trying_until { f('.edit_event_link').should be_displayed }
+    keep_trying_until { expect(f('.edit_event_link')).to be_displayed }
     driver.execute_script("$('.edit_event_link').trigger('click')")
     wait_for_ajaximations
   end

@@ -148,6 +148,7 @@ require [
       @list.collection.setParam('scope', filters.type)
       @list.collection.setParam('filter', @_currentFilter())
       @list.collection.setParam('filter_mode', 'and')
+      @list.collection.setParam('include_private_conversation_enrollments', false)
       @list.collection.fetch()
       @compose.setDefaultCourse(filters.course)
 

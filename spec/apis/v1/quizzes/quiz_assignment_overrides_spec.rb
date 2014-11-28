@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizAssignmentOverridesController, type: :request do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   describe '[GET] /courses/:course_id/quizzes/assignment_overrides' do
     before do
       course_with_teacher(:active_all => true)
@@ -18,7 +22,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                   {:controller=>"quizzes/quiz_assignment_overrides", :action => "index", :format => "json", :course_id => "#{@course.id}"},
                   {:quiz_assignment_overrides => [{ :quiz_ids => [@quiz.id] }] })
 
-      response.code.should == '401'
+      expect(response.code).to eq '401'
     end
 
     it "should include visible overrides" do
@@ -30,7 +34,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
         due_at: due_at
       })
 
-      @quiz.reload.assignment_overrides.count.should == 1
+      expect(@quiz.reload.assignment_overrides.count).to eq 1
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides", {
         :controller => 'quizzes/quiz_assignment_overrides',
@@ -43,13 +47,13 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
         }]
       })
 
-      json.should have_key('quiz_assignment_overrides')
-      json['quiz_assignment_overrides'].size.should == 1
+      expect(json).to have_key('quiz_assignment_overrides')
+      expect(json['quiz_assignment_overrides'].size).to eq 1
       json['quiz_assignment_overrides'][0].tap do |override|
-        override.keys.sort.should == %w[ all_dates due_dates quiz_id ]
-        override['quiz_id'].should == @quiz.id
-        override['due_dates'].length.should == 1
-        override['due_dates'][0]['due_at'].should == due_at.iso8601
+        expect(override.keys.sort).to eq %w[ all_dates due_dates quiz_id ]
+        expect(override['quiz_id']).to eq @quiz.id
+        expect(override['due_dates'].length).to eq 1
+        expect(override['due_dates'][0]['due_at']).to eq due_at.iso8601
       end
     end
   end

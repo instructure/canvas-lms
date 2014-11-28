@@ -81,32 +81,32 @@ describe CoursesHelper do
                                                  :current_user => @teacher, 
                                                  :recent_event => @assignment, 
                                                  :submission => nil)
-      @icon_explanation.should eql msg
-      @icon_class.should eql icon
+      expect(@icon_explanation).to eql msg
+      expect(@icon_class).to eql icon
     end
   end
 
   context "readable_grade" do
     it "should return nil if not graded" do
       submission = Submission.new
-      readable_grade(submission).should be_nil
+      expect(readable_grade(submission)).to be_nil
     end
 
     it "should return a capitalized grade without an assignment" do
       submission = Submission.new(:grade => 'unknown', :workflow_state => 'graded')
-      readable_grade(submission).should == 'Unknown'
+      expect(readable_grade(submission)).to eq 'Unknown'
     end
 
     it "should return nil if not graded" do
       submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded')
       submission.create_assignment(:points_possible => 5, :grading_type => 'points')
-      readable_grade(submission).should == '1.33 out of 5'
+      expect(readable_grade(submission)).to eq '1.33 out of 5'
     end
 
     it "should not raise an error when passing a numeric type but grading_type is not 'points'" do
       submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded')
       submission.create_assignment(:points_possible => 5)
-      readable_grade(submission).should == '1.33333333'
+      expect(readable_grade(submission)).to eq '1.33333333'
     end
   end
 

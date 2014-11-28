@@ -38,32 +38,32 @@ describe LiveAssessments::Submission do
       # possible, but we don't now so that's what we test
       submission.possible = 0
       submission.create_outcome_result(alignment)
-      result = alignment.learning_outcome_results.count.should == 0
+      result = expect(alignment.learning_outcome_results.count).to eq 0
     end
 
     it 'creates an outcome result' do
       submission.create_outcome_result(alignment)
       result = alignment.learning_outcome_results.first
-      result.should_not be_nil
-      result.title.should == "#{assessment_user.name}, #{assessment.title}"
-      result.context.should == assessment.context
-      result.artifact.should == submission
-      result.assessed_at.to_i.should == submission.assessed_at.to_i
-      result.score.should == submission.score
-      result.possible.should == submission.possible
-      result.percent.should == 0.5
-      result.mastery.should be_nil
+      expect(result).not_to be_nil
+      expect(result.title).to eq "#{assessment_user.name}, #{assessment.title}"
+      expect(result.context).to eq assessment.context
+      expect(result.artifact).to eq submission
+      expect(result.assessed_at.to_i).to eq submission.assessed_at.to_i
+      expect(result.score).to eq submission.score
+      expect(result.possible).to eq submission.possible
+      expect(result.percent).to eq 0.5
+      expect(result.mastery).to be_nil
     end
 
     it 'updates an existing outcome result' do
       submission.create_outcome_result(alignment)
       result = alignment.learning_outcome_results.first
-      result.percent.should == 0.5
+      expect(result.percent).to eq 0.5
       submission.score = 80
       submission.possible = 100
       submission.create_outcome_result(alignment)
-      alignment.learning_outcome_results.count.should == 1
-      result.reload.percent.should == 0.8
+      expect(alignment.learning_outcome_results.count).to eq 1
+      expect(result.reload.percent).to eq 0.8
     end
 
     it "scales the score to the outcome rubric criterion if present" do
@@ -71,8 +71,8 @@ describe LiveAssessments::Submission do
       outcome.save!
       submission.create_outcome_result(alignment)
       result = alignment.learning_outcome_results.first
-      result.percent.should == 0.5
-      result.score.should == 2.5
+      expect(result.percent).to eq 0.5
+      expect(result.score).to eq 2.5
     end
 
     context 'alignment has a mastery score' do
@@ -81,12 +81,12 @@ describe LiveAssessments::Submission do
         alignment.save!
         submission.create_outcome_result(alignment)
         result = alignment.learning_outcome_results.first
-        result.mastery.should be_false
+        expect(result.mastery).to be_falsey
         submission.score = 80
         submission.possible = 100
         submission.create_outcome_result(alignment)
-        alignment.learning_outcome_results.count.should == 1
-        result.reload.mastery.should be_true
+        expect(alignment.learning_outcome_results.count).to eq 1
+        expect(result.reload.mastery).to be_truthy
       end
     end
   end

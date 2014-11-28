@@ -29,7 +29,7 @@ def submit
   count = @course.content_migrations.count
   driver.execute_script("$('#migrationConverterContainer').submit()")
   keep_trying_until do
-    @course.content_migrations.count.should == count + 1
+    expect(@course.content_migrations.count).to eq count + 1
   end
 end
 
@@ -53,7 +53,7 @@ def test_selective_content(source_course=nil)
   visit_page
 
   # Open selective dialog
-  f('.migrationProgressItem .progressStatus').should include_text("Waiting for select")
+  expect(f('.migrationProgressItem .progressStatus')).to include_text("Waiting for select")
   f('.migrationProgressItem .selectContentBtn').click
   wait_for_ajaximations
 
@@ -72,8 +72,8 @@ def test_selective_content(source_course=nil)
 
   visit_page
 
-  f('.migrationProgressItem .progressStatus').should include_text("Completed")
-  @course.assignments.count.should == (source_course ? source_course.assignments.count : 1)
+  expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
+  expect(@course.assignments.count).to eq(source_course ? source_course.assignments.count : 1)
 end
 
 describe "content migrations", :non_parallel do
@@ -87,8 +87,8 @@ describe "content migrations", :non_parallel do
     end
 
     it "should import all content immediately by default" do
-      pending('fragile')
-      pending unless Qti.qti_enabled?
+      skip('fragile')
+      skip unless Qti.qti_enabled?
       visit_page
       fill_migration_form
       ff('[name=selective_import]')[0].click
@@ -97,16 +97,16 @@ describe "content migrations", :non_parallel do
 
       keep_trying_until do
         visit_page
-        f('.migrationProgressItem .progressStatus').should include_text("Completed")
+        expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
       end
 
       # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
-      @course.attachments.count.should == 10
-      @course.discussion_topics.count.should == 2
-      @course.context_modules.count.should == 3
-      @course.context_external_tools.count.should == 2
-      @course.quizzes.count.should == 1
-      @course.quizzes.first.quiz_questions.count.should == 11
+      expect(@course.attachments.count).to eq 10
+      expect(@course.discussion_topics.count).to eq 2
+      expect(@course.context_modules.count).to eq 3
+      expect(@course.context_external_tools.count).to eq 2
+      expect(@course.quizzes.count).to eq 1
+      expect(@course.quizzes.first.quiz_questions.count).to eq 11
     end
 
     it "should show each form" do
@@ -116,18 +116,18 @@ describe "content migrations", :non_parallel do
       migration_types.each do |type|
         select_migration_type(type)
 
-        keep_trying_until { ffj("input[type=\"submit\"]").any? { |el| el.displayed? }.should == true }
+        keep_trying_until { expect(ffj("input[type=\"submit\"]").any? { |el| el.displayed? }).to eq true }
 
         select_migration_type('none')
-        ff("input[type=\"submit\"]").any? { |el| el.displayed? }.should == false
+        expect(ff("input[type=\"submit\"]").any? { |el| el.displayed? }).to eq false
       end
 
       select_migration_type
       cancel_btn = f('#migrationConverterContainer .cancelBtn')
-      cancel_btn.should be_displayed
+      expect(cancel_btn).to be_displayed
       cancel_btn.click
 
-      f('#migrationFileUpload').should_not be_present
+      expect(f('#migrationFileUpload')).not_to be_present
     end
 
     it "should submit, queue and list migrations" do
@@ -136,7 +136,7 @@ describe "content migrations", :non_parallel do
       ff('[name=selective_import]')[0].click
       submit
 
-      ff('.migrationProgressItem').count.should == 1
+      expect(ff('.migrationProgressItem').count).to eq 1
 
       fill_migration_form(:filename => 'cc_ark_test.zip')
 
@@ -144,15 +144,15 @@ describe "content migrations", :non_parallel do
       submit
 
       visit_page
-      @course.content_migrations.count.should == 2
+      expect(@course.content_migrations.count).to eq 2
 
       progress_items = ff('.migrationProgressItem')
-      progress_items.count.should == 2
+      expect(progress_items.count).to eq 2
 
       source_links = []
       progress_items.each do |item|
-        item.find_element(:css, '.migrationName').should include_text('Common Cartridge')
-        item.find_element(:css, '.progressStatus').should include_text('Queued')
+        expect(item.find_element(:css, '.migrationName')).to include_text('Common Cartridge')
+        expect(item.find_element(:css, '.progressStatus')).to include_text('Queued')
 
         source_links << item.find_element(:css, '.sourceLink a')
       end
@@ -160,13 +160,13 @@ describe "content migrations", :non_parallel do
       hrefs = source_links.map { |a| a.attribute(:href) }
 
       @course.content_migrations.each do |cm|
-        hrefs.find { |href| href.include?("/files/#{cm.attachment.id}/download") }.should_not be_nil
+        expect(hrefs.find { |href| href.include?("/files/#{cm.attachment.id}/download") }).not_to be_nil
       end
     end
 
     it "should import selective content" do
-      pending('fragile')
-      pending unless Qti.qti_enabled?
+      skip('fragile')
+      skip unless Qti.qti_enabled?
       visit_page
       fill_migration_form
       ff('[name=selective_import]')[1].click
@@ -177,8 +177,8 @@ describe "content migrations", :non_parallel do
     end
 
     it "should overwrite quizzes when option is checked and duplicate otherwise" do
-      pending('fragile')
-      pending unless Qti.qti_enabled?
+      skip('fragile')
+      skip unless Qti.qti_enabled?
 
       # Pre-create the quiz
       q = @course.quizzes.create!(:title => "Name to be overwritten")
@@ -190,8 +190,8 @@ describe "content migrations", :non_parallel do
       fill_migration_form(:type => "qti_converter")
       submit
       run_migration
-      @course.quizzes.reload.count.should == 2
-      @course.quizzes.map(&:title).sort.should == ["Name to be overwritten", "Pretest"]
+      expect(@course.quizzes.reload.count).to eq 2
+      expect(@course.quizzes.map(&:title).sort).to eq ["Name to be overwritten", "Pretest"]
 
       # Overwrite original
       visit_page
@@ -199,10 +199,10 @@ describe "content migrations", :non_parallel do
       f('#overwriteAssessmentContent').click
       submit
       cm = @course.content_migrations.last
-      cm.migration_settings["overwrite_quizzes"].should == true
+      expect(cm.migration_settings["overwrite_quizzes"]).to eq true
       run_migration(cm)
-      @course.quizzes.reload.count.should == 2
-      @course.quizzes.map(&:title).should == ["Pretest", "Pretest"]
+      expect(@course.quizzes.reload.count).to eq 2
+      expect(@course.quizzes.map(&:title)).to eq ["Pretest", "Pretest"]
     end
 
     it "should shift dates" do
@@ -221,16 +221,16 @@ describe "content migrations", :non_parallel do
       click_option('#daySubstitution ul > div:nth-child(2) .subDay', "4", :value)
       submit
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      opts["shift_dates"].should == '1'
-      opts["day_substitutions"].should == {"1" => "2", "5" => "4"}
-      Date.parse(opts["old_start_date"]).should == Date.new(2014, 7, 1)
-      Date.parse(opts["old_end_date"]).should == Date.new(2014, 7, 11)
-      Date.parse(opts["new_start_date"]).should == Date.new(2014, 8, 5)
-      Date.parse(opts["new_end_date"]).should == Date.new(2014, 8, 15)
+      expect(opts["shift_dates"]).to eq '1'
+      expect(opts["day_substitutions"]).to eq({"1" => "2", "5" => "4"})
+      expect(Date.parse(opts["old_start_date"])).to eq Date.new(2014, 7, 1)
+      expect(Date.parse(opts["old_end_date"])).to eq Date.new(2014, 7, 11)
+      expect(Date.parse(opts["new_start_date"])).to eq Date.new(2014, 8, 5)
+      expect(Date.parse(opts["new_end_date"])).to eq Date.new(2014, 8, 15)
     end
 
     it "should remove dates" do
-      pending('fragile')
+      skip('fragile')
       visit_page
       fill_migration_form
       f('#dateAdjustCheckbox').click
@@ -238,13 +238,13 @@ describe "content migrations", :non_parallel do
       ff('[name=selective_import]')[0].click
       submit
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      opts["remove_dates"].should == '1'
+      expect(opts["remove_dates"]).to eq '1'
     end
 
     context "default question bank" do
       it "should import into selected question bank" do
-        pending('fragile')
-        pending unless Qti.qti_enabled?
+        skip('fragile')
+        skip unless Qti.qti_enabled?
 
         bank = @course.assessment_question_banks.create!(:title => "bankity bank")
         visit_page
@@ -259,14 +259,14 @@ describe "content migrations", :non_parallel do
         run_migration
 
         keep_trying_until do
-          @course.assessment_question_banks.count.should == 1
-          bank.assessment_questions.count.should == 1
+          expect(@course.assessment_question_banks.count).to eq 1
+          expect(bank.assessment_questions.count).to eq 1
         end
       end
 
       it "should import into new question bank" do
-        pending('fragile')
-        pending unless Qti.qti_enabled?
+        skip('fragile')
+        skip unless Qti.qti_enabled?
 
         old_bank = @course.assessment_question_banks.create!(:title => "bankity bank")
         visit_page
@@ -282,14 +282,14 @@ describe "content migrations", :non_parallel do
         submit
         run_migration
 
-        @course.assessment_question_banks.count.should == 2
+        expect(@course.assessment_question_banks.count).to eq 2
         new_bank = @course.assessment_question_banks.find_by_title('new bank naem')
-        new_bank.assessment_questions.count.should == 1
+        expect(new_bank.assessment_questions.count).to eq 1
       end
 
       it "should import into default question bank if not selected" do
-        pending('fragile')
-        pending unless Qti.qti_enabled?
+        skip('fragile')
+        skip unless Qti.qti_enabled?
 
         old_bank = @course.assessment_question_banks.create!(:title => "bankity bank")
         visit_page
@@ -304,9 +304,9 @@ describe "content migrations", :non_parallel do
         submit
         run_migration
 
-        @course.assessment_question_banks.count.should == 2
+        expect(@course.assessment_question_banks.count).to eq 2
         new_bank = @course.assessment_question_banks.find_by_title(AssessmentQuestionBank.default_imported_title)
-        new_bank.assessment_questions.count.should == 1
+        expect(new_bank.assessment_questions.count).to eq 1
       end
     end
   end
@@ -356,32 +356,32 @@ describe "content migrations", :non_parallel do
       wait_for_ajaximations
 
       # drop-down
-      f("option[value=\"#{@copy_from.id}\"]").should_not be_nil
+      expect(f("option[value=\"#{@copy_from.id}\"]")).not_to be_nil
 
       # search bar
       f('#courseSearchField').send_keys("cop")
       keep_trying_until do
         ui_auto_complete = f('.ui-autocomplete')
-        ui_auto_complete.should be_displayed
+        expect(ui_auto_complete).to be_displayed
       end
 
       el = f('.ui-autocomplete li a')
       divs = ff('div', el)
-      divs[0].text.should == @copy_from.name
-      divs[1].text.should == @copy_from.enrollment_term.name
+      expect(divs[0].text).to eq @copy_from.name
+      expect(divs[1].text).to eq @copy_from.enrollment_term.name
       el.click
 
       ff('[name=selective_import]')[0].click
       submit
 
       cm = @course.content_migrations.last
-      cm.migration_settings["source_course_id"].should == @copy_from.id
-      cm.source_course.should == @copy_from
-      cm.initiated_source.should == :api
+      expect(cm.migration_settings["source_course_id"]).to eq @copy_from.id
+      expect(cm.source_course).to eq @copy_from
+      expect(cm.initiated_source).to eq :api
 
       source_link = f('.migrationProgressItem .sourceLink a')
-      source_link.text.should == @copy_from.name
-      source_link['href'].should include("/courses/#{@copy_from.id}")
+      expect(source_link.text).to eq @copy_from.name
+      expect(source_link['href']).to include("/courses/#{@copy_from.id}")
     end
 
     it "should only show courses the user is authorized to see" do
@@ -390,8 +390,8 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      f("option[value=\"#{@copy_from.id}\"]").should_not be_nil
-      f("option[value=\"#{new_course.id}\"]").should be_nil
+      expect(f("option[value=\"#{@copy_from.id}\"]")).not_to be_nil
+      expect(f("option[value=\"#{new_course.id}\"]")).to be_nil
 
       admin_logged_in
 
@@ -399,7 +399,7 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      f("option[value=\"#{new_course.id}\"]").should_not be_nil
+      expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
 
     it "should include completed courses when checked" do
@@ -412,9 +412,9 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      f("option[value=\"#{new_course.id}\"]").should be_nil
+      expect(f("option[value=\"#{new_course.id}\"]")).to be_nil
       f('#include_completed_courses').click
-      f("option[value=\"#{new_course.id}\"]").should_not be_nil
+      expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
 
     it "should find courses in other accounts" do
@@ -431,12 +431,12 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      f("option[value=\"#{admin_course.id}\"]").should_not be_nil
-      f("option[value=\"#{enrolled_course.id}\"]").should_not be_nil
+      expect(f("option[value=\"#{admin_course.id}\"]")).not_to be_nil
+      expect(f("option[value=\"#{enrolled_course.id}\"]")).not_to be_nil
     end
 
     it "should copy all content from a course" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
       visit_page
 
       select_migration_type
@@ -448,16 +448,16 @@ describe "content migrations", :non_parallel do
 
       run_migration
 
-      @course.attachments.count.should == 10
-      @course.discussion_topics.count.should == 2
-      @course.context_modules.count.should == 3
-      @course.context_external_tools.count.should == 2
-      @course.quizzes.count.should == 1
-      @course.quizzes.first.quiz_questions.count.should == 11
+      expect(@course.attachments.count).to eq 10
+      expect(@course.discussion_topics.count).to eq 2
+      expect(@course.context_modules.count).to eq 3
+      expect(@course.context_external_tools.count).to eq 2
+      expect(@course.quizzes.count).to eq 1
+      expect(@course.quizzes.first.quiz_questions.count).to eq 11
     end
 
     it "should selectively copy content" do
-      pending unless Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
       visit_page
 
       select_migration_type
@@ -484,9 +484,9 @@ describe "content migrations", :non_parallel do
         f('#addDaySubstitution').click
       end
 
-      ff("#daySubstitution ul > div").count.should == 3
+      expect(ff("#daySubstitution ul > div").count).to eq 3
       f("#daySubstitution ul > div a").click # Remove day substitution
-      ff("#daySubstitution ul > div").count.should == 2
+      expect(ff("#daySubstitution ul > div").count).to eq 2
 
       click_option('#daySubstitution ul > div:nth-child(1) .currentDay', "1", :value)
       click_option('#daySubstitution ul > div:nth-child(1) .subDay', "2", :value)
@@ -504,14 +504,14 @@ describe "content migrations", :non_parallel do
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      opts["shift_dates"].should == '1'
-      opts["day_substitutions"].should == {"1" => "2", "2" => "3"}
+      expect(opts["shift_dates"]).to eq '1'
+      expect(opts["day_substitutions"]).to eq({"1" => "2", "2" => "3"})
       expected = {
           "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
           "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
-        Date.parse(opts[k].to_s).should == Date.parse(v)
+        expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
       end
     end
 
@@ -534,14 +534,14 @@ describe "content migrations", :non_parallel do
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      opts["shift_dates"].should == '1'
-      opts["day_substitutions"].should == {}
+      expect(opts["shift_dates"]).to eq '1'
+      expect(opts["day_substitutions"]).to eq({})
       expected = {
           "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
           "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
-        Date.parse(opts[k].to_s).should == Date.parse(v)
+        expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
       end
     end
 
@@ -561,7 +561,7 @@ describe "content migrations", :non_parallel do
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      opts["remove_dates"].should == '1'
+      expect(opts["remove_dates"]).to eq '1'
     end
   end
 
@@ -613,18 +613,18 @@ describe "content migrations", :non_parallel do
       migration_type_options = ff('#chooseMigrationConverter option')
       migration_type_values = migration_type_options.map { |op| op['value'] }
       migration_type_texts = migration_type_options.map { |op| op.text }
-      migration_type_values.should include(import_tool.asset_string)
-      migration_type_texts.should include(import_tool.name)
-      migration_type_values.should_not include(other_tool.asset_string)
-      migration_type_texts.should_not include(other_tool.name)
+      expect(migration_type_values).to include(import_tool.asset_string)
+      expect(migration_type_texts).to include(import_tool.name)
+      expect(migration_type_values).not_to include(other_tool.asset_string)
+      expect(migration_type_texts).not_to include(other_tool.name)
     end
 
     it "should show LTI view when LTI tool selected" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      f("#converter .externalToolLaunch").should be_displayed
-      f("#converter .selectContent").should be_displayed
+      expect(f("#converter .externalToolLaunch")).to be_displayed
+      expect(f("#converter .selectContent")).to be_displayed
     end
 
     it "should launch LTI tool on browse and get content link" do
@@ -633,20 +633,20 @@ describe "content migrations", :non_parallel do
       select_migration_type(import_tool.asset_string)
       f("button#externalToolLaunch").click
       tool_iframe = keep_trying_until { f(".tool_launch") }
-      f('.ui-dialog-title').text.should == import_tool.label_for(:migration_selection)
+      expect(f('.ui-dialog-title').text).to eq import_tool.label_for(:migration_selection)
 
       driver.switch_to.frame(tool_iframe)
       keep_trying_until { f("#basic_lti_link") }.click
 
       driver.switch_to.default_content
-      file_name_elt = keep_trying_until { f("#converter .file_name").text.should == "lti embedded link" }
+      file_name_elt = keep_trying_until { expect(f("#converter .file_name").text).to eq "lti embedded link" }
     end
 
     it "should have content selection option" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      ff('input[name=selective_import]').size.should == 2
+      expect(ff('input[name=selective_import]').size).to eq 2
     end
   end
 end

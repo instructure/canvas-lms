@@ -48,7 +48,7 @@ describe 'alert' do
     course_with_student
     @alert = @course.alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
     generate_message(:alert, :twitter, @alert, :asset_context => @course.enrollments.first)
-    @message.main_link.should be_present
-    @message.body.should be_present
+    expect(@message.main_link).to be_present
+    expect(@message.body).to be_present
   end
 end

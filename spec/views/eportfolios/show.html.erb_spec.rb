@@ -33,21 +33,21 @@ describe "/eportfolios/show" do
 
   it "should render" do
     render "eportfolios/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should not link the user name if @owner_url is not set" do
     render "eportfolios/show"
-    view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/].should be_nil
-    view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/].should_not be_nil
+    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).to be_nil
+    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
   end
 
   it "should link the user name if @owner_url is set" do
     assigns[:owner_url] = user_url(@portfolio.user)
     render "eportfolios/show"
-    view.content_for(:left_side)[assigns[:owner_url]].should_not be_nil
-    view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/].should_not be_nil
-    view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/].should be_nil
+    expect(view.content_for(:left_side)[assigns[:owner_url]]).not_to be_nil
+    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
+    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).to be_nil
   end
 end
 

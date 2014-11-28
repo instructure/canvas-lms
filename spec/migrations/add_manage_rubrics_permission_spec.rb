@@ -24,17 +24,18 @@ describe "AddManageRubricsPermission" do
 
     new_role_overrides = RoleOverride.find(:all, :conditions => {:permission => 'manage_rubrics'})
 
-    role_overrides.count.should == new_role_overrides.count
+    expect(role_overrides.count).to eq new_role_overrides.count
     role_overrides.each do |old_role_override|
       new_role_override = new_role_overrides.find{|ro|
         ro.context_id == old_role_override.context_id &&
         ro.context_type == old_role_override.context_type &&
         ro.enrollment_type == old_role_override.enrollment_type
       }
-      new_role_override.should_not be_nil
+      expect(new_role_override).not_to be_nil
 
-      new_role_override.attributes.delete_if{|k,v| [:id, :permission, :created_at, :updated_at].include?(k.to_sym)}.should ==
+      expect(new_role_override.attributes.delete_if{|k,v| [:id, :permission, :created_at, :updated_at].include?(k.to_sym)}).to eq(
         old_role_override.attributes.delete_if{|k,v| [:id, :permission, :created_at, :updated_at].include?(k.to_sym)}
+      )
     end
 
   end

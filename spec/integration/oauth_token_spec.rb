@@ -45,21 +45,21 @@ describe integration do
   it "should error if the service isn't enabled" do
     UsersController.any_instance.expects(:feature_and_service_enabled?).with(integration.underscore).returns(false)
     get "/oauth?service=#{integration.underscore}"
-    response.should redirect_to(user_profile_url(@user))
-    flash[:error].should be_present
+    expect(response).to redirect_to(user_profile_url(@user))
+    expect(flash[:error]).to be_present
   end
 
   it "should redirect to the service for auth" do
     oauth_start(integration)
-    response.should redirect_to("http://oauth.example.com/start")
+    expect(response).to redirect_to("http://oauth.example.com/start")
 
     oreq = OauthRequest.last
-    oreq.should be_present
-    oreq.service.should == integration.underscore
-    oreq.token.should == "test_token"
-    oreq.secret.should == "test_secret"
-    oreq.user.should == @user
-    oreq.return_url.should == user_profile_url(@user)
+    expect(oreq).to be_present
+    expect(oreq.service).to eq integration.underscore
+    expect(oreq.token).to eq "test_token"
+    expect(oreq.secret).to eq "test_secret"
+    expect(oreq.user).to eq @user
+    expect(oreq.return_url).to eq user_profile_url(@user)
   end
 
   describe "oauth_success" do
@@ -76,20 +76,20 @@ describe integration do
 
     it "should fail without a valid token" do
       get "/oauth_success?service=#{integration.underscore}&oauth_token=wrong&oauth_verifier=test_verifier"
-      response.should redirect_to(user_profile_url(@user))
-      flash[:error].should be_present
+      expect(response).to redirect_to(user_profile_url(@user))
+      expect(flash[:error]).to be_present
     end
 
     it "should fail with the wrong user" do
       OauthRequest.last.update_attribute(:user, User.create!)
       get "/oauth_success?service=#{integration.underscore}&oauth_token=test_token&oauth_verifier=test_verifier"
-      response.should redirect_to(user_profile_url(@user))
-      flash[:error].should be_present
+      expect(response).to redirect_to(user_profile_url(@user))
+      expect(flash[:error]).to be_present
     end
 
     it "should redirect to the original host if a different host is returned to" do
       get "http://otherschool.example.com/oauth_success?service=#{integration.underscore}&oauth_token=test_token&oauth_verifier=test_verifier"
-      response.should redirect_to("http://www.example.com/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}")
+      expect(response).to redirect_to("http://www.example.com/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}")
     end
 
     it "should create the UserService on successful auth" do
@@ -108,15 +108,15 @@ describe integration do
       end
 
       get "/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}"
-      response.should redirect_to(user_profile_url(@user))
-      flash[:error].should be_blank
-      flash[:notice].should be_present
+      expect(response).to redirect_to(user_profile_url(@user))
+      expect(flash[:error]).to be_blank
+      expect(flash[:notice]).to be_present
       us = UserService.find_by_service_and_user_id(integration.underscore, @user.id)
-      us.should be_present
-      us.service_user_id.should == "test_user_id"
-      us.service_user_name.should == "test_user_name"
-      us.token.should == "test_token"
-      us.secret.should == "test_secret"
+      expect(us).to be_present
+      expect(us.service_user_id).to eq "test_user_id"
+      expect(us.service_user_name).to eq "test_user_name"
+      expect(us.token).to eq "test_token"
+      expect(us.secret).to eq "test_secret"
     end
 
     it "should fail creating the UserService if getting the initial user info fails" do
@@ -137,11 +137,11 @@ describe integration do
       end
 
       get "/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}"
-      response.should redirect_to(user_profile_url(@user))
-      flash[:error].should be_present
-      flash[:notice].should be_blank
+      expect(response).to redirect_to(user_profile_url(@user))
+      expect(flash[:error]).to be_present
+      expect(flash[:notice]).to be_blank
       us = UserService.find_by_service_and_user_id(integration.underscore, @user.id)
-      us.should_not be_present
+      expect(us).not_to be_present
     end
   end
 end

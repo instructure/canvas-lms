@@ -27,7 +27,7 @@ module Quizzes
 
     attributes :id
 
-    has_one :quiz_submission, include: true, embed: :ids, key: :quiz_submission, embed_in_root: true, serializer: Quizzes::QuizSubmissionSerializer
+    has_one :quiz_submission, embed_in_root: true, embed: :ids, key: :quiz_submission, embed_in_root: true, serializer: Quizzes::QuizSubmissionSerializer
 
     LEGACY_INSTANCE_VARIABLES = %w[
       current_user

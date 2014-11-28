@@ -33,9 +33,9 @@ describe UserObserver do
     student.observers << observer
 
     enrollments = observer.observer_enrollments.sort_by(&:course_id)
-    enrollments.size.should eql 2
-    enrollments.map(&:course_id).should eql [c1.id, c2.id]
-    enrollments.map(&:workflow_state).should eql ["invited", "active"]
+    expect(enrollments.size).to eql 2
+    expect(enrollments.map(&:course_id)).to eql [c1.id, c2.id]
+    expect(enrollments.map(&:workflow_state)).to eql ["invited", "active"]
   end
 
   it "should not enroll the observer in institutions where they lack a login" do
@@ -53,7 +53,7 @@ describe UserObserver do
     student.observers << observer
 
     enrollments = observer.observer_enrollments
-    enrollments.size.should eql 1
-    enrollments.map(&:course_id).should eql [c2.id]
+    expect(enrollments.size).to eql 1
+    expect(enrollments.map(&:course_id)).to eql [c2.id]
   end
 end

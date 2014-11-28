@@ -85,6 +85,9 @@ jQuery(function($){
       var url = $.replaceTags($("#sub_account_urls .sub_account_url").attr('href'), 'id', account.id);
       $(this).attr({action: url, method: 'PUT'});
       $(this).parents(".account:first").attr('id', 'account_' + account.id);
+
+      var expand_link = $("#account_" + account.id + " .expand_sub_accounts_link");
+      expand_link.attr({'data-link': $.replaceTags(expand_link.attr('data-link'), 'id', account.id)});
     }
   });
   
@@ -143,8 +146,8 @@ jQuery(function($){
           }
           sub_account.courses_count = I18n.t('courses_count', {one: '1 Course', other: '%{count} Courses'}, {count: sub_account.course_count});
           sub_account.sub_accounts_count = I18n.t('sub_accounts_count', {one: '1 Sub-Account', other: '%{count} Sub-Accounts'}, {count: sub_account.sub_account_count});
-          $("<li class='sub_account'/>")
-            .append($("#account_blank")
+          var sub_account_node = $("<li class='sub_account'/>")
+          sub_account_node.append($("#account_blank")
                       .clone(true)
                       .attr('id', 'account_new')
                       .show()
@@ -158,10 +161,12 @@ jQuery(function($){
             .find(".sub_accounts_count").showIf(sub_account.sub_account_count).end()
             .find(".courses_count").showIf(sub_account.course_count).end()
             .find(".collapse_sub_accounts_link").hide().end()
-            .find(".expand_sub_accounts_link").showIf(sub_account.sub_account_count > 0).end()
+            .find(".expand_sub_accounts_link").showIf(sub_account.sub_account_count > 0).attr({
+                'data-link': $.replaceTags(sub_account_node.find('.expand_sub_accounts_link').attr('data-link'), 'id', sub_account.id)
+              }).end()
             .find(".add_sub_account_link").showIf(sub_account.sub_account_count == 0).end()
             .find(".edit_sub_account_form").attr({
-              action: $.replaceTags($("#sub_account_urls .sub_account_url").attr('href'), 'id', sub_account.id), 
+              action: $.replaceTags($("#sub_account_urls .sub_account_url").attr('href'), 'id', sub_account.id),
               method: 'PUT'}
             );
         }

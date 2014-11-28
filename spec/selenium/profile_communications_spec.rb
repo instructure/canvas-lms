@@ -46,18 +46,18 @@ describe "profile communication settings" do
   it "should render" do
     get "/profile/communication"
     # Page title should match expected
-    driver.execute_script("return document.title").should == 'Notification Preferences'
+    expect(driver.execute_script("return document.title")).to eq 'Notification Preferences'
     # Expect breadcrumbs to correctly display page name
-    f('#breadcrumbs').should include_text('Notification Preferences')
+    expect(f('#breadcrumbs')).to include_text('Notification Preferences')
     # Expect h1 with
-    f('#content > h1').text.should == 'Notification Preferences'
+    expect(f('#content > h1').text).to eq 'Notification Preferences'
   end
 
   it "should display the users email address as channel" do
     get "/profile/communication"
     wait_for_ajaximations
-    fj('th.comm-channel:first').should include_text('Email Address')
-    fj('th.comm-channel:first').should include_text('somebody@example.com')
+    expect(fj('th.comm-channel:first')).to include_text('Email Address')
+    expect(fj('th.comm-channel:first')).to include_text('somebody@example.com')
   end
 
   it "should display an SMS number as channel" do
@@ -65,8 +65,8 @@ describe "profile communication settings" do
     channel.confirm
     get "/profile/communication"
     wait_for_ajaximations
-    fj('tr.grouping:first th.comm-channel:last').should include_text('Cell Number')
-    fj('tr.grouping:first th.comm-channel:last').should include_text('8011235555@vtext.com')
+    expect(fj('tr.grouping:first th.comm-channel:last')).to include_text('Cell Number')
+    expect(fj('tr.grouping:first th.comm-channel:last')).to include_text('8011235555@vtext.com')
   end
 
   let(:sns_response) { stub(data: {endpointarn: 'endpointarn'}) }
@@ -88,7 +88,7 @@ describe "profile communication settings" do
     sns_channel
     get "/profile/communication"
     wait_for_ajaximations
-    fj('tr.grouping:first th.comm-channel:last').should include_text('Push Notification')
+    expect(fj('tr.grouping:first th.comm-channel:last')).to include_text('Push Notification')
   end
 
   it "should only display asap and never for sns channels" do
@@ -97,7 +97,7 @@ describe "profile communication settings" do
     wait_for_ajaximations
     cell = find_frequency_cell("grading", sns_channel.id)
     buttons = ffj('.frequency', cell)
-    buttons.map {|b| b.attribute(:'data-value')}.should == %w(immediately never)
+    expect(buttons.map {|b| b.attribute(:'data-value')}).to eq %w(immediately never)
   end
 
   it "should load the initial state of a user-pref checkbox" do
@@ -106,7 +106,7 @@ describe "profile communication settings" do
     @user.save!
     get "/profile/communication"
     wait_for_ajaximations
-    is_checked('.user-pref-check[name=send_scores_in_emails]').should be_false
+    expect(is_checked('.user-pref-check[name=send_scores_in_emails]')).to be_falsey
   end
 
   it "should save a user-pref checkbox change" do
@@ -123,7 +123,7 @@ describe "profile communication settings" do
 
     # test data stored
     @user.reload
-    @user.preferences[:send_scores_in_emails].should == true
+    expect(@user.preferences[:send_scores_in_emails]).to eq true
   end
 
   it "should load an existing frequency setting and save a change" do
@@ -136,19 +136,19 @@ describe "profile communication settings" do
     get "/profile/communication"
     cell = find_frequency_cell(@sub_comment.category.underscore.gsub(/\s/, '_'), channel.id)
     # validate existing text is shown correctly (text display and button state)
-    cell.text.should == 'Daily'
+    expect(cell.text).to eq 'Daily'
 
     mouse_enter_cell(@sub_comment.category, channel.id)
     cell.find_element(:css, '.immediately-label').click
     mouse_leave_cell(@sub_comment.category, channel.id)
     # Change to a different value and verify flash and the save. (click on the radio)
-    cell.text.should == 'ASAP'
+    expect(cell.text).to eq 'ASAP'
 
     wait_for_ajaximations
 
     # test data stored
     policy.reload
-    policy.frequency.should == Notification::FREQ_IMMEDIATELY
+    expect(policy.frequency).to eq Notification::FREQ_IMMEDIATELY
   end
 
   context "accessibility usage" do

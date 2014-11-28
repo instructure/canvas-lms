@@ -48,13 +48,12 @@ module StreamItemsHelper
           participant = user.conversation_participant(item.asset_id)
 
           next if participant.nil? || participant.last_message.nil? || participant.last_author?
-          item.data.write_attribute(:last_message, participant.last_message)
-          item.data.write_attribute(:last_author, participant.last_message.author)
+          item.participant = participant
 
           # because we're cheating and just checking unread here instead of using
           # the workflow_state on the stream_item_instance, that workflow_state
           # may be out of sync with the underlying conversation.
-          item.data.write_attribute(:unread, participant.unread?)
+          item.unread = participant.unread?
         elsif category == "Assignment"
           # TODO: this handles an edge case for old stream items where their
           # context code was getting set to "assignment_x" instead of "course_y".
@@ -116,9 +115,10 @@ module StreamItemsHelper
       context.linked_to = polymorphic_path([context.type.underscore, category.underscore.pluralize], "#{context.type.underscore}_id" => context.id)
     when "Conversation"
       context.type = "User"
-      context.id = asset.last_author.id
-      context.name = asset.last_author.short_name
-      context.linked_to = user_path(asset.last_author.id)
+      last_author = item.participant.last_message.author
+      context.id = last_author.id
+      context.name = last_author.short_name
+      context.linked_to = user_path(last_author.id)
     when "AssessmentRequest"
       context.type = item.context_type
       context.id = item.context_id
@@ -134,7 +134,7 @@ module StreamItemsHelper
     when "Announcement", "DiscussionTopic"
       asset.title
     when "Conversation"
-      CanvasTextHelper.truncate_text(asset.last_message.body, :max_length => 250)
+      CanvasTextHelper.truncate_text(item.participant.last_message.body, :max_length => 250)
     when "Assignment"
       asset.subject
     when "AssessmentRequest"

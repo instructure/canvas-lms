@@ -9,7 +9,7 @@ describe DataFixup::AttachDissociatedDiscussionTopics do
     topic.update_attribute(:old_assignment_id, assignment.id)
 
     DataFixup::AttachDissociatedDiscussionTopics.run
-    topic.reload.assignment_id.should == assignment.id
+    expect(topic.reload.assignment_id).to eq assignment.id
   end
 
   it 'should not change topics with an existing assignment_id' do
@@ -19,7 +19,7 @@ describe DataFixup::AttachDissociatedDiscussionTopics do
     topic.update_attribute(:old_assignment_id, assignment.id - 1)
 
     DataFixup::AttachDissociatedDiscussionTopics.run
-    topic.reload.assignment_id.should == assignment.id
+    expect(topic.reload.assignment_id).to eq assignment.id
   end
 
   it 'should not change topics that have no file link in their message' do
@@ -29,6 +29,6 @@ describe DataFixup::AttachDissociatedDiscussionTopics do
     topic.update_attribute(:old_assignment_id, assignment.id)
 
     DataFixup::AttachDissociatedDiscussionTopics.run
-    topic.reload.assignment_id.should be_nil
+    expect(topic.reload.assignment_id).to be_nil
   end
 end

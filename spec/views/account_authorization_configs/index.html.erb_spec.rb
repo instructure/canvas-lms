@@ -30,7 +30,7 @@ describe "account_authorization_configs/index" do
     assigns[:saml_authn_contexts] = []
     assigns[:saml_login_attributes] = {}
     render 'account_authorization_configs/index'
-    response.body.should match("192.168.0.1\n192.168.0.2")
+    expect(response.body).to match("192.168.0.1\n192.168.0.2")
   end
 
   it "should display the last_timeout_failure" do
@@ -43,7 +43,7 @@ describe "account_authorization_configs/index" do
     assigns[:saml_login_attributes] = {}
     render 'account_authorization_configs/index'
     doc = Nokogiri::HTML(response.body)
-    doc.css('form.ldap_form tr.last_timeout_failure').length.should == 1
+    expect(doc.css('form.ldap_form tr.last_timeout_failure').length).to eq 1
   end
 
   it "should display more than 2 LDAP configs" do
@@ -59,8 +59,8 @@ describe "account_authorization_configs/index" do
 
     render 'account_authorization_configs/index'
     doc = Nokogiri::HTML(response.body)
-    doc.css('.ldap_secondary').length.should == 3
+    expect(doc.css('.ldap_secondary').length).to eq 3
     # we go in to a degenerate mode that users can't add/remove individual configs
-    doc.css('.remove_secondary_ldap_link').length.should == 0
+    expect(doc.css('.remove_secondary_ldap_link').length).to eq 0
   end
 end

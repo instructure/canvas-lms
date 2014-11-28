@@ -45,8 +45,8 @@ module Alerts
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
-        (lambda {::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days }}).
-          should raise_error("Validation failed: Title is too long (maximum is 255 characters)")
+        expect(lambda {::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days }}).
+          to raise_error("Validation failed: Title is too long (maximum is 255 characters)")
       end
 
       it 'returns true when the course root account has user notes disabled' do
@@ -57,21 +57,21 @@ module Alerts
         ::UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        user_note_alert.should_not_receive_message?(@student.id, 29).should == true
+        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq true
       end
 
       it 'returns true when the student has received a note less than threshold days ago' do
         ::UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        user_note_alert.should_not_receive_message?(@student.id, 31).should == true
+        expect(user_note_alert.should_not_receive_message?(@student.id, 31)).to eq true
       end
 
       it 'returns false when the student has not received a note less than threshold days ago' do
         ::UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        user_note_alert.should_not_receive_message?(@student.id, 29).should == false
+        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq false
       end
 
       it 'handles multiple user notes' do
@@ -79,7 +79,7 @@ module Alerts
         ::UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 10.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        user_note_alert.should_not_receive_message?(@student.id, 29).should == true
+        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq true
       end
 
       it 'handles notes from multiple students' do
@@ -91,7 +91,7 @@ module Alerts
         ::UserNote.create!(:creator => @teacher, :user => student_2) { |un| un.created_at = Time.now - 10.days }
 
         ungraded_timespan = Alerts::UserNote.new(@course, [student_1.id, student_2.id], [@teacher.id])
-        ungraded_timespan.should_not_receive_message?(student_1.id, 2).should == false
+        expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to eq false
       end
 
 
@@ -102,7 +102,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            user_note_alert.should_not_receive_message?(@student.id, 3).should == true
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq true
           end
 
           it 'returns false when threshold days from course start are not exceeded' do
@@ -110,7 +110,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            user_note_alert.should_not_receive_message?(@student.id, 3).should == false
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq false
           end
 
         end
@@ -122,7 +122,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            user_note_alert.should_not_receive_message?(@student.id, 3).should == true
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq true
           end
 
           it 'returns false when threshold days from course created at are not exceeded' do
@@ -131,7 +131,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            user_note_alert.should_not_receive_message?(@student.id, 3).should == false
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq false
           end
         end
       end

@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Essay do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples 'Answer Serializers'
 
   let :input do
@@ -16,7 +20,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Essay do
   end
 
   it 'should return nil when un-answered' do
-    subject.deserialize({}).should == nil
+    expect(subject.deserialize({})).to eq nil
   end
 
   context 'validations' do

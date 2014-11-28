@@ -50,10 +50,10 @@ describe LearningOutcome do
         }
       ]
       @rubric.save!
-      @rubric.should_not be_new_record
+      expect(@rubric).not_to be_new_record
       @rubric.reload
-      @rubric.learning_outcome_alignments.should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric.learning_outcome_alignments).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
     end
 
     it "should delete learning outcome alignments when they no longer exist" do
@@ -81,10 +81,10 @@ describe LearningOutcome do
         }
       ]
       @rubric.save!
-      @rubric.should_not be_new_record
+      expect(@rubric).not_to be_new_record
       @rubric.reload
-      @rubric.learning_outcome_alignments.should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric.learning_outcome_alignments).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @rubric.data = [{
         :points => 5,
         :description => "Row",
@@ -106,7 +106,7 @@ describe LearningOutcome do
       }]
       @rubric.save!
       @rubric.reload
-      @rubric.learning_outcome_alignments.active.should be_empty
+      expect(@rubric.learning_outcome_alignments.active).to be_empty
     end
 
     it "should create learning outcome associations for multiple outcome rows" do
@@ -156,9 +156,9 @@ describe LearningOutcome do
       ]
       @rubric.save!
       @rubric.reload
-      @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments.should_not be_empty
-      @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
+      expect(@rubric).not_to be_new_record
+      expect(@rubric.learning_outcome_alignments).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, @outcome2.id].sort)
     end
 
     it "should create outcome results when outcome-aligned rubrics are assessed" do
@@ -187,15 +187,15 @@ describe LearningOutcome do
       ]
       @rubric.save!
       @rubric.reload
-      @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments.should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric).not_to be_new_record
+      expect(@rubric.learning_outcome_alignments).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @assignment.learning_outcome_alignments.count.should eql(1)
-      @assignment.rubric_association.should_not be_nil
+      expect(@assignment.learning_outcome_alignments.count).to eql(1)
+      expect(@assignment.rubric_association).not_to be_nil
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @assessment = @a.assess({
         :user => @user,
@@ -209,15 +209,15 @@ describe LearningOutcome do
           }
         }
       })
-      @outcome.learning_outcome_results.should_not be_empty
+      expect(@outcome.learning_outcome_results).not_to be_empty
       @result = @outcome.learning_outcome_results.first
-      @result.user_id.should eql(@user.id)
-      @result.score.should eql(2.0)
-      @result.possible.should eql(3.0)
-      @result.original_score.should eql(2.0)
-      @result.original_possible.should eql(3.0)
-      @result.mastery.should eql(false)
-      @result.versions.length.should eql(1)
+      expect(@result.user_id).to eql(@user.id)
+      expect(@result.score).to eql(2.0)
+      expect(@result.possible).to eql(3.0)
+      expect(@result.original_score).to eql(2.0)
+      expect(@result.original_possible).to eql(3.0)
+      expect(@result.mastery).to eql(false)
+      expect(@result.versions.length).to eql(1)
       n = @result.version_number
       @assessment = @a.assess({
         :user => @user,
@@ -232,19 +232,19 @@ describe LearningOutcome do
         }
       })
       @result.reload
-      @result.versions.length.should eql(2)
-      @result.version_number.should > n
-      @result.score.should eql(3.0)
-      @result.possible.should eql(3.0)
-      @result.original_score.should eql(2.0)
-      @result.mastery.should eql(true)
+      expect(@result.versions.length).to eql(2)
+      expect(@result.version_number).to be > n
+      expect(@result.score).to eql(3.0)
+      expect(@result.possible).to eql(3.0)
+      expect(@result.original_score).to eql(2.0)
+      expect(@result.mastery).to eql(true)
     end
 
     it "should override non-rubric-based alignments with rubric-based alignments for the same assignment" do
       @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
-      @alignment.should_not be_nil
-      @alignment.content.should eql(@assignment)
-      @alignment.context.should eql(@course)
+      expect(@alignment).not_to be_nil
+      expect(@alignment.content).to eql(@assignment)
+      expect(@alignment.context).to eql(@course)
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -270,22 +270,22 @@ describe LearningOutcome do
       ]
       @rubric.save!
       @rubric.reload
-      @rubric.should_not be_new_record
+      expect(@rubric).not_to be_new_record
 
-      @rubric.learning_outcome_alignments.should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric.learning_outcome_alignments).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @assignment.learning_outcome_alignments.count.should eql(1)
-      @assignment.learning_outcome_alignments.first.should eql(@alignment)
-      @assignment.learning_outcome_alignments.first.should have_rubric_association
+      expect(@assignment.learning_outcome_alignments.count).to eql(1)
+      expect(@assignment.learning_outcome_alignments.first).to eql(@alignment)
+      expect(@assignment.learning_outcome_alignments.first).to have_rubric_association
       @alignment.reload
-      @alignment.should have_rubric_association
+      expect(@alignment).to have_rubric_association
 
       @submission = @assignment.grade_student(@user, :grade => "10").first
-      @outcome.learning_outcome_results.should be_empty
+      expect(@outcome.learning_outcome_results).to be_empty
       @assessment = @a.assess({
         :user => @user,
         :assessor => @user,
@@ -299,16 +299,16 @@ describe LearningOutcome do
         }
       })
       @outcome.reload
-      @outcome.learning_outcome_results.should_not be_empty
-      @outcome.learning_outcome_results.length.should eql(1)
+      expect(@outcome.learning_outcome_results).not_to be_empty
+      expect(@outcome.learning_outcome_results.length).to eql(1)
       @result = @outcome.learning_outcome_results.select{|r| r.artifact_type == 'RubricAssessment'}.first
-      @result.should_not be_nil
-      @result.user_id.should eql(@user.id)
-      @result.score.should eql(2.0)
-      @result.possible.should eql(3.0)
-      @result.original_score.should eql(2.0)
-      @result.original_possible.should eql(3.0)
-      @result.mastery.should eql(false)
+      expect(@result).not_to be_nil
+      expect(@result.user_id).to eql(@user.id)
+      expect(@result.score).to eql(2.0)
+      expect(@result.possible).to eql(3.0)
+      expect(@result.original_score).to eql(2.0)
+      expect(@result.original_possible).to eql(3.0)
+      expect(@result.mastery).to eql(false)
       n = @result.version_number
     end
 
@@ -338,18 +338,18 @@ describe LearningOutcome do
       ]
       @rubric.save!
       @rubric.reload
-      @rubric.should_not be_new_record
+      expect(@rubric).not_to be_new_record
 
-      @rubric.learning_outcome_alignments.should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric.learning_outcome_alignments).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @assignment.learning_outcome_alignments.count.should eql(1)
+      expect(@assignment.learning_outcome_alignments.count).to eql(1)
       @alignment = @assignment.learning_outcome_alignments.first
-      @alignment.learning_outcome.should_not be_deleted
-      @alignment.should have_rubric_association
+      expect(@alignment.learning_outcome).not_to be_deleted
+      expect(@alignment).to have_rubric_association
       @assignment.reload
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @assessment = @a.assess({
@@ -364,16 +364,16 @@ describe LearningOutcome do
           }
         }
       })
-      @outcome.learning_outcome_results.should_not be_empty
-      @outcome.learning_outcome_results.length.should eql(1)
+      expect(@outcome.learning_outcome_results).not_to be_empty
+      expect(@outcome.learning_outcome_results.length).to eql(1)
       @result = @outcome.learning_outcome_results.select{|r| r.artifact_type == 'RubricAssessment'}.first
-      @result.should_not be_nil
-      @result.user_id.should eql(@user.id)
-      @result.score.should eql(2.0)
-      @result.possible.should eql(3.0)
-      @result.original_score.should eql(2.0)
-      @result.original_possible.should eql(3.0)
-      @result.mastery.should eql(false)
+      expect(@result).not_to be_nil
+      expect(@result.user_id).to eql(@user.id)
+      expect(@result.score).to eql(2.0)
+      expect(@result.possible).to eql(3.0)
+      expect(@result.original_score).to eql(2.0)
+      expect(@result.original_possible).to eql(3.0)
+      expect(@result.mastery).to eql(false)
       n = @result.version_number
     end
   end
@@ -385,22 +385,22 @@ describe LearningOutcome do
       end
 
       it "should grant :read to any user" do
-        @outcome.grants_right?(User.new, :read).should be_true
+        expect(@outcome.grants_right?(User.new, :read)).to be_truthy
       end
 
       it "should not grant :read without a user" do
-        @outcome.grants_right?(nil, :read).should be_false
+        expect(@outcome.grants_right?(nil, :read)).to be_falsey
       end
 
       it "should grant :update iff the site admin grants :manage_global_outcomes" do
         @admin = stub
 
         Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(true)
-        @outcome.grants_right?(@admin, :update).should be_true
+        expect(@outcome.grants_right?(@admin, :update)).to be_truthy
         @outcome.clear_permissions_cache(@admin)
 
         Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(false)
-        @outcome.grants_right?(@admin, :update).should be_false
+        expect(@outcome.grants_right?(@admin, :update)).to be_falsey
       end
     end
 
@@ -412,21 +412,21 @@ describe LearningOutcome do
 
       it "should grant :read to users with :read_outcomes on the context" do
         student_in_course(:active_enrollment => 1)
-        @outcome.grants_right?(@user, :read).should be_true
+        expect(@outcome.grants_right?(@user, :read)).to be_truthy
       end
 
       it "should not grant :read to users without :read_outcomes on the context" do
-        @outcome.grants_right?(User.new, :read).should be_false
+        expect(@outcome.grants_right?(User.new, :read)).to be_falsey
       end
 
       it "should grant :update to users with :manage_outcomes on the context" do
         teacher_in_course(:active_enrollment => 1)
-        @outcome.grants_right?(@user, :update).should be_true
+        expect(@outcome.grants_right?(@user, :update)).to be_truthy
       end
 
       it "should not grant :read to users without :read_outcomes on the context" do
         student_in_course(:active_enrollment => 1)
-        @outcome.grants_right?(User.new, :update).should be_false
+        expect(@outcome.grants_right?(User.new, :update)).to be_falsey
       end
     end
   end

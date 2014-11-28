@@ -18,23 +18,21 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe Canvas::DraftStateValidations do
-  shared_examples_for "Canvas::DraftStateValidations" do
-    describe ":validate_draft_state_change" do
-      it "should work" do
-        subject.workflow_state = 'unpublished'
-        subject.stubs(has_student_submissions?: true)
-        subject.stubs(workflow_state_changed?: true)
-        subject.stubs({
-          changes: { 'workflow_state' => [ 'published', 'unpublished' ] }
-        })
-        subject.save
+shared_examples_for "Canvas::DraftStateValidations" do
+  describe ":validate_draft_state_change" do
+    it "should work" do
+      subject.workflow_state = 'unpublished'
+      subject.stubs(has_student_submissions?: true)
+      subject.stubs(workflow_state_changed?: true)
+      subject.stubs({
+        changes: { 'workflow_state' => [ 'published', 'unpublished' ] }
+      })
+      subject.save
 
-        subject.errors[:workflow_state].should be_present
-        subject.errors[:workflow_state][0].to_s.should match(
-          %r{can't unpublish if there are student submissions}i
-        )
-      end
+      expect(subject.errors[:workflow_state]).to be_present
+      expect(subject.errors[:workflow_state][0].to_s).to match(
+        %r{can't unpublish if there are student submissions}i
+      )
     end
   end
 end

@@ -29,8 +29,8 @@ describe AssignmentsController do
     course ||= @course
     @group = course.assignment_groups.create(:name => "some group")
     @assignment = course.assignments.create(:title => "some assignment", :assignment_group => @group)
-    @assignment.assignment_group.should eql(@group)
-    @group.assignments.should be_include(@assignment)
+    expect(@assignment.assignment_group).to eql(@group)
+    expect(@group.assignments).to be_include(@assignment)
     @assignment
   end
 
@@ -50,27 +50,27 @@ describe AssignmentsController do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>3,'hidden'=>true}])
       get 'index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "should assign variables" do
       user_session(@student)
 
       get 'index', :course_id => @course.id
-      assigns[:assignments].should_not be_nil
-      assigns[:assignment_groups].should_not be_nil
+      expect(assigns[:assignments]).not_to be_nil
+      expect(assigns[:assignment_groups]).not_to be_nil
     end
 
     it "should retrieve course assignments if they exist" do
       user_session(@student)
 
       get 'index', :course_id => @course.id
-      assigns[:assignment_groups].should_not be_nil
-      assigns[:assignment_groups].should_not be_empty
-      assigns[:assignments].should_not be_nil
-      assigns[:assignments].should_not be_empty
-      assigns[:assignments][0].should eql(@assignment)
+      expect(assigns[:assignment_groups]).not_to be_nil
+      expect(assigns[:assignment_groups]).not_to be_empty
+      expect(assigns[:assignments]).not_to be_nil
+      expect(assigns[:assignments]).not_to be_empty
+      expect(assigns[:assignments][0]).to eql(@assignment)
     end
 
     it "should create a default group if none exist" do
@@ -78,7 +78,7 @@ describe AssignmentsController do
 
       get 'index', :course_id => @course.id
 
-      assigns[:assignment_groups][0].name.should eql("Assignments")
+      expect(assigns[:assignment_groups][0].name).to eql("Assignments")
     end
 
     context "draft state" do
@@ -91,16 +91,16 @@ describe AssignmentsController do
 
         get 'index', :course_id => @course.id
 
-        @course.reload.assignment_groups.count.should == 1
+        expect(@course.reload.assignment_groups.count).to eq 1
       end
 
       it "should separate manage_assignments and manage_grades permissions" do
         user_session(@teacher)
         @course.account.role_overrides.create! enrollment_type: 'TeacherEnrollment', permission: 'manage_assignments', enabled: false
         get 'index', course_id: @course.id
-        assigns[:js_env][:PERMISSIONS][:manage_grades].should be_true
-        assigns[:js_env][:PERMISSIONS][:manage_assignments].should be_false
-        assigns[:js_env][:PERMISSIONS][:manage].should be_false
+        expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
+        expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:manage]).to be_falsey
       end
     end
   end
@@ -124,16 +124,16 @@ describe AssignmentsController do
       a = @course.assignments.create(:title => "some assignment")
 
       get 'show', :course_id => @course.id, :id => a.id
-      @course.reload.assignment_groups.should_not be_empty
-      assigns[:unlocked].should_not be_nil
+      expect(@course.reload.assignment_groups).not_to be_empty
+      expect(assigns[:unlocked]).not_to be_nil
     end
 
     it "should assign submission variable if current user and submitted" do
       user_session(@student)
       @assignment.submit_homework(@student, :submission_type => 'online_url', :url => 'http://www.google.com')
       get 'show', :course_id => @course.id, :id => @assignment.id
-      response.should be_success
-      assigns[:current_user_submission].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:current_user_submission]).not_to be_nil
     end
 
     it "should redirect to discussion if assignment is linked to discussion" do
@@ -142,7 +142,7 @@ describe AssignmentsController do
       @assignment.save!
 
       get 'show', :course_id => @course.id, :id => @assignment.id
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     it "should not redirect to discussion for observer if assignment is linked to discussion but read_forum is false" do
@@ -155,8 +155,8 @@ describe AssignmentsController do
                            :enrollment_type => "ObserverEnrollment", :enabled => false)
 
       get 'show', :course_id => @course.id, :id => @assignment.id
-      response.should_not be_redirect
-      response.should be_success
+      expect(response).not_to be_redirect
+      expect(response).to be_success
     end
 
     it "should not show locked external tool assignments" do
@@ -172,10 +172,10 @@ describe AssignmentsController do
 
       get 'show', :course_id => @course.id, :id => @assignment.id
 
-      assigns[:locked].should be_true
+      expect(assigns[:locked]).to be_truthy
       # make sure that the show.html.erb template is rendered, because
       # in normal cases we redirect to the assignment's external_tool_tag.
-      response.should render_template('assignments/show')
+      expect(response).to render_template('assignments/show')
     end
 
     it "should require login for external tools in a public course" do
@@ -209,17 +209,17 @@ describe AssignmentsController do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>1,'hidden'=>true}])
       get 'syllabus', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "should assign variables" do
       user_session(@student)
       get 'syllabus', :course_id => @course.id
-      assigns[:assignment_groups].should_not be_nil
-      assigns[:events].should_not be_nil
-      assigns[:undated_events].should_not be_nil
-      assigns[:dates].should_not be_nil
+      expect(assigns[:assignment_groups]).not_to be_nil
+      expect(assigns[:events]).not_to be_nil
+      expect(assigns[:undated_events]).not_to be_nil
+      expect(assigns[:dates]).not_to be_nil
     end
   end
 
@@ -236,7 +236,7 @@ describe AssignmentsController do
 
       get 'new', :course_id => @course.id
 
-      assigns[:assignment].workflow_state.should == 'unpublished'
+      expect(assigns[:assignment].workflow_state).to eq 'unpublished'
     end
   end
 
@@ -250,38 +250,32 @@ describe AssignmentsController do
     it "should create assignment" do
       user_session(@student)
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
-      assigns[:assignment].should_not be_nil
-      assigns[:assignment].title.should eql("some assignment")
-      assigns[:assignment].context_id.should eql(@course.id)
+      expect(assigns[:assignment]).not_to be_nil
+      expect(assigns[:assignment].title).to eql("some assignment")
+      expect(assigns[:assignment].context_id).to eql(@course.id)
     end
 
     it "should create assignment when no groups exist yet" do
       user_session(@student)
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => ''}
-      assigns[:assignment].should_not be_nil
-      assigns[:assignment].title.should eql("some assignment")
-      assigns[:assignment].context_id.should eql(@course.id)
+      expect(assigns[:assignment]).not_to be_nil
+      expect(assigns[:assignment].title).to eql("some assignment")
+      expect(assigns[:assignment].context_id).to eql(@course.id)
     end
 
     it "should set updating_user on created assignment" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :submission_types => "discussion_topic"}
       a = assigns[:assignment]
-      a.should_not be_nil
-      a.discussion_topic.should_not be_nil
-      a.discussion_topic.user_id.should eql(@teacher.id)
-    end
-
-    it "should default to published if draft state is disabled" do
-      Account.default.disable_feature!(:draft_state)
-      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
-      assigns[:assignment].should be_published
+      expect(a).not_to be_nil
+      expect(a.discussion_topic).not_to be_nil
+      expect(a.discussion_topic.user_id).to eql(@teacher.id)
     end
 
     it "should default to unpublished if draft state is enabled" do
       Account.default.enable_feature!(:draft_state)
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
-      assigns[:assignment].should be_unpublished
+      expect(assigns[:assignment]).to be_unpublished
     end
   end
 
@@ -295,14 +289,14 @@ describe AssignmentsController do
     it "should find assignment" do
       user_session(@student)
       get 'edit', :course_id => @course.id, :id => @assignment.id
-      assigns[:assignment].should eql(@assignment)
+      expect(assigns[:assignment]).to eql(@assignment)
     end
 
     it "bootstraps the correct assignment info to js_env" do
       user_session(@teacher)
       get 'edit', :course_id => @course.id, :id => @assignment.id
-      assigns[:js_env][:ASSIGNMENT]['id'].should == @assignment.id
-      assigns[:js_env][:ASSIGNMENT_OVERRIDES].should == []
+      expect(assigns[:js_env][:ASSIGNMENT]['id']).to eq @assignment.id
+      expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
     end
 
   end
@@ -317,8 +311,8 @@ describe AssignmentsController do
     it "should update attributes" do
       user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title"}
-      assigns[:assignment].should eql(@assignment)
-      assigns[:assignment].title.should eql("test title")
+      expect(assigns[:assignment]).to eql(@assignment)
+      expect(assigns[:assignment].title).to eql("test title")
     end
   end
 
@@ -331,9 +325,9 @@ describe AssignmentsController do
     it "should delete assignments if authorized" do
       user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @assignment.id
-      assigns[:assignment].should_not be_nil
-      assigns[:assignment].should_not be_frozen
-      assigns[:assignment].should be_deleted
+      expect(assigns[:assignment]).not_to be_nil
+      expect(assigns[:assignment]).not_to be_frozen
+      expect(assigns[:assignment]).to be_deleted
     end
   end
 end

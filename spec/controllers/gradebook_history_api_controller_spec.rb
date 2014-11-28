@@ -54,23 +54,23 @@ describe GradebookHistoryApiController do
       before { get 'days', :course_id => @course.id, :format => 'json' }
 
       it 'provides an array of the dates where there are submissions' do
-        json_body.map{ |d| d['date'] }.sort.should == [date_key(@submission1), date_key(@submission3)].sort
+        expect(json_body.map{ |d| d['date'] }.sort).to eq [date_key(@submission1), date_key(@submission3)].sort
       end
 
       it 'nests all the graders for a day inside the date entry' do
-        graders_hash_for(@submission1).map{|g| g['name'] }.sort.should == ['Grader', 'SuperGrader']
-        graders_hash_for(@submission3).map{|g| g['name'] }.should == ['OtherGrader']
+        expect(graders_hash_for(@submission1).map{|g| g['name'] }.sort).to eq ['Grader', 'SuperGrader']
+        expect(graders_hash_for(@submission3).map{|g| g['name'] }).to eq ['OtherGrader']
       end
 
       it 'includes a list of assignment names for each grader' do
         grader_hash = graders_hash_for(@submission3).select{|h| h['id'] == @other_grader.id }.first
-        grader_hash['assignments'].map{|a| a['name'] }.sort.should == ['some assignment', 'another assignment'].sort
+        expect(grader_hash['assignments'].map{|a| a['name'] }.sort).to eq ['some assignment', 'another assignment'].sort
       end
     end
 
     it 'paginates' do
       get 'days', :course_id => @course.id, :format => 'json', :page => 2, :per_page => 2
-      json_body.map{|d| d['date'] }.should == [@submission3.graded_at.to_date.as_json]
+      expect(json_body.map{|d| d['date'] }).to eq [@submission3.graded_at.to_date.as_json]
     end
   end
 
@@ -78,11 +78,11 @@ describe GradebookHistoryApiController do
     before { get 'day_details', :course_id => @course.id, :format => 'json', :date => @submission1.graded_at.strftime('%Y-%m-%d') }
 
     it 'has the graders as the top level piece of data' do
-      json_body.map{|g| g['id'] }.sort.should == [@grader.id, @super_grader.id].sort
+      expect(json_body.map{|g| g['id'] }.sort).to eq [@grader.id, @super_grader.id].sort
     end
 
     it 'lists assignment names under the graders' do
-      json_body.select{|g| g['id'] == @grader.id }.first['assignments'].first['name'].should == @assignment1.title
+      expect(json_body.select{|g| g['id'] == @grader.id }.first['assignments'].first['name']).to eq @assignment1.title
     end
   end
 
@@ -93,8 +93,8 @@ describe GradebookHistoryApiController do
     before { get( 'submissions', { :format => 'json' }.merge(params) ) }
 
     it 'lists submissions' do
-      json_body.first['submission_id'].should == @submission1.id
-      json_body.first['versions'].first['score'].should == 100
+      expect(json_body.first['submission_id']).to eq @submission1.id
+      expect(json_body.first['versions'].first['score']).to eq 100
     end
   end
 end

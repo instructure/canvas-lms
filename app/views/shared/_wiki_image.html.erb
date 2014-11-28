@@ -1,3 +1,4 @@
+<% wiki_image ||= nil %>
 <% url = context_url(@context, :context_file_preview_url, wiki_image.id) if wiki_image %>
 <a href="#" style="text-align: center <%= hidden unless wiki_image %>" class="img_link" title="<%= t('titles.embed_image', %{Click to embed image}) %>">
   <div class="img_holder">

@@ -49,7 +49,7 @@ module Lti
       def perform
         callbacks.each do |tool_id, callback|
           begin
-            Net::HTTP::get(URI.parse(callback))
+            CanvasHttp.get(URI.parse(callback).to_s)
           rescue => e
             Rails.logger.error("Failed to call logout callback '#{callback}': #{e.inspect}")
           end

@@ -51,10 +51,10 @@ describe "users/_logins.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
-      response.should have_tag("div.can_edit_sis_user_id", 'true')
+      expect(response).to have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
+      expect(response).to have_tag("div.can_edit_sis_user_id", 'true')
       page = Nokogiri('<document>' + response.body + '</document>')
-      page.css(".login .delete_pseudonym_link").first['style'].should == ''
+      expect(page.css(".login .delete_pseudonym_link").first['style']).to eq ''
     end
 
     it "should not show to non-sis admin" do
@@ -62,10 +62,10 @@ describe "users/_logins.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
-      response.should have_tag("div.can_edit_sis_user_id", 'false')
+      expect(response).to have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
+      expect(response).to have_tag("div.can_edit_sis_user_id", 'false')
       page = Nokogiri('<document>' + response.body + '</document>')
-      page.css(".login .delete_pseudonym_link").first['style'].should == 'display: none;'
+      expect(page.css(".login .delete_pseudonym_link").first['style']).to eq 'display: none;'
     end
   end
 end

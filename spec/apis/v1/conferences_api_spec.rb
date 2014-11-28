@@ -25,7 +25,7 @@ include Api
 describe "Conferences API", type: :request do
   before :once do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.find_or_create_by_name('wimba')
+    @plugin = PluginSetting.create!(name: 'wimba')
     @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
     @category_path_options = { :controller => "conferences", :format => "json" }
     course_with_teacher(:active_all => true)
@@ -39,7 +39,7 @@ describe "Conferences API", type: :request do
       @user = nil
       raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      response.code.should == '401'
+      expect(response.code).to eq '401'
     end
 
     it "should list all the conferences" do
@@ -50,11 +50,11 @@ describe "Conferences API", type: :request do
 
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      json.should == api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @course, @user)
+      expect(json).to eq api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @course, @user)
     end
 
     it "should not list conferences for disabled plugins" do
-      plugin = PluginSetting.find_or_create_by_name('adobe_connect')
+      plugin = PluginSetting.create!(name: 'adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
       @conferences = ['AdobeConnect', 'Wimba'].map {|ct| @course.web_conferences.create!(:conference_type => ct,
                                                                                          :duration => 60,
@@ -64,7 +64,7 @@ describe "Conferences API", type: :request do
       plugin.save!
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      json.should == api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
+      expect(json).to eq api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
     end
 
     it "should only list conferences the user is a participant of" do
@@ -77,7 +77,7 @@ describe "Conferences API", type: :request do
       @conferences[0].save!
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      json.should == api_conferences_json([WebConference.find(@conferences[0].id)], @course, @user)
+      expect(json).to eq api_conferences_json([WebConference.find(@conferences[0].id)], @course, @user)
     end
 
     it 'should get a conferences for a group' do
@@ -90,7 +90,7 @@ describe "Conferences API", type: :request do
                                                                       :title => "Wimba #{i}")}
       json = api_call(:get, "/api/v1/groups/#{@group.to_param}/conferences", @category_path_options.
         merge(action: 'index', group_id: @group.to_param))
-      json.should == api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @group, @student)
+      expect(json).to eq api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @group, @student)
     end
 
   end

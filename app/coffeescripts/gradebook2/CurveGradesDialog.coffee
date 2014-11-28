@@ -132,7 +132,7 @@ define [
           if users
             pct = (users.length / maxCount)
             cnt = users.length
-          color = (if idx == 0 then "#ee8" else "#cdf")
+          color = (if idx == 0 then "#a03536" else "#007ab8")
           $("#results_list").prepend "<td style='padding: 1px;'><div title='" + cnt + " student" + (if cnt == 1 then "" else "s") + " will get " + idx + " points' style='border: 1px solid #888; background-color: " + color + "; width: " + width + "px; height: " + (100 * pct) + "px; margin-top: " + (100 * (1 - pct)) + "px;'>&nbsp;</div></td>"
           $("#results_values").prepend "<td style='text-align: center;'>" + idx + "</td>"
           skipCount = 0

@@ -1,18 +1,18 @@
-require [
+define [
   'jquery'
   'compiled/jquery/fixDialogButtons'
   'jquery.disableWhileLoading'
   'helpers/jquery.simulate'
-], ($, elementToggler)->
+], ($) ->
 
   module 'fixDialogButtons',
-    
+
     setup: ->
       @clock = sinon.useFakeTimers()
-    
+
     teardown: ->
       @clock.restore()
-    
+
 
   test 'handles buttons', ->
 
@@ -64,7 +64,7 @@ require [
     $closer = $dialog.dialog('widget').find('.ui-dialog-buttonpane .ui-button:contains("This will cause the dialog to close")')
     $closer.click()
     equal $dialog.dialog('isOpen'), false, msg
-    
+
     $dialog.remove() #clean up
 
   test "enter key submits form", ->
@@ -91,6 +91,21 @@ require [
       e.preventDefault()
       ++submitCount
 
+    $('#box').simulate("keyup", { keyCode: $.ui.keyCode.ENTER })
+    equal submitCount, 1
+
+    $dialog.remove()
+
+  test "enter key submits form only once without preventDefault", ->
+    $dialog = $("<form style='display:none' action='#' onsubmit='return false;'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('body').dialog()
+    $dialog.fixDialogButtons()
+
+    submitCount = 0
+    $dialog.submit (e) ->
+      ++submitCount
+
+    $('#box').simulate("keydown", { keyCode: $.ui.keyCode.ENTER })
+    $('#box').simulate("keypress", { keyCode: $.ui.keyCode.ENTER })
     $('#box').simulate("keyup", { keyCode: $.ui.keyCode.ENTER })
     equal submitCount, 1
 

@@ -305,7 +305,7 @@
     # paginate the indexed scope and then convert to actual Version records
     path = api_v1_gradebook_history_feed_url(@context, params)
     indexed_versions = Api.paginate(indexed_versions, self, path)
-    SubmissionVersion.send(:preload_associations, indexed_versions, :version)
+    ActiveRecord::Associations::Preloader.new(indexed_versions, :version).run
     versions = indexed_versions.map(&:version)
 
     # render them

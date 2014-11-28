@@ -26,8 +26,8 @@ describe GradeCalculator do
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
       @assignment2 = @course.assignments.create!(:title => "Some Assignment2", :points_possible => 10, :assignment_group => @group)
       @submission = @assignment2.grade_student(@user, :grade => "5")
-      @user.enrollments.first.computed_current_score.should eql(50.0)
-      @user.enrollments.first.computed_final_score.should eql(25.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(25.0)
     end
     
     it "should recompute when an assignment's points_possible changes'" do
@@ -35,14 +35,14 @@ describe GradeCalculator do
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
       @submission = @assignment.grade_student(@user, :grade => "5")
-      @user.enrollments.first.computed_current_score.should eql(50.0)
-      @user.enrollments.first.computed_final_score.should eql(50.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
       
       @assignment.points_possible = 5
       @assignment.save!
       
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(100.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(100.0)
     end
     
     it "should recompute when an assignment group's weight changes'" do
@@ -55,16 +55,16 @@ describe GradeCalculator do
       @assignment.grade_student(@user, :grade => "10")
       @course.assignments.create! :points_possible => 1,
                                   :assignment_group => @group2
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(50.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
 
       @group.group_weight = 60
       @group2.group_weight = 40
       @group.save!
       @group2.save!
 
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(60.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(60.0)
     end
 
     def two_groups_two_assignments(g1_weight, a1_possible, g2_weight, a2_possible)
@@ -82,24 +82,24 @@ describe GradeCalculator do
     describe "group with no grade or muted grade" do
       before(:each) do
         two_groups_two_assignments(50, 10, 50, 10)
-        @user.enrollments.first.computed_current_score.should eql(nil)
-        @user.enrollments.first.computed_final_score.should eql(0.0)
+        expect(@user.enrollments.first.computed_current_score).to eql(nil)
+        expect(@user.enrollments.first.computed_final_score).to eql(0.0)
         @submission = @assignment.grade_student(@user, :grade => "5")
-        @submission[0].score.should eql(5.0)
+        expect(@submission[0].score).to eql(5.0)
       end
 
       it "should ignore no grade for current grade calculation, even when weighted" do
         @course.group_weighting_scheme = "percent"
         @course.save!
         @user.reload
-        @user.enrollments.first.computed_current_score.should eql(50.0)
-        @user.enrollments.first.computed_final_score.should eql(25.0)
+        expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+        expect(@user.enrollments.first.computed_final_score).to eql(25.0)
       end
 
       it "should ignore no grade for current grade but not final grade" do
         @user.reload
-        @user.enrollments.first.computed_current_score.should eql(50.0)
-        @user.enrollments.first.computed_final_score.should eql(25.0)
+        expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+        expect(@user.enrollments.first.computed_final_score).to eql(25.0)
       end
 
       context "muted assignments" do
@@ -111,8 +111,8 @@ describe GradeCalculator do
           # should have same scores as previous spec despite having a grade
           @assignment2.grade_student(@user, :grade => "500")
           @user.reload
-          @user.enrollments.first.computed_current_score.should eql(50.0)
-          @user.enrollments.first.computed_final_score.should eql(25.0)
+          expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+          expect(@user.enrollments.first.computed_final_score).to eql(25.0)
         end
 
         it "should ignore muted grade for current grade calculation, even when weighted" do
@@ -121,8 +121,8 @@ describe GradeCalculator do
           @course.group_weighting_scheme = "percent"
           @course.save!
           @user.reload
-          @user.enrollments.first.computed_current_score.should eql(50.0)
-          @user.enrollments.first.computed_final_score.should eql(25.0)
+          expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+          expect(@user.enrollments.first.computed_final_score).to eql(25.0)
         end
 
         it "should be possible to compute grades with muted assignments" do
@@ -134,8 +134,8 @@ describe GradeCalculator do
                                      @course.id,
                                      :ignore_muted => false
           (current, _), (final, _) = calc.compute_scores.first
-          current[:grade].should == 50
-          final[:grade].should == 25
+          expect(current[:grade]).to eq 50
+          expect(final[:grade]).to eq 25
         end
 
         it "should be impossible to save grades that considered muted assignments" do
@@ -143,7 +143,7 @@ describe GradeCalculator do
           calc = GradeCalculator.new [@user.id],
                                      @course.id,
                                      :ignore_muted => false
-          lambda { calc.save_scores }.should raise_error
+          expect { calc.save_scores }.to raise_error
         end
       end
     end
@@ -154,88 +154,88 @@ describe GradeCalculator do
       @assignment2.grade_student @user, grade: 10
       calc = GradeCalculator.new [@user.id], @course.id
       (_, current_group_info), (_, final_group_info) = calc.compute_scores.first
-      current_group_info.should == final_group_info
-      current_group_info[@group.id][:grade].should == 50
-      current_group_info[@group2.id][:grade].should == 100
+      expect(current_group_info).to eq final_group_info
+      expect(current_group_info[@group.id][:grade]).to eq 50
+      expect(current_group_info[@group2.id][:grade]).to eq 100
     end
 
     it "should compute a weighted grade when specified" do
       two_groups_two_assignments(50, 10, 50, 40)
-      @user.enrollments.first.computed_current_score.should eql(nil)
-      @user.enrollments.first.computed_final_score.should eql(0.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(nil)
+      expect(@user.enrollments.first.computed_final_score).to eql(0.0)
       @submission = @assignment.grade_student(@user, :grade => "9")
-      @submission[0].score.should eql(9.0)
-      @user.enrollments.should_not be_empty
+      expect(@submission[0].score).to eql(9.0)
+      expect(@user.enrollments).not_to be_empty
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(90.0)
-      @user.enrollments.first.computed_final_score.should eql(18.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(90.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(18.0)
       @course.group_weighting_scheme = "percent"
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(90.0)
-      @user.enrollments.first.computed_final_score.should eql(45.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(90.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(45.0)
       @submission2 = @assignment2.grade_student(@user, :grade => "20")
-      @submission2[0].score.should eql(20.0)
+      expect(@submission2[0].score).to eql(20.0)
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(70.0)
-      @user.enrollments.first.computed_final_score.should eql(70.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(70.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(70.0)
       @course.group_weighting_scheme = nil
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(58.0)
-      @user.enrollments.first.computed_final_score.should eql(58.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(58.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(58.0)
     end
     
     it "should incorporate extra credit when the weighted total is more than 100%" do
       two_groups_two_assignments(50, 10, 60, 40)
-      @user.enrollments.first.computed_current_score.should eql(nil)
-      @user.enrollments.first.computed_final_score.should eql(0.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(nil)
+      expect(@user.enrollments.first.computed_final_score).to eql(0.0)
       @submission = @assignment.grade_student(@user, :grade => "10")
-      @submission[0].score.should eql(10.0)
+      expect(@submission[0].score).to eql(10.0)
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(20.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(20.0)
       @course.group_weighting_scheme = "percent"
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(50.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
       @submission2 = @assignment2.grade_student(@user, :grade => "40")
-      @submission2[0].score.should eql(40.0)
+      expect(@submission2[0].score).to eql(40.0)
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(110.0)
-      @user.enrollments.first.computed_final_score.should eql(110.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(110.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(110.0)
       @course.group_weighting_scheme = nil
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(100.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(100.0)
     end
     
     it "should incorporate extra credit when the total is more than the possible" do
       two_groups_two_assignments(50, 10, 60, 40)
-      @user.enrollments.first.computed_current_score.should eql(nil)
-      @user.enrollments.first.computed_final_score.should eql(0.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(nil)
+      expect(@user.enrollments.first.computed_final_score).to eql(0.0)
       @submission = @assignment.grade_student(@user, :grade => "11")
-      @submission[0].score.should eql(11.0)
+      expect(@submission[0].score).to eql(11.0)
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(110.0)
-      @user.enrollments.first.computed_final_score.should eql(22.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(110.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(22.0)
       @course.group_weighting_scheme = "percent"
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(110.0)
-      @user.enrollments.first.computed_final_score.should eql(55.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(110.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(55.0)
       @submission2 = @assignment2.grade_student(@user, :grade => "45")
-      @submission2[0].score.should eql(45.0)
+      expect(@submission2[0].score).to eql(45.0)
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(122.5)
-      @user.enrollments.first.computed_final_score.should eql(122.5)
+      expect(@user.enrollments.first.computed_current_score).to eql(122.5)
+      expect(@user.enrollments.first.computed_final_score).to eql(122.5)
       @course.group_weighting_scheme = nil
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(112.0)
-      @user.enrollments.first.computed_final_score.should eql(112.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(112.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(112.0)
     end
     
     it "should properly calculate the grade when total weight is less than 100%" do
@@ -244,13 +244,13 @@ describe GradeCalculator do
       @course.group_weighting_scheme = "percent"
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(55.6)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(55.6)
       
       @submission2 = @assignment2.grade_student(@user, :grade => "40")
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(100.0)
-      @user.enrollments.first.computed_final_score.should eql(100.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(100.0)
     end
 
     it "should properly calculate the grade when there are 'not graded' assignments with scores" do
@@ -266,8 +266,8 @@ describe GradeCalculator do
       @submission2 = @assignment2.grade_student(@user, :grade => "1")
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(90.0)
-      @user.enrollments.first.computed_final_score.should eql(90.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(90.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(90.0)
     end
     
     def two_graded_assignments
@@ -283,34 +283,34 @@ describe GradeCalculator do
       @submission2 = @assignment2.grade_student(@user, :grade => "4")
       @course.save!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(60.0)
-      @user.enrollments.first.computed_final_score.should eql(60.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(60.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(60.0)
     end
     
     it "should recalculate all cached grades when an assignment is deleted/restored" do
       two_graded_assignments
       @assignment2.destroy
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(40.0) # 2/5
-      @user.enrollments.first.computed_final_score.should eql(40.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(40.0) # 2/5
+      expect(@user.enrollments.first.computed_final_score).to eql(40.0)
       
       @assignment2.restore
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(60.0)
-      @user.enrollments.first.computed_final_score.should eql(60.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(60.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(60.0)
     end
 
     it "should recalculate all cached grades when an assignment is muted/unmuted" do
       two_graded_assignments
       @assignment2.mute!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(40.0) # 2/5
-      @user.enrollments.first.computed_final_score.should eql(20.0) # 2/10
+      expect(@user.enrollments.first.computed_current_score).to eql(40.0) # 2/5
+      expect(@user.enrollments.first.computed_final_score).to eql(20.0) # 2/10
 
       @assignment2.unmute!
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(60.0)
-      @user.enrollments.first.computed_final_score.should eql(60.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(60.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(60.0)
     end
 
     def nil_graded_assignment
@@ -336,15 +336,15 @@ describe GradeCalculator do
       nil_graded_assignment
 
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(93.2)
-      @user.enrollments.first.computed_final_score.should eql(75.9)
+      expect(@user.enrollments.first.computed_current_score).to eql(93.2)
+      expect(@user.enrollments.first.computed_final_score).to eql(75.9)
 
       @course.group_weighting_scheme = "percent"
       @course.save!
 
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(58.3)
-      @user.enrollments.first.computed_final_score.should eql(48.4)
+      expect(@user.enrollments.first.computed_current_score).to eql(58.3)
+      expect(@user.enrollments.first.computed_final_score).to eql(48.4)
     end
 
     it "should treat muted assignments as if there is no submission" do
@@ -355,15 +355,15 @@ describe GradeCalculator do
       @assignment_1.grade_student(@user, :grade => 500)
       
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(93.2)
-      @user.enrollments.first.computed_final_score.should eql(75.9)
+      expect(@user.enrollments.first.computed_current_score).to eql(93.2)
+      expect(@user.enrollments.first.computed_final_score).to eql(75.9)
 
       @course.group_weighting_scheme = "percent"
       @course.save!
 
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(58.3)
-      @user.enrollments.first.computed_final_score.should eql(48.4)
+      expect(@user.enrollments.first.computed_current_score).to eql(58.3)
+      expect(@user.enrollments.first.computed_final_score).to eql(48.4)
     end
 
     it "should not include unpublished assignments" do
@@ -373,8 +373,8 @@ describe GradeCalculator do
       @assignment2.unpublish
 
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(40.0)
-      @user.enrollments.first.computed_final_score.should eql(40.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(40.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(40.0)
     end
   end
 
@@ -390,8 +390,8 @@ describe GradeCalculator do
 
     calc = GradeCalculator.new([@student2.id, @student1.id], @course)
     grades = calc.compute_scores
-    grades.shift.map { |g,_| g[:grade] }.should == [100, 100]
-    grades.shift.map { |g,_| g[:grade] }.should == [50, 50]
+    expect(grades.shift.map { |g,_| g[:grade] }).to eq [100, 100]
+    expect(grades.shift.map { |g,_| g[:grade] }).to eq [50, 50]
   end
 
   it "returns point information for unweighted courses" do
@@ -400,7 +400,7 @@ describe GradeCalculator do
     a.grade_student @student, :grade => 25
     calc = GradeCalculator.new([@student.id], @course)
     ((grade_info, _), _) = calc.compute_scores.first
-    grade_info.should == {:grade => 50, :total => 25, :possible => 50}
+    expect(grade_info).to eq({:grade => 50, :total => 25, :possible => 50})
   end
 
   # We should keep this in sync with GradeCalculatorSpec.coffee
@@ -431,8 +431,8 @@ describe GradeCalculator do
     def check_grades(current, final)
       GradeCalculator.recompute_final_score(@student.id, @course.id)
       @enrollment.reload
-      @enrollment.computed_current_score.should == current
-      @enrollment.computed_final_score.should == final
+      expect(@enrollment.computed_current_score).to eq current
+      expect(@enrollment.computed_final_score).to eq final
     end
 
     it "should work without assignments or submissions" do
@@ -624,22 +624,22 @@ describe GradeCalculator do
         end
         it "should calculate scores based on visible assignments only" do
           # 5 + 15 + 10 + 20 + 10
-          get_user_points_and_course_total(@user,@course).should == [60,100]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [60,100]
         end
         it "should drop the lowest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_lowest:1')
           # 5 + 15 + 10 + 20 + 10 - 5
-          get_user_points_and_course_total(@user,@course).should == [55,80]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [55,80]
         end
         it "should drop the highest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_highest:1')
           # 5 + 15 + 10 + 20 + 10 - 20
-          get_user_points_and_course_total(@user,@course).should == [40,80]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [40,80]
         end
         it "shouldnt count an invisible assingment with never drop on" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           # 5 + 15 + 10 + 20 + 10 - 10 - 10
-          get_user_points_and_course_total(@user,@course).should == [40,60]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [40,60]
         end
       end
 
@@ -649,22 +649,22 @@ describe GradeCalculator do
         end
         it "should calculate scores based on all active assignments" do
           # 5 + 15 + 10 + 0 + 20 + 10
-          get_user_points_and_course_total(@user,@course).should == [60,140]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [60,140]
         end
         it "should drop the lowest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_lowest:1')
           # 5 + 15 + 10 + 0 + 20 + 10 - 0
-          get_user_points_and_course_total(@user,@course).should == [60,120]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [60,120]
         end
         it "should drop the highest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_highest:1')
           # 5 + 15 + 10 + 0 + 20 + 10 - 20
-          get_user_points_and_course_total(@user,@course).should == [40,120]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [40,120]
         end
         it "shouldnt count an invisible assingment with never drop on" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@non_overridden_lowest.id}")
           # 5 + 15 + 10 + 0 + 20 + 10 - 5 - 0
-          get_user_points_and_course_total(@user,@course).should == [55,100]
+          expect(get_user_points_and_course_total(@user,@course)).to eq [55,100]
         end
       end
     end

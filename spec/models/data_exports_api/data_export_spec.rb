@@ -26,12 +26,12 @@ describe DataExportsApi::DataExport do #nothing
     end
 
     it "should find data exports for a given account" do
-      DataExportsApi::DataExport.for(Account.default).should == [@dd]
+      expect(DataExportsApi::DataExport.for(Account.default)).to eq [@dd]
     end
 
     it "should cancel data export" do
       @dd.cancel
-      @dd.workflow_state.should == "cancelled"
+      expect(@dd.workflow_state).to eq "cancelled"
     end
   end
 end

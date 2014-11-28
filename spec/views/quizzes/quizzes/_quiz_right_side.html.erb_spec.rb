@@ -20,12 +20,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/_quiz_right_side" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render" do
     course_with_student
     view_context
     assigns[:quiz] = @course.quizzes.create!
     render :partial => "quizzes/quizzes/quiz_right_side"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

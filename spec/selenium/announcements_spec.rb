@@ -39,20 +39,20 @@ describe "announcements" do
     wait_for_ajaximations
     expect_new_page_load { submit_form('.form-actions') }
     announcement = Announcement.find_by_title(topic_title)
-    announcement[:require_initial_post].should == true
+    expect(announcement[:require_initial_post]).to eq true
     student_2 = student_in_course.user
     announcement.discussion_entries.create!(:user => student_2, :message => student_2_entry)
 
     login_as(student.primary_pseudonym.unique_id, password)
     get "/courses/#{@course.id}/announcements/#{announcement.id}"
-    f('#discussion_subentries span').text.should == "Replies are only visible to those who have posted at least one reply."
-    ff('.discussion_entry').each { |entry| entry.should_not include_text(student_2_entry) }
+    expect(f('#discussion_subentries span').text).to eq "Replies are only visible to those who have posted at least one reply."
+    ff('.discussion_entry').each { |entry| expect(entry).not_to include_text(student_2_entry) }
     f('.discussion-reply-action').click
     wait_for_ajaximations
     type_in_tiny('textarea', 'reply')
     submit_form('#discussion_topic .discussion-reply-form')
     wait_for_ajaximations
-    ff('.discussion_entry .message')[1].should include_text(student_2_entry)
+    expect(ff('.discussion_entry .message')[1]).to include_text(student_2_entry)
   end
 
   context "announcements as a student" do
@@ -68,7 +68,7 @@ describe "announcements" do
       driver.execute_script('window.scrollTo(0, 100000)')
       keep_trying_until { ffj(".discussionTopicIndexList .discussion-topic").length > start }
 
-      f(".discussionTopicIndexList").should_not include_text('discussion_topic')
+      expect(f(".discussionTopicIndexList")).not_to include_text('discussion_topic')
     end
 
     it "should validate that a student can not see an announcement with a delayed posting date" do
@@ -77,11 +77,11 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
       wait_for_ajaximations
 
-      f('#content').should include_text('There are no announcements to show')
+      expect(f('#content')).to include_text('There are no announcements to show')
       announcement.update_attributes(:delayed_post_at => nil)
       announcement.reload
       refresh_page # in order to see the announcement
-      f(".discussion-topic").should include_text(announcement_title)
+      expect(f(".discussion-topic")).to include_text(announcement_title)
     end
 
     it "should allow a group member to create an announcement" do
@@ -122,16 +122,16 @@ describe "announcements" do
         what_to_create.last.update_attributes(attribute => update_value)
         refresh_page # in order to get the new topic information
         replace_content(f('#searchTerm'), search_term)
-        ff('.discussionTopicIndexList .discussion-topic').count.should == expected_results
+        expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq expected_results
       end
 
       def refresh_and_filter(filter_type, filter, expected_text, expected_results = 1)
         refresh_page # in order to get the new topic information
         wait_for_ajaximations
-        keep_trying_until { ff('.toggleSelected').count.should == what_to_create.count }
+        keep_trying_until { expect(ff('.toggleSelected').count).to eq what_to_create.count }
         filter_type == :css ? driver.execute_script("$('#{filter}').click()") : replace_content(f('#searchTerm'), filter)
-        ff('.discussionTopicIndexList .discussion-topic').count.should == expected_results
-        expected_results > 1 ? ff('.discussionTopicIndexList .discussion-topic').each { |topic| topic.should include_text(expected_text) } : (f('.discussionTopicIndexList .discussion-topic').should include_text(expected_text))
+        expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq expected_results
+        expected_results > 1 ? ff('.discussionTopicIndexList .discussion-topic').each { |topic| expect(topic).to include_text(expected_text) } : (expect(f('.discussionTopicIndexList .discussion-topic')).to include_text(expected_text))
       end
 
       it "should bulk delete topics" do
@@ -139,8 +139,8 @@ describe "announcements" do
         f('#delete').click
         driver.switch_to.alert.accept
         wait_for_ajax_requests
-        ff('.discussion-topic').count.should == 0
-        what_to_create.where(:workflow_state => 'active').count.should == 0
+        expect(ff('.discussion-topic').count).to eq 0
+        expect(what_to_create.where(:workflow_state => 'active').count).to eq 0
       end
 
       it "should bulk lock topics" do
@@ -148,7 +148,7 @@ describe "announcements" do
         f('#lock').click
         wait_for_ajax_requests
         #TODO: check the UI to make sure the topics have a locked symbol
-        what_to_create.where(:locked => true).count.should == 5
+        expect(what_to_create.where(:locked => true).count).to eq 5
       end
 
       it "should search by title" do
@@ -192,14 +192,14 @@ describe "announcements" do
         type_in_tiny('textarea[name=message]', 'file attachement discussion')
         expect_new_page_load { submit_form('.form-actions') }
         wait_for_ajaximations
-        f('.zip').should include_text(filename)
+        expect(f('.zip')).to include_text(filename)
       end
 
       def edit(title, message)
         replace_content(f('input[name=title]'), title)
         type_in_tiny('textarea[name=message]', message)
         expect_new_page_load { submit_form('.form-actions') }
-        f('#discussion_topic .discussion-title').text.should == title
+        expect(f('#discussion_topic .discussion-title').text).to eq title
       end
 
       before (:each) do
@@ -221,7 +221,7 @@ describe "announcements" do
         expect_new_page_load { f('.btn-primary').click }
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
-        what_to_create.find_by_title(topic_title).attachment_id.should be_present
+        expect(what_to_create.find_by_title(topic_title).attachment_id).to be_present
       end
 
       it "should add an attachment to a graded topic" do
@@ -253,8 +253,8 @@ describe "announcements" do
         f('#delete').click
         driver.switch_to.alert.accept
         wait_for_ajaximations
-        what_to_create.last.workflow_state.should == 'deleted'
-        f('.discussionTopicIndexList').should be_nil
+        expect(what_to_create.last.workflow_state).to eq 'deleted'
+        expect(f('.discussionTopicIndexList')).to be_nil
       end
 
       it "should reorder topics" do
@@ -269,19 +269,19 @@ describe "announcements" do
         driver.action.drag_and_drop(fj('.discussion-drag-handle:visible', topics[0]), topics[2]).perform
         wait_for_ajax_requests
         new_topics = ffj('.discussion-topic') # using ffj to avoid selenium caching
-        new_topics[0].should_not include_text('new topic 0')
+        expect(new_topics[0]).not_to include_text('new topic 0')
       end
     end
 
     it "should create a delayed announcement" do
-      pending("193")
+      skip("193")
       get course_announcements_path(@course)
       create_announcement_manual('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
       datepicker_next
       f('.ui-datepicker-time .ui-datepicker-ok').click
       expect_new_page_load { submit_form('.form-actions') }
-      f('.discussion-fyi').should include_text('This topic will not be visible')
+      expect(f('.discussion-fyi')).to include_text('This topic will not be visible')
     end
 
     it "should add and remove an external feed to announcements" do
@@ -293,12 +293,12 @@ describe "announcements" do
 
       f(".add_external_feed_link").click
       wait_for_ajaximations
-      f("#external_feed_url").should be_displayed
+      expect(f("#external_feed_url")).to be_displayed
       f('#external_feed_url').send_keys(feed_name)
 
       f('#external_feed_enable_header_match').click
       wait_for_ajaximations
-      f('#external_feed_header_match').should be_displayed
+      expect(f('#external_feed_header_match')).to be_displayed
       f('#external_feed_header_match').send_keys('blah')
 
       expect {
@@ -307,11 +307,11 @@ describe "announcements" do
       }.to change(ExternalFeed, :count).by(1)
 
       #delete external feed
-      f(".external_feed").should include_text('feed')
+      expect(f(".external_feed")).to include_text('feed')
       expect {
         f('.external_feed .close').click
         wait_for_ajax_requests
-        element_exists('.external_feed').should be_false
+        expect(element_exists('.external_feed')).to be_falsey
       }.to change(ExternalFeed, :count).by(-1)
     end
 
@@ -324,11 +324,11 @@ describe "announcements" do
       expect_new_page_load { f('.form-actions button[type=submit]').click }
 
       topic.reload
-      topic.delayed_post_at.should be_nil
+      expect(topic.delayed_post_at).to be_nil
     end
 
     it "should have a teacher add a new entry to its own announcement" do
-      pending "delayed jobs"
+      skip "delayed jobs"
       create_announcement
       get [@course, @announcement]
 
@@ -336,9 +336,9 @@ describe "announcements" do
       entry_text = 'new entry text'
       type_in_tiny('textarea[name=message]', entry_text)
       expect_new_page_load { submit_form('.form-actions') }
-      f('#entry_list .discussion_entry .content').should include_text(entry_text)
+      expect(f('#entry_list .discussion_entry .content')).to include_text(entry_text)
       f('#left-side .announcements').click
-      f('.topic_reply_count').text.should == '1'
+      expect(f('.topic_reply_count').text).to eq '1'
     end
 
     it "should show announcements to student view student" do
@@ -347,7 +347,7 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
 
       announcement = f('.discussionTopicIndexList .discussion-topic')
-      announcement.find_element(:css, '.discussion-summary').should include_text(@announcement.message)
+      expect(announcement.find_element(:css, '.discussion-summary')).to include_text(@announcement.message)
     end
   end
 end

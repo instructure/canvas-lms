@@ -30,17 +30,17 @@ describe CalendarsController do
   describe "GET 'show2'" do
     it "should not redirect to the old calendar even with default settings" do
       get 'show2', :user_id => @user.id
-      response.should_not redirect_to(calendar_url(anchor: ' '))
+      expect(response).not_to redirect_to(calendar_url(anchor: ' '))
     end
 
     it "should assign variables" do
       course_event
       get 'show2', :user_id => @user.id
-      response.should be_success
-      assigns[:contexts].should_not be_nil
-      assigns[:contexts].should_not be_empty
-      assigns[:contexts][0].should eql(@user)
-      assigns[:contexts][1].should eql(@course)
+      expect(response).to be_success
+      expect(assigns[:contexts]).not_to be_nil
+      expect(assigns[:contexts]).not_to be_empty
+      expect(assigns[:contexts][0]).to eql(@user)
+      expect(assigns[:contexts][1]).to eql(@course)
     end
 
     specs_require_sharding
@@ -58,43 +58,43 @@ describe CalendarsController do
         student_in_course(:active_all => true, :user => @user)
       end
       get 'show2', :user_id => @user.id
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
   describe "POST 'switch_calendar'" do
     it "should not switch to the old calendar anymore" do
-      @user.preferences[:use_calendar1].should be_nil
+      expect(@user.preferences[:use_calendar1]).to be_nil
 
       post 'switch_calendar', {:preferred_calendar => '1'}
-      response.should redirect_to(calendar2_url(anchor: ' '))
-      @user.reload.preferences[:use_calendar1].should be_true
+      expect(response).to redirect_to(calendar2_url(anchor: ' '))
+      expect(@user.reload.preferences[:use_calendar1]).to be_truthy
     end
 
     it "should not switch to the old calendar if not allowed" do
-      @user.preferences[:use_calendar1].should be_nil
+      expect(@user.preferences[:use_calendar1]).to be_nil
       post 'switch_calendar', {:preferred_calendar => '1'}
-      response.should redirect_to(calendar2_url(anchor: ' '))
+      expect(response).to redirect_to(calendar2_url(anchor: ' '))
 
       # not messing with their preference in case they prefer cal1 in a
       # different account
-      @user.reload.preferences[:use_calendar1].should be_true
+      expect(@user.reload.preferences[:use_calendar1]).to be_truthy
     end
 
     it "should redirect to new calendar regardless of old preference settings" do
-      @user.preferences[:use_calendar1].should be_nil
+      expect(@user.preferences[:use_calendar1]).to be_nil
 
       post 'switch_calendar', {:preferred_calendar => '2'}
-      response.should redirect_to(calendar2_url(anchor: ' '))
-      @user.reload.preferences[:use_calendar1].should be_nil
+      expect(response).to redirect_to(calendar2_url(anchor: ' '))
+      expect(@user.reload.preferences[:use_calendar1]).to be_nil
     end
 
     it "should switch to the new calendar if allowed" do
       @user.update_attribute(:preferences, {:use_calendar1 => true})
 
       post 'switch_calendar', {:preferred_calendar => '2'}
-      response.should redirect_to(calendar2_url(anchor: ' '))
-      @user.reload.preferences[:use_calendar1].should be_nil
+      expect(response).to redirect_to(calendar2_url(anchor: ' '))
+      expect(@user.reload.preferences[:use_calendar1]).to be_nil
     end
   end
 end
@@ -115,9 +115,9 @@ describe CalendarEventsApiController do
 
     it "should assign variables" do
       get 'public_feed', :feed_code => "course_#{@course.uuid}", :format => 'ics'
-      response.should be_success
-      assigns[:events].should be_present
-      assigns[:events][0].should eql(@event)
+      expect(response).to be_success
+      expect(assigns[:events]).to be_present
+      expect(assigns[:events][0]).to eql(@event)
     end
 
     it "should use the relevant event for that section" do
@@ -125,41 +125,41 @@ describe CalendarEventsApiController do
       c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
       c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
       get 'public_feed', :feed_code => "user_#{@user.uuid}", :format => 'ics'
-      response.should be_success
-      assigns[:events].should be_present
-      assigns[:events].should == [c1]
+      expect(response).to be_success
+      expect(assigns[:events]).to be_present
+      expect(assigns[:events]).to eq [c1]
     end
 
     it "should use the relevant event for that section, in the course feed" do
-      pending "requires changing the format of the course feed url to include user information"
+      skip "requires changing the format of the course feed url to include user information"
       s2 = @course.course_sections.create!(:name => 's2')
       c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
       c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
       get 'public_feed', :feed_code => "course_#{@course.uuid}", :format => 'ics'
-      response.should be_success
-      assigns[:events].should be_present
-      assigns[:events].should == [c1]
+      expect(response).to be_success
+      expect(assigns[:events]).to be_present
+      expect(assigns[:events]).to eq [c1]
     end
 
     it "should require authorization" do
       get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
-      response.should render_template('shared/unauthorized_feed')
+      expect(response).to render_template('shared/unauthorized_feed')
     end
 
     it "should include absolute path for rel='self' link" do
       get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
+      expect(feed).not_to be_nil
+      expect(feed.links.first.rel).to match(/self/)
+      expect(feed.links.first.href).to match(/http:\/\//)
     end
 
     it "should include an author for each entry" do
       get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
+      expect(feed).not_to be_nil
+      expect(feed.entries).not_to be_empty
+      expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
     end
   end
 end

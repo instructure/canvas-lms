@@ -34,25 +34,25 @@ describe AvatarHelper do
     describe ".avatar_image_attrs" do
       it "accepts a user id" do
         self.expects(:avatar_url_for_user).with(user).returns("test_url")
-        avatar_image_attrs(user.id).should == ["test_url", user.short_name]
+        expect(avatar_image_attrs(user.id)).to eq ["test_url", user.short_name]
       end
 
       it "accepts a user" do
         self.expects(:avatar_url_for_user).with(user).returns("test_url")
-        avatar_image_attrs(user).should == ["test_url", user.short_name]
+        expect(avatar_image_attrs(user)).to eq ["test_url", user.short_name]
       end
 
       it "falls back to blank avatar when given a user id of 0" do
-        avatar_image_attrs(0).should == ["/images/messages/avatar-50.png", '']
+        expect(avatar_image_attrs(0)).to eq ["/images/messages/avatar-50.png", '']
       end
 
       it "falls back to blank avatar when user's avatar has been reported during this session" do
         self.expects(:session).returns({"reported_#{user.id}" => true})
-        avatar_image_attrs(user).should == ["/images/messages/avatar-50.png", '']
+        expect(avatar_image_attrs(user)).to eq ["/images/messages/avatar-50.png", '']
       end
 
       it "falls back to a blank avatar when the user is nil" do
-        avatar_image_attrs(nil).should == ["/images/messages/avatar-50.png", '']
+        expect(avatar_image_attrs(nil)).to eq ["/images/messages/avatar-50.png", '']
       end
     end
 
@@ -60,24 +60,24 @@ describe AvatarHelper do
       let_once(:user) {user_model}
 
       it "leaves off the href if url is nil" do
-        avatar(user, url: nil).should_not match(/href/)
+        expect(avatar(user, url: nil)).not_to match(/href/)
       end
 
       it "sets the href to the given url" do
-        avatar(user, url: "/test_url").should match(/href="\/test_url"/)
+        expect(avatar(user, url: "/test_url")).to match(/href="\/test_url"/)
       end
 
       it "links to the context user's page when given a context_code" do
         self.expects(:context_prefix).with('course_1').returns('/courses/1')
-        avatar(user, context_code: "course_1").should match("href=\"/courses/1/users/#{user.id}\"")
+        expect(avatar(user, context_code: "course_1")).to match("href=\"/courses/1/users/#{user.id}\"")
       end
 
       it "links to the user's page" do
-        avatar(user).should match("/users/#{user.id}")
+        expect(avatar(user)).to match("/users/#{user.id}")
       end
 
       it "falls back to a blank avatar when the user is nil" do
-        avatar(nil).should match("/images/messages/avatar-50.png")
+        expect(avatar(nil)).to match("/images/messages/avatar-50.png")
       end
     end
 
@@ -85,22 +85,22 @@ describe AvatarHelper do
       let(:services) {{avatars: false}}
 
       it "should return full URIs for users" do
-        avatar_url_for_user(user).should match(%r{\Ahttps?://})
-        avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
+        expect(avatar_url_for_user(user)).to match(%r{\Ahttps?://})
+        expect(avatar_url_for_user(user, true)).to match(%r{\Ahttps?://})
       end
     end
 
     it "should return full URIs for users" do
       user
-      avatar_url_for_user(@user).should match(%r{\Ahttps?://})
-      avatar_url_for_user(@user, true).should match(%r{\Ahttps?://})
+      expect(avatar_url_for_user(@user)).to match(%r{\Ahttps?://})
+      expect(avatar_url_for_user(@user, true)).to match(%r{\Ahttps?://})
 
       @user.avatar_image_source = 'no_pic'
       @user.save!
       # reload to clear instance vars
       @user = User.find(@user.id)
-      avatar_url_for_user(@user).should match(%r{\Ahttps?://})
-      avatar_url_for_user(@user, true).should match(%r{\Ahttps?://})
+      expect(avatar_url_for_user(@user)).to match(%r{\Ahttps?://})
+      expect(avatar_url_for_user(@user, true)).to match(%r{\Ahttps?://})
 
       @user.avatar_state = 'approved'
 
@@ -108,18 +108,18 @@ describe AvatarHelper do
       @user.avatar_image_url = "/relative/canvas/path"
       @user.save!
       @user = User.find(@user.id)
-      avatar_url_for_user(@user).should == "http://test.host/relative/canvas/path"
+      expect(avatar_url_for_user(@user)).to eq "http://test.host/relative/canvas/path"
 
       @user.avatar_image_source = 'external'
       @user.avatar_image_url = "http://www.example.com/path"
       @user.save!
       @user = User.find(@user.id)
-      avatar_url_for_user(@user).should == "http://www.example.com/path"
+      expect(avatar_url_for_user(@user)).to eq "http://www.example.com/path"
     end
 
     it "should return full URIs for groups" do
-      avatar_url_for_group.should match(%r{\Ahttps?://})
-      avatar_url_for_group(true).should match(%r{\Ahttps?://})
+      expect(avatar_url_for_group).to match(%r{\Ahttps?://})
+      expect(avatar_url_for_group(true)).to match(%r{\Ahttps?://})
     end
   end
 end

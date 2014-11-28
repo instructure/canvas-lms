@@ -22,18 +22,14 @@ describe AccountsController do
 
   context "SAML meta data" do
     before(:each) do
-      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
-      ConfigFile.stub('saml', {
-              :tech_contact_name => nil,
-              :tech_contact_email => nil
-      })
+      skip("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
       @account = Account.create!(:name => "test")
     end
 
     it 'should render for non SAML configured accounts' do
       get "/saml_meta_data"
-      response.should be_success
-      response.body.should_not == ""
+      expect(response).to be_success
+      expect(response.body).not_to eq ""
     end
     
     it "should use the correct entity_id" do
@@ -41,9 +37,9 @@ describe AccountsController do
       @aac = @account.account_authorization_configs.create!(:auth_type => "saml")
       
       get "/saml_meta_data"
-      response.should be_success
+      expect(response).to be_success
       doc = Nokogiri::XML(response.body)
-      doc.at_css("EntityDescriptor")['entityID'].should == "http://bob.cody.instructure.com/saml2"
+      expect(doc.at_css("EntityDescriptor")['entityID']).to eq "http://bob.cody.instructure.com/saml2"
     end
 
   end
@@ -57,9 +53,9 @@ describe AccountsController do
         user_session @admin
         Timecop.freeze(61.minutes.ago) do
           get "/accounts/#{@account.id}"
-          response.should be_ok
+          expect(response).to be_ok
           doc = Nokogiri::HTML(response.body)
-          doc.at_css('#section-tabs .section .outcomes').should_not be_nil
+          expect(doc.at_css('#section-tabs .section .outcomes')).not_to be_nil
         end
 
         # change a permission on the user's role
@@ -68,9 +64,9 @@ describe AccountsController do
 
         # ensure the change is reflected once the user's cached permissions expire
         get "/accounts/#{@account.id}"
-        response.should be_ok
+        expect(response).to be_ok
         doc = Nokogiri::HTML(response.body)
-        doc.at_css('#section-tabs .section .outcomes').should be_nil
+        expect(doc.at_css('#section-tabs .section .outcomes')).to be_nil
       end
     end
   end

@@ -8,15 +8,15 @@ def should_make_folders_in_the_menu_droppable
   keep_trying_until do
     f(".add_folder_link").click
     wait_for_ajaximations
-    f("#files_content .add_folder_form #folder_name").should be_displayed
+    expect(f("#files_content .add_folder_form #folder_name")).to be_displayed
   end
 
   f("#files_content .add_folder_form #folder_name").send_keys("my folder\n")
   wait_for_ajaximations
-  f(".node.folder span").should have_class('ui-droppable')
+  expect(f(".node.folder span")).to have_class('ui-droppable')
 
   # also make sure that it has a tooltip of the file name so that you can read really long names
-  f(".node.folder .name[title='my folder']").should_not be_nil
+  expect(f(".node.folder .name[title='my folder']")).not_to be_nil
 end
 
 def should_show_students_link_to_download_zip_of_folder
@@ -26,10 +26,10 @@ def should_show_students_link_to_download_zip_of_folder
   link = keep_trying_until do
     link = f(".links a.download_zip_link")
     wait_for_ajaximations
-    link.should be_displayed
+    expect(link).to be_displayed
     link
   end
-  link.attribute('href').should match(%r"/courses/#{@course.id}/folders/\d+/download")
+  expect(link.attribute('href')).to match(%r"/courses/#{@course.id}/folders/\d+/download")
 end
 
 
@@ -43,23 +43,23 @@ def unzip_from_form_to_folder()
       if !refresh
         expect_new_page_load { f('a.upload_zip_link').click }
 
-        URI.parse(driver.current_url).path.should == @files_import_url
+        expect(URI.parse(driver.current_url).path).to eq @files_import_url
       else
         refresh_page
       end
       filename, path, data, file = get_file('attachments.zip')
-      first_selected_option(f('#upload_to select')).should have_value(@folder.id.to_s)
+      expect(first_selected_option(f('#upload_to select'))).to have_value(@folder.id.to_s)
       f('input#zip_file').send_keys(path)
       submit_form('#zip_file_import_form')
 
       zfi = keep_trying_until { ZipFileImport.order(:id).last }
-      zfi.context.should == @context
-      zfi.folder.should == @folder
+      expect(zfi.context).to eq @context
+      expect(zfi.folder).to eq @folder
 
-      f('.ui-dialog-title').should include_text('Uploading, Please Wait.') # verify it's visible
+      expect(f('.ui-dialog-title')).to include_text('Uploading, Please Wait.') # verify it's visible
 
       job = Delayed::Job.order(:id).last
-      job.tag.should == 'ZipFileImport#process_without_send_later'
+      expect(job.tag).to eq 'ZipFileImport#process_without_send_later'
       run_job(job)
       upload_file(true) if refresh != true && flash_message_present?(:error)
       zfi
@@ -69,13 +69,13 @@ def unzip_from_form_to_folder()
 
     keep_trying_until { URI.parse(driver.current_url).path == @files_url }
 
-    zfi.reload.state.should == :imported
+    expect(zfi.reload.state).to eq :imported
 
-    @folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
-    @folder.sub_folders.active.count.should == 1
+    expect(@folder.attachments.active.map(&:display_name)).to eq ["first_entry.txt"]
+    expect(@folder.sub_folders.active.count).to eq 1
     sub = folder.sub_folders.active.first
-    sub.name.should == "adir"
-    sub.attachments.active.map(&:display_name).should == ["second_entry.txt"]
+    expect(sub.name).to eq "adir"
+    expect(sub.attachments.active.map(&:display_name)).to eq ["second_entry.txt"]
   end
 
 
@@ -84,7 +84,7 @@ def unzip_from_form_to_folder()
     # to mock some of the process
 
     folder = Folder.root_folders(@context).first
-    keep_trying_until { f('#files_content .message.no_content').should be_nil }
+    keep_trying_until { expect(f('#files_content .message.no_content')).to be_nil }
 
     filename, path, data, file = get_file('attachments.zip')
 
@@ -101,24 +101,24 @@ def unzip_from_form_to_folder()
     wait_for_ajax_requests
 
     zfi = keep_trying_until { ZipFileImport.order(:id).last }
-    zfi.context.should == @context
-    zfi.folder.should == folder
+    expect(zfi.context).to eq @context
+    expect(zfi.folder).to eq folder
 
-    f('.ui-dialog-title').should include_text('Extracting Files into Folder') # verify it's visible
+    expect(f('.ui-dialog-title')).to include_text('Extracting Files into Folder') # verify it's visible
 
     job = Delayed::Job.order(:id).last
-    job.tag.should == 'ZipFileImport#process_without_send_later'
+    expect(job.tag).to eq 'ZipFileImport#process_without_send_later'
     run_job(job)
 
-    keep_trying_until { f('#uploading_please_wait_dialog').should be_nil } # wait until it's no longer visible
+    keep_trying_until { expect(f('#uploading_please_wait_dialog')).to be_nil } # wait until it's no longer visible
 
-    zfi.reload.state.should == :imported
+    expect(zfi.reload.state).to eq :imported
 
-    folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
-    folder.sub_folders.active.count.should == 1
+    expect(folder.attachments.active.map(&:display_name)).to eq ["first_entry.txt"]
+    expect(folder.sub_folders.active.count).to eq 1
     sub = folder.sub_folders.active.first
-    sub.name.should == "adir"
-    sub.attachments.active.map(&:display_name).should == ["second_entry.txt"]
+    expect(sub.name).to eq "adir"
+    expect(sub.attachments.active.map(&:display_name)).to eq ["second_entry.txt"]
   end
 
 

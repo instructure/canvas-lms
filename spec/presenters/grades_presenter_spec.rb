@@ -15,17 +15,17 @@ describe GradesPresenter do
 
     it 'puts the enrollments in a hash with courses as keys' do
       student_enrollments.each do |course, enrollment|
-        [course1, course2].should include(course)
-        enrollments.should include(enrollment)
+        expect([course1, course2]).to include(course)
+        expect(enrollments).to include(enrollment)
       end
     end
 
     it 'includes enrollments that are students' do
-      student_enrollments.values.should include(student)
+      expect(student_enrollments.values).to include(student)
     end
 
     it 'excludes objects which are not students' do
-      student_enrollments.values.should_not include(nonstudent)
+      expect(student_enrollments.values).not_to include(nonstudent)
     end
   end
 
@@ -43,19 +43,19 @@ describe GradesPresenter do
     end
 
     it 'uniqs out duplicates' do
-      StudentEnrollment.stubs(:active => stub(:find_by_user_id_and_course_id => 3))
-      presenter.observed_enrollments.should == [3]
+      StudentEnrollment.stubs(active: stub(where: [3]))
+      expect(presenter.observed_enrollments).to eq [3]
     end
 
     it 'removes nil enrollments' do
-      StudentEnrollment.stubs(:active => stub(:find_by_user_id_and_course_id => nil))
-      presenter.observed_enrollments.should == []
+      StudentEnrollment.stubs(active: stub(where: []))
+      expect(presenter.observed_enrollments).to eq []
     end
 
     context 'exclusions' do
       before do
         active_enrollments = stub('active_enrollments')
-        active_enrollments.stubs(:find_by_user_id_and_course_id).returns(1, 2, 3)
+        active_enrollments.stubs(:where).returns([1], [2], [3])
         StudentEnrollment.stubs(:active => active_enrollments)
       end
 
@@ -64,14 +64,14 @@ describe GradesPresenter do
         student_enrollment.expects(:is_a?).with(ObserverEnrollment).returns(false)
         student_enrollment.stubs(:shard).returns(shard)
         enrollments << student_enrollment
-        presenter.observed_enrollments.should == [1, 2]
+        expect(presenter.observed_enrollments).to eq [1, 2]
       end
 
       it 'excludes enrollments without an associated user id' do
         unassociated_enrollment = stub(:state_based_on_date => :active, :is_a? => true, :associated_user_id => nil)
         unassociated_enrollment.stubs(:shard).returns(shard)
         enrollments << unassociated_enrollment
-        presenter.observed_enrollments.should == [1, 2]
+        expect(presenter.observed_enrollments).to eq [1, 2]
       end
     end
 
@@ -97,7 +97,7 @@ describe GradesPresenter do
 
         enrollments.each { |e| e.stubs(:state_based_on_date).returns(:active) }
         presenter = GradesPresenter.new(enrollments)
-        presenter.observed_enrollments.should include(student_enrollment)
+        expect(presenter.observed_enrollments).to include(student_enrollment)
       end
     end
   end
@@ -113,15 +113,15 @@ describe GradesPresenter do
     let(:teacher_enrollments) { presenter.teacher_enrollments }
 
     it 'includes instructors' do
-      teacher_enrollments[0].course.should == course1
+      expect(teacher_enrollments[0].course).to eq course1
     end
 
     it 'includes should not include duplicate courses' do
-      teacher_enrollments.length.should == 1
+      expect(teacher_enrollments.length).to eq 1
     end
 
     it 'excludes non-instructors' do
-      teacher_enrollments.should_not include(noninstructor)
+      expect(teacher_enrollments).not_to include(noninstructor)
     end
   end
 
@@ -138,29 +138,29 @@ describe GradesPresenter do
     let(:student_enrollment) { student_enrollment = stub('student_enrollment', attrs.merge(:student? => true)) }
 
     before do
-      StudentEnrollment.stubs(:active => stub(:find_by_user_id_and_course_id => stub))
+      StudentEnrollment.stubs(active: stub(where: [stub]))
       observed_enrollment.stubs(:shard).returns(shard)
     end
 
     it 'is true with one student enrollment' do
-      GradesPresenter.new([student_enrollment]).has_single_enrollment?.should be_true
+      expect(GradesPresenter.new([student_enrollment]).has_single_enrollment?).to be_truthy
     end
 
     it 'is true with one teacher enrollment' do
-      GradesPresenter.new([teacher_enrollment]).has_single_enrollment?.should be_true
+      expect(GradesPresenter.new([teacher_enrollment]).has_single_enrollment?).to be_truthy
     end
 
     it 'is true with one observed enrollment' do
-      GradesPresenter.new([observed_enrollment]).has_single_enrollment?.should be_true
+      expect(GradesPresenter.new([observed_enrollment]).has_single_enrollment?).to be_truthy
     end
 
     it 'is false with one of each' do
       enrollments = [teacher_enrollment, student_enrollment, observed_enrollment]
-      GradesPresenter.new(enrollments).has_single_enrollment?.should be_false
+      expect(GradesPresenter.new(enrollments).has_single_enrollment?).to be_falsey
     end
 
     it 'is false with none of each' do
-      GradesPresenter.new([]).has_single_enrollment?.should be_false
+      expect(GradesPresenter.new([]).has_single_enrollment?).to be_falsey
     end
   end
 

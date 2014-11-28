@@ -233,7 +233,6 @@ is for items that are not draggable.
   }
 
   .ellipses {
-    color: #7c7c7c;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -301,6 +300,7 @@ is for items that are not draggable.
 
   .publish-icon {
     margin-right: 22px;
+    
 
     i[class*=icon-]:before,
     i[class^=icon-]:before {

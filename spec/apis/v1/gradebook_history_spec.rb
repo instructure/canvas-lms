@@ -20,7 +20,7 @@ module Api::V1
   end
 
   describe GradebookHistory do
-    let(:course) { stub }
+    let(:course) { double }
     let(:controller) { stub(:params => {} , :request => stub(:query_parameters => {}), :response => stub(:headers => {}) )}
     let(:path) { '' }
     let(:user) { ::User.new }
@@ -65,24 +65,24 @@ module Api::V1
 
       it 'has a top level key for each day represented' do
         dates = @days.map{|d| d[:date] }
-        dates.size.should == 2
-        dates.should include(now.to_date.as_json)
-        dates.should include(24.hours.ago.in_time_zone.to_date.as_json)
+        expect(dates.size).to eq 2
+        expect(dates).to include(now.to_date.as_json)
+        expect(dates).to include(24.hours.ago.in_time_zone.to_date.as_json)
       end
 
       it 'has a hash of graders for each day keyed by id' do
         graders_hash = @days.select{|d| d[:date] == yesterday.to_date.as_json }.first[:graders]
         grader = graders_hash.first
-        grader[:id].should == @grader2.id
-        grader[:name].should == @grader2.name
+        expect(grader[:id]).to eq @grader2.id
+        expect(grader[:name]).to eq @grader2.name
       end
 
       it 'puts an assignment list under each grader' do
         graders = @days.select{|d| d[:date] == yesterday.to_date.as_json }.first[:graders]
         grader2_assignments = graders.select { |g| g[:id] == @grader2.id }.first[:assignments]
         ids = grader2_assignments.map { |assignment| assignment['id'] }
-        ids.should include(@assignment1.id)
-        ids.should include(@assignment2.id)
+        expect(ids).to include(@assignment1.id)
+        expect(ids).to include(@assignment2.id)
       end
 
       it 'paginates' do
@@ -91,7 +91,7 @@ module Api::V1
         harness = GradebookHistoryHarness.new
         harness.instance_variable_set(:@domain_root_account, ::Account.default)
         days = harness.days_json(course, api_context)
-        days.map { |d| d[:date] }.first.should == yesterday.to_date.as_json
+        expect(days.map { |d| d[:date] }.first).to eq yesterday.to_date.as_json
       end
 
     end
@@ -118,13 +118,13 @@ module Api::V1
       end
 
       it 'returns a grader hash for that day' do
-        @day_hash.map{|g| g[:id] }.sort.should == [@grader1.id, @grader2.id].sort
+        expect(@day_hash.map{|g| g[:id] }.sort).to eq [@grader1.id, @grader2.id].sort
       end
 
       it 'includes assignment data' do
         assignment_hash = @day_hash.select{|g| g[:id] == @grader1.id}.first[:assignments].first
-        assignment_hash['id'].should == @assignment.id
-        assignment_hash['name'].should == @assignment.title
+        expect(assignment_hash['id']).to eq @assignment.id
+        expect(assignment_hash['name']).to eq @assignment.title
       end
     end
 
@@ -147,17 +147,17 @@ module Api::V1
       it 'should be an array of submissions' do
         harness = GradebookHistoryHarness.new
         submissions_hash = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
-        submissions_hash.first[:submission_id].should == @submission.id
+        expect(submissions_hash.first[:submission_id]).to eq @submission.id
       end
 
       it 'has the version hash' do
         harness = GradebookHistoryHarness.new
         submissions_hash = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
         version1 = submissions_hash.first[:versions].first
-        version1[:assignment_id].should == @assignment.id
-        version1[:current_grade].should == "90"
-        version1[:current_grader].should == 'grader 2'
-        version1[:new_grade].should == "90"
+        expect(version1[:assignment_id]).to eq @assignment.id
+        expect(version1[:current_grade]).to eq "90"
+        expect(version1[:current_grader]).to eq 'grader 2'
+        expect(version1[:new_grade]).to eq "90"
       end
 
       it 'can find submissions with no grader' do
@@ -169,7 +169,7 @@ module Api::V1
         submission.save!
 
         submissions = GradebookHistoryHarness.new.submissions_for(@course, api_context, now, 0, @assignment.id)
-        submissions.first[:submission_id].should == submission.id
+        expect(submissions.first[:submission_id]).to eq submission.id
       end
 
       it 'should properly set pervious_* attributes' do
@@ -180,22 +180,22 @@ module Api::V1
 
         harness = GradebookHistoryHarness.new
         submissions = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
-        submissions.first[:versions][0][:grade].should == "80"
-        submissions.first[:versions][0][:previous_grade].should == "90"
-        submissions.first[:versions][1][:grade].should == "90"
-        submissions.first[:versions][1][:previous_grade].should == nil
+        expect(submissions.first[:versions][0][:grade]).to eq "80"
+        expect(submissions.first[:versions][0][:previous_grade]).to eq "90"
+        expect(submissions.first[:versions][1][:grade]).to eq "90"
+        expect(submissions.first[:versions][1][:previous_grade]).to eq nil
       end
     end
 
     describe '#day_string_for' do
       it 'builds a formatted date' do
         submission = stub(:graded_at => now)
-        gradebook_history.day_string_for(submission).should =~ /\d{4}-\d{2}-\d{2}/
+        expect(gradebook_history.day_string_for(submission)).to match /\d{4}-\d{2}-\d{2}/
       end
 
       it 'gives a empty string if there is no time' do
         submission = stub(:graded_at => nil)
-        gradebook_history.day_string_for(submission).should == ''
+        expect(gradebook_history.day_string_for(submission)).to eq ''
       end
     end
 
@@ -224,24 +224,24 @@ module Api::V1
         end
 
         it 'includes the submission' do
-          submissions.should include(@submission)
+          expect(submissions).to include(@submission)
         end
 
         it 'orders submissions by graded timestamp' do
           add_submission
-          submissions.first.should == @submission
+          expect(submissions.first).to eq @submission
         end
 
         it 'accepts a date option' do
           add_submission
-          gradebook_history.submissions_set(course, api_context, :date => 3.days.ago.in_time_zone).should be_empty
-          gradebook_history.submissions_set(course, api_context, :date => Time.now.in_time_zone).should_not be_empty
+          expect(gradebook_history.submissions_set(course, api_context, :date => 3.days.ago.in_time_zone)).to be_empty
+          expect(gradebook_history.submissions_set(course, api_context, :date => Time.now.in_time_zone)).not_to be_empty
         end
 
       end
 
       it 'does not include ungraded submissions' do
-        submissions.should_not include(@submission)
+        expect(submissions).not_to include(@submission)
       end
     end
 

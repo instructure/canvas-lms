@@ -113,6 +113,20 @@ module AuthenticationMethods
           end
         end
       end
+
+      if @current_pseudonym &&
+         session[:cas_session] &&
+         @current_pseudonym.cas_ticket_expired?(session[:cas_session]) &&
+         @domain_root_account.cas_authentication?
+
+        destroy_session
+        @current_pseudonym = nil
+
+        raise LoggedOutError if api_request? || request.format.json?
+
+        redirect_to_login
+      end
+
       if params[:login_success] == '1' && !@current_pseudonym
         # they just logged in successfully, but we can't find the pseudonym now?
         # sounds like somebody hates cookies.

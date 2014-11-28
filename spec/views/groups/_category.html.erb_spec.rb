@@ -26,7 +26,7 @@ describe "/groups/_category" do
     assigns[:groups] = []
     category = @course.group_categories.create(:name => "Good Students")
     render :partial => "groups/category", :object => category
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

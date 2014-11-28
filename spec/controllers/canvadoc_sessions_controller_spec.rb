@@ -45,14 +45,14 @@ describe CanvadocSessionsController do
 
     it "works" do
       get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
-      response.should redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
+      expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
 
     it "doesn't upload documents that are already uploaded" do
       @attachment1.submit_to_canvadocs
       Attachment.any_instance.expects(:submit_to_canvadocs).never
       get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
-      response.should redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
+      expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
 
     it "needs a valid signed blob" do
@@ -85,7 +85,7 @@ describe CanvadocSessionsController do
       @blob[:user_id] = nil
       blob = @blob.to_json
       get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
-      response.should redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
+      expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
   end
 end

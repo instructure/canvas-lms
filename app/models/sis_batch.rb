@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -235,6 +235,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def as_json(options={})
+    self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
       "created_at" => self.created_at,
       "ended_at" => self.ended_at,

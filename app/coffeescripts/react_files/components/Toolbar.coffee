@@ -1,4 +1,5 @@
 define [
+  'underscore'
   'i18n!react_files'
   'react'
   'react-router'
@@ -6,12 +7,17 @@ define [
   './UploadButton'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
+  '../utils/deleteStuff'
   '../modules/customPropTypes'
   './RestrictedDialogForm'
-], (I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, customPropTypes, RestrictedDialogForm) ->
+  'jquery'
+  'compiled/jquery.rails_flash_notifications'
+], (_, I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
+
+    mixins: [Router.Navigation]
 
     propTypes:
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
@@ -21,7 +27,7 @@ define [
     onSubmitSearch: (event) ->
       event.preventDefault()
       query = {search_term: @refs.searchTerm.getDOMNode().value}
-      Router.transitionTo 'search', @props.params, query
+      @transitionTo 'search', {}, query
 
     addFolder: (event) ->
       event.preventDefault()
@@ -33,20 +39,36 @@ define [
         contextId: @props.contextId
       })
 
-    deleteSelectedItems: ->
-      count = @props.selectedItems.length
-      message = I18n.t('confirm_delete_selected', 'Are you sure you want to delete these %{count} items?', {count})
-      return unless confirm message
-      promises = @props.selectedItems.map (item) -> item.destroy()
-      $.when(promises...).then ->
-        $.flashMessage I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count})
-      @props.clearSelectedItems()
+    componentDidUpdate: (prevProps) ->
+      if prevProps.selectedItems.length isnt @props.selectedItems.length
+        $.screenReaderFlashMessage(I18n.t('count_items_selected', '%{count} items selected', {
+          count: @props.selectedItems.length
+        }))
+
+    getPreviewQuery: ->
+      return unless @props.selectedItems.length
+      retObj =
+        preview: @props.selectedItems[0].id
+      unless @props.selectedItems.length is 1
+        retObj.only_preview = @props.selectedItems.map((item) -> item.id).join(',')
+      if @props.query?.search_term
+        retObj.search_term = @props.query.search_term
+      retObj
+
+    getPreviewRoute: ->
+      if @props.query?.search_term
+        'search'
+      else if @props.currentFolder?.urlPath()
+        'folder'
+      else
+        'rootFolder'
+
+
 
     # Function Summary
     # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
-    # dialog window. This allows us to do react things inside of this all ready rendered
+    # dialog window. This allows us to do react things inside of this already rendered
     # jQueryUI widget
-
     openRestrictedDialog: ->
       $dialog = $('<div>').dialog
         title: I18n.t("title.permissions", "Editing permissions for %{count} items", {count: @props.selectedItems.length})
@@ -65,7 +87,7 @@ define [
       downloadTitle = if @props.selectedItems.length is 1
         I18n.t('download', 'Download')
       else
-        I18n.t('download_as_zip', 'Downlod as Zip')
+        I18n.t('download_as_zip', 'Download as Zip')
 
       header {
         className:'ef-header grid-row between-xs'
@@ -88,14 +110,15 @@ define [
 
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
 
-          button {
-            disabled: !showingButtons
-            className: 'ui-button btn-view'
-            onClick: alert.bind(null, 'TODO: handle CNVS-14727 actually implement previewing of files')
-            title: I18n.t('view', 'View')
-            'aria-label': I18n.t('view', 'View')
-            'data-tooltip': ''
-          },
+
+          Router.Link  {
+              to: @getPreviewRoute()
+              query: @getPreviewQuery()
+              splat: @props.currentFolder?.urlPath()
+              className: 'ui-button btn-view'
+              title: I18n.t('view', 'View')
+              'data-tooltip': ''
+            },
             i className: 'icon-search'
 
           if @props.userCanManageFilesForContext
@@ -139,14 +162,14 @@ define [
             button {
               disabled: !showingButtons
               className: 'ui-button btn-delete'
-              onClick: @deleteSelectedItems
+              onClick: => deleteStuff(@props.selectedItems)
               title: I18n.t('delete', 'Delete')
               'aria-label': I18n.t('delete', 'Delete')
               'data-tooltip': ''
             },
               i className: 'icon-trash'
 
-          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13}, 'aria-live' : 'polite',
+          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13},
             I18n.t('count_items_selected', '%{count} items selected', {count: @props.selectedItems.length})
 
         if @props.userCanManageFilesForContext

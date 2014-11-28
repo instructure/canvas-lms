@@ -23,11 +23,11 @@ describe ExternalFeed do
     @feed = external_feed_model(:feed_purpose => 'calendar')
     require 'icalendar'
     cals = Icalendar.parse ical_example
-    cals[0].events.first.summary.should eql("Bastille Day Party")
+    expect(cals[0].events.first.summary).to eql("Bastille Day Party")
     res = @feed.add_ical_entries(cals[0])
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Bastille Day Party")
+    expect(res).not_to be_nil
+    expect(res.length).to eql(1)
+    expect(res[0].title).to eql("Bastille Day Party")
   end
   
   it "should add ical entries to a course" do
@@ -35,14 +35,14 @@ describe ExternalFeed do
     @feed = external_feed_model(:feed_purpose => 'calendar', :context => @course)
     require 'icalendar'
     cals = Icalendar.parse ical_example
-    cals[0].events.first.summary.should eql("Bastille Day Party")
+    expect(cals[0].events.first.summary).to eql("Bastille Day Party")
     res = @feed.add_ical_entries(cals[0])
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Bastille Day Party")
+    expect(res).not_to be_nil
+    expect(res.length).to eql(1)
+    expect(res[0].title).to eql("Bastille Day Party")
     @course.reload
-    @course.calendar_events.length.should eql(1)
-    @course.calendar_events[0].should eql(res[0].asset)
+    expect(@course.calendar_events.length).to eql(1)
+    expect(@course.calendar_events[0]).to eql(res[0].asset)
   end
   
   it "should add rss entries" do
@@ -51,12 +51,12 @@ describe ExternalFeed do
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
-    res.should_not be_nil
-    res.length.should eql(4)
-    res[0].title.should eql("Star City")
-    res[1].title.should eql("Space Exploration")
-    res[2].title.should eql("The Engine That Does More")
-    res[3].title.should eql("Astronauts' Dirty Laundry")
+    expect(res).not_to be_nil
+    expect(res.length).to eql(4)
+    expect(res[0].title).to eql("Star City")
+    expect(res[1].title).to eql("Space Exploration")
+    expect(res[2].title).to eql("The Engine That Does More")
+    expect(res[3].title).to eql("Astronauts' Dirty Laundry")
   end
   
   
@@ -67,10 +67,10 @@ describe ExternalFeed do
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
-    res.should_not be_nil
-    res.length.should eql(4)
-    @course.announcements.length.should eql(4)
-    (res.map{|i| i.asset} - @course.announcements).should be_empty
+    expect(res).not_to be_nil
+    expect(res.length).to eql(4)
+    expect(@course.announcements.length).to eql(4)
+    expect(res.map{|i| i.asset} - @course.announcements).to be_empty
   end
   
   it "should add atom entries" do
@@ -78,9 +78,9 @@ describe ExternalFeed do
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Atom-Powered Robots Run Amok")
+    expect(res).not_to be_nil
+    expect(res.length).to eql(1)
+    expect(res[0].title).to eql("Atom-Powered Robots Run Amok")
   end
   
   it "should add atom entries as course announcements" do
@@ -89,11 +89,11 @@ describe ExternalFeed do
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Atom-Powered Robots Run Amok")
-    @course.announcements.length.should eql(1)
-    res[0].asset.should eql(@course.announcements.first)
+    expect(res).not_to be_nil
+    expect(res.length).to eql(1)
+    expect(res[0].title).to eql("Atom-Powered Robots Run Amok")
+    expect(@course.announcements.length).to eql(1)
+    expect(res[0].asset).to eql(@course.announcements.first)
   end
   
 end

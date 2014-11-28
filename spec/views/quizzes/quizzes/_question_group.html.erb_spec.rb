@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/_question_group" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render" do
     course_with_student
     view_context
@@ -28,7 +32,7 @@ describe "/quizzes/quizzes/_question_group" do
     group[:id] = 5
     group[:questions] = []
     render :partial => "quizzes/quizzes/question_group", :object => group, :locals => {:question_type => OpenObject.new}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

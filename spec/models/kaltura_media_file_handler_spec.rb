@@ -44,8 +44,8 @@ describe KalturaMediaFileHandler do
 
     it "queues a job to check on the bulk upload later" do
       MediaObject.expects(:send_later_enqueue_args).with do |method, config, *args|
-        method.should == :refresh_media_files
-        args.should == ['someBulkUploadId', [attachment.id], attachment.root_account_id]
+        expect(method).to eq :refresh_media_files
+        expect(args).to eq ['someBulkUploadId', [attachment.id], attachment.root_account_id]
       end
 
       KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
@@ -75,8 +75,8 @@ describe KalturaMediaFileHandler do
         Setting.set('media_bulk_upload_timeout', 0)
 
         MediaObject.expects(:send_later_enqueue_args).with do |method, config, *args|
-          method.should == :refresh_media_files
-          args.should == ['someBulkUploadId', [attachment.id], attachment.root_account_id]
+          expect(method).to eq :refresh_media_files
+          expect(args).to eq ['someBulkUploadId', [attachment.id], attachment.root_account_id]
         end
 
         media_file_handler.add_media_files(attachment, wait_for_completion)
@@ -90,11 +90,11 @@ describe KalturaMediaFileHandler do
         KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
         partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-        partner_data_json.should == {
+        expect(partner_data_json).to eq({
           "attachment_id" => attachment.id.to_s,
           "context_source" => "file_upload",
           "root_account_id" => Shard.global_id_for(attachment.root_account_id).to_s,
-        }
+        })
       end
 
       context "when the kaltura settings for the account include 'Write SIS data to Kaltura'" do
@@ -104,7 +104,7 @@ describe KalturaMediaFileHandler do
           KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
           partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-          partner_data_json['context_code'].should == "user_#{attachment_context.id}"
+          expect(partner_data_json['context_code']).to eq "user_#{attachment_context.id}"
         end
 
         context "and the context has a root_account attached" do
@@ -122,7 +122,7 @@ describe KalturaMediaFileHandler do
               KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
               partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-              partner_data_json["sis_user_id"].should == "some_id_from_sis"
+              expect(partner_data_json["sis_user_id"]).to eq "some_id_from_sis"
             end
           end
 
@@ -136,7 +136,7 @@ describe KalturaMediaFileHandler do
               KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
               partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-              partner_data_json["sis_source_id"].should == "gooboo"
+              expect(partner_data_json["sis_source_id"]).to eq "gooboo"
             end
           end
         end

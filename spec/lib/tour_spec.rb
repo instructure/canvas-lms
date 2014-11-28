@@ -8,10 +8,10 @@ describe Tour do
 
     def assert_tour
       tour = Tour.tours[:fake]
-      tour[:name].should == :fake
-      tour[:version].should == 1
-      tour[:actions].should == ['controller#action']
-      tour[:block].should == block
+      expect(tour[:name]).to eq :fake
+      expect(tour[:version]).to eq 1
+      expect(tour[:actions]).to eq ['controller#action']
+      expect(tour[:block]).to eq block
     end
 
     it "should configure an tour" do
@@ -68,37 +68,37 @@ describe Tour do
     it "should add tours to js_env" do
       Tour.tour(:fake, 1, 'controller#action') { true }
       @controller.set_tours
-      tour_included?(:fake).should be_true
+      expect(tour_included?(:fake)).to be_truthy
     end
 
     it "should not include an tour if the block returns false" do
       Tour.tour(:fake, 1, 'controller#action') { false }
       @controller.set_tours
-      tour_included?(:fake).should be_false
+      expect(tour_included?(:fake)).to be_falsey
     end
 
     it "should include an tour if no block is given" do
       Tour.tour :fake, 1, 'controller#action'
       @controller.set_tours
-      tour_included?(:fake).should be_true
+      expect(tour_included?(:fake)).to be_truthy
     end
 
     it "should not include an tour if user has dismissed it" do
       Tour.tour :dismissed, 1, 'controller#action'
       @controller.set_tours
-      tour_included?(:dismissed).should be_false
+      expect(tour_included?(:dismissed)).to be_falsey
     end
 
     it "should not exclude an tour if user has dismissed an old version of it" do
       Tour.tour :dismissed, 2, 'controller#action'
       @controller.set_tours
-      tour_included?(:dismissed).should be_true
+      expect(tour_included?(:dismissed)).to be_truthy
     end
 
     it "should not include an tour if user has dismissed it this session" do
       Tour.tour :dismissed, 1, 'controller#action'
       @controller.set_tours
-      tour_included?(:dismissed).should be_false
+      expect(tour_included?(:dismissed)).to be_falsey
     end
 
   end

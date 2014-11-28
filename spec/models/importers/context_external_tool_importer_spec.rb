@@ -4,15 +4,15 @@ describe Importers::ContextExternalToolImporter do
   it "should work for course-level tools" do
     course_model
     tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course)
-    tool.should_not be_nil
-    tool.context.should == @course
+    expect(tool).not_to be_nil
+    expect(tool.context).to eq @course
   end
 
   it "should work for account-level tools" do
     course_model
     tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course.account)
-    tool.should_not be_nil
-    tool.context.should == @course.account
+    expect(tool).not_to be_nil
+    expect(tool.context).to eq @course.account
   end
 
   context "combining imported external tools" do
@@ -32,7 +32,7 @@ describe Importers::ContextExternalToolImporter do
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
 
-      @course.context_external_tools.map(&:migration_id).sort.should == ['1', '2']
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '2']
     end
 
     it "should combine an external tool with a url and one with a domain" do
@@ -45,14 +45,14 @@ describe Importers::ContextExternalToolImporter do
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
 
-      @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
-      tool.domain.should == 'example.com'
-      tool.url.should be_blank
-      tool.name.should == 'example.com'
-      @migration.find_external_tool_translation('1').should == [tool.id, nil]
-      @migration.find_external_tool_translation('2').should == [tool.id, nil]
-      @migration.find_external_tool_translation('3').should be_nil
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '3']
+      tool = @course.context_external_tools.where(migration_id: '1').first
+      expect(tool.domain).to eq 'example.com'
+      expect(tool.url).to be_blank
+      expect(tool.name).to eq 'example.com'
+      expect(@migration.find_external_tool_translation('1')).to eq [tool.id, nil]
+      expect(@migration.find_external_tool_translation('2')).to eq [tool.id, nil]
+      expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
     it "should combine two external tools with urls (if they're on the same domain)" do
@@ -66,14 +66,14 @@ describe Importers::ContextExternalToolImporter do
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
 
-      @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
-      tool.domain.should == 'example.com'
-      tool.url.should be_blank
-      tool.name.should == 'example.com'
-      @migration.find_external_tool_translation('1').should == [tool.id, nil]
-      @migration.find_external_tool_translation('2').should == [tool.id, nil]
-      @migration.find_external_tool_translation('3').should be_nil
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '3']
+      tool = @course.context_external_tools.where(migration_id: '1').first
+      expect(tool.domain).to eq 'example.com'
+      expect(tool.url).to be_blank
+      expect(tool.name).to eq 'example.com'
+      expect(@migration.find_external_tool_translation('1')).to eq [tool.id, nil]
+      expect(@migration.find_external_tool_translation('2')).to eq [tool.id, nil]
+      expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
     it "should include the custom fields in translation (if they're on the same domain)" do
@@ -87,14 +87,14 @@ describe Importers::ContextExternalToolImporter do
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
 
-      @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
-      tool.domain.should == 'example.com'
-      tool.url.should be_blank
-      tool.name.should == 'example.com'
-      @migration.find_external_tool_translation('1').should == [tool.id, {'ihasacustomfield' => 'blah'}]
-      @migration.find_external_tool_translation('2').should == [tool.id, {'bloop' => 'so do i'}]
-      @migration.find_external_tool_translation('3').should be_nil
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '3']
+      tool = @course.context_external_tools.where(migration_id: '1').first
+      expect(tool.domain).to eq 'example.com'
+      expect(tool.url).to be_blank
+      expect(tool.name).to eq 'example.com'
+      expect(@migration.find_external_tool_translation('1')).to eq [tool.id, {'ihasacustomfield' => 'blah'}]
+      expect(@migration.find_external_tool_translation('2')).to eq [tool.id, {'bloop' => 'so do i'}]
+      expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
     it "should not combine external tools with extremely long custom fields" do
@@ -108,14 +108,14 @@ describe Importers::ContextExternalToolImporter do
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
 
-      @course.context_external_tools.map(&:migration_id).sort.should == ['1', '3']
-      tool = @course.context_external_tools.find_by_migration_id('1')
-      tool.domain.should == 'example.com'
-      tool.url.should be_blank
-      tool.name.should == 'example.com'
-      @migration.find_external_tool_translation('1').should be_nil
-      @migration.find_external_tool_translation('2').should == [tool.id, nil]
-      @migration.find_external_tool_translation('3').should be_nil
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '3']
+      tool = @course.context_external_tools.where(migration_id: '1').first
+      expect(tool.domain).to eq 'example.com'
+      expect(tool.url).to be_blank
+      expect(tool.name).to eq 'example.com'
+      expect(@migration.find_external_tool_translation('1')).to be_nil
+      expect(@migration.find_external_tool_translation('2')).to eq [tool.id, nil]
+      expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
     it "should combine external tools with the same settings" do
@@ -128,13 +128,13 @@ describe Importers::ContextExternalToolImporter do
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
 
-      @course.context_external_tools.map(&:migration_id).sort.should == ['1']
-      tool = @course.context_external_tools.find_by_migration_id('1')
-      tool.domain.should == 'example.com'
-      tool.url.should be_blank
-      tool.name.should == 'example.com'
-      @migration.find_external_tool_translation('1').should be_nil
-      @migration.find_external_tool_translation('2').should == [tool.id, nil]
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1']
+      tool = @course.context_external_tools.where(migration_id: '1').first
+      expect(tool.domain).to eq 'example.com'
+      expect(tool.url).to be_blank
+      expect(tool.name).to eq 'example.com'
+      expect(@migration.find_external_tool_translation('1')).to be_nil
+      expect(@migration.find_external_tool_translation('2')).to eq [tool.id, nil]
     end
   end
 

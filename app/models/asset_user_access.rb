@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -124,10 +124,13 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset_display_name
+    return nil unless asset
     if self.asset.respond_to?(:title) && !self.asset.title.nil?
       asset.title
     elsif self.asset.is_a? Enrollment
       asset.user.name
+    elsif self.asset.respond_to?(:name) && !self.asset.name.nil?
+      asset.name
     else
       self.asset_code
     end
@@ -142,7 +145,8 @@ class AssetUserAccess < ActiveRecord::Base
       split = self.asset_code.split(/\:/)
       if split[1] == self.context_code
         # TODO: i18n
-        "#{self.context_type} #{split[0].titleize}"
+        title = split[0] == "topics" ? "Discussions" : split[0].titleize
+        "#{self.context_type} #{title}"
       else
         self.display_name
       end
@@ -153,13 +157,16 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset
+    return nil unless asset_code
     asset_code, general = self.asset_code.split(":").reverse
     asset = Context.find_asset_by_asset_string(asset_code, context)
     asset
   end
 
   def asset_class_name
-    self.asset.class.name.underscore if self.asset
+    name = self.asset.class.name.underscore if self.asset
+    name = "Quiz" if name == "Quizzes::Quiz"
+    name
   end
 
   def log( kontext, accessed )
@@ -169,6 +176,7 @@ class AssetUserAccess < ActiveRecord::Base
     self.context = kontext
     self.summarized_at = nil
     self.last_access = Time.now.utc
+    self.display_name = self.asset_display_name
     log_action(accessed[:level])
     save
   end

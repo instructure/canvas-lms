@@ -19,6 +19,7 @@ require([
     $("#add_course_form :text:visible:first").focus().select();
   });
   $("#add_course_form").formSubmit({
+    formErrors: false,
     required: ['course[name]', 'course[course_code]'],
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true)

@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizGroup do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
 
   describe "saving a group" do
     it "should mark its quiz as having unpublished changes when updated" do
@@ -28,11 +32,11 @@ describe Quizzes::QuizGroup do
       group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
       quiz.published_at = Time.now
       quiz.publish!
-      quiz.unpublished_changes?.should be_false
+      expect(quiz.unpublished_changes?).to be_falsey
 
       Timecop.freeze(5.minutes.from_now) do
         group.update_attribute :question_points, 10.0
-        quiz.reload.unpublished_changes?.should be_true
+        expect(quiz.reload.unpublished_changes?).to be_truthy
       end
     end
   end
@@ -45,10 +49,10 @@ describe Quizzes::QuizGroup do
         group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
         group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
         group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
-        group.quiz_questions.active.size.should == 2
+        expect(group.quiz_questions.active.size).to eq 2
 
-        group.pick_count.should == 3
-        group.actual_pick_count.should == 2
+        expect(group.pick_count).to eq 3
+        expect(group.actual_pick_count).to eq 2
       end
     end
 
@@ -65,20 +69,20 @@ describe Quizzes::QuizGroup do
       end
 
       it "should return the correct pick count for question bank" do
-        @bank.assessment_questions.count.should == 2
-        @group.pick_count.should == 3
-        @group.actual_pick_count.should == 2
+        expect(@bank.assessment_questions.count).to eq 2
+        expect(@group.pick_count).to eq 3
+        expect(@group.actual_pick_count).to eq 2
 
         @bank.assessment_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 3}, {'id' => 4}]})
         @group.reload
-        @group.actual_pick_count.should == 3
+        expect(@group.actual_pick_count).to eq 3
       end
 
       it "should emit the correct data" do
         data = @group.data
-        data[:pick_count].should == 3
-        data[:assessment_question_bank_id].should == @bank.id
-        data[:questions].should == []
+        expect(data[:pick_count]).to eq 3
+        expect(data[:assessment_question_bank_id]).to eq @bank.id
+        expect(data[:questions]).to eq []
       end
     end
   end
@@ -90,20 +94,20 @@ describe Quizzes::QuizGroup do
       g = quiz.quiz_groups.create(:name => "question group", :pick_count => 2, :question_points => 5.0)
       g.quiz_questions << quiz.quiz_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
       g.quiz_questions << quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
-      g.name.should eql("question group")
-      g.pick_count.should eql(2)
-      g.question_points.should eql(5.0)
+      expect(g.name).to eql("question group")
+      expect(g.pick_count).to eql(2)
+      expect(g.question_points).to eql(5.0)
       g.save!
 
       data = g.data
-      data[:name].should eql("question group")
-      data[:pick_count].should eql(2)
-      data[:question_points].should eql(5.0)
-      data[:questions].should_not be_empty
-      data[:questions].length.should eql(2)
+      expect(data[:name]).to eql("question group")
+      expect(data[:pick_count]).to eql(2)
+      expect(data[:question_points]).to eql(5.0)
+      expect(data[:questions]).not_to be_empty
+      expect(data[:questions].length).to eql(2)
       data[:questions].sort_by! { |q| q[:id] }
-      data[:questions][0][:name].should eql("test question")
-      data[:questions][1][:name].should eql("test question 2")
+      expect(data[:questions][0][:name]).to eql("test question")
+      expect(data[:questions][1][:name]).to eql("test question 2")
     end
   end
 
@@ -124,7 +128,7 @@ describe Quizzes::QuizGroup do
       before = group_positions(@quiz)
 
       Quizzes::QuizGroup.update_all_positions!([])
-      before.should == group_positions(@quiz.reload)
+      expect(before).to eq group_positions(@quiz.reload)
     end
 
     it "should update positions for groups" do
@@ -133,7 +137,7 @@ describe Quizzes::QuizGroup do
       @group2.position = 3
 
       Quizzes::QuizGroup.update_all_positions!([@group3, @group1, @group2])
-      group_positions(@quiz.reload).should == [@group3.id, @group1.id, @group2.id]
+      expect(group_positions(@quiz.reload)).to eq [@group3.id, @group1.id, @group2.id]
     end
   end
 end

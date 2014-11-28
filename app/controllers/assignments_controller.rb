@@ -36,6 +36,8 @@ class AssignmentsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+      log_asset_access("assignments:#{@context.asset_string}", 'assignments', 'other')
+
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
       # It'd be nice to do this as an after_create, but it's not that simple
@@ -113,7 +115,9 @@ class AssignmentsController < ApplicationController
     end
     if authorized_action(@assignment, @current_user, :read)
 
-      if @context.feature_enabled?(:differentiated_assignments) && @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
+      if (da_on = @context.feature_enabled?(:differentiated_assignments)) &&
+           @current_user && @assignment &&
+           !@assignment.visible_to_user?(@current_user, differentiated_assignments: da_on)
         respond_to do |format|
           flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }

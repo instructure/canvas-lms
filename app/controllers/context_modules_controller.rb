@@ -37,10 +37,11 @@ class ContextModulesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :read)
+      log_asset_access("modules:#{@context.asset_string}", "modules", "other")
       load_modules
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
-        ContextModule.send(:preload_associations, @modules, [:content_tags])
+        ActiveRecord::Associations::Preloader.new(@modules, :content_tags).run
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
@@ -268,7 +269,7 @@ class ContextModulesController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       order = params[:order].split(",").map{|id| id.to_i}
-      tags = @context.context_module_tags.not_deleted.find_all_by_id(order).compact
+      tags = @context.context_module_tags.not_deleted.where(id: order)
       affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
@@ -342,7 +343,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
       @tag[:publishable] = module_item_publishable?(@tag)
-      @tag[:published] = module_item_published?(@tag)
+      @tag[:published] = @tag.published?
       @tag[:publishable_id] = module_item_publishable_id(@tag)
       @tag[:unpublishable] = module_item_unpublishable?(@tag)
       @tag[:graded] = @tag.graded?

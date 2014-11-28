@@ -1135,6 +1135,11 @@ en:
         one: "%{file_size} *from one file*"
         other: "%{file_size} *from %{count} files*"
       uploaded_file_storage_header: "Uploaded File Storage"
+    student_assessment_scores_csv_parameters: 
+      account_reports: 
+        orbis: 
+          parameters: 
+            note: "Courses with muted assignments may not accurately reflect scores in this report."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -2609,10 +2614,13 @@ en:
     messages_sent: "Messages Sent"
     missing_due_date_dialog: 
       buttons: 
+        continue: Continue
         goBack: "Go Back"
         noDueDate: "No Due Date"
       modal: 
         chooseDueDate: "Do you want to go back and select a due date?"
+        goBackToInclude: "Would you like to go back to include:"
+        notAllSectionsAssigned: "Not all sections will be assigned this item."
     no_groups: "No groups found"
     no_users: "No users found"
     ok: OK
@@ -4077,30 +4085,13 @@ en:
       unstar_conversation: "Unstar conversation"
     message_deleted: "Message Deleted!"
     message_detail: 
+      delete: Delete
+      forward: Forward
+      message_actions: "Message actions"
+      more_options: "More options"
       no_subject: "No subject"
-    message_form: 
-      buttons: 
-        reply: Reply
-        reply_all: "Reply all"
-        send_message: Send
-      headings: 
-        new_message: "New Message"
-      inbox_actions: 
-        add_people: "Add People"
-      labels: 
-        add_to_faculty_journal: "Add as a Faculty Journal entry"
-        group_conversation: "This is a group conversation. Participants will see everyone's replies"
-        message: "Message:"
-        to: "To:"
-      links: 
-        add_attachment: Attach
-        media_comment: Record
-      media_comment: "Media Comment"
-      titles: 
-        add_attachment: "Add an attachment"
-        media_comment: "Recorded media comment"
-        record_media_comment: "Record an audio or video comment"
-        remove_media_comment: "Remove media comment"
+      reply: Reply
+      reply_all: "Reply all"
     message_form_dialog: 
       body: Body
       headings: 
@@ -4152,7 +4143,7 @@ en:
     other_recipients: 
       one: "and 1 other"
       other: "and %{count} others"
-    search_category: "Search %{category}"
+    result_status: "The autocomplete has %{results} entries listed, use the up and down arrow keys to navigate to a listing, then press enter to add the person to the To field."
     star: Star
     star_conversation: "Star conversation"
     titles: 
@@ -4167,6 +4158,10 @@ en:
     batch_update_message: 
       one: "1 course processed"
       other: "%{count} courses processed"
+    course_format: 
+      not_set: "Not Set"
+      on_campus: On-Campus
+      online: Online
     course_not_found: "The course was not found"
     csv: 
       comments: Comments
@@ -4748,6 +4743,7 @@ en:
         allow_student_organized_groups: "Let students organize their own groups"
         conclude_at: Ends
         course_code: "Course Code"
+        course_format: Format
         course_lock_all_announcements: "Disable comments on announcements"
         course_name: Name
         course_section_name: "Add a New Section"
@@ -5068,10 +5064,6 @@ en:
       student: 
         count: "Wrong Student Count"
         ratio: "Wrong Student Ratio"
-  current_uploads: 
-    click_to_browse: "or click to browse your computer"
-    close: close
-    drag_files_here: "Drag Folders and Files here"
   curve_grades_dialog: 
     average_score: "Average Score"
     buttons: 
@@ -5535,6 +5527,7 @@ en:
       loading_replies: "Loading replies..."
       lock_topic: "Close for Comments"
       locked: "This topic is closed for comments"
+      manage_announcement: "Manage Announcement"
       manage_discussion: "Manage Discussion"
       mark_all_as_read: "Mark All as Read"
       mark_all_as_unread: "Mark All as Unread"
@@ -5729,6 +5722,7 @@ en:
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations."
+  enable_multiple_grading_periods: "Enable multiple grading periods management in the account admin, and use in the Gradebook."
   enrollment: 
     default_course_name: Course
     default_email: "No Email"
@@ -6290,6 +6284,7 @@ en:
     k12: "K-12 specific features"
     learning_mastery_gradebook: "Learning Mastery Gradebook"
     lor: "LOR External Tools"
+    multiple_grading_periods: "Multiple Grading Periods"
     new_quiz_moderate: "New Quiz Moderate Page"
     new_quiz_statistics: "New Quiz Statistics Page"
     new_styles: "Use New Styles"
@@ -6298,6 +6293,24 @@ en:
     student_outcome_gradebook: "Student Learning Mastery Gradebook"
   file_browser_view: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose the selected item."
+  file_preview: 
+    file_preview_headerbutton_close: Close
+    file_preview_headerbutton_download: Download
+    file_preview_headerbutton_info: Info
+    file_preview_hide: Hide
+    file_preview_infotable_datecreated: "Date Created"
+    file_preview_infotable_datemodified: "Date Modified"
+    file_preview_infotable_kind: Kind
+    file_preview_infotable_modifiedby: "Modified By"
+    file_preview_infotable_name: Name
+    file_preview_infotable_size: Size
+    file_preview_infotable_status: Status
+    file_preview_show: Show
+  file_previews: 
+    no_preview: 
+      file_previews: 
+        download_file: "Download *filename*"
+        no_preview_available: "No preview is available for this file."
   file_rename_form: 
     back: Back
     change: Change
@@ -6323,6 +6336,7 @@ en:
     content_folder: 
       titles: 
         edit_and_move_instructions: "Click to edit, drag to move to another folder"
+    could_not_find_file: "This file has been deleted"
     errors: 
       empty_file: "That file is empty.  Please upload a different file."
       extracting: "There were errors extracting the zip file.  Please try again."
@@ -6341,6 +6355,7 @@ en:
       uploading_zip: "There were errors uploading the zip file."
     fields: 
       file: File
+    files_page_title: Files
     full_index: 
       alts: 
         file_locked: locked
@@ -6526,7 +6541,10 @@ en:
       no_students_in_groups_back: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
       no_students_in_groups_close: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
       no_students_in_section: "Could not find any students in that section, falling back to showing all sections."
+    allow_message: "Click the \"Allow\" button to begin recording."
+    begin_record_prompt: "Click the \"Record\" button to begin."
     buttons: 
+      dialog_buttons: Cancel
       saving_settings: "Saving Settings..."
       submit_comment: "Submit Comment"
       submitting: Submitting...
@@ -6540,6 +6558,10 @@ en:
            %{users}
           Continue anyway?
     crocodoc_expiring: "Your Crocodoc session is expiring soon.  Please reload the window to avoid losing any work."
+    dialog_button: 
+      aria_record: "Click to record"
+      aria_record_reset: "Click to record"
+      aria_stop: "Hit \"Stop\" to end recording."
     edit_view_rubric: "View Rubric"
     errors: 
       select_an_option: "Please select an option"
@@ -6550,18 +6572,22 @@ en:
     grading_in_progress: "Instructor is working on grades"
     group: Group
     hide_all_details_button: "Hide All Details"
+    mic_blocked_message: "Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions\\#media-stream"
     mute_assignment: "Mute Assignment"
     new_assessment: "[New Assessment]"
     no_submission_time: "no submission time"
+    nodetect_message: "No speech was detected. You may need to adjust your microphone settings."
     not_graded: "not graded"
     not_submitted: "not submitted"
     nth_student: "Student %{n}"
     portion_graded: "%{x} / %{y} Graded"
+    recording_expired_message: "Speech recognition has expired due to inactivity. Click the \"Stop\" button to use current text for comment or \"Cancel\" to discard."
+    recording_message: Recording...
     show_all_details_button: "Show All Details"
     student: Student
     student_mute_notification: "Instructor is working on grades"
     titles: 
-      click_to_record: "Click the mic to record your comments"
+      click_to_record: "Speech to Text"
       dropped_assignment_no_total: "This assignment will not be considered in the total calculation"
       hypothetical_score: "This is a What-If score"
     turnitin: 
@@ -6805,7 +6831,6 @@ en:
         out_of: "Out of"
         score: Score
       icons: 
-        rubric_results: "See rubric results"
         turnitin_results: "See Turnitin results"
       labels: 
         final_grade_hidden: "Calculation of totals has been disabled"
@@ -7019,6 +7044,9 @@ en:
     out_of: "(out of %{points})"
     out_of_nil: "No points possible"
     out_of_with_score: "(%{score} out of %{points})"
+  grading_period: 
+    errors: 
+      invalid_grading_period_end_date: "Grading period end date precedes start date"
   grading_standard: 
     unknown_grading_details: "Unknown Details"
   grading_standards: 
@@ -7264,6 +7292,11 @@ en:
         assign_user_to_group: "Assign user to this group"
         assign_user_to_group_name: "Assign user to group %{name}"
         no_groups_created: "Groups need to be created before users can be added."
+      auto_leadership_controls: 
+        auto_first_group_leader: "Set first student to join as group leader"
+        auto_group_leader: "Automatically assign a student group leader"
+        auto_random_group_leader: "Set a random student as group leader"
+        leadership: Leadership
       edit_group_assignment: 
         all_available_groups_full: "All available groups are full."
         all_groups_full_suggestion: "Either change group limits or add more groups."
@@ -7288,15 +7321,11 @@ en:
         search_users: "Search users"
       group_category_create: 
         allow_self_signup: "Allow self sign-up"
-        auto_first_group_leader: "Set first student to join as group leader"
-        auto_group_leader: "Automatically assign a student group leader"
-        auto_random_group_leader: "Set a random student as group leader"
         cancel: Cancel
         create_groups: "Create %h{num_groups} groups now"
         create_groups_manually: "I'll create groups manually"
         group_set_name: "Group Set Name"
         group_structure: "Group Structure"
-        leadership: Leadership
         leave_group_limit_blank: "Leave blank for no limit"
         limit_group_size: "Limit groups to %h{group_limit} members"
         require_same_section: "Require group members to be in the same section"
@@ -7883,7 +7912,7 @@ en:
       media_contribution: "Media Contribution"
       play_comment: "Play Media Comment"
       record_upload_media_comment: "Record/Upload Media Comment"
-    track_uploaded_successfully: "Track uploaded successfuly, refresh to see it."
+    track_uploaded_successfully: "Track uploaded successfully; please refresh your browser."
     upload: Upload
     uploading: Uploading...
   menu: 
@@ -9920,7 +9949,7 @@ en:
         published: Published
     post_grades_dialog_title: "Post Grades to SIS"
     progression_module_collection: 
-      module_progress_for: "Module Progress for %{student_link}"
+      module_progress_for: "Module Progress for *%{student.name}*"
       module_progress_for_student: "Module Progress for %{student.name}"
       no_modules_found: "No modules were found"
     progression_module_view: 
@@ -9989,8 +10018,6 @@ en:
     announcement_created_by_you_display: "Announcement Created By You"
     announcement_description: "New Announcement in your course"
     announcement_display: Announcement
-    announcement_reply: "Replies to Announcements you create"
-    announcement_reply_display: "Announcement Reply"
     appointment_availability_description: |-
         *Instructor and Admin only:*
         
@@ -10263,6 +10290,17 @@ en:
     : "No"
     ? "yes"
     : "Yes"
+  orbis_report_header_assignment_id: "assignment id"
+  orbis_report_header_assignment_title: "assignment title"
+  orbis_report_header_canvas_course_id: "course id"
+  orbis_report_header_course_name: "course name"
+  orbis_report_header_course_sis_id: "course sis id"
+  orbis_report_header_date_submitted: "date submitted"
+  orbis_report_header_points_possible: "points possible"
+  orbis_report_header_student_canvas_id: "canvas user id"
+  orbis_report_header_student_name: "student name"
+  orbis_report_header_student_sis_id: "user sis"
+  orbis_report_header_submission_score: "submission score"
   outcome_groups: 
     invalid_file: "Invalid outcome group file"
   outcome_groups_api: 
@@ -10402,14 +10440,18 @@ en:
         latest_score: "Latest Score"
         outcome: Outcome
   overrides: 
+    due_date_after_course_conclude: "Due date cannot be after course end date"
+    due_date_before_course_start: "Due date cannot be before course start date"
     everyone: Everyone
     everyone_else: "Everyone else"
+    lock_date_after_course_end: "Lock date cannot be after course end"
     lock_date_before_due_date: "Lock date cannot be before due date"
     overrides: 
       everyone: Everyone
       everyone_else: "Everyone Else"
     unlock_date_after_due_date: "Unlock date cannot be after due date"
     unlock_date_after_lock_date: "Unlock date cannot be after lock date"
+    unlock_date_before_course_start: "Unlock date cannot be before course start"
   page_comment: 
     default_user_name: Anonymous
   page_comments: 
@@ -11794,6 +11836,7 @@ en:
       finished_in_duration: "finished in %{duration}"
       time_up: "Time Up!"
       titles: 
+        autosubmit_dialog: "Outstanding Quiz Submissions"
         extend_quiz_time: "Extend Quiz Time"
         student_extensions: "Student Extensions"
     more_questions: "more questions"
@@ -12138,20 +12181,23 @@ en:
           submission_needs_review: "This submission needs review"
       moderate: 
         add_time: "Add Time"
+        attempts: attempts
+        autosubmit_link_description: "Check on outstanding quiz submissions"
         buttons: 
           change_extensions_for_selected_students: "Change Extensions for %{n} Selected Students"
           extend_time: "Extend Time"
           save: Save
         end_quiz_reference_time_current_end: "the current end time"
         end_quiz_reference_time_now: now
-        end_quiz_when: "End the quiz %{n} minutes from %{reference_time}."
+        end_the_quiz: "End the quiz"
         extended_quiz_time_explanation: "You can give this student extra time on their current quiz attempt. How much time would you like to give them?"
+        extra_time_on_every_attempt: "Extra time on every attempt:"
         finished_in: "finished in %{duration}"
-        global_extra_attempts: "everyone gets %{n} already"
+        global_extra_attempt_time: "everyone already gets %{count} minute"
+        global_extra_attempts: "everyone already gets %{n}"
         headers: 
           attempt: Attempt
           attempts_left: "Attempts Left"
-          extended_quiz_time: "Extend Quiz Time"
           score: Score
           student: Student
           student_extensions: "Student Extensions"
@@ -12160,17 +12206,26 @@ en:
         labels: 
           ending: Ending
           extra_attempts: "Extra Attempts"
-          extra_time_per_attempt: "Extra Time on Every Attempt"
           manually_unlock: "Manually unlock the quiz for the next attempt"
           reset_has_seen_results: "Let the student see the results one more time"
           started: Started
+        maximum_of_1440_minutes: "Maximum of 1440 minutes (24 hours)"
         minutes: minutes
+        minutes_from: "minutes from"
         moderate_page_title: "%{title}: Moderate"
+        outstanding_autosubmission_description: "These quiz submissions are outstanding, likely because a student left the quiz page prior to submission. If you would like to grade them, please press 'Submit' below."
+        outstanding_quiz_submissions_found: "There are outstanding quiz submissions."
         page_title: "Moderate Quiz"
-        student_gets_extra_time: "*%{student_name}* **gets %{extra_time} extra minutes on each attempt**"
+        reload_student_table: "Reload student table"
+        student_gets_extra_time: 
+          one: "*%{student_name}* **gets 1 extra minute on each attempt**"
+          other: "*%{student_name}* **gets %{count} extra minutes on each attempt**"
         student_n: "Student %{n}"
+        submitting: Submitting...
         titles: 
           change_user_extensions: "Change user extensions"
+          extra_attempts: "additional extra attempts"
+          extra_quiz_minutes: "additional minutes on each attempt"
           manually_unlocked: "Manually Unlocked"
           minutes_to_add: "minutes to add"
           select_deselect_all: "Select/Deselect All"
@@ -12258,6 +12313,7 @@ en:
         has_submissions_already: "Keep in mind, some students have already taken or started taking this quiz"
         less_than_allotted_time: "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz."
         no_submission_for_user: "There is no submission available for that user"
+        quiz_not_availible: "You do not have access to the requested quiz."
         quiz_updated: "Quiz successfully updated"
         quizzes_published: 
           one: "1 quiz successfully published!"
@@ -12698,15 +12754,22 @@ en:
     add_folder: "Add Folder"
     all_my_files: "All My Files"
     cancel: Cancel
-    confirm_delete: "Are you sure you want to delete %{name}?"
-    confirm_delete_selected: "Are you sure you want to delete these %{count} items?"
+    cancel_button: 
+      label: "Cancel %{fileName} from uploading"
+    confirm_delete: 
+      one: "Are you sure you want to delete %{name}?"
+      other: "Are you sure you want to delete these %{count} items?"
+    confirm_delete_with_contents: 
+      one: "Are you sure you want to delete %{name}? It is not empty, anything inside it will be deleted too."
+      other: "Are you sure you want to delete these %{count} items and everything inside them?"
     count_items_selected: "%{count} items selected"
     created_at: "Date Created"
     created_at_short: Created
     delete: Delete
+    delete_error: "Error deleting %{name}: %{reason}"
     deleted_items_successfully: "%{count} items deleted successfully"
     download: Download
-    download_as_zip: "Downlod as Zip"
+    download_as_zip: "Download as Zip"
     edit_name: "Edit Name"
     errors: 
       no_match: 
@@ -12715,7 +12778,9 @@ en:
         suggestions: "Suggestions:"
         three_chars: "Enter at least 3 letters in the search box."
         your_search: "Your search - \"%{search_term}\" - did not match any files."
+    file_list: "File List"
     files: Files
+    files_heading: Files
     files_toolbar: "Files Toolbar"
     folder: Folder
     folder_browsing_tree: "Folder Browsing Tree"
@@ -12724,7 +12789,6 @@ en:
     labels: 
       select: "Select This Item"
     loading_more_results: "Loading more results..."
-    main_file_browser_pane: "Main file browser pane"
     modified_by: "Modified By"
     move: Move
     move_question: 
@@ -12739,7 +12803,6 @@ en:
     progress_message: "Preparing download: %{percent}% complete"
     restrict_access: "Restrict Access"
     search_for_files: "Search for files"
-    search_results: "Search results"
     search_results_for: "search results for \"%{search_term}\""
     select_all: "Select All"
     settings: Settings
@@ -12818,8 +12881,8 @@ en:
       cancel: Cancel
       update: Update
     label: 
-      availableFrom: From
-      availableUntil: Until
+      availableFrom: "Lock From"
+      availableUntil: "Lock Until"
     options: 
       hiddenInput: 
         description: "Only available to students with link. Not visible in student files."
@@ -14499,6 +14562,8 @@ en:
   unused_courses_title: "Unused Courses"
   upload_button: 
     upload: Upload
+  upload_drop_zone: 
+    drop_to_upload: "Drop items to upload"
   user: 
     default_user_name: User
     errors: 

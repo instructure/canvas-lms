@@ -38,7 +38,7 @@ describe UserContent, type: :request do
         :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
-    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
   it "should translate group file download links to directly-downloadable urls" do
@@ -58,13 +58,13 @@ describe UserContent, type: :request do
         :format => 'json', :group_id => @group.id.to_s, :topic_id => @group_topic.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
-    doc.at_css('img')['src'].should == "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
   it "should translate file download links to directly-downloadable urls for deleted and replaced files" do
     @attachment.destroy
     attachment2 = Attachment.create!(:folder => @attachment.folder, :context => @attachment.context, :filename => @attachment.filename, :uploaded_data => StringIO.new("first"))
-    @context.attachments.find(@attachment.id).id.should == attachment2.id
+    expect(@context.attachments.find(@attachment.id).id).to eq attachment2.id
 
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
@@ -79,7 +79,7 @@ describe UserContent, type: :request do
         :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
-    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
   end
 
   it "should not corrupt absolute links" do
@@ -95,7 +95,7 @@ describe UserContent, type: :request do
       { :controller => 'discussion_topics_api', :action => 'show',
         :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
     doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
-    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
   it "should not remove wrap parameter on file download links" do
@@ -111,7 +111,7 @@ describe UserContent, type: :request do
                     { :controller => 'discussion_topics_api', :action => 'show',
                       :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
     doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
-    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
   end
 
   it "should translate file preview links to directly-downloadable preview urls" do
@@ -128,7 +128,7 @@ describe UserContent, type: :request do
         :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
-    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
   end
 
   it "should translate media comment links to embedded video tags" do
@@ -146,17 +146,17 @@ describe UserContent, type: :request do
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
     video = doc.at_css('video')
-    video.should be_present
-    video['class'].should match(/\binstructure_inline_media_comment\b/)
-    video['data-media_comment_type'].should == 'video'
-    video['data-media_comment_id'].should == 'qwerty'
-    video['poster'].should match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
-    video['src'].should match(%r{http://www.example.com/courses/#{@course.id}/media_download})
-    video['src'].should match(%r{entryId=qwerty})
+    expect(video).to be_present
+    expect(video['class']).to match(/\binstructure_inline_media_comment\b/)
+    expect(video['data-media_comment_type']).to eq 'video'
+    expect(video['data-media_comment_id']).to eq 'qwerty'
+    expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
+    expect(video['src']).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
+    expect(video['src']).to match(%r{entryId=qwerty})
     # we leave width/height out of it, since browsers tend to have good
     # defaults and it makes it easier to set via client css rules
-    video['width'].should be_nil
-    video['height'].should be_nil
+    expect(video['width']).to be_nil
+    expect(video['height']).to be_nil
   end
 
   it "should translate media comment audio tags" do
@@ -174,13 +174,13 @@ describe UserContent, type: :request do
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
     audio = doc.at_css('audio')
-    audio.should be_present
-    audio['class'].should match(/\binstructure_inline_media_comment\b/)
-    audio['data-media_comment_type'].should == 'audio'
-    audio['data-media_comment_id'].should == 'abcde'
-    audio['poster'].should be_blank
-    audio['src'].should match(%r{http://www.example.com/courses/#{@course.id}/media_download})
-    audio['src'].should match(%r{entryId=abcde})
+    expect(audio).to be_present
+    expect(audio['class']).to match(/\binstructure_inline_media_comment\b/)
+    expect(audio['data-media_comment_type']).to eq 'audio'
+    expect(audio['data-media_comment_id']).to eq 'abcde'
+    expect(audio['poster']).to be_blank
+    expect(audio['src']).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
+    expect(audio['src']).to match(%r{entryId=abcde})
   end
 
   it "should not translate links in content not viewable by user" do
@@ -204,7 +204,7 @@ describe UserContent, type: :request do
       :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
-    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
   end
 
   it "should prepend the hostname to all absolute-path links" do
@@ -225,8 +225,8 @@ describe UserContent, type: :request do
       :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
-    doc.at_css('img')['src'].should == "http://www.example.com/equation_images/1234"
-    doc.css('a').map { |e| e['href'] }.should == [
+    expect(doc.at_css('img')['src']).to eq "http://www.example.com/equation_images/1234"
+    expect(doc.css('a').map { |e| e['href'] }).to eq [
       "http://www.example.com/help",
       "//example.com/quiz",
       "http://example.com/test1",
@@ -271,7 +271,7 @@ describe UserContent, type: :request do
                         { :controller => 'wiki_pages_api', :action => 'show',
                           :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
         doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
-        doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
+        expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments",
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments/9~123",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages",
@@ -285,8 +285,9 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/999",
           "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
-        doc.css('a').collect { |att| att['data-api-returntype'] }.should ==
+        expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
             %w([Assignment] Assignment [Page] Page [Discussion] Discussion Folder File File [Quiz] Quiz SessionlessLaunchUrl)
+        )
       end
     end
 
@@ -311,7 +312,7 @@ describe UserContent, type: :request do
                         { :controller => 'wiki_pages_api', :action => 'show',
                           :format => 'json', :group_id => @group.id.to_s, :url => @wiki_page.url })
         doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
-        doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
+        expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
             "http://www.example.com/api/v1/groups/#{@group.id}/pages",
             "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
             "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics",
@@ -319,8 +320,9 @@ describe UserContent, type: :request do
             "http://www.example.com/api/v1/groups/#{@group.id}/folders/root",
             "http://www.example.com/api/v1/files/789"
         ]
-        doc.css('a').collect{ |att| att['data-api-returntype'] }.should ==
+        expect(doc.css('a').collect{ |att| att['data-api-returntype'] }).to eq(
             %w([Page] Page [Discussion] Discussion Folder File)
+        )
       end
     end
 
@@ -335,12 +337,13 @@ describe UserContent, type: :request do
                         :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
                         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s)
         doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
-        doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
+        expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/users/#{@teacher.id}/folders/root",
           "http://www.example.com/api/v1/files/789"
         ]
-        doc.css('a').collect { |att| att['data-api-returntype'] }.should ==
+        expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
             %w(Folder File)
+        )
       end
     end
   end
@@ -364,15 +367,15 @@ describe UserContent, type: :request do
 
       doc = Nokogiri::HTML::DocumentFragment.parse(html)
       anchors = doc.css('a')
-      anchors[0]['id'].should == 'something-else'
-      anchors[0]['href'].should == '/blah'
-      anchors[1]['href'].should be_nil
-      anchors[2]['href'].should == '/media_objects/test1'
-      anchors[2]['class'].should == 'instructure_inline_media_comment audio_comment'
-      anchors[3]['class'].should == 'instructure_inline_media_comment audio_comment' # media_type added by code
-      anchors[3]['href'].should == '/media_objects/test2'
-      anchors[4]['class'].should == 'instructure_inline_media_comment' # media object not found, no type added
-      anchors[4]['href'].should == '/media_objects/test3'
+      expect(anchors[0]['id']).to eq 'something-else'
+      expect(anchors[0]['href']).to eq '/blah'
+      expect(anchors[1]['href']).to be_nil
+      expect(anchors[2]['href']).to eq '/media_objects/test1'
+      expect(anchors[2]['class']).to eq 'instructure_inline_media_comment audio_comment'
+      expect(anchors[3]['class']).to eq 'instructure_inline_media_comment audio_comment' # media_type added by code
+      expect(anchors[3]['href']).to eq '/media_objects/test2'
+      expect(anchors[4]['class']).to eq 'instructure_inline_media_comment' # media object not found, no type added
+      expect(anchors[4]['href']).to eq '/media_objects/test3'
     end
 
     it "should translate video and audio instructure_inline_media_comment tags" do
@@ -385,18 +388,18 @@ describe UserContent, type: :request do
 
       doc = Nokogiri::HTML::DocumentFragment.parse(html)
       tags = doc.css('audio,video,a')
-      tags[0].name.should == 'video'
-      tags[0]['src'].should == '/other'
-      tags[0]['class'].should be_nil
-      tags[1].name.should == 'video'
-      tags[2].name.should == 'a'
-      tags[2]['class'].should == 'instructure_inline_media_comment video_comment'
-      tags[2]['href'].should == '/media_objects/test1'
-      tags[2]['id'].should == 'media_comment_test1'
-      tags[3].name.should == 'a'
-      tags[3]['class'].should == 'instructure_inline_media_comment audio_comment'
-      tags[3]['href'].should == '/media_objects/test2'
-      tags[3]['id'].should == 'media_comment_test2'
+      expect(tags[0].name).to eq 'video'
+      expect(tags[0]['src']).to eq '/other'
+      expect(tags[0]['class']).to be_nil
+      expect(tags[1].name).to eq 'video'
+      expect(tags[2].name).to eq 'a'
+      expect(tags[2]['class']).to eq 'instructure_inline_media_comment video_comment'
+      expect(tags[2]['href']).to eq '/media_objects/test1'
+      expect(tags[2]['id']).to eq 'media_comment_test1'
+      expect(tags[3].name).to eq 'a'
+      expect(tags[3]['class']).to eq 'instructure_inline_media_comment audio_comment'
+      expect(tags[3]['href']).to eq '/media_objects/test2'
+      expect(tags[3]['id']).to eq 'media_comment_test2'
     end
 
     context "with verified user-context file links" do
@@ -409,7 +412,7 @@ describe UserContent, type: :request do
         link = %Q{<a href="#{url}">what</a>}
         html = tester.process_incoming_html_content(link)
         doc = Nokogiri::HTML::DocumentFragment.parse(html)
-        doc.at_css('a')['href'].should == url
+        expect(doc.at_css('a')['href']).to eq url
       end
 
       it "ignores them when scoped to the file" do
@@ -433,7 +436,7 @@ describe UserContent, type: :request do
         link = %Q{<a href="#{url}">what</a>a>}
         html = tester.process_incoming_html_content(link)
         doc = Nokogiri::HTML::DocumentFragment.parse(html)
-        doc.at_css('a')['href'].should == url
+        expect(doc.at_css('a')['href']).to eq url
       end
 
       it "ignores them when scoped to the file" do
@@ -467,11 +470,11 @@ describe UserContent, type: :request do
         include Api
       end
 
-      ApiClass.new.api_bulk_load_user_content_attachments(
+      expect(ApiClass.new.api_bulk_load_user_content_attachments(
         [html1, html2],
         @course,
         @teacher
-      ).should == {a1.id => a1, a2.id => a2, a3.id => a3}
+      )).to eq({a1.id => a1, a2.id => a2, a3.id => a3})
     end
   end
 end

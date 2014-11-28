@@ -34,7 +34,7 @@ describe "/profile/profile" do
     assigns[:pseudonyms] = @user.pseudonyms
     assigns[:password_pseudonyms] = []
     render "profile/profile"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should not show the delete link for SIS pseudonyms" do
@@ -53,8 +53,8 @@ describe "/profile/profile" do
     assigns[:password_pseudonyms] = []
     render "profile/profile"
     page = Nokogiri('<document>' + response.body + '</document>')
-    page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style'].should == ''
-    page.css("#pseudonym_#{sis_pseudonym.id} .delete_pseudonym_link").first['style'].should == 'display: none;'
+    expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style']).to eq ''
+    expect(page.css("#pseudonym_#{sis_pseudonym.id} .delete_pseudonym_link").first['style']).to eq 'display: none;'
   end
 end
 

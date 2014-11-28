@@ -1,3 +1,4 @@
+<% grading_standard ||= nil %>
 <% grading_standard_list ||= false %>
 <% data = grading_standard.data rescue GradingStandard.default_grading_standard %>
 <div class="grading_standard" id="grading_standard_<%= grading_standard ? grading_standard.id : 'blank' %>">
@@ -13,7 +14,7 @@
               <% if !grading_standard_list %>
                 <a href="#" class="find_grading_standard_link no-hover" title="<%= t('find_existing_scheme', 'Find Existing Grading Scheme') %>"><%= image_tag "find.png", :alt => t('find', "Find") %> <%= t('select_another_scheme','Select Another Scheme') %></a>
               <% end %>
-                <a href="#" title="<%= t('edit_scheme', 'Edit Grading Scheme') %>" class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && !can_do(grading_standard, @current_user, :update) %>"><i class="icon-edit standalone-icon"></i></a>
+                <a href="#" title="<%= t('edit_scheme', 'Edit Grading Scheme') %>" class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && grading_standard.assessed_assignment? %>"><i class="icon-edit standalone-icon"></i></a>
               <% if grading_standard_list %>
                 <a href="#" title="<%= t('delete_scheme', 'Delete Grading Scheme') %>" class="delete_grading_standard_link no-hover"><i class="icon-trash standalone-icon"></i></a>
               <% else %>

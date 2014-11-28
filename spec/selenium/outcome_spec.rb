@@ -79,16 +79,16 @@ describe "outcomes" do
 
         # the "readable" version should be rendered in directory browser
         li_el = fj('.outcomes-sidebar .outcome-level:first li:first')
-        li_el.should be_true # should be present
-        li_el.text.should == title
+        expect(li_el).to be_truthy # should be present
+        expect(li_el.text).to eq title
 
         # the "readable" version should be rendered in the view:
-        f(".outcomes-content .title").text.should == title
+        expect(f(".outcomes-content .title").text).to eq title
 
         # and the escaped version should be stored!
         # LearningOutcome.find_by_short_description(escaped_title).should be_present
         # or not, looks like it isn't being escaped
-        LearningOutcome.find_by_short_description(title).should be_present
+        expect(LearningOutcome.find_by_short_description(title)).to be_present
       end
     end
 
@@ -99,7 +99,7 @@ describe "outcomes" do
         get "/courses/#{@course.id}/outcomes/#{@outcome.id}"
         wait_for_ajaximations
 
-        f('#alignments').text.should match(/#{@rubric.title}/)
+        expect(f('#alignments').text).to match(/#{@rubric.title}/)
       end
     end
   end
@@ -128,23 +128,23 @@ describe "outcomes" do
       end
 
       it "should have account outcomes available for course" do
-        f(".ellipsis[title='outcome 0']").should be_displayed
+        expect(f(".ellipsis[title='outcome 0']")).to be_displayed
       end
 
       it "should add account outcomes to course" do
         f(".ellipsis[title='outcome 0']").click
         import_account_level_outcomes()
-        f(".ellipsis[title='outcome 0']").should be_displayed
+        expect(f(".ellipsis[title='outcome 0']")).to be_displayed
       end
 
       it "should remove account outcomes from course" do
-        pending("no delete button when seeding, functionality should be available")
+        skip("no delete button when seeding, functionality should be available")
         f(".ellipsis[title='outcome 0']").click
         import_account_level_outcomes()
         f(".ellipsis[title='outcome 0']").click
         wait_for_ajaximations
         msg = "redmine bug on this functionality"
-        msg.should == ""
+        expect(msg).to eq ""
       end
 
       context "find/import dialog" do
@@ -155,10 +155,10 @@ describe "outcomes" do
           f('.find_outcome').click
           wait_for_ajaximations
           groups = ff('.outcome-group')
-          groups.size.should == 1
+          expect(groups.size).to eq 1
           groups.each do |g|
             g.click
-            f('.ui-dialog-buttonpane .btn-primary').should_not be_displayed
+            expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
           end
         end
       end
@@ -176,8 +176,8 @@ describe "outcomes" do
         get outcome_url
         wait_for_ajaximations
         keep_trying_until do
-          ff(".outcome-level li").first.should have_class("outcome-group")
-          ff(".outcome-level li").last.should have_class("outcome-link")
+          expect(ff(".outcome-level li").first).to have_class("outcome-group")
+          expect(ff(".outcome-level li").last).to have_class("outcome-link")
         end
       end
 
@@ -186,7 +186,7 @@ describe "outcomes" do
         course_bulk_outcome_groups_course(num, num)
         get outcome_url
         wait_for_ajaximations
-        keep_trying_until { ff(".outcome-group").count.should == 20 }
+        keep_trying_until { expect(ff(".outcome-group").count).to eq 20 }
       end
 
       it "should display 20 initial associated outcomes in nested group" do
@@ -195,7 +195,7 @@ describe "outcomes" do
         get outcome_url
         ff(".outcome-group")[0].click
         wait_for_ajaximations
-        keep_trying_until { ff(".outcome-link").length.should == 20 }
+        keep_trying_until { expect(ff(".outcome-link").length).to eq 20 }
       end
 
       context "instructions" do
@@ -203,7 +203,7 @@ describe "outcomes" do
           course_bulk_outcome_groups_course(2, 2)
           get outcome_url
           wait_for_ajaximations
-          ff('.outcomes-content').first.text.should include "Setting up Outcomes"
+          expect(ff('.outcomes-content').first.text).to include "Setting up Outcomes"
         end
       end
     end
@@ -222,21 +222,21 @@ describe "outcomes" do
         course_bulk_outcome_groups_course(2, 2)
         get outcome_url
         wait_for_ajaximations
-        ff('.outcomes-content').first.text.should_not include "Setting up Outcomes"
+        expect(ff('.outcomes-content').first.text).not_to include "Setting up Outcomes"
       end
 
       it "should select the first outcome from the list if there are no outcome groups" do
         course_outcome 2
         get outcome_url
         wait_for_ajaximations
-        keep_trying_until { ff('.outcomes-content .title').first.text.should include "outcome 0" }
+        keep_trying_until { expect(ff('.outcomes-content .title').first.text).to include "outcome 0" }
       end
 
       it "should select the first outcome group from the list if there are outcome groups" do
         course_bulk_outcome_groups_course(2, 2)
         get outcome_url
         wait_for_ajaximations
-        keep_trying_until { ff('.outcomes-content .title').first.text.should include "group 0" }
+        keep_trying_until { expect(ff('.outcomes-content .title').first.text).to include "group 0" }
       end
     end
   end

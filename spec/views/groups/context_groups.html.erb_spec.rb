@@ -25,14 +25,14 @@ describe "/groups/context_groups" do
     view_context
     
     render "groups/context_groups"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should render for an account" do
     view_context(Account.default)
 
     render "groups/context_groups"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

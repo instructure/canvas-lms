@@ -29,6 +29,9 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   MAX_UNIQUE_ID_LENGTH = 100
 
+  CAS_TICKET_EXPIRED = 'expired'
+  CAS_TICKET_TTL = 1.day
+
   EXPORTABLE_ATTRIBUTES = [
     :id, :user_id, :account_id, :workflow_state, :unique_id, :login_count, :failed_login_count, :last_request_at, :last_login_at, :current_login_at, :last_login_ip,
     :current_login_ip, :position, :created_at, :updated_at, :deleted_at, :sis_batch_id, :sis_user_id, :sis_ssha, :communication_channel_id, :login_path_to_ignore, :sis_communication_channel_id
@@ -435,19 +438,39 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  def claim_cas_ticket(ticket)
-    return unless Canvas.redis_enabled?
-    Canvas.redis.setex("cas_session:#{ticket}", 1.day, global_id)
+  def self.cas_ticket_key(ticket)
+    "cas_session:#{ticket}"
   end
 
-  def self.release_cas_ticket(ticket)
+  def claim_cas_ticket(ticket)
     return unless Canvas.redis_enabled?
-    redis_key = "cas_session:#{ticket}"
-    if id = Canvas.redis.get(redis_key)
-      pseudonym = Pseudonym.where(id: id).first
-      Canvas.redis.del(redis_key)
+
+    redis_key = Pseudonym.cas_ticket_key(ticket)
+
+    # Refresh the keys ttl if it exists.
+    unless Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+      # If it does not exist we need to create it.
+      Canvas.redis.set(redis_key, global_id, ex: CAS_TICKET_TTL, nx: true)
     end
-    pseudonym.try(:reset_persistence_token!)
-    pseudonym
+  end
+
+  def cas_ticket_expired?(ticket)
+    return unless Canvas.redis_enabled?
+    redis_key = Pseudonym.cas_ticket_key(ticket)
+
+    # Refresh the ttl on the cas ticket before we check its state.
+    Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+    Canvas.redis.get(redis_key) != global_id.to_s
+  end
+
+  def self.expire_cas_ticket(ticket)
+    return unless Canvas.redis_enabled?
+    redis_key = cas_ticket_key(ticket)
+
+    if id = Canvas.redis.getset(redis_key, CAS_TICKET_EXPIRED)
+      Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+
+      Pseudonym.where(id: id).exists? if id != CAS_TICKET_EXPIRED
+    end
   end
 end

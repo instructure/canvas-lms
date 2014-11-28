@@ -20,60 +20,60 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CanvasSort::First do
   it "should be equal to itself" do
-    CanvasSort::First.should == CanvasSort::First
+    expect(CanvasSort::First).to eq CanvasSort::First
   end
 
   it "should be less than any string" do
-    CanvasSort::First.should < ""
-    CanvasSort::First.should < "a"
+    expect(CanvasSort::First).to be < ""
+    expect(CanvasSort::First).to be < "a"
   end
 
   it "should be less than any string, commutatively" do
-    "".should > CanvasSort::First
-    "a".should > CanvasSort::First
+    expect("").to be > CanvasSort::First
+    expect("a").to be > CanvasSort::First
   end
 
   it "should be less than any number" do
-    CanvasSort::First.should < 0
-    CanvasSort::First.should < -1
-    CanvasSort::First.should < 1
+    expect(CanvasSort::First).to be < 0
+    expect(CanvasSort::First).to be < -1
+    expect(CanvasSort::First).to be < 1
   end
 
   it "should be less than any number, commutatively" do
-    0.should > CanvasSort::First
-    -1.should > CanvasSort::First
-    1.should > CanvasSort::First
+    expect(0).to be > CanvasSort::First
+    expect(-1).to be > CanvasSort::First
+    expect(1).to be > CanvasSort::First
   end
 
   it "should be less than any time or time with zone" do
-    CanvasSort::First.should < Time.now
-    CanvasSort::First.should < Time.at(0)
-    CanvasSort::First.should < Time.at(-1)
-    CanvasSort::First.should < Time.zone.now
+    expect(CanvasSort::First).to be < Time.now
+    expect(CanvasSort::First).to be < Time.at(0)
+    expect(CanvasSort::First).to be < Time.at(-1)
+    expect(CanvasSort::First).to be < Time.zone.now
   end
 
   it "should be less than any time or time with zone, commutatively" do
-    Time.now.should > CanvasSort::First
-    Time.at(0).should > CanvasSort::First
-    Time.at(-1).should > CanvasSort::First
-    Time.zone.now.should > CanvasSort::First
+    expect(Time.now).to be > CanvasSort::First
+    expect(Time.at(0)).to be > CanvasSort::First
+    expect(Time.at(-1)).to be > CanvasSort::First
+    expect(Time.zone.now).to be > CanvasSort::First
   end
 
   it "should sort with a few strings" do
-    [CanvasSort::Last, 'a', CanvasSort::First, 'b'].sort.should == [CanvasSort::First, 'a', 'b', CanvasSort::Last]
+    expect([CanvasSort::Last, 'a', CanvasSort::First, 'b'].sort).to eq [CanvasSort::First, 'a', 'b', CanvasSort::Last]
   end
 
   it "should sort with a few numbers" do
-    [CanvasSort::Last, 1, CanvasSort::First, 2].sort.should == [CanvasSort::First, 1, 2, CanvasSort::Last]
+    expect([CanvasSort::Last, 1, CanvasSort::First, 2].sort).to eq [CanvasSort::First, 1, 2, CanvasSort::Last]
   end
 
   it "should sort with a few times" do
     a = 5.seconds.ago
     b = Time.now
-    [CanvasSort::Last, a, CanvasSort::First, b].sort.should == [CanvasSort::First, a, b, CanvasSort::Last]
+    expect([CanvasSort::Last, a, CanvasSort::First, b].sort).to eq [CanvasSort::First, a, b, CanvasSort::Last]
   end
 
   it "should work with Array#min" do
-    [1, 2, CanvasSort::First].min.should == CanvasSort::First
+    expect([1, 2, CanvasSort::First].min).to eq CanvasSort::First
   end
 end

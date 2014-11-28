@@ -26,10 +26,10 @@ describe "syllabus" do
 
     get "/courses/#{@course.id}/assignments/syllabus"
 
-    response.should be_success
+    expect(response).to be_success
     page = Nokogiri::HTML(response.body)
-    page.css('#identity a[href="/login"]').should_not be_nil
-    page.at_css('#syllabusContainer').should_not be_nil
+    expect(page.css('#identity a[href="/login"]')).not_to be_nil
+    expect(page.at_css('#syllabusContainer')).not_to be_nil
   end
 
   it "should allow access to public courses" do
@@ -49,8 +49,8 @@ describe "syllabus" do
 
     get "/courses/#{@course.id}"
 
-    response.should be_success
+    expect(response).to be_success
     page = Nokogiri::HTML(response.body)
-    page.at_css('#course_syllabus').text.should include(syllabus_body)
+    expect(page.at_css('#course_syllabus').text).to include(syllabus_body)
   end
 end

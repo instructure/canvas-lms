@@ -234,8 +234,9 @@ define([
       var tooltip;
       if ($assignment.data('muted')) {
         tooltip = I18n.t('student_mute_notification', 'Instructor is working on grades');
-      } else if(submission_status == 'pending_review') {
-        tooltip = I18n.t('grading_in_progress', "Instructor is working on grades");
+      // Commented out until CNVS-16332 backend fixes are ready
+      //} else if(submission_status == 'pending_review') {
+      //  tooltip = I18n.t('grading_in_progress', "Instructor is working on grades");
       } else {
         tooltip = I18n.t('click_to_change', 'Click to test a different score');
       }

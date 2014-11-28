@@ -20,13 +20,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/_form_question" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   it "should render" do
     course_with_student
     view_context
     assigns[:js_env] = {quiz_max_combination_count: 200}
     render :partial => "quizzes/quizzes/form_question"
 
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

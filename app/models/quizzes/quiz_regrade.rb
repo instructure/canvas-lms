@@ -1,7 +1,7 @@
 class Quizzes::QuizRegrade < ActiveRecord::Base
   self.table_name = 'quiz_regrades'
 
-  attr_accessible :user_id, :quiz_id, :quiz_version
+  attr_accessible :user_id, :quiz_id, :quiz_version, :user, :quiz
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :user
   has_many :quiz_regrade_runs, class_name: 'Quizzes::QuizRegradeRun'

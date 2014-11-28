@@ -24,7 +24,7 @@ describe "/files/_nested_content" do
     course_with_student
     view_context
     render :partial => "files/nested_content", :object => []
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

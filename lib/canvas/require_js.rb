@@ -32,7 +32,7 @@ module Canvas
             end
             hash
           }
-    
+
         # inject any bundle extensions defined in plugins
         extensions_for("*").each do |bundle, extensions|
           if app_bundles["compiled/bundles/#{bundle}"]
@@ -101,13 +101,16 @@ module Canvas
       def cache_busting_paths
         { 'compiled/tinymce' => 'compiled/tinymce.js?v2' } # hack: increment to purge browser cached bundles after tiny change
       end
-      
+
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
             'bower/react-router/dist/react-router': {
               deps: ['react'],
               exports: 'ReactRouter'
+            },
+            'bower/react-modal/dist/react-modal': {
+              deps: ['react']
             },
             'bower/ember/ember': {
               deps: ['jquery', 'handlebars'],

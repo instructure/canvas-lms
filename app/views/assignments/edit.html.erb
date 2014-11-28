@@ -21,7 +21,7 @@
 <%= render "groups/add_group_category" %>
 <%= render "shared/select_content_dialog", :only => [:external_tools] %>
 <div id="edit_letter_grades_form" style="display: none;">
-  <%= render "shared/grading_standard", :object => @assignment.grading_standard %>
+  <%= render partial: "shared/grading_standard", object: @assignment.grading_standard %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
 </div>

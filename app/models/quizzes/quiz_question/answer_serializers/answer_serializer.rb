@@ -37,6 +37,18 @@ module Quizzes::QuizQuestion::AnswerSerializers
       self.name.demodulize.underscore
     end
 
+    # Prevent the serializer from locating which question data to use for doing
+    # its work. Use this only if you have something like a hash of the question
+    # data and not actual QuizQuestion objects.
+    #
+    # @see #frozen_question_data()
+    #
+    # Also, don't use this unless you really know what you're doing.
+    def override_question_data(question_data)
+      @frozen_question_data = question_data
+      @question_key = [ 'question', question_data[:id] ].join('_')
+    end
+
     protected
 
     # The hash-key of the question answer record in the submission_data.

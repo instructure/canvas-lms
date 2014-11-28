@@ -329,6 +329,13 @@ class ConversationsController < ApplicationController
       context_id = context.id
     end
 
+    params[:recipients].each do |recipient|
+      if recipient =~ /\Acourse_\d+\Z/ &&
+         !Context.find_by_asset_string(recipient).try(:grants_right?, @current_user, session, :send_messages_all)
+        return render_error('recipients', 'invalid')
+      end
+    end
+
     group_conversation     = value_to_boolean(params[:group_conversation])
     batch_private_messages = !group_conversation && @recipients.size > 1
     batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
@@ -502,7 +509,7 @@ class ConversationsController < ApplicationController
     messages = nil
     Shackles.activate(:slave) do
       messages = @conversation.messages
-      ConversationMessage.send(:preload_associations, messages, :asset)
+      ActiveRecord::Associations::Preloader.new(messages, :asset).run
     end
 
     render :json => conversation_json(@conversation,
@@ -787,7 +794,7 @@ class ConversationsController < ApplicationController
   #   }
   def remove_messages
     if params[:remove]
-      @conversation.remove_messages(*@conversation.messages.find_all_by_id(*params[:remove]))
+      @conversation.remove_messages(*@conversation.messages.where(id: params[:remove]).to_a)
       if @conversation.conversation_message_participants.where('workflow_state <> ?', 'deleted').length == 0
         @conversation.update_attribute(:last_message_at, nil)
       end

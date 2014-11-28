@@ -2,6 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples 'Answer Serializers'
 
   let :inputs do
@@ -22,17 +26,17 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
   end
 
   it 'should return nil when un-answered' do
-    subject.deserialize({}).should == nil
+    expect(subject.deserialize({})).to eq nil
   end
 
   context 'validations' do
     it 'should turn garbage into 0.0' do
       [ 'foobar', nil, { foo: 'bar' } ].each do |garbage|
         rc = subject.serialize(garbage)
-        rc.error.should be_nil
-        rc.answer.should == {
+        expect(rc.error).to be_nil
+        expect(rc.answer).to eq({
           question_5: "0.0"
-        }.with_indifferent_access
+        }.with_indifferent_access)
       end
     end
   end

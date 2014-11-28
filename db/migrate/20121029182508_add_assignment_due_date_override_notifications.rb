@@ -8,6 +8,6 @@ class AddAssignmentDueDateOverrideNotifications < ActiveRecord::Migration
 
   def self.down
     return unless Shard.current.default?
-    Notification.find_by_name("Assignment Due Date Override Changed").try(:destroy)
+    Notification.where(name: "Assignment Due Date Override Changed").delete_all
   end
 end

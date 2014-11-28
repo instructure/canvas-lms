@@ -33,18 +33,18 @@ describe 'MoveAccountMembershipTypes' do
   it "should add active roles for each membership type" do
     MoveAccountMembershipTypes.up
 
-    @account1.roles.count.should == 2
+    expect(@account1.roles.count).to eq 2
     role_names = ['role1', 'role2']
-    @account1.roles.collect(&:name).sort.should == role_names
+    expect(@account1.roles.collect(&:name).sort).to eq role_names
     role_names.each do |r|
-      @account1.roles.find_by_name(r).workflow_state.should == 'active'
+      expect(@account1.roles.find_by_name(r).workflow_state).to eq 'active'
     end
 
-    @account2.roles.count.should == 2
+    expect(@account2.roles.count).to eq 2
     role_names = ['role2', 'role3']
-    @account2.roles.collect(&:name).sort.should == role_names
+    expect(@account2.roles.collect(&:name).sort).to eq role_names
     role_names.each do |r|
-      @account2.roles.find_by_name(r).workflow_state.should == 'active'
+      expect(@account2.roles.find_by_name(r).workflow_state).to eq 'active'
     end
   end
 
@@ -63,13 +63,13 @@ describe 'MoveAccountMembershipTypes' do
 
     MoveAccountMembershipTypes.up
 
-    @account1.roles.count.should == 2
-    @account1.roles.find_by_name('role1').base_role_type.should == 'TeacherEnrollment'
-    @account1.roles.find_by_name('role2').base_role_type.should == 'AccountMembership'
+    expect(@account1.roles.count).to eq 2
+    expect(@account1.roles.find_by_name('role1').base_role_type).to eq 'TeacherEnrollment'
+    expect(@account1.roles.find_by_name('role2').base_role_type).to eq 'AccountMembership'
 
-    @account2.roles.count.should == 2
-    @account2.roles.find_by_name('role2').base_role_type.should == 'StudentEnrollment'
-    @account2.roles.find_by_name('role3').base_role_type.should == 'ObserverEnrollment'
+    expect(@account2.roles.count).to eq 2
+    expect(@account2.roles.find_by_name('role2').base_role_type).to eq 'StudentEnrollment'
+    expect(@account2.roles.find_by_name('role3').base_role_type).to eq 'ObserverEnrollment'
   end
 
   context "when adding inactive roles for role overrides" do
@@ -90,25 +90,25 @@ describe 'MoveAccountMembershipTypes' do
     end
 
     it "should add inactive roles if there is a role-override referencing a missing type" do
-      @account1.roles.count.should == 4
-      @account1.roles.collect(&:name).sort.should == ['customrole1', 'customrole2', 'role1', 'role2']
-      @account1.roles.find_by_name('customrole1').base_role_type.should == 'AccountMembership'
-      @account1.roles.find_by_name('customrole1').workflow_state.should == 'inactive'
-      @account1.roles.find_by_name('customrole2').base_role_type.should == 'AccountMembership'
-      @account1.roles.find_by_name('customrole2').workflow_state.should == 'inactive'
+      expect(@account1.roles.count).to eq 4
+      expect(@account1.roles.collect(&:name).sort).to eq ['customrole1', 'customrole2', 'role1', 'role2']
+      expect(@account1.roles.find_by_name('customrole1').base_role_type).to eq 'AccountMembership'
+      expect(@account1.roles.find_by_name('customrole1').workflow_state).to eq 'inactive'
+      expect(@account1.roles.find_by_name('customrole2').base_role_type).to eq 'AccountMembership'
+      expect(@account1.roles.find_by_name('customrole2').workflow_state).to eq 'inactive'
 
-      @account2.roles.count.should == 3
-      @account2.roles.collect(&:name).sort.should == ['customrole2', 'role2', 'role3']
-      @account2.roles.find_by_name('customrole2').base_role_type.should == 'AccountMembership'
-      @account2.roles.find_by_name('customrole2').workflow_state.should == 'inactive'
+      expect(@account2.roles.count).to eq 3
+      expect(@account2.roles.collect(&:name).sort).to eq ['customrole2', 'role2', 'role3']
+      expect(@account2.roles.find_by_name('customrole2').base_role_type).to eq 'AccountMembership'
+      expect(@account2.roles.find_by_name('customrole2').workflow_state).to eq 'inactive'
     end
 
     it "should not overwrite the active roles added" do
-      @account2.roles.find_by_name('role2').workflow_state.should == 'active'
+      expect(@account2.roles.find_by_name('role2').workflow_state).to eq 'active'
     end
 
     it "should not overwrite an already existing role" do
-      @account2.roles.find_by_name('role3').base_role_type.should == 'ObserverEnrollment'
+      expect(@account2.roles.find_by_name('role3').base_role_type).to eq 'ObserverEnrollment'
     end
   end
 
@@ -120,16 +120,16 @@ describe 'MoveAccountMembershipTypes' do
 
     MoveAccountMembershipTypes.up
 
-    @account1.roles.count.should == 3
-    @account1.roles.collect(&:name).sort.should == ['NonexistentType', 'role1', 'role2']
-    @account1.roles.find_by_name('NonexistentType').base_role_type.should == 'AccountMembership'
-    @account1.roles.find_by_name('NonexistentType').workflow_state.should == 'inactive'
+    expect(@account1.roles.count).to eq 3
+    expect(@account1.roles.collect(&:name).sort).to eq ['NonexistentType', 'role1', 'role2']
+    expect(@account1.roles.find_by_name('NonexistentType').base_role_type).to eq 'AccountMembership'
+    expect(@account1.roles.find_by_name('NonexistentType').workflow_state).to eq 'inactive'
 
-    @account2.roles.count.should == 4
-    @account2.roles.collect(&:name).sort.should == ['AnotherNonexistentType', 'YetAnotherNonexistentType', 'role2', 'role3', ]
+    expect(@account2.roles.count).to eq 4
+    expect(@account2.roles.collect(&:name).sort).to eq ['AnotherNonexistentType', 'YetAnotherNonexistentType', 'role2', 'role3', ]
     ['AnotherNonexistentType', 'YetAnotherNonexistentType'].each do |t|
-      @account2.roles.find_by_name(t).base_role_type.should == 'AccountMembership'
-      @account2.roles.find_by_name(t).workflow_state.should == 'inactive'
+      expect(@account2.roles.find_by_name(t).base_role_type).to eq 'AccountMembership'
+      expect(@account2.roles.find_by_name(t).workflow_state).to eq 'inactive'
     end
   end
 
@@ -142,10 +142,10 @@ describe 'MoveAccountMembershipTypes' do
 
     MoveAccountMembershipTypes.up
 
-    @account1.roles.count.should == 3
-    @account1.roles.collect(&:name).sort.should == ['NonexistentType', 'role1', 'role2']
-    @account1.roles.find_by_name('NonexistentType').base_role_type.should == 'TeacherEnrollment'
-    @account1.roles.find_by_name('NonexistentType').workflow_state.should == 'active'
+    expect(@account1.roles.count).to eq 3
+    expect(@account1.roles.collect(&:name).sort).to eq ['NonexistentType', 'role1', 'role2']
+    expect(@account1.roles.find_by_name('NonexistentType').base_role_type).to eq 'TeacherEnrollment'
+    expect(@account1.roles.find_by_name('NonexistentType').workflow_state).to eq 'active'
   end
 
   it "should not fail when encountering a user with a reserved membership type" do

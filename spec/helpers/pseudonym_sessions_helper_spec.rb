@@ -26,7 +26,7 @@ describe PseudonymSessionsHelper do
       end
 
       it "returns true" do
-        helper.session_timeout_enabled.should be_true
+        expect(helper.session_timeout_enabled).to be_truthy
       end
     end
 
@@ -36,7 +36,7 @@ describe PseudonymSessionsHelper do
       end
 
       it "returns false" do 
-        helper.session_timeout_enabled.should be_false
+        expect(helper.session_timeout_enabled).to be_falsey
       end
     end
   end

@@ -31,7 +31,7 @@ describe AssignmentGroup do
   end
 
   it "should act as list" do
-    AssignmentGroup.should be_respond_to(:acts_as_list)
+    expect(AssignmentGroup).to be_respond_to(:acts_as_list)
   end
 
   context "visible assignments" do
@@ -56,10 +56,10 @@ describe AssignmentGroup do
       it "should return only active assignments with overrides or grades for the user" do
         @c.enable_feature! :differentiated_assignments
         @c.enable_feature! :draft_state
-        @ag.active_assignments.count.should == 3
+        expect(@ag.active_assignments.count).to eq 3
         # one with override, one with grade
-        @ag.visible_assignments(@u).count.should == 2
-        AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 2
+        expect(@ag.visible_assignments(@u).count).to eq 2
+        expect(AssignmentGroup.visible_assignments(@u, @c, [@ag]).count).to eq 2
       end
     end
 
@@ -67,26 +67,16 @@ describe AssignmentGroup do
       it "should return all published assignments" do
         @c.disable_feature! :differentiated_assignments
         @c.enable_feature! :draft_state
-        @ag.active_assignments.count.should == 3
-        @ag.visible_assignments(@u).count.should == 3
-        AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 3
-      end
-    end
-
-    context "with both differentiated assignments and draft state off" do
-      it "should return all active assignments" do
-        @c.disable_feature! :differentiated_assignments
-        @c.disable_feature! :draft_state
-        @ag.active_assignments.count.should == 3
-        @ag.visible_assignments(@u).count.should == 3
-        AssignmentGroup.visible_assignments(@u, @c, [@ag]).count.should == 3
+        expect(@ag.active_assignments.count).to eq 3
+        expect(@ag.visible_assignments(@u).count).to eq 3
+        expect(AssignmentGroup.visible_assignments(@u, @c, [@ag]).count).to eq 3
       end
     end
 
     context "logged out users" do
       it "should return assignments for logged out users so that invited users can see them before accepting a course invite" do
-        @ag.visible_assignments(nil).count.should == 3
-        AssignmentGroup.visible_assignments(nil, @c, [@ag]).count.should == 3
+        expect(@ag.visible_assignments(nil).count).to eq 3
+        expect(AssignmentGroup.visible_assignments(nil, @c, [@ag]).count).to eq 3
 
       end
     end
@@ -112,7 +102,7 @@ describe AssignmentGroup do
 
   it "should have a state machine" do
     assignment_group_model
-    @ag.state.should eql(:available)
+    expect(@ag.state).to eql(:available)
   end
 
   it "should return never_drop list as ints" do
@@ -123,7 +113,7 @@ describe AssignmentGroup do
     end
     assignment_group_model :rules => rules
     result = @ag.rules_hash()
-    result['never_drop'].should eql(expected)
+    expect(result['never_drop']).to eql(expected)
   end
 
   it "should return never_drop list as strings if `stringify_json_ids` is true" do
@@ -135,21 +125,21 @@ describe AssignmentGroup do
 
     assignment_group_model :rules => rules
     result = @ag.rules_hash({stringify_json_ids: true})
-    result['never_drop'].should eql(expected)
+    expect(result['never_drop']).to eql(expected)
   end
 
   it "should return rules that aren't never_drops as ints" do
     rules = "drop_highest:25\n"
     assignment_group_model :rules => rules
     result = @ag.rules_hash()
-    result['drop_highest'].should eql(25)
+    expect(result['drop_highest']).to eql(25)
   end
 
   it "should return rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
     assignment_group_model :rules => rules
     result = @ag.rules_hash({stringify_json_ids: true})
-    result['drop_lowest'].should eql(2)
+    expect(result['drop_lowest']).to eql(2)
   end
 end
 

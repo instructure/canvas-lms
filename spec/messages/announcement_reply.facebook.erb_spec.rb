@@ -24,8 +24,8 @@ describe 'announcement_reply.facebook' do
     announcement_model
     @object = @a
     @message = generate_message(:new_announcement, :facebook, @object)
-    @message.subject.should == "Canvas Alert"
-    @message.url.should match(/\/courses\/\d+\/announcements\/\d+/)
-    @message.body.should match(/\/courses\/\d+\/announcements\/\d+/)
+    expect(@message.subject).to eq "Canvas Alert"
+    expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)
+    expect(@message.body).to match(/\/courses\/\d+\/announcements\/\d+/)
   end
 end

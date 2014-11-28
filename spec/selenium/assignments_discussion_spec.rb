@@ -14,14 +14,14 @@ describe "discussion assignments" do
       build_assignment_with_type("Discussion", :submit => true)
       expect_new_page_load { f("#left-side .discussions").click }
       wait_for_ajaximations
-      ffj('.discussion-list li.discussion:visible').should_not be_empty
+      expect(ffj('.discussion-list li.discussion:visible')).not_to be_empty
     end
 
     it "should redirect to the discussion topic" do
       get "/courses/#{@course.id}/assignments"
       build_assignment_with_type("Discussion", :submit => true)
       expect_new_page_load { f(".assignment_list .group_assignment .assignment_title a").click }
-      driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
+      expect(driver.current_url).to match %r{/courses/\d+/discussion_topics/\d+}
     end
   end
 
@@ -31,8 +31,8 @@ describe "discussion assignments" do
       build_assignment_with_type("Discussion", :name => "Discuss!", :points => "5")
       expect_new_page_load { f('.more_options_link').click }
       wait_for_ajaximations
-      f('#discussion-title').attribute(:value).should == "Discuss!"
-      f('#discussion_topic_assignment_points_possible').attribute(:value).should == "5"
+      expect(f('#discussion-title').attribute(:value)).to eq "Discuss!"
+      expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "5"
     end
   end
 
@@ -43,7 +43,7 @@ describe "discussion assignments" do
       driver.execute_script %{$('#assignment_#{assign.id} .edit_assignment_link:first').addClass('focus');}
       f("#assignment_#{assign.id} .edit_assignment_link").click
       edit_assignment(:name => "Rediscuss!", :submit => true)
-      assign.reload.discussion_topic.title.should == "Rediscuss!"
+      expect(assign.reload.discussion_topic.title).to eq "Rediscuss!"
     end
   end
 
@@ -56,8 +56,8 @@ describe "discussion assignments" do
       edit_assignment(:name => "Rediscuss!", :points => 10)
       expect_new_page_load { f('.more_options_link').click }
       wait_for_ajaximations
-      f('#discussion-title').attribute(:value).should == "Rediscuss!"
-      f('#discussion_topic_assignment_points_possible').attribute(:value).should == "10"
+      expect(f('#discussion-title').attribute(:value)).to eq "Rediscuss!"
+      expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "10"
     end
   end
 end

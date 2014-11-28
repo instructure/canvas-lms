@@ -46,7 +46,7 @@ describe CrocodocSessionsController do
 
     it "works for the user in the blob" do
       get :show, blob: @blob, hmac: @hmac
-      response.body.should include 'https://crocodoc.com/view/SESSION'
+      expect(response.body).to include 'https://crocodoc.com/view/SESSION'
     end
 
     it "doesn't work for others" do

@@ -65,28 +65,28 @@ describe Api::V1::PageView do
   it "should be formatted as a page view hash" do
     page_view = page_view_json(@page_view, @student, @session)
 
-    page_view[:id].should == @page_view.request_id
-    page_view[:created_at].should == @page_view.created_at.in_time_zone
-    page_view[:updated_at].should == @page_view.updated_at
-    page_view[:remote_ip].should == @page_view.remote_ip
-    page_view[:context_type].should == @page_view.context_type
-    page_view[:user_agent].should == @page_view.user_agent
-    page_view[:render_time].should == @page_view.render_time
-    page_view[:participated].should == @page_view.participated
-    page_view[:user_request].should == @page_view.user_request
-    page_view[:interaction_seconds].should == @page_view.interaction_seconds
-    page_view[:contributed].should == false
-    page_view[:action].should == @page_view.action
-    page_view[:controller].should == @page_view.controller
+    expect(page_view[:id]).to eq @page_view.request_id
+    expect(page_view[:created_at]).to eq @page_view.created_at.in_time_zone
+    expect(page_view[:updated_at]).to eq @page_view.updated_at
+    expect(page_view[:remote_ip]).to eq @page_view.remote_ip
+    expect(page_view[:context_type]).to eq @page_view.context_type
+    expect(page_view[:user_agent]).to eq @page_view.user_agent
+    expect(page_view[:render_time]).to eq @page_view.render_time
+    expect(page_view[:participated]).to eq @page_view.participated
+    expect(page_view[:user_request]).to eq @page_view.user_request
+    expect(page_view[:interaction_seconds]).to eq @page_view.interaction_seconds
+    expect(page_view[:contributed]).to eq false
+    expect(page_view[:action]).to eq @page_view.action
+    expect(page_view[:controller]).to eq @page_view.controller
 
-    page_view[:links][:user].should == Shard.relative_id_for(@page_view.user, Shard.current, Shard.current)
-    page_view[:links][:real_user].should == Shard.relative_id_for(@page_view.real_user, Shard.current, Shard.current)
-    page_view[:links][:context].should == @page_view.context_id
-    page_view[:links][:asset].should == @page_view.asset_id
-    page_view[:links][:account].should == @page_view.account_id
+    expect(page_view[:links][:user]).to eq Shard.relative_id_for(@page_view.user, Shard.current, Shard.current)
+    expect(page_view[:links][:real_user]).to eq Shard.relative_id_for(@page_view.real_user, Shard.current, Shard.current)
+    expect(page_view[:links][:context]).to eq @page_view.context_id
+    expect(page_view[:links][:asset]).to eq @page_view.asset_id
+    expect(page_view[:links][:account]).to eq @page_view.account_id
   end
 
   it "should be formatted as an array of page view hashes" do
-    page_views_json(@page_views, @student, @session).size.should eql(@page_views.size)
+    expect(page_views_json(@page_views, @student, @session).size).to eql(@page_views.size)
   end
 end

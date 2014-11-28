@@ -37,7 +37,7 @@ describe "terms/_term.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render :partial => "terms/term.html.erb", :locals => {:term => @term}
-      response.should have_tag("input#enrollment_term_sis_source_id")
+      expect(response).to have_tag("input#enrollment_term_sis_source_id")
     end
 
     it "should not show to non-sis admin" do
@@ -45,8 +45,8 @@ describe "terms/_term.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render :partial => "terms/term.html.erb", :locals => {:term => @term}
-      response.should_not have_tag("input#enrollment_term_sis_source_id")
-      response.should have_tag("span.sis_source_id", @term.sis_source_id)
+      expect(response).not_to have_tag("input#enrollment_term_sis_source_id")
+      expect(response).to have_tag("span.sis_source_id", @term.sis_source_id)
     end
   end
 end

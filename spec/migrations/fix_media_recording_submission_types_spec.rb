@@ -39,8 +39,8 @@ describe DataFixup::FixMediaRecordingSubmissionTypes do
     DataFixup::FixMediaRecordingSubmissionTypes.run
 
     # verify the results
-    assign1.reload.submission_types.should == 'online_recording,media_recording,online_text_entry'
-    assign2.reload.submission_types.should == 'online_recording,media_recording,online_text_entry'
-    assign3.reload.submission_types.should == 'discussion_topic'
+    expect(assign1.reload.submission_types).to eq 'online_recording,media_recording,online_text_entry'
+    expect(assign2.reload.submission_types).to eq 'online_recording,media_recording,online_text_entry'
+    expect(assign3.reload.submission_types).to eq 'discussion_topic'
   end
 end

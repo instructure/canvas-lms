@@ -25,6 +25,6 @@ describe UserListsController do
     user_session(@user)
 
     post 'create', :course_id => @course.id, :user_list => '', :format => "json"
-    response.should be_success
+    expect(response).to be_success
   end
 end

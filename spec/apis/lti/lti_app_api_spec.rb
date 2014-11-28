@@ -39,8 +39,8 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                  {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json',
                   placements: %w(module_item resource_selection), course_id: @course.id.to_s})
-        json.select {|j| j['definition_type'] == @mh.class.name && j['definition_id'] == @mh.id.to_s}.should_not be_nil
-        json.select {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id.to_s}.should_not be_nil
+        expect(json.select {|j| j['definition_type'] == @mh.class.name && j['definition_id'] == @mh.id.to_s}).not_to be_nil
+        expect(json.select {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id.to_s}).not_to be_nil
       end
 
       it 'paginates the launch definitions' do
@@ -51,8 +51,8 @@ module Lti
                          placements: %w(module_item resource_selection), course_id: @course.id.to_s, per_page: '3'})
 
         json_next = follow_pagination_link('next', :controller => 'lti/lti_apps', :action => 'launch_definitions')
-        json.count.should == 3
-        json_next.count.should == 3
+        expect(json.count).to eq 3
+        expect(json_next.count).to eq 3
         json
       end
 

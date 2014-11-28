@@ -25,11 +25,11 @@ describe "user_content" do
       wait_for_ajaximations
       name = ff(".user_content_iframe").first.attribute('name')
       in_frame(name) do
-        keep_trying_until { driver.current_url.should match("/object_snippet") }
+        keep_trying_until { expect(driver.current_url).to match("/object_snippet") }
         html = Nokogiri::HTML(driver.page_source)
         obj = html.at_css('object')
-        obj.should_not be_nil
-        obj['data'].should == '/javascripts/swfobject/test.swf'
+        expect(obj).not_to be_nil
+        expect(obj['data']).to eq '/javascripts/swfobject/test.swf'
       end
     end
 
@@ -38,16 +38,16 @@ describe "user_content" do
       get "/calendar2"
       wait_for_ajaximations
 
-      ff(".user_content_iframe").size.should == 0
+      expect(ff(".user_content_iframe").size).to eq 0
       f('.fc-event').click
       wait_for_ajaximations
       name = keep_trying_until { ff(".user_content_iframe").first.attribute('name') }
       in_frame(name) do
-        keep_trying_until { driver.current_url.should match("/object_snippet") }
+        keep_trying_until { expect(driver.current_url).to match("/object_snippet") }
         html = Nokogiri::HTML(driver.page_source)
         obj = html.at_css('object')
-        obj.should_not be_nil
-        obj['data'].should == '/javascripts/swfobject/test.swf'
+        expect(obj).not_to be_nil
+        expect(obj['data']).to eq '/javascripts/swfobject/test.swf'
       end
     end
   end

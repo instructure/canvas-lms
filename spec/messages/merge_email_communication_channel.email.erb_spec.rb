@@ -23,7 +23,7 @@ describe 'merge_email_communication_channel.email' do
   it "should render" do
     user_with_pseudonym
     @object = @user.communication_channel
-    @object.user.should_not be_nil
+    expect(@object.user).not_to be_nil
     generate_message(:merge_email_communication_channel, :email, @object)
   end
 end

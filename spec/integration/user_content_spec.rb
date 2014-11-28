@@ -29,12 +29,12 @@ describe "User Content" do
       snippet = Base64.encode64 obj_data
       sig = Canvas::Security.hmac_sha1(snippet)
       post "http://files.example.com/object_snippet", :object_data => snippet, :s => sig
-      response.should be_success
-      response.body.should be_include(obj_data)
+      expect(response).to be_success
+      expect(response.body).to be_include(obj_data)
 
       post "http://canvas.example.com/object_snippet", :object_data => snippet, :s => sig
       assert_status(400)
-      response.body.should be_blank
+      expect(response.body).to be_blank
     end
 
     it "should allow object_snippet if there is no safefiles domain configured" do
@@ -45,8 +45,8 @@ describe "User Content" do
       snippet = Base64.encode64 obj_data
       sig = Canvas::Security.hmac_sha1(snippet)
       post "http://files.example.com/object_snippet", :object_data => snippet, :s => sig
-      response.should be_success
-      response.body.should be_include(obj_data)
+      expect(response).to be_success
+      expect(response.body).to be_include(obj_data)
     end
   end
 end

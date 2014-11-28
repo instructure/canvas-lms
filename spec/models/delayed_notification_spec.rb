@@ -24,16 +24,16 @@ describe DelayedNotification do
       qs = quiz_model.quiz_submissions.create!
       notification = DelayedNotification.create! asset: qs, notification: Notification.create!(notification_valid_attributes)
 
-      notification.asset_type.should == 'Quizzes::QuizSubmission'
+      expect(notification.asset_type).to eq 'Quizzes::QuizSubmission'
 
       DelayedNotification.where(id: notification).update_all(asset_type: 'QuizSubmission')
 
-      DelayedNotification.find(notification.id).asset_type.should == 'Quizzes::QuizSubmission'
+      expect(DelayedNotification.find(notification.id).asset_type).to eq 'Quizzes::QuizSubmission'
     end
 
     it 'returns the content type attribute if not a quiz' do
       notification = DelayedNotification.create! asset: assignment_model, notification: Notification.create!(notification_valid_attributes)
-      notification.asset_type.should == 'Assignment'
+      expect(notification.asset_type).to eq 'Assignment'
     end
   end
 
@@ -52,7 +52,7 @@ describe DelayedNotification do
       nil
       )
 
-      messages.size.should == 1
+      expect(messages.size).to eq 1
       messages.first.user == group_user
     end
  end

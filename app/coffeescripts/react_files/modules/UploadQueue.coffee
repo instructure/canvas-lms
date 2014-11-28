@@ -43,6 +43,19 @@ define [
     dequeue: ->
       @_queue.shift()
 
+    # An uploader can exist in the upload queue or as a currentUploader. 
+    # This will check both places and remove it.
+    # Returns nothing
+
+    remove: (uploader) =>
+      if @currentUploader == uploader
+        @currentUploader = null
+
+      index = @_queue.indexOf(uploader)
+      @_queue.splice(index, 1)
+
+      @onChange() # Ensure change events happen after queue is updated so everything remains in sync
+
     attemptNextUpload: ->
       @onChange()
       return if @_uploading || @_queue.length == 0

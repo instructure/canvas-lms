@@ -24,8 +24,8 @@ describe 'new_account_user.facebook' do
     account = Account.create!(:name => "some account")
     user_model
     account_user = account.account_users.create!(user: @user)
-    account_user.account.should eql(account)
-    account_user.user.should eql(@user)
+    expect(account_user.account).to eql(account)
+    expect(account_user.user).to eql(@user)
     @object = account_user
     generate_message(:new_account_user, :facebook, @object)
   end

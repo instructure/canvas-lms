@@ -23,13 +23,11 @@ describe "Course Account Reports" do
 
   before(:each) do
 
-    Notification.find_or_create_by_name("Report Generated")
-    Notification.find_or_create_by_name("Report Generation Failed")
+    Notification.where(name: "Report Generated").first_or_create
+    Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @admin = account_admin_user(:account => @account)
-    @default_term = @account.enrollment_terms.active.find_or_create_by_name(
-      EnrollmentTerm::DEFAULT_TERM_NAME
-    )
+    @default_term = @account.default_enrollment_term
 
     @sub_account = Account.create(:parent_account => @account, :name => 'Math')
     @sub_account.sis_source_id = 'sub1'
@@ -82,29 +80,29 @@ describe "Course Account Reports" do
       parameters["enrollment_term_id"] = @default_term.id
       parsed = read_report(@report, {params: parameters})
 
-      parsed.should == [[@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
+      expect(parsed).to eq [[@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
                          "Science 101", nil, nil]]
-      parsed.length.should == 1
+      expect(parsed.length).to eq 1
 
     end
 
     it "should run unpublished courses report on sub account" do
       parsed = read_report(@report, {account: @sub_account})
 
-      parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+      expect(parsed).to eq [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                          "English 101", @course1.start_at.iso8601,
                          @course1.conclude_at.iso8601]]
-      parsed.length.should == 1
+      expect(parsed.length).to eq 1
     end
 
     it "should run unpublished courses report" do
       parsed = read_report(@report, {order: 1})
-      parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+      expect(parsed).to eq [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                          "English 101", @course1.start_at.iso8601,
                          @course1.conclude_at.iso8601],
                         [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
                          "Science 101", nil, nil]]
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
     end
   end
 
@@ -119,30 +117,30 @@ describe "Course Account Reports" do
       parameters["enrollment_term_id"] = @default_term.id
       parsed = read_report(@report,{params: parameters})
 
-      parsed[0].should == [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
+      expect(parsed[0]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
                            "Math 101", nil, nil]
-      parsed.length.should == 1
+      expect(parsed.length).to eq 1
     end
 
     it "should run recently deleted courses report on sub account" do
       @course1.destroy
       parsed = read_report(@report, {account: @sub_account})
 
-      parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                            "English 101", @course1.start_at.iso8601,
                            @course1.conclude_at.iso8601]
-      parsed.length.should == 1
+      expect(parsed.length).to eq 1
     end
 
     it "should run recently deleted courses report" do
       @course1.destroy
       parsed = read_report(@report, {order: 1})
-      parsed.length.should == 2
+      expect(parsed.length).to eq 2
 
-      parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                            "English 101", @course1.start_at.iso8601,
                            @course1.conclude_at.iso8601]
-      parsed[1].should == [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
+      expect(parsed[1]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
                            "Math 101", nil, nil]
     end
   end
@@ -166,15 +164,15 @@ describe "Course Account Reports" do
       @attachment.destroy
 
       parsed = read_report(@type, {order: 3})
-      parsed.length.should == 3
+      expect(parsed.length).to eq 3
 
-      parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                            "English 101", "unpublished",
                            @course1.created_at.iso8601]
-      parsed[1].should == [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
+      expect(parsed[1]).to eq [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
                            "Science 101", "unpublished",
                            @course3.created_at.iso8601]
-      parsed[2].should == [@course6.id.to_s, nil, "THE01",
+      expect(parsed[2]).to eq [@course6.id.to_s, nil, "THE01",
                            "Theology 101", "unpublished",
                            @course6.created_at.iso8601]
     end
@@ -184,9 +182,9 @@ describe "Course Account Reports" do
         :title => "Some random wiki page",
         :body => "wiki page content")
       report = run_report(@type)
-      report.parameters["extra_text"].should == "Term: All Terms;"
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms;"
       parsed = parse_report(report)
-      parsed.length.should == 0
+      expect(parsed.length).to eq 0
     end
 
     it "should run unused courses report with a term" do
@@ -199,9 +197,9 @@ describe "Course Account Reports" do
       parameters = {}
       parameters["enrollment_term_id"] = @term1.id
       parsed = read_report(@type, {params: parameters})
-      parsed.length.should == 1
+      expect(parsed.length).to eq 1
 
-      parsed[0].should == [@course6.id.to_s, nil, "THE01",
+      expect(parsed[0]).to eq [@course6.id.to_s, nil, "THE01",
                            "Theology 101", "unpublished",
                            @course6.created_at.iso8601]
     end
@@ -215,9 +213,9 @@ describe "Course Account Reports" do
       @course4.save
       @module.destroy
       parsed = read_report(@type, {account: sub_account})
-      parsed.length.should == 1
+      expect(parsed.length).to eq 1
 
-      parsed[0].should == [@course4.id.to_s, nil, "self",
+      expect(parsed[0]).to eq [@course4.id.to_s, nil, "self",
                            "self help", "active",
                            @course4.created_at.iso8601]
     end

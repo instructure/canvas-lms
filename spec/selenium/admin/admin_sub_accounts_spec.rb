@@ -40,9 +40,9 @@ describe "admin sub accounts" do
     click_account_action_link(DEFAULT_ACCOUNT_ID, '.add_sub_account_link')
     edit_account_info('#new_account #account_name', new_account_name)
     sub_accounts = ff('.sub_accounts .sub_account')
-    sub_accounts.count.should == 1
-    sub_accounts[0].should include_text(new_account_name)
-    Account.last.name.should == new_account_name
+    expect(sub_accounts.count).to eq 1
+    expect(sub_accounts[0]).to include_text(new_account_name)
+    expect(Account.last.name).to eq new_account_name
   end
 
   it "should delete a sub account" do
@@ -53,7 +53,7 @@ describe "admin sub accounts" do
       wait_for_ajaximations
     }.to change(Account.default.sub_accounts, :count).by(-1)
     sub_accounts = ff('.sub_accounts .sub_account')
-    sub_accounts.each { |account| account.should_not include_text(sub_account.name) }
+    sub_accounts.each { |account| expect(account).not_to include_text(sub_account.name) }
   end
 
   it "should edit a sub account" do
@@ -61,16 +61,16 @@ describe "admin sub accounts" do
     sub_account = create_sub_account_and_go
     click_account_action_link(sub_account.id, '.edit_account_link')
     edit_account_info("#account_#{sub_account.id} #account_name", edit_name)
-    f("#account_#{sub_account.id}").should include_text(edit_name)
-    Account.find_by_id(sub_account.id).name.should == edit_name
+    expect(f("#account_#{sub_account.id}")).to include_text(edit_name)
+    expect(Account.where(id: sub_account).first.name).to eq edit_name
   end
 
   it "should validate sub account count on main account" do
     get "/accounts/#{DEFAULT_ACCOUNT_ID}/sub_accounts"
-    f('.sub_accounts_count').should_not be_displayed
+    expect(f('.sub_accounts_count')).not_to be_displayed
     create_sub_account
     refresh_page # to make new sub account show up
-    f('.sub_accounts_count').text.should == "1 Sub-Account"
+    expect(f('.sub_accounts_count').text).to eq "1 Sub-Account"
   end
 
   it "should be able to nest sub accounts" do
@@ -78,18 +78,18 @@ describe "admin sub accounts" do
     first_sub = create_sub_account
     second_sub = create_sub_account('second sub account', 1, first_sub)
     sub_accounts = [first_sub, second_sub]
-    Account.default.sub_accounts.each_with_index { |account, i| account.name.should == sub_accounts[i].name }
+    Account.default.sub_accounts.each_with_index { |account, i| expect(account.name).to eq sub_accounts[i].name }
     get "/accounts/#{DEFAULT_ACCOUNT_ID}/sub_accounts"
-    first_sub.sub_accounts.first.name.should == expected_second_sub_account_name
+    expect(first_sub.sub_accounts.first.name).to eq expected_second_sub_account_name
     first_sub_account = f("#account_#{first_sub.id}")
-    first_sub_account.find_element(:css, ".sub_accounts_count").text.should == '1 Sub-Account'
-    first_sub_account.find_element(:css, ".sub_account").should include_text(second_sub.name)
+    expect(first_sub_account.find_element(:css, ".sub_accounts_count").text).to eq '1 Sub-Account'
+    expect(first_sub_account.find_element(:css, ".sub_account")).to include_text(second_sub.name)
   end
 
   it "should hide sub accounts and re-expand them" do
     def check_sub_accounts(displayed = true)
       sub_accounts = ff('.sub_accounts .sub_account')
-      displayed ? sub_accounts.each { |account| account.should be_displayed } : sub_accounts.each { |account| account.should_not be_displayed }
+      displayed ? sub_accounts.each { |account| expect(account).to be_displayed } : sub_accounts.each { |account| expect(account).not_to be_displayed }
     end
 
     create_sub_account('sub account', 5)
@@ -105,7 +105,7 @@ describe "admin sub accounts" do
 
   it "should validate course count for a sub account" do
     def validate_course_count(account_id, count_text)
-      f("#account_#{account_id} .courses_count").text.should == count_text
+      expect(f("#account_#{account_id} .courses_count").text).to eq count_text
     end
 
     added_courses_count = 3
@@ -121,8 +121,8 @@ describe "admin sub accounts" do
   it "should validate that you can't delete a sub account with courses in it" do
     get "/accounts/#{DEFAULT_ACCOUNT_ID}/sub_accounts"
     click_account_action_link(DEFAULT_ACCOUNT_ID, '.cant_delete_account_link')
-    driver.switch_to.alert.text.should == "You can't delete a sub-account that has courses in it"
+    expect(driver.switch_to.alert.text).to eq "You can't delete a sub-account that has courses in it"
     driver.switch_to.alert.accept
-    Account.default.workflow_state.should == 'active'
+    expect(Account.default.workflow_state).to eq 'active'
   end
 end

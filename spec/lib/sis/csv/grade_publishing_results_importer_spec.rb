@@ -29,9 +29,9 @@ describe SIS::CSV::GradePublishingResultsImporter do
       "1,published",
       "2,asplode")
 
-    importer.errors.should == []
+    expect(importer.errors).to eq []
     warnings = importer.warnings.map { |r| r.last }
-    warnings.should == ["No enrollment_id given",
+    expect(warnings).to eq ["No enrollment_id given",
                       "Enrollment 1 doesn't exist",
                       "Improper grade_publishing_status \"asplode\" for enrollment 2"]
   end
@@ -49,7 +49,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
       "#{@enrollment.id},published")
 
     @enrollment.reload
-    @enrollment.grade_publishing_status.should == 'published'
+    expect(@enrollment.grade_publishing_status).to eq 'published'
   end
 
   it 'should properly pass in messages' do
@@ -60,18 +60,18 @@ describe SIS::CSV::GradePublishingResultsImporter do
     @enrollment.grade_publishing_status = 'publishing'
     @enrollment.save!
 
-    @course.reload.grade_publishing_statuses[1].should == "publishing"
+    expect(@course.reload.grade_publishing_statuses[1]).to eq "publishing"
 
     process_csv_data_cleanly(
       "enrollment_id,grade_publishing_status,message",
       "#{@enrollment.id},published,message1")
 
     statuses = @course.reload.grade_publishing_statuses
-    statuses[1].should == "published"
-    statuses[0].should == { "Published: message1" => [@enrollment] }
+    expect(statuses[1]).to eq "published"
+    expect(statuses[0]).to eq({ "Published: message1" => [@enrollment] })
 
     @enrollment.reload
-    @enrollment.grade_publishing_status.should == 'published'
+    expect(@enrollment.grade_publishing_status).to eq 'published'
   end
 
   it 'should give a proper error if you try to reference an enrollment from another root account' do
@@ -81,8 +81,8 @@ describe SIS::CSV::GradePublishingResultsImporter do
     importer = process_csv_data(
       "enrollment_id,grade_publishing_status,message",
       "#{@enrollment.id},published,message1")
-    importer.errors.should == []
+    expect(importer.errors).to eq []
     warnings = importer.warnings.map { |r| r.last }
-    warnings.should == ["Enrollment #{@enrollment.id} doesn't exist"]
+    expect(warnings).to eq ["Enrollment #{@enrollment.id} doesn't exist"]
   end
 end

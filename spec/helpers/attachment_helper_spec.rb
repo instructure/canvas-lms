@@ -31,17 +31,17 @@ describe AttachmentHelper do
     @current_user = @student
     @att.stubs(:crocodoc_available?).returns(true)
     attrs = doc_preview_attributes(@att)
-    attrs.should match /crocodoc_session/
-    attrs.should match /#{@current_user.id}/
-    attrs.should match /#{@att.id}/
+    expect(attrs).to match /crocodoc_session/
+    expect(attrs).to match /#{@current_user.id}/
+    expect(attrs).to match /#{@att.id}/
   end
 
   it "should return a valid canvadoc session url" do
     @current_user = @student
     @att.stubs(:canvadocable?).returns(true)
     attrs = doc_preview_attributes(@att)
-    attrs.should match /canvadoc_session/
-    attrs.should match /#{@current_user.id}/
-    attrs.should match /#{@att.id}/
+    expect(attrs).to match /canvadoc_session/
+    expect(attrs).to match /#{@current_user.id}/
+    expect(attrs).to match /#{@att.id}/
   end
 end

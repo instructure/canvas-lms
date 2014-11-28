@@ -108,7 +108,7 @@ module Quizzes
       if submitted_param?
         submitted? ? submitted_users : unsubmitted_users
       else
-        user_finder.all_students
+        user_finder.all_students_with_visibility
       end
     end
 

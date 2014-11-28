@@ -29,6 +29,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   EXPORTABLE_ATTRIBUTES = [:id, :quiz_id, :quiz_group_id, :assessment_question_id, :question_data, :assessment_question_version, :position, :created_at, :updated_at, :workflow_state]
   EXPORTABLE_ASSOCIATIONS = [:quiz, :assessment_question, :quiz_group]
+  TEXT_ONLY = 'text_only_question'
 
   before_save :infer_defaults
   before_save :create_assessment_question
@@ -61,25 +62,42 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     Quizzes::Quiz.mark_quiz_edited(self.quiz_id)
   end
 
-  def question_data=(data)
+  # @param [Hash] data
+  # @param [String] data[:regrade_option]
+  #  If present, the question will be regraded.
+  #  You must also pass in data[:regrade_user] if you pass this option.
+  #
+  #  See Quizzes::QuizRegrader::Answer::REGRADE_OPTIONS for a rundown of the
+  #  possible values for this parameter.
+  #
+  # @param [User] data[:regrade_user]
+  #  The user/teacher who's performing the regrade (e.g, updating the question).
+  #  Note that this is NOT an id, but an actual instance of a User model.
+  def question_data=(in_data)
+    data = if in_data.is_a?(String)
+      ActiveSupport::JSON.decode(in_data)
+    elsif in_data.is_a?(Hash)
+      in_data.with_indifferent_access
+    else
+      in_data
+    end
+
     if data[:regrade_option].present?
       update_question_regrade(data[:regrade_option], data[:regrade_user])
     end
 
-    if data.is_a?(String)
-      data = ActiveSupport::JSON.decode(data) rescue nil
-    elsif data.class == Hash
-      data = data.with_indifferent_access
-    end
     return if data == self.question_data
+
     data = AssessmentQuestion.parse_question(data, self.assessment_question)
     data[:name] = data[:question_name]
+
     write_attribute(:question_data, data.to_hash)
   end
 
   def question_data
     if data = read_attribute(:question_data)
       if data.class == Hash
+        # TODO: a reader shouldn't write ?????????????????????
         data = write_attribute(:question_data, data.with_indifferent_access)
       end
     end

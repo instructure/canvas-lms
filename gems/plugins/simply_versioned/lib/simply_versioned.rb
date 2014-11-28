@@ -114,7 +114,7 @@ module SimplyVersioned
       version = if version.kind_of?( Version )
         version
       elsif version.kind_of?( Fixnum )
-        self.versions.find_by_number( version )
+        self.versions.where(number: version).first
       end
       
       raise "Invalid version (#{version.inspect}) specified!" unless version
@@ -257,7 +257,7 @@ module SimplyVersioned
     
     # Get the Version instance corresponding to this models for the specified version number.
     def get_version( number )
-      populate_versionable find_by_number( number )
+      populate_versionable where(number: number).first
     end
     alias_method :get, :get_version
     

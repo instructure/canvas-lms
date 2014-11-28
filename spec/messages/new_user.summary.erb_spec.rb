@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'new_user.summary' do
   it "should render" do
     @object = user_model
-    @object.account.should_not be_nil
+    expect(@object.account).not_to be_nil
     generate_message(:new_user, :summary, @object)
   end
 end

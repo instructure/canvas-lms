@@ -36,28 +36,28 @@ describe UsersController do
 
     it "should count conversations as interaction" do
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text.should match(/never/)
+      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
 
       @conversation = Conversation.initiate([@e1.user, @teacher], false)
       @conversation.add_message(@teacher, "hello")
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text.should match(/less than 1 day/)
+      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
     end
 
     it "should only include students the teacher can view" do
       get user_course_teacher_activity_url(@teacher, @course)
-      response.should be_success
-      response.body.should match(/studentname1/)
-      response.body.should_not match(/studentname2/)
+      expect(response).to be_success
+      expect(response.body).to match(/studentname1/)
+      expect(response.body).not_to match(/studentname2/)
     end
 
     it "should show user notes if enabled" do
       get user_course_teacher_activity_url(@teacher, @course)
-      response.body.should_not match(/journal entry/i)
+      expect(response.body).not_to match(/journal entry/i)
       @course.root_account.update_attribute(:enable_user_notes, true)
       get user_course_teacher_activity_url(@teacher, @course)
-      response.body.should match(/journal entry/i)
+      expect(response.body).to match(/journal entry/i)
     end
 
     it "should show individual user info across courses" do
@@ -66,18 +66,18 @@ describe UsersController do
       @course2.update_attribute(:name, 'coursename2')
       student_in_course(:course => @course2, :user => @e1.user)
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      response.should be_success
-      response.body.should match(/studentname1/)
-      response.body.should_not match(/studentname2/)
-      response.body.should match(/coursename1/)
+      expect(response).to be_success
+      expect(response.body).to match(/studentname1/)
+      expect(response.body).not_to match(/studentname2/)
+      expect(response.body).to match(/coursename1/)
       # teacher not in course2
-      response.body.should_not match(/coursename2/)
+      expect(response.body).not_to match(/coursename2/)
       # now put teacher in course2
       @course2.enroll_teacher(@teacher).accept!
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      response.should be_success
-      response.body.should match(/coursename1/)
-      response.body.should match(/coursename2/)
+      expect(response).to be_success
+      expect(response.body).to match(/coursename1/)
+      expect(response.body).to match(/coursename2/)
     end
 
     it "should be available for concluded courses/enrollments" do
@@ -89,24 +89,24 @@ describe UsersController do
       @e1.conclude
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      response.should be_success
-      response.body.should match(/studentname1/)
+      expect(response).to be_success
+      expect(response.body).to match(/studentname1/)
 
       get user_course_teacher_activity_url(@teacher, @course)
-      response.should be_success
-      response.body.should match(/studentname1/)
+      expect(response).to be_success
+      expect(response.body).to match(/studentname1/)
     end
 
     it "should show concluded students to active teachers" do
       @e1.conclude
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      response.should be_success
-      response.body.should match(/studentname1/)
+      expect(response).to be_success
+      expect(response.body).to match(/studentname1/)
 
       get user_course_teacher_activity_url(@teacher, @course)
-      response.should be_success
-      response.body.should match(/studentname1/)
+      expect(response).to be_success
+      expect(response.body).to match(/studentname1/)
     end
   end
 
@@ -119,8 +119,8 @@ describe UsersController do
       Account.default.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
       get account_users_url(Account.default)
-      response.should be_success
-      response.body.should match /Olds, JT.*St\. Clair, John/m
+      expect(response).to be_success
+      expect(response.body).to match /Olds, JT.*St\. Clair, John/m
     end
 
     it "should not show any student view students at the account level" do
@@ -132,8 +132,8 @@ describe UsersController do
 
       get account_users_url Account.default.id
       body = Nokogiri::HTML(response.body)
-      body.css("#user_#{@fake_student.id}").should be_empty
-      body.at_css('.users').text.should_not match(/Test Student/)
+      expect(body.css("#user_#{@fake_student.id}")).to be_empty
+      expect(body.at_css('.users').text).not_to match(/Test Student/)
     end
   end
 
@@ -145,7 +145,7 @@ describe UsersController do
       course
       student_in_course(:course => @course)
       get "/users/#{@student.id}"
-      response.should be_success
+      expect(response).to be_success
 
       course(:account => account_model)
       student_in_course(:course => @course)
@@ -162,7 +162,7 @@ describe UsersController do
       user_session(@user)
 
       get "/users/#{@student.id}"
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should show course user to account users that have the read_roster permission" do
@@ -174,7 +174,7 @@ describe UsersController do
       user_session(@user)
 
       get "/courses/#{@course.id}/users/#{@student.id}"
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
@@ -199,33 +199,33 @@ describe UsersController do
       disable_avatars!
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "http://someschool.instructure.com/images/no_pic.gif"
+        expect(response).to redirect_to "http://someschool.instructure.com/images/no_pic.gif"
 
         get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://otherschool.instructure.com/images/no_pic.gif"
+        expect(response).to redirect_to "https://otherschool.instructure.com/images/no_pic.gif"
       end
     end
 
     it "should maintain protocol and domain name in gravatar redirect fallback" do
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
+        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
 
         get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/images/messages/avatar-50.png")}"
+        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/images/messages/avatar-50.png")}"
       end
     end
 
     it "should return different urls for different fallbacks" do
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
+        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI.escape("/my/custom/fallback/url.png")}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/my/custom/fallback/url.png")}"
+        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/my/custom/fallback/url.png")}"
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI.escape("https://test.domain/another/custom/fallback/url.png")}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://test.domain/another/custom/fallback/url.png")}"
+        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://test.domain/another/custom/fallback/url.png")}"
       end
     end
 
@@ -235,23 +235,23 @@ describe UsersController do
         orig_size = data.size
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
+        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
 
         get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=/my/custom/fallback/url.png"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/my/custom/fallback/url.png")}"
+        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/my/custom/fallback/url.png")}"
 
         diff = data.select{|k,v|k =~ /avatar_img/}.size - orig_size
-        diff.should > 0
+        expect(diff).to be > 0
 
         @user.update_attribute(:avatar_image, {'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif'})
-        data.select{|k,v|k =~ /avatar_img/}.size.should == orig_size
+        expect(data.select{|k,v|k =~ /avatar_img/}.size).to eq orig_size
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
+        expect(response).to redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
 
         get "http://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI::escape("https://test.domain/my/custom/fallback/url.png")}"
-        response.should redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
-        data.select{|k,v|k =~ /avatar_img/}.size.should == orig_size + diff
+        expect(response).to redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
+        expect(data.select{|k,v|k =~ /avatar_img/}.size).to eq orig_size + diff
       end
     end
   end
@@ -266,9 +266,9 @@ describe UsersController do
 
       get grades_url
       student_grades = Nokogiri::HTML(response.body).css('.student_grades tr')
-      student_grades.length.should == 2
-      student_grades.text.should match /#{@first_course.name}/
-      student_grades.text.should match /#{@course.name}/
+      expect(student_grades.length).to eq 2
+      expect(student_grades.text).to match /#{@first_course.name}/
+      expect(student_grades.text).to match /#{@course.name}/
     end
   end
 
@@ -281,21 +281,21 @@ describe UsersController do
       user_session(@admin)
 
       get user_admin_merge_url(@user, :pending_user_id => @admin.id)
-      response.should be_success
-      assigns['pending_other_user'].should == @admin
-      assigns['other_user'].should be_nil
+      expect(response).to be_success
+      expect(assigns['pending_other_user']).to eq @admin
+      expect(assigns['other_user']).to be_nil
 
       get user_admin_merge_url(@user, :new_user_id => @admin.id)
-      response.should be_success
-      assigns['pending_other_user'].should be_nil
-      assigns['other_user'].should == @admin
+      expect(response).to be_success
+      expect(assigns['pending_other_user']).to be_nil
+      expect(assigns['other_user']).to eq @admin
 
       post user_merge_url(@user, :new_user_id => @admin.id)
-      response.should redirect_to(user_profile_url(@admin))
+      expect(response).to redirect_to(user_profile_url(@admin))
 
-      @user.reload.should be_deleted
-      @admin.reload.should be_registered
-      @admin.pseudonyms.count.should == 2
+      expect(@user.reload).to be_deleted
+      expect(@admin.reload).to be_registered
+      expect(@admin.pseudonyms.count).to eq 2
     end
   end
 end

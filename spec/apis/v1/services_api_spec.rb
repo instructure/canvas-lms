@@ -41,22 +41,22 @@ describe "Services API", type: :request do
   it "should return the config information for kaltura" do
     json = api_call(:get, "/api/v1/services/kaltura",
               :controller => "services_api", :action => "show_kaltura_config", :format => "json")
-    json.should == {
+    expect(json).to eq({
       'enabled' => true,
       'domain' => 'kaltura.fake.local',
       'resource_domain' => 'cdn.kaltura.fake.local',
       'rtmp_domain' => 'rtmp-kaltura.fake.local',
       'partner_id' => '420',
-    }
+    })
   end
   
   it "should degrade gracefully if kaltura is disabled or not configured" do
     CanvasKaltura::ClientV3.stubs(:config).returns(nil)
     json = api_call(:get, "/api/v1/services/kaltura",
               :controller => "services_api", :action => "show_kaltura_config", :format => "json")
-    json.should == {
+    expect(json).to eq({
       'enabled' => false,
-    }
+    })
   end
 
   it "should return a new kaltura session" do
@@ -66,11 +66,11 @@ describe "Services API", type: :request do
     CanvasKaltura::ClientV3.stubs(:new).returns(kal)
     json = api_call(:post, "/api/v1/services/kaltura_session",
                     :controller => "services_api", :action => "start_kaltura_session", :format => "json")
-    json.delete_if { |k,v| %w(serverTime).include?(k) }.should == {
+    expect(json.delete_if { |k,v| %w(serverTime).include?(k) }).to eq({
       'ks' => "new_session_id_here",
       'subp_id' => '10000',
       'partner_id' => '100',
       'uid' => "#{@user.id}_#{Account.default.id}",
-    }
+    })
   end
 end

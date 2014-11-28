@@ -21,49 +21,49 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Context do
   it "should not have draft_state_enabled" do
     class TmpContext; include Context; end
-    TmpContext.new.should_not be_feature_enabled(:draft_state)
+    expect(TmpContext.new).not_to be_feature_enabled(:draft_state)
   end
 
   context "find_by_asset_string" do
     it "should find a valid course" do
       course = Course.create!
-      Context.find_by_asset_string(course.asset_string).should eql(course)
+      expect(Context.find_by_asset_string(course.asset_string)).to eql(course)
     end
     
     it "should not find an invalid course" do
-      Context.find_by_asset_string("course_0").should eql(nil)
+      expect(Context.find_by_asset_string("course_0")).to eql(nil)
     end
     
     it "should find a valid group" do
       group = Group.create!(:context => Account.default)
-      Context.find_by_asset_string(group.asset_string).should eql(group)
+      expect(Context.find_by_asset_string(group.asset_string)).to eql(group)
     end
     
     it "should not find an invalid group" do
-      Context.find_by_asset_string("group_0").should eql(nil)
+      expect(Context.find_by_asset_string("group_0")).to eql(nil)
     end
     
     it "should find a valid account" do
       account = Account.create!(:name => "test")
-      Context.find_by_asset_string(account.asset_string).should eql(account)
+      expect(Context.find_by_asset_string(account.asset_string)).to eql(account)
     end
     
     it "should not find an invalid account" do
-      Context.find_by_asset_string("account_0").should eql(nil)
+      expect(Context.find_by_asset_string("account_0")).to eql(nil)
     end
     
     it "should find a valid user" do
       user = User.create!
-      Context.find_by_asset_string(user.asset_string).should eql(user)
+      expect(Context.find_by_asset_string(user.asset_string)).to eql(user)
     end
     
     it "should not find an invalid user" do
-      Context.find_by_asset_string("user_0").should eql(nil)
+      expect(Context.find_by_asset_string("user_0")).to eql(nil)
     end
     
     it "should not find an invalid asset string" do
-      Context.find_by_asset_string("").should eql(nil)
-      Context.find_by_asset_string("loser_5").should eql(nil)
+      expect(Context.find_by_asset_string("")).to eql(nil)
+      expect(Context.find_by_asset_string("loser_5")).to eql(nil)
     end
     
     it "should not find a valid asset" do
@@ -75,25 +75,25 @@ describe Context do
   context "find_asset_by_asset_string" do
     it "should find a valid assignment" do
       assignment_model
-      @course.find_asset(@assignment.asset_string).should eql(@assignment)
+      expect(@course.find_asset(@assignment.asset_string)).to eql(@assignment)
     end
     it "should find a valid wiki page" do
       course_model
       page = @course.wiki.wiki_pages.create!(:title => 'test')
-      @course.find_asset(page.asset_string).should eql(page)
-      @course.find_asset(page.asset_string, [:wiki_page]).should eql(page)
+      expect(@course.find_asset(page.asset_string)).to eql(page)
+      expect(@course.find_asset(page.asset_string, [:wiki_page])).to eql(page)
     end
     it "should not find a valid wiki page if told to ignore wiki pages" do
       course_model
       page = @course.wiki.wiki_pages.create!(:title => 'test')
-      @course.find_asset(page.asset_string, [:assignment]).should eql(nil)
+      expect(@course.find_asset(page.asset_string, [:assignment])).to eql(nil)
     end
     it "should not find an invalid assignment" do
       assignment_model
       @course2 = Course.create!
-      @course2.find_asset(@assignment.asset_string).should eql(nil)
-      @course.find_asset("assignment_0").should eql(nil)
-      @course.find_asset("").should eql(nil)
+      expect(@course2.find_asset(@assignment.asset_string)).to eql(nil)
+      expect(@course.find_asset("assignment_0")).to eql(nil)
+      expect(@course.find_asset("")).to eql(nil)
     end
   end
 
@@ -107,7 +107,7 @@ describe Context do
       contexts << user = User.create!(:name => "a user")
       names = Context.names_by_context_types_and_ids(contexts.map{|c| [c.class.name, c.id]})
       contexts.each do |c|
-        names[[c.class.name, c.id]].should eql(c.name)
+        expect(names[[c.class.name, c.id]]).to eql(c.name)
       end
     end
   end

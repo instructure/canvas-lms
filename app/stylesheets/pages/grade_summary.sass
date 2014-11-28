@@ -66,7 +66,7 @@
     margin-bottom: 20px
 
 #grades_summary tr.editable:hover > *
-  background-color: #cdf
+  background-color: lighten(#cdf, 6%)
 
 #grades_summary tr.editable.student_assignment.dropped:hover td.points_possible
   background-image: url(/images/earmark_hover.png)
@@ -107,6 +107,13 @@
 #grades_summary th.possible
   text-align: right
   white-space: nowrap
+
+#grades_summary td a, #grades_summary th a
+  @if $use_high-contrast
+    color: $textColor
+    text-decoration: underline
+    &:hover, &:focus
+      text-decoration: none
 
 #grades_summary td.possible
   text-align: right
@@ -195,17 +202,16 @@
   position: absolute
   top: 2px
   left: 0px
-  opacity: 0.5
   display: none
-
-.revert_score_link:hover
-  opacity: 1.0
-
+  &:hover, &:focus
+    opacity: 0.7
 
 #grades_summary .tooltip
   :position relative
   :z-index 10
   :outline none
+  @if $use_high_contrast
+    text-decoration: none
   &:hover, &:focus
     :text-decoration none
     .tooltip_wrap, .tooltip_text
@@ -258,9 +264,22 @@
   :border 1px solid black
 
 a.screenreader-toggle
-  :color #b7b7b7
   :font-weight normal
   :padding-right 5px
+  #grades_summary .score_details_table &
+    :color white
+
+.grade-summary-graph-component
+  position: absolute
+  top: 0
+  left: 0
+  width: 0
+  overflow: hidden
+  border-style: solid
+  @if $use_high_contrast
+    border-color: $canvas-neutral
+  @else
+    border-color: #888
 
 div.rubric-toggle
   :padding-bottom 5px
