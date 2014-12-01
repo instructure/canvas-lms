@@ -70,6 +70,7 @@ define [
       spinner = new Spinner(@spinnerOptions)
       spinner.spin(@$sendingSpinner[0])
       @toggleSending(false)
+      @updateFilterLabels()
 
     onSearch:      (tokens) => @trigger('search', tokens)
 
@@ -156,6 +157,13 @@ define [
         @$conversationActions.show()
         @$submissionCommentActions.hide()
       @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
+      @updateFilterLabels()
+
+    updateFilterLabels: ->
+      @$typeFilterSelectionLabel = $("##{@$typeFilter.attr('aria-labelledby')}").find('.current-selection-label') unless @$typeFilterSelectionLabel?.length
+      @$courseFilterSelectionLabel = $("##{@$courseFilter.attr('aria-labelledby')}").find('.current-selection-label') unless @$courseFilterSelectionLabel?.length
+      @$typeFilterSelectionLabel.text(@$typeFilter.find(':selected').text())
+      @$courseFilterSelectionLabel.text(@$courseFilter.find(':selected').text())
 
     displayState: (state) ->
       @$typeFilter.selectpicker('val', state.type)
