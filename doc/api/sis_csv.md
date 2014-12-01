@@ -63,8 +63,9 @@ from the remote system.</td>
 <td>password</td>
 <td>text</td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
-this isn't needed. Otherwise this is the password that will be used to
-login to Canvas along with the 'login_id' above.</p>
+this should NEVER be set as it will reset users sessions. Otherwise this 
+is the password that will be used to login to Canvas along with the 
+'login_id' above.</p>
 <p>If the user already has a password (from previous SIS import or
 otherwise) it will <em>not</em> be overwritten</p></td>
 </tr>
