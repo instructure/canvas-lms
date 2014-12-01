@@ -11,10 +11,9 @@ define [
   'compiled/fn/preventDefault'
   'compiled/react/shared/utils/withReactDOM'
   '../utils/collectionHandler'
-  './FilePreviewFooter'
-  './FilePreviewInfoPanel',
+  './FilePreviewInfoPanel'
   '../modules/filesEnv'
-], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, preventDefault, withReactDOM, collectionHandler, FilePreviewFooter, FilePreviewInfoPanel, filesEnv) ->
+], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, preventDefault, withReactDOM, collectionHandler, FilePreviewInfoPanel, filesEnv) ->
 
   FilePreview = React.createClass
 
@@ -30,8 +29,6 @@ define [
 
     getInitialState: ->
       showInfoPanel: false
-      showFooter: false
-      showFooterBtn: true
       displayedItem: null
 
     componentWillMount: ->
@@ -46,7 +43,7 @@ define [
 
     componentWillReceiveProps: (newProps) ->
       items = @getItemsToView(newProps)
-      @setState @stateProperties(items, newProps), @scrollFooterToItem
+      @setState @stateProperties(items, newProps)
 
     getItemsToView: (props) ->
       # Sets up our collection that we will be using.
@@ -72,24 +69,6 @@ define [
       params: props.params
       otherItemsString: (props.query.only_preview if props.query.only_preview)
       otherItemsIsBackBoneCollection: items.otherItems instanceof Backbone.Collection
-
-    scrollFooterToItem: ->
-      # Determine if the footer is open.
-      if @state.showFooter
-
-        $active = $('.ef-file-preview-footer-active')
-        $footerList = $('.ef-file-preview-footer-list')
-        footerOffset = $footerList.offset()
-        activeOffset = $active.offset()
-
-        # Check if the displayed item thumbnail is hidden to right
-        if (activeOffset.left > (footerOffset.left + $footerList.width()))
-          $footerList.scrollTo $active
-          # @scrollRight()
-        # Hidden to the left
-        if (activeOffset.left < footerOffset.left )
-          $footerList.scrollTo $active
-          # @scrollLeft()
 
     setUpOtherItemsQuery: (otherItems) ->
       otherItems.map((item) ->
@@ -157,20 +136,6 @@ define [
           div {className: 'ef-file-preview-arrow-link'},
             i {className: "icon-arrow-open-#{direction}"}
 
-
-
-    scrollLeft: (event) ->
-      width = $('.ef-file-preview-footer-list').width()
-      $('.ef-file-preview-footer-list').animate({
-        scrollLeft: '-=' + width
-        }, 300, 'easeOutQuad')
-
-    scrollRight: (event) ->
-      width = $('.ef-file-preview-footer-list').width()
-      $('.ef-file-preview-footer-list').animate({
-        scrollLeft: '+=' + width
-        }, 300, 'easeOutQuad')
-
     closeModal: ->
       @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(except: 'only_preview'))
 
@@ -211,9 +176,7 @@ define [
                 i {className: 'icon-end'}
                 ' ' + I18n.t('file_preview_headerbutton_close', 'Close')
 
-
           div {className: 'ef-file-preview-stretch'},
-            # We need to render out the left/right arrows
             @renderArrowLink('left') if @state.otherItems?.length > 0
             if @state.displayedItem
               iframe {
@@ -225,26 +188,4 @@ define [
             if @state.showInfoPanel
               FilePreviewInfoPanel
                 displayedItem: @state.displayedItem
-
                 getStatusMessage: @getStatusMessage
-          div {className: 'ef-file-preview-footer'},
-            if @state.showFooterBtn
-              button {
-                className: 'ef-file-preview-toggle btn-link'
-                onClick: @toggle('showFooter')
-                style: {bottom: '140px'} if @state.showFooter
-              },
-                if @state.showFooter
-                  I18n.t('file_preview_hide', 'Hide')
-                else
-                  I18n.t('file_preview_show', 'Show')
-
-          if @state.showFooter
-            FilePreviewFooter
-              otherItems: @state.otherItems
-              to: @getRouteIdentifier()
-              splat: @props.params.splat
-              query: @getNavigationParams
-              displayedItem: @state.displayedItem
-
-
