@@ -83,6 +83,7 @@ module Lti
       product_instance = IMS::LTI::Models::ProductInstance.new
       product_instance.guid = @root_account.lti_guid
       product_instance.product_info = create_product_info
+      product_instance.service_owner = create_service_owner
       product_instance
     end
 
@@ -107,6 +108,13 @@ module Lti
       vendor.create_vendor_name('Instructure')
       vendor.timestamp = Time.parse('2008-03-27 00:00:00 -0600')
       vendor
+    end
+
+    def create_service_owner
+      service_owner = IMS::LTI::Models::ServiceOwner.new
+      service_owner.create_service_owner_name(@root_account.name)
+      service_owner.create_description(@root_account.name)
+      service_owner
     end
 
     def services

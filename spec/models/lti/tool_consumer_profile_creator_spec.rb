@@ -3,7 +3,12 @@ require 'spec_helper'
 module Lti
   describe ToolConsumerProfileCreator do
 
-    let(:root_account) { mock('root account', lti_guid: 'my_guid') }
+    let(:root_account) do
+      mock('root account') do
+        stubs(:lti_guid).returns('my_guid')
+        stubs(:name).returns('root_account_name')
+      end
+    end
     let(:account) { mock('account', id: 3, root_account: root_account) }
     let(:tcp_url) { 'http://example.instructure.com/tcp/uuid' }
     subject { ToolConsumerProfileCreator.new(account, tcp_url) }
@@ -21,7 +26,12 @@ module Lti
         product_instance = subject.create.product_instance
         expect(product_instance.guid).to eq 'my_guid'
         expect(product_instance.product_info).to be_an IMS::LTI::Models::ProductInfo
+      end
 
+      it 'creates the service owner' do
+        service_owner = subject.create.product_instance.service_owner
+        expect(service_owner.service_owner_name.default_value).to eq 'root_account_name'
+        expect(service_owner.description.default_value).to eq 'root_account_name'
       end
 
       it 'creates the product info' do
