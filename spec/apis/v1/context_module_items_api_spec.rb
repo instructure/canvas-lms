@@ -1134,6 +1134,37 @@ describe "Module Items API", type: :request do
                       {:expected_status => 401})
     end
 
+    describe "POST 'mark_item_read'" do
+      it "should fulfill must-view requirement" do
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}/mark_read",
+                 :controller => "context_module_items_api", :action => "mark_item_read",
+                 :format => "json", :course_id => @course.to_param, :module_id => @module1.to_param, :id => @external_url_tag.to_param)
+        expect(@module1.evaluate_for(@user).requirements_met).to be_any {
+            |rm| rm[:type] == "must_view" && rm[:id] == @external_url_tag.id }
+      end
+
+      it "should not fulfill must-view requirement on unpublished item" do
+        @external_url_tag.unpublish
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}/mark_read",
+                 { :controller => "context_module_items_api", :action => "mark_item_read",
+                   :format => "json", :course_id => @course.to_param, :module_id => @module1.to_param, :id => @external_url_tag.to_param },
+                 {}, {}, { expected_status: 404 })
+        expect(@module1.evaluate_for(@user).requirements_met).not_to be_any {
+            |rm| rm[:type] == "must_view" && rm[:id] == @external_url_tag.id }
+      end
+
+      it "should not fulfill must-view requirement on locked item" do
+        @module2.completion_requirements = { @attachment_tag.id => { :type => 'must_view' } }
+        @module2.save!
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}/mark_read",
+                 { :controller => "context_module_items_api", :action => "mark_item_read",
+                   :format => "json", :course_id => @course.to_param, :module_id => @module2.to_param, :id => @attachment_tag.to_param },
+                 {}, {}, { expected_status: 403 })
+        expect(json['message']).to eq('The module item is locked.')
+        expect(@module2.evaluate_for(@user).requirements_met).to be_empty
+      end
+    end
+
     describe "GET 'module_item_sequence'" do
       context "unpublished item" do
         before :once do

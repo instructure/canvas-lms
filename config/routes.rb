@@ -1315,6 +1315,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/modules/:module_id/items", action: :create, as: 'course_context_module_items_create'
       put "courses/:course_id/modules/:module_id/items/:id", action: :update, as: 'course_context_module_item_update'
       delete "courses/:course_id/modules/:module_id/items/:id", action: :destroy
+      post "courses/:course_id/modules/:module_id/items/:id/mark_read", action: :mark_item_read
     end
 
     scope(controller: 'quizzes/quiz_assignment_overrides') do
