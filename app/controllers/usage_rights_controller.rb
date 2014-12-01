@@ -47,6 +47,12 @@
 #           "type": "string",
 #           "description": "Explanation of the action performed",
 #           "example": "4 files updated"
+#         },
+#         "file_ids": {
+#           "description": "List of ids of files that were updated",
+#           "type": "array",
+#           "items": { "type": "integer" },
+#           "example": [1, 2, 3]
 #         }
 #       }
 #     }
@@ -154,11 +160,14 @@ private
     folder_ids = Array(params[:folder_ids]).map(&:to_i)
     folders = @context.folders.active.where(id: folder_ids).to_a
     file_ids = folders.inject([]) { |file_ids, folder| file_ids += enumerate_contents(folder) }
-    file_ids += Array(params[:file_ids]).map(&:to_i)
+    file_ids += @context.attachments.not_deleted.where(id: Array(params[:file_ids]).map(&:to_i)).pluck(:id)
 
     count = @context.attachments.not_deleted.where(id: file_ids).update_all(usage_rights_id: usage_rights)
     result = usage_rights ? usage_rights_json(usage_rights, @current_user) : {}
-    result.merge!(message: I18n.t({one: "1 file updated", other: "%{count} files updated"}, count: count))
+    result.merge!({
+      message: I18n.t({one: "1 file updated", other: "%{count} files updated"}, count: count ),
+      file_ids: file_ids
+    })
     return render json: result
   end
 end

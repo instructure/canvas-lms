@@ -79,6 +79,7 @@ describe UsageRightsController, type: :request do
                         { file_ids: [@fileR.id], usage_rights: {use_justification: 'public_domain'} })
 
         expect(json['message']).to eq('1 file updated')
+        expect(json['file_ids']).to match_array([@fileR.id])
         expect(json['legal_copyright']).to be_nil
         expect(json['license']).to eq('public_domain')
         expect(json['use_justification']).to eq('public_domain')
@@ -99,6 +100,7 @@ describe UsageRightsController, type: :request do
                  { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
                  { file_ids: [@fileR.id, @fileA1.id], usage_rights: {use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'} })
         expect(json['message']).to eq('2 files updated')
+        expect(json['file_ids']).to match_array([@fileR.id, @fileA1.id])
 
         expect(@fileR.reload.usage_rights_id).to eq(usage_rights.id)
         expect(@fileA1.reload.usage_rights_id).to eq(usage_rights.id)
@@ -109,6 +111,7 @@ describe UsageRightsController, type: :request do
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
                         { folder_ids: [@folderA.id], usage_rights: {use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'} })
         expect(json['message']).to eq('3 files updated')
+        expect(json['file_ids']).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
 
         expect(@fileR.reload.usage_rights).to be_nil
 
@@ -129,6 +132,7 @@ describe UsageRightsController, type: :request do
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
                         { file_ids: [@fileR.id], folder_ids: [@folderA.id], usage_rights: {use_justification: 'used_by_permission', legal_copyright: '(C) 2014 XYZ Corp'} })
         expect(json['message']).to eq('1 file updated')
+        expect(json['file_ids']).to match_array([@fileA2.id])
         expect(@fileR.reload.usage_rights).to be_nil
         expect(@fileA1.reload.usage_rights).to be_nil
         expect(@fileA2.reload.usage_rights.legal_copyright).to eq('(C) 2014 XYZ Corp')
@@ -150,7 +154,8 @@ describe UsageRightsController, type: :request do
         json = api_call(:delete, "/api/v1/courses/#{@course.id}/usage_rights",
                  { controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
                  { folder_ids: [@folderA.id] })
-        expect(json).to eq({"message" => "3 files updated"})
+        expect(json['message']).to eq("3 files updated")
+        expect(json['file_ids']).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
         expect(@fileR.reload.usage_rights_id).to eq(usage_rights.id)
         expect(@course.attachments.where(usage_rights_id: nil).pluck(:id)).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
       end
