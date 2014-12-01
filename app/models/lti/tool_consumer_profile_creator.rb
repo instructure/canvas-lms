@@ -20,6 +20,7 @@ module Lti
           CourseSection.sourcedId
           Person.sourcedId
           Membership.role
+          ToolConsumerProfile.url
         ).freeze
 
     SERVICES = [

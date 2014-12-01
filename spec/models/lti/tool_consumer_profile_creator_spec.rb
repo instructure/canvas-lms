@@ -83,6 +83,11 @@ module Lti
         it 'adds the Canvas.placements.courseNavigation capability' do
           expect(subject.create.capability_offered).to include 'Canvas.placements.courseNavigation'
         end
+
+        it 'adds the ToolConsumerProfile.url capability' do
+          expect(subject.create.capability_offered).to include 'ToolConsumerProfile.url'
+        end
+
       end
 
 
