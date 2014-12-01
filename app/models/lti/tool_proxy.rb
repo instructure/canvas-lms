@@ -21,8 +21,9 @@ module Lti
 
     attr_accessible :shared_secret, :guid, :product_version, :lti_version, :product_family, :workflow_state, :raw_data, :context
 
-    has_many :bindings, class_name: 'Lti::ToolProxyBinding'
-    has_many :resources, class_name: 'Lti::ResourceHandler'
+    has_many :bindings, class_name: 'Lti::ToolProxyBinding', dependent: :destroy
+    has_many :resources, class_name: 'Lti::ResourceHandler', dependent: :destroy
+    has_many :tool_settings, class_name: 'Lti::ToolSetting', dependent: :destroy
     validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
     belongs_to :context, :polymorphic => true
 
