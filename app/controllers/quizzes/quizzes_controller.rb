@@ -253,11 +253,8 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
 
       student_ids = @context.student_ids
-      @banks_hash = {}
-      bank_ids = @quiz.quiz_groups.map(&:assessment_question_bank_id)
-      unless bank_ids.empty?
-        @banks_hash = AssessmentQuestionBank.active.where(id: bank_ids).index_by(&:id)
-      end
+      @banks_hash = get_banks(@quiz)
+
       if @has_student_submissions = @quiz.has_student_submissions?
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
@@ -672,6 +669,8 @@ class Quizzes::QuizzesController < ApplicationController
   def read_only
     @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :read_statistics)
+      @banks_hash = get_banks(@quiz)
+
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       js_env(quiz_max_combination_count: QUIZ_MAX_COMBINATION_COUNT)
       render
@@ -690,6 +689,15 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   private
+
+  def get_banks(quiz)
+    banks_hash = {}
+    bank_ids = quiz.quiz_groups.map(&:assessment_question_bank_id)
+    unless bank_ids.empty?
+      banks_hash = AssessmentQuestionBank.active.where(id: bank_ids).index_by(&:id)
+    end
+    banks_hash
+  end
 
   def get_submission
     submission = @quiz.quiz_submissions.where(user_id: @current_user).order(:created_at).first
