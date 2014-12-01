@@ -124,10 +124,14 @@ from the remote system.</td>
 <td>password</td>
 <td>text</td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
-this isn't needed. Otherwise this is the password that will be used to
+this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
 <p>If the user already has a password (from previous SIS import or
-otherwise) it will <em>not</em> be overwritten</p></td>
+otherwise) it will <em>not</em> be overwritten</p>
+<p>Setting the password will in all cases log the user out of Canvas.  
+For this reason it is important to not set this if you are using DAP or an 
+SSO protocol</p>
+</td>
 </tr>
 <tr>
 <td>first_name</td>
