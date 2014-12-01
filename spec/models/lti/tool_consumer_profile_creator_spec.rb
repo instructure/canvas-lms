@@ -14,6 +14,7 @@ module Lti
         profile = subject.create
         expect(profile.lti_version).to eq 'LTI-2p0'
         expect(profile.product_instance).to be_an_instance_of IMS::LTI::Models::ProductInstance
+        expect(profile.guid).to eq '339b6700-e4cb-47c5-a54f-3ee0064921a9' #Hard coded until we start persisting the tcp
       end
 
       it 'creates the product instance' do

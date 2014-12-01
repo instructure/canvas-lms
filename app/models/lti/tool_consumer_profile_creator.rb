@@ -72,6 +72,7 @@ module Lti
       profile.product_instance = create_product_instance
       profile.service_offered = services
       profile.capability_offered = CAPABILITIES
+      profile.guid = '339b6700-e4cb-47c5-a54f-3ee0064921a9' #Hard coded until we start persisting the tcp
 
       profile
     end
