@@ -14,6 +14,7 @@ define (require) ->
   trackers.push require('./log_auditing/event_trackers/page_blurred')
   trackers.push require('./log_auditing/event_trackers/question_viewed')
   trackers.push require('./log_auditing/event_trackers/question_flagged')
+  trackers.push require('./log_auditing/event_trackers/session_started')
 
   eventManager = new EventManager()
 
