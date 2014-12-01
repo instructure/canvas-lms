@@ -33,7 +33,7 @@ define [
             returnFocusTo: @refs.settingsCogBtn.getDOMNode()
           })
 
-      span {},
+      span style: "min-width": "45px",
 
         button {
           type: 'button'

@@ -121,6 +121,7 @@ $ef-thumbnail-size: 36px;
 
   .btn-link {
     border-width: 0;
+    padding-right: 15px;
     &.restricted { color: $canvas-alert;}
   }
 }
