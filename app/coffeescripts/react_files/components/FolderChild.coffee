@@ -158,5 +158,5 @@ define [
           unless @props.model.isNew()
             PublishCloud(model: @props.model, ref: 'publishButton', userCanManageFilesForContext: @props.userCanManageFilesForContext)
 
-          unless @props.model.isNew()
+          unless @props.model.isNew() or @props.model.get('locked_for_user')
             ItemCog(model: @props.model, startEditingName: @startEditingName, userCanManageFilesForContext: @props.userCanManageFilesForContext)

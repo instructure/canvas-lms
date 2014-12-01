@@ -187,13 +187,14 @@ define [
             h1 {className: 'ef-file-preview-header-filename'},
               @state.initialItem?.displayName()
             div {className: 'ef-file-preview-header-buttons'},
-              a {
-                className: 'ef-file-preview-header-download ef-file-preview-button'
-                download: true
-                href: @state.displayedItem?.get('url')
-              },
-                i {className: 'icon-download'}
-                ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
+              unless @state.displayedItem?.get('locked_for_user')
+                a {
+                  className: 'ef-file-preview-header-download ef-file-preview-button'
+                  download: true
+                  href: @state.displayedItem?.get('url')
+                },
+                  i {className: 'icon-download'}
+                  ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
               button {
                 type: 'button'
                 className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"

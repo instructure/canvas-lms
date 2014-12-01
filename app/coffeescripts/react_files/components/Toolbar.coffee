@@ -33,8 +33,14 @@ define [
       event.preventDefault()
       @props.currentFolder.folders.add({})
 
+    getItemsToDownload: ->
+      itemsToDownload = @props.selectedItems.filter (item) ->
+        !item.get('locked_for_user')
+
     downloadSelectedAsZip: ->
-      downloadStuffAsAZip(@props.selectedItems, {
+      return unless @getItemsToDownload().length
+
+      downloadStuffAsAZip(@getItemsToDownload(), {
         contextType: @props.contextType,
         contextId: @props.contextId
       })
@@ -50,7 +56,7 @@ define [
     openRestrictedDialog: ->
       $dialog = $('<div>').dialog
         title: I18n.t({
-            one: "Edit permissions for: %{itemName}", 
+            one: "Edit permissions for: %{itemName}",
             other: "Edit permissions for %{count} items"
           }, {
             count: @props.selectedItems.length
@@ -120,29 +126,29 @@ define [
               'data-tooltip': ''
             },
               i className: 'icon-cloud-lock'
-
-          if (@props.selectedItems.length is 1) and @props.selectedItems[0].get('url')
-            a {
-              tabIndex: -1 unless showingButtons
-              className: 'ui-button btn-download'
-              href: @props.selectedItems[0].get('url')
-              download: true
-              title: downloadTitle
-              'aria-label': downloadTitle
-              'data-tooltip': ''
-            },
-              i className: 'icon-download'
-          else
-            button {
-              type: 'button'
-              disabled: !showingButtons
-              className: 'ui-button btn-download'
-              onClick: @downloadSelectedAsZip
-              title: downloadTitle
-              'aria-label': downloadTitle
-              'data-tooltip': ''
-            },
-              i className: 'icon-download'
+          if @getItemsToDownload().length
+            if (@props.selectedItems.length is 1) and @props.selectedItems[0].get('url')
+              a {
+                tabIndex: -1 unless showingButtons
+                className: 'ui-button btn-download'
+                href: @props.selectedItems[0].get('url')
+                download: true
+                title: downloadTitle
+                'aria-label': downloadTitle
+                'data-tooltip': ''
+              },
+                i className: 'icon-download'
+            else
+              button {
+                type: 'button'
+                disabled: !showingButtons
+                className: 'ui-button btn-download'
+                onClick: @downloadSelectedAsZip
+                title: downloadTitle
+                'aria-label': downloadTitle
+                'data-tooltip': ''
+              },
+                i className: 'icon-download'
 
           if @props.userCanManageFilesForContext
             button {
