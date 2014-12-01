@@ -462,19 +462,25 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    user_ids = Array.wrap(user_ids).join(',')
-    course_ids = Array.wrap(course_ids).join(',')
-    scope = joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
-      LEFT JOIN assignment_student_visibilities
+   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+     without_assignment_in_course(course_ids).union(joins_assignment_student_visibilities(user_ids, course_ids))
+   }
+
+   scope :without_assignment_in_course, lambda { |course_ids|
+     where(context_id: course_ids, context_type: "Course").where("discussion_topics.assignment_id IS NULL")
+   }
+
+   scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
+     user_ids = Array.wrap(user_ids).join(',')
+     course_ids = Array.wrap(course_ids).join(',')
+     joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
+      JOIN assignment_student_visibilities
         ON (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
             AND assignment_student_visibilities.user_id IN (%s)
             AND assignment_student_visibilities.course_id IN (%s)
         )
       SQL
-    scope.where("discussion_topics.assignment_id IS NULL OR assignment_student_visibilities.assignment_id IS NOT NULL").
-    where("discussion_topics.context_id IN (?)",course_ids)
-   }
+  }
 
   alias_attribute :available_from, :delayed_post_at
   alias_attribute :unlock_at, :delayed_post_at
@@ -483,8 +489,8 @@ class DiscussionTopic < ActiveRecord::Base
   def self.visible_ids_by_user(opts)
     # pluck id, assignment_id, and user_id from discussions joined with the SQL view
     plucked_visibilities = pluck_discussion_visibilities(opts).group_by{|r| r["user_id"]}
-    # discussions with no user_id are visible to all, so add them into every students hash at the end
-    ids_of_discussions_visible_to_all = (plucked_visibilities.delete(nil) || []).map{|r| r["id"]}.uniq
+    # discussions without an assignment are visible to all, so add them into every students hash at the end
+    ids_of_discussions_visible_to_all = self.without_assignment_in_course(opts[:course_id]).pluck(:id)
     # format to be hash of user_id's with array of discussion_ids: {1 => [2,3,4], 2 => [2,4]}
     opts[:user_id].reduce({}) do |vis_hash, student_id|
       vis_hash[student_id] = begin
@@ -499,7 +505,7 @@ class DiscussionTopic < ActiveRecord::Base
     # once on Rails 4 change this to a multi-column pluck
     # and clean up reformatting in visible_ids_by_user
     connection.select_all(
-      self.visible_to_students_in_course_with_da(opts[:user_id],opts[:course_id]).
+      self.joins_assignment_student_visibilities(opts[:user_id],opts[:course_id]).
         select(["discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id"])
     )
   end
