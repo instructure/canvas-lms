@@ -697,6 +697,26 @@ describe "Files API", type: :request do
       user_root = Folder.root_folders(@user).first
       api_call(:put, @file_path, @file_path_options, {:parent_folder_id => user_root.id.to_param}, {}, :expected_status => 404)
     end
+
+    context "with usage_rights_required" do
+      before do
+        @course.enable_feature! :usage_rights_required
+        user_session(@teacher)
+        @att.update_attribute(:locked, true)
+      end
+
+      it "should not publish if usage_rights unset" do
+        api_call(:put, @file_path, @file_path_options, {:locked => false}, {}, :expected_status => 400)
+        expect(@att.reload).to be_locked
+      end
+
+      it "should publish if usage_rights set" do
+        @att.usage_rights = @course.usage_rights.create! use_justification: 'public_domain'
+        @att.save!
+        api_call(:put, @file_path, @file_path_options, {:locked => false}, {}, :expected_status => 200)
+        expect(@att.reload).not_to be_locked
+      end
+    end
   end
 
   describe "quota" do
