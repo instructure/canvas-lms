@@ -30,7 +30,7 @@ module Lti
     def show
       tool_proxy = ToolProxy.where(guid: params['tool_proxy_guid']).first
       if tool_proxy && oauth_authenticated_request?(tool_proxy.shared_secret)
-        render json: tool_proxy.raw_data
+        render json: tool_proxy.raw_data, content_type: 'application/vnd.ims.lti.v2.toolproxy+json'
       else
         render json: {error: 'unauthorized'}, status: :unauthorized
       end
@@ -53,7 +53,7 @@ module Lti
         #TODO: this needs to be moved to whatever changes the workflow state to active
         invalidate_nav_tabs_cache(tool_proxy)
 
-        render json: json, status: :created
+        render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
       else
         render json: {error: 'unauthorized'}, status: :unauthorized
       end

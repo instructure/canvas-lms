@@ -47,6 +47,12 @@ module Lti
         get "api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
         expect(JSON.parse(body)).to eq tool_proxy.raw_data
       end
+
+      it 'has the correct content-type' do
+        get "api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
+        expect(response.headers['Content-Type']).to include 'application/vnd.ims.lti.v2.toolproxy+json'
+      end
+
     end
 
     describe "POST #create" do
@@ -60,6 +66,14 @@ module Lti
         response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
         expect(response).to eq 201
         expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid"]
+      end
+
+      it 'has the correct content-type' do
+        course_with_teacher_logged_in(:active_all => true)
+        tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+        headers = { 'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolproxy+json', 'ACCEPT' => 'application/vnd.ims.lti.v2.toolproxy.id+json' }
+        post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
+        expect(response.headers['Content-Type']).to include 'application/vnd.ims.lti.v2.toolproxy.id+json'
       end
 
       it 'returns an error message' do
