@@ -263,7 +263,6 @@ describe "quizzes" do
     end
 
     it "should validate numerical input data" do
-      skip("fix ExpectationNotMetError: expected: falsey value got: true on error_displayed?.should be_false")
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
@@ -286,7 +285,10 @@ describe "quizzes" do
         wait_for_ajaximations
         expect(error_displayed?).to be_falsey
         input.send_keys(:tab)
-        expect(input).to have_attribute(:value, "1.0000")
+        wait_for_ajaximations
+        keep_trying_until {
+          expect(input).to have_attribute(:value, "1.0000")
+        }
       end
     end
 
