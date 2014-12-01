@@ -261,8 +261,6 @@ namespace :js do
       puts "--> Compiling CoffeeScript finished in #{coffee_time}"
     end
 
-
-
     threads.each(&:join)
   end
 
@@ -295,10 +293,15 @@ namespace :js do
   task :jsx do
     source = Rails.root + 'app/jsx'
     dest = Rails.root + 'public/javascripts/jsx'
-    if Rails.env == 'production'
-      `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest}`
+    if Rails.env == 'development'
+      #npm_run "jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null"
+      msg = `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null`
     else
-      `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest}`
+      msg = `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest} 2>&1 >/dev/null`
+    end
+
+    unless $?.success?
+      raise msg
     end
   end
 
@@ -309,5 +312,14 @@ namespace :js do
       EmberBundle.new(app).build
     end
   end
+
+  #def npm_run(command)
+    #puts "Running npm script `#{command}`"
+    #msg = `$(npm bin)/#{command} 2>&1`
+    #unless $?.success?
+      #raise msg
+    #end
+    #msg
+  #end
 
 end
