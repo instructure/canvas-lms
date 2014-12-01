@@ -24,12 +24,12 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
 $table-shadow: 0 1px 0 #dde0e4
 
 $revision-sidebar-width: 270px
-$revision-sidebar-background-color: #f6f8fa
+$revision-sidebar-background-color: $base-body-background-color
 $revision-sidebar-selected-color: #ffffff
-$revision-sidebar-hover-color: #eef1f3
-$revision-sidebar-dimmed-color: #999999
-$revision-button-color: #999999
-$revision-button-hover-color: #2590cf
+$revision-sidebar-hover-color: lighten($canvas-neutral, 10)
+$revision-sidebar-dimmed-color: $ic-base-dim-helper-text
+$revision-button-color: $canvas-secondary
+$revision-button-hover-color: $canvas-primary
 
 .pages .sticky-toolbar .sticky
   position: fixed
@@ -322,8 +322,6 @@ $revision-button-hover-color: #2590cf
       :margin-bottom 0
 
 .pages.show.revisions
-  .revision:first-child
-    :border-top $pages-inner-border
 
   #wiki_page_revisions
     :position relative
@@ -338,7 +336,6 @@ $revision-button-hover-color: #2590cf
     :right 0
     :width $revision-sidebar-width
     :background-color $revision-sidebar-background-color
-    :border-left $pages-border
     aside
       :width $revision-sidebar-width
       :position fixed
@@ -350,8 +347,6 @@ $revision-button-hover-color: #2590cf
       :padding 4px 11px
       :margin-top -1px
       :margin-left -1px
-      :border-left $pages-border
-      :border-top $pages-border
       :border-bottom none
       :color $subdued-text-color
       :position relative
@@ -384,9 +379,6 @@ $revision-button-hover-color: #2590cf
     :border-right none
     :border-top 1px solid transparent
     :border-bottom 1px solid transparent
-    &.selected
-      :border-top $pages-border
-      :border-bottom $pages-border
 
     // height and transitions
     :height 34px
