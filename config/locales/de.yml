@@ -13327,7 +13327,6 @@ de:
       buttons: 
         accept: Akzeptieren
         decline: Ablehnen
-      invitation_text: "Sie wurden eingeladen, an **[%{course}](%{link_to_course})** als %{enrollment_type_with_indefinite_article} teilzunehmen"
     enrollment: 
       enrolled_as_designer: "eingeschrieben als Designer"
       enrolled_as_limited_designer: "eingeschrieben als Designer mit Zugang zu bestimmten Kursabschnitten"
