@@ -13140,7 +13140,6 @@ nl:
       buttons: 
         accept: Accepteren
         decline: Weigeren
-      invitation_text: "Je bent uitgenodigd voor de cursus **[%{course}](%{link_to_course})** als %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "ingeschreven als ontwerper"
       enrolled_as_limited_designer: "ingeschreven als ontwerper met alleen toegang tot sectie"
