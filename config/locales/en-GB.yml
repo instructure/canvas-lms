@@ -13408,7 +13408,6 @@ en-GB:
       buttons: 
         accept: Accept
         decline: Decline
-      invitation_text: "You have been invited to join **[%{course}](%{link_to_course})** as %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "enrolled as a designer"
       enrolled_as_limited_designer: "enrolled as a designer with section-only access"
