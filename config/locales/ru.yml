@@ -13540,7 +13540,6 @@ ru:
       buttons: 
         accept: Принять
         decline: Снизить
-      invitation_text: "Вас пригласили присоединиться к **[%{course}](%{link_to_course})** в качестве %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "зарегистрирован как дизайнер"
       enrolled_as_limited_designer: "зарегистрирован как дизайнер с доступом только к разделу"
