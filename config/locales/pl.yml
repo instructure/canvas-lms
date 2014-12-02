@@ -13569,7 +13569,6 @@ pl:
       buttons: 
         accept: Akceptuj
         decline: Odrzuć
-      invitation_text: "Masz zaproszenie, aby przyłączyć sie do **[%{course}](%{link_to_course})** jako %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "zapisano w roli autora"
       enrolled_as_limited_designer: "zapisano w roli autora z dostępem tylko do sekcji"
