@@ -13403,7 +13403,6 @@ fr:
       buttons: 
         accept: Accepter
         decline: Refuser
-      invitation_text: "Vous avez été invité à participer à **[%{course}](%{link_to_course})** en tant %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "inscrit comme concepteur"
       enrolled_as_limited_designer: "inscrit comme concepteur avec accès aux sections uniquement"
