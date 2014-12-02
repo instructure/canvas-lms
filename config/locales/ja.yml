@@ -13386,7 +13386,6 @@ ja:
       buttons: 
         accept: 受諾
         decline: 拒否
-      invitation_text: "%{enrollment_type_with_indefinite_article} として **[%{course}](%{link_to_course})** への参加を招待されました"
     enrollment: 
       enrolled_as_designer: 設計者として参加登録済み
       enrolled_as_limited_designer: セクションのみへのアクセス権を持つ設計者として参加登録済み
