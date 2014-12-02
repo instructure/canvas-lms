@@ -13383,7 +13383,6 @@ nb:
       buttons: 
         accept: Godta
         decline: Avslå
-      invitation_text: "Du har blitt invitert til å bli med i **[%{course}](%{link_to_course})** som %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "påmeldt som designer"
       enrolled_as_limited_designer: "påmeldt som designer med tilgang til en klasse"
