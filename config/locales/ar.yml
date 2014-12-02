@@ -13952,7 +13952,6 @@ ar:
       buttons: 
         accept: قبول
         decline: رفض
-      invitation_text: "لقد تمت دعوتك للانضمام إلى  **[%{course}](%{link_to_course})** كـ %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "تم التسجيل كمصمم"
       enrolled_as_limited_designer: "تم التسجيل كمصمم مع الوصول إلى القسم فقط"
