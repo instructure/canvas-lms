@@ -842,7 +842,7 @@ define [
 
       $('#gradebook_settings').show().kyleMenu()
 
-      $settingsMenu.find('.gradebook_upload_link').click (event) =>
+      $('.gradebook_upload_link').click (event) =>
         event.preventDefault()
         new UploadDialog(@options.context_url)
 

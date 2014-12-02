@@ -567,12 +567,15 @@ $gradebook_checkbox_width: 16px;
 
 .gradebook_filter {
   position: absolute;
-  right: 10px;
-  top: 6px;
+  input {
+    width: 300px;
+  }
 }
 
-.gradebook_filter input {
-  width: 300px;
+.gradebook_menu {
+  position: absolute;
+  right: 10px;
+  top: 6px;
 }
 
 @mixin gradebook_menu_label($fontsize) {
