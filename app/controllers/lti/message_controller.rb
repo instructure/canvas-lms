@@ -159,7 +159,7 @@ module Lti
       if parameters && (parameters.map {|p| p['variable']}.compact & (%w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ))).any?
         link = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class.name, resource_link_id: resource_link_id).first_or_create
         binding = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class.name, resource_link_id: nil).first_or_create
-        proxy = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).first_or_create
+        proxy = tool_proxy_settings(tool_proxy)
         {
           'LtiLink.custom.url' => show_lti_tool_settings_url(link.id),
           'ToolProxyBinding.custom.url' => show_lti_tool_settings_url(binding.id),
@@ -168,6 +168,14 @@ module Lti
       else
         {}
       end
+    end
+
+    def tool_proxy_settings(tool_proxy)
+      unless tool_proxy_settings = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).first
+        custom = tool_proxy.raw_data['custom'] || {}
+        tool_proxy_settings = ToolSetting.create!(tool_proxy: tool_proxy, context_id: nil, resource_link_id: nil, custom: custom)
+      end
+      tool_proxy_settings
     end
 
   end
