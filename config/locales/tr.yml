@@ -13190,7 +13190,6 @@ tr:
       buttons: 
         accept: Onayla
         decline: Reddet
-      invitation_text: "%{enrollment_type_with_indefinite_article} olarak **[%{course}](%{link_to_course})** dersine katılmaya davet edildiniz"
     enrollment: 
       enrolled_as_designer: "tasarımcı olarak kayıtlı"
       enrolled_as_limited_designer: "sadece bölüm erişimi olan bir tasarımcı olarak kayıtlı"
