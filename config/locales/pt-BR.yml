@@ -13441,7 +13441,6 @@ pt-BR:
       buttons: 
         accept: Aceitar
         decline: Recusar
-      invitation_text: "Você tem um convite para o curso **[%{course}](%{link_to_course})** como %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: "inscrito como designer"
       enrolled_as_limited_designer: "inscrito como designer com acesso somente à seção"
