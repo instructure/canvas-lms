@@ -13419,7 +13419,6 @@ zh:
       buttons: 
         accept: 接受
         decline: 拒绝
-      invitation_text: "您已经受邀加入 **[%{course}](%{link_to_course})** 成为 %{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: 注册为设计者
       enrolled_as_limited_designer: 注册为仅班级访问权限的设计者
