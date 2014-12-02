@@ -12862,9 +12862,6 @@ fa-IR:
       buttons: 
         accept: پذیرفتن
         decline: "رد کردن"
-      invitation_text: |-
-          برای پیوستن به **[%{course}](%{link_to_course})**
-          به عنوان %{enrollment_type_with_indefinite_article} دعوت شده اید
     enrollment: 
       enrolled_as_designer: "به عنوان طراح ثبت نام شد"
       enrolled_as_limited_designer: "به عنوان طراح فقط با دسترسی به بخش ثبت نام شد"
