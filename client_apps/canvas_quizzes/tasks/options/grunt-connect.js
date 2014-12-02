@@ -79,9 +79,10 @@ module.exports = {
 
   docs: {
     options: {
-      keepalive: true,
+      keepalive: false,
       port: 9444,
-      base: "doc"
+      base: 'www',
+      hostname: '*'
     }
   },
 };

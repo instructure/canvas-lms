@@ -1,10 +1,13 @@
 define(function(require) {
   var Store = require('canvas_quizzes/core/store');
+  var Environment = require('canvas_quizzes/core/environment');
   var ajax = require('canvas_quizzes/core/adapter').request;
   var Config = require('../config');
   var EventCollection = require('../collections/events');
   var QuestionCollection = require('../collections/questions');
   var Submission = require('../models/submission');
+  var QuestionAnsweredEventDecorator = require('../models/question_answered_event_decorator');
+  var K = require('../constants');
   var _ = require('lodash');
   var range = _.range;
 
@@ -13,14 +16,21 @@ define(function(require) {
    */
   return new Store('events', {
     getInitialState: function() {
+      var attempt = Config.attempt;
+      var requestedAttempt = Environment.getQueryParameter('attempt');
+
+      if (requestedAttempt) {
+        attempt = parseInt(requestedAttempt, 10);
+      }
+
       return {
         submission: new Submission(),
         events: new EventCollection(),
         questions: new QuestionCollection(),
-        cursor: null, // points to the currently selected event
-        loadingQuestion: false,
-        inspectedQuestionId: null,
-        attempt: Config.attempt,
+
+        loading: false,
+
+        attempt: attempt,
 
         /**
          * @property {Integer} latestAttempt
@@ -30,7 +40,7 @@ define(function(require) {
          *
          * @see #loadInitialData.
          */
-        latestAttempt: Config.attempt
+        latestAttempt: attempt
       }
     },
 
@@ -46,15 +56,27 @@ define(function(require) {
      */
     loadInitialData: function() {
       return this.state.submission.fetch().then(function(submission) {
-        this.setState({ latestAttempt: this.state.submission.get('attempt') });
+        var newState = {};
+        var latestAttempt = this.state.submission.get('attempt');
+
+        if (!this.state.attempt || this.state.attempt > latestAttempt) {
+          newState.attempt = latestAttempt;
+        }
+
+        newState.latestAttempt = latestAttempt;
+
+        this.setState(newState);
       }.bind(this));
     },
 
     load: function() {
+      this.setState({ loading: true });
       this.loadSubmission()
         .then(this.loadQuestions.bind(this))
         .then(this.loadEvents.bind(this))
-        .then(this.emitChange.bind(this));
+        .finally(function() {
+          this.setState({ loading: false });
+        }.bind(this));
     },
 
     loadSubmission: function() {
@@ -68,10 +90,6 @@ define(function(require) {
     },
 
     loadQuestions: function() {
-      if (this.state.attempt === undefined) {
-        this.state.attempt = this.state.submission.get('attempt');
-      }
-
       return this.state.questions.fetchAll({
         reset: true,
         data: {
@@ -82,12 +100,28 @@ define(function(require) {
     },
 
     loadEvents: function() {
-      return this.state.events.fetch({
+      var events = this.state.events;
+      var questions = this.getQuestions();
+
+      return events.fetchAll({
         reset: true,
         data: {
-          attempt: this.state.attempt
+          attempt: this.state.attempt,
+          per_page: 50
         }
-      });
+      }).then(function decorateAnswerEvents(/*payload*/) {
+        var answerEvents = events.filter(function(model) {
+          return model.get('type') === K.EVT_QUESTION_ANSWERED;
+        });
+
+        QuestionAnsweredEventDecorator.run(answerEvents, questions);
+
+        return events;
+      }.bind(this));
+    },
+
+    isLoading: function() {
+      return this.state.loading;
     },
 
     getAll: function() {
@@ -102,66 +136,12 @@ define(function(require) {
       return this.state.submission.toJSON();
     },
 
-    getInspectedQuestionId: function() {
-      return this.state.inspectedQuestionId;
-    },
-
-    getInspectedQuestion: function() {
-      var question = this.state.questions.get(this.state.inspectedQuestionId);
-
-      if (question) {
-        return question.toJSON();
-      }
-    },
-
     getAttempt: function() {
       return this.state.attempt;
     },
 
     getAvailableAttempts: function() {
-      return range(1, Math.max(1, this.state.latestAttempt + 1));
-    },
-
-    isLoadingQuestion: function() {
-      return !!this.state.loadingQuestion;
-    },
-
-    setCursor: function(eventId) {
-      if (this.state.events.get(eventId) && this.state.cursor !== eventId) {
-        this.state.cursor = eventId;
-        this.emitChange();
-      }
-    },
-
-    getCursor: function() {
-      return this.state.cursor;
-    },
-
-    inspectQuestion: function(id) {
-      var question = this.state.questions.get(id);
-      var onLoad = function() {
-        this.state.inspectedQuestionId = id;
-        this.state.loadingQuestion = false;
-        this.emitChange();
-      }.bind(this);
-
-      if (!question) {
-        this.state.loadingQuestion = true;
-        this.state.inspectedQuestionId = null;
-        this.emitChange();
-
-        this.loadQuestions().then(onLoad);
-      }
-      else {
-        onLoad();
-      }
-    },
-
-    stopInspectingQuestion: function() {
-      if (this.state.inspectedQuestionId) {
-        this.state.inspectedQuestionId = undefined;
-        this.emitChange();
-      }
+      return range(1, Math.max(1, (this.state.latestAttempt || 0) + 1));
     },
 
     setActiveAttempt: function(_attempt) {

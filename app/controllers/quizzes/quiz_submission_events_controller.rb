@@ -54,9 +54,10 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
 
     js_env({
       quiz_url: api_v1_course_quiz_url(@context, @quiz),
-      questions_url: api_v1_course_quiz_questions_url(@context, @quiz),
+      questions_url: api_v1_course_quiz_questions_url(@context, @quiz, quiz_submission_id: @quiz_submission.id, quiz_submission_attempt: @quiz_submission.attempt),
       submission_url: api_v1_course_quiz_submission_url(@context, @quiz, @quiz_submission),
-      events_url: api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission)
+      events_url: api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission),
+      can_view_answer_audits: @quiz.grants_right?(@current_user, :view_answer_audits)
     })
   end
 end

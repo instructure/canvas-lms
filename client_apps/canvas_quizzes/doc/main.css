@@ -1,0 +1,19 @@
+@import "/vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css";
+@import "/vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css";
+@import "/dist/canvas_quizzes.css";
+
+.seed-data { display: none; }
+.seed-name {
+  cursor: pointer;
+}
+
+.seed-runner {
+  max-width: 100%;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.seed-runner:not(:empty) {
+  margin: 10px;
+  margin-left: -9px;
+}

@@ -47,6 +47,14 @@ define([], function() {
     loadOnStartup: true,
 
     /**
+     * @cfg {Boolean} [allowMatrixView=true]
+     *
+     * Turn this off if you don't want the user to be able to view the answer
+     * matrix.
+     */
+    allowMatrixView: true,
+
+    /**
      * Error emitter. Default behavior is to log the error message to the
      * console.
      *

@@ -8,7 +8,9 @@ define(function(require) {
       type: Subject
     });
 
-    it('should render', function() {});
+    it('should render', function() {
+      expect(subject.isMounted()).toEqual(true);
+    });
 
     describe('detail visibility', function() {
       it('should expand details of all questions', function() {

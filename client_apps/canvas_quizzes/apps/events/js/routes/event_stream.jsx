@@ -1,11 +1,10 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var Events = require('jsx!../views/events');
+  var React = require('react');
+  var EventStream = require('jsx!../views/event_stream');
   var Session = require('jsx!../views/session');
-  var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
-  var I18n = require('i18n!quiz_inspector');
 
-  var EventsRoute = React.createClass({
+  var EventStreamRoute = React.createClass({
     mixins: [],
 
     getDefaultProps: function() {
@@ -18,26 +17,20 @@ define(function(require) {
 
       return(
         <div>
-          <ScreenReaderContent tagName="h1">
-            {I18n.t('title', 'Quiz Inspector')}
-          </ScreenReaderContent>
-
           <Session
             submission={this.props.submission}
             attempt={this.props.attempt}
             availableAttempts={this.props.availableAttempts} />
 
-          <Events
+          <EventStream
             submission={this.props.submission}
             events={this.props.events}
             questions={this.props.questions}
-            currentEventId={this.props.currentEventId}
-            inspectedQuestion={this.props.inspectedQuestion}
-            isLoadingQuestion={this.props.isLoadingQuestion} />
+            attempt={this.props.attempt} />
         </div>
       );
     }
   });
 
-  return EventsRoute;
+  return EventStreamRoute;
 });

@@ -40,14 +40,24 @@
           'canvas_quizzes': 'apps/common/js'
         },
 
+        config: {
+          'canvas_quizzes/config': {
+            environment: 'development'
+          }
+        },
+
         deps: [ 'config/requirejs/development' ]
       });
 
-      require([ 'app/main' ], function(app) {
-        window.app = app;
-
-        app.mount(document.body.querySelector('#main'));
+      require([ 'app/config' ], function(config) {
+        config.onLoad(function() {
+          require([ 'app/main' ], function(app) {
+            window.app = app;
+            app.mount(document.body.querySelector('#main'));
+          });
+        });
       });
+
     </script>
 
     <script src="//localhost:9224/livereload.js"></script>

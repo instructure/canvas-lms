@@ -1000,6 +1000,9 @@ class Quizzes::Quiz < ActiveRecord::Base
         visible_to_user?(user)
     end
     can :read and can :submit
+
+    given { |user| context.grants_right?(user, :view_quiz_answer_audits) }
+    can :view_answer_audits
   end
 
   scope :include_assignment, -> { includes(:assignment) }

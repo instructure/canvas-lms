@@ -19,5 +19,5 @@ exclude
 /.ruby-version
 /.grunt/
 /node_modules
-development_local.js
+/apps/*/js/config/environments/development_local.js
 *.swp

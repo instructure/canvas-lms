@@ -6,7 +6,10 @@ define(function(require) {
       type: Subject
     });
 
-    it('should render', function() {});
+    it('should render', function() {
+      expect(subject.isMounted()).toEqual(true);
+    });
+
     it('should show details if "expanded" is truthy', function() {
       setProps({ expanded: true });
       expect(subject.getDOMNode().className).toMatch('with-details');

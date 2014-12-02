@@ -34,4 +34,20 @@ define({
     'answers',
     'matches'
   ],
+
+  Q_CALCULATED: 'calculated_question',
+  Q_ESSAY: 'essay_question',
+  Q_FILE_UPLOAD: 'file_upload_question',
+  Q_FILL_IN_MULTIPLE_BLANKS: 'fill_in_multiple_blanks_question',
+  Q_MATCHING: 'matching_question',
+  Q_MULTIPLE_ANSWERS: 'multiple_answers_question',
+  Q_MULTIPLE_CHOICE: 'multiple_choice_question',
+  Q_MULTIPLE_DROPDOWNS: 'multiple_dropdowns_question',
+  Q_TRUE_FALSE: 'true_false_question',
+  Q_NUMERICAL: 'numerical_question',
+  Q_SHORT_ANSWER: 'short_answer_question',
+
+  // Answer text longer than this will be truncated for questions of types
+  // "essay" and other free-form input ones. This applies to the table view.
+  MAX_VISIBLE_CHARS: 50
 });

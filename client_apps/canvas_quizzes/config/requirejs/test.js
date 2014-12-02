@@ -30,9 +30,13 @@ requirejs.config({
 
   waitSeconds: 5,
 
-  callback: function() {
-    this.__TESTING__ = true;
+  config: {
+    'canvas_quizzes/config': {
+      environment: 'test'
+    }
+  },
 
+  callback: function() {
     // Avoid infinite loop in the pretty printer when trying to print objects
     // with circular references.
     jasmine.MAX_PRETTY_PRINT_DEPTH = 3;
@@ -40,17 +44,21 @@ requirejs.config({
     // Hide the global "launchTest" that the grunt-contrib-requirejs-template
     // unconditionally calls without respecting our callback; we must initialize
     // the app before any of the specs are run.
-    this.launchTests = this.launchTest;
+    var go = this.launchTest;
     this.launchTest = function() {};
 
     // this script actually starts the tests, must be the last one:
-    require([ 'test/boot' ], function(boot) {
-      if (boot instanceof Function) {
-        boot(this.launchTests);
-      }
-      else {
-        this.launchTests();
-      }
-    }, this.launchTests);
+    require([ 'config' ], function(config) {
+      config.onLoad(function() {
+        require([ 'test/boot' ], function(boot) {
+          if (boot instanceof Function) {
+            boot(go); // boot file is async
+          }
+          else {
+            go(); // boot file is synchronous and requires no callback
+          }
+        }, go); // no boot file
+      });
+    }, go); // no app config file
   }
 });

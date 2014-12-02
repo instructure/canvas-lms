@@ -8,10 +8,7 @@ define(function(require) {
       submission: EventStore.getSubmission(),
       questions: EventStore.getQuestions(),
       events: EventStore.getAll(),
-      currentEventId: EventStore.getCursor(),
-      isLoadingQuestion: EventStore.isLoadingQuestion(),
-      inspectedQuestion: EventStore.getInspectedQuestion(),
-      inspectedQuestionId: EventStore.getInspectedQuestionId(),
+      isLoading: EventStore.isLoading(),
       attempt: EventStore.getAttempt(),
       availableAttempts: EventStore.getAvailableAttempts(),
     });

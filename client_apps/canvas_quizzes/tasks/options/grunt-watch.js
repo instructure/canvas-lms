@@ -23,10 +23,10 @@ module.exports = {
 
   tests: {
     files: [
-      'apps/*/js/**/*.j{s,sx}',
+      'apps/*/{js,test}/**/*.j{s,sx}',
       'tasks/*.js',
       'vendor/packages/**/*.js'
     ],
-    tasks: [ 'jasmine' ],
+    tasks: [ "jasmine:<%= grunt.config.get('currentApp') %>" ],
   },
 };

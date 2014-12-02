@@ -7,7 +7,10 @@ define(function(require) {
       type: Subject
     });
 
-    it('should render', function() {});
+    it('should render', function() {
+      expect(subject.isMounted()).toEqual(true);
+    });
+
     it('goes positive when the DI is above the threshold', function() {
       setProps({
         discriminationIndex: K.DISCRIMINATION_INDEX_THRESHOLD + 0.1

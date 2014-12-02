@@ -38,7 +38,7 @@ define(function(require) {
     };
   };
 
-  return function(startTests) {
-    require([ 'core/delegate', 'config' ], startTests);
-  };
+  // return function(startTests) {
+  //   require([ 'core/delegate' ], startTests);
+  // };
 });

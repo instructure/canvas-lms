@@ -7,16 +7,16 @@ define(function(require) {
   var classSet = require('canvas_quizzes/util/class_set');
   var K = require('../constants');
   var ReactRouter = require('canvas_packages/react-router');
-
-  var NO_ANSWER = <em>{I18n.t('no_answer', 'No answer')}</em>;
+  var Answer = require('jsx!./question_inspector/answer');
+  var NoAnswer = require('jsx!./question_inspector/answers/no_answer');
 
   var QuestionInspector = React.createClass({
     mixins: [ ReactRouter.Navigation ],
 
     getDefaultProps: function() {
       return {
-        loading: false,
-        question: undefined
+        question: undefined,
+        events: []
       };
     },
 
@@ -31,7 +31,6 @@ define(function(require) {
     render: function() {
       return(
         <div id="ic-QuizInspector__QuestionInspector">
-          {this.props.loading && <p>{I18n.t('loading', 'Loading...')}</p>}
           {this.props.question && this.renderQuestion(this.props.question)}
         </div>
       );
@@ -47,11 +46,14 @@ define(function(require) {
       }).sort(function(event) {
         return event.createdAt;
       }).map(function(event) {
+        var record = event.data.filter(function(record) {
+          return record.quizQuestionId === question.id;
+        })[0];
+
         return {
           active: event.id === currentEventId,
-          value: event.data.filter(function(record) {
-            return record.quizQuestionId === question.id;
-          })[0].answer
+          value: record.answer,
+          answered: record.answered
         };
       });
 
@@ -92,110 +94,29 @@ define(function(require) {
       );
     },
 
-    renderAnswer: function(answer, index) {
+    renderAnswer: function(record, index) {
+      var answer;
       var className = classSet({
         'ic-QuestionInspector__Answer': true,
-        'ic-QuestionInspector__Answer--is-active': !!answer.active,
+        'ic-QuestionInspector__Answer--is-active': !!record.active,
       });
 
-      return (
-        <li key={"answer-"+index} className={className}>
-          {this.getAnswerForQuestion(answer.value)}
-        </li>
-      );
-    },
-
-    getAnswerForQuestion: function(answer) {
-      var answered = false;
-      var question = this.props.question;
-      var questionType = this.props.question.questionType;
-      var formattedAnswer = ''+answer;
-      var blank;
-
-      switch(questionType) {
-        case 'numerical_question':
-        case 'multiple_choice_question':
-        case 'short_answer_question':
-        case 'essay_question':
-          answered = answer !== null;
-          break;
-
-        case 'fill_in_multiple_blanks_question':
-        case 'multiple_dropdowns_question':
-          for (blank in answer) {
-            if (answer.hasOwnProperty(blank)) {
-              answered = answer[blank] !== null;
-            }
-
-            if (answered) {
-              break;
-            }
-          }
-
-          formattedAnswer = (
-            <table>
-              {
-                Object.keys(answer).map(function(blank) {
-                  return (
-                    <tr>
-                      <th scope="row">{blank}</th>
-                      <td>{answer[blank] || NO_ANSWER}</td>
-                    </tr>
-                  );
-                })
-              }
-            </table>
-          );
-
-          break;
-
-        case 'matching_question':
-          answered = answer.length > 0;
-
-          formattedAnswer = (
-            <table>
-              <tr>
-                <th>Left</th>
-                <th>Right</th>
-              </tr>
-
-              {
-                question.answers.map(function(questionAnswer) {
-                  var match;
-                  var answerRecord = answer.filter(function(record) {
-                    return record.answer_id === questionAnswer.id+'';
-                  })[0];
-
-                  if (answerRecord) {
-                    match = question.matches.filter(function(match) {
-                      return (''+match.match_id) === ''+answerRecord.match_id;
-                    })[0];
-                  }
-
-                  return (
-                    <tr>
-                      <th>{questionAnswer.left}</th>
-                      <td>{match ? match.text : NO_ANSWER}</td>
-                    </tr>
-                  )
-                })
-              }
-            </table>
-          );
-        break;
-
-        case 'multiple_answers_question':
-          answered = answer.length > 0;
-        break;
-
-        case 'file_upload_question':
-          answered = answer instanceof Array && answer.length > 0;
-        default:
-          answered = answer !== null;
+      if (record.answered) {
+        answer = Answer({
+          key: "answer-"+index,
+          answer: record.value,
+          isActive: record.active,
+          question: this.props.question
+        });
+      }
+      else {
+        answer = NoAnswer;
       }
 
-      return answered ? formattedAnswer : NO_ANSWER;
-    }
+      return (
+        <li key={"answer-"+index} className={className} children={answer} />
+      );
+    },
   });
 
   return QuestionInspector;

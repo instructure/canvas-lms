@@ -1,10 +1,16 @@
 /** @jsx React.DOM */
 define(function(require) {
   var React = require('react');
-  var Router = require('canvas_packages/react-router');
   var Actions = require('../actions');
+  var I18n = require('i18n!quiz_log_auditing');
 
   var AppRoute = React.createClass({
+    getInitialState: function() {
+      return {
+        isLoading: false
+      };
+    },
+
     componentDidUpdate: function(prevProps, prevState) {
       if (this.props.query.attempt) {
         Actions.setActiveAttempt(this.props.query.attempt);
@@ -14,6 +20,7 @@ define(function(require) {
     render: function() {
       return (
         <div id="ic-QuizInspector">
+          {this.state.isLoading && <p>{I18n.t('loading', 'Loading...')}</p>}
           {this.props.activeRouteHandler(this.state)}
         </div>
       )

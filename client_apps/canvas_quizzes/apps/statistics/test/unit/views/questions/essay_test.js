@@ -6,7 +6,10 @@ define(function(require) {
       type: Subject
     });
 
-    it('should render', function() {});
+    it('should render', function() {
+      expect(subject.isMounted()).toEqual(true);
+    });
+
     it('should provide a link to speedgrader', function() {
       setProps({
         speedGraderUrl: 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=10'

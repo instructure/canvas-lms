@@ -22,6 +22,7 @@ module.exports = {
       'configureProxies:www',
       'connect:www',
       'connect:tests',
+      'connect:docs',
       'watch'
     ]);
   }

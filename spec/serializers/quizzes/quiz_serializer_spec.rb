@@ -447,6 +447,7 @@ describe Quizzes::QuizSerializer do
         create: true,
         update: true,
         read_statistics: true,
+        view_answer_audits: true,
         manage: true,
         delete: true,
         grade: true

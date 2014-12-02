@@ -7,7 +7,7 @@ var PKG_NAME = grunt.config.get('pkg.name');
 
 // Test config shared between all the app suites:
 var SHARED_CONFIG = {
-  timeout: 10000,
+  timeout: 2500,
 
   host: "http://127.0.0.1:<%= grunt.config.get('connect.tests.options.port') %>/",
 

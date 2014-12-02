@@ -127,12 +127,15 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
         retrieve_quiz_submission_attempt!(params[:attempt])
       end
 
-      events = @quiz_submission.events.
+      scope = @quiz_submission.events.
         where('attempt = :attempt AND created_at > :started_at', {
           attempt: @quiz_submission.attempt,
           started_at: @quiz_submission.started_at
         }).
         order('created_at ASC')
+
+      api_route = api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission)
+      events = Api.paginate(scope, self, api_route)
 
       render({
         json: {

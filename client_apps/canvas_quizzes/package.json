@@ -31,7 +31,8 @@
       "qtip"
     ]
   },
-  "devDependencies": {
+
+  "dependencies": {
     "fs-extra": "0.12.0",
     "grunt-connect-proxy": "0.1.11",
     "grunt-connect-rewrite": "0.2.1",
@@ -42,14 +43,12 @@
     "grunt-jsduck": "1.0.1",
     "grunt-sass": "0.14.1",
     "grunt-template-jasmine-requirejs": "git://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0",
-    "jasmine_react": "1.2.2",
+    "jasmine_react": "1.2.4",
     "jasmine_rsvp": "1.0.0",
     "jasmine_xhr": "1.0.2",
     "jquery": "2.1.1",
     "jshint-stylish-ex": "0.2.0",
-    "node-sass": "0.9.3"
-  },
-  "dependencies": {
+    "node-sass": "0.9.3",
     "canvas_react_i18n": "1.1.1",
     "glob": "4.0.5",
     "grunt": "0.4.5",

@@ -4,28 +4,28 @@ define(function(require) {
   var WithSidebar = require('jsx!../mixins/with_sidebar');
   var QuestionInspector = require('jsx!../views/question_inspector');
   var QuestionListing = require('jsx!../views/question_listing');
-  var Actions = require('../actions');
 
   var QuestionRoute = React.createClass({
     mixins: [ WithSidebar ],
-    statics: {
-      willTransitionFrom: function() {
-        Actions.stopInspectingQuestion();
-      }
-    },
 
-    componentDidMount: function() {
-      Actions.inspectQuestion(this.props.params.id);
+    getDefaultProps: function() {
+      return {
+        questions: []
+      };
     },
 
     renderContent: function() {
+      var questionId = this.props.params.id;
+      var question = this.props.questions.filter(function(question) {
+        return question.id === questionId;
+      })[0];
+
       return (
         <QuestionInspector
-          loading={this.props.isLoadingQuestion}
-          questions={this.props.questions}
-          question={this.props.inspectedQuestion}
-          currentEventId={this.props.currentEventId}
-          inspectedQuestionId={this.props.inspectedQuestionId}
+          loading={this.props.isLoading}
+          question={question}
+          currentEventId={this.props.query.event}
+          inspectedQuestionId={questionId}
           events={this.props.events} />
       );
     },
@@ -33,8 +33,10 @@ define(function(require) {
     renderSidebar: function() {
       return (
         <QuestionListing
-          activeId={this.props.inspectedQuestionId}
-          questions={this.props.questions} />
+          activeQuestionId={this.props.params.id}
+          activeEventId={this.props.query.event}
+          questions={this.props.questions}
+          query={this.props.query} />
       );
     },
   });

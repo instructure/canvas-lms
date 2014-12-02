@@ -11,15 +11,6 @@ define(function(require) {
     EventStore.load();
   };
 
-  Actions.inspectQuestion = function(questionId, eventId) {
-    EventStore.inspectQuestion(questionId);
-    EventStore.setCursor(eventId);
-  };
-
-  Actions.stopInspectingQuestion = function() {
-    EventStore.stopInspectingQuestion();
-  };
-
   Actions.setActiveAttempt = function(attempt) {
     EventStore.setActiveAttempt(attempt);
   };

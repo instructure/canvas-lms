@@ -9,7 +9,10 @@ define(function(require) {
       type: Subject
     });
 
-    it('should render', function() {});
+    it('should render', function() {
+      expect(subject.isMounted()).toEqual(true);
+    });
+
     it('should show a tooltip when hovering over a bar', function() {
       var rect;
 

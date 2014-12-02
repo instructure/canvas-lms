@@ -1,11 +1,5 @@
 define(function(require) {
   var $ = require('canvas_packages/jquery');
-  var Root = this;
-  var DEBUG = {
-  };
-
-  Root.DEBUG = DEBUG;
-  Root.d = DEBUG;
 
   return {
     xhr: {

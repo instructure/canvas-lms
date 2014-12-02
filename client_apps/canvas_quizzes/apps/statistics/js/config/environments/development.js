@@ -1,22 +1,5 @@
 define(function(require) {
   var $ = require('canvas_packages/jquery');
-  var Root = this;
-  var DEBUG = {
-  };
-
-  // You can use this in development_local.js to expose certain modules that
-  // are hard to reach from the console. Example:
-  //
-  //   DEBUG.expose('stores/reports', 'reportStore');
-  //   DEBUG.reportStore; // ReportStore
-  DEBUG.expose = function(script, varName) {
-    require([ script ], function(__script__) {
-      DEBUG[varName] = __script__;
-    });
-  };
-
-  Root.DEBUG = DEBUG;
-  Root.d = DEBUG;
 
   return {
     xhr: {

@@ -6,6 +6,7 @@ define(function(require) {
   var Button = require('jsx!../components/button');
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
   var Actions = require('../actions');
+  var Config = require('../config');
 
   var Link = ReactRouter.Link;
 
@@ -24,10 +25,18 @@ define(function(require) {
             {I18n.t('page_header', 'Session Information')}
 
             <div className="ic-QuizInspector__HeaderControls">
-              <Button onClick={Actions.reloadEvents} className="pull-right">
+              <Button onClick={Actions.reloadEvents}>
                 <ScreenReaderContent>{I18n.t('buttons.reload_events', 'Reload')}</ScreenReaderContent>
                 <i className="icon-refresh" />
               </Button>
+
+              {' '}
+
+              {Config.allowMatrixView &&
+                <a href="#/answer_matrix" className="btn btn-default">
+                  {I18n.t('buttons.table_view', 'View Table')}
+                </a>
+              }
             </div>
           </h1>
 

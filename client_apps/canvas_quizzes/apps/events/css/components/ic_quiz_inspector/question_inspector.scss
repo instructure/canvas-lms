@@ -8,8 +8,7 @@
   margin: 0;
 
   td, th {
-    border: 1px solid $borderColor;
-    padding: $whitespace/2;
+    padding: 0 $whitespace 0 0;
   }
 }
 
@@ -20,7 +19,7 @@
   padding-left: $counter-w + $whitespace;
   min-height: $counter-h;
   margin: $whitespace*2 0;
-  line-height: $counter-h;
+  min-height: $counter-h;
 
   &:before {
     counter-increment: answers;
@@ -33,6 +32,7 @@
     width: $counter-w;
     text-align: center;
     line-height: 1.4;
+    border-radius: 4px;
   }
 }
 
@@ -60,4 +60,21 @@
 .ic-QuestionInspector__QuestionType {
   color: $muteFg;
   margin-left: $whitespace/2;
+}
+
+.ic-QuestionInspector__MultipleAnswers,
+.ic-QuestionInspector__MultipleChoice {
+  line-height: normal;
+
+  input {
+    margin: 0 $whitespace/2 0 0;
+  }
+
+  input, input + span {
+    vertical-align: middle;
+  }
+}
+
+.ic-QuestionInspector__NoAnswer {
+  color: $muteFg;
 }

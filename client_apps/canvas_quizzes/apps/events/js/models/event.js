@@ -4,7 +4,7 @@ define(function(require) {
   var fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
   var K = require('../constants');
 
-  return Backbone.Model.extend({
+  var QuizSubmissionEvent = Backbone.Model.extend({
     parse: function(payload) {
       var attrs;
 
@@ -30,6 +30,8 @@ define(function(require) {
       }
 
       return attrs;
-    }
+    },
   });
+
+  return QuizSubmissionEvent;
 });
