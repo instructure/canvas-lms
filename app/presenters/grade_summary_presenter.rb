@@ -183,7 +183,7 @@ class GradeSummaryPresenter
   end
 
   def real_and_active_student_ids
-    @context.all_real_student_enrollments.where("workflow_state not in (?)", ['rejected','inactive']).pluck(:user_id).uniq
+    @context.all_real_student_enrollments.active_or_pending.pluck(:user_id).uniq
   end
 
   def assignment_presenters

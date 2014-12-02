@@ -65,11 +65,16 @@ describe GradeSummaryPresenter do
         @course.disable_feature!(:differentiated_assignments)
       end
       it 'works' do
-        s1, s2, s3 = n_students_in_course(3)
+        s1, s2, s3, s4 = n_students_in_course(4)
         a = @course.assignments.create! points_possible: 10
         a.grade_student s1, grade:  0
         a.grade_student s2, grade:  5
         a.grade_student s3, grade: 10
+
+        # this student should be ignored
+        a.grade_student s4, grade: 99
+        s4.enrollments.each &:destroy
+
         p = GradeSummaryPresenter.new(@course, @teacher, nil)
         stats = p.assignment_stats
         assignment_stats = stats[a.id]
