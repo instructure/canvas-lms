@@ -13260,7 +13260,6 @@ zh_Hant:
       buttons: 
         accept: 接受
         decline: 拒絕
-      invitation_text: "您已被邀请參加**[%{course}](%{link_to_course})**，作為%{enrollment_type_with_indefinite_article}"
     enrollment: 
       enrolled_as_designer: 註冊為設計師
       enrolled_as_limited_designer: 註冊為設計師，具有僅章節存取
