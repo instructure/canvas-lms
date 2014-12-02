@@ -1,6 +1,6 @@
 <div>
   <div class="message-header">
-    <b class="subject" tabindex="-1" {{#if subject}}title="{{subject}}"{{/if}}>
+    <h2 class="subject" tabindex="-1" {{#if subject}}title="{{subject}}"{{/if}}>
     {{#if subject}}
       {{#if subject_url}}
         <a href={{subject_url}}>{{subject}}</a>
@@ -10,7 +10,7 @@
     {{else}}
         ({{#t "no_subject"}}No subject{{/t}})
       {{/if}}
-    </b>
+    </h2>
 
     <ul class="message-detail-actions pull-right unstyled">
       <li>

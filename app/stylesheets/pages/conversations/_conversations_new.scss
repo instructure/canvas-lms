@@ -199,6 +199,13 @@
     white-space: nowrap;
   }
 
+  h2.author {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 20px;
+    margin: 0px;
+  }
+
   .date {
     color: $canvas-primary;
   }
@@ -227,6 +234,18 @@
   &:focus {
     outline: 0;
   }
+}
+
+h3.subject {
+ margin: 0px 0px 8px 0;
+ font-size: 13px;
+ line-height: 20px;
+}
+
+h2.subject {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0px;
 }
 
 .message-full-participants {
