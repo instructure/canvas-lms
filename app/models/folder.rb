@@ -144,8 +144,8 @@ class Folder < ActiveRecord::Base
 
   def infer_full_name
     # TODO i18n
-    t :default_folder_name, 'folder'
-    self.name = 'folder' if self.name.blank?
+    t :default_folder_name, 'New Folder'
+    self.name = 'New Folder' if self.name.blank?
     self.name = self.name.gsub(/\//, "_")
     folder = self
     @update_sub_folders = false
