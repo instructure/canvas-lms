@@ -182,26 +182,26 @@ class OutcomesApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def update
-    if authorized_action(@outcome, @current_user, :update)
-      @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid))
-      if params[:mastery_points] || params[:ratings]
-        criterion = @outcome.data && @outcome.data[:rubric_criterion]
-        criterion ||= {}
-        if params[:mastery_points]
-          criterion[:mastery_points] = params[:mastery_points]
-        else
-          criterion.delete(:mastery_points)
-        end
-        if params[:ratings]
-          criterion[:ratings] = params[:ratings]
-        end
-        @outcome.rubric_criterion = criterion
-      end
-      if @outcome.save
-        render :json => outcome_json(@outcome, @current_user, session)
+    return unless authorized_action(@outcome, @current_user, :update)
+
+    @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid))
+    if params[:mastery_points] || params[:ratings]
+      criterion = @outcome.data && @outcome.data[:rubric_criterion]
+      criterion ||= {}
+      if params[:mastery_points]
+        criterion[:mastery_points] = params[:mastery_points]
       else
-        render :json => @outcome.errors, :status => :bad_request
+        criterion.delete(:mastery_points)
       end
+      if params[:ratings]
+        criterion[:ratings] = params[:ratings]
+      end
+      @outcome.rubric_criterion = criterion
+    end
+    if @outcome.save
+      render :json => outcome_json(@outcome, @current_user, session)
+    else
+      render :json => @outcome.errors, :status => :bad_request
     end
   end
 

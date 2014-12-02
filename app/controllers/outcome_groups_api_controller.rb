@@ -140,12 +140,12 @@ class OutcomeGroupsApiController < ApplicationController
   # context. Will redirect to the appropriate outcome group's URL.
   #
   def redirect
-    if can_read_outcomes
-      @outcome_group = @context ?
-        @context.root_outcome_group :
-        LearningOutcomeGroup.global_root_outcome_group
-      redirect_to polymorphic_path [:api_v1, @context || :global, :outcome_group], :id => @outcome_group.id
-    end
+    return unless can_read_outcomes
+
+    @outcome_group = @context ?
+      @context.root_outcome_group :
+      LearningOutcomeGroup.global_root_outcome_group
+    redirect_to polymorphic_path [:api_v1, @context || :global, :outcome_group], :id => @outcome_group.id
   end
 
   # @API Get all outcome groups for context
@@ -189,10 +189,10 @@ class OutcomeGroupsApiController < ApplicationController
   # @returns OutcomeGroup
   #
   def show
-    if can_read_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
-      render :json => outcome_group_json(@outcome_group, @current_user, session)
-    end
+    return unless can_read_outcomes
+
+    @outcome_group = context_outcome_groups.find(params[:id])
+    render :json => outcome_group_json(@outcome_group, @current_user, session)
   end
 
   # @API Update an outcome group
@@ -242,25 +242,25 @@ class OutcomeGroupsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def update
-    if can_manage_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
-      if @outcome_group.learning_outcome_group_id.nil?
+    return unless can_manage_outcomes
+
+    @outcome_group = context_outcome_groups.find(params[:id])
+    if @outcome_group.learning_outcome_group_id.nil?
+      render :json => 'error'.to_json, :status => :bad_request
+      return
+    end
+    @outcome_group.update_attributes(params.slice(:title, :description, :vendor_guid))
+    if params[:parent_outcome_group_id] && params[:parent_outcome_group_id] != @outcome_group.learning_outcome_group_id
+      new_parent = context_outcome_groups.find(params[:parent_outcome_group_id])
+      unless new_parent.adopt_outcome_group(@outcome_group)
         render :json => 'error'.to_json, :status => :bad_request
         return
       end
-      @outcome_group.update_attributes(params.slice(:title, :description, :vendor_guid))
-      if params[:parent_outcome_group_id] && params[:parent_outcome_group_id] != @outcome_group.learning_outcome_group_id
-        new_parent = context_outcome_groups.find(params[:parent_outcome_group_id])
-        unless new_parent.adopt_outcome_group(@outcome_group)
-          render :json => 'error'.to_json, :status => :bad_request
-          return
-        end
-      end
-      if @outcome_group.save
-        render :json => outcome_group_json(@outcome_group, @current_user, session)
-      else
-        render :json => @outcome_group.errors, :status => :bad_request
-      end
+    end
+    if @outcome_group.save
+      render :json => outcome_group_json(@outcome_group, @current_user, session)
+    else
+      render :json => @outcome_group.errors, :status => :bad_request
     end
   end
 
@@ -283,20 +283,20 @@ class OutcomeGroupsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def destroy
-    if can_manage_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
-      if @outcome_group.learning_outcome_group_id.nil?
-        render :json => 'error'.to_json, :status => :bad_request
-        return
-      end
-      begin
-        @outcome_group.skip_tag_touch = true
-        @outcome_group.destroy
-        @context.try(:touch)
-        render :json => outcome_group_json(@outcome_group, @current_user, session)
-      rescue ActiveRecord::RecordNotSaved
-        render :json => 'error'.to_json, :status => :bad_request
-      end
+    return unless can_manage_outcomes
+
+    @outcome_group = context_outcome_groups.find(params[:id])
+    if @outcome_group.learning_outcome_group_id.nil?
+      render :json => 'error'.to_json, :status => :bad_request
+      return
+    end
+    begin
+      @outcome_group.skip_tag_touch = true
+      @outcome_group.destroy
+      @context.try(:touch)
+      render :json => outcome_group_json(@outcome_group, @current_user, session)
+    rescue ActiveRecord::RecordNotSaved
+      render :json => 'error'.to_json, :status => :bad_request
     end
   end
 
@@ -307,53 +307,53 @@ class OutcomeGroupsApiController < ApplicationController
   # @returns [OutcomeLink]
   #
   def outcomes
-    if can_read_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
+    return unless can_read_outcomes
 
-      # get and paginate links from group
-      link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title
-      url = polymorphic_url [:api_v1, @context || :global, :outcome_group_outcomes], :id => @outcome_group.id
-      @links = Api.paginate(link_scope, self, url)
+    @outcome_group = context_outcome_groups.find(params[:id])
 
-      # pre-populate the links' groups and contexts to prevent
-      # extraneous loads
-      @links.each do |link|
-        link.associated_asset = @outcome_group
-        link.context = @outcome_group.context
-      end
+    # get and paginate links from group
+    link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title
+    url = polymorphic_url [:api_v1, @context || :global, :outcome_group_outcomes], :id => @outcome_group.id
+    @links = Api.paginate(link_scope, self, url)
 
-      # preload the links' outcomes' contexts.
-      ActiveRecord::Associations::Preloader.new(@links, :learning_outcome_content => :context).run
-
-      # render to json and serve
-      render :json => @links.map{ |link| outcome_link_json(link, @current_user, session) }
+    # pre-populate the links' groups and contexts to prevent
+    # extraneous loads
+    @links.each do |link|
+      link.associated_asset = @outcome_group
+      link.context = @outcome_group.context
     end
+
+    # preload the links' outcomes' contexts.
+    ActiveRecord::Associations::Preloader.new(@links, :learning_outcome_content => :context).run
+
+    # render to json and serve
+    render :json => @links.map{ |link| outcome_link_json(link, @current_user, session) }
   end
 
   # Intentionally undocumented in the API. Used by the UI to show a list of
   # accounts' root outcome groups for the account(s) above the context.
   def account_chain
-    if authorized_action(@context, @current_user, :manage_outcomes)
-      account_chain =
-        if @context.is_a?(Account)
-          @context.account_chain - [@context]
-        else
-          @context.account.account_chain
-        end
-      account_chain.map! {|a| {
-          :id => a.root_outcome_group.id,
-          :title => a.name,
-          :description => t('account_group_description', 'Account level outcomes group.'),
-          :dontImport => true,
-          :url => polymorphic_path([:api_v1, a, :outcome_group], :id => a.root_outcome_group.id),
-          :subgroups_url => polymorphic_path([:api_v1, a, :outcome_group_subgroups], :id => a.root_outcome_group.id),
-          :outcomes_url => polymorphic_path([:api_v1, a, :outcome_group_outcomes], :id => a.root_outcome_group.id)
-        } }
-      path = polymorphic_path [:api_v1, @context, :account_chain]
-      account_chain = Api.paginate(account_chain, self, path)
+    return unless authorized_action(@context, @current_user, :manage_outcomes)
 
-      render :json => account_chain
-    end
+    account_chain =
+      if @context.is_a?(Account)
+        @context.account_chain - [@context]
+      else
+        @context.account.account_chain
+      end
+    account_chain.map! {|a| {
+        :id => a.root_outcome_group.id,
+        :title => a.name,
+        :description => t('account_group_description', 'Account level outcomes group.'),
+        :dontImport => true,
+        :url => polymorphic_path([:api_v1, a, :outcome_group], :id => a.root_outcome_group.id),
+        :subgroups_url => polymorphic_path([:api_v1, a, :outcome_group_subgroups], :id => a.root_outcome_group.id),
+        :outcomes_url => polymorphic_path([:api_v1, a, :outcome_group_outcomes], :id => a.root_outcome_group.id)
+      } }
+    path = polymorphic_path [:api_v1, @context, :account_chain]
+    account_chain = Api.paginate(account_chain, self, path)
+
+    render :json => account_chain
   end
 
   # @API Create/link an outcome
@@ -451,24 +451,24 @@ class OutcomeGroupsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def link
-    if can_manage_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
-      if params[:outcome_id]
-        @outcome = context_available_outcome(params[:outcome_id])
-        unless @outcome
-          render :json => 'error'.to_json, :status => :bad_request
-          return
-        end
-      else
-        @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name))
-        unless @outcome.valid?
-          render :json => @outcome.errors, :status => :bad_request
-          return
-        end
+    return unless can_manage_outcomes
+
+    @outcome_group = context_outcome_groups.find(params[:id])
+    if params[:outcome_id]
+      @outcome = context_available_outcome(params[:outcome_id])
+      unless @outcome
+        render :json => 'error'.to_json, :status => :bad_request
+        return
       end
-      @outcome_link = @outcome_group.add_outcome(@outcome)
-      render :json => outcome_link_json(@outcome_link, @current_user, session)
+    else
+      @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name))
+      unless @outcome.valid?
+        render :json => @outcome.errors, :status => :bad_request
+        return
+      end
     end
+    @outcome_link = @outcome_group.add_outcome(@outcome)
+    render :json => outcome_link_json(@outcome_link, @current_user, session)
   end
 
   # @API Unlink an outcome
@@ -487,18 +487,18 @@ class OutcomeGroupsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def unlink
-    if can_manage_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
-      @outcome_link = @outcome_group.child_outcome_links.active.where(content_id: params[:outcome_id]).first
-      raise ActiveRecord::RecordNotFound unless @outcome_link
-      begin
-        @outcome_link.destroy
-        render :json => outcome_link_json(@outcome_link, @current_user, session)
-      rescue ContentTag::LastLinkToOutcomeNotDestroyed => error
-        render :json => { 'message' => error.message }, :status => :bad_request
-      rescue ActiveRecord::RecordNotSaved
-        render :json => 'error'.to_json, :status => :bad_request
-      end
+    return unless can_manage_outcomes
+
+    @outcome_group = context_outcome_groups.find(params[:id])
+    @outcome_link = @outcome_group.child_outcome_links.active.where(content_id: params[:outcome_id]).first
+    raise ActiveRecord::RecordNotFound unless @outcome_link
+    begin
+      @outcome_link.destroy
+      render :json => outcome_link_json(@outcome_link, @current_user, session)
+    rescue ContentTag::LastLinkToOutcomeNotDestroyed => error
+      render :json => { 'message' => error.message }, :status => :bad_request
+    rescue ActiveRecord::RecordNotSaved
+      render :json => 'error'.to_json, :status => :bad_request
     end
   end
 
@@ -509,21 +509,21 @@ class OutcomeGroupsApiController < ApplicationController
   # @returns [OutcomeGroup]
   #
   def subgroups
-    if can_read_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
+    return unless can_read_outcomes
 
-      # get and paginate subgroups from group
-      subgroup_scope = @outcome_group.child_outcome_groups.active.order_by_title
-      url = polymorphic_url [:api_v1, @context || :global, :outcome_group_subgroups], :id => @outcome_group.id
-      @subgroups = Api.paginate(subgroup_scope, self, url)
+    @outcome_group = context_outcome_groups.find(params[:id])
 
-      # pre-populate the subgroups' parent groups to prevent extraneous
-      # loads
-      @subgroups.each{ |group| group.context = @outcome_group.context }
+    # get and paginate subgroups from group
+    subgroup_scope = @outcome_group.child_outcome_groups.active.order_by_title
+    url = polymorphic_url [:api_v1, @context || :global, :outcome_group_subgroups], :id => @outcome_group.id
+    @subgroups = Api.paginate(subgroup_scope, self, url)
 
-      # render to json and serve
-      render :json => @subgroups.map{ |group| outcome_group_json(group, @current_user, session, :abbrev) }
-    end
+    # pre-populate the subgroups' parent groups to prevent extraneous
+    # loads
+    @subgroups.each{ |group| group.context = @outcome_group.context }
+
+    # render to json and serve
+    render :json => @subgroups.map{ |group| outcome_group_json(group, @current_user, session, :abbrev) }
   end
 
   # @API Create a subgroup
@@ -564,14 +564,14 @@ class OutcomeGroupsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def create
-    if can_manage_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
-      @child_outcome_group = @outcome_group.child_outcome_groups.build(params.slice(:title, :description, :vendor_guid))
-      if @child_outcome_group.save
-        render :json => outcome_group_json(@child_outcome_group, @current_user, session)
-      else
-        render :json => 'error'.to_json, :status => :bad_request
-      end
+    return unless can_manage_outcomes
+
+    @outcome_group = context_outcome_groups.find(params[:id])
+    @child_outcome_group = @outcome_group.child_outcome_groups.build(params.slice(:title, :description, :vendor_guid))
+    if @child_outcome_group.save
+      render :json => outcome_group_json(@child_outcome_group, @current_user, session)
+    else
+      render :json => 'error'.to_json, :status => :bad_request
     end
   end
 
@@ -603,34 +603,34 @@ class OutcomeGroupsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def import
-    if can_manage_outcomes
-      @outcome_group = context_outcome_groups.find(params[:id])
+    return unless can_manage_outcomes
 
-      # source has to exist
-      @source_outcome_group = LearningOutcomeGroup.active.where(id: params[:source_outcome_group_id]).first
-      unless @source_outcome_group
-        render :json => 'error'.to_json, :status => :bad_request
-        return
-      end
+    @outcome_group = context_outcome_groups.find(params[:id])
 
-      # source has to be global, in same context, or in an associated
-      # account
-      source_context = @source_outcome_group.context
-      unless !source_context || source_context == @context || @context.associated_accounts.include?(source_context)
-        render :json => 'error'.to_json, :status => :bad_request
-        return
-      end
-
-      # source can't be a root group
-      unless @source_outcome_group.learning_outcome_group_id
-        render :json => 'error'.to_json, :status => :bad_request
-        return
-      end
-
-      # import the validated source
-      @child_outcome_group = @outcome_group.add_outcome_group(@source_outcome_group)
-      render :json => outcome_group_json(@child_outcome_group, @current_user, session)
+    # source has to exist
+    @source_outcome_group = LearningOutcomeGroup.active.where(id: params[:source_outcome_group_id]).first
+    unless @source_outcome_group
+      render :json => 'error'.to_json, :status => :bad_request
+      return
     end
+
+    # source has to be global, in same context, or in an associated
+    # account
+    source_context = @source_outcome_group.context
+    unless !source_context || source_context == @context || @context.associated_accounts.include?(source_context)
+      render :json => 'error'.to_json, :status => :bad_request
+      return
+    end
+
+    # source can't be a root group
+    unless @source_outcome_group.learning_outcome_group_id
+      render :json => 'error'.to_json, :status => :bad_request
+      return
+    end
+
+    # import the validated source
+    @child_outcome_group = @outcome_group.add_outcome_group(@source_outcome_group)
+    render :json => outcome_group_json(@child_outcome_group, @current_user, session)
   end
 
   protected
