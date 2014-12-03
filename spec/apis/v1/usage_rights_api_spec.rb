@@ -52,6 +52,37 @@ describe UsageRightsController, type: :request do
                          {}, {}, {expected_status: 401})
       end
 
+      it "should publish on save when usage_rights & publish have been set" do
+        @fileR.locked = true
+        @fileR.save
+        expect(@fileR.reload.locked).to be_truthy
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
+                        { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
+                        { file_ids: [@fileR.id], publish: true, usage_rights: {use_justification: 'used_by_permission', legal_copyright: '(C) 2014 XYZ Corp'} })
+
+        expect(json['message']).to eq('1 file updated')
+        expect(json['file_ids']).to match_array([@fileR.id])
+        expect(json['use_justification']).to eq('used_by_permission')
+
+        @fileR.reload
+        expect(@fileR.usage_rights.use_justification).to eq('used_by_permission')
+        expect(@fileR.locked).to be_falsey
+      end
+
+      it "should not publish when usage_rights have not been set" do
+        @fileR.locked = true
+        @fileR.save
+        expect(@fileR.reload.locked).to be_truthy
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
+                        { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
+                        { file_ids: [@fileR.id], publish: true }, {}, {expected_status: 400})
+
+        expect(json).to eql({'message' => "No 'usage_rights' object supplied"})
+        expect(@fileR.reload.locked).to be_truthy
+      end
+
       it "should require usage_rights hash" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                          { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },

@@ -94,6 +94,9 @@ class UsageRightsController < ApplicationController
   #   List of ids of folders to search for files to set usage rights for.
   #   Note that new files uploaded to these folders do not automatically inherit these rights.
   #
+  # @argument publish [Optional, Boolean]
+  #   Whether the file(s) or folder(s) should be published on save, provided that usage rights have been specified (set to `true` to publish on save).
+  #
   # @argument usage_rights[use_justification] [Required, String, "own_copyright"|"used_by_permission"|"fair_use"|"public_domain"|"creative_commons"]
   #   The intellectual property justification for using the files in Canvas
   #
@@ -161,8 +164,10 @@ private
     folders = @context.folders.active.where(id: folder_ids).to_a
     file_ids = folders.inject([]) { |file_ids, folder| file_ids += enumerate_contents(folder) }
     file_ids += @context.attachments.not_deleted.where(id: Array(params[:file_ids]).map(&:to_i)).pluck(:id)
+    update_attrs = {usage_rights_id: usage_rights}
+    update_attrs.merge!(locked: false) if usage_rights.present? && value_to_boolean(params[:publish])
 
-    count = @context.attachments.not_deleted.where(id: file_ids).update_all(usage_rights_id: usage_rights)
+    count = @context.attachments.not_deleted.where(id: file_ids).update_all(update_attrs)
     result = usage_rights ? usage_rights_json(usage_rights, @current_user) : {}
     result.merge!({
       message: I18n.t({one: "1 file updated", other: "%{count} files updated"}, count: count ),
