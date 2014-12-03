@@ -130,8 +130,8 @@ login to Canvas along with the 'login_id' above.</p>
 otherwise) it will <em>not</em> be overwritten</p>
 <p>Setting the password will in most cases log the user out of Canvas. If 
 the user has managed to change their password in Canvas they will not be 
-effected by this.  This latter case would happen if your institution
-transistioned from using the Canvas authentication to a SSO solution.
+affected by this.  This latter case would happen if your institution
+transistioned from using Canvas authentication to a SSO solution.
 For this reason it is important to not set this if you are using LDAP or an 
 SSO protocol.</p>
 </td>
