@@ -1,31 +1,31 @@
-- name: Install packages
+- name: Install postgresql
   sudo: yes
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items:
-      # Database
-      - postgresql
-      - libpq-dev # Required for Ansible to interact with postgres
-      - python-psycopg2 # Required for Ansible to interact with postgres
+    # Database
+    - postgresql
+    - libpq-dev # Required for Ansible to interact with postgres
+    - python-psycopg2 # Required for Ansible to interact with postgres
 
-- name: Allow password authentication for local socket users
+- name: Copy pg_hba.conf
   sudo: yes
-  copy: src=pg_hba.conf dest=/etc/postgresql/9.1/main/pg_hba.conf force=yes
+  copy: src=pg_hba.conf dest=/etc/postgresql/9.3/main/pg_hba.conf force=yes
   notify:
-      - Restart Postgres
+    - Restart Postgres
 
-- name: Create Databases
+- name: Create databases
   sudo: yes
   sudo_user: postgres
-  with_items: "{{ db_names }}"
+  with_items: db_names
   postgresql_db: name={{ item }}
 
-- name: Create User
+- name: Create database user
   sudo: yes
   sudo_user: postgres
   postgresql_user: name={{ db_user }} password={{ db_password }} state=present role_attr_flags=NOSUPERUSER,CREATEDB
 
-- name: Provide user with DB permissions
+- name: Provide database user with permissions
   sudo: yes
   sudo_user: postgres
-  with_items: "{{ db_names }}"
+  with_items: db_names
   postgresql_user: user={{ db_user }} db={{ item }} priv=ALL
