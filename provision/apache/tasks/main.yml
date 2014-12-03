@@ -1,0 +1,5 @@
+- name: Install apache
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+      - apache2
