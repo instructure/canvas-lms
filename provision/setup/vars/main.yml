@@ -1,0 +1,5 @@
+db_names:
+  - canvas_production
+  - canvas_queue_production
+db_user: canvas
+db_password: canvas4me
