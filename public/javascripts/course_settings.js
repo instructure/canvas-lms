@@ -266,6 +266,12 @@ define([
         handleFragmentType("TeacherEnrollment");
       }
     });
+    $("#course_account_id_lookup").autocomplete({
+      source: $("#course_account_id_url").attr('href'),
+      select: function (event, ui) {
+        $("#course_account_id").val(ui.item.id);
+      }
+    });
     $(".move_course_link").click(function(event) {
       event.preventDefault();
       $("#move_course_dialog").dialog({
