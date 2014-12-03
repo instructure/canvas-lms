@@ -663,27 +663,27 @@ class Quizzes::Quiz < ActiveRecord::Base
     q
   end
 
-  # Generates a submission for the specified user on this quiz, based
-  # on the SAVED version of the quiz.  Does not consider permissions.
-  def generate_submission(user, preview=false)
-    submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
-    submission.retake
-    submission.attempt = (submission.attempt + 1) rescue 1
+  def build_user_questions(preview)
     user_questions = []
     @submission_question_index = 0
     @stored_questions = nil
-    @submission_questions = self.stored_questions
+    submission_questions = self.stored_questions
     if preview
-      @submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
+      submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
     end
 
-    exclude_ids = @submission_questions.map { |q| q[:assessment_question_id] }.compact
-    @submission_questions.each do |q|
-      if q[:pick_count] #Quizzes::QuizGroup
+    exclude_ids = submission_questions.map { |q| q[:assessment_question_id] }.compact
+    submission_questions.each do |q|
+      # pulling from question group
+      if q[:pick_count]
+
+        # pulling from question bank
         if q[:assessment_question_bank_id]
           bank = ::AssessmentQuestionBank.where(id: q[:assessment_question_bank_id]).first if q[:assessment_question_bank_id].present?
           if bank
             questions = bank.select_for_submission(q[:pick_count], exclude_ids)
+            exclude_ids.concat(questions.map {|q| q.id })
+
             questions = questions.map { |aq| aq.data }
             questions.each do |question|
               if question[:answers]
@@ -695,24 +695,34 @@ class Quizzes::Quiz < ActiveRecord::Base
               user_questions << generate_submission_question(question)
             end
           end
+
+        # a group with questions
         else
-          questions = q[:questions].shuffle
-          q[:pick_count].times do |i|
-            if questions[i]
-              question = questions[i]
-              question[:points_possible] = q[:question_points]
-              user_questions << generate_submission_question(question)
-            end
+          questions = q[:questions].shuffle.slice(0, q[:pick_count])
+          questions.each do |question|
+            question[:points_possible] = q[:question_points]
+            user_questions << generate_submission_question(question)
           end
         end
-      else #just a question
+
+      # just a question
+      else
         user_questions << generate_submission_question(q)
       end
     end
 
+    user_questions
+  end
+
+  # Generates a submission for the specified user on this quiz, based
+  # on the SAVED version of the quiz.  Does not consider permissions.
+  def generate_submission(user, preview=false)
+    submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
+    submission.retake
+    submission.attempt = (submission.attempt + 1) rescue 1
     submission.score = nil
     submission.fudge_points = nil
-    submission.quiz_data = user_questions
+    submission.quiz_data = build_user_questions(preview)
     submission.quiz_version = self.version_number
     submission.started_at = ::Time.now
     submission.score_before_regrade = nil
