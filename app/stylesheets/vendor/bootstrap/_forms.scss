@@ -465,12 +465,11 @@ This is the standard form actions button bar at the bottom of every content form
     width: auto;
     height: $baseLineHeight;
     min-width: 16px;
-    padding: 4px 5px;
+    padding: 8px;
     font-size: $baseFontSize;
     font-weight: normal;
     line-height: $baseLineHeight;
     text-align: center;
-    text-shadow: 0 1px 0 $white;
     background-color: $grayLighter;
     border: 1px solid #ccc;
   }
