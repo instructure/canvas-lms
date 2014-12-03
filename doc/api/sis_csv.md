@@ -126,11 +126,14 @@ from the remote system.</td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
 this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
-<p>If the user already has a password (from previous SIS import or
+<p>If the user already has a password (from previous a SIS import or
 otherwise) it will <em>not</em> be overwritten</p>
-<p>Setting the password will in all cases log the user out of Canvas.  
-For this reason it is important to not set this if you are using DAP or an 
-SSO protocol</p>
+<p>Setting the password will in most cases log the user out of Canvas. If 
+the user has managed to change their password in Canvas they will not be 
+effected by this.  This latter case would happen if your institution
+transistioned from using the Canvas authentication to a SSO solution.
+For this reason it is important to not set this if you are using LDAP or an 
+SSO protocol.</p>
 </td>
 </tr>
 <tr>
