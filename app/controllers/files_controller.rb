@@ -326,13 +326,23 @@ class FilesController < ApplicationController
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
+
+        tool_context = if context.is_a?(Course)
+          context
+        elsif context.is_a?(User)
+          @domain_root_account
+        elsif context.is_a?(Group)
+          context.context
+        end
+        file_menu_tools = (tool_context ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
         {
           asset_string: context.asset_string,
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
           usage_rights_required: context.feature_enabled?(:usage_rights_required),
           permissions: {
             manage_files: context.grants_right?(@current_user, session, :manage_files),
-          }
+          },
+          file_menu_tools: file_menu_tools
         }
       end
 
@@ -340,7 +350,9 @@ class FilesController < ApplicationController
       @body_classes << 'full-width padless-content'
       js_bundle :react_files
       jammit_css :react_files
-      js_env :FILES_CONTEXTS => files_contexts
+      js_env({
+        :FILES_CONTEXTS => files_contexts
+      })
 
       render :text => "".html_safe, :layout => true
     end

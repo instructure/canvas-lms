@@ -5,6 +5,7 @@ define [
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
   '../modules/filesEnv'
+  'compiled/models/File'
   'compiled/models/Folder'
   './RestrictedDialogForm'
   '../utils/openMoveDialog'
@@ -13,7 +14,7 @@ define [
   '../utils/deleteStuff'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, Folder, RestrictedDialogForm, openMoveDialog, openUsageRightsDialog, downloadStuffAsAZip, deleteStuff, $) ->
+], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, File, Folder, RestrictedDialogForm, openMoveDialog, openUsageRightsDialog, downloadStuffAsAZip, deleteStuff, $) ->
 
   ItemCog = React.createClass
     displayName: 'ItemCog'
@@ -22,6 +23,24 @@ define [
       model: customPropTypes.filesystemObject
 
     render: withReactDOM ->
+      if @props.model instanceof File
+        externalToolMenuItems = @props.externalToolsForContext.map (tool) =>
+          if @props.model.externalToolEnabled(tool)
+            li {},
+              a {
+                href: "#{tool.base_url}&files[]=#{@props.model.id}",
+              },
+                tool.title
+          else
+            li {},
+              a {
+                className: "disabled",
+                href: "#"
+              },
+              tool.title
+      else
+        externalToolMenuItems = []
+
       wrap = (fn) =>
         preventDefault (event) =>
           singularContextType = @props.model.collection?.parentFolder?.get('context_type').toLowerCase()
@@ -91,4 +110,4 @@ define [
                   ref: 'deleteLink'
                 },
                   I18n.t('delete', 'Delete')
-            ]
+            ].concat(externalToolMenuItems)

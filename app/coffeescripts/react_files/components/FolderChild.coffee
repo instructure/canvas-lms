@@ -173,4 +173,5 @@ define [
               startEditingName: @startEditingName
               userCanManageFilesForContext: @props.userCanManageFilesForContext
               usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+              externalToolsForContext: @props.externalToolsForContext
             })

@@ -46,8 +46,10 @@ class ContextExternalTool < ActiveRecord::Base
     :user_navigation, :course_navigation, :account_navigation, :resource_selection,
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
     :course_settings_sub_navigation, :global_navigation,
-    :assignment_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu
+    :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu
   ]
+
+  CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types]}
 
   EXTENSION_TYPES.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -79,6 +81,9 @@ class ContextExternalTool < ActiveRecord::Base
 
     extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url,
                       :selection_height, :selection_width, :text, :url, :message_type]
+    if custom_keys = CUSTOM_EXTENSION_KEYS[type]
+      extension_keys += custom_keys
+    end
     extension_keys += {
         :visibility => lambda{|v| %w{members admins}.include?(v)}
     }.to_a
@@ -452,7 +457,8 @@ class ContextExternalTool < ActiveRecord::Base
   private_class_method :contexts_to_search
 
   LOR_TYPES = [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation,
-               :assignment_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu]
+               :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu,
+               :wiki_page_menu]
   def self.all_tools_for(context, options={})
     #options[:type] is deprecated, use options[:placements] instead
     placements =* options[:placements] || options[:type]

@@ -113,6 +113,7 @@ define [
               toggleSelected: @props.toggleItemSelected.bind(null, child)
               userCanManageFilesForContext: @props.userCanManageFilesForContext
               usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+              externalToolsForContext: @props.externalToolsForContext
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
 

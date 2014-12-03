@@ -461,12 +461,16 @@ class ExternalToolsController < ApplicationController
   protected :content_item_selection_response
 
   def content_item_response
-    #contstruct query params for the export endpoint
-    export_type = params["export_type"] || "common_cartridge"
     content_items = []
 
-    if export_type == "common_cartridge"
-      content_items << content_item_for_common_cartridge
+    if params[:files].present?
+      content_items << content_item_for_file
+    else
+      #construct query params for the export endpoint
+      export_type = params["export_type"] || "common_cartridge"
+      if export_type == "common_cartridge"
+        content_items << content_item_for_common_cartridge
+      end
     end
 
     {
@@ -475,6 +479,30 @@ class ExternalToolsController < ApplicationController
     }
   end
   protected :content_item_response
+
+  def content_item_for_file
+    #find the content title
+    file = Attachment.where(:id => params[:files].first).first
+    if @context.is_a?(Account)
+      raise ActiveRecord::RecordNotFound unless file.context == @current_user
+    elsif file.context.is_a?(Course)
+      raise ActiveRecord::RecordNotFound unless file.context == @context
+    elsif file.context.is_a?(Group)
+      raise ActiveRecord::RecordNotFound unless file.context.context == @context
+    end
+    render_unauthorized_action if file.locked_for?(@current_user, check_policies: true)
+
+    {
+        "@type" => "ContentItemPlacement",
+        "placementOf" => {
+            "@type" => "FileItem",
+            "@id" => file_download_url(file, { :verifier => file.uuid, :download => '1', :download_frd => '1' }),
+            "mediaType" => file.content_type,
+            "title" => file.display_name
+        }
+    }
+  end
+  protected :content_item_for_file
 
   def content_item_for_common_cartridge
     query_params = {"export_type" => "common_cartridge"}

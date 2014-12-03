@@ -184,6 +184,11 @@ shared_examples_for "external tools tests" do
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
         <lticm:property name="display_type">full_width</lticm:property>
       </lticm:options>
+      <lticm:options name="file_menu">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
       <lticm:options name="module_menu">
         <lticm:property name="url">https://example.com/wiki</lticm:property>
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>

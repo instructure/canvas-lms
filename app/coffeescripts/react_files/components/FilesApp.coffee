@@ -74,6 +74,7 @@ define [
 
       userCanManageFilesForContext = filesEnv.userHasPermission({contextType: contextType, contextId: contextId}, 'manage_files')
       usageRightsRequiredForContext = filesEnv.contextsDictionary["#{contextType}_#{contextId}"]?.usage_rights_required
+      externalToolsForContext = filesEnv.contextFor({contextType: contextType, contextId: contextId})?.file_menu_tools || []
 
       div null,
         # For whatever reason, VO in Safari didn't like just the h1 tag.
@@ -129,6 +130,7 @@ define [
               areAllItemsSelected: @areAllItemsSelected
               userCanManageFilesForContext: userCanManageFilesForContext
               usageRightsRequiredForContext: usageRightsRequiredForContext
+              externalToolsForContext: externalToolsForContext
               previewItem: @previewItem
               dndOptions:
                 onItemDragStart: @onItemDragStart

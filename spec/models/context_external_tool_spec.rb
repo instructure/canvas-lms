@@ -118,6 +118,19 @@ describe ContextExternalTool do
     expect(@tool.has_placement?(:course_navigation)).to eq true
   end
 
+  it "should allow accept_media_types setting exclusively for file_menu extension" do
+    @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @tool.course_navigation = {
+        :accept_media_types => "types"
+    }
+    @tool.file_menu = {
+        :accept_media_types => "types"
+    }
+    @tool.save!
+    expect(@tool.extension_setting(:course_navigation, :accept_media_types)).to be_blank
+    expect(@tool.extension_setting(:file_menu, :accept_media_types)).to eq "types"
+  end
+
   it "should clear disabled extensions" do
     @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
     @tool.course_navigation = {
