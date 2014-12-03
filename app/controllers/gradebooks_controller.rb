@@ -474,8 +474,7 @@ class GradebooksController < ApplicationController
 
 
   def assignment_groups_json(opts={})
-    assignment_scope = AssignmentGroup.assignment_scope_for_draft_state(@context)
-    @context.assignment_groups.active.includes(assignment_scope).map { |g|
+    @context.assignment_groups.active.includes(:published_assignments).map { |g|
       assignment_group_json(g, @current_user, session, ['assignments'], {
         stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?
       })
