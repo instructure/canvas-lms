@@ -1,0 +1,16 @@
+- name: Install dependencies
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - zlib1g-dev
+    - libxml2-dev
+    - libmysqlclient-dev
+    - libxslt1-dev
+    - imagemagick
+    - libpq-dev
+    - libxmlsec1-dev
+    - libcurl4-gnutls-dev
+    - libxmlsec1
+    - build-essential
+    - openjdk-7-jre
+    - unzip

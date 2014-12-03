@@ -1,4 +1,5 @@
 - hosts: all
   roles:
+    - dependencies
     - postgres
     - deploy
