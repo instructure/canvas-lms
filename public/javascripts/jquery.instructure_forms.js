@@ -1013,7 +1013,7 @@ define([
       if ($('#aria_alerts').length === 0) {
         $template.find(".error_text").attr('role', 'alert');
       } else {
-        $('#aria_alerts').append($('<div/>').html(message));
+        $('#aria_alerts').append($('<div/>').html(htmlEscape(message).toString()));
       }
       var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
 
