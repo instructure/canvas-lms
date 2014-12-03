@@ -30,13 +30,14 @@ define [
           fn([@props.model], {
             contextType: contextType
             contextId: contextId
-            returnFocusTo: event.target
+            returnFocusTo: @refs.settingsCogBtn.getDOMNode()
           })
 
       span {},
 
         button {
           type: 'button'
+          ref: 'settingsCogBtn'
           className: 'al-trigger al-trigger-gray btn btn-link'
           'aria-label': I18n.t('settings', 'Settings')
           'data-popup-within' : "#wrapper"
