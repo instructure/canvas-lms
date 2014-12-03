@@ -7,7 +7,7 @@ $preview-toggle-border: 1px solid $preview-border-color;
 $preview-font-color: $canvas-light;
 $spacing-width: 0;
 $preview-footer-height: 140px;
-$preview-header-height: 70px;
+$preview-header-height: 9vh;
 
 .ReactModal__Overlay.ReactModal__Overlay--ef-file-preview {
   background: rgba(black, 0.9);
@@ -57,7 +57,7 @@ $preview-header-height: 70px;
 /// __File Preview Header
 ////////////////////////////////
 .ef-file-preview-header {
-  height: 70px;
+  height: $preview-header-height;
   color: $preview-font-color;  
   font-weight: 300; 
   flex: 0 0 $preview-header-height;
@@ -181,7 +181,7 @@ $preview-header-height: 70px;
 .ef-file-preview-frame {
   flex: 1 1 auto;
   border: none;
-  height: 100%; // IE fix for main container height
+  height: 100vh - $preview-header-height; // IE fix for main container height
 }
 
 .ef-file-preview-frame { border: none; }

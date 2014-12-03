@@ -1,14 +1,13 @@
 <% content_for :head, include_common_stylesheets %>
 <%= render :partial => "layouts/head" %>
-<body>
-<div id="content" class="file_preview_container">
-<h2><%= @file.display_name %></h2>
-<div><%= t('file_previews.no_preview_available', 'No preview is available for this file.')%></div>
-<div>
-  <%= link_to(t('file_previews.download_file', 'Download *filename*', :wrapper => {'*' => h(@file.display_name)}),
-              context_url(@context, :context_file_download_url, @file.id, :download_frd => 1)) %>
-  (<%= @file.readable_size %>)
-</div>
-</div>
-<%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+<body style="margin:0; padding: 0; background: transparent;">
+  <div id="content" class="file_preview_container" style="margin:0; padding: 0; position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); color: white; text-align: center;">
+    <h2><%= @file.display_name %></h2>
+    <div><%= t('file_previews.no_preview_available', 'No preview is available for this file.')%></div>
+    <div>
+      <%= link_to(t('file_previews.download_file', 'Download *filename*', :wrapper => {'*' => h(@file.display_name)}), context_url(@context, :context_file_download_url, @file.id, :download_frd => 1)) %>
+      (<%= @file.readable_size %>)
+    </div>
+  </div>
+  <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </body>

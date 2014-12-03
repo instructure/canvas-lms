@@ -1,9 +1,9 @@
 <% content_for :head, include_common_stylesheets %>
 <%= render :partial => "layouts/head" %>
 <% js_bundle :file_preview %>
-<body style="display:flex; align-items:center; justify-content: center;">
-<div id="content" class="file_preview_container">
-<div id="media_preview" <%= media_preview_attributes(@file) %>></div>
-</div>
-<%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+<body style="margin:0; padding: 0; background: transparent;">
+  <div id="content" class="file_preview_container" style="margin:0; padding: 0; position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);">
+    <div id="media_preview" <%= media_preview_attributes(@file) %>></div>
+  </div>
+  <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </body>
