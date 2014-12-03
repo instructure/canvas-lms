@@ -410,6 +410,23 @@ describe AssignmentsApiController, type: :request do
       )
     end
 
+    it "includes all_dates with include flag" do
+      course_with_student_logged_in(:active_all => true)
+      @course.assignments.create!(:title => "all_date_test", :submission_types => "online_url")
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/assignments.json",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['all_dates']
+             )
+      assign = json.first
+      expect(assign['all_dates']).not_to be_nil
+    end
+
 
     it "returns due dates as they apply to the user" do
         course_with_student(:active_all => true)
@@ -1786,6 +1803,18 @@ describe AssignmentsApiController, type: :request do
         expect(json['due_at']).to eq @assignment.due_at.iso8601.to_s
         expect(json['unlock_at']).to eq @assignment.unlock_at.iso8601.to_s
         expect(json['lock_at']).to eq @assignment.lock_at.iso8601.to_s
+      end
+
+      it "returns all_dates when requested" do
+        @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+                        { :controller => "assignments_api", :action => "show",
+                          :format => "json", :course_id => @course.id.to_s,
+                          :id => @assignment.id.to_s,
+                          :all_dates => true},
+                        {:override_assignment_dates => 'false'})
+        expect(json['all_dates']).not_to be_nil
       end
 
       it "does not fulfill requirements when description isn't returned" do
