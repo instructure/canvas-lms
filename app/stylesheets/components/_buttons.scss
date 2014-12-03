@@ -203,14 +203,12 @@ input[type="button"] {
 // Danger and error appear as red
 .btn-danger, // <-- deprecated- do not use
 .Button--danger {
-  @if $use_high_contrast { @include canvas-button($canvas-danger, $canvas-light, false); }
-  @else { @include canvas-button(lighten($canvas-danger, 4%), $canvas-light, false); }
+  @include canvas-button($canvas-danger, $canvas-light, false);
 }
 // Success appears as green
 .btn-success, // <-- deprecated- do not use
 .Button--success {
-  @if $use_high_contrast { @include canvas-button($canvas-success, $canvas-light, false); }
-  @else { @include canvas-button(lighten($canvas-success, 5%), $canvas-light, false); }
+  @include canvas-button($canvas-success, $canvas-light, false);
 }
 // Info appears as a neutral blue
 .btn-info, // <-- deprecated- do not use
