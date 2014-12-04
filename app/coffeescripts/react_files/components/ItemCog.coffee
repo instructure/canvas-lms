@@ -66,7 +66,7 @@ define [
                   onClick: preventDefault(@props.startEditingName)
                   ref: 'editName'
                 },
-                  I18n.t('edit_name', 'Edit Name')
+                  I18n.t('Rename')
               li {},
                 a {
                   href:'#'
