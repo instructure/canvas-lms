@@ -1,4 +1,22 @@
 - hosts: all
+  sudo: true
+  pre_tasks:
+    - name: update apt cache
+      apt: update_cache=yes
+  vars:
+    rvm1_rvm_check_for_updates: False
+    rvm1_symlink_binaries:
+      - 'erb'
+      - 'executable-hooks-uninstaller'
+      - 'gem'
+      - 'irb'
+      - 'rake'
+      - 'rdoc'
+      - 'ri'
+      - 'ruby'
+      - 'testrb'
+    rvm1_rubies:
+      - 'ruby-1.9.3'
   roles:
     - dependencies
     - rvm_io.rvm1-ruby
