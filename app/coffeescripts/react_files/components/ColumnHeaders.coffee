@@ -70,6 +70,9 @@ define [
           },
           I18n.t('select_all', 'Select All')
         columns.map (column) =>
+          # don't show any usage rights related stuff to people that don't have the feature flag on
+          return if (column.property is 'usage_rights') and !@props.usageRightsRequiredForContext
+
           isSortedCol = sort is column.property
           div {
             key: column.property

@@ -163,4 +163,9 @@ define [
             PublishCloud(model: @props.model, ref: 'publishButton', userCanManageFilesForContext: @props.userCanManageFilesForContext)
 
           unless @props.model.isNew() or @props.model.get('locked_for_user')
-            ItemCog(model: @props.model, startEditingName: @startEditingName, userCanManageFilesForContext: @props.userCanManageFilesForContext)
+            ItemCog({
+              model: @props.model
+              startEditingName: @startEditingName
+              userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+            })

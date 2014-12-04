@@ -74,13 +74,16 @@ define [
                   ref: 'move'
                 },
                   I18n.t('move', 'Move')
-              li {},
-                a {
-                  href: '#'
-                  onClick: wrap(openUsageRightsDialog)
-                  ref: 'usageRights'
-                },
-                  I18n.t('Manage Usage Rights')
+
+              # don't show any usage rights related stuff to people that don't have the feature flag on
+              if @props.usageRightsRequiredForContext
+                li {},
+                  a {
+                    href: '#'
+                    onClick: wrap(openUsageRightsDialog)
+                    ref: 'usageRights'
+                  },
+                    I18n.t('Manage Usage Rights')
               li {},
                 a {
                   href:'#'

@@ -168,7 +168,7 @@ define [
             },
               i className: 'icon-copy-course'
 
-          if @props.userCanManageFilesForContext
+          if @props.userCanManageFilesForContext and @props.usageRightsRequiredForContext
             button {
               type: 'button'
               disabled: !showingButtons

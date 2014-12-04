@@ -99,6 +99,7 @@ define [
           params: @props.params
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
+          usageRightsRequiredForContext: @props.usageRightsRequiredForContext
           splat: @props.params.splat
         }
         if @props.currentFolder.isEmpty()
