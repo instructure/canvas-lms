@@ -1,6 +1,6 @@
 - name: Install postgresql
   sudo: yes
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=installed
   with_items:
     - postgresql
     - libpq-dev # Required for Ansible to interact with postgres
