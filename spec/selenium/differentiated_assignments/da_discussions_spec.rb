@@ -20,7 +20,7 @@ describe "interaction with differentiated discussions" do
         expect(f("#open-discussions")).to include_text("There are no discussions to show in this section.")
       end
       it "should show discussions with an override" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         get "/courses/#{@course.id}/assignments"
         expect(f("#assignment_group_upcoming")).to include_text(@da_discussion.title)
         get "/courses/#{@course.id}/discussion_topics/"
@@ -37,14 +37,16 @@ describe "interaction with differentiated discussions" do
 
     context "Discussion Show page" do
       it "should redirect back to discussion index from inaccessible discussions" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         @da_discussion.reply_from(:user => @user, :text => 'hello')
+        @da_discussion.assignment.assignment_overrides.each(&:destroy!)
+        create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.") }
         expect(driver.current_url).to match %r{/courses/\d+/discussion_topics}
       end
       it "should show the discussion page with an override" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         expect(driver.current_url).to match %r{/courses/\d+/discussion_topics/#{@da_discussion.id}}
       end
@@ -57,7 +59,7 @@ describe "interaction with differentiated discussions" do
 
     context "Student Grades Page" do
       it "should show discussions with an override" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_discussion.title)
       end
@@ -90,7 +92,7 @@ describe "interaction with differentiated discussions" do
         expect(f("#open-discussions")).to include_text("There are no discussions to show in this section.")
       end
       it "should show discussions with an override" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         get "/courses/#{@course.id}/assignments"
         expect(f("#assignment_group_upcoming")).to include_text(@da_discussion.title)
         get "/courses/#{@course.id}/discussion_topics/"
@@ -107,14 +109,16 @@ describe "interaction with differentiated discussions" do
 
     context "Discussion Show page" do
       it "should redirect back to discussion index from inaccessible discussions" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         @da_discussion.reply_from(:user => @user, :text => 'hello')
+        @da_discussion.assignment.assignment_overrides.each(&:destroy!)
+        create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.") }
         expect(driver.current_url).to match %r{/courses/\d+/discussion_topics}
       end
       it "should show the discussion page with an override" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         expect(driver.current_url).to match %r{/courses/\d+/discussion_topics/#{@da_discussion.id}}
       end
@@ -127,7 +131,7 @@ describe "interaction with differentiated discussions" do
 
     context "Student Grades Page" do
       it "should show discussions with an override" do
-        create_section_override_for_assignment(@da_discussion.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_discussion.assignment) #on default section
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_discussion.title)
       end
