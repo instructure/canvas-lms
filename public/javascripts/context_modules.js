@@ -902,7 +902,8 @@ define([
         title: I18n.t('titles.edit_item', "Edit Item Details"),
         open: function(){
           $(this).find('input[type=text],textarea,select').first().focus();
-        }
+        },
+        minWidth: 320
       }).fixDialogButtons();
     });
     $("#edit_item_form .cancel_button").click(function(event) {
