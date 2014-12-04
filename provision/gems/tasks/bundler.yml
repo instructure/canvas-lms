@@ -1,0 +1,5 @@
+- name: Install bundler gem
+  sudo: yes
+  shell: >
+      executable=/bin/bash source /etc/profile.d/rvm.sh;
+      gem install bundler --version=1.6.0 --no-ri --no-rdoc
