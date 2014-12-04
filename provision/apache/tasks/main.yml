@@ -1,5 +1,30 @@
 - name: Install apache
   sudo: yes
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=installed
   with_items:
       - apache2
+      - libapache2-mod-xsendfile
+
+- name: Enable mods
+  sudo: yes
+  command: a2enmod {{item}}
+  with_items:
+    - headers
+    - xsendfile
+
+- name: Copy canvas.conf
+  sudo: yes
+  copy: src=canvas.conf dest=/etc/apache2/sites-available force=yes
+
+- name: Remove default virtual host
+  file:
+    path=/etc/apache2/sites-enabled/000-default.conf
+    state=absent
+
+- name: Enable canvas virtual host
+  file:
+    src=/etc/apache2/sites-available/canvas.conf
+    dest=/etc/apache2/sites-enabled/canvas.conf
+    state=link
+  notify:
+    - apache restart
