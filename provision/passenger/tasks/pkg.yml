@@ -1,0 +1,6 @@
+---
+- name: pkg - install apache passenger packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - libapache2-mod-passenger
+  notify: apache restart

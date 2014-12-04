@@ -1,0 +1,9 @@
+- name: Copy passenger.conf
+  sudo: yes
+  copy: src=passenger.conf dest=/etc/apache2/mods-available force=yes
+
+- name: Enable passenger
+  sudo: yes
+  command: a2enmod {{item}}
+  with_items:
+    - passenger
