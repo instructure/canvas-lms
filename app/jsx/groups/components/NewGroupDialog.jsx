@@ -6,8 +6,8 @@ define([
   'jquery',
   'react',
   'jsx/groups/mixins/BackboneState',
-  'jsx/groups/components/PaginatedUserCheckList'
-
+  'jsx/groups/components/PaginatedUserCheckList',
+  'jquery.instructure_forms', /* errorBox */
 ], (I18n, _, $, React, BackboneState, PaginatedUserCheckList) => {
   var NewGroupDialog = React.createClass({
     mixins: [BackboneState, React.addons.LinkedStateMixin],
@@ -23,8 +23,12 @@ define([
 
     handleFormSubmit: function(e){
       e.preventDefault()
-      this.props.createGroup(this.state.name, this.state.joinLevel, this.state.checked);
-      this.props.closeDialog(e);
+      if (this.state.name.length == 0) {
+        $(this.refs.nameInput.getDOMNode()).errorBox(I18n.t('Group name is required'));
+      } else {
+        this.props.createGroup(this.state.name, this.state.joinLevel, this.state.checked);
+        this.props.closeDialog(e);
+      }
     },
 
     _onUserCheck(user, isChecked) {
@@ -48,7 +52,7 @@ define([
                 <tr>
                   <td><label htmlFor="group_name">{I18n.t('Group Name')}</label></td>
                   <td>
-                    <input type="text" name="name" valueLink={this.linkState('name')}/>
+                    <input ref="nameInput" type="text" name="name" maxLength="200" valueLink={this.linkState('name')}/>
                   </td>
                 </tr>
                 <tr>
@@ -74,7 +78,7 @@ define([
               </table>
             </div>
             <div className="form-controls">
-              <button className="btn confirm-dialog-cancel-button" onClick={this.props.closeDialog}>{I18n.t('Cancel')}</button>
+              <button className="btn confirm-dialog-cancel-btn" onClick={this.props.closeDialog}>{I18n.t('Cancel')}</button>
               <button className="btn btn-primary confirm-dialog-confirm-btn" type="submit">{I18n.t('Submit')}</button>
             </div>
           </form>

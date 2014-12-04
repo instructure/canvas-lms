@@ -291,6 +291,18 @@ class Group < ActiveRecord::Base
     return member
   end
 
+  def set_users(users)
+    user_ids = users.map(&:id)
+    memberships = []
+    transaction do
+      self.group_memberships.where("user_id NOT IN (?)", user_ids).destroy_all
+      users.each do |user|
+        memberships << invite_user(user)
+      end
+    end
+    memberships
+  end
+
   def bulk_add_users_to_group(users, options = {})
     return if users.empty?
     user_ids = users.map(&:id)

@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 describe "Groups API", type: :request do
   def group_json(group, opts = {})
     opts[:is_admin] ||= false
+    opts[:manage_users] ||= false
     opts[:include_users] ||= false
     opts[:include_category] ||= false
     opts[:include_permissions] ||= false
@@ -42,7 +43,7 @@ describe "Groups API", type: :request do
       'leader' => group.leader
     }
     if opts[:include_users]
-      json['users'] = users_json(group.users)
+      json['users'] = users_json(group.users, opts)
     end
     if opts[:include_permissions]
       json['permissions'] = {
@@ -76,17 +77,21 @@ describe "Groups API", type: :request do
     }
   end
 
-  def users_json(users)
-    users.map { |user| user_json(user) }
+  def users_json(users, opts)
+    users.map { |user| user_json(user, opts) }
   end
 
-  def user_json(user)
-    {
+  def user_json(user, opts)
+    hash = {
       'id' => user.id,
       'name' => user.name,
       'sortable_name' => user.sortable_name,
       'short_name' => user.short_name
     }
+    if opts[:manage_users]
+      hash['login_id'] = user.pseudonym.unique_id
+    end
+    hash
   end
 
   def membership_json(membership, is_admin = false)
@@ -297,7 +302,7 @@ describe "Groups API", type: :request do
     expect(@community.is_public).to eq true
     expect(@community.join_level).to eq "parent_context_auto_join"
     expect(@community.avatar_attachment).to eq avatar
-    expect(json).to eq group_json(@community)
+    expect(json).to eq group_json(@community, :include_users => true, :include_permissions => true, :include_category => true, :manage_users => true)
   end
 
   it "should only allow updating a group from private to public" do

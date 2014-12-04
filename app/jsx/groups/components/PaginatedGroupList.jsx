@@ -18,7 +18,8 @@ define([
       var groups = this.props.groups.map(g => <Group key={g.id}
                                                      group={g}
                                                      onLeave={() => this.props.onLeave(g)}
-                                                     onJoin={() => this.props.onJoin(g)} />);
+                                                     onJoin={() => this.props.onJoin(g)}
+                                                     onManage={() => this.props.onManage(g)} />);
       return (
         <div>
           {groups}

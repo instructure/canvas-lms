@@ -466,6 +466,11 @@ class GroupsController < ApplicationController
   #   The allowed file storage for the group, in megabytes. This parameter is
   #   ignored if the caller does not have the manage_storage_quotas permission.
   #
+  # @argument members[] [String]
+  #   An array of user ids for users you would like in the group.
+  #   Users not in the group will be sent invitations. Existing group
+  #   members who aren't in the list will be removed from the group.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \
   #          -X PUT \
@@ -497,11 +502,24 @@ class GroupsController < ApplicationController
 
     if authorized_action(@group, @current_user, :update)
       respond_to do |format|
-        if @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+        @group.transaction do
+          @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+          if params[:members]
+            user_ids = Api.value_to_array(params[:members]).map(&:to_i).uniq
+            if @group.context
+              users = @group.context.users.where(id: user_ids)
+            else
+              users = User.where(id: user_ids)
+            end
+            @memberships = @group.set_users(users)
+          end
+        end
+
+        if !@group.errors.any?
           @group.users.update_all(updated_at: Time.now.utc)
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session) }
+          format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @group.errors, :status => :bad_request }

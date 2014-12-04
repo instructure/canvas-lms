@@ -12,7 +12,8 @@ define([
   'jsx/groups/components/PaginatedGroupList',
   'jsx/groups/components/Filter',
   'jsx/groups/components/NewGroupDialog',
-], (I18n, _, $, React, Group, UserCollection, ContextGroupCollection, BackboneState, PaginatedGroupList, Filter, NewGroupDialog) => {
+  'jsx/groups/components/ManageGroupDialog',
+], (I18n, _, $, React, Group, UserCollection, ContextGroupCollection, BackboneState, PaginatedGroupList, Filter, NewGroupDialog, ManageGroupDialog) => {
   var StudentView = React.createClass({
     mixins: [BackboneState],
 
@@ -24,6 +25,35 @@ define([
       });
     },
 
+    openManageGroupDialog(group) {
+      var $dialog = $('<div>').dialog({
+        id: "manage_group_form",
+        title: "Manage Student Group",
+        height: 500,
+        width: 700,
+        'fix-dialog-buttons': false,
+
+        close: function(e){
+          React.unmountComponentAtNode($dialog[0]);
+          $( this ).remove();
+        }
+      });
+
+      var closeDialog = function(e){
+        e.preventDefault();
+        $dialog.dialog('close');
+      };
+
+      React.renderComponent(<ManageGroupDialog userCollection={this.state.userCollection}
+                                               checked={_.map(group.users, (u) => u.id)}
+                                               groupId={group.id}
+                                               name={group.name}
+                                               maxMembership={group.max_membership}
+                                               updateGroup={this.updateGroup}
+                                               closeDialog={closeDialog}
+                                               loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
+    },
+
     openNewGroupDialog() {
       var $dialog = $('<div>').dialog({
         id: "add_group_form",
@@ -33,7 +63,7 @@ define([
         'fix-dialog-buttons': false,
 
         close: function(e){
-          React.unmountComponentAtNode($dialog);
+          React.unmountComponentAtNode($dialog[0]);
           $( this ).remove();
         }
       });
@@ -44,7 +74,6 @@ define([
       };
 
       React.renderComponent(<NewGroupDialog userCollection={this.state.userCollection}
-                                            checked={[]}
                                             createGroup={this.createGroup}
                                             closeDialog={closeDialog}
                                             loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
@@ -66,11 +95,23 @@ define([
                  (group) => this._onCreateGroup(group));
     },
 
+    _onUpdateGroup(group) {
+      this.state.groupCollection.add(group, {merge: true});
+      $.flashMessage(I18n.t("Updated Group %{group_name}", {group_name: group.name}));
+    },
+
+    updateGroup(groupId, name, members) {
+      $.ajaxJSON(`/api/v1/groups/${groupId}`,
+                 'PUT',
+                 {name: name, members: members},
+                 (group) => this._onUpdateGroup(group));
+    },
+
     _loadMore(collection) {
       if (collection.loadedAll || collection.fetchingNextPage) {
         return;
       }
-      collection.fetch({page: 'next'})
+      collection.fetch({page: 'next'});
     },
 
     _extendAttribute(model, attribute, hash) {
@@ -136,6 +177,10 @@ define([
               group.users.some(u => u.name.toLowerCase().indexOf(filter) > -1));
     },
 
+    manage(group) {
+      this.openManageGroupDialog(group);
+    },
+
     render() {
       var filteredGroups = this.state.groupCollection.toJSON().filter(this._filter);
       var newGroupButton = null
@@ -168,7 +213,8 @@ define([
                                   filter={this.state.filter}
                                   loadMore={() => this._loadMore(this.state.groupCollection)}
                                   onLeave={this.leave}
-                                  onJoin={this.join} />
+                                  onJoin={this.join}
+                                  onManage={this.manage}/>
             </div>
           </div>
         </div>);
