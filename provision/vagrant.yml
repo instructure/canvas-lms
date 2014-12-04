@@ -20,6 +20,8 @@
   roles:
     - dependencies
     - rvm_io.rvm1-ruby
+    - gems
     - apache
+    - passenger
     - postgres
     - deploy
