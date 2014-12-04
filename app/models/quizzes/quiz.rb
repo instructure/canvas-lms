@@ -714,46 +714,77 @@ class Quizzes::Quiz < ActiveRecord::Base
     user_questions
   end
 
+  def build_submission_end_at(submission)
+    course = context
+    user   = submission.user
+    end_at = nil
+
+    if self.time_limit
+      end_at = submission.started_at + (self.time_limit.to_f * 60.0)
+    end
+
+    # add extra time
+    if end_at && submission.extra_time
+      end_at += (submission.extra_time * 60.0)
+    end
+
+    # Admins can take the full quiz whenever they want
+    return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
+
+    # set to lock date
+    if lock_at && !submission.manually_unlocked
+      if !end_at || lock_at < end_at
+        end_at = lock_at
+      end
+
+    # set to course end
+    elsif course.end_at && course.restrict_enrollments_to_course_dates
+      if !end_at || course.end_at < end_at
+        end_at = course.end_at
+      end
+
+    # set to enrollment term end
+    elsif course.enrollment_term.end_at
+      if !end_at || course.enrollment_term.end_at < end_at
+        end_at = course.enrollment_term.end_at
+      end
+    end
+
+    end_at
+  end
+
   # Generates a submission for the specified user on this quiz, based
   # on the SAVED version of the quiz.  Does not consider permissions.
   def generate_submission(user, preview=false)
-    submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
-    submission.retake
-    submission.attempt = (submission.attempt + 1) rescue 1
-    submission.score = nil
-    submission.fudge_points = nil
-    submission.quiz_data = build_user_questions(preview)
-    submission.quiz_version = self.version_number
-    submission.started_at = ::Time.now
-    submission.score_before_regrade = nil
-    submission.end_at = nil
-    submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
-    # Admins can take the full quiz whenever they want
-    unless user.is_a?(::User) && self.grants_right?(user, :grade)
-      submission.end_at = lock_at if lock_at && !submission.manually_unlocked && (!submission.end_at || lock_at < submission.end_at)
-    end
-    submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
-    if context.end_at && context.restrict_enrollments_to_course_dates
-      submission.end_at ||= context.end_at
-      submission.end_at = context.end_at if context.end_at && context.end_at < submission.end_at
-    else
-      submission.end_at ||= context.enrollment_term.end_at
-      submission.end_at = context.end_at if context.enrollment_term.end_at && context.enrollment_term.end_at < submission.end_at
-    end
-    submission.finished_at = nil
-    submission.submission_data = {}
-    submission.workflow_state = 'preview' if preview
-    submission.was_preview = preview
-    if preview || submission.untaken?
-      submission.save!
-    else
-      submission.with_versioning(true, &:save!)
+    submission = nil
+
+    transaction do
+      submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
+      submission.retake
+      submission.attempt = (submission.attempt + 1) rescue 1
+      submission.score = nil
+      submission.fudge_points = nil
+      submission.quiz_data = build_user_questions(preview)
+      submission.quiz_version = self.version_number
+      submission.started_at = ::Time.now
+      submission.score_before_regrade = nil
+      submission.end_at = build_submission_end_at(submission)
+      submission.finished_at = nil
+      submission.submission_data = {}
+      submission.workflow_state = 'preview' if preview
+      submission.was_preview = preview
+
+      if preview || submission.untaken?
+        submission.save!
+      else
+        submission.with_versioning(true, &:save!)
+      end
+
     end
 
     # Make sure the submission gets graded when it becomes overdue (if applicable)
-    submission.grade_when_overdue unless preview || !submission.end_at
+    submission.grade_when_overdue if submission && submission.end_at && !preview
     submission
-
   end
 
   def generate_submission_for_participant(quiz_participant)
