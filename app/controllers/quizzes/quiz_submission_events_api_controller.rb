@@ -93,7 +93,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
   # @API Retrieve captured events
   # @beta
   #
-  # Retrieve the set of events captured for a specific submission attempt.
+  # Retrieve the set of events captured during a specific submission attempt.
   #
   # @argument attempt [Integer]
   #  The specific submission attempt to look up the events for. If unspecified,
@@ -123,10 +123,13 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
         reject! 400, "quiz log auditing must be enabled"
       end
 
-      attempt = params[:attempt] || @quiz_submission.attempt
+      if params.has_key?(:attempt)
+        retrieve_quiz_submission_attempt!(params[:attempt])
+      end
+
       events = @quiz_submission.events.
         where('attempt = :attempt AND created_at > :started_at', {
-          attempt: attempt,
+          attempt: @quiz_submission.attempt,
           started_at: @quiz_submission.started_at
         }).
         order('created_at ASC')

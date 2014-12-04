@@ -546,8 +546,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     Quizzes::QuizSubmissionHistory.new(self)
   end
 
+  # Load the model for this quiz submission at a given attempt.
+  #
+  # @return [Quizzes::QuizSubmission|NilClass]
+  #   The submission model at that attempt, or nil if there's no such attempt.
+  def model_for_attempt(attempt)
+    attempts.model_for(attempt)
+  end
+
   def questions_regraded_since_last_attempt
-    return unless last_attempt = attempts.last
+    return if attempts.last.nil?
 
     version = attempts.last.versions.first
     quiz.questions_regraded_since(version.created_at)

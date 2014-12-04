@@ -1,4 +1,57 @@
-define(function() {
+define(function(require) {
+  var _ = require('lodash');
+  var find = _.find;
+  var RE_EXTRACT_LINK = /<([^>]+)>; rel="([^"]+)",?\s*/g;
+  var RE_EXTRACT_PP = /per_page=(\d+)/;
+
+  // Extract pagination meta from a JSON-API payload inside the
+  // "meta.pagination" set.
+  var parseJsonApiPagination = function(respMeta, meta) {
+    if (!meta) meta = {};
+
+    meta.perPage = respMeta.per_page;
+    meta.hasMore = !!respMeta.next;
+    meta.nextPage = meta.hasMore ? respMeta.page + 1 : undefined;
+    meta.count = respMeta.count;
+
+    return meta;
+  };
+
+  // Extract pagination from the Link header.
+  //
+  // Here's a good reference:
+  //   https://developer.github.com/guides/traversing-with-pagination/
+  var parseLinkPagination = function(linkHeader, meta) {
+    var match, nextLink, lastLink;
+    var links = [];
+
+    if (!meta) meta = {};
+
+    while (match = RE_EXTRACT_LINK.exec(linkHeader)) {
+      links.push({
+        rel: match[2],
+        href: match[1],
+        page: parseInt(/page=(\d+)/.exec(match[1])[1], 10)
+      });
+    }
+
+    nextLink = find(links, { rel: 'next' });
+    lastLink = find(links, { rel: 'last' });
+
+    meta.perPage = parseInt((RE_EXTRACT_PP.exec(linkHeader) || [])[1] || 0, 10);
+    meta.hasMore = !!nextLink;
+    meta.nextPage = meta.hasMore ? nextLink.page : undefined;
+
+    // Link header does not provide us with an accurate count of objects, so
+    // we'll estimate it if we know how many we get per page, and we know the
+    // index of the last page:
+    if (lastLink) {
+      meta.count = meta.perPage * lastLink.page;
+    }
+
+    return meta;
+  };
+
   /**
    * @class Events.Mixins.PaginatedCollection
    * @extends {Backbone.Collection}
@@ -67,15 +120,20 @@ define(function() {
 
       options.data.page = options.page || meta.nextPage;
 
-      return this.sync('read', this, options).then(function(payload) {
-        this.add(payload, { parse: true /* always parse */ });
+      options.success = function(payload, statusText, xhr) {
+        var header = xhr.getResponseHeader('Link');
 
         if (payload.meta && payload.meta.pagination) {
-          this._parsePaginationMeta(payload.meta.pagination);
+          parseJsonApiPagination(payload.meta.pagination, meta);
+        }
+        else if (header) {
+          parseLinkPagination(header, meta);
         }
 
-        return payload;
-      }.bind(this));
+        this.add(payload, { parse: true /* always parse */ });
+      }.bind(this);
+
+      return this.sync('read', this, options);
     },
 
     /**
@@ -112,6 +170,10 @@ define(function() {
         delete options.page;
       }
 
+      if (options.reset) {
+        this.reset(null, { silent: true });
+      }
+
       meta.nextPage = 1;
 
       return (function fetch(collection) {
@@ -130,24 +192,11 @@ define(function() {
       this._paginationMeta = {};
     },
 
-    /** @private */
-    _parsePaginationMeta: function(respMeta) {
-      var meta = this._paginationMeta;
-
-      meta.perPage = respMeta.per_page;
-      meta.count = respMeta.count;
-      meta.remainder = meta.count - this.models.length;
-      meta.hasMore = !!respMeta.next;
-      meta.nextPage = meta.hasMore ? respMeta.page + 1 : undefined;
-
-      return meta;
-    }
   };
 
   return function applyMixin(collection) {
     collection.fetchNext = Mixin.fetchNext;
     collection.fetchAll = Mixin.fetchAll;
-    collection._parsePaginationMeta = Mixin._parsePaginationMeta;
     collection._resetPaginationMeta = Mixin._resetPaginationMeta;
 
     collection.on('reset', collection._resetPaginationMeta, collection);

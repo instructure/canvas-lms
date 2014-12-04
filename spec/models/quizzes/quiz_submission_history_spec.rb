@@ -95,6 +95,26 @@ describe Quizzes::QuizSubmissionHistory do
         expect(attempts.kept).to eq models.first
       end
     end
+
+    describe "#model_for" do
+      it "should return model for the current attempt" do
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+        expect(attempts.length).to eq 2
+
+        qs = attempts.model_for(@submission.attempt)
+        expect(qs.attempt).to eq 2
+        expect(qs).to be_a(Quizzes::QuizSubmission)
+      end
+
+      it "should return model for previous attempts" do
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+        expect(attempts.length).to eq 2
+
+        qs = attempts.model_for(1)
+        expect(qs.attempt).to eq 1
+        expect(qs).to be_a(Quizzes::QuizSubmission)
+      end
+    end
   end
 
   it "should not lose string encodings" do

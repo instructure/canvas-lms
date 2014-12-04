@@ -56,7 +56,7 @@ define(function(require) {
      * Load initial application data; quiz statistics and reports.
      */
     load: function() {
-      EventStore.load();
+      EventStore.loadInitialData().then(EventStore.load.bind(EventStore));
     },
 
     /**

@@ -46,6 +46,12 @@ module Filters::QuizSubmissions
     @quiz_submission
   end
 
+  def retrieve_quiz_submission_attempt!(attempt)
+    unless @quiz_submission = @quiz_submission.model_for_attempt(attempt.to_i)
+      reject! "unable to find a submission with that attempt", 404
+    end
+  end
+
   def prepare_service
     participant = Quizzes::QuizParticipant.new(@current_user, temporary_user_code)
     participant.access_code = params[:access_code]

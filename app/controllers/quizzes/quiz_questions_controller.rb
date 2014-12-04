@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API QuizQuestions
+# @API Quiz Questions
 # @beta
 #
 # @model QuizQuestion
@@ -173,28 +173,35 @@
 class Quizzes::QuizQuestionsController < ApplicationController
   include Api::V1::QuizQuestion
   include Filters::Quizzes
+  include Filters::QuizSubmissions
 
   before_filter :require_context, :require_quiz
   before_filter :require_question, :only => [:show]
 
-  # @API List questions in a quiz
+  # @API List questions in a quiz or a submission
   # @beta
   #
   # Returns the list of QuizQuestions in this quiz.
   #
+  # @argument quiz_submission_id [Integer]
+  #  If specified, the endpoint will return the questions that were presented
+  #  for that submission. This is useful if the quiz has been modified after
+  #  the submission was created and the latest quiz version's set of questions
+  #  does not match the submission's.
+  #  NOTE: you must specify quiz_submission_attempt as well if you specify this
+  #  parameter.
+  #
+  # @argument quiz_submission_attempt [Integer]
+  #  The attempt of the submission you want the questions for.
+  #
   # @returns [QuizQuestion]
   def index
-    if authorized_action(@quiz, @current_user, :update)
-      scope = @quiz.active_quiz_questions
-      api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
-      @questions = Api.paginate(scope, self, api_route)
+    if params[:quiz_submission_id] && params[:quiz_submission_attempt]
+      return index_submission_questions
+    end
 
-      render :json => questions_json(@questions,
-        @current_user,
-        session,
-        @context,
-        parse_includes,
-        censored?)
+    if authorized_action(@quiz, @current_user, :update)
+      render_question_set(@quiz.active_quiz_questions)
     end
   end
 
@@ -399,5 +406,46 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   def censored?
     !@quiz.grants_right?(@current_user, session, :update)
+  end
+
+  # @private
+  #
+  # Basically, instead of rendering the quiz's active question set, this method
+  # would locate a submission model at a specific attempt and render the
+  # questions that were provided for that session instead.
+  #
+  # Requires :quiz_submission_id and :quiz_submission_attempt as parameters.
+  # These are currently documented in #index.
+  #
+  # @note
+  #  This is a good candidate to move out of this controller and into
+  #  QuizSubmissionQuestionsController. If you do, you can munge the rendered
+  #  question data along with the submission's question answer records provided
+  #  by that API. That way, API users won't have to pull each separately.
+  def index_submission_questions
+    require_quiz_submission
+
+    if authorized_action(@quiz_submission, @current_user, :read)
+      retrieve_quiz_submission_attempt!(params[:quiz_submission_attempt])
+
+      scope = Quizzes::QuizQuestion.where({
+        id: @quiz_submission.quiz_data.map { |question| question['id'] }
+      })
+
+      render_question_set(scope, @quiz_submission.quiz_data)
+    end
+  end
+
+  def render_question_set(scope, quiz_data=nil)
+    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
+    questions = Api.paginate(scope, self, api_route)
+
+    render :json => questions_json(questions,
+      @current_user,
+      session,
+      @context,
+      parse_includes,
+      censored?,
+      quiz_data)
   end
 end
