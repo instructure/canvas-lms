@@ -94,6 +94,7 @@ define [
           contextType: contextType
           contextId: contextId
           userCanManageFilesForContext: userCanManageFilesForContext
+          usageRightsRequiredForContext: usageRightsRequiredForContext
           getPreviewQuery: @getPreviewQuery
           getPreviewRoute: @getPreviewRoute
         })

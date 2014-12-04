@@ -160,7 +160,12 @@ define [
 
         div className: 'ef-links-col', role: 'gridcell',
           unless @props.model.isNew()
-            PublishCloud(model: @props.model, ref: 'publishButton', userCanManageFilesForContext: @props.userCanManageFilesForContext)
+            PublishCloud({
+              model: @props.model,
+              ref: 'publishButton',
+              userCanManageFilesForContext: @props.userCanManageFilesForContext,
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+            })
 
           unless @props.model.isNew() or @props.model.get('locked_for_user')
             ItemCog({

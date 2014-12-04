@@ -26,7 +26,6 @@ define [
 
     propTypes:
       closeDialog: React.PropTypes.func
-      setTitle: React.PropTypes.func
       itemsToManage: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
 
 

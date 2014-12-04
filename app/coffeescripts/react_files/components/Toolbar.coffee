@@ -64,13 +64,15 @@ define [
             itemName: @props.selectedItems[0].displayName()
           })
 
-        width: 400
+        width: 800
+        minHeight: 400
         close: ->
           React.unmountComponentAtNode this
           $(this).remove()
 
       React.renderComponent(RestrictedDialogForm({
         models: @props.selectedItems
+        usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         closeDialog: -> $dialog.dialog('close')
       }), $dialog[0])
 

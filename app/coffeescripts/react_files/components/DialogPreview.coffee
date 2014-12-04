@@ -11,9 +11,9 @@ define [
 
   {div, i} = React.DOM
 
-#####
-# This is used to show a preview inside of a modal dialog.
-#####
+  #####
+  # This is used to show a preview inside of a modal dialog.
+  #####
   DialogPreview = React.createClass
     displayName: 'DialogPreview'
 

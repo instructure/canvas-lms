@@ -64,12 +64,14 @@ define [
     openRestrictedDialog: ->
       $dialog = $('<div>').dialog
         title: I18n.t("title.permissions", "Editing permissions for: %{name}", {name: @props.model.displayName()})
-        width: 400
+        width: 800
+        minHeight: 300
         close: ->
           React.unmountComponentAtNode this
           $(this).remove()
 
       React.renderComponent(RestrictedDialogForm({
+        usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         models: [@props.model]
         closeDialog: -> $dialog.dialog('close')
       }), $dialog[0])
