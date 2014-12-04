@@ -3,13 +3,14 @@ class GradingPeriod < ActiveRecord::Base
   include Workflow
 
   belongs_to :grading_period_group, :inverse_of => :grading_periods
+  has_many :grading_period_grades
 
   validates_presence_of :weight, :start_date, :end_date
   validate :validate_dates
 
   set_policy do
     [:read, :update, :create, :delete].each do |permission|
-      given { |user, http_session| grading_period_group.grants_right?(user, http_session, permission) }
+      given { |user| grading_period_group.grants_right?(user, permission) }
       can permission
     end
   end
