@@ -62,7 +62,7 @@ define [
 
     handleChange: (event) ->
       @setState({
-        showTextBox: true
+        showTextBox: event.target.value != 'choose'
         showCreativeCommonsOptions: event.target.value == 'creative_commons'
       })
 
@@ -78,9 +78,6 @@ define [
       onlyCC.map (license) ->
         option {value: license.id},
           license.name
-
-
-
 
     render: ->
       div {className: 'UsageRightsSelectBox__container'},

@@ -11,7 +11,7 @@ define [
   openUsageRightsDialog = (itemsToManage, {contextType, contextId, returnFocusTo}) ->
     $dialog = $('<div>').dialog
       width: 800
-      height: 400
+      minHeight: 400
       title: I18n.t('Manage Usage Rights')
       close: ->
         React.unmountComponentAtNode this

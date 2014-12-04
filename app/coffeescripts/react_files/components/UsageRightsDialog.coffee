@@ -16,9 +16,10 @@ define [
   'jquery.instructure_forms'
 ], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBox, filesEnv, setUsageRights, updateModelsUsageRights, FilesystemObjectThumbnail, DialogPreview) ->
 
-  {div, form, button, span, ul, li, i} = React.DOM
+  {div, form, button, span, ul, li, i, a, hr} = React.DOM
 
   MAX_THUMBNAILS_TO_SHOW = 5
+  MAX_FOLDERS_TO_SHOW = 2
 
   ManageUsageRightsModal = React.createClass
     displayName: 'ManageUsageRightsModal'
@@ -91,39 +92,50 @@ define [
     renderFolderMessage: ->
       folders = @props.itemsToManage.filter (item) ->
         item instanceof Folder
-
-
-
+      foldersToShow = folders.slice(0, MAX_FOLDERS_TO_SHOW)
+      toolTipFolders = folders.slice(MAX_FOLDERS_TO_SHOW)
       div {},
-        if (folders.length > 0)
-          I18n.t({
-            one: "Usage rights will be set for all of the files contained in %{name}",
-            other: "Usage rights will be set for all of the files contained in:"
-          }, {
-            count: folders.length
-            name: folders[0]?.displayName()
-          })
-        if folders.length > 1
-          ul {},
-            folders.map (item) ->
-              li {},
-                item?.displayName()
+        if (folders.length)
+          div {},
+            span {},
+              I18n.t("Usage rights will be set for all of the files contained in:")
+            ul {className: 'UsageRightsDialog__folderBulletList'},
+              foldersToShow.map (item) ->
+                li {},
+                  item?.displayName()
+        if (toolTipFolders.length)
+          displayNames = toolTipFolders.map (item) -> item?.displayName()
+          # Doing it this way so commas, don't so up when rendering the list out in the tooltip.
+          renderedNames = displayNames.join('<br />')
+          span {
+            className: 'UsageRightsDialog__andMore'
+            tabIndex: '0'
+            title: renderedNames
+            'data-tooltip': 'right'
+          },
+            I18n.t("and %{count} more…", {count: toolTipFolders.length})
+            span {className: 'screenreader-only'},
+              ul {},
+                displayNames.map (item) ->
+                  li {},
+                    item
+        hr {}
 
     renderDifferentRightsMessage: ->
-      span {className: 'UsageRightsDialog__differentRightsMessage'},
+      span {className: 'UsageRightsDialog__differentRightsMessage alert'},
         i {className: 'icon-warning UsageRightsDialog__warning'}
-        I18n.t('You have selected multiple items with different licenses, however they will all be set to the one you select now.')
+        I18n.t('Items selected have different usage rights.')
 
     render: ->
-      form { ref: 'form', className: 'form-dialog form-horizontal', onSubmit: preventDefault(@submit)},
-        div {className: 'form-dialog-content'},
-          div {className: 'UsageRightsDialog__content grid-row'},
+      form { ref: 'form', className: 'form-dialog', onSubmit: preventDefault(@submit)},
+        div {},
+          div {className: 'UsageRightsDialog__paddingFix grid-row'},
             div {className: 'UsageRightsDialog__previewColumn col-xs-3'},
               DialogPreview(itemsToShow: @props.itemsToManage)
-            div {className: 'UsageRightsDialog__contentColumn col-xs-9'},
+            div {className: 'UsageRightsDialog__contentColumn off-xs-1 col-xs-8'},
+              @renderDifferentRightsMessage() if ((@copyright == '' || @usageRight == 'choose') && @props.itemsToManage.length > 1 && @copyright != "undefined")
               @renderFileName()
               @renderFolderMessage()
-              @renderDifferentRightsMessage() if ((@copyright == '' || @usageRight == 'choose') && @props.itemsToManage.length > 1 && @copyright != "undefined")
               UsageRightsSelectBox(ref: 'usageSelection', use_justification: @use_justification, copyright: @copyright)
 
         div {className: 'form-controls'},
