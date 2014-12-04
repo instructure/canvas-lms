@@ -17,3 +17,7 @@
     - nodejs-legacy
     - npm
     - git
+
+- name: Remove system ruby
+  sudo: yes
+  apt: pkg=ruby state=absent
