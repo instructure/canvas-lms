@@ -1,0 +1,47 @@
+---
+
+- name: Detect rvm binary
+  stat: path='{{ rvm1_rvm }}'
+  register: rvm_binary
+
+- name: Detect rvm installer
+  stat: path='{{ rvm1_temp_download_path }}/rvm-installer.sh'
+  register: rvm_installer
+
+- name: Detect current rvm version
+  command: '{{ rvm1_rvm}} version'
+  changed_when: False
+  register: rvm_current_version
+  when: rvm_binary.stat.exists
+
+- name: Install rvm installer
+  get_url:
+    url: '{{ rvm1_rvm_latest_installer }}'
+    dest: '{{ rvm1_temp_download_path }}/rvm-installer.sh'
+  when: not rvm_installer.stat.exists
+
+- name: Configure rvm installer
+  file:
+    path: '{{ rvm1_temp_download_path }}/rvm-installer.sh'
+    mode: 0755
+  when: not rvm_binary.stat.exists
+
+- name: Import GPG keys
+  command: 'gpg --keyserver {{ rvm1_gpg_key_server }} --recv-keys {{ rvm1_gpg_keys }}'
+  changed_when: False
+  when: rvm1_gpg_keys != ''
+
+- name: Install rvm
+  command: >
+    {{ rvm1_temp_download_path }}/rvm-installer.sh {{ rvm1_rvm_version }}
+    --path {{ rvm1_install_path }} {{ rvm1_install_flags }}
+  when: not rvm_binary.stat.exists
+
+- name: Update rvm
+  shell: '{{ rvm1_rvm }} get {{ rvm1_rvm_version }} && {{ rvm1_rvm }} reload'
+  changed_when: False
+  when: rvm_binary.stat.exists and rvm1_rvm_check_for_updates
+
+- name: Configure rvm
+  command: '{{ rvm1_rvm }} autolibs 3'
+  when: not rvm_binary.stat.exists

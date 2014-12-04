@@ -1,6 +1,7 @@
 - hosts: all
   roles:
     - dependencies
+    - rvm_io.rvm1-ruby
     - apache
     - postgres
     - deploy

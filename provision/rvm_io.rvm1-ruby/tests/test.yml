@@ -1,0 +1,15 @@
+---
+
+- hosts: localhost
+  remote_user: travis
+  sudo: true
+
+  vars:
+    rvm1_rubies:
+      - 'ruby-2.1.0'
+      - 'ruby-2.1.2'
+    rvm1_install_path: '/home/travis/.rvm'
+    rvm1_install_flags: '--auto-dotfiles --user-install'
+
+  roles:
+    - rvm1-ansible

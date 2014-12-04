@@ -1,0 +1,46 @@
+---
+
+- name: Detect if rubies are installed
+  command: '{{ rvm1_rvm }} {{ item }} do true'
+  changed_when: False
+  failed_when: False
+  register: detect_rubies
+  with_items: rvm1_rubies
+  when: rvm1_rubies
+
+- name: Install rubies
+  command: '{{ rvm1_rvm }} install {{ item.item }}'
+  when: rvm1_rubies and item.rc != 0
+  with_items: detect_rubies.results
+
+- name: Detect default ruby version
+  command: '{{ rvm1_rvm }} alias list default'
+  changed_when: False
+  register: detect_default_ruby_version
+
+- name: Select default ruby
+  command: '{{ rvm1_rvm }} alias create default {{ rvm1_default_ruby_version }}'
+  when: detect_default_ruby_version.stdout == '' or
+        rvm1_default_ruby_version not in detect_default_ruby_version.stdout
+
+- name: Symlink ruby related binaries on the system path
+  file:
+    state: 'link'
+    src: '{{ rvm1_install_path }}/wrappers/default/{{ item }}'
+    dest: '{{ rvm1_symlink_to }}/{{ item }}'
+    owner: 'root'
+    group: 'root'
+  when: not '--user-install' in rvm1_install_flags
+  with_items: rvm1_symlink_binaries
+
+- name: Detect if ruby version can be deleted
+  command: '{{ rvm1_rvm }} {{ rvm1_delete_ruby }} do true'
+  changed_when: False
+  failed_when: False
+  register: detect_delete_ruby
+  when: rvm1_delete_ruby
+
+- name: Delete ruby version
+  command: '{{ rvm1_rvm }} remove {{ rvm1_delete_ruby }}'
+  changed_when: False
+  when: rvm1_delete_ruby and detect_delete_ruby.rc == 0
