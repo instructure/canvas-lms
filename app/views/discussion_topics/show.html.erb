@@ -243,19 +243,19 @@
         <div class="headerBar" data-sticky>
           <div class="row-fluid form-inline" style="overflow: visible;">
             <div class="span9">
-              <label id="discussion-search-label" class="screenreader-only" for="discussion-search"><%= t("search_entries_placeholder", "Search entries or author") %></label>
               <input
                 id               = "discussion-search"
                 type             = "text"
-                aria-labelledby  = "discussion-search-label"
-                placeholder      = "<%= t("search_entries_placeholder", "Search entries or author") %>"
+                aria-label       = "<%= t("Search entries or author") %>"
+                placeholder      = "<%= t("Search entries or author") %>"
                 size             = 50
               >
 
               <input
                 type    = "checkbox"
                 id      = "onlyUnread"
-              ><label for="onlyUnread"><%= t('unread', 'Unread') %></label>
+                aria-label = "<%= t("filter replies by unread") %>"
+              ><label aria-hidden="true" for="onlyUnread"><%= t('unread', 'Unread') %></label>
 
               &nbsp; &nbsp;
               <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
