@@ -413,6 +413,12 @@ describe FilesController do
         get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
         expect(json_parse['attachment']['canvadoc_session_url']).to be_nil
       end
+
+      it "is included in newly uploaded files" do
+        user_session(@teacher)
+        post 'create', :format => 'json', :course_id => @course.id, :attachment => {:display_name => "bob", :uploaded_data => io}
+        expect(json_parse['attachment']['canvadoc_session_url']).to be_present
+      end
     end
   end
 

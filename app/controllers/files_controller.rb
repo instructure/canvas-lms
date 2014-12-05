@@ -1081,7 +1081,7 @@ class FilesController < ApplicationController
         methods: [:uuid,:readable_size,:mime_class,:currently_locked,:thumbnail_url],
         permissions: {user: @current_user, session: session},
         include_root: false
-      ),
+      ).merge(doc_preview_json(attachment, @current_user)),
       :deleted_attachment_ids => deleted_attachments.map(&:id)
     }
     if folder.name == 'profile pictures'
