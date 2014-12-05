@@ -579,12 +579,7 @@
       box-shadow: none;
     }
   }
-
-  &.disabled, &[disabled] {
-    cursor: not-allowed;
-    pointer-events: none;
-    opacity: 0.5;
-  }
+  
 }
 
 // Navbar vertical align
