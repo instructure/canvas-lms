@@ -43,11 +43,8 @@
 #header
   @if $is-k12 == false
     position: relative
-    z-index: 11 /* IE7 needs this so the menu-item-drops get stuck above #main */
-    @if $use_high_contrast
-      background-color: #333
-    @else    
-      background-color: #4b5662
+    z-index: 11 /* IE7 needs this so the menu-item-drops get stuck above #main */    
+    background-color: $ic-base-header-background
     &.no-user
       background-position: 0 -25px
       min-height: 45px

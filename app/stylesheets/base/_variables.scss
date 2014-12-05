@@ -96,7 +96,10 @@ $eportfolio-name--disabled: #777;
 $base-body-background-color: lighten($canvas-neutral, 4);
 $base-content-background-color: $canvas-light;
 $base-content-padding: 15px;
-
+$ic-base-header-background: $canvas-secondary;
+@if $use_high_contrast {$ic-base-header-background: #333;}
+      
+    
 
 $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
