@@ -1,5 +1,5 @@
-# - name: delete vendor/bundle
-#   file: path=/vagrant/vendor/bundle state=absent
+- name: delete vendor/bundle
+  file: path=/vagrant/vendor/bundle state=absent
 
 - name: bundle install
   shell: >
@@ -7,7 +7,6 @@
     bundle install --path=vendor/bundle --without=sqlite mysql
   args:
     chdir: /vagrant
-    creates: /vagrant/vendor/bundle
 
 - name: npm install
   shell: >
