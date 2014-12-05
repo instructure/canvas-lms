@@ -5,9 +5,10 @@ define [
   'react'
   '../modules/customPropTypes'
   '../modules/filesEnv'
-  ], ($, _, I18n, React, customPropTypes, filesEnv) ->
+  '../utils/omitEmptyValues'
+  ], ($, _, I18n, React, customPropTypes, filesEnv, omitEmptyValues) ->
 
-  {select, option, div, input, label} = React.DOM
+  {select, option, div, input, label, span, i} = React.DOM
 
   contentOptions = [{
       display:  I18n.t("Choose usage rights..."),
@@ -35,27 +36,34 @@ define [
     propTypes:
       use_justification: React.PropTypes.oneOf(_.pluck(contentOptions, 'value'))
       copyright: React.PropTypes.string
+      showMessage: React.PropTypes.bool
+      contextType: React.PropTypes.string
+      contextId: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
 
     getInitialState: ->
       showTextBox: @props.use_justification
       showCreativeCommonsOptions: @props.use_justification == 'creative_commons' && @props.copyright?
-      licenseOptions: false
+      licenseOptions: []
+      showMessage: @props.showMessage
 
     componentDidMount: ->
       @getUsageRightsOptions()
 
-    apiUrl: "/api/v1/#{filesEnv.contextType}/#{filesEnv.contextId}/content_licenses"
+    apiUrl: ->
+      "/api/v1/#{filesEnv.contextType || @props.contextType}/#{filesEnv.contextId || @props.contextId}/content_licenses"
 
 
     # Exposes the selected values to the outside world.
-    getValue: ->
-      use_justification: @refs.usageRightSelection.getDOMNode().value
-      copyright: @refs.copyright.getDOMNode().value if @state.showTextBox
-      cc_license: @refs.creativeCommons.getDOMNode().value if @state.showCreativeCommonsOptions
+    getValues: ->
+      obj =
+        use_justification: @refs.usageRightSelection.getDOMNode().value
+        copyright: @refs.copyright?.getDOMNode()?.value if @state.showTextBox
+        cc_license: @refs.creativeCommons?.getDOMNode()?.value if @state.showCreativeCommonsOptions
 
+      omitEmptyValues obj
 
     getUsageRightsOptions: ->
-      $.get @apiUrl, (data) =>
+      $.get @apiUrl(), (data) =>
         @setState({
           licenseOptions: data
         })
@@ -64,6 +72,7 @@ define [
       @setState({
         showTextBox: event.target.value != 'choose'
         showCreativeCommonsOptions: event.target.value == 'creative_commons'
+        showMessage: (@props.showMessage && event.target.value == 'choose')
       })
 
     renderContentOptions: ->
@@ -111,7 +120,12 @@ define [
                 defaultValue: @props.copyright
               },
                 @renderCreativeCommonsOptions()
-        if @state.showTextBox
+        if @state.showMessage
+          div {className: 'alert'},
+            span {},
+              i {className: 'icon-warning'}, null
+              span {style: {paddingLeft: "10px"}}, I18n.t("If you do not select usage rights now, this file will be unpublished after it's uploaded.")
+        if @state.showTextBox and not @state.showMessage
           div {className: 'control-group'},
             label {
               className: 'control-label',

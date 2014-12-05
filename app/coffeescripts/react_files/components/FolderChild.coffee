@@ -155,12 +155,13 @@ define [
         div className:'ef-size-col', role: 'gridcell',
           friendlyBytes(@props.model.get('size'))
 
-        div className: 'ef-usage-rights-col', role: 'gridcell',
-          UsageRightsIndicator({
-            model: @props.model
-            userCanManageFilesForContext: @props.userCanManageFilesForContext
-            usageRightsRequiredForContext: @props.usageRightsRequiredForContext
-          })
+        if @props.usageRightsRequiredForContext
+          div className: 'ef-usage-rights-col', role: 'gridcell',
+            UsageRightsIndicator({
+              model: @props.model
+              userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+            })
 
         div className: 'ef-links-col', role: 'gridcell',
           unless @props.model.isNew()

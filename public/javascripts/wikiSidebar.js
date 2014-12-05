@@ -20,6 +20,7 @@ define([
   'i18n!wiki.sidebar',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'compiled/util/UsageRights' /* Usage Rights for File Uploading */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData */,
@@ -32,7 +33,7 @@ define([
   'vendor/jquery.pageless' /* pageless */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, UsageRights) {
 
   var $editor_tabs,
       $tree1,
@@ -252,6 +253,8 @@ define([
     },
     init: function() {
       wikiSidebar.inited = true;
+
+      UsageRights.render('#usage-rights');
 
       $editor_tabs.find("#pages_accordion a.add").click(function(event){
         event.preventDefault();
@@ -625,6 +628,7 @@ define([
           $sidebar_upload_file_form.slideUp(function() {
             $sidebar_upload_file_form.find(".uploading").hide();
           });
+          UsageRights.setFileUsageRights(data.attachment);
           wikiSidebar.fileAdded(data.attachment, true, function(node) {
             wikiSidebar.fileSelected(node);
           });
