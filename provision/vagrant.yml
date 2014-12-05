@@ -4,6 +4,7 @@
     - name: update apt cache
       apt: update_cache=yes
   vars:
+    rvm1_install_flags: '--auto-dotfiles --user-install'
     rvm1_rvm_check_for_updates: False
     rvm1_symlink_binaries:
       - 'erb'
