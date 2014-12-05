@@ -124,5 +124,5 @@ define [
                 type: 'text',
                 ref: 'copyright',
                 defaultValue: @props.copyright if @props.copyright?
-                placeholder: I18n.t('(c) 2014 Instructure')
+                placeholder: I18n.t('(c) 2001 Acme Inc.')
               }

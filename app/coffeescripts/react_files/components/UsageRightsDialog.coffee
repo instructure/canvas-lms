@@ -104,7 +104,7 @@ define [
                   item?.displayName()
         if (toolTipFolders.length)
           displayNames = toolTipFolders.map (item) -> item?.displayName()
-          # Doing it this way so commas, don't so up when rendering the list out in the tooltip.
+          # Doing it this way so commas, don't show up when rendering the list out in the tooltip.
           renderedNames = displayNames.join('<br />')
           span {
             className: 'UsageRightsDialog__andMore'
