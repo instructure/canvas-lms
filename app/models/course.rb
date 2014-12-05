@@ -1466,7 +1466,9 @@ class Course < ActiveRecord::Base
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = calc.assignments
+    assignments = calc.assignments.sort_by { |a|
+      [a.assignment_group_id, a.position, a.due_at, a.title]
+    }
     groups = calc.groups
 
     read_only = t('csv.read_only_field', '(read only)')
