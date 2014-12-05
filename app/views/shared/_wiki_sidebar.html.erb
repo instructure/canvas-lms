@@ -1,5 +1,5 @@
 <% @context ||= @current_user %>
-<% cache(['wiki_sidebar_render_3', @context.cache_key, @current_user].cache_key.to_s) do %>
+<% cache(['wiki_sidebar_render_3', @context.cache_key, @current_user, @context.feature_enabled?(:usage_rights_required)].cache_key.to_s) do %>
 <% load_wiki_sidebar %>
 <div id="editor_tabs" class="ui-tabs--mini" style="display: none;">
 
@@ -110,7 +110,7 @@
           </div>
       </div>
       <% end %>
-      
+
       <div>
         <div class="header" role="tab" aria-controls="groups_panel"><a href="#"><%= @context.is_a?(Group) ? t('links_to.nav.group', 'Group Navigation') : t('links_to.nav.course', 'Course Navigation') %></a></div>
          <div role="tabpanel" id="groups_panel">
@@ -192,18 +192,19 @@
     </div>
     <% if can_do(@context, @current_user, :manage_files) %>
       <div><a href="#" class="upload_new_file_link add" style="padding-top:2px;"><%= t('links.upload_file', %{Upload a new file}) %></a></div>
-      <%= form_for :attachment, :url => context_url(@context, :context_files_url), :html => {:id => "sidebar_upload_file_form", :style => "display: none;", :multipart => true} do |f| %>
+      <%= form_for :attachment, :url => context_url(@context, :context_files_url), :html => {:id => "sidebar_upload_file_form", :style => "display: none;", :multipart => true, :class => "sidebar_upload_file_form"} do |f| %>
         <input type="hidden" name="return_to" value="<%= request.url %>"/>
         <%= f.file_field :uploaded_data, :class => "file_name", :size => 20 %>
         <% if !@wiki_sidebar_data[:root_folders].empty? %>
-        <div style="margin-left: 10px;">
+        <div>
           <div><%= t('file_size_limit', %{limit %{size} per file}, :size => '50MB') %></div>
-          <label for="attachment_folder_id"><%= t('labels.folder', %{Folder}) %></label> 
+          <label for="attachment_folder_id"><%= t('labels.folder', %{Folder}) %></label>
           <select name="attachment[folder_id]" id="attachment_folder_id" class="attachment_folder_id">
             <% @wiki_sidebar_data[:root_folders].each do |folder| %>
               <option value="<%= folder.id %>"><%= folder.name %></option>
             <% end %>
           </select>
+          <div id="usage-rights" data-usage-rights-required="<%= @context.feature_enabled?(:usage_rights_required) %>"></div>
         </div>
         <% end %>
         <div class="uploading" style="display: none; text-align: center;">
@@ -226,7 +227,7 @@
       <%= form_for :attachment, :url => context_url(@context, :context_files_url), :html => {:id => "sidebar_upload_image_form", :style => "display: none;", :multipart => true} do |f| %>
         <input type="hidden" name="return_to" value="<%= request.url %>"/>
         <div style="margin-left: 10px;">
-          <label for="image_folder_id"><%= t('labels.folder', %{Folder}) %></label> 
+          <label for="image_folder_id"><%= t('labels.folder', %{Folder}) %></label>
           <select name="attachment[folder_id]" id="image_folder_id" aria-label="<%= t('aria_label.folder_select_label', 'Select a folder to upload your image into') %>">
             <% @wiki_sidebar_data[:root_folders].each do |folder| %>
               <option value="<%= folder.id %>"><%= folder.name %></option>

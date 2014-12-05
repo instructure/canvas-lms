@@ -39,7 +39,7 @@ define [
     use_justification: null
 
     submit: ->
-      values = @refs.usageSelection.getValue()
+      values = @refs.usageSelection.getValues()
 
       # No copyright specified
       if (!values.copyright)
