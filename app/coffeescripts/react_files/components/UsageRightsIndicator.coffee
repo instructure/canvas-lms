@@ -7,7 +7,7 @@ define [
   '../utils/openUsageRightsDialog'
 ], (I18n, React, customPropTypes, Folder, filesEnv, openUsageRightsDialog) ->
 
-  {button, i} = React.DOM
+  {button, span, i} = React.DOM
 
   UsageRightsIndicator = React.createClass
     displayName: 'UsageRightsIndicator'
@@ -48,4 +48,13 @@ define [
           title: @props.model.get('usage_rights').license_name
           'data-tooltip': 'top'
           },
+            span {className: 'screenreader-only'},
+              switch useJustification
+                when 'own_copyright' then I18n.t('Own Copyright')
+                when 'public_domain' then I18n.t('Public Domain')
+                when 'used_by_permission' then I18n.t('Used by Permission')
+                when 'fair_use' then I18n.t('Fair Use')
+                when 'creative_commons' then I18n.t('Creative Commons')
+            span {className: 'screenreader-only'},
+              @props.model.get('usage_rights').license_name
             i {className: iconClass}
