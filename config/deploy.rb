@@ -56,6 +56,11 @@ set :linked_dirs, %w{bin log tmp/pids public/system}
 # Canvas uses it's own precompile assets defined below.
 Rake::Task["deploy:compile_assets"].clear_actions
 
+# Since we disable the default "deploy:compile_assets" and overide with the custom 
+# "canvas:compile_assets", we also disable the rollback which attempts to put the
+# manifest* that rails generates during a normal "deploy:compile_assets" back into place.
+Rake::Task["deploy:rollback_assets"].clear_actions
+
 # Disable for now until we get the basic Cap deploy and rollback going for code and can really test this.
 Rake::Task["deploy:migrate"].clear_actions
 
@@ -109,6 +114,7 @@ namespace :deploy do
 
   # TODO: This takes forever, see if we can copy the assets from the last deploy if nothing has changed.
   # Try this: https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
+  # Another way to try this: http://www.snip2code.com/Snippet/119715/Skip-asset-compilation-in-Capistrano-3-i
   desc "Compile static assets"
   task :compile_assets => :npm_install do
    on roles(:app) do
@@ -172,5 +178,17 @@ namespace :deploy do
   end
 
   after :published, 'deploy:delayed_jobs:restart'
+
+  # Many files have only rw permissions for the canvasadmin user (not the group) and
+  # since the Capistrano deploy user is part of the canvasadmin group,
+  # the rollback_cleanup fails when it tries to create a tar archive and then remove the files.  
+  # We're adding canvasadmin group permissions to make it work (before the revert b/c otherwise 
+  # the release_path would be the release we rolled back to instead of the one we're cleaning up).
+  # Note: I also tried running the cleanup_rollback task as sudo, but couldn't figure out how.
+  before :reverting, :fix_rollback_permissions do
+    on roles(:app) do
+      execute :sudo, 'chmod -R g+rw', "#{release_path}"
+    end
+  end
 
 end
