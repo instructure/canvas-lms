@@ -317,7 +317,7 @@ class AssignmentsController < ApplicationController
         # the requesting user may not have :read if the course syllabus is public, in which
         # case, we pass nil as the user so verifiers are added to links in the syllabus body
         # (ability for the user to read the syllabus was checked above as :read_syllabus)
-        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil, {}, true)
       end
 
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }

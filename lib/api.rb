@@ -388,7 +388,7 @@ module Api
     end
   end
 
-  def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {})
+  def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
     return html if html.blank?
 
     # if we're a controller, use the host of the request, otherwise let HostUrl
@@ -412,7 +412,7 @@ module Api
                 end
       end
 
-      next unless obj && obj.grants_right?(user, nil, :download)
+      next unless obj && (is_public || obj.grants_right?(user, nil, :download))
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         opts = {:verifier => obj.uuid, :only_path => true}
