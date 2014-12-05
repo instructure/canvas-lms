@@ -1,3 +1,8 @@
-.UsageRightsIndicator_warning {
+.UsageRightsIndicator__warning {
   color: $canvas-alert;
+}
+
+.UsageRightsIndicator__openModal {
+  cursor: pointer;
+  color: $canvas-dark;
 }

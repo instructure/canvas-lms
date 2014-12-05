@@ -166,6 +166,15 @@ $ef-thumbnail-size: 36px;
   @include hideForPhone;
 }
 
+.ef-usage-rights-col {
+  flex: 1
+}
+
+/* used to make sure the icons align nicely */
+.ef-usage-rights-col-offset {
+  margin-left: 5px;
+}
+
 .ef-links-col{
   display: flex;
   flex: 0 0 63px;

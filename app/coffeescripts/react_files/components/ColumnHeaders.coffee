@@ -85,7 +85,7 @@ define [
               className: 'ef-plain-link'
             }, @props),
 
-              span className: ('visible-desktop' if column.displayNameShort),
+              span className: ("#{'visible-desktop' if column.displayNameShort} #{'ef-usage-rights-col-offset' if column.property == 'usage_rights'}"),
                 if (column.property == 'usage_rights')
                   i {className: 'icon-files-copyright'},
                     span {className: 'screenreader-only'},

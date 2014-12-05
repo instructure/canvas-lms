@@ -4,9 +4,10 @@ define [
   '../modules/customPropTypes'
   'compiled/models/Folder'
   '../modules/filesEnv'
-], (I18n, React, customPropTypes, Folder, filesEnv) ->
+  '../utils/openUsageRightsDialog'
+], (I18n, React, customPropTypes, Folder, filesEnv, openUsageRightsDialog) ->
 
-  {span, i} = React.DOM
+  {button, i} = React.DOM
 
   UsageRightsIndicator = React.createClass
     displayName: 'UsageRightsIndicator'
@@ -16,16 +17,23 @@ define [
       userCanManageFilesForContext: React.PropTypes.bool
       usageRightsRequiredForContext: React.PropTypes.bool
 
+    handleClick: (event) ->
+      event.preventDefault()
+
+      openUsageRightsDialog([@props.model], {returnFocusTo: @getDOMNode()})
+
 
     render: ->
       if (@props.model instanceof Folder) || (!@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))
         null
       else if (@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))
-        span {
+        button {
+            className: 'UsageRightsIndicator__openModal btn-link'
+            onClick: @handleClick
             title: I18n.t('Before publishing this file, you must specify usage rights.')
             'data-tooltip': 'top'
           },
-                i {className: 'UsageRightsIndicator_warning icon-warning'}
+                i {className: 'UsageRightsIndicator__warning icon-warning'}
       else
         useJustification = @props.model.get('usage_rights').use_justification
         iconClass = switch useJustification
@@ -34,7 +42,9 @@ define [
           when 'used_by_permission' then 'icon-files-obtained-permission'
           when 'fair_use' then 'icon-files-fair-use'
           when 'creative_commons' then 'icon-files-creative-commons'
-        span {
+        button {
+          className: 'UsageRightsIndicator__openModal btn-link'
+          onClick: @handleClick
           title: @props.model.get('usage_rights').license_name
           'data-tooltip': 'top'
           },
