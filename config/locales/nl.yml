@@ -1301,7 +1301,7 @@ nl:
   allow_lor_tools: "Gebruikers toelaten om externe tools, die voor LOR geconfigureerd zijn, te bekijken en te gebruiken."
   allow_opt_out_of_inbox: "Gebruikers toelaten om Gesprekken Inbox af te wijzen. Hierdoor zullen alle gespreksberichten en meldingen als zo snel mogelijke meldingen naar de primaire email van de gebruiker gestuurd worden, zal de ongelezen berichtenbadge uit de gesprekken inbox verborgen worden en zullen de meldingsvoorkeuren van de Gesprekken verborgen worden."
   always_3a59e701: Altijd
-  an_unknown_server_error_occurred_please_try_again_f517eaf3: " (Er is) Een onbekende server fout opgetreden. Probeer nogmaals. "
+  an_unknown_server_error_occurred_please_try_again_f517eaf3: " Er is een onbekende server fout opgetreden. Probeer nogmaals. "
   analytics: 
     course: 
       analytics: Analytics
@@ -1367,7 +1367,7 @@ nl:
     podcast_feed_description_course: "Mediabestanden die gekoppeld zijn vanuit of ingesloten zijn in aankondigingen in de cursus \"%{course}\" zullen in deze feed verschijnen."
     podcast_feed_description_group: "Mediabestanden die doorgelinkt zijn vanuit of ingebed zijn in aankondigingen in de groep \"%{group}\" zullen in deze feed verschijnen."
     podcast_feed_name: "Postcast-feed voor aankondigingen van %{course}"
-  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "(De) antwoorden zullen na jouw laatste poging aangegeven worden."
+  answers_will_be_shown_after_your_last_attempt_d9db6b1d: "De antwoorden zullen na jouw laatste poging aangegeven worden."
   application: 
     errors: 
       feed_not_found: "Kan feed niet vinden."
@@ -1802,7 +1802,7 @@ nl:
     grading_type_selector: 
       display_grade_as: "Geef cijfer aan als"
       gpa_scale_explainer: "Het gemiddelde eindcijfer is ontworpen voor instellingen die voor alle opdrachten een schaal van 4.0 (of 5.0/6.0) gebruiken. Dit beoordelingsschema is vergelijkbaar met op de display van het lettercijfer maar verschilt op enkele belangrijke punten:"
-      gpa_scale_input_explainer: "Cijfers worden op de schaal van 4.0 ingevoerd. Bijvoorbeeld, als een opdracht 100 punten bedraagt/oplevert, dan wordt 100% als 4.0 ingevoerd, 87% als 3.0, enz./etc. "
+      gpa_scale_input_explainer: "Cijfers worden op de schaal van 4.0 ingevoerd. Bijvoorbeeld, als een opdracht 100 punten oplevert, dan wordt 100% als 4.0 ingevoerd, 87% als 3.0, etc. "
       gpa_scale_letters_explainer: "Letter cijfers kunnen naast getal eindcijfer worden gebruiken. "
       gpa_scale_percentage_explainer: "Je kunt geen punten direct invoeren, maar je kunt wel percentages invoeren. Als je bijvoorbeeld een opdracht hebt die 50 punten waard is, zal \"40\" invoeren niet lukken but \"80%\" zal wel lukken."
       gpa_scale_recommendation: "Tenzij jouw instelling een schaal van 4.0 of (5.0/6.0) gebruikt, raadt Canvas aan om eindcijfers als lettercijfer aan te geven."
@@ -2475,6 +2475,7 @@ nl:
       scheduler_explanation_teacher_paragraph_1: "Dit is de planner/de planningstool. Je kunt deze gebruiken om afspraakgroepen aan te maken zodat jouw cursisten zich hiervoor kunnen inschrijven."
       scheduler_explanation_teacher_paragraph_2: "Stel,  dat je een schriftelijk midterm opdracht  met alle cursisten uit de cursus wilt bespreken. Je kunt dan een nieuwe afspraakgroep aanmaken, je kunt opgeven op welke dagen en tijdstippen je beschikbaar bent, je kunt de tijdstippen opsplitsen in blokken van 15 minuten en maximaal een cursist per tijdblok toelaten."
       scheduler_explanation_teacher_paragraph_3: "De cursisten ontvangen dan een bericht dat ze zich moeten inschrijven voor een van de opgegeven tijdblokken. De cursisten krijgen een combinatie van een kalender met de beschikbare tijdblokken te zien, zodat ze een voor hen geschikte tijd kunnen kiezen."
+      scheduler_explanation_teacher_paragraph_4: "* Nu beginnen door aan rechts op de toets \"Een afspraakgroep te creëren\" te klikken. *"
       signed_up_for: "Je bent aangemeld voor"
       x_groups_have_signed_up: "%{participant_count} groepen hebben zich aangemeld"
       x_people_have_signed_up: "%{participant_count} personen hebben zich aangemeld"
@@ -4577,7 +4578,7 @@ nl:
         status_link: "Status importeren"
         text: "Een of meerdere items worden momenteel geïmporteerd. Eens ze beschikbaar zijn zullen ze in de cursus hieronder worden weergegeven. "
     index: 
-      browse_more_courses: "Meer cursussen browsen/Door meer cursussen bladeren "
+      browse_more_courses: "Door meer cursussen bladeren "
       headings: 
         future_enrollments: "Toekomstige inschrijvingen"
         my_courses: "Mijn cursussen"
@@ -5637,8 +5638,7 @@ nl:
     unsubscribe: "Aanmelding voor dit onderwerp opheffen"
     unsubscribed: "Aanmelding opgeheven"
     unsubscribed_hint: "Je bent niet aangemeld voor dit onderwerp. Klikken om je aan te melden."
-  display_course_catalog: "Een doorzoekbare lijst met cursussen in dit hoofdaccount aangeven met de markering \"Deze cursus in de openbare cursus index\" inschakelen./\n\
-      Een lijst met cursussen, die je kunt doorlopen in dit hoofdaccount aangeven met de markering \"Deze cursus opnemen in de openbare cursus index\". "
+  display_course_catalog: "Een lijst met cursussen, die je kunt doorlopen in dit hoofdaccount aangeven met de markering \"Deze cursus opnemen in de openbare cursus index\". "
   draft_state_description: |-
       Deze beta functie ontwerpt veel onderdelen van Canvas opnieuw en laat de inhoud bestaan in 
       een nieuwe niet gepubliceerde status die voor cursisten onzichtbaar is en waarin berekeningen van cijfers niet zijn 
@@ -7335,6 +7335,7 @@ nl:
         group_set_name: "Naam van groepsreeks"
         group_structure: Groepsstructuur
         leave_group_limit_blank: "Leeglaten voor geen limiet"
+        limit_group_size: "Groepen tot %{group_limit} beperken"
         require_same_section: "Vereisen dat groepsleden in dezelfde sectie moeten zitten"
         save: Opslaan
         saving: "Bezig met opslaan..."
@@ -10080,7 +10081,7 @@ nl:
     sure_you_want_to_mute: "Weet je zeker dat je deze opdracht wilt verbergen? Terwijl deze opdracht verborgen wordt, zullen cursisten geen nieuwe meldingen ontvangen. Ze kunnen ze ook niet zien:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "Er is een nieuw bericht van Canvas"
-  new_quiz_statistics_desc: "De nieuwe statistieken pagina/de nieuwe pagina met statistieken van de toets voor een cursus inschakelen"
+  new_quiz_statistics_desc: "De nieuwe pagina met statistieken van de toets voor een cursus inschakelen."
   new_styles_description: "We zijn bezig met de Canvas gebruikersinterface een facelift te geven. Dit inschakelen om de bijgewerkte, simpeler vormgeving en stijl van de Canvas gebruikersinterface te kunnen zien. Dit is een \"Work in Progress\" functie en moet nog niet ingeschakeld worden voor huidige gebruikers. "
   no_e16d9132: Nee
   no_migration_file: "Bestand nodig om inhoud te migreren."
@@ -10818,11 +10819,11 @@ nl:
     notices: 
       settings_updated: "Instellingen van plug-in zijn succesvol bijgewerkt."
     panda_pub_settings: 
-      description: "PandaPub is een pub/sub service die, wanneer deze geconfigureerd is, sommige onderdelen van Canvas toelaat om notificaties van gebeurtenissen te ontvangen binnen(in) de browser, in plaats van polling voor wijzigingen.  "
+      description: "PandaPub is een pub/sub service die, wanneer deze geconfigureerd is, sommige onderdelen van Canvas toelaat om notificaties van gebeurtenissen te ontvangen binnen de browser, in plaats van polling voor wijzigingen.  "
       labels: 
-        application_id: "Id van de toepassing/Id voor toepassing"
+        application_id: "Id voor toepassing"
         base_url: Basis-URL
-        key_id: "ID van de sleutel/Id voor sleutel"
+        key_id: "ID voor sleutel"
         key_secret: "Geheim van de sleutel"
     pandapub: 
       description: "Pub/Sub service"
@@ -11125,7 +11126,7 @@ nl:
           U kunt ook Canvas-notificaties naar uw Twitter-account laten sturen. Deze worden getoond als DM's van uzelf naar uzelf en ze verschijnen niet in uw openbare stream.
       unknown_service: Onbekend"
       web_services: "Canvas kan jouw leven een stuk gemakkelijker maken door veel te integreren met webhulpmiddelen die je al gebruikt. Op welke dienst dan ook in \"Andere services\" klikken om te zien wat we daarmee bedoelen."
-      yo_description: "Yo is een geen tik karakter communicatie tool/Yo is een communicatietool zonder tik karakter.\n\
+      yo_description: "Yo is een communicatietool zonder tik karakter.\n\
           Als je een Yo account hebt, dan kun je deze hier registreren. Als je dan\n\
           medecursisten/groepsleden toelaat om de registreerde services te zien, kunnen ze\n\
           makkelijk met jouw Yo account verbinding maken.\n\n\
@@ -11514,11 +11515,11 @@ nl:
       some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*scores van sommige cursisten kunnen verlaagd worden*)"
       update_question_without_regrading: "Vraag bijwerken zonder opnieuw te beoordelen"
   quiz_reports: 
-    download_item_analysis: "Onderdeel van analyse rapport downloaden/Onderdeel van rapport met analyses downloaden. "
-    download_student_analysis: "Cursist analyse rapport downloaden/Rapport met analyses van cursist downloaden."
+    download_item_analysis: "Onderdeel van rapport met analyses downloaden. "
+    download_student_analysis: "Rapport met analyses van cursist downloaden."
     generatable: "Rapport was nooit gegenereerd."
-    generate_item_analysis_report: "Onderdeel van analyse rapport genereren/Onderdeel van rapport met analyses genereren."
-    generate_student_analysis_report: "Cursisten analyse rapport genereren/Rapport met analyses van cursist genereren."
+    generate_item_analysis_report: "Onderdeel van rapport met analyses genereren."
+    generate_student_analysis_report: "Rapport met analyses van cursist genereren."
     generated_at: "Gegenereerd: %{date}"
     generating: "Bezig met genereren van rapport..."
     generation_almost_done: "Bijna klaar."
@@ -11549,23 +11550,23 @@ nl:
         other: "%{count} cursisten"
         zero: Niemand
     answer_details: 
-      hide: "Details van (de) antwoorden verbergen/Details van antwoord verbergen."
-      hide_all: "Details van (de) antwoorden voor alle vragen verbergen"
-      show: "Details van (de) antwoorden aangeven/Details van antwoord aangeven. "
-      show_all: "Details van (de) antwoorden voor alle vragen aangeven"
+      hide: "Details van de antwoorden verbergen."
+      hide_all: "Details van de antwoorden voor alle vragen verbergen"
+      show: "Details van antwoord aangeven"
+      show_all: "Details van de antwoorden voor alle vragen aangeven"
     attempts: "Pogingen: %{count} uit %{total}"
     correct_answer: "Correct/juist antwoord"
     correct_essay_student_ratio: "%{ratio}% van jouw cusisten hebben het volledig aantal punten voor deze vraag gekregen."
     correct_multiple_response_ratio: "%{ratio}% hebben juist beantwoord."
     correct_response_ratio: "%{ratio}% van jouw cursisten hebben deze vraag juist beantwoord."
     discrimination_index: 
-      audible_bottom_bracket: "Onderste haak/bracket:"
+      audible_bottom_bracket: "Onderste bracket:"
       audible_bracket_aced: "Alle cursisten in deze bracket hebben correct/juist geantwoord."
-      audible_bracket_failed: "Geen enkele cursist in deze bracket heeft correct/juist geantwoord."
+      audible_bracket_failed: "Geen enkele cursist in deze bracket heeft juist geantwoord."
       audible_chart_description: "Deze tabel laat zien hoe in iedere bracket de cursisten in de cursus op deze vraag hebben geantwoord. De brackets worden door de cijfers van de cursisten bepaald. De hoogste 27% vormt de top bracket terwijl de middelste 46% de middelste bracket vormt, en de laagste 27% de onderste bracket. "
       audible_discrimination_index: "Discrimiatie index: %{number}."
       audible_middle_bracket: "Middelste bracket:"
-      audible_response_ratio_distribution: "%{correct_ratio}%  van cursisten in deze bracket hebben correct/juist geantwoord. "
+      audible_response_ratio_distribution: "%{correct_ratio}%  van cursisten in deze bracket hebben juist geantwoord. "
       audible_top_bracket: "Top bracket:"
       discrimination_index: "Discriminatie index"
       discrimination_index_dialog_title: "De disciminatie indexgrafiek"
@@ -11582,13 +11583,11 @@ nl:
     duration_in_seconds: 
       one: "1 seconde"
       other: "%{count} seconden"
-    empty_question_breakdown: "Er zijn geen statistieken voor de vragen beschikbaar./Er zijn geen statistieken over de vraag beschikbaar."
+    empty_question_breakdown: "Er zijn geen statistieken over de vraag beschikbaar."
     essay_score: "Score: %{score}"
-    loading_questions: |-
-        Statistieken voor de vragen worden geladen./ Statistieken over de vraag worden geladen.
-        Even wachten.
+    loading_questions: "Statistieken over de vraag worden geladen. Even wachten."
     no_answer: "Geen antwoord"
-    question_breakdown: "Breakdown van de vragen/Uitsplitsing van de vraag"
+    question_breakdown: "Uitsplitsing van de vraag"
     question_header: "Vraag %{position}"
     response_student_count: 
       one: "1 cursist"
@@ -11598,13 +11597,13 @@ nl:
     summary: 
       audible_chart_description: "%{above_average} cursisten behaalden een gemiddeld cijfer of een cijfer boven het gemiddelde, en %{below_average} behaalden een cijfer onder het gemiddelde."
       avg_time: "Gemiddelde tijd"
-      chart_brushing_tip: "Tip: je kunt op een specifiek segment van de grafiek instellen door een keuze met je cursor te maken./Tip: je kunt focussen op een specifiek segment van de grafiek door een keuze met je cursor te maken."
+      chart_brushing_tip: "Tip: je kunt focussen op een specifiek segment van de grafiek door een keuze met je cursor te maken."
       chart_title: "Grafiek met cijferpercentage"
       high_score: "Hoogste score"
       low_score: "Laagste score"
       mean: "Gemiddelde score"
       not_available_abbrev: "Niet van toepassing"
-      quiz_summary: "Samenvatting van (de) toets"
+      quiz_summary: "Samenvatting van de toets"
       stdev: Standaard-deviatie
       students_who_got_a_certain_score: 
         one: "Een cursist heeft een score van %{score}% behaalt."
@@ -11612,9 +11611,9 @@ nl:
         zero: "Geen enkele cursist heeft een score van {score}% behaalt."
       students_who_scored_in_a_range: 
         one: "Een cursist heeft een score tussen %{start}  en %{end}%."
-        other: "%{count} cursisten hebben een score tussen {start} en %{end}%."
+        other: "%{count} cursisten hebben een score tussen %{start} en %{end}%."
         zero: "Geen enkele cursist heeft een score tussen {start} en %{end}%."
-      table_description: "Samenvattingsstatistieken voor alles dat ingeleverd is/Samenvattingsstatistieken over alles wat is ingeleverd"
+      table_description: "Samenvattingsstatistieken over alles wat is ingeleverd"
     title: Toetsstatistieken
     unknown_answer: "Iets anders"
   quizzes: 
@@ -12704,7 +12703,7 @@ nl:
     progress_error: "Er is een fout opgetreden bij het voorbereiden van de download, probeer nogmaals."
     progress_message: "Download aan het voorbereiden: %{percent}% voltooien"
     restrict_access: "Toegang beperken"
-    results_count: "Bezig met aangeven van %{num_results} zoekresultaten/.%{num_results} zoekresultaten aangeven\n\
+    results_count: "%{num_results} zoekresultaten aangeven\n\
         \x20"
     retry: "Opnieuw proberen"
     search_for_files: "Naar bestanden zoeken"
@@ -13037,7 +13036,7 @@ nl:
       hide_student_names_label: "Namen van cursisten verbergen"
       result: Resultaat
       result_for: "Resultaten voor:"
-      results_loading: "Nog bezig met laden van (de) resultaten voor deze cursist..."
+      results_loading: "Nog bezig met laden van de resultaten voor deze cursist..."
       select_a_section: "Een gedeelte selecteren"
       select_student: "Een cursist selecteren"
       student_info: "Informatie over de cursist"
@@ -13059,8 +13058,8 @@ nl:
         include_ungraded_assignments: "Opdrachten die niet beoordeeld zijn behandelen als een 0"
         set_group_weights: "Groepswegingen instellen"
         show_concluded_enrollments_label: "Voltooide inschrijvingen tonen"
-        show_notes: "Opmerkingen in cursist info/info voor cursist weergeven"
-        show_total_as_points: "Totalen als punten weergeven op de eindcijfer pagina/pagina met eindcijfer van de cursist"
+        show_notes: "Info voor cursist weergeven"
+        show_total_as_points: "Totalen als punten weergeven op de pagina met eindcijfer van de cursist"
         sis_export: "Cijfers publiceren in SIS"
         upload_scores: "Cijfers (.csv) (up)loaden"
       header: 
