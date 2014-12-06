@@ -119,7 +119,10 @@ zh_Hant:
       unknown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
     index: 
       add_auth_desc: 添加一個身份識別提供者至此帳戶：
-      canvas_login_tip: "如果組態設定會導致無法登入，則可以新增 *%{url1}* 至登入 URL 的末尾。這將允許使用正常的 Canvas 登入過程。此帳戶的 URL 將為 %{url2}。"
+      canvas_login_tip: |-
+          如果組態設定會導致無法登入，則可以新增 *%{url1}* 
+          至登入 URL 的末尾。這將允許使用正常的 Canvas 
+          登入過程。此帳戶的 URL 將為 %{url2}。
       choose_auth_type_option: 選擇驗證服務
       current_settings_title: 當前整合
       delete_auth_confirmation: 是否確定？如果移除，則使用者可能無法登入。
