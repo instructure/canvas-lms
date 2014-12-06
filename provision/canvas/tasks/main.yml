@@ -28,8 +28,21 @@
     RAILS_ENV=production \
     CANVAS_LMS_ADMIN_EMAIL=vagrant@localhost \
     CANVAS_LMS_ADMIN_PASSWORD=canvas4me \
-    CANVAS_LMS_ACCOUNT_NAME=admin \
+    CANVAS_LMS_ACCOUNT_NAME="Simon Fraser University" \
     CANVAS_LMS_STATS_COLLECTION=opt_out \
     bundle exec rake db:initial_setup
   args:
     chdir: /vagrant
+
+- name: symlink canvas_init script
+  sudo: yes
+  file:
+    src=/vagrant/scripts/canvas_init
+    dest=/etc/init.d/canvas_init
+    state=link
+  notify:
+    - canvas_init restart
+
+- name: update-rc.d canvas_init
+  sudo: yes
+  shell: update-rc.d canvas_init defaults
