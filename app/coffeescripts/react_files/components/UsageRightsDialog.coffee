@@ -111,6 +111,7 @@ define [
             tabIndex: '0'
             title: renderedNames
             'data-tooltip': 'right'
+            'data-tooltip-class': 'UsageRightsDialog__tooltip'
           },
             I18n.t("and %{count} more…", {count: toolTipFolders.length})
             span {className: 'screenreader-only'},
