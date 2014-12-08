@@ -223,6 +223,10 @@ class SubmissionsApiController < ApplicationController
   #   If this argument is present, the response will be grouped by student,
   #   rather than a flat array of submissions.
   #
+  # @argument grading_period_id [Integer]
+  #   The id of the grading period in which submissions are being requested
+  #   (Requires the Multiple Grading Periods account feature turned on)
+  #
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"]
   #   Associations to include with the group. `total_scores` requires the
   #   `grouped` argument.
@@ -294,7 +298,11 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
 
-    assignments = assignment_scope.all
+    if multiple_grading_periods?
+      assignments = GradingPeriod.find(params[:grading_period_id]).assignments(assignment_scope)
+    else
+      assignments = assignment_scope.all
+    end
 
     assignment_visibilities = {}
     if @context.feature_enabled?(:differentiated_assignments)
@@ -358,7 +366,8 @@ class SubmissionsApiController < ApplicationController
         student_submissions.each do |submission|
             # we've already got all the assignments loaded, so bypass AR loading
             # here and just give the submission its assignment
-            submission.assignment = assignments_hash[submission.assignment_id]
+            next unless assignment = assignments_hash[submission.assignment_id]
+            submission.assignment = assignment
             submission.user = student
 
             visible_assignments = assignment_visibilities.fetch(submission.user_id, [])

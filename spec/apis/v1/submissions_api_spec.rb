@@ -1465,6 +1465,40 @@ describe 'Submissions API', type: :request do
     expect(json.detect { |u| u['user_id'] == student2.id }['submissions'].size).to eq 0
   end
 
+  context "Multiple Grading Periods" do
+    before :once do
+      @student1 = user(:active_all => true)
+      @student2 = user_with_pseudonym(:active_all => true)
+
+      course_with_teacher(:active_all => true)
+
+      @course.enroll_student(@student1).accept!
+      @course.enroll_student(@student2).accept!
+
+      @course.account.enable_feature!(:multiple_grading_periods)
+      gpg = @course.grading_period_groups.create!
+      @gp1 = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 2.days.ago, end_date: 1.day.from_now)
+      @gp2 = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 2.days.from_now, end_date: 1.month.from_now)
+      a1 = @course.assignments.create!(due_at: 1.minute.from_now, :submission_types => 'online_text_entry')
+      a2 = @course.assignments.create!(due_at: 1.week.from_now, :submission_types => 'online_text_entry')
+
+      submit_homework(a1, @student1)
+      submit_homework(a2, @student1) # only one in current grading period
+      submit_homework(a1, @student2)
+    end
+
+    it "should filter by grading period" do
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/students/submissions.json",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :course_id => @course.to_param },
+        { :student_ids => [@student1.to_param, @student2.to_param], :grouped => '1',
+          :grading_period_id => @gp2.to_param})
+      expect(json.detect { |u| u['user_id'] == @student1.id }['submissions'].size).to eq 1
+      expect(json.detect { |u| u['user_id'] == @student2.id }['submissions'].size).to eq 0
+    end
+  end
+
   describe "for_students non-admin" do
     before :once do
       course_with_student :active_all => true
