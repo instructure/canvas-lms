@@ -308,7 +308,7 @@ module CC
       end
       
       def add_group(node, group)
-        id = create_key(group['id']) 
+        id = create_key("quizzes/quiz_group_#{group['id']}")
         node.section(
                 :ident => id,
                 :title => group['name']

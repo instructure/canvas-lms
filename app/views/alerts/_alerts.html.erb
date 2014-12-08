@@ -59,8 +59,8 @@
     }
   }
   @role_types.each do |role|
-    alert_data[:POSSIBLE_RECIPIENTS_ORDER] << role[:name]
-    alert_data[:POSSIBLE_RECIPIENTS][role[:name]] = {:label => role[:label]}
+    alert_data[:POSSIBLE_RECIPIENTS_ORDER] << role[:id]
+    alert_data[:POSSIBLE_RECIPIENTS][role[:id]] = {:label => role[:label]}
   end
   if @context.enable_user_notes
     alert_data[:POSSIBLE_CRITERIA_ORDER] << 'UserNote'

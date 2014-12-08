@@ -39,6 +39,18 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eql("http://url")
     end
 
+    it "should allow submitting homework as attachments" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+      att = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => { "0" => { :uploaded_data => "" }, "-1" => { :uploaded_data => "" } }
+      expect(response).to be_redirect
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission].user_id).to eql(@user.id)
+      expect(assigns[:submission][:assignment_id].to_i).to eql(@assignment.id)
+      expect(assigns[:submission][:submission_type]).to eql("online_upload")
+    end
+
     it "should reject illegal file extensions from submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "an additional assignment", :submission_types => "online_upload", :allowed_extensions => ['txt'])

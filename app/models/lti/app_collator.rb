@@ -18,7 +18,7 @@ module Lti
   class AppCollator
 
     def self.bookmarked_collection(context, placements)
-      external_tools_scope = ContextExternalTool.all_tools_for(context, selectable: placements.include?('module_item'))
+      external_tools_scope = ContextExternalTool.all_tools_for(context).placements(*placements)
       external_tools_collection = BookmarkedCollection.wrap(ExternalToolBookmarker, external_tools_scope)
       message_handler_scope = MessageHandler.for_context(context).by_message_types('basic-lti-launch-request')
       message_handler_collection = BookmarkedCollection.wrap(MessageHandlerBookmarker, message_handler_scope)
@@ -52,12 +52,16 @@ module Lti
         placements: {}
       }
       placements.each do |p|
-        if tool.has_placement?(p) || p == 'module_item'
+        if tool.has_placement?(p)
           definition[:placements][p.to_sym] = {
             message_type: tool.extension_setting(placement, :message_type) || tool.extension_default_value(placement, :message_type),
             url: tool.extension_setting(placement, :url) || tool.extension_default_value(placement, :url),
             title: tool.label_for(placement, I18n.locale || I18n.default_locale.to_s),
           }
+          if p.to_sym == :resource_selection
+            definition[:placements][:resource_selection][:selection_width] = tool.extension_setting(:resource_selection, :selection_width) || 500
+            definition[:placements][:resource_selection][:selection_height] = tool.extension_setting(:resource_selection, :selection_height) || 500
+          end
         end
       end
       definition

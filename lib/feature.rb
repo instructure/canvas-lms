@@ -63,7 +63,10 @@ class Feature
     display_name: lambda { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
     description: lambda { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-    state: 'allowed',     # or 'off' or 'on' or 'hidden'
+    state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
+                          # - 'hidden' means the feature must be set by a site admin before it will be visible
+                          #   (in that context and below) to other users
+                          # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere
     root_opt_in: false,   # if true, 'allowed' features in source or site admin
                           # will be inherited in "off" state by root accounts
     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
@@ -132,7 +135,7 @@ By default, Canvas will try to use Flash first to play videos. Turn this on to t
 then fall back to Flash.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
+      state: 'on',
       beta: true
     },
     'high_contrast' =>
@@ -195,16 +198,6 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       root_opt_in: true,
-      beta: true
-    },
-    'quiz_moderate' =>
-    {
-      display_name: -> { I18n.t('features.new_quiz_moderate', 'New Quiz Moderate Page') },
-      description: -> { I18n.t('new_quiz_moderate_desc', <<-END) },
-When Draft State and Quiz Statistics is allowed/on, this enables the new quiz moderate page for an account.
-END
-      applies_to: 'Course',
-      state: 'hidden',
       beta: true
     },
     'student_groups_next' =>
@@ -272,16 +265,6 @@ END
       state: 'hidden',
       beta: true
     },
-    'quiz_stats' =>
-    {
-      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
-      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
-Enable the new quiz statistics page for an account.
-END
-      applies_to: 'Course',
-      state: 'allowed',
-      development: true
-    },
     'multiple_grading_periods' =>
     {
       display_name: -> { I18n.t('features.multiple_grading_periods', 'Multiple Grading Periods') },
@@ -289,8 +272,19 @@ END
 Enable multiple grading periods management in the account admin, and use in the Gradebook.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
+      state: 'hidden',
       development: true
+    },
+    'course_catalog' =>
+    {
+      display_name: -> { I18n.t('features.course_catalog', "Course Catalog") },
+      description:  -> { I18n.t('display_course_catalog', <<-END) },
+Show a searchable list of courses in this root account with the "Include this course in the public course index" flag enabled.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
+      root_opt_in: true
     }
   )
 

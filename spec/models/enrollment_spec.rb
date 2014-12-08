@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe Enrollment do
   before(:once) do
@@ -91,8 +91,9 @@ describe Enrollment do
 
   describe "sis_role" do
     it "should return role_name if present" do
+      role = custom_account_role('Assistant Grader', :account => Account.default)
       e = TaEnrollment.new
-      e.role_name = 'Assistant Grader'
+      e.role_id = role.id
       expect(e.sis_role).to eq 'Assistant Grader'
     end
 
@@ -275,9 +276,10 @@ describe Enrollment do
 
   context "permissions" do
     it "should grant read rights to account members with the ability to read_roster" do
-      user = account_admin_user(:membership_type => "AccountMembership")
+      role = Role.get_built_in_role("AccountMembership")
+      user = account_admin_user(:role => role)
       RoleOverride.create!(:context => Account.default, :permission => :read_roster,
-                           :enrollment_type => "AccountMembership", :enabled => true)
+                           :role => role, :enabled => true)
       @enrollment.save
 
       expect(@enrollment.user.grants_right?(user, :read)).to eq false
@@ -516,8 +518,9 @@ describe Enrollment do
         @override.save!
         @term.start_at = 2.days.from_now
         @term.end_at = 4.days.from_now
-        @term.save!
-        expect(@enrollment.reload.state_based_on_date).to eql(@enrollment.admin? ? :active : :inactive)
+        @term.save!        
+        expected = @enrollment.admin? ? :active : :inactive
+        expect(@enrollment.reload.state_based_on_date).to eql(expected)
       end
 
       context "as a student" do
@@ -586,16 +589,9 @@ describe Enrollment do
       end
     end
 
-    context 'student dates change' do
-      before :once do
-        enable_cache
-        Timecop.freeze(10.minutes.ago) do
-          course_with_student(active_all: true)
-        end
-      end
-
+    shared_examples_for 'term and enrollment dates' do
       describe 'enrollment dates' do
-        it "should return active enrolmnet" do
+        it "should return active enrollment" do
           @enrollment.start_at = 2.days.ago
           @enrollment.end_at = 2.days.from_now
           @enrollment.workflow_state = 'active'
@@ -604,7 +600,7 @@ describe Enrollment do
           expect(@enrollment.state_based_on_date).to eql(:active)
         end
 
-        it "should return completed enrolmnet" do
+        it "should return completed enrollment" do
           @enrollment.start_at = 4.days.ago
           @enrollment.end_at = 2.days.ago
           @enrollment.save!
@@ -612,7 +608,7 @@ describe Enrollment do
           expect(@enrollment.state_based_on_date).to eql(:completed)
         end
 
-        it "should return inactive enrolmnet" do
+        it "should return inactive enrollment" do
           @enrollment.start_at = 2.days.from_now
           @enrollment.end_at = 4.days.from_now
           @enrollment.save!
@@ -621,10 +617,92 @@ describe Enrollment do
         end
       end
 
+      describe 'term dates' do
+        before do
+          @term = @course.enrollment_term
+          expect(@term).to_not be_nil
+        end
+
+        it "should return active" do
+          @term.start_at = 2.days.ago
+          @term.end_at = 2.days.from_now
+          @term.save!
+          @enrollment.workflow_state = 'active'
+          expect(@enrollment.reload.state).to eql(:active)
+          expect(@enrollment.state_based_on_date).to eql(:active)
+        end
+
+        it "should return completed" do
+          @term.start_at = 4.days.ago
+          @term.end_at = 2.days.ago
+          @term.reset_touched_courses_flag
+          @term.save!
+          expect(@enrollment.reload.state).to eql(:active)
+          expect(@enrollment.state_based_on_date).to eql(:completed)
+        end
+
+        it "should return inactive for students (not admins)" do
+          @term.start_at = 2.days.from_now
+          @term.end_at = 4.days.from_now
+          @term.reset_touched_courses_flag
+          @term.save!
+          @enrollment.course.reload
+          expect(@enrollment.reload.state).to eql(:active)
+          expected = @enrollment.admin? ? :active : :inactive
+          expect(@enrollment.state_based_on_date).to eql(expected)
+        end
+      end
+
+      describe 'enrollment_dates_override dates' do
+        before do
+          @term = @course.enrollment_term
+          expect(@term).to_not be_nil
+          @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
+        end
+
+        it "should return active" do
+          @override.start_at = 2.days.ago
+          @override.end_at = 2.days.from_now
+          @override.save!
+          @enrollment.workflow_state = 'active'
+          @enrollment.save!
+          expect(@enrollment.reload.state).to eql(:active)
+          expect(@enrollment.state_based_on_date).to eql(:active)
+        end
+
+        it "should return completed" do
+          @override.start_at = 4.days.ago
+          @override.end_at = 2.days.ago
+          @term.reset_touched_courses_flag
+          @override.save!
+          expect(@enrollment.reload.state).to eql(:active)
+          expect(@enrollment.state_based_on_date).to eql(:completed)
+        end
+
+        it "should return inactive" do
+          @override.start_at = 2.days.from_now
+          @override.end_at = 4.days.from_now
+          @term.reset_touched_courses_flag
+          @override.save!
+          expect(@enrollment.reload.state).to eql(:active)
+          expect(@enrollment.state_based_on_date).to eql(:inactive)
+        end
+      end
+    end
+
+    context 'dates for students' do
+      before :once do
+        enable_cache
+        Timecop.freeze(10.minutes.ago) do
+          course_with_student(active_all: true)
+        end
+      end
+      include_examples 'term and enrollment dates'
+
       describe 'section dates' do
         before do
           @section = @course.course_sections.first
-          expect(@section).not_to be_nil
+          expect(@section).to_not be_nil
           @section.restrict_enrollments_to_section_dates = true
         end
 
@@ -684,78 +762,16 @@ describe Enrollment do
           expect(@enrollment.state_based_on_date).to eql(:inactive)
         end
       end
+    end
 
-      describe 'term dates' do
-        before do
-          @term = @course.enrollment_term
-          expect(@term).not_to be_nil
-        end
-
-        it "should return active" do
-          @term.start_at = 2.days.ago
-          @term.end_at = 2.days.from_now
-          @term.save!
-          @enrollment.workflow_state = 'active'
-          expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:active)
-        end
-
-        it "should return completed" do
-          @term.start_at = 4.days.ago
-          @term.end_at = 2.days.ago
-          @term.reset_touched_courses_flag
-          @term.save!
-          expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:completed)
-        end
-
-        it "should return inactive" do
-          @term.start_at = 2.days.from_now
-          @term.end_at = 4.days.from_now
-          @term.reset_touched_courses_flag
-          @term.save!
-          @enrollment.course.reload
-          expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:inactive)
+    context 'dates for teachers' do
+      before :once do
+        enable_cache
+        Timecop.freeze(10.minutes.ago) do
+          course_with_teacher(active_all: true)
         end
       end
-
-      describe 'enrollment_dates_override dates' do
-        before do
-          @term = @course.enrollment_term
-          expect(@term).not_to be_nil
-          @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term)
-
-        end
-
-        it "should return active" do
-          @override.start_at = 2.days.ago
-          @override.end_at = 2.days.from_now
-          @override.save!
-          @enrollment.workflow_state = 'active'
-          @enrollment.save!
-          expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:active)
-        end
-
-        it "should return completed" do
-          @override.start_at = 4.days.ago
-          @override.end_at = 2.days.ago
-          @term.reset_touched_courses_flag
-          @override.save!
-          expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:completed)
-        end
-
-        it "should return inactive" do
-          @override.start_at = 2.days.from_now
-          @override.end_at = 4.days.from_now
-          @term.reset_touched_courses_flag
-          @override.save!
-          expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:inactive)
-        end
-      end
+      include_examples 'term and enrollment dates'
     end
 
     it "should allow teacher access if both course and term have dates" do
@@ -889,9 +905,8 @@ describe Enrollment do
       @course.conclude_at = 2.days.ago
       @course.save!
 
-      expect(@teacher_enrollment.reload.state_based_on_date).to eq :completed
+      expect(@teacher_enrollment.reload.state_based_on_date).to eq :active
       expect(@student_enrollment.reload.state_based_on_date).to eq :completed
-
     end
 
     it "should affect the active?/inactive?/completed? predicates" do

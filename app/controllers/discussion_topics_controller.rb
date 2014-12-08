@@ -313,8 +313,10 @@ class DiscussionTopicsController < ApplicationController
         }
         append_sis_data(hash)
 
-        js_env(hash)
-        js_env(DRAFT_STATE: @context.feature_enabled?(:draft_state))
+        js_env(hash.merge(
+          DRAFT_STATE: @context.feature_enabled?(:draft_state),
+          POST_GRADES: @context.feature_enabled?(:post_grades)
+        ))
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
@@ -381,6 +383,7 @@ class DiscussionTopicsController < ApplicationController
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
                  DRAFT_STATE: @topic.draft_state_enabled?,
+                 POST_GRADES: @context.feature_enabled?(:post_grades),
                  DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
       append_sis_data(js_hash)
       js_env(js_hash)
@@ -855,13 +858,20 @@ class DiscussionTopicsController < ApplicationController
       id = params[:assignment].delete(:group_category_id)
       discussion_topic_hash[:group_category_id] ||= id
     end
-    return unless discussion_topic_hash.has_key?(:group_category_id) && discussion_topic_hash[:group_category_id].to_s != @topic.group_category.try(:id).to_s
+    return unless discussion_topic_hash.has_key?(:group_category_id)
+    return if discussion_topic_hash[:group_category_id].nil? && @topic.group_category_id.nil?
+    return if discussion_topic_hash[:group_category_id].to_i == @topic.group_category_id
     if @topic.is_announcement
       @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
       return
     end
     if !@topic.can_group?
       @errors[:group] = t(:error_group_change, "You cannot change grouping on a discussion with replies.")
+    end
+    if discussion_topic_hash[:group_category_id]
+      discussion_topic_hash[:group_category] = @context.group_categories.find(discussion_topic_hash[:group_category_id])
+    else
+      discussion_topic_hash[:group_category] = nil
     end
   end
 

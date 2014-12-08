@@ -68,9 +68,6 @@ define [
       return @get 'name' unless arguments.length > 0
       @set 'name', newName
 
-    postToSIS:  =>
-      return @get 'post_to_sis' unless arguments.length > 0
-
     pointsPossible: (points) =>
       return @get('points_possible') || 0 unless arguments.length > 0
       @set 'points_possible', points
@@ -136,6 +133,10 @@ define [
       _.any @_submissionTypes(), (thing) ->
         thing in ['online', 'online_text_entry',
           'media_recording', 'online_url', 'online_upload']
+
+    postToSIS: (postToSisBoolean) =>
+      return @get 'post_to_sis' unless arguments.length > 0
+      @set 'post_to_sis', postToSisBoolean
 
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0

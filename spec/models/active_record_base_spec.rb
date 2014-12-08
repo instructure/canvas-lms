@@ -428,52 +428,6 @@ describe ActiveRecord::Base do
     end
   end
 
-  context "after_transaction_commit" do
-    self.use_transactional_fixtures = false
-
-    before do
-      Rails.env.stubs(:test?).returns(false)
-    end
-
-    it "should execute the callback immediately if not in a transaction" do
-      a = 0
-      User.connection.after_transaction_commit { a += 1 }
-      expect(a).to eq 1
-    end
-
-    it "should execute the callback after commit if in a transaction" do
-      a = 0
-      User.connection.transaction do
-        User.connection.after_transaction_commit { a += 1 }
-        expect(a).to eq 0
-      end
-      expect(a).to eq 1
-    end
-
-    it "should not execute the callbacks on rollback" do
-      a = 0
-      User.connection.transaction do
-        User.connection.after_transaction_commit { a += 1 }
-        expect(a).to eq 0
-        raise ActiveRecord::Rollback
-      end
-      expect(a).to eq 0
-      User.connection.transaction do
-        # verify that the callback gets cleared out, so this second transaction won't trigger it
-      end
-      expect(a).to eq 0
-    end
-
-    it "should avoid loops due to callbacks causing a new transaction" do
-      a = 0
-      User.connection.transaction do
-        User.connection.after_transaction_commit { User.connection.transaction { a += 1 } }
-        expect(a).to eq 0
-      end
-      expect(a).to eq 1
-    end
-  end
-
   context "Finder tests" do
     before :once do
       @user = user_model

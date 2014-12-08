@@ -22,8 +22,8 @@ module Canvas
         # Foo so you can do stuff to it anytime somebody requires "foo" as
         # per usual.
 
-        GLOB = "vendor/plugins/*/app/coffeescripts/extensions"
-        REGEXP = Regexp.new GLOB.gsub('*', '([^/]*)')
+        GLOB = "{gems,vendor}/plugins/*/app/coffeescripts/extensions"
+        REGEXP = %r{(?:gems|vendor)/plugins/([^/]*)/app/coffeescripts/extensions}
 
         # added to require config paths so that when you require an
         # extended module, you instead get the glue module which gives you

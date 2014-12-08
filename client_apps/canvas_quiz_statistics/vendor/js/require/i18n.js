@@ -1,5 +1,7 @@
 define([], function() {
   var INTERPOLATER = /\%\{([^\}]+)\}/g;
+  var KEY_PATTERN = /^\#?\w+(\.\w+)+$/; // handle our absolute keys
+  var COUNT_KEY_MAP = ["zero", "one"];
 
   var i18n = {
     interpolate: function(contents, options) {
@@ -15,56 +17,51 @@ define([], function() {
       return contents;
     },
 
-    load : function(name, req, onLoad) {
+    isKeyProvided: function(keyOrDefault, defaultOrOptions, maybeOptions) {
+      if (typeof keyOrDefault === 'object')
+        return false;
+      if (typeof defaultOrOptions === 'string')
+        return true;
+      if (maybeOptions)
+        return true;
+      if (typeof keyOrDefault === 'string' && keyOrDefault.match(this.keyPattern))
+        return true;
+      return false;
+    },
+
+    inferArguments: function(args) {
+      var hasKey = this.isKeyProvided.apply(this, args);
+      if (hasKey) args = args.slice(1);
+      return args;
+    },
+
+    load: function(name, req, onLoad) {
       // Development only.
       // This gets replaced by Canvas I18n when embedded.
+      //
+      // Adapted/simplified from i18nliner-js and canvas' i18nObj
       //
       // Returns the defaultValue you provide with variables interpolated,
       // if specified.
       //
       // See the project README for i18n work.
-      var t = function(__key__, defaultValue, options) {
-        var value;
 
-        if (arguments.length === 2) {
-          if (typeof defaultValue === 'string') {
-            options = { defaultValue: defaultValue };
-          }
-          else if (typeof defaultValue === 'object') {
-            options = defaultValue;
-          }
-          else {
-            throw new Error("Bad I18n.t() call, expected an options object or a defaultValue string.");
-          }
-        }
-        else if (arguments.length === 3 && !options.defaultValue) {
-          options.defaultValue = defaultValue;
+      var t = function() {
+        var args = i18n.inferArguments([].slice.call(arguments));
+        var defaultValue = args[0];
+        var options = args[1] || {};
+        var countKey;
+
+        if (typeof defaultValue !== 'string' && typeof defaultValue !== 'object') {
+          throw new Error("Bad I18n.t() call, expected a default string or object.");
         }
 
         if (options.hasOwnProperty('count') && typeof defaultValue === 'object') {
-          switch(options.count) {
-            case 0:
-              if (defaultValue.zero) {
-                options.defaultValue = defaultValue.zero;
-              }
-            break;
-
-            case 1:
-              if (defaultValue.one) {
-                options.defaultValue = defaultValue.one;
-              }
-            break;
-
-            default:
-              if (defaultValue.other) {
-                options.defaultValue = defaultValue.other;
-              }
-          }
+          countKey = COUNT_KEY_MAP[options.count];
+          defaultValue = defaultValue[countKey] || defaultValue.other;
         }
 
-        value = i18n.interpolate(''+options.defaultValue, options);
-
-        return value;
+        return i18n.interpolate(''+defaultValue, options);
       };
 
       var l = function(scope, value) {

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -105,7 +105,7 @@
 #       }
 #     }
 class UsersController < ApplicationController
-  include DeliciousDiigo
+  include Delicious
   include SearchHelper
   include I18nUtilities
 
@@ -123,7 +123,7 @@ class UsersController < ApplicationController
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
-      current_active_enrollments = @user.current_enrollments.with_each_shard { |scope| scope.includes(:course) }
+      current_active_enrollments = @user.enrollments.current.includes(:course).shard(@user).to_a
 
       @presenter = GradesPresenter.new(current_active_enrollments)
 
@@ -319,6 +319,11 @@ class UsersController < ApplicationController
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
+  #
+  #  @example_request
+  #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<sis_user_id> \
+  #       -X GET \
+  #       -H 'Authorization: Bearer <token>'
   #
   # @returns [User]
   def index
@@ -569,7 +574,14 @@ class UsersController < ApplicationController
   #   }
   def activity_stream
     if @current_user
-      api_render_stream_for_contexts(nil, :api_v1_user_activity_stream_url)
+      # this endpoint has undocumented params (context_code, submission_user_id and asset_type) to
+      # support submission comments in the conversations inbox.
+      # please replace this with a more reasonable solution at your earliest convenience
+      opts = {paginate_url: :api_v1_user_activity_stream_url}
+      opts[:asset_type] = params[:asset_type] if params.has_key?(:asset_type)
+      opts[:context] = Context.find_by_asset_string(params[:context_code]) if params[:context_code]
+      opts[:submission_user_id] = params[:submission_user_id] if params.has_key?(:submission_user_id)
+      api_render_stream(opts)
     else
       render_unauthorized_action
     end
@@ -844,8 +856,10 @@ class UsersController < ApplicationController
         when 'delicious'
           delicious_get_last_posted(service)
         when 'diigo'
-          diigo_get_bookmarks(service, 1)
+          Diigo::Connection.diigo_get_bookmarks(service)
         when 'skype'
+          true
+        when 'yo'
           true
         else
           raise "Unknown Service"
@@ -1358,68 +1372,56 @@ class UsersController < ApplicationController
   end
 
   def merge
-    @user_about_to_go_away = User.find(params[:user_id])
-
-    @true_user = User.where(id: params[:new_user_id]).first if params[:new_user_id]
-    @true_user ||= @current_user
-
-    if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
-      @user_that_will_still_be_around = @true_user
-    else
-      @user_that_will_still_be_around = nil
-    end
-
-    if @user_about_to_go_away && @user_that_will_still_be_around
-      UserMerge.from(@user_about_to_go_away).into(@user_that_will_still_be_around)
-      @user_that_will_still_be_around.touch
-      flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
+    @source_user = User.find(params[:user_id])
+    @target_user = User.where(id: params[:new_user_id]).first if params[:new_user_id]
+    @target_user ||= @current_user
+    if @source_user.grants_right?(@current_user, :merge) && @target_user.grants_right?(@current_user, :merge)
+      UserMerge.from(@source_user).into(@target_user)
+      @target_user.touch
+      flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @target_user.name, :second_user => @source_user.name)
+      if @target_user == @current_user
+        redirect_to user_profile_url(@current_user)
+      else
+        redirect_to user_url(@target_user)
+      end
     else
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
-    end
-
-    if @user_that_will_still_be_around == @current_user
-      redirect_to user_profile_url(@current_user)
-    elsif @user_that_will_still_be_around
-      redirect_to user_url(@user_that_will_still_be_around)
-    else
       redirect_to dashboard_url
     end
   end
 
   def admin_merge
     @user = User.find(params[:user_id])
-    pending_other_error = get_pending_user_and_error(params[:pending_user_id])
-    @other_user = User.where(id: params[:new_user_id]).first if params[:new_user_id].present?
-    if authorized_action(@user, @current_user, :manage_logins)
-      flash[:error] = pending_other_error if pending_other_error.present?
-
-      if @user && (params[:clear] || !@pending_other_user)
-        @pending_other_user = nil
+    if authorized_action(@user, @current_user, :merge)
+      if params[:clear]
+        params.delete(:new_user_id)
+        params.delete(:pending_user_id)
       end
 
-      unless @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
-        @other_user = nil
+      if params[:new_user_id].present?
+        @other_user = api_find_all(User, [params[:new_user_id]]).first
+        if !@other_user || !@other_user.grants_right?(@current_user, :merge)
+          @other_user = nil
+          flash[:error] = t('user_not_found', "No active user with that ID was found.")
+        elsif @other_user == @user
+          @other_user = nil
+          flash[:error] = t('cant_self_merge', "You can't merge an account with itself.")
+        end
       end
 
-      render :action => 'admin_merge'
+      if params[:pending_user_id].present?
+        @pending_other_user = api_find_all(User, [params[:pending_user_id]]).first
+        if !@pending_other_user || !@pending_other_user.grants_right?(@current_user, :merge)
+          @pending_other_user = nil
+          flash[:error] = t('user_not_found', "No active user with that ID was found.")
+        elsif @pending_other_user == @user
+          @pending_other_user = nil
+          flash[:error] = t('cant_self_merge', "You can't merge an account with itself.")
+        end
+      end
+
+      render action: 'admin_merge'
     end
-  end
-
-  def get_pending_user_and_error(pending_user_id)
-    pending_other_error = nil
-
-    if pending_user_id.present?
-      @pending_other_user = api_find_all(User, [pending_user_id]).first
-      @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
-      if @pending_other_user == @user
-        @pending_other_user = nil
-        pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
-      elsif @pending_other_user.blank? && pending_other_error.blank?
-        pending_other_error = t('user_not_found', "No active user with that ID was found.")
-      end
-    end
-
-    pending_other_error
   end
 
   def assignments_needing_grading
@@ -1459,31 +1461,13 @@ class UsersController < ApplicationController
 
   def delete
     @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, [:manage, :manage_logins])
-      unless @user.grants_right?(@current_user, :delete)
-        flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-        redirect_to user_profile_url(@current_user)
-      end
-    end
+    render_unauthorized_action unless @user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
   end
 
-  # @API Delete a user
-  #
-  # Delete a user record from Canvas.
-  #
-  # WARNING: This API will allow a user to delete themselves. If you do this,
-  # you won't be able to make API calls or log into Canvas.
-  #
-  # @example_request
-  #     curl https://<canvas>/api/v1/users/5 \
-  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
-  #       -X DELETE
-  #
-  # @returns User
   def destroy
     @user = api_find(User, params[:id])
-    if authorized_action(@user, @current_user, :delete)
-      @user.destroy(true)
+    if @user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
+      @user.remove_from_root_account(@domain_root_account)
       if @user == @current_user
         logout_current_user
       end
@@ -1499,6 +1483,8 @@ class UsersController < ApplicationController
           render :json => user_json(@user, @current_user, session)
         end
       end
+    else
+      render_unauthorized_action
     end
   end
 
@@ -1658,7 +1644,7 @@ class UsersController < ApplicationController
   # @returns User
   def merge_into
     user = api_find(User, params[:id])
-    if authorized_action(user, @current_user, :manage_logins)
+    if authorized_action(user, @current_user, :merge)
 
       if (account_id = params[:destination_account_id])
         destination_account = Account.find_by_domain(account_id)
@@ -1669,7 +1655,7 @@ class UsersController < ApplicationController
 
       into_user = api_find(User, params[:destination_user_id], account: destination_account)
 
-      if authorized_action(into_user, @current_user, :manage_logins)
+      if authorized_action(into_user, @current_user, :merge)
         UserMerge.from(user).into into_user
         render(:json => user_json(into_user,
                                   @current_user,

@@ -279,7 +279,7 @@ XML
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
       expect(comments.count).to eq 1
-      expect(comments.first.comment).to eq <<-NO_POINTS
+      expect(comments.first.comment).to eq <<-NO_POINTS.strip
 An external tool attempted to grade this assignment as 75%, but was unable
 to because the assignment has no points possible.
       NO_POINTS

@@ -94,6 +94,7 @@ define [
             onChange: @handleFilesInputChange
             multiple: true
         button
+          type: 'button'
           className:'btn btn-primary btn-upload'
           'aria-label': I18n.t('upload', 'Upload')
           onClick: @handleAddFilesClick,

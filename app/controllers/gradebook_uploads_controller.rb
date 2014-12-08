@@ -77,30 +77,39 @@ class GradebookUploadsController < ApplicationController
           assignment_map[a.id] = a
         end
 
-        if da_enabled = @context.feature_enabled?(:differentiated_assignments)
-          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: @students.map{|s| s["previous_id"].to_i})
-        end
+        @submissions ||= []
+        @students.each_slice(100) do |students|
 
-        @submissions = @students.inject([]) do |list, student_record|
-          student_record['submissions'].each do |submission_record|
-            assignment_id = new_assignment_ids[submission_record['assignment_id']] || submission_record['assignment_id'].to_i
-            user_id = student_record['previous_id'].to_i
-            new_submission = {
-              :assignment_id => assignment_id,
-              :user_id => user_id,
-              :grade => submission_record['grade']
-            }
-            if da_enabled
-              if visible_assignments[user_id].include?(assignment_id)
-                list << new_submission
-              else
-                logger.info "Assignment: #{assignment_map[assignment_id].title} for student: #{student_record['name']} was not updated because it is not assigned to that student."
-              end
-            else
-              list << new_submission
-            end
+          if da_enabled = @context.feature_enabled?(:differentiated_assignments)
+            visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: students.map{|s| s["previous_id"].to_i})
           end
-          list
+
+          students.inject(@submissions) do |list, student_record|
+            student_record['submissions'].each do |submission_record|
+              assignment_id = new_assignment_ids[submission_record['assignment_id']] || submission_record['assignment_id'].to_i
+              user_id = student_record['previous_id'].to_i
+              new_submission = {
+                :assignment_id => assignment_id,
+                :user_id => user_id,
+                :grade => submission_record['grade']
+              }
+              assignment = assignment_map[assignment_id]
+              if assignment.grading_type == 'gpa_scale'
+                new_submission[:grade] = assignment.score_to_grade(submission_record['grade'])
+                new_submission[:score] = submission_record['grade'].to_f
+              end
+              if da_enabled
+                if visible_assignments[user_id].include?(assignment_id)
+                  list << new_submission
+                else
+                  logger.info "Assignment: #{assignment_map[assignment_id].title} for student: #{student_record['name']} was not updated because it is not assigned to that student."
+                end
+              else
+                list << new_submission
+              end
+            end
+            list
+          end
         end
 
         all_submissions = {}
@@ -120,7 +129,7 @@ class GradebookUploadsController < ApplicationController
           submission ||= Submission.new(:assignment => assignment) { |s| s.user_id = sub[:user_id] }
           # grade_to_score expects a string so call to_s here, otherwise things that have a score of zero will return nil
           # we should really be using Assignment#grade_student here
-          score = assignment.grade_to_score(sub[:grade].to_s)
+          score = assignment.grading_type == 'gpa_scale' ? sub[:score] : assignment.grade_to_score(sub[:grade].to_s)
           unless score == submission.score
             old_score = submission.score
             submission.grade = sub[:grade].to_s

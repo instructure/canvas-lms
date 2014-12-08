@@ -17,16 +17,19 @@
 #
 
 module AssignmentsHelper
-  PEER_REVIEW_LINK_OPTIONS = {
-    completed: {
+  def completed_link_options
+    {
       class: 'pass',
-      title: I18n.t('tooltips.finished', 'finished'),
-    },
-    in_progress: {
-      class: 'warning',
-      title: I18n.t('tooltips.incomplete', 'incomplete'),
+      title: I18n.t('tooltips.finished', 'finished')
     }
-  }
+  end
+
+  def in_progress_link_options
+    {
+      class: 'warning',
+      title: I18n.t('tooltips.incomplete', 'incomplete')
+    }
+  end
 
   def multiple_due_dates(assignment)
     # can use this method as the single source of rendering multiple due dates
@@ -36,7 +39,7 @@ module AssignmentsHelper
   end
 
   def student_peer_review_link_for(context, assignment, assessment)
-    link_options = assessment.completed? ? PEER_REVIEW_LINK_OPTIONS[:completed] : PEER_REVIEW_LINK_OPTIONS[:in_progress]
+    link_options = assessment.completed? ? completed_link_options : in_progress_link_options
     link_to assessment.asset_user_name, context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id), link_options
   end
 

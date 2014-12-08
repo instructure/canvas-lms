@@ -36,11 +36,15 @@ class Alert < ActiveRecord::Base
 
   before_save :infer_defaults
 
+  def find_role_by_name(role_name)
+    context.is_a?(Account) ? context.get_account_role_by_name(role_name) : context.account.get_account_role_by_name(role_name)
+  end
+
   def resolve_recipients(student_id, teachers = nil)
     include_student = false
     include_teacher = false
     include_teachers = false
-    admin_roles = []
+    admin_role_ids = []
     self.recipients.try(:each) do |recipient|
       case
         when recipient == :student
@@ -48,7 +52,9 @@ class Alert < ActiveRecord::Base
         when recipient == :teachers
           include_teachers = true
         when recipient.is_a?(String)
-          admin_roles << recipient
+          admin_role_ids << find_role_by_name(recipient).id
+        when recipient.is_a?(Hash)
+          admin_role_ids << recipient[:role_id]
         else
           raise "Unsupported recipient type!"
       end
@@ -58,7 +64,7 @@ class Alert < ActiveRecord::Base
 
     recipients << student_id if include_student
     recipients.concat(Array(teachers)) if teachers.present? && include_teachers
-    recipients.concat context.account_users.where(:membership_type => admin_roles).uniq.pluck(:user_id) if context_type == 'Account' && !admin_roles.empty?
+    recipients.concat context.account_users.where(:role_id => admin_role_ids).uniq.pluck(:user_id) if context_type == 'Account' && !admin_roles.empty?
     recipients.uniq
   end
 
@@ -67,16 +73,21 @@ class Alert < ActiveRecord::Base
   end
 
   def as_json(*args)
+    converted_recipients = self.recipients.to_a.map do |recipient|
+      if recipient.is_a?(String)
+        find_role_by_name(recipient).id
+      elsif recipient.is_a?(Hash)
+        recipient[:role_id]
+      else
+        ":#{recipient}"
+      end
+    end
     {
       :id => id,
       :criteria => criteria.map { |c| c.as_json(:include_root => false) },
-      :recipients => recipients.try(:map) { |r| (r.is_a?(Symbol) ? ":#{r}" : r) },
+      :recipients => converted_recipients,
       :repetition => repetition
     }.with_indifferent_access
-  end
-
-  def recipients=(recipients)
-    write_attribute(:recipients, recipients.map { |r| (r.is_a?(String) && r[0..0] == ':' ? r[1..-1].to_sym : r) })
   end
 
   def criteria=(values)

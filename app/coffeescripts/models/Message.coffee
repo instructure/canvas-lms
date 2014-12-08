@@ -1,17 +1,40 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/str/TextHelper'
-], (_, {Model, Collection}, TextHelper) ->
+], ($, _, {Model, Collection}, TextHelper) ->
 
   class Message extends Model
     initialize: ->
-      @messageCollection = new Collection()
+      @messageCollection = new Collection(this.get('messages') || [])
       @on('change:messages', @handleMessages)
 
+    save: (attrs, opts) ->
+      if @get('for_submission')
+        $.ajaxJSON "/api/v1/courses/#{@get('course_id')}/assignments/#{@get('assignment_id')}/submissions/#{@get('user_id')}/read.json", if @unread() then 'DELETE' else 'PUT'
+      else
+        Model.prototype.save.call(this)
+
     parse: (data) ->
-      if data.messages
-          findParticipant = (id) -> _.find(data.participants, id: id)
+      if data.type == 'Submission'
+        data.for_submission = true
+        data.subject = "#{data.course.name} - #{data.title}"
+        data.messages = data.submission_comments
+        data.messages.reverse()
+        _.each data.messages, (message) ->
+          message.author.name = message.author.display_name
+          message.bodyHTML = TextHelper.formatMessage(message.comment)
+          message.for_submission = true
+        data.participants = _.uniq(_.map(data.submission_comments, (m) -> {name: m.author_name}), null, (u) -> u.name)
+        data.last_authored_message_at = data.submission_comments[0].created_at
+        data.last_message_at = data.submission_comments[0].created_at
+        data.message_count = data.submission_comments.length
+        data.last_message = data.submission_comments[0].comment
+        data.read = data.read_state
+        data.workflow_state = if data.read_state then 'read' else 'unread'
+      else if data.messages
+        findParticipant = (id) -> _.find(data.participants, id: id)
         _.each data.messages, (message) ->
           message.author = findParticipant(message.author_id)
 

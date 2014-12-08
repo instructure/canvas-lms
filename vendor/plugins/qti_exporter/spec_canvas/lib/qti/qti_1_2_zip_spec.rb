@@ -59,36 +59,36 @@ if Qti.migration_executable
       expect(@course.attachments.count).to eq 4
 
       dir = Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY
-      expect(@course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821").full_display_path).to eq "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
-      expect(@course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1").full_display_path).to eq "course files/#{dir}/#{@migration.id}/contact info.png"
-      expect(@course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30").full_display_path).to eq "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
-      expect(@course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22").full_display_path).to eq "course files/#{dir}/#{@migration.id}/image.png"
+      expect(@course.attachments.where(migration_id: "f3e5ead7f6e1b25a46a4145100566821").first.full_display_path).to eq "course files/#{dir}/#{@migration.id}/exam1/my_files/org1/images/image.png"
+      expect(@course.attachments.where(migration_id: "c16566de1661613ef9e5517ec69c25a1").first.full_display_path).to eq "course files/#{dir}/#{@migration.id}/contact info.png"
+      expect(@course.attachments.where(migration_id: "4d348a246af616c7d9a7d403367c1a30").first.full_display_path).to eq "course files/#{dir}/#{@migration.id}/exam1/my_files/org0/images/image.png"
+      expect(@course.attachments.where(migration_id: "d2b5ca33bd970f64a6301fa75ae2eb22").first.full_display_path).to eq "course files/#{dir}/#{@migration.id}/image.png"
     end
 
     it "should use expected file links in questions" do
-      aq = @course.assessment_questions.find_by_migration_id("QUE_1003")
-      c_att = @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30")
-      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
+      aq = @course.assessment_questions.where(migration_id: "QUE_1003").first
+      c_att = @course.attachments.where(migration_id: "4d348a246af616c7d9a7d403367c1a30").first
+      att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
-      aq = @course.assessment_questions.find_by_migration_id("QUE_1007")
-      c_att = @course.attachments.find_by_migration_id("f3e5ead7f6e1b25a46a4145100566821")
-      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
+      aq = @course.assessment_questions.where(migration_id: "QUE_1007").first
+      c_att = @course.attachments.where(migration_id: "f3e5ead7f6e1b25a46a4145100566821").first
+      att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
-      aq = @course.assessment_questions.find_by_migration_id("QUE_1014")
-      c_att = @course.attachments.find_by_migration_id("d2b5ca33bd970f64a6301fa75ae2eb22")
-      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
+      aq = @course.assessment_questions.where(migration_id: "QUE_1014").first
+      c_att = @course.attachments.where(migration_id: "d2b5ca33bd970f64a6301fa75ae2eb22").first
+      att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
-      aq = @course.assessment_questions.find_by_migration_id("QUE_1053")
-      c_att = @course.attachments.find_by_migration_id("c16566de1661613ef9e5517ec69c25a1")
-      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
+      aq = @course.assessment_questions.where(migration_id: "QUE_1053").first
+      c_att = @course.attachments.where(migration_id: "c16566de1661613ef9e5517ec69c25a1").first
+      att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
     end
     
     it "should hide the quiz directory" do
-      folder = @course.folders.find_by_name(Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY)
+      folder = @course.folders.where(name: Canvas::Migration::MigratorHelper::QUIZ_FILE_DIRECTORY).first
       expect(folder.hidden?).to be_truthy
     end
     
@@ -106,15 +106,15 @@ if Qti.migration_executable
       Importers::CourseContentImporter.import_content(@course, course_data, nil, migration)
       
       # Check the first import
-      aq = @course.assessment_questions.find_by_migration_id("QUE_1003")
-      c_att = @course.attachments.find_by_migration_id("4d348a246af616c7d9a7d403367c1a30")
-      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
+      aq = @course.assessment_questions.where(migration_id: "QUE_1003").first
+      c_att = @course.attachments.where(migration_id: "4d348a246af616c7d9a7d403367c1a30").first
+      att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
       
       # check the second import
-      aq = @course.assessment_questions.find_by_migration_id("test2_QUE_1003")
-      c_att = @course.attachments.find_by_migration_id("test2_4d348a246af616c7d9a7d403367c1a30")
-      att = aq.attachments.find_by_migration_id(CC::CCHelper.create_key(c_att))
+      aq = @course.assessment_questions.where(migration_id: "test2_QUE_1003").first
+      c_att = @course.attachments.where(migration_id: "test2_4d348a246af616c7d9a7d403367c1a30").first
+      att = aq.attachments.where(migration_id: CC::CCHelper.create_key(c_att)).first
       expect(aq.question_data["question_text"]).to match %r{files/#{att.id}/download}
     end
 

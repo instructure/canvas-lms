@@ -1,3 +1,6 @@
+# note: most of these tests are now redundant w/ i18nliner-js, leaving them
+# for a little bit though
+
 define [
   "jquery"
   "i18nObj"
@@ -21,7 +24,7 @@ define [
     originalLocale = I18n.locale
     try
       $.extend(true, I18n, {locale: 'bad-locale', translations: {en: {foo: {fallback_message: 'this is in the en locale'}}}})
-      equal scope.lookup('fallback_message'),
+      equal scope.lookup('foo.fallback_message'),
         'this is in the en locale'
     finally
       I18n.locale = originalLocale
@@ -32,11 +35,11 @@ define [
 
   test "html safety: should html-escape translations and interpolations if any interpolated values are htmlSafe", ->
     equal t('bar', "only one of these won't get escaped: <input>, %{a}, %{b} & %{c}", {a: '<img>', b: $.raw('<br>'), c: '<hr>'}),
-      'only one of these won\'t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
+      'only one of these won&#39;t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
 
   test "html safety: should html-escape translations and interpolations if any placeholders are flagged as safe", ->
     equal t('bar', "only one of these won't get escaped: <input>, %{a}, %h{b} & %{c}", {a: '<img>', b: '<br>', c: '<hr>'}),
-      'only one of these won\'t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
+      'only one of these won&#39;t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
 
   test "wrappers: should auto-html-escape", ->
     equal t('bar', '*2* > 1', {wrapper: '<b>$1</b>'}),

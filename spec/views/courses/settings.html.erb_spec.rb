@@ -36,7 +36,7 @@ describe "courses/settings.html.erb" do
       view_context(@course, @user)
       assigns[:current_user] = @user
       render
-      expect(response).to have_tag("span.sis_source_id", @course.sis_source_id)
+      expect(response).to have_tag("span#course_sis_source_id", @course.sis_source_id)
       expect(response).not_to have_tag("input#course_sis_source_id")
     end
 
@@ -49,7 +49,8 @@ describe "courses/settings.html.erb" do
     end
 
     it "should not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false}, :membership_type => "NoSissy")
+      role = custom_account_role('NoSissy', :account => @course.root_account)
+      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false}, :role => role)
       view_context(@course, admin)
       assigns[:current_user] = admin
       render

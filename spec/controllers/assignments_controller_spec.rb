@@ -54,33 +54,6 @@ describe AssignmentsController do
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
-    it "should assign variables" do
-      user_session(@student)
-
-      get 'index', :course_id => @course.id
-      expect(assigns[:assignments]).not_to be_nil
-      expect(assigns[:assignment_groups]).not_to be_nil
-    end
-
-    it "should retrieve course assignments if they exist" do
-      user_session(@student)
-
-      get 'index', :course_id => @course.id
-      expect(assigns[:assignment_groups]).not_to be_nil
-      expect(assigns[:assignment_groups]).not_to be_empty
-      expect(assigns[:assignments]).not_to be_nil
-      expect(assigns[:assignments]).not_to be_empty
-      expect(assigns[:assignments][0]).to eql(@assignment)
-    end
-
-    it "should create a default group if none exist" do
-      course_with_student_logged_in(:active_all => true)
-
-      get 'index', :course_id => @course.id
-
-      expect(assigns[:assignment_groups][0].name).to eql("Assignments")
-    end
-
     context "draft state" do
       before :once do
         @course.root_account.enable_feature!(:draft_state)
@@ -96,7 +69,7 @@ describe AssignmentsController do
 
       it "should separate manage_assignments and manage_grades permissions" do
         user_session(@teacher)
-        @course.account.role_overrides.create! enrollment_type: 'TeacherEnrollment', permission: 'manage_assignments', enabled: false
+        @course.account.role_overrides.create! role: teacher_role, permission: 'manage_assignments', enabled: false
         get 'index', course_id: @course.id
         expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
         expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
@@ -152,7 +125,7 @@ describe AssignmentsController do
       @assignment.save!
 
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+                           :role => observer_role, :enabled => false)
 
       get 'show', :course_id => @course.id, :id => @assignment.id
       expect(response).not_to be_redirect

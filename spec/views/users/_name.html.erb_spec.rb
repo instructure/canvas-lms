@@ -61,4 +61,49 @@ describe "/users/name" do
     render :partial => "users/name"
     expect(response.body).not_to match /Delete from #{Account.default.name}/
   end
+
+  describe "merge_user_link" do
+    let(:account) { Account.default }
+    let(:sally) { account_admin_user(account: account) }
+    let(:bob) { teacher_in_course(account: account, active_enrollment: true).user }
+
+    it "should display when acting user has permission to merge shown user" do
+      pseudonym(bob, account: account)
+
+      assigns[:domain_root_account] = account
+      assigns[:context] = account
+      assigns[:current_user] = sally
+      assigns[:user] = bob
+      assigns[:enrollments] = []
+      render partial: "users/name"
+      expect(response).to have_tag("a.merge_user_link")
+    end
+
+    it "should not display when acting user lacks permission to merge shown user" do
+      pseudonym(sally, account: account)
+
+      assigns[:domain_root_account] = account
+      assigns[:context] = account
+      assigns[:current_user] = bob
+      assigns[:user] = sally
+      assigns[:enrollments] = []
+      render partial: "users/name"
+      expect(response).not_to have_tag("a.merge_user_link")
+    end
+
+    it "should not display when non-admin looking at self" do
+      # has permission to merge on self, but wouldn't be able to select any
+      # merge targets
+      pseudonym(bob, account: account)
+
+      assigns[:domain_root_account] = account
+      assigns[:context] = @course
+      assigns[:current_user] = bob
+      assigns[:user] = bob
+      assigns[:enrollments] = []
+      render partial: "users/name"
+      expect(response).to have_tag("a.edit_user_link")
+      expect(response).not_to have_tag("a.merge_user_link")
+    end
+  end
 end

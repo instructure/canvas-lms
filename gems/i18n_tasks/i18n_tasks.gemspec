@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "i18n", "0.6.9"
   spec.add_dependency "ruby_parser", "3.6.1"
-  spec.add_dependency "ya2yaml", "0.30"
+  spec.add_dependency "ya2yaml", ">= 0.30"
   spec.add_dependency "i18n_extraction"
   spec.add_dependency "utf8_cleaner"
 

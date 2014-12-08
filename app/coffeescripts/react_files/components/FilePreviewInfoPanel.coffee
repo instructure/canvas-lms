@@ -4,8 +4,9 @@ define [
   './FriendlyDatetime'
   'compiled/util/friendlyBytes'
   'compiled/react/shared/utils/withReactDOM'
-  '../modules/customPropTypes'
- ], (React, I18n, FriendlyDatetime, friendlyBytes, withReactDOM, customPropTypes) ->
+  '../modules/customPropTypes',
+  '../utils/getFileStatus'
+ ], (React, I18n, FriendlyDatetime, friendlyBytes, withReactDOM, customPropTypes, getFileStatus) ->
 
   FilePreviewInfoPanel = React.createClass
 
@@ -13,10 +14,12 @@ define [
 
     propTypes:
       displayedItem: customPropTypes.filesystemObject.isRequired
-      getStatusMessage: React.PropTypes.func
+
+    getStatusMessage: ->
+      getFileStatus(@props.displayedItem)
 
     render: withReactDOM ->
-      div {className: 'col-xs-4 full-height ef-file-preview-information'},
+      div {className: 'ef-file-preview-information-container'},
         table {className: 'ef-file-preview-infotable'},
           tbody {},
             tr {},
@@ -28,7 +31,7 @@ define [
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_status', 'Status')
               td {},
-                @props.getStatusMessage();
+                @getStatusMessage();
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_kind', 'Kind')
@@ -49,9 +52,8 @@ define [
                 th {scope: 'row'},
                   I18n.t('file_preview_infotable_modifiedby', 'Modified By')
                 td {},
-                  img {className: 'avatar', src: @props.displayedItem?.get('user').avatar_image_url }
-                    a {href: @props.displayedItem?.get('user').html_url},
-                      @props.displayedItem?.get('user').display_name
+                  a {href: @props.displayedItem?.get('user').html_url},
+                    @props.displayedItem?.get('user').display_name
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_datecreated', 'Date Created')

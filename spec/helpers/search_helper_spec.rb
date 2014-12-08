@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe SearchHelper do
   
@@ -40,6 +40,15 @@ describe SearchHelper do
       @current_user = @teacher
       second_section = @course.course_sections.create!(:name => 'second section')
       load_all_contexts(context: second_section)
+
+      expect(@contexts[:courses].count).to eq 1
+      expect(@contexts[:sections].count).to eq 1
+    end
+
+    it "loads the section even with restricted privileges" do
+      course_with_teacher(:active_all => true, :limit_privileges_to_course_section => true)
+      @current_user = @teacher
+      load_all_contexts(context: @course.default_section)
 
       expect(@contexts[:courses].count).to eq 1
       expect(@contexts[:sections].count).to eq 1

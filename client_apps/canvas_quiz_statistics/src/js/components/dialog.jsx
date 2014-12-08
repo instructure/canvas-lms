@@ -152,6 +152,18 @@ define(function(require) {
        * what the toggle element really is.
        */
       "aria-label": React.PropTypes.string,
+
+      /**
+       * @property {String} [autoFocus="a.ui-dialog-titlebar-close"]
+       *
+       * An element to auto focus when the dialog is *opened*. Naturally, this
+       * should be a selector to an element *inside* the dialog content.
+       *
+       * Default is set to focus the close button, which is the default for
+       * Canvas dialogs as well. If you want to opt-out of this behavior, set
+       * this to null or false.
+       */
+      autoFocus: React.PropTypes.string
     },
 
     getInitialState: function() {
@@ -170,8 +182,21 @@ define(function(require) {
         role: 'button',
         title: null,
         width: 300,
-        keyboardAccessible: true
+        keyboardAccessible: true,
+        autoFocus: 'a.ui-dialog-titlebar-close'
       };
+    },
+
+    componentDidMount: function() {
+      var props = this.props;
+
+      // Create the dialog:
+      if (props.content) {
+        this.__renderDialog(props.content, props);
+      }
+      else {
+        console.warn("You are attempting to create a dialog without any content.");
+      }
     },
 
     componentDidUpdate: function(/*prevProps, prevState*/) {
@@ -243,11 +268,17 @@ define(function(require) {
     __renderDialog: function(content, props) {
       var container = document.createElement('div');
       var renderedContent = React.renderComponent(content(), container);
+      var autoFocusSelector = this.props.autoFocus;
 
       $(container).dialog({
         autoOpen: props.autoOpen,
         title: props.title,
-        width: props.width
+        width: props.width,
+        open: function(event, ui) {
+          if (autoFocusSelector) {
+            $(container).closest('.ui-dialog').find(autoFocusSelector).focus();
+          }
+        }
       });
 
       this.setState({

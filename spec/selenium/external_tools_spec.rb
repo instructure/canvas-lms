@@ -101,6 +101,7 @@ describe "external tools" do
 
     before (:each) do
       course_with_teacher_logged_in
+      set_course_draft_state
     end
 
     it "should clear the shared secret after saving" do
@@ -114,7 +115,7 @@ describe "external tools" do
       f('#external_tool_domain').send_keys('instructure.com')
       fj('.ui-dialog:visible .btn-primary').click()
       wait_for_ajaximations
-      f(".edit_tool_link[data-edit-external-tool='#{ContextExternalTool.find_by_name(tool_name).id}']").click
+      f(".edit_tool_link[data-edit-external-tool='#{ContextExternalTool.where(name: tool_name).first.id}']").click
       expect(f('#external_tool_name')).to have_attribute(:value, tool_name)
       expect(f('#external_tool_shared_secret')).to have_attribute(:value, "")
     end
@@ -167,7 +168,6 @@ describe "external tools" do
 
       keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-      f("#context_module_#{@module.id} .admin-links.al-trigger").click
       f("#context_module_#{@module.id} .add_module_item_link").click
 
       f("#add_module_item_select option[value='context_external_tool']").click
@@ -201,7 +201,6 @@ describe "external tools" do
 
       keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-      f("#context_module_#{@module.id} .admin-links.al-trigger").click
       f("#context_module_#{@module.id} .add_module_item_link").click
 
       f("#add_module_item_select option[value='context_external_tool']").click
@@ -222,7 +221,6 @@ describe "external tools" do
 
       keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-      f("#context_module_#{@module.id} .admin-links.al-trigger").click
       f("#context_module_#{@module.id} .add_module_item_link").click
 
       f("#add_module_item_select option[value='context_external_tool']").click
@@ -244,7 +242,6 @@ describe "external tools" do
       expect(@tag.url).to eq @tool1.url
       expect(@tag.content).to eq @tool1
 
-      f("#context_module_#{@module.id} .admin-links.al-trigger").click
       f("#context_module_#{@module.id} .add_module_item_link").click
 
       f("#add_module_item_select option[value='context_external_tool']").click
@@ -277,7 +274,6 @@ describe "external tools" do
 
       keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-      f("#context_module_#{@module.id} .admin-links.al-trigger").click
       f("#context_module_#{@module.id} .add_module_item_link").click
 
       f("#add_module_item_select option[value='context_external_tool']").click
@@ -320,7 +316,6 @@ describe "external tools" do
 
       keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-      f("#context_module_#{@module.id} .admin-links.al-trigger").click
       f("#context_module_#{@module.id} .add_module_item_link").click
       f("#add_module_item_select option[value='context_external_tool']").click
       wait_for_ajax_requests
@@ -381,7 +376,6 @@ describe "external tools" do
 
       keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-      f("#context_module_#{@module.id} .admin-links.al-trigger").click
       f("#context_module_#{@module.id} .add_module_item_link").click
       f("#add_module_item_select option[value='context_external_tool']").click
 
@@ -418,7 +412,7 @@ describe "external tools" do
       get "/courses/#{@course.id}/modules"
       keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-      f("#context_module_item_#{@tag.id}").click
+      f("#context_module_item_#{@tag.id} .al-trigger").click
       f("#context_module_item_#{@tag.id} .edit_item_link").click
 
       expect(f("#edit_item_form")).to be_displayed
@@ -679,7 +673,7 @@ describe "external tools" do
           f('#external_tool_domain').send_keys('instructure.com')
           f('#external_tool_form').submit()
           wait_for_ajaximations
-          f("#external_tool_#{ContextExternalTool.find_by_name(tool_name).id} .edit_tool_link").click
+          f("#external_tool_#{ContextExternalTool.where(name: tool_name).first.id} .edit_tool_link").click
           expect(f('#external_tool_name')).to have_attribute(:value, tool_name)
           expect(f('#external_tool_shared_secret')).to have_attribute(:value, "")
         end
@@ -832,6 +826,7 @@ describe "external tools" do
   describe 'return url redirection' do
     before do
       course_with_teacher_logged_in(active_all: true)
+      set_course_draft_state
       @tool = @course.context_external_tools.create!(
           name: "new tool",
           consumer_key: "key",
@@ -875,7 +870,7 @@ describe "external tools" do
         next_item = @mod.add_item(:type => 'external_url', :url => "http://#{HostUrl.default_host}", :title => 'pls view')
         get "/courses/#{@course.id}/modules/items/#{@mod_item.id}"
 
-        expect(f('#sequence_footer a.next')['href']).to end_with "/courses/#{@course.id}/modules/items/#{next_item.id}"
+        expect(f('#sequence_footer a.pull-right')['href']).to end_with "/courses/#{@course.id}/modules/items/#{next_item.id}"
         return_from_tool
 
         expect(driver.current_url).to match %r{/courses/\d+/modules$}

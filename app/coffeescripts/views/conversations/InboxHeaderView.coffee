@@ -27,6 +27,9 @@ define [
       '#sending-message' : '$sendingMessage'
       '#sending-spinner' : '$sendingSpinner'
       '[role=search]'    : '$search'
+      '#conversation-actions'       : '$conversationActions'
+      '#submission-comment-actions' : '$submissionCommentActions'
+      '#submission-reply-btn'       : '$submissionReplyBtn'
 
     events:
       'click #compose-btn':       'onCompose'
@@ -40,6 +43,7 @@ define [
       'click #mark-read-btn':   'onMarkRead'
       'click #forward-btn':       'onForward'
       'click #star-toggle-btn':   'onStarToggle'
+      'click #submission-reply-btn': 'onSubmissionReply'
 
     messages:
       star: I18n.t('star', 'Star')
@@ -95,6 +99,8 @@ define [
       e.preventDefault()
       @trigger('star-toggle')
 
+    onSubmissionReply: (e) -> @trigger('submission-reply')
+
     onModelChange: (newModel, oldModel) ->
       @detachModelEvents(oldModel)
       @attachModelEvents(newModel)
@@ -141,6 +147,14 @@ define [
 
     onFilterChange: (e) =>
       @searchView?.autocompleteView.setContext(@courseView.getCurrentContext())
+      if @$typeFilter.val() == 'submission_comments'
+        @$search.show()
+        @$conversationActions.hide()
+        @$submissionCommentActions.show()
+      else
+        @$search.show()
+        @$conversationActions.show()
+        @$submissionCommentActions.hide()
       @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
 
     displayState: (state) ->
@@ -156,10 +170,12 @@ define [
       @toggleAdminBtn(value)
       @hideForwardBtn(value)
 
-    toggleReplyBtn:    (value) -> @_toggleBtn(@$replyBtn, value)
+    toggleReplyBtn:    (value) ->
+      @_toggleBtn(@$replyBtn, value)
+      @_toggleBtn(@$submissionReplyBtn, value)
 
     toggleReplyAllBtn: (value) -> @_toggleBtn(@$replyAllBtn, value)
-    
+
     toggleArchiveBtn:  (value) -> @_toggleBtn(@$archiveBtn, value)
 
     toggleDeleteBtn:   (value) -> @_toggleBtn(@$deleteBtn, value)

@@ -9,9 +9,6 @@ define [
     propTypes:
       progress: React.PropTypes.number.isRequired
 
-    createWidthStyle: ->
-      width: @props.progress + '%'
-
     render: withReactDOM ->
       almostDone = ''
       almostDone = ' almost-done' if @props.progress == 100
@@ -23,4 +20,5 @@ define [
           'aria-valuenow': @props.progress
           'aria-valuemin': 0
           'aria-valuemax': 100
-          style: @createWidthStyle()
+          style:
+            width: @props.progress + '%'

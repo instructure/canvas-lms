@@ -82,15 +82,22 @@ class Assignment < ActiveRecord::Base
   validate :positive_points_possible?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
-    # only accept the url and new_tab params, the other accessible
+    # only accept the url, content_type, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
-    attrs.slice!(:url, :new_tab)
+    content = case attrs['content_type']
+                when 'Lti::MessageHandler'
+                  Lti::MessageHandler.find(attrs['content_id'].to_i)
+                when 'ContextExternalTool'
+                  ContextExternalTool.find(attrs['content_id'].to_i)
+              end
+    attrs[:content] = content if content
+    attrs.slice!(:url, :new_tab, :content)
     false
   }
   before_validation do |assignment|
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
-      assignment.external_tool_tag.content_type = "ContextExternalTool"
+      assignment.external_tool_tag.content_type ||= "ContextExternalTool"
     else
       assignment.association(:external_tool_tag).reset
     end
@@ -1098,7 +1105,7 @@ class Assignment < ActiveRecord::Base
     res
   end
 
-  SUBMIT_HOMEWORK_ATTRS = %w[body url attachments submission_type
+  SUBMIT_HOMEWORK_ATTRS = %w[body url submission_type
                              media_comment_id media_comment_type]
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
                                     %w[comment group_comment attachments]).to_set
@@ -1284,6 +1291,7 @@ class Assignment < ActiveRecord::Base
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
                                                json[:attachment][:crocodoc_url] = a.crocodoc_url(user)
+                                               json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                                              }
                                            end
                                          end
@@ -1589,26 +1597,21 @@ class Assignment < ActiveRecord::Base
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
   }
 
-  # shim to get MRA build passing (remove once MRA is patched)
-  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
-    visible_to_students_in_course_with_da(user_id, course_id)
-  }
-
   # course_ids should be courses that restrict visibility based on overrides
   # ie: courses with differentiated assignments on or in which the user is not a teacher
-  scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids|
-    if course_ids.nil? || course_ids.empty?
+  scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids_that_have_da_enabled|
+    if course_ids_that_have_da_enabled.nil? || course_ids_that_have_da_enabled.empty?
       active
     else
-      joins(:assignment_student_visibilities).
-      where("""
-        (assignments.context_id NOT IN (?)
-        AND assignments.workflow_state<>'deleted')
-        OR (
-          assignment_student_visibilities.user_id IN (?)
-          AND assignment_student_visibilities.course_id IN (?)
-        )
-      """, course_ids, user_ids, course_ids)
+      user_ids = Array.wrap(user_ids).join(',')
+      course_ids = Array.wrap(course_ids_that_have_da_enabled).join(',')
+      scope = joins(sanitize_sql([<<-SQL, course_ids, user_ids]))
+        LEFT OUTER JOIN assignment_student_visibilities ON (
+         assignment_student_visibilities.assignment_id = assignments.id
+         AND assignment_student_visibilities.course_id IN (%s)
+         AND assignment_student_visibilities.user_id IN (%s))
+      SQL
+      scope.where("(assignments.context_id NOT IN (?) AND assignments.workflow_state<>'deleted') OR (assignment_student_visibilities.assignment_id IS NOT NULL)", course_ids_that_have_da_enabled)
     end
   }
 
@@ -1870,7 +1873,20 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.submissions.having_submission.where("user_id IS NOT NULL").exists?
+    if attribute_present? :student_submission_count
+      student_submission_count.to_i > 0
+    else
+      submissions.having_submission.where("user_id IS NOT NULL").exists?
+    end
+  end
+
+  def self.with_student_submission_count
+    joins("LEFT OUTER JOIN submissions s ON
+           s.assignment_id = assignments.id AND
+           s.submission_type IS NOT NULL AND
+           s.user_id IS NOT NULL")
+    .group("assignments.id")
+    .select("assignments.*, count(s.id) AS student_submission_count")
   end
 
   def can_unpublish?

@@ -9,6 +9,7 @@ require [
   'compiled/views/conversations/MessageListView'
   'compiled/views/conversations/MessageDetailView'
   'compiled/views/conversations/MessageFormDialog'
+  'compiled/views/conversations/SubmissionCommentFormDialog'
   'compiled/views/conversations/InboxHeaderView'
   'compiled/util/deparam'
   'compiled/collections/CourseCollection'
@@ -16,7 +17,7 @@ require [
   'compiled/collections/GroupCollection'
   'compiled/behaviors/unread_conversations'
   'jquery.disableWhileLoading'
-], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
+], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog, SubmissionCommentFormDialog,
  InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection, GroupCollection) ->
 
   class ConversationsRouter extends Backbone.Router
@@ -99,8 +100,14 @@ require [
       @detail.onModelChange(model, null)
       @detail.render()
 
+    onSubmissionReply: =>
+      @submissionReply.show(@detail.model, trigger: $('#submission-reply-btn'))
+
     onReply: (message) =>
-      @_delegateReply(message, 'reply')
+      if @detail.model.get('for_submission')
+        @onSubmissionReply()
+      else
+        @_delegateReply(message, 'reply')
 
     onReplyAll: (message) =>
       @_delegateReply(message, 'replyAll')
@@ -145,10 +152,21 @@ require [
       @selectConversation(null)
       @list.selectedMessages = []
       @list.collection.reset()
-      @list.collection.setParam('scope', filters.type)
-      @list.collection.setParam('filter', @_currentFilter())
-      @list.collection.setParam('filter_mode', 'and')
-      @list.collection.setParam('include_private_conversation_enrollments', false)
+      if filters.type == 'submission_comments'
+        _.each(['scope', 'filter', 'filter_mode', 'include_private_conversation_enrollments'], @list.collection.deleteParam, @list.collection)
+        @list.collection.url = '/api/v1/users/self/activity_stream'
+        @list.collection.setParam('asset_type', 'Submission')
+        if filters.course
+          @list.collection.setParam('context_code', filters.course)
+        else
+          @list.collection.deleteParam('context_code')
+      else
+        _.each(['context_code', 'asset_type', 'submission_user_id'], @list.collection.deleteParam, @list.collection)
+        @list.collection.url = '/api/v1/conversations'
+        @list.collection.setParam('scope', filters.type)
+        @list.collection.setParam('filter', @_currentFilter())
+        @list.collection.setParam('filter_mode', 'and')
+        @list.collection.setParam('include_private_conversation_enrollments', false)
       @list.collection.fetch()
       @compose.setDefaultCourse(filters.course)
 
@@ -213,6 +231,7 @@ require [
       @_initDetailView()
       @_initHeaderView()
       @_initComposeDialog()
+      @_initSubmissionCommentReplyDialog()
 
     _attachEvents: ->
       @list.collection.on('change:selected', @onSelected)
@@ -228,11 +247,14 @@ require [
       @header.on('forward',     @onForward)
       @header.on('star-toggle', @onStarToggle)
       @header.on('search',      @onSearch)
+      @header.on('submission-reply', @onReply)
       @compose.on('close',      @onCloseCompose)
       @compose.on('addMessage', @onAddMessage)
       @compose.on('addMessage', @list.updateMessage)
       @compose.on('newConversations', @onNewConversations)
       @compose.on('submitting', @onSubmit)
+      @submissionReply.on('addMessage', @onSubmissionAddMessage)
+      @submissionReply.on('submitting', @onSubmit)
       @detail.on('reply',       @onReply)
       @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
@@ -262,6 +284,14 @@ require [
         if model == @detail.model
           @detail.render()
 
+    onSubmissionAddMessage: (message, submission) =>
+      model = @list.collection.findWhere(submission_id: submission.id)
+      if model? && model.get('messages')
+        model.get('messages').unshift(message)
+        model.trigger('change:messages')
+        if model == @detail.model
+          @detail.render()
+
     onNewConversations: (conversations) =>
 
     _incrementSending: (increment) ->
@@ -276,7 +306,13 @@ require [
     onSearch: (tokens) =>
       @list.collection.reset()
       @searchTokens = if tokens.length then tokens else null
-      @list.collection.setParam('filter', @_currentFilter())
+      if @filters.type == 'submission_comments'
+        if @searchTokens and match = @searchTokens[0].match(/^user_(\d+)$/)
+          @list.collection.setParam('submission_user_id', match[1])
+        else
+          @list.collection.deleteParam('submission_user_id')
+      else
+        @list.collection.setParam('filter', @_currentFilter())
       delete @detail.model
       @list.selectedMessages = []
       @detail.render()
@@ -303,6 +339,9 @@ require [
         courses: @courses
         folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID
         account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
+
+    _initSubmissionCommentReplyDialog: ->
+      @submissionReply = new SubmissionCommentFormDialog
 
     onKeyDown: (e) =>
       nodeName = e.target.nodeName.toLowerCase()

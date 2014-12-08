@@ -89,8 +89,7 @@ define [
       form {
         ref: 'dialogForm', 
         onSubmit: @handleSubmit, 
-        className: 'form-horizontal form-dialog permissions-dialog-form', 
-        title: I18n.t("title.limit_student_access", "Permissions")
+        className: 'form-horizontal form-dialog permissions-dialog-form',
       },
         div className: "radio",
           label {},
@@ -102,7 +101,7 @@ define [
               onChange: (event) =>
                 @setState { selectedOption: 'published'}
             },
-            I18n.t("options.publish.description", "Publish")
+          I18n.t("options.publish.description", "Publish")
 
         div className: "radio",
           label {},

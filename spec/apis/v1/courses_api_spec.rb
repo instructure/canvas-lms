@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 class TestCourseApi
@@ -114,7 +115,8 @@ describe Api::V1::Course do
       it "should include computed scores" do
         expect(json['enrollments']).to eq [{
           "type" => "student",
-          "role" => "StudentEnrollment",
+          "role" => student_role.name,
+          "role_id" => student_role.id,
           "enrollment_state" => "active",
           "computed_current_score" => 95,
           "computed_final_score" => 85,
@@ -430,11 +432,11 @@ describe CoursesController, type: :request do
 
       context "without :manage_storage_quotas" do
         before :once do
-          custom_account_role 'lamer', :account => @account
+          @role = custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
-                                          :enrollment_type => 'lamer'
+                                          :role => @role
           user
-          @account.account_users.create!(user: @user, membership_type: 'lamer')
+          @account.account_users.create!(user: @user, role: @role)
         end
 
         it "should ignore storage_quota" do
@@ -1053,6 +1055,30 @@ describe CoursesController, type: :request do
     )
   end
 
+  describe "term dates" do
+    before do
+      @course2.enrollment_term.set_overrides(@course1.account, 'StudentEnrollment' =>
+          {start_at: '2014-01-01T00:00:00Z', end_at: '2014-12-31T00:00:00Z'})
+    end
+
+    it "should return overridden term dates from index" do
+      json = api_call_as_user(@student, :get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :include => ['term'] })
+      course_json = json.detect { |c| c['id'] == @course2.id }
+      expect(course_json['term']['start_at']).to eq '2014-01-01T00:00:00Z'
+      expect(course_json['term']['end_at']).to eq '2014-12-31T00:00:00Z'
+    end
+
+    it "should return overridden term dates from show" do
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course2.id}",
+                      { :controller => 'courses', :action => 'show', :id => @course.to_param, :format => 'json' },
+                      { :include => ['term'] })
+      expect(json['term']['start_at']).to eq '2014-01-01T00:00:00Z'
+      expect(json['term']['end_at']).to eq '2014-12-31T00:00:00Z'
+    end
+  end
+
   it "should return public_syllabus if requested" do
     @course1.public_syllabus = true
     @course1.save
@@ -1133,11 +1159,11 @@ describe CoursesController, type: :request do
 
   describe "enrollment_role" do
     before :once do
-      role = Account.default.roles.build :name => 'SuperTeacher'
-      role.base_role_type = 'TeacherEnrollment'
-      role.save!
+      @role = Account.default.roles.build :name => 'SuperTeacher'
+      @role.base_role_type = 'TeacherEnrollment'
+      @role.save!
       @course3 = course
-      @course3.enroll_user(@me, 'TeacherEnrollment', { :role_name => 'SuperTeacher', :active_all => true })
+      @course3.enroll_user(@me, 'TeacherEnrollment', { :role => @role, :active_all => true })
     end
 
     it "should return courses with all teacher types on ?enrollment_type=teacher" do
@@ -1156,14 +1182,17 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses.json?enrollment_role=SuperTeacher",
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'enrollment_state' => 'invited' }]
     end
   end
 
   describe "course state" do
     before :once do
+      @role = Account.default.roles.build :name => 'SuperTeacher'
+      @role.base_role_type = 'TeacherEnrollment'
+      @role.save!
       @course3 = course
-      @course3.enroll_user(@me, 'TeacherEnrollment', { :role_name => 'SuperTeacher', :active_all => true })
+      @course3.enroll_user(@me, 'TeacherEnrollment', { :role => @role, :active_all => true })
       @course4 = course
       @course4.enroll_user(@me, 'TaEnrollment')
       @course4.workflow_state = 'created'
@@ -1205,7 +1234,7 @@ describe CoursesController, type: :request do
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' },
                       { :state => ['unpublished'] })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'enrollment_state' => 'invited' }]
       json.collect{ |c| c['workflow_state']}.each do |s|
         expect(%w{unpublished}).to include(s)
       end
@@ -1214,7 +1243,8 @@ describe CoursesController, type: :request do
     it "should not return courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
       @course4.enrollments.each do |e|
         e.type = 'StudentEnrollment'
-        e.save
+        e.role_id = student_role.id
+        e.save!
       end
       json = api_call(:get, "/api/v1/courses.json",
                       { :controller => 'courses', :action => 'index', :format => 'json' },
@@ -1223,7 +1253,8 @@ describe CoursesController, type: :request do
 
       @course3.enrollments.each do |e|
         e.type = 'ObserverEnrollment'
-        e.save
+        e.role_id = observer_role.id
+        e.save!
       end
       json = api_call(:get, "/api/v1/courses.json",
                       { :controller => 'courses', :action => 'index', :format => 'json' },
@@ -1234,13 +1265,15 @@ describe CoursesController, type: :request do
     it "should return courses with active StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
       @course3.enrollments.each do |e|
         e.type = 'ObserverEnrollment'
+        e.role_id = observer_role.id
         e.workflow_state = "active"
-        e.save
+        e.save!
       end
       @course4.enrollments.each do |e|
         e.type = 'StudentEnrollment'
+        e.role_id = student_role.id
         e.workflow_state = "active"
-        e.save
+        e.save!
       end
       json = api_call(:get, "/api/v1/courses.json",
                       { :controller => 'courses', :action => 'index', :format => 'json' },
@@ -1295,7 +1328,7 @@ describe CoursesController, type: :request do
       first_user = @user
       new_user = User.create!(:name => 'Zombo')
       @course2.enroll_student(new_user).accept!
-      RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :role => teacher_role, :enabled => false)
 
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
@@ -1307,7 +1340,7 @@ describe CoursesController, type: :request do
       first_user = @user
       new_user = User.create!(:name => 'Zombo')
       @course2.enroll_student(new_user).accept!
-      RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :role => teacher_role, :enabled => false)
 
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
@@ -1369,7 +1402,7 @@ describe CoursesController, type: :request do
       new_user = User.create!(:name => 'Zombo')
       @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
       @course2.enroll_student(new_user).accept!
-      ro = RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+      ro = RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :role => teacher_role, :enabled => false)
 
       json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
@@ -1611,7 +1644,7 @@ describe CoursesController, type: :request do
           role.base_role_type = 'StudentEnrollment'
           role.save!
           @student3 = user(:name => 'S3')
-          @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role_name => 'EliteStudent' })
+          @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role => role })
         end
 
         it "should return all student types with ?enrollment_type=student" do
@@ -1647,6 +1680,40 @@ describe CoursesController, type: :request do
         end
       end
 
+      describe "enrollment_role_id" do
+        before :once do
+          @role = Account.default.roles.build :name => 'EliteStudent'
+          @role.base_role_type = 'StudentEnrollment'
+          @role.save!
+          @student3 = user(:name => 'S3')
+          @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role => @role })
+        end
+
+        it "should return only base student types with ?enrollment_role_id=(built_in_role id)" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                          :enrollment_role_id => student_role.id)
+
+          expect(json.map {|x| x["id"].to_i}.sort).to eq [@student1, @student2].map(&:id).sort
+        end
+
+        it "should return users with a custom role type" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                          :enrollment_role_id => @role.id)
+
+          expect(json.map {|x| x["id"].to_i}).to eq [@student3.id]
+        end
+
+        it "should accept an array of enrollment roles" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                          :enrollment_role_id => [student_role.id, @role.id])
+
+          expect(json.map {|x| x["id"].to_i}.sort).to eq [@student1, @student2, @student3].map(&:id).sort
+        end
+      end
+
       it "maintains query parameters in link headers" do
         json = api_call(
           :get,
@@ -1660,7 +1727,7 @@ describe CoursesController, type: :request do
       end
 
       it "should not include sis user id or login id for non-admins" do
-        RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+        RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :role => teacher_role, :enabled => false)
         student_in_course(:course => @course2, :active_all => true, :name => 'Zombo')
 
         @user = @me # @me is a student in course 2
@@ -1779,7 +1846,7 @@ describe CoursesController, type: :request do
         new_user = User.create!(:name => 'Zombo')
         @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
         @course2.enroll_student(new_user).accept!
-        ro = RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+        ro = RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :role => teacher_role, :enabled => false)
 
         json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
@@ -1906,7 +1973,7 @@ describe CoursesController, type: :request do
         'name' => @course1.name,
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'enrollment_state' => 'active'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'enrollment_state' => 'active'}],
         'sis_course_id' => @course1.sis_course_id,
         'integration_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
@@ -2101,7 +2168,9 @@ describe CoursesController, type: :request do
       expect(json).to eq({
         'allow_student_discussion_topics' => true,
         'allow_student_forum_attachments' => false,
-        'allow_student_discussion_editing' => true
+        'allow_student_discussion_editing' => true,
+        'grading_standard_enabled' => false,
+        'grading_standard_id' => nil
       })
     end
 
@@ -2121,7 +2190,9 @@ describe CoursesController, type: :request do
       expect(json).to eq({
         'allow_student_discussion_topics' => false,
         'allow_student_forum_attachments' => true,
-        'allow_student_discussion_editing' => false
+        'allow_student_discussion_editing' => false,
+        'grading_standard_enabled' => false,
+        'grading_standard_id' => nil
       })
       @course.reload
       expect(@course.allow_student_discussion_topics).to eq false
@@ -2394,4 +2465,34 @@ describe ContentImportsController, type: :request do
       check_counts(1, option)
     end
   end
+
+  it "should create and retrieve link validation results" do
+    course_with_teacher_logged_in(:active_all => true, :name => 'validayshun')
+
+    # shouldn't have started
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
+      { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json).to be_empty
+
+    # start
+    json = api_call(:post, "/api/v1/courses/#{@course.id}/link_validation",
+      { :controller => 'courses', :action => 'start_link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json).to eq({'success' => true})
+
+    # check queued state
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
+      { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json).to eq({'state' => 'queued'})
+
+    CourseLinkValidator.any_instance.stubs(:check_course)
+    CourseLinkValidator.any_instance.stubs(:issues).returns(['mock_issue'])
+    run_jobs
+
+    # check results
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/link_validation",
+                    { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
+    expect(json['state']).to eq('completed')
+    expect(json['issues']).to eq(['mock_issue'])
+  end
+
 end

@@ -171,19 +171,16 @@ class GradeSummaryPresenter
 
   def assignment_stats
     @stats ||= begin
-      chain = @context.assignments.active
-        .except(:order)
-        .joins(:submissions)
-        .where("submissions.user_id in (?)", real_and_active_student_ids)
+      chain = @context.assignments.active.except(:order)
       if @context.feature_enabled?(:differentiated_assignments)
         # if DA is on, further restrict the assignments to those visible to each student
-        chain = chain.joins(:assignment_student_visibilities).where("""
-                  submissions.assignment_id = assignments.id
-                  AND submissions.assignment_id = assignment_student_visibilities.assignment_id
-                  AND submissions.user_id = assignment_student_visibilities.user_id
-                """)
+        # note: adding the context_id avoids a seq scan
+        chain = chain.joins(:assignment_student_visibilities).
+          where("assignment_student_visibilities.course_id = ?", @context.id)
       end
-      chain.group("assignments.id")
+      chain.joins(:submissions)
+        .where("submissions.user_id in (?)", real_and_active_student_ids)
+        .group("assignments.id")
         .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
         .index_by(&:id)
     end

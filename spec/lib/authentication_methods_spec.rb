@@ -49,7 +49,8 @@ describe AuthenticationMethods do
         cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
 
         request = stub(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
-                      :format => stub(:json? => false))
+                      :format => stub(:json? => false),
+                      :host_with_port => "")
         controller = RSpec::MockController.new(domain_root_account, request)
         controller.expects(:destroy_session).once
         controller.expects(:redirect_to_login).once
@@ -137,7 +138,8 @@ describe AuthenticationMethods do
   describe "#load_user" do
     before do
       @request = stub(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
-                      :format => stub(:json? => false))
+                      :format => stub(:json? => false),
+                      :host_with_port => "")
       @controller = RSpec::MockController.new(nil, @request)
       @controller.stubs(:load_pseudonym_from_access_token)
       @controller.stubs(:api_request?).returns(false)
@@ -174,6 +176,53 @@ describe AuthenticationMethods do
         expect(@controller.instance_variable_get(:@current_user)).to eq @user
         expect(@controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
       end
+
+      it "should set the CSRF cookie" do
+        @controller.send(:load_user)
+        expect(@controller.cookies['_csrf_token']).not_to be nil
+      end
+    end
+  end
+
+  describe "#masked_authenticity_token" do
+    before do
+      @request = stub(host_with_port: "")
+      @controller = RSpec::MockController.new(nil, @request)
+      @session_options = {}
+      CanvasRails::Application.config.expects(:session_options).at_least_once.returns(@session_options)
+    end
+
+    it "should not set SSL-only explicitly if session_options doesn't specify" do
+      @controller.send(:masked_authenticity_token)
+      expect(@controller.cookies['_csrf_token']).not_to be_has_key(:secure)
+    end
+
+    it "should set SSL-only if session_options specifies" do
+      @session_options[:secure] = true
+      @controller.send(:masked_authenticity_token)
+      expect(@controller.cookies['_csrf_token'][:secure]).to be true
+    end
+
+    it "should set httponly explicitly false on a non-files host" do
+      @controller.send(:masked_authenticity_token)
+      expect(@controller.cookies['_csrf_token'][:httponly]).to be false
+    end
+
+    it "should set httponly explicitly true on a files host" do
+      HostUrl.expects(:is_file_host?).once.with(@request.host_with_port).returns(true)
+      @controller.send(:masked_authenticity_token)
+      expect(@controller.cookies['_csrf_token'][:httponly]).to be true
+    end
+
+    it "should not set a cookie domain explicitly if session_options doesn't specify" do
+      @controller.send(:masked_authenticity_token)
+      expect(@controller.cookies['_csrf_token']).not_to be_has_key(:domain)
+    end
+
+    it "should set a cookie domain explicitly if session_options specifies" do
+      @session_options[:domain] = "cookie domain"
+      @controller.send(:masked_authenticity_token)
+      expect(@controller.cookies['_csrf_token'][:domain]).to eq @session_options[:domain]
     end
   end
 end
@@ -205,6 +254,8 @@ class RSpec::MockController
     options[:target]
   end
 
-  def cookies; {}; end
+  def cookies
+    @cookies ||= {}
+  end
 end
 

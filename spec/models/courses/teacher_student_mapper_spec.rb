@@ -39,12 +39,26 @@ module Courses
         stub(user_id: 101, course_section_id: 99, limit_privileges_to_course_section: true)
       ]
     }
+    let(:mock_only_section_limited_teacher_enrollments) {
+      [
+        stub(user_id: teacher_id, course_section_id: course_section_id_1, limit_privileges_to_course_section: true),
+        stub(user_id: teacher_id, course_section_id: course_section_id_2, limit_privileges_to_course_section: true),
+      ]
+    }
 
 
     describe "#teachers_for_student" do
       it 'returns teacher ids for a given student id' do
         teacher_student_mapper = TeacherStudentMapper.new(mock_student_enrollments, mock_teacher_enrollments)
         expect(teacher_student_mapper.teachers_for_student(student_id)).to match_array [teacher_id, privileged_teacher_id]
+      end
+
+      it 'works even if all teachers are section limited' do
+        teacher_student_mapper = TeacherStudentMapper.new(
+          mock_student_enrollments,
+          mock_only_section_limited_teacher_enrollments
+        )
+        expect(teacher_student_mapper.teachers_for_student(student_id)).to match_array [teacher_id]
       end
     end
 

@@ -301,7 +301,7 @@ describe CourseSection, "moving to new course" do
         RoleOverride.create!({
           :context => Account.default,
           :permission => 'manage_students',
-          :enrollment_type => "TaEnrollment",
+          :role => ta_role,
           :enabled => false
         })
         course_with_ta(:active_all => true)

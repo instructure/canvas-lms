@@ -213,6 +213,12 @@ namespace :js do
     end
 
     threads << Thread.new do
+      puts "--> Compiling React JSX"
+      jsx_time = Benchmark.realtime { Rake::Task['js:jsx'].invoke }
+      puts "--> Compiling React JSX finished in #{jsx_time}"
+    end
+
+    threads << Thread.new do
       puts "--> Pre-compiling handlebars templates"
       handlebars_time = Benchmark.realtime { Rake::Task['jst:compile'].invoke }
       puts "--> Pre-compiling handlebars templates finished in #{handlebars_time}"
@@ -283,6 +289,22 @@ namespace :js do
     puts "--> Compressed JavaScript in #{optimize_time}"
   end
 
+  desc "Compile React JSX to JS"
+  task :jsx do
+    source = Rails.root + 'app/jsx'
+    dest = Rails.root + 'public/javascripts/jsx'
+    if Rails.env == 'development'
+      #npm_run "jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null"
+      msg = `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null`
+    else
+      msg = `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest} 2>&1 >/dev/null`
+    end
+
+    unless $?.success?
+      raise msg
+    end
+  end
+
   desc "creates ember app bundles"
   task :bundle_ember_apps do
     require 'lib/ember_bundle'
@@ -290,5 +312,14 @@ namespace :js do
       EmberBundle.new(app).build
     end
   end
+
+  #def npm_run(command)
+    #puts "Running npm script `#{command}`"
+    #msg = `$(npm bin)/#{command} 2>&1`
+    #unless $?.success?
+      #raise msg
+    #end
+    #msg
+  #end
 
 end

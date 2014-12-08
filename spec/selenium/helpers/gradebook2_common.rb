@@ -102,8 +102,8 @@ def conclude_and_unconclude_course
   @course.reload
 end
 
-def data_setup
-  course_with_teacher_logged_in
+def gradebook_data_setup
+  assignment_setup_defaults
   assignment_setup
 end
 
@@ -111,8 +111,28 @@ def data_setup_as_observer
   user_with_pseudonym
   course_with_observer_logged_in user: @user
   @course.observers=[@observer]
+  assignment_setup_defaults
   assignment_setup
   @all_students.each {|s| s.observers=[@observer]}
+end
+
+def assignment_setup_defaults
+  @assignment_1_points = "10"
+  @assignment_2_points = "5"
+  @assignment_3_points = "50"
+  @attendance_points = "15"
+
+  @student_name_1 = "student 1"
+  @student_name_2 = "student 2"
+  @student_name_3 = "student 3"
+
+  @student_1_total_ignoring_ungraded = "100%"
+  @student_2_total_ignoring_ungraded = "66.7%"
+  @student_3_total_ignoring_ungraded = "66.7%"
+  @student_1_total_treating_ungraded_as_zeros = "18.8%"
+  @student_2_total_treating_ungraded_as_zeros = "12.5%"
+  @student_3_total_treating_ungraded_as_zeros = "12.5%"
+  @default_password = "qwerty"
 end
 
 def assignment_setup
@@ -122,9 +142,9 @@ def assignment_setup
   @course.reload
 
   #add first student
-  @student_1 = User.create!(:name => STUDENT_NAME_1)
+  @student_1 = User.create!(:name => @student_name_1)
   @student_1.register!
-  @student_1.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+  @student_1.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => @default_password, :password_confirmation => @default_password)
 
   e1 = @course.enroll_student(@student_1)
   e1.workflow_state = 'active'
@@ -132,9 +152,9 @@ def assignment_setup
   @course.reload
   #add second student
   @other_section = @course.course_sections.create(:name => "the other section")
-  @student_2 = User.create!(:name => STUDENT_NAME_2)
+  @student_2 = User.create!(:name => @student_name_2)
   @student_2.register!
-  @student_2.pseudonyms.create!(:unique_id => "nobody2@example.com", :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+  @student_2.pseudonyms.create!(:unique_id => "nobody2@example.com", :password => @default_password, :password_confirmation => @default_password)
   e2 = @course.enroll_student(@student_2, :section => @other_section)
 
   e2.workflow_state = 'active'
@@ -142,9 +162,9 @@ def assignment_setup
   @course.reload
 
   #add third student
-  @student_3 = User.create!(:name => STUDENT_NAME_3)
+  @student_3 = User.create!(:name => @student_name_3)
   @student_3.register!
-  @student_3.pseudonyms.create!(:unique_id => "nobody3@example.com", :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+  @student_3.pseudonyms.create!(:unique_id => "nobody3@example.com", :password => @default_password, :password_confirmation => @default_password)
   e3 = @course.enroll_student(@student_3)
   e3.workflow_state = 'active'
   e3.save!
@@ -158,7 +178,7 @@ def assignment_setup
                                            :course => @course,
                                            :name => 'A name that would not reasonably fit in the header cell which should have some limit set',
                                            :due_at => nil,
-                                           :points_possible => ASSIGNMENT_1_POINTS,
+                                           :points_possible => @assignment_1_points,
                                            :submission_types => 'online_text_entry,online_upload',
                                            :assignment_group => @group
                                        })
@@ -187,7 +207,7 @@ def assignment_setup
                                             :course => @course,
                                             :name => 'second assignment',
                                             :due_at => nil,
-                                            :points_possible => ASSIGNMENT_2_POINTS,
+                                            :points_possible => @assignment_2_points,
                                             :submission_types => 'online_text_entry',
                                             :assignment_group => @group
                                         })
@@ -206,7 +226,7 @@ def assignment_setup
                                            :course => @course,
                                            :name => 'assignment three',
                                            :due_at => due_date,
-                                           :points_possible => ASSIGNMENT_3_POINTS,
+                                           :points_possible => @assignment_3_points,
                                            :submission_types => 'online_text_entry',
                                            :assignment_group => @group
                                        })
@@ -218,7 +238,7 @@ def assignment_setup
                                                 :name => 'attendance assignment',
                                                 :title => 'attendance assignment',
                                                 :due_at => nil,
-                                                :points_possible => ATTENDANCE_POINTS,
+                                                :points_possible => @attendance_points,
                                                 :submission_types => 'attendance',
                                                 :assignment_group => @group,
                                             })

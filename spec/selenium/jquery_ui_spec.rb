@@ -25,6 +25,7 @@ describe "jquery ui" do
 
   before (:each) do
     course_with_teacher_logged_in
+    set_course_draft_state
     get "/"
   end
   
@@ -71,7 +72,7 @@ describe "jquery ui" do
     it "should let you replace content by selecting and typing instead of appending" do
       get "/courses/#{@course.id}/assignments"
       
-      f("#right-side .add_assignment_link").click
+      f(".add_assignment").click
       wait_for_ajaximations
       f(".ui-datepicker-trigger").click
       wait_for_ajaximations

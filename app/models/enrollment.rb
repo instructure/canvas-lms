@@ -18,6 +18,15 @@
 
 class Enrollment < ActiveRecord::Base
 
+  BASE_ROLE_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"]
+  SIS_TYPES = {
+      'TeacherEnrollment' => 'teacher',
+      'TaEnrollment' => 'ta',
+      'DesignerEnrollment' => 'designer',
+      'StudentEnrollment' => 'student',
+      'ObserverEnrollment' => 'observer'
+  }
+
   include Workflow
 
   belongs_to :course, :touch => true, :inverse_of => :enrollments
@@ -25,6 +34,10 @@ class Enrollment < ActiveRecord::Base
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :user
   belongs_to :associated_user, :class_name => 'User'
+
+  belongs_to :role
+  include Role::AssociationHelper
+
   has_many :role_overrides, :as => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
@@ -32,7 +45,7 @@ class Enrollment < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [
     :id, :user_id, :course_id, :type, :uuid, :workflow_state, :created_at, :updated_at, :associated_user_id, :sis_source_id, :sis_batch_id, :start_at, :end_at,
     :course_section_id, :root_account_id, :computed_final_score, :completed_at, :self_enrolled, :computed_current_score, :grade_publishing_status, :last_publish_attempt_at,
-    :grade_publishing_message, :limit_privileges_to_course_section, :role_name, :last_activity_at
+    :grade_publishing_message, :limit_privileges_to_course_section, :role_id, :last_activity_at
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :root_account, :user, :role_overrides, :pseudonyms]
@@ -42,6 +55,8 @@ class Enrollment < ActiveRecord::Base
   validates_inclusion_of :associated_user_id, :in => [nil],
                          :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
                          :message => "only ObserverEnrollments may have an associated_user_id"
+
+  validate :valid_role?
 
   before_save :assign_uuid
   before_validation :assert_section
@@ -53,9 +68,38 @@ class Enrollment < ActiveRecord::Base
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
   after_save :update_cached_due_dates
+  after_save :touch_graders_if_needed
 
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
+
+  scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
+  scope :current_and_invited, -> { joins(:course).where(QueryBuilder.new(:current_and_invited).conditions).readonly(false) }
+  scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
+  scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
+  scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
+
+  def valid_role?
+    return true if role.built_in?
+
+    unless self.role.base_role_type == self.type
+      self.errors.add(:role_id, "is not valid for the enrollment type")
+    end
+
+    unless self.course.account.valid_role?(role)
+      self.errors.add(:role_id, "is not an available role for this course's account")
+    end
+  end
+
+  def self.get_built_in_role_for_type(enrollment_type)
+    role = Role.get_built_in_role("StudentEnrollment") if enrollment_type == "StudentViewEnrollment"
+    role ||= Role.get_built_in_role(enrollment_type)
+    role
+  end
+
+  def default_role
+    Enrollment.get_built_in_role_for_type(self.type)
+  end
 
   # see #active_student?
   def self.active_student_conditions
@@ -217,13 +261,6 @@ class Enrollment < ActiveRecord::Base
     readable_types[type] || readable_types['StudentEnrollment']
   end
 
-  SIS_TYPES = {
-      'TeacherEnrollment' => 'teacher',
-      'TaEnrollment' => 'ta',
-      'DesignerEnrollment' => 'designer',
-      'StudentEnrollment' => 'student',
-      'ObserverEnrollment' => 'observer'
-  }
   def self.sis_type(type)
     SIS_TYPES[type] || SIS_TYPES['StudentEnrollment']
   end
@@ -233,7 +270,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def sis_role
-    self.role_name || Enrollment.sis_type(self.type)
+    (!self.role.built_in? && self.role.name) || Enrollment.sis_type(self.type)
   end
 
   def self.valid_types
@@ -342,9 +379,10 @@ class Enrollment < ActiveRecord::Base
 
   def create_linked_enrollment_for(observer)
     # we don't want to create a new observer enrollment if one exists
-    return true if linked_enrollment_for(observer)
+    enrollment = linked_enrollment_for(observer)
+    return true if enrollment && !enrollment.deleted?
     return false unless observer.can_be_enrolled_in_course?(course)
-    enrollment = observer.observer_enrollments.build
+    enrollment ||= observer.observer_enrollments.build
     enrollment.associated_user_id = user_id
     enrollment.update_from(self)
   end
@@ -353,7 +391,7 @@ class Enrollment < ActiveRecord::Base
     observer.observer_enrollments.where(
       :associated_user_id => user_id,
       :course_id => course_id,
-      :course_section_id => course_section_id_was).first
+      :course_section_id => course_section_id_was || course_section_id).first
   end
 
   def active_linked_enrollment_for(observer)
@@ -582,8 +620,8 @@ class Enrollment < ActiveRecord::Base
     return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
       :completed
-    # Allow admins and student view students to use the course before the term starts
-    elsif self.admin? || self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
+    # Allow student view students to use the course before the term starts
+    elsif self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
       state
     else
       :inactive
@@ -645,7 +683,7 @@ class Enrollment < ActiveRecord::Base
   def has_permission_to?(action)
     @permission_lookup ||= {}
     unless @permission_lookup.has_key? action
-      @permission_lookup[action] = RoleOverride.enabled_for?(course, course, action, base_role_name, self.role_name)
+      @permission_lookup[action] = RoleOverride.enabled_for?(course, action, self.role)
     end
     @permission_lookup[action].include?(:self)
   end
@@ -1010,10 +1048,6 @@ class Enrollment < ActiveRecord::Base
     false
   end
 
-  def role
-    self.role_name || self.type
-  end
-
   # DO NOT TRUST
   # This is only a convenience method to assist in identifying which enrollment
   # goes to which user when users have accidentally been merged together
@@ -1031,5 +1065,13 @@ class Enrollment < ActiveRecord::Base
 
   def total_activity_time
     self.read_attribute(:total_activity_time).to_i
+  end
+
+  def touch_graders_if_needed
+    if !active_student? && active_student?(:was) && self.course.submissions.where(:user_id => self.user_id).exists?
+      connection.after_transaction_commit do
+        User.where(id: self.course.admins).touch_all
+      end
+    end
   end
 end

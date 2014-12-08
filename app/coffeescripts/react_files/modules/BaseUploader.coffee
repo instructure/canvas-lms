@@ -12,7 +12,6 @@ define [
       @options = fileOptions
       @folder = folder
       @progress = 0
-      @_xhr = new XMLHttpRequest 
 
     onProgress: (percentComplete, file) ->
       #noop will be set up a level
@@ -44,16 +43,17 @@ define [
     # kickoff / preflight upload process
     upload: ->
       @deferred = $.Deferred()
-      params = @createPreFlightParams()
-      preflightUrl = @getPreflightUrl()
-      $.ajaxJSON preflightUrl, 'POST', params, @onPreflightComplete
-      @deferred
+      @deferred.fail (failReason) =>
+        @error = failReason
+      $.ajaxJSON(@getPreflightUrl(), 'POST', @createPreFlightParams(), @onPreflightComplete, @deferred.reject)
+      @deferred.promise()
 
     #actual upload based on kickoff / preflight
     _actualUpload: () ->
       @_xhr = new XMLHttpRequest
       @_xhr.upload.addEventListener('progress', @trackProgress, false)
       @_xhr.onload = @onUploadPosted
+      @_xhr.onerror = @deferred.reject
       @_xhr.open 'POST', @uploadData.upload_url, true
       @_xhr.send @createFormData()
 
@@ -79,3 +79,4 @@ define [
 
     abort: ->
       @_xhr.abort()
+      @deferred.reject('user_aborted_upload')

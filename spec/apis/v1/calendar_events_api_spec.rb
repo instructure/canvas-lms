@@ -686,7 +686,7 @@ describe CalendarEventsApiController, type: :request do
 
     it 'should api translate event descriptions in ics' do
       HostUrl.stubs(:default_host).returns('www.example.com')
-      should_translate_user_content(@course) do |content|
+      should_translate_user_content(@course, false) do |content|
         @course.calendar_events.create!(:description => content, :start_at => Time.now + 1.hours, :end_at => Time.now + 2.hours)
         json = api_call(:get, "/api/v1/courses/#{@course.id}",
                         :controller => 'courses', :action => 'show', :format => 'json', :id => @course.id.to_s)

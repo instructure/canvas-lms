@@ -11,9 +11,6 @@ define [
     teardown: ->
       React.unmountComponentAtNode(@prog.getDOMNode().parentNode)
 
-  test 'createWidthStyle returns object with correct percentage from progress', ->
-    equal(@prog.createWidthStyle().width, '35%')
-
   test 'sets width on progress bar', ->
     equal @prog.refs.bar.getDOMNode().style.width, '35%'
 

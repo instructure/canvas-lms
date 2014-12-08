@@ -1,13 +1,25 @@
-define ['ember', 'i18nObj'], (Ember, I18n) ->
-  Ember.Handlebars.registerHelper 't', (translationKey, defaultValue, options) ->
-    wrappers = {}
-    options = options?.hash ? {}
-    scope = options.scope
-    delete options.scope
-    for key, value of options when key.match(/^w\d+$/)
-      wrappers[new Array(parseInt(key.replace('w', '')) + 2).join('*')] = value
+define ['ember', 'i18nObj', 'str/htmlEscape'], (Ember, I18n, htmlEscape) ->
+  Ember.Handlebars.registerHelper 't', (args..., hbsOptions) ->
+    {hash, hashTypes, hashContexts} = hbsOptions
+    options = {}
+    for own key, value of hash
+      type = hashTypes[key]
+      if type is 'ID'
+        options[key] = Ember.get(hashContexts[key], value)
+      else
+        options[key] = value
+
+    wrappers = []
+    while (key = "w#{wrappers.length}") and options[key]
+      wrappers.push(options[key])
       delete options[key]
-    options.wrapper = wrappers if wrappers['*']
-    options.needsEscaping = true
-    options = Ember.$.extend(options, this) unless this instanceof String or typeof this is 'string'
-    I18n.scoped(scope).t(translationKey, defaultValue, options)
+    options.wrapper = wrappers if wrappers.length
+    new Ember.Handlebars.SafeString htmlEscape I18n.t(args..., options)
+
+  Ember.Handlebars.registerHelper '__i18nliner_escape', htmlEscape
+
+  Ember.Handlebars.registerHelper '__i18nliner_safe', (val) ->
+    new htmlEscape.SafeString(val)
+
+  Ember.Handlebars.registerHelper '__i18nliner_concat', (args..., options) ->
+    args.join("")

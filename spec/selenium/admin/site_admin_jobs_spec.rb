@@ -214,8 +214,7 @@ describe "site admin jobs ui" do
 
   context "running jobs" do
     it "should display running jobs in the workers grid" do
-      j = Delayed::Job.order(:id).first
-      j.lock_exclusively!('my test worker')
+      Delayed::Job.get_and_lock_next_available('my test worker')
       load_jobs_page
       expect(ffj('#running-grid .slick-row').size).to eq 1
       keep_trying_until do
@@ -225,11 +224,9 @@ describe "site admin jobs ui" do
     end
 
     it "should sort by runtime by default" do
-      @all_jobs[0].lock_exclusively!('my test worker 1')
-      Delayed::Job.stubs(:db_time_now).returns(24.hours.ago)
-      @all_jobs[1].update_attribute(:run_at, 48.hours.ago)
-      @all_jobs[1].lock_exclusively!('my test worker 2')
-      Delayed::Job.unstub(:db_time_now)
+      j1 = Delayed::Job.get_and_lock_next_available('my test worker 1')
+      j2 = Delayed::Job.get_and_lock_next_available('my test worker 2')
+      j2.update_attribute(:locked_at, 48.hours.ago)
 
       load_jobs_page
       expect(ffj('#running-grid .slick-row').size).to eq 2
@@ -243,8 +240,8 @@ describe "site admin jobs ui" do
     end
 
     it "should sort dynamically" do
-      @all_jobs[0].lock_exclusively!('my test worker 1')
-      @all_jobs[1].lock_exclusively!('my test worker 2')
+      Delayed::Job.get_and_lock_next_available('my test worker 1')
+      Delayed::Job.get_and_lock_next_available('my test worker 2')
 
       load_jobs_page
       expect(ffj('#running-grid .slick-row').size).to eq 2

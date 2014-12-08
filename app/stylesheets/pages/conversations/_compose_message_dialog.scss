@@ -2,7 +2,7 @@
 
 $subtleBorderColor: #e5e5e5;
 
-.compose-message-dialog {
+.compose-message-dialog, .submission-comment-reply-dialog {
   overflow: visible;
 
   .ui-dialog-titlebar {
@@ -46,7 +46,7 @@ $subtleBorderColor: #e5e5e5;
   }
 }
 
-#compose-new-message {
+#compose-new-message, #submission-comment-reply {
   padding: 0;
   overflow: visible;
   margin: 0;
@@ -204,7 +204,7 @@ $subtleBorderColor: #e5e5e5;
     overflow-x: hidden;
   }
 
-  .conversation_body {
+  .conversation_body, .reply_body {
     min-height: 200px;
     width: 100%;
     bottom: 0;

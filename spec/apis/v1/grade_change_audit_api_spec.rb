@@ -181,7 +181,7 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       it "should not authorize the endpoints with revoking the :view_grade_changes permission" do
-        RoleOverride.manage_role_override(@account_user.account, @account_user.membership_type, :view_grade_changes.to_s, :override => false)
+        RoleOverride.manage_role_override(@account_user.account, @account_user.role, :view_grade_changes.to_s, :override => false)
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@assignment, expected_status: 401)

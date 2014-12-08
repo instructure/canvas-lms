@@ -111,7 +111,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(new_assignment.peer_reviews_assigned).to be_falsey
     end
 

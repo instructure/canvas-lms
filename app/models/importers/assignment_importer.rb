@@ -33,6 +33,7 @@ module Importers
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.assignments.new #new(:context => context)
       item.title = hash[:title]
+      item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
       item.workflow_state = (hash[:workflow_state] || 'published') if item.new_record? || item.deleted?
       if hash[:instructions_in_html] == false

@@ -602,7 +602,7 @@ describe "Canvas Cartridge importing" do
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
       <a href=\"/courses/%s/file_contents/course%%20files/tbe_banner.jpg\">Some file</a>
-      <a href=\"/courses/%s/wiki/assignments\">Assignments wiki link</a>
+      <a href=\"/courses/%s/#{@copy_to.wiki.path}/assignments\">Assignments wiki link</a>
       <a href=\"/courses/%s/modules\">Modules</a>
       <a href=\"/courses/%s/modules/%s\">some module</a>
       <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
@@ -1378,7 +1378,7 @@ describe "matching question reordering" do
 
     @course = course
     @migration = ContentMigration.create(:context => @course)
-    @migration.migration_type = "canvas_cartridge_importer"
+    @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
     enable_cache do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)

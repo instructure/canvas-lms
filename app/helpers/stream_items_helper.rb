@@ -138,7 +138,8 @@ module StreamItemsHelper
     when "Assignment"
       asset.subject
     when "AssessmentRequest"
-      asset.asset.assignment.title + I18n.t('for'," for ") + asset.asset.user.name
+      # TODO I18N should use placeholders, not concatenation
+      asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + asset.asset.user.name
     else
       nil
     end

@@ -7,11 +7,12 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     before (:each) do
       course_with_teacher_logged_in
+      set_course_draft_state
     end
 
     def wysiwyg_state_setup(text = "<p>1</p><p>2</p><p>3</p>", val = false)
-      get "/courses/#{@course.id}/wiki"
-      wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
 
       if val == true
         add_text_to_tiny(text)
@@ -37,7 +38,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.mce_unlink').click
       save_wiki
 
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce a')).to be_nil
       end
     end
@@ -45,7 +46,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should switch views and handle html code" do
       wysiwyg_state_setup
 
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(ff("#tinymce p").length).to eq 3
       end
     end
@@ -54,12 +55,12 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup
 
       f('.mce_bullist').click
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         ff('#tinymce li').length == 3
       end
 
       f('.mce_bullist').click
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce li')).to be_nil
       end
     end
@@ -68,12 +69,12 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup
 
       f('.mce_numlist').click
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         ff('#tinymce li').length == 3
       end
 
       f('.mce_numlist').click
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce li')).to be_nil
       end
     end
@@ -81,33 +82,34 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should change font color for all selected text" do
       wysiwyg_state_setup
 
-      f('#wiki_page_body_forecolor_open').click
-      fba("#wiki_page_body_forecolor_menu", "title", "Red")
+      f("##{wiki_page_editor_id}_forecolor_open").click
+      fba("##{wiki_page_editor_id}_forecolor_menu", "title", "Red")
       validate_wiki_style_attrib("color", "rgb(255, 0, 0)", "p span")
     end
 
     it "should change background font color" do
       wysiwyg_state_setup
 
-      f('#wiki_page_body_backcolor_open').click
-      fba("#wiki_page_body_backcolor_menu", "title", "Red")
+      f("##{wiki_page_editor_id}_backcolor_open").click
+      fba("##{wiki_page_editor_id}_backcolor_menu", "title", "Red")
       validate_wiki_style_attrib("background-color", "rgb(255, 0, 0)", "p span")
     end
 
     it "should change font size" do
       wysiwyg_state_setup
-      f('#wiki_page_body_fontsizeselect_open').click
-      #f('#menu_wiki_page_body_wiki_page_body_fontsizeselect_menu_tbl [style="font-size:small"]').click
-      fba("#menu_wiki_page_body_wiki_page_body_fontsizeselect_menu_tbl", "style", "font-size:xx-large")
+      f("##{wiki_page_editor_id}_fontsizeselect_open").click
+      #f('#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_fontsizeselect_menu_tbl [style="font-size:small"]').click
+
+      fba("#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_fontsizeselect_menu_tbl", "style", "font-size:xx-large")
       validate_wiki_style_attrib("font-size", "xx-large", "p span")
     end
 
     it "should change and remove all custom formatting on selected text" do
       wysiwyg_state_setup
-      f('#wiki_page_body_fontsizeselect_open').click
-      fba("#menu_wiki_page_body_wiki_page_body_fontsizeselect_menu_tbl", "style", "font-size:xx-large")
+      f("##{wiki_page_editor_id}_fontsizeselect_open").click
+      fba("#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_fontsizeselect_menu_tbl", "style", "font-size:xx-large")
       validate_wiki_style_attrib("font-size", "xx-large", "p span")
-      f('#wiki_page_body_removeformat').click
+      f("##{wiki_page_editor_id}_removeformat").click
       validate_wiki_style_attrib_empty("p")
     end
 
@@ -167,21 +169,21 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       create_wiki_page(title, unpublished, edit_roles)
 
-      get "/courses/#{@course.id}/wiki"
-      wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
 
       f('#new_page_link').click
       keep_trying_until { expect(f('#new_page_name')).to be_displayed }
       f('#new_page_name').send_keys(title)
       submit_form("#new_page_drop_down")
 
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce p a').attribute('href')).to include_text title
       end
 
       select_all_wiki
       f('.mce_unlink').click
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce p a')).to be_nil
       end
     end
@@ -189,36 +191,34 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should change paragraph type" do
       text = "<p>This is a sample paragraph</p><p>This is a test</p><p>I E O U A</p>"
       wysiwyg_state_setup(text)
-      f("#wiki_page_body_formatselect_open").click
-      f('#menu_wiki_page_body_wiki_page_body_formatselect_menu .mce_pre').click
-      in_frame "wiki_page_body_ifr" do
+      f("##{wiki_page_editor_id}_formatselect_open").click
+      f("#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_formatselect_menu .mce_pre").click
+      in_frame wiki_page_body_ifr_id do
         expect(ff('#tinymce pre').length).to eq 3
     end
   end
 
   it "should add bold and italic text to the rce" do
-    get "/courses/#{@course.id}/wiki"
+    get "/courses/#{@course.id}/pages/front-page/edit"
 
-    wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
+    wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
     f('.mceIcon.mce_bold').click
     f('.mceIcon.mce_italic').click
     first_text = 'This is my text.'
 
-    type_in_tiny('#wiki_page_body', first_text)
-    in_frame "wiki_page_body_ifr" do
+    type_in_tiny("##{wiki_page_editor_id}", first_text)
+    in_frame wiki_page_body_ifr_id do
       expect(f('#tinymce')).to include_text(first_text)
     end
     #make sure each view uses the proper format
-    fj('.wiki_switch_views_link:visible').click
-    expect(driver.execute_script("return $('#wiki_page_body').val()")).to include '<em><strong>'
-    fj('.wiki_switch_views_link:visible').click
-    in_frame "wiki_page_body_ifr" do
+    fj('a.switch_views:visible').click
+    expect(driver.execute_script("return $('##{wiki_page_editor_id}').val()")).to include '<em><strong>'
+    fj('a.switch_views:visible').click
+    in_frame wiki_page_body_ifr_id do
       expect(f('#tinymce')).not_to include_text('<p>')
     end
 
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
+    f('form.edit-form button.submit').click
     wait_for_ajax_requests
 
     expect(driver.page_source).to match(/<em><strong>This is my text\./)
@@ -226,9 +226,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
   it "should add an equation to the rce by using equation buttons" do
     skip "check_image broken"
-    get "/courses/#{@course.id}/wiki"
+    get "/courses/#{@course.id}/pages/front-page/edit"
 
-    f('#wiki_page_body_instructure_equation').click
+    f("##{wiki_page_editor_id}_instructure_equation").click
     wait_for_ajaximations
     expect(f('.mathquill-editor')).to be_displayed
     misc_tab = f('.mathquill-tab-bar > li:last-child a')
@@ -239,24 +239,22 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     f('#Basic_tab li:nth-child(27) a').click
     f('.ui-dialog-buttonset .btn-primary').click
     keep_trying_until do
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce img.equation_image')).to be_displayed
       end
     end
 
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
+    f('form.edit-form button.submit').click
     wait_for_ajax_requests
 
-    check_image(f('#wiki_body img'))
+    check_image(f('#wiki_page_show img'))
   end
 
   it "should add an equation to the rce by using the equation editor" do
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
-    get "/courses/#{@course.id}/wiki"
-    f('#wiki_page_body_instructure_equation').click
+    get "/courses/#{@course.id}/pages/front-page/edit"
+    f("##{wiki_page_editor_id}_instructure_equation").click
     wait_for_ajaximations
     expect(f('.mathquill-editor')).to be_displayed
     textarea = f('.mathquill-editor .textarea textarea')
@@ -290,7 +288,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     textarea.send_keys "\\text that. is. so. cool."
     f('.ui-dialog-buttonset .btn-primary').click
     wait_for_ajax_requests
-    in_frame "wiki_page_body_ifr" do
+    in_frame wiki_page_body_ifr_id do
       keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
 
       # currently there's an issue where the equation is double-escaped in the
@@ -306,9 +304,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
   it "should add an equation to the rce by using equation buttons in advanced view" do
     skip('broken')
-    get "/courses/#{@course.id}/wiki"
+    get "/courses/#{@course.id}/pages/front-page/edit"
 
-    f('#wiki_page_body_instructure_equation').click
+    f("##{wiki_page_editor_id}_instructure_equation").click
     wait_for_ajaximations
     expect(f('.mathquill-editor')).to be_displayed
     f('a.math-toggle-link').click
@@ -322,24 +320,22 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     f('#basic_tab li:nth-child(27) a').click
     f('.ui-dialog-buttonset .btn-primary').click
     keep_trying_until do
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce img.equation_image')).to be_displayed
       end
     end
 
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
+    f('form.edit-form button.submit').click
     wait_for_ajax_requests
 
-    check_image(f('#wiki_body img'))
+    check_image(f('#wiki_page_show img'))
   end
 
   it "should add an equation to the rce by using the equation editor in advanced view" do
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}= \\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
-    get "/courses/#{@course.id}/wiki"
-    f('#wiki_page_body_instructure_equation').click
+    get "/courses/#{@course.id}/pages/front-page/edit"
+    f("##{wiki_page_editor_id}_instructure_equation").click
     wait_for_ajaximations
     expect(f('.mathquill-editor')).to be_displayed
     f('a.math-toggle-link').click
@@ -360,7 +356,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     f('.ui-dialog-buttonset .btn-primary').click
     wait_for_ajax_requests
-    in_frame "wiki_page_body_ifr" do
+    in_frame wiki_page_body_ifr_id do
       keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
 
       # currently there's an issue where the equation is double-escaped in the
@@ -378,7 +374,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       stub_kaltura
       #pending("failing because it is dependant on an external kaltura system")
 
-      get "/courses/#{@course.id}/wiki"
+      get "/courses/#{@course.id}/pages/front-page/edit"
 
     f('.mce_instructure_record').click
     keep_trying_until { expect(f('#record_media_tab')).to be_displayed }
@@ -389,15 +385,15 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
   end
 
   it "should handle table borders correctly" do
-    get "/courses/#{@course.id}/wiki"
+    get "/courses/#{@course.id}/pages/front-page/edit"
 
     def check_table(attributes = {})
       # clear out whatever is in the editor
-      driver.execute_script("$('#wiki_page_body_ifr')[0].contentDocument.body.innerHTML =''")
+      driver.execute_script("$('##{wiki_page_body_ifr_id}')[0].contentDocument.body.innerHTML =''")
 
       # this is the only way I know to actually trigger the insert table dialog to open
       # listening to the click events on the button in the menu did not work
-      driver.execute_script("$('#wiki_page_body').editorBox('execute', 'mceInsertTable')")
+      driver.execute_script("$('##{wiki_page_editor_id}').editorBox('execute', 'mceInsertTable')")
 
       # the iframe will be created with an id of mce_<some number>_ifr
       table_iframe_id = keep_trying_until { ff('iframe').map { |f| f['id'] }.detect { |w| w =~ /mce_\d+_ifr/ } }
@@ -413,7 +409,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         end
         f('#insert').click
       end
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         table = f('#tinymce table')
         attributes.each do |attribute, value|
           (expect(table[attribute]).to eq value.to_s) if (value && (attribute != :bordercolor))

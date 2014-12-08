@@ -1,37 +1,12 @@
 define([
+  'vendor/i18n_js_extension',
   'jquery',
   'str/htmlEscape',
-  'str/pluralize',
-  'str/escapeRegex',
   'compiled/str/i18nLolcalize',
   'vendor/date' /* Date.parse, Date.UTC */
-], function($, htmlEscape, pluralize, escapeRegex, i18nLolcalize) {
-
-// Instantiate the object, export globally for tinymce/specs
-var I18n = window.I18n = {};
-
-// Set default locale to english
-I18n.defaultLocale = "en";
-
-// Set default separator
-I18n.defaultSeparator = ".";
+], function(I18n, $, htmlEscape, i18nLolcalize) {
 
 I18n.locale = document.documentElement.getAttribute('lang');
-
-// Set the placeholder format. Accepts `%{placeholder}` and %h{placeholder}.
-// %h{placeholder} indicate it is an htmlSafe value, (e.g. an input) and
-// anything not already safe should be html-escaped
-I18n.PLACEHOLDER = /%h?\{(.*?)\}/gm;
-
-I18n.isValidNode = function(obj, node) {
-  // handle names like "foo.bar.baz"
-  var nameParts = node.split('.');
-  for (var j=0; j < nameParts.length; j++) {
-    obj = obj[nameParts[j]];
-    if (typeof obj === 'undefined' || obj === null) return false;
-  }
-  return true;
-};
 
 I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);
@@ -66,185 +41,13 @@ I18n.lookup = function(scope, options) {
   return messages;
 };
 
-// Merge serveral hash options, checking if value is set before
-// overwriting any value. The precedence is from left to right.
-//
-//   I18n.prepareOptions({name: "John Doe"}, {name: "Mary Doe", role: "user"});
-//   #=> {name: "John Doe", role: "user"}
-//
-I18n.prepareOptions = function() {
-  var options = {};
-  var opts;
-  var count = arguments.length;
-
-  for (var i = 0; i < count; i++) {
-    opts = arguments[i];
-
-    if (!opts) {
-      continue;
-    }
-
-    for (var key in opts) {
-      if (!this.isValidNode(options, key)) {
-        options[key] = opts[key];
-      }
-    }
-  }
-
-  return options;
-};
-
-I18n.interpolate = function(message, options) {
-  var placeholder, value, name, matches, needsEscaping = false, htmlSafe;
-
-  options = this.prepareOptions(options);
-  if (options.wrapper) {
-    needsEscaping = true;
-    message = this.applyWrappers(message, options.wrapper);
-  }
-  if (options.needsEscaping) {
-    needsEscaping = true;
-  }
-
-  matches = message.match(this.PLACEHOLDER) || [];
-
-  for (var i = 0; placeholder = matches[i]; i++) {
-    name = placeholder.replace(this.PLACEHOLDER, "$1");
-    htmlSafe = (placeholder[1] === 'h'); // e.g. %h{input}
-
-    // handle names like "foo.bar.baz"
-    var nameParts = name.split('.');
-    value = options;
-    for (var j=0; j < nameParts.length; j++) {
-      value = value[nameParts[j]];
-    }
-
-    if (!this.isValidNode(options, name)) {
-      value = "[missing " + placeholder + " value]";
-    }
-    if (needsEscaping) {
-      if (!value._icHTMLSafe && !htmlSafe) {
-        value = htmlEscape(value);
-      }
-    } else if (value._icHTMLSafe || htmlSafe) {
-      needsEscaping = true;
-      message = htmlEscape(message);
-    }
-
-    regex = new RegExp(placeholder.replace(/\{/gm, "\\{").replace(/\}/gm, "\\}"));
-    message = message.replace(regex, value);
-  }
-
-  return message;
-};
-
-I18n.wrapperRegexes = {};
-
-I18n.applyWrappers = function(string, wrappers) {
-  var keys = [];
-  var key;
-
-  string = htmlEscape(string);
-  if (typeof(wrappers) == "string") {
-    wrappers = {'*': wrappers};
-  }
-  for (key in wrappers) {
-    keys.push(key);
-  }
-  keys.sort().reverse();
-  for (var i=0, l=keys.length; i < l; i++) {
-    key = keys[i];
-    if (!this.wrapperRegexes[key]) {
-      var escapedKey = escapeRegex(key);
-      this.wrapperRegexes[key] = new RegExp(escapedKey + "([^" + escapedKey + "]*)" + escapedKey, "g");
-    }
-    string = string.replace(this.wrapperRegexes[key], wrappers[key]);
-  }
-  return string;
-};
-
-I18n.translate = function(scope, options) {
-  options = this.prepareOptions(options);
-  var translation = this.lookup(scope, options);
-
-  try {
-    if (typeof(translation) == "object") {
-      if (typeof(options.count) == "number") {
-        return this.pluralize(options.count, scope, options);
-      } else {
-        return translation;
-      }
-    } else {
-      return this.interpolate(translation, options);
-    }
-  } catch(err) {
-    return this.missingTranslation(scope);
-  }
-};
-
+var _localize = I18n.localize;
 I18n.localize = function(scope, value) {
-  switch (scope) {
-    case "currency":
-      return this.toCurrency(value);
-    case "number":
-      scope = this.lookup("number.format");
-      return this.toNumber(value, scope);
-    case "percentage":
-      return this.toPercentage(value);
-    default:
-      if (scope.match(/^(date|time)/)) {
-        return this.toTime(scope, value).replace(/\s{2,}/, ' ');
-      } else {
-        return value.toString();
-      }
-  }
-};
-
-I18n.parseDate = function(d) {
-  var matches, date;
-  matches = d.toString().match(/(\d{4})-(\d{2})-(\d{2})(?:[ |T](\d{2}):(\d{2}):(\d{2}))?(Z)?/);
-
-  if (matches) {
-    // date/time strings: yyyy-mm-dd hh:mm:ss or yyyy-mm-dd or yyyy-mm-ddThh:mm:ssZ
-    for (var i = 1; i <= 6; i++) {
-      matches[i] = parseInt(matches[i], 10) || 0;
-    }
-
-    // month starts on 0
-    matches[2] -= 1;
-
-    if (matches[7]) {
-      date = new Date(Date.UTC(matches[1], matches[2], matches[3], matches[4], matches[5], matches[6]));
-    } else {
-      date = new Date(matches[1], matches[2], matches[3], matches[4], matches[5], matches[6]);
-    }
-  } else if (typeof(d) == "number") {
-    // UNIX timestamp
-    date = new Date();
-    date.setTime(d);
-  } else {
-    // an arbitrary javascript string
-    date = new Date();
-    date.setTime(Date.parse(d));
-  }
-
-  return date;
-};
-
-I18n.toTime = function(scope, d) {
-  var date = this.parseDate(d);
-  var format = this.lookup(scope);
-
-  if (date.toString().match(/invalid/i)) {
-    return date.toString();
-  }
-
-  if (!format) {
-    return date.toString();
-  }
-
-  return this.strftime(date, format);
-};
+  var result = _localize.call(this, scope, value);
+  if (scope.match(/^(date|time)/))
+    result = result.replace(/\s{2,}/, ' ');
+  return result;
+}
 
 I18n.strftime = function(date, format) {
   var options = this.lookup("date");
@@ -369,171 +172,18 @@ I18n.strftime = function(date, format) {
   return f;
 };
 
-I18n.toNumber = function(number, options) {
-  options = this.prepareOptions(
-    options,
-    this.lookup("number.format"),
-    {precision: 3, separator: ".", delimiter: ",", strip_insignificant_zeros: false}
-  );
-
-  var negative = number < 0;
-  var string = Math.abs(number).toFixed(options.precision).toString();
-  var parts = string.split(".");
-
-  number = parts[0];
-  var precision = parts[1];
-
-  var n = [];
-
-  while (number.length > 0) {
-    n.unshift(number.substr(Math.max(0, number.length - 3), 3));
-    number = number.substr(0, number.length -3);
+I18n.Utils.HtmlSafeString = htmlEscape.SafeString; // this is what we use elsewhere in canvas, so make i18nliner use it too
+I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
+I18n.CallHelpers.normalizeKey = function(key, options) {
+  if (key[0] === '#') {
+    key = key.slice(1);
+    delete options.scope;
   }
+  return key;
+}
 
-  var formattedNumber = n.join(options.delimiter);
-
-  if (options.precision > 0) {
-    formattedNumber += options.separator + parts[1];
-  }
-
-  if (negative) {
-    formattedNumber = "-" + formattedNumber;
-  }
-
-  if (options.strip_insignificant_zeros) {
-    var regex = {
-        separator: new RegExp(options.separator.replace(/\./, "\\.") + "$")
-      , zeros: /0+$/
-    };
-
-    formattedNumber = formattedNumber
-      .replace(regex.zeros, "")
-      .replace(regex.separator, "");
-  }
-
-  return formattedNumber;
-};
-
-I18n.toCurrency = function(number, options) {
-  options = this.prepareOptions(
-    options,
-    this.lookup("number.currency.format"),
-    this.lookup("number.format"),
-    {unit: "$", precision: 2, format: "%u%n", delimiter: ",", separator: "."}
-  );
-
-  number = this.toNumber(number, options);
-  number = options.format
-    .replace("%u", options.unit)
-    .replace("%n", number);
-
-  return number;
-};
-
-I18n.toHumanSize = function(number, options) {
-  var kb = 1024
-    , size = number
-    , iterations = 0
-    , unit
-    , precision
-  ;
-
-  while (size >= kb && iterations < 4) {
-    size = size / kb;
-    iterations += 1;
-  }
-
-  if (iterations === 0) {
-    unit = this.t("number.human.storage_units.units.byte", {count: size});
-    precision = 0;
-  } else {
-    unit = this.t("number.human.storage_units.units." + [null, "kb", "mb", "gb", "tb"][iterations]);
-    precision = (size - Math.floor(size) === 0) ? 0 : 1;
-  }
-
-  options = this.prepareOptions(
-    options,
-    {precision: precision, format: "%n%u", delimiter: ""}
-  );
-
-  number = this.toNumber(size, options);
-  number = options.format
-    .replace("%u", unit)
-    .replace("%n", number);
-
-  return number;
-};
-
-I18n.toPercentage = function(number, options) {
-  options = this.prepareOptions(
-    options,
-    this.lookup("number.percentage.format"),
-    this.lookup("number.format"),
-    {precision: 3, separator: ".", delimiter: ""}
-  );
-
-  number = this.toNumber(number, options);
-  return number + "%";
-};
-
-I18n.pluralize = function(count, scope, options) {
-  var translation;
-
-  try {
-    translation = this.lookup(scope, options);
-  } catch (error) {}
-
-  if (!translation) {
-    return this.missingTranslation(scope);
-  }
-
-  var message;
-  options = this.prepareOptions(options);
-  options.count = count.toString();
-
-  switch(Math.abs(count)) {
-    case 0:
-      message = this.isValidNode(translation, "zero") ? translation.zero :
-                this.isValidNode(translation, "none") ? translation.none :
-                this.isValidNode(translation, "other") ? translation.other :
-                this.missingTranslation(scope, "zero");
-      break;
-    case 1:
-      message = this.isValidNode(translation, "one") ? translation.one : this.missingTranslation(scope, "one");
-      break;
-    default:
-      message = this.isValidNode(translation, "other") ? translation.other : this.missingTranslation(scope, "other");
-  }
-
-  return this.interpolate(message, options);
-};
-
-I18n.missingTranslation = function() {
-  var message = '[missing "' + this.currentLocale();
-  var count = arguments.length;
-
-  for (var i = 0; i < count; i++) {
-    message += "." + arguments[i];
-  }
-
-  message += '" translation]';
-
-  return message;
-};
-
-I18n.currentLocale = function() {
-  return (I18n.locale || I18n.defaultLocale);
-};
-
-// shortcuts
-I18n.t = I18n.translate;
-I18n.l = I18n.localize;
-I18n.p = I18n.pluralize;
-
-
-var normalizeDefault = function(str) { return str };
 if (window.ENV && window.ENV.lolcalize) {
-  normalizeDefault = i18nLolcalize;
+  I18n.CallHelpers.normalizeDefault = i18nLolcalize;
 }
 
 I18n.scoped = function(scope, callback) {
@@ -547,54 +197,31 @@ I18n.scope = function(scope) {
   this.scope = scope;
 };
 I18n.scope.prototype = {
-  resolveScope: function(key) {
-    if (typeof(key) == "object") {
-      key = key.join(I18n.defaultSeparator);
+  HtmlSafeString: I18n.HtmlSafeString,
+
+  translate: function() {
+    var args = [].slice.call(arguments);
+    var options = args[args.length - 1];
+    if (!(options instanceof Object)) {
+      options = {}
+      args.push(options);
     }
-    if (key[0] == '#') {
-      return key.replace(/^#/, '');
-    } else {
-      return this.scope + I18n.defaultSeparator + key;
-    }
+    options.scope = this.scope;
+    return I18n.translate.apply(I18n, args);
   },
-  translate: function(scope, defaultValue, options) {
-    options = options || {};
-    if (typeof(options.count) != 'undefined' && typeof(defaultValue) == "string" && defaultValue.match(/^[\w\-]+$/)) {
-      defaultValue = pluralize.withCount(options.count, defaultValue);
-    }
-    options.defaultValue = normalizeDefault(defaultValue);
-    return I18n.translate(this.resolveScope(scope), options);
+  localize: function(key, date) {
+    if (key[0] === '#') key = key.slice(1);
+    return I18n.localize(key, date);
   },
-  localize: function(scope, value) {
-    return I18n.localize(this.resolveScope(scope), value);
+  beforeLabel: function(text) {
+    return this.t("#before_label_wrapper", "%{text}:", {'text': text});
   },
-  pluralize: function(count, scope, options) {
-    return I18n.pluralize(count, this.resolveScope(scope), options);
-  },
-  beforeLabel: function(textOrKey, defaultValue) {
-    if (typeof defaultValue != "undefined") {
-      textOrKey = this.t('labels.' + textOrKey, defaultValue);
-    }
-    return this.t("#before_label_wrapper", "%{text}:", {'text': textOrKey});
-  },
-  toTime: function(scope, d) {
-    return I18n.toTime(scope, d);
-  },
-  toNumber: function(number, options) {
-    return I18n.toNumber(number, options);
-  },
-  toCurrency: function(number, options) {
-    return I18n.toCurrency(number, options);
-  },
-  toHumanSize: function(number, options) {
-    return I18n.toHumanSize(number, options);
-  },
-  toPercentage: function(number, options) {
-    return I18n.toPercentage(number, options);
-  },
-  lookup: function(scope, options) {
-    return I18n.lookup(this.resolveScope(scope), options);
-  }
+  lookup:       I18n.lookup.bind(I18n),
+  toTime:       I18n.toTime.bind(I18n),
+  toNumber:     I18n.toNumber.bind(I18n),
+  toCurrency:   I18n.toCurrency.bind(I18n),
+  toHumanSize:  I18n.toHumanSize.bind(I18n),
+  toPercentage: I18n.toPercentage.bind(I18n)
 };
 I18n.scope.prototype.t = I18n.scope.prototype.translate;
 I18n.scope.prototype.l = I18n.scope.prototype.localize;

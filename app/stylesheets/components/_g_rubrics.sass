@@ -19,17 +19,15 @@
     position: absolute
     bottom: 0
     right: 0
-    i
-      visibility: hidden
+    display: none
   &.editing
-    td.rating:hover
-      i
-        display:inline-block
-        visibility: visible
-  td.criterion_description:hover, .links a:hover, .links a:focus
-    i
+    tr.criterion .links
       display: inline-block
-      visibility: visible
+      i
+        visibility: hidden
+    td.rating:hover, td.criterion_description:hover, .links a:focus
+      i
+        visibility: visible
 
   .rubric_table
     :border-collapse collapse

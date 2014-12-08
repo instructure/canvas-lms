@@ -1,0 +1,10 @@
+<div class="clearfix">
+<h2 class="pull-left"><%= @context.name %></h2>
+<% if @context.open_enrollment %>
+  <a class="btn course_enrollment_link pull-right" data-open-as-dialog="" title="<%= t('links.join_course', %{Join this Course}) %>" href="/enroll/<%= @context.self_enrollment_code %>">
+    <i class="icon-user-add"></i>
+    <%= t('links.join_course', %{Join this Course}) %>
+  </a>
+<% end %>
+</div>
+<p><%= format_message(@context.public_description).first %></p>

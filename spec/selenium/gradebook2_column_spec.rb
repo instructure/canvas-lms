@@ -3,27 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "assignment column headers" do
   include_examples "in-process server selenium tests"
 
-  ASSIGNMENT_1_POINTS = "10"
-  ASSIGNMENT_2_POINTS = "5"
-  ASSIGNMENT_3_POINTS = "50"
-  ATTENDANCE_POINTS = "15"
-
-  STUDENT_NAME_1 = "student 1"
-  STUDENT_NAME_2 = "student 2"
-  STUDENT_NAME_3 = "student 3"
-  STUDENT_SORTABLE_NAME_1 = "1, student"
-  STUDENT_SORTABLE_NAME_2 = "2, student"
-  STUDENT_SORTABLE_NAME_3 = "3, student"
-  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
-  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
-  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  DEFAULT_PASSWORD = "qwerty"
-
   before (:each) do
-    data_setup
+    gradebook_data_setup
     @assignment = @course.assignments.first
     @header_selector = %([id$="assignment_#{@assignment.id}"])
     get "/courses/#{@course.id}/gradebook2"
@@ -38,9 +19,9 @@ describe "assignment column headers" do
     meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
     grade_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     #filter validation
-    validate_cell_text(meta_cells[0], STUDENT_NAME_3 + "\n" + @course.name)
-    validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_3_TOTAL_IGNORING_UNGRADED)
+    validate_cell_text(meta_cells[0], @student_name_3 + "\n" + @course.name)
+    validate_cell_text(grade_cells[0], @assignment_2_points)
+    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), @student_3_total_ignoring_ungraded)
   end
 
   it "should minimize a column and remember it" do
@@ -83,8 +64,8 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], expected_text)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[2], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_1_points)
+    validate_cell_text(first_row_cells[2], @assignment_2_points)
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
@@ -94,8 +75,8 @@ describe "assignment column headers" do
 
   it "should default to arrange columns by assignment group" do
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_1_points)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
     validate_cell_text(first_row_cells[2], "-")
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
@@ -110,8 +91,8 @@ describe "assignment column headers" do
     open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
     open_gradebook_settings(arrange_settings.last.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_1_points)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
     validate_cell_text(first_row_cells[2], "-")
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
@@ -124,8 +105,8 @@ describe "assignment column headers" do
     wait_for_ajaximations
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_1_points)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
     validate_cell_text(first_row_cells[2], "-")
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
@@ -141,8 +122,8 @@ describe "assignment column headers" do
     driver.action.drag_and_drop_by(columns[1], -300, 0).perform
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_2_points)
+    validate_cell_text(first_row_cells[1], @assignment_1_points)
     validate_cell_text(first_row_cells[2], "-")
 
     # with a custom order, both sort options should be displayed
@@ -167,8 +148,8 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
-    validate_cell_text(first_row_cells[2], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
+    validate_cell_text(first_row_cells[2], @assignment_1_points)
 
     # both predefined short orders should be displayed since neither one is selected.
     arrange_settings = ff('input[name="arrange-columns-by"]')
@@ -200,8 +181,8 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
-    validate_cell_text(first_row_cells[2], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
+    validate_cell_text(first_row_cells[2], @assignment_1_points)
     validate_cell_text(first_row_cells[3], '150')
   end
 
@@ -220,7 +201,7 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
   end
 
   it "should validate show attendance columns option" do

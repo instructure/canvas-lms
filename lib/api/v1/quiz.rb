@@ -28,6 +28,7 @@ module Api::V1::Quiz
       shuffle_answers
       hide_results
       show_correct_answers
+      show_correct_answers_last_attempt
       show_correct_answers_at
       hide_correct_answers_at
       one_time_results
@@ -127,6 +128,7 @@ module Api::V1::Quiz
     # hide_results="until_after_last_attempt" is valid if allowed_attempts > 1
     if update_params['hide_results'] == "until_after_last_attempt"
       allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
+
       unless allowed_attempts.to_i > 1
         update_params.delete 'hide_results'
       end
@@ -135,22 +137,37 @@ module Api::V1::Quiz
     # show_correct_answers is valid if hide_results is null
     if update_params.has_key?('show_correct_answers')
       hide_results = update_params.fetch('hide_results', quiz.hide_results)
+
       unless hide_results.blank?
         update_params.delete 'show_correct_answers'
       end
     end
 
-    # show_correct_answers_at and hide_correct_answers_at are valid only if
-    # show_correct_answers=true
-    unless update_params.fetch('show_correct_answers', quiz.show_correct_answers)
-      %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
-        update_params.delete(key) if update_params.has_key?(key)
+    begin
+      show_correct_answers = parse_tribool update_params.fetch('show_correct_answers', quiz.show_correct_answers)
+
+      # The following fields are valid only if `show_correct_answers` is true:
+      if show_correct_answers == false
+        %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
+          update_params.delete(key) if update_params.has_key?(key)
+        end
+      end
+
+      # show_correct_answers_last_attempt is valid only if
+      # show_correct_answers=true and allowed_attempts > 1
+      if update_params.has_key?('show_correct_answers_last_attempt')
+        allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts).to_i
+
+        if show_correct_answers == false || allowed_attempts <= 1
+          update_params.delete 'show_correct_answers_last_attempt'
+        end
       end
     end
 
     # one_time_results is valid if hide_results is null
     if update_params.has_key?('one_time_results')
       hide_results = update_params.fetch('hide_results', quiz.hide_results)
+
       unless hide_results.blank?
         update_params.delete 'one_time_results'
       end
@@ -167,6 +184,7 @@ module Api::V1::Quiz
     # cant_go_back is valid if one_question_at_a_time=true
     if update_params.has_key?('cant_go_back')
       one_question_at_a_time = update_params.fetch('one_question_at_a_time', quiz.one_question_at_a_time)
+
       unless one_question_at_a_time
         update_params.delete 'one_question_at_a_time'
       end
@@ -196,5 +214,18 @@ module Api::V1::Quiz
     quiz.save if save
 
     quiz
+  end
+
+  protected
+
+  # nil, "null" => nil
+  # false, "false" => false
+  # true, "true" => true
+  def parse_tribool(value)
+    if value.nil? || value.to_s == 'null'
+      nil
+    else
+      Canvas::Plugin.value_to_boolean(value)
+    end
   end
 end

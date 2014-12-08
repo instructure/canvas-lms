@@ -38,7 +38,7 @@ module Lti
         definitions = described_class.launch_definitions(tools_collection, placements)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
+        expect(definition).to eq( {
           :definition_type => mh.class.name,
           :definition_id => mh.id,
           :name => rh.name,
@@ -62,7 +62,7 @@ module Lti
         definitions = described_class.launch_definitions(tools_collection, placements)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
+        expect(definition).to eq( {
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
@@ -84,7 +84,7 @@ module Lti
         definitions = described_class.launch_definitions(tools_collection, placements)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
+        expect(definition).to eq( {
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
@@ -98,7 +98,10 @@ module Lti
             :resource_selection => {
               :message_type => "resource_selection",
               :url => "http://example.com/selection_test",
-              :title => tool.name}
+              :title => tool.name,
+              :selection_width=>500,
+              :selection_height=>500
+            }
           }
         })
       end
@@ -117,8 +120,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:definition_type] == 'ContextExternalTool' }
         message_handler = definitions.find { |d| d[:definition_type] == 'Lti::MessageHandler' }
-        expect(message_handler).not_to be nil
-        expect(external_tool).not_to be nil
+        expect(message_handler).to_not be nil
+        expect(external_tool).to_not be nil
       end
 
       context 'pagination' do
@@ -138,7 +141,7 @@ module Lti
           page2 = collection.paginate(page: page1.next_page, per_page: per_page)
           expect(page1.count).to eq 3
           expect(page2.count).to eq 3
-          expect(page1.first).not_to eq page2.first
+          expect(page1.first).to_not eq page2.first
         end
       end
 
@@ -173,7 +176,7 @@ module Lti
                                                 :consumer_key => "key",
                                                 :shared_secret => "secret")
       tool.url = "http://www.example.com/basic_lti"
-      tool.resource_selection = {:url => "http://example.com/selection_test", :selection_width => 400, :selection_height => 400} if resource_selection
+      tool.resource_selection = {:url => "http://example.com/selection_test", :selection_width => 500, :selection_height => 500} if resource_selection
       tool.save!
       tool
     end

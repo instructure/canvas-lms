@@ -9,7 +9,7 @@ group :test do
   gem 'bullet_instructure', '4.0.3', :require => 'bullet'
   gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
     gem 'metaclass', '0.0.2'
-  gem 'thin', '1.5.1'
+  gem 'thin', '1.6.3'
     if RUBY_VERSION >= '2.2'
       gem 'eventmachine', :github => 'eventmachine/eventmachine'
     else
@@ -19,12 +19,13 @@ group :test do
   gem 'rspec', '3.1.0'
   gem 'rspec-rails', '3.1.0'
   gem 'rspec-legacy_formatters', '1.0.0'
-  gem 'once-ler', '0.0.13'
+  gem 'once-ler', '0.0.15'
 
   gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.43.0'
     gem 'childprocess', '0.5.0'
     gem 'websocket', '1.0.7'
+  gem 'test_after_commit', '0.4.0'
   gem 'webmock', '1.16.1', :require => false
     gem 'addressable', '2.3.5'
     gem 'crack', '0.4.1'

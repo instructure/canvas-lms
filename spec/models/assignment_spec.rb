@@ -79,6 +79,7 @@ describe Assignment do
     it "does not allow itself to be unpublished if it has student submissions" do
       @assignment.submit_homework @stu1, :submission_type => "online_text_entry"
       expect(@assignment).not_to be_can_unpublish
+
       @assignment.unpublish
       expect(@assignment).not_to be_valid
       expect(@assignment.errors['workflow_state']).to eq ["Can't unpublish if there are student submissions"]
@@ -248,29 +249,25 @@ describe Assignment do
   context "differentiated_assignment visibility" do
     describe "students_with_visibility" do
       before :once do
-        setup_DA
+        setup_differentiated_assignments
       end
 
-      context "draft state on" do
-        before {@course.enable_feature!(:draft_state)}
-        context "differentiated_assignment on" do
-          before {@course.enable_feature!(:differentiated_assignments)}
-          it "should return assignments only when a student has overrides" do
-            expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
-            expect(@assignment.students_with_visibility.include?(@student2)).to be_falsey
-          end
-
-          it "should not return students outside the class" do
-            expect(@assignment.students_with_visibility.include?(@student3)).to be_falsey
-          end
+      context "differentiated_assignment on" do
+        it "should return assignments only when a student has overrides" do
+          expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
+          expect(@assignment.students_with_visibility.include?(@student2)).to be_falsey
         end
 
-        context "differentiated_assignment off" do
-          before {@course.disable_feature!(:differentiated_assignments)}
-          it "should return all published assignments" do
-            expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
-            expect(@assignment.students_with_visibility.include?(@student2)).to be_truthy
-          end
+        it "should not return students outside the class" do
+          expect(@assignment.students_with_visibility.include?(@student3)).to be_falsey
+        end
+      end
+
+      context "differentiated_assignment off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should return all published assignments" do
+          expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
+          expect(@assignment.students_with_visibility.include?(@student2)).to be_truthy
         end
       end
 
@@ -914,16 +911,14 @@ describe Assignment do
     end
 
     context "differentiated_assignments" do
-      before do
-        setup_DA
+      before :once do
+        setup_differentiated_assignments
         @submissions = []
         [@student1, @student2].each do |u|
           @submissions << @assignment.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
         end
       end
       context "feature on" do
-        before {@course.enable_feature!(:differentiated_assignments)}
-
         it "should assign peer reviews only to students with visibility" do
           @assignment.peer_review_count = 1
           res = @assignment.assign_peer_reviews
@@ -946,11 +941,15 @@ describe Assignment do
         end
 
       end
-
       context "feature off" do
-        before {@course.disable_feature!(:differentiated_assignments)}
+        before :once do
+          @course.disable_feature!(:differentiated_assignments)
+          @assignment.reload
+        end
+
         it "should assign peer reviews to any student with a submission" do
           @assignment.peer_review_count = 1
+
           res = @assignment.assign_peer_reviews
           expect(res.length).to eql(@submissions.length)
           @submissions.each do |s|
@@ -1410,19 +1409,19 @@ describe Assignment do
   context "participants" do
     describe "with differentiated_assignments on" do
       before :once do
-        setup_differentiated_assignments_course
+        setup_differentiated_assignments(ta: true)
       end
 
       it 'returns users with visibility' do
-        expect(@assignment.participants.length).to eq 3
+        expect(@assignment.participants.length).to eq(4) #teacher, TA, 2 students
       end
 
       it 'includes students with visibility' do
-        expect(@assignment.participants.include?(@student_one)).to be_truthy
+        expect(@assignment.participants.include?(@student1)).to be_truthy
       end
 
       it 'excludes students without visibility' do
-        expect(@assignment.participants.include?(@student_two)).to be_falsey
+        expect(@assignment.participants.include?(@student2)).to be_falsey
       end
 
       it 'includes admins with visibility' do
@@ -1433,7 +1432,8 @@ describe Assignment do
 
     describe "with differentiated_assignments off" do
       before :once do
-        setup_differentiated_assignments_course(false)
+        setup_differentiated_assignments
+        @course.disable_feature!(:differentiated_assignments)
       end
 
       it 'returns all users in the course' do
@@ -2628,7 +2628,7 @@ describe Assignment do
     end
 
     it 'returns the cached value if present' do
-      @assignment.write_attribute(:graded_count, 50)
+      @assignment = Assignment.select("assignments.*, 50 AS graded_count").where(id: @assignment).first
       expect(@assignment.graded_count).to eq 50
     end
   end
@@ -2645,7 +2645,7 @@ describe Assignment do
     end
 
     it 'returns the cached value if present' do
-      @assignment.write_attribute(:submitted_count, 50)
+      @assignment = Assignment.select("assignments.*, 50 AS submitted_count").where(id: @assignment).first
       expect(@assignment.submitted_count).to eq 50
     end
   end
@@ -3048,22 +3048,6 @@ describe Assignment do
   end
 end
 
-
-def setup_differentiated_assignments_course(enabled=true)
-  @course = course(draft_state: true, active_all: true, differentiated_assignments: enabled)
-  @section_one = @course.course_sections.create!(name: 'Section One')
-  @section_two = @course.course_sections.create!(name: 'Section Two')
-
-  @ta = course_with_ta(course: @course, active_all: true).user
-  @student_one = student_in_section(@section_one)
-  @student_two = student_in_section(@section_two)
-
-  @assignment = assignment_model(course: @course)
-  @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section_one)
-  @override_s1.due_at = 1.day.from_now
-  @override_s1.save!
-end
-
 def setup_assignment_with_group
   assignment_model(:group_category => "Study Groups", :course => @course)
   @group = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
@@ -3123,14 +3107,24 @@ def zip_submissions
   zip
 end
 
-def setup_DA
-  @course_section = @course.course_sections.create
+def setup_differentiated_assignments(opts={})
+  if !opts[:course]
+    course_with_teacher(draft_state: true, active_all: true, differentiated_assignments: true)
+  end
+
+  @section1 = @course.course_sections.create!(name: 'Section One')
+  @section2 = @course.course_sections.create!(name: 'Section Two')
+
+  if opts[:ta]
+    @ta = course_with_ta(course: @course, active_all: true).user
+  end
+
   @student1, @student2, @student3 = create_users(3, return_type: :record)
-  @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
-  @course.enroll_student(@student2, :enrollment_state => 'active')
-  @section = @course.course_sections.create!(name: "test section")
-  @section2 = @course.course_sections.create!(name: "second test section")
-  student_in_section(@section, user: @student1)
-  create_section_override_for_assignment(@assignment, {course_section: @section})
-  @course.reload
+  student_in_section(@section1, user: @student1)
+  student_in_section(@section2, user: @student2)
+
+  @assignment = assignment_model(course: @course, submission_types: "online_url", workflow_state: "published")
+  @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section1)
+  @override_s1.due_at = 1.day.from_now
+  @override_s1.save!
 end

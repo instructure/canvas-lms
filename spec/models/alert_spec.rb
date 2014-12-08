@@ -26,12 +26,6 @@ describe Alert do
 
   context "Alerts" do
     context "mass assignment" do
-      it "should translate string-symbols to symbols when assigning to recipients" do
-        alert = Alert.new
-        alert.recipients = [':student', :teachers, 'AccountAdmin']
-        expect(alert.recipients).to eq [:student, :teachers, 'AccountAdmin']
-      end
-
       it "should accept mass assignment of criteria" do
         alert = Alert.new(:context => Account.default, :recipients => [:student])
         alert.criteria = [{:criterion_type => 'Interaction', :threshold => 1}]

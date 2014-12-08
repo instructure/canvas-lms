@@ -33,7 +33,7 @@ require [
   course.url = ENV.URLS.course_url
   course.fetch()
 
-  includes = ["assignments"]
+  includes = ["assignments", "discussion_topic"]
   if ENV.PERMISSIONS.manage
     includes.push "all_dates"
     includes.push "module_ids"
