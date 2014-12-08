@@ -906,7 +906,11 @@ RSpec.configure do |config|
 
   def outcome_with_rubric(opts={})
     @outcome_group ||= @course.root_outcome_group
-    @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
+    @outcome = @course.created_learning_outcomes.create!(
+      :description => '<p>This is <b>awesome</b>.</p>',
+      :short_description => 'new outcome',
+      :calculation_method => 'highest'
+    )
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 

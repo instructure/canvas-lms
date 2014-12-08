@@ -25,6 +25,65 @@ describe LearningOutcome do
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
     end
 
+    def assess_with(outcome=@outcome)
+      @rubric = Rubric.create!(:context => @course)
+      @rubric.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => @outcome.id
+        }
+      ]
+      @rubric.save!
+      @user = user(:active_all => true)
+      @e = @course.enroll_student(@user)
+      @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      @assignment.reload
+      @submission = @assignment.grade_student(@user, :grade => "10").first
+      @assessment = @a.assess({
+        :user => @user,
+        :assessor => @user,
+        :artifact => @submission,
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_1 => {
+            :points => 2,
+            :comments => "cool, yo"
+          }
+        }
+      })
+      @result = @outcome.learning_outcome_results.first
+      @assessment = @a.assess({
+        :user => @user,
+        :assessor => @user,
+        :artifact => @submission,
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_1 => {
+            :points => 3,
+            :comments => "cool, yo"
+          }
+        }
+      })
+      @result.reload
+      @rubric.reload
+    end
+
     it "should allow learning outcome rows in the rubric" do
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
@@ -376,6 +435,88 @@ describe LearningOutcome do
       expect(@result.mastery).to eql(false)
       n = @result.version_number
     end
+
+    it "should not let you change calculation_method if it has been used to assess a student" do
+      @outcome.calculation_method = 'latest'
+      @outcome.save!
+      expect(@outcome.calculation_method).to eq('latest')
+      assess_with
+      @outcome.calculation_method = 'n_mastery'
+      @outcome.save!
+      @outcome.reload
+      expect(@outcome.calculation_method).to eq('latest')
+    end
+
+    it "should not let you change calculation_int if it has been used to assess a student" do
+      @outcome.calculation_int = 24
+      @outcome.save!
+      expect(@outcome.calculation_int).to eq(24)
+      assess_with
+      @outcome.calculation_int = 71
+      @outcome.save!
+      @outcome.reload
+      expect(@outcome.calculation_int).to eq(24)
+    end
+
+    it "should not let you set the calculation_method to nil if it has been set to seomthing else" do
+      @outcome.calculation_method = 'latest'
+      @outcome.save!
+      expect(@outcome.calculation_method).to eq('latest')
+      @outcome.calculation_method = nil
+      @outcome.save!
+      @outcome.reload
+      expect(@outcome.calculation_method).to eq('latest')
+    end
+
+    it "should not let you set calculation_int to nil if calculation_method is n_mastery" do
+      @outcome.calculation_method = 'n_mastery'
+      @outcome.calculation_int = 4
+      @outcome.save!
+      expect(@outcome.calculation_method).to eq('n_mastery')
+      expect(@outcome.calculation_int).to eq(4)
+      @outcome.calculation_int = nil
+      @outcome.save!
+      @outcome.reload
+      expect(@outcome.calculation_method).to eq('n_mastery')
+      expect(@outcome.calculation_int).to eq(4)
+    end
+
+    it "should not let you set calculation_int to nil if calculation_method is decaying_average" do
+      @outcome.calculation_method = 'decaying_average'
+      @outcome.calculation_int = 66
+      @outcome.save!
+      expect(@outcome.calculation_method).to eq('decaying_average')
+      expect(@outcome.calculation_int).to eq(66)
+      @outcome.calculation_int = nil
+      @outcome.save!
+      @outcome.reload
+      expect(@outcome.calculation_method).to eq('decaying_average')
+      expect(@outcome.calculation_int).to eq(66)
+    end
+
+    context "should set calculation_int to default if the calculation_method is changed and calculation_int isn't set" do
+      method_to_int = {
+        "decaying_average" => { default: 75, testval: 4, altmeth: 'n_mastery' },
+        "n_mastery" => { default: 5, testval: nil, altmeth: 'highest' },
+        "highest" => { default: nil, testval: nil, altmeth: 'latest' },
+        "latest" => { default: nil, testval: 72, altmeth: 'decaying_average' },
+      }
+
+      method_to_int.each do |method, set|
+        it "should set calculation_int to #{set[:default]} if the calculation_method is changed to #{method} and calculation_int isn't set" do
+          @outcome.calculation_method = set[:altmeth]
+          @outcome.calculation_int = set[:testval]
+          @outcome.save!
+          expect(@outcome.calculation_method).to eq(set[:altmeth])
+          expect(@outcome.calculation_int).to eq(set[:testval])
+          @outcome.calculation_method = method
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq(method)
+          expect(@outcome.calculation_int).to eq(set[:default])
+        end
+      end
+    end
   end
 
   describe "permissions" do
@@ -427,6 +568,179 @@ describe LearningOutcome do
       it "should not grant :read to users without :read_outcomes on the context" do
         student_in_course(:active_enrollment => 1)
         expect(@outcome.grants_right?(User.new, :update)).to be_falsey
+      end
+    end
+  end
+
+  context "mastery values" do
+    context "can be set" do
+      before :once do
+        @outcome = LearningOutcome.create!(:title => 'outcome', :calculation_method => 'highest', :calculation_int => 0)
+      end
+
+      it { is_expected.to respond_to(:calculation_method) }
+      it { is_expected.to respond_to(:calculation_int) }
+
+      it "should allow setting a calculation_method" do
+        expect(@outcome.calculation_method).not_to eq('n_mastery')
+        @outcome.calculation_method = 'n_mastery'
+        @outcome.save!
+        @outcome.reload
+        expect(@outcome.calculation_method).to eq('n_mastery')
+      end
+
+      it "should allow setting a calculation_int for decaying_average" do
+        expect(@outcome.calculation_int).not_to eq(85)
+        @outcome.calculation_method = 'decaying_average'
+        @outcome.calculation_int = 85
+        @outcome.save!
+        @outcome.reload
+        expect(@outcome.calculation_method).to eq('decaying_average')
+        expect(@outcome.calculation_int).to eq(85)
+      end
+
+      it "should allow setting a calculation_int for n_mastery" do
+        expect(@outcome.calculation_int).not_to eq(7)
+        @outcome.calculation_method = 'n_mastery'
+        @outcome.calculation_int = 2
+        @outcome.save!
+        @outcome.reload
+        expect(@outcome.calculation_method).to eq('n_mastery')
+        expect(@outcome.calculation_int).to eq(2)
+      end
+
+      it "should allow updating the calculation_int and calculation_method together" do
+        @outcome.calculation_method = 'decaying_average'
+        @outcome.calculation_int = 59
+        @outcome.save!
+        @outcome.reload
+        expect(@outcome.calculation_method).to eq('decaying_average')
+        expect(@outcome.calculation_int).to eq(59)
+        @outcome.calculation_method = 'n_mastery'
+        @outcome.calculation_int = 3
+        @outcome.save!
+        @outcome.reload
+        expect(@outcome.calculation_method).to eq('n_mastery')
+        expect(@outcome.calculation_int).to eq(3)
+      end
+    end
+
+    context "reject illegal values" do
+      before :once do
+        @outcome = LearningOutcome.create!(:title => 'outcome', :calculation_method => 'highest', :calculation_int => 0)
+      end
+
+      it "should reject an illegal calculation_method" do
+        expect(@outcome.calculation_method).not_to eq('foo bar baz qux')
+        expect(@outcome.calculation_method).to eq('highest')
+        @outcome.calculation_method = 'foo bar baz qux'
+        @outcome.save!
+        @outcome.reload
+        expect(@outcome.calculation_method).not_to eq('foo bar baz qux')
+        expect(@outcome.calculation_method).to eq('highest')
+      end
+
+      context "reject illegal calculation_int s" do
+        it "should reject an illegal calculation_int for decaying_average" do
+          @outcome.calculation_method = 'decaying_average'
+          @outcome.calculation_int = 68
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('decaying_average')
+          expect(@outcome.calculation_int).to eq(68)
+          @outcome.calculation_int = 15000
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('decaying_average')
+          expect(@outcome.calculation_int).to eq(68)
+        end
+
+        it "should reject an illegal calculation_int for n_mastery" do
+          @outcome.calculation_method = 'n_mastery'
+          @outcome.calculation_int = 4
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('n_mastery')
+          expect(@outcome.calculation_int).to eq(4)
+          @outcome.calculation_int = 15000
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('n_mastery')
+          expect(@outcome.calculation_int).to eq(4)
+        end
+
+        it "should reject an illegal calculation_int for highest" do
+          @outcome.calculation_method = 'highest'
+          @outcome.calculation_int = nil
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('highest')
+          expect(@outcome.calculation_int).to be_nil
+          @outcome.calculation_int = 15000
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('highest')
+          expect(@outcome.calculation_int).to be_nil
+        end
+
+        it "should reject an illegal calculation_int for latest" do
+          @outcome.calculation_method = 'latest'
+          @outcome.calculation_int = nil
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('latest')
+          expect(@outcome.calculation_int).to be_nil
+          @outcome.calculation_int = 15000
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq('latest')
+          expect(@outcome.calculation_int).to be_nil
+        end
+      end
+    end
+
+    context "default values" do
+      it "should default calculation_method to decaying_average" do
+        @outcome = LearningOutcome.create!(:title => 'outcome')
+        expect(@outcome.calculation_method).to eql('decaying_average')
+      end
+
+      it "should default calculation_int to 75 for decaying_average" do
+        @outcome = LearningOutcome.create!(:title => 'outcome')
+        expect(@outcome.calculation_method).to eql('decaying_average')
+        expect(@outcome.calculation_int).to eql(75)
+      end
+
+      it "should default calculation_int to 5 for n_mastery" do
+        @outcome = LearningOutcome.create!(:title => 'outcome', :calculation_method => 'n_mastery')
+        expect(@outcome.calculation_method).to eql('n_mastery')
+        expect(@outcome.calculation_int).to eql(5)
+      end
+
+      it "should default calculation_int to nil for highest" do
+        @outcome = LearningOutcome.create!(:title => 'outcome', :calculation_method => 'highest')
+        expect(@outcome.calculation_method).to eql('highest')
+        expect(@outcome.calculation_int).to be_nil
+      end
+
+      it "should default calculation_int to nil for latest" do
+        @outcome = LearningOutcome.create!(:title => 'outcome', :calculation_method => 'latest')
+        expect(@outcome.calculation_method).to eql('latest')
+        expect(@outcome.calculation_int).to be_nil
+      end
+
+      # This is to prevent changing behavior of existing outcomes made before we added the
+      # ability to set a calculation_method
+      it "should not set default values for calculation_method if the record is pre-existing and nil" do
+        @outcome = LearningOutcome.create!(:title => 'outcome')
+        @outcome.update_column(:calculation_method, nil)
+        @outcome.reload
+        expect(@outcome.calculation_method).to be_nil
+        @outcome.description = "foo bar baz qux"
+        @outcome.save!
+        @outcome.reload
+        expect(@outcome.description).to eq("foo bar baz qux")
+        expect(@outcome.calculation_method).to be_nil
       end
     end
   end

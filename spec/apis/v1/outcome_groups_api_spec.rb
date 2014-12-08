@@ -864,6 +864,44 @@ describe "Outcome Groups API", type: :request do
       })
     end
 
+    it "should create a new outcome with default values for mastery calculation" do
+      prev_count = LearningOutcome.active.count
+      json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
+               { :controller => 'outcome_groups_api',
+                 :action => 'link',
+                 :account_id => @account.id.to_s,
+                 :id => @group.id.to_s,
+                 :format => 'json' },
+               { :title => "My Outcome",
+                 :display_name => "Friendly Name",
+                 :description => "Description of my outcome",
+                 :mastery_points => 5,
+                 :ratings => [
+                   { :points => 5, :description => "Exceeds Expectations" },
+                   { :points => 3, :description => "Meets Expectations" },
+                   { :points => 0, :description => "Does Not Meet Expectations" }
+                 ]
+      })
+
+      expect(LearningOutcome.active.count).to eq(prev_count + 1)
+      @outcome = LearningOutcome.find(json["outcome"]["id"])
+      expect(@outcome.title).to eq "My Outcome"
+      expect(@outcome.display_name).to eq "Friendly Name"
+      expect(@outcome.description).to eq "Description of my outcome"
+      expect(@outcome.data[:rubric_criterion]).to eq({
+        :description => 'My Outcome',
+        :mastery_points => 5,
+        :points_possible => 5,
+        :ratings => [
+          { :points => 5, :description => "Exceeds Expectations" },
+          { :points => 3, :description => "Meets Expectations" },
+          { :points => 0, :description => "Does Not Meet Expectations" }
+        ]
+      })
+      expect(@outcome.calculation_method).to eq("decaying_average")
+      expect(@outcome.calculation_int).to eq(75)
+    end
+
     it "should link the new outcome into the group" do
       LearningOutcome.update_all(:workflow_state => 'deleted')
       api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",

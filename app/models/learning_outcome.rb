@@ -19,7 +19,7 @@
 class LearningOutcome < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :description, :short_description, :title, :display_name
-  attr_accessible :rubric_criterion, :vendor_guid
+  attr_accessible :rubric_criterion, :vendor_guid, :calculation_method, :calculation_int
 
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
@@ -29,7 +29,10 @@ class LearningOutcome < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :short_description, :context_code, :description, :data, :workflow_state, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
   EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
   serialize :data
-  before_save :infer_defaults
+
+  before_create :infer_default_calculation_options
+  before_save :infer_defaults, :validate_calculation_options
+
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :short_description, :maximum => maximum_string_length
   validates_presence_of :short_description, :workflow_state
@@ -58,6 +61,82 @@ class LearningOutcome < ActiveRecord::Base
       self.data[:rubric_criterion][:description] = self.short_description
     end
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+  end
+
+  def infer_default_calculation_options
+    self.calculation_method ||= default_calculation_method
+    self.calculation_int ||= default_calculation_int
+  end
+
+  def validate_calculation_options
+    if self.assessed?
+      # if we've been used to assess a student, refuse to accept any changes to our calculation options
+      self.calculation_method = self.calculation_method_was
+      self.calculation_int = self.calculation_int_was
+    else
+      # if we previously had a calculation_method, don't let it be set to nil
+      if self.calculation_method.nil? && ! self.calculation_method_was.nil?
+        self.calculation_method = self.calculation_method_was
+      end
+
+      # if we are changing the calculation_method but not the calculation_int, set the int to the default value
+      if self.calculation_method != self.calculation_method_was && self.calculation_int == self.calculation_int_was
+        self.calculation_int = default_calculation_int
+      end
+
+      # if calculation_method is nil, leave it alone so we don't inadvertently change existing learning outcomes
+      # that were created before we added a calculation_method.  If it is invalid, set it back to what it was before,
+      # unless the previous setting was invalid too.  In that case, set it to the default.  Do the same for the int
+      if self.calculation_method.nil? || ! valid_calculation_method?(self.calculation_method)
+        if self.calculation_method_was.nil? && self.calculation_method.nil?
+          # if calculation_method is nil, and it isn't being set in this transaction,
+          # leave it alone so we don't inadvertently change existing learning outcomes
+        elsif valid_calculation_method?(self.calculation_method_was)
+          self.calculation_method = self.calculation_method_was
+        else
+          self.calculation_method = default_calculation_method
+        end
+      end
+
+      # If the new calculation_int is invalid, set it back to what it was before,
+      # unless the previous setting was invalid too.  In that case, set it to the default
+      unless valid_calculation_int?(self.calculation_int)
+        if valid_calculation_int?(self.calculation_int_was)
+          self.calculation_int = self.calculation_int_was
+        else
+          self.calculation_int = default_calculation_int
+        end
+      end
+    end
+  end
+
+  def valid_calculation_method?(method)
+    %w[n_mastery decaying_average latest highest].include?(method)
+  end
+
+  def valid_calculation_int?(int, method=self.calculation_method)
+    case method
+    when 'decaying_average'
+      (1..99).include?(int)
+    when 'n_mastery'
+      (2..5).include?(int)
+    when 'latest', 'highest', nil
+      int.nil?
+    else
+      false
+    end
+  end
+
+  def default_calculation_method
+    "decaying_average"
+  end
+
+  def default_calculation_int(method=self.calculation_method)
+    case method
+    when 'decaying_average' then 75
+    when 'n_mastery' then 5
+    else nil
+    end
   end
 
   def align(asset, context, opts={})
@@ -181,6 +260,10 @@ class LearningOutcome < ActiveRecord::Base
     save!
   end
 
+  def assessed?
+    learning_outcome_results.exists?
+  end
+
   def tie_to(context)
     @tied_context = context
   end
@@ -215,5 +298,4 @@ class LearningOutcome < ActiveRecord::Base
   }
 
   scope :global, -> { where(:context_id => nil) }
-
 end

@@ -74,6 +74,24 @@
 #           "example": 3,
 #           "type": "integer"
 #         },
+#         "calculation_method": {
+#           "description": "the method used to calculate a students score",
+#           "example": "decaying_average",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "decaying_average",
+#               "n_mastery",
+#               "latest",
+#               "highest"
+#             ]
+#           }
+#         },
+#         "calculation_int": {
+#           "description": "this defines the variable value used by the calculation_method. included only if calculation_method uses it",
+#           "example": 75,
+#           "type": "integer"
+#         },
 #         "ratings": {
 #           "description": "possible ratings for this outcome. included only if the outcome embeds a rubric criterion. omitted in the abbreviated form.",
 #           "type": "array",
@@ -143,23 +161,32 @@ class OutcomesApiController < ApplicationController
   #   The points corresponding to a new rating level for the embedded rubric
   #   criterion.
   #
+  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
+  #   The new calculation method.
+  #
+  # @argument calculation_int [Integer]
+  #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"
+  #
   # @returns Outcome
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
-  #        -X PUT \ 
-  #        -F 'title=Outcome Title' \ 
+  #        -X PUT \
+  #        -F 'title=Outcome Title' \
   #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9001' \
-  #        -F 'mastery_points=3' \ 
-  #        -F 'ratings[][description]=Exceeds Expectations' \ 
-  #        -F 'ratings[][points]=5' \ 
-  #        -F 'ratings[][description]=Meets Expectations' \ 
-  #        -F 'ratings[][points]=3' \ 
-  #        -F 'ratings[][description]=Does Not Meet Expectations' \ 
-  #        -F 'ratings[][points]=0' \ 
+  #        -F 'mastery_points=3' \
+  #        -F 'ratings[][description]=Exceeds Expectations' \
+  #        -F 'ratings[][points]=5' \
+  #        -F 'ratings[][description]=Meets Expectations' \
+  #        -F 'ratings[][points]=3' \
+  #        -F 'ratings[][description]=Does Not Meet Expectations' \
+  #        -F 'ratings[][points]=0' \
+  #        -F 'calculation_method=decaying_average' \
+  #        -F 'calculation_int=75' \
+  #        -F 'ratings[][points]=0' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_request
@@ -185,6 +212,7 @@ class OutcomesApiController < ApplicationController
     return unless authorized_action(@outcome, @current_user, :update)
 
     @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid))
+
     if params[:mastery_points] || params[:ratings]
       criterion = @outcome.data && @outcome.data[:rubric_criterion]
       criterion ||= {}
@@ -198,6 +226,22 @@ class OutcomesApiController < ApplicationController
       end
       @outcome.rubric_criterion = criterion
     end
+
+    if params[:calculation_method] || params[:calculation_int]
+      unless @outcome.assessed?
+        if params[:calculation_method] && @outcome.valid_calculation_method?(params[:calculation_method])
+          @outcome.calculation_method = params[:calculation_method]
+        end
+        # in this if statement, check 'calculation_int' validity based on '@outcome.calculation_method'
+        # instead of 'params[:calculation_method]' since 'params[:calculation_method]' might not be
+        # valid.  '@outcome.calculation_method' will still be current if being set to something
+        # valid in this call, since it gets set immediately above ^^
+        if params[:calculation_int] && @outcome.valid_calculation_int?(params[:calculation_int].to_i)
+          @outcome.calculation_int = params[:calculation_int].to_i
+        end
+      end
+    end
+
     if @outcome.save
       render :json => outcome_json(@outcome, @current_user, session)
     else
