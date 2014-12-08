@@ -143,6 +143,17 @@ class PseudonymSessionsController < ApplicationController
     # reset the session id cookie to prevent session fixation.
     reset_session_for_login
 
+    # Check referer and authenticity token.  If the token is invalid but the referer is trusted
+    # and one is not provided then continue.  If the referer is trusted and they provide a token
+    # we still want to check it.
+    if params.has_key?(request_forgery_protection_token) || !@domain_root_account.trusted_referer?(request.referer)
+      begin
+        verify_authenticity_token
+      rescue ActionController::InvalidAuthenticityToken
+        return unsuccessful_login(t("Invalid Authenticity Token"))
+      end
+    end
+
     if params[:pseudonym_session].blank? || params[:pseudonym_session][:password].blank?
       return unsuccessful_login(t('errors.blank_password', "No password was given"))
     end
@@ -649,10 +660,6 @@ class PseudonymSessionsController < ApplicationController
     @current_pseudonym = pseudonym
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'login')
-
-    if !params.has_key?(request_forgery_protection_token) && @domain_root_account.trusted_referer?(request.referer)
-      response.headers['X-Account-Trusted-Referrer'] = 'true'
-    end
 
     otp_passed ||= @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'], request.remote_ip)
     if !otp_passed
