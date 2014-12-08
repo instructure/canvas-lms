@@ -39,9 +39,11 @@ define [
       showMessage: React.PropTypes.bool
       contextType: React.PropTypes.string
       contextId: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+      # This is where focus should be given should no option be selected... a11y for the win.
+      afterChooseBlur: React.PropTypes.func.isRequired
 
     getInitialState: ->
-      showTextBox: @props.use_justification
+      showTextBox: @props.use_justification != 'choose'
       showCreativeCommonsOptions: @props.use_justification == 'creative_commons' && @props.copyright?
       licenseOptions: []
       showMessage: @props.showMessage
@@ -75,6 +77,15 @@ define [
         showMessage: (@props.showMessage && event.target.value == 'choose')
       })
 
+    handleBlur: (event) ->
+      if (@state.showCreativeCommonsOptions)
+        @refs.creativeCommons.getDOMNode().focus()
+      else if (@state.showTextBox)
+        @refs.copyright.getDOMNode().focus()
+      else
+        # a11y for the win.
+        @props.afterChooseBlur().getDOMNode().focus()
+
     renderContentOptions: ->
       contentOptions.map (contentOption) ->
         option {value: contentOption.value},
@@ -101,6 +112,7 @@ define [
               id: 'usageRightSelector'
               className: 'UsageRightsSelectBox__select',
               onChange: @handleChange,
+              onBlur: @handleBlur
               ref: 'usageRightSelection'
               defaultValue: @props.use_justification if @props.use_justification
             },

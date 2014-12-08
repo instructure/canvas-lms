@@ -136,16 +136,24 @@ define [
               @renderDifferentRightsMessage() if ((@copyright == '' || @usageRight == 'choose') && @props.itemsToManage.length > 1 && @copyright != "undefined")
               @renderFileName()
               @renderFolderMessage()
-              UsageRightsSelectBox(ref: 'usageSelection', use_justification: @use_justification, copyright: @copyright)
+              UsageRightsSelectBox {
+                ref: 'usageSelection'
+                use_justification: @use_justification
+                copyright: @copyright
+                afterChooseBlur: => @refs.cancelButton # a11y for the win
+              }
 
         div {className: 'form-controls'},
           button {
+            ref: 'cancelButton'
             type: 'button'
             className: 'btn'
             onClick: @props.closeDialog
-          }, I18n.t('Cancel')
+          },
+            I18n.t('Cancel')
           button {
             type: 'submit'
             className: 'btn btn-primary'
             'data-text-while-loading': I18n.t('saving', 'Saving...')
-          }, I18n.t('Save')
+          },
+            I18n.t('Save')

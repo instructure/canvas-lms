@@ -211,7 +211,7 @@
           <%= image_tag "ajax-loader-bar.gif", :alt => t('images.alt.loading', "Loading...") %>
         </div>
         <div class="button-container">
-          <button class="btn " type="submit"><%= t('buttons.upload', %{Upload}) %></button>
+          <button class="btn uploadFileBtn" type="submit"><%= t('buttons.upload', %{Upload}) %></button>
         </div>
         <a href="<%= context_url(@context, :context_files_url, :format => :json) %>" class="json_upload_url" style="display: none;">&nbsp;</a>
         <a href="<%= context_url(@context, :context_file_download_url, "{{ id }}", :wrap => 1) %>" class="file_url" style="display: none;">&nbsp;</a>
