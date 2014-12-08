@@ -104,13 +104,11 @@ describe Api::V1::User do
     it 'should use an sis pseudonym from another account if necessary' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
-      sis_pseudonym = @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a'}
+      @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a'}
       Account.default.any_instantiation.stubs(:trust_exists?).returns(true)
       Account.default.any_instantiation.stubs(:trusted_account_ids).returns([@account2.id])
       HostUrl.expects(:context_host).with(@account2).returns('school1')
       @user.stubs(:find_pseudonym_for_account).with(Account.default).returns(@pseudonym)
-      sis_pseudonym.any_instantiation.stubs(:grants_right?).with(@admin, :read_sis).returns(true)
-      sis_pseudonym.any_instantiation.stubs(:grants_right?).with(@admin, :manage_sis).returns(true)
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',
