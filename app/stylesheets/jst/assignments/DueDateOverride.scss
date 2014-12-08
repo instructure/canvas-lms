@@ -1,14 +1,14 @@
+@import "base/environment";
+
 .js-assignment-overrides {
   overflow: auto;
 
-  .remove-link .icon-end:hover {
-    opacity: 1.0;
-  }
-
   .remove-link .icon-end {
-    opacity: 0.5;
-    color: black;
+    color: $ic-icon-link-color;
     vertical-align: middle;
+    &:hover, &:focus {
+      color: $ic-icon-link-color-hover;  
+    }
   }
 
   .due-date-override-headers {

@@ -269,3 +269,17 @@ $can-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color ex
 // If it's a dark border, it should be this color.
 @if $use_new_styles { $can-border-dark: lighten($canvas-secondary, 25%); }
 @else { $can-border-dark: lighten(#4b5662, 20%); }
+
+/// Link-color-related variables
+//==============================
+
+// Note: right now, our primary link color is set using the Bootstrap variable $linkColor.
+
+$ic-icon-link-color: lighten($canvas-dark, 25%);
+@if $use_high_contrast { $ic-icon-link-color: lighten($canvas-dark, 12%); }
+$ic-icon-link-color-hover: $canvas-dark;
+
+
+
+
+
