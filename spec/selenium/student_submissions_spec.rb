@@ -280,7 +280,8 @@ describe "submissions" do
         File.read(fixture_file_path("files/html-editing-test.html"))
         assignment = @course.assignments.create!(:title => 'assignment 1',
                                                  :name => 'assignment 1',
-                                                 :submission_types => "online_upload")
+                                                 :submission_types => "online_upload",
+                                                 :allowed_extensions => '.html')
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         f('.submit_assignment_link').click
         wait_for_ajaximations

@@ -102,11 +102,13 @@ define([
         if(ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
           var subButton = $(this).find('button[type=submit]');
           var badExt = false;
-          $.each(uploadedAttachmentIds, function(index, id) {
-            var ext = $("#uploaded_files .file_" + id + " .name").text().split('.').pop().toLowerCase();
-            if ($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
-              badExt = true;
-              $.flashError(I18n.t('#errors.wrong_file_extension', 'The file you selected with extension "%{extension}", is not authorized for submission', {extension: ext}));
+          $.each(uploadedAttachmentIds.split(","), function(index, id) {
+            if (id.length > 0) {
+              var ext = $("#uploaded_files .file_" + id + " .name").text().split('.').pop().toLowerCase();
+              if ($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
+                badExt = true;
+                $.flashError(I18n.t('#errors.wrong_file_extension', 'The file you selected with extension "%{extension}", is not authorized for submission', {extension: ext}));
+              }
             }
           });
           if(badExt) {
