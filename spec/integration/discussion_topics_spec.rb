@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "discussion_topics" do
   def discussion_assignment
     assignment_model(:course => @course, :submission_types => 'discussion_topic', :title => 'Assignment Discussion')
-    @topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+    @topic = DiscussionTopic.where(assignment_id: @assignment).first
   end
 
   it "should show assignment group discussions without errors" do

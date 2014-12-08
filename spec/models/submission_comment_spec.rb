@@ -134,6 +134,7 @@ This text has a http://www.google.com link in it...
     expect(@item.data).to be_is_a(Submission)
     expect(@item.data.submission_comments.target).to eq [] # not stored on the stream item
     expect(@item.data.submission_comments).to eq [@comment] # but we can still get them
+    expect(@item.stream_item_instances.first.read?).to be_truthy
   end
 
   it "should ensure the media object exists" do

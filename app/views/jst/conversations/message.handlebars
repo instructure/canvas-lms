@@ -18,6 +18,7 @@
 <div class="summary">{{last_message}}</div>
 
 <ul class="message-actions unstyled">
+  {{#unless for_submission}}
   <li>
     <a href="#"
        class="star-btn {{#if starred}}active{{/if}}"
@@ -30,6 +31,7 @@
       </span>
     </a>
   </li>
+  {{/unless}}
   <li>
     <a href="#"
        class="read-state {{#unless unread}}read{{/unless}}"

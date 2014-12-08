@@ -72,7 +72,7 @@ describe "submissions" do
         expect(f('#sidebar_content .header')).to include_text "Turned In!"
         expect(f('.details .file-big')).to include_text "testfile1"
       end
-      @submission = @assignment.reload.submissions.find_by_user_id(@student.id)
+      @submission = @assignment.reload.submissions.where(user_id: @student).first
       expect(@submission.submission_type).to eq 'online_upload'
       expect(@submission.attachments.length).to eq 1
       expect(@submission.workflow_state).to eq 'submitted'

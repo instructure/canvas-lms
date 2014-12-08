@@ -140,18 +140,6 @@ describe Role do
       new_role.base_role_type = 'StudentEnrollment'
       expect(new_role).to be_valid
     end
-
-    it "should not allow a role name to be reused with a different base role type within a root account" do
-      new_role = @sub_account_1b.roles.create :name => 'TestRole'
-      new_role.base_role_type = 'TaEnrollment'
-      expect(new_role).not_to be_valid
-    end
-
-    it "should allow a role name to be reused with a different base role type in a separate root account" do
-      new_role = @sub_account_2.roles.create :name => 'TestRole'
-      new_role.base_role_type = 'TaEnrollment'
-      expect(new_role).to be_valid
-    end
   end
 
   context "with active role" do
@@ -161,10 +149,12 @@ describe Role do
       @role.reload
     end
 
-    it "should not allow a duplicate role to be created in the same account" do
-      dup_role = @account.roles.create :name => "1337 Student"
+    it "should not allow a duplicate active role to be created in the same account" do
+      dup_role = @account.roles.new :name => "1337 Student"
       dup_role.base_role_type = 'StudentEnrollment'
       expect(dup_role).to be_invalid
+      @role.destroy
+      expect(dup_role).to be_valid
     end
 
     describe "workflow" do
@@ -207,11 +197,12 @@ describe Role do
       account_model
       @sub_account = @account.sub_accounts.create!
       @base_types = RoleOverride::ENROLLMENT_TYPES.map{|et|et[:base_role_name]}
+      @custom_roles = {}
       @base_types.each do |bt|
         if bt == 'DesignerEnrollment'
-          custom_role(bt, "custom #{bt}", :account => @sub_account)
+          @custom_roles[bt] = custom_role(bt, "custom #{bt}", :account => @sub_account)
         else
-          custom_role(bt, "custom #{bt}")
+          @custom_roles[bt] = custom_role(bt, "custom #{bt}")
         end
       end
     end
@@ -234,7 +225,7 @@ describe Role do
 
       @base_types.each do |bt|
         @course.enroll_user(user, bt)
-        @course.enroll_user(user, bt, :role_name => "custom #{bt}")
+        @course.enroll_user(user, bt, :role => @custom_roles[bt])
       end
 
       all = Role.custom_roles_and_counts_for_course(@course, @course.teachers.first)
@@ -252,7 +243,7 @@ describe Role do
 
         @base_types.each do |bt|
           @course.enroll_user(user, bt)
-          @course.enroll_user(user, bt, :role_name => "custom #{bt}")
+          @course.enroll_user(user, bt, :role => @custom_roles[bt])
         end
 
         roles = Role.role_data(@course, @course.teachers.first)
@@ -269,5 +260,16 @@ describe Role do
     end
   end
 
-
+  describe "cross-shard built-in role translation" do
+    specs_require_sharding
+    it "should return the id of the built in role on the current shard" do
+      built_in_role = Role.get_built_in_role("AccountAdmin")
+      @shard1.activate do
+        expect(built_in_role.id).to eq Role.get_built_in_role("AccountAdmin", @shard1).id
+        account = Account.create
+        # should not get foreign key error
+        account.role_overrides.create!(role: built_in_role, enabled: false, permission: :manage_admin_users)
+      end
+    end
+  end
 end

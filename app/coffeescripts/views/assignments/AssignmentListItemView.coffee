@@ -40,7 +40,7 @@ define [
 
     messages:
       confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
-      ag_move_label: I18n.beforeLabel 'assignment_group_move_label', 'Assignment Group'
+      ag_move_label: I18n.beforeLabel I18n.t('labels.assignment_group_move_label', 'Assignment Group')
 
     initialize: ->
       super
@@ -150,7 +150,7 @@ define [
       else if @model.isDiscussionTopic()
         data.menu_tools = ENV.discussion_topic_menu_tools
         _.each data.menu_tools, (tool) =>
-          tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic_id")}"
+          tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic")?.id}"
       else
         data.menu_tools = ENV.assignment_menu_tools
         _.each data.menu_tools, (tool) =>

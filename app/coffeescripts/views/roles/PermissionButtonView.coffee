@@ -73,7 +73,7 @@ define [
     #   with
     # @api private
     setDataAttributes: -> 
-      @$el.attr 'data-role_name', @model.id
+      @$el.attr 'data-role_id', @model.id
       @$el.attr 'data-permission_name', @permission_name
 
     # Method Summary

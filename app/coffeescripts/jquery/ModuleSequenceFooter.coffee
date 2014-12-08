@@ -69,13 +69,14 @@ define [
       # @api private
 
       iconClasses: 
-        'ModuleItem'   : "icon-module"
-        'File'         : "icon-download"
-        'Page'         : "icon-document"
-        'Discussion'   : "icon-discussion"
-        'Assignment'   : "icon-assignment"
-        'Quiz'         : "icon-quiz"
-        'ExternalTool' : "icon-link"
+        'ModuleItem'          : "icon-module"
+        'File'                : "icon-download"
+        'Page'                : "icon-document"
+        'Discussion'          : "icon-discussion"
+        'Assignment'          : "icon-assignment"
+        'Quiz'                : "icon-quiz"
+        'ExternalTool'        : "icon-link"
+        'Lti::MessageHandler' : "icon-link"
 
       # Sets up the class variables and generates a url. Fetch should be
       # called somewhere else to set up the data.

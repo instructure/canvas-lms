@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 describe "AuthenticationAudit API", type: :request do
@@ -42,6 +43,8 @@ describe "AuthenticationAudit API", type: :request do
 
       @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
       @account = Account.default
+      @custom_role = custom_account_role('CustomAdmin', :account => @account)
+      @custom_sa_role = custom_account_role('CustomAdmin', :account => Account.site_admin)
       user_with_pseudonym(active_all: true)
 
       @page_view = PageView.new
@@ -354,7 +357,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_role,
             :role_changes => {:view_statistics => true})
         end
 
@@ -375,7 +378,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_role,
             :role_changes => {:manage_user_logins => true})
         end
 
@@ -396,7 +399,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => Account.site_admin, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_sa_role,
             :role_changes => {:view_statistics => true})
         end
 
@@ -417,7 +420,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => Account.site_admin, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_sa_role,
             :role_changes => {:manage_user_logins => true})
         end
 
@@ -438,9 +441,10 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @account = account_model
           user_with_pseudonym(user: @user, account: @account, active_all: true)
+          custom_role = custom_account_role('CustomAdmin', :account => @account)
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => custom_role,
             :role_changes => {:manage_user_logins => true})
         end
 
@@ -454,7 +458,7 @@ describe "AuthenticationAudit API", type: :request do
           before do
             @user, _ = @user, account_admin_user_with_role_changes(
               :account => Account.site_admin, :user => @viewing_user,
-              :membership_type => 'CustomAdmin',
+              :role => @custom_sa_role,
               :role_changes => {:manage_user_logins => true})
           end
 
@@ -495,9 +499,10 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, @viewing_user = @user, @shard2.activate{ user_model }
           @user, _ = @user, @shard2.activate do
+            custom_role = custom_account_role("CustomAdmin", :account => @account)
             account_admin_user_with_role_changes(
               :account => @account, :user => @viewing_user,
-              :membership_type => 'CustomAdmin',
+              :role => custom_role,
               :role_changes => {:manage_user_logins => true})
           end
         end

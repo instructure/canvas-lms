@@ -510,10 +510,10 @@ class AccountsController < ApplicationController
       @account_users = @account.account_users
       ActiveRecord::Associations::Preloader.new(@account_users, user: :communication_channels).run
       order_hash = {}
-      @account.available_account_roles.each_with_index do |type, idx|
-        order_hash[type] = idx
+      @account.available_account_roles.each_with_index do |role, idx|
+        order_hash[role.id] = idx
       end
-      @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.membership_type] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
+      @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
       @role_types = RoleOverride.account_membership_types(@account)
       @enrollment_types = RoleOverride.enrollment_types
@@ -558,36 +558,48 @@ class AccountsController < ApplicationController
   end
 
   def confirm_delete_user
-    @root_account = @account.root_account
-    if authorized_action(@root_account, @current_user, :manage_user_logins)
-      @context = @root_account
-      @user = @root_account.all_users.where(id: params[:user_id]).first if params[:user_id].present?
-      if !@user
-        flash[:error] = t(:no_user_message, "No user found with that id")
-        redirect_to account_url(@account)
-      end
+    raise ActiveRecord::RecordNotFound unless @account.root_account?
+    @user = api_find(User, params[:user_id])
+
+    unless @account.user_account_associations.where(user_id: @user).exists?
+      flash[:error] = t(:no_user_message, "No user found with that id")
+      redirect_to account_url(@account)
+      return
     end
+
+    @context = @account
+    render_unauthorized_action unless @user.allows_user_to_remove_from_account?(@account, @current_user)
   end
 
+  # @API Delete a user from the root account
+  #
+  # Delete a user record from a Canvas root account. If a user is associated
+  # with multiple root accounts (in a multi-tenant instance of Canvas), this
+  # action will NOT remove them from the other accounts.
+  #
+  # WARNING: This API will allow a user to remove themselves from the account.
+  # If they do this, they won't be able to make API calls or log into Canvas at
+  # that account.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/3/users/5 \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  #       -X DELETE
+  #
+  # @returns User
   def remove_user
-    @root_account = @account.root_account
-    if authorized_action(@root_account, @current_user, :manage_user_logins)
-      @user = UserAccountAssociation.where(account_id: @root_account.id, user_id: params[:user_id]).first.user rescue nil
-      # if the user is in any account other then the
-      # current one, remove them from the current account
-      # instead of deleting them completely
-      if @user
-        if !(@user.associated_root_accounts.map(&:id).compact.uniq - [@root_account.id]).empty?
-          @user.remove_from_root_account(@root_account)
-        else
-          @user.destroy(true)
-        end
-        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
-      end
+    raise ActiveRecord::RecordNotFound unless @account.root_account?
+    @user = api_find(User, params[:user_id])
+    raise ActiveRecord::RecordNotFound unless @account.user_account_associations.where(user_id: @user).exists?
+    if @user.allows_user_to_remove_from_account?(@account, @current_user)
+      @user.remove_from_root_account(@account)
+      flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
       respond_to do |format|
         format.html { redirect_to account_users_url(@account) }
         format.json { render :json => @user || {} }
       end
+    else
+      render_unauthorized_action
     end
   end
 
@@ -759,14 +771,19 @@ class AccountsController < ApplicationController
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
-    role = params[:membership_type] || 'AccountAdmin'
+    if role_id = params[:role_id]
+      role = Role.get_role_by_id(role_id)
+      raise ActiveRecord::RecordNotFound unless role
+    else
+      role = Role.get_built_in_role('AccountAdmin')
+    end
 
     list = UserList.new(params[:user_list],
                         :root_account => @context.root_account,
                         :search_method => @context.user_list_search_mode_for(@current_user))
     users = list.users
     admins = users.map do |user|
-      admin = @context.account_users.where(user_id: user.id, membership_type: role).first_or_initialize
+      admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
       admin.user = user
       return unless authorized_action(admin, @current_user, :create)
       admin
@@ -785,7 +802,8 @@ class AccountsController < ApplicationController
       { :enrollment => {
           :id => admin.id,
           :name => admin.user.name,
-          :membership_type => admin.membership_type,
+          :role_id => admin.role_id,
+          :membership_type => AccountUser.readable_type(admin.role.name),
           :workflow_state => 'active',
           :user_id => admin.user.id,
           :type => 'admin',

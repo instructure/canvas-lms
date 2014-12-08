@@ -41,12 +41,8 @@ module ConfigFile
     config = nil
     path = File.join(Rails.root, 'config', "#{config_name}.yml")
     if File.exists?(path)
-      if Rails.env.test?
-        config_string = ERB.new(File.read(path))
-        config = YAML.load(config_string.result)
-      else
-        config = YAML.load_file(path)
-      end
+      config_string = ERB.new(File.read(path))
+      config = YAML.load(config_string.result)
 
       if config.respond_to?(:with_indifferent_access)
         config = config.with_indifferent_access

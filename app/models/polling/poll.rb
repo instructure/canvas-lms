@@ -33,15 +33,15 @@ module Polling
       given { |user| self.user.present? && self.user == user }
       can :update and can :read and can :delete
 
-      given { |user| user.roles.include?("teacher") }
+      given { |user| TeacherEnrollment.active.where(user_id: user).exists? }
       can :create
 
       given do |user, http_session|
-        user.roles.include?("admin") && self.poll_sessions.with_each_shard do |scope|
-          scope.includes(:course).any? { |session| session.course.grants_right?(user, http_session, :read_as_admin) }
+        self.poll_sessions.with_each_shard do |scope|
+          scope.includes(:course).any? { |session| session.course.grants_right?(user, http_session, :manage_content) }
         end.any?
       end
-      can :create and can :update and can :read and can :delete and can :submit
+      can :update and can :read and can :delete and can :submit
 
       given do |user|
         self.poll_sessions.with_each_shard do |scope|

@@ -129,11 +129,13 @@ module Canvas
 
   # can be called by plugins to allow reloading of that plugin in dev mode
   # pass in the path to the plugin directory
-  # e.g., in the vendor/plugins/<plugin_name>/init.rb:
+  # e.g., in the vendor/plugins/<plugin_name>/init.rb or
+  # gems/plugins/<plugin_name>/lib/<plugin_name>/engine.rb:
   #     Canvas.reloadable_plugin(File.dirname(__FILE__))
   def self.reloadable_plugin(dirname)
     return unless Rails.env.development?
     base_path = File.expand_path(dirname)
+    base_path.gsub(%r{/lib/[^/]*$}, '')
     ActiveSupport::Dependencies.autoload_once_paths.reject! { |p|
       p[0, base_path.length] == base_path
     }

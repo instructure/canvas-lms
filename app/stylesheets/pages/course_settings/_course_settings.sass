@@ -1,12 +1,3 @@
-#course_form .course_form
-  display: none
-
-#course_form.editing
-  .course_form
-    display: inline
-  .course_info, .edit_course_link, .move_course_link
-    display: none
-
 #course_form .date_entry
   width: 165px
 
@@ -231,11 +222,12 @@ ul.user_list div.enrollment_type.pending
   top: 1px
 
 #course_form table.coursesettings
-  td.form-label
-    text-align: left
-    vertical-align: top
-    padding-top: 3px
-    width: 10%
+  input[type=checkbox] + label
+    vertical-align: baseline
+  input, select, td
+    vertical-align: baseline
+  td
+    padding-right: 10px
   .tall-row
     padding-top: 3px
   .aside
@@ -254,12 +246,6 @@ ul.user_list div.enrollment_type.pending
   i.date-warning
     padding: 8px 0 0 8px
     color: $btnWarningBackground
-
-#course_form.editing table.coursesettings
-  td.form-label
-    vertical-align: top
-    padding-top: 5px
-
 
 input.move-nav-item-label-spacer
   margin-right: 10px

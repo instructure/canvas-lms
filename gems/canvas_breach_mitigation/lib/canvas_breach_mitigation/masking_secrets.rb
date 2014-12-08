@@ -6,13 +6,16 @@ module CanvasBreachMitigation
       # Sets the token value for the current session and returns it in
       # a masked form that's safe to send to the client. See section
       # 3.4 of "BREACH: Reviving the CRIME attack".
-      def masked_authenticity_token(cookies)
-        one_time_pad = SecureRandom.random_bytes(AUTHENTICITY_TOKEN_LENGTH)
+      def masked_authenticity_token(cookies, options={})
+        # remask token
+        encoded_masked_token = masked_token(unmasked_token(cookies['_csrf_token']))
 
-        encrypted_csrf_token = xor_byte_strings(one_time_pad, unmasked_token(cookies['_csrf_token']))
-        masked_token = one_time_pad + encrypted_csrf_token
-        encoded_masked_token = Base64.strict_encode64(masked_token)
-        cookies['_csrf_token'] = encoded_masked_token
+        cookie = { value: encoded_masked_token }
+        [:domain, :httponly, :secure].each do |key|
+          next unless options.has_key?(key)
+          cookie[key] = options[key]
+        end
+        cookies['_csrf_token'] = cookie
 
         encoded_masked_token
       end
@@ -25,6 +28,13 @@ module CanvasBreachMitigation
       def valid_authenticity_token?(session, cookies, encoded_masked_token)
         (session[:_csrf_token] && Base64.strict_decode64(session[:_csrf_token]) == unmasked_token(encoded_masked_token)) ||
             unmasked_token(cookies['_csrf_token']) == unmasked_token(encoded_masked_token)
+      end
+
+      def masked_token(token)
+        one_time_pad = SecureRandom.random_bytes(AUTHENTICITY_TOKEN_LENGTH)
+        encrypted_csrf_token = xor_byte_strings(one_time_pad, token)
+        masked_token = one_time_pad + encrypted_csrf_token
+        Base64.strict_encode64(masked_token)
       end
 
       private

@@ -1,0 +1,16 @@
+<form class="reply_form" method="post"
+  action="/api/v1/courses/{{conversation.assignment.course_id}}/assignments/{{conversation.assignment_id}}/submissions/{{conversation.user_id}}" class="form-horizontal"
+  >
+
+  <input type="hidden" name="_method" value="put">
+
+  <div class='message-body'>
+    <textarea name="comment[text_comment]"
+              data-track-category="Compose Message"
+              data-track-action="Edit"
+              data-track-label="Body"
+              aria-label="{{#t "body"}}Body{{/t}}"
+              class="reply_body"></textarea>
+    <div class='context_messages'></div>
+  </div>
+</form>

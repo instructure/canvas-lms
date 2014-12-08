@@ -57,6 +57,14 @@ module Canvas::Migration::Helpers
         data['wiki_pages'] ||= data['wikis']
         data["context_external_tools"] ||= data["external_tools"]
         data["learning_outcomes"] ||= data["outcomes"]
+
+        # skip auto generated quiz question banks for canvas imports
+        if data['assessment_question_banks']
+          data['assessment_question_banks'].select! do |item|
+            !(item['for_quiz'] && @migration && (@migration.for_course_copy? || (@migration.migration_type == 'canvas_cartridge_importer')))
+          end
+        end
+
         att.close
         data
       end

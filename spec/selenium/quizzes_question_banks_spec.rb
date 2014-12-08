@@ -24,7 +24,7 @@ describe "quizzes question banks" do
       end
       question_bank_title.send_keys('goober', :return)
       wait_for_ajaximations
-      question_bank = AssessmentQuestionBank.find_by_title('goober')
+      question_bank = AssessmentQuestionBank.where(title: 'goober').first
       expect(question_bank).to be_present
       expect(question_bank.workflow_state).to eq "active"
       expect(f("#question_bank_adding .title")).to(include_text('goober'))
@@ -144,7 +144,7 @@ describe "quizzes question banks" do
 
   it "should check permissions when retrieving question banks" do
     @course.account = Account.default
-    @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+    @course.account.role_overrides.create(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
 

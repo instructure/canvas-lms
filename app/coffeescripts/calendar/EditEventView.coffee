@@ -98,6 +98,7 @@ define [
             $fields = $('[name*=start_date]:visible').filter -> $(this).val() is ''
             if $fields.length > 0 then $fields else true
           labelFn   : (input) -> $(input).parents('tr').prev().find('label').text()
+          da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success   : ($dialog) =>
             $dialog.dialog('close')
             @$el.disableWhileLoading @model.save eventData, success: =>

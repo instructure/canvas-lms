@@ -127,7 +127,8 @@ describe Qti::Converter do
     expect(quiz).to be_present
     expect(quiz).not_to be_available
     expect(quiz.quiz_questions.size).to eq 9
-    match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id prepped_for_import question_bank_migration_id quiz_question_id])
+
+    match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id prepped_for_import is_quiz_question_bank question_bank_migration_id quiz_question_id])
   end
 
   it "should apply respondus settings" do
@@ -153,7 +154,7 @@ describe Qti::Converter do
     expect(qb).to be_present
     expect(qb.assessment_questions.size).to eq 9
     data = qb.assessment_questions.map(&:question_data).sort_by!{|q| q["migration_id"]}
-    match_ignoring(data, RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id missing_links position prepped_for_import question_bank_migration_id quiz_question_id])
+    match_ignoring(data, RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id missing_links position prepped_for_import is_quiz_question_bank question_bank_migration_id quiz_question_id])
   end
 
   def match_ignoring(a, b, ignoring = [])

@@ -1,0 +1,8 @@
+#!/bin/bash
+# little shortcut for doing npm install/update/whatever for each of our
+# gems that do node-y stuff
+for path in $(ls -1 gems/*/package.json); do
+  cd ${path:0:${#path}-13}
+  npm $1
+  cd ../..
+done

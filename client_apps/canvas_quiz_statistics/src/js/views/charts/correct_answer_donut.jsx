@@ -10,18 +10,47 @@ define(function(require) {
   var CIRCLE = 2 * Math.PI;
   var FMT_PERCENT = d3.format('%');
 
+  // A tween for the foreground of the donut.
+  //
+  // See https://github.com/mbostock/d3/wiki/Transitions#attrTween
+  var arcTween = function(arc, transition, newAngle) {
+    transition.attrTween('d', function(d) {
+      var interpolate = d3.interpolate(d.endAngle, newAngle);
+
+      return function(t) {
+        d.endAngle = interpolate(t);
+
+        return arc(d);
+      };
+    });
+  };
+
+  // A tween for the ratio caption (0% to 100%)
+  //
+  // See https://github.com/mbostock/d3/wiki/Transitions#text
+  var textTween = function(newRatio) {
+    var currentRatio = parseFloat(''+this.textContent) / 100.0;
+    var i = d3.interpolate(currentRatio, newRatio);
+
+    return function(t) {
+      this.textContent = FMT_PERCENT(i(t));
+    };
+  };
+
   var Chart = React.createClass({
     mixins: [ ChartMixin.mixin ],
 
+    getDefaultProps: function() {
+      return {
+        animeDuration: 500
+      };
+    },
+
     createChart: function(node, props) {
-      var ratio = props.correctResponseRatio;
       var diameter = props.diameter;
       var radius = diameter / 2;
-
-      var arc = d3.svg.arc()
-        .innerRadius(radius)
-        .outerRadius(diameter / 2.5)
-        .startAngle(0);
+      var ratio = props.correctResponseRatio;
+      var arc, foreground, caption;
 
       var svg = d3.select(node)
         .attr('width', radius)
@@ -30,6 +59,11 @@ define(function(require) {
         .append('g')
           .attr('transform', 'translate(' + radius + ',' + radius + ')');
 
+      arc = d3.svg.arc()
+        .innerRadius(radius)
+        .outerRadius(diameter / 2.5)
+        .startAngle(0);
+
       // background circle that's always "empty" (shaded in light color)
       svg.append('path')
         .datum({ endAngle: CIRCLE })
@@ -37,18 +71,39 @@ define(function(require) {
         .attr('d', arc);
 
       // foreground circle that fills up based on ratio (green, or flashy)
-      svg.append('path')
-        .datum({ endAngle: CIRCLE * ratio })
+      foreground = svg.append('path')
+        .datum({ endAngle: 0 })
         .attr('class', 'foreground')
         .attr('d', arc);
 
       // text inside the circle
-      svg.append('text')
+      caption = svg.selectAll('text').data([ ratio ]);
+      caption.enter().append('text')
         .attr('text-anchor', 'middle')
         .attr('dy', '.35em')
-        .text(FMT_PERCENT(ratio));
+        .text(FMT_PERCENT(0));
+
+      // we need these for updating
+      this.arc = arc;
+      this.foreground = foreground;
+      this.caption = caption;
+
+      this.updateChart(svg, props);
 
       return svg;
+    },
+
+    updateChart: function(svg, props) {
+      var ratio = props.correctResponseRatio;
+
+      this.foreground
+        .transition()
+        .duration(props.animeDuration)
+        .call(arcTween.bind(null, this.arc), CIRCLE * ratio);
+
+      this.caption.datum(ratio).transition()
+        .duration(props.animeDuration)
+        .tween('text', textTween);
     },
 
     render: ChartMixin.defaults.render

@@ -12,6 +12,8 @@ define(function(require) {
   var EssayRenderer = require('jsx!./questions/essay');
   var CalculatedRenderer = require('jsx!./questions/calculated');
   var FileUploadRenderer = require('jsx!./questions/file_upload');
+  var ScreenReaderContent = require('jsx!../components/screen_reader_content');
+  var SightedUserContent = require('jsx!../components/sighted_user_content');
 
   var extend = _.extend;
   var Renderers = {
@@ -44,11 +46,13 @@ define(function(require) {
       var props = this.props;
       var quizStatistics = this.props.quizStatistics;
       var submissionStatistics = quizStatistics.submissionStatistics;
-      var questionStatistics = quizStatistics.questionStatistics;
-      var participantCount = submissionStatistics.uniqueCount;
 
       return(
         <div id="canvas-quiz-statistics">
+          <ScreenReaderContent tagName="h1">
+            {I18n.t('title', 'Quiz Statistics')}
+          </ScreenReaderContent>
+
           <section>
             <Summary
               pointsPossible={quizStatistics.pointsPossible}
@@ -59,27 +63,60 @@ define(function(require) {
               durationAverage={submissionStatistics.durationAverage}
               quizReports={this.props.quizReports}
               scores={submissionStatistics.scores}
+              loading={this.props.isLoadingStatistics}
               />
           </section>
 
           <section id="question-statistics-section">
             <header className="padded">
-              <h3 className="section-title inline">
+              <h2 className="section-title inline">
                 {I18n.t('question_breakdown', 'Question Breakdown')}
-              </h3>
+              </h2>
 
               <aside className="all-question-controls pull-right">
-                <ToggleDetailsButton
-                  onClick={this.toggleAllDetails}
-                  expanded={quizStatistics.expandingAll}
-                  controlsAll />
+                <SightedUserContent tagName="div">
+                  <ToggleDetailsButton
+                    onClick={this.toggleAllDetails}
+                    expanded={quizStatistics.expandingAll}
+                    disabled={this.props.isLoadingStatistics}
+                    controlsAll />
+                </SightedUserContent>
               </aside>
             </header>
 
-            {questionStatistics.map(this.renderQuestion.bind(null, participantCount))}
+            {this.renderQuestions()}
           </section>
         </div>
       );
+    },
+
+    renderQuestions: function() {
+      var isLoadingStatistics = this.props.isLoadingStatistics;
+      var questionStatistics = this.props.quizStatistics.questionStatistics;
+      var participantCount = this.props.quizStatistics.submissionStatistics.uniqueCount;
+
+      if (isLoadingStatistics) {
+        return (
+          <p>
+            {I18n.t('loading_questions',
+              'Question statistics are being loaded. Please wait a while.')}
+          </p>
+        );
+      }
+      else if (questionStatistics.length === 0) {
+        return (
+          <p>
+            {I18n.t('empty_question_breakdown', 'There are no question statistics available.')}
+          </p>
+        );
+      }
+      else {
+        return (
+          <div>
+            {questionStatistics.map(this.renderQuestion.bind(null, participantCount))}
+          </div>
+        );
+      }
     },
 
     renderQuestion: function(participantCount, question) {

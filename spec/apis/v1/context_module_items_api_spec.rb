@@ -986,9 +986,11 @@ describe "Module Items API", type: :request do
           :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
       end
       let(:assignment_details) { json.find{|item| item['id'] == @assignment_tag.id}['content_details'] }
+      let(:external_url_details) { json.find{|item| item['id'] == @external_url_tag.id}['content_details'] }
 
       before :once do
         override_assignment
+        @module1.update_attribute(:require_sequential_progress, true)
       end
 
       it "should include user specific details" do
@@ -1002,11 +1004,20 @@ describe "Module Items API", type: :request do
 
       it "should include lock information" do
         expect(assignment_details['locked_for_user']).to eq true
-        assignment_details.include?('lock_explanation')
-        assignment_details.include?('lock_info')
+        expect(assignment_details).to include 'lock_explanation'
+        expect(assignment_details).to include 'lock_info'
         expect(assignment_details['lock_info']).to include(
           'asset_string' => @assignment.asset_string,
           'unlock_at' => @unlock_at.iso8601,
+        )
+      end
+
+      it "should include lock information for contentless tags" do
+        expect(external_url_details['locked_for_user']).to eq true
+        expect(external_url_details).to include 'lock_explanation'
+        expect(external_url_details).to include 'lock_info'
+        expect(external_url_details['lock_info']).to include(
+            'asset_string' => @module1.asset_string
         )
       end
     end
@@ -1035,8 +1046,8 @@ describe "Module Items API", type: :request do
 
       it "should include lock information" do
         expect(assignment_details['locked_for_user']).to eq true
-        assignment_details.include?('lock_explanation')
-        assignment_details.include?('lock_info')
+        expect(assignment_details).to include 'lock_explanation'
+        expect(assignment_details).to include 'lock_info'
         expect(assignment_details['lock_info']).to include(
           'asset_string' => @assignment.asset_string,
           'unlock_at' => @unlock_at.iso8601,

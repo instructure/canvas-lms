@@ -44,7 +44,7 @@ define [
                 li {},
                   Link {
                     to: (if folder.urlPath() then 'folder' else 'rootFolder')
-                    splat: folder.urlPath()
+                    params: {splat: folder.urlPath()}
                     activeClassName: 'active'
                     className: 'ellipsis'
                   },

@@ -321,7 +321,6 @@ describe User do
     p1.sis_user_id = 'sis_id1'
     p1.save!
     user.pseudonyms.create! :unique_id => "id2", :account => account2
-    expect { p1.destroy }.to raise_error /Cannot delete system-generated pseudonyms/
     user.remove_from_root_account account1
     expect(user.associated_root_accounts).to eql [account2]
   end
@@ -573,24 +572,11 @@ describe User do
     end
   end
 
-  it "should delete the user transactionally in case the pseudonym removal fails" do
+  it "should delete system generated pseudonyms on delete" do
     user_with_managed_pseudonym
     expect(@pseudonym).to be_managed_password
     expect(@user.workflow_state).to eq "pre_registered"
-    expect { @user.destroy }.to raise_error("Cannot delete system-generated pseudonyms")
-    expect(@user.workflow_state).to eq "deleted"
-    @user.reload
-    expect(@user.workflow_state).to eq "pre_registered"
-    @account.account_authorization_config.destroy
-    expect(@pseudonym).not_to be_managed_password
     @user.destroy
-    expect(@user.workflow_state).to eq "deleted"
-    @user.reload
-    expect(@user.workflow_state).to eq "deleted"
-    user_with_managed_pseudonym
-    expect(@pseudonym).to be_managed_password
-    expect(@user.workflow_state).to eq "pre_registered"
-    @user.destroy(true)
     expect(@user.workflow_state).to eq "deleted"
     @user.reload
     expect(@user.workflow_state).to eq "deleted"
@@ -635,7 +621,8 @@ describe User do
     it "should not allow restricted admins to become full admins" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @restricted_admin = user_with_pseudonym(:username => 'nobody3@example.com')
-      account_admin_user_with_role_changes(:user => @restricted_admin, :membership_type => 'Restricted', :role_changes => { :become_user => true })
+      role = custom_account_role('Restricted', :account => Account.default)
+      account_admin_user_with_role_changes(:user => @restricted_admin, :role => role, :role_changes => { :become_user => true })
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
       Account.default.account_users.create!(user: @admin)
       expect(user.can_masquerade?(@restricted_admin, Account.default)).to be_truthy
@@ -705,14 +692,6 @@ describe User do
     end
   end
 
-  context "permissions" do
-    it "should not allow account admin to modify admin privileges of other account admins" do
-      expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, AccountUser::BASE_ROLE_NAME, 'AccountAdmin')).to be_truthy
-      expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, AccountUser::BASE_ROLE_NAME, 'AccountAdmin')).to be_truthy
-      expect(RoleOverride.readonly_for(Account.default, :manage_account_settings, AccountUser::BASE_ROLE_NAME, 'AccountAdmin')).to be_truthy
-    end
-  end
-
   context "check_courses_right?" do
     before :once do
       course_with_teacher(:active_all => true)
@@ -745,8 +724,9 @@ describe User do
     before(:once) do
       @admin = user_model
       @student = user_model
-      tie_user_to_account(@admin, :membership_type => 'AccountAdmin')
-      tie_user_to_account(@student, :membership_type => 'Student')
+      tie_user_to_account(@admin, :role => admin_role)
+      role = custom_account_role('Student', :account => Account.default)
+      tie_user_to_account(@student, :role => role)
       set_up_course_with_users
     end
 
@@ -832,7 +812,7 @@ describe User do
 
     it "should not let users message the entire class if they cannot send_messages" do
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
-                           :enrollment_type => "StudentEnrollment", :enabled => false)
+                           :role => student_role, :enabled => false)
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # can only message self or the admins
@@ -1976,6 +1956,20 @@ describe User do
           assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
           expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
         end
+
+        it "should not return the assignments without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
+        end
+
+        it "should return the assignments in both types of courses" do
+          assignment0 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
+          assignment1 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          assignment2 = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment0)).to be_truthy
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment1)).to be_falsey
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment2)).to be_truthy
+        end
       end
 
       context "feature flag off" do
@@ -2522,53 +2516,140 @@ describe User do
     end
   end
 
-  describe '#grants_right?' do
-    let_once(:subaccount) do
-      account = Account.create!
-      account.root_account_id = Account.default.id
-      account.save!
-      account
+  describe 'permissions' do
+    it "should not allow account admin to modify admin privileges of other account admins" do
+      expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_settings, admin_role)).to be_truthy
     end
 
-    let_once(:site_admin) do
-      user = User.create!
-      Account.site_admin.account_users.create!(user: user)
-      Account.default.account_users.create!(user: user)
-      user
+    describe ":reset_mfa" do
+      let(:account1) {
+        a = Account.default
+        a.settings[:admins_can_view_notifications] = true
+        a.save!
+        a
+      }
+      let(:account2) { Account.create! }
+
+      let(:sally) { account_admin_user(
+        user: student_in_course(account: account2).user,
+        account: account1) }
+
+      let(:bob) { student_in_course(
+        user: student_in_course(account: account2).user,
+        course: course(account: account1)).user }
+
+      let(:charlie) { student_in_course(account: account1).user }
+
+      let(:alice) { account_admin_user_with_role_changes(
+        account: account1,
+        role: custom_account_role('StrongerAdmin', account: account1),
+        role_changes: { view_notifications: true }) }
+
+      it "should grant non-admins :reset_mfa on themselves" do
+        pseudonym(charlie, account: account1)
+        expect(charlie).to be_grants_right(charlie, :reset_mfa)
+      end
+
+      it "should grant admins :reset_mfa on themselves" do
+        pseudonym(sally, account: account1)
+        expect(sally).to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should grant admins :reset_mfa on fully admined users" do
+        pseudonym(charlie, account: account1)
+        expect(charlie).to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should not grant admins :reset_mfa on partially admined users" do
+        pseudonym(bob, account: account1)
+        pseudonym(bob, account: account2)
+        expect(bob).not_to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should not grant subadmins :reset_mfa on stronger admins" do
+        pseudonym(alice, account: account1)
+        expect(alice).not_to be_grants_right(sally, :reset_mfa)
+      end
+
+      context "MFA is required on the account" do
+        before do
+          account1.settings[:mfa_settings] = :required
+          account1.save!
+        end
+
+        it "should no longer grant non-admins :reset_mfa on themselves" do
+          pseudonym(charlie, account: account1)
+          expect(charlie).not_to be_grants_right(charlie, :reset_mfa)
+        end
+
+        it "should no longer grant admins :reset_mfa on themselves" do
+          pseudonym(sally, account: account1)
+          expect(sally).not_to be_grants_right(sally, :reset_mfa)
+        end
+
+        it "should still grant admins :reset_mfa on other fully admined users" do
+          pseudonym(charlie, account: account1)
+          expect(charlie).to be_grants_right(sally, :reset_mfa)
+        end
+      end
     end
 
-    let_once(:local_admin) do
-      user = User.create!
-      Account.default.account_users.create!(user: user)
-      subaccount.account_users.create!(user: user)
-      user
-    end
+    describe ":merge" do
+      let(:account1) {
+        a = Account.default
+        a.settings[:admins_can_view_notifications] = true
+        a.save!
+        a
+      }
+      let(:account2) { Account.create! }
 
-    let_once(:user) do
-      user = User.create!
-      subaccount.account_users.create!(user: user)
-      user
-    end
+      let(:sally) { account_admin_user(
+        user: student_in_course(account: account2).user,
+        account: account1) }
 
+      let(:bob) { student_in_course(
+        user: student_in_course(account: account2).user,
+        course: course(account: account1)).user }
 
-    it 'allows site admins to manage their own logins' do
-      expect(site_admin.grants_right?(site_admin, :manage_logins)).to be_truthy
-    end
+      let(:charlie) { student_in_course(account: account2).user }
 
-    it 'allows local admins to manage their own logins' do
-      expect(local_admin.grants_right?(local_admin, :manage_logins)).to be_truthy
-    end
+      let(:alice) { account_admin_user_with_role_changes(
+        account: account1,
+        role: custom_account_role('StrongerAdmin', account: account1),
+        role_changes: { view_notifications: true }) }
 
-    it 'allows site admins to manage local admins logins' do
-      expect(local_admin.grants_right?(site_admin, :manage_logins)).to be_truthy
-    end
+      it "should grant admins :merge on themselves" do
+        pseudonym(sally, account: account1)
+        expect(sally).to be_grants_right(sally, :merge)
+      end
 
-    it 'forbids local admins from managing site admins logins' do
-      expect(site_admin.grants_right?(local_admin, :manage_logins)).to be_falsey
-    end
+      it "should not grant non-admins :merge on themselves" do
+        pseudonym(bob, account: account1)
+        expect(bob).not_to be_grants_right(bob, :merge)
+      end
 
-    it 'only considers root accounts when checking subset permissions' do
-      expect(user.grants_right?(local_admin, :manage_logins)).to be_truthy
+      it "should not grant non-admins :merge on other users" do
+        pseudonym(sally, account: account1)
+        expect(sally).not_to be_grants_right(bob, :merge)
+      end
+
+      it "should grant admins :merge on partially admined users" do
+        pseudonym(bob, account: account1)
+        pseudonym(bob, account: account2)
+        expect(bob).to be_grants_right(sally, :merge)
+      end
+
+      it "should not grant admins :merge on users from other accounts" do
+        pseudonym(charlie, account: account2)
+        expect(charlie).not_to be_grants_right(sally, :merge)
+      end
+
+      it "should not grant subadmins :merge on stronger admins" do
+        pseudonym(alice, account: account1)
+        expect(alice).not_to be_grants_right(sally, :merge)
+      end
     end
   end
 

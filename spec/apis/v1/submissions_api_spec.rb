@@ -708,7 +708,7 @@ describe 'Submissions API', type: :request do
              'locked_for_user' => false,
              'hidden_for_user' => false,
              'created_at' => sub1.attachments.first.reload.created_at.as_json,
-             'updated_at' => sub1.attachments.first.updated_at.as_json, 
+             'updated_at' => sub1.attachments.first.updated_at.as_json,
              'preview_url' => nil,
              'thumbnail_url' => sub1.attachments.first.thumbnail_url },
          ],
@@ -776,7 +776,7 @@ describe 'Submissions API', type: :request do
                 'locked_for_user' => false,
                 'hidden_for_user' => false,
                 'created_at' => sub1.attachments.first.created_at.as_json,
-                'updated_at' => sub1.attachments.first.updated_at.as_json, 
+                'updated_at' => sub1.attachments.first.updated_at.as_json,
                 'preview_url' => nil,
                 'thumbnail_url' => sub1.attachments.first.thumbnail_url },
             ],
@@ -929,6 +929,7 @@ describe 'Submissions API', type: :request do
         'user_id' => student2.id,
         "section_id" => enrollment2.course_section_id,
         'integration_id' => nil,
+        'sis_user_id' => 'my-student-id',
         'submissions' => [],
       },
     ]
@@ -941,23 +942,44 @@ describe 'Submissions API', type: :request do
     expect(json).to eq []
   end
 
-  it "should return integration_id for user and assignment" do
-    student1 = user(:active_all => true)
-    student2 = user_with_pseudonym(:active_all => true)
-    student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
-    student2.pseudonym.update_attribute(:integration_id, 'xyz')
+  it "should return sis_user_id for user when grouped" do
+    student = user_with_pseudonym(:active_all => true)
+    batch = SisBatch.create(account_id: Account.default.id, workflow_state: 'imported')
+    student.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
+    student.pseudonym.update_attribute(:sis_batch_id, batch.id)
 
     course_with_teacher(:active_all => true)
+    @course.update_attribute(:sis_batch_id, batch.id)
 
-    @course.enroll_student(student1).accept!
-    @course.enroll_student(student2).accept!
-    
+    @course.enroll_student(student).accept!
+
+    account_admin_user
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/students/submissions.json",
           { :controller => 'submissions_api', :action => 'for_students',
             :format => 'json', :course_id => @course.to_param },
-          { :student_ids => 'all' })
-    expect(json).to eq []
+          { :student_ids => 'all', :grouped => 'true' })
+    expect(json.first['sis_user_id']).to eq 'my-student-id'
+  end
+
+  it "should return integration_id for the user when grouped" do
+    student = user_with_pseudonym(:active_all => true)
+    batch = SisBatch.create(account_id: Account.default.id, workflow_state: 'imported')
+    student.pseudonym.update_attribute(:integration_id, 'xyz')
+    student.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
+    student.pseudonym.update_attribute(:sis_batch_id, batch.id)
+
+    course_with_teacher(:active_all => true)
+    @course.update_attribute(:sis_batch_id, batch.id)
+    @course.enroll_student(student).accept!
+
+    account_admin_user
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => 'all', :grouped => 'true' })
+    expect(json.first['integration_id']).to eq 'xyz'
   end
 
   it "should return turnitin data if present" do
@@ -2488,5 +2510,37 @@ describe 'Submissions API', type: :request do
     expect(json[0]["submission_history"][0]["attachments"][0]["preview_url"]).to match(
       /canvadoc_session/
     )
+  end
+
+
+  def course_with_student_and_submitted_homework
+    course_with_teacher(:active_all => true)
+    @teacher = @user
+    student_in_course
+    @student = @user
+    @user = @teacher # @user needs to be the user making the api calls later
+    @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+    @submission = @assignment.submit_homework(@student)
+  end
+
+  it 'marks as read' do
+    course_with_student_and_submitted_homework
+    @submission.add_comment(:author => @student, :comment => "some comment")
+    raw_api_call(:put,
+             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/read",
+             {course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s,
+               action: 'mark_submission_read', controller: 'submissions_api', format: 'json'})
+    expect(@submission.reload.read?(@teacher)).to be_truthy
+  end
+
+  it 'marks as unread' do
+    course_with_student_and_submitted_homework
+    @submission.add_comment(:author => @student, :comment => "some comment")
+    @submission.change_read_state('read', @teacher)
+    raw_api_call(:delete,
+             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/read",
+             {course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s,
+               action: 'mark_submission_unread', controller: 'submissions_api', format: 'json'})
+    expect(@submission.reload.read?(@teacher)).to be_falsey
   end
 end

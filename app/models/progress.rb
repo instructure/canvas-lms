@@ -30,6 +30,8 @@ class Progress < ActiveRecord::Base
   validates_presence_of :context_type
   validates_presence_of :tag
 
+  serialize :results
+
   include Workflow
   workflow do
     state :queued do
@@ -42,6 +44,18 @@ class Progress < ActiveRecord::Base
     end
     state :completed
     state :failed
+  end
+
+  def reset!
+    self.results = nil
+    self.workflow_state = 'queued'
+    self.completion = 0
+    self.save!
+  end
+
+  def set_results(results)
+    self.results = results
+    self.save
   end
 
   def update_completion!(value)

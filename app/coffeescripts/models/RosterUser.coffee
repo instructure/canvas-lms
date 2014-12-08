@@ -1,4 +1,4 @@
-define ['compiled/models/User', 'compiled/ember/quizzes/shared/seconds_to_time'], (User, formatSeconds) ->
+define ['compiled/models/User', 'compiled/util/secondsToTime'], (User, secondsToTime) ->
 
   class RosterUser extends User
 
@@ -24,5 +24,8 @@ define ['compiled/models/User', 'compiled/ember/quizzes/shared/seconds_to_time']
       user_sections
 
     total_activity_string: ->
-      if time = @get('enrollments')[0].total_activity_time then formatSeconds(time) else ''
+      if time = @get('enrollments')[0].total_activity_time
+        secondsToTime(time)
+      else
+        ''
 

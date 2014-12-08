@@ -33,6 +33,8 @@ define [
         onlyShowFolders: true,
         rootFoldersToShow: @props.rootFoldersToShow
         onClick: @onSelectFolder
+        focusStyleClass: 'MoveDialog__folderItem--focused'
+        selectedStyleClass: 'MoveDialog__folderItem--selected'
       }).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode()).find(':tabbable:first').focus();
 
     onSelectFolder: (event, folder) ->

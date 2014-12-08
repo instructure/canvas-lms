@@ -39,7 +39,7 @@ describe SectionsController, type: :request do
       section2 = @course2.course_sections.create!(:name => 'Section B')
       section2.update_attribute :sis_source_id, 'sis-section'
       @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
-      RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :role => teacher_role, :enabled => false)
 
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
@@ -60,9 +60,9 @@ describe SectionsController, type: :request do
     end
 
     it "should return sections but not students if user has :read but not :read_roster, :view_all_grades, or :manage_grades" do
-      RoleOverride.create!(:context => Account.default, :permission => 'read_roster', :enrollment_type => 'TaEnrollment', :enabled => false)
-      RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :enrollment_type => 'TaEnrollment', :enabled => false)
-      RoleOverride.create!(:context => Account.default, :permission => 'manage_grades', :enrollment_type => 'TaEnrollment', :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'read_roster', :role => ta_role, :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :role => ta_role, :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'manage_grades', :role => ta_role, :enabled => false)
       enrollment = course_with_ta(:active_all => true)
       enrollment.update_attribute(:limit_privileges_to_course_section, true)
 

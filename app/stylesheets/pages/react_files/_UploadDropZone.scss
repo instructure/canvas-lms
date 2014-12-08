@@ -1,0 +1,38 @@
+.UploadDropZone {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  background: rgba(254, 254, 254, 0);
+  z-index: -1;
+}
+
+.UploadDropZone__active {
+  background: rgba(254, 254, 254, 0.9);
+  z-index: 1;
+}
+
+.UploadDropZone__instructions {
+  margin-top: 70px;
+  text-align: center;
+  pointer-events: none;
+}
+.UploadDropZone__instructions__close {
+  float: right;
+  color: $canvas-neutral;
+  font-size: -1.8em;
+  pointer: cursor;
+}
+i[class*=UploadDropZone__instructions--icon-upload]:before {
+  font-size: 100px;
+}
+i[class*=UploadDropZone__instructions--icon-upload] {
+  color: $canvas-primary;
+  width: 100px;
+  height: 100px;
+}
+.UploadDropZone__instructions--drag {
+  font-size: 1.3em;
+  font-weight: bold;
+}

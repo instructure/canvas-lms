@@ -167,7 +167,7 @@ class FilesController < ApplicationController
 
   def index
     # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
-    return ember_app if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
+    return react_files if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
 
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
@@ -318,7 +318,7 @@ class FilesController < ApplicationController
     end
   end
 
-  def ember_app
+  def react_files
     raise ActiveRecord::RecordNotFound unless (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
     if tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
@@ -336,7 +336,7 @@ class FilesController < ApplicationController
       @page_title = t('files_page_title', 'Files')
       @body_classes << 'full-width padless-content'
       js_bundle :react_files
-      jammit_css :ember_files
+      jammit_css :react_files
       js_env :FILES_CONTEXTS => files_contexts
 
       render :text => "".html_safe, :layout => true

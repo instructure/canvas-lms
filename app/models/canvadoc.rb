@@ -40,7 +40,7 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def session_url
-    Canvas.timeout_protection("canvadocs") do
+    Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
       session = canvadocs_api.session(document_id)
       canvadocs_api.view(session["id"])
     end

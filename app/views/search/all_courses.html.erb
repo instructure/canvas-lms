@@ -1,0 +1,20 @@
+<% jammit_css :all_courses %>
+<% js_bundle  :all_courses %>
+<% content_for :page_title, t('titles.all_courses', "All Courses") %>
+
+<h1>All Courses</h1>
+<form id="course_filter" action="/search/all_courses" method="get" class="form-inline">
+  <input type="search" placeholder="<%= t(:name, 'Name') %>" aria-label="<%= t(:search, 'Search') %>" name="search" value="<%= @search %>" />
+  <input type="checkbox" id="public_only" name="public_only"<%= ' checked' if @public_only %> />
+  <label for="public_only">
+    <%= t(:public_only, 'Public courses only') %>
+  </label>
+  <input type="checkbox" id="open_enrollment_only" name="open_enrollment_only"<%= ' checked' if @open_enrollment_only %> />
+  <label for="open_enrollment_only">
+    <%= t(:open_enrollment_only, 'Open enrollment courses only') %>
+  </label>
+  <button type="submit"><%= t(:search, 'Search') %></button>
+</form>
+<div id="catalog_content">
+  <%=raw @contentHTML %>
+</div>

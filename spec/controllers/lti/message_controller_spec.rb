@@ -97,6 +97,12 @@ module Lti
           expect(params[:oauth_signature]).not_to be_empty
         end
 
+        it 'sets the active tab' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          expect(response.code).to eq "200"
+          expect(assigns[:active_tab]).to eq message_handler.asset_string
+        end
+
         it 'returns a 404 when when no handler is found' do
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: 0
           expect(response.code).to eq "404"

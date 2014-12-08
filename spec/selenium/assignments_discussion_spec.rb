@@ -5,34 +5,30 @@ describe "discussion assignments" do
 
 
   before (:each) do
+    @domain_root_account = Account.default
+    @domain_root_account.enable_feature!(:draft_state)
     course_with_teacher_logged_in
   end
 
   context "created on the index page" do
     it "should create a discussion topic when created" do
+      ag = @course.assignment_groups.create!(:name => "Stuff")
       get "/courses/#{@course.id}/assignments"
-      build_assignment_with_type("Discussion", :submit => true)
-      expect_new_page_load { f("#left-side .discussions").click }
-      wait_for_ajaximations
-      expect(ffj('.discussion-list li.discussion:visible')).not_to be_empty
-    end
-
-    it "should redirect to the discussion topic" do
-      get "/courses/#{@course.id}/assignments"
-      build_assignment_with_type("Discussion", :submit => true)
-      expect_new_page_load { f(".assignment_list .group_assignment .assignment_title a").click }
-      expect(driver.current_url).to match %r{/courses/\d+/discussion_topics/\d+}
+      build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "This discussion was created on the assignments page", :submit => true)
+      expect_new_page_load { f("#section-tabs .discussions").click }
+      expect(f('#open-discussions')).to include_text("This discussion was created on the assignments page")
     end
   end
 
   context "created with 'more options'" do
     it "should redirect to the discussion new page and maintain parameters" do
+      ag = @course.assignment_groups.create!(:name => "Stuff")
       get "/courses/#{@course.id}/assignments"
-      build_assignment_with_type("Discussion", :name => "Discuss!", :points => "5")
-      expect_new_page_load { f('.more_options_link').click }
-      wait_for_ajaximations
-      expect(f('#discussion-title').attribute(:value)).to eq "Discuss!"
-      expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "5"
+      expect_new_page_load { build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "More options created discussion", :points => '30', :more_options => true)}
+      #check the content of the discussion page for our set point value and name and the URL to make sure were in /discussions
+      expect(driver.current_url).to include_text("discussion_topics/new?assignment_group_id=#{ag.id}&points_possible=30&title=More+options+created+discussion")
+      expect(f('#discussion-title').attribute(:value)).to eq "More options created discussion"
+      expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "30"
     end
   end
 
@@ -40,9 +36,7 @@ describe "discussion assignments" do
     it "should update discussion when updated" do
       assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
       get "/courses/#{@course.id}/assignments"
-      driver.execute_script %{$('#assignment_#{assign.id} .edit_assignment_link:first').addClass('focus');}
-      f("#assignment_#{assign.id} .edit_assignment_link").click
-      edit_assignment(:name => "Rediscuss!", :submit => true)
+      edit_assignment(assign.id, :name => 'Rediscuss!', :submit => true)
       expect(assign.reload.discussion_topic.title).to eq "Rediscuss!"
     end
   end
@@ -51,11 +45,7 @@ describe "discussion assignments" do
     it "should redirect to the discussion edit page and maintain parameters" do
       assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
       get "/courses/#{@course.id}/assignments"
-      driver.execute_script %{$('#assignment_#{assign.id} .edit_assignment_link:first').addClass('focus');}
-      f("#assignment_#{assign.id} .edit_assignment_link").click
-      edit_assignment(:name => "Rediscuss!", :points => 10)
-      expect_new_page_load { f('.more_options_link').click }
-      wait_for_ajaximations
+      expect_new_page_load{ edit_assignment(assign.id, :name => "Rediscuss!", :points => "10", :more_options => true) }
       expect(f('#discussion-title').attribute(:value)).to eq "Rediscuss!"
       expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "10"
     end

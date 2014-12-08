@@ -43,6 +43,9 @@ module Importers
         bank_mig_id = question[:question_bank_migration_id] || CC::CCHelper.create_key(default_title, 'assessment_question_bank')
         next unless migration.import_object?("assessment_question_banks", bank_mig_id)
 
+        # for canvas imports/copies, don't auto generate banks for quizzes
+        next if question['is_quiz_question_bank'] && (migration.for_course_copy? || (migration.migration_type == 'canvas_cartridge_importer'))
+
         question_bank = bank_map[bank_mig_id]
 
         if !question_bank

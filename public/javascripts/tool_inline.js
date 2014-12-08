@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-define(['jquery', 'jquery.google-analytics'], function($) {
+define(['jquery', 'jquery.google-analytics', 'compiled/jquery/ModuleSequenceFooter'], function($) {
 
 var $toolForm = $("#tool_form")
 
@@ -81,8 +81,8 @@ var messageType = $toolForm.data('message-type') || 'tool_launch';
 $.trackEvent(messageType, toolName, toolPath);
 
 //Iframe resize handler
-var min_tool_height;
 var $tool_content_wrapper;
+var min_tool_height, canvas_chrome_height;
 
 function tool_content_wrapper() {
   return $tool_content_wrapper || $('.tool_content_wrapper');
@@ -95,15 +95,15 @@ var resize_tool_content_wrapper = function(height) {
 
 $(function() {
   var $window = $(window);
-  min_tool_height = $('#main').height();
   $tool_content_wrapper = $('.tool_content_wrapper');
+
+  min_tool_height = $('#main').height();
+  canvas_chrome_height = $tool_content_wrapper.offset().top + $('#wrapper').height() - $('#main').height();
 
   if ($tool_content_wrapper.length) {
     $window.resize(function () {
       if (!$tool_content_wrapper.data('height_overridden')) {
-        var top = $tool_content_wrapper.offset().top;
-        var height = $window.height();
-        resize_tool_content_wrapper(height - top);
+        resize_tool_content_wrapper($window.height() - canvas_chrome_height);
       }
     }).triggerHandler('resize');
   }
@@ -123,6 +123,16 @@ window.addEventListener('message', function(e) {
   } catch(err) {
     (console.error || console.log)('invalid message received from ', e.origin);
   }
+
+    if (ENV.LTI != null && ENV.LTI.SEQUENCE != null) {
+      $('#module_sequence_footer').moduleSequenceFooter({
+          assetType: 'Lti',
+          assetID: ENV.LTI.SEQUENCE.ASSET_ID,
+          courseID: ENV.LTI.SEQUENCE.COURSE_ID
+      });
+    }
+
 });
+
 
 });

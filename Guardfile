@@ -12,3 +12,4 @@ guard :ember_bundles
 guard :styleguide
 guard :js_extensions
 guard :compass
+guard :jsx

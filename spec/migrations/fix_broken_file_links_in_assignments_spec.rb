@@ -98,7 +98,7 @@ describe 'DataFixup::FixBrokenFileLinksInAssignments' do
     course2.reload
     att1.reload
 
-    att2_2 = course2.attachments.find_by_cloned_item_id(att1.cloned_item_id) if att1.cloned_item_id
+    att2_2 = course2.attachments.where(cloned_item_id: att1.cloned_item_id).first if att1.cloned_item_id
     expect(att2_2).to eq att2
   end
 

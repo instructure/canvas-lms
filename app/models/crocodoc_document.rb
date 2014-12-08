@@ -72,7 +72,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:editable] = false
     end
 
-    Canvas.timeout_protection("crocodoc") do
+    Canvas.timeout_protection("crocodoc", raise_on_timeout: true) do
       response = crocodoc_api.session(uuid, opts)
       session = response['session']
       crocodoc_api.view(session)

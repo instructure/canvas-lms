@@ -189,6 +189,12 @@ class Wiki < ActiveRecord::Base
     page
   end
 
+  def find_page(param)
+    self.wiki_pages.not_deleted.where(url: param.to_s).first ||
+      self.wiki_pages.not_deleted.where(url: param.to_url).first ||
+      self.wiki_pages.not_deleted.where(id: param.to_i).first
+  end
+
   def path
     if self.context.respond_to?(:feature_enabled?)
       self.context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'

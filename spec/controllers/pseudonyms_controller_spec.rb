@@ -156,42 +156,34 @@ describe PseudonymsController do
       expect(@pseudonym).to be_active
 
       delete 'destroy', :user_id => @other_user.id, :id => @pseudonym.id
-      assert_unauthorized
+      assert_status(404)
       expect(@other_pseudonym).to be_active
       expect(@pseudonym).to be_active
     end
 
     it "should not destroy if it's the last active pseudonym" do
+      account_admin_user(user: @user)
       delete 'destroy', :user_id => @user.id, :id => @pseudonym.id
       assert_status(400)
       expect(@pseudonym).to be_active
     end
 
     it "should not destroy if it's SIS and the user doesn't have permission" do
+      account_admin_user_with_role_changes(user: @user, role_changes: {manage_sis: false})
       @pseudonym.sis_user_id = 'bob'
       @pseudonym.save!
       delete 'destroy', :user_id => @user.id, :id => @pseudonym.id
-      assert_status(400)
+      assert_unauthorized
       expect(@pseudonym).to be_active
     end
 
     it "should destroy if for the current user with more than one pseudonym" do
+      account_admin_user(user: @user)
       @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       delete 'destroy', :user_id => @user.id, :id => @p2.id
       assert_status(200)
       expect(@pseudonym).to be_active
       expect(@p2.reload).to be_deleted
-    end
-
-    it "should not destroy if for the current user and it's a system-generated pseudonym" do
-      @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
-      @p2.sis_user_id = 'another_one@test.com'
-      @p2.save!
-      @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
-      delete 'destroy', :user_id => @user.id, :id => @p2.id
-      assert_status(401)
-      expect(@pseudonym).to be_active
-      expect(@p2).to be_active
     end
 
     it "should destroy if authorized to delete pseudonyms" do
@@ -374,13 +366,54 @@ describe PseudonymsController do
       @user1 = @user
       @pseudonym1 = @pseudonym
 
+      role = custom_account_role('sis_only', :account => account1)
       user_with_pseudonym(:active_all => 1, :username => 'user2@example.com', :password => 'qwerty2')
-      account_admin_user_with_role_changes(user: @user, account: account1, membership_type: 'sis_only', role_changes: { manage_sis: true, manage_user_logins: true })
+      account_admin_user_with_role_changes(user: @user, account: account1, role: role, role_changes: { manage_sis: true, manage_user_logins: true })
       user_session(@user, @pseudonym)
 
       post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :sis_user_id => 'sis1' }
       expect(response).to be_success
       expect(@pseudonym1.reload.sis_user_id).to eq 'sis1'
+    end
+
+    it "should be able to change unique_id with permission" do
+      bob = user_with_pseudonym(username: 'old_username')
+      sally = account_admin_user
+      user_session(sally)
+      put 'update',
+        id: bob.pseudonym.id,
+        user_id: bob.id,
+        pseudonym: { unique_id: 'new_username' }
+      expect(response).to be_redirect
+      expect(bob.pseudonym.reload.unique_id).to eq 'new_username'
+    end
+
+    it "should not be able to change unique_id without permission" do
+      bob = user_with_pseudonym(username: 'old_username')
+      user_session(bob)
+      put 'update',
+        id: bob.pseudonym.id,
+        user_id: bob.id,
+        pseudonym: { unique_id: 'new_username' }
+      expect(response).not_to be_success
+      expect(bob.pseudonym.reload.unique_id).to eq 'old_username'
+    end
+
+    it "should succeed with partial update" do
+      bob = user_with_pseudonym(username: 'old_username', password: 'old_password')
+      user_session(bob)
+      put 'update',
+        id: bob.pseudonym.id,
+        user_id: bob.id,
+        pseudonym: {
+          password: 'new_password',
+          password_confirmation: 'new_password',
+          unique_id: 'new_username'
+        }
+      expect(response).to be_redirect
+      bob.pseudonym.reload
+      expect(bob.pseudonym.unique_id).to eq 'old_username'
+      expect(bob.pseudonym).to be_valid_password('new_password')
     end
   end
 

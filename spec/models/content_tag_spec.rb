@@ -466,14 +466,14 @@ describe ContentTag do
   end
 
   it "should touch the module after committing the save" do
-    Rails.env.stubs(:test?).returns(false)
     course
     mod = @course.context_modules.create!
     yesterday = 1.day.ago
     ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
-    tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
-    expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
-    mod.connection.run_transaction_commit_callbacks
+    ContextModule.transaction do
+      tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
+      expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
+    end
     expect(mod.reload.updated_at).to be > 5.seconds.ago
   end
 
@@ -541,7 +541,7 @@ describe ContentTag do
       end
     end
     context "discussions" do
-      def set_up_discussion
+      def attach_assignment_to_discussion
         @assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
         @assignment.submission_types = 'discussion_topic'
         @assignment.save!
@@ -561,12 +561,12 @@ describe ContentTag do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
       it "returns discussions with attached assignments if there is visibility" do
-        set_up_discussion
+        attach_assignment_to_discussion
         create_section_override_for_assignment(@assignment, {course_section: @section})
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
       it "does not return discussions with attached assignments if there is no visibility" do
-        set_up_discussion
+        attach_assignment_to_discussion
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end
@@ -584,7 +584,7 @@ describe ContentTag do
         create_section_override_for_quiz(@quiz, course_section: @section)
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
-      it "does not return quiz if there is visibility" do
+      it "does not return quiz if there is not visibility" do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end

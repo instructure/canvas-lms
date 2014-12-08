@@ -16,25 +16,11 @@ define [
       if attributes
         @set @nestAccountModel(attributes)
 
-    # Roles don't use a traditional id, and instead use the unique
-    # name (role) in any URLs
-    idAttribute: 'role'
-
     isNew: ->
       not @get('id')?
 
     # Method Summary
-    #   urlRoot is used in url to generate the a restful url. Because 
-    #   the "id" is set to the roles name (see parse function), the 
-    #   url uses the role name in place of the :id attribute in the url
-    #
-    #   ie: 
-    #      /accounts/:account_id/roles
-    #      /accounts/:account_id/roles/:some_role_name
-    #
-    #   produces
-    #      /accounts/1/roles
-    #      /accounts/1/roles/StudentAssistant
+    #   urlRoot is used in url to generate the a restful url
     #
     # @api override backbone
     urlRoot: -> "/api/v1/accounts/#{@get('account').get('id')}/roles" 
@@ -59,7 +45,6 @@ define [
     #   make sure the account is set up correctly
     # @api override backbone
     parse: (data) ->
-      @set 'id', data.role if data.role
       data = @nestAccountModel(data)
       data
 

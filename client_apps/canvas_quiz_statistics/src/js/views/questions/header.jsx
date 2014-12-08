@@ -4,6 +4,7 @@ define(function(require) {
   var I18n = require('i18n!quiz_statistics');
   var ToggleDetailsButton = require('jsx!./toggle_details_button');
   var ScreenReaderContent = require('jsx!../../components/screen_reader_content');
+  var SightedUserContent = require('jsx!../../components/sighted_user_content');
 
   var QuestionHeader = React.createClass({
     getDefaultProps: function() {
@@ -20,7 +21,7 @@ define(function(require) {
     render: function() {
       return (
         <header>
-          <ScreenReaderContent tagName="h4">
+          <ScreenReaderContent tagName="h3">
             {I18n.t('question_header', 'Question %{position}', { position: this.props.position })}
           </ScreenReaderContent>
 
@@ -40,9 +41,11 @@ define(function(require) {
 
           <div className="pull-right">
             {this.props.expandable &&
-              <ToggleDetailsButton
-                onClick={this.props.onToggleDetails}
-                expanded={this.props.expanded} />
+              <SightedUserContent>
+                <ToggleDetailsButton
+                  onClick={this.props.onToggleDetails}
+                  expanded={this.props.expanded} />
+              </SightedUserContent>
             }
 
             {this.props.asideContents}

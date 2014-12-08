@@ -27,10 +27,10 @@ describe RoleOverridesController do
 
   describe "add_role" do
     it "adds the role type to the account" do
-      expect(@account.available_account_roles).not_to include('NewRole')
+      expect(@account.available_account_roles.map(&:name)).not_to include('NewRole')
       post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
       @account.reload
-      expect(@account.available_account_roles).to include('NewRole')
+      expect(@account.available_account_roles.map(&:name)).to include('NewRole')
     end
 
     it "requires a role type" do
@@ -40,7 +40,7 @@ describe RoleOverridesController do
 
     it "fails when given an existing role type" do
       role = @account.roles.build(:name => 'NewRole')
-      role.base_role_type = AccountUser::BASE_ROLE_NAME
+      role.base_role_type = AccountUser::DEFAULT_BASE_ROLE_TYPE
       role.workflow_state = 'active'
       role.save!
       post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
@@ -50,32 +50,32 @@ describe RoleOverridesController do
 
   it "should deactivate a role" do
     role = @account.roles.build(:name => 'NewRole')
-    role.base_role_type = AccountUser::BASE_ROLE_NAME
+    role.base_role_type = AccountUser::DEFAULT_BASE_ROLE_TYPE
     role.workflow_state = 'active'
     role.save!
-    delete 'remove_role', :account_id => @account.id, :role => 'NewRole'
+    delete 'remove_role', :account_id => @account.id, :id => role.id
     expect(@account.roles.where(name: 'NewRole').first).to be_inactive
   end
 
   describe "create" do
     before :each do
-      @role = 'NewRole'
+      @role_name = 'NewRole'
       @permission = 'read_reports'
-      role = @account.roles.build(:name => @role)
-      role.base_role_type = AccountUser::BASE_ROLE_NAME
-      role.workflow_state = 'active'
-      role.save!
+      @role = @account.roles.build(:name => @role_name)
+      @role.base_role_type = AccountUser::DEFAULT_BASE_ROLE_TYPE
+      @role.workflow_state = 'active'
+      @role.save!
     end
 
     def post_with_settings(settings={})
-      post 'create', :account_id => @account.id, :account_roles => 1, :permissions => { @permission => { @role => settings } }
+      post 'create', :account_id => @account.id, :account_roles => 1, :permissions => { @permission => { @role.id => settings } }
     end
 
     describe "override already exists" do
       before :each do
         @existing_override = @account.role_overrides.build(
           :permission => @permission,
-          :enrollment_type => @role)
+          :role => @role)
         @existing_override.enabled = true
         @existing_override.locked = false
         @existing_override.save!
@@ -131,7 +131,7 @@ describe RoleOverridesController do
       it "should create the override if override has a value" do
         post_with_settings(:override => 'unchecked')
         expect(@account.role_overrides(true).size).to eq @initial_count + 1
-        override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
+        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
         expect(override).not_to be_nil
         expect(override.enabled).to be_falsey
       end
@@ -139,14 +139,14 @@ describe RoleOverridesController do
       it "should create the override if override is nil but locked is truthy" do
         post_with_settings(:locked => 'true')
         expect(@account.role_overrides(true).size).to eq @initial_count + 1
-        override = @account.role_overrides.where(permission: @permission, enrollment_type: @role).first
+        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
         expect(override).not_to be_nil
         expect(override.locked).to be_truthy
       end
 
       it "sets override as false when override is unchecked" do 
         post_with_settings(:override => 'unchecked')
-        override = @account.role_overrides(true).where(permission: @permission, enrollment_type: @role).first
+        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
         expect(override).not_to be_nil
         expect(override.enabled).to be_falsey
         expect(override.locked).to be_nil
@@ -155,7 +155,7 @@ describe RoleOverridesController do
 
       it "sets the override to locked when specifiying locked" do
         post_with_settings(:locked => 'true')
-        override = @account.role_overrides(true).where(permission: @permission, enrollment_type: @role).first
+        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
         expect(override).not_to be_nil
         expect(override.enabled).to be_nil
         expect(override.locked).to be_truthy

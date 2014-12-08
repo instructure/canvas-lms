@@ -18,6 +18,8 @@ define [
     @optionProperty 'onClick'
     @optionProperty 'dndOptions'
     @optionProperty 'href'
+    @optionProperty 'focusStyleClass'
+    @optionProperty 'selectedStyleClass'
 
     # Handle keyboard events for accessibility.
     events:
@@ -58,7 +60,7 @@ define [
         contextTypeAndId = splitAssetString(ENV.context_asset_string || '')
         if contextTypeAndId && contextTypeAndId.length == 2 && (contextTypeAndId[0] == 'courses' || contextTypeAndId[0] == 'groups')
           contextFiles = new Folder({contentTypes: @contentTypes})
-          contextFiles.set 'custom_name', if contextTypeAndId[0] is 'courses' then I18n.t('course_files', 'Course files') else I18n.t('group_files', 'Group files') 
+          contextFiles.set 'custom_name', if contextTypeAndId[0] is 'courses' then I18n.t('course_files', 'Course files') else I18n.t('group_files', 'Group files')
           contextFiles.url = "/api/v1/#{contextTypeAndId[0]}/#{contextTypeAndId[1]}/folders/root"
           contextFiles.fetch()
 
@@ -81,6 +83,7 @@ define [
           onClick: @onClick
           dndOptions: @dndOptions
           href: @href
+          selectedStyleClass: @selectedStyleClass
         }).$el.appendTo(@$folderTree)
       super
 
@@ -88,8 +91,9 @@ define [
     setFocus: ($to, $from) ->
       if not $to?.length or $from?.is? $to
         return
-      @$folderTree.find('[role=treeitem]').not($to).attr 'aria-selected', false
+      @$folderTree.find('[role=treeitem]').not($to).attr('aria-selected', false).removeClass(@focusStyleClass)
       $to.attr 'aria-selected', true
+      $to.addClass(@focusStyleClass)
       toId = $to.attr 'id'
       if not toId
         toId = _.uniqueId 'treenode-'
@@ -176,6 +180,7 @@ define [
       else
         @setFocus $current.parent().closest('[role=treeitem]'), $current
 
-    activateCurrent: ($current) -> $current.find('a:first').click()
+    activateCurrent: ($current) ->
+      $current.find('a:first').trigger('selectItem')
 
     ariaPropIsTrue: ($e, attrib) -> $e.attr(attrib)?.toLowerCase?() is 'true'

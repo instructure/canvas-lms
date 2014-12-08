@@ -16,6 +16,7 @@ define [
 
     usersPath: "/courses/#{ENV.course_id}/users"
     groupsUrl: "/api/v1/courses/#{ENV.course_id}/groups?include[]=users&include[]=group_category"
+    studentCanOrganizeGroupsForCourse: ENV.STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE
     sortedGroups: (->
       groups = @get('groups') || []
       text = @get('filterText').toLowerCase()

@@ -2,27 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "editing grades" do
   include_examples "in-process server selenium tests"
 
-  ASSIGNMENT_1_POINTS = "10"
-  ASSIGNMENT_2_POINTS = "5"
-  ASSIGNMENT_3_POINTS = "50"
-  ATTENDANCE_POINTS = "15"
-
-  STUDENT_NAME_1 = "student 1"
-  STUDENT_NAME_2 = "student 2"
-  STUDENT_NAME_3 = "student 3"
-  STUDENT_SORTABLE_NAME_1 = "1, student"
-  STUDENT_SORTABLE_NAME_2 = "2, student"
-  STUDENT_SORTABLE_NAME_3 = "3, student"
-  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
-  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
-  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  DEFAULT_PASSWORD = "qwerty"
-
   before (:each) do
-    data_setup
+    gradebook_data_setup
   end
 
   context 'submission details dialog' do
@@ -31,7 +12,7 @@ describe "editing grades" do
       wait_for_ajaximations
       open_comment_dialog(0, 0)
       grade_box = f("form.submission_details_grade_form input.grading_value")
-      expect(grade_box.attribute('value')).to eq ASSIGNMENT_1_POINTS
+      expect(grade_box.attribute('value')).to eq @assignment_1_points
       set_value(grade_box, 7)
       f("form.submission_details_grade_form button").click
       wait_for_ajax_requests
@@ -63,23 +44,23 @@ describe "editing grades" do
 
     # make sure it shows like it is not treating ungraded as 0's by default
     expect(is_checked('#include_ungraded_assignments')).to be_falsey
-    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_IGNORING_UNGRADED
-    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_IGNORING_UNGRADED
+    expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
+    expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
 
     # set the "treat ungraded as 0's" option in the header
     open_gradebook_settings(f('label[for="include_ungraded_assignments"]'))
 
     # now make sure that the grades show as if those ungraded assignments had a '0'
     expect(is_checked('#include_ungraded_assignments')).to be_truthy
-    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
-    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    expect(final_score_for_row(0)).to eq @student_1_total_treating_ungraded_as_zeros
+    expect(final_score_for_row(1)).to eq @student_2_total_treating_ungraded_as_zeros
 
     # reload the page and make sure it remembered the setting
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     expect(is_checked('#include_ungraded_assignments')).to be_truthy
-    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
-    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    expect(final_score_for_row(0)).to eq @student_1_total_treating_ungraded_as_zeros
+    expect(final_score_for_row(1)).to eq @student_2_total_treating_ungraded_as_zeros
 
     # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
 
@@ -91,8 +72,8 @@ describe "editing grades" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
-    expect(final_score_for_row(0)).to eq STUDENT_1_TOTAL_IGNORING_UNGRADED
-    expect(final_score_for_row(1)).to eq STUDENT_2_TOTAL_IGNORING_UNGRADED
+    expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
+    expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
   end
 
   it "should change grades and validate course total is correct" do
@@ -257,7 +238,7 @@ describe "editing grades" do
   end
 
   it "should not factor non graded assignments into group total" do
-    expected_totals = [STUDENT_1_TOTAL_IGNORING_UNGRADED, STUDENT_2_TOTAL_IGNORING_UNGRADED]
+    expected_totals = [@student_1_total_ignoring_ungraded, @student_2_total_ignoring_ungraded]
     ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
     @ungraded_assignment.grade_student(@student_1, :grade => 20)
     ungraded_submission.save!

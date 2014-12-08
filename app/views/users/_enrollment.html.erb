@@ -1,10 +1,5 @@
 <li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.state_based_on_date %> clearfix">
-  <span style="float: right; margin-right: 5px; margin-top: 3px;">
-    <a href="#" rel="<%= course_unenroll_url(enrollment.course_id, enrollment.id) %>" class="unenroll_link" role="button">
-      <i class="icon-end standalone-icon"></i>
-      <span class="screenreader-only"><%= t(:unenrollr, "Unenroll") %></span>
-    </a>
-  </span>
+
   <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: left;">
     <span class="name ellipsis" title="<%= enrollment.long_name %>">
       <%= enrollment.long_name %>
@@ -19,7 +14,7 @@
 
     <span class="subtitle ellipsis">
       <%= Enrollment.workflow_readable_type(enrollment.state_based_on_date) %>,
-      <%= 
+      <%=
         case enrollment.class.to_s
         when 'TeacherEnrollment'
           t('roles_teacher', "Enrolled as a Teacher.")
@@ -41,6 +36,12 @@
       <% end %>
     </span>
   </a>
+  <span style="float: right; margin-right: 5px; margin-top: 3px;">
+    <a href="#" rel="<%= course_unenroll_url(enrollment.course_id, enrollment.id) %>" class="unenroll_link" role="button">
+      <i class="icon-end standalone-icon"></i>
+      <span class="screenreader-only"><%= t(:unenrollr, "Unenroll") %></span>
+    </a>
+  </span>
   <% if enrollment.admin? && can_do(enrollment.user, @current_user, :read_reports) %>
     <div style='clear:left'>
       <%= link_to(t('links.teacher_activity', 'See Student Interactions Report'), user_course_teacher_activity_url(enrollment.user_id, enrollment.course_id)) %>

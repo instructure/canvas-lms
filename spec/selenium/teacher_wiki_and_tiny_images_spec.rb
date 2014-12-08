@@ -9,6 +9,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
     before (:each) do
       course_with_teacher_logged_in
+      set_course_draft_state
       @blank_page = @course.wiki.wiki_pages.create! :title => 'blank'
     end
 
@@ -62,7 +63,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       wait_for_animations
       results = fj('.results .image_link[tabindex="0"]:first')
       results.send_keys(:return)
-      in_frame "wiki_page_body_ifr" do
+      in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce img')).to be_displayed
       end
     end
@@ -105,9 +106,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
       expect(root_folders.first.find_elements(:css, '.file.image').length).to eq 2
 
-      wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
+      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
       f('.upload_new_file_link').click
-      fj('.wiki_switch_views_link:visible').click
+      fj('a.switch_views:visible').click
       wiki_page_body = clear_wiki_rce
 
       expect(@image_list.find_elements(:css, '.img').length).to eq 2
@@ -122,46 +123,43 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     it "should show uploaded images in image list and add the image to the rce" do
       skip "check image broken"
       wiki_page_tools_file_tree_setup
-      wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-      fj('.wiki_switch_views_link:visible').click
+      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      fj('a.switch_views:visible').click
       clear_wiki_rce
-      fj('.wiki_switch_views_link:visible').click
+      fj('a.switch_views:visible').click
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajax_requests
 
       expect(@image_list.find_elements(:css, '.img').length).to eq 2
       keep_trying_until do
         ff('#editor_tabs_4 .image_list .img').first.click
-        in_frame "wiki_page_body_ifr" do
+        in_frame wiki_page_body_ifr_id do
           expect(f('#tinymce img')).to be_displayed
         end
         true
       end
 
-      submit_form('#new_wiki_page')
-      wait_for_ajax_requests
-      get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
+      f('form.edit-form button.submit').click
       wait_for_ajax_requests
 
-      check_image(f('#wiki_body img'))
+      check_image(f('#wiki_page_show img'))
     end
 
     it "should be able to upload an image and add the image to the rce" do
       skip "check_image broken"
-      get "/courses/#{@course.id}/wiki"
 
       add_image_to_rce
-      check_image(f('#wiki_body img'))
+      check_image(f('#wiki_page_show img'))
     end
 
     it "should add image via url" do
-      get "/courses/#{@course.id}/wiki/blank"
+      get "/courses/#{@course.id}/pages/blank"
       wait_for_ajaximations
-      f('.edit_link').click
+      f('a.edit-wiki').click
       add_url_image(driver, 'http://example.com/image.png', 'alt text')
-      submit_form("#edit_wiki_page_#{@blank_page.id}")
-      keep_trying_until { expect(f('#wiki_body')).to be_displayed }
-      check_element_attrs(f('#wiki_body img'), :src => 'http://example.com/image.png', :alt => 'alt text')
+      f('form.edit-form button.submit').click
+      keep_trying_until { expect(f('#wiki_page_show')).to be_displayed }
+      check_element_attrs(f('#wiki_page_show img'), :src => 'http://example.com/image.png', :alt => 'alt text')
     end
     
     describe "canvas images" do
@@ -170,24 +168,24 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         @course_attachment = @course_root.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'course.jpg', :display_name => 'course.jpg', :context => @course
         @teacher_root = Folder.root_folders(@teacher).first
         @teacher_attachment = @teacher_root.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'teacher.jpg', :display_name => 'teacher.jpg', :context => @teacher
-        get "/courses/#{@course.id}/wiki/blank"
+        get "/courses/#{@course.id}/pages/blank"
         wait_for_ajaximations
-        f('.edit_link').click
+        f('a.edit-wiki').click
       end
       
       it "should add a course image" do
         add_canvas_image(driver, 'Course files', 'course.jpg')
-        submit_form("#edit_wiki_page_#{@blank_page.id}")
-        keep_trying_until { expect(f('#wiki_body')).to be_displayed }
-        check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
+        f('form.edit-form button.submit').click
+        keep_trying_until { expect(f('#wiki_page_show')).to be_displayed }
+        check_element_attrs(f('#wiki_page_show img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
       end
       
       it "should add a user image" do
         skip('testbot fragile')
         add_canvas_image(driver, 'My files', 'teacher.jpg')
         submit_form("#edit_wiki_page_#{@blank_page.id}")
-        keep_trying_until { expect(f('#wiki_body')).to be_displayed }
-        check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@teacher_attachment.id}/, :alt => 'teacher.jpg')
+        keep_trying_until { expect(f('#wiki_page_show')).to be_displayed }
+        check_element_attrs(f('#wiki_page_show img'), :src => /\/files\/#{@teacher_attachment.id}/, :alt => 'teacher.jpg')
       end
     end
 

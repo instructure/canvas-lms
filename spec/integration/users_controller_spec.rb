@@ -156,9 +156,11 @@ describe UsersController do
     it "should show user to account users that have the view_statistics permission" do
       account_model
       student_in_course(:account => @account)
+
+      role = custom_account_role('custom', :account => @account)
       RoleOverride.create!(:context => @account, :permission => 'view_statistics',
-                           :enrollment_type => 'AccountMembership', :enabled => true)
-      @account.account_users.create!(user: user, membership_type: 'AccountMembership')
+                           :role => role, :enabled => true)
+      @account.account_users.create!(user: user, role: role)
       user_session(@user)
 
       get "/users/#{@student.id}"
@@ -168,9 +170,10 @@ describe UsersController do
     it "should show course user to account users that have the read_roster permission" do
       account_model
       student_in_course(:account => @account)
+      role = custom_account_role('custom', :account => @account)
       RoleOverride.create!(:context => @account, :permission => 'read_roster',
-                           :enrollment_type => 'AccountMembership', :enabled => true)
-      @account.account_users.create!(user: user, membership_type: 'AccountMembership')
+                           :role => role, :enabled => true)
+      @account.account_users.create!(user: user, role: role)
       user_session(@user)
 
       get "/courses/#{@course.id}/users/#{@student.id}"

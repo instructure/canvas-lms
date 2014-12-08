@@ -106,6 +106,39 @@ describe UserSearch do
             it { is_expected.not_to include('Tyler Teacher') }
             it { is_expected.not_to include('Rose Tyler') }
           end
+
+          describe 'with the role name parameter' do
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_role => 'StudentEnrollment' ).to_a }
+
+            before do
+              newstudent = User.create!(:name => 'Tyler Student')
+              e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              # manually replicate the pre-job state
+              Enrollment.where(:id => e.id).update_all(:role_id => nil)
+            end
+
+            it { should include('Rose Tyler') }
+            it { should include('Tyler Pickett') }
+            it { should include('Tyler Student') }
+            it { should_not include('Tyler Teacher') }
+          end
+
+          describe 'with the role id parameter' do
+
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role_id => student_role.id ).to_a }
+
+            before do
+              newstudent = User.create!(:name => 'Tyler Student')
+              e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              # manually replicate the pre-job state
+              Enrollment.where(:id => e.id).update_all(:role_id => nil)
+            end
+
+            it { should include('Rose Tyler') }
+            it { should include('Tyler Pickett') }
+            it { should include('Tyler Student') }
+            it { should_not include('Tyler Teacher') }
+          end
         end
 
         describe 'searching on sis ids' do

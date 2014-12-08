@@ -52,7 +52,8 @@ describe LtiApiController, type: :request do
   end
 
   it "should generate a logout service URL with token" do
-    user_session(@student)
+    p = pseudonym(@student)
+    user_session(@student, p)
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
     expect(response).to be_success
     doc = Nokogiri::HTML(response.body)
@@ -61,7 +62,7 @@ describe LtiApiController, type: :request do
     expect(match).not_to be_nil
     token = Lti::LogoutService::Token.parse_and_validate(match[1])
     expect(token.tool).to eql(@tool)
-    expect(token.pseudonym).to eql(@pseudonym)
+    expect(token.pseudonym).to eql(p)
   end
 
   it "should reject an invalid secret" do

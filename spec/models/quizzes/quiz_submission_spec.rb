@@ -744,7 +744,7 @@ describe Quizzes::QuizSubmission do
     it "allows users with the manage_grades permission but not 'manage' permission to update scores and add attempts" do
       RoleOverride.create!(
         context: Account.default,
-        enrollment_type: 'TeacherEnrollment',
+        role: teacher_role,
         permission: 'manage_assignments',
         enabled: false
       )

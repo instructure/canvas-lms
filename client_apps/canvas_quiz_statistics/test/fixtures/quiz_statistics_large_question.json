@@ -1,0 +1,298 @@
+{
+  "quiz_statistics": [
+    {
+      "id": "1",
+      "url": "http://localhost:3000/api/v1/courses/1/quizzes/32/statistics",
+      "html_url": "http://localhost:3000/courses/1/quizzes/32/statistics",
+      "generated_at": "2014-08-04T16:32:50Z",
+      "points_possible": 1,
+      "question_statistics": [
+        {
+          "id": "79",
+          "question_type": "fill_in_multiple_blanks_question",
+          "question_text": "<p>Hello. This should force a horizontal scroller cuz it's got MANY MANY MANY answers.</p>",
+          "position": 1,
+          "responses": 14,
+          "answered": 0,
+          "correct": 10,
+          "partially_correct": 0,
+          "incorrect": 4,
+          "answer_sets": [
+            {
+              "id": "bf0109538456c0c93d49334c032c4a0c",
+              "text": "Hair color",
+              "answers": [
+                {
+                  "id": "1",
+                  "text": "Red",
+                  "correct": true,
+                  "responses": 1
+                },
+                {
+                  "id": "2",
+                  "text": "Green",
+                  "correct": true,
+                  "responses": 1
+                },
+                {
+                  "id": "3",
+                  "text": "Blue",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "4",
+                  "text": "Teal",
+                  "correct": true,
+                  "responses": 5
+                },
+                {
+                  "id": "5",
+                  "text": "Purple",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "6",
+                  "text": "Yellow",
+                  "correct": true,
+                  "responses": 3
+                },
+                {
+                  "id": "7",
+                  "text": "Orange",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "8",
+                  "text": "Pink",
+                  "correct": false,
+                  "responses": 2
+                },
+                {
+                  "id": "9",
+                  "text": "Pink",
+                  "correct": false,
+                  "responses": 2
+                },
+                {
+                  "id": "10",
+                  "text": "A",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "11",
+                  "text": "B",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "12",
+                  "text": "C",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "13",
+                  "text": "D",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "14",
+                  "text": "E",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "none",
+                  "text": "No Answer",
+                  "correct": false,
+                  "responses": 2
+                }
+              ]
+            },
+            {
+              "id": "bf0109538456c0c93d49334c032c4a0d",
+              "text": "Skin color",
+              "answers": [
+                {
+                  "id": "1",
+                  "text": "Red",
+                  "correct": true,
+                  "responses": 2
+                },
+                {
+                  "id": "2",
+                  "text": "Green",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "3",
+                  "text": "Blue",
+                  "correct": false,
+                  "responses": 2
+                },
+                {
+                  "id": "4",
+                  "text": "Teal",
+                  "correct": true,
+                  "responses": 3
+                },
+                {
+                  "id": "5",
+                  "text": "Purple",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "6",
+                  "text": "Yellow",
+                  "correct": true,
+                  "responses": 3
+                },
+                {
+                  "id": "7",
+                  "text": "Orange",
+                  "correct": true,
+                  "responses": 0
+                },
+                {
+                  "id": "8",
+                  "text": "Pink",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "9",
+                  "text": "Pink",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "10",
+                  "text": "A",
+                  "correct": false,
+                  "responses": 3
+                },
+                {
+                  "id": "11",
+                  "text": "B",
+                  "correct": false,
+                  "responses": 1
+                },
+                {
+                  "id": "12",
+                  "text": "C",
+                  "correct": false,
+                  "responses": 0
+                },
+                {
+                  "id": "13",
+                  "text": "D",
+                  "correct": false,
+                  "responses": 2
+                },
+                {
+                  "id": "14",
+                  "text": "E",
+                  "correct": false,
+                  "responses": 1
+                },
+                {
+                  "id": "none",
+                  "text": "No Answer",
+                  "correct": false,
+                  "responses": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11",
+          "question_type": "multiple_choice_question",
+          "question_text": "<p>Which?</p>",
+          "position": 1,
+          "responses": 156,
+          "answers": [
+            {
+              "id": "3866",
+              "text": "I am a very long description of an answer that should span multiple lines.",
+              "correct": true,
+              "responses": 129
+            },
+            {
+              "id": "2040",
+              "text": "b",
+              "correct": false,
+              "responses": 1
+            },
+            {
+              "id": "7387",
+              "text": "c",
+              "correct": false,
+              "responses": 26
+            },
+            {
+              "id": "4082",
+              "text": "d",
+              "correct": false,
+              "responses": 0
+            }
+          ],
+          "answered_student_count": 156,
+          "top_student_count": 42,
+          "middle_student_count": 72,
+          "bottom_student_count": 42,
+          "correct_student_count": 129,
+          "incorrect_student_count": 27,
+          "correct_student_ratio": 0.8269230769230769,
+          "incorrect_student_ratio": 0.17307692307692307,
+          "correct_top_student_count": 42,
+          "correct_middle_student_count": 72,
+          "correct_bottom_student_count": 15,
+          "variance": 0.14312130177514806,
+          "stdev": 0.3783137610174233,
+          "difficulty_index": 0.8269230769230769,
+          "alpha": null,
+          "point_biserials": [
+            {
+              "answer_id": 3866,
+              "point_biserial": 0.7157094891780442,
+              "correct": true,
+              "distractor": false
+            },
+            {
+              "answer_id": 2040,
+              "point_biserial": -0.0608778335993478,
+              "correct": false,
+              "distractor": true
+            },
+            {
+              "answer_id": 7387,
+              "point_biserial": -0.7134960236217814,
+              "correct": false,
+              "distractor": true
+            },
+            {
+              "answer_id": 4082,
+              "point_biserial": null,
+              "correct": false,
+              "distractor": true
+            }
+          ]
+        }
+      ],
+      "submission_statistics": {
+        "unique_count": 14
+      },
+      "links": {
+        "quiz": "http://localhost:3000/api/v1/courses/1/quizzes/32"
+      }
+    }
+  ]
+}

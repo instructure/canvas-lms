@@ -272,6 +272,38 @@ describe Quizzes::QuizzesApiController, type: :request do
         end
       end
 
+      context 'show_correct_answers_last_attempt' do
+        it 'should be settable if show_correct_answers is on and allowed_attempts > 1' do
+          api_create_quiz({
+            'allowed_attempts' => 2,
+            'show_correct_answers' => true,
+            'show_correct_answers_last_attempt' => true
+          })
+
+          expect(new_quiz.show_correct_answers_last_attempt).to be_truthy
+        end
+
+        it 'should be ignored otherwise' do
+          api_create_quiz({
+            'allowed_attempts' => 2,
+            'show_correct_answers' => false,
+            'show_correct_answers_last_attempt' => true
+          })
+
+          expect(new_quiz.show_correct_answers_last_attempt).to be_falsey,
+            'does not work when show_correct_answers is false'
+
+          api_create_quiz({
+            'allowed_attempts' => 1,
+            'show_correct_answers' => true,
+            'show_correct_answers_last_attempt' => true
+          })
+
+          expect(new_quiz.show_correct_answers_last_attempt).to be_falsey,
+            'does not work when multiple attempts are not specified'
+        end
+      end
+
       context "scoring_policy" do
         it "should set scoring policy if allowed_attempts > 1" do
           api_create_quiz({'scoring_policy' => 'keep_latest', 'allowed_attempts' => 3})

@@ -31,7 +31,7 @@ class DiscussionTopic < ActiveRecord::Base
   attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
-    :group_category, :group_category_id
+    :group_category
   attr_accessor :user_has_posted
 
   module DiscussionTypes
@@ -129,19 +129,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :default_values
 
-  # TODO: These overrides for assignment's group_category can be removed after the migration.
-  alias_method :raw_group_category, :group_category
-
-  def group_category
-    return raw_group_category || (self.assignment && self.assignment.group_category)
-  end
-
-  def legacy_group_category_id
-    return self.group_category.id if self.group_category
-  end
-
   def has_group_category?
-    self.group_category.present?
+    !!self.group_category_id
   end
 
   def set_schedule_delayed_transitions
@@ -478,8 +467,16 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    joins("LEFT JOIN assignment_student_visibilities ON assignment_student_visibilities.assignment_id = discussion_topics.assignment_id").
-    where("discussion_topics.assignment_id IS NULL OR (discussion_topics.assignment_id = assignment_student_visibilities.assignment_id AND assignment_student_visibilities.user_id IN (?))",user_ids).
+    user_ids = Array.wrap(user_ids).join(',')
+    course_ids = Array.wrap(course_ids).join(',')
+    scope = joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
+      LEFT JOIN assignment_student_visibilities
+        ON (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
+            AND assignment_student_visibilities.user_id IN (%s)
+            AND assignment_student_visibilities.course_id IN (%s)
+        )
+      SQL
+    scope.where("discussion_topics.assignment_id IS NULL OR assignment_student_visibilities.assignment_id IS NOT NULL").
     where("discussion_topics.context_id IN (?)",course_ids)
    }
 
@@ -790,7 +787,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
     given { |user, session| !self.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
-    can :update and can :delete and can :read
+    can :update and can :delete and can :read and can :attach
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
     can :update

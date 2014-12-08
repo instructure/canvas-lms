@@ -29,16 +29,7 @@
       </nav>
       <div class="section-button-placeholder"></div>
       <% if @context.feature_enabled?(:post_grades) %>
-        <div class="pull-right">
-          <nav class="gradebook-navigation hidden">
-            <ul class="nav nav-pills gradebook-navigation-pills pull-right">
-              <li>
-                <a class="btn-outline" href="#"
-                   id="post-grades-button"><%= t(:post_grades, "Post Grades") %></a>
-              </li>
-            </ul>
-          </nav>
-        </div>
+        <div class="pull-right post-grades-placeholder"></div>
       <% end %>
     <% end %>
   </div>

@@ -19,36 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradingPeriod do
-  before (:all) do
+  before :once do
     @grading_period = GradingPeriod.create(course_id: 1, weight: 25.0, start_date: Time.zone.now, end_date: 1.day.from_now)
-  end
-
-  it "should respond to course_id" do
-    expect(@grading_period).to respond_to(:course_id)
-  end
-
-  it "should respond to account_id" do
-    expect(@grading_period).to respond_to(:account_id)
-  end
-
-  it "should respond to weight" do
-    expect(@grading_period).to respond_to(:weight)
-  end
-
-  it "should respond to start_date" do
-    expect(@grading_period).to respond_to(:start_date)
-  end
-
-  it "should respond to end_date" do
-    expect(@grading_period).to respond_to(:end_date)
-  end
-
-  it "should respond to course" do
-    expect(@grading_period).to respond_to(:course)
-  end
-
-  it "should respond to account" do
-    expect(@grading_period).to respond_to(:account)
   end
 
   context "associations" do
@@ -98,6 +70,14 @@ describe GradingPeriod do
         grading_period.update_attributes(start_date: 2.days.from_now)
         expect(grading_period).not_to be_valid
       end
+    end
+  end
+
+  describe '#destroy' do
+    it 'soft deletes' do
+      @grading_period.destroy
+      expect(@grading_period).to be_deleted
+      expect(@grading_period).to_not be_destroyed
     end
   end
 end

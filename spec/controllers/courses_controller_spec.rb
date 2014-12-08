@@ -475,6 +475,7 @@ describe CoursesController do
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
       @enrollment.save!
+      controller.instance_variable_set(:@js_env, nil)
       get 'show', :id => @course.id
       assert_status(401)
       expect(assigns[:unauthorized_reason]).to eq :unpublished
@@ -523,6 +524,7 @@ describe CoursesController do
       a.save!
 
       controller.instance_variable_set(:@context_all_permissions, nil)
+      controller.instance_variable_set(:@js_env, nil)
 
       get 'show', :id => @course.id
       expect(response).to be_success
@@ -672,6 +674,7 @@ describe CoursesController do
         @course.workflow_state = 'claimed'
         @course.save!
 
+        controller.instance_variable_set(:@js_env, nil)
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
         assert_status(401)
         expect(assigns[:unauthorized_message]).not_to be_nil
@@ -739,6 +742,7 @@ describe CoursesController do
         @enrollment.reload
         expect(@enrollment).to be_invited
 
+        controller.instance_variable_set(:@js_env, nil)
         get 'show', :id => @course.id # invitation should be in the session now
         expect(response).to be_success
         expect(assigns[:pending_enrollment]).to eq @enrollment
@@ -780,6 +784,7 @@ describe CoursesController do
         permissions_key = session[:permissions_key]
 
         controller.instance_variable_set(:@pending_enrollment, nil)
+        controller.instance_variable_set(:@js_env, nil)
         get 'show', :id => @course2.id
         expect(response).to be_success
         expect(assigns[:pending_enrollment]).to eq @enrollment2
@@ -806,8 +811,9 @@ describe CoursesController do
       # permission to any course, but will not have :read permission unless
       # they've been granted the :read_course_content role override, which
       # defaults to false for everyone except those with the AccountAdmin role
+      role = custom_account_role('LimitedAccess', :account => Account.site_admin)
       user(:active_all => true)
-      Account.site_admin.account_users.create!(user: @user, membership_type: 'LimitedAccess')
+      Account.site_admin.account_users.create!(user: @user, :role => role)
       user_session(@user)
 
       get 'show', :id => @course.id
@@ -816,8 +822,9 @@ describe CoursesController do
     end
 
     it "should not redirect xhr to settings page when user can :read_as_admin, but not :read" do
+      role = custom_account_role('LimitedAccess', :account => Account.site_admin)
       user(:active_all => true)
-      Account.site_admin.account_users.create!(user: @user, membership_type: 'LimitedAccess')
+      Account.site_admin.account_users.create!(user: @user, role: role)
       user_session(@user)
 
       xhr :get, 'show', :id => @course.id
@@ -834,6 +841,18 @@ describe CoursesController do
       expect(response).to be_redirect
       expect(response.location).to match(%r{/courses/#{@course2.id}})
     end
+
+    it "should not redirect to the xlisted course if the enrollment is deleted" do
+      user_session(@student)
+      @course1 = @course
+      @course2 = course(:active_all => true)
+      @course1.default_section.crosslist_to_course(@course2, :run_jobs_immediately => true)
+      @user.enrollments.destroy_all
+
+      get 'show', :id => @course1.id
+      expect(response.status).to eq 401
+    end
+
   end
 
   describe "POST 'unenroll_user'" do
@@ -938,6 +957,16 @@ describe CoursesController do
       expect(@course.observers.first.initial_enrollment_type).to eq 'observer'
     end
 
+    it "should enroll using custom role id" do
+      user_session(@teacher)
+      role = custom_student_role('customrole', :account => @course.account)
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>", :role_id => role.id
+      expect(response).to be_success
+      @course.reload
+      expect(@course.students.map(&:name)).to include("Sam")
+      expect(@course.student_enrollments.find_by_role_id(role.id)).to_not be_nil
+    end
+
     it "should allow TAs to enroll Observers (by default)" do
       course_with_teacher(:active_all => true)
       @user = user
@@ -968,11 +997,10 @@ describe CoursesController do
   describe "POST create" do
     before do
       @account = Account.default
-      custom_account_role 'lamer', :account => @account
-      @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
-                                      :enrollment_type => 'lamer'
+      role = custom_account_role 'lamer', :account => @account
+      @account.role_overrides.create! :permission => 'manage_courses', :enabled => true, :role => role
       user
-      @account.account_users.create!(user: @user, membership_type: 'lamer')
+      @account.account_users.create!(user: @user, role: role)
       user_session @user
     end
 
@@ -1505,11 +1533,11 @@ describe CoursesController do
       describe "create" do
         before :once do
           @account = Account.default
-          custom_account_role 'lamer', :account => @account
+          role = custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
-                                          :enrollment_type => 'lamer'
+                                          :role => role
           user
-          @account.account_users.create!(user: @user, membership_type: 'lamer')
+          @account.account_users.create!(user: @user, role: role)
         end
 
         before :each do
