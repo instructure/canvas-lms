@@ -163,8 +163,8 @@ module BB8Expected
 
   # removed ids on the answers
   TRUE_FALSE = {:answers=>
-          [{:text=>"true", :weight=>100, :migration_id=>"true"},
-           {:text=>"false", :weight=>0, :migration_id=>"false"}],
+          [{:text=>"True", :weight=>100, :migration_id=>"true"},
+           {:text=>"False", :weight=>0, :migration_id=>"false"}],
                 :correct_comments=>"yep",
                 :incorrect_comments=>"nope",
                 :points_possible=>10.0,
