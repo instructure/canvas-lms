@@ -978,12 +978,12 @@ describe DiscussionTopic do
       expect(student_submission.workflow_state).to eq 'graded'
     end
 
-    it "should create submissions for existing entries when setting the assignment" do
+    it "should create submissions for existing entries when setting the assignment (even if locked)" do
       @topic.reply_from(:user => @student, :text => "entry")
       @student.reload
       expect(@student.submissions).to be_empty
 
-      @assignment = assignment_model(:course => @course)
+      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago)
       @topic.assignment = @assignment
       @topic.save
       @student.reload
