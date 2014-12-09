@@ -18,7 +18,6 @@ module Lti
   class LtiAppsController < ApplicationController
     before_filter :require_context
     before_filter :require_user
-    include Lti::ApiServiceHelper
 
     def launch_definitions
       if authorized_action(@context, @current_user, :update)
