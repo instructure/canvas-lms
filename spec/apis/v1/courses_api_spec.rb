@@ -1982,6 +1982,7 @@ describe CoursesController, type: :request do
         'end_at' => @course1.end_at,
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
+        'is_public' => @course1.is_public,
         'workflow_state' => @course1.workflow_state,
         'storage_quota_mb' => @course1.storage_quota_mb,
         'apply_assignment_group_weights' => false,

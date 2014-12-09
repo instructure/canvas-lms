@@ -411,6 +411,7 @@ describe "Accounts API", type: :request do
         expect(json.first['id']).to eq @c1.id
         expect(json.first['name']).to eq 'c1'
         expect(json.first['account_id']).to eq @c1.account_id
+        expect(json.first['is_public']).to eq true
 
         expect(json.last['id']).to eq @c2.id
         expect(json.last['name']).to eq 'c2'

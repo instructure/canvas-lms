@@ -341,6 +341,7 @@ describe UsersController, type: :request do
         'default_view' => 'feed',
         'workflow_state' => 'available',
         'public_syllabus' => false,
+        'is_public' => @course.is_public,
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false
       },
@@ -445,6 +446,7 @@ describe UsersController, type: :request do
         'default_view' => 'feed',
         'workflow_state' => 'available',
         'public_syllabus' => false,
+        'is_public' => @course.is_public,
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false
       },
