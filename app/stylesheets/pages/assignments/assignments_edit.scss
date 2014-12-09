@@ -14,7 +14,13 @@ div.form-column-left {
     margin-top: 0px;
   }
 }
-
+#discussion_point_change_warning {
+  margin-top: 15px;
+  margin-bottom: 0px;
+  margin-left: 180px;
+  display: inline-block;
+  display: none;
+}
 /* for grouped and un-grouped form els */
 div.form-column-right {
   width: 380px;

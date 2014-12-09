@@ -38,10 +38,12 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
     els:
       '#availability_options': '$availabilityOptions'
       '#use_for_grading': '$useForGrading'
+      '#discussion_point_change_warning' : '$assignmentPointsPossible'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
       'change #use_for_grading' : 'toggleAvailabilityOptions'
+      'change #discussion_topic_assignment_points_possible' : 'handlePointsChange'
     )
 
     messages:
@@ -53,6 +55,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
 
     initialize: (options) ->
       @assignment = @model.get("assignment")
+      @initialPointsPossible = @assignment.pointsPossible()
       @dueDateOverrideView = options.views['js-assignment-overrides']
       @model.on 'sync', =>
         @unwatchUnload()
@@ -78,6 +81,12 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         differentiatedAssignmentsEnabled: @model.differentiatedAssignmentsEnabled()
       json.assignment = json.assignment.toView()
       json
+
+
+    handlePointsChange:(ev) =>
+      ev.preventDefault()
+      data = @getFormData()
+      @$assignmentPointsPossible.toggleAccessibly(data.assignment.pointsPossible() != (@initialPointsPossible + ""))
 
     render: =>
       super

@@ -58,7 +58,13 @@
       value="{{pointsPossible}}"
       type="text"
       {{disabledIfIncludes frozenAttributes "points_possible"}}/>
+      <div aria-live="polite" role="alert">
+        <div id=point_change_warning class="alert">
+          {{#t}}If you change an assignment's points possible you must regrade the assignment.{{/t}}
+         </div>
+      </div>
   </div>
+
 </div>
 
 

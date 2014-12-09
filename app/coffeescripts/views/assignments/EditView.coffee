@@ -50,6 +50,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
     EXTERNAL_TOOLS_CONTENT_TYPE = '#assignment_external_tool_tag_attributes_content_type'
     EXTERNAL_TOOLS_CONTENT_ID = '#assignment_external_tool_tag_attributes_content_id'
     EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
+    ASSIGNMENT_POINTS_POSSIBLE = '#point_change_warning'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -73,6 +74,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       els["#{EXTERNAL_TOOLS_NEW_TAB}"] = '$externalToolsNewTab'
       els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
       els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
+      els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
       els
     )
 
@@ -86,6 +88,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
       events["click #{EXTERNAL_TOOLS_URL}"] = 'showExternalToolsDialog'
       events["click #{EXTERNAL_TOOLS_URL}_screenreader_button"] = 'showExternalToolsDialogForScreenreader'
+      events["change #assignment_points_possible"] = 'handlePointsChange'
       events
     )
 
@@ -111,6 +114,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
        "points_possible","allowed_extensions","peer_reviews","peer_review_count",
        "automatic_peer_reviews","group_category_id","grade_group_students_individually",
        "turnitin_enabled"]
+
+    handlePointsChange:(ev) =>
+      ev.preventDefault()
+      data = @getFormData()
+      @$assignmentPointsPossible.toggleAccessibly(data.points_possible != (@assignment.pointsPossible() + ""))
 
     setDefaultsIfNew: =>
       if @assignment.isNew()
@@ -339,8 +347,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
     _validatePointsRequired: (data, errors) =>
       return errors unless _.include ['percent','letter_grade','gpa_scale'], data.grading_type
 
-      if data.points_possible == "0" or isNaN(parseFloat(data.points_possible))
+      if parseInt(data.points_possible,10) < 0 or isNaN(parseFloat(data.points_possible))
         errors["points_possible"] = [
-          message: I18n.t('points_possible_not_zero', "Points possible must be more than 0 for selected grading type")
+          message: I18n.t("Points possible must be 0 or more for selected grading type")
         ]
       errors
