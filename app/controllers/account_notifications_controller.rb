@@ -19,7 +19,7 @@
 # @API Account Notifications
 #
 # API for account notifications.
-# @model AccountNotificaion
+# @model AccountNotification
 #     {
 #       "id": "AccountNotification",
 #       "description": "",
@@ -75,7 +75,36 @@
 #     }
 class AccountNotificationsController < ApplicationController
   include Api::V1::AccountNotifications
-  before_filter :require_account_admin
+  before_filter :require_user
+  before_filter :require_account_admin, except: [:user_index, :user_close_notification]
+
+  # @API Index of active global notification for the user
+  # Returns a list of all global notifications in the account for this user
+  # Any notifications that have been closed by the user will not be returned
+  #
+  # @example_request
+  #   curl -H 'Authorization: Bearer <token>' \
+  #   https://<canvas>/api/v1/accounts/2/users/4/account_notifications
+  #
+  # @returns [AccountNotification]
+  def user_index
+    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+    render :json => account_notifications_json(notifications, @current_user, session)
+  end
+
+  # @API Close notification for user
+  # If the user no long wants to see this notification it can be excused with this call
+  #
+  # @example_request
+  #   curl -X DELETE -H 'Authorization: Bearer <token>' \
+  #   https://<canvas>/api/v1/accounts/2/users/4/account_notifications/4
+  #
+  # @returns AccountNotification
+  def user_close_notification
+    notification = AccountNotification.find(params[:id])
+    @current_user.close_announcement(notification)
+    render :json => account_notification_json(notification, @current_user, session)
+  end
 
   # @API Create a global notification
   # Create and return a new global notification for an account.
@@ -140,7 +169,7 @@ class AccountNotificationsController < ApplicationController
     respond_to do |format|
       if @notification.save
         if api_request?
-          format.json { render :json => account_notifications_json(@notification, @current_user, session) }
+          format.json { render :json => account_notification_json(@notification, @current_user, session) }
         else
           flash[:notice] = t(:announcement_created_notice, "Announcement successfully created")
           format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }

@@ -26,6 +26,46 @@ describe 'Account Notification API', type: :request do
     user_with_pseudonym(:user => @admin)
   end
 
+  describe 'user_index' do
+    before do
+      account_notification(message: 'default')
+      @path = "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications"
+      @api_params = {controller: 'account_notifications',
+                     action: 'user_index',
+                     format: 'json',
+                     user_id: @admin.id,
+                     account_id: @admin.account.id.to_s}
+    end
+
+    it "should list notifications" do
+      account_notification(message: 'second')
+      json = api_call(:get, @path, @api_params,)
+      expect(json.length).to eq 2
+    end
+  end
+
+  describe 'user_close_notification' do
+    before do
+      @a = account_notification(message: 'default')
+      @path = "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications/#{@a.id}"
+      @api_params = {controller: 'account_notifications',
+                     action: 'user_close_notification',
+                     format: 'json',
+                     id: @a.id.to_param,
+                     user_id: @admin.id,
+                     account_id: @admin.account.id.to_s}
+    end
+
+    it "should close notifications" do
+      json = api_call(:delete, @path, @api_params)
+      @admin.reload
+      expect(@admin.preferences[:closed_notifications]).to eq [@a.id]
+
+      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications", @api_params.merge(action: 'user_index'),)
+      expect(json.length).to eq 0
+    end
+  end
+
   describe 'create' do
     before :each do
       @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications"
