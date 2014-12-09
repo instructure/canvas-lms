@@ -10836,14 +10836,14 @@ fr:
     notices: 
       settings_updated: "Les paramètres de module d’extension ont été mis à jour."
     panda_pub_settings: 
-      description: "PandaPub est un service de publication/remplacement qui, une fois configuré, permet à certaines parties de Canvas de recevoir des notifications pour des événements à l’intérieur du navigateur, plutôt que de s’interroger sur les changements."
+      description: "PandaPub est un service de publication/envoi qui, une fois configuré, permet à certaines parties de Canvas de recevoir des notifications pour des événements à l’intérieur du navigateur, plutôt que de s’interroger sur les changements."
       labels: 
         application_id: "ID de l’application"
         base_url: "URL de base"
         key_id: "ID de la clé"
         key_secret: "Secret par clé"
     pandapub: 
-      description: "Service de publication/remplacement"
+      description: "Service Publier/Envoyer"
       name: PandaPub
     qti_converter_settings: 
       labels: 
@@ -11641,6 +11641,7 @@ fr:
         one: "Un étudiant a reçu une note comprise entre %{start} et %{end}%."
         other: "%{count} étudiants ont reçu une note comprise entre %{start} et %{end}%."
         zero: "Aucun étudiant n’a reçu une note comprise entre %{start} et %{end}%."
+      table_description: "Récapitulatif des statistiques pour tous les envois remis"
     title: "Statistiques du questionnaire"
     unknown_answer: "Autre chose"
   quizzes: 
