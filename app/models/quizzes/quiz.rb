@@ -42,16 +42,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
-  # @property [Fixnum] submission_question_index
-  # @private
-  #
-  # A counter used in generating question names for students based on the
-  # position of the question within the quiz_data set.
-  #
-  # See #generate_submission
-  # See #generate_submission_question
-  attr_readonly :submission_question_index
-
   has_many :quiz_questions, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizQuestion'
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :quiz_groups, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizGroup'
@@ -545,7 +535,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       if q[:pick_count]
         question_count += q[:actual_pick_count] || q[:pick_count]
       else
-        question_count += 1 unless q[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
+        question_count += 1 unless q[:question_type] == Quizzes::QuizQuestion::Q_TEXT_ONLY
       end
     end
     question_count || 0
@@ -559,36 +549,22 @@ class Quizzes::Quiz < ActiveRecord::Base
   # the version found by gathering relationships on the Quiz data models,
   # but the version being held in Quizzes::Quiz.quiz_data.  Caches the result
   # in @stored_questions.
-  def stored_questions(hashes=nil)
-    res = []
-    return @stored_questions if @stored_questions && !hashes
-    questions = hashes || self.quiz_data || []
-    questions.each do |val|
+  def stored_questions(preview=false)
+    return @stored_questions if @stored_questions && !preview
 
-      if val[:answers]
-        val[:answers] = prepare_answers(val)
-        val[:matches] = prepare_matches(val) if val[:matches]
-      elsif val[:questions] # It's a Quizzes::QuizGroup
-        if val[:assessment_question_bank_id]
-          # It points to a question bank
-          # question/answer/match shuffling happens when a submission is generated
-        else #normal Quizzes::QuizGroup
-          questions = []
-          val[:questions].each do |question|
-            if question[:answers]
-              question[:answers] = prepare_answers(question)
-              question[:matches] = prepare_matches(question) if question[:matches]
-            end
-            questions << question
-          end
-          questions = questions.sort_by { |q| rand }
-          val[:questions] = questions
-        end
+    @stored_questions = begin
+      data_set = if preview
+        self.generate_quiz_data(:persist => false)
+      else
+        self.quiz_data || []
       end
-      res << val
+
+      builder = Quizzes::QuizQuestionBuilder.new({
+        shuffle_answers: self.shuffle_answers
+      })
+
+      builder.shuffle_quiz_data!(data_set)
     end
-    @stored_questions = res
-    res
   end
 
   def single_attempt?
@@ -597,121 +573,6 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def unlimited_attempts?
     self.allowed_attempts == -1
-  end
-
-  def generate_submission_question(q)
-    @submission_question_index = 0 if @submission_question_index.nil?
-
-    unless q[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
-      @submission_question_index += 1
-    end
-
-    self.class.decorate_question_for_submission(q, @submission_question_index)
-  end
-
-  # TODO: could this stop mutating the question object and instead return the
-  # decorated version?
-  #
-  # this currently has too many side-effects: on quiz_data, @stored_questions,
-  # and (what we really want) a submissions's quiz_data...
-  #
-  # anyway if ur wondering why any of these fields are being modified in a spec
-  # when you are just innocently calling Quiz#generate_submission, you know why
-  def self.decorate_question_for_submission(q, position)
-    q[:name] = t '#quizzes.quiz.question_name_counter', "Question %{question_number}", :question_number => position
-
-    if q[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
-      q[:name] = t '#quizzes.quiz.default_text_only_question_name', "Spacer"
-    elsif q[:question_type] == 'fill_in_multiple_blanks_question'
-      text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
-      variables.each do |variable|
-        variable_id = ::AssessmentQuestion.variable_id(variable)
-        re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, "<input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_#{q[:id]}_#{variable_id}' value='{{question_#{q[:id]}_#{variable_id}}}' />")
-      end
-      q[:original_question_text] = q[:question_text]
-      q[:question_text] = text
-    elsif q[:question_type] == 'multiple_dropdowns_question'
-      text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
-      variables.each do |variable|
-        variable_id = ::AssessmentQuestion.variable_id(variable)
-        variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
-        options = variable_answers.map { |a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
-        select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>#{ERB::Util.h(t('#quizzes.quiz.default_question_input', "[ Select ]"))}</option>#{options}</select>"
-        re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, select)
-      end
-      q[:original_question_text] = q[:question_text]
-      q[:question_text] = text
-      # on equation questions, pick one of the formulas, plug it in
-      # and you should be able to treat it like a numerical_answer
-      # question for all intents and purposes
-    elsif q[:question_type] == 'calculated_question'
-      text = q[:question_text]
-      q[:answers] = [q[:answers].sort_by { |a| rand }.first].compact
-      if q[:answers].first
-        q[:answers].first[:variables].each do |variable|
-          re = Regexp.new("\\[#{variable[:name]}\\]")
-          text = text.gsub(re, variable[:value].to_s)
-        end
-      end
-      q[:question_text] = text
-    end
-    q[:question_name] = q[:name]
-    q
-  end
-
-  def build_user_questions(preview)
-    user_questions = []
-    @submission_question_index = 0
-    @stored_questions = nil
-    submission_questions = self.stored_questions
-    if preview
-      submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
-    end
-
-    exclude_ids = submission_questions.map { |q| q[:assessment_question_id] }.compact
-    submission_questions.each do |q|
-      # pulling from question group
-      if q[:pick_count]
-
-        # pulling from question bank
-        if q[:assessment_question_bank_id]
-          bank = ::AssessmentQuestionBank.where(id: q[:assessment_question_bank_id]).first if q[:assessment_question_bank_id].present?
-          if bank
-            questions = bank.select_for_submission(q[:pick_count], exclude_ids)
-            exclude_ids.concat(questions.map {|q| q.id })
-
-            questions = questions.map { |aq| aq.data }
-            questions.each do |question|
-              if question[:answers]
-                question[:answers] = prepare_answers(question)
-                question[:matches] = prepare_matches(question) if question[:matches]
-              end
-              question[:points_possible] = q[:question_points]
-              question[:published_at] = q[:published_at]
-              user_questions << generate_submission_question(question)
-            end
-          end
-
-        # a group with questions
-        else
-          questions = q[:questions].shuffle.slice(0, q[:pick_count])
-          questions.each do |question|
-            question[:points_possible] = q[:question_points]
-            user_questions << generate_submission_question(question)
-          end
-        end
-
-      # just a question
-      else
-        user_questions << generate_submission_question(q)
-      end
-    end
-
-    user_questions
   end
 
   def build_submission_end_at(submission)
@@ -759,12 +620,21 @@ class Quizzes::Quiz < ActiveRecord::Base
     submission = nil
 
     transaction do
+      builder = Quizzes::QuizQuestionBuilder.new({
+        shuffle_answers: self.shuffle_answers
+      })
+
       submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
       submission.retake
       submission.attempt = (submission.attempt + 1) rescue 1
       submission.score = nil
       submission.fudge_points = nil
-      submission.quiz_data = build_user_questions(preview)
+
+      submission.quiz_data = begin
+        @stored_questions = nil
+        builder.build_submission_questions(self.id, self.stored_questions(preview))
+      end
+
       submission.quiz_version = self.version_number
       submission.started_at = ::Time.now
       submission.score_before_regrade = nil
@@ -773,6 +643,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       submission.submission_data = {}
       submission.workflow_state = 'preview' if preview
       submission.was_preview = preview
+      submission.question_references_fixed = true
 
       if preview || submission.untaken?
         submission.save!
@@ -795,24 +666,6 @@ class Quizzes::Quiz < ActiveRecord::Base
                end
 
     generate_submission quiz_participant.send(identity), false
-  end
-
-  def prepare_answers(question)
-    if answers = question[:answers]
-      if shuffle_answers && Quizzes::Quiz.shuffleable_question_type?(question[:question_type])
-        answers.sort_by { |a| rand }
-      else
-        answers
-      end
-    end
-  end
-
-  def prepare_matches(question)
-    if matches = question[:matches]
-      # question matches should always be shuffled, regardless of the
-      # shuffle_answers option
-      matches.sort_by { |m| rand }
-    end
   end
 
   # Takes the PRE-SAVED version of the quiz and uses it to generate a

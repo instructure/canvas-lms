@@ -82,7 +82,7 @@ describe Quizzes::QuizRegrader::Submission do
   describe "#rescored_submission" do
     before do
       regraded_quiz_data = question_regrades.map do |key, qr|
-        Quizzes::Quiz.decorate_question_for_submission({
+        Quizzes::QuizQuestionBuilder.decorate_question_for_submission({
           id: key,
           points_possible: question_group.question_points
         }, key)

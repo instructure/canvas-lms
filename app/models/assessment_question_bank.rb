@@ -121,10 +121,13 @@ class AssessmentQuestionBank < ActiveRecord::Base
     user && self.assessment_question_bank_users.where(user_id: user).exists?
   end
 
-  def select_for_submission(count, exclude_ids=[])
+  def select_for_submission(quiz_id, count, exclude_ids=[], exclude_qq_ids=[])
     ids = self.assessment_questions.active.pluck(:id)
     ids = (ids - exclude_ids).shuffle[0...count]
-    ids.empty? ? [] : AssessmentQuestion.where(id: ids).shuffle
+    questions = ids.empty? ? [] : AssessmentQuestion.where(id: ids).shuffle
+    questions.map do |aq|
+      aq.find_or_create_quiz_question(quiz_id, exclude_qq_ids)
+    end
   end
 
   alias_method :destroy!, :destroy

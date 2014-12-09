@@ -634,34 +634,6 @@ describe Quizzes::Quiz do
     end
   end
 
-  describe "#build_user_question" do
-    it "should not duplicate questions from a bank" do
-      course_with_student
-
-      # create single bank
-      @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-      @bank.assessment_questions.create!(:question_data => {'name' => 'Group Question 1', :question_type=>'essay_question', :question_text=>'gq1', 'answers' => []})
-
-      @quiz = @course.quizzes.create!(:title => "i'm tired quiz")
-
-      # both groups pull from the same bank
-      @group1 = @quiz.quiz_groups.create!(:name => "question group a", :pick_count => 1, :question_points => 5.0)
-      @group1.assessment_question_bank = @bank
-      @group1.save!
-
-      @group2 = @quiz.quiz_groups.create!(:name => "question group b", :pick_count => 1, :question_points => 5.0)
-      @group2.assessment_question_bank = @bank
-      @group2.save!
-
-      @quiz.generate_quiz_data
-      @quiz.save!
-      @quiz.reload
-
-      # building questions should never grab the same question from the bank
-      expect(@quiz.build_user_questions(false).length).to eq 1
-    end
-  end
-
   it "should return a default title if the quiz is untitled" do
     q = @course.quizzes.create!
     expect(q.quiz_title).to eql("Unnamed Quiz")
@@ -737,8 +709,11 @@ describe Quizzes::Quiz do
 
     it "should create a submission" do
       submission = @quiz.generate_submission(@user)
-      expect(submission.quiz_data.length).to eq 3
+      expect(submission.quiz_data.length).to eq 4
       texts = submission.quiz_data.map{|q|q[:question_text]}
+      # one of the bank questions should be duplicated, since the group
+      # pick count is 3 and the bank only has 2 questions:
+      expect(texts.uniq.count).to eq(3)
       expect(texts.member?('gq1')).to be_truthy
       expect(texts.member?('gq2')).to be_truthy
       expect(texts.member?('qq1')).to be_truthy
@@ -754,6 +729,7 @@ describe Quizzes::Quiz do
       linked_question = @quiz.quiz_questions.build(:question_data => questions[0].question_data)
       linked_question.assessment_question_id = questions[0].id
       linked_question.save!
+      @group.update_attribute(:pick_count, 1)
       @quiz.generate_quiz_data
       @quiz.save!
       @quiz.reload
@@ -825,61 +801,6 @@ describe Quizzes::Quiz do
     it { is_expected.to include "matching_question" }
     it { is_expected.to include "fill_in_multiple_blanks_question" }
     it { is_expected.not_to include "multiple_choice_question" }
-  end
-
-  describe "prepare_answers" do
-    let(:quiz) { Quizzes::Quiz.new }
-    let(:question) { { :answers => answers } }
-    let(:answers) { ['a', 'b', 'c'] }
-
-    context "on a shuffle answers question" do
-      before { quiz.stubs(:shuffle_answers).returns(true) }
-
-      context "on a non-shuffleable question type" do
-        before { Quizzes::Quiz.stubs(:shuffleable_question_type?).returns(false) }
-
-        it "doesn't shuffle" do
-          expect(quiz.prepare_answers(question)).to eq answers
-        end
-      end
-
-      context "on a shuffleable question type" do
-        before { Quizzes::Quiz.stubs(:shuffleable_question_type?).returns(true) }
-
-        it "returns the same answers, not necessarily in the same order" do
-          expect(quiz.prepare_answers(question).sort).to eq answers.sort
-        end
-
-        it "shuffles" do
-          answers.expects(:sort_by)
-          quiz.prepare_answers(question)
-        end
-      end
-    end
-
-    context "on a non-shuffle answers question" do
-      it "doesn't shuffle" do
-        expect(quiz.prepare_answers(question)).to eq answers
-      end
-    end
-  end
-
-  describe "prepare_matches" do
-    let(:quiz) { Quizzes::Quiz.new }
-    let(:question) { { :matches => matches } }
-    let(:matches) { ['a', 'b', 'c'] }
-
-    it "shuffles matches for a matching question" do
-      quiz.stubs(:shuffle_answers).returns(true)
-      matches.expects(:sort_by)
-      quiz.prepare_matches(question)
-    end
-
-    it "still shuffles even if shuffle_answers option is off" do
-      quiz.stubs(:shuffle_answers).returns(false)
-      matches.expects(:sort_by)
-      quiz.prepare_matches(question)
-    end
   end
 
   describe "shuffleable_question_type?" do

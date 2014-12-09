@@ -24,6 +24,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   include Workflow
+
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
   attr_accessor :grader_id
@@ -863,5 +864,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     participant.anonymous? ?
         where(temporary_user_code: participant.user_code) :
         where(user_id: participant.user.id)
+  end
+
+  def ensure_question_reference_integrity!
+    fixer = ::Quizzes::QuizSubmission::QuestionReferenceDataFixer.new
+    fixer.run!(self)
   end
 end

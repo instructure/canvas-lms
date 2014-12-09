@@ -42,6 +42,7 @@ module Filters::QuizSubmissions
       raise ActiveRecord::RecordNotFound.new('Quiz Submission not found')
     end
 
+    @quiz_submission.ensure_question_reference_integrity!
     @quiz_submission
   end
 
