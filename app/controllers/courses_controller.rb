@@ -1427,6 +1427,43 @@ class CoursesController < ApplicationController
 
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
 
+      # Course Wizard JS Info
+      js_env({:COURSE_WIZARD => {
+          :just_saved =>  @context_just_saved,
+          :checklist_states => {
+            :import_step => @context.attachments.active.first.nil?,
+            :assignment_step => @context.assignments.active.first.nil?,
+            :add_student_step => @context.students.first.nil?,
+            :navigation_step => @context.tab_configuration.empty?,
+            :home_page_step => true, # The current wizard just always marks this as complete.
+            :calendar_event_step => @context.calendar_events.active.first.nil?,
+            :add_ta_step => @context.tas.empty?,
+            :publish_step => @context.workflow_state === "available"
+          },
+          :urls => {
+            :content_import => context_url(@context, :context_content_migrations_url),
+            :add_assignments => context_url(@context, :context_assignments_url, :wizard => 1),
+            :add_students => course_users_path(course_id: @context),
+            :add_files => context_url(@context, :context_files_url, :wizard => 1),
+            :select_navigation => context_url(@context, :context_details_url),
+            :course_calendar => calendar_path(:wizard => 1),
+            :add_tas => course_users_path(:course_id => @context),
+            :publish_course => course_path(@context)
+          },
+          :permisssions => {
+            # Sending the permissions just so maybe later we can extract this easier.
+            :can_manage_content => can_do(@context, @current_user, :manage_content),
+            :can_manage_students => can_do(@context, @current_user, :manage_students),
+            :can_manage_assignments => can_do(@context, @current_user, :manage_assignments),
+            :can_manage_files => can_do(@context, @current_user, :manage_files),
+            :can_update => can_do(@context, @current_user, :update),
+            :can_manage_calendar => can_do(@context, @current_user, :manage_calendar),
+            :can_manage_admin_users => can_do(@context, @current_user, :manage_admin_users),
+            :can_change_course_state => can_do(@context, @current_user, :change_course_state)
+          }
+        }
+      })
+
       # make sure the wiki front page exists
       if @course_home_view == 'wiki'
         @context.wiki.check_has_front_page

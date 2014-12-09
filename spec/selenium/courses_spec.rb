@@ -81,9 +81,9 @@ describe "courses" do
 
       create_new_course
 
-      wizard_box = f("#wizard_box")
+      wizard_box = f(".ic-wizard-box")
       keep_trying_until { expect(wizard_box).to be_displayed }
-      hover_and_click(".close_wizard_link")
+      hover_and_click(".ic-wizard-box__close a")
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
@@ -97,7 +97,7 @@ describe "courses" do
     it "should open and close wizard after initial close" do
       def find_wizard_box
         wizard_box = keep_trying_until do
-          wizard_box = f("#wizard_box")
+          wizard_box = f(".ic-wizard-box")
           expect(wizard_box).to be_displayed
           wizard_box
         end
@@ -109,19 +109,34 @@ describe "courses" do
 
       wait_for_ajaximations
       wizard_box = find_wizard_box
-      hover_and_click(".close_wizard_link")
+      f(".ic-wizard-box__close a").click
       wait_for_ajaximations
-      expect(wizard_box).not_to be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
       checklist_button = f('.wizard_popup_link')
       expect(checklist_button).to be_displayed
       checklist_button.click
       wait_for_ajaximations
-      expect(checklist_button).not_to be_displayed
       wizard_box = find_wizard_box
-      hover_and_click(".close_wizard_link")
+      f(".ic-wizard-box__close a").click
       wait_for_ajaximations
-      expect(wizard_box).not_to be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
       expect(checklist_button).to be_displayed
+    end
+
+    it "should open up the choose home page dialog from the wizard" do
+      course_with_teacher_logged_in
+      create_new_course
+
+      wizard_box = f(".ic-wizard-box")
+      keep_trying_until { expect(wizard_box).to be_displayed }
+
+      f("#wizard_home_page").click
+      f(".ic-wizard-box__message-button a").click
+      wait_for_ajaximations
+      modal = f("#edit_course_home_content_form")
+      expect(modal).to be_displayed
     end
 
     it "should correctly update the course quota" do

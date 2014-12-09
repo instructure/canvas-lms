@@ -16,6 +16,8 @@ compress_assets: off
 
 
 stylesheets:
+  course_wizard:
+    - public/stylesheets/compiled/pages/course_wizard/compiler-course_wizard.css
   react_files:
     - public/stylesheets/compiled/pages/react_files/compiler-react_files.css
   instructure_eportfolio:
