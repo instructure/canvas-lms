@@ -1240,6 +1240,7 @@ class Course < ActiveRecord::Base
 
   def account_chain
     @account_chain ||= Account.account_chain(account_id)
+    @account_chain.dup
   end
 
   def institution_name
