@@ -13,17 +13,21 @@
   border-bottom: 1px solid #ddd
 
   .title
-    font-weight: bold
+    font-weight: normal
 
   .links
     font-size: 11px
 
   .unread-count
+    display: block
+    background: $canvas-primary
+    border-radius: 15px
+    width: 10px
+    height: 10px
     position: absolute
-    left: 36px
-    top: 3px
-    +count-bubble
-    padding: 0 6px
+    left: 3px
+    top: 22px
+    padding: 0   
 
   .accessibly-hidden
     position: absolute
@@ -33,10 +37,7 @@
     width: 10px
     height: 10px
     margin-left: -15px
-    @if $use_high_contrast
-      background-color: $canvas-primary
-    @else
-      background-color: darken($canvas-primary, 10%)
+    background-color: $canvas-primary
     border-radius: 5px
 
 .stream_header
@@ -127,7 +128,8 @@ $ignore-col-width: 50px
 $dashboardIconSize: 32px
 .recent_activity .image-block-image
   width: $dashboardIconSize
-  margin-right: 20px
+  margin-right: 10px
+  margin-left: 10px
 
 .recent_activity .image-block-image i
   height: $dashboardIconSize
