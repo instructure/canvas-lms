@@ -1,0 +1,51 @@
+postgres:
+  image: postgres:9.3
+
+redis:
+  image: redis:2.6
+
+selenium:
+  build: ./docker-compose/seleniumff
+  ports:
+    - "5900:5900"
+
+web:
+  build: ./docker-compose
+  command: bundle exec bin/rails s
+  ports:
+    - "3000:3000"
+  volumes:
+    - ".:/app"
+  links:
+    - postgres
+    - redis
+    - selenium
+  environment:
+    RACK_ENV: development
+    VIRTUAL_HOST: canvas.docker
+
+jobs:
+  build: ./docker-compose
+  command: bundle exec script/delayed_job run
+  volumes:
+    - ".:/app"
+  links:
+    - postgres
+    - redis
+  environment:
+    RACK_ENV: development
+
+# guard is turbo-slow because it relies on polling to see updates
+# (because the volume is shared over NFS, so no inotify stuff.)
+# This probably isn't a good solution for you if you're doing lots
+# of js/css development. It may take minutes for changes to be
+# reflected.
+guard:
+  build: ./docker-compose
+  command: bundle exec guard -i -p
+  ports:
+    - "4000:4000"
+  volumes:
+    - ".:/app"
+  environment:
+    RACK_ENV: development

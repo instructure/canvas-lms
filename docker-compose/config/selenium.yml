@@ -1,0 +1,4 @@
+test:
+  host: selenium
+  port: 4444
+  browser: "firefox"
