@@ -38,4 +38,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.playbook = "provision/vagrant.yml"
   end
 
+  config.vm.provision :shell, :inline => "sudo service canvas_init start && sudo service apache2 restart", run: "always"
+
 end
