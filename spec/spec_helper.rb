@@ -690,8 +690,9 @@ RSpec.configure do |config|
     @course.reload
   end
 
-  def multiple_student_enrollment(user, section)
-    @enrollment = @course.enroll_student(user,
+  def multiple_student_enrollment(user, section, opts={})
+    course = opts[:course] || @course || course(opts)
+    @enrollment = course.enroll_student(user,
                                          :enrollment_state => "active",
                                          :section => section,
                                          :allow_multiple_enrollments => true)

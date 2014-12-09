@@ -107,7 +107,9 @@ module Lti
       if @current_user && @context.is_a?(Course)
         substitutions.merge!(
               {
-                 '$Canvas.xapi.url' => -> { lti_xapi_url(Lti::XapiService.create_token(@tool, @current_user, @context)) }
+                 '$Canvas.xapi.url' => -> { lti_xapi_url(Lti::XapiService.create_token(@tool, @current_user, @context)) },
+                 '$Canvas.course.sectionIds' => -> { lti_helper.section_ids },
+                 '$Canvas.course.sectionSisSourceIds' => -> { lti_helper.section_sis_ids }
               }
         )
       end

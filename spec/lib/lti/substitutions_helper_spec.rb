@@ -346,5 +346,31 @@ module Lti
       end
     end
 
+    describe "section substitutions" do
+      before do
+        course.save!
+        @sec1 = course.course_sections.create(:name => 'sec1')
+        @sec1.sis_source_id = 'def'
+        @sec1.save!
+        @sec2 = course.course_sections.create!(:name => 'sec2')
+        @sec2.sis_source_id = 'abc'
+        @sec2.save!
+        # course.reload
+
+        user.save!
+        multiple_student_enrollment(user, @sec1, course: course)
+        multiple_student_enrollment(user, @sec2, course: course)
+      end
+
+      it "should return all canvas section ids" do
+        expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
+      end
+
+      it "should return all canvas section sis ids" do
+        expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(',')
+      end
+    end
+
+
   end
 end

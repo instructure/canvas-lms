@@ -106,6 +106,11 @@ module Lti
       @current_course_enrollments ||= @context.current_enrollments.where(user_id: @user.id)
     end
 
+    def course_sections
+      return [] unless @context.is_a?(Course) && @user
+      @current_course_sections ||= @context.course_sections.where(id: course_enrollments.map(&:course_section_id)).select("id, sis_source_id")
+    end
+
     def account_enrollments
       unless @current_account_enrollments
         @current_account_enrollments = []
@@ -146,6 +151,14 @@ module Lti
 
     def previous_course_ids
       previous_course_ids_and_context_ids.map(&:id).sort.join(',')
+    end
+
+    def section_ids
+      course_enrollments.map(&:course_section_id).uniq.sort.join(',')
+    end
+
+    def section_sis_ids
+      course_sections.map(&:sis_source_id).compact.uniq.sort.join(',')
     end
 
     private
