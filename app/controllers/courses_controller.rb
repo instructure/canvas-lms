@@ -1890,7 +1890,7 @@ class CoursesController < ApplicationController
         @course.attributes = params[:course]
         changes = changed_settings(@course.changes, @course.settings, old_settings)
 
-        if !@course.changed? || @course.save
+        if params[:for_reload] || @course.save
           Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
           @current_user.touch
           if params[:update_default_pages]
