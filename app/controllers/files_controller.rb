@@ -166,9 +166,6 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
-    # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
-    return react_files if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
-
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
@@ -205,6 +202,8 @@ class FilesController < ApplicationController
         end
       end
     else
+      # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
+      return react_files if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
       full_index
     end
   end
