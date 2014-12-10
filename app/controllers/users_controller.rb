@@ -626,6 +626,7 @@ class UsersController < ApplicationController
     @courses = @query.present? ?
       @context.manageable_courses_name_like(@query, include_concluded) :
       @context.manageable_courses(include_concluded).limit(500)
+    @courses = @courses.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key')
 
     cancel_cache_buster
     expires_in 30.minutes
