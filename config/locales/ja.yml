@@ -1351,12 +1351,11 @@ ja:
       podcast_title_course: "コース アナウンスのポッドキャスト フィード"
       podcast_title_group: "グループ アナウンスのポッドキャスト フィード"
     index_view: 
+      announcement_fb4cb645: アナウンス
       announcements_title: アナウンス
       delete: 削除
       loading: 読み込んでいます...
       lock_for_comments: コメントのロック
-      make_an_announcement: アナウンスの作成
-      make_an_announcement_caps: アナウンスの作成
       make_sure_all_search_terms_are_spelled_correctly: すべての検索条件について誤入力がないことを確認してください。
       rss_feed: "RSS フィード"
       search_title_body_or_author: タイトル、本文、または作成者を検索する
@@ -1427,8 +1426,10 @@ ja:
     invalid_participants: "少なくとも 1 人のユーザの参加を許可する必要があります"
     title: "%{name} の編集"
     update: 更新
+  archive_3f794d7e: アーカイブ
   aria_labels: 
     unlock_at_date: ロック解除日付
+  as_you_type_in_this_field_the_list_of_groups_will__16688a5f: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
   assessment_question: 
     default_question_name: 問題
   assessment_question_bank: 
@@ -1512,6 +1513,7 @@ ja:
     unmute_button: 課題のミュート解除
     unmute_dialog: この課題は現在ミュートになっています。つまり、受講生は成績やフィードバックを見ることができません。今すぐミュートを解除しますか?
     unmuting_assignment: 課題のミュートを解除しています...
+  assignment_name_b2d87383: 課題名
   assignments: 
     add_assignment_form: 
       assignment_name: 課題名
@@ -1757,7 +1759,6 @@ ja:
       notify_content_change: この内容が変更になったことをユーザに通知する
       only_visible_to_overrides_note: "注: この課題は、以下の指定されたセクションに*のみ*表示されます。"
       points_possible: 点数
-      post_to_sis: "SIS に投稿"
       warnings: 
         assignment_is_frozen: 一部の設定は管理上の理由でロックされています。
     errors: 
@@ -1979,6 +1980,8 @@ ja:
       reviews_per_user: ユーザごとのレビュー
     points_possible_number: 配点は数値で入力してください
     positive_number: 正の数字を使用する必要があります
+    post_to_sis_selector: 
+      post_grades_to_sis_97ece878: "成績表を SIS に投稿"
     redirect_page: 
       redirect_message: |-
           この提出物は URL でした。今からその URL リンクにお連れします。  
@@ -2250,6 +2253,7 @@ ja:
     corrupted: 詳細なし
     login: ログイン
     logout: ログアウト
+  available_from_587ce92f: 次から使用可能
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 から .zip ファイルをエクスポート"
   bb_name: "Blackboard コンバータ"
@@ -2272,7 +2276,6 @@ ja:
       published: 公開済み
       unpublished: 未公開
     published_title: 公開済み
-    restricted_title: "%{from_date} から %{until_date} まで利用できます"
     title: 
       permissions: "編集権限: %{name}"
     unpublished_title: 未公開
@@ -2335,8 +2338,6 @@ ja:
       user_name_description: "その行のコースへの講師/設計者アクセス権を持つユーザのユーザ名です。このユーザ名は、上記の Blackboard ログイン資格情報リストに含まれているユーザ名のいずれかに一致する必要があります。"
     only_one_bulk_migration: "一括コース移行は一度に 1 つずつしか実行できません。"
   button: 
-    go_back: 戻る
-    post: 成績の投稿
     submit_assignment: 課題の提出
   buttons: 
     add_item: アイテムの追加
@@ -2350,7 +2351,6 @@ ja:
     done: 完了
     filter: フィルタ
     find_user: ユーザの検索
-    ignore_all: すべてを無視
     import: インポート
     login: ログイン
     manage_rubrics: 注釈の管理
@@ -2856,6 +2856,7 @@ ja:
         create_assignment: 新しい課題の作成
         delete: イベント/課題の削除
         new: 新しいイベントの作成
+  cancel_caeb1e68: キャンセル
   canvas: 
     migration: 
       errors: 
@@ -3989,6 +3990,7 @@ ja:
       tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
   context_modules_api: 
     invalid_position: 無効な場所
+  continue_ac067716: 続行
   conversation_dialog: 
     errors: 
       field_is_required: このフィールドは必須項目です
@@ -4361,6 +4363,7 @@ ja:
       uuid: UUID
       wiki_id: "Wiki ID"
       workflow_state: ワークフロー状態
+  course_members_are_free_to_join_9b2603d4: "コース メンバーは自由に参加できる"
   course_restore: 
     restore_error: コースを復元する際にエラーが発生しました。コースは復元されませんでした。
   course_search: 
@@ -4378,8 +4381,6 @@ ja:
       delete_section: このセクションを削除してもよろしいですか?
       publish_grades: これらの成績表を受講生情報システムに公開してもよろしいですか?この操作は、すべての採点が完了してから行ってください。
       re_publish_grades: これらの成績表を受講生情報システムに再公開してもよろしいですか?
-    course_dates_enforced: ユーザは次の期間のコースにのみ参加できます
-    course_dates_unenforced: これらの日付はコースの可用性に影響を及ぼしません
     edit_sections_placeholder: セクション名を入力する
     edit_sections_title: セクション名
     errors: 
@@ -4394,9 +4395,6 @@ ja:
       links: 受講生リンクは正常に更新されました
       sectionError: ユーザのセクションを更新する際に、問題が発生しました。後でもう一度、試してください。
       sections: セクションの登録は正常に更新されました
-    grading_standard_set: 現在設定されています
-    grading_standard_unset: 設定されていません
-    indexed_course: "公開コース インデックスに含まれます"
     invitation_sent: 招待が送信されました!
     invitation_sent_now: 今すぐ
     link_students_placeholder: 受講生名を入力する
@@ -4408,8 +4406,6 @@ ja:
       re_send_all: 受諾されていない招待をすべて再送信
       re_sending_invitation: 招待を再送信しています...
       republish: "成績表を SIS に再公開"
-    private_course: 非公開
-    public_course: 公開
     re_send_invitation: 招待の再送信
     remove_user_from_course_section: "%{course_section} からユーザを削除"
     titles: 
@@ -4891,7 +4887,6 @@ ja:
           assignments: 課題リスト
           custom_page: "ページ/トップ ページ"
           modules: "コース モジュール"
-          recent_activity_dashboard: "最近のアクティビティ ダッシュボード"
           syllabus: 要綱
       empty_body: コンテンツなし
       front_page_not_set: "トップ ページを最初に設定する必要があります"
@@ -5396,7 +5391,6 @@ ja:
         other: "これは採点済みのディスカッションです:  *配点 %{count}*"
       show_due_dates: 期日の表示
       until: 次の日時まで
-    cannot_unpublish_with_replies: 返信がある場合は公開を中止できません
     confirm_delete_announcement: 
       one: "この %{count} 個のアナウンスを削除してもよろしいですか?"
       other: "この %{count} 個のアナウンスを削除してもよろしいですか?"
@@ -5615,7 +5609,6 @@ ja:
       go_to_topic: トピックに移動
       manage_discussion_entry: "ディスカッション エントリの管理"
       open_in_speedgrader: "SpeedGrader で開く"
-      unknown_author: 不明な作成者
       write_a_reply: 返信
     entry_stats: 
       show_more: 詳細
@@ -5669,6 +5662,7 @@ ja:
       することができます。この状態では、コンテンツは受講生に表示されず、成績の計算からも除外され
       ます。注意: この機能を無効にすると、新しく作成または編集されたコンテンツが講師のビューに
       表示されなくなる可能性があります。
+  due_date_822625d8: 期日
   due_dates: 
     due_at: "期限: %{assignment_due_date_time}"
     multiple_due_dates: "期限: 複数の期日"
@@ -5697,7 +5691,6 @@ ja:
   edit_survey_b0d6890d: サーベイの編集
   editor: 
     alt_text: "代替テキスト:"
-    based_on_type: "%{base_type} を基にする"
     button: 
       insert_equation: 方程式の挿入
     cancel: キャンセル
@@ -5720,9 +5713,7 @@ ja:
     loading: 読み込んでいます...
     mathjax_text_entry_field_label: "方程式を LaTeX として入力します。"
     more_external_tools: その他の外部ツール
-    role: 
-      duplicate_role_error: 同じ名前の役割が既に存在するため、この役割は作成できませんでした。別の名前を試してください
-      remove_role_confirmation: "この役割のユーザが存在する場合、そのユーザは現在の権限を維持しますが、この役割で新しいユーザを作成することはできません。この役割の削除を続行するには、[OK] をクリックしてください。"
+    no_name_error: 名前が必要です
     save_failed: 保存に失敗しました。後でもう一度試してください
     saving: 保存しています...
     screen_reader_tip: "スクリーン リーダーのユーザ: スクリーン リーダーを利用しているユーザがこのエディタを使用するには、詳細ビューに切り替えてから、LaTeX を直接入力するか、またはツールバーの LaTeX 入力支援機能を使用します。詳細ビューに切り替えるためのリンクは、このダイアログの末尾近くの編集フィールドの直前にあります。"
@@ -6046,6 +6037,7 @@ ja:
       submissions: 
         body1: "このページの最下部に、ご自分のクラスからの最近の提出物のリストが表示されていることに、既にお気付きかもしれません (%{showme})。ポートフォリオの新しいページへの課題追加も、このページから素早く行うことができます。追加する提出物をクリックすると、シンプルなダイアログがポップアップ表示されます。"
         body2: "OK です!それでは、課題の追加を完成させましょう。課題を追加するセクションを選び、そのページに名前を付ける必要があります。\"ページの追加\" をクリックすると、新しいページに移動します。必要であれば、より詳しく編集できます。"
+  error_deleting_name_reason_11f9d399: "%{name} の削除時にエラーが発生しました: %{reason}"
   error_message_2b9d12ee: "エラー: %{message}"
   error_uploading_file_e2d31b56: ファイルのアップロードでエラーが発生しました。
   errors: 
@@ -6093,6 +6085,7 @@ ja:
     sis_id_in_use: "SIS ID \"%{sis_id}\" は既に使用されています"
     unsaved_changes: 未保存の変更内容があります。
     wrong_file_extension: "選択した拡張子 \"%{extension}\" のファイルは、提出が許可されていません"
+  everyone_854554dd: 全員
   external_content: 
     cancel: 
       canceling: 取り消しています...
@@ -6325,22 +6318,21 @@ ja:
     post_grades: "成績表を SIS に投稿"
     student_groups: "新しい受講生グループ ページ"
     student_outcome_gradebook: 受講生の学習達成度の成績表
-  file_browser_view: 
-    folder_tree_instructions: "上および下矢印キーを使用して、ツリー内をナビゲートします。フォルダを展開するには右方向キーを、折りたたむには左方向キーを、選択中のアイテムを選択するには Enter キーを押します。"
   file_preview: 
     file_preview_headerbutton_close: 閉じる
     file_preview_headerbutton_download: ダウンロード
     file_preview_headerbutton_info: 情報
-    file_preview_hide: 非表示
     file_preview_infotable_datecreated: 作成日
     file_preview_infotable_datemodified: 変更日
     file_preview_infotable_kind: 種類
-    file_preview_infotable_modifiedby: 変更者
     file_preview_infotable_name: 名前
     file_preview_infotable_size: サイズ
     file_preview_infotable_status: 状況
-    file_preview_show: 表示
   file_previews: 
+    lock_explanation: 
+      messages: 
+        file_locked: このファイルはまだロック解除されていません。
+        folder_locked: "このファイルが含まれているフォルダ  \"%{folder}\" は、ロックされています。"
     no_preview: 
       file_previews: 
         download_file: "*ファイル名* のダウンロード"
@@ -6359,10 +6351,6 @@ ja:
     published_status: 公開済み
     restricted_status: "%{from_date} から %{until_date} まで利用できます"
     unpublished_status: 未公開
-  filebrowserview: 
-    course_files: "コース ファイル"
-    group_files: "グループ ファイル"
-    my_files: "マイ ファイル"
   files: 
     alts: 
       file: ファイル
@@ -6536,10 +6524,8 @@ ja:
       no_rubric_outcomes_found: 注釈の設定された成果が見つかりません
     titles: 
       find_outcome: 成果の検索
-      find_outcome_criterion: 成果の検索条件
   folder: 
     course_content_folder_name: コースの内容
-    default_folder_name: フォルダ
     errors: 
       invalid_recursion: フォルダをそれ自体の親にすることはできません
       invalid_root_folder_name: "ルート フォルダ名は変更できません"
@@ -6918,7 +6904,6 @@ ja:
       individual_view: 個別ビューに切り替え
       learning_mastery: 学習の達成度
       page_header_title: 成績表
-      post_grades: 成績表の投稿
       publish_to_sis: "成績表を SIS に公開"
       set_group_weights: グループの重み付けの設定
       show_attendance_columns: 出席者列の表示
@@ -6974,7 +6959,6 @@ ja:
       headers: 
         anonymous_submission: この課題は匿名なので、この受講生の応答は表示されません。
         assessment: アセスメント
-        discussion: ディスカッション
         grading: 採点
         no_group_submission: このグループは、この課題に対する提出物を持っていません
         no_submission: この受講生は、この課題に対する提出物を持っていません
@@ -7127,6 +7111,7 @@ ja:
       home: ホーム
       pages: ページ
       people: メンバー
+  group_a8f5ed9c: グループ
   group_categories: 
     notices: 
       create_category_success: カテゴリは正常に作成されました。
@@ -7148,10 +7133,13 @@ ja:
     name_unavailable: "%{name} は既に使用されています。"
     self_signup_for_courses: "セルフ サインアップは、コース グループまたはコミュニティに対してのみ有効化できます"
   group_category_locked: "受講生がこの課題に対して既に提出を完了しているため、グループ カテゴリを変更できません"
+  group_is_full_56849d78: グループは満員です
   group_membership: 
     errors: 
       group_full: グループに空きがありません。
       not_in_group_section: "%{student} は、%{group} の他のメンバーと、どのセクションも共有していません。"
+  group_name_b69c144: グループ名
+  group_name_is_required_5547bc0b: グループ名が必要です
   group_settings: 
     invitation_sent: 招待が送信されました
   groups: 
@@ -7430,6 +7418,7 @@ ja:
       group_users: 
         add_student: 最初に、受講生を追加します。
         add_user: 最初に、ユーザを追加します。
+        greater_than_three: "検索語を 3 文字以上で入力してください"
         no_matching_students: 一致する受講生はいません。
         no_matching_users: 一致するユーザはいません。
         no_students: 現在このグループには受講生がいません。
@@ -7485,6 +7474,7 @@ ja:
       self_signup_help: "セルフ サインアップ グループ"
     unassigned_students: "未割り当ての受講生 (%{count})"
     unassigned_users: "未割り当てのユーザ (%{count})"
+  groups_6c90e26a: グループ
   help_dialog: 
     Back: 戻る
     Help: ヘルプ
@@ -7562,6 +7552,7 @@ ja:
   html5_first_videos_description: |-
       Canvas は、デフォルトでは Flash を優先的に使用してビデオの再生を試みます。HTML5 を優先して使用し、
       その後に Flash での再生を試みる場合は、この設定を有効にします。
+  html_editor_fb2ab713: "HTML エディタ"
   ic_actions: 
     manage: 管理
   icons: 
@@ -7571,6 +7562,7 @@ ja:
     online_url_submission: "オンライン URL の提出"
     quiz_submission: クイズの提出
     text_entry_submission: テキスト入力での提出
+  image_8ad06: 画像
   images: 
     error_checking_color: 画像の色の確認でエラーが発生しました
     invalid_background_color: "背景色は %{color} にする必要があります"
@@ -7681,6 +7673,7 @@ ja:
   invalid_points_possible: "この課題の配点の値は、0 以上であることが必要です。"
   invalid_url_in_xml: "xml 内の url が無効です。アンパサンドはエスケープする必要があります。"
   invalid_xml_syntax: "無効な XML 構文"
+  invite_5b1fcbcd: 招待する
   jobs: 
     columns: 
       attempt: 試行
@@ -7738,6 +7731,9 @@ ja:
     titles: 
       job_handler: "ジョブ ハンドラ"
       last_error: 最後のエラー
+  join_6cafecca: 参加
+  joined_group_group_name_e3802c04: "グループ %{group_name} に参加しました"
+  joining_81f8b6c9: 参加しています
   jquery: 
     module_sequence_footer: 
       next: 次へ
@@ -7785,6 +7781,8 @@ ja:
   learning_outcome: 
     no_comment: コメントなし
     no_description: 説明なし
+  leave_5e852989: 退出
+  left_group_group_name_aac4e813: "グループ %{group_name} を脱退しました"
   lib: 
     angel: 
       failed_import_link: リンクのインポートに失敗しました
@@ -7952,6 +7950,8 @@ ja:
     track_uploaded_successfully: トラックは正常にアップロードされました。ブラウザを更新してください。
     upload: アップロード
     uploading: アップロードしています...
+  members_af25c21d: メンバー
+  membership_by_invitation_only_9bc27199: 招待によるメンバーシップのみ
   menu: 
     current_groups: 現在のグループ
     customize: カスタマイズ
@@ -9666,26 +9666,6 @@ ja:
         subject: "新しいアセスメント: %{title}、%{context}"
       twitter: 
         tweet: "Canvas アラート - 新しいアセスメント: %{title}、%{context}"
-    self_enrollment_registration: 
-      email: 
-        body: |-
-            %{user} さん⏎
-             ⏎
-            Canvas ネットワークのコース「%{course}」へのセルフ登録に成功しました。⏎
-             ⏎
-            コースの他の受講者にあなたのことを知ってもらうために、Canvas ネットワーク プロフィールを設定してください。プロフィールは %{profile_url} で更新できます。⏎
-             ⏎
-            ご利用をお待ちしております。⏎
-             ⏎
-            Canvas ネットワーク
-        html: 
-          farewell: ご利用をお待ちしております。
-          greetings: "%{user} さん"
-          profile_reminder: "コースの他の受講者にあなたのことを知ってもらうために、*Canvas ネットワーク プロフィール* を設定してください。"
-          self_enrollment_confirmation: "Canvas ネットワークのコース「%{course}」へのセルフ登録に成功しました。"
-          self_enrollment_registration: "%{course} への登録"
-          signature: "Canvas ネットワーク"
-        self_enrollment_registration: "%{course} への登録"
     send_form: 
       labels: 
         message_body: メッセージ
@@ -10056,7 +10036,6 @@ ja:
       module: 
         prerequisites: コース受講前提条件
         published: 公開済み
-    post_grades_dialog_title: "成績表を SIS に投稿"
     progression_module_collection: 
       module_progress_for: "*%{student.name}* のモジュールの進捗"
       module_progress_for_student: "%{student.name} のモジュールの進捗"
@@ -10103,6 +10082,7 @@ ja:
     students_will_see: 受講生は、この課題がミュートになっていることを確認できます。
     submission_comments: 提出コメント
     sure_you_want_to_mute: "この課題をミュートにしてもよろしいですか?この課題がミュートになっている間、受講生は以下について表示できず、新しいお知らせも受信しません:"
+  n_a_d6f6c42f: N/A
   name: "Academic Benchmark インポーター"
   new_facebook_message: "Canvas からの新しいメッセージがあります"
   new_quiz_statistics_desc: コースの新しいクイズ統計ページを有効にします。
@@ -10382,6 +10362,7 @@ ja:
     new_observee_username: ユーザ名
     observee_added: "%{user} を監視しています"
     observing: 監視中
+  ok_c47544a2: OK
   options: 
     ? "no"
     : いいえ
@@ -10465,7 +10446,6 @@ ja:
     mastery_error: "0 以上にする必要があります"
     missing_outcome: その学習成果は見つかりませんでした
     near: ほぼ達成
-    new_outcome: 新しい成果
     new_outcome_group: 新しい成果グループ
     outcome: 
       links: 
@@ -10488,6 +10468,7 @@ ja:
       description: この成果を説明する
       display_name: "わかりやすい名前 (任意)"
       mastery: 熟達日時
+      new_outcome_7fba8c7d: 新しい成果
       points: "%{points_possible} 点"
       title: この成果の名前を指定
       total_points: 合計点
@@ -10537,18 +10518,14 @@ ja:
         latest_score: 直近のスコア
         outcome: 成果
   overrides: 
-    due_date_after_course_conclude: 期日はコース終了日よりも後には設定できません
-    due_date_before_course_start: 期日はコース開始日よりも前には設定できません
     everyone: 全員
     everyone_else: 他の全員
-    lock_date_after_course_end: ロック日はコース終了日よりも後には設定できません
     lock_date_before_due_date: ロック日を期日より前にすることはできません
     overrides: 
       everyone: 全員
       everyone_else: 他の全員
     unlock_date_after_due_date: ロック解除日を期日より後にすることはできません
     unlock_date_after_lock_date: ロック解除日をロック日より後にすることはできません
-    unlock_date_before_course_start: ロック解除日はコース開始日よりも前には設定できません
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -10851,9 +10828,6 @@ ja:
     qti_converter_settings: 
       labels: 
         enabled: 使用可能
-    registration_form_recaptcha: 
-      description: "登録フォーム用 CAPTCHA プラグイン"
-      name: "登録フォーム ReCAPTCHA"
     respondus_soap_endpoint: 
       description: "Respondus QTI アップロード用 SOAP エンドポイント"
       name: "Respondus の SOAP エンドポイント"
@@ -10933,10 +10907,12 @@ ja:
         poll_choice_belongs_to_poll: その投票の選択肢は、既存の投票に属していません。
         poll_is_published: この投票セッションは、提出を受付可能な状態ではありません。
         user_and_poll_session_uniqueness: "各投票セッションでは1 つの選択肢のみを送信できます。"
+  post_grades_39c52870: 成績表の投稿
   post_grades_description: |-
       講師は、成績の投稿を使用して、成績を対応する SIS システムに投稿できます。対応するシステムは、
       SIF 要素 GradingCategory、GradingAssignment、GradingAssignmentScore を受け入れる、
       Powerschool、Aspire (SIS2000)、JMC、その他の SIF 対応 SIS システムです。
+  post_grades_to_sis_97ece878: "成績表を SIS に投稿"
   practice_quiz_19a8505d: 練習クイズ
   prerequisites_lookup: 
     headers: 
@@ -11386,6 +11362,7 @@ ja:
       link_invalid: "ご利用になったリンクはもはや有効でないようです。ログインできない場合は、\"パスワードが分かりません\" をクリックして、パスワードをリセットしてください。"
       password_changed: パスワードが変更されました
   public_courses_title: 公開コース
+  public_domain_112ed397: 公有財産
   publish_btn_module: 
     buttons: 
       publish: 公開
@@ -11537,6 +11514,7 @@ ja:
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
   quiz_reports: 
+    cancel_generation: キャンセル
     download_item_analysis: アイテム分析レポートをダウンロードします。
     download_student_analysis: 受講生分析レポートをダウンロードします。
     generatable: レポートは生成されていません。
@@ -11548,6 +11526,7 @@ ja:
     generation_complete: レポートが生成されました。
     generation_halfway: "50% 以上完了しました。"
     generation_started: レポートを生成しています。
+    item_analysis: アイテム分析
     non_generatable_report_notice: "サーベイ クイズについてはレポートを生成できません。"
     quiz_report_generator: 
       download_report_name: "%{report_name} のダウンロード"
@@ -11555,6 +11534,7 @@ ja:
       generated_at_date_time: "作成日: %{dateAndTime}"
       generating_report_name: "%{report_name}を生成しています..."
       item_analysis_not_available: サーベイではアイテム分析は利用できません
+    student_analysis: 受講生分析
   quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: このクイズのクイズ結果は保護されており、受講生には表示されません。
   quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: このクイズのクイズ結果は保護されており、受講生が最後の試行を提出するまでは受講生に表示されません。
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "このクイズのクイズ結果は保護されており、提出直後に 1 回表示できます。"
@@ -12091,26 +12071,6 @@ ja:
         unnamed_survey_results: "%{user} のサーベイ結果"
       index: 
         page_titles: クイズ
-      index_legacy: 
-        buttons: 
-          publish_quizzes: クイズを公開
-        headers: 
-          assignment_quizzes: 課題クイズ
-          course_quizzes: "コース クイズ"
-          practice_quizzes: 練習クイズ
-          publish_multiple_quizzes: 複数のクイズの公開
-          surveys: サーベイ
-          unpublished_quizzes: 未公開のクイズ
-        labels: 
-          publish_multiple_quizzes: 今回公開するクイズを選択します
-        links: 
-          create_new_quiz: 新しいクイズの作成
-          manage_question_banks: 問題バンクの管理
-          publish_multiple_quizzes: 複数のクイズの公開
-        no_quizzes: 利用できるクイズがありません
-        page_titles: クイズ
-        titles: 
-          this_quiz_is_locked: このクイズは現在ロックされています。詳細を見るにはクリックしてください。
       invalid_ip: 
         quiz_protected: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
         survey_protected: このサーベイは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このサーベイに参加できる正当な場所ではないようです。
@@ -12239,6 +12199,7 @@ ja:
         one_time_results: 各試行の後一度のみ
         only_visible_to_overrides_note: "注: このクイズは以下の指定されたセクションに**のみ**表示されます。"
         points_possible: "点数 %{n}"
+        post_to_sis: "成績表を SIS に投稿"
         quiz_title: "クイズ タイトル"
         quiz_type: "クイズ タイプ"
         require_lockdown_browser: "Respondus LockDown Browser が必要"
@@ -12448,8 +12409,6 @@ ja:
         buttons: 
           lock_quiz: 今すぐこのクイズをロックする
           lock_survey: 今すぐこのサーベイをロックする
-          publish: 公開
-          republish: 再公開
           unlock_quiz: 今すぐ受講生にこのクイズを答えさせる
           unlock_survey: 今すぐ受講生にこのサーベイを答えさせる
         course_concluded_notice: コースが完了しているため、このクイズは利用できません。
@@ -12684,21 +12643,14 @@ ja:
     add_folder: フォルダの追加
     all_my_files: 自分のすべてのファイル
     cancel: キャンセル
-    confirm_delete: 
-      one: "これら %{count} 個のアイテムを削除してもよろしいですか?"
-      other: "これら %{count} 個のアイテムを削除してもよろしいですか?"
     confirm_delete_with_contents: 
       one: "これら %{count} 個のアイテム、およびその中のすべてのものを削除してもよろしいですか?"
       other: "これら %{count} 個のアイテム、およびその中のすべてのものを削除してもよろしいですか?"
-    count_items_selected: "%{count} 個のアイテムが選択されました"
     created_at: 作成日
     created_at_short: 作成日時
     delete: 削除
-    delete_error: "%{name} の削除時にエラーが発生しました: %{reason}"
-    deleted_items_successfully: "%{count} 個のアイテムが正常に削除されました"
     download: ダウンロード
     download_as_zip: "ZIP としてダウンロード"
-    edit_name: 名前の編集
     errors: 
       no_match: 
         keywords: 別のキーワードを試してください。
@@ -12740,11 +12692,8 @@ ja:
     sorted_ascending: 昇順に並べ替え
     sorted_desending: 降順に並べ替え
     this_folder_is_empty: このフォルダは空です
-    title: 
-      permissions: "%{count} 個のアイテムの権限の編集"
     updated_at: 変更日
     updated_at_short: 変更日
-    usage_details: "%{quota_used} / %{quota}"
     view: 表示
   recent_student: 
     last_logged_in: "最終ログイン日時: %{last_login}"
@@ -12796,21 +12745,17 @@ ja:
         email: "電子メール アドレス"
         name: 名前
     welcome_to_canvas: "Canvas へようこそ!"
+  remove_f47dc62a: 削除
+  rename_45608f54: 名前変更
   reply_from_name: "%{name} (Canvas のお知らせから)"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
         enabled: "有効 (QTI コンバータも有効にする必要があります)"
   restrict_student_access: 
-    aria_label: 
-      availableFrom: 変更前
-      availableUntil: 次の日時まで
     button_text: 
       cancel: キャンセル
       update: 更新
-    label: 
-      availableFrom: ロック開始
-      availableUntil: ロック終了時刻
     options: 
       hiddenInput: 
         description: 受講生はリンクでのみ利用できます。受講生のファイルには表示されません。
@@ -12827,6 +12772,7 @@ ja:
   resume_quiz_afeceb87: クイズの再開
   resume_survey_58dce775: サーベイの再開
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
+  rich_content_editor_2708ef21: "リッチ コンテンツ エディタ"
   role_override: 
     permission: 
       read_sis: "SIS データを読み取る"
@@ -12923,12 +12869,13 @@ ja:
     site_admin_permissions: サイト管理者の権限
     update_failed_notice: 役割の作成に失敗しました
   roles: 
-    new_role: 
-      add: 追加
-      add_role: 役割を追加
-      add_role_label: 役割を追加
-      role_name: 役割名
+    based_on_type: "%{base_type} を基にする"
+    edit_role: 
       role_name_label: 役割名
+    new_role: 
+      cancel: キャンセル
+      save: 保存
+      saving: 保存しています...
     permission_button: 
       rolebutton: 
         disable: 無効
@@ -12937,10 +12884,18 @@ ja:
         enable_and_lock: 有効にしてロック
         use_default: デフォルトを使用
     permissions: 権限
+    role: 
+      remove_role_confirmation: "この役割のユーザが存在する場合、そのユーザは現在の権限を維持しますが、この役割で新しいユーザを作成することはできません。この役割の削除を続行するには、[OK] をクリックしてください。"
+    roles_collection_view: 
+      add_role: 役割を追加
     roles_override_index: 
       account_roles: アカウントの役割
       course_roles: コースの役割
       page_header_title: アカウントの権限
+  rootFoldersFinder: 
+    course_files: "コース ファイル"
+    group_files: "グループ ファイル"
+    my_files: "マイ ファイル"
   roster: 
     delete_confirm: このユーザを削除してもよろしいですか?
     error_sending_invitations: 招待の送信時にエラーが発生しました。もう一度、試してください。
@@ -13008,6 +12963,7 @@ ja:
         are_you_sure_delete: この注釈を削除してもよろしいですか?注釈を削除しても、現在この注釈を使用している場所からは注釈にアクセスできますが、ほかの人はこの注釈を使用できなくなります。
         are_you_sure_remove: この注釈をリストから削除してもよろしいですか?
       remove_rubric: "この注釈をマイ リストから削除"
+  save_11a80ec3: 保存
   score_out_of_points_possible_88f370fd: "%{score} (配点 %{points_possible})"
   screenreader_gradebook: 
     assignment_information: 
@@ -13130,6 +13086,7 @@ ja:
     enrollments_tas: 授業助手
     enrollments_teachers: 講師
     student_groups: 受講生グループ
+  search_groups_or_people_6c15d6ad: グループまたはメンバーを検索
   section: 
     confirms: 
       delete_enrollment: この登録を完全に削除してもよろしいですか?
@@ -13270,6 +13227,7 @@ ja:
         go_to_course: コースに移動
         go_to_dashboard: ダッシュボードに移動
       not_available_yet: コースの開始が近づいたら、電子メールをお送りします。
+  send_e3bd0ed0: 送信
   sequence_footer: 
     next_module: "次のモジュール:"
     next_module_desc: "次のモジュール: *module*"
@@ -13285,6 +13243,11 @@ ja:
     overwrite: 既に入力されている成績を上書き
     set_grades_button: 既定の成績の設定
     set_grades_button_loading: 成績を設定しています...
+  settings: 
+    recaptcha_settings: 
+      labels: 
+        recaptcha_private_key: "ReCAPTCHA の秘密鍵"
+        recaptcha_public_key: "ReCAPTCHA の公開鍵"
   shared: 
     account_notification: 
       close: 閉じる
@@ -13374,7 +13337,6 @@ ja:
       enrolled_as_teacher: 講師として参加登録済み
       favorited_tooltip: "クリックしてコース メニューから削除します。"
       nonfavorited_tooltip: "クリックしてコース メニューに追加します。"
-      not_favoritable_tooltip: "このコースは、現在コース メニューに追加できません。"
       unpublished_course: 未公開
       unpublished_course_tooltip: "このコースは公開されていません。受講生がアクセスするには、コース インストラクタに連絡してください。"
     custom_search_results: 
@@ -13690,7 +13652,7 @@ ja:
         edit: 注釈の編集
         find_a_rubric: 注釈の検索
         find_another_rubric: 別の注釈の検索
-        find_outcome_criterion: 成果の検索条件
+        find_outcome: 成果の検索
         find_rubric: 注釈の検索
       messages: 
         locked: 注釈は、使用しているときは変更できません。
@@ -14102,31 +14064,6 @@ ja:
   stream_items_api: 
     assessment_request_title: "%{title} のピア レビュー"
   student_assignment_outcome_map_title: 受講生の能力
-  student_groups: 
-    group_join: "グループ %{group_name} に参加しました"
-    group_leave: "グループ %{group_name} を脱退しました"
-    group_name: "%{group_category} の %{group_name}"
-    new_group: 
-      group_explanation: "グループは、プロジェクトの共同作業や、勉強会などのスケジュール設定に適した場所です。グループごとにカレンダー、Wiki、ディスカッションを使用でき、ファイルを保存できる場所もあります。グループでは、文書を共同で作成したり、Web 会議を計画することもできます。グループはコースの小型版のようなもので、限られた数の受講生とより狭い範囲のプロジェクトで学習を進めることができます。"
-      joining: 参加しています
-      name: グループ名
-      name_error: グループ名が必要です
-    search_groups_placeholder: グループまたはメンバーを検索
-    student_groups: 
-      full: 満員
-      group: グループ
-      group_full: グループは満員です
-      invite_only: 招待のみ
-      student_groups_join: 参加
-      student_groups_leave: 退出
-      student_groups_switch: 移動
-      student_groups_tabs_everyone: 全員
-      student_groups_tabs_groups: グループ
-      visit: アクセス
-    student_groups_filter_description: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
-    students_count: 
-      one: "%{count} 人の受講生"
-      other: "%{count} 人の受講生"
   student_groups_desc: |-
       これにより、アカウントの新しい受講生グループ ページが有効になります。新しいページでは、グループのサインアップをより動的に
       行うことができます。
@@ -14295,7 +14232,6 @@ ja:
       preview_title: "%{title} のプレビュー"
       quiz_submission: この提出物は、クイズへの提出物です。クイズのページにリダイレクトします。
       show_entire_discussion: ディスカッション全体の表示
-      student: 受講生
       url_preview: "URL のプレビュー"
       view_feedback_button: フィードバックの表示
       view_original_submission: "%{user} さんへの元の提出物を表示"
@@ -14304,6 +14240,7 @@ ja:
     submission_download: 
       download_message: "**受講生の提出物を収集** し、zip ファイルに圧縮しています。提出ファイルのサイズと数により、しばらく時間がかかる場合があります。"
       gathering_files: ファイルを収集しています...
+  submit_a3cc6859: 提出
   support: 
     array: 
       last_word_connector: "、および "
@@ -14321,6 +14258,7 @@ ja:
       curriculum_assessment_errata_description: "既に報告されているアセスメントおよびカリキュラムのエラーを表示します。\"正誤表\" を検索してください。"
       networking_academy_description: "最も一般的な質問に対する Cisco の回答を表示します。"
       networking_academy_faqs: "ネットワーキング アカデミーの FAQ"
+  switch_to_3f310557: 移動
   syllabus: コース要綱
   table_headings: 
     name: 名前
@@ -14626,6 +14564,8 @@ ja:
       second_bullet: 受講生のスコアに影響を及ぼす可能性があるため、必ず最も適切なオプションを選択してください。
       third_bullet: クイズを保存すると、すべての提出物が再評価されます。この処理には数分かかる場合があります。
       try_later: 既にクイズに回答した受講生のための再評価オプションを設定できます。
+  tree_browser: 
+    folder_tree_instructions: "上および下矢印キーを使用して、ツリー内をナビゲートします。フォルダを展開するには右方向キーを、折りたたむには左方向キーを、選択中のアイテムを選択するには Enter キーを押します。"
   turnitin: 
     error_1007: アップロードされたファイルが大きすぎます。
     error_1009: "ファイルのタイプが無効です (有効なファイル タイプ: MS Word、Acrobat PDF、Postscript、テキスト、HTML、WordPerfect (WPD)、リッチ テキスト形式)。"
@@ -14643,6 +14583,7 @@ ja:
       resubmit_to_turnitin: "Turnitin に再提出"
   ungraded_survey_ad7de790: 未採点のサーベイ
   unknown: 不明
+  unknown_47a3b725: 不明
   unknown_question_bank: 不明な問題バンクです
   unknown_quiz: 不明なクイズです
   unpublished_courses_title: 未公開のコース
@@ -14654,6 +14595,8 @@ ja:
     upload: アップロード
   upload_drop_zone: 
     drop_to_upload: アップロードするアイテムをドロップ
+  usage_rights_modal: 
+    saving: 保存しています...
   user: 
     default_user_name: ユーザ
     errors: 
@@ -14975,18 +14918,6 @@ ja:
       terms_of_use: 利用規約
     no_self_registration: このアカウントでは自己登録はできません
     oauth_fail: "OAuth 要求が失敗しました。有効な要求が見つかりませんでした"
-    recaptcha_settings: 
-      instructions: |-
-          ReCAPTCHA プラグインを使用する場合は、その前に、 
-          [ReCAPTCHA のアカウントでサインアップ](%{url}) する必要があります。ご利用のサイトのドメインが処理されるよう
-          お使いのドメインを正しくセットアップしてください。アカウントのセットアップが完了したら、
-          ご自分の公開鍵と秘密鍵を下に入力します。
-          
-          **注:** これらの設定に対する変更は、
-          サーバを再起動するまで更新されません。
-      labels: 
-        private_key: "ReCAPTCHA の秘密鍵"
-        public_key: "ReCAPTCHA の公開鍵"
     registered: 
       almost_there: あと一歩です...
       done_resending: 完了です!メッセージが送信されるまで数分かかる場合があります。
@@ -15057,6 +14988,7 @@ ja:
       welcome_to_happiness: "Canvas へようこそ!"
   validate: 
     is_required: このフィールドは必須項目です
+  visit_864b4060: アクセス
   warnings: 
     test_install: 
       periodic_message: "この Canvas 環境はテスト用であり、定期的にリセットされます。"
@@ -15307,7 +15239,6 @@ ja:
       archive: アーカイブ
       archive_link: アーカイブを表示
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*このクイズの問題は変更されています。*これらの変更内容は、クイズを保存するまで、受講生には表示されません。"
-  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*このクイズに加えた変更内容は未公開です。*これらの変更内容は、クイズを公開または再公開するまで、受講生には表示されません。"
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "検索で以下のエラーが発生しました:"
     other: "検索で以下のエラーが発生しました:"
