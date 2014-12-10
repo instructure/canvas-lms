@@ -1351,12 +1351,11 @@ pl:
       podcast_title_course: "Kanał informacyjny Podcast z ogłoszeniami dla kursów"
       podcast_title_group: "Kanał informacyjny Podcast z ogłoszeniami dla grupy"
     index_view: 
+      announcement_fb4cb645: Ogłoszenie
       announcements_title: Ogłoszenia
       delete: Usuń
       loading: "Trwa ładowanie..."
       lock_for_comments: "Zablokuj wpisywanie komentarzy"
-      make_an_announcement: "Utwórz ogłoszenie"
-      make_an_announcement_caps: "Utwórz ogłoszenie"
       make_sure_all_search_terms_are_spelled_correctly: "Sprawdź, czy wyszukiwane terminy są dobrze przeliterowane."
       rss_feed: "Strumień RSS"
       search_title_body_or_author: "Wyszukaj tytuł, treść lub autora"
@@ -1427,8 +1426,10 @@ pl:
     invalid_participants: "Musisz pozwolić przynajmniej jednemu użytkownikowi na udział"
     title: "Edytuj %{name}"
     update: Aktualizuj
+  archive_3f794d7e: Archiwum
   aria_labels: 
     unlock_at_date: "Odblokuj dnia"
+  as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Podczas uzupełniania tego pola lista grup będzie automatycznie filtrowana i zostaną pokazane jedynie nazwy odpowiadające wpisowi."
   assessment_question: 
     default_question_name: Pytanie
   assessment_question_bank: 
@@ -1513,6 +1514,7 @@ pl:
     unmute_button: "Odkryj zadanie"
     unmute_dialog: "To zadanie jest obecnie ukryte. Oznacza to, że uczestnicy nie widzą swoich ocen ani komentarzy. Czy chcesz odkryć zadanie?"
     unmuting_assignment: "Odkrywanie zadania"
+  assignment_name_b2d87383: "Nazwa zadania"
   assignments: 
     add_assignment_form: 
       assignment_name: "Nazwa zadania"
@@ -1762,7 +1764,6 @@ pl:
       notify_content_change: "Powiadom użytkowników o zmianie tej zawartości"
       only_visible_to_overrides_note: "Uwaga: to zadanie jest widoczne *jedynie* dla sekcji określonych poniżej:"
       points_possible: Punkty
-      post_to_sis: "Wyślij do SIS"
       warnings: 
         assignment_is_frozen: "Niektóre ustawienia zostały administracyjnie zablokowane."
     errors: 
@@ -1985,6 +1986,8 @@ pl:
       reviews_per_user: "Liczba recenzji na jednego uczestnika"
     points_possible_number: "Możliwe punkty do zdobycia muszą być wartością liczbową"
     positive_number: "Należy wpisać liczbę dodatnią"
+    post_to_sis_selector: 
+      post_grades_to_sis_97ece878: "Wyślij oceny do SIS"
     redirect_page: 
       redirect_message: |-
           Zadanie zostało przesłane w formie adresu URL — nastąpi teraz przekierowanie do podanego łącza.  
@@ -2257,6 +2260,7 @@ pl:
     corrupted: "Informacje szczegółowe nie są dostępne"
     login: LOGOWANIE
     logout: WYLOGOWANIE
+  available_from_587ce92f: "Dostępne od"
   bb_display: "Nauka w systemie Blackboard"
   bb_file_description: "Blackboard 6/7/8/9 eksport pliku .zip"
   bb_name: "Blackboard Converter"
@@ -2279,7 +2283,6 @@ pl:
       published: Opublikowano
       unpublished: Nieopublikowane
     published_title: Opublikowano
-    restricted_title: "Dostępne od %{from_date} do %{until_date}"
     title: 
       permissions: "Uprawnienia do edycji posiada: %{name}"
     unpublished_title: Nieopublikowano
@@ -2342,8 +2345,6 @@ pl:
       user_name_description: "Nazwa tego użytkownika, który ma dostęp instruktora/projektanta do kursu dla tego wiersza. Musi pasować do nazwy użytkownika umieszczonej w powyższych poświadczeniach loginu do systemu Blackboard."
     only_one_bulk_migration: "Jednocześnie można uruchomić tylko jedną zbiorczą migrację kursu."
   button: 
-    go_back: "Przejdź wstecz"
-    post: "Wyślij oceny"
     submit_assignment: "Prześlij zadanie"
   buttons: 
     add_item: "Dodaj element"
@@ -2357,7 +2358,6 @@ pl:
     done: Gotowe
     filter: Filtruj
     find_user: "Wyszukaj użytkownika"
-    ignore_all: "Ignoruj wszystko"
     import: Importuj
     login: Zaloguj
     manage_rubrics: "Zarządzaj kryteriami ocen"
@@ -2865,6 +2865,7 @@ pl:
         create_assignment: "Utworzyć nowe zadanie"
         delete: "Usunąć wydarzenie/zadanie"
         new: "Utworzyć nowe wydarzenie"
+  cancel_caeb1e68: Anuluj
   canvas: 
     migration: 
       errors: 
@@ -3993,6 +3994,7 @@ pl:
       tool_insecure_warning: "Próbujesz połączyć się z niezabezpieczoną zawartością z poziomu zabezpieczonej strony (canvas). W niektórych przeglądarkach otwarcie tej zawartości może nie być możliwe."
   context_modules_api: 
     invalid_position: "Nieprawidłowa pozycja"
+  continue_ac067716: Kontynuuj
   conversation_dialog: 
     errors: 
       field_is_required: "To pole jest wymagane"
@@ -4370,6 +4372,7 @@ pl:
       uuid: UUID
       wiki_id: "Identyfikator strony Wiki"
       workflow_state: "Stan pracy"
+  course_members_are_free_to_join_9b2603d4: "Uczestnicy kursu mogą dołączyć"
   course_restore: 
     restore_error: "Wystąpił błąd podczas próby przywracania kursu. Kurs nie został przywrócony."
   course_search: 
@@ -4387,8 +4390,6 @@ pl:
       delete_section: "Czy na pewno chcesz usunąć tę sekcję?"
       publish_grades: "Czy na pewno chcesz opublikować te oceny w systemie informowania uczestników? Czynność tę należy wykonać tylko w przypadku, gdy ukończono wystawianie wszystkich ocen."
       re_publish_grades: "Czy na pewno chcesz ponownie opublikować te oceny w systemie informowania uczestników?"
-    course_dates_enforced: "Użytkownicy mogą uczestniczyć w kursie tylko w tym okresie"
-    course_dates_unenforced: "Daty nie będą mieć wpływu na dostępność kursu"
     edit_sections_placeholder: "Wprowadź nazwę sekcji"
     edit_sections_title: "Nazwa sekcji"
     errors: 
@@ -4403,9 +4404,6 @@ pl:
       links: "Łącza uczestników zaktualizowano z powodzeniem"
       sectionError: "Coś poszło nie tak podczas aktualizowania sekcji użytkownika. Prosimy spróbować ponownie później."
       sections: "Zapisy do sekcji zaktualizowano z powodzeniem"
-    grading_standard_set: "Bieżące ustawienie"
-    grading_standard_unset: Nieustawione
-    indexed_course: "Dołączone do publicznego katalogu kursów"
     invitation_sent: "Zaproszenie zostało wysłane!"
     invitation_sent_now: "Tylko teraz"
     link_students_placeholder: "Wprowadź nazwę uczestnika"
@@ -4417,8 +4415,6 @@ pl:
       re_send_all: "Ponownie wyślij wszystkie niezaakceptowane zaproszenia"
       re_sending_invitation: "Trwa ponowne wysyłanie zaproszenia..."
       republish: "Ponownie publikuj stopnie w systemie SIS"
-    private_course: Prywatny
-    public_course: Publiczny
     re_send_invitation: "Wyślij ponownie zaproszenie"
     remove_user_from_course_section: "Usuń użytkownika z %{course_section} "
     titles: 
@@ -4902,7 +4898,6 @@ pl:
           assignments: "Lista zadań"
           custom_page: "Strony, pierwsza strona"
           modules: "Moduły kursowe"
-          recent_activity_dashboard: "Pulpit nawigacyjny ostatniej aktywności"
           syllabus: "Program kursu"
       empty_body: "Brak zawartości"
       front_page_not_set: "Strona początkowa musi być ustawiona jako pierwsza"
@@ -5428,7 +5423,6 @@ pl:
         other: "Ten temat jest tematem ocenianym: *%{count} możliwych punktów do zdobycia*"
       show_due_dates: "Pokaż terminy dostarczenia"
       until: Do
-    cannot_unpublish_with_replies: "Nie można cofnąć publikowania, jeśli wciąż są odpowiedzi"
     confirm_delete_announcement: 
       few: "Czy na pewno chcesz usunąć te %{count} ogłoszenia?"
       one: "Czy na pewno chcesz usunąć to ogłoszenie?"
@@ -5651,7 +5645,6 @@ pl:
       go_to_topic: "Przejdź do tematu"
       manage_discussion_entry: "Zarządzaj wpisami do dyskusji"
       open_in_speedgrader: "Otwórz w SpeedGrader"
-      unknown_author: "Nieznany autor"
       write_a_reply: Odpowiedz
     entry_stats: 
       show_more: "Pokaż więcej"
@@ -5706,6 +5699,7 @@ pl:
       nowym nieopublikowanym stanie, która będzie niewidoczna dla uczestników i nie będzie miała wpływu
       na oceny. Uwaga — wyłączenie tej funkcji może spowodować usunięcie nowo utworzonej lub edytowanej
       zawartości z podglądu instruktora.
+  due_date_822625d8: "Termin do"
   due_dates: 
     due_at: "termin dostarczenia: %{assignment_due_date_time}"
     multiple_due_dates: "termin dostarczenia: więcej niż jedna data"
@@ -5735,7 +5729,6 @@ pl:
   edit_survey_b0d6890d: "Edytuj ankietę"
   editor: 
     alt_text: "Alternatywny tekst:"
-    based_on_type: "Na podstawie %{base_type}"
     button: 
       insert_equation: "Wstaw równanie"
     cancel: Anuluj
@@ -5758,9 +5751,7 @@ pl:
     loading: "Trwa ładowanie..."
     mathjax_text_entry_field_label: "Wprowadź równanie jako LaTeX."
     more_external_tools: "Więcej zewnętrznych narzędzi"
-    role: 
-      duplicate_role_error: "Nie można utworzyć roli o tej nazwie, ponieważ już taka istnieje. Spróbuj wpisać inną nazwę"
-      remove_role_confirmation: "Jeśli istnieją użytkownicy z taką rolą, zachowają oni obecne uprawnienia, ale nie będzie można utworzyć nowych użytkowników z ta rolą. Kliknij przycisk Ok, aby kontynuować usuwanie tej roli."
+    no_name_error: "Wymagana jest nazwa"
     save_failed: "Zapis nie powiódł się, spróbuj ponownie później"
     saving: "Trwa zapisywanie..."
     screen_reader_tip: "Użytkownicy programu do odczytywania zawartości ekranu: najłatwiejszym sposobem na skorzystanie z tego edytora jest włączenie zaawansowanego widoku i wpisanie w nim słowa LaTeX lub użycie paska narzędzi, który wskaże użytkownikowi kolejne etapy działania. Łącze przekierowujące do zaawansowanego widoku można odnaleźć pod koniec tego okienka, bezpośrednio przed polem edytowania."
@@ -6086,6 +6077,7 @@ pl:
       submissions: 
         body1: "W dolnej części strony znajduje się lista ostatnio przesłanych zadań z Twoich zajęć (%{showme}). Z poziomu tej strony możesz szybko dodawać przesłane zadania do nowych stron w swoim portfolio. Wystarczy kliknąć przesłane zadanie, które chcesz dodać, a zostanie wyświetlone proste okno dialogowe."
         body2: "Świetnie! Aby zakończyć dodawanie przesłanego zadania, musisz wybrać sekcję, do której chcesz je dodać i nadać nazwę stronie. Po wybraniu pozycji \"Dodaj stronę\", system przekieruje Cię do nowej strony, umożliwiając bardziej szczegółową edycję."
+  error_deleting_name_reason_11f9d399: "Błąd podczas usuwania nazwy %{name}: powód %{reason}"
   error_message_2b9d12ee: "Błąd: %{message}"
   error_uploading_file_e2d31b56: "Błąd podczas przekazywania pliku."
   errors: 
@@ -6133,6 +6125,7 @@ pl:
     sis_id_in_use: "Identyfikator SIS \"%{sis_id}\" jest już używany"
     unsaved_changes: "Nie zapisano wszystkich zmian."
     wrong_file_extension: "Nie można przesłać zadania z wybranym plikiem o rozszerzeniu \"%{extension}\""
+  everyone_854554dd: Wszyscy
   external_content: 
     cancel: 
       canceling: "Trwa anulowanie..."
@@ -6363,22 +6356,21 @@ pl:
     post_grades: "Wyślij oceny do SIS"
     student_groups: "Strona z nowymi grupami uczestników"
     student_outcome_gradebook: "Dzienniczek nauki poziomu biegłości uczestnika"
-  file_browser_view: 
-    folder_tree_instructions: "Użyj strzałek do góry i w dół w celu nawigacji po drzewie. Naciśnij prawy przycisk, aby rozwinąć foldery, lewy w celu ich zwinięcia lub klawisz enter, aby wybrać zaznaczony element."
   file_preview: 
     file_preview_headerbutton_close: Zamknij
     file_preview_headerbutton_download: Pobierz
     file_preview_headerbutton_info: Informacje
-    file_preview_hide: Ukryj
     file_preview_infotable_datecreated: "Data utworzenia"
     file_preview_infotable_datemodified: "Data modyfikacji"
     file_preview_infotable_kind: Typ
-    file_preview_infotable_modifiedby: "Zmodyfikowano przez"
     file_preview_infotable_name: Nazwa
     file_preview_infotable_size: Rozmiar
     file_preview_infotable_status: Status
-    file_preview_show: Pokaż
   file_previews: 
+    lock_explanation: 
+      messages: 
+        file_locked: "Plik nie został jeszcze odblokowany."
+        folder_locked: "Folder \"%{folder},\" który zawiera ten plik, został zablokowany."
     no_preview: 
       file_previews: 
         download_file: "Pobierz *filename*"
@@ -6397,10 +6389,6 @@ pl:
     published_status: Opublikowano
     restricted_status: "Dostępne od %{from_date} do %{until_date}"
     unpublished_status: Nieopublikowano
-  filebrowserview: 
-    course_files: "Pliki kursu"
-    group_files: "Pliki grupy"
-    my_files: "Moje pliki"
   files: 
     alts: 
       file: Plik
@@ -6576,10 +6564,8 @@ pl:
       no_rubric_outcomes_found: "Brak wyników skonfigurowanych według kryteriów ocen"
     titles: 
       find_outcome: "Wyszukaj wynik"
-      find_outcome_criterion: "Znajdź kryterium wynikowe"
   folder: 
     course_content_folder_name: "zawartość kursu"
-    default_folder_name: folder
     errors: 
       invalid_recursion: "Folder nie może być nadrzędny względem samego siebie"
       invalid_root_folder_name: "Nie można zmienić nazwy folderu głównego"
@@ -6964,7 +6950,6 @@ pl:
       individual_view: "Przełącz na widok indywidualny"
       learning_mastery: "Nauka poziomu biegłości"
       page_header_title: Dzienniczek
-      post_grades: "Wyślij oceny"
       publish_to_sis: "Opublikuj stopnie w systemie SIS"
       set_group_weights: "Ustaw wyważanie grup"
       show_attendance_columns: "Pokaż kolumny obecności"
@@ -7023,7 +7008,6 @@ pl:
       headers: 
         anonymous_submission: "Odpowiedzi uczestników są ukryte, ponieważ to zadanie jest anonimowe"
         assessment: Ocena
-        discussion: Dyskusja
         grading: Ocenianie
         no_group_submission: "W tej grupie nie ma przesłanego zadania do tego zlecenia"
         no_submission: "Uczestnik nie przesłał zadania dla tego zadania"
@@ -7178,6 +7162,7 @@ pl:
       home: "Strona główna"
       pages: Strony
       people: Użytkownicy
+  group_a8f5ed9c: Grupa
   group_categories: 
     notices: 
       create_category_success: "Kategoria została pomyślnie utworzona."
@@ -7199,10 +7184,13 @@ pl:
     name_unavailable: "%{name} jest już w użyciu."
     self_signup_for_courses: "Samodzielny zapis może być jedynie włączony w przypadku grup kursu lub społeczności"
   group_category_locked: "Nie można zmienić kategorii grupy, ponieważ uczestnicy przesłali już zadanie"
+  group_is_full_56849d78: "Grupa jest pełna"
   group_membership: 
     errors: 
       group_full: "Grupa jest pełna."
       not_in_group_section: "Uczestnik %{student} nie dzieli sekcji z innymi członkami grupy %{group}."
+  group_name_b69c144: "Nazwa grupy"
+  group_name_is_required_5547bc0b: "Wymagana jest nazwa grupy"
   group_settings: 
     invitation_sent: "Zaproszenie wysłane"
   groups: 
@@ -7485,6 +7473,7 @@ pl:
       group_users: 
         add_student: "Dodaj uczestnika, aby rozpocząć."
         add_user: "Dodaj użytkownika, aby rozpocząć."
+        greater_than_three: "Wprowadź szukany termin zawierający co najmniej trzy znaki"
         no_matching_students: "Brak dopasowanych uczestników."
         no_matching_users: "Brak dopasowanych użytkowników."
         no_students: "Obecnie nie ma uczestników w tej grupie."
@@ -7541,6 +7530,7 @@ pl:
       self_signup_help: "Grupy z możliwością samodzielnego zapisu"
     unassigned_students: "Liczba nieprzydzielonych uczestników: (%{count})"
     unassigned_users: "Liczba nieprzydzielonych użytkowników (%{count})"
+  groups_6c90e26a: Grupy
   help_dialog: 
     Back: Wstecz
     Help: Pomoc
@@ -7623,6 +7613,7 @@ pl:
   html5_first_videos_description: |-
       Program Canvas domyślnie będzie próbował najpierw używać wtyczki Flash w celu odtworzenia plików wideo. Włącz ją, aby korzystać z programu HTML5,
       następnie wróć do wtyczki Flash.
+  html_editor_fb2ab713: "Edytor HTML"
   ic_actions: 
     manage: zarządzaj
   icons: 
@@ -7632,6 +7623,7 @@ pl:
     online_url_submission: "Przesłane zadanie w formie adresu URL on-line"
     quiz_submission: "Przesłane zadanie w formie testu"
     text_entry_submission: "Przesłane zadanie w formie wpisu"
+  image_8ad06: Obraz
   images: 
     error_checking_color: "Błąd w trakcie sprawdzania koloru obrazu"
     invalid_background_color: "Kolor tła musi być następujący: %{color}"
@@ -7742,6 +7734,7 @@ pl:
   invalid_points_possible: "Wartość możliwych punktów do zdobycia dla tego zadania powinna wynosić co najmniej zero."
   invalid_url_in_xml: "Nieprawidłowy adres URL w XML. Należy zmienić znaki &."
   invalid_xml_syntax: "Nieprawidłowa składnia xml"
+  invite_5b1fcbcd: Zaproś
   jobs: 
     columns: 
       attempt: próba
@@ -7799,6 +7792,9 @@ pl:
     titles: 
       job_handler: "Obsługa zadań"
       last_error: "Ostatni błąd"
+  join_6cafecca: Dołącz
+  joined_group_group_name_e3802c04: "Uczestnika dołączono do grupy %{group_name}"
+  joining_81f8b6c9: Dołączanie
   jquery: 
     module_sequence_footer: 
       next: Dalej
@@ -7850,6 +7846,8 @@ pl:
   learning_outcome: 
     no_comment: "Brak komentarzy"
     no_description: "Brak opisu"
+  leave_5e852989: Opuść
+  left_group_group_name_aac4e813: "Uczestnik opuścił grupę %{group_name}"
   lib: 
     angel: 
       failed_import_link: "Importowanie łącza zakończone niepowodzeniem"
@@ -8018,6 +8016,8 @@ pl:
     track_uploaded_successfully: "Aktualizacja ścieżki zakończona pomyślnie; odśwież, aby zobaczyć."
     upload: Przekaż
     uploading: "Trwa przekazywanie..."
+  members_af25c21d: Członkowie/uczestnicy
+  membership_by_invitation_only_9bc27199: "Przynależność tylko na zaproszenie"
   menu: 
     current_groups: "Bieżące grupy"
     customize: Dostosuj
@@ -9756,26 +9756,6 @@ pl:
         subject: "Nowa ocena: %{title}, %{context}"
       twitter: 
         tweet: "Alert systemu Canvas — nowa ocena: %{title}, %{context}."
-    self_enrollment_registration: 
-      email: 
-        body: |-
-            Witaj %{user},⏎
-            ⏎
-            Pomyślnie zakończyłeś/-aś samodzielny zapis na %{course}, kurs w sieci Canvas!
-            ⏎
-            Nie zapomnij ustawić swojego profilu w sieci Canvas — dzięki temu pozostali uczestnicy kursu będą wiedzieli kim jesteś. Profil można aktualizować pod adresem %{profile_url}⏎
-            ⏎
-            Powodzenia w nauce,⏎
-            ⏎
-            Canvas Network
-        html: 
-          farewell: "Powodzenia w nauce,"
-          greetings: "Witaj %{user},"
-          profile_reminder: "Nie zapomnij ustawić swojego *profilu w sieci Canvas* — dzięki temu pozostali uczestnicy kursu będą wiedzieli kim jesteś. "
-          self_enrollment_confirmation: "Pomyślnie zakończyłeś/-aś samodzielny zapis na %{course}, kurs w sieci Canvas!"
-          self_enrollment_registration: "Twój zapis na %{course}"
-          signature: "Canvas Network"
-        self_enrollment_registration: "Twój zapis na %{course}"
     send_form: 
       labels: 
         message_body: Wiadomość
@@ -10146,7 +10126,6 @@ pl:
       module: 
         prerequisites: Warunki
         published: Opublikowane
-    post_grades_dialog_title: "Wyślij oceny do SIS"
     progression_module_collection: 
       module_progress_for: "Postęp w module dla uczestnika *%{student.name}*"
       module_progress_for_student: "Postęp uczestnika w module dla %{student.name}"
@@ -10193,6 +10172,7 @@ pl:
     students_will_see: "Uczestnicy będą widzieć, że zadanie zostało ukryte."
     submission_comments: "Komentarze do przesłanego zadania"
     sure_you_want_to_mute: "Czy na pewno chcesz ukryć to zadanie? Gdy zadanie jest ukryte, uczestnicy nie otrzymują nowych powiadomień ani nie mogą zobaczyć:"
+  n_a_d6f6c42f: "Brak danych"
   name: "Importer usługi Academic Benchmark"
   new_facebook_message: "Masz nową wiadomość z programu Canvas"
   new_quiz_statistics_desc: "Włącz nową stronę statystyki testu na koncie."
@@ -10472,6 +10452,7 @@ pl:
     new_observee_username: "Nazwa użytkownika"
     observee_added: "Teraz obserwowany jest użytkownik %{user}"
     observing: Obserwowanie
+  ok_c47544a2: OK
   options: 
     ? "no"
     : Nie
@@ -10555,7 +10536,6 @@ pl:
     mastery_error: "Musi być większe lub równe 0"
     missing_outcome: "Nie można było odnaleźć wyniku nauczania"
     near: "W okolicach biegłości"
-    new_outcome: "Nowy wynik"
     new_outcome_group: "Nowa grupa wyników"
     outcome: 
       links: 
@@ -10578,6 +10558,7 @@ pl:
       description: "Opisz ten wynik"
       display_name: "Łatwa do zapamiętania nazwa (opcjonalnie)"
       mastery: "Biegłość wynosi"
+      new_outcome_7fba8c7d: "Nowy wynik"
       points: "%{points_possible} punkty"
       title: "Nazwij ten wynik"
       total_points: "Łączna liczba punktów"
@@ -10629,18 +10610,14 @@ pl:
         latest_score: "Najnowszy wynik punktowy"
         outcome: Wynik
   overrides: 
-    due_date_after_course_conclude: "Termin dostarczenia musi byc wyznaczony przed datą zakończenia kursu"
-    due_date_before_course_start: "Termin dostarczenia musi byc wyznaczony po dacie rozpoczęcia kursu"
     everyone: Wszyscy
     everyone_else: "Wszyscy pozostali"
-    lock_date_after_course_end: "Data zablokowania musi być wyznaczona przed datą zakończenia kursu"
     lock_date_before_due_date: "Data zablokowania nie może być ustawiona przed terminem dostarczenia"
     overrides: 
       everyone: Wszyscy
       everyone_else: "Wszyscy pozostali"
     unlock_date_after_due_date: "Data odblokowania nie może być ustawiona po terminie dostarczenia"
     unlock_date_after_lock_date: "Data odblokowania nie może być ustawiona po terminie odblokowania"
-    unlock_date_before_course_start: "Data odblokowania musi byc wyznaczona po dacie rozpoczęcia kursu"
   page_comment: 
     default_user_name: Anonimowy
   page_comments: 
@@ -10957,9 +10934,6 @@ pl:
     qti_converter_settings: 
       labels: 
         enabled: Uaktywniony
-    registration_form_recaptcha: 
-      description: "Wtyczka CAPTCHA do formularzy rejestracyjnych"
-      name: "Formularz rejestracyjny ReCAPTCHA"
     respondus_soap_endpoint: 
       description: "Punkt końcowy SOAP do przekazywania plików QTI programu Respondus"
       name: "Punkt końcowy SOAP programu Respondus"
@@ -11044,10 +11018,12 @@ pl:
         poll_choice_belongs_to_poll: "Ten wybór sondy nie należy do istniejącej sondy."
         poll_is_published: "Ta sesja sondy nie jest otwarta dla przesyłania zadań."
         user_and_poll_session_uniqueness: "można przesłać jedynie jeden wybór na sesję sondy."
+  post_grades_39c52870: "Wyślij oceny"
   post_grades_description: |-
       Wysyłanie ocen umożliwia nauczycielom przesyłanie ocen z powrotem do aktywnych systemów SIS: Powerschool,
       Aspire (SIS2000), JMC, systemu SIS z aktywną opcją SIS, która zatwierdza elementy SIF GradingCategory,
       GradingAssignment, GradingAssignmentScore.
+  post_grades_to_sis_97ece878: "Wyślij oceny do SIS"
   practice_quiz_19a8505d: "Test próbny"
   prerequisites_lookup: 
     headers: 
@@ -11503,6 +11479,7 @@ pl:
       link_invalid: "Użyte łącze wygasło.  Jeśli nie możesz się zalogować, kliknij opcję \"Nie znasz swojego hasła?\", aby zresetować swoje hasło."
       password_changed: "Hasło zostało zmienione"
   public_courses_title: "Kursy publiczne"
+  public_domain_112ed397: "Domena publiczna"
   publish_btn_module: 
     buttons: 
       publish: Publikuj
@@ -11659,6 +11636,7 @@ pl:
       some_scores_reduced: "Przydziel punkty jedynie za poprawną odpowiedź (*wyniki niektórych studentów mogą zostać zmniejszone*)"
       update_question_without_regrading: "Aktualizuj pytanie bez ponownego oceniania"
   quiz_reports: 
+    cancel_generation: Anuluj
     download_item_analysis: "Pobierz raport analizy elementu."
     download_student_analysis: "Pobierz raport analizy uczestnika."
     generatable: "Nie wygenerowano wcześniej raportu."
@@ -11670,6 +11648,7 @@ pl:
     generation_complete: "Raport został wygenerowany."
     generation_halfway: "Wykonano ponad połowę pracy."
     generation_started: "Raport jest generowany."
+    item_analysis: "Analiza elementu"
     non_generatable_report_notice: "Nie można wygenerować raportu dla testów do ankiet."
     quiz_report_generator: 
       download_report_name: "Pobieranie %{report_name}"
@@ -11677,6 +11656,7 @@ pl:
       generated_at_date_time: "Wygenerowano %{dateAndTime}"
       generating_report_name: "Trwa generowanie raportu o nazwie %{report_name}..."
       item_analysis_not_available: "Analiza elementu nie jest dostępna w przypadku ankiet"
+    student_analysis: "Analiza uczestnika"
   quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Wyniki tego testu są chronione i nie są widoczne dla uczestników."
   quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Wyniki tego testu są chronione i nie są widoczne dla studentów do momentu ostatniego podejścia."
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Wyniki tego testu są chronione, można je wyświetlić tylko raz bezpośrednio po przesłaniu zadania."
@@ -12236,26 +12216,6 @@ pl:
         unnamed_survey_results: "Wyniki ankiet dla użytkownika %{user}"
       index: 
         page_titles: Testy
-      index_legacy: 
-        buttons: 
-          publish_quizzes: "Opublikuj testy"
-        headers: 
-          assignment_quizzes: "Testy do zadania"
-          course_quizzes: "Testy do kursu"
-          practice_quizzes: "Testy próbne"
-          publish_multiple_quizzes: "Opublikuj wiele testów"
-          surveys: Ankiety
-          unpublished_quizzes: "Nieopublikowane testy"
-        labels: 
-          publish_multiple_quizzes: "Wybierz testy, które chcesz teraz opublikować"
-        links: 
-          create_new_quiz: "Utwórz nowy test"
-          manage_question_banks: "Zarządzaj bankami pytań"
-          publish_multiple_quizzes: "Opublikuj wiele testów"
-        no_quizzes: "Brak dostępnych testów"
-        page_titles: Testy
-        titles: 
-          this_quiz_is_locked: "Ten test jest obecnie zablokowany. Kliknij, aby uzyskać więcej informacji szczegółowych."
       invalid_ip: 
         quiz_protected: "Ten test jest chroniony i jest dostępny tylko z niektórych lokalizacji. Komputer, z którego korzystasz nie wydaje się prawidłową lokalizacją na podejście do testu."
         survey_protected: "Ta ankieta jest chroniona i jest dostępna tylko z niektórych lokalizacji. Komputer, z którego korzystasz, prawdopodobnie nie znajduje się w takiej lokalizacji."
@@ -12385,6 +12345,7 @@ pl:
         one_time_results: "Tylko raz po każdej próbie"
         only_visible_to_overrides_note: "Uwaga: ten test jest **jedynie** widoczny w sekcjach podanych poniżej:"
         points_possible: "Punkty %{n}"
+        post_to_sis: "Wyślij oceny do SIS"
         quiz_title: "Tytuł testu"
         quiz_type: "Typ testu"
         require_lockdown_browser: "Wymagaj programu Respondus LockDown Browser"
@@ -12605,8 +12566,6 @@ pl:
         buttons: 
           lock_quiz: "Zablokuj teraz ten test"
           lock_survey: "Zablokuj teraz tę ankietę"
-          publish: Publikuj
-          republish: "Opublikuj ponownie"
           unlock_quiz: "Pozwól uczestnikom rozpocząć teraz ten test"
           unlock_survey: "Pozwól uczestnikom rozpocząć teraz tę ankietę"
         course_concluded_notice: "Test nie jest już dostępny, ponieważ kurs został zakończony."
@@ -12854,23 +12813,15 @@ pl:
     add_folder: "Dodaj folder"
     all_my_files: "Wszystkie moje pliki"
     cancel: Anuluj
-    confirm_delete: 
-      few: "Czy na pewno chcesz usunąć te %{count} elementy?"
-      one: "Czy na pewno chcesz usunąć element %{name}?"
-      other: "Czy na pewno chcesz usunąć tych %{count} elementów?"
     confirm_delete_with_contents: 
       few: "Czy na pewno chcesz usunąć te %{count} elementy i wszystko co się w nich znajuje?"
       one: "Czy na pewno chcesz usunąć element o nazwie %{name}? Nie jest pusty, więc wszystko co się w nim znajduje zostanie również usunięte."
       other: "Czy na pewno chcesz usunąć tych %{count} elementów i wszystko co się w nich znajduje?"
-    count_items_selected: "Wybrano następującą liczbę elementów: %{count}"
     created_at: "Data utworzenia"
     created_at_short: Utworzono
     delete: Usuń
-    delete_error: "Błąd podczas usuwania nazwy %{name}: powód %{reason}"
-    deleted_items_successfully: "Pomyślnie usunięto następującą liczbę elementów: %{count}"
     download: Pobierz
     download_as_zip: "Pobierz w formacie Zip"
-    edit_name: "Edytuj nazwę"
     errors: 
       no_match: 
         keywords: "Wpisz inne słowa kluczowe."
@@ -12914,11 +12865,8 @@ pl:
     sorted_ascending: "Sortowane rosnąco"
     sorted_desending: "Sortowane malejąco"
     this_folder_is_empty: "Folder jest pusty"
-    title: 
-      permissions: "Uprawnienia do edycji %{count} elementów"
     updated_at: "Data modyfikacji"
     updated_at_short: Zmodyfikowano
-    usage_details: "%{quota_used} z %{quota}"
     view: Pokaż
   recent_student: 
     last_logged_in: "ostatnio zalogowani w %{last_login}"
@@ -12973,21 +12921,17 @@ pl:
         email: "Adres e-mail"
         name: Nazwa
     welcome_to_canvas: "Witamy w systemie Canvas!"
+  remove_f47dc62a: Usuń
+  rename_45608f54: "Zmień nazwę"
   reply_from_name: "%{name} za pośrednictwem powiadomień z systemu Canvas"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
         enabled: "Włączono (należy również włączyć QTI Converter)"
   restrict_student_access: 
-    aria_label: 
-      availableFrom: Od
-      availableUntil: Do
     button_text: 
       cancel: Anuluj
       update: Aktualizuj
-    label: 
-      availableFrom: "Zablokuj od"
-      availableUntil: "Zablokuj do"
     options: 
       hiddenInput: 
         description: "Dostępne jedynie dla uczestników posiadających łącze. Nie jest widoczne w plikach uczestnika."
@@ -13004,6 +12948,7 @@ pl:
   resume_quiz_afeceb87: "Wznów test"
   resume_survey_58dce775: "Wznów ankietę"
   retrieve_timeout: "nie można pobrać konfiguracji, serwer nie odpowiadał zbyt długo"
+  rich_content_editor_2708ef21: "Edytor wzbogaconej zawartości"
   role_override: 
     permission: 
       read_sis: "Odczytaj dane SIS"
@@ -13100,12 +13045,13 @@ pl:
     site_admin_permissions: "Uprawnienia administratora witryny"
     update_failed_notice: "Utworzenie roli nie powiodło się"
   roles: 
-    new_role: 
-      add: Dodaj
-      add_role: "Dodaj rolę"
-      add_role_label: "Dodaj rolę"
-      role_name: "Nazwa roli"
+    based_on_type: "Na podstawie %{base_type}"
+    edit_role: 
       role_name_label: "Nazwa roli"
+    new_role: 
+      cancel: Anuluj
+      save: Zapisz
+      saving: "Trwa zapisywanie..."
     permission_button: 
       rolebutton: 
         disable: Wyłącz
@@ -13114,10 +13060,18 @@ pl:
         enable_and_lock: "Uaktywnij i zablokuj"
         use_default: "Użyj domyślne"
     permissions: Uprawnienia
+    role: 
+      remove_role_confirmation: "Jeśli istnieją użytkownicy z taką rolą, zachowają oni obecne uprawnienia, ale nie będzie można utworzyć nowych użytkowników z ta rolą. Kliknij przycisk Ok, aby kontynuować usuwanie tej roli."
+    roles_collection_view: 
+      add_role: "Dodaj rolę"
     roles_override_index: 
       account_roles: "Role konta"
       course_roles: "Role kursu"
       page_header_title: "Uprawnienia konta"
+  rootFoldersFinder: 
+    course_files: "Pliki kursu"
+    group_files: "Pliki grupy"
+    my_files: "Moje pliki"
   roster: 
     delete_confirm: "Czy na pewno chcesz usunąć tego użytkownika?"
     error_sending_invitations: "Wystąpił błąd podczas wysyłania zaproszenia.  Spróbuj ponownie."
@@ -13187,6 +13141,7 @@ pl:
         are_you_sure_delete: "Czy na pewno chcesz usunąć te kryteria ocen?  Lokalizacje obecnie uzyskujące dostęp do kryteriów ocen nie stracą go, jednak nikt inny nie będzie mógł ich użyć."
         are_you_sure_remove: "Czy na pewno chcesz usunąć te kryteria ocen ze swojej listy?"
       remove_rubric: "Usuń te kryteria ocen z mojej listy"
+  save_11a80ec3: Zapisz
   score_out_of_points_possible_88f370fd: "%{score} na %{points_possible} możliwych"
   screenreader_gradebook: 
     assignment_information: 
@@ -13309,6 +13264,7 @@ pl:
     enrollments_tas: "Asystenci instruktorów"
     enrollments_teachers: Instruktorzy
     student_groups: "Grupy uczestników"
+  search_groups_or_people_6c15d6ad: "Wyszukaj grupy lub osoby"
   section: 
     confirms: 
       delete_enrollment: "Czy na pewno chcesz na stałe usunąć te zapisy?"
@@ -13452,6 +13408,7 @@ pl:
         go_to_course: "Przejdź do kursu"
         go_to_dashboard: "Przejdź do pulpitu nawigacyjnego"
       not_available_yet: "Na chwilę przed rozpoczęciem kursu wyślemy Ci wiadomość e-mail."
+  send_e3bd0ed0: Wyślij
   sequence_footer: 
     next_module: "Następny moduł:"
     next_module_desc: "Następny moduł: *module*"
@@ -13467,6 +13424,11 @@ pl:
     overwrite: "Zastąp wprowadzone oceny"
     set_grades_button: "Ustaw ocenę domyślną"
     set_grades_button_loading: "Trwa ustawianie ocen..."
+  settings: 
+    recaptcha_settings: 
+      labels: 
+        recaptcha_private_key: "Klucz prywatny ReCAPTCHA"
+        recaptcha_public_key: "Klucz publiczny ReCAPTCHA"
   shared: 
     account_notification: 
       close: zamknij
@@ -13557,7 +13519,6 @@ pl:
       enrolled_as_teacher: "Zapisano w roli instruktora"
       favorited_tooltip: "Kliknij, aby usunąć z menu Kursy."
       nonfavorited_tooltip: "Kliknij, aby dodać do menu Kursy."
-      not_favoritable_tooltip: "Kursu nie można teraz dodać do menu Kursy."
       unpublished_course: nieopublikowane
       unpublished_course_tooltip: "Ten kurs nie został opublikowany. Uczestnicy powinni skontaktować się z instruktorem kursu, aby uzyskać dostęp."
     custom_search_results: 
@@ -13875,7 +13836,7 @@ pl:
         edit: "Edytuj kryteria ocen"
         find_a_rubric: "Znajdź kryteria ocen"
         find_another_rubric: "Znajdź inne kryteria ocen"
-        find_outcome_criterion: "Znajdź kryterium wynikowe"
+        find_outcome: "Wyszukaj wynik"
         find_rubric: "Znajdź kryteria ocen"
       messages: 
         locked: "Nie można zmienić już używanych kryterium ocen."
@@ -14289,32 +14250,6 @@ pl:
   stream_items_api: 
     assessment_request_title: "Recenzja uczestnika za %{title}"
   student_assignment_outcome_map_title: "Kompetencje uczestnika"
-  student_groups: 
-    group_join: "Uczestnika dołączono do grupy %{group_name}"
-    group_leave: "Uczestnik opuścił grupę %{group_name}"
-    group_name: "%{group_name} w %{group_category}"
-    new_group: 
-      group_explanation: "Grupy są dobrym miejscem do współpracy nad projektami, ustalania terminów wspólnej nauki itp. Każdej grupie zostaje przydzielony kalendarz, strona typu Wiki, miejsce na dyskusje oraz na magazynowanie plików. Grupy mogą wspólnie pracować nad tworzeniem dokumentów lub nawet ustalaniem terminów konferencji sieciowych. W rzeczywistości stanowią coś w rodzaju minikursu i dają możliwość pracy w mniejszych zespołach nad wąsko zdefiniowanymi projektami."
-      joining: Dołączanie
-      name: "Nazwa grupy"
-      name_error: "Wymagana jest nazwa grupy"
-    search_groups_placeholder: "Wyszukaj grupy lub osoby"
-    student_groups: 
-      full: Pełne
-      group: Grupa
-      group_full: "Grupa jest pełna"
-      invite_only: "Zaproś jedynie"
-      student_groups_join: Dołącz
-      student_groups_leave: Opuść
-      student_groups_switch: "Przełącz na"
-      student_groups_tabs_everyone: Wszyscy
-      student_groups_tabs_groups: Grupy
-      visit: Odwiedź
-    student_groups_filter_description: "Podczas uzupełniania tego pola lista grup będzie automatycznie filtrowana i zostaną pokazane jedynie nazwy odpowiadające wpisowi."
-    students_count: 
-      few: "%{count} uczestników"
-      one: "1 uczestnik"
-      other: "%{count} uczestników"
   student_groups_desc: |-
       Umożliwia to dodanie strony z nową grupą studentów do konta. Nowa strona została utworzona w celu szybszego rejestrowania
       grupy.
@@ -14488,7 +14423,6 @@ pl:
       preview_title: "Podgląd %{title} "
       quiz_submission: "Zadanie wymaga przesłania testu. Trwa przekierowywanie do strony testu."
       show_entire_discussion: "Wyświetl całą dyskusję"
-      student: Uczestnik
       url_preview: "Podgląd adresu URL"
       view_feedback_button: "Wyświetl opinię"
       view_original_submission: "Pokaż oryginał zadania przesłanego przez użytkownika %{user}"
@@ -14497,6 +14431,7 @@ pl:
     submission_download: 
       download_message: "**Trwa zbieranie przesłanych przez użytkownika zadań**i kompresowanie ich do formatu .zip. Zależnie od wielkości i liczby przesyłanych plików może to chwilę potrwać."
       gathering_files: "Trwa zbieranie plików..."
+  submit_a3cc6859: Prześlij
   support: 
     array: 
       last_word_connector: "oraz "
@@ -14514,6 +14449,7 @@ pl:
       curriculum_assessment_errata_description: "Zobacz zgłoszone błędy oceniania i programu. Wyszukaj słowo „errata”."
       networking_academy_description: "Zobacz odpowiedzi Cisco na najczęściej zadawane pytania."
       networking_academy_faqs: "Najczęściej zadawane pytania Networking Academy"
+  switch_to_3f310557: "Przełącz na"
   syllabus: "Program kursu"
   table_headings: 
     name: Nazwa
@@ -14823,6 +14759,8 @@ pl:
       second_bullet: "Pamiętaj, aby wybrać najbardziej odpowiednią opcję, ponieważ wyniki uczestników MOGĄ ulec zmianie."
       third_bullet: "Canvas oceni wszystkie przesłane zadania po zapisaniu testu, może to zająć kilka minut."
       try_later: "Możesz teraz ustawić opcję ponownego oceniania dla studentów, którzy napisali już test."
+  tree_browser: 
+    folder_tree_instructions: "Użyj strzałek do góry i w dół w celu nawigacji po drzewie. Naciśnij prawy przycisk, aby rozwinąć foldery, lewy w celu ich zwinięcia lub klawisz enter, aby wybrać zaznaczony element."
   turnitin: 
     error_1007: "Przesyłany plik jest zbyt duży."
     error_1009: "Nieprawidłowy typ pliku. (Prawidłowe typy plików to MS Word, Acrobat PDF, Postscript, Tekst, HTML, WordPerfect (WPD) oraz Rich Text Format RTF.)"
@@ -14840,6 +14778,7 @@ pl:
       resubmit_to_turnitin: "Wyślij ponownie do programu Turnitin"
   ungraded_survey_ad7de790: "Ankieta bez oceny"
   unknown: Nieznany
+  unknown_47a3b725: Nieznany
   unknown_question_bank: "Nieznany bank pytań"
   unknown_quiz: "Nieznany test"
   unpublished_courses_title: "Nieopublikowane kursy"
@@ -14851,6 +14790,8 @@ pl:
     upload: Przekaż
   upload_drop_zone: 
     drop_to_upload: "Upuść elementy, aby przekazać"
+  usage_rights_modal: 
+    saving: "Trwa zapisywanie..."
   user: 
     default_user_name: Użytkownik
     errors: 
@@ -15180,18 +15121,6 @@ pl:
       terms_of_use: "Warunki użytkowania"
     no_self_registration: "Samodzielna rejestracja nie została uaktywniona na tym koncie"
     oauth_fail: "Żądanie protokołu OAuth nie powiodło się. Nie można było odnaleźć prawidłowego żądania"
-    recaptcha_settings: 
-      instructions: |-
-          Zanim można będzie skorzystać z wtyczki ReCAPTCHA konieczne będzie 
-          [utworzenie konta w serwisie ReCAPTCHA](%{url}). Upewnij się, że twoja domena została
-          poprawnie skonfigurowana do zarządzania domen witryny.  Po założeniu konta
-          wprowadź klucz publiczny i prywatny poniżej.
-          
-          **Uwaga:** zmiany dokonane w ustawieniach zostaną wprowadzone
-          dopiero po ponownym uruchomieniu serwera.
-      labels: 
-        private_key: "Klucz prywatny ReCAPTCHA"
-        public_key: "Klucz publiczny ReCAPTCHA"
     registered: 
       almost_there: "To już prawie koniec..."
       done_resending: "Gotowe! Wysłanie wiadomości może zająć kilka minut."
@@ -15262,6 +15191,7 @@ pl:
       welcome_to_happiness: "Witamy w systemie Canvas!"
   validate: 
     is_required: "To pole jest wymagane"
+  visit_864b4060: Odwiedź
   warnings: 
     test_install: 
       periodic_message: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać okresowo."
@@ -15513,7 +15443,6 @@ pl:
       archive: Archiwum
       archive_link: "Pokaż archiwa"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Dokonano zmiany pytań w tym teście.* Zmiany te nie będą widoczne dla uczestników aż do zapisania testu."
-  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*Dokonano nieopublikowanych zmian tego testu.* Zmiany te nie będą widoczne dla uczestników aż do opublikowania lub ponownego opublikowania testu."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     few: "Podczas wyszukiwanie pojawiły się następujące błędy:"
     one: "Podczas wyszukiwania pojawił się następujący błąd:"
