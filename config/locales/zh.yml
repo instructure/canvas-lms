@@ -1351,12 +1351,11 @@ zh:
       podcast_title_course: 课程通告播客动态消息
       podcast_title_group: 小组通告播客动态消息
     index_view: 
+      announcement_fb4cb645: 通告
       announcements_title: 通告
       delete: 删除
       loading: 正在加载...
       lock_for_comments: 锁定以发表评论
-      make_an_announcement: 进行通告
-      make_an_announcement_caps: 进行通告
       make_sure_all_search_terms_are_spelled_correctly: 确保所有的搜索词拼写正确。
       rss_feed: "RSS 信息源"
       search_title_body_or_author: 搜索标题、正文或作者
@@ -1427,8 +1426,10 @@ zh:
     invalid_participants: "您至少要允许 1 名用户参加"
     title: "编辑 %{name}"
     update: 更新
+  archive_3f794d7e: 存档
   aria_labels: 
     unlock_at_date: 解锁日期
+  as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
   assessment_question: 
     default_question_name: 问题
   assessment_question_bank: 
@@ -1512,6 +1513,7 @@ zh:
     unmute_button: 取消屏蔽作业
     unmute_dialog: 此作业当前被屏蔽。这意味着学生无法看到其计分和反馈。是否要立即取消屏蔽?
     unmuting_assignment: 正在取消屏蔽作业...
+  assignment_name_b2d87383: 作业名称
   assignments: 
     add_assignment_form: 
       assignment_name: 作业名称
@@ -1757,7 +1759,6 @@ zh:
       notify_content_change: 通知用户此内容已更改
       only_visible_to_overrides_note: "注意：此作业 *仅* 对下面指定的章节显示："
       points_possible: 得分
-      post_to_sis: "发布到 SIS"
       warnings: 
         assignment_is_frozen: 某些设置已被管理员锁定。
     errors: 
@@ -1979,6 +1980,8 @@ zh:
       reviews_per_user: 每位用户的审阅次数
     points_possible_number: 满分必须为数字
     positive_number: 您必须使用正数
+    post_to_sis_selector: 
+      post_grades_to_sis_97ece878: "发布评分到 SIS"
     redirect_page: 
       redirect_message: |-
           此提交为 url，我们立即带您前往 url 链接。  
@@ -2250,6 +2253,7 @@ zh:
     corrupted: 详细信息不可用
     login: 登录
     logout: 登出
+  available_from_587ce92f: 开始时间
   bb_display: "Blackboard 学习"
   bb_file_description: "Blackboard 6/7/8/9 export .zip 文件"
   bb_name: "Blackboard 转换器"
@@ -2272,7 +2276,6 @@ zh:
       published: 已发布
       unpublished: 已取消发布
     published_title: 已发布
-    restricted_title: "从 %{from_date} 到 %{until_date} 可用"
     title: 
       permissions: "此人员的编辑权限：%{name}"
     unpublished_title: 已取消发布
@@ -2335,8 +2338,6 @@ zh:
       user_name_description: "让教师/设计者访问该行中课程的用户的用户名。该名称必须符合以上列出的 Blackboard 登录凭证中的用户名之一。"
     only_one_bulk_migration: 一次只能运行一个批量课程迁移。
   button: 
-    go_back: 返回
-    post: 发布评分
     submit_assignment: 提交作业
   buttons: 
     add_item: 添加项目
@@ -2350,7 +2351,6 @@ zh:
     done: 完成
     filter: 过滤
     find_user: 查找用户
-    ignore_all: 忽略全部
     import: 导入
     login: 登录
     manage_rubrics: 管理评分标准
@@ -2856,6 +2856,7 @@ zh:
         create_assignment: 创建新作业
         delete: 删除事件/作业
         new: 创建新事件
+  cancel_caeb1e68: 取消
   canvas: 
     migration: 
       errors: 
@@ -3988,6 +3989,7 @@ zh:
       tool_insecure_warning: "您正在尝试从安全站点 (canvas) 内启动不安全的内容。某些 Internet 浏览器可能阻止加载此内容。"
   context_modules_api: 
     invalid_position: 位置无效
+  continue_ac067716: 继续
   conversation_dialog: 
     errors: 
       field_is_required: 此字段为必填字段
@@ -4360,6 +4362,7 @@ zh:
       uuid: UUID
       wiki_id: "Wiki ID"
       workflow_state: 工作流状态
+  course_members_are_free_to_join_9b2603d4: 学员可自由加入
   course_restore: 
     restore_error: 尝试恢复课程时出现错误。课程未恢复。
   course_search: 
@@ -4377,8 +4380,6 @@ zh:
       delete_section: 是否确定要删除此班级?
       publish_grades: 是否确定要发布这些评分到学生信息系统?如果所有评分都已确定，应只执行此操作。
       re_publish_grades: 是否确定要重新发布这些评分到学生信息系统?
-    course_dates_enforced: 用户只能参与这些日期之间的课程
-    course_dates_unenforced: 这些日期不会影响课程可用性
     edit_sections_placeholder: 输入班级名称
     edit_sections_title: 班级名称
     errors: 
@@ -4393,9 +4394,6 @@ zh:
       links: 学生链接已成功更新
       sectionError: 更新用户的班级时出错。请稍后重试。
       sections: 班级注册已成功更新
-    grading_standard_set: 现已设置
-    grading_standard_unset: 未设置
-    indexed_course: 包含在公共课程索引中
     invitation_sent: 邀请已发送！
     invitation_sent_now: 刚才
     link_students_placeholder: 输入学生姓名
@@ -4407,8 +4405,6 @@ zh:
       re_send_all: 重新发送所有未接受的邀请
       re_sending_invitation: 正在重新发送邀请...
       republish: "重新发布评分到 SIS"
-    private_course: 私人
-    public_course: 公共
     re_send_invitation: 重新发送邀请
     remove_user_from_course_section: "从 %{course_section} 中删除用户"
     titles: 
@@ -4890,7 +4886,6 @@ zh:
           assignments: 作业列表
           custom_page: 页面首页
           modules: 课程单元
-          recent_activity_dashboard: 最近活动仪表板
           syllabus: 大纲
       empty_body: 无内容
       front_page_not_set: 必须先设置首页
@@ -5395,7 +5390,6 @@ zh:
         other: "此讨论为计分作业：*满分 %{count} 分*"
       show_due_dates: 显示截止时间
       until: 结束时间
-    cannot_unpublish_with_replies: 如果有回复则无法取消发布
     confirm_delete_announcement: 
       one: "是否确定要删除这 %{count} 个通告?"
       other: "是否确定要删除这 %{count} 个通告?"
@@ -5614,7 +5608,6 @@ zh:
       go_to_topic: 返回主题
       manage_discussion_entry: 管理讨论条目
       open_in_speedgrader: 在快速评分器中打开
-      unknown_author: 未知作者
       write_a_reply: 回复
     entry_stats: 
       show_more: 显示更多
@@ -5668,6 +5661,7 @@ zh:
       内容可以在学生不可见的的新的未发布状态下
       存在并且不包括在评分计算中。注意: 禁用此功能
       可能会在教师视图中删除新创建的或编辑的内容。
+  due_date_822625d8: 截止时间
   due_dates: 
     due_at: "截止时间: %{assignment_due_date_time}"
     multiple_due_dates: "截止时间: 多个截止时间"
@@ -5696,7 +5690,6 @@ zh:
   edit_survey_b0d6890d: 编辑调查
   editor: 
     alt_text: "替换文本:"
-    based_on_type: "基于 %{base_type}"
     button: 
       insert_equation: 插入等式
     cancel: 取消
@@ -5719,9 +5712,7 @@ zh:
     loading: 正在加载...
     mathjax_text_entry_field_label: "以 LaTeX 格式输入等式。"
     more_external_tools: 更多外部工具
-    role: 
-      duplicate_role_error: 无法创建此身份，因为具有此姓名的身份已存在。请尝试使用其它姓名
-      remove_role_confirmation: 如果有任何用户具有此身份，他们将保留当前的权限，但您无法创建具有该身份的新用户。单击“确定”继续删除此身份。
+    no_name_error: 需要名称
     save_failed: 保存失败，请稍后重试
     saving: 正在保存...
     screen_reader_tip: "屏幕阅读器用户: 最便于访问此编辑器的使用方式是，切换到高级试图，然后直接输入 LaTeX 或使用工具栏帮助您完成输入。用于切换到高级视图的链接可在此对话框快结束时找到，紧邻编辑字段前。"
@@ -6045,6 +6036,7 @@ zh:
       submissions: 
         body1: "您可能已经注意到，此页的底部是班级 (%{showme}) 最近提交的文件列表。您可以在此页中快速添加提交文件到学习档案中的新页面。只需单击要添加的提交的作业，就会弹出一个简单的对话框。"
         body2: "很好！现在要完成添加提交文件的操作，您需要选择要添加到的班级，并指定页面名称。单击 \"添加页面\" 之后，您将会转到新页面，以便能够根据需要进行详细编辑。"
+  error_deleting_name_reason_11f9d399: "删除 %{name} 时出错：%{reason}"
   error_message_2b9d12ee: "错误：%{message}"
   error_uploading_file_e2d31b56: 上传文件时出错。
   errors: 
@@ -6092,6 +6084,7 @@ zh:
     sis_id_in_use: "学号 \"%{sis_id}\" 已在使用中"
     unsaved_changes: 您有未保存的更改。
     wrong_file_extension: "您所选的扩展名为 \"%{extension}\" 的文件不允许进行提交"
+  everyone_854554dd: 所有人
   external_content: 
     cancel: 
       canceling: 正在取消...
@@ -6324,22 +6317,21 @@ zh:
     post_grades: "发布评分到 SIS"
     student_groups: 新学生组页面
     student_outcome_gradebook: 学生学习掌握程度评分册
-  file_browser_view: 
-    folder_tree_instructions: 使用上下箭头键在树中导航。按右箭头键展开文件夹，按左箭头键折叠文件夹，进入可选择选定的项目。
   file_preview: 
     file_preview_headerbutton_close: 关闭
     file_preview_headerbutton_download: 下载
     file_preview_headerbutton_info: 信息
-    file_preview_hide: 隐藏
     file_preview_infotable_datecreated: 创建日期
     file_preview_infotable_datemodified: 修改日期
     file_preview_infotable_kind: 类型
-    file_preview_infotable_modifiedby: 修改者
     file_preview_infotable_name: 名称
     file_preview_infotable_size: 大小
     file_preview_infotable_status: 状态
-    file_preview_show: 显示
   file_previews: 
+    lock_explanation: 
+      messages: 
+        file_locked: 此文件尚未解锁。
+        folder_locked: "包含此文件的文件夹 \"%{folder},\" 已锁定。"
     no_preview: 
       file_previews: 
         download_file: "下载 *文件名*"
@@ -6358,10 +6350,6 @@ zh:
     published_status: 已发布
     restricted_status: "从 %{from_date} 到 %{until_date} 可用"
     unpublished_status: 已取消发布
-  filebrowserview: 
-    course_files: 课程文件
-    group_files: 小组文件
-    my_files: 我的文件
   files: 
     alts: 
       file: 文件
@@ -6535,10 +6523,8 @@ zh:
       no_rubric_outcomes_found: 找不到评分标准配置的成果
     titles: 
       find_outcome: 查找评分标准
-      find_outcome_criterion: 查找成果标准
   folder: 
     course_content_folder_name: 课程内容
-    default_folder_name: 文件夹
     errors: 
       invalid_recursion: 文件夹不能是自身的父级
       invalid_root_folder_name: 无法更改根文件夹名称
@@ -6918,7 +6904,6 @@ zh:
       individual_view: 切换到个人视图
       learning_mastery: 学习掌握程度
       page_header_title: 评分册
-      post_grades: 发布评分
       publish_to_sis: "发布评分到 SIS"
       set_group_weights: 设置组权重
       show_attendance_columns: 显示参与列
@@ -6974,7 +6959,6 @@ zh:
       headers: 
         anonymous_submission: 由于作业是匿名安排的，所以隐藏了此学生的回答。
         assessment: 测验
-        discussion: 讨论
         grading: 评分
         no_group_submission: 该小组没有提交此作业的文件
         no_submission: 该学生没有提交此作业的文件。
@@ -7127,6 +7111,7 @@ zh:
       home: 主页
       pages: 页面
       people: 人员
+  group_a8f5ed9c: 小组
   group_categories: 
     notices: 
       create_category_success: 类别已成功创建。
@@ -7148,10 +7133,13 @@ zh:
     name_unavailable: "%{name} 已在使用。"
     self_signup_for_courses: 自行注册只对课程组或社区启用
   group_category_locked: 无法更改组类别，因为学生已经提交了此项作业的家作。
+  group_is_full_56849d78: 小组已满
   group_membership: 
     errors: 
       group_full: 该小组已满。
       not_in_group_section: "%{student} 没有与 %{group} 的其他成员共享班级。"
+  group_name_b69c144: 小组名称
+  group_name_is_required_5547bc0b: 需要小组名称
   group_settings: 
     invitation_sent: 邀请已发送
   groups: 
@@ -7429,6 +7417,7 @@ zh:
       group_users: 
         add_student: 添加学生以开始。
         add_user: 添加用户以开始。
+        greater_than_three: 请输入具有三个或更多字符的搜索词
         no_matching_students: 无匹配学生。
         no_matching_users: 无匹配用户。
         no_students: 目前此学习小组中没有学生。
@@ -7484,6 +7473,7 @@ zh:
       self_signup_help: 自行注册小组
     unassigned_students: "未分配的学生 (%{count})"
     unassigned_users: "未分配的用户 (%{count})"
+  groups_6c90e26a: 小组
   help_dialog: 
     Back: 返回
     Help: 帮助
@@ -7561,6 +7551,7 @@ zh:
   html5_first_videos_description: |-
       默认情况下，Canvas 将首先尝试使用 Flash 来播放视频。启用此项可首先尝试使用 HTML5，
       然后返回到 Flash。
+  html_editor_fb2ab713: "HTML 编辑器"
   ic_actions: 
     manage: 管理
   icons: 
@@ -7570,6 +7561,7 @@ zh:
     online_url_submission: "在线 URL 提交项"
     quiz_submission: 测验提交项
     text_entry_submission: 文本条目提交项
+  image_8ad06: 图像
   images: 
     error_checking_color: 检查图像颜色时出错
     invalid_background_color: "背景色必须为 %{color}"
@@ -7680,6 +7672,7 @@ zh:
   invalid_points_possible: 此项作业的可能分数值必须为零或更大的值。
   invalid_url_in_xml: "xml 中的 url 无效。& 号必须转义。"
   invalid_xml_syntax: "无效的 xml 语法"
+  invite_5b1fcbcd: 邀请
   jobs: 
     columns: 
       attempt: 已尝试次数
@@ -7737,6 +7730,9 @@ zh:
     titles: 
       job_handler: 任务处理程序
       last_error: 上次的错误
+  join_6cafecca: 加入
+  joined_group_group_name_e3802c04: "已加入组 %{group_name}"
+  joining_81f8b6c9: 加入
   jquery: 
     module_sequence_footer: 
       next: 下一页
@@ -7788,6 +7784,8 @@ zh:
   learning_outcome: 
     no_comment: 无评论
     no_description: 无说明
+  leave_5e852989: 离开
+  left_group_group_name_aac4e813: "已离开组 %{group_name}"
   lib: 
     angel: 
       failed_import_link: 导入链接失败
@@ -7953,6 +7951,8 @@ zh:
     track_uploaded_successfully: 曲目已成功上载；请刷新您的浏览器。
     upload: 上传
     uploading: 正在上传...
+  members_af25c21d: 成员
+  membership_by_invitation_only_9bc27199: 只能通过邀请加入
   menu: 
     current_groups: 当前习小组
     customize: 自定义
@@ -9665,26 +9665,6 @@ zh:
         subject: "新测验:%{title}，%{context}"
       twitter: 
         tweet: "Canvas 警报 - 新测验:%{title}，%{context}。"
-    self_enrollment_registration: 
-      email: 
-        body: |-
-            您好，%{user}！
-            
-            您已成功自行登记 Canvas Network 上的课程 %{course}！
-            
-            请不要忘了设置您的 Canvas 网络个人资料，这样该课程的其他人员可对您有所了解。您可以在 %{profile_url} 上更新您的个人资料！
-            
-            学无止境！
-            
-            Canvas Network
-        html: 
-          farewell: 学无止境！
-          greetings: "您好，%{user}！"
-          profile_reminder: "请不要忘了设置您的 *Canvas 网络个人资料*，这样该课程的其他人员可对您有所了解。"
-          self_enrollment_confirmation: "您已成功自行登记 Canvas Network 上的课程 %{course}！"
-          self_enrollment_registration: "%{course} 的登记"
-          signature: "Canvas Network"
-        self_enrollment_registration: "%{course} 的登记"
     send_form: 
       labels: 
         message_body: 消息
@@ -10055,7 +10035,6 @@ zh:
       module: 
         prerequisites: 先修课程
         published: 已发布
-    post_grades_dialog_title: "发布评分到 SIS"
     progression_module_collection: 
       module_progress_for: "*%{student.name}* 的单元进度"
       module_progress_for_student: "%{student.name} 学习单元的进度"
@@ -10102,6 +10081,7 @@ zh:
     students_will_see: 学生将能够看到此作业已静音。
     submission_comments: 提交评论
     sure_you_want_to_mute: "是否确定要静音此作业?此作业静音时，学生将不会收到关于以下内容的新通知或无法看到:"
+  n_a_d6f6c42f: 不适用
   name: 学术基准导入器
   new_facebook_message: "您有来自 Canvas 的新消息"
   new_quiz_statistics_desc: 启用某课程的新测验统计页面。
@@ -10380,6 +10360,7 @@ zh:
     new_observee_username: 用户名
     observee_added: "现在正在观察 %{user}"
     observing: 正在观察
+  ok_c47544a2: 确定
   options: 
     ? "no"
     : 否
@@ -10463,7 +10444,6 @@ zh:
     mastery_error: "必须大于或等于 0"
     missing_outcome: 无法找到该学习成果
     near: 接近掌握
-    new_outcome: 新建成果
     new_outcome_group: 新建成果组
     outcome: 
       links: 
@@ -10486,6 +10466,7 @@ zh:
       description: 说明此成果
       display_name: 友好名称（可选）
       mastery: 掌握程度为
+      new_outcome_7fba8c7d: 新建成果
       points: "%{points_possible} 分"
       title: 命名此成果
       total_points: 总得分
@@ -10535,18 +10516,14 @@ zh:
         latest_score: 最新分数
         outcome: 成果
   overrides: 
-    due_date_after_course_conclude: 到期日期不能晚于课程结束日期
-    due_date_before_course_start: 到期日期不能早于课程开始日期
     everyone: 所有人
     everyone_else: 其他所有人
-    lock_date_after_course_end: 锁定日期不能晚于课程结束日期
     lock_date_before_due_date: 锁定时间不能早于截止时间
     overrides: 
       everyone: 所有人
       everyone_else: 其他所有人
     unlock_date_after_due_date: 解锁时间不能晚于截止时间
     unlock_date_after_lock_date: 解锁日期不能晚于锁定日期
-    unlock_date_before_course_start: 解锁日期不能早于课程开始日期
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -10861,9 +10838,6 @@ zh:
     qti_converter_settings: 
       labels: 
         enabled: 已启用
-    registration_form_recaptcha: 
-      description: "注册表单的 CAPTCHA 插件"
-      name: "注册表单 ReCAPTCHA"
     respondus_soap_endpoint: 
       description: "Respondus QTI 上传的 SOAP 端点"
       name: "Respondus SOAP 端点"
@@ -10949,10 +10923,12 @@ zh:
         poll_choice_belongs_to_poll: 该投票选项不属于现有投票。
         poll_is_published: 此投票会话未针对提交项打开。
         user_and_poll_session_uniqueness: 每个投票会话只能提交一个选项。
+  post_grades_39c52870: 发布评分
   post_grades_description: |-
       通过发布评分，教师可以将评分重新发布至支持的 SIS 系统：Powerschool、
       Aspire (SIS2000)、JMC 和其他任何支持 SIF 的 SIS（接受 SIF 元素 GradingCategory、
       GradingAssignment 和 GradingAssignmentScore）。
+  post_grades_to_sis_97ece878: "发布评分到 SIS"
   practice_quiz_19a8505d: 练习测验
   prerequisites_lookup: 
     headers: 
@@ -11404,6 +11380,7 @@ zh:
       link_invalid: 您所使用的链接不再有效。如果您无法登录，请单击“不知道您的密码？”来重置密码。
       password_changed: 密码已更改
   public_courses_title: 公共课程
+  public_domain_112ed397: 公共域
   publish_btn_module: 
     buttons: 
       publish: 发布
@@ -11555,6 +11532,7 @@ zh:
       some_scores_reduced: 仅正确的回答可得分（*可能会扣除某些学生的分数*）
       update_question_without_regrading: 更新问题而不重新评分
   quiz_reports: 
+    cancel_generation: 取消
     download_item_analysis: " 下载项目分析报告。"
     download_student_analysis: 下载学生分析报告。
     generatable: 从未生成报告。
@@ -11566,6 +11544,7 @@ zh:
     generation_complete: 已生成报告。
     generation_halfway: 完成了不到一半。
     generation_started: 正在生成报告。
+    item_analysis: 项目分析
     non_generatable_report_notice: 无法针对调查测验生成报告。
     quiz_report_generator: 
       download_report_name: "下载 %{report_name}"
@@ -11573,6 +11552,7 @@ zh:
       generated_at_date_time: "生成时间 %{dateAndTime}"
       generating_report_name: "正在生成 %{report_name}..."
       item_analysis_not_available: 项目分析对调查不可用
+    student_analysis: 学生分析
   quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: 此测验的测验结果受到保护，不对学生显示。
   quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: 此测验的测验结果受到保护，不对学生显示，直到学生提交了最后一次尝试。
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: 此测验的测验结果受到保护，只能在提交后立即查看一次。
@@ -12124,26 +12104,6 @@ zh:
         unnamed_survey_results: "%{user} 的调查结果"
       index: 
         page_titles: 测验
-      index_legacy: 
-        buttons: 
-          publish_quizzes: 发布测验
-        headers: 
-          assignment_quizzes: 作业测验
-          course_quizzes: 课程测验
-          practice_quizzes: 练习测验
-          publish_multiple_quizzes: 发布多个测验
-          surveys: 调查
-          unpublished_quizzes: 取消发布测验
-        labels: 
-          publish_multiple_quizzes: 选择您要在此时发布的测验
-        links: 
-          create_new_quiz: 创建新测验
-          manage_question_banks: 管理题库
-          publish_multiple_quizzes: 发布多个测验
-        no_quizzes: 没有可用的测验
-        page_titles: 测验
-        titles: 
-          this_quiz_is_locked: 此测验目前处于锁定状态。单击了解详细信息。
       invalid_ip: 
         quiz_protected: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
         survey_protected: 此调查受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此调查的有效位置。
@@ -12272,6 +12232,7 @@ zh:
         one_time_results: 每次尝试后仅一次
         only_visible_to_overrides_note: "注意：此测验 **仅** 对下面指定的章节显示："
         points_possible: "得分 %{n}"
+        post_to_sis: "发布评分到 SIS"
         quiz_title: 测验标题
         quiz_type: 测验类型
         require_lockdown_browser: "需要 Respondus LockDown Browser"
@@ -12481,8 +12442,6 @@ zh:
         buttons: 
           lock_quiz: 立即锁定此测验
           lock_survey: 立即锁定此调查
-          publish: 发布
-          republish: 重新发布
           unlock_quiz: 立即允许学生进行此测验
           unlock_survey: 立即允许学生进行此调查
         course_concluded_notice: 因为课程已结束，不再提供此测验。
@@ -12717,21 +12676,14 @@ zh:
     add_folder: 添加文件夹
     all_my_files: 我的所有文件
     cancel: 取消
-    confirm_delete: 
-      one: "是否确实要删除这 %{count} 个项目？"
-      other: "是否确实要删除这 %{count} 个项目？"
     confirm_delete_with_contents: 
       one: "是否确实要删除这 %{count} 个项目和其中的任何内容？"
       other: "是否确实要删除这 %{count} 个项目和其中的任何内容？"
-    count_items_selected: "已选择 %{count} 个项目"
     created_at: 创建日期
     created_at_short: 已创建
     delete: 删除
-    delete_error: "删除 %{name} 时出错：%{reason}"
-    deleted_items_successfully: "已成功删除 %{count} 个项目"
     download: 下载
     download_as_zip: "作为 Zip 下载"
-    edit_name: 编辑名称
     errors: 
       no_match: 
         keywords: 尝试不同的关键字。
@@ -12773,11 +12725,8 @@ zh:
     sorted_ascending: 按升序排序
     sorted_desending: 按降序排序
     this_folder_is_empty: 此文件夹为空
-    title: 
-      permissions: "%{count} 个项目的编辑权限"
     updated_at: 修改日期
     updated_at_short: 已修改
-    usage_details: "%{quota_used} / %{quota}"
     view: 查看
   recent_student: 
     last_logged_in: "上次登录时间 %{last_login}"
@@ -12829,21 +12778,17 @@ zh:
         email: 电子邮件
         name: 姓名
     welcome_to_canvas: "欢迎使用 Canvas！"
+  remove_f47dc62a: 删除
+  rename_45608f54: 重命名
   reply_from_name: "%{name}，借助 Canvas 通知"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
         enabled: "已启用（还必须启用 QTI 转换器）"
   restrict_student_access: 
-    aria_label: 
-      availableFrom: 从
-      availableUntil: 截止时间
     button_text: 
       cancel: 取消
       update: 更新
-    label: 
-      availableFrom: 锁定开始时间
-      availableUntil: 锁定结束时间
     options: 
       hiddenInput: 
         description: 只能通过链接向学生提供。在学生文件中不显示。
@@ -12860,6 +12805,7 @@ zh:
   resume_quiz_afeceb87: 继续测验
   resume_survey_58dce775: 继续调查
   retrieve_timeout: 无法检索配置，服务器响应超时
+  rich_content_editor_2708ef21: 富内容编辑器
   role_override: 
     permission: 
       read_sis: "读取 SIS 数据"
@@ -12956,12 +12902,13 @@ zh:
     site_admin_permissions: 网站管理员权限
     update_failed_notice: 身份创建失败
   roles: 
-    new_role: 
-      add: 添加
-      add_role: 添加角色
-      add_role_label: 添加角色
-      role_name: 角色名称
+    based_on_type: "基于 %{base_type}"
+    edit_role: 
       role_name_label: 角色名称
+    new_role: 
+      cancel: 取消
+      save: 保存
+      saving: 正在保存...
     permission_button: 
       rolebutton: 
         disable: 禁用
@@ -12970,10 +12917,18 @@ zh:
         enable_and_lock: 启用和锁定
         use_default: 使用默认设置
     permissions: 权限
+    role: 
+      remove_role_confirmation: 如果有任何用户具有此身份，他们将保留当前的权限，但您无法创建具有该身份的新用户。单击“确定”继续删除此身份。
+    roles_collection_view: 
+      add_role: 添加角色
     roles_override_index: 
       account_roles: 帐户角色
       course_roles: 课程角色
       page_header_title: 帐户权限
+  rootFoldersFinder: 
+    course_files: 课程文件
+    group_files: 小组文件
+    my_files: 我的文件
   roster: 
     delete_confirm: 是否确定要删除此用户？
     error_sending_invitations: 发送邀请时出错。请重试。
@@ -13041,6 +12996,7 @@ zh:
         are_you_sure_delete: "是否确定要删除此评分标准说明? 当前使用评分标准的任何位置将仍可访问，但其他人将无法使用该评分标准。"
         are_you_sure_remove: 是否确定要从您的列表中删除此评分标准?
       remove_rubric: 从我的列表中删除此评分标准
+  save_11a80ec3: 保存
   score_out_of_points_possible_88f370fd: "%{score}，满分 %{points_possible} 分"
   screenreader_gradebook: 
     assignment_information: 
@@ -13163,6 +13119,7 @@ zh:
     enrollments_tas: 助教
     enrollments_teachers: 教师
     student_groups: 学习小组
+  search_groups_or_people_6c15d6ad: 搜索组或人员
   section: 
     confirms: 
       delete_enrollment: 是否确定要永久删除此注册?
@@ -13303,6 +13260,7 @@ zh:
         go_to_course: 转到课程
         go_to_dashboard: 转到您的面板
       not_available_yet: 在课程开始之前，我们将很快向您发送电子邮件。
+  send_e3bd0ed0: 发送
   sequence_footer: 
     next_module: "下个单元:"
     next_module_desc: "下个单元: *单元*"
@@ -13318,6 +13276,11 @@ zh:
     overwrite: 覆盖已输入的评分
     set_grades_button: 设置默认评分
     set_grades_button_loading: 正在设置评分...
+  settings: 
+    recaptcha_settings: 
+      labels: 
+        recaptcha_private_key: "ReCAPTCHA 私钥"
+        recaptcha_public_key: "ReCAPTCHA 公钥"
   shared: 
     account_notification: 
       close: 关闭
@@ -13407,7 +13370,6 @@ zh:
       enrolled_as_teacher: 注册为教师
       favorited_tooltip: 单击可从课程菜单中删除。
       nonfavorited_tooltip: 单击可添加到课程菜单。
-      not_favoritable_tooltip: 此时该课程无法添加到课程菜单。
       unpublished_course: 已取消发布
       unpublished_course_tooltip: 此课程尚未发布。学生应联系课程导师进行访问。
     custom_search_results: 
@@ -13723,7 +13685,7 @@ zh:
         edit: 编辑评分标准说明
         find_a_rubric: 查找评分标准
         find_another_rubric: 查找其它评分标准
-        find_outcome_criterion: 查找成果标准
+        find_outcome: 查找评分标准
         find_rubric: 查找评分标准
       messages: 
         locked: 一旦开始使用后，就无法更改评分标准。
@@ -14135,31 +14097,6 @@ zh:
   stream_items_api: 
     assessment_request_title: "%{title} 的同伴审阅"
   student_assignment_outcome_map_title: 学生能力
-  student_groups: 
-    group_join: "已加入组 %{group_name}"
-    group_leave: "已离开组 %{group_name}"
-    group_name: "%{group_category} 中的 %{group_name}"
-    new_group: 
-      group_explanation: 小组是项目协作或安排学习时间之类活动的良好场所。每个小组都有一份日历、一个维基页面、若干讨论和存储文件用的一些空间。各小组可协作处理文档，甚至安排网络会议。它就像一个小型班级，学生数量更少，可开展更有针对性的项目。
-      joining: 加入
-      name: 小组名称
-      name_error: 需要小组名称
-    search_groups_placeholder: 搜索组或人员
-    student_groups: 
-      full: 已满
-      group: 小组
-      group_full: 小组已满
-      invite_only: 仅限邀请
-      student_groups_join: 加入
-      student_groups_leave: 离开
-      student_groups_switch: 切换至
-      student_groups_tabs_everyone: 所有人
-      student_groups_tabs_groups: 小组
-      visit: 访问
-    student_groups_filter_description: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
-    students_count: 
-      one: "%{count} 名学生"
-      other: "%{count} 名学生"
   student_groups_desc: |-
       这可以为帐户启用新学生组页面。新页面的构建可提供动态程度更高的组注册
       体验。
@@ -14331,7 +14268,6 @@ zh:
       preview_title: "%{title} 的预览"
       quiz_submission: 此提交是测验提交。正在重定向到测试页面。
       show_entire_discussion: 显示完整讨论
-      student: 学生
       url_preview: "URL 预览"
       view_feedback_button: 查看反馈
       view_original_submission: "查看 %{user} 的原始提交文件"
@@ -14340,6 +14276,7 @@ zh:
     submission_download: 
       download_message: "**正在收集学生的提交文件**并将其压缩成 zip 文件。这可能需要一些时间，具体视提交文件的大小和数量而定。"
       gathering_files: 正在收集文件...
+  submit_a3cc6859: 提交
   support: 
     array: 
       last_word_connector: ", and "
@@ -14357,6 +14294,7 @@ zh:
       curriculum_assessment_errata_description: 查看已经报告的测验和课程错误。搜索“勘误”。
       networking_academy_description: "查看 Cisco 对最常见问题的答案。"
       networking_academy_faqs: "Networking Academy 常见问题解答"
+  switch_to_3f310557: 切换至
   syllabus: 课程大纲
   table_headings: 
     name: 姓名
@@ -14662,6 +14600,8 @@ zh:
       second_bullet: 请确保您选择最合适的选项，因为学生的分数可能会受到影响。
       third_bullet: "Canvas 将在您保存测验后对您的所有提交项重新评分，此过程可能要用几分钟时间。"
       try_later: 您现在可以为已经参加测验的学生设置重新评分可选功能。
+  tree_browser: 
+    folder_tree_instructions: 使用上下箭头键在树中导航。按右箭头键展开文件夹，按左箭头键折叠文件夹，进入可选择选定的项目。
   turnitin: 
     error_1007: 上传的文件过大。
     error_1009: "无效的文件类型。（有效的文件类型包括 MS Word、Acrobat PDF、Postscript、Text、HTML、WordPerfect (WPD) 和 RTF 格式。）"
@@ -14679,6 +14619,7 @@ zh:
       resubmit_to_turnitin: "重新提交到 Turnitin"
   ungraded_survey_ad7de790: 非评分调查
   unknown: 未知
+  unknown_47a3b725: 未知
   unknown_question_bank: 未知题库
   unknown_quiz: 未知测验
   unpublished_courses_title: 未发布的课程
@@ -14690,6 +14631,8 @@ zh:
     upload: 上传
   upload_drop_zone: 
     drop_to_upload: 放下项目即可上传
+  usage_rights_modal: 
+    saving: 正在保存...
   user: 
     default_user_name: 用户
     errors: 
@@ -15011,18 +14954,6 @@ zh:
       terms_of_use: 使用条款
     no_self_registration: 已为此帐户启用自助注册
     oauth_fail: "OAuth 请求失败。无法找到有效的请求"
-    recaptcha_settings: 
-      instructions: |-
-          在能够使用 ReCAPTCHA 插件之前，您将需要 
-          [注册 ReCAPTCHA 帐户](%{url})。确保正确设置
-          您的域以处理网站域。设置帐户
-          后，在下面输入您的公钥和私钥。
-          
-          **注:**您对这些设置所做的任何更改都不会
-          更新，直到您重新启动服务器。
-      labels: 
-        private_key: "ReCAPTCHA 私钥"
-        public_key: "ReCAPTCHA 公钥"
     registered: 
       almost_there: 您几乎已经...
       done_resending: 完成！收到消息可能需要几分钟。
@@ -15093,6 +15024,7 @@ zh:
       welcome_to_happiness: "欢迎使用 Canvas!"
   validate: 
     is_required: 此字段为必填字段
+  visit_864b4060: 访问
   warnings: 
     test_install: 
       periodic_message: "此 Canvas 安装仅用于测试，且将定期重置。"
@@ -15343,7 +15275,6 @@ zh:
       archive: 存档
       archive_link: 查看存档
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已对此测验中的问题进行了更改。* 这些更改将不会对学生显示，直到您保存测验。"
-  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*您已对此测验进行了未发布的更改。* 这些更改将不会对学生显示，直到您发布或重新发布测验。"
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: 您的搜索遇到了以下错误：
     other: 您的搜索遇到了以下错误：
