@@ -26,7 +26,8 @@ module SearchHelper
   # If a course is provided, just return it (and its groups/sections)
   def load_all_contexts(options = {})
     context = options[:context]
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user, context].cache_key, :expires_in => 10.minutes) do
+    include_permissions = options[:permissions].present?
+    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user, context, include_permissions].cache_key, :expires_in => 10.minutes) do
       contexts = {:courses => {}, :groups => {}, :sections => {}}
 
       term_for_course = lambda do |course|
@@ -43,9 +44,10 @@ module SearchHelper
             :term => term_for_course.call(course),
             :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
             :available => type == :current && course.available?,
-            :permissions => course.rights_status(@current_user).select { |key, value| value },
             :default_section_id => course.default_section(no_create: true).try(:id)
-          }
+          }.tap do |hash|
+            hash[:permissions] = course.rights_status(@current_user).select { |key, value| value } if include_permissions
+          end
         end
       end
 
@@ -65,7 +67,7 @@ module SearchHelper
         end
       end
 
-      add_groups = lambda do |groups|
+      add_groups = lambda do |groups, group_context = nil|
         ActiveRecord::Associations::Preloader.new(groups, :group_category).run
         ActiveRecord::Associations::Preloader.new(groups, :group_memberships, conditions: { group_memberships: { user_id: @current_user }}).run
         groups.each do |group|
@@ -75,11 +77,12 @@ module SearchHelper
             :name => group.name,
             :type => :group,
             :state => group.active? ? :active : :inactive,
-            :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
-            :context_name => group.context.name,
-            :category => group.category,
-            :permissions => group.rights_status(@current_user).select { |key, value| value }
-          }
+            :parent => group.context_type == 'Course' ? {:course => group.context_id} : nil,
+            :context_name => (group_context || group.context).name,
+            :category => group.category
+          }.tap do |hash|
+            hash[:permissions] = group.rights_status(@current_user).select { |key, value| value } if include_permissions
+          end
         end
       end
 
@@ -95,7 +98,7 @@ module SearchHelper
           []
         end
         add_sections.call sections
-        add_groups.call context.groups.active
+        add_groups.call context.groups.active, context
       elsif context.is_a?(CourseSection)
         visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), true)
         sections = (visibility == :restricted) ? [] : [context]
