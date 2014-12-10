@@ -480,11 +480,11 @@ describe Submission do
         @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({})
 
         expects_job_with_tag('Submission#check_turnitin_status') do
-          @submission.check_turnitin_status(Submission::TURNITIN_RETRY-1)
+          @submission.check_turnitin_status(Submission::TURNITIN_STATUS_RETRY-1)
           expect(@submission.reload.turnitin_data[@submission.asset_string][:status]).to eq 'pending'
         end
 
-        @submission.check_turnitin_status(Submission::TURNITIN_RETRY)
+        @submission.check_turnitin_status(Submission::TURNITIN_STATUS_RETRY)
         @submission.reload
         updated_data = @submission.turnitin_data[@submission.asset_string]
         expect(updated_data[:status]).to eq 'error'
