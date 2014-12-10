@@ -45,7 +45,7 @@ set :deploy_to, '/var/canvas'
 # for core ruby config, like boot.rb when it sets RAILS_ROOT.  You'll get Rack loading
 # errors when it can't find files (e.g. lib/canvas_logger).  This is the reason that
 # configs are copied over in the copy_configs task.
-set :linked_dirs, %w{bin log tmp/pids public/system}
+set :linked_dirs, %w{log tmp/pids public/system}
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
