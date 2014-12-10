@@ -1154,12 +1154,11 @@ ko:
       podcast_title_course: "과목 공지 Podcast 피드"
       podcast_title_group: "그룹 공지 Podcast 피드"
     index_view: 
+      announcement_fb4cb645: "공지 사항"
       announcements_title: 공지
       delete: 삭제
       loading: "로드하는 중..."
       lock_for_comments: "의견 잠금"
-      make_an_announcement: 공지하기
-      make_an_announcement_caps: 공지하기
       make_sure_all_search_terms_are_spelled_correctly: "모든 검색 용어의 철자가 올바른지 확인하십시오. "
       rss_feed: "RSS 피드"
       search_title_body_or_author: "제목, 내용, 작성자 검색"
@@ -1227,6 +1226,7 @@ ko:
     invalid_participants: "한 명 이상의 참가자를 허용해야 함"
     title: "%{name} 편집"
     update: 업데이트
+  archive_3f794d7e: 저장소
   assessment_question: 
     default_question_name: 질문
   assessment_question_bank: 
@@ -1302,6 +1302,7 @@ ko:
     unmute_button: "과제 평점 공개"
     unmute_dialog: "이 과제는 현재 평점 비공개 상태입니다. 이는 학생이 평점과 피드백을 볼 수 없다는 것을 뜻합니다. 지금 평점을 공개하시겠습니까?"
     unmuting_assignment: "과제 평점 공개 중..."
+  assignment_name_b2d87383: "과제 이름"
   assignments: 
     add_assignment_form: 
       assignment_name: "과제 이름"
@@ -1983,6 +1984,7 @@ ko:
   auth_logging: 
     login: 로그인
     logout: 로그아웃
+  available_from_587ce92f: "다음부터 사용 가능"
   bb_display: "Blackboard 학습"
   bb_file_description: "Blackboard 6/7/8/9 내보내기 .zip 파일"
   bb_name: "Blackboard 변환기"
@@ -2058,7 +2060,6 @@ ko:
       user_name_description: "행에 해당하는 과목에 대한 교사/디자이너 액세스를 가진 사용자의 사용자 이름입니다. 이는 위 Blackboard 로그인 자격 증명에 나열된 사용자 이름 중 하나와 일치해야 합니다."
     only_one_bulk_migration: "한번에 하나의 일괄 과목 마이그레이션만 실행할 수 있습니다."
   button: 
-    go_back: "뒤로 가기"
     submit_assignment: "과제 제출"
   buttons: 
     add_item: "항목 추가"
@@ -2562,6 +2563,7 @@ ko:
         create_assignment: "새 과제 만들기"
         delete: "행사/과제 삭제"
         new: "새 행사 만들기"
+  cancel_caeb1e68: 취소
   canvas: 
     migration: 
       errors: 
@@ -3632,6 +3634,7 @@ ko:
       student_progress: "모듈의 학생 진행률"
   context_modules_api: 
     invalid_position: "유효하지 않은 위치"
+  continue_ac067716: 계속
   conversation_dialog: 
     errors: 
       field_is_required: "이 필드가 필요함"
@@ -3932,6 +3935,7 @@ ko:
       license: 라이선스
       name: 이름
       turnitin_comments: "Turnitin 설명"
+  course_members_are_free_to_join_9b2603d4: "과목 구성원은 자유롭게 참여"
   course_restore: 
     restore_error: "과목 복원을 시도하는 중에 오류가 발생했습니다. 과목이 복원되지 않았습니다."
   course_search: 
@@ -3949,8 +3953,6 @@ ko:
       delete_section: "이 섹션을 삭제하시겠습니까?"
       publish_grades: "이 평점을 학생 정보 시스템에 게시하시겠습니까? 모든 평점이 완료된 후에 이 작업을 해야 합니다."
       re_publish_grades: "이 평점을 학생 정보 시스템에 다시 게시하시겠습니까?"
-    course_dates_enforced: "사용자가 이 날짜 사이의 과목에만 참여할 수 있음"
-    course_dates_unenforced: "이 날짜는 과목 사용 가능에 영향을 미치지 않음"
     edit_sections_placeholder: "섹션 이름 입력"
     edit_sections_title: "이름 선택"
     errors: 
@@ -3965,9 +3967,6 @@ ko:
       links: "학생 링크를 성공적으로 업데이트"
       sectionError: "사용자 섹션을 업데이트하는 중 오류가 발생했습니다. 다시 시도하시기 바랍니다."
       sections: "섹션 등록을 성공적으로 업데이트"
-    grading_standard_set: "현재 설정됨"
-    grading_standard_unset: "설정되지 않음"
-    indexed_course: "공개 과목 색인에 포함됨"
     invitation_sent: "초대를 보냈습니다!"
     invitation_sent_now: "바로 지금"
     link_students_placeholder: "학생 이름 입력"
@@ -3978,8 +3977,6 @@ ko:
       re_send_all: "수락하지 않은 초대를 모두 다시 보내기"
       re_sending_invitation: "초대 다시 보내는 중..."
       republish: "SIS에 평점 다시 게시"
-    private_course: 비공개
-    public_course: 공개
     re_send_invitation: "초대 다시 보내기"
     remove_user_from_course_section: "%{course_section}에서 사용자 제거"
     titles: 
@@ -4413,7 +4410,6 @@ ko:
         options: 
           assignments: "과제 목록"
           modules: "과목 모듈"
-          recent_activity_dashboard: "최근 활동 대시보드"
           syllabus: 요강
       empty_body: "내용 없음"
       headings: 
@@ -4864,7 +4860,6 @@ ko:
         other: "이는 평가하는 토론입니다: *%{count}점 가능*"
       show_due_dates: "기한 표시"
       until: "다음 시간까지"
-    cannot_unpublish_with_replies: "답변이 있으면 게시를 취소할 수 없음"
     confirm_delete_announcement: 
       one: "이 알림 %{count}개를 삭제하시겠습니까?"
       other: "이 알림 %{count}개를 삭제하시겠습니까?"
@@ -5045,7 +5040,6 @@ ko:
       go_to_topic: "주제로 가기"
       manage_discussion_entry: "토론 항목 관리"
       open_in_speedgrader: "SpeedGrader에서 열기"
-      unknown_author: "알 수 없는 작성자"
       write_a_reply: "답변 작성..."
     entry_stats: 
       show_more: "자세히 표시"
@@ -5092,6 +5086,7 @@ ko:
     unsubscribe: "이 주제를 구독 해제"
     unsubscribed: "구독 해제함"
     unsubscribed_hint: "이 주제를 구독하고 있지 않습니다. 구독하려면 클릭합니다."
+  due_date_822625d8: 기한
   due_dates: 
     due_at: "기한: %{assignment_due_date_time}"
     multiple_due_dates: "기한: 여러 기한"
@@ -5117,7 +5112,6 @@ ko:
   edit_survey_b0d6890d: "설문 편집"
   editor: 
     alt_text: "대체 텍스트:"
-    based_on_type: "%{base_type}을 바탕으로 함"
     button: 
       insert_equation: "수식 삽입"
     cancel: 취소
@@ -5136,9 +5130,6 @@ ko:
       dialog_title: "키보드 단축키"
     loading: "로드 중..."
     more_external_tools: "더 많은 외부 도구"
-    role: 
-      duplicate_role_error: "같은 이름의 역할이 있으서 이 역할을 만들 수 없습니다. 다른 이름을 시도하시기 바랍니다."
-      remove_role_confirmation: "이 역할을 가진 사용자가 있다면 현재 사용 권한을 유지하지만 이 역할로 새 사용자를 추가할 수 없습니다. 이 역할을 삭제하려면 확인을 클릭하십시오."
     save_failed: "저장 실패"
     saving: "저장 중..."
     search_flickr: "Flickr creative commons 검색"
@@ -5498,6 +5489,7 @@ ko:
     registration_incomplete: "이 페이지를 보기 전에 이메일 주소를 확인해야 함"
     required: "필수 사항"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
+  everyone_854554dd: 모두
   external_content: 
     cancel: 
       canceling: "취소 중..."
@@ -5691,19 +5683,18 @@ ko:
     google_docs_domain_restriction: "Google Docs 도메인 제한"
   file_preview: 
     file_preview_headerbutton_close: 닫기
-    file_preview_hide: 숨기기
     file_preview_infotable_name: 이름
     file_preview_infotable_status: 상태
-    file_preview_show: 표시
+  file_previews: 
+    lock_explanation: 
+      messages: 
+        file_locked: "파일의 잠금을 아직 해제하지 않았습니다."
+        folder_locked: "이 파일을 포함한 \"%{folder},\" 폴더가 잠겼습니다."
   file_rename_form: 
     name: 이름
   file_status: 
     published_status: 게시됨
     unpublished_status: "게시 안 됨"
-  filebrowserview: 
-    course_files: "과목 파일"
-    group_files: "그룹 파일"
-    my_files: "내 파일"
   files: 
     alts: 
       file: 파일
@@ -5874,10 +5865,8 @@ ko:
       no_rubric_outcomes_found: "루브릭이 구성된 성과를 찾을 수 없음"
     titles: 
       find_outcome: "성과 검색"
-      find_outcome_criterion: "성과 검색 조건"
   folder: 
     course_content_folder_name: "과목 내용"
-    default_folder_name: 폴더
     errors: 
       invalid_recursion: "폴더는 자신의 부모가 될 수 없음"
     folder_created: "\"%{name}\" 폴더 만듦"
@@ -6242,7 +6231,6 @@ ko:
       headers: 
         anonymous_submission: "과제가 익명이므로 이 학생의 답변이 표시되지 않습니다."
         assessment: 평가
-        discussion: 토론
         grading: "평점 매기기"
         no_group_submission: "이 그룹은 이 과제에 대한 제출물이 없음"
         no_submission: "이 학생은 이 과제에 대한 제출물이 없음"
@@ -6387,6 +6375,7 @@ ko:
       home: 홈
       pages: 페이지
       people: 사용자
+  group_a8f5ed9c: 그룹
   group_categories: 
     notices: 
       create_category_success: "범주를 성공적으로 만들었습니다."
@@ -6409,6 +6398,7 @@ ko:
     errors: 
       group_full: "그룹이 꽉 찼습니다."
       not_in_group_section: "%{student}는 %{group}의 다른 구성원과 섹션을 공유하지 않습니다."
+  group_name_b69c144: "그룹 이름"
   group_settings: 
     invitation_sent: "초대 보냄"
   groups: 
@@ -6668,6 +6658,7 @@ ko:
         remove: 제거
         remove_from_group: "%{name}을(를) 그룹에서 제거"
       group_users: 
+        greater_than_three: "3자 이상으로 된 검색어를 입력하십시오."
         no_matching_students: "일치하는 학생이 없습니다."
         no_matching_users: "일치하는 사용자가 없습니다."
       groups: 
@@ -6719,6 +6710,7 @@ ko:
       self_signup_help: "직접 등록 그룹"
     unassigned_students: "할당 안 된 학생 (%{count}명)"
     unassigned_users: "할당 안 된 사용자 (%{count}명)"
+  groups_6c90e26a: 그룹
   help_dialog: 
     Back: 뒤로
     Help: 도움말
@@ -6780,6 +6772,7 @@ ko:
     online_url_submission: "온라인 URL 제출물"
     quiz_submission: "퀴즈 제출물"
     text_entry_submission: "텍스트 항목 제출물"
+  image_8ad06: 이미지
   images: 
     error_checking_color: "이미지 색상 확인 오류"
     invalid_background_color: "배경색은 %{color}이어야 함"
@@ -6881,6 +6874,7 @@ ko:
       enter_search_terms: "검색 용어 입력"
   invalid_url_in_xml: "XML에 잘못된 URL이 있습니다. 앰퍼샌드는 이스케이프 처리를 해야 합니다."
   invalid_xml_syntax: "유효하지 않은 XML 구문"
+  invite_5b1fcbcd: 초대
   jobs: 
     columns: 
       attempt: 시도
@@ -6937,6 +6931,8 @@ ko:
     titles: 
       job_handler: "작업 처리기"
       last_error: "마지막 오류"
+  join_6cafecca: 참여
+  joining_81f8b6c9: 참여하기
   jquery: 
     module_sequence_footer: 
       next: 다음
@@ -7129,6 +7125,8 @@ ko:
       record_upload_media_comment: "미디어 설명 녹음/녹화/업로드"
     upload: 업로드
     uploading: "업로드 중..."
+  members_af25c21d: 구성원
+  membership_by_invitation_only_9bc27199: "초대에 의해서만 참여"
   menu: 
     current_groups: "현재 그룹"
     customize: "사용자 정의"
@@ -8757,11 +8755,6 @@ ko:
         subject: "새 평가: %{title}, %{context}"
       twitter: 
         tweet: "Canvas 알림 - 새 평가: %{title}, %{context}."
-    self_enrollment_registration: 
-      email: 
-        html: 
-          profile_reminder: "과목에 속한 다른 사람들이 여러분이 누구인지 알 수 있도록 *Canvas Network 프로필*을 설정하는 것을 잊지 마시기 바랍니다."
-          signature: "Canvas Network"
     send_form: 
       labels: 
         message_body: 메시지
@@ -9136,6 +9129,7 @@ ko:
     students_will_see: "학생이 이 과제가 평점 비공개라는 것을 볼 수 있습니다."
     submission_comments: "제출물 의견"
     sure_you_want_to_mute: "이 과제의 평점을 비공개하시겠습니까? 과제가 평점 비공개 상태인 동안에는 학생이 다음 경우에 대한 알림을 받거나 볼 수 없습니다:"
+  n_a_d6f6c42f: "해당 없음"
   name: "Academic Benchmark 가져오기 도구"
   new_facebook_message: "Canvas에서 온 새로운 메시지가 있음"
   no_e16d9132: 아니요
@@ -9366,6 +9360,7 @@ ko:
   observees: 
     new_observee_password: 암호
     new_observee_username: "사용자 이름"
+  ok_c47544a2: 확인
   options: 
     ? "no"
     : 아니오
@@ -9434,7 +9429,6 @@ ko:
             title: "성과 설정하기"
     mastery_error: "0보다 크거나 같아야 함"
     missing_outcome: "해당 학습 성과를 찾을 수 없음"
-    new_outcome: "새 성과"
     new_outcome_group: "새 성과 그룹"
     outcome: 
       links: 
@@ -9456,6 +9450,7 @@ ko:
       criterion_info_link: "기준 등급에 대해서 알아보려면 클릭"
       description: "이 성과의 설명"
       mastery: "숙달 점수"
+      new_outcome_7fba8c7d: "새 성과"
       points: "%{points_possible}점"
       title: "성과 이름"
       total_points: 총점
@@ -9788,9 +9783,6 @@ ko:
     qti_converter_settings: 
       labels: 
         enabled: 사용함
-    registration_form_recaptcha: 
-      description: "등록 양식을 위한 CAPTCHA 플러그 인"
-      name: "등록 양식 ReCAPTCHA"
     respondus_soap_endpoint: 
       description: "Respondus QTI 업로드를 위한 SOAP 끝점"
       name: "Respondus SOAP 끝점"
@@ -10265,6 +10257,7 @@ ko:
       email_sent: "확인 이메일을 %{email}로 전송했습니다. 스팸 상자를 확인하는 것을 잊지 마십시오."
       link_invalid: "사용한 링크가 더 이상 유효하지 않습니다. 로그인할 수 없는 경우에는 \"암호를 모릅니다\"를 클릭해서 암호를 다시 설정하십시오."
       password_changed: "암호 변경됨"
+  public_domain_112ed397: "공개 도메인"
   publish_btn_module: 
     buttons: 
       publish: 게시
@@ -10401,11 +10394,14 @@ ko:
       some_scores_reduced: "정답에만 점수 주기 (*일부 학생*의 점수가 낮아질 수도 있음)"
       update_question_without_regrading: "다시 평가하지 않고 문제를 업데이트"
   quiz_reports: 
+    cancel_generation: 취소
+    item_analysis: "항목 분석"
     quiz_report_generator: 
       download_report_name: "%{report_name} 다운로드"
       generate_report_name: "%{report_name} 생성"
       generated_at_date_time: "%{dateAndTime}에 생성"
       generating_report_name: "%{report_name} 생성 중..."
+    student_analysis: "학생 분석"
   quiz_statistics: 
     answer_bars_chart: 
       response_count: 
@@ -10862,8 +10858,6 @@ ko:
         unnamed_survey_results: "%{user}의 설문 결과"
       index: 
         page_titles: 퀴즈
-      index_legacy: 
-        page_titles: 퀴즈
       invalid_ip: 
         quiz_protected: "이 퀴즈는 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
         survey_protected: "이 설문은 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
@@ -11134,8 +11128,6 @@ ko:
         buttons: 
           lock_quiz: "이 퀴즈를 지금 잠금"
           lock_survey: "이 설문을 지금 잠금"
-          publish: 게시
-          republish: "다시 게시"
           unlock_quiz: "지금 학생이 이 퀴즈를 치르도록 함"
           unlock_survey: "지금 학생이 이 설문을 치르도록 함"
         labels: 
@@ -11410,15 +11402,12 @@ ko:
         email: 이메일
         name: 이름
     welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
+  remove_f47dc62a: 제거
+  rename_45608f54: "이름 바꾸기"
   restrict_student_access: 
-    aria_label: 
-      availableFrom: 시작
-      availableUntil: "다음 시간까지"
     button_text: 
       cancel: 취소
       update: 업데이트
-    label: 
-      availableUntil: "이 시각까지 잠금"
     options: 
       publish: 
         description: 게시
@@ -11516,8 +11505,11 @@ ko:
     site_admin_permissions: "사이트 관리자 권한"
     update_failed_notice: "역할 만들기 실패"
   roles: 
+    based_on_type: "%{base_type}을 바탕으로 함"
     new_role: 
-      add: 추가
+      cancel: 취소
+      save: 저장
+      saving: "저장 중..."
     permission_button: 
       rolebutton: 
         disable: "사용 안 함"
@@ -11526,8 +11518,14 @@ ko:
         enable_and_lock: "사용 및 잠금"
         use_default: "기본값 사용"
     permissions: 권한
+    role: 
+      remove_role_confirmation: "이 역할을 가진 사용자가 있다면 현재 사용 권한을 유지하지만 이 역할로 새 사용자를 추가할 수 없습니다. 이 역할을 삭제하려면 확인을 클릭하십시오."
     roles_override_index: 
       page_header_title: "계정 권한"
+  rootFoldersFinder: 
+    course_files: "과목 파일"
+    group_files: "그룹 파일"
+    my_files: "내 파일"
   roster: 
     delete_confirm: "이 사용자를 제거하시겠습니까?"
     error_sending_invitations: "초대를 보내는 데 오류가 발생했습니다. 다시 시도하시기 바랍니다."
@@ -11595,6 +11593,7 @@ ko:
         are_you_sure_delete: "이 루브릭을 삭제하시겠습니까? 현재 이 루브릭과 연결된 과목에서는 계속 액세스할 수 있지만 새 과목은 사용할 수 없게 됩니다."
         are_you_sure_remove: "목록에서 이 루브릭을 제거하시겠습니까?"
       remove_rubric: "목록에서 이 루브릭 제거"
+  save_11a80ec3: 저장
   score_out_of_points_possible_88f370fd: "%{score} / %{points_possible}"
   screenreader_gradebook: 
     assignment_information: 
@@ -11791,6 +11790,7 @@ ko:
         go_to_course: "과목으로 가기"
         go_to_dashboard: "대시보드로 가기"
       not_available_yet: "과목이 시작하기 직전에 이메일을 보냅니다."
+  send_e3bd0ed0: 보내기
   sequence_footer: 
     next_module: "다음 모듈:"
     next_module_desc: "다음 모듈: *모듈*"
@@ -11806,6 +11806,11 @@ ko:
     overwrite: "이미 입력한 평점을 다시 정의"
     set_grades_button: "기본 평점 설정"
     set_grades_button_loading: "평점 설정 중..."
+  settings: 
+    recaptcha_settings: 
+      labels: 
+        recaptcha_private_key: "ReCAPTCHA 비공개 키"
+        recaptcha_public_key: "ReCAPTCHA 공개 키"
   shared: 
     account_notification: 
       close: 닫기
@@ -12183,7 +12188,7 @@ ko:
         edit: "루브릭 편집"
         find_a_rubric: "루브릭 찾기"
         find_another_rubric: "다른 루브릭 찾기"
-        find_outcome_criterion: "성과 기준 찾기"
+        find_outcome: "성과 검색"
         find_rubric: "루브릭 찾기"
       messages: 
         locked: "일단 사용하기 시작하면 루브릭을 바꿀 수 없습니다."
@@ -12530,20 +12535,6 @@ ko:
     inexact_answer: "%{lower_bound} 부터 %{upper_bound} 까지"
     no_answer: "답 없음"
   step: 단계
-  student_groups: 
-    new_group: 
-      group_explanation: "그룹은 프로젝트에서 협업하거나 학습 세션 등의 일정을 파악하기에 좋은 곳입니다. 모든 그룹에는 달력이 있고 위키, 토론, 파일을 저장할 공간이 있습니다. 그룹은 문서를 협업하고 웹 회의를 예약할 수도 있습니다. 이는 실제로 소수의 학생이 보다 집중된 프로젝트에서 작업할 수 있는 작은 과목과 같습니다."
-      joining: 참여하기
-      name: "그룹 이름"
-    student_groups: 
-      full: "꽉 참"
-      group: 그룹
-      student_groups_join: 참여
-      student_groups_tabs_everyone: 모두
-      student_groups_tabs_groups: 그룹
-    students_count: 
-      one: "학생 %{count}명"
-      other: "학생 %{count}명"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "이 퀴즈를 치른 학생 (%{count})"
     other: "이 퀴즈를 치른 학생 (%{count})"
@@ -12688,7 +12679,6 @@ ko:
       plain_view: "일반 텍스트 뷰"
       quiz_submission: "이 제출물은 퀴즈 제출물입니다. 퀴즈 페이지로 리디렉트합니다."
       show_entire_discussion: "전체 토론 표시"
-      student: 학생
       url_preview: "URL 미리 보기"
       view_original_submission: "%{user}의 원본 제출물 보기"
       view_preview_button: "미리 보기"
@@ -12696,6 +12686,7 @@ ko:
     submission_download: 
       download_message: "**학생 제출물을 수집해서** ZIP 파일로 압축합니다. 이 작업은 제출물 파일의 크기와 수에 따라 다소 시간이 걸릴 수도 있습니다."
       gathering_files: "파일 수집 중..."
+  submit_a3cc6859: 제출
   support: 
     array: 
       last_word_connector: ", "
@@ -12884,12 +12875,15 @@ ko:
       resubmit_to_turnitin: "Turnitin에 다시 제출"
   ungraded_survey_ad7de790: "평가 안 된 설문"
   unknown: "알 수 없음"
+  unknown_47a3b725: "알 수 없음"
   unknown_question_bank: "알 수 없는 문제 은행"
   unknown_quiz: "알 수 없는 퀴즈"
   unsupported_package: "지원하지 않는 내용 묶음"
   until_date_949017c4: "%{date} 까지"
   upload_button: 
     upload: 업로드
+  usage_rights_modal: 
+    saving: "저장 중..."
   user: 
     default_user_name: 사용자
     errors: 
@@ -13206,18 +13200,6 @@ ko:
       terms_of_use: "사용 조건"
     no_self_registration: "이 계정은 직접 등록을 사용 안 함"
     oauth_fail: "OAuth 인증에 실패했습니다. 유효한 요청을 찾을 수 없습니다."
-    recaptcha_settings: 
-      instructions: |-
-          ReCAPTCHA 플러그 인을 사용하기 전에
-          [ReCAPTCHA에 계정 등록](%{url})을 해야 합니다. 사이트 도메인을 처리하려면
-          도메인을 올바르게 설정했는지 확인하십시오. 계정을 등록한 후에
-          아래에 공개 키와 비공개 키를 입력하십시오.
-          
-          **참고:** 이 설정의 변경 사항은 서버를 다시 시작하기 전까지
-          업데이트되지 않습니다.
-      labels: 
-        private_key: "ReCAPTCHA 비공개 키"
-        public_key: "ReCAPTCHA 공개 키"
     registered: 
       almost_there: "거의 마쳤습니다..."
       done_resending: "마쳤습니다! 메시지는 수 분이 걸릴 수도 있습니다."
@@ -13534,7 +13516,6 @@ ko:
     external_urls: 
       archive: 저장소
       archive_link: "저장소 보기"
-  you_have_made_unpublished_changes_to_this_quiz_the_127e0f91: "*이 퀴즈에 게시하지 않은 변경 사항이 있습니다.* 변경 사항은 퀴즈를 게시하거나 다시 게시하기 전까지 학생에게 나타나지 않습니다."
   zip_argument_error: ".zip 업로드는 업로드할 대상 폴더가 필요합니다."
   zip_file_display: "파일 가져오기"
   zip_file_file_description: ".zip 파일을 폴더에 압축 해제"
