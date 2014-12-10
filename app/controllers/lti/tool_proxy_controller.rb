@@ -21,9 +21,21 @@ module Lti
 
     def destroy
       if authorized_action(@context, @current_user, :update)
-        Lti::ToolProxy.find(params[:tool_proxy_id]).update_attribute(:workflow_state, 'deleted')
+        update_workflow_state('deleted')
         render json: '{"status":"success"}'
       end
+    end
+
+    def update
+      if authorized_action(@context, @current_user, :update)
+        update_workflow_state(params['workflow_state'])
+        render json: '{"status":"success"}'
+      end
+    end
+
+    private
+    def update_workflow_state(workflow_state)
+      Lti::ToolProxy.find(params[:tool_proxy_id]).update_attribute(:workflow_state, workflow_state)
     end
 
   end

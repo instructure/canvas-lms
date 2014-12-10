@@ -982,6 +982,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/tool_proxy') do
       def et_routes(context)
         delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :destroy, as: "#{context}_delete_tool_proxy"
+        put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :update, as: "#{context}_update_tool_proxy"
       end
       et_routes("course")
       et_routes("account")
