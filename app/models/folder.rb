@@ -171,7 +171,7 @@ class Folder < ActiveRecord::Base
 
     existing_folders.each do |folder_name|
       iterator = folder_name.split.last.to_i
-      iterations.push(iterator) if iterator > 1
+      iterations << iterator if iterator > 1
     end
 
     iterations.sort.each do |i|

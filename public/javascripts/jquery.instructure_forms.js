@@ -329,7 +329,8 @@ define([
           'attachment[intent]': options.intent,
           'attachment[asset_string]': options.asset_string,
           'attachment[filename]': item.name,
-          'attachment[context_code]': options.context_code
+          'attachment[context_code]': options.context_code,
+          'attachment[duplicate_handling]': 'rename'
         }, options.formDataTarget == 'uploadDataUrl' ? options.formData : {}), item);
       } else {
         ready.call($this);
