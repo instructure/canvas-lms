@@ -9,8 +9,12 @@
  * http://docs.jquery.com/UI/Dialog#theming
  */
 .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
-.ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative;  }
-.ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .1em 0; } 
+
+.ui-dialog .ui-dialog-title { 
+  float: left; margin: 0 16px 0 0;
+  font-size: 18px;
+  font-weight: normal;
+} 
 .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
 .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
 .ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
@@ -21,46 +25,60 @@
 .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
 .ui-draggable .ui-dialog-titlebar { cursor: move; }
 
-/*
-@styleguide Modal Dialog
-
-We don't use Bootstraps modal dialog, please use jQuery UI `ui-dialog` with our normal bootstrap style buttons
-
-```html
-<button class="btn element_toggler" aria-controls="testdialog">Show Dialog</button>
-
-<form id="testdialog" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none" title="Title Goes Here">
-  <p> Leggings etsy aesthetic hella viral blog literally, squid you probably haven't heard of them synth raw denim 90's mlkshk odd future try-hard. Lo-fi next level kale chips narwhal tattooed, tonx YOLO mixtape. Locavore vice disrupt yr ethnic. Biodiesel messenger bag cardigan american apparel. DIY four loko tumblr pickled yr scenester.</p>
-  <div class="button-container">
-    <button type="submit" class="btn btn-primary">submit</button>
-    <a class="btn dialog_closer">cancel</a>
-  </div>
-</form>
-```
-
-*/
-
 //our overrides
 
 .ui-dialog {
   padding: 0;
 
   .ui-dialog-titlebar-close {
-    span { background: url(/images/modal_close.svg) 0 0 no-repeat; background-size: 16px 16px; }
-    &:hover, &:focus {
+    right: 12px;
+    width: 20px; height: 20px;
+    span { 
+      transition: opacity 0.2s;
+      background: url(/images/icon-x-black.svg) 50% 50% no-repeat; 
+      background-size: 10px; 
+      opacity: 0.6;
+    }
+    &.ui-state-hover, &.ui-state-focus {
       border-color: transparent;
+      span {
+        opacity: 0.8;
+      }  
     }
   }
+}
+
+.ui-dialog .ui-dialog-titlebar { 
+  padding: .4em 1em; position: relative;
+  &.ui-widget-header {
+    background: $canvas-light;
+    padding: 16px 12px;
+    border-bottom: 1px solid $can-border-light;
+  }
+}
+
+.ui-dialog.ui-widget-content {
+  border: none;
+  box-shadow: 0 1px 4px 1px rgba($canvas-secondary, 0.95);
 }
 
 // note that these styles are shared in both .ui-dialog and .ui-datepicker
 
 .ui-datepicker .ui-datepicker-time,
 .ui-dialog .ui-dialog-buttonpane {
-  background-color: $formActionsBackground;
-  box-shadow: inset 0 1px 0 white;
-  border-top: 1px solid #e5e5e5;
+  background-color: lighten($canvas-neutral, 5%);
+  border-top: 1px solid $can-border-light;
 }
+
+.ui-dialog .ui-dialog-buttonpane {
+  padding: 6px;
+  @include breakpoint(tablet) { padding: 12px; }
+  .ui-dialog-buttonset button {
+    margin-top: 0; margin-bottom: 0;
+    &:last-of-type { margin-right: 0; }
+  }
+}
+
 .ui-datepicker .ui-datepicker-header,
 .ui-dialog .ui-dialog-titlebar {
   border-top: 0; border-left: 0; border-right: 0;

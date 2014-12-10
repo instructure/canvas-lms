@@ -549,18 +549,17 @@
   color: $text-color;
   border: 1px solid darken($button-color, 15%);
 
-  @if $use_high_contrast {
-    &:hover {
+  &:hover, &:focus {
+    background: darken($button-color, 6%);
+    color: $text-color;
+    
+    // handle jquery UI ui-button conflicts
+    &.ui-state-hover, &.ui-state-focus {
       background: darken($button-color, 6%);
       color: $text-color;
-    }
-  }
-
-  @else {
-    &:hover, &:focus {
-      background: darken($button-color, 6%);
-      color: $text-color;
-    }
+      border-color: darken($button-color, 15%);
+    } 
+  
   }
 
   @if lightness($button-color) > lightness($text-color) {

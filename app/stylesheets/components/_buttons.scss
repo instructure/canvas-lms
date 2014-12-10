@@ -262,6 +262,24 @@ input[type="button"] {
   }
 }
 
+// Icon "action" buttons
+// --------------------------------------------------
+
+// Like link buttons, but containing only an icon, which appears in dark gray
+// Usually used to perform user actions like closing, editing, etc.
+
+.Button--icon-action {
+  transition: color 0.2s;
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+  border-radius: 0;
+  color: $ic-icon-link-color;
+  &:hover, &:focus {
+    background: transparent;
+    color: $ic-icon-link-color-hover;  
+  }
+}
 
 // Handle jQueryUI-generated button classes
 .ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { @extend .ui-helper-hidden-accessible; }

@@ -63,8 +63,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
 
 
 @mixin ReactModalPadding {
-  padding: 6px;
-  @include breakpoint(tablet) { padding: 12px; }
+  padding: 12px;
   @include breakpoint(desktop) { padding: 16px; }
 }
 
@@ -139,7 +138,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
     .ReactModal__Header-Actions { text-align: right; }
 
     .ReactModal__Body {
-      padding: 6px;
+      padding: 12px;
       background: $canvas-light;
       @include breakpoint(tablet) { padding: 16px; }
       @include breakpoint(desktop) { padding: 24px; }

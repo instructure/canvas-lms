@@ -45,8 +45,9 @@ define([
                   <h4>Modal Title Goes Here</h4>
                 </div>
                 <div className="ReactModal__Header-Actions">
-                  <button className="Button Button--link Button--small" type="button" onClick={this.closeModal}>
+                  <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
                     <i className="icon-x"></i>
+                    <span className="screenreader-only">Close</span>
                   </button>
                 </div>
               </div>
