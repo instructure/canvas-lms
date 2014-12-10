@@ -12,7 +12,8 @@ define [
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
   './PublishCloud'
-], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud) ->
+  './UsageRightsIndicator'
+], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator) ->
 
 
   FolderChild = React.createClass
@@ -29,16 +30,31 @@ define [
     startEditingName: ->
       @setState editing: true, @focusNameInput
 
+    focusPreviousElement: ->
+      @previouslyFocusedElement?.focus()
+      return if document.activeElement ==  @previouslyFocusedElement
+      @focusNameLink()
+
     focusNameInput: ->
-      @refs.newName.getDOMNode().focus()
+      @previouslyFocusedElement = document.activeElement
+      setTimeout () =>
+        @refs.newName?.getDOMNode().focus()
+      , 0
+
+    focusNameLink: ->
+      setTimeout () =>
+        @refs.nameLink?.getDOMNode().focus()
+      , 0
 
     saveNameEdit: ->
-      @props.model.save(name: @refs.newName.getDOMNode().value)
-      @setState(editing: false)
+      @setState editing: false, @focusNameLink
+      @props.model.save(name: @refs.newName.getDOMNode().value, {success: =>
+          @focusNameLink()
+      })
 
     cancelEditingName: ->
       @props.model.collection.remove(@props.model) if @props.model.isNew()
-      @setState(editing: false)
+      @setState editing: false, @focusPreviousElement
 
     getAttributesForRootNode: ->
       attrs =
@@ -98,6 +114,7 @@ define [
                 i className: 'icon-x'
           else if @props.model instanceof Folder
             Link {
+              ref: 'nameLink'
               to: 'folder'
               className: 'media'
               params: {splat: @props.model.urlPath()}
@@ -107,7 +124,12 @@ define [
               span className: 'media-body',
                 @props.model.displayName()
           else
-            a href: @props.model.get('url'), className: 'media',
+            a {
+              href: @props.model.get('url')
+              onClick: preventDefault(@props.previewItem)
+              className: 'media'
+              ref: 'nameLink'
+            },
               span className: 'pull-left',
                 FilesystemObjectThumbnail(model: @props.model)
               span className: 'media-body',
@@ -133,6 +155,28 @@ define [
         div className:'ef-size-col', role: 'gridcell',
           friendlyBytes(@props.model.get('size'))
 
+        if @props.usageRightsRequiredForContext
+          div className: 'ef-usage-rights-col', role: 'gridcell',
+            UsageRightsIndicator({
+              model: @props.model
+              userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+            })
+
         div className: 'ef-links-col', role: 'gridcell',
-          PublishCloud(model: @props.model, ref: 'publishButton', userCanManageFilesForContext: @props.userCanManageFilesForContext)
-          ItemCog(model: @props.model, startEditingName: @startEditingName, userCanManageFilesForContext: @props.userCanManageFilesForContext)
+          unless @props.model.isNew()
+            PublishCloud({
+              model: @props.model,
+              ref: 'publishButton',
+              userCanManageFilesForContext: @props.userCanManageFilesForContext,
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+            })
+
+          unless @props.model.isNew() or @props.model.get('locked_for_user')
+            ItemCog({
+              model: @props.model
+              startEditingName: @startEditingName
+              userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+              externalToolsForContext: @props.externalToolsForContext
+            })

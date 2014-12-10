@@ -83,7 +83,7 @@ define(function(require) {
         var targetNode = d3.event.target;
 
         if (this.props.onInspect) {
-          contentNode = this.props.onInspect(itemId);
+          contentNode = this.props.onInspect(itemId, datapoint);
         }
 
         if (!contentNode) {

@@ -576,6 +576,33 @@ class ContextModuleItemsApiController < ApplicationController
     end
   end
 
+  # @API Mark module item read
+  #
+  # Fulfills "must view" requirement for a module item. It is generally not necessary to do this explicitly,
+  # but it is provided for applications that need to access external content directly (bypassing the html_url
+  # redirect that normally allows Canvas to fulfill "must view" requirements).
+  #
+  # This endpoint cannot be used to complete requirements on locked or unpublished module items.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id>/mark_read \
+  #       -X POST \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  def mark_item_read
+    if authorized_action(@context, @current_user, :read)
+      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
+      item = mod.content_tags_visible_to(@current_user).find(params[:id])
+
+      content = (item.content && item.content.respond_to?(:locked_for?)) ? item.content : item
+      return render :json => { :message => t('The module item is locked.') }, :status => :forbidden if content.locked_for?(@current_user)
+
+      item.context_module_action(@current_user, :read)
+      render :json => { :message => t('OK') }
+    end
+  end
+
   def set_position
     return true unless @tag && params[:module_item][:position]
 

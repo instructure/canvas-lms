@@ -124,10 +124,6 @@ class GradeSummaryPresenter
     end
   end
 
-  def relevant_assignments_scope
-    AssignmentGroup.assignment_scope_for_draft_state(@context)
-  end
-
   def submissions
     @submissions ||= begin
       ss = @context.submissions

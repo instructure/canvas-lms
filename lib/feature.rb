@@ -222,7 +222,7 @@ goes to the personal files page for a user ('/files') then you need to turn it o
 END
 
       applies_to: 'Course',
-      state: 'hidden_in_prod',
+      state: 'allowed',
       beta: true
     },
     'modules_next' =>
@@ -284,6 +284,24 @@ END
       applies_to: 'RootAccount',
       state: 'allowed',
       beta: true,
+      root_opt_in: true
+    },
+    'gradebook_list_students_by_sortable_name' =>
+    {
+      display_name: -> { I18n.t('features.gradebook_list_students_by_sortable_name', "Gradebook - List Students by Sortable Name") },
+      description: -> { I18n.t('enable_gradebook_list_students_by_sortable_name', <<-END) },
+List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true
+    },
+    'usage_rights_required' =>
+    {
+      display_name: -> { I18n.t('Require usage rights for uploaded files') },
+      description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published') },
+      applies_to: 'Course',
+      state: 'hidden',
       root_opt_in: true
     }
   )

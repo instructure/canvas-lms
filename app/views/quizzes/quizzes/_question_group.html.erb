@@ -7,7 +7,9 @@
 %>
 <div class="quiz_sortable group_top <%= 'question_bank_top' if question_bank %>" style="<%= "display: none;" unless group %>" id="group_top_<%= hash_get(group, :id, 'template') %>">
   <%= form_for :quiz_group, :url => context_url(@context, :context_quiz_quiz_groups_url, @quiz.id), :html => {:class => "quiz_group_form"} do |f| %>
+    <% if can_do(@quiz, @current_user, :update) %>
     <%= render partial: "quizzes/quizzes/move_handle" %>
+    <% end %>
 
   <div style="float: left;">
     <input type="hidden" name="quiz_group[assessment_question_bank_id]" class="bank_id"/>

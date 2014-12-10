@@ -1,0 +1,112 @@
+/*
+@styleguide Tab Navigation
+
+For accessibility reasons, we use jQuery UI tabs.
+
+### Regular Tabs
+Our default tabs come complete with a panel attached to the tabs that displays the content inside each tab. jQueryUI adds all the classes, once you initialize the tabs using the script and markup below:
+
+```javascript
+$("#styleguide-tabs-demo-regular").tabs()
+```
+
+```html
+<div id="styleguide-tabs-demo-regular">
+  <ul>
+    <li><a href="#tabs-1">Tab One</a></li>
+    <li><a href="#tabs-2">Tab Two</a></li>
+    <li><a href="#tabs-3">Tab Three</a></li>
+  </ul>
+  <div id="tabs-1">Tab 1 content</div>
+  <div id="tabs-2">Tab 2 content</div>
+  <div id="tabs-3">Tab 3 content</div>
+</div>
+```
+
+### Minimal Tabs
+
+Don't want the bordered box around each tab panel? Simply add the **.ui-tabs-minimal** class to the parent tab element, as we've done in the example below:
+
+```javascript
+$("#styleguide-tabs-demo-minimal").tabs()
+```
+
+```html
+<div id="styleguide-tabs-demo-minimal" class="ui-tabs-minimal">
+  <ul>
+    <li><a href="#tabs-1">Tab One</a></li>
+    <li><a href="#tabs-2">Tab Two</a></li>
+    <li><a href="#tabs-3">Tab Three</a></li>
+  </ul>
+  <div id="tabs-1">Tab 1 content</div>
+  <div id="tabs-2">Tab 2 content</div>
+  <div id="tabs-3">Tab 3 content</div>
+</div>
+```
+
+*/
+
+// Custom Canvas branding for tabs -- overwriting the defaults in the jQuery UI tabs styles
+
+.ui-tabs {
+  .ui-tabs-panel {
+    border-color: $can-border-light;
+    padding: 14px;
+  }
+  .ui-tabs-nav {
+    border-bottom-color: $can-border-light;
+    li { 
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      a {
+        color: $linkColor;
+        font-weight: normal;
+        padding: 8px 14px;
+        text-shadow: none;
+        @if $use_high_contrast { text-decoration: underline; }
+
+        // special handling for Calendar tabs with solid-color header backgrounds
+        #edit_event & { color: $canvas-light; }
+      }
+      &.ui-state-hover {
+        background: $canvas-light;
+        border-color: $can-border-light;
+        a {
+          color: $canvas-dark;
+          @if $use_high_contrast { text-decoration: none; }
+          
+          // special handling for Calendar tabs with solid-color header backgrounds
+          #edit_event & { color: $linkColor; }
+        }
+      }
+      &.ui-state-focus,
+      &.ui-state-focus.ui-tabs-active {
+        @if $use_high_contrast { @include button-focus; }
+        @else {
+          outline: none;
+          border-color: $can-border-light;
+          background: $canvas-light;
+        }
+      }
+      &.ui-tabs-active,
+      &.ui-tabs-active.ui-state-hover {
+        border-color: $can-border-light;
+        background: $canvas-light;
+        a {
+          @if $use_high_contrast { text-decoration: none; }
+
+          // special handling for Calendar tabs with solid-color header backgrounds
+          #edit_event & { color: $canvas-dark; }
+        }
+      }
+    }
+  }
+  &.ui-tabs--mini {
+    .ui-tabs-nav {
+      li { 
+        a { padding: 4px 8px; }
+      }
+    }
+  }
+}

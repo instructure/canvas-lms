@@ -224,6 +224,7 @@ class FilesController < ApplicationController
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content
+  #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
   # @argument sort [String, "name"|"size"|"created_at"|"updated_at"|"content_type"|"user"]
   #   Sort results by this field. Defaults to 'name'. Note that `sort=user` implies `include[]=user`.
@@ -270,6 +271,7 @@ class FilesController < ApplicationController
         end
       end
       scope = scope.includes(:user) if params[:include].include? 'user' && params[:sort] != 'user'
+      scope = scope.includes(:usage_rights) if params[:include].include? 'usage_rights'
       scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
 
       order_clause = case params[:sort]
@@ -324,12 +326,23 @@ class FilesController < ApplicationController
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
+
+        tool_context = if context.is_a?(Course)
+          context
+        elsif context.is_a?(User)
+          @domain_root_account
+        elsif context.is_a?(Group)
+          context.context
+        end
+        file_menu_tools = (tool_context ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
         {
           asset_string: context.asset_string,
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
+          usage_rights_required: context.feature_enabled?(:usage_rights_required),
           permissions: {
             manage_files: context.grants_right?(@current_user, session, :manage_files),
-          }
+          },
+          file_menu_tools: file_menu_tools
         }
       end
 
@@ -337,7 +350,9 @@ class FilesController < ApplicationController
       @body_classes << 'full-width padless-content'
       js_bundle :react_files
       jammit_css :react_files
-      js_env :FILES_CONTEXTS => files_contexts
+      js_env({
+        :FILES_CONTEXTS => files_contexts
+      })
 
       render :text => "".html_safe, :layout => true
     end
@@ -436,6 +451,7 @@ class FilesController < ApplicationController
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content
+  #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
   # @example_request
   #
@@ -462,11 +478,12 @@ class FilesController < ApplicationController
     # attachment.
     # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
-      @attachment = @context.attachments.find(params[:id])
+      @attachment = @context.attachments.where(:id => params[:id]).first
     else
-      @attachment = Attachment.find(params[:id])
+      @attachment = Attachment.where(:id => params[:id]).first
       @skip_crumb = true unless @context
     end
+
     params[:download] ||= params[:preview]
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
@@ -571,7 +588,10 @@ class FilesController < ApplicationController
 
     @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
 
-    raise ActiveRecord::RecordNotFound if !@attachment
+    unless @attachment
+      return render :template => 'shared/errors/file_not_found', :status => :bad_request
+    end
+
     params[:id] = @attachment.id
 
     params[:download] = '1'
@@ -741,6 +761,7 @@ class FilesController < ApplicationController
         @attachment.folder_id = @folder.id
       end
       @attachment.content_type = Attachment.mimetype(@attachment.filename)
+      @attachment.locked = true if @attachment.usage_rights_id.nil? && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:usage_rights_required)
       @attachment.save!
 
       res = @attachment.ajax_upload_params(@current_pseudonym,
@@ -921,6 +942,7 @@ class FilesController < ApplicationController
         end
         @attachment.folder = @folder
         @folder_id_changed = @attachment.folder_id_changed?
+        @attachment.locked = true if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:usage_rights_required)
         if @attachment.save
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = t 'notices.updated', "File was successfully updated."
@@ -979,6 +1001,9 @@ class FilesController < ApplicationController
       end
 
       @attachment.attributes = process_attachment_params(params)
+      if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:usage_rights_required)
+        return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request
+      end
       if @attachment.save
         render :json => attachment_json(@attachment, @current_user)
       else

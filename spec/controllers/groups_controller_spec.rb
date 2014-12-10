@@ -52,6 +52,49 @@ describe GroupsController do
       expect(assigns[:groups] - [g1,g2,g3]).to be_empty
       expect(assigns[:categories].length).to eql(2)
     end
+
+    it "should return groups in sorted by group category name, then group name for student view" do
+      skip "requires pg_collkey on the server" if Group.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
+      user_session(@student)
+      category1 = @course.group_categories.create(:name => "1")
+      category2 = @course.group_categories.create(:name => "2")
+      category3 = @course.group_categories.create(:name => "11")
+      groups = []
+      groups << @course.groups.create(:name => "11", :group_category => category1)
+      groups << @course.groups.create(:name => "2", :group_category => category1)
+      groups << @course.groups.create(:name => "1", :group_category => category1)
+      groups << @course.groups.create(:name => "22", :group_category => category2)
+      groups << @course.groups.create(:name => "2", :group_category => category2)
+      groups << @course.groups.create(:name => "3", :group_category => category2)
+      groups << @course.groups.create(:name => "4", :group_category => category3)
+      groups << @course.groups.create(:name => "44", :group_category => category3)
+      groups << @course.groups.create(:name => "4.5", :group_category => category3)
+      groups.each {|g| g.add_user @student, 'accepted' }
+      get 'index', :course_id => @course.id, :per_page => 50, :format => 'json'
+      expect(response).to be_success
+      expect(assigns[:paginated_groups]).not_to be_empty
+      expect(assigns[:paginated_groups].length).to eql(9)
+      #Check group category ordering
+      expect(assigns[:paginated_groups][0].group_category.name).to eql("1")
+      expect(assigns[:paginated_groups][1].group_category.name).to eql("1")
+      expect(assigns[:paginated_groups][2].group_category.name).to eql("1")
+      expect(assigns[:paginated_groups][3].group_category.name).to eql("2")
+      expect(assigns[:paginated_groups][4].group_category.name).to eql("2")
+      expect(assigns[:paginated_groups][5].group_category.name).to eql("2")
+      expect(assigns[:paginated_groups][6].group_category.name).to eql("11")
+      expect(assigns[:paginated_groups][7].group_category.name).to eql("11")
+      expect(assigns[:paginated_groups][8].group_category.name).to eql("11")
+      #Check group name ordering
+      expect(assigns[:paginated_groups][0].name).to eql("1")
+      expect(assigns[:paginated_groups][1].name).to eql("2")
+      expect(assigns[:paginated_groups][2].name).to eql("11")
+      expect(assigns[:paginated_groups][3].name).to eql("2")
+      expect(assigns[:paginated_groups][4].name).to eql("3")
+      expect(assigns[:paginated_groups][5].name).to eql("22")
+      expect(assigns[:paginated_groups][6].name).to eql("4")
+      expect(assigns[:paginated_groups][7].name).to eql("4.5")
+      expect(assigns[:paginated_groups][8].name).to eql("44")
+    end
   end
 
   describe "GET index" do

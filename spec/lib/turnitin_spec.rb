@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -32,6 +32,13 @@ describe Turnitin::Client do
       @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
     end
     @submission.reload
+  end
+
+  FakeHTTPResponse = Struct.new(:body)
+  def stub_net_http_to_return(partial_body, return_code = 1)
+    body = "<returndata>#{ partial_body }<rcode>#{return_code}</rcode></returndata>"
+    fake_response = FakeHTTPResponse.new(body)
+    Net::HTTP.any_instance.expects(:start).returns(fake_response)
   end
 
   describe "initialize" do
@@ -109,7 +116,7 @@ describe Turnitin::Client do
 
     it "should mark assignment as created an current on success" do
       # doesn't matter what the assignmentid is, it's existance is simply used as a request success test
-      @turnitin_api.expects(:sendRequest).with(:create_assignment, '2', has_entries(@sample_turnitin_settings)).returns(Nokogiri('<assignmentid>12345</assignmentid>'))
+      stub_net_http_to_return('<assignmentid>12345</assignmentid>')
       status = @assignment.create_in_turnitin
 
       expect(status).to be_truthy
@@ -118,8 +125,7 @@ describe Turnitin::Client do
 
     it "should store error code and message on failure" do
       # doesn't matter what the assignmentid is, it's existance is simply used as a request success test
-      example_error = '<rerror><rcode>123</rcode><rmessage>You cannot create this assignment right now</rmessage></rerror>'
-      @turnitin_api.expects(:sendRequest).with(:create_assignment, '2', has_entries(@sample_turnitin_settings)).returns(Nokogiri(example_error))
+      stub_net_http_to_return '<rcode>123</rcode><rmessage>You cannot create this assignment right now</rmessage>'
       status = @assignment.create_in_turnitin
 
       expect(status).to be_falsey
@@ -135,7 +141,7 @@ describe Turnitin::Client do
     end
 
     it "should not make api call if assignment is marked current" do
-      @turnitin_api.expects(:sendRequest).with(:create_assignment, '2', has_entries(@sample_turnitin_settings)).returns(Nokogiri('<assignmentid>12345</assignmentid>'))
+      stub_net_http_to_return('<assignmentid>12345</assignmentid')
       @assignment.create_in_turnitin
       status = @assignment.create_in_turnitin
 
@@ -146,7 +152,7 @@ describe Turnitin::Client do
     it "should set s_view_report to 0 if originality_report_visibility is 'never'" do
       @sample_turnitin_settings[:originality_report_visibility] = 'never'
       @assignment.update_attributes(:turnitin_settings => @sample_turnitin_settings)
-      @turnitin_api.expects(:sendRequest).returns(Nokogiri('<assignmentid>12345</assignmentid>'))
+      stub_net_http_to_return('<assignmentid>12345</assignmentid>')
       @assignment.create_in_turnitin
 
       expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0', :submit_papers_to => '0'})
@@ -161,14 +167,14 @@ describe Turnitin::Client do
 
       @submission.context.expects(:turnitin_settings).at_least(1).returns([:placeholder])
       Turnitin::Client.expects(:new).at_least(1).with(:placeholder).returns(@turnitin_api)
-      @turnitin_api.expects(:enrollStudent).with(@course, @user).returns(true)
+      @turnitin_api.expects(:enrollStudent).with(@course, @user).returns(stub(:success? => true))
       @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
       Attachment.stubs(:instantiate).returns(@attachment)
       @attachment.expects(:open).returns(:my_stub)
     end
 
     it "should submit attached files to turnitin" do
-      @turnitin_api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => :my_stub)).returns(Nokogiri('<objectID>12345</objectID>'))
+      stub_net_http_to_return('<objectID>12345</objectID>')
       status = @submission.submit_to_turnitin
 
       expect(status).to be_truthy
@@ -176,8 +182,7 @@ describe Turnitin::Client do
     end
 
     it "should store errors in the turnitin_data hash" do
-      example_error = '<rerror><rcode>216</rcode><rmessage>I am a random turnitin error message.</rmessage></rerror>'
-      @turnitin_api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => :my_stub)).returns(Nokogiri(example_error))
+      stub_net_http_to_return('<rmessage>I am a random turnitin error message.</rmessage>', 216)
       status = @submission.submit_to_turnitin
 
       expect(status).to be_falsey

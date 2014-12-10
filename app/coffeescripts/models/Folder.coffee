@@ -106,6 +106,8 @@ define [
         model.get('display_name')
       else if sortProp is 'user'
         model.get('user')?.display_name
+      else if sortProp is 'usage_rights'
+        model.get('usage_rights')?.license_name
       else
         model.get(sortProp)
 

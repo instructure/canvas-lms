@@ -56,6 +56,7 @@ class AssignmentsController < ApplicationController
           :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
         :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
@@ -316,7 +317,7 @@ class AssignmentsController < ApplicationController
         # the requesting user may not have :read if the course syllabus is public, in which
         # case, we pass nil as the user so verifiers are added to links in the syllabus body
         # (ability for the user to read the syllabus was checked above as :read_syllabus)
-        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil, {}, true)
       end
 
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
@@ -508,15 +509,13 @@ class AssignmentsController < ApplicationController
 
   def get_assignment_group(assignment_params)
     return unless assignment_params
-    if (group_id = assignment_params.delete(:assignment_group_id)).present?
-      group = @context.assignment_groups.find(group_id)
+    if (group_id = assignment_params[:assignment_group_id]).present?
+      @context.assignment_groups.find(group_id)
     end
   end
 
   def normalize_title_param
-    if title = params.delete(:name)
-      params[:title] = title
-    end
+    params[:title] ||= params[:name]
   end
 
   def index_edit_params

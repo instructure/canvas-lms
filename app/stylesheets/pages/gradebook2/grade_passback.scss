@@ -44,6 +44,17 @@
     margin-left: 14px;
     height: 52px;
 }
+
+/* Prevents the name input in the grade pass back from overlapping each other */
+.correction-row .span3 {
+  width: 270px;
+}
+
+/* Prevents the date input in the grade pass back from overlapping each other */
+.correction-row .span2 {
+    width: 170px;
+}
+
 .title-row {
     margin-left: 14px;
 }

@@ -9,9 +9,10 @@ define [
   'wikiSidebar'
   'compiled/object/unflatten'
   'compiled/util/deparam'
+  'compiled/views/editor/KeyboardShortcuts'
   'tinymce.editor_box'
   'compiled/tinymce'
-], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten, deparam) ->
+], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten, deparam, KeyboardShortcuts) ->
 
   ##
   # View for editing a calendar event on it's own page
@@ -55,7 +56,13 @@ define [
       $textarea = @$('textarea').editorBox()
       wikiSidebar.init() unless wikiSidebar.inited
       wikiSidebar.attachToEditor($textarea).show()
+
+      _.defer(@attachKeyboardShortcuts)
       this
+
+    attachKeyboardShortcuts: =>
+      $('.switch_event_description_view').first().before((new KeyboardShortcuts()).render().$el)
+
 
     destroyModel: =>
       msg = I18n.t "confirm_delete_calendar_event", "Are you sure you want to delete this calendar event?"

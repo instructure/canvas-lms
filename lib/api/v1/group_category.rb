@@ -31,6 +31,7 @@ module Api::V1::GroupCategory
     hash.merge!(included_data(group_category, options[:include]))
     hash['protected'] = group_category.protected?
     hash['allows_multiple_memberships'] = group_category.allows_multiple_memberships?
+    hash['is_member'] = group_category.is_member?(user)
     hash
   end
 

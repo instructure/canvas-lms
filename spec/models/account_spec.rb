@@ -657,7 +657,7 @@ describe Account do
       expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
-    it "should not include external tools if not configured for course navigation" do
+    it "should not include external tools if not configured for account navigation" do
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -708,6 +708,20 @@ describe Account do
       expect(tab[:label]).to eq tool.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
       expect(tab[:args]).to eq [@account.id, tool.id]
+    end
+
+    it "should not include external tools for non-admins if visibility is set" do
+      course_with_teacher(:account => @account)
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
+      tool.account_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => "admins"}
+      tool.save!
+      expect(tool.has_placement?(:account_navigation)).to eq true
+      tabs = @account.tabs_available(@teacher)
+      expect(tabs.map{|t| t[:id] }).to_not be_include(tool.asset_string)
+
+      admin = account_admin_user(:account => @account)
+      tabs = @account.tabs_available(admin)
+      expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     end
 
     it 'includes message handlers' do

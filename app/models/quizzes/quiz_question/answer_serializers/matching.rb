@@ -70,18 +70,26 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc
     end
 
-    # @note answers that were not matched will _not_ be present in the output
-    def deserialize(submission_data)
+    # @return [Array<Hash{String => String}>]
+    #   Pairs of answer-match records.
+    #
+    # @example output for answer #1 matched to match #2:
+    #   [{ "answer_id": "1", "match_id": "2" }]
+    #
+    # @example output for answer #1 not matched to anything:
+    #   [{ "answer_id": "1", "match_id": null }]
+    def deserialize(submission_data, full=false)
       answers.each_with_object([]) do |answer_record, out|
         answer_id = answer_record[:id]
         answer_key = build_answer_key(answer_id)
 
-        match_id = submission_data[answer_key]
+        match_id = submission_data[answer_key] # this is always a string
+        has_match = match_id.present?
 
-        if match_id.present?
+        if has_match || full
           out << {
-            answer_id: answer_id,
-            match_id: match_id.to_i
+            answer_id: answer_id.to_s,
+            match_id: has_match ? match_id : nil
           }.with_indifferent_access
         end
       end

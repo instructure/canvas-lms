@@ -1561,7 +1561,7 @@ class UsersController < ApplicationController
 
       if params[:student_id]
         student = User.find(params[:student_id])
-        enrollments = student.student_enrollments.active.includes(:course).all
+        enrollments = student.student_enrollments.active.includes(:course).with_each_shard
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).where(id: enrollment).first &&

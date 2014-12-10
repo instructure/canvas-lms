@@ -151,7 +151,6 @@ class ContentImportsController < ApplicationController
           end
         end
       end
-      params.delete :items_to_copy
     end
   end
 

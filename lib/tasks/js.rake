@@ -196,8 +196,8 @@ namespace :js do
     # clear out all the files in case there are any old compiled versions of
     # files that don't map to any source file anymore
     paths_to_remove = [
-      Dir.glob('public/javascripts/{compiled,jst}'),
-      Dir.glob('public/plugins/*/javascripts/{compiled,jst}'),
+      Dir.glob('public/javascripts/{compiled,jst,jsx}'),
+      Dir.glob('public/plugins/*/javascripts/{compiled,jst,jsx}'),
       'spec/javascripts/compiled',
       Dir.glob('spec/plugins/*/javascripts/compiled')
     ]

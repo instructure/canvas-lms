@@ -19,7 +19,7 @@
 </div>
 
 <%= render "groups/add_group_category" %>
-<%= render "shared/select_content_dialog", :only => [:external_tools] %>
+<%= render "shared/select_content_dialog", :only => [:external_tools], lti_app_placements: [Lti::ResourcePlacement::ASSIGNMENT_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION] %>
 <div id="edit_letter_grades_form" style="display: none;">
   <%= render partial: "shared/grading_standard", object: @assignment.grading_standard %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>

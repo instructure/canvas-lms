@@ -29,7 +29,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     # @return [Any]
     #   The output is similar to the user-supplied answer, which may vary between
     #   serializers.
-    def deserialize(submission_data)
+    def deserialize(submission_data, full=false)
       raise NotImplementedError
     end
 

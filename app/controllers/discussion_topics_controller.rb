@@ -20,7 +20,7 @@
 # @model FileAttachment
 #     {
 #       "id": "FileAttachment",
-#       "description": "",
+#       "description": "A file attachment",
 #       "properties": {
 #         "content-type": {
 #           "example": "unknown/unknown",
@@ -43,8 +43,8 @@
 #
 # @model DiscussionTopic
 #     {
-#       "id": "",
-#       "description": "",
+#       "id": "DiscussionTopic",
+#       "description": "A discussion topic",
 #       "properties": {
 #         "id": {
 #           "description": "The ID of this topic.",
@@ -246,6 +246,8 @@ class DiscussionTopicsController < ApplicationController
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [DiscussionTopic]
   def index
     return unless authorized_action(@context.discussion_topics.scoped.new, @current_user, :read)
     return child_topic if is_child_topic?
@@ -321,9 +323,10 @@ class DiscussionTopicsController < ApplicationController
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
       end
-
       format.json do
-        render json: discussion_topics_api_json(@topics, @context, @current_user, session)
+        student_ids = user_can_moderate ? @context.all_real_students.pluck(:id) : nil
+        render json: discussion_topics_api_json(@topics, @context, @current_user, session,
+                                                :student_ids => student_ids, :can_moderate => user_can_moderate)
       end
     end
   end
@@ -457,8 +460,8 @@ class DiscussionTopicsController < ApplicationController
 
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @locked ? false : @topic.grants_right?(@current_user, session, :reply),     # Can reply
-                :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
+                :CAN_REPLY      => @topic.grants_right?(@current_user, session, :reply),     # Can reply
+                :CAN_ATTACH     => @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
                 :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
                 :MODERATE       => user_can_moderate                                                        # Can moderate any topic
               },
@@ -478,6 +481,10 @@ class DiscussionTopicsController < ApplicationController
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
+            if params[:hide_student_names]
+              env_hash[:HIDE_STUDENT_NAMES] = true
+              env_hash[:STUDENT_ID] = params[:student_id]
+            end
             if @sequence_asset
               env_hash[:SEQUENCE] = {
                 :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
@@ -947,7 +954,13 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def child_topic
-    extra_params = {:headless => 1} if params[:headless]
+    if params[:headless]
+      extra_params = {
+        :headless => 1,
+        :hide_student_names => params[:hide_student_names],
+        student_id => params[:student_id]
+      }
+    end
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
     @topic.message = @root_topic.message

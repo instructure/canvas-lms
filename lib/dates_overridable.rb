@@ -66,9 +66,10 @@ module DatesOverridable
   end
 
   def all_due_dates
-    all_dates = assignment_overrides.active.overriding_due_at.map(&:as_hash)
-    all_dates << base_due_date_hash unless differentiated_assignments_applies?
-    all_dates
+    due_at_overrides = assignment_overrides.loaded? ? assignment_overrides.select{|ao| ao.active? && ao.due_at_overridden} : assignment_overrides.active.overriding_due_at
+    dates = due_at_overrides.map(&:as_hash)
+    dates << base_due_date_hash unless differentiated_assignments_applies?
+    dates
   end
 
   def all_dates_visible_to(user)

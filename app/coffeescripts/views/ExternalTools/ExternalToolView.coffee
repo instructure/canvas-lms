@@ -30,6 +30,7 @@ define [
         {extension_type: 'discussion_topic_menu', text: I18n.t 'discussion_topic_menu_configured', 'Discussion Topic menu configured'}
         {extension_type: 'module_menu', text: I18n.t 'module_menu_configured', 'Module menu configured'}
         {extension_type: 'quiz_menu', text: I18n.t 'quiz_menu_configured', 'Quiz menu configured'}
+        {extension_type: 'file_menu', text: I18n.t 'file_menu_configured', 'File menu configured'}
         {extension_type: 'wiki_page_menu', text: I18n.t 'wiki_page_menu_configured', 'Wiki page menu configured'}
       ]
 

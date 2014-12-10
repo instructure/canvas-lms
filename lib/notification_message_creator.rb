@@ -111,8 +111,11 @@ class NotificationMessageCreator
 
   def build_fallback_for(user)
     fallback_channel = immediate_channels_for(user).sort_by(&:path_type).first
-    fallback_policy = fallback_channel.notification_policies.by('daily').where(:notification_id => nil).first
-    fallback_policy ||= fallback_channel.notification_policies.create!(frequency: 'daily')
+    fallback_policy = nil
+    NotificationPolicy.unique_constraint_retry do
+      fallback_policy = fallback_channel.notification_policies.by('daily').where(:notification_id => nil).first
+      fallback_policy ||= fallback_channel.notification_policies.create!(frequency: 'daily')
+    end
 
     build_summary_for(user, fallback_policy)
   end

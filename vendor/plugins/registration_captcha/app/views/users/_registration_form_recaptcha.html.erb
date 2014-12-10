@@ -1,8 +1,0 @@
-<% plugin = Canvas::Plugin.find('registration_form_recaptcha') %>
-<% if plugin && !plugin.settings[:public_key].blank? && !plugin.settings[:private_key].blank? %>
-  <tr>
-    <td colspan="2">
-      <%= recaptcha_tags(:public_key => plugin.settings[:public_key], :ssl => true) %>
-    </td>
-  </tr>
-<% end %>

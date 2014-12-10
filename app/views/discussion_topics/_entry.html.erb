@@ -10,7 +10,8 @@
   skip_sub_entries ||= false
   read_state = entry ? entry.read_state(@current_user) : "read"
   link_to_headless ||= false
-  headless_param = {:headless => 1} if link_to_headless
+  headless_param = {:headless => 1, :hide_student_names => hide_student_names, :student_id => user_id} if link_to_headless
+  hide_student_names = hide_student_names
  %>
 <% cache([
     'entry_message_render_2_',
@@ -60,7 +61,9 @@
     <% end %>
   </div>
   <div class="content">
-    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), context_code: entry_context.asset_string) %></div>
+    <% unless hide_student_names %>
+      <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), context_code: entry_context.asset_string) %></div>
+    <% end %>
     <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
     <div class="message user_content"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>

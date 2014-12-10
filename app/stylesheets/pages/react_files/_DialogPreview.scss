@@ -1,0 +1,13 @@
+
+.DialogPreview__thumbnail {
+  width: 160px !important;
+  height: 160px !important;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+  position: relative;
+}
+
+.DialogPreview__container {
+  height: 0; /* Super weird way to keep the column from being massively tall. */
+}

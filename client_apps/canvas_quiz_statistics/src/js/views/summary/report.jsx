@@ -53,6 +53,7 @@ define(function(require) {
           <Popup
             ref="popup"
             content={Status}
+            id={this.props.id}
             isGenerated={this.props.isGenerated}
             isGenerating={this.props.isGenerating}
             generatable={this.props.generatable}
@@ -66,12 +67,12 @@ define(function(require) {
                   event: 'mouseenter focusin',
                   delay: 0,
                   effect: false,
-                  solo: false
+                  solo: true
                 },
 
                 hide: {
                   event: 'mouseleave focusout',
-                  delay: 0,
+                  delay: 350,
                   effect: false,
                   fixed: true,
                 },

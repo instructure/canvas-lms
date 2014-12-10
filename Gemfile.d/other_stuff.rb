@@ -1,12 +1,13 @@
 
 if CANVAS_RAILS3
-  gem 'rails', '3.2.19'
+  gem 'rails', '3.2.21'
   gem 'rack', '1.4.5'
   gem 'builder', '3.0.0'
   gem 'tzinfo', '0.3.39'
   gem 'routing_concerns', '0.1.0'
+  gem 'strong_parameters', '0.2.3'
 else
-  gem 'rails', '4.0.10'
+  gem 'rails', '4.0.12'
   gem 'rack', '1.5.2'
   gem 'builder', '3.1.4'
   gem 'tzinfo', '0.3.39'
@@ -49,7 +50,7 @@ gem 'i18nema', '0.0.8', :platforms => [:mri_20, :mri_21]
 gem 'i18nema19', '0.0.8', :platform => :mri_19
 gem 'i18nliner', '0.0.9'
 gem 'icalendar', '1.5.4'
-gem 'ims-lti', '2.0.0.beta.10'
+gem 'ims-lti', '2.0.0.beta.17'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
@@ -116,6 +117,7 @@ gem 'canvas_ext', :path => 'gems/canvas_ext'
 gem 'canvas_http', :path => 'gems/canvas_http'
 gem 'canvas_kaltura', :path => 'gems/canvas_kaltura'
 gem 'canvas_panda_pub', :path => 'gems/canvas_panda_pub'
+gem 'canvas_partman', :path => 'gems/canvas_partman'
 gem 'event_stream', :path => 'gems/event_stream'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_quiz_statistics', :path => 'gems/canvas_quiz_statistics'

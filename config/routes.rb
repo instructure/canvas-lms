@@ -286,7 +286,7 @@ CanvasRails::Application.routes.draw do
 
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
-
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return', as: :registration_return
 
     resources :submissions
     resources :calendar_events
@@ -547,7 +547,7 @@ CanvasRails::Application.routes.draw do
 
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
-
+    get 'lti/registration_return', controller: 'lti/message', action: 'registration_return', as: :registration_return
 
     get 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', as: :user_outcomes_results
     resources :outcomes do
@@ -693,7 +693,6 @@ CanvasRails::Application.routes.draw do
   # Thought this idea of having dashboard-scoped urls was a good idea at the
   # time... now I'm not as big a fan.
   resource :dashboard, only: [] do
-    resources :files, only: :index
     resources :content_exports, path: :data_exports
   end
 
@@ -1316,6 +1315,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/modules/:module_id/items", action: :create, as: 'course_context_module_items_create'
       put "courses/:course_id/modules/:module_id/items/:id", action: :update, as: 'course_context_module_item_update'
       delete "courses/:course_id/modules/:module_id/items/:id", action: :destroy
+      post "courses/:course_id/modules/:module_id/items/:id/mark_read", action: :mark_item_read
     end
 
     scope(controller: 'quizzes/quiz_assignment_overrides') do
@@ -1353,6 +1353,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'quizzes/quiz_reports') do
       post "courses/:course_id/quizzes/:quiz_id/reports", action: :create, as: 'course_quiz_reports_create'
+      delete "courses/:course_id/quizzes/:quiz_id/reports/:id", action: :abort, as: 'course_quiz_reports_abort'
       get "courses/:course_id/quizzes/:quiz_id/reports", action: :index, as: 'course_quiz_reports'
       get "courses/:course_id/quizzes/:quiz_id/reports/:id", action: :show, as: 'course_quiz_report'
     end
@@ -1580,6 +1581,16 @@ CanvasRails::Application.routes.draw do
         delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
       end
     end
+
+    scope(controller: :usage_rights) do
+      %w(course group user).each do |context|
+        content_prefix = "#{context.pluralize}/:#{context}_id"
+        put "#{content_prefix}/usage_rights", action: :set_usage_rights
+        delete "#{content_prefix}/usage_rights", action: :remove_usage_rights
+        get "#{content_prefix}/content_licenses", action: :licenses
+      end
+    end
+
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

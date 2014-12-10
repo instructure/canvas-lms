@@ -19,6 +19,11 @@ require_relative '../../spec_helper'
 
 module Utils
   describe DatetimeRangePresenter do
+    def overridden_presenter(datetime, zone_name)
+      zone = ActiveSupport::TimeZone[zone_name]
+      DatetimeRangePresenter.new(datetime, nil, :event, zone)
+    end
+
     describe "#as_string" do
       it 'can display a single datetime if theres no range' do
         datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
@@ -74,10 +79,19 @@ module Utils
 
       it "accepts a timezone override" do
         datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
-        mountain_presenter = DatetimeRangePresenter.new(datetime, nil, :event, ActiveSupport::TimeZone["America/Denver"])
-        central_presenter = DatetimeRangePresenter.new(datetime, nil, :event, ActiveSupport::TimeZone["America/Chicago"])
+        mountain_presenter = overridden_presenter(datetime, "America/Denver")
+        central_presenter = overridden_presenter(datetime, "America/Chicago")
         expect(mountain_presenter.as_string).to eq("Jan 1 at  5am")
         expect(central_presenter.as_string).to eq("Jan 1 at  6am")
+      end
+
+      it "uses the default timezone if none provided" do
+        datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
+        pre_zone = Time.zone
+        Time.zone = "Mountain Time (US & Canada)"
+        nilzone_presenter = DatetimeRangePresenter.new(datetime, nil, :event, nil)
+        expect(nilzone_presenter.as_string).to eq("Jan 1 at  5am")
+        Time.zone = pre_zone
       end
 
       it "can deal with date boundaries in the override on time objects" do
@@ -87,7 +101,7 @@ module Utils
         datetime = Time.now
 
         alaskan_presenter = DatetimeRangePresenter.new(datetime)
-        mountain_presenter = DatetimeRangePresenter.new(datetime, nil, :event,  ActiveSupport::TimeZone["America/Denver"])
+        mountain_presenter = overridden_presenter(datetime, "America/Denver")
         expect(alaskan_presenter.as_string).to eq("Sep 30 at 11:30pm")
         expect(mountain_presenter.as_string).to eq("Oct 1 at  1:30am")
         Timecop.return

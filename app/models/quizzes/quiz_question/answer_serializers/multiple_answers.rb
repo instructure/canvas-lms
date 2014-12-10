@@ -46,18 +46,23 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc
     end
 
-    # @return [Array<Integer>] IDs of the selected answers.
+    # @return [Array<String>]
+    #   IDs of the selected answers.
+    #
     # @example output for answers 5 and 8 selected:
-    #   [ 5, 8 ]
-    def deserialize(submission_data)
+    #   [ "5", "8" ]
+    #
+    # @example output for no answers selected:
+    #   []
+    def deserialize(submission_data, full=false)
       answers.each_with_object([]) do |answer_record, out|
-        answer_id = answer_record[:id].to_i
+        answer_id = answer_record[:id]
 
         is_selected = submission_data[answer_key(answer_id)]
         is_selected = Util.to_boolean(is_selected)
 
         if is_selected
-          out << answer_id
+          out << answer_id.to_s
         end
       end
     end

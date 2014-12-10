@@ -5,9 +5,14 @@
 }
 .form-horizontal{
   .dialog-adapter-form-calendar-label{
-    width: 90px;
+    width: 110px;
     margin-left: 0px;
   }
 }
 .dateSelectInput { width: 100px }
-.controls.dateSelectInputContainer{ margin-left: 100px }
+.controls.dateSelectInputContainer{ margin-left: 120px }
+
+
+.RestrictedDialogForm__warning {
+  color: $canvas-alert;
+}

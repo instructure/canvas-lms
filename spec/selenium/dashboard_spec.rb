@@ -48,12 +48,34 @@ describe "dashboard" do
 
     it_should_behave_like 'load events list'
 
-    it "should allow hiding a stream item on the dashboard", :non_parallel do
+    it "should allow hiding a stream item on the dashboard" do
       test_hiding("/")
     end
 
     it "should allow hiding a stream item on the course page" do
       test_hiding("/courses/#{@course.to_param}")
+    end
+
+    it "should not show stream items for deleted objects" do
+      enable_cache do
+        announcement = create_announcement
+        item_selector = '#announcement-details tbody tr'
+        Timecop.freeze(5.minutes.ago) do
+          items = @user.stream_item_instances
+          expect(items.size).to eq 1
+          expect(items.first.hidden).to eq false
+
+          get "/"
+
+          click_recent_activity_header
+          expect(ff(item_selector).size).to eq 1
+        end
+
+        announcement.destroy
+
+        get "/"
+        expect(f('.no-recent-messages')).to include_text('No Recent Messages')
+      end
     end
 
     def click_recent_activity_header(type='announcement')

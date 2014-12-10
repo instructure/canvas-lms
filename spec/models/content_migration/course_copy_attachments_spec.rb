@@ -109,5 +109,36 @@ describe ContentMigration do
       expect(page2.body).to include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
     end
 
+    it "should reference existing usage rights on course copy" do
+      usage_rights = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2014 Incom Corp Ltd.'
+      att1 = Attachment.create(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att1.usage_rights = usage_rights
+      att1.save!
+      run_course_copy
+      expect(@copy_to.attachments.where(migration_id: mig_id(att1)).first.usage_rights).to eq(usage_rights)
+    end
+
+    it "should preserve usage rights on export/import" do
+      att1 = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => '2.txt', :uploaded_data => StringIO.new('2'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att3 = Attachment.create!(:filename => '3.txt', :uploaded_data => StringIO.new('3'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+
+      ur1 = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2014 Incom Corp Ltd.'
+      ur2 = @copy_from.usage_rights.create! use_justification: 'creative_commons', license: 'cc_by_nd', legal_copyright: '(C) 2014 Koensayr Manufacturing Inc.'
+      Attachment.where(id: [att1.id, att2.id]).update_all(usage_rights_id: ur1.id)
+      Attachment.where(id: [att3.id]).update_all(usage_rights_id: ur2.id)
+
+      run_export_and_import
+
+      att1_rights = @copy_to.attachments.where(migration_id: mig_id(att1)).first.usage_rights
+      att2_rights = @copy_to.attachments.where(migration_id: mig_id(att2)).first.usage_rights
+      att3_rights = @copy_to.attachments.where(migration_id: mig_id(att3)).first.usage_rights
+      expect(att1_rights).not_to eq(ur1) # check it was actually copied
+      expect(att1_rights).to eq(att2_rights) # check de-duplication
+
+      attrs = %w(use_justification legal_copyright license)
+      expect(att1_rights.attributes.slice(*attrs)).to eq({"use_justification" => 'used_by_permission', "legal_copyright" => '(C) 2014 Incom Corp Ltd.', "license" => 'private'})
+      expect(att3_rights.attributes.slice(*attrs)).to eq({"use_justification" => 'creative_commons', "legal_copyright" => '(C) 2014 Koensayr Manufacturing Inc.', "license" => 'cc_by_nd'})
+    end
   end
 end

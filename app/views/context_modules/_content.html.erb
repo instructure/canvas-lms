@@ -160,7 +160,7 @@ TEXT
       <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   </div>
-  <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
+  <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true, lti_app_placements: [Lti::ResourcePlacement::LINK_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION]} %>
   <div id="edit_item_dialog" style="display: none;">
     <%= form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>
       <table class="formtable">

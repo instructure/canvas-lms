@@ -151,6 +151,125 @@ describe Quizzes::QuizReportsController, type: :request do
         expect(json['quiz_reports'][0]['id']).to eq "#{Quizzes::QuizStatistics.first.id}"
       end
     end
+
+    context 're-generation' do
+      JOB_TAG = Quizzes::QuizStatistics.csv_job_tag
+      let(:report_type) { 'student_analysis' }
+
+      it "should work when a job had failed previously" do
+        stats, original_job = *begin
+          Quizzes::QuizStatistics::StudentAnalysis.any_instance.stubs(:to_csv) {
+            throw 'simulated failure'
+          }
+
+          stats = @quiz.current_statistics_for(report_type)
+          stats.generate_csv_in_background
+
+          # keep a reference to the job before we run because it will get
+          # migrated to the failed jobs table:
+          job = Delayed::Job.where(tag: JOB_TAG).first
+
+          run_jobs
+
+          [ stats.reload, job ]
+        end
+
+        expect(stats.csv_generation_failed?).to be_truthy
+
+        api_create({
+          quiz_reports: [{
+            report_type: report_type
+          }]
+        }, { jsonapi: true })
+
+        new_job = Delayed::Job.where(tag: JOB_TAG).first
+
+        expect(new_job).to be_present
+        expect(original_job.id).not_to eq new_job.id
+      end
+
+      it "should return 409 when report is being/already generated" do
+        stats = @quiz.current_statistics_for(report_type)
+        stats.generate_csv_in_background
+
+        api_create({
+          quiz_reports: [{
+            report_type: report_type
+          }]
+        }, { jsonapi: true, raw: true })
+
+        assert_status(409)
+      end
+    end
+  end
+
+  describe "DELETE /courses/:course_id/quizzes/:quiz_id/reports/:id [#abort]" do
+    before :once do
+      teacher_in_course(:active_all => true)
+
+      simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T}, {
+        user: @teacher,
+        course: @course
+      }
+    end
+
+    let(:report) { @quiz.current_statistics_for("student_analysis") }
+
+    def api_abort
+      raw_api_call(
+        :delete,
+        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{report.id}", {
+          controller: "quizzes/quiz_reports",
+          action: "abort",
+          format: "json",
+          course_id: @course.id.to_s,
+          quiz_id: @quiz.id.to_s,
+          id: report.id.to_s
+        }, {}, {
+          'Accept' => 'application/vnd.api+json'
+        }
+      )
+    end
+
+    it 'denies unprivileged access' do
+      student_in_course(:active_all => true)
+      api_abort
+      assert_status(401)
+    end
+
+    it 'works when the report is already generated' do
+      report.generate_csv
+      api_abort
+      assert_status(204)
+      expect(report.reload.csv_attachment).to eq nil
+    end
+
+    it 'works when the report is queued for generation' do
+      report.generate_csv_in_background
+      expect(report.reload.generating_csv?).to eq true
+
+      api_abort
+
+      assert_status(204)
+      expect(report.reload.generating_csv?).to eq false
+    end
+
+    it 'works when the report failed to generate' do
+      report.generate_csv_in_background
+      report.progress.fail
+
+      api_abort
+      assert_status(204)
+    end
+
+    it 'does not work when the report is being generated' do
+      report.generate_csv_in_background
+      report.progress.start
+
+      api_abort
+
+      assert_status(422)
+    end
   end
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/reports/:id [show]" do
@@ -216,10 +335,11 @@ describe Quizzes::QuizReportsController, type: :request do
         end
 
         it 'embeds its progress with ?include=progress' do
-          @report.start_progress
+          @report.generate_csv_in_background
           @report.reload
 
           json = api_show({:include=>['progress']}, { jsonapi: true })
+
           expect(json['quiz_reports'][0]['file']).not_to be_present
           expect(json['quiz_reports'][0]['progress']).to be_present
           expect(json['quiz_reports'][0]['progress']['id']).to eq @report.progress.id

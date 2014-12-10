@@ -44,11 +44,13 @@ module Utils
 
     def present_range
       if start.to_date == finish.to_date
-        I18n.t('time.ranges.same_day', "%{date} from %{start_time} to %{end_time}", date: start_date_string, start_time: start_as_time, end_time: finish_as_time)
+        I18n.t('time.ranges.same_day', "%{date} from %{start_time} to %{end_time}",
+               date: start_date_string, start_time: start_as_time, end_time: finish_as_time)
       else
         start_string = datetime_component(start_date_string, start)
         end_string = datetime_component(end_date_string, finish)
-        I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}", start_date_and_time: start_string, end_date_and_time: end_string)
+        I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}",
+               start_date_and_time: start_string, end_date_and_time: end_string)
       end
     end
 

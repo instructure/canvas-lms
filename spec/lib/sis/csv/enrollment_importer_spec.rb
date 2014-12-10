@@ -130,6 +130,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.tas.first.name).to eq "User Tres"
     expect(course.observers.first.name).to eq "User Quatro"
     expect(course.observer_enrollments.first.associated_user_id).to eq course.students.first.id
+    expect(course.observer_enrollments.first.sis_source_id).to eq "test_1:user_5:#{observer_role.id}:Sec1"
     expect(course.designers.first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil
@@ -707,6 +708,37 @@ describe SIS::CSV::EnrollmentImporter do
     e = observer.observer_enrollments.first
     expect(e.course_id).to eq course.id
     expect(e.associated_user_id).to eq student.id
+  end
+
+  it "should delete observer enrollments when the student enrollment is already deleted" do
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "student_user,user1,User,Uno,user@example.com,active",
+        "observer_user,user2,User,Two,user2@example.com,active"
+    )
+    process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,student_user,student,,active,",
+        "test_1,observer_user,observer,,active,student_user"
+    )
+
+    student = Pseudonym.where(:sis_user_id => "student_user").first.user
+    observer = Pseudonym.where(:sis_user_id => "observer_user").first.user
+
+    expect(observer.enrollments.count).to eq 1
+    expect(observer.enrollments.first.associated_user_id).to eq student.id
+
+    process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,student_user,student,,deleted,",
+        "test_1,observer_user,observer,,deleted,student_user"
+    )
+    expect(observer.enrollments.count).to eq 1
+    expect(observer.enrollments.first.workflow_state).to eq 'deleted'
   end
 
 end

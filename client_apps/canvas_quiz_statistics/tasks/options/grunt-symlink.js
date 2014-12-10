@@ -20,7 +20,7 @@ module.exports = {
       dest: 'vendor/canvas'
     }, {
       expand: true,
-      src: '{src,dist,vendor}',
+      src: '{src,dist,vendor,node_modules}',
       dest: 'www/',
     }, {
       expand: true,

@@ -1,9 +1,10 @@
 define [
   'react'
   'react-router'
-  'compiled/views/FileBrowserView'
+  'compiled/views/TreeBrowserView'
+  'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
-], (React, Router, FileBrowserView, customPropTypes) ->
+], (React, Router, TreeBrowserView, RootFoldersFinder, customPropTypes) ->
 
   FolderTree = React.createClass
     displayName: 'FolderTree'
@@ -15,9 +16,12 @@ define [
     mixins: [Router.Navigation, Router.ActiveState]
 
     componentDidMount: ->
-      new FileBrowserView({
-        onlyShowFolders: true,
+      rootFoldersFinder = new RootFoldersFinder({
         rootFoldersToShow: @props.rootFoldersToShow
+      })
+      new TreeBrowserView({
+        onlyShowFolders: true,
+        rootModelsFinder: rootFoldersFinder
         onClick: @onClick
         dndOptions: @props.dndOptions
         href: @hrefFor

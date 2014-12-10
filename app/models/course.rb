@@ -25,9 +25,10 @@ class Course < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
   include TimeZoneHelper
+  include ContentLicenses
 
   attr_accessor :teacher_names
-  attr_writer :student_count, :primary_enrollment, :primary_enrollment_rank, :primary_enrollment_state, :invitation
+  attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :invitation
 
   attr_accessible :name,
                   :section,
@@ -209,7 +210,8 @@ class Course < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
   has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
-  has_many :grading_periods, dependent: :destroy
+  has_many :grading_period_groups, dependent: :destroy
+  has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
   include Profile::Association
 
@@ -331,52 +333,7 @@ class Course < ActiveRecord::Base
   end
 
   def public_license?
-    license && license != 'private'
-  end
-
-  def self.licenses
-    ActiveSupport::OrderedHash[
-      'private',
-      {
-        :readable_license => t('#cc.private', 'Private (Copyrighted)'),
-        :license_url => "http://en.wikipedia.org/wiki/Copyright"
-      },
-      'cc_by_nc_nd',
-      {
-        :readable_license => t('#cc.by_nc_nd', 'CC Attribution Non-Commercial No Derivatives'),
-        :license_url => "http://creativecommons.org/licenses/by-nc-nd/3.0/"
-      },
-      'cc_by_nc_sa',
-      {
-        :readable_license => t('#cc.by_nc_sa', 'CC Attribution Non-Commercial Share Alike'),
-        :license_url => "http://creativecommons.org/licenses/by-nc-sa/3.0"
-      },
-      'cc_by_nc',
-      {
-        :readable_license => t('#cc.by_nc', 'CC Attribution Non-Commercial'),
-        :license_url => "http://creativecommons.org/licenses/by-nc/3.0"
-      },
-      'cc_by_nd',
-      {
-        :readable_license => t('#cc.by_nd', 'CC Attribution No Derivatives'),
-        :license_url => "http://creativecommons.org/licenses/by-nd/3.0"
-      },
-      'cc_by_sa',
-      {
-        :readable_license => t('#cc.by_sa', 'CC Attribution Share Alike'),
-        :license_url => "http://creativecommons.org/licenses/by-sa/3.0"
-      },
-      'cc_by',
-      {
-        :readable_license => t('#cc.by', 'CC Attribution'),
-        :license_url => "http://creativecommons.org/licenses/by/3.0"
-      },
-      'public_domain',
-      {
-        :readable_license => t('#cc.public_domain', 'Public Domain'),
-        :license_url => "http://en.wikipedia.org/wiki/Public_domain"
-      },
-    ]
+    license && self.class.public_license?(license)
   end
 
   def license_data
@@ -1240,6 +1197,7 @@ class Course < ActiveRecord::Base
 
   def account_chain
     @account_chain ||= Account.account_chain(account_id)
+    @account_chain.dup
   end
 
   def institution_name
@@ -2213,7 +2171,7 @@ class Course < ActiveRecord::Base
     section_ids = visibilities.map{ |s| s[:course_section_id] }
     is_scope = sections.respond_to?(:where)
 
-    if [:full, :limited, :sections].include?(visibility)
+    if [:full, :limited, :restricted, :sections].include?(visibility)
       if visibility == :sections || visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
         is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
       else
@@ -2767,7 +2725,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  %w{student_count primary_enrollment primary_enrollment_rank primary_enrollment_state invitation}.each do |method|
+  %w{student_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state invitation}.each do |method|
     class_eval <<-RUBY
       def #{method}
         read_attribute(:#{method}) || @#{method}

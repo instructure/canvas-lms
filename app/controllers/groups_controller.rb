@@ -225,8 +225,9 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
-
-    @groups      = all_groups = @context.groups.active.by_name
+    @groups      = all_groups = @context.groups.active
+                                  .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+                                  .includes(:group_category)
     @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name'))
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
@@ -282,8 +283,8 @@ class GroupsController < ApplicationController
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
-        paginated_groups = Api.paginate(all_groups, self, path)
-        render :json => paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
+        @paginated_groups = Api.paginate(all_groups, self, path)
+        render :json => @paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
       end
     end
   end
@@ -428,7 +429,7 @@ class GroupsController < ApplicationController
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session, {include: ['users']}) }
+          format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
         else
           format.html { render :action => "new" }
           format.json { render :json => @group.errors, :status => :bad_request }
@@ -465,6 +466,11 @@ class GroupsController < ApplicationController
   #   The allowed file storage for the group, in megabytes. This parameter is
   #   ignored if the caller does not have the manage_storage_quotas permission.
   #
+  # @argument members[] [String]
+  #   An array of user ids for users you would like in the group.
+  #   Users not in the group will be sent invitations. Existing group
+  #   members who aren't in the list will be removed from the group.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \
   #          -X PUT \
@@ -496,11 +502,24 @@ class GroupsController < ApplicationController
 
     if authorized_action(@group, @current_user, :update)
       respond_to do |format|
-        if @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+        @group.transaction do
+          @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+          if params[:members]
+            user_ids = Api.value_to_array(params[:members]).map(&:to_i).uniq
+            if @group.context
+              users = @group.context.users.where(id: user_ids)
+            else
+              users = User.where(id: user_ids)
+            end
+            @memberships = @group.set_users(users)
+          end
+        end
+
+        if !@group.errors.any?
           @group.users.update_all(updated_at: Time.now.utc)
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session) }
+          format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @group.errors, :status => :bad_request }
@@ -626,7 +645,6 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
 
     search_term = params[:search_term].presence
-
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
     else
@@ -634,7 +652,7 @@ class GroupsController < ApplicationController
     end
 
     users = Api.paginate(users, self, api_v1_group_users_url)
-    render :json => users_json(users, @current_user, session, Array(params[:include]))
+    render :json => users_json(users, @current_user, session, Array(params[:include]), @context, nil, Array(params[:exclude]))
   end
 
   def edit

@@ -191,7 +191,7 @@
       <%= form_for :course, :url => context_url(@context, :context_url), :html => {:tabindex=>"0", :'data-turn-into-dialog'=>'{"height": 300, "width":500,"modal":true}', :title=>t('headings.choose_home_page_title', %{Choose Home Page}), :style => "display:none", :id => "edit_course_home_content_form", :method => :put} do |f| %>
         <label for="edit_course_home_content_select"><%= t('draft_state.labels.select_content', %{Select what you'd like to display on the home page.}) %></label>
 
-        <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="feed" <%= 'checked' if @context.default_view == 'feed' || (!has_front_page && @context.default_view == 'wiki') %>><%= t('draft_state.options.recent_activity_dashboard', %{Recent Activity Dashboard}) %></label></div>
+        <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="feed" <%= 'checked' if @context.default_view == 'feed' || (!has_front_page && @context.default_view == 'wiki') %>><%= t('draft_state.options.course_activity_stream', %{Course Activity Stream}) %></label></div>
         <div class="form_group">
           <label class="radio"><input type="radio" name="course[default_view]" value="wiki" <%= 'checked' if has_front_page && @context.default_view == 'wiki' %><%= 'disabled' unless has_front_page %>>
             <span class="<%= 'ui-state-disabled' unless has_front_page %>"><%= t('draft_state.options.custom_page', %{Pages Front Page}) %></span></label>

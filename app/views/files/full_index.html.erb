@@ -62,9 +62,9 @@
 <% end %>
 <div style="float: right; font-size: 0.8em; margin-right: 1.0em;">
   <% if showing_all_contexts %>
-    <a href="<%= dashboard_files_url %>"><%= t 'links.show_personal_files', "just show my personal files" %></a>
+    <a href="<%= files_url %>"><%= t 'links.show_personal_files', "just show my personal files" %></a>
   <% else %>
-    <a href="<%= dashboard_files_url(:show_all_contexts => 1) %>"><%= t 'links.show_all_files', "see files for all your courses/groups" %></a>
+    <a href="<%= files_url(:show_all_contexts => 1) %>"><%= t 'links.show_all_files', "see files for all your courses/groups" %></a>
   <% end %>
 </div>
 <div class="clear"></div>

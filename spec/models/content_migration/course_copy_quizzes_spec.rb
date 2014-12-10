@@ -93,6 +93,8 @@ describe ContentMigration do
       expect(@copy_to.assignments.map(&:title).sort).to eq ["edited published quiz", "edited unpublished quiz"]
       expect(@copy_to.context_module_tags.map(&:title).sort).to eq ["edited published quiz", "edited unpublished quiz"]
 
+      expect(@copy_to.context_module_tags.map(&:workflow_state).sort).to eq ["active", "unpublished"]
+
       expect(@copy_to.quizzes.where(title: "edited published quiz").first).not_to be_unpublished
       expect(@copy_to.quizzes.where(title: "edited unpublished quiz").first).to be_unpublished
     end

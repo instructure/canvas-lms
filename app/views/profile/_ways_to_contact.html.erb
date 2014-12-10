@@ -162,7 +162,7 @@
     <div class="control-group">
       <%= label :communication_channel, :address, t('labels.email_address', 'Email Address'), :class => 'control-label' %>
       <div class="controls">
-        <%= text_field :communication_channel, :address %>
+        <%= email_field :communication_channel, :address %>
       </div>
     </div>
 
@@ -209,7 +209,7 @@
     <div class="control-group">
       <label for='communication_channel_sms_email' class='control-label'><%= t('labels.sms_email', 'SMS Email') %></label>
       <div class="controls">
-        <%= text_field :communication_channel, :address, :id => 'communication_channel_sms_email', :class => 'sms_email' %>
+        <%= email_field :communication_channel, :address, :id => 'communication_channel_sms_email', :class => 'sms_email' %>
       </div>
     </div>
 

@@ -36,10 +36,11 @@ module Api::V1::User
     end
   end
 
-  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil)
+  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [])
     includes ||= []
+    excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
-      if user_json_is_admin?(context, current_user)
+      if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
         include_root_account = @domain_root_account.trust_exists?
         if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account, include_root_account)
           # the sis fields on pseudonym are poorly named -- sis_user_id is
@@ -67,6 +68,13 @@ module Api::V1::User
       if includes.include?('email') && context.grants_right?(current_user, session, :read_as_admin)
         json[:email] = user.email
       end
+
+      if includes.include?('sections')
+        json[:sections] = user.enrollments.
+          map(&:course_section).compact.uniq.
+          map(&:name).join(", ")
+      end
+
       json[:locale] = user.locale if includes.include?('locale')
       json[:confirmation_url] = user.communication_channels.email.first.try(:confirmation_url) if includes.include?('confirmation_url')
 
@@ -80,8 +88,13 @@ module Api::V1::User
     end
   end
 
-  def users_json(users, current_user, session, includes = [], context = @context, enrollments = nil)
-    users.map{ |user| user_json(user, current_user, session, includes, context, enrollments) }
+  def users_json(users, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [])
+
+    if includes.include?('sections')
+      ActiveRecord::Associations::Preloader.new(users, enrollments: :course_section).run
+    end
+
+    users.map{ |user| user_json(user, current_user, session, includes, context, enrollments, excludes) }
   end
 
   # this mini-object is used for secondary user responses, when we just want to

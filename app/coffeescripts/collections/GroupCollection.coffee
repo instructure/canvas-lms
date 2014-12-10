@@ -20,11 +20,12 @@ define [
   'compiled/collections/PaginatedCollection'
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
-], (PaginatedCollection, GroupUserCollection, Group) ->
+  'compiled/util/natcompare'
+], (PaginatedCollection, GroupUserCollection, Group, natcompare) ->
 
   class GroupCollection extends PaginatedCollection
     model: Group
-    comparator: (group) -> group.get('name').toLowerCase()
+    comparator: natcompare.byGet('name')
 
     @optionProperty 'category'
     @optionProperty 'loadAll'

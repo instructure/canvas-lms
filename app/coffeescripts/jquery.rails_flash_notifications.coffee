@@ -32,8 +32,8 @@ define [
     """)
 
     $screenreader_node.appendTo($screenreader_holder)
-    # these aren't displayed, so removing them at a specified time is not critical
-    window.setTimeout((-> $screenreader_node.remove()), 20000)
+    # By not removing these in a timely manner, they can stack up and become repetitive
+    window.setTimeout((-> $screenreader_node.remove()), 1000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
@@ -70,6 +70,14 @@ define [
 
   $.screenReaderFlashError = (content) ->
     screenReaderFlashBox('error', content)
+
+  # This is for when you want to clear the flash message content prior to
+  # updating it with new content.  Makes it so the SR only reads this one
+  # message.
+  $.screenReaderFlashMessageExclusive = (content) ->
+    $screenreader_holder.html("""
+      <span>#{escapeContent(content)}</span>
+    """)
 
   $.initFlashContainer = ->
     initFlashContainer()

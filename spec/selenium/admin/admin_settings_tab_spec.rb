@@ -401,4 +401,61 @@ describe "admin settings tab" do
       ]
     end
   end
+
+  context "external integration keys" do
+    let!(:key_value) { '42' }
+    before(:once) do
+      ExternalIntegrationKey.key_type :external_key0, label: 'External Key 0', rights: { read: proc { true }, write: true }
+      ExternalIntegrationKey.key_type :external_key1, label: proc { 'External Key 1' }, rights: { read: true, write: false }
+      ExternalIntegrationKey.key_type :external_key2, label: 'External Key 2', rights: { read: proc { false }, write: false }
+    end
+
+    it "should not display external integration keys if no key types exist" do
+      ExternalIntegrationKey.stubs(:key_types).returns([])
+      get "/accounts/#{Account.default.id}/settings"
+      expect(f("#external_integration_keys")).to be_nil
+    end
+
+    it "should not display external integration keys if no rights are granted" do
+      ExternalIntegrationKey.any_instance.stubs(:grants_right_for?).returns(false)
+      get "/accounts/#{Account.default.id}/settings"
+      expect(f("#external_integration_keys")).to be_nil
+    end
+
+    it "should display keys with the correct rights" do
+      eik = ExternalIntegrationKey.new
+      eik.context = Account.default
+      eik.key_type = 'external_key0'
+      eik.key_value = key_value
+      eik.save
+
+      eik = ExternalIntegrationKey.new
+      eik.context = Account.default
+      eik.key_type = 'external_key1'
+      eik.key_value = key_value
+      eik.save
+
+      get "/accounts/#{Account.default.id}/settings"
+
+      expect(f("label[for='account_external_integration_keys_external_key0']").text).to eq 'External Key 0:'
+      expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq 'External Key 1:'
+      expect(f("label[for='account_external_integration_keys_external_key2']")).to be_nil
+
+      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq key_value
+      expect(f("#external_integration_keys span").text).to eq key_value
+      expect(f("#account_external_integration_keys_external_key2")).to be_nil
+    end
+
+    it "should update writable keys" do
+      set_value f("#account_external_integration_keys_external_key0"), key_value
+      click_submit
+
+      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq key_value
+
+      set_value f("#account_external_integration_keys_external_key0"), ''
+      click_submit
+
+      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq ''
+    end
+  end
 end

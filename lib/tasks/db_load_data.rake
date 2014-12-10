@@ -115,8 +115,14 @@ namespace :db do
     end
     puts "\nNotifications Loaded"
   end
-  
-  desc "Create an administrator account"
+
+  desc "Create default accounts"
+  task :create_default_accounts => :environment do
+    Account.default(true)
+    Account.site_admin(true)
+  end
+
+  desc "Create an administrator user"
   task :configure_admin => :load_environment do
 
     def create_admin(email, password)
@@ -237,7 +243,7 @@ namespace :db do
   end
   
   desc "Create all the initial data, including notifications and admin account"
-  task :load_initial_data => [:configure_admin, :configure_account_name, :configure_statistics_collection, :generate_data] do
+  task :load_initial_data => [:create_default_accounts, :configure_admin, :configure_account_name, :configure_statistics_collection, :generate_data] do
    
     puts "\nInitial data loaded"
     

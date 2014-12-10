@@ -38,12 +38,19 @@ module Lti
           account_tp_url_stub = course_tool_consumer_profile_url(@course, 'abc123').gsub('abc123', '')
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
+
+        it "doesn't allow student to register an app" do
+          course_with_student_logged_in(active_all:true)
+          get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
+          expect(response.code).to eq '401'
+        end
+
       end
 
       context 'account' do
         it 'initiates a tool proxy registration request' do
-          course_with_teacher_logged_in(:active_all => true)
-          get 'registration', account_id: @course.root_account.id, tool_consumer_url: 'http://tool.consumer.url'
+          user_session(account_admin_user)
+          get 'registration', account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
@@ -52,9 +59,15 @@ module Lti
           expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
-          account_tp_url_stub = account_tool_consumer_profile_url(@course.root_account, 'abc123').gsub('abc123', '')
+          account_tp_url_stub = account_tool_consumer_profile_url(Account.default, 'abc123').gsub('abc123', '')
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
+
+        it "doesn't allow non admin to register an app" do
+          get 'registration', account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'
+          expect(response.code).to eq '401'
+        end
+
       end
 
     end
@@ -98,7 +111,7 @@ module Lti
         end
 
         it 'sets the active tab' do
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
           expect(response.code).to eq "200"
           expect(assigns[:active_tab]).to eq message_handler.asset_string
         end
@@ -115,7 +128,7 @@ module Lti
           message_handler.parameters = parameters.as_json
           message_handler.save
 
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
           expect(response.code).to eq "200"
 
           params = assigns[:lti_launch].params.with_indifferent_access
@@ -124,11 +137,62 @@ module Lti
           expect(params['custom_tool_proxy.custom.url']).to include('api/lti/tool_settings/')
         end
 
-        it 'uses the correct binding' do
+        it 'returns the roles' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['roles']).to eq ["http://purl.imsglobal.org/vocab/lis/v2/person#None"]
+        end
 
+        it 'adds module item substitutions' do
+          parameters = %w( Canvas.module.id Canvas.moduleItem.id ).map do |key|
+            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
+          end
+          message_handler.parameters = parameters.as_json
+          message_handler.save
+
+          tag = message_handler.context_module_tags.create!(context: account, tag_type: 'context_module')
+          tag.context_module =  ContextModule.create!(context: Course.create!)
+          tag.save!
+
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' }
+          expect(response.code).to eq "200"
+
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['custom_canvas.module.id']).to eq tag.context_module_id
+          expect(params['custom_canvas.module_item.id']).to eq tag.id
+        end
+
+        it 'returns the locale' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['launch_presentation_locale']).to eq :en
         end
 
       end
+
+      describe "resource link" do
+
+        it 'creates resource_links without a resource_link_fragment' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          expect(response.code).to eq "200"
+
+          lti_launch = assigns[:lti_launch]
+          params = lti_launch.params.with_indifferent_access
+          expect(Base64.urlsafe_decode64(params[:resource_link_id])).to eq "Account_#{account.id},MessageHandler_#{message_handler.id}"
+        end
+
+        it 'creates resource_links with a resource_link_fragment' do
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, resource_link_fragment: 'my_custom_postfix'
+          expect(response.code).to eq "200"
+
+          lti_launch = assigns[:lti_launch]
+          params = lti_launch.params.with_indifferent_access
+          expect(Base64.urlsafe_decode64(params[:resource_link_id])).to eq "Account_#{account.id},MessageHandler_#{message_handler.id},my_custom_postfix"
+        end
+
+
+      end
+
     end
   end
 end

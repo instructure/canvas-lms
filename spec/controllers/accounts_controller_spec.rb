@@ -517,5 +517,74 @@ describe AccountsController do
 
       expect(assigns[:last_reports].first.last).to eq report
     end
+
+    context "external_integration_keys" do
+      before(:once) do
+        ExternalIntegrationKey.key_type :external_key0, rights: { write: true }
+        ExternalIntegrationKey.key_type :external_key1, rights: { write: false }
+        ExternalIntegrationKey.key_type :external_key2, rights: { write: true }
+      end
+
+      before do
+        user
+        user_session(@user)
+        @account = Account.create!
+        Account.site_admin.account_users.create!(user: @user)
+
+        @eik = ExternalIntegrationKey.new
+        @eik.context = @account
+        @eik.key_type = :external_key0
+        @eik.key_value = '42'
+        @eik.save
+      end
+
+      it "should load account external integration keys" do
+        get 'settings', account_id: @account
+        expect(response).to be_success
+
+        external_integration_keys = assigns[:external_integration_keys]
+        expect(external_integration_keys.keys).to include('external_key0')
+        expect(external_integration_keys.keys).to include('external_key1')
+        expect(external_integration_keys.keys).to include('external_key2')
+        expect(external_integration_keys[:external_key0]).to eq @eik
+      end
+
+      it "should create a new external integration key" do
+        key_value = "2142"
+        post 'update', :id => @account.id, :account => { :external_integration_keys => {
+          external_key0: "42",
+          external_key2: key_value
+        } }
+        @account.reload
+        eik = @account.external_integration_keys.where(key_type: :external_key2).first
+        expect(eik).to_not be_nil
+        expect(eik.key_value).to eq "2142"
+      end
+
+      it "should update an existing external integration key" do
+        key_value = "2142"
+        post 'update', :id => @account.id, :account => { :external_integration_keys => {
+          external_key0: key_value,
+          external_key1: key_value,
+          external_key2: key_value
+        } }
+        @account.reload
+
+        # Should not be able to edit external_key1.  The user does not have the rights.
+        eik = @account.external_integration_keys.where(key_type: :external_key1).first
+        expect(eik).to be_nil
+
+        eik = @account.external_integration_keys.where(key_type: :external_key0).first
+        expect(eik.id).to eq @eik.id
+        expect(eik.key_value).to eq "2142"
+      end
+
+      it "should delete an external integration key when not provided or the value is blank" do
+        post 'update', :id => @account.id, :account => { :external_integration_keys => {
+          external_key0: nil
+        } }
+        expect(@account.external_integration_keys.count).to eq 0
+      end
+    end
   end
 end

@@ -1,5 +1,4 @@
 {{#ifAny count loading}}
-  <ul class="collectionViewItems unstyled"></ul>
   <div class="no-results-wrapper">
     <div class="no-results hidden">
       {{#ifEqual ENV.group_user_type "student"}}
@@ -8,7 +7,11 @@
         {{#t "no_matching_users"}}No matching users.{{/t}}
       {{/ifEqual}}
     </div>
+    <div class="invalid-filter hidden">
+      {{#t "greater_than_three"}}Please enter a search term with three or more characters{{/t}}
+    </div>
   </div>
+  <ul class="collectionViewItems unstyled"></ul>
   <div class="paginatedLoadingIndicator"></div>
 {{else}}
   <div class="no-results">

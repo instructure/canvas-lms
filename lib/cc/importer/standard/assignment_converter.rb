@@ -26,6 +26,9 @@ module CC::Importer::Standard
           resource_dir = File.dirname(path) if path
           
           asmnt = {:migration_id => res[:migration_id]}.with_indifferent_access
+          if res[:intended_user_role] == 'Instructor'
+            asmnt[:workflow_state] = 'unpublished'
+          end
           parse_cc_assignment_data(asmnt, doc, resource_dir)
 
           # FIXME check the XML namespace to make sure it's actually a canvas assignment

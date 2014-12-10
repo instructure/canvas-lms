@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 200 200" enable-background="new 0 0 200 200" xml:space="preserve">
+<g id="check_plus">
+	<path fill="#767676" d="M75,125L37.5,75L0,137.5c22.2,7.5,48,18.4,75,50c19.1-33.1,87.5-100,125-100V0C125,25,75,125,75,125z
+		 M175,125h-25v25h-25v25h25v25h25v-25h25v-25h-25V125z"/>
+</g>
+</svg>

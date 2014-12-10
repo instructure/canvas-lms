@@ -11,10 +11,9 @@ define [
   'compiled/fn/preventDefault'
   'compiled/react/shared/utils/withReactDOM'
   '../utils/collectionHandler'
-  './FilePreviewFooter'
-  './FilePreviewInfoPanel',
+  './FilePreviewInfoPanel'
   '../modules/filesEnv'
-], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, preventDefault, withReactDOM, collectionHandler, FilePreviewFooter, FilePreviewInfoPanel, filesEnv) ->
+], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, preventDefault, withReactDOM, collectionHandler, FilePreviewInfoPanel, filesEnv) ->
 
   FilePreview = React.createClass
 
@@ -30,13 +29,11 @@ define [
 
     getInitialState: ->
       showInfoPanel: false
-      showFooter: false
-      showFooterBtn: true
       displayedItem: null
 
     componentWillMount: ->
       items = @getItemsToView(@props)
-      @setState @stateProperties(items, @props)
+      @setState @stateProperties(items, @props), @scrollFooterToItem
 
     componentDidMount: ->
       $('.ReactModal__Overlay').on 'keydown', @handleKeyboardNavigation
@@ -46,7 +43,7 @@ define [
 
     componentWillReceiveProps: (newProps) ->
       items = @getItemsToView(newProps)
-      @setState @stateProperties(items, newProps), @scrollFooterToItem
+      @setState @stateProperties(items, newProps)
 
     getItemsToView: (props) ->
       # Sets up our collection that we will be using.
@@ -72,24 +69,6 @@ define [
       params: props.params
       otherItemsString: (props.query.only_preview if props.query.only_preview)
       otherItemsIsBackBoneCollection: items.otherItems instanceof Backbone.Collection
-
-    scrollFooterToItem: ->
-      # Determine if the footer is open.
-      if @state.showFooter
-
-        $active = $('.ef-file-preview-footer-active')
-        $footerList = $('.ef-file-preview-footer-list')
-        footerOffset = $footerList.offset()
-        activeOffset = $active.offset()
-
-        # Check if the displayed item thumbnail is hidden to right
-        if (activeOffset.left > (footerOffset.left + $footerList.width()))
-          $footerList.scrollTo $active
-          # @scrollRight()
-        # Hidden to the left
-        if (activeOffset.left < footerOffset.left )
-          $footerList.scrollTo $active
-          # @scrollLeft()
 
     setUpOtherItemsQuery: (otherItems) ->
       otherItems.map((item) ->
@@ -147,7 +126,7 @@ define [
         @state.otherItems[goToItemIndex]
       if (@state.otherItemsString)
         @props.params.only_preview = @state.otherItemsString
-      div {className: 'col-xs-1 ef-file-align-center'},
+      div {className: 'col-xs-1 ef-file-arrow_container'},
         ReactRouter.Link {
           to: @getRouteIdentifier()
           query: (@getNavigationParams(id: goToItem.id) if goToItem)
@@ -156,20 +135,6 @@ define [
         },
           div {className: 'ef-file-preview-arrow-link'},
             i {className: "icon-arrow-open-#{direction}"}
-
-
-
-    scrollLeft: (event) ->
-      width = $('.ef-file-preview-footer-list').width()
-      $('.ef-file-preview-footer-list').animate({
-        scrollLeft: '-=' + width
-        }, 300, 'easeOutQuad')
-
-    scrollRight: (event) ->
-      width = $('.ef-file-preview-footer-list').width()
-      $('.ef-file-preview-footer-list').animate({
-        scrollLeft: '+=' + width
-        }, 300, 'easeOutQuad')
 
     closeModal: ->
       @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(except: 'only_preview'))
@@ -181,77 +146,46 @@ define [
         @setState(newState)
 
     render: withReactDOM ->
-      ReactModal {isOpen: true, onRequestClose: @closeModal, closeTimeoutMS: 10},
+      ReactModal {isOpen: true, onRequestClose: @closeModal, className: 'ReactModal__Content--ef-file-preview', overlayClassName: 'ReactModal__Overlay--ef-file-preview', closeTimeoutMS: 10},
         div {className: 'ef-file-preview-overlay'},
           div {className: 'ef-file-preview-header'},
-            div {className: 'grid-row middle-xs'},
-              div {className: 'col-xs-6'},
-                div {className: 'ef-file-preview-header-filename-container'},
-                  h1 {className: 'ef-file-preview-header-filename'},
-                    @state.initialItem?.displayName()
-              div {className: 'col-xs end-xs'},
-                div {className: 'ef-file-preview-header-buttons'},
-                  a {
-                    className: 'ef-file-preview-header-download ef-file-preview-button'
-                    href: @state.displayedItem?.get('url')
-                    style: {'border-right': '1px solid #8c8c8c'} if @state.showInfoPanel
-                  },
-                    i {className: 'icon-download'} #Replace with actual icon
-                    " " + I18n.t('file_preview_headerbutton_download', 'Download')
-                  button {
-                    className: if @state.showInfoPanel then 'ef-file-preview-button--active btn-link ef-file-preview-header-info ef-file-preview-button' else 'btn-link ef-file-preview-header-info ef-file-preview-button'
-                    onClick: @toggle('showInfoPanel')
-                  },
-                    i {className: 'icon-info'}
-                    ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
-                  ReactRouter.Link {
-                    to: @getRouteIdentifier(),
-                    query: @getNavigationParams(except: 'only_preview'),
-                    params: @props.params,
-                    className: 'ef-file-preview-header-close ef-file-preview-button',
-                    style: {'border-left': '1px solid #8c8c8c'} if @state.showInfoPanel
-                  },
-                    i {className: 'icon-end'}
-                    ' ' + I18n.t('file_preview_headerbutton_close', 'Close')
-
+            h1 {className: 'ef-file-preview-header-filename'},
+              @state.initialItem?.displayName()
+            div {className: 'ef-file-preview-header-buttons'},
+              unless @state.displayedItem?.get('locked_for_user')
+                a {
+                  className: 'ef-file-preview-header-download ef-file-preview-button'
+                  download: true
+                  href: @state.displayedItem?.get('url')
+                },
+                  i {className: 'icon-download'}
+                  ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
+              button {
+                type: 'button'
+                className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"
+                onClick: @toggle('showInfoPanel')
+              },
+                i {className: 'icon-info'}
+                ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
+              ReactRouter.Link {
+                to: @getRouteIdentifier(),
+                query: @getNavigationParams(except: 'only_preview'),
+                params: @props.params,
+                className: 'ef-file-preview-header-close ef-file-preview-button',
+              },
+                i {className: 'icon-end'}
+                ' ' + I18n.t('file_preview_headerbutton_close', 'Close')
 
           div {className: 'ef-file-preview-stretch'},
-            div {className: 'ef-file-preview-content'},
-              # We need to render out the left/right arrows
-              @renderArrowLink('left') if @state.otherItems?.length > 0
-              if @state.displayedItem
-                div {className: 'ef-file-preview-viewer-content'},
-                  #TODO - we need to figure out how to make this full height
-                  iframe {
-                    src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
-                    className: 'ef-file-preview-frame'
-                  }
-              @renderArrowLink('right') if @state.otherItems?.length > 0
+            @renderArrowLink('left') if @state.otherItems?.length > 0
+            if @state.displayedItem
+              iframe {
+                src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
+                className: 'ef-file-preview-frame'
+              }
+            @renderArrowLink('right') if @state.otherItems?.length > 0
 
-              if @state.showInfoPanel
-                FilePreviewInfoPanel
-                  displayedItem: @state.displayedItem
-
-                  getStatusMessage: @getStatusMessage
-
-          div {className: 'ef-file-preview-footer'},
-            if @state.showFooterBtn
-              button {
-                className: 'ef-file-preview-toggle btn-link'
-                onClick: @toggle('showFooter')
-                style: {bottom: '140px'} if @state.showFooter
-              },
-                if @state.showFooter
-                  I18n.t('file_preview_hide', 'Hide')
-                else
-                  I18n.t('file_preview_show', 'Show')
-
-          if @state.showFooter
-            FilePreviewFooter
-              otherItems: @state.otherItems
-              to: @getRouteIdentifier()
-              splat: @props.params.splat
-              query: @getNavigationParams
-              displayedItem: @state.displayedItem
-
-
+            if @state.showInfoPanel
+              FilePreviewInfoPanel
+                displayedItem: @state.displayedItem
+                getStatusMessage: @getStatusMessage

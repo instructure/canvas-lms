@@ -99,6 +99,7 @@ define [
           params: @props.params
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
+          usageRightsRequiredForContext: @props.usageRightsRequiredForContext
           splat: @props.params.splat
         }
         if @props.currentFolder.isEmpty()
@@ -111,6 +112,9 @@ define [
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
               userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+              externalToolsForContext: @props.externalToolsForContext
+              previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
 
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
@@ -122,3 +126,4 @@ define [
             currentFolder: @props.currentFolder
             params: @props.params
             query: @props.query
+

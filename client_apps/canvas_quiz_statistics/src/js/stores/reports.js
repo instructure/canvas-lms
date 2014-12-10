@@ -1,6 +1,7 @@
 define(function(require) {
   var Store = require('../core/store');
   var config = require('../config');
+  var K = require('../constants');
   var QuizReports = require('../collections/quiz_reports');
   var pollProgress = require('../services/poll_progress');
   var populateCollection = require('./common/populate_collection');
@@ -19,7 +20,7 @@ define(function(require) {
    * @class Stores.QuizReports
    * Load and generate quiz reports.
    */
-  var store = new Store('quizReports', {
+  return new Store('quizReports', {
     /**
      * Load quiz reports from the Canvas API.
      *
@@ -30,7 +31,6 @@ define(function(require) {
      *
      * @return {RSVP.Promise}
      *         Fulfills when the reports have been loaded.
-     *
      */
     load: function() {
       var onLoad = this.populate.bind(this);
@@ -90,13 +90,61 @@ define(function(require) {
       generate: function(reportType, onChange, onError) {
         var quizReport = quizReports.findWhere({ reportType: reportType });
 
-        if (quizReport && (quizReport.get('isGenerating') || quizReport.get('isGenerated'))) {
-          return onError();
+        if (quizReport) {
+          if (quizReport.get('isGenerating')) {
+            return onError('report is already being generated');
+          }
+          else if (quizReport.get('isGenerated')) {
+            return onError('report is already generated');
+          }
         }
 
         quizReports.generate(reportType).then(function(quizReport) {
           this.trackReportGeneration(quizReport, true);
           onChange();
+        }.bind(this), onError);
+      },
+
+      regenerate: function(reportId, onChange, onError) {
+        var quizReport = quizReports.get(reportId);
+        var progress = quizReport.get('progress');
+
+        if (!quizReport) {
+          return onError('no such report');
+        }
+        else if (!progress) {
+          return onError('report is not being generated');
+        }
+        else if (progress.workflowState !== K.PROGRESS_FAILED) {
+          return onError('report generation is not stuck');
+        }
+
+        quizReports.generate(quizReport.get('reportType'))
+          .then(function retrackGeneration(quizReport) {
+            this.stopTracking(quizReport.get('id'));
+            this.trackReportGeneration(quizReport, true);
+
+            onChange();
+          }.bind(this), onError);
+      },
+
+      abort: function(reportId, onChange, onError) {
+        var quizReport = quizReports.get(reportId);
+
+        if (!quizReport) {
+          return onError('no such quiz report');
+        }
+        else if (!quizReport.get('progress')) {
+          return onError('quiz report is not being generated');
+        }
+
+        quizReport.destroy({ wait: true }).then(function() {
+          this.stopTracking(quizReport.get('id'));
+
+          // destroy() would remove the report from the collection but we
+          // don't want that... just reload the report from the server:
+          quizReports.add(quizReport);
+          quizReport.fetch().then(onChange, onError);
         }.bind(this), onError);
       }
     },
@@ -110,7 +158,7 @@ define(function(require) {
 
     /** @private */
     trackReportGeneration: function(quizReport, autoDownload) {
-      var onChange, progressUrl, poll, reload;
+      var emitChange, progressUrl, poll, reload;
       var quizReportId = quizReport.get('id');
       var generationRequest = generationRequests.filter(function(request) {
         return request.quizReportId === quizReportId;
@@ -128,15 +176,15 @@ define(function(require) {
 
       generationRequests.push(generationRequest);
 
-      onChange = this.emitChange.bind(this);
+      emitChange = this.emitChange.bind(this);
       progressUrl = quizReport.get('progress').url;
 
       poll = function() {
         return pollProgress(progressUrl, {
           interval: 1000,
-          onTick: function(completion) {
-            quizReport.attributes.progress.completion = completion;
-            onChange();
+          onTick: function(completion, progress) {
+            quizReport.set('progress', progress);
+            emitChange();
           }
         });
       };
@@ -149,16 +197,26 @@ define(function(require) {
         });
       };
 
-      poll().finally(reload).then(function() {
-        if (generationRequest.autoDownload) {
+      poll().then(reload, reload).finally(function() {
+        this.stopTracking(quizReportId);
+
+        if (generationRequest.autoDownload && quizReport.get('isGenerated')) {
           triggerDownload(quizReport.get('file').url);
         }
 
-        onChange();
-      });
+        emitChange();
+      }.bind(this));
     },
 
-  });
+    /** @private */
+    stopTracking: function(quizReportId) {
+      var request = generationRequests.filter(function(request) {
+        return request.quizReportId === quizReportId;
+      })[0];
 
-  return store;
+      if (request) {
+        generationRequests.splice(generationRequests.indexOf(request), 1);
+      }
+    }
+  });
 });

@@ -138,6 +138,7 @@ $(document).ready(function() {
         submitted(item_data);
       }
     };
+
     var item_type = $("#add_module_item_select").val();
     if(item_type == 'external_url') {
       var item_data = {
@@ -148,8 +149,10 @@ $(document).ready(function() {
       }
       item_data['item[url]'] = $("#content_tag_create_url").val();
       item_data['item[title]'] = $("#content_tag_create_title").val();
-      submit(item_data);   
+      submit(item_data);
+
     } else if(item_type == 'context_external_tool') {
+
       var tool = $("#context_external_tools_select .tools .tool.selected").data('tool');
       var tool_type = tool ? tool.definition_type :$("#add_module_item_select").val()
       var tool_id = tool ? tool.definition_id : 0
@@ -169,15 +172,19 @@ $(document).ready(function() {
       } else {
         submit(item_data);
       }
+
     } else if(item_type == 'context_module_sub_header') {
+
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
         'item[id]': $("#select_context_content_dialog .module_item_option:visible:first .module_item_select").val(),
         'item[indent]': $("#content_tag_indent").val()
       }
       item_data['item[title]'] = $("#sub_header_title").val();
-      submit(item_data);   
+      submit(item_data);
+
     } else {
+
       var $options = $("#select_context_content_dialog .module_item_option:visible:first .module_item_select option:selected");
       $options.each(function() {
         var $option = $(this);
@@ -215,6 +222,7 @@ $(document).ready(function() {
             $("#" + item_data['item[type]'] + "s_select").find(".module_item_select option:last").after($option);
             submit(item_data);
           };
+
           if(item_data['item[type]'] == 'attachment') {
             $.ajaxJSONFiles(url, 'POST', data, $("#module_attachment_uploaded_data"), function(data) {
               callback(data);
@@ -227,7 +235,13 @@ $(document).ready(function() {
               callback(data);
             }, function(data) {
               $("#select_context_content_dialog").loadingImage('remove');
-              $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
+              if (data && data.errors && data.errors.title[0] && data.errors.title[0].message && data.errors.title[0].message === "blank") {
+                $("#select_context_content_dialog").errorBox(I18n.t('errors.assignment_name_blank', 'Assignment name cannot be blank.'));
+                $('.item_title').focus();
+              } else {
+                $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
+              }
+
             });
           }
         } else {
@@ -236,11 +250,13 @@ $(document).ready(function() {
       });
     }
   });
-  $("#context_external_tools_select .tools").delegate('.tool', 'click', function() {
+  $("#context_external_tools_select .tools").delegate('.tool', 'click', function(e) {
+    e.preventDefault();
+
     var $tool = $(this);
-    if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) { 
-      $(this).removeClass('selected'); 
-      return; 
+    if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) {
+      $(this).removeClass('selected');
+      return;
     }
     $tool.parents(".tools").find(".tool.selected").removeClass('selected');
     $tool.addClass('selected');
@@ -303,11 +319,12 @@ $(document).ready(function() {
       var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
       $dialog.find("iframe").attr('src', url);
     } else {
-        var module_item_placement = $tool.data('tool').placements.module_item;
-      $("#external_tool_create_url").val(module_item_placement.url || '');
+      var placements = $tool.data('tool').placements
+      var placement = placements.assignment_selection || placements.link_selection
+      $("#external_tool_create_url").val(placement.url || '');
       $("#context_external_tools_select .domain_message").showIf($tool.data('tool').domain)
         .find(".domain").text($tool.data('tool').domain);
-      $("#external_tool_create_title").val(module_item_placement.title);
+      $("#external_tool_create_title").val(placement.title);
     }
   });
   var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();
@@ -329,7 +346,7 @@ $(document).ready(function() {
             $tool.toggleClass('resource_selection', 'resource_selection' in tool.placements);
             $tool.fillTemplateData({
               data: tool,
-              dataValues: ['definition_type', 'definition_id', 'domain', 'name', 'placements']
+              dataValues: ['definition_type', 'definition_id', 'domain', 'name', 'placements', 'description']
             });
             $tool.data('tool', tool);
             $select.find(".tools").append($tool.show());

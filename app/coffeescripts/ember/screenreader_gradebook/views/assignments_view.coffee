@@ -23,9 +23,10 @@ define [
     actions:
       openDialog: (dialogType) ->
         con = @controller
+        assignment = con.get('selectedAssignment')
         options =
-          assignment: con.get('selectedAssignment')
-          students: con.studentsHash()
+          assignment: assignment
+          students: con.studentsThatCanSeeAssignment(assignment)
           selected_section: con.get('selectedSection')?.id
           context_id: ENV.GRADEBOOK_OPTIONS.context_id
           context_url: ENV.GRADEBOOK_OPTIONS.context_url

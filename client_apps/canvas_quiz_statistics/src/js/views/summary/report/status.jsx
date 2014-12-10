@@ -2,7 +2,9 @@
 define(function(require) {
   var React = require('react');
   var I18n = require('i18n!quiz_reports');
+  var K = require('../../../constants');
   var Descriptor = require('../../../models/quiz_report_descriptor');
+  var Actions = require('../../../actions');
 
   var Status = React.createClass({
     propTypes: {
@@ -53,6 +55,7 @@ define(function(require) {
 
     renderProgress: function(label) {
       var completion = this.props.progress.completion;
+      var cancelable = this.props.progress.workflowState === K.PROGRESS_QUEUED;
 
       return (
         <div className="auxiliary">
@@ -60,6 +63,10 @@ define(function(require) {
             <span className="screenreader-only" children={label} />
             <span aria-hidden="true">
               {I18n.t('generating', 'Report is being generated...')}
+              {' '}
+              {cancelable &&
+                <a href="#" onClick={this.cancel}>{I18n.t('cancel_generation', 'Cancel')}</a>
+              }
             </span>
           </p>
 
@@ -68,6 +75,10 @@ define(function(require) {
           </div>
         </div>
       );
+    },
+
+    cancel: function() {
+      Actions.abortReportGeneration(this.props.id);
     }
   });
 

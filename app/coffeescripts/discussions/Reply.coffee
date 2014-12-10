@@ -7,8 +7,9 @@ define [
   'str/htmlEscape'
   'jst/discussions/_reply_attachment'
   'compiled/fn/preventDefault'
+  'compiled/views/editor/KeyboardShortcuts'
   'tinymce.editor_box'
-], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault) ->
+], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts) ->
 
   class Reply
 
@@ -33,6 +34,12 @@ define [
         $(e.currentTarget).siblings('a').andSelf().toggle()
       @form.delegate '.alert .close', 'click', preventDefault @hideNotification
       @editing = false
+
+      _.defer(@attachKeyboardShortcuts)
+
+
+    attachKeyboardShortcuts: =>
+      $('.toggle-wrapper').first().before((new KeyboardShortcuts()).render().$el)
 
     ##
     # Shows or hides the TinyMCE editor for a reply

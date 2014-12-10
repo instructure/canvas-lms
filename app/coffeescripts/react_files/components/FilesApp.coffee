@@ -1,5 +1,6 @@
 define [
   'react'
+  'react-router'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/str/splitAssetString'
@@ -10,7 +11,7 @@ define [
   '../mixins/MultiselectableMixin'
   '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
+], (React, ReactRouter, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   FilesApp = React.createClass
     displayName: 'FilesApp'
@@ -31,7 +32,7 @@ define [
         selectedItems: undefined
       }
 
-    mixins: [MultiselectableMixin, dndMixin]
+    mixins: [MultiselectableMixin, dndMixin, ReactRouter.Navigation]
 
     # for MultiselectableMixin
     selectables: ->
@@ -39,6 +40,29 @@ define [
         @state.searchResultCollection.models
       else
         @state.currentFolder.children(@props.query)
+
+    getPreviewQuery: ->
+      retObj =
+        preview: @state.selectedItems[0]?.id or true
+      if @state.selectedItems.length > 1
+        retObj.only_preview = @state.selectedItems.map((item) -> item.id).join(',')
+      if @props.query?.search_term
+        retObj.search_term = @props.query.search_term
+      retObj
+
+    getPreviewRoute: ->
+      if @props.query?.search_term
+        'search'
+      else if @state.currentFolder?.urlPath()
+        'folder'
+      else
+        'rootFolder'
+
+    previewItem: (item) ->
+      @clearSelectedItems()
+      @toggleItemSelected item, null, =>
+        params = {splat: @props.currentFolder?.urlPath()}
+        @transitionTo(@getPreviewRoute(), params, @getPreviewQuery())
 
     render: withReactDOM ->
       if @state.currentFolder # when showing a folder
@@ -49,6 +73,8 @@ define [
         contextId = filesEnv.contextId
 
       userCanManageFilesForContext = filesEnv.userHasPermission({contextType: contextType, contextId: contextId}, 'manage_files')
+      usageRightsRequiredForContext = filesEnv.contextsDictionary["#{contextType}_#{contextId}"]?.usage_rights_required
+      externalToolsForContext = filesEnv.contextFor({contextType: contextType, contextId: contextId})?.file_menu_tools || []
 
       div null,
         # For whatever reason, VO in Safari didn't like just the h1 tag.
@@ -69,6 +95,9 @@ define [
           contextType: contextType
           contextId: contextId
           userCanManageFilesForContext: userCanManageFilesForContext
+          usageRightsRequiredForContext: usageRightsRequiredForContext
+          getPreviewQuery: @getPreviewQuery
+          getPreviewRoute: @getPreviewRoute
         })
 
         div className: 'ef-main',
@@ -100,6 +129,9 @@ define [
               toggleAllSelected: @toggleAllSelected
               areAllItemsSelected: @areAllItemsSelected
               userCanManageFilesForContext: userCanManageFilesForContext
+              usageRightsRequiredForContext: usageRightsRequiredForContext
+              externalToolsForContext: externalToolsForContext
+              previewItem: @previewItem
               dndOptions:
                 onItemDragStart: @onItemDragStart
                 onItemDragEnterOrOver: @onItemDragEnterOrOver
@@ -109,12 +141,12 @@ define [
         div className: 'ef-footer grid-row',
           if userCanManageFilesForContext
             FilesUsage({
-              className: 'col-xs-3'
+              className: 'col-xs-4'
               contextType: contextType
               contextId: contextId
             })
           unless filesEnv.showingAllContexts
             div className: 'col-xs',
               div {},
-                a className: 'pull-right', href: '/files?show_all_contexts=1',
+                a className: 'pull-right', href: '/files',
                   I18n.t('all_my_files', 'All My Files')

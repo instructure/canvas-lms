@@ -172,12 +172,18 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def attachment_csv(answer)
-    return "" unless answer && answer[:attachment_ids]
-    @attachments[answer[:attachment_ids].first.to_i].display_name
+    return "" unless answer && answer[:attachment_ids].present?
+
+    attachment = @attachments[answer[:attachment_ids].first.to_i]
+
+    if attachment.present?
+      attachment.display_name
+    else
+      ''
+    end
   end
 
   def to_csv
-    start_progress
     include_root_accounts = quiz.context.root_account.trust_exists?
     csv = CSV.generate do |csv|
       context = quiz.context

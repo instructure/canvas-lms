@@ -20,6 +20,7 @@ module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
   include Api::V1::User
+  include Api::V1::UsageRights
 
   def attachments_json(files, user, url_options = {}, options = {})
     files.map do |f|
@@ -93,6 +94,9 @@ module Api::V1::Attachment
       hash['preview_url'] = attachment.crocodoc_url(user) ||
                             attachment.canvadoc_url(user)
     end
+    if includes.include? 'usage_rights'
+      hash['usage_rights'] = usage_rights_json(attachment.usage_rights, user)
+    end
 
     hash
   end
@@ -140,6 +144,7 @@ module Api::V1::Attachment
         end
       end
     end
+    @attachment.locked = true if @attachment.usage_rights_id.nil? && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:usage_rights_required)
     @attachment.save!
     if params[:url]
       @attachment.send_later_enqueue_args(:clone_url, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :n_strand => 'file_download' }, params[:url], duplicate_handling, opts[:check_quota])

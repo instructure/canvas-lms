@@ -23,6 +23,7 @@ class Quizzes::QuizQuestion::CalculatedQuestion < Quizzes::QuizQuestion::Numeric
     return [{:id => answer[:id], :numerical_answer_type => "exact_answer", :exact => answer[:answer], :margin => @question_data[:answer_tolerance]}]
   end
 
+  # TODO: remove once new stats is on for everybody
   # returns @question_data augmented with statistical data
   # mutates responses with statistical data
   # also potentially mutates @question_data[:answers]

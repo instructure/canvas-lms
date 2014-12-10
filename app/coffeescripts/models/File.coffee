@@ -68,3 +68,8 @@ define [
     present: ->
       _.clone(@attributes)
 
+    externalToolEnabled: (tool) =>
+      if tool.accept_media_types && tool.accept_media_types.length > 0
+        _.indexOf(tool.accept_media_types.split(","), @get('content-type')) != -1
+      else
+        true

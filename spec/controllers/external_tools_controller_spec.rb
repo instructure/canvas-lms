@@ -130,6 +130,18 @@ describe ExternalToolsController do
         expect(placement['placementOf']['title']).to eq 'blah'
       end
 
+      it "sends content item json for a file" do
+        user_session(@teacher)
+        attachment_model
+        get :show, :course_id => @course.id, id: @tool.id, :files => [@attachment.id]
+        placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
+        download_url = placement['placementOf']['@id']
+
+        expect(download_url).to include(@attachment.uuid)
+        expect(placement['placementOf']['mediaType']).to eq @attachment.content_type
+        expect(placement['placementOf']['title']).to eq @attachment.display_name
+      end
+
       it "sends content item json for a quiz" do
         user_session(@teacher)
         quiz = @course.quizzes.create!(title: 'a quiz')

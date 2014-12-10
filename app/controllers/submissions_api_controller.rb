@@ -25,6 +25,117 @@
 # All submission actions can be performed with either the course id, or the
 # course section id. SIS ids can be used, prefixed by "sis_course_id:" or
 # "sis_section_id:" as described in the API documentation on SIS IDs.
+#
+# @model Submission
+#     {
+#       "id": "Submission",
+#       "description": "",
+#       "properties": {
+#         "assignment_id": {
+#           "description": "The submission's assignment id",
+#           "example": 23,
+#           "type": "integer"
+#         },
+#         "assignment": {
+#           "description": "The submission's assignment (see the assignments API) (optional)",
+#           "example": "Assignment",
+#           "type": "string"
+#         },
+#         "course": {
+#           "description": "The submission's course (see the course API) (optional)",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "attempt": {
+#           "description": "This is the submission attempt number.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "body": {
+#           "description": "The content of the submission, if it was submitted directly in a text field.",
+#           "example": "There are three factors too...",
+#           "type": "string"
+#         },
+#         "grade": {
+#           "description": "The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).",
+#           "example": "A-",
+#           "type": "string"
+#         },
+#         "grade_matches_current_submission": {
+#           "description": "A boolean flag which is false if the student has re-submitted since the submission was last graded.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "html_url": {
+#           "description": "URL to the submission. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134",
+#           "type": "string"
+#         },
+#         "preview_url": {
+#           "description": "URL to the submission preview. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
+#           "type": "string"
+#         },
+#         "score": {
+#           "description": "The raw score",
+#           "example": 13.5,
+#           "type": "float"
+#         },
+#         "submission_comments": {
+#           "description": "Associated comments for a submission (optional)",
+#           "type": "array",
+#           "items": { "$ref": "SubmissionComment" }
+#         },
+#         "submission_type": {
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "example": "online_text_entry",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "online_text_entry",
+#               "online_url",
+#               "online_upload",
+#               "media_recording"
+#             ]
+#           }
+#         },
+#         "submitted_at": {
+#           "description": "The timestamp when the assignment was submitted",
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "url": {
+#           "description": "The URL of the submission (for 'online_url' submissions).",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The id of the user who created the submission",
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "grader_id": {
+#           "description": "The id of the user who graded the submission",
+#           "example": 86,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "The submissions user (see user API) (optional)",
+#           "example": "User",
+#           "type": "string"
+#         },
+#         "late": {
+#           "description": "Whether the submission was made after the applicable due date",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "assignment_visible": {
+#           "description": "Whether the assignment is visible to the user who submitted the assignment. Submissions where `assignment_visible` is false no longer count towards the student's grade and the assignment can no longer be accessed by the student. `assignment_visible` becomes false for submissions that do not have a grade and whose assignment is no longer assigned to the student's section.",
+#           "example": true,
+#           "type": "boolean"
+#         }
+#       }
+#     }
+#
 class SubmissionsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
   batch_jobs_in_actions :only => :update, :batch => { :priority => Delayed::LOW_PRIORITY }
@@ -35,7 +146,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get all existing submissions for an assignment.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"]
   #   Associations to include with the group.
   #
   # @response_field assignment_id The unique identifier for the assignment.
@@ -50,19 +161,47 @@ class SubmissionsApiController < ApplicationController
   # @response_field preview_url Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
   # @response_field url If the submission was made as a URL.
   # @response_field late Whether the submission was made after the applicable due date.
+  # @response_field assignment_visible Whether this assignment is visible to the user who submitted the assignment.
+  #
+  # @returns [Submission]
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @submissions = @assignment.submissions.where(:user_id => visible_user_ids).all
+      submissions = @assignment.submissions.where(:user_id => visible_user_ids)
+      includes = Array.wrap(params[:include])
 
-      bulk_load_attachments_and_previews(@submissions)
-
-      includes = Array(params[:include])
-
-      result = @submissions.map { |s| submission_json(s, @assignment, @current_user, session, @context, includes) }
-
-      render :json => result
+      if includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments)
+        json = bulk_process_submissions_for_visibility(submissions, includes)
+      else
+        submissions = submissions.all
+        bulk_load_attachments_and_previews(submissions)
+        json = submissions.map { |s|
+          s.visible_to_user = true
+          submission_json(s, @assignment, @current_user, session, @context, includes)
+        }
+      end
+      render :json => json
     end
+  end
+
+  def bulk_process_submissions_for_visibility(submissions_scope, includes)
+    result = []
+    submissions_scope.find_in_batches(batch_size: 100) do |submission_batch|
+      bulk_load_attachments_and_previews(submission_batch)
+
+      user_ids = submission_batch.map(&:user_id)
+
+      users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
+
+      submission_array = submission_batch.map { |s|
+        s.visible_to_user = users_with_visibility.include?(s.user_id)
+        submission_json(s, @assignment, @current_user, session, @context, includes)
+      }
+
+      result.concat submission_array
+
+    end
+    result
   end
 
   # @API List submissions for multiple assignments
@@ -84,7 +223,7 @@ class SubmissionsApiController < ApplicationController
   #   If this argument is present, the response will be grouped by student,
   #   rather than a flat array of submissions.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"]
   #   Associations to include with the group. `total_scores` requires the
   #   `grouped` argument.
   #
@@ -222,6 +361,8 @@ class SubmissionsApiController < ApplicationController
             submission.assignment = assignments_hash[submission.assignment_id]
             submission.user = student
 
+            visible_assignments = assignment_visibilities.fetch(submission.user_id, [])
+            submission.visible_to_user = visible_assignments.include? submission.assignment_id
             hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
         end unless assignments.empty?
         if includes.include?('total_scores') && params[:grouped].present?
@@ -242,6 +383,8 @@ class SubmissionsApiController < ApplicationController
         assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
       }.map { |s|
         s.assignment = assignments_hash[s.assignment_id]
+        visible_assignments = assignment_visibilities.fetch(s.user_id, [])
+        s.visible_to_user = visible_assignments.include? s.assignment_id
         submission_json(s, s.assignment, @current_user, session, @context, includes)
       }
     end
@@ -253,7 +396,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get a single submission, based on user id.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"visibility"]
   #   Associations to include with the group.
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -266,6 +409,7 @@ class SubmissionsApiController < ApplicationController
            @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments) ||
            @submission.assignment_visible_to_user?(@current_user, differentiated_assignments: da_on)
         includes = Array(params[:include])
+        @submission.visible_to_user = includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments) ? @assignment.visible_to_user?(@submission.user) : true
         render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes)
       else
         @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
@@ -342,6 +486,9 @@ class SubmissionsApiController < ApplicationController
   # @argument comment[file_ids][] [Integer]
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
+  #
+  # @argument include["visibility"] [String]
+  #   Whether this assignment is visible to the owner of the submission
   #
   # @argument submission[posted_grade] [String]
   #   Assign a score to the submission, updating both the "score" and "grade"
@@ -479,8 +626,21 @@ class SubmissionsApiController < ApplicationController
       @submission.reload
       bulk_load_attachments_and_previews([@submission])
 
-      json = submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments))
-      json[:all_submissions] = @submissions.map { |submission| submission_json(submission, @assignment, @current_user, session, @context) }
+      includes = %w(submission_comments)
+      includes.concat(Array.wrap(params[:include]) & ["visibility"])
+
+      da_enabled = @context.feature_enabled?(:differentiated_assignments)
+      if includes.include?("visibility") && da_enabled
+        user_ids = @submissions.map(&:user_id)
+        users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
+      end
+      json = submission_json(@submission, @assignment, @current_user, session, @context, includes)
+
+      includes.delete("submission_comments")
+      json[:all_submissions] = @submissions.map { |submission|
+        submission.visible_to_user = da_enabled ? users_with_visibility.include?(submission.user_id) : true
+        submission_json(submission, @assignment, @current_user, session, @context, includes)
+      }
       render :json => json
     end
   end

@@ -70,6 +70,12 @@ $(document).ready(function() {
   $("#register_sms_number,#register_email_address").formSubmit({
     object_name: 'communication_channel',
     required: ['address'],
+    property_validations: {
+      address: function (value) {
+        var match = value.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
+        return !match && !(match && match.length !== value.length) && !(value.length === 0) && I18n.t("Email is invalid!");
+      }
+    },
     beforeSubmit: function(data) {
       var $list = $(".email_channels");
       var data = $(this).getFormData({object_name: 'communication_channel'});
@@ -98,7 +104,7 @@ $(document).ready(function() {
     }, success: function(channel, $channel) {
       $("#communication_channels").dialog('close');
       $channel.loadingImage('remove');
-      
+
       channel.channel_id = channel.id;
       var select_type = "email_select";
       if($(this).attr('id') == 'register_sms_number') {
@@ -130,7 +136,7 @@ $(document).ready(function() {
   });
   $("a.email_address_taken_learn_more").live('click', function(event) {
     event.preventDefault();
-    
+
   });
   $(".channel_list .channel .delete_channel_link").click(function(event) {
     event.preventDefault();

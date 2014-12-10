@@ -15,7 +15,7 @@ define [
         name: filesAndFolders[0]?.displayName()
       })
     else
-      I18n.t('confirm_delete', {
+      I18n.t({
         one: "Are you sure you want to delete %{name}?",
         other: "Are you sure you want to delete these %{count} items?"
       }, {
@@ -34,9 +34,15 @@ define [
           reason = try
             $.parseJSON(response.responseText)?.message
 
-          $.flashError I18n.t 'delete_error', 'Error deleting %{name}: %{reason}',
+          $.flashError I18n.t 'Error deleting %{name}: %{reason}',
             name: item.displayName()
             reason: reason
 
     $.when(promises...).then ->
-      $.flashMessage(I18n.t('deleted_items_successfully', '%{count} items deleted successfully', {count: filesAndFolders.length}))
+      $.flashMessage(I18n.t({
+        one: '%{name} deleted successfully.'
+        other: '%{count} items deleted successfully.'
+      }, {
+        count: filesAndFolders.length
+        name: filesAndFolders[0]?.displayName()
+      }))

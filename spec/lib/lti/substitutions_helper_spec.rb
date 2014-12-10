@@ -126,6 +126,26 @@ module Lti
         helper = SubstitutionsHelper.new(course, root_account, nil)
         expect(helper.all_roles).to eq [LtiOutbound::LTIRoles::System::NONE]
       end
+
+      it 'converts multiple roles for lis 2' do
+        subject.stubs(:course_enrollments).returns([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
+        user.stubs(:roles).returns(['user', 'student', 'teacher', 'admin'])
+        roles = subject.all_roles('lis2')
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant'
+      end
+
+      it "returns none if no user for lis 2" do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.all_roles('lis2')).to eq ['http://purl.imsglobal.org/vocab/lis/v2/person#None']
+      end
     end
 
     describe '#course_enrollments' do

@@ -3,6 +3,7 @@ module.exports = {
   runner: [
     'clean:compiled_symlink',
     'clean:compiled_jsx',
+    'generate_notification_bundle',
     'copy:src',
     'copy:map',
     'convert_jsx_i18n',

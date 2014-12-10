@@ -22,11 +22,11 @@ describe Folder do
   before(:once) do
     course
   end
-  
+
   it "should create a new instance given valid attributes" do
     folder_model
   end
-  
+
   it "should infer its full name if it has a parent folder" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
@@ -50,6 +50,21 @@ describe Folder do
     expect(grandchild.full_name).to eql("course files/grandchild")
     great_grandchild.reload
     expect(great_grandchild.full_name).to eql("course files/grandchild/great_grandchild")
+  end
+
+  it "should add an iterator to duplicate folder names" do
+    f = Folder.root_folders(@course).first
+    expect(f.full_name).to eql("course files")
+    child = f.active_sub_folders.build(:name => "child")
+    child.context = @course
+    child.save!
+    expect(child.parent_folder).to eql(f)
+    expect(child.full_name).to eql("course files/child")
+    child2 = f.active_sub_folders.build(:name => "child")
+    child2.context = @course
+    child2.save!
+    expect(child2.parent_folder).to eql(f)
+    expect(child2.full_name).to eql("course files/child 2")
   end
 
   it "should not allow recursive folder structures" do
@@ -92,7 +107,7 @@ describe Folder do
     expect(f.active_file_attachments).to be_include(a)
     expect(f.active_file_attachments).to be_include(nil_a)
   end
-  
+
   it "should not return files without a folder_id if it's not the 'unfiled' folder" do
     f = @course.folders.create!(:name => "not_unfiled")
     a = f.active_file_attachments.build
@@ -181,15 +196,6 @@ describe Folder do
     it "should return nil on incomplete match" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       expect(Folder.resolve_path(@course, "foo/bar")).to be_nil
-    end
-
-    it "should search duplicate paths" do
-      foo1 = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      foo2 = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      bar = @course.folders.create! name: 'bar', parent_folder: foo1
-      baz = @course.folders.create! name: 'baz', parent_folder: foo2
-      expect(Folder.resolve_path(@course, "foo/bar")).to eql [@root_folder, foo1, bar]
-      expect(Folder.resolve_path(@course, "foo/baz")).to eql [@root_folder, foo2, baz]
     end
 
     it "should exclude hidden if specified" do

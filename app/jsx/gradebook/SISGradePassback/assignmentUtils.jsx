@@ -23,6 +23,17 @@ define([
       return a.name === b.name && a !== b
     },
 
+    nameTooLong (a) {
+      if (a.name.length > 30){
+        console.log(a.name + "too long")
+        return true 
+      }
+      else{
+        console.log(a.name + "not too long")
+        return false
+      }    
+    },
+
     notUniqueName (assignments, a) {
       return assignments.some(_.partial(assignmentUtils.namesMatch, a))
     },
@@ -48,7 +59,7 @@ define([
     },
 
     hasError (assignments, a) {
-      return !a.please_ignore && (!a.due_at || assignmentUtils.notUniqueName(assignments, a))
+      return !a.please_ignore && (!a.due_at || assignmentUtils.notUniqueName(assignments, a) || assignmentUtils.nameTooLong(a))
     },
 
     suitableToPost(assignment) {

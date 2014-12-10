@@ -117,7 +117,7 @@ module SIS
               @total_rows += rows
               false
             rescue ::CSV::MalformedCSVError
-              add_error(csv, "Malformed CSV")
+              add_error(csv, I18n.t("Malformed CSV"))
               true
             end
           end
@@ -171,7 +171,7 @@ module SIS
             :message => "Importing CSV for account: #{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e.to_s}",
             :during_tests => false
           )
-          add_error(nil, "Error while importing CSV. Please contact support. (Error report #{error_report.id})")
+          add_error(nil, I18n.t("Error while importing CSV. Please contact support. (Error report %{number})", number: error_report.id))
         else
           add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}")
           raise e
@@ -254,7 +254,7 @@ module SIS
             :message => "Importing CSV for account: #{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e.to_s}",
             :during_tests => false
           )
-          add_error(nil, "Error while importing CSV. Please contact support. (Error report #{error_report.id})")
+          add_error(nil, I18n.t("Error while importing CSV. Please contact support. (Error report %{number})", number: error_report.id))
           @batch.processing_errors ||= []
           @batch.processing_warnings ||= []
           @batch.processing_errors.concat(@errors)
@@ -394,7 +394,7 @@ module SIS
               end
             end
           rescue Iconv::Failure
-            add_error(csv, "Invalid UTF-8")
+            add_error(csv, I18n.t("Invalid UTF-8"))
             return
           end
           begin
@@ -409,14 +409,14 @@ module SIS
                   false
                 end
               end
-              add_error(csv, "Couldn't find Canvas CSV import headers") if importer.nil?
+              add_error(csv, I18n.t("Couldn't find Canvas CSV import headers")) if importer.nil?
               break
             end
           rescue ::CSV::MalformedCSVError
             add_error(csv, "Malformed CSV")
           end
         elsif !File.directory?(csv[:fullpath]) && !(csv[:fullpath] =~ IGNORE_FILES)
-          add_warning(csv, "Skipping unknown file type")
+          add_warning(csv, I18n.t("Skipping unknown file type"))
         end
       end
     end

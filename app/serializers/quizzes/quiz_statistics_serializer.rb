@@ -46,12 +46,10 @@ module Quizzes
       #   - correct_count_average
       #   - incorrect_count_average
       #   - duration_average
-      #   - logged_out_users (id set)
       #   - score_average
       #   - score_high
       #   - score_low
       #   - score_stdev
-      #   - user_ids (id set)
       :submission_statistics,
     ]
 
@@ -109,7 +107,10 @@ module Quizzes
           out[$1] = statistic if key =~ SubmissionStatisticsExtractor
         end
 
-        out[:unique_count] = student_analysis_report[:unique_submission_count]
+        out.delete('user_ids')
+        out.delete('logged_out_users')
+
+        out['unique_count'] = student_analysis_report[:unique_submission_count]
       end
     end
 

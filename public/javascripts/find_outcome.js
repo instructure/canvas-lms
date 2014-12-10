@@ -73,15 +73,9 @@ var find_outcome = (function() {
           $dialog.find(".loading_message").text(I18n.t('errors.outcome_retrieval_failed', "Outcomes Retrieval failed unexpected.  Please try again."));
         });
       }
-      var find_outcome_title;
-      if (options.for_rubric) {
-        find_outcome_title = I18n.t('titles.find_outcome_criterion', "Find Outcome Criterion");
-      } else {
-        find_outcome_title = I18n.t('titles.find_outcome', "Find Outcome");
-      }
       $dialog.dialog({
         modal: true,
-        title: find_outcome_title,
+        title: I18n.t('titles.find_outcome', "Find Outcome"),
         width: 700,
         height: 400
       });

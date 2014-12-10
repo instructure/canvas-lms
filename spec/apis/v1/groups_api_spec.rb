@@ -22,7 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 describe "Groups API", type: :request do
   def group_json(group, opts = {})
     opts[:is_admin] ||= false
+    opts[:manage_users] ||= false
     opts[:include_users] ||= false
+    opts[:include_category] ||= false
+    opts[:include_permissions] ||= false
     json = {
       'id' => group.id,
       'name' => group.name,
@@ -40,7 +43,16 @@ describe "Groups API", type: :request do
       'leader' => group.leader
     }
     if opts[:include_users]
-      json['users'] = users_json(group.users)
+      json['users'] = users_json(group.users, opts)
+    end
+    if opts[:include_permissions]
+      json['permissions'] = {
+        'join' => group.grants_right?(@user, nil, :join),
+        'create_discussion_topic' => DiscussionTopic.context_allows_user_to_create?(group, @user, nil)
+      }
+    end
+    if opts[:include_category]
+      json['group_category'] = group_category_json(group.group_category, @user)
     end
     if group.context_type == 'Account' && opts[:is_admin]
       json['sis_import_id'] = group.sis_batch_id
@@ -49,17 +61,37 @@ describe "Groups API", type: :request do
     json
   end
 
-  def users_json(users)
-    users.map { |user| user_json(user) }
+  def group_category_json(group_category, user)
+    {
+      "auto_leader" => group_category.auto_leader,
+      "group_limit" => group_category.group_limit,
+      "id" => group_category.id,
+      "name" => group_category.name,
+      "role" => group_category.role,
+      "self_signup" => group_category.self_signup,
+      "context_type" => group_category.context_type,
+      "#{group_category.context_type.underscore}_id" => group_category.context_id,
+      "protected" => group_category.protected?,
+      "allows_multiple_memberships" => group_category.allows_multiple_memberships?,
+      "is_member" => group_category.is_member?(user)
+    }
   end
 
-  def user_json(user)
-    {
+  def users_json(users, opts)
+    users.map { |user| user_json(user, opts) }
+  end
+
+  def user_json(user, opts)
+    hash = {
       'id' => user.id,
       'name' => user.name,
       'sortable_name' => user.sortable_name,
       'short_name' => user.short_name
     }
+    if opts[:manage_users]
+      hash['login_id'] = user.pseudonym.unique_id
+    end
+    hash
   end
 
   def membership_json(membership, is_admin = false)
@@ -210,7 +242,7 @@ describe "Groups API", type: :request do
     })
     @community2 = Group.order(:id).last
     expect(@community2.group_category).to be_communities
-    expect(json).to eq group_json(@community2, :include_users => true)
+    expect(json).to eq group_json(@community2, :include_users => true, :include_permissions => true, :include_category => true)
   end
 
   it "should allow a teacher to create a group in a course" do
@@ -270,7 +302,7 @@ describe "Groups API", type: :request do
     expect(@community.is_public).to eq true
     expect(@community.join_level).to eq "parent_context_auto_join"
     expect(@community.avatar_attachment).to eq avatar
-    expect(json).to eq group_json(@community)
+    expect(json).to eq group_json(@community, :include_users => true, :include_permissions => true, :include_category => true, :manage_users => true)
   end
 
   it "should only allow updating a group from private to public" do

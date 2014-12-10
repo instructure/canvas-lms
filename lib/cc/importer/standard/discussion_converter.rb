@@ -31,6 +31,9 @@ module CC::Importer::Standard
           topic[:description] = get_node_val(doc, 'text')
           topic[:description] = replace_urls(topic[:description])
           topic[:title] = get_node_val(doc, 'title')
+          if res[:intended_user_role] == 'Instructor'
+            topic[:workflow_state] = 'unpublished'
+          end
 
           if doc.css('attachment').length > 1
             # canvas discussions only support one attachment, so just list them at the bottom of the description

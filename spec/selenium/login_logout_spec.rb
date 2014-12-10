@@ -1,19 +1,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "login logout test", :priority => "2" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def should_show_message(message_text, selector)
     expect(fj(selector)).to include_text(message_text)
     # the text isn't visible on the page so the webdriver .text method doesn't return it
-    expect(driver.execute_script("return $('#aria_alerts div:last').text()")).to eq message_text
+    expect(driver.execute_script("return $('#flash_screenreader_holder').text()")).to eq message_text
   end
 
   def verify_logout
     expected_url = app_host + "/login"
     user_with_pseudonym({:active_user => true})
     login_as
-    expect_new_page_load { f('.logout > a').click }
+    expect_new_page_load { f('.logout a').click }
     expect(driver.current_url).to eq expected_url
     expected_url
   end

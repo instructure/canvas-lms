@@ -38,6 +38,25 @@ module Lti
         StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
     }
 
+    LIS_V2_ROLE_MAP = {
+      'user' => 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User',
+      'siteadmin' => 'http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin',
+
+      'teacher' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor',
+      'student' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student',
+      'admin' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator',
+      AccountUser => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator',
+
+      StudentEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner',
+      TeacherEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor',
+      TaEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant',
+      DesignerEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper',
+      ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer',
+      StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
+    }
+
+    LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
+
     def initialize(context, root_account, user)
       @context = context
       @root_account = root_account
@@ -60,16 +79,25 @@ module Lti
       enrollments.map { |enrollment| Lti::LtiUserCreator::ENROLLMENT_MAP[enrollment.class] }.uniq
     end
 
-    def all_roles
+    def all_roles(version = 'lis1')
+      case version
+        when 'lis2'
+          role_map = LIS_V2_ROLE_MAP
+          role_none = LIS_V2_ROLE_NONE
+        else
+          role_map = LIS_ROLE_MAP
+          role_none = LtiOutbound::LTIRoles::System::NONE
+      end
+
       if @user
-        context_roles = course_enrollments.map { |enrollment| LIS_ROLE_MAP[enrollment.class] }
-        institution_roles = @user.roles(@root_account).map { |role| LIS_ROLE_MAP[role] }
+        context_roles = course_enrollments.map { |enrollment| role_map[enrollment.class] }
+        institution_roles = @user.roles(@root_account).map { |role| role_map[role] }
         if Account.site_admin.account_users_for(@user).present?
-          institution_roles << LIS_ROLE_MAP['siteadmin']
+          institution_roles << role_map['siteadmin']
         end
         (context_roles + institution_roles).uniq.sort.join(',')
       else
-        [LtiOutbound::LTIRoles::System::NONE]
+        [role_none]
       end
     end
 

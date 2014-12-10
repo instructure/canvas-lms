@@ -301,7 +301,7 @@ module ApplicationHelper
         tabs.each do |tab|
           path = nil
           if tab[:args]
-            path = send(tab[:href], *tab[:args])
+            path = tab[:args].instance_of?(Array) ? send(tab[:href], *tab[:args]) : send(tab[:href], tab[:args])
           elsif tab[:no_args]
             path = send(tab[:href])
           else
@@ -583,10 +583,11 @@ module ApplicationHelper
   def map_courses_for_menu(courses)
     mapped = courses.map do |course|
       term = course.enrollment_term.name if !course.enrollment_term.default_term?
+      role = Role.get_role_by_id(course.primary_enrollment_role_id) || Enrollment.get_built_in_role_for_type(course.primary_enrollment_type)
       subtitle = (course.primary_enrollment_state == 'invited' ?
                   before_label('#shared.menu_enrollment.labels.invited_as', 'Invited as') :
                   before_label('#shared.menu_enrollment.labels.enrolled_as', "Enrolled as")
-                 ) + " " + Enrollment.readable_type(course.primary_enrollment)
+                 ) + " " + role.label
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
@@ -756,7 +757,8 @@ module ApplicationHelper
 
   def context_sensitive_datetime_title(datetime, context, options={})
     just_text = options.fetch(:just_text, false)
-    return "" unless datetime.present?
+    default_text = options.fetch(:default_text, "")
+    return default_text unless datetime.present?
     local_time = datetime_string(datetime)
     text = local_time
     if context.present?

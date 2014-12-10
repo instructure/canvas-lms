@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "links", :priority => "2" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
@@ -113,10 +113,6 @@ describe "links", :priority => "2" do
         f('#header-logo')
         expect_new_page_load { f('#header-logo').click }
         expect(driver.current_url).to eq f('#header-logo').attribute('href')
-      end
-
-      it "should navigate user to assignments page after assignments link is clicked" do
-        validate_breadcrumb_link(f('#assignments_menu_item a'), 'Assignments')
       end
 
       it "should navigate user to gradebook page after grades link is clicked" do

@@ -446,6 +446,23 @@ RSpec.configure do |config|
     @account
   end
 
+  def account_with_grading_periods
+    @account = Account.default
+    @account.set_feature_flag!(:multiple_grading_periods, 'on')
+    grading_period_group = @account.grading_period_groups.create!()
+    account_admin_user(account: @account)
+    user_session(@admin)
+    now = Time.zone.now
+    gps = 3.times.map do |n|
+      grading_period_group.
+        grading_periods.create!(weight: 50, start_date: n.month.since(now),
+                                end_date: (n+1).month.since(now),
+                                title: "Grading Period #{n+1}")
+    end
+    gps.last.destroy
+    @account
+  end
+
   def course(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
@@ -754,7 +771,7 @@ RSpec.configure do |config|
   end
 
   def custom_account_role(name, opts={})
-    custom_role(AccountUser::DEFAULT_BASE_ROLE_TYPE, name, opts)
+    custom_role(Role::DEFAULT_ACCOUNT_TYPE, name, opts)
   end
 
   def student_role
@@ -1518,7 +1535,7 @@ RSpec.configure do |config|
   def create_assignments(course_ids, count_per_course = 1, fields = {})
     course_ids = Array(course_ids)
     course_ids *= count_per_course
-    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", workflow_state: 'published'}.merge(fields)})
+    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", grading_type: "points", submission_types: "none", workflow_state: 'published'}.merge(fields)})
   end
 end
 

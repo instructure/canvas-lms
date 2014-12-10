@@ -125,6 +125,17 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
     end
 
+    it "should return assignment_visible" do
+      @course.enable_feature!(:differentiated_assignments)
+      json = api_call(:get,
+            "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",
+            { :controller => 'submissions_api', :action => 'index',
+              :format => 'json', :section_id => @section.id.to_s,
+              :assignment_id => @a1.id.to_s },
+              { :include => %w(visibility), :student_ids => [@student1.id] })
+      expect(json[0]["assignment_visible"]).to eq true
+    end
+
     it "should post to submissions" do
       @a1 = @course.assignments.create!({:title => 'assignment1', :grading_type => 'percent', :points_possible => 10})
       json = raw_api_call(:put,
@@ -151,6 +162,18 @@ describe 'Submissions API', type: :request do
 
       expect(json['score']).to eq 7.5
       expect(json['grade']).to eq '75%'
+    end
+
+    it "should return assignment_visible after posting to submissions" do
+      @course.enable_feature!(:differentiated_assignments)
+      json = api_call(:put,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
+        { :controller => 'submissions_api', :action => 'update',
+        :format => 'json', :section_id => @section.id.to_s,
+        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
+        { :submission => { :posted_grade => '75%' }, :include => %w(visibility) })
+      expect(json["assignment_visible"]).to eq true
+      expect(json["all_submissions"][0]["assignment_visible"]).to eq true
     end
 
     it "should return submissions for a section" do
@@ -1300,12 +1323,14 @@ describe 'Submissions API', type: :request do
     end
 
     def call_to_submissions_show(opts={})
+      includes = %w(submission_comments rubric_assessment)
+      includes.concat(opts[:includes]) if opts[:includes]
       helper_method = opts[:as_student] ? [:api_call_as_user, @student] : [:api_call]
       args = helper_method + [:get,
             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
             { :controller => 'submissions_api', :action => 'show',
               :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-            { :include => %w(submission_comments rubric_assessment) }]
+            { :include => includes }]
       self.send(*args)
     end
 
@@ -1316,6 +1341,11 @@ describe 'Submissions API', type: :request do
           json = call_to_submissions_show(as_student: false)
 
           expect(json["assignment_id"]).not_to be_nil
+        end
+
+        it "should return assignment_visible" do
+          json = call_to_submissions_show(as_student: false, includes: ["visibility"])
+          expect(json["assignment_visible"]).not_to be_nil
         end
       end
       context "without differentiated_assignments" do
@@ -1344,6 +1374,11 @@ describe 'Submissions API', type: :request do
           json = call_to_submissions_show(as_student: true)
 
           expect(json["assignment_id"]).not_to be_nil
+        end
+
+        it "should return assignment_visible false" do
+          json = call_to_submissions_show(as_student: false, includes: ["visibility"])
+          expect(json["assignment_visible"]).to eq(false)
         end
       end
       context "without differentiated_assignments" do

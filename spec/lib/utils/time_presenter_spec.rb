@@ -61,6 +61,12 @@ module Utils
         presenter = TimePresenter.new(time, zone)
         expect(presenter.as_string).to_not eq(native_zone_presenter.as_string)
       end
+
+      it 'can handle a nil zone override' do
+        native_zone_presenter = TimePresenter.new(time, nil)
+        explicit_presenter = TimePresenter.new(time, Time.zone)
+        expect(explicit_presenter.as_string).to eq(native_zone_presenter.as_string)
+      end
     end
   end
 end

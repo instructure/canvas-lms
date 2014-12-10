@@ -45,6 +45,8 @@ define [
       @deferred = $.Deferred()
       @deferred.fail (failReason) =>
         @error = failReason
+        $.screenReaderFlashError(@error.message) if @error?.message
+
       $.ajaxJSON(@getPreflightUrl(), 'POST', @createPreFlightParams(), @onPreflightComplete, @deferred.reject)
       @deferred.promise()
 

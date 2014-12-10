@@ -637,6 +637,34 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#build_user_question" do
+    it "should not duplicate questions from a bank" do
+      course_with_student
+
+      # create single bank
+      @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      @bank.assessment_questions.create!(:question_data => {'name' => 'Group Question 1', :question_type=>'essay_question', :question_text=>'gq1', 'answers' => []})
+
+      @quiz = @course.quizzes.create!(:title => "i'm tired quiz")
+
+      # both groups pull from the same bank
+      @group1 = @quiz.quiz_groups.create!(:name => "question group a", :pick_count => 1, :question_points => 5.0)
+      @group1.assessment_question_bank = @bank
+      @group1.save!
+
+      @group2 = @quiz.quiz_groups.create!(:name => "question group b", :pick_count => 1, :question_points => 5.0)
+      @group2.assessment_question_bank = @bank
+      @group2.save!
+
+      @quiz.generate_quiz_data
+      @quiz.save!
+      @quiz.reload
+
+      # building questions should never grab the same question from the bank
+      expect(@quiz.build_user_questions(false).length).to eq 1
+    end
+  end
+
   it "should return a default title if the quiz is untitled" do
     q = @course.quizzes.create!
     expect(q.quiz_title).to eql("Unnamed Quiz")

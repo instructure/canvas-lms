@@ -72,7 +72,7 @@ describe "grading standards" do
     expect(@assignment.reload.grading_standard_id).to eq @standard.id
   end
 
-  it "should allow setting a grading standard for a course", :non_parallel => true do
+  it "should allow setting a grading standard for a course" do
     course_with_teacher_logged_in
 
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
