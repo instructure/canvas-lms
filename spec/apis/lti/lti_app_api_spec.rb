@@ -16,14 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/lti_spec_helper.rb')
 
 module Lti
   describe LtiAppsController, type: :request do
 
     let (:account) { Account.create }
-    let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
-
     describe '#launch_definitions' do
 
       before do
@@ -57,41 +55,6 @@ module Lti
       end
 
       
-    end
-
-
-    def create_tool_proxy(opts = {})
-      default_opts = {
-        context: account,
-        shared_secret: 'shared_secret',
-        guid: SecureRandom.uuid,
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        workflow_state: 'active',
-        raw_data: 'some raw data'
-      }
-      ToolProxy.create(default_opts.merge(opts))
-    end
-
-    def create_resource_handler(tool_proxy, opts = {})
-      default_opts = {resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, tool_proxy: tool_proxy}
-      ResourceHandler.create(default_opts.merge(opts))
-    end
-
-    def create_message_handler(resource_handler, opts = {})
-      default_ops = {message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler}
-      MessageHandler.create(default_ops.merge(opts))
-    end
-
-    def new_valid_external_tool(context, resource_selection = false)
-      tool = context.context_external_tools.new(:name => (0...8).map { (65 + rand(26)).chr }.join,
-                                                :consumer_key => "key",
-                                                :shared_secret => "secret")
-      tool.url = "http://www.example.com/basic_lti"
-      tool.resource_selection = {:url => "http://example.com/selection_test", :selection_width => 400, :selection_height => 400} if resource_selection
-      tool.save!
-      tool
     end
 
   end

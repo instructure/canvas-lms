@@ -979,6 +979,14 @@ CanvasRails::Application.routes.draw do
       et_routes("account")
     end
 
+    scope(controller: 'lti/tool_proxy') do
+      def et_routes(context)
+        delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :destroy, as: "#{context}_delete_tool_proxy"
+      end
+      et_routes("course")
+      et_routes("account")
+    end
+
     scope(controller: :external_feeds) do
       def ef_routes(context)
         get "#{context}s/:#{context}_id/external_feeds", action: :index, as: "#{context}_external_feeds"
