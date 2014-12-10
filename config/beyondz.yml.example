@@ -1,14 +1,20 @@
-test:
-  base_url: https://staging.beyondz.org/
+development:
+  base_url: https://localhost
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
 
-development:
+test:
+  base_url: https://test.beyondz.org/
+  change_password_path: /users/edit
+  nonexistent_user_path: /users/not_on_lms
+
+staging:
   base_url: https://staging.beyondz.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
 
 production:
-  base_url: https://staging.beyondz.org/
+  google_analytics_account: UA-XXXXXXXX-1
+  base_url: https://www.beyondz.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
