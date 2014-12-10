@@ -15,18 +15,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Lti
-  class AppCollator
-
+  class AppLaunchCollator
     def self.bookmarked_collection(context, placements)
       external_tools_scope = ContextExternalTool.all_tools_for(context).placements(*placements)
-      external_tools_collection = BookmarkedCollection.wrap(ExternalToolBookmarker, external_tools_scope)
+      external_tools_collection = BookmarkedCollection.wrap(ExternalToolNameBookmarker, external_tools_scope)
       message_handler_scope = MessageHandler.for_context(context).by_message_types('basic-lti-launch-request').has_placements(*placements)
-      message_handler_collection = BookmarkedCollection.wrap(MessageHandlerBookmarker, message_handler_scope)
+      message_handler_collection = BookmarkedCollection.wrap(MessageHandlerNameBookmarker, message_handler_scope)
       BookmarkedCollection.merge(
         ['external_tools', external_tools_collection],
         ['message_handlers', message_handler_collection]
       )
     end
+
 
     def self.launch_definitions(collection, placements)
       collection.map do |o|
@@ -91,49 +91,5 @@ module Lti
         title: message_handler.resource_handler.name
       }
     end
-
-
-    module MessageHandlerBookmarker
-      def self.bookmark_for(message_handler)
-        message_handler.resource_handler.name
-      end
-
-      def self.validate(bookmark)
-        bookmark.is_a?(String)
-      end
-
-      def self.restrict_scope(scope, pager)
-        if pager.current_bookmark
-          name = pager.current_bookmark
-          comparison = (pager.include_bookmark ? ">=" : ">")
-          scope = scope.where(
-            "name #{comparison} ?",
-            name)
-        end
-        scope.order('lti_resource_handlers.name')
-      end
-    end
-
-    module ExternalToolBookmarker
-      def self.bookmark_for(external_tool)
-        external_tool.name
-      end
-
-      def self.validate(bookmark)
-        bookmark.is_a?(String)
-      end
-
-      def self.restrict_scope(scope, pager)
-        if pager.current_bookmark
-          name = pager.current_bookmark
-          comparison = (pager.include_bookmark ? ">=" : ">")
-          scope = scope.where(
-            "name #{comparison} ?",
-            name)
-        end
-        scope.order(:name)
-      end
-    end
-
   end
 end

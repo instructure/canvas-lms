@@ -22,11 +22,11 @@ module Lti
     def launch_definitions
       if authorized_action(@context, @current_user, :update)
         placements = params['placements'] || []
-        collection = AppCollator.bookmarked_collection(@context, placements)
+        collection = AppLaunchCollator.bookmarked_collection(@context, placements)
 
         respond_to do |format|
           launch_defs = Api.paginate(collection, self, launch_definitions_url)
-          format.json { render :json => AppCollator.launch_definitions(launch_defs, placements) }
+          format.json { render :json => AppLaunchCollator.launch_definitions(launch_defs, placements) }
         end
       end
     end
