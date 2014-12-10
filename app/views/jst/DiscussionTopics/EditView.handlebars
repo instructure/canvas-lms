@@ -138,7 +138,9 @@
 
 {{#if isTopic}}
   {{#unless isLargeRoster}}
-    <div id="group_category_options" class="control-group"></div>
+    {{#if contextIsCourse}}
+      <div id="group_category_options" class="control-group"></div>
+    {{/if}}
   {{/unless}}
 
   {{#if contextIsCourse}}
