@@ -60,6 +60,7 @@ tr:
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
+      yo: Yo
     ask_canvas_network: "Canvas Ağ Topluluğuna Sor"
     default_account_name: "Varsayılan Hesap"
     default_site_administrator_account_name: "Site Yöneticisi"
@@ -9952,13 +9953,27 @@ tr:
     sub_header: "Alt Başlık"
   modules: 
     add: 
+      assignment: 
+        add_assignments: "Ödev ekle"
+        loading_assignments: "Ödevler yükleniyor..."
+      discussion: 
+        add_topics: "Tartışma Başlıkları Ekle"
+      file: 
+        add_files: "Dosya ekle"
       header: 
         cancel: İptal
+        create_header: "Gövde Oluştur"
       link: 
+        add_link: "Bağlantı Ekle"
         cancel: İptal
+      page: 
+        add_pages: "Sayfa ekle"
+      quiz: 
+        add_quizzes: "Kısa sınav ekle"
       tool: 
         cancel: İptal
     add_item: 
+      add_new_item: "Yeni öğe ekle"
       assignment: Ödev
       content_page: "Sayfa İçeriği"
       discussion: Tartışma
@@ -9980,17 +9995,22 @@ tr:
         create: Oluştur
       discussion: 
         cancel: İptal
+        create_discussion: "Tartışma Oluştur"
       file: 
         cancel: İptal
         upload: Yükle
       header: 
         cancel: İptal
+        create_header: "Gövde Oluştur"
       link: 
+        add_link: "Bağlantı Ekle"
         cancel: İptal
       page: 
         cancel: İptal
+        creat_page: "Sayfa Oluştur"
       quiz: 
         cancel: İptal
+        create_quiz: "Kısa Sınav Oluştur"
       tool: 
         cancel: İptal
     dialog_title: "%{moduleName}'e öğe ekle"
@@ -9998,6 +10018,7 @@ tr:
       cancel: İptal
       points_possible: not
       save: Kaydet
+      saving: kaydediliyor...
     module: 
       header: 
         delete: Sil
@@ -10012,7 +10033,9 @@ tr:
     module_edit: 
       Create: Oluştur
       cancel: İptal
+      lock_datea: "Kilit tarihi"
       module_name: "Modül Adı"
+      new_module: "Yeni modül oluştur"
     module_item_view: 
       button: 
         delete: Sil
@@ -10074,11 +10097,15 @@ tr:
     sure_you_want_to_mute: "Bu ödevi askıya almak istediğinize emin misiniz? Bu ödev askıdayken öğenciler yeni bildirim almayacak ve şunları göremeyecekler:"
   n_a_d6f6c42f: Yok
   name: "Academic Benchmark İçeri Aktarıcı"
+  new_2b97b0d9: yeni
+  new_account_role_6e5c4964: "Yeni Hesap Rolü"
+  new_course_role_6a7bb75f: "Yeni Kurs Rolü"
   new_facebook_message: "Canvas'tan yeni bir mesajınız var"
   new_styles_description: |-
       Canvas Ara Birimi üzerinde iyileştirme yapıyoruz. Canvas ara biriminin basit ve
       güncellenmiş görünümüne katılmak için bu özelliği etkinleştirin. Bu özellik
       "Devam Eden bir süreç" ve gerçek kullanıcılı eğitim veren sitelerde henüz etkinleştirilmemeli.
+  no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_e16d9132: Hayır
   no_migration_file: "İçerik taşıma için dosya gereklidir."
   no_students_have_taken_the_quiz_yet_e667644b: "Henüz bu kısa sınavı alan öğrenci yok"
@@ -10283,6 +10310,8 @@ tr:
         display: "Telefon Numarası"
       twitter: 
         display: Twitter
+      yo: 
+        display: Yo
     frequencies: 
       daily: Günlük
       immediately: HEMEN
@@ -10508,6 +10537,7 @@ tr:
   page_comments: 
     errors: 
       create_failed: "Yorum oluşturma başarısız"
+  page_not_found_2b0d05f5: "Sayfa bulunamadı"
   page_views: 
     download_filename: "%{user}'ın Sayfa İzlemeleri"
     table: 
@@ -10548,6 +10578,8 @@ tr:
     loading_more_results: "Daha fazla sonuç yükleniyor"
   paypal: 
     exception: "Üzgünüz, bir hata oluştu, lütfen daha sonra tekrar deneyin."
+  pdf_d8236d9a: PDF
+  plain_text_e3ab33aa: "Düz metin"
   plugins: 
     academic_benchmark_importer: 
       description: "Bu eklenti ile Akademik Karşılaştırma standartları Canvas'a aktarılabilir."
@@ -10800,7 +10832,12 @@ tr:
       settings_updated: "Eklenti ayarları başarıyla güncellendi"
     panda_pub_settings: 
       labels: 
+        application_id: "Uygulama Id"
         base_url: "Temel URL"
+        key_id: "Anahtar ID"
+        key_secret: "Gizli Anahtar"
+    pandapub: 
+      name: PandaPub
     qti_converter_settings: 
       labels: 
         enabled: Etkin
@@ -10873,6 +10910,11 @@ tr:
         domain: Alan
         password: Şifre
         username: "Kullanıcı Adı"
+    yo: 
+      name: Yo
+    yo_settings: 
+      labels: 
+        api_token: "Api token"
   polling: 
     poll_sessions: 
       errors: 
@@ -10896,6 +10938,7 @@ tr:
       completion_prerequisites: "Önkoşulları Tamamlama"
     labels: 
       requirements_must_be_completed: "Bu sayfa kilidini açmak için öncelikle şu gereksinimleri karşılamanız gerekmektedir"
+  presentation_2d9387ca: Sunum
   product_name: Canvas
   profile: 
     access_token: 
@@ -10974,6 +11017,7 @@ tr:
         register_linkedin_account: "LinkedIn Hesabınızı Kaydedin"
         save_login: "Oturumu Kaydet"
         save_skype_name: "Skype İsmini Kaydet"
+        save_yo_name: "Yo İsmi Kaydet"
         select_image: "Resim Seçiniz"
         update_settings: "Ayarları Güncelle"
       confirm_email_instructions: "Profilinizi düzenlemeden önce, e-posta adresinize (%{email}) yollamış olduğumuz bağlantıdan doğrulamanız gerekmektedir. Eğer e-postaya ulaşamadıysanız, gereksiz klasörünü kontrol edin veya *tekrardan e-posta gönderimi sağlamak için tıklayın* "
@@ -11013,6 +11057,7 @@ tr:
         users_profile: "%{user}'ın Ayarları"
         ways_to_log_in: "Oturum Açma Yolları"
         web_services: "Web Servisleri"
+        yo_login: "Yo Giriş"
       hints: 
         expires_at: "boş bırakırsanız sona ermez"
         language: "Herhangi bir tarayıcı veya hesap ayarının üzerine yazılacaktır."
@@ -11067,6 +11112,7 @@ tr:
         upload_new_image: "Yeni bir resim yükle"
         view_facebook_app: "Facebook uygulamalarını gör"
         view_your_profile: "profilinizi inceleyin"
+        yo: Yo
       loading_token_details: "Token Ayrıntıları Yükleniyor..."
       no_approved_integrations: "Üçüncü şahıs uygulamalar sizin adınıza Canvas sitesine erişim isteyebilir. Bu uygulamalara izin verdikçe buradaki listede bunları görebilirsiniz."
       no_language_preference: "Sistem Varsayılanı (%{language})"
@@ -11082,6 +11128,7 @@ tr:
         authorize_google_docs: "Google Drive'a İzin Ver"
         authorize_linkedin: "LinkedIn'e İzin Ver"
         authorize_twitter: "Twitter'a İzin Ver"
+        authorize_yo: "Yo Giriş"
         click_to_change_profile_pic: "Profil resmini değiştirmek için tıklayın"
         delicious_login: "Delicious Girişi"
         diigo_login: "Diigo Girişi"
@@ -11176,6 +11223,8 @@ tr:
       validations: 
         should_be_10_digits: "10 haneli bir sayı olmalıdır"
     ways_to_contact_me: "Benimle iletişim yolları"
+    yo_select: 
+      yo: Yo
     you_have_no_services: "Herhangi bir hizmete kayıtlı değilsiniz, *ayarlar* sayfasından hizmet ekleyebilirsiniz."
   profiles: 
     avatar_dialog: 
@@ -11498,24 +11547,35 @@ tr:
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Bu kısa sınav için sonuçlar korumalıdır ve gönderimden hemen sonra bir kez görülebilir."
   quiz_statistics: 
     answer_bars_chart: 
+      audible_answer_response_count: 
+        one: "Tek cevap."
       response_count: 
-        one: "%{count} öğrenci"
+        one: "1 öğrenci"
         other: "%{count} öğrenci"
+        zero: Kimse
+    answer_details: 
+      hide: "Cevap detaylarını gizle"
+      show: "Cevap detaylarını göster"
     attempts: "Deneme: %{count} / %{total}"
+    correct_answer: "Doğru cevap"
     correct_essay_student_ratio: "Öğrencileriniz %{ratio}% oranında bu sorudan tam puan aldı."
     correct_multiple_response_ratio: "Öğrencileriniz %{ratio}% oranında doğru cevap verdi."
     correct_response_ratio: "Öğrencileriniz %{ratio}% oranında bu soruya doğru cevap verdi."
     discrimination_index: 
       discrimination_index_dialog_title: "Ayrışma Endeks Göstergesi"
+    dismiss_notification: Yoksay
     download_submissions: "Tüm Dosyaları İndir"
     duration_in_minutes: 
       one: "%{count} dakika"
       other: "%{count} dakika"
+    empty_question_breakdown: "Soru istatistiği bulunamadı"
     essay_score: "Puan: %{score}"
     no_answer: "Cevap Yok"
     response_student_count: 
-      one: "%{count} öğrenci"
+      one: "1 öğrenci"
       other: "%{count} öğrenci"
+      zero: Kimse
+    speedgrader: "Hızlı Değerlendirmede Gör"
     summary: 
       avg_time: "Ortalama Süre"
       high_score: "Yüksek Puan"
@@ -12769,6 +12829,7 @@ tr:
       role_name_label: "Rol İsmi"
     new_role: 
       cancel: İptal
+      role_name: "Rol İsmi:"
       save: Kaydet
       saving: Kaydediliyor...
     permission_button: 
@@ -12878,8 +12939,11 @@ tr:
     header: 
       gradebook_individual_view: "Not Defteri: Bireysel Görünüm"
     learning_mastery: 
+      download_results: "Sonuçları İndir (.csv)"
       hide_student_names_label: "Öğrenci İsimlerini Gösterme"
       result: Sonuç
+      select_a_section: "Bölüm seçin"
+      student_info: "Öğrenci Bilgisi"
     outcome_information: 
       avg_score: "Ortalama Puan"
       high_score: "Yüksek Puan"
@@ -12897,17 +12961,27 @@ tr:
         show_concluded_enrollments_label: "Sonlandırılmış Ders Kayıtlarını Göster"
         sis_export: "Notları ÖBS'de Yayınla"
       mastery_toggles_and_actions: 
+        download_results: "Sonuçları İndir (.csv)"
         hide_student_names_label: "Öğrenci İsimlerini Gösterme"
+      section_select: 
+        select_a_section: "Bölüm seçin"
+      sort_select: 
+        sort_assignments: "Ödevleri sırala"
     student_information: 
       assignment_groups: 
         ag_group_grade: Not
         ag_group_name: "Ödev Grubu"
         ag_letter_grade: "Harf Notu"
+      details: 
+        hidden: gizli
       index: 
         grades: Notlar
+        student_info: "Öğrenci Bilgisi"
   search: 
     all_courses: 
       name: İsim
+      open_enrollment_only: "Sadece açık girişli kurslar"
+      public_only: "Sadece yayınlanmış kurslar"
       search: Ara
       titles: 
         all_courses: "Tüm Dersler"
@@ -13152,6 +13226,7 @@ tr:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "İndirmek için buraya tıklayın"
+        download_submissions: "Tüm gönderimleri indir"
     conference: 
       buttons: 
         delete: "Konferansı Sil"
@@ -14791,6 +14866,8 @@ tr:
       welcome_to_happiness: "Canvas'a Hoşgeldiniz"
   validate: 
     is_required: "Bu alan zorunludur"
+  video_b9f27375: Video
+  visit_864b4060: Ziyaret
   warnings: 
     test_install: 
       periodic_message: "Bu Canvas kurulumu sadece test işlemi içindir ve belirli aralıklarda sıfırlanacaktır."
@@ -14807,6 +14884,7 @@ tr:
         : Kapalı
         ? "true"
         : Açık
+  web_page_146f9102: "Web sayfası"
   webct_credentials: 
     credential_not_found: "Kimlik bulunamadı."
   webct_display: "Blackboard Vista/CE (WebCT)"
