@@ -469,6 +469,8 @@ class Group < ActiveRecord::Base
     can :post_to_forum and
     can :read and
     can :read_roster and
+    can :send_messages and
+    can :send_messages_all and
     can :update and
     can :view_unpublished_items
 
