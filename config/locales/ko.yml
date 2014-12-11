@@ -1338,6 +1338,7 @@ ko:
         never_drop: "제외 안 함"
         no_assignments: "[과제 없음]"
         weighted_by_points: "점수로 가중"
+      percent_of_total_grade: "전체 평가의 %{percent} %"
     assignment_count: 
       one: "과제 %{count}개"
       other: "과제 %{count}개"
