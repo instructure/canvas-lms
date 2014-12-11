@@ -18,6 +18,7 @@ set :group,         'canvasadmin'
 set :bundle_path, "vendor/bundle"
 set :bundle_without, nil
 set :bundle_flags,  ""
+set :bundle_binstubs, nil 
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
