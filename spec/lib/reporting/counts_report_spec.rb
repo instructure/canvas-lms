@@ -188,5 +188,37 @@ describe Reporting::CountsReport do
         expect(@snapshot.data[datum]).to eq 1
       end
     end
+
+    describe "files" do
+      before :each do
+        # the account needs a course in it to get data out of the report
+        course(account: @account1, active_course: 1)
+      end
+
+      it "should count files with the account's local id in the namespace" do
+        attachment_model(namespace: "account_#{@account1.local_id}", size: 5 * 1024)
+        Reporting::CountsReport.process
+        @snapshot = @account1.report_snapshots.detailed.first
+        expect(@snapshot.data['files']).to eq 1
+        expect(@snapshot.data['files_size']).to eq 5 * 1024
+      end
+
+      it "should count files with the account's global id in the namespace" do
+        attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
+        Reporting::CountsReport.process
+        @snapshot = @account1.report_snapshots.detailed.first
+        expect(@snapshot.data['files']).to eq 1
+        expect(@snapshot.data['files_size']).to eq 3 * 1024
+      end
+
+      it "should count with a heterogenous mixture of file namespaces" do
+        attachment_model(namespace: "account_#{@account1.local_id}", size: 5 * 1024)
+        attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
+        Reporting::CountsReport.process
+        @snapshot = @account1.report_snapshots.detailed.first
+        expect(@snapshot.data['files']).to eq 2
+        expect(@snapshot.data['files_size']).to eq 8 * 1024
+      end
+    end
   end
 end
