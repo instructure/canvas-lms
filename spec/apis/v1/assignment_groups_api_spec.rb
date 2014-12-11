@@ -420,6 +420,26 @@ describe AssignmentGroupsApiController, type: :request do
       expect(json['assignments']).not_to be_empty
     end
 
+    it 'should only return assignments in the given grading period with MGP on' do
+      @course.account.enable_feature!(:multiple_grading_periods)
+      @course.assignments.create!(:assignment_group => @group, :due_at => 1.minute.from_now)
+      @course.assignments.create!(:assignment_group => @group, :due_at => 1.week.from_now)
+      gpg = @course.grading_period_groups.create!
+      @gp1 = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 2.days.ago, end_date: 1.day.from_now)
+      @gp2 = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 2.days.from_now, end_date: 1.month.from_now)
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments&grading_period_id=#{@gp2.id}",
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @group.id.to_s,
+        :grading_period_id => @gp2.id.to_s,
+        :include => ['assignments'])
+
+      expect(json['assignments'].length).to eq 1
+    end
+
     it "should include assignment_visibility when requested and with DA on" do
       @course.enable_feature!(:differentiated_assignments)
       @course.assignments.create!(:title => "test", :assignment_group => @group, :points_possible => 10)
