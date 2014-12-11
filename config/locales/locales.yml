@@ -2,6 +2,10 @@ en:
   locales:
     en: English
   qualified_locale: en-US
+bz:
+  locales:
+    bz: English (Beyond Z)
+  qualified_locale: bz
 es:
   locales:
     es: Español
