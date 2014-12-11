@@ -130,6 +130,71 @@
         });
     });
 
+    // Add privacy notices
+    utils.onPage(/^\/courses\/\d+\/collaborations\/?$/, function () {
+        $('<div class="pia-notice">')
+            .appendTo('#collaborate_authorize_google_docs')
+            .append('<p><em>Google Docs notice for instructors</em></p>')
+            .append('<p><strong>Is your use of Google Docs privacy compliant?</strong> There are <strong>personal ' +
+                'legal consequences</strong> if you use an app that discloses and stores students&rsquo; personal ' +
+                'information elsewhere inside or outside Canada without their consent. Unauthorized disclosure is a ' +
+                'privacy protection offense under BC law. Employees and SFU are liable to investigation and possible ' +
+                'fines. <strong>Before using Google Docs</strong>, carefully review the complete ' +
+                '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas Privacy Protection Notice</a> ' +
+                'to <strong>understand your legal responsibilities</strong> and please contact ' +
+                '<a href="mailto:learntech@sfu.ca">learntech@sfu.ca</a>. The Learning Technology Specialists in the ' +
+                '<strong>Teaching and Learning Centre will help you</strong> with the student consent procedure that ' +
+                'you must use. By authorizing your SFU Canvas account to use Google Docs in your course, you ' +
+                'acknowledge that you <strong>read the Privacy Protection Notice</strong> and will <strong>follow the ' +
+                'described protection of privacy requirements and procedure</strong>.</p>')
+            .append('<hr />')
+            .append('<p><em>Google Docs notice for students</em></p>')
+            .append('<p><strong>Is your use of Google Docs privacy compliant?</strong> Google Docs is a collaboration ' +
+                'tool that allows you to create and share documents with other people. <strong>Before using Google ' +
+                'Docs</strong>, carefully review the <a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">' +
+                'Canvas Privacy Protection Notice</a> to <strong>understand the personal privacy implications</strong> ' +
+                'for yourself <strong>as well as your responsibilities to other persons</strong> and their information. ' +
+                'By authorizing your SFU Canvas account to use Google Docs, you acknowledge that you read and are ' +
+                'agreeing to the Privacy Protection Notice.</p>');
+        $('#right-side-wrapper').find('.rs-margin-all').append('<p>Please read the ' +
+            '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas@SFU Privacy Protection Notices</a> ' +
+            'before using External Learning and Collaboration Tools such as Google Docs because they may disclose and ' +
+            'store your personal information elsewhere inside and outside Canada.</p>');
+    });
+    utils.onPage(/^\/courses\/\d+\/settings\/?$/, function () {
+        var addedAppCenterNotice = false;
+        var addAppCenterNotice = function () {
+            if (addedAppCenterNotice) { return; } // only add it once
+            addedAppCenterNotice = true;
+            $('<div class="pia-notice">')
+                .insertBefore('#app_center_filter_wrapper')
+                .append('<p><strong>Is your app privacy compliant?</strong> There are <strong>personal legal ' +
+                    'consequences</strong> if you use an app that discloses and stores students&rsquo; personal ' +
+                    'information elsewhere inside or outside Canada without their consent. Unauthorized disclosure ' +
+                    'is a privacy protection offense under BC law. Employees and SFU are liable to investigation and ' +
+                    'possible fines. <strong>Before using any app</strong>, carefully review the complete ' +
+                    '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas Privacy Protection Notice</a> ' +
+                    'to <strong>understand your legal responsibilities</strong> and please contact ' +
+                    '<a href="mailto:learntech@sfu.ca">learntech@sfu.ca</a>. The Learning Technology Specialists in the ' +
+                    '<strong>Teaching and Learning Centre will help you</strong> complete an app privacy assessment ' +
+                    'and, if needed, advise you how to obtain students&rsquo; consent in the manner prescribed by law. ' +
+                    'By using apps in your course and the App Centre in Canvas, you acknowledge that you <strong>read ' +
+                    'the Privacy Protection Notice</strong> and will <strong>follow the described protection of privacy ' +
+                    'requirements and procedure</strong>.</p>');
+        };
+
+        // If App Center content is not present, wait for external tools to load before adding the notice.
+        if ($('#app_center_filter_wrapper').length == 0) {
+            $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
+                if (ajaxOptions.url && ajaxOptions.url.match(/api\/v1\/courses\/\d+\/external_tools/)) {
+                    addAppCenterNotice();
+                }
+            });
+        } else {
+            addAppCenterNotice();
+        }
+    });
+
     // Fixes for Import Content page only
     utils.onPage(/courses\/\d+\/content_migrations/, function() {
         // The fixes are for elements that are dynamically generated when a specific XHR call completes
