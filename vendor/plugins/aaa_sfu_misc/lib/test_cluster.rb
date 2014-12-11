@@ -63,6 +63,7 @@ ApplicationController.class_eval do
     return true unless @domain_root_account # WTF? apparently mobile verify skips loading the DRA
     return true if @domain_root_account.service_enabled?(:beta_for_students) # account setting to be nice
     old_crumbs = crumbs.dup
+    old_context = @context.dup
     get_context rescue nil
     # avoid double-crumbs cause we nil out @context and it gets called again
     crumbs.replace(old_crumbs)
@@ -70,6 +71,6 @@ ApplicationController.class_eval do
       @unauthorized_message = "Students are not allowed to access test installations."
       return render_unauthorized_action
     end
-    @context = nil
+    @context = old_context
   end
 end
