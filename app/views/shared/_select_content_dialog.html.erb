@@ -79,7 +79,7 @@
       <% end %>
       <% if !only || only.include?(:external_tools) %>
       <div id="context_external_tools_select" class="module_item_option">
-        <div style="font-size: 0.8em;">
+        <div style="font-size: 0.8em;" tabindex="0" aria-alert="true">
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
