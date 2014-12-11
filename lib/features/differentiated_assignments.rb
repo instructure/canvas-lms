@@ -39,7 +39,7 @@ Sections that are not given an assignment will not see it in their course conten
 calculated without those points.
 END
     applies_to: 'Course',
-    state: 'hidden',
+    state: 'allowed',
     root_opt_in: true,
     beta: true,
     development: false,
