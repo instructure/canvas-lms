@@ -338,8 +338,8 @@ class GroupCategory < ActiveRecord::Base
       number_of_users_to_add = number_to_bring_base_equality + chunk_count + sprinkle
       ##
       # respect group limits!
-      if self.group_limit
-        slots_remaining = self.group_limit - group.users.size
+      if group.max_membership
+        slots_remaining = group.max_membership - group.users.size
         number_of_users_to_add = [slots_remaining, number_of_users_to_add].min
       end
       next if number_of_users_to_add <= 0

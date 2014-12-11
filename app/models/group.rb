@@ -79,7 +79,7 @@ class Group < ActiveRecord::Base
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
-  after_save :update_max_membership_from_group_category
+  before_save :update_max_membership_from_group_category
 
   delegate :time_zone, :to => :context
 
@@ -148,9 +148,8 @@ class Group < ActiveRecord::Base
   end
 
   def update_max_membership_from_group_category
-    if group_category && group_category.group_limit && (!max_membership || max_membership == 0)
+    if (!max_membership || max_membership == 0) && group_category && group_category.group_limit
       self.max_membership = group_category.group_limit
-      self.save
     end
   end
 
