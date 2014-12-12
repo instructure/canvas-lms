@@ -18,7 +18,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f("#right-side")).not_to include_text("Turn in DA assignment")
       end
       it "should show assignments with an override in the To Do section" do
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section, due_at: 4.days.from_now)
+        create_section_override_for_assignment(@da_assignment, due_at: 4.days.from_now)
         get "/"
         expect(f("#right-side")).to include_text("Turn in DA assignment")
       end
@@ -29,7 +29,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
       end
       it "should show assignments with an override in Recent activity" do
         skip "recent activity items are not being generated"
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_assignment)
         get "/"
         f("#not-right-side .title").click
         expect(f("#assignment-details")).to include_text("Assignment Created - DA assignment")
@@ -44,7 +44,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".to-do-list")).to be nil
       end
       it "should show assignments with an override in the To Do section" do
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}"
         expect(f(".to-do-list")).to include_text("Turn in DA assignment")
       end
@@ -58,7 +58,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-view-month")).not_to include_text(@da_assignment.title)
       end
       it "should show assignments with an override" do
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_assignment)
         get "/calendar"
         wait_for_ajaximations
         expect(f(".fc-view-month")).to include_text(@da_assignment.title)
@@ -86,7 +86,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f("#right-side")).not_to include_text("DA assignment")
       end
       it "should show assignments with an override in the To Do section" do
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_assignment)
         get "/"
         expect(f("#right-side")).to include_text("DA assignment")
       end
@@ -97,7 +97,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
       end
       it "should show assignments with an override in Recent activity" do
         skip "recent activity is not working currently in these tests"
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_assignment)
         get "/"
         f("#not-right-side .title").click
         expect(f("#assignment-details")).to include_text("Assignment Created - DA assignment")
@@ -112,7 +112,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".to-do-list")).to be nil
       end
       it "should show assignments with an override in the To Do section" do
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}"
         expect(f(".coming_up")).to include_text("DA assignment")
       end
@@ -126,7 +126,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-view-month")).not_to include_text(@da_assignment.title)
       end
       it "should show assignments with an override" do
-        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_assignment)
         get "/calendar"
         wait_for_ajaximations
         expect(f(".fc-view-month")).to include_text(@da_assignment.title)

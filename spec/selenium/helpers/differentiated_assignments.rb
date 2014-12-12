@@ -3,14 +3,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 def da_setup
   # use after already calling course_with_role_logged_in
   @course.enable_feature!(:differentiated_assignments)
-  @section1 = @course.course_sections.create!(:name => 'Section A')
+  @default_section = @course.course_sections.first
+  @section1 = @course.course_sections.create!(:name => 'Section 1')
 end
 
 def observer_setup()
   course_with_observer_logged_in
   course_with_student(:course => @course)
   observer_enrollment = @observer.enrollments.first!
-  @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :section => @other_section)
+  @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :section => @default_section)
   observer_enrollment.update_attribute(:associated_user_id, @student.id)
   observer_enrollment.save!
   @observer
