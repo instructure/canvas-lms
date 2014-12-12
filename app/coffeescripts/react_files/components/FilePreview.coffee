@@ -170,8 +170,8 @@ define [
                 },
                   i {className: 'icon-download'}
                   ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
-              button {
-                type: 'button'
+              a {
+                role: 'button'
                 className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"
                 onClick: @toggle('showInfoPanel')
               },
