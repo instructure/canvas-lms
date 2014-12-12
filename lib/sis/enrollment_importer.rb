@@ -206,9 +206,6 @@ module SIS
             role ||= Role.get_built_in_role(type)
             enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_user_id, :role_id => role.id).first
 
-            # TODO can remove after enrollment role ids are populated
-            enrollment ||= @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_user_id, :role_id => nil).first if role.built_in?
-
             unless enrollment
               enrollment = Enrollment.typed_enrollment(type).new
               enrollment.root_account = @root_account

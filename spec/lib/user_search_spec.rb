@@ -113,8 +113,6 @@ describe UserSearch do
             before do
               newstudent = User.create!(:name => 'Tyler Student')
               e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
-              # manually replicate the pre-job state
-              Enrollment.where(:id => e.id).update_all(:role_id => nil)
             end
 
             it { should include('Rose Tyler') }
@@ -130,8 +128,6 @@ describe UserSearch do
             before do
               newstudent = User.create!(:name => 'Tyler Student')
               e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
-              # manually replicate the pre-job state
-              Enrollment.where(:id => e.id).update_all(:role_id => nil)
             end
 
             it { should include('Rose Tyler') }
