@@ -18,7 +18,7 @@
 # SFU Note: Slightly modified from the original provided by ccutrer in IRC.
 #           Original file can be found at https://gist.github.com/grahamb/ed5475ac5f4cbbacf62b
 
-require Pathname(File.dirname(__FILE__)) + "../../sfu_api/app/model/sfu/sfu"
+require Pathname(File.dirname(__FILE__)) + "../../vendor/plugins/sfu_api/app/model/sfu/sfu"
 
 ApplicationController.class_eval do
   def self.test_cluster
@@ -63,6 +63,7 @@ ApplicationController.class_eval do
     return true unless @domain_root_account # WTF? apparently mobile verify skips loading the DRA
     return true if @domain_root_account.service_enabled?(:beta_for_students) # account setting to be nice
     old_crumbs = crumbs.dup
+    had_context = @context.present?
     get_context rescue nil
     # avoid double-crumbs cause we nil out @context and it gets called again
     crumbs.replace(old_crumbs)
@@ -70,6 +71,6 @@ ApplicationController.class_eval do
       @unauthorized_message = "Students are not allowed to access test installations."
       return render_unauthorized_action
     end
-    @context = nil
+    @context = nil unless had_context
   end
 end
