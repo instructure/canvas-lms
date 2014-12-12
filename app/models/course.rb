@@ -211,6 +211,7 @@ class Course < ActiveRecord::Base
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
   has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
   has_many :grading_period_groups, dependent: :destroy
+  has_many :grading_periods, through: :grading_period_groups
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
   has_many :sis_post_grades_statuses
