@@ -101,6 +101,11 @@
 #           "description": "Optional: This field is only returned in ceratin API calls, and will return the IANA time zone name of the user's preferred timezone.",
 #           "example": "America/Denver",
 #           "type": "string"
+#         },
+#         "bio": {
+#           "description": "Optional: The user's bio.",
+#           "example": "I like the Muppets.",
+#           "type": "string"
 #         }
 #       }
 #     }

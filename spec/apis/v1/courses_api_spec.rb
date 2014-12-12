@@ -1534,7 +1534,12 @@ describe CoursesController, type: :request do
 
       it "should respect includes" do
         @user = @course1.teachers.first
-        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['email'])
+        @ta.profile.bio = 'hey'
+        @ta.save!
+        @course1.root_account.settings[:enable_profiles] = true
+        @course1.root_account.save!
+
+        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['email', 'bio'])
 
         expect(json).to eq [
           {
@@ -1542,7 +1547,8 @@ describe CoursesController, type: :request do
             'name' => 'TAPerson',
             'sortable_name' => 'TAPerson',
             'short_name' => 'TAPerson',
-            'email' => 'ta@ta.com'
+            'email' => 'ta@ta.com',
+            'bio' => 'hey'
           }
         ]
       end
