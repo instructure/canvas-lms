@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'underscore'
   'react'
   'react-router'
@@ -8,12 +9,14 @@ define [
   './FriendlyDatetime'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
+  'compiled/models/File'
+  'compiled/models/FilesystemObject'
   'compiled/fn/preventDefault'
   'compiled/react/shared/utils/withReactDOM'
   '../utils/collectionHandler'
   './FilePreviewInfoPanel'
   '../modules/filesEnv'
-], (_, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, preventDefault, withReactDOM, collectionHandler, FilePreviewInfoPanel, filesEnv) ->
+], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, File, FilesystemObject, preventDefault, withReactDOM, collectionHandler, FilePreviewInfoPanel, filesEnv) ->
 
   FilePreview = React.createClass
 
@@ -32,8 +35,8 @@ define [
       displayedItem: null
 
     componentWillMount: ->
-      items = @getItemsToView(@props)
-      @setState @stateProperties(items, @props), @scrollFooterToItem
+      items = @getItemsToView @props, (items) =>
+        @setState @stateProperties(items, @props)
 
     componentDidMount: ->
       $('.ReactModal__Overlay').on 'keydown', @handleKeyboardNavigation
@@ -42,11 +45,12 @@ define [
       $('.ReactModal__Overlay').off 'keydown', @handleKeyboardNavigation
 
     componentWillReceiveProps: (newProps) ->
-      items = @getItemsToView(newProps)
-      @setState @stateProperties(items, newProps)
+      items = @getItemsToView newProps, (items) =>
+        @setState @stateProperties(items, newProps)
 
-    getItemsToView: (props) ->
+    getItemsToView: (props, cb) ->
       # Sets up our collection that we will be using.
+      initialItem = null
       onlyIdsToPreview = props.query.only_preview?.split(',')
       files = if !!props.query.search_term
                 props.collection.models
@@ -57,9 +61,15 @@ define [
                       return true unless onlyIdsToPreview
                       file.id in onlyIdsToPreview
 
-      initialItem = (props.query.preview and _.findWhere(files, {id: props.query.preview})) or files[0]
+      visibleFile = props.query.preview and _.findWhere(files, {id: props.query.preview})
 
-      {initialItem, otherItems}
+      if !visibleFile and files.length
+        new File({id: props.query.preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include":"usage_rights"}) if props.usageRightsRequiredForContext).success (file) ->
+          initialItem = new FilesystemObject(file)
+          cb?({initialItem, otherItems})
+      else
+        initialItem = visibleFile or files[0]
+        cb?({initialItem, otherItems})
 
     stateProperties: (items, props) ->
       initialItem: items.initialItem
