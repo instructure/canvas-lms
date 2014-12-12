@@ -108,9 +108,17 @@ define [
             div className: 'muted', error.message
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
       div role: 'grid',
+
+        div {
+          ref: 'accessibilityMessage'
+          className: 'ShowFolder__accessbilityMessage col-xs',
+          tabIndex: 0
+        },
+          I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")
         UploadDropZone(currentFolder: @props.currentFolder)
         CurrentUploads({})
         ColumnHeaders {
+          ref: 'columnHeaders'
           to: (if @props.params.splat then 'folder' else 'rootFolder')
           query: @props.query
           params: @props.params
