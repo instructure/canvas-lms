@@ -192,6 +192,8 @@ class Quizzes::QuizzesController < ApplicationController
         upload_url = api_v1_quiz_submission_files_path(:course_id => @context.id, :quiz_id => @quiz.id)
         js_env :UPLOAD_URL => upload_url
         js_env :SUBMISSION_VERSIONS_URL => course_quiz_submission_versions_url(@context, @quiz) unless @quiz.muted?
+        events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
+        js_env QUIZ_SUBMISSION_EVENTS_URL: events_url unless @js_env[:QUIZ_SUBMISSION_EVENTS_URL]
       end
 
       setup_attachments
@@ -837,9 +839,8 @@ class Quizzes::QuizzesController < ApplicationController
       redirect_to course_quiz_url(@context, @quiz) and return
     end
 
-    js_env({
-      :QUIZ_SUBMISSION_EVENTS_URL => api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
-    })
+    events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
+    js_env QUIZ_SUBMISSION_EVENTS_URL: events_url unless @js_env[:QUIZ_SUBMISSION_EVENTS_URL]
 
     @quiz_presenter = Quizzes::TakeQuizPresenter.new(@quiz, @submission, params)
     render :action => 'take_quiz'

@@ -24,6 +24,7 @@ define([
   'quiz_inputs',
   'compiled/models/Quiz',
   'compiled/views/PublishButtonView',
+  'compiled/quizzes/dump_events',
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
@@ -32,10 +33,11 @@ define([
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
-], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods, Quiz, PublishButtonView) {
+], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods, Quiz, PublishButtonView, QuizLogAuditingEventDumper) {
 
 
   $(document).ready(function () {
+    QuizLogAuditingEventDumper(true);
 
     function ensureStudentsLoaded(callback) {
       if ($('#quiz_details').length) {
