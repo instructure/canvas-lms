@@ -54,6 +54,11 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
+# Capistrano runs as the deploy user, but Canvas is setup to be owned by another user.
+# Rollbacks and cleanups of more than :keep_releases fail with permissions errors. 
+# This solves that.
+SSHKit.config.command_map[:rm]  = "sudo rm"
+
 # Canvas uses it's own precompile assets defined below.
 Rake::Task["deploy:compile_assets"].clear_actions
 
@@ -180,16 +185,19 @@ namespace :deploy do
 
   after :published, 'deploy:delayed_jobs:restart'
 
+  # NOTE: This is commented out because I just remapped :rm to "sudo rm" so that it works in all cases.
+  # I did this after I saw the cleanup of older release fail with the same error.
+  #
   # Many files have only rw permissions for the canvasadmin user (not the group) and
   # since the Capistrano deploy user is part of the canvasadmin group,
   # the rollback_cleanup fails when it tries to create a tar archive and then remove the files.  
   # We're adding canvasadmin group permissions to make it work (before the revert b/c otherwise 
   # the release_path would be the release we rolled back to instead of the one we're cleaning up).
   # Note: I also tried running the cleanup_rollback task as sudo, but couldn't figure out how.
-  before :reverting, :fix_rollback_permissions do
-    on roles(:app) do
-      execute :sudo, 'chmod -R g+rw', "#{release_path}"
-    end
-  end
+  #before :reverting, :fix_rollback_permissions do
+  #  on roles(:app) do
+  #    execute :sudo, 'chmod -R g+rw', "#{release_path}"
+  #  end
+  #end
 
 end
