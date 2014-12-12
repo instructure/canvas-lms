@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/lti_spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
 
 module Lti
   describe LtiAppsController, type: :request do
@@ -56,6 +57,39 @@ module Lti
 
       
     end
+
+    describe '#index' do
+
+      before do
+        @tp = create_tool_proxy
+        @tp.bindings.create(context: account)
+        @external_tool = new_valid_external_tool(account)
+      end
+
+      it 'returns a list of app definitions for a context' do
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps",
+                        {controller: 'lti/lti_apps', action: 'index', format: 'json',
+                         course_id: @course.id.to_s})
+        expect(json.select {|j| j['app_type'] == @tp.class.name && j['app_id'] == @tp.id.to_s}).not_to be_nil
+        expect(json.select {|j| j['app_type'] == @external_tool.class.name && j['app_id'] == @external_tool.id.to_s}).not_to be_nil
+      end
+
+      it 'paginates the launch definitions' do
+        5.times { |_| new_valid_external_tool(account) }
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps?per_page=3",
+                        {controller: 'lti/lti_apps', action: 'index', format: 'json',
+                         course_id: @course.id.to_s, per_page: '3'})
+
+        json_next = follow_pagination_link('next', :controller => 'lti/lti_apps', :action => 'index')
+        expect(json.count).to eq 3
+        expect(json_next.count).to eq 3
+        json
+      end
+
+    end
+
 
   end
 end

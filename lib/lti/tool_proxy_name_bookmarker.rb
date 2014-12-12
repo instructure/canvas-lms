@@ -17,7 +17,7 @@
 module Lti
   module ToolProxyNameBookmarker
     def self.bookmark_for(tool_proxy)
-      tool_proxy.name
+      tool_proxy.name || ''
     end
 
     def self.validate(bookmark)
@@ -27,9 +27,9 @@ module Lti
     def self.restrict_scope(scope, pager)
       if pager.current_bookmark
         name = pager.current_bookmark
-        comparision = (pager.include_bookmark ? ">=" : ">")
+        comparison = (pager.include_bookmark ? ">=" : ">")
         scope = scope.where(
-          "name #{comaprison} ?",
+          "name #{comparison} ?",
           name)
       end
       scope.order(:name)

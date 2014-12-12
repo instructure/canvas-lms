@@ -974,6 +974,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/lti_apps') do
       def et_routes(context)
         get "#{context}s/:#{context}_id/lti_apps/launch_definitions", action: :launch_definitions, as: "#{context}_launch_definitions"
+        get "#{context}s/:#{context}_id/lti_apps", action: :index, as: "#{context}_app_definitions"
       end
       et_routes("course")
       et_routes("account")

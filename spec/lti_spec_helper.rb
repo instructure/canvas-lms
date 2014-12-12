@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-
 def create_tool_proxy(opts = {})
   default_opts = {
     context: account,
@@ -25,16 +23,17 @@ def create_tool_proxy(opts = {})
     guid: SecureRandom.uuid,
     product_version: '1.0beta',
     lti_version: 'LTI-2p0',
-    product_family: create_product_family,
+    product_family: find_or_create_product_family,
     workflow_state: 'active',
-    raw_data: 'some raw data'
+    raw_data: 'some raw data',
+    name:  (0...8).map { (65 + rand(26)).chr }.join,
   }
-  Lti::ToolProxy.create(default_opts.merge(opts))
+  Lti::ToolProxy.create!(default_opts.merge(opts))
 end
 
-def create_product_family(opts = {})
-  default_opts = {vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account}
-  Lti::ProductFamily.create(default_opts.merge(opts))
+def find_or_create_product_family(opts = {})
+  default_opts = {vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account_id: account.id}
+  Lti::ProductFamily.where(default_opts.merge(opts)).first_or_create
 end
 
 def create_resource_handler(tool_proxy, opts = {})
