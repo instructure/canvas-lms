@@ -50,7 +50,7 @@ class Enrollment < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :root_account, :user, :role_overrides, :pseudonyms]
 
-  validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state
+  validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],
                          :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
@@ -62,6 +62,7 @@ class Enrollment < ActiveRecord::Base
   before_validation :assert_section
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
+  before_validation :ensure_role_id
   before_validation :infer_privileges
   after_create :create_linked_enrollments
   after_save :clear_email_caches
@@ -78,6 +79,10 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
   scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
+
+  def ensure_role_id
+    self.role_id ||= self.role.id
+  end
 
   def valid_role?
     return true if role.built_in?
