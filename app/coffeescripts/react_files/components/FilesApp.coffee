@@ -59,10 +59,10 @@ define [
         'rootFolder'
 
     previewItem: (item) ->
-      @clearSelectedItems()
-      @toggleItemSelected item, null, =>
-        params = {splat: @props.currentFolder?.urlPath()}
-        @transitionTo(@getPreviewRoute(), params, @getPreviewQuery())
+      @clearSelectedItems =>
+        @toggleItemSelected item, null, =>
+          params = {splat: @state.currentFolder?.urlPath()}
+          @transitionTo(@getPreviewRoute(), params, @getPreviewQuery())
 
     render: withReactDOM ->
       if @state.currentFolder # when showing a folder

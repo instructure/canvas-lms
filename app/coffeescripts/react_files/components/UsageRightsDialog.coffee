@@ -42,7 +42,7 @@ define [
       values = @refs.usageSelection.getValues()
 
       # No copyright specified
-      if (!values.copyright)
+      if (@refs.usageSelection.refs.copyright? and !values.copyright)
         $(@refs.usageSelection.refs.copyright.getDOMNode()).errorBox(I18n.t('You must specify the copyright holder.'))
         return false
       # They didn't choose a copyright
