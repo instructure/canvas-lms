@@ -134,11 +134,25 @@ $preview-header-height: 9vh;
 
 /// __File Preview Content
 ////////////////////////////////
+.ef-file-not-found{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  font-size: 2.5em;
+}
 .ef-file-align-center {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.ef-not-found-icon{
+  width: 100px;
+  height: 100px;
+  margin-bottom: 10px;
+  background-size: 70px;
 }
 .ef-file-preview-item {
   padding: 10px;

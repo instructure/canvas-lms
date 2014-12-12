@@ -193,6 +193,11 @@ define [
                 src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
                 className: 'ef-file-preview-frame'
               }
+            else # file was not found
+              div className: 'ef-file-not-found ef-file-preview-frame',
+                i className:'media-object ef-not-found-icon FilesystemObjectThumbnail mimeClass-file'
+                I18n.t "File not found"
+
             @renderArrowLink('right') if @state.otherItems?.length > 0
 
             if @state.showInfoPanel
