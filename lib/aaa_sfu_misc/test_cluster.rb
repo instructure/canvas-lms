@@ -18,7 +18,7 @@
 # SFU Note: Slightly modified from the original provided by ccutrer in IRC.
 #           Original file can be found at https://gist.github.com/grahamb/ed5475ac5f4cbbacf62b
 
-require Pathname(File.dirname(__FILE__)) + "../../sfu_api/app/model/sfu/sfu"
+require Pathname(File.dirname(__FILE__)) + "../../vendor/plugins/sfu_api/app/model/sfu/sfu"
 
 ApplicationController.class_eval do
   def self.test_cluster
