@@ -136,7 +136,7 @@ then fall back to Flash.
 END
       applies_to: 'RootAccount',
       state: 'on',
-      beta: true
+      beta: false
     },
     'high_contrast' =>
     {
