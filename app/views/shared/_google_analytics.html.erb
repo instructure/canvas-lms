@@ -6,7 +6,11 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', '<%=BeyondZConfiguration.google_analytics_account%>', 'auto');
+  <% if @current_user %>
+    ga('create', '<%=BeyondZConfiguration.google_analytics_account%>', {'userId': '<%= @current_user.id %>' });
+  <% else %>
+    ga('create', '<%=BeyondZConfiguration.google_analytics_account%>', 'auto');
+  <% end %>
   ga('require', 'displayfeatures');
   ga('send', 'pageview');
 
