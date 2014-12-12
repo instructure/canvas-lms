@@ -20,8 +20,7 @@ module Outcomes
   module ResultAnalytics
 
     Rollup = Struct.new(:context, :scores)
-    RollupScore = Struct.new(:outcome, :score, :count)
-    NullDate = Time.new('')
+    RollupScore = Struct.new(:outcome, :score, :count, :title, :submitted_at)
 
     # Public: Queries learning_outcome_results for rollup.
     #
@@ -105,7 +104,15 @@ module Outcomes
           calculation_method: outcome.calculation_method || "highest",
           calculation_int: outcome.calculation_int
         })
-        RollupScore.new(outcome_results.first.learning_outcome, user_rollup_score, outcome_results.size)
+        latest_result = outcome_results.max_by{|result| result.submitted_at.to_i}
+        if !latest_result.submitted_at
+          # don't pass in a title for comparison if there are no submissions with timestamps
+          # otherwise grab the portion of the title that has the assignment/quiz's name
+          latest_result.title = nil
+        else
+          latest_result.title = latest_result.title.split(", ")[1]
+        end
+        RollupScore.new(outcome, user_rollup_score, outcome_results.size, latest_result.title, latest_result.submitted_at)
       end
     end
 
@@ -131,13 +138,13 @@ module Outcomes
         when 'latest'
           latest(results)
         when 'highest'
-          results.map(&:score).max
+          results.max_by{|result| result.score}.score
       end
       score
     end
     #scoring methods
     def latest(results)
-      results.max_by{|result| result.submitted_at || NullDate}.score
+      results.max_by{|result| result.submitted_at.to_i}.score
     end
 
     def n_mastery(results, n_of_scores)
@@ -151,7 +158,7 @@ module Outcomes
       #default grading method with weight of 75 if none selected
       return nil if results.length < 2
 
-      scores = results.sort_by{|result| result.submitted_at || NullDate}.map(&:score)
+      scores = results.sort_by{|result| result.submitted_at.to_i}.map(&:score)
       latestWeighted = scores.pop * (0.01 * weight)
       olderAvgWeighted = (scores.sum / scores.length) * (0.01 * (100 - weight)).round(2)
       latestWeighted + olderAvgWeighted

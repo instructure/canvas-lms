@@ -324,7 +324,7 @@ $outcome-border: 1px solid #BCC2CA
   .group-description
     cursor: pointer
     overflow: hidden
-    padding: 10px 50px 10px 15px
+    padding: 10px 15px 10px 15px
     &:hover
       background-color: #f7f7f7
     .outcome-icon i
@@ -335,17 +335,20 @@ $outcome-border: 1px solid #BCC2CA
       line-height: 40px
     .group-status
       float: right
-      margin: 0
-      text-align: center
+      top: 8px
       font-size: 30px
-      color: #959595
       position: relative
-      top: 4px
       strong
         color: #2a333b
       span
         display: block
         font-size: 14px
+      li
+        color: white
+        &:first-child
+          background-color: $green
+        &:last-child
+          background-color: $grayLight
 
   .undefined>i
     color: #C0C0C0
@@ -370,11 +373,20 @@ $outcome-border: 1px solid #BCC2CA
       float: left
       margin-right: 15px
 
-  li.group.expanded li.outcome
-    display: block
+  li.group
+    i.collapsed-arrow
+      display: block
+    i.expanded-arrow
+      display: none
+
+  li.group.expanded
+    i.collapsed-arrow
+      display: none
+    i.expanded-arrow, li.outcome
+      display: block
 
   li.outcome
-    padding: 20px 50px 20px 15px
+    padding: 20px 15px 20px 15px
     border-top: $outcome-border
     display: none
 
@@ -400,14 +412,67 @@ $outcome-border: 1px solid #BCC2CA
         font-size: inherit
         font-weight: bold
 
-    .outcome-score
+    .alignment-info
       float: right
+      text-align: right
       width: 165px
       padding-top: 10px
+      i
+        margin: 0px 10px
+        cursor: pointer
+      i:before
+        font-size: 1.5em
 
-      a
-        float: right
-        line-height: 22px
+.outcome-details
+  position: absolute
+  z-index: 1000
+  background-color: #fff
+  border: 1px solid #b0afaf
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6)
+  max-width: 500px
+  min-width: 250px
+  padding: 18px 12px
+  border-radius: 8px
+  font-weight: 500
+
+  .last-assessment
+    color: $grayLight
+    font-size: $fontSizeSmall
+
+  .mastery-details i:before
+    font-size: 1.5em
+
+  .mastery:before
+    color: #5DC28F
+
+  .near-mastery
+    color: #DFB056
+
+  .remedial:before
+    color: #F76A66
+
+  .method-details
+    background-color: $canvas-neutral
+    margin-bottom: 0px
+    margin-top: 10px
+    div
+      padding-bottom: 10px
+    span
+      display: inline-block
+      font-style: italic
+
+    .example
+      color: $grayLight
+      font-size: $fontSizeSmall
+
+    .left-content
+      float: left
+
+    .right-content
+      padding-left: 10px
+
+    .method-description
+      width: 320px
 
 @media print
   #navpills, .course_selector, .outcome-toggles

@@ -22,6 +22,7 @@ describe Outcomes::ResultAnalytics do
 
   # import some stuff so we don't have to spell it out all the time
   let(:ra) { Outcomes::ResultAnalytics }
+  let(:time) { Time.now }
   Rollup = Outcomes::ResultAnalytics::Rollup
   RollupScore = Outcomes::ResultAnalytics::RollupScore
 
@@ -29,7 +30,7 @@ describe Outcomes::ResultAnalytics do
   # the surrounding database logic
   MockUser = Struct.new(:id, :name)
   MockOutcome = Struct.new(:id, :calculation_method, :calculation_int)
-  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :submitted_at)
+  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at)
     def learning_outcome_id
       learning_outcome.id
     end
@@ -77,12 +78,12 @@ describe Outcomes::ResultAnalytics do
 
     it 'returns correct score when latest score method is selected' do
       results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 4.0, nil],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 3.0, Time.now],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 1.0, Time.now - 1.day]
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 4.0, "name, o1", nil],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 3.0, "name, o1", time],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 1.0, "name, o1", time - 1.day]
       ]
       expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80, 'latest'], 3.0, 3)
+        RollupScore.new(MockOutcome[80, 'latest'], 3.0, 3, "o1", time)
       ]
     end
 
@@ -111,16 +112,16 @@ describe Outcomes::ResultAnalytics do
     it 'properly calculates results when method is decaying average' do
       results = [
         #first outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 75], 3.0, Time.now],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 75], 3.0, "name, o1", time],
         #second outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 4.0, Time.now],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 5.0, Time.now - 1.day],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 1.0, Time.now - 2.days],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 3.0, nil],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 4.0, "name, o2", time],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 5.0, "name, o2", time - 1.day],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 1.0, "name, o2", time - 2.days],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 3.0, "name, o2", time - 3.days],
       ]
       expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80, 'decaying_average', 75], nil, 1),
-        RollupScore.new(MockOutcome[81, 'decaying_average', 75], 3.75, 4),
+        RollupScore.new(MockOutcome[80, 'decaying_average', 75], nil, 1, "o1", time),
+        RollupScore.new(MockOutcome[81, 'decaying_average', 75], 3.75, 4, "o2", time),
       ]
     end
   end
