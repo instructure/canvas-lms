@@ -277,11 +277,13 @@ $can-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color ex
 /// Link-color-related variables
 //==============================
 
-// Note: right now, our primary link color is set using the Bootstrap variable $linkColor.
+$ic-icon-link-color-hover: lighten($canvas-dark, 15%);
+@if $use_high_contrast { $ic-icon-link-color-hover: $canvas-dark; }
 
-$ic-icon-link-color: lighten($canvas-dark, 25%);
+$ic-icon-link-color: lighten($canvas-dark, 30%);
 @if $use_high_contrast { $ic-icon-link-color: lighten($canvas-dark, 12%); }
-$ic-icon-link-color-hover: $canvas-dark;
+
+
 
 
 
