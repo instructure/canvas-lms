@@ -125,31 +125,50 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_site_admin.id}/features",
                         { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_site_admin.to_param })
         expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature)
-        expect(json.find { |f| f['feature'] == 'hidden_feature' }['hidden']).to be_truthy
+        expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to eq true
       end
 
       it "should show hidden features on root accounts to a site admin user" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
            { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
         expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature)
-        expect(json.find { |f| f['feature'] == 'hidden_feature' }['hidden']).to be_truthy
+        expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to eq true
       end
 
-      it "should show un-hidden features on root accounts" do
-        t_root_account.feature_flags.create! feature: 'hidden_feature'
+      it "should show un-hidden features to non-site-admins on root accounts" do
+        t_root_account.allow_feature! :hidden_feature
         json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                         { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
         expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature)
-        expect(json.find { |f| f['feature'] == 'hidden_feature' }['hidden']).to be_nil
+        expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to be_nil
       end
 
-      it "should show 'hidden' flag for site admin even after a feature has been un-hidden" do
-        t_root_account.feature_flags.create! feature: 'hidden_feature'
+      it "should show 'hidden' tag to site admin on the feature flag that un-hides a hidden feature" do
+        t_root_account.allow_feature! 'hidden_feature'
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                                 { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
         feature = json.find { |f| f['feature'] == 'hidden_feature' }
-        expect(feature['hidden']).to be_truthy
-        expect(feature['feature_flag']['state']).to eql 'allowed'
+        expect(feature['feature_flag']['hidden']).to eq true
+        expect(feature['feature_flag']['state']).to eq 'allowed'
+      end
+
+      it "should not show 'hidden' tag on a lower-level feature flag" do
+        t_root_account.allow_feature! :hidden_feature
+        t_sub_account.enable_feature! :hidden_feature
+        json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_sub_account.id}/features",
+                                { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_sub_account.to_param })
+        feature = json.find { |f| f['feature'] == 'hidden_feature' }
+        expect(feature['feature_flag']['hidden']).to eq false
+        expect(feature['feature_flag']['state']).to eq 'on'
+      end
+
+      it "should not show 'hidden' tag on an inherited feature flag" do
+        t_root_account.allow_feature! :hidden_feature
+        json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_sub_account.id}/features",
+                                { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_sub_account.to_param })
+        feature = json.find { |f| f['feature'] == 'hidden_feature' }
+        expect(feature['feature_flag']['hidden']).to eq false
+        expect(feature['feature_flag']['state']).to eq 'allowed'
       end
     end
 
