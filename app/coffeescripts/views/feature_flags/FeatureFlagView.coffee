@@ -32,7 +32,7 @@ define [
       @$detailToggle.toggleClass('icon-mini-arrow-down')
 
     shouldDelete: (action) ->
-      ENV.ACCOUNT?.site_admin && @model.get('hidden') && action == 'off'
+      @model.get('hidden') && action == 'off'
 
     toggleValue: ($target) ->
       action = $target.data('action')
