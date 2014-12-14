@@ -10972,6 +10972,7 @@ ar:
       description: "دعم عقد مؤتمرات على ويب من خلال BigBlueButton"
       name: BigBlueButton
     big_blue_button_settings: 
+      description: "سيلزم الوصول إلى مثيل [BigBlueButton](%{url})."
       domain_description: "**اسم المضيف** أو **عنوان ip** لتثبيت BigBlueButton (مثل bigbluebutton.mycompany.com)"
       labels: 
         domain: المجال
@@ -11261,6 +11262,7 @@ ar:
       description: "دعم عقد مؤتمرات Wimba عبر الويب"
       name: Wimba
     wimba_settings: 
+      description: "سيلزمك الوصول إلى حساب [Wimba](%{url})."
       domain_description: "(على سبيل المثال، mycompany.wimba.com)"
       labels: 
         domain: المجال
