@@ -1497,6 +1497,15 @@ describe 'Submissions API', type: :request do
       expect(json.detect { |u| u['user_id'] == @student1.id }['submissions'].size).to eq 1
       expect(json.detect { |u| u['user_id'] == @student2.id }['submissions'].size).to eq 0
     end
+
+    it "should not return an error when no grading_period_id is provided" do
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/students/submissions.json",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :course_id => @course.to_param },
+        { :student_ids => [@student1.to_param, @student2.to_param], :grouped => '1' })
+      expect(response).to be_ok
+    end
   end
 
   describe "for_students non-admin" do
