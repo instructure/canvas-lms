@@ -725,7 +725,7 @@ describe User do
       @admin = user_model
       @student = user_model
       tie_user_to_account(@admin, :role => admin_role)
-      role = custom_account_role('Student', :account => Account.default)
+      role = custom_account_role('CustomStudent', :account => Account.default)
       tie_user_to_account(@student, :role => role)
       set_up_course_with_users
     end

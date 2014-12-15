@@ -20,6 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "accounts/settings.html.erb" do
+  before do
+    assigns[:account_roles] = []
+    assigns[:course_roles] = []
+  end
+
   describe "sis_source_id edit box" do
     before do
       @account = Account.default.sub_accounts.create!

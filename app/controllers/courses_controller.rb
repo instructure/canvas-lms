@@ -969,7 +969,6 @@ class CoursesController < ApplicationController
              })
 
       @alerts = @context.alerts
-      @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       js_env :APP_CENTER => {
         enabled: Canvas::Plugin.find(:app_center).enabled?
