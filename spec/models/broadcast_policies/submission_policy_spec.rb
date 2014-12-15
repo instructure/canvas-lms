@@ -53,7 +53,11 @@ module BroadcastPolicies
       end
     end
 
-    let(:policy) { SubmissionPolicy.new(submission) }
+    let(:policy) do
+      SubmissionPolicy.new(submission).tap do |policy|
+        policy.stubs(:user_active_invited_or_concluded?).returns(true)
+      end
+    end
 
     describe '#should_dispatch_assignment_submitted_late?' do
       before { submission.stubs(:late?).returns true }
@@ -154,6 +158,7 @@ module BroadcastPolicies
       specify { wont_send_when{ course.stubs(:available?).returns false}}
       specify { wont_send_when{ submission.stubs(:quiz_submission).returns stub }}
       specify { wont_send_when{ assignment.stubs(:published?).returns false}}
+      specify { wont_send_when{ policy.stubs(:user_active_invited_or_concluded?).returns(false)}}
     end
 
 
