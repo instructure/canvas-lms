@@ -173,7 +173,6 @@ define(['jquery'],function($) {
     , blurSubmenu: function(e) {
       var self = this;
       setTimeout(function() {
-        console.log("focusout")
         if ($.contains(self, document.activeElement)) {return;}
         $(self).removeAttr('role')
         $(self).removeClass('open').attr('aria-expanded', 'false')
