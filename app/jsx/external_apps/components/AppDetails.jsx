@@ -4,7 +4,7 @@ define([
   'i18n!external_tools',
   'react',
   'react-router',
-  'jsx/external_apps/lib/store',
+  'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/AddApp',
   'compiled/jquery.rails_flash_notifications'
@@ -14,6 +14,10 @@ define([
     displayName: 'AppDetails',
 
     mixins: [Navigation],
+
+    propTypes: {
+      params: React.PropTypes.object.isRequired
+    },
 
     getInitialState() {
       return {
@@ -32,17 +36,16 @@ define([
 
     handleToolInstalled() {
       var app = this.state.app;
-      app.attributes.is_installed = true;
+      app.is_installed = true;
       this.setState({ app: app });
-      store.flagAppAsInstalled(app.attributes.short_name);
-      store.fetchExternalTools(true);
+      store.flagAppAsInstalled(app.short_name);
       store.setState({filter: 'installed', filterText: ''});
       $.flashMessage(I18n.t('The app was added successfully'));
       this.transitionTo('appList');
     },
 
     alreadyInstalled() {
-      if (this.state.app.attributes.is_installed) {
+      if (this.state.app.is_installed) {
         return <div className="gray-box-centered">{I18n.t('Installed')}</div>;
       }
     },
@@ -64,7 +67,7 @@ define([
                 <tr>
                   <td className="individual-app-left" valign="top">
                     <div className="app">
-                      <img className="img-polaroid" src={this.state.app.attributes.banner_image_url} />
+                      <img className="img-polaroid" src={this.state.app.banner_image_url} />
                       {this.alreadyInstalled()}
                     </div>
                     <AddApp ref="addAppButton" app={this.state.app} handleToolInstalled={this.handleToolInstalled} />
@@ -72,8 +75,8 @@ define([
                     <Link to="appList" className="app_cancel">&laquo; {I18n.t('Back to App Center')}</Link>
                   </td>
                   <td className="individual-app-right" valign="top">
-                    <h2>{this.state.app.attributes.name}</h2>
-                    <p dangerouslySetInnerHTML={{__html: this.state.app.attributes.description}} />
+                    <h2 ref="appName">{this.state.app.name}</h2>
+                    <p ref="appDescription" dangerouslySetInnerHTML={{__html: this.state.app.description}} />
                   </td>
                 </tr>
               </tbody>

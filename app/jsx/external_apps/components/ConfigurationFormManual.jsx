@@ -5,9 +5,11 @@ define([
   'underscore',
   'jquery',
   'react',
-  'jsx/external_apps/mixins/FormHelpersMixin',
+  'jsx/external_apps/components/TextInput',
+  'jsx/external_apps/components/TextAreaInput',
+  'jsx/external_apps/components/SelectInput',
   'compiled/jquery.rails_flash_notifications'
-], function(I18n, _, $, React, FormHelpersMixin) {
+], function(I18n, _, $, React, TextInput, TextAreaInput, SelectInput) {
 
   var PRIVACY_OPTIONS = {
     anonymous  : I18n.t('Anonymous'),
@@ -19,15 +21,13 @@ define([
   return React.createClass({
     displayName: 'ConfigurationFormManual',
 
-    mixins: [FormHelpersMixin],
-
     propTypes: {
       name         : React.PropTypes.string,
       consumerKey  : React.PropTypes.string,
       sharedSecret : React.PropTypes.string,
       url          : React.PropTypes.string,
       domain       : React.PropTypes.string,
-      privacy      : React.PropTypes.string,
+      privacyLevel : React.PropTypes.string,
       customFields : React.PropTypes.object,
       description  : React.PropTypes.string
     },
@@ -41,12 +41,9 @@ define([
     isValid() {
       var errors     = {}
         , formErrors = []
-        , nameNode   = this.refs.name.getDOMNode()
-        , urlNode    = this.refs.url.getDOMNode()
-        , domainNode = this.refs.domain.getDOMNode()
-        , name       = nameNode.value
-        , url        = urlNode.value
-        , domain     = domainNode.value;
+        , name       = this.refs.name.state.value   || ''
+        , url        = this.refs.url.state.value    || ''
+        , domain     = this.refs.domain.state.value || '';
 
       if (name.length == 0) {
         errors['name'] = I18n.t('This field is required');
@@ -58,10 +55,6 @@ define([
         errors['domain'] = I18n.t('Either the url or domain should be set.');
         formErrors.push(I18n.t('Either the url or domain should be set.'));
       }
-
-      nameNode.setAttribute('aria-invalid', _.has(errors, 'name'));
-      urlNode.setAttribute('aria-invalid', _.has(errors, 'url'));
-      domainNode.setAttribute('aria-invalid', _.has(errors, 'domain'));
 
       this.setState({ errors: errors });
 
@@ -75,47 +68,100 @@ define([
 
     getFormData() {
       return {
-        name         : this.refs.name.getDOMNode().value,
-        consumerKey  : this.refs.consumerKey.getDOMNode().value,
-        sharedSecret : this.refs.sharedSecret.getDOMNode().value,
-        url          : this.refs.url.getDOMNode().value,
-        domain       : this.refs.domain.getDOMNode().value,
-        privacy      : this.refs.privacy.getDOMNode().value,
-        customFields : this.refs.customFields.getDOMNode().value,
-        description  : this.refs.description.getDOMNode().value
+        name         : this.refs.name.state.value,
+        consumerKey  : this.refs.consumerKey.state.value,
+        sharedSecret : this.refs.sharedSecret.state.value,
+        url          : this.refs.url.state.value,
+        domain       : this.refs.domain.state.value,
+        privacyLevel : this.refs.privacyLevel.state.value,
+        customFields : this.refs.customFields.state.value,
+        description  : this.refs.description.state.value
       };
     },
 
-    customFields() {
+    customFieldsToMultiLine() {
+      if (!this.props.customFields) {
+        return '';
+      }
       return _.map(this.props.customFields, function(v, k) {
         return k+'='+v;
       }.bind(this)).join("\n")
     },
 
     render() {
-
       return (
         <div className="ConfigurationFormManual">
-          {this.renderTextInput('name', this.props.name, I18n.t('Name'), null, true)}
+          <TextInput
+            ref="name"
+            id="name"
+            defaultValue={this.props.name}
+            label={I18n.t('Name')}
+            required={true}
+            errors={this.state.errors} />
+
           <div className="grid-row">
             <div className="col-xs-6">
-            {this.renderTextInput('consumerKey', this.props.consumerKey, I18n.t('Consumer Key'))}
+              <TextInput
+                ref="consumerKey"
+                id="consumerKey"
+                defaultValue={this.props.consumerKey}
+                label={I18n.t('Consumer key')}
+                errors={this.state.errors} />
             </div>
             <div className="col-xs-6">
-            {this.renderTextInput('sharedSecret', this.props.sharedSecret, I18n.t('Shared Secret'))}
+              <TextInput
+                ref="sharedSecret"
+                id="sharedSecret"
+                defaultValue={this.props.sharedSecret}
+                label={I18n.t('Shared Secret')}
+                errors={this.state.errors} />
             </div>
           </div>
-          {this.renderTextInput('url', this.props.url, I18n.t('Launch URL'))}
+
+          <TextInput
+            ref="url"
+            id="url"
+            defaultValue={this.props.url}
+            label={I18n.t('Launch URL')}
+            required={true}
+            errors={this.state.errors} />
+
           <div className="grid-row">
             <div className="col-xs-6">
-            {this.renderTextInput('domain', this.props.domain, I18n.t('Domain'))}
+              <TextInput
+                ref="domain"
+                id="domain"
+                name={this.props.domain}
+                label={I18n.t('Domain')}
+                errors={this.state.errors} />
             </div>
             <div className="col-xs-6">
-            {this.renderSelect('privacy', this.props.privacy, I18n.t('Privacy'), PRIVACY_OPTIONS)}
+              <SelectInput
+                ref="privacyLevel"
+                id="privacyLevel"
+                defaultValue={this.props.privacyLevel}
+                label={I18n.t('Privacy')}
+                values={PRIVACY_OPTIONS}
+                errors={this.state.errors} />
             </div>
           </div>
-          {this.renderTextarea('customFields', this.customFields(), I18n.t('Custom Fields'), I18n.t('One per line. Format: name=value'), 6)}
-          {this.renderTextarea('description', this.props.description, I18n.t('Description'), '', 6)}
+
+          <TextAreaInput
+            ref="customFields"
+            id="customFields"
+            defaultValue={this.customFieldsToMultiLine()}
+            label={I18n.t('Custom Fields')}
+            hintText={I18n.t('One per line. Format: name=value')}
+            rows={6}
+            errors={this.state.errors} />
+
+          <TextAreaInput
+            ref="description"
+            id="description"
+            defaultValue={this.props.description}
+            label={I18n.t('Description')}
+            rows={6}
+            errors={this.state.errors} />
         </div>
       );
     }

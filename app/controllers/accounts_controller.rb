@@ -536,9 +536,12 @@ class AccountsController < ApplicationController
 
       @announcements = @account.announcements
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
-      js_env :APP_CENTER => {
-        enabled: Canvas::Plugin.find(:app_center).enabled?
-      }
+      js_env({
+        APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
+        ENABLE_LTI2: @account.root_account.feature_enabled?(:lti2_ui),
+        LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
+        CONTEXT_BASE_URL: "/api/v1/accounts/#{@context.id}"
+      })
     end
   end
 

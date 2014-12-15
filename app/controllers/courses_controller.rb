@@ -996,9 +996,14 @@ class CoursesController < ApplicationController
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
-      js_env :APP_CENTER => {
-        enabled: Canvas::Plugin.find(:app_center).enabled?
-      }
+      js_env({
+        :APP_CENTER => {
+          enabled: Canvas::Plugin.find(:app_center).enabled?
+        },
+        ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
+        LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
+        CONTEXT_BASE_URL: "/api/v1/courses/#{@context.id}"
+      })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :manage_content)

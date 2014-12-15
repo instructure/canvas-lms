@@ -16,7 +16,7 @@ define([
         if (!ENV.APP_CENTER['enabled']) {
           return '';
         }
-        return <Link to="appList" className="btn view_tools_link lm pull-right">{I18n.t('View App Center')}</Link>;
+        return <Link ref="appCenterLink" to="appList" className="btn view_tools_link lm pull-right">{I18n.t('View App Center')}</Link>;
       }.bind(this);
 
       return (

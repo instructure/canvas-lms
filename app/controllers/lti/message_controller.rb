@@ -32,7 +32,7 @@ module Lti
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
 
-        render template: 'lti/framed_launch'
+        render ExternalToolsController::TOOL_DISPLAY_TEMPLATES['borderless']
       end
     end
 
@@ -74,8 +74,16 @@ module Lti
     end
 
     def registration_return
-      #params['lti_log']
-      @message = params['lti_errormsg'] || params['lti_msg']
+      @tool = ToolProxy.where(guid: params[:tool_proxy_guid]).first
+      @data = {
+        subject: 'lti.lti2Registration',
+        status: params[:status],
+        app_id: @tool.id,
+        name: @tool.name,
+        description: @tool.description,
+        message: params[:lti_errormsg] || params[:lti_msg]
+      }
+      render layout: false
     end
 
     private
