@@ -124,6 +124,19 @@ describe "admin settings tab" do
     it "should click on 'restrict students from viewing courses before start date'" do
       check_box_verifier("#account_settings_restrict_student_future_view", :restrict_student_future_view)
     end
+
+    it "should set trusted referers for account" do
+      trusted_referers = 'https://example.com,http://example.com'
+      set_value f("#account_settings_trusted_referers"), trusted_referers
+      click_submit
+      expect(Account.default[:settings][:trusted_referers]).to eq trusted_referers
+      expect(f("#account_settings_trusted_referers").attribute('value')).to eq trusted_referers
+
+      set_value f("#account_settings_trusted_referers"), ''
+      click_submit
+      expect(Account.default[:settings][:trusted_referers]).to be_nil
+      expect(f("#account_settings_trusted_referers").attribute('value')).to eq ''
+    end
   end
 
   context "global includes" do

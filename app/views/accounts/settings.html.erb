@@ -147,6 +147,17 @@ TEXT
                   <% end %>
 
                   <tr>
+                    <td><%= settings.blabel :trusted_referers, :en => "Trusted HTTP Referers" %></td>
+                    <td>
+                      <%= settings.text_field :trusted_referers,
+                                              :value => @account.settings[:trusted_referers],
+                                              :class => 'same-width-as-select',
+                                              :placeholder => "https://example.edu" %>
+                      <p style="font-size: 0.9em;"><%= t("This is a comma separated list of URL's to trust.  Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas.") %></p>
+                    </td>
+                  </tr>
+
+                  <tr>
                     <td colspan="2"><%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
                     <%= settings.label :prevent_course_renaming_by_teachers, :en => "Don't let teachers rename their courses" %>
                     </td>

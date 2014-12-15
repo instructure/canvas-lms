@@ -1107,6 +1107,53 @@ describe Account do
       account.ensure_defaults
       expect(account.lti_guid).to eq '12345'
     end
+  end
 
+  it 'should format a referer url' do
+    account = Account.new
+    expect(account.format_referer(nil)).to be_nil
+    expect(account.format_referer('')).to be_nil
+    expect(account.format_referer('not a url')).to be_nil
+    expect(account.format_referer('http://example.com/')).to eq 'http://example.com'
+    expect(account.format_referer('http://example.com/index.html')).to eq 'http://example.com'
+    expect(account.format_referer('http://example.com:80')).to eq 'http://example.com'
+    expect(account.format_referer('https://example.com:443')).to eq 'https://example.com'
+    expect(account.format_referer('http://example.com:3000')).to eq 'http://example.com:3000'
+  end
+
+  it 'should format trusted referers when set' do
+    account = Account.new
+    account.trusted_referers = 'https://example.com/,http://example.com:80,http://example.com:3000'
+    expect(account.settings[:trusted_referers]).to eq 'https://example.com,http://example.com,http://example.com:3000'
+
+    account.trusted_referers = nil
+    expect(account.settings[:trusted_referers]).to be_nil
+
+    account.trusted_referers = ''
+    expect(account.settings[:trusted_referers]).to be_nil
+  end
+
+  describe 'trusted_referer?' do
+    let!(:account) do
+      account = Account.new
+      account.settings[:trusted_referers] = 'https://example.com,http://example.com,http://example.com:3000'
+      account
+    end
+
+    it 'should be true when a referer is trusted' do
+      expect(account.trusted_referer?('http://example.com')).to be_truthy
+      expect(account.trusted_referer?('http://example.com:3000')).to be_truthy
+      expect(account.trusted_referer?('http://example.com:80')).to be_truthy
+      expect(account.trusted_referer?('https://example.com:443')).to be_truthy
+    end
+
+    it 'should be false when a referer is not provided' do
+      expect(account.trusted_referer?(nil)).to be_falsey
+      expect(account.trusted_referer?('')).to be_falsey
+    end
+
+    it 'should be false when a referer is not trusted' do
+      expect(account.trusted_referer?('https://example.com:5000')).to be_falsey
+    end
   end
 end

@@ -311,9 +311,28 @@ describe AccountsController do
       expect(@account.sis_source_id).to be_nil
     end
 
+    it "should not allow admins to set the trusted_referers on sub accounts" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      post 'update', :id => @account.id, :account => { :settings => {
+        :trusted_referers => 'http://example.com'
+      } }
+      @account.reload
+      expect(@account.settings[:trusted_referers]).to be_nil
+    end
+
+    it "should allow admins to set the trusted_referers on root accounts" do
+      account_with_admin_logged_in
+      post 'update', :id => @account.id, :account => { :settings => {
+        :trusted_referers => 'http://example.com'
+      } }
+      @account.reload
+      expect(@account.settings[:trusted_referers]).to eq 'http://example.com'
+    end
+
     it "should not allow non-site-admins to update certain settings" do
       account_with_admin_logged_in
-      post 'update', :id => @account.id, :account => { :settings => { 
+      post 'update', :id => @account.id, :account => { :settings => {
         :global_includes => true,
         :enable_profiles => true,
         :admins_can_change_passwords => true,
@@ -331,7 +350,7 @@ describe AccountsController do
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
-      post 'update', :id => @account.id, :account => { :settings => { 
+      post 'update', :id => @account.id, :account => { :settings => {
         :global_includes => true,
         :enable_profiles => true,
         :admins_can_change_passwords => true,
@@ -378,7 +397,7 @@ describe AccountsController do
       before :each do
         user_session(@user)
       end
-      
+
       context "with :manage_storage_quotas" do
         before :once do
           role = custom_account_role 'quota-setter', :account => @account
@@ -388,7 +407,7 @@ describe AccountsController do
                                           :role => role
           @account.account_users.create!(user: @user, role: role)
         end
-        
+
         it "should allow setting default quota (mb)" do
           post 'update', :id => @account.id, :account => {
               :default_storage_quota_mb => 999,
@@ -400,7 +419,7 @@ describe AccountsController do
           expect(@account.default_user_storage_quota_mb).to eq 99
           expect(@account.default_group_storage_quota_mb).to eq 9999
         end
-        
+
         it "should allow setting default quota (bytes)" do
           post 'update', :id => @account.id, :account => {
               :default_storage_quota => 101.megabytes,
@@ -408,7 +427,7 @@ describe AccountsController do
           @account.reload
           expect(@account.default_storage_quota).to eq 101.megabytes
         end
-        
+
         it "should allow setting storage quota" do
           post 'update', :id => @account.id, :account => {
             :storage_quota => 777.megabytes
@@ -417,7 +436,7 @@ describe AccountsController do
           expect(@account.storage_quota).to eq 777.megabytes
         end
       end
-      
+
       context "without :manage_storage_quotas" do
         before :once do
           role = custom_account_role 'quota-loser', :account => @account
@@ -425,7 +444,7 @@ describe AccountsController do
                                           :role => role
           @account.account_users.create!(user: @user, role: role)
         end
-        
+
         it "should disallow setting default quota (mb)" do
           post 'update', :id => @account.id, :account => {
               :default_storage_quota => 999,
