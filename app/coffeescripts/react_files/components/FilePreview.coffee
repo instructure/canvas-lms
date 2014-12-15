@@ -63,12 +63,12 @@ define [
 
       visibleFile = props.query.preview and _.findWhere(files, {id: props.query.preview})
 
-      if !visibleFile and files.length
+      if !visibleFile
         new File({id: props.query.preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include":"usage_rights"}) if props.usageRightsRequiredForContext).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
-        initialItem = visibleFile or files[0]
+        initialItem = visibleFile or (files[0] if files.length)
         cb?({initialItem, otherItems})
 
     stateProperties: (items, props) ->
