@@ -517,8 +517,10 @@ class AccountsController < ApplicationController
       end
       @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
-      @role_types = RoleOverride.account_membership_types(@account)
-      @enrollment_types = RoleOverride.enrollment_type_labels
+
+      @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
+      @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
+
       @announcements = @account.announcements
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
       js_env :APP_CENTER => {

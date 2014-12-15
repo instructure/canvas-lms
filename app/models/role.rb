@@ -25,7 +25,6 @@ class Role < ActiveRecord::Base
   ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership']
 
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
-
   KNOWN_TYPES = (BASE_TYPES +
     ['StudentViewEnrollment',
      'TeacherlessStudentEnrollment',
@@ -58,6 +57,7 @@ class Role < ActiveRecord::Base
 
   validates_inclusion_of :base_role_type, :in => BASE_TYPES, :message => 'is invalid'
   validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
+  validate :ensure_non_built_in_name
 
   def id
     if self.built_in? && self.shard != Shard.current && role = Role.get_built_in_role(self.name, Shard.current)
@@ -74,6 +74,13 @@ class Role < ActiveRecord::Base
         self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
         return false
       end
+    end
+  end
+
+  def ensure_non_built_in_name
+    if !self.built_in? && Role.built_in_roles.map(&:label).include?(self.name)
+      self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
+      return false
     end
   end
 
@@ -184,6 +191,15 @@ class Role < ActiveRecord::Base
       end
     else
       self.name
+    end
+  end
+
+  # Should order course roles so we get "StudentEnrollment", custom student roles, "Teacher Enrollment", custom teacher roles, etc
+  def display_sort_index
+    if self.course_role?
+      ENROLLMENT_TYPES.index(self.base_role_type) * 2 + (self.built_in? ? 0 : 1)
+    else
+      self.built_in? ? 0 : 1
     end
   end
 
