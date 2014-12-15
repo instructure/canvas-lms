@@ -7,21 +7,6 @@ def maintain_client_app_symlinks
     end
   end
 
-  # remove stale apps that were migrated/rewritten and have left build artifacts
-  # and such after being removed from git (stuff was gitignored)
-  #
-  # needed since https://gerrit.instructure.com/#/c/44576
-  Dir.glob("client_apps/*/.delete_me").each do |file|
-    app = file.split('/')[1]
-
-    FileUtils.rm_rf(File.dirname(file))
-
-    [ "#{app}", "#{app}.js" ].each do |asset|
-      asset_symlink = "public/javascripts/client_apps/#{asset}"
-      FileUtils.rm(asset_symlink) if File.exists?(asset_symlink)
-    end
-  end
-
   # create new ones
   Dir.glob("client_apps/*").select { |f| File.directory?(f) }.each do |app_dir|
     unless File.exists?("public/javascripts/client_apps")
