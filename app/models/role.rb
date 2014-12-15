@@ -217,6 +217,7 @@ class Role < ActiveRecord::Base
     custom_roles = account.available_custom_course_roles(include_inactive)
     RoleOverride.enrollment_type_labels.map do |br|
       new = br.clone
+      new[:id] = Role.get_built_in_role(br[:name]).id
       new[:label] = br[:label].call
       new[:plural_label] = br[:plural_label].call
       new[:custom_roles] = custom_roles.select{|cr|cr.base_role_type == new[:base_role_name]}.map do |cr|
