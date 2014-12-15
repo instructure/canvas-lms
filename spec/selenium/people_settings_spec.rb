@@ -16,7 +16,7 @@ describe "course people" do
     add_button.click
     wait_for_ajaximations
 
-    click_option('#enrollment_type', type)
+    click_option('#role_id', type)
     click_option('#course_section_id', section_name) if section_name
     f('#user_list_textarea').send_keys(email)
     f('#next-step').click
@@ -272,7 +272,7 @@ describe "course people" do
         add_button = f('#addUsers')
         keep_trying_until { expect(add_button).to be_displayed }
         add_button.click
-        click_option('#enrollment_type', type)
+        click_option('#role_id', type)
       end
 
       %w[student teacher ta designer observer].each do |base_type|

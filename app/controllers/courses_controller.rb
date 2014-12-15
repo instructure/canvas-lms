@@ -1525,7 +1525,6 @@ class CoursesController < ApplicationController
 
     custom_role = nil
     if params[:role_id].present? || !Role.get_built_in_role(params[:enrollment_type])
-      # TODO: update UI to use role_id
       custom_role = @context.account.get_role_by_id(params[:role_id]) if params[:role_id].present?
       custom_role ||= @context.account.get_role_by_name(params[:enrollment_type]) # backwards compatibility
       if custom_role && custom_role.course_role?
@@ -1536,7 +1535,7 @@ class CoursesController < ApplicationController
           params[:enrollment_type] = custom_role.base_role_type
         end
       else
-        render :json => t('errors.role_not_found', "No role named '%{role}' exists.", :role => params[:enrollment_type]), :status => :bad_request
+        render :json => t('errors.role_not_found', "Could not find role"), :status => :bad_request
         return
       end
     end
