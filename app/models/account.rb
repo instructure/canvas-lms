@@ -216,6 +216,7 @@ class Account < ActiveRecord::Base
   add_setting :product_name, root_only: true
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: true
+  add_setting :trusted_referers, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -1526,4 +1527,30 @@ class Account < ActiveRecord::Base
   end
 
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Account, :name, :id)
+
+  def format_referer(referer_url)
+    begin
+      referer = URI(referer_url || '')
+    rescue URI::InvalidURIError
+      return
+    end
+    return unless referer.host
+
+    referer_with_port = "#{referer.scheme}://#{referer.host}"
+    referer_with_port += ":#{referer.port}" unless referer.port == (referer.scheme == 'https' ? 443 : 80)
+    referer_with_port
+  end
+
+  def trusted_referers=(value)
+    self.settings[:trusted_referers] = unless value.blank?
+      value.split(',').map { |referer_url| format_referer(referer_url) }.compact.join(',')
+    end
+  end
+
+  def trusted_referer?(referer_url)
+    return if !self.settings.has_key?(:trusted_referers) || self.settings[:trusted_referers].empty?
+    if referer_with_port = format_referer(referer_url)
+      self.settings[:trusted_referers].split(',').include?(referer_with_port)
+    end
+  end
 end

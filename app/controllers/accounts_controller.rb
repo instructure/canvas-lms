@@ -462,6 +462,12 @@ class AccountsController < ApplicationController
           end
         end
 
+        if params[:account][:settings] && params[:account][:settings].has_key?(:trusted_referers)
+          if trusted_referers = params[:account][:settings].delete(:trusted_referers)
+            @account.trusted_referers = trusted_referers if @account.root_account?
+          end
+        end
+
         if sis_id = params[:account].delete(:sis_source_id)
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
