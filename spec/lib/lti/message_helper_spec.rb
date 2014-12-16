@@ -156,6 +156,18 @@ module Lti
           subject.stubs(:lti_xapi_url).returns('/xapi/abcd')
           expect(subject.common_variable_substitutions['$Canvas.xapi.url'].call).to eq '/xapi/abcd'
         end
+
+        it 'has substitution for $Canvas.course.sectionIds' do
+          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          substitution_helper.stubs(:section_ids).returns('5,6')
+          expect(subject.common_variable_substitutions['$Canvas.course.sectionIds'].call).to eq '5,6'
+        end
+
+        it 'has substitution for $Canvas.course.sectionSisSourceIds' do
+          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          substitution_helper.stubs(:section_sis_ids).returns('5a,6b')
+          expect(subject.common_variable_substitutions['$Canvas.course.sectionSisSourceIds'].call).to eq '5a,6b'
+        end
       end
 
       context 'user is logged in' do

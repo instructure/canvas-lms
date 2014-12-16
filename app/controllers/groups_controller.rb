@@ -481,18 +481,19 @@ class GroupsController < ApplicationController
   # @returns Group
   def update
     find_group
-    if !api_request? && params[:group] && params[:group][:group_category_id]
-      group_category_id = params[:group].delete :group_category_id
+    attrs = api_request? ? params : params[:group]
+
+    attrs.delete :group_category
+    if !api_request? && attrs[:group_category_id]
+      group_category_id = attrs.delete :group_category_id
       group_category = @context.group_categories.where(id: group_category_id).first
       return render :json => {}, :status => :bad_request unless group_category
-      params[:group][:group_category] = group_category
+      attrs[:group_category] = group_category
     end
-    attrs = api_request? ? params : params[:group]
+
     attrs.delete :storage_quota_mb unless @group.context.grants_right? @current_user, session, :manage_storage_quotas
 
-    if avatar_id = (params[:avatar_id] || (params[:group] && params[:group][:avatar_id]))
-      attrs[:avatar_attachment] = @group.active_images.where(id: avatar_id).first
-    end
+    attrs[:avatar_attachment] = @group.active_images.where(id: attrs[:avatar_id]).first if attrs[:avatar_id]
 
     if attrs[:leader]
       membership = @group.group_memberships.where(user_id: attrs[:leader][:id]).first
@@ -504,8 +505,8 @@ class GroupsController < ApplicationController
       respond_to do |format|
         @group.transaction do
           @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
-          if params[:members]
-            user_ids = Api.value_to_array(params[:members]).map(&:to_i).uniq
+          if attrs[:members]
+            user_ids = Api.value_to_array(attrs[:members]).map(&:to_i).uniq
             if @group.context
               users = @group.context.users.where(id: user_ids)
             else

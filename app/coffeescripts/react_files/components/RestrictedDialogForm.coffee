@@ -77,13 +77,13 @@ define [
       event.preventDefault()
 
       if (@props.usageRightsRequiredForContext && !@usageRightsOnAll() && !@allFolders())
-        values = @refs.usageSelection.getValue()
+        values = @refs.usageSelection.getValues()
         # They didn't choose a use justification
         if (values.use_justification == 'choose')
           $(@refs.usageSelection.refs.usageRightSelection.getDOMNode()).errorBox(I18n.t('You must specify a usage right.'))
           return false
         # No copyright specified
-        if (!values.copyright)
+        if (!values.copyright and @refs.usageSelection.refs.copyright?)
           $(@refs.usageSelection.refs.copyright.getDOMNode()).errorBox(I18n.t('You must specify the copyright holder.'))
           return false
 
