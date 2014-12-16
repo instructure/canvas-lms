@@ -11576,6 +11576,7 @@ nb:
       discrimination_index: "Diskriminering Indeks"
       discrimination_index_dialog_title: "The Discrimination Index Chart"
       discrimination_index_dialog_trigger: "Lær mer om Diskriminering Indeks."
+    discrimination_index_help: "* Dette måltallet gir et mål på hvor godt et enkelt spørsmål kan fortelle forskjellen (eller diskriminere) mellom studenter som gjør det bra på en eksamen og de som ikke gjør det. * ** Den deler elevene inn i tre grupper basert på deres poengsum på hele spørrekonkurranse og viser de grupper av som svarte på spørsmålet riktig. ** *** ****Mer informasjon er tilgjengelig her.**** ***"
     download_submissions: "Last ned alle filer"
     duration_in_hours: 
       one: "1 time"
