@@ -787,10 +787,13 @@ define([
   $.extend(INST, {
     refreshGrades: function(){
       var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
+      var currentStudentIDAsOfAjaxCall = EG.currentStudent.id;
       $.getJSON( url,
         function(data){
-          EG.currentStudent.submission = data.submission;
-          EG.showGrade();
+          if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
+            EG.currentStudent.submission = data.submission;
+            EG.showGrade();
+          }
       });
     },
     refreshQuizSubmissionSnapshot: function(data) {
