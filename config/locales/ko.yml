@@ -4194,10 +4194,12 @@ ko:
       no_new_submissions: "새 제출물 없음"
       no_submissions: "제출물 없음"
       not_submitted: "제출 안 됨"
+      submission_score: "%{score} * / %{points_possible}*"
     recent_feedback: 
       comments: "설명: %{count}"
       not_graded: "평가 안 됨"
       submission_points: 
+        with_score: "점수: %{score} * / %{points_possible}*"
         without_score: "/ %{points_possible}"
     roster: 
       create_users: 
@@ -12530,6 +12532,7 @@ ko:
       score: 점수
       section: 섹션
       section_id: "섹션 ID"
+      section_sis_id: "섹션 SIS ID"
       sis_id: "SIS ID"
       submitted: 제출됨
     exact_answer: "%{exact_value} +/- %{margin}"
