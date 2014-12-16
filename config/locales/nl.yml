@@ -10986,7 +10986,6 @@ nl:
         save_yo_name: "Yo naam opslaan"
         select_image: "Afbeelding selecteren"
         update_settings: "Instellingen bijwerken"
-      confirm_email_instructions: "Voordat je jouw profiel kunt bewerken, moet je jouw e-mailadres (%{email}) verifiëren door op de koppeling te klikken in de e-mail die we je gestuurd hebben*.  **Hier klikken om de e-mail opnieuw te versturen** als je deze niet ziet, en zorg ervoor dat je jouw spambox controleert."
       delicious_description: "Delicious is een tool waarmee je jouw bladwijzers kunt opslaan en met anderen kunt delen. De Rich Content-editor van Canvas maakt het je mogelijk om jouw Delicious-tags te zoeken om vanuit Canvas makkelijk te kunnen koppelen  naar andere, voor jou, nuttige bronnen."
       diigo_description: "Diigo is een sociaal bladwijzer-tool specifiek aangepast voor onderzoek en onderwijs. De Rich Content-editor van Canvas maakt het je mogelijk om Diigo tags te zoeken om vanuit Canvas makkelijk te kunnen koppelen naar andere, voor jou, nuttige bronnen."
       error_loading_token_details: "Er is een fout opgetreden tijdens het laden van details over token"
@@ -11551,6 +11550,7 @@ nl:
       discrimination_index: "Discriminatie index"
       discrimination_index_dialog_title: "De disciminatie indexgrafiek"
       discrimination_index_dialog_trigger: "Meer informatie over de discriminatie index."
+    discrimination_index_help: "* Deze statistiek biedt een maat voor hoe goed een enkele vraag het verschil kan aangeven (of onderscheiden) tussen cursisten die het goed doen op een examen en degenen waarbij dat niet het geval is. * ** Het verdeelt cursisten in drie groepen op basis van hun cijfer voor de hele toets en geeft die groepen aan die de vraag goed beantwoord hebben. ** *** ****Meer informatie hier beschikbaar.**** ***"
     download_submissions: "Alle bestanden downloaden"
     duration_in_hours: 
       one: "1 uur"
