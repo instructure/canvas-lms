@@ -64,54 +64,23 @@ module Context
   end
 
   def add_aggregate_entries(entries, feed)
-    if feed.feed_purpose == 'announcements'
-      entries.each do |entry|
-        user = entry.user || feed.user
-        # If already existed and has been updated
-        if entry.entry_changed? && entry.asset
-          entry.asset.update_attributes(
-            :title => entry.title,
-            :message => entry.message
-          )
-        elsif !entry.asset
-          announcement = self.announcements.build(
-            :title => entry.title,
-            :message => entry.message
-          )
-          announcement.external_feed_id = feed.id
-          announcement.user = user
-          announcement.save
-          entry.update_attributes(:asset => announcement)
-        end
-      end
-    elsif feed.feed_purpose == 'calendar'
-      entries.each do |entry|
-        user = entry.user || feed.user
-        # If already existed and has been updated
-        if entry.entry_changed? && entry.asset
-          event = entry.asset
-          event.attributes = {
-            :title => entry.title,
-            :description => entry.message,
-            :start_at => entry.start_at,
-            :end_at => entry.end_at
-          }
-          event.workflow_state = 'read_only'
-          event.workflow_state = 'cancelled' if entry.cancelled?
-          event.save
-        elsif entry.active? && !entry.asset
-          event = self.calendar_events.build(
-            :title => entry.title,
-            :description => entry.message,
-            :start_at => entry.start_at,
-            :end_at => entry.end_at
-          )
-          event.workflow_state = 'read_only'
-          event.workflow_state = 'cancelled' if entry.cancelled?
-          event.external_feed_id = feed.id
-          event.save
-          entry.update_attributes(:asset => event)
-        end
+    entries.each do |entry|
+      user = entry.user || feed.user
+      # If already existed and has been updated
+      if entry.entry_changed? && entry.asset
+        entry.asset.update_attributes(
+          :title => entry.title,
+          :message => entry.message
+        )
+      elsif !entry.asset
+        announcement = self.announcements.build(
+          :title => entry.title,
+          :message => entry.message
+        )
+        announcement.external_feed_id = feed.id
+        announcement.user = user
+        announcement.save
+        entry.update_attributes(:asset => announcement)
       end
     end
   end

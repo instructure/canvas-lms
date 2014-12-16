@@ -258,8 +258,6 @@ describe "Canvas Cartridge importing" do
     ef = @copy_from.external_feeds.new
     ef.url = "http://search.twitter.com/search.atom?q=instructure"
     ef.title = "Instructure on Twitter"
-    ef.feed_type = "rss/atom"
-    ef.feed_purpose = 'announcements'
     ef.verbosity = 'full'
     ef.header_match = "canvas"
     ef.save!
@@ -277,8 +275,6 @@ describe "Canvas Cartridge importing" do
     ef_2 = @copy_to.external_feeds.where(migration_id: CC::CCHelper.create_key(ef)).first
     expect(ef_2.url).to eq ef.url
     expect(ef_2.title).to eq ef.title
-    expect(ef_2.feed_type).to eq ef.feed_type
-    expect(ef_2.feed_purpose).to eq ef.feed_purpose
     expect(ef_2.verbosity).to eq ef.verbosity
     expect(ef_2.header_match).to eq ef.header_match
   end
