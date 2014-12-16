@@ -5732,7 +5732,6 @@ fr:
     titles: 
       font_size: "Taille du texte. Appuyez pour sélectionner."
       formatting: "Mise en forme. Appuyez pour sélectionner."
-      rte_help: "Zone de texte enrichi. Appuyez sur Alt+F10 pour afficher la barre d’outils et sur Alt+F8 pour accéder à l’Aide."
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "Modules réécrits dans Ember. L’API glisser-déposer native est utilisée, ce qui permet de faire glisser des éléments depuis des emplacements externes."
@@ -11579,6 +11578,7 @@ fr:
       discrimination_index: "Indice de discrimination "
       discrimination_index_dialog_title: "L’indice de discrimination "
       discrimination_index_dialog_trigger: "Apprenez-en davantage sur l’indice de discrimination."
+    discrimination_index_help: "* Cet indicateur permet de quantifier la différence (ou discrimination) que révèle une question entre les étudiants qui ont de bons résultats à un examen et ceux qui ont moins bien réussi. * ** Il les répartit en trois groupes selon les résultats qu’ils ont obtenus pour l’ensemble du questionnaire et affiche ces groupes selon ceux qui ont donné la bonne réponse à la question. ** *** ****Plus d’infos ici.**** ***"
     download_submissions: "Télécharger tous les fichiers"
     duration_in_hours: 
       one: "1 heure"
@@ -12508,7 +12508,6 @@ fr:
         score: Note
         time: Heure
       take_quiz: 
-        audible_quiz_timer_shortcut_description: "Remarque : ce questionnaire est à remplir dans un temps imparti. Vous pouvez vérifier le temps restant à tout moment en appuyant sur la combinaison de touches MAj+ALT+T... Encore : MAJ+ALT+T..."
         buttons: 
           next: Suivant
           out_of_time_submit: OK
