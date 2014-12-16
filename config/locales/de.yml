@@ -5712,7 +5712,6 @@ de:
     titles: 
       font_size: "Schriftgröße, zum Auswählen Nach-Unten-Taste drücken"
       formatting: "Formatierung, zum Auswählen Nach-Unten-Taste drücken"
-      rte_help: "Rich-Text-Bereich. Drücken Sie ALT+F10, um die Symbolleiste anzuzeigen. Drücken Sie ALT+F8, um die Hilfe anzuzeigen."
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "In Ember neu geschriebene Module. Verwenden Sie die native API zum Ziehen und Ablegen, um das Ziehen und Ablegen aus externen Speicherorten zu gestatten."
@@ -11515,6 +11514,7 @@ de:
       discrimination_index: Unterscheidungsindex
       discrimination_index_dialog_title: "Das Unterscheidungsindex-Diagramm"
       discrimination_index_dialog_trigger: "Erfahren Sie mehr über den Unterscheidungsindex."
+    discrimination_index_help: "* Diese Kennzahl stellt ein Maß dafür dar, wie gut eine einzelne Frage den Unterschied zwischen Studenten aufzeigen kann, die bei einer Prüfung gut abschneiden, und denen, die schlecht abschneiden. * ** Sie teilt Studenten basierend auf ihrer Punktzahl im gesamten Quiz in drei Gruppen ein und zeigt diese Gruppen danach an, wer die Frage richtig beantwortet hat. ** *** ****Hier erhalten Sie weitere Informationen.**** ***"
     download_submissions: "Alle Dateien herunterladen"
     duration_in_hours: 
       one: "1 Stunde"
