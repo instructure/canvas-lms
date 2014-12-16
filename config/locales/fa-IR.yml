@@ -3720,6 +3720,10 @@ fa-IR:
       module: ماژول
       module_details: "ماژولها به ترتیب نمایش داده می شوند، بنابراین فقط ماژول هایی که بالای %{name} هستند را می توان به عنوان پیش نیاز تعیین کرد."
       module_name: "نام ماژول"
+      move_module: 
+        place: مکان
+      move_module_item: 
+        place: مکان
       must_complete_prerequisites: "باید کامل شوند"
       no_preprequisites: "پیش نیاز مشخص نشده است"
       no_requirements: "هیچ الزامی تعیین نشده است"
@@ -4737,6 +4741,8 @@ fa-IR:
           delete_section: "حذف بخش"
           edit_section: "ویرایش بخش"
       megabytes: مگابایت
+      move_module: 
+        place: مکان
       no_language_preference: "تعیین نشده (قابل پیکربندی توسط کاربر، به طور پیش فرض روی %{language} )"
       none: "هیچ یک"
       page_title: "اطلاعات درس"
@@ -5569,6 +5575,7 @@ fa-IR:
     subscribe: "اشتراک در این موضوع"
     subscribed: "مشترک شدید"
     subscribed_hint: "در این موضوع مشترک شدید. برای لغو اشتراک، کلیک کنید."
+    this_student: "این دانشجو"
     toggle_message: "تغییر قابلیت مشاهده بخش"
     uknown_author: "نویسنده ناشناس"
     unknown: ناشناس
@@ -5589,6 +5596,7 @@ fa-IR:
   ecollege_file_description: Ecollege
   ecollege_name: "مبدل Ecollege"
   edit_quiz_ededddd8: "ویرایش آزمون"
+  edit_role_1e96ad20: "ویرایش نقش"
   edit_rubric: 
     buttons: 
       create_rubric: "ایجاد دستورالعمل ارزیابی"
@@ -6224,12 +6232,15 @@ fa-IR:
   file_preview: 
     file_preview_headerbutton_close: بستن
     file_preview_infotable_name: نام
+    file_preview_infotable_size: اندازه
   file_previews: 
     lock_explanation: 
       messages: 
         file_locked: "این فایل هنوز قفل گشایی نشده است."
         folder_locked: "پوشه \"%{folder},\" که این فایل در آن قرار دارد، قفل شده است."
   file_rename_form: 
+    change: تغییر
+    change_name: "تغییر اسم"
     name: نام
   file_status: 
     published_status: "منتشر شده"
@@ -12280,6 +12291,7 @@ fa-IR:
     retry: "تلاش دوباره"
     search_for_files: "جستجوی فایل ها"
     select_all: "انتخاب همه"
+    size: اندازه
     this_folder_is_empty: "این پوشه خالی است"
     view: نمایش
   recent_student: 
@@ -13701,6 +13713,7 @@ fa-IR:
       submitted_at: "در %{submit_date} ارسال شد"
       teachers_notified_of_comments: "اساتید و ارسال کننده از همه نظرها مطلع خواهند شد."
     show_preview: 
+      anonymous_username: "این دانشجو"
       discussion_submission_description: "موردهای ارسالی برای این تکلیف، ارسال های موجود در بحث مربوط به تکلیف هستند. در زیر ارسال های مربوط به بحث برای %{user} آمده است یا می توانید *بحث کامل را مشاهده کنید*."
       entry_no_image: "به یاد داشته باشید که این صفحه از زمان ارسال اولیه، ممکن است تغییر یافته باشد."
       entry_with_image: "یک تصویر کلی از ظاهر صفحه در هنگام ارسال را گنجانده ایم. یا اینکه می توانید برای مشاهده مورد ارسالی اصلی  کلیک کنید."
