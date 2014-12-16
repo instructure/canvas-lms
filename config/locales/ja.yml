@@ -5742,7 +5742,6 @@ ja:
     titles: 
       font_size: "フォント サイズ、押して選択"
       formatting: 書式設定、押して選択
-      rte_help: "リッチ テキスト領域。ツールバーの場合は ALT + F10 を押してください。ヘルプの場合は ALT + F8 を押してください。"
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "モジュールが Ember で書き直されています。外部の場所からのドラッグを許可するには、ネイティブのドラッグ アンド ドロップ API を使用します。"
@@ -6207,6 +6206,7 @@ ja:
       all: すべて
       app_headder: 外部アプリ
       external_tools_note: "アプリを利用すると、Canvas に新しい機能を簡単に追加できます。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。アプリを設定すると、コース モジュールからアプリにリンクして、アセスメント ツール用の課題を作成できます。"
+      external_tools_references: "Canvas との連携性に優れた *LTIツール* をご確認ください。**LTI ツールについての Canvas コミュニティのトピック** もご覧ください。"
       installed: インストール済み
       not_installed: 未インストール
       search_filter: 名前でフィルタ
@@ -11573,6 +11573,7 @@ ja:
       discrimination_index: 識別指数
       discrimination_index_dialog_title: 識別指数グラフ
       discrimination_index_dialog_trigger: 識別指数についての詳細を確認します。
+    discrimination_index_help: "* この指標は、特定の質問が、試験で成績の良い受講者と成績の良くない受講者を判別 (識別) するための基準としてどの程度役立つかを示すものです。* ** この指標では、受講生をクイズ全体のスコアに基づいて 3 つのグループに分け、質問に正しく回答した受講生ごとのグループを表示します。**  *** ****詳細についてはこちらをご覧ください。**** ***"
     download_submissions: すべてのファイルのダウンロード
     duration_in_hours: 
       one: "%{count} 時間"
@@ -12490,7 +12491,6 @@ ja:
         score: スコア
         time: 時刻
       take_quiz: 
-        audible_quiz_timer_shortcut_description: "注: これは時間制限のあるクイズです。キーボードで SHIFT + ALT + T の組み合わせを押すことで、クイズの回答中にいつでも残り時間を確認できます。"
         buttons: 
           next: 次へ
           out_of_time_submit: OK
