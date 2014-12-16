@@ -4356,6 +4356,7 @@ pt-BR:
       sis_source_id: "ID de origem SIS"
       start_at: "Início em"
       storage_quota: "Cota de armazenamento"
+      syllabus_body: corpo_do_programa
       tab_configuration: "Configuração de guia"
       template_course_id: "ID de curso modelo"
       turnitin_comments: "Comentários Turnitin"
@@ -5742,7 +5743,6 @@ pt-BR:
     titles: 
       font_size: "Tamanho da fonte, pressione para selecionar"
       formatting: "Formatação, pressione para selecionar"
-      rte_help: "Área de rich text. Pressione ALT+F10 para barra de tarefas. Pressione ALT+F8 para ajuda."
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "Módulos regravados em Ember. Usa a API nativa de arrastar e soltar para permitir arrastar de locais externos."
