@@ -1,6 +1,7 @@
 define [
   'underscore'
   'react'
+  'react-router'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/filesEnv'
@@ -14,7 +15,7 @@ define [
   './FilePreview'
   './UploadDropZone'
   '../utils/forceScreenreaderToReparse'
-], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone, forceScreenreaderToReparse) ->
+], (_, React, Router, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone, forceScreenreaderToReparse) ->
 
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
@@ -22,9 +23,13 @@ define [
   ShowFolder = React.createClass
     displayName: 'ShowFolder'
 
+    mixins: [Router.Navigation]
+
     debouncedForceUpdate: _.debounce ->
       @forceUpdate() if @isMounted()
     , 0
+
+    previousFolderId: null
 
     registerListeners: (props) ->
       return unless props.currentFolder
@@ -75,6 +80,7 @@ define [
 
     componentDidUpdate: ->
       # hooray for a11y
+      @redirectToCourseFiles() if @props.currentFolder?.get('locked_for_user')
       forceScreenreaderToReparse(@getDOMNode())
 
     componentWillReceiveProps: (newProps) ->
@@ -83,6 +89,17 @@ define [
       @registerListeners(newProps)
       [newProps.currentFolder.folders, newProps.currentFolder.files].forEach (collection) ->
         updateAPIQuerySortParams(collection, newProps.query)
+
+    redirectToCourseFiles: ->
+      if @props.currentFolder? and (@previousFolderId?.toString() isnt @props.currentFolder.get('id').toString())
+        @previousFolderId = @props.currentFolder.get('id')
+        message = I18n.t('This folder is currently locked and unavailable to view.')
+        $.flashError message
+        $.screenReaderFlashMessage message
+
+        setTimeout(=>
+          @transitionTo filesEnv.baseUrl, {}, {}
+        , 0)
 
     render: withReactDOM ->
       if @state?.errorMessages

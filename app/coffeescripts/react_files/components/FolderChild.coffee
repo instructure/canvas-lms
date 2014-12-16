@@ -13,6 +13,7 @@ define [
   'compiled/fn/preventDefault'
   './PublishCloud'
   './UsageRightsIndicator'
+  'compiled/jquery.rails_flash_notifications'
 ], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator) ->
 
 
@@ -80,7 +81,13 @@ define [
           @props.dndOptions.onItemDrop(event, @props.model, toggleActive(false))
       attrs
 
-
+    checkForAccess: (event) ->
+      if @props.model.get('locked_for_user')
+        event.preventDefault()
+        message = I18n.t('This folder is currently locked and unavailable to view.')
+        $.flashError message
+        $.screenReaderFlashMessage message
+        return false
 
     render: withReactDOM ->
       div @getAttributesForRootNode(),
@@ -117,6 +124,7 @@ define [
               ref: 'nameLink'
               to: 'folder'
               className: 'media'
+              onClick: @checkForAccess
               params: {splat: @props.model.urlPath()}
             },
               span className: 'pull-left',
