@@ -10531,7 +10531,6 @@ pl:
       instructions: 
         main: 
           manage: 
-            description: "*Wyniki są tu tworzone, aby śledzić poziom biegłości podczas kursu. Aby rozpocząć, sprawdź pasek menu na górze. Kliknij przycisk Nowy, aby utworzyć nowy wynik lub przycisk Nowa grupa w celu utworzenia nowej grupy, w której będzie można organizować wyniki. Przycisk Znajdź umożliwia korzystanie z wyników, które zostały utworzone przez instytucję. Po utworzeniu i użyciu wyników będziesz w stanie skorzystać z panelu po lewej stronie w celu odnajdywania swoich wyników. Możesz przeciągać i upuszczać wyniki między różnymi poziomami, aby utworzyć strukturę.**System Canvas umożliwia również dodawanie wyników do rubryk oceniania, można więc szacować biegłość podczas oceniania zadań. Po ustawieniu wyników kliknij Zarządzaj rubrykami, aby rozpocząć korzystanie z wyników do oceniania.*"
             title: "Ustawianie wyników"
     mastery: Biegłość
     mastery_error: "Musi być większe lub równe 0"
@@ -11696,6 +11695,7 @@ pl:
       discrimination_index: "Wykaz sporządzony na podstawie dyskryminacji"
       discrimination_index_dialog_title: "Wykaz osób dyskryminowanych"
       discrimination_index_dialog_trigger: "Dowiedz się więcej o wykazie sporządzonym na podstawie dyskryminacji."
+    discrimination_index_help: "* Ten pomiar podpowiada, jak pojedyncze pytanie może wpłynąć na różnicę (lub ją wywołać) między uczestnikami, którzy dobrze i źle radzą sobie na egzaminie.* ** Przyporządkowuje uczestników do trzech grup na podstawie wyniku z całego testu i wyświetla grupy według poprawnych odpowiedzi.** *** ****Więcej informacji można zasięgnąć tutaj.**** *** "
     download_submissions: "Pobierz wszystkie pliki"
     duration_in_hours: 
       few: "%{count} godziny"
