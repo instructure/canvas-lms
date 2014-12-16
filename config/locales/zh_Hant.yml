@@ -10699,6 +10699,15 @@ zh_Hant:
       description: "LinkedIn 整合"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          您將需要註冊[在 LinkedIn 上的新應用程式](%{linkedin_url})。
+          設定以下設定選項，以確保您的 LinkedIn 
+          整合正常工作：
+          
+          * **應用程式類型：** 設定為『Web 應用程式』
+          * ** Live 狀態：**設定為『Live』
+          * **OAuth 重定向 URL：** 設定為 %{oauth_url}
+          * 儲存您的應用程式之後，請記下 API 金鑰和祕密金鑰
       domain_name: 網域
       labels: 
         api_key: "API 金鑰"
@@ -11459,6 +11468,7 @@ zh_Hant:
       discrimination_index: 辨別力指數
       discrimination_index_dialog_title: 辨別力指數圖
       discrimination_index_dialog_trigger: 瞭解更多關於辨別力指數的內容。
+    discrimination_index_help: "* 該度量標準衡量一個問題是如何區分 (或辨別) 在考試中獲得好成績和差成績的學生。* ** 根據整個測驗分數，將學生分為三組，并顯示各組中哪些學生回答正確。** *** ****在這裡，瞭解更多資訊。**** ***"
     download_submissions: 下載所有檔案
     duration_in_hours: 
       one: "%{count} 小時"
@@ -12371,7 +12381,6 @@ zh_Hant:
         score: 分數
         time: 時間
       take_quiz: 
-        audible_quiz_timer_shortcut_description: "注：這是一次定時測驗。請注意時間，答題過程中，您可以按鍵盤組合鍵 SHIFT + ALT + T，查看剩餘時間。再重複一遍：SHIFT + ALT+ T..."
         buttons: 
           next: 下一個
           out_of_time_submit: 好吧
