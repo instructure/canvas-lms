@@ -237,7 +237,7 @@ END
     },
     'allow_opt_out_of_inbox' =>
     {
-      display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow users to opt out of the inbox") },
+      display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow Users to Opt-out of the Inbox") },
       description:  -> { I18n.t('allow_opt_out_of_inbox', <<-END) },
 Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences.
 END
@@ -298,7 +298,7 @@ END
     },
     'usage_rights_required' =>
     {
-      display_name: -> { I18n.t('Require usage rights for uploaded files') },
+      display_name: -> { I18n.t('Require Usage Rights for Uploaded Files') },
       description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published') },
       applies_to: 'Course',
       state: 'hidden',
