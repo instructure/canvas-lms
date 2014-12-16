@@ -6206,6 +6206,7 @@ zh:
       all: 全部
       app_headder: 外部应用程序
       external_tools_note: "应用程序是向 Canvas 添加新功能的简单方式。这些功能可添加到帐户中的各个课程或所有课程。配置完毕后，您可以通过课程模块与其链接，并为测验工具创建作业。"
+      external_tools_references: "*查看某些 LTI 工具*，这些工具与 Canvas 完美搭配使用。您还可以查看 **有关 LTI 工具的 Canvas 社区主题**"
       installed: 已安装
       not_installed: 未安装
       search_filter: 按姓名过滤
@@ -11591,6 +11592,7 @@ zh:
       discrimination_index: 鉴别指数
       discrimination_index_dialog_title: 鉴别指数图
       discrimination_index_dialog_trigger: 详细了解鉴别指数。
+    discrimination_index_help: "* 此指标提供一种衡量方式，用以衡量一个问题能在何种程度上区别（或鉴定）考试中做得好和做得不好的学生。* ** 它根据整个测验的分数将学生分为三组，并通过谁正确回答了问题来显示这些组。** *** ****详细信息请参见此处。**** ***"
     download_submissions: 下载所有文件
     duration_in_hours: 
       one: "%{count} 小时"
