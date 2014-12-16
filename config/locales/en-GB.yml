@@ -11598,6 +11598,7 @@ en-GB:
       discrimination_index: "Discrimination Index"
       discrimination_index_dialog_title: "The Discrimination Index Chart"
       discrimination_index_dialog_trigger: "Learn more about the Discrimination Index."
+    discrimination_index_help: "* This metric provides a measure of how well a single question can tell the difference (or discriminate) between students who do well on an exam and those who do not. * ** It divides students into three groups based on their score on the whole quiz and displays those groups by who answered the question correctly. ** *** ****More information is available here.**** ***"
     download_submissions: "Download all files"
     duration_in_hours: 
       one: "1 hour"
