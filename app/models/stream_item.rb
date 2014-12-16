@@ -35,7 +35,7 @@ class StreamItem < ActiveRecord::Base
 
   attr_accessible :context, :asset
   after_destroy :destroy_stream_item_instances
-  attr_accessor :unread, :participant
+  attr_accessor :unread, :participant, :invalidate_immediately
 
   def self.reconstitute_ar_object(type, data)
     return nil unless data
@@ -342,7 +342,9 @@ class StreamItem < ActiveRecord::Base
         if touch_users
           user_ids.add(item.stream_item_instances.map(&:user_id))
         end
+
         # this will destroy the associated stream_item_instances as well
+        item.invalidate_immediately = true
         item.destroy
       end
       break if batch.empty?
@@ -404,7 +406,7 @@ class StreamItem < ActiveRecord::Base
   def destroy_stream_item_instances
     self.stream_item_instances.with_each_shard do |scope|
       user_ids = scope.pluck(:user_id)
-      if user_ids.count > 100
+      if !self.invalidate_immediately && user_ids.count > 100
         StreamItemCache.send_later_if_production_enqueue_args(:invalidate_all_recent_stream_items,
           { :priority => Delayed::LOW_PRIORITY }, user_ids, self.context_type, self.context_id)
       else
