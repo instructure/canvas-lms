@@ -228,7 +228,6 @@ describe "scheduler" do
     end
 
     it "should allow me to create a course with multiple contexts" do
-      skip('fragile')
       course1 = @course
       course_with_teacher(:user => @teacher, :active_all => true)
       get "/calendar2"
@@ -236,14 +235,14 @@ describe "scheduler" do
       fill_out_appointment_group_form('multiple contexts')
       f('.ag_contexts_selector').click
       ff('.ag_sections_toggle').last.click
-      course_box = f("[value=#{@course.asset_string}]")
-      course_box.click
+      f("[value=#{course1.asset_string}]").click
 
       # sections should get checked by their parent
       section_box = f("[value=#{@course.course_sections.first.asset_string}]")
       expect(section_box[:checked]).to be_truthy
 
       # unchecking all sections should uncheck their parent
+      course_box = f("[value=#{@course.asset_string}]")
       section_box.click
       expect(course_box[:checked]).to be_falsey
 
