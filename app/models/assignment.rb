@@ -487,7 +487,8 @@ class Assignment < ActiveRecord::Base
     p.to {
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
-      participants - participants_with_overridden_due_at
+      excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
+      participants(include_observers: true, excluded_user_ids: excluded_ids)
     }
     p.whenever { |assignment|
       policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
@@ -495,14 +496,14 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_changed
-    p.to { participants }
+    p.to { participants(include_observers: true) }
     p.whenever { |assignment|
       policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
       policy.should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
-    p.to { participants }
+    p.to { participants(include_observers: true) }
     p.whenever { |assignment|
       policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
       policy.should_dispatch_assignment_created?
@@ -512,7 +513,7 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_unmuted
-    p.to { participants }
+    p.to { participants(include_observers: true) }
     p.whenever { |assignment|
       assignment.recently_unmuted
     }
@@ -855,14 +856,27 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def participants
-    return context.participants unless differentiated_assignments_applies?
-    participants_with_visibility
+  def participants(opts={})
+    return context.participants(opts[:include_observers], excluded_user_ids: opts[:excluded_user_ids]) unless differentiated_assignments_applies?
+    participants_with_visibility(opts)
   end
 
-  def participants_with_visibility
+  def participants_with_visibility(opts={})
     users = context.participating_admins
-    users += students_with_visibility
+
+    applicable_students = if opts[:excluded_user_ids]
+                            students_with_visibility.reject{|s| opts[:excluded_user_ids].include?(s.id)}
+                          else
+                            students_with_visibility
+                          end
+
+    users += applicable_students
+
+    if opts[:include_observers]
+      users += User.observing_students_in_course(applicable_students.map(&:id), self.context_id)
+      users += User.observing_full_course(context.id)
+    end
+
     users.uniq
   end
 

@@ -1609,8 +1609,28 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def participants(include_observers=false)
-    (participating_admins + participating_students + (include_observers ? participating_observers : [])).uniq
+  def active_course_level_observers
+    participating_observers.observing_full_course(self.id)
+  end
+
+  def participants(include_observers=false, opts={})
+    participants = []
+    participants += participating_admins
+
+    applicable_students = if opts[:excluded_user_ids]
+                 participating_students.reject{|p| opts[:excluded_user_ids].include?(p.id)}
+               else
+                 participating_students
+               end
+
+    participants += applicable_students
+
+    if include_observers
+      participants += User.observing_students_in_course(applicable_students.map(&:id), self.id)
+      participants += User.observing_full_course(self.id)
+    end
+
+    participants.uniq
   end
 
   def enroll_user(user, type='StudentEnrollment', opts={})

@@ -679,6 +679,59 @@ describe Course do
   end
 end
 
+
+describe Course, "participants" do
+  before :once do
+    @course = Course.create(:name => "some_name")
+    se = @course.enroll_student(user_with_pseudonym,:enrollment_state => 'active')
+    tae = @course.enroll_ta(user_with_pseudonym,:enrollment_state => 'active')
+    te = @course.enroll_teacher(user_with_pseudonym,:enrollment_state => 'active')
+    @student, @ta, @teach = [se, tae, te].map(&:user)
+  end
+
+  context "vanilla usage" do
+    it "should return participating_admins and participating_students" do
+      [@student, @ta, @teach].each { |usr| expect(@course.participants).to be_include(usr) }
+    end
+  end
+
+  context "including obervers" do
+    before :once  do
+      oe = @course.enroll_user(user_with_pseudonym, 'ObserverEnrollment',:enrollment_state => 'active')
+      @course_level_observer = oe.user
+
+      oe = @course.enroll_user(user_with_pseudonym, 'ObserverEnrollment',:enrollment_state => 'active')
+      oe.associated_user_id = @student.id
+      oe.save!
+      @student_following_observer = oe.user
+    end
+
+    it "should return participating_admins, participating_students, and observers" do
+      participants = @course.participants(true)
+      [@student, @ta, @teach, @course_level_observer, @student_following_observer].each do |usr|
+        expect(participants).to be_include(usr)
+      end
+    end
+
+    context "excluding specific students" do
+      it "should reject observers only following one of the excluded students" do
+        partic = @course.participants(true, excluded_user_ids: [@student.id, @student_following_observer.id])
+        [@student, @student_following_observer].each { |usr| expect(partic).to_not be_include(usr) }
+      end
+      it "should include admins and course level observers" do
+        partic = @course.participants(true, excluded_user_ids: [@student.id, @student_following_observer.id])
+        [@ta, @teach, @course_level_observer].each { |usr| expect(partic).to be_include(usr) }
+      end
+    end
+  end
+
+  it "should exclude some student when passed their id" do
+    partic = @course.participants(false, excluded_user_ids: [@student.id])
+    [@ta, @teach].each { |usr| expect(partic).to be_include(usr) }
+    expect(partic).to_not be_include(@student)
+  end
+end
+
 describe Course, "enroll" do
 
   before :once do
@@ -1352,6 +1405,16 @@ describe Course, "tabs_available" do
                            :role => observer_role, :enabled => false)
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
+    end
+
+    it "should recognize active_course_level_observers" do
+      user = user_with_pseudonym
+      observer_enrollment = @course.enroll_user(user, 'ObserverEnrollment',:enrollment_state => 'active')
+      @course_level_observer = observer_enrollment.user
+
+      course_observers = @course.active_course_level_observers
+      expect(course_observers).to be_include(@course_level_observer)
+      expect(course_observers).to_not be_include(@oe.user)
     end
   end
 

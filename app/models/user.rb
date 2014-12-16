@@ -205,6 +205,24 @@ class User < ActiveRecord::Base
     where(:quiz_student_visibilities => { :quiz_id => quiz_id, :course_id => course_id })
   }
 
+  scope :observing_students_in_course, lambda {|observee_ids, course_ids|
+    joins(:enrollments).where(enrollments: {type: 'ObserverEnrollment', associated_user_id: observee_ids, course_id: course_ids, workflow_state: 'active'})
+  }
+
+  # when an observer is added to a course they get an enrollment where associated_user_id is nil. when they are linked to
+  # a student, this first enrollment stays the same, but a new one with an associated_user_id is added. thusly to find
+  # course observers, you take the difference between all active observers and active observers with associated users
+  scope :observing_full_course, lambda {|course_ids|
+    active_observer_scope = joins(:enrollments).where(enrollments: {type: 'ObserverEnrollment', course_id: course_ids, workflow_state: 'active'})
+    users_observing_students = active_observer_scope.where("enrollments.associated_user_id IS NOT NULL").pluck(:id)
+
+    if users_observing_students == [] || users_observing_students == nil
+      active_observer_scope
+    else
+      active_observer_scope.where("users.id NOT IN (?)", users_observing_students)
+    end
+  }
+
   def assignment_and_quiz_visibilities(opts = {})
      opts = {user_id: self.id}.merge(opts)
      {assignment_ids: AssignmentStudentVisibility.where(opts).order('assignment_id desc').pluck(:assignment_id),
