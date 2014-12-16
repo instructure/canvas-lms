@@ -11517,6 +11517,7 @@ es:
       discrimination_index: "Índice de discriminación"
       discrimination_index_dialog_title: "Gráfico de índice de discriminación"
       discrimination_index_dialog_trigger: "Más información sobre el índice de discriminación."
+    discrimination_index_help: "* Esta métrica ofrece una medida sobre lo bien que una sola pregunta puede marcar la diferencia (o discriminar) entre alumnos que hacen un buen trabajo en un examen y aquellos que no. * ** Divide a los estudiantes en tres grupos según su puntuación en la evaluación entera y muestra esos grupos por orden, en función de quién respondió a la pregunta correctamente. ** *** ****Más información disponible aquí.**** ***"
     download_submissions: "Descargar todos los archivos"
     duration_in_hours: 
       one: "1 hora"
