@@ -5746,7 +5746,6 @@ tr:
     titles: 
       font_size: "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
       formatting: "Format, aşağı tuşa basın ve seçin"
-      rte_help: "Zengin Metin Alanı. Araç çubuğu için ALT+F10 tuşlarına; yardım için ALT+F8 tuşlarına basın."
   email: 
     default_from_name: "Instructure Canvas"
   email_is_invalid_e0d982eb: "Eposta adresi geçersiz!"
@@ -10563,6 +10562,7 @@ tr:
     notices: 
       delete_failed: "\"%{title}\" sayfası silinemiyor."
       page_deleted: "\"%{title}\" sayfası silindi."
+    reload_editing_page: "Siz düzenlemeye başladığınızdan beri bu sayfa değişti. * Tekrar yüklemenizde * tüm değişiklikleri kaybedersiniz."
     reload_viewing_page: "Siz incelemeye başladığınızdan beri bu sayfa değişti.  *Tekrar Yükle*"
     restore_failed: "Sayfa gözden geçirmeyi geri yükleme başarısız"
     save_button: Kaydet
