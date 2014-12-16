@@ -17,8 +17,9 @@
 define [
   'underscore'
   'jquery'
+  'str/htmlEscape'
   'jqueryui/tooltip'
-], (_, $) ->
+], (_, $, htmlEscape) ->
 
   # create a custom widget that inherits from the default jQuery UI
   # tooltip but extends the open method with a setTimeout wrapper so
@@ -27,16 +28,19 @@ define [
   do ($) ->
     $.widget "custom.timeoutTooltip", $.ui.tooltip,
       _open: ( event, target, content ) ->
+        # Converts arguments to an array
+        args = Array.prototype.slice.call(arguments, 0)
+        args.splice(2, 1, htmlEscape(content))
         # if you move very fast, it's possible that
         # @timeout will be defined
         return if @timeout
-        apply = @_superApply.bind(@, arguments)
+        apply = @_superApply.bind(@, args)
         @timeout = setTimeout (=>
           # make sure close will be called
           delete @timeout
           # remove extra handlers we added, super will add them back
           @_off(target, "mouseleave focusout keyup")
-          apply.call(@)
+          apply()
         ), 20
         # this is from the jquery ui tooltip _open
         # we need to bind events to trigger close so that the
