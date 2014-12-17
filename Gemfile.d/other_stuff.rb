@@ -83,7 +83,7 @@ gem 'ritex', '1.0.1'
 
 gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
-gem 'net-ldap', '0.3.1', :require => 'net/ldap'
+gem 'net-ldap', '0.10.1'
 gem 'ruby-duration', '3.2.0'
 gem 'ruby-saml-mod', '0.2.1'
 gem 'rubycas-client', '2.3.9'
