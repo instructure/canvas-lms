@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,15 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define ['Backbone', 'i18n!overrides'], ({Model}, I18n ) ->
+module Api::V1::PostGradesStatus
+  include Api::V1::Json
 
-  class Section extends Model
-    @defaultDueDateSection: ->
-      new Section
-        id: Section.defaultDueDateSectionID
-        name: I18n.t 'overrides.everyone', 'Everyone'
-
-    @defaultDueDateSectionID: '0'
-
-    isDefaultDueDateSection: =>
-      @id is Section.defaultDueDateSectionID
+  def post_grades_status_json(course_or_section)
+    res = course_or_section.sis_post_grades_statuses.last.as_json(:only => %w(id course_id course_section_id status message grades_posted_at))
+  end
+end

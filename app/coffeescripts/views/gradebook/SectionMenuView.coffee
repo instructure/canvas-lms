@@ -12,16 +12,30 @@ define [
   class SectionMenuView extends View
 
     @optionProperty 'sections'
+    @optionProperty 'course'
+    @optionProperty 'showSisSync'
+    @optionProperty 'showSections'
 
     @optionProperty 'currentSection'
 
     template: template
 
-    defaultSection: I18n.t('all_sections', 'All Sections')
+    determineDefaultSection: ->
+      if @showSections || !@course
+        defaultSection = I18n.t('all_sections', 'All Sections')
+      else
+        defaultSection = @course.name
+      defaultSection
 
     constructor: (options) ->
       super
-      @sections.unshift(name: @defaultSection, checked: !options.currentSection)
+      @defaultSection = @determineDefaultSection()
+      if @sections.length > 1
+        @sections.unshift(name: @defaultSection, checked: !options.currentSection)
+      if options.course && options.course.passback_status
+        date = new Date(options.course.passback_status.sis_post_grades_status.grades_posted_at)
+        @sections[0].passback_status = options.course.passback_status
+        @sections[0].date = date
 
     render: ->
       @detachEvents()
@@ -53,8 +67,16 @@ define [
         section
       )
 
+    showSisSync: ->
+      @showSisSync
+
+    showSections: ->
+      @showSections
+
     toJSON: ->
       {
         sections: @sections,
+        showSisSync: @showSisSync,
+        showSections: @showSections,
         currentSection: _.findWhere(@sections, id: @currentSection)?.name or @defaultSection
       }

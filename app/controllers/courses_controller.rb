@@ -345,6 +345,7 @@ class CoursesController < ApplicationController
   #   - "storage_quota_used_mb": The amount of storage space used by the files in this course
   #   - "total_students": Optional information to include with each Course.
   #     Returns an integer for the total amount of active and invited students.
+  #   - "passback_status": Include the grade passback_status
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).

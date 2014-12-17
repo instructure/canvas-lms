@@ -318,7 +318,6 @@ class AssignmentsController < ApplicationController
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
     @assignment.workflow_state ||= "unpublished"
-    @assignment.post_to_sis ||= @context.feature_enabled?(:post_to_sis) ? true : false
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group

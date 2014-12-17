@@ -96,11 +96,18 @@ define [
       # this method should be removed after a month in production
       @alignCoursePreferencesWithLocalStorage()
 
+      ajax_calls = [
+        $.ajaxJSON(@options[enrollmentsUrl], "GET")
+      , $.ajaxJSON(@options.assignment_groups_url, "GET", {}, @gotAssignmentGroups)
+      , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
+      ]
+
+      if(@options.post_grades_feature_enabled)
+        ajax_calls.push($.ajaxJSON( @options.course_url, "GET", {}, @gotCourse))
+
       # getting all the enrollments for a course via the api in the polite way
       # is too slow, so we're going to cheat.
-      $.when($.ajaxJSON(@options[enrollmentsUrl], "GET")
-      , $.ajaxJSON(@options.assignment_groups_url, "GET", {}, @gotAssignmentGroups)
-      , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections))
+      $.when(ajax_calls...)
       .then ([students, status, xhr]) =>
         @gotChunkOfStudents students
 
@@ -212,6 +219,9 @@ define [
           @assignments[assignment.id] = assignment
 
       @postGradesStore.setGradeBookAssignments @assignments
+
+    gotCourse: (course) =>
+      @course = course
 
     gotSections: (sections) =>
       @sections = {}
@@ -784,12 +794,17 @@ define [
 
     sectionList: ->
       _.map @sections, (section, id) =>
-        { name: section.name, id: id, checked: @sectionToShow == id }
+        if(section.passback_status)
+          date = new Date(section.passback_status.sis_post_grades_status.grades_posted_at)
+        { name: section.name, id: id, passback_status: section.passback_status, date: date, checked: @sectionToShow == id }
 
     drawSectionSelectButton: () ->
       @sectionMenu = new SectionMenuView(
         el: $('.section-button-placeholder'),
         sections: @sectionList(),
+        course: @course,
+        showSections: @showSections(),
+        showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
 
@@ -798,6 +813,12 @@ define [
       @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
+
+    showSections: ->
+      if @sections_enabled && @options.post_grades_feature_enabled
+        true
+      else
+        false
 
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
@@ -815,7 +836,7 @@ define [
         React.renderComponent(app, $placeholder[0])
 
     initHeader: =>
-      @drawSectionSelectButton() if @sections_enabled
+      @drawSectionSelectButton() if @sections_enabled || @course
 
       $settingsMenu = $('#gradebook_settings').next()
       $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (i, setting) =>
