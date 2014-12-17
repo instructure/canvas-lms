@@ -58,14 +58,14 @@ describe 'ExternalFeedsController', type: :request do
       expect(json).to eq feed_json(feed)
 
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
-                              { :url => "http://www.example.com/feed", :header_match => '' })
+                              { :url => "http://www.example.com/feed2", :header_match => '' })
       feed = @context.external_feeds.find(json['id'])
       expect(feed.verbosity).to eq 'full'
       expect(feed.header_match).to eq nil
       expect(json).to eq feed_json(feed)
 
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
-                              { :url => "http://www.example.com/feed", :header_match => ' #mytag  ', :verbosity => 'truncate' })
+                              { :url => "http://www.example.com/feed3", :header_match => ' #mytag  ', :verbosity => 'truncate' })
       feed = @context.external_feeds.find(json['id'])
       expect(feed.verbosity).to eq 'truncate'
       expect(feed.header_match).to eq '#mytag'
@@ -73,7 +73,7 @@ describe 'ExternalFeedsController', type: :request do
 
       # bad verbosity value
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
-                              { :url => "http://www.example.com/feed", :verbosity => 'bogus' })
+                              { :url => "http://www.example.com/feed4", :verbosity => 'bogus' })
       feed = @context.external_feeds.find(json['id'])
       expect(feed.verbosity).to eq 'full'
 
@@ -85,11 +85,15 @@ describe 'ExternalFeedsController', type: :request do
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
                               { :verbosity => 'full' }, {}, :expected_status => 400)
 
+      # duplicate url
+      json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
+                              { :url => "http://www.example.com/feed" }, {}, :expected_status => 400)
+
       # url protocol is inferred
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
-                              { :url => "www.example.com/feed" })
+                              { :url => "www.example.com/feed5" })
       feed = @context.external_feeds.find(json['id'])
-      expect(feed.url).to eq "http://www.example.com/feed"
+      expect(feed.url).to eq "http://www.example.com/feed5"
       expect(json).to eq feed_json(feed)
     end
 

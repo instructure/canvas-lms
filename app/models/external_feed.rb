@@ -21,6 +21,7 @@ class ExternalFeed < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+
   has_many :external_feed_entries, :dependent => :destroy
   has_many :discussion_topics, dependent: :nullify
 
@@ -29,6 +30,7 @@ class ExternalFeed < ActiveRecord::Base
   include CustomValidations
   validates_presence_of :url, :context_id, :context_type
   validates_as_url :url
+  validates_uniqueness_of :url, scope: [:context_id, :context_type, :verbosity, :header_match]
 
   VERBOSITIES = %w(full link_only truncate)
   validates_inclusion_of :verbosity, :in => VERBOSITIES, :allow_nil => true
