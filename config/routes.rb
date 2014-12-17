@@ -796,7 +796,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :account_notifications) do
       post 'accounts/:account_id/account_notifications', action: :create, as: 'account_notification'
-      get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notification'
+      get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
       delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
     end
 
