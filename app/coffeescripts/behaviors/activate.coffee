@@ -6,7 +6,7 @@ define [
     kce = $.Event('keyclick')
     $(e.target).trigger(kce)
     e.preventDefault() if kce.isDefaultPrevented()
-    e.stopPropagation() if kce.isPropogationStopped()
+    e.stopPropagation() if kce.isPropagationStopped()
 
   keydownHandler = (e) ->
     switch e.which
