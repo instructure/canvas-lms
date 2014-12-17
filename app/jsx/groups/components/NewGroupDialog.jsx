@@ -7,10 +7,15 @@ define([
   'react',
   'jsx/groups/mixins/BackboneState',
   'jsx/groups/components/PaginatedUserCheckList',
+  'jsx/groups/mixins/InfiniteScroll',
   'jquery.instructure_forms', /* errorBox */
-], (I18n, _, $, React, BackboneState, PaginatedUserCheckList) => {
+], (I18n, _, $, React, BackboneState, PaginatedUserCheckList, InfiniteScroll) => {
   var NewGroupDialog = React.createClass({
-    mixins: [BackboneState, React.addons.LinkedStateMixin],
+    mixins: [BackboneState, React.addons.LinkedStateMixin, InfiniteScroll],
+
+    loadMore() {
+      this.props.loadMore();
+    },
 
     getInitialState() {
       return {
@@ -40,7 +45,7 @@ define([
       return (
         <div id="add_group_form">
           <form className="form-dialog" onSubmit={this.handleFormSubmit}>
-            <div className="form-dialog-content">
+            <div ref="scrollElement" className="form-dialog-content">
               <p>
                 {I18n.t(`Groups are a good place to collaborate on projects or to figure out schedules for study sessions
                 and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
@@ -71,7 +76,6 @@ define([
                   <td>
                     <PaginatedUserCheckList checked={this.state.checked}
                                             users={users}
-                                            loadMore={this.props.loadMore}
                                             onUserCheck={this._onUserCheck} />
                   </td>
                 </tr>
