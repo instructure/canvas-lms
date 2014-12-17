@@ -20,6 +20,7 @@ module Api::V1::Course
   include Api::V1::Json
   include Api::V1::EnrollmentTerm
   include Api::V1::SectionEnrollments
+  include Api::V1::PostGradesStatus
 
   def course_settings_json(course)
     settings = {}
@@ -75,6 +76,7 @@ module Api::V1::Course
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
       hash['total_students'] = course.students.count if includes.include?('total_students')
+      hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       add_helper_dependant_entries(hash, course, builder)
     end
   end

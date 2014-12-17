@@ -8,12 +8,10 @@ define([
 
   var PostGradesDialogNeedsGradingPage = React.createClass({
     onClickRow(assignment_id) {
-      console.log("onClickRow", assignment_id)
       window.location = "gradebook/speed_grader?assignment_id=" + assignment_id
     },
 
     render () {
-      console.log("PostGradesDialogNeedsGradingPage-render", this.props.needsGrading)
       return (
         <div>
           <small>

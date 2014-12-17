@@ -90,7 +90,7 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"]
+  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"]
   #   - "students": Associations to include with the group. Note: this is only
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
@@ -98,6 +98,7 @@ class SectionsController < ApplicationController
   #      enrollment for each student
   #   - "total_students": Returns the total amount of active and invited students
   #      for the course section
+  #   - "passback_status": Include the grade passback status.
   #
   # @returns [Section]
   def index
