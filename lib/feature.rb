@@ -208,9 +208,7 @@ This enables the new student group page for an account. The new page was build t
 experience.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
-      root_opt_in: true,
-      beta: true
+      state: 'on'
     },
     'better_file_browsing' =>
     {

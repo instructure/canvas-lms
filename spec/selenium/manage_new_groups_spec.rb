@@ -9,13 +9,6 @@ describe "manage groups" do
   end
 
   context "2.0" do
-    before do
-      #TODO: Remove this setting once made the default behavior?
-      account = Account.default
-      account.settings[:enable_manage_groups2] = true
-      account.save!
-    end
-
     describe "group category creation" do
       it "should auto-split students into groups" do
         groups_student_enrollment 4
