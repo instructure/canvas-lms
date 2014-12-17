@@ -107,9 +107,6 @@ define [
                     .css('left', caratOffset)
                     .prependTo(@$menu)
 
-      # this, along with the webkit animation makes it bounce into place.
-      @$menu.css('-webkit-transform-origin-x', caratOffset + 'px')
-
     @defaults =
       popupOpts:
         position:

@@ -168,7 +168,7 @@
     background: transparent;
     border: none;
     border-radius: 0;
-    color: inherit;
+    &.al-trigger { display: inline-block; }
   }
 
   .discussion-content {
@@ -259,10 +259,6 @@
 
   .discussion-actions {
     width: 45px;
-
-    .al-options a {
-      color: #fff;
-    }
   }
 
   .title {

@@ -42,8 +42,8 @@
 
 $kyle-menu-bg-color: #e6e7e9;
 $kyle-menu-border-color: #b0afaf;
-$kyle-menu-carat-size: 10px;
-$kyle-menu-border-radius: 8px;
+$kyle-menu-carat-size: 8px;
+$kyle-menu-border-radius: 4px;
 
 
 // the .ui-menu-carat is the outer border of the carat to make it match the border of the popup
@@ -88,16 +88,15 @@ $kyle-menu-border-radius: 8px;
   color: #525252;
   position: absolute; // take it out of the "flow" so that it pops on top and doesnt push things down
   z-index: 9999;
-  border-radius:  $kyle-menu-border-radius;
+  border-radius:  $kyle-menu-border-radius + 1;
   box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
 
   a { color: #525252}
   hr {
-    margin: 0 2px;
+    margin: 0;
     height: 0;
     border: 0;
-    border-top: 1px solid #d4d5d7;
-    border-bottom: 1px solid #f2f2f3;
+    border-top: 1px solid $can-border-light;
   }
   // have to use first-of-type instead of :first-child because the carat that gets inserted becomes
   // :first-child but the carat is not an <li>, so this gets the first <li> which is what we want.
