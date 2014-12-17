@@ -16,7 +16,7 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator) ->
 
-  classSet = React.addons.classSet;
+  classSet = React.addons.classSet
 
   FolderChild = React.createClass
     displayName: 'FolderChild'
@@ -61,11 +61,16 @@ define [
       @setState editing: false, @focusPreviousElement
 
     getAttributesForRootNode: ->
+
+      classNameString = classSet({
+        'ef-item-row': true
+        'ef-item-selected': @props.isSelected
+        'activeDragTarget': @state.isActiveDragTarget
+      })
+
       attrs =
         onClick: @props.toggleSelected
-        className: "ef-item-row
-                   #{'ef-item-selected' if @props.isSelected}
-                   #{'activeDragTarget' if @state.isActiveDragTarget}"
+        className: classNameString
         role: 'row'
         'aria-selected': @props.isSelected
         draggable: !@state.editing
@@ -158,12 +163,6 @@ define [
                 FilesystemObjectThumbnail(model: @props.model)
               span className: 'media-body',
                 @props.model.displayName()
-
-        div className: 'screenreader-only', role: 'gridcell',
-          if @props.model instanceof Folder
-            I18n.t('folder', 'Folder')
-          else
-            @props.model.get('content-type')
 
 
         div className:'ef-date-created-col', role: 'gridcell',

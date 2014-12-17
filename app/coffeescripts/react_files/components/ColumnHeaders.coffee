@@ -7,16 +7,12 @@ define [
   'compiled/fn/preventDefault'
 ], (I18n, _, React, ReactRouter, withReactDOM, preventDefault) ->
 
-  classSet = React.addons.classSet;
+  classSet = React.addons.classSet
 
   columns = [
     displayName: I18n.t('name', 'Name')
     property: 'name'
     className: 'ef-name-col'
-  ,
-    displayName: I18n.t('kind', 'Kind')
-    property: 'content-type'
-    className: 'ef-hidden-flex'
   ,
     displayNameShort: I18n.t('created_at_short', 'Created')
     displayName: I18n.t('created_at', 'Date Created')
@@ -77,7 +73,9 @@ define [
       })
 
       header className:'ef-directory-header', role: 'row',
-        label className: selectAllCheckboxClass, role: 'columnheader',
+        div className: selectAllCheckboxClass, role: 'columnheader',
+          span {className: selectAllLabelClass },
+            I18n.t('select_all', 'Select All')
           input {
             className: selectAllCheckboxClass
             type: 'checkbox'
@@ -85,17 +83,31 @@ define [
             onBlur: (event) => @setState({hideToggleAll: true})
             checked: @props.areAllItemsSelected()
             onChange: (event) => @props.toggleAllSelected(event.target.checked)
-          }
-          span {className: selectAllLabelClass },
-            I18n.t('select_all', 'Select All')
+          },
+
         columns.map (column) =>
           # don't show any usage rights related stuff to people that don't have the feature flag on
           return if (column.property is 'usage_rights') and !@props.usageRightsRequiredForContext
 
           isSortedCol = sort is column.property
+
+          # This little bit is done so that we can get a dynamic key added into
+          # the object since string interpolation in an object key is forbidden
+          # by CoffeeScript... which makes a lot of sense.
+          columnClassNameObj =
+            "current-filter": isSortedCol
+          columnClassNameObj[column.className] = true
+
+          columnClassName = classSet(columnClassNameObj)
+
+          linkClassName = classSet({
+            'visible-desktop': column.displayNameShort
+            'ef-usage-rights-col-offset': (column.property == 'usage_rights')
+          })
+
           div {
             key: column.property
-            className: "#{column.className} #{'current-filter' if isSortedCol}"
+            className: columnClassName
             role: 'columnheader'
             'aria-sort': {asc: 'ascending', desc: 'descending'}[isSortedCol and order] or 'none'
           },
@@ -104,11 +116,14 @@ define [
               className: 'ef-plain-link'
             }, @props),
 
-              span className: ("#{'visible-desktop' if column.displayNameShort} #{'ef-usage-rights-col-offset' if column.property == 'usage_rights'}"),
-                if (column.property == 'usage_rights')
+              span className: linkClassName,
+                if (column.property == 'select')
+                  span {className: 'screenreader-only'},
+                    column.displayName
+                else if (column.property == 'usage_rights')
                   i {className: 'icon-files-copyright'},
                     span {className: 'screenreader-only'},
-                      I18n.t('Usage Rights')
+                      column.displayName
                 else
                   column.displayName
               if column.displayNameShort
@@ -125,4 +140,10 @@ define [
                   span className: 'screenreader-only',
                     I18n.t('sorted_desending', "Sorted Descending")
 
-        div className:'ef-links-col', role: 'columnheader'
+        div {
+          className:'ef-links-col'
+          role: 'columnheader'
+        },
+          span {className:'screenreader-only'},
+            I18n.t('Links')
+
