@@ -220,39 +220,42 @@
               <div id="comment_attachments"></div>
               <div class="comment_attachment_input" id="comment_attachment_input_blank" style="display: none;">
                 <input type="file" name="attachments[-1][uploaded_data]" style="font-size: 0.8em;"/>
-                <a href="#"><%= t('links.remove_attachment', "Remove Attachment") %></a>
+                <a href="#">
+                  <i class="icon-end text-error"></i>
+                  <span class="screenreader-only">
+                    <%= t('links.remove_attachment', "Remove Attachment") %>
+                  </span>
+                </a>
               </div>
 
 
-              <button class="btn btn-small" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
+              <button class="btn btn-small btn-primary" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
               <ul class="attach_things">
                 <li class="prompt"><%= t(:attach, "Attach") %></li>
                 <li>
-                  <a id="add_attachment" href="#" class="tooltip">
-                    <span class="tooltip_wrap">
-                      <span class="tooltip_text"><%= t('tooltips.file_attachment', "File Attachment") %></span>
-                    </span>
-                    <span class="icon"><%= image_tag "file_multiple.png", :alt => t('icons.file_attachment', 'File Attachment') %></span>
+                  <a data-tooltip title="<%= t('tooltips.file_attachment', "File Attachment") %>" id="add_attachment" href="#" class="btn btn-small">
+                    <i class="icon-paperclip"></i>
+                    <span class="screenreader-only"><%= t('icons.file_attachment', "File Attachment") %><span>
                   </a>
                 </li>
                 <% if feature_enabled?(:kaltura) %>
                   <li>
-                    <a class="media_comment_link tooltip" href="#">
-                      <span class="tooltip_wrap">
-                        <span class="tooltip_text"><%= t('tooltips.media_comment', "Media Comment") %></span>
+                    <a data-tooltip title="<%= t('tooltips.media_comment', "Media Comment") %>" href="#" class="btn btn-small media_comment_link">
+                      <i class="icon-media"></i>
+                      <span class="screenreader-only">
+                        <%= t('icons.media_comment', 'Media Comment') %>
                       </span>
-                      <span class="icon"><%= image_tag "webcam.png", :alt => t('icons.media_comment', 'Media Comment') %></span>
                     </a>
                   </li>
                 <% end %>
                 <li style="display:none">
-                    <a class="speech_recognition_link tooltip" href="#">
-                      <span class="tooltip_wrap">
-                        <span class="tooltip_text"><%= t('tooltips.speech_recognition', "Speech Recognition") %></span>
-                      </span>
-                      <span class="icon"><%= image_tag "microphone_pencil.png", :alt => t('icons.speech_recognition', 'Speech Recognition') %></span>
-                    </a>
-                  </li>
+                  <a data-tooltip title="<%= t('tooltips.speech_recognition', "Speech Recognition") %>" href="#" class="btn btn-small speech_recognition_link">
+                    <i class="icon-audio"></i>
+                    <span class="screenreader-only">
+                      <%= t('icons.speech_recognition', 'Speech Recognition') %>
+                    </span>
+                  </a>
+                </li>
                 <li style="clear:both;"></li>
               </ul>
               <div style="clear:both;"></div>
