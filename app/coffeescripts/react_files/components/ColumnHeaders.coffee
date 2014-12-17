@@ -7,6 +7,8 @@ define [
   'compiled/fn/preventDefault'
 ], (I18n, _, React, ReactRouter, withReactDOM, preventDefault) ->
 
+  classSet = React.addons.classSet;
+
   columns = [
     displayName: I18n.t('name', 'Name')
     property: 'name'
@@ -50,6 +52,11 @@ define [
       areAllItemsSelected: React.PropTypes.func.isRequired
       splat: React.PropTypes.string
 
+    getInitialState: ->
+      return {
+        hideToggleAll: true
+      }
+
     queryParamsFor: (query, property) ->
       order = if ((query.sort || 'name') is property) and (query.order is 'desc')
         'asc'
@@ -61,14 +68,26 @@ define [
       sort = @props.query.sort or 'name'
       order = @props.query.order or 'asc'
 
+      selectAllCheckboxClass = classSet({
+        'screenreader-only': @state.hideToggleAll
+      })
+
+      selectAllLabelClass = classSet({
+        'screenreader-only': !@state.hideToggleAll
+      })
+
       header className:'ef-directory-header', role: 'row',
-        label className: 'ef-hidden-flex', role: 'columnheader',
+        label className: selectAllCheckboxClass, role: 'columnheader',
           input {
+            className: selectAllCheckboxClass
             type: 'checkbox'
+            onFocus: (event) => @setState({hideToggleAll: false})
+            onBlur: (event) => @setState({hideToggleAll: true})
             checked: @props.areAllItemsSelected()
             onChange: (event) => @props.toggleAllSelected(event.target.checked)
-          },
-          I18n.t('select_all', 'Select All')
+          }
+          span {className: selectAllLabelClass },
+            I18n.t('select_all', 'Select All')
         columns.map (column) =>
           # don't show any usage rights related stuff to people that don't have the feature flag on
           return if (column.property is 'usage_rights') and !@props.usageRightsRequiredForContext
