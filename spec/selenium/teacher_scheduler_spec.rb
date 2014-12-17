@@ -19,6 +19,14 @@ describe "scheduler" do
       make_full_screen
     end
 
+    it "should bring up 'edit appointment group' modal when clicking 'create an appointment group' scheduler button" do
+      get "/calendar2"
+      click_scheduler_link
+      wait_for_ajaximations
+      f('#right-side .create_link').click
+      expect(f('#edit_event')).not_to be_nil
+    end
+
     it "should split time slots" do
       start_time_text = '02'
       end_time_text = '06'
