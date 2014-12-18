@@ -15,6 +15,7 @@
 /app/coffeescripts/ember/*/main.coffee
 /app/views/info/styleguide.html.erb
 /config/*.yml
+/config/brand_variables.scss
 /config/build.js
 /config/environments/*-local.rb
 /config/locales/generated/

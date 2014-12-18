@@ -1,7 +1,3 @@
-// there is magic that happens here, see the docs at the top of assets.yml for more info
-@import "variant_variables";
-
-
 //
 // Variables
 // --------------------------------------------------
@@ -39,7 +35,8 @@ $textColor:             $grayDark !default;
 
 // Links
 // -------------------------
-$linkColor:             ensure-contrast(#08c, white);
+$linkColor:             #08c !default;
+$linkColor:             ensure-contrast($linkColor, white);
 
 $linkColorHover:        darken($linkColor, 15%) !default;
 
