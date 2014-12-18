@@ -18,7 +18,7 @@ define(function(require) {
       return(
         <Question expanded={this.props.expanded}>
           <QuestionHeader
-            responseCount={this.props.answeredStudentCount}
+            responseCount={this.props.responses}
             participantCount={this.props.participantCount}
             onToggleDetails={this.props.onToggleDetails}
             expanded={this.props.expanded}

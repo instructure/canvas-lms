@@ -20,5 +20,51 @@ define(function(require) {
       expect(subject.get('id')).toBe('267');
       expect(subject.get('questionStatistics')[0].discriminationIndex).toBe(0.7157094891780442);
     });
+
+    describe('calculating participant count', function() {
+      it('should use the number of students who actually took the question', function() {
+        var subject = new Subject({
+          question_statistics: [
+            {
+              question_type: 'multiple_choice_question',
+              answers: [
+                { id: '1', responses: 2 },
+                { id: '2', responses: 3 }
+              ]
+            }
+          ]
+        }, { parse: true });
+
+        expect(subject.get('questionStatistics')[0].participantCount).toEqual(5);
+      });
+
+      it('should work with questions that have answer sets', function() {
+        var subject = new Subject({
+          question_statistics: [
+            {
+              question_type: 'fill_in_multiple_blanks_question',
+              answer_sets: [
+                {
+                  id: 'some answer set',
+                  answers: [
+                    { id: '1', responses: 2 },
+                    { id: '2', responses: 3 }
+                  ]
+                },
+                {
+                  id: 'some other answer set',
+                  answers: [
+                    { id: '3', responses: 0 },
+                    { id: '4', responses: 5 }
+                  ]
+                }
+              ]
+            }
+          ]
+        }, { parse: true });
+
+        expect(subject.get('questionStatistics')[0].participantCount).toEqual(5);
+      });
+    });
   });
 });

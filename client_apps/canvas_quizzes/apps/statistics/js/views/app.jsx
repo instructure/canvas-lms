@@ -129,7 +129,7 @@ define(function(require) {
       var stats = this.props.quizStatistics;
       var questionProps = extend({}, question, {
         key: 'question-' + question.id,
-        participantCount: participantCount,
+        participantCount: question.participantCount,
         expanded: stats.expanded.indexOf(question.id) > -1,
         speedGraderUrl: stats.speedGraderUrl,
         quizSubmissionsZipUrl: stats.quizSubmissionsZipUrl,
