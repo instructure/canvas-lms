@@ -55,7 +55,7 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # set :keep_releases, 5
 
 # set the locations that we will look for changed assets to determine whether to precompile
-set :assets_dependencies, %w(app/stylesheets public/javascripts public/stylesheets spec/javascripts Gemfile.lock config/routes.rb)
+set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
 #
 # Capistrano runs as the deploy user, but Canvas is setup to be owned by another user.
 # Rollbacks and cleanups of more than :keep_releases fail with permissions errors. 
@@ -113,29 +113,24 @@ namespace :deploy do
     # TODO: need to get this working, but for now we're just focusing on getting a code deploy and rollback flow going
   end
 
-  # TODO: This takes forever, see if we can copy the assets from the last deploy if nothing has changed.
-  # Try this: https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
-  # Another way to try this: http://www.snip2code.com/Snippet/119715/Skip-asset-compilation-in-Capistrano-3-i
   desc "Compile static assets"
   task :compile_assets => :set_compile_assets_vars do
    on roles(:app) do
       within release_path do
         with rails_env: fetch(:rails_env) do
           begin
+
+            # This task only actually does the precompile if any files changed that require it.  Otherwise, it copies
+            # the file from the previous release.  I used these for inspiration on how to implement:
+            # https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
+            # http://www.snip2code.com/Snippet/119715/Skip-asset-compilation-in-Capistrano-3-i
+
             # precompile if this is the first deploy
             raise PrecompileRequired unless fetch(:latest_release)
 
-            info("Comparing asset changes between revision #{fetch(:latest_release_revision)} and #{fetch(:release_revision)}")
+            info("Comparing asset changes between revision #{fetch(:latest_release_revision)} and #{fetch(:release_revision)} to see if asset precompile is required.")
             fetch(:assets_dependencies).each do |dep|
-              #########
-              ########
-              #BTODO: THIS DOESN'T WORK.  this invokes all the checks in parallel and continues
-              # see: http://stackoverflow.com/questions/12379026/how-do-i-execute-rake-tasks-with-arguments-multiple-times
-              # I think that I should use a method instead of a task?
-              
-              # Raises PrecompileRequired if any of the files in this directory have changed in git.
-              invoke("deploy:check_compile_assets", "#{dep}")
-              ###########
+              if should_compile_assets(dep) then raise PrecompileRequired end
             end
 
             info("Skipping asset precompile, no asset diff found")
@@ -159,7 +154,6 @@ namespace :deploy do
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
             execute :npm, 'install', '--silent'
-            #execute :rake, 'canvas:compile_assets --trace'
             execute :rake, 'canvas:compile_assets'
           end
         end
@@ -180,42 +174,25 @@ namespace :deploy do
     end
   end
 
-  desc "Check if compile_assets should run based on if there were changes to certain files.  E.g. check_compile_assets['some/path']"
-  task :check_compile_assets, [:path_to_check] => :set_compile_assets_vars do |t, args|
-    on roles(:all) do
-      within repo_path do
-
-        # Canvas compiles assets to the same directory and the source files that are in github.
-        # So we can't just look at the local filesystem to compare if files changes, because that 
-        # just ends up telling us that assets haven't been compiled no matter what.  So, instead 
-        # we need to use git to tell if there is a change to the assets.
-        #
-        # This code reads the REVISION file from the previous release and compares the files in the specified
-        # directory to this revision to see if there were any changes (specified in the asset_dependecies directories)
-        #
-        #changed_files = capture(:git,'diff --name-only', "#{fetch(:latest_release_revision)}", "HEAD~10", '--', "#{args[:path_to_check]}") # for testing
-        changed_files = capture(:git,'diff --name-only', "#{fetch(:latest_release_revision)}", "#{fetch(:release_revision)}", '--', "#{args[:path_to_check]}")
-        if !changed_files.empty? then raise PrecompileRequired
-        end
-      end
-    end
-  end
-
-  # TODO: delete me
-  desc "test task"
-  task :test do
-    on roles(:all) do
-    #invoke("deploy:test1")
-    #execute(:echo, "testvar1=",fetch(:test_var1))
-    #invoke("deploy:set_compile_assets_vars")
-    #execute(:echo, "latest_release=#{fetch(:latest_release)}")
-    #execute(:echo, "latest_release_path=#{fetch(:latest_release_path)}")
-    #execute(:echo, "release_revision=#{fetch(:release_revision)}")
-    #execute(:echo, "latest_release_revision=#{fetch(:latest_release_revision)}")
-    invoke("deploy:check_compile_assets", "app/views/shared")
-    end
-  end
-  
+ def should_compile_assets(path_to_check)
+   result = true
+   on roles(:all) do
+     within repo_path do
+       # Canvas compiles assets to the same directory as the source files that are in github.
+       # So we can't just look at the local filesystem to compare if files changed
+       # So, instead we need to use git to tell if there is a change to the assets.
+       #
+       # This code reads the REVISION file from the previous release and compares the files in the specified
+       # path_to_check to this revision to see if there were any changes.
+       #
+       debug("Checking #{path_to_check} for asset changes.")
+       changed_files = capture(:git,'diff --name-only', "#{fetch(:latest_release_revision)}", "#{fetch(:release_revision)}", '--', "#{path_to_check}")
+       result = !changed_files.empty?
+       if result then debug("Changed files: #{changed_files}") end
+     end
+   end
+   return result
+ end
 
   desc "Fix ownership on Canvas install directory"
   task :fix_owner do
