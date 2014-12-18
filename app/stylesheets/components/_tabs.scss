@@ -71,7 +71,8 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         // special handling for Calendar tabs with solid-color header backgrounds
         #edit_event & { color: $canvas-light; }
       }
-      &.ui-state-hover {
+      &.ui-state-hover,
+      &:hover {
         background: $canvas-light;
         border-color: $can-border-light;
         a {
@@ -92,7 +93,8 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         }
       }
       &.ui-tabs-active,
-      &.ui-tabs-active.ui-state-hover {
+      &.ui-tabs-active.ui-state-hover,
+      &.ui-tabs-active:hover {
         border-color: $can-border-light;
         background: $canvas-light;
         a {
