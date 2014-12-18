@@ -168,6 +168,7 @@ define [
       @collection = @outcomes
       @bindPaginationEvents()
       @outcomes.fetch(success: => @loadDfd.resolve(this))
+      @startPaginationListener()
       @showPaginationLoader()
 
     triggerSelect: (sv) =>
