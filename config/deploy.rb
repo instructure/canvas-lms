@@ -54,6 +54,9 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
+# set the locations that we will look for changed assets to determine whether to precompile
+set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
+#
 # Capistrano runs as the deploy user, but Canvas is setup to be owned by another user.
 # Rollbacks and cleanups of more than :keep_releases fail with permissions errors. 
 # This solves that.
@@ -61,6 +64,8 @@ SSHKit.config.command_map[:rm]  = "sudo rm"
 
 # Canvas uses it's own precompile assets defined below.
 Rake::Task["deploy:compile_assets"].clear_actions
+class PrecompileRequired < StandardError;
+end
 
 # Since we disable the default "deploy:compile_assets" and overide with the custom 
 # "canvas:compile_assets", we also disable the rollback which attempts to put the
@@ -108,35 +113,86 @@ namespace :deploy do
     # TODO: need to get this working, but for now we're just focusing on getting a code deploy and rollback flow going
   end
 
-  desc "Install node dependencies"
-  task :npm_install do
-    on roles(:app) do
-      within release_path do
-        execute :npm, 'install', '--silent'
-      end
-    end
-  end
-
-
-  # TODO: This takes forever, see if we can copy the assets from the last deploy if nothing has changed.
-  # Try this: https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
-  # Another way to try this: http://www.snip2code.com/Snippet/119715/Skip-asset-compilation-in-Capistrano-3-i
   desc "Compile static assets"
-  task :compile_assets => :npm_install do
+  task :compile_assets => :set_compile_assets_vars do
    on roles(:app) do
       within release_path do
         with rails_env: fetch(:rails_env) do
-          # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
-          # files in the config directory, however, we setup those files to only be accessible from canvasuser.
-          # The way it works now is that /var/canvas/config has the master copies of the files owned by "canvasadmin:canvasadmin"
-          # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
-          # "canvasadmin" group.
-          #execute :rake, 'canvas:compile_assets --trace'
-          execute :rake, 'canvas:compile_assets'
+          begin
+
+            # This task only actually does the precompile if any files changed that require it.  Otherwise, it copies
+            # the file from the previous release.  I used these for inspiration on how to implement:
+            # https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
+            # http://www.snip2code.com/Snippet/119715/Skip-asset-compilation-in-Capistrano-3-i
+
+            # precompile if this is the first deploy
+            raise PrecompileRequired unless fetch(:latest_release)
+
+            info("Comparing asset changes between revision #{fetch(:latest_release_revision)} and #{fetch(:release_revision)} to see if asset precompile is required.")
+            fetch(:assets_dependencies).each do |dep|
+              if should_compile_assets(dep) then raise PrecompileRequired end
+            end
+
+            info("Skipping asset precompile, no asset diff found")
+
+            # NOTE: the commented out command below is for a standard Rails 4+ assets, but our version of Canvas uses an older Rails.
+            #
+            # copy over all of the assets from the last release
+            # execute(:sudo, 'cp -r', latest_release_path.join('public', fetch(:assets_prefix)), release_path.join('public', fetch(:assets_prefix)))
+            latest_release_path=fetch(:latest_release_path)
+            execute(:sudo, 'cp -r', latest_release_path.join('public/assets'), release_path.join('public/assets'))
+            execute(:sudo, 'cp -r', latest_release_path.join('public/doc'), release_path.join('public/doc'))
+            execute(:sudo, 'cp -r', latest_release_path.join('public/javascripts'), release_path.join('public/javascripts'))
+            execute(:sudo, 'cp -r', latest_release_path.join('public/optimized'), release_path.join('public/optimized'))
+            execute(:sudo, 'cp -r', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public/stylesheets_compiled'))
+
+          rescue PrecompileRequired
+            # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
+            # files in the config directory, however, we setup those files to only be accessible from canvasuser.
+            # The way it works now is that /var/canvas/config has the master copies of the files owned by "canvasadmin:canvasadmin"
+            # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
+            # "canvasadmin" group.
+            info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
+            execute :npm, 'install', '--silent'
+            execute :rake, 'canvas:compile_assets'
+          end
         end
       end
     end
   end
+
+  desc "Set the variables needed by the compile_assets task"
+  task :set_compile_assets_vars do
+    on roles(:all) do
+      # find the most recent release
+      set(:latest_release, capture(:ls, '-xr', releases_path).split[1])
+      set(:latest_release_path, releases_path.join(fetch(:latest_release)))
+
+      # store the previous and current git revisions
+      set(:release_revision, capture(:cat,release_path.join('REVISION')).strip)
+      set(:latest_release_revision, capture(:cat, fetch(:latest_release_path).join('REVISION')).strip)
+    end
+  end
+
+ def should_compile_assets(path_to_check)
+   result = true
+   on roles(:all) do
+     within repo_path do
+       # Canvas compiles assets to the same directory as the source files that are in github.
+       # So we can't just look at the local filesystem to compare if files changed
+       # So, instead we need to use git to tell if there is a change to the assets.
+       #
+       # This code reads the REVISION file from the previous release and compares the files in the specified
+       # path_to_check to this revision to see if there were any changes.
+       #
+       debug("Checking #{path_to_check} for asset changes.")
+       changed_files = capture(:git,'diff --name-only', "#{fetch(:latest_release_revision)}", "#{fetch(:release_revision)}", '--', "#{path_to_check}")
+       result = !changed_files.empty?
+       if result then debug("Changed files: #{changed_files}") end
+     end
+   end
+   return result
+ end
 
   desc "Fix ownership on Canvas install directory"
   task :fix_owner do
