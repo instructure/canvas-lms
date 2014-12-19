@@ -25,16 +25,10 @@ $white:                 #fff !default;
 // Accent colors
 // -------------------------
 $blue:                  #049cdb !default;
-$blueDark:              #0064cd !default;
 $green:                 #46a546 !default;
 $red:                   #9d261d !default;
-$yellow:                #ffc40d !default;
 $orange:                #f89406 !default;
 @if $use_high_contrast { $orange: darken($orange, 15%) }
-
-
-$pink:                  #c3325f !default;
-$purple:                #7a43b6 !default;
 
 
 // Scaffolding
@@ -161,11 +155,6 @@ $zindexModalBackdrop:     1040 !default;
 $zindexModal:             1050 !default;
 
 
-// Sprite icons path
-// -------------------------
-$iconSpritePath:          image-path("glyphicons-halflings.png") !default;
-$iconWhiteSpritePath:     image-path("glyphicons-halflings-white.png") !default;
-
 
 // Input placeholder text color
 // -------------------------
@@ -192,59 +181,6 @@ $wellBackground:                  #f5f5f5 !default;
 $droppableBackground:             #dde0e4 !default;
 
 
-// Navbar
-// -------------------------
-$navbarCollapseWidth:             979px !default;
-$navbarCollapseDesktopWidth:      $navbarCollapseWidth + 1;
-
-$navbarHeight:                    40px !default;
-$navbarBackgroundHighlight:       #ffffff !default;
-$navbarBackground:                darken($navbarBackgroundHighlight, 5%) !default;
-$navbarBorder:                    darken($navbarBackground, 12%) !default;
-
-$navbarText:                      #777 !default;
-$navbarLinkColor:                 #777 !default;
-$navbarLinkColorHover:            $grayDark !default;
-$navbarLinkColorActive:           $gray !default;
-$navbarLinkBackgroundHover:       transparent !default;
-$navbarLinkBackgroundActive:      darken($navbarBackground, 5%) !default;
-
-$navbarBrandColor:                $navbarLinkColor !default;
-
-// Inverted navbar
-$navbarInverseBackground:                #111111 !default;
-$navbarInverseBackgroundHighlight:       #222222 !default;
-$navbarInverseBorder:                    #252525 !default;
-
-$navbarInverseText:                      $grayLight !default;
-$navbarInverseLinkColor:                 $grayLight !default;
-$navbarInverseLinkColorHover:            $white !default;
-$navbarInverseLinkColorActive:           $navbarInverseLinkColorHover !default;
-$navbarInverseLinkBackgroundHover:       transparent !default;
-$navbarInverseLinkBackgroundActive:      $navbarInverseBackground !default;
-
-$navbarInverseSearchBackground:          lighten($navbarInverseBackground, 25%) !default;
-$navbarInverseSearchBackgroundFocus:     $white !default;
-$navbarInverseSearchBorder:              $navbarInverseBackground !default;
-$navbarInverseSearchPlaceholderColor:    #ccc !default;
-
-$navbarInverseBrandColor:                $navbarInverseLinkColor !default;
-
-
-// Pagination
-// -------------------------
-$paginationBackground:                #fff !default;
-$paginationBorder:                    #ddd !default;
-$paginationActiveBackground:          #f5f5f5 !default;
-
-
-// Hero unit
-// -------------------------
-$heroUnitBackground:              $grayLighter !default;
-$heroUnitHeadingColor:            inherit !default;
-$heroUnitLeadColor:               inherit !default;
-
-
 // Form states and alerts
 // -------------------------
 $warningBackground:       #fcf8e3 !default;
@@ -268,7 +204,6 @@ $infoBorder:              darken(adjust-hue($infoBackground, -10), 7%) !default;
 // -------------------------
 $tooltipColor:            #fff !default;
 $tooltipBackground:       #000 !default;
-$tooltipArrowWidth:       5px !default;
 $tooltipArrowColor:       $tooltipBackground !default;
 
 $popoverBackground:       #fff !default;
