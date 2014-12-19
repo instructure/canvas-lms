@@ -16,7 +16,7 @@ set :group,         'canvasadmin'
 # This essentially makes Capistrano run the "bundle install" command found in the Canvas Production Start guide
 # which doesn't specify the "--without development test" options.
 set :bundle_path, "vendor/bundle"
-set :bundle_without, nil
+set :bundle_without, "sqlite mysql"
 set :bundle_flags,  ""
 set :bundle_binstubs, nil 
 
@@ -74,6 +74,8 @@ Rake::Task["deploy:rollback_assets"].clear_actions
 
 # Disable for now until we get the basic Cap deploy and rollback going for code and can really test this.
 Rake::Task["deploy:migrate"].clear_actions
+
+Rake::Task["deploy:restart"].clear_actions
 
 namespace :deploy do
 
@@ -166,11 +168,13 @@ namespace :deploy do
     on roles(:all) do
       # find the most recent release
       set(:latest_release, capture(:ls, '-xr', releases_path).split[1])
-      set(:latest_release_path, releases_path.join(fetch(:latest_release)))
+      unless fetch(:latest_release).nil? # Can happen on the first deploy to a fresh server
+        set(:latest_release_path, releases_path.join(fetch(:latest_release)))
 
-      # store the previous and current git revisions
-      set(:release_revision, capture(:cat,release_path.join('REVISION')).strip)
-      set(:latest_release_revision, capture(:cat, fetch(:latest_release_path).join('REVISION')).strip)
+        # store the previous and current git revisions
+        set(:release_revision, capture(:cat,release_path.join('REVISION')).strip)
+        set(:latest_release_revision, capture(:cat, fetch(:latest_release_path).join('REVISION')).strip)
+      end
     end
   end
 
@@ -212,6 +216,7 @@ namespace :deploy do
   desc 'Restart application'
   task :restart do
     on roles(:app) do
+      execute :sudo, 'chmod g+w', release_path.join('tmp') # No clue why, but on prod the releases/XXXXX/tmp dir is created but not group writeable.
       execute :touch, release_path.join('tmp/restart.txt')
     end
   end
