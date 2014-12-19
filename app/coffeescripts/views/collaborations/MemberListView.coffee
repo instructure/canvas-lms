@@ -62,13 +62,14 @@ define [
     render: =>
       @removeCurrentUser() if @options.currentUser
       @updateElementVisibility()
-      collaborators = @collection.map (c) =>
+      collaboratorsHtml = @collection.map (c) =>
         collaboratorTemplate(extend(c.toJSON(),
                                     type: c.modelType or c.get('type'),
                                     id: c.get('collaborator_id') or c.get('id')
                                     name: c.get('sortable_name') or c.get('name')
                                     selected: true))
-      @$list.html(collaborators.join(''))
+      collaboratorsHtml = collaboratorsHtml.join('')
+      @$list.html(collaboratorsHtml)
       @updateFocus() if @currentIndex? && @hasFocus
       @hasFocus = false
 

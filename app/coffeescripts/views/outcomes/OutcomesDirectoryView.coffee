@@ -26,10 +26,11 @@ define [
   'compiled/collections/OutcomeGroupCollection'
   'compiled/views/outcomes/OutcomeGroupIconView'
   'compiled/views/outcomes/OutcomeIconView'
+  'str/htmlEscape'
   'jquery.disableWhileLoading'
   'jqueryui/droppable'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, $, _, PaginatedView, OutcomeGroup, OutcomeCollection, OutcomeGroupCollection, OutcomeGroupIconView, OutcomeIconView) ->
+], (I18n, $, _, PaginatedView, OutcomeGroup, OutcomeCollection, OutcomeGroupCollection, OutcomeGroupIconView, OutcomeIconView, htmlEscape) ->
 
   # The outcome group "directory" browser.
   class OutcomesDirectoryView extends PaginatedView
@@ -157,11 +158,12 @@ define [
     # Overriding
     paginationLoaderTemplate: ->
       "<li><a href='#' class='loading-more'>
-        #{I18n.t("loading_more_results", "Loading more results")}</a></li>"
+        #{htmlEscape I18n.t("loading_more_results", "Loading more results")}</a></li>"
 
     # Overriding to insert into the ul.
     showPaginationLoader: ->
-      @$el.append(@$paginationLoader ?= $(@paginationLoaderTemplate()))
+      @$paginationLoader ?= $(@paginationLoaderTemplate())
+      @$el.append(@$paginationLoader)
 
     # Fetch outcomes after all the groups have been fetched.
     fetchOutcomes: ->

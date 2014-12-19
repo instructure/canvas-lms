@@ -266,7 +266,7 @@ define([
           moduleSelectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
         $('#move_module_item_module_select').empty();
-        $('#move_module_item_module_select').append(moduleSelectOptions.join(''));
+        $('#move_module_item_module_select').append($.raw(moduleSelectOptions.join('')));
 
         // Trigger the change to make sure the list is initally populated.
         $('#move_module_item_module_select').trigger('change');
@@ -307,7 +307,7 @@ define([
 
         var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
         $('#move_context_module_select').empty();
-        $('#move_context_module_select').append(selectOptions.join(''));
+        $('#move_context_module_select').append($.raw(selectOptions.join('')));
         //$form.fillFormData(data, {object_name: 'context_module'});
         $form.dialog({
           autoOpen: false,
@@ -960,7 +960,7 @@ define([
         var name = $(item).children().find('span.title').text();
         selectItemOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
       });
-      $('#move_module_item_select').append(selectItemOptions.join(''));
+      $('#move_module_item_select').append($.raw(selectItemOptions.join('')));
 
       // The case where the module has no items.
       if ($('#move_module_item_select').children().length === 0) {
@@ -1550,7 +1550,7 @@ define([
           });
           $row.find(".still_need_completing")
             .append("<b>"+htmlEscape(I18n.t('still_needs_completing', 'Still Needs to Complete'))+"</b><br/>")
-            .append(unfulfilled.join("<br/>"));
+            .append($.raw(unfulfilled.join("<br/>")));
         }
         $row.removeClass('locked').removeClass('in_progress').removeClass('completed')
           .addClass(type);

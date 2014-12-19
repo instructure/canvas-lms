@@ -41,8 +41,8 @@ define([
       if ($('#quiz_details').length) {
         return callback();
       } else {
-        return $.get($("#quiz_details_wrapper").data('url'), function(data) {
-          $("#quiz_details_wrapper").html(data);
+        return $.get($("#quiz_details_wrapper").data('url'), function(html) {
+          $("#quiz_details_wrapper").html(html);
           callback();
         });
       };

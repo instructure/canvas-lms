@@ -249,7 +249,7 @@ define([
       $("#media_upload_progress").hide();
     },
     setupErrorHandler: function() {
-      $("#media_upload_feedback_text").html(I18n.t('errors.media_comment_installation_broken', "Media comment uploading has not been set up properly. Please contact your administrator."));
+      $("#media_upload_feedback_text").text(I18n.t('errors.media_comment_installation_broken', "Media comment uploading has not been set up properly. Please contact your administrator."));
       $("#media_upload_feedback").css('visibility', 'visible');
       $('#audio_upload_holder').css('visibility', 'hidden');
       $('#video_upload_holder').css('visibility', 'hidden');

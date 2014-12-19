@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
+// xsslint jqueryObject.property sortable placeholder
+// xsslint safeString.property question_text
 define([
   'jst/quiz/regrade',
   'i18n!quizzes',
@@ -494,14 +498,14 @@ define([
               $tr.append($td);
             }
             var $td = $("<td class='final_answer'/>");
-            var answer = data.answer;
+            var answerHtml = data.answer;
             if (question.answerDecimalPoints || question.answer_tolerance) {
               var tolerance = parseFloatOrPercentage(question.answer_tolerance);
               tolerance = tolerance || Math.pow(0.1, question.answerDecimalPoints);
-              answer = answer + " <span style='font-size: 0.8em;'>+/-</span> " + tolerance;
+              answerHtml = answerHtml + " <span style='font-size: 0.8em;'>+/-</span> " + htmlEscape(tolerance);
               $question.find(".answer_tolerance").text(tolerance);
             }
-            $td.html(answer);
+            $td.html(answerHtml);
             $tr.append($td);
             $question.find(".equation_combinations tbody").append($tr);
           });
@@ -532,9 +536,9 @@ define([
       $question.find(".blank_id_select").empty();
       if (question.question_type == 'missing_word_question') {
         var $text = $question.find(".question_text");
-        $text.html("<span class='text_before_answers'>" + question.question_text + "</span> ");
+        $text.html("<span class='text_before_answers'>" + $.raw(question.question_text) + "</span> ");
         $text.append($select);
-        $text.append(" <span class='text_after_answers'>" + question.text_after_answers + "</span>");
+        $text.append(" <span class='text_after_answers'>" + $.raw(question.text_after_answers) + "</span>");
       } else if (question.question_type == 'multiple_dropdowns_question' || question.question_type == 'fill_in_multiple_blanks_question') {
         var variables = {}
         $.each(question.answers, function(i, data) {
@@ -570,15 +574,15 @@ define([
             split = split.split("\n");
           }
         }
-        var code = "";
+        var codeHtml = "";
         for(var cdx in split) {
           if(split[cdx]) {
-            code = code + "<li>" + htmlEscape(split[cdx]) + "</li>";
+            codeHtml = codeHtml + "<li>" + htmlEscape(split[cdx]) + "</li>";
           }
         }
 
-        if (code) {
-          $text.append(I18n.beforeLabel(I18n.t('labels.other_incorrect_matches', "Other Incorrect Match Options")) + "<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
+        if (codeHtml) {
+          $text.append(htmlEscape(I18n.beforeLabel(I18n.t('labels.other_incorrect_matches', "Other Incorrect Match Options"))) + "<ul class='matching_answer_incorrect_matches_list'>" + codeHtml + "</ul>");
         }
       }
       $question.find(".blank_id_select").change();
@@ -1852,12 +1856,12 @@ define([
             $td.attr('aria-labelledby', 'possible_solution_' + question.answers[idx].variables[jdx].name);
             $tr.append($td);
           }
-          var text = question.answers[idx].answer_text;
+          var html = question.answers[idx].answer_text;
           if (question.answer_tolerance) {
-            text = text + " <span style='font-size: 0.8em;'>+/-</span> " + question.answer_tolerance;
+            html = html + " <span style='font-size: 0.8em;'>+/-</span> " + htmlEscape(question.answer_tolerance);
           }
           var $td = $("<td class='final_answer'/>");
-          $td.html(text);
+          $td.html(html);
           $td.attr('aria-labelledby', 'possible_solution_final');
           $tr.append($td);
           $form.find(".combinations tbody").append($tr);
@@ -2206,7 +2210,7 @@ define([
       var $form = $question.parents(".question_holder").children("form");
       $form.attr('action', $("#quiz_urls .add_question_url,#bank_urls .add_question_url").attr('href'))
         .attr('method', 'POST')
-        .find(".submit_button").html(I18n.t('buttons.create_question', "Create Question"));
+        .find(".submit_button").text(I18n.t('buttons.create_question', "Create Question"));
       $form.find("option.missing_word").remove();
       $question.find(".question_type").change();
       $("html,body").scrollTo({top: $question.offset().top - 10, left: 0});
@@ -3077,17 +3081,17 @@ define([
 
         if (this.intoGroups.length > 0) {
           options = $.map(this.intoGroups, function(g) {
-            return '<option value="' + g.id + '">' + g.name + '</option>';
+            return '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>';
           });
           options.unshift('<option value="top">' +
-            I18n.t('top_level', '-- Top level --') +
+            htmlEscape(I18n.t('top_level', '-- Top level --')) +
           '</option>');
 
           moveWrapper.show();
         } else {
           moveWrapper.hide();
         }
-        moveSelect.html(options.join(''));
+        moveSelect.html($.raw(options.join('')));
 
         // trigger building 'place' menu
         moveSelect.change(this.buildPlaceMenu.bind(this));
@@ -3103,14 +3107,14 @@ define([
 
         // build options
         var options = $.map(filtered, function(item) {
-          return '<option value="' + item.type + '_' + item.id + '">' +
-            I18n.t('before_quiz_item', "before %{name}", {name: item.name}) +
+          return '<option value="' + htmlEscape(item.type) + '_' + item.id + '">' +
+            htmlEscape(I18n.t('before_quiz_item', "before %{name}", {name: item.name})) +
           '</option>';
         });
         options.push('<option value="last">' +
-          I18n.t('at_the_bottom', "-- at the bottom --") +
+          htmlEscape(I18n.t('at_the_bottom', "-- at the bottom --")) +
         '</option>');
-        this.$form.find('#move_select_question').html(options.join(''));
+        this.$form.find('#move_select_question').html($.raw(options.join('')));
       },
 
       itemsInGroup: function(group) {
@@ -3199,7 +3203,7 @@ define([
         this.reorderDomGroupContent(bottom);
         this.setQuestionGroupClass(group);
       },
-      reorderDomGroupContent: function(bottom) {
+      reorderDomGroupContent: function($bottom) {
         if (this.selected.type != 'group') { return; }
 
         var prev = this.selected.sortable;
@@ -3210,7 +3214,7 @@ define([
             prev = item.sortable;
           });
         }
-        prev.after(bottom);
+        prev.after($bottom);
       },
       setQuestionGroupClass: function(group) {
         if (this.selected.type != 'question') { return; }
@@ -3300,7 +3304,7 @@ define([
           } else {
             ui.placeholder.removeClass('group');
           }
-          ui.placeholder.append("<div class='question_placeholder' style='height: " + (ui.helper.height() - 10) + "px;'>&nbsp;</div>");
+          ui.placeholder.append("<div class='question_placeholder' style='height: " + $.raw(ui.helper.height() - 10) + "px;'>&nbsp;</div>");
         }
       },
       change: function(event, ui) {
@@ -3508,8 +3512,8 @@ define([
     $("#calc_helper_methods").change(function() {
       var method = $(this).val();
       $("#calc_helper_method_description").text(calcCmd.functionDescription(method));
-      var code = "<pre>" + calcCmd.functionExamples(method).join("</pre><pre>") + "</pre>";
-      $("#calc_helper_method_examples").html(code);
+      var html = "<pre>" + $.raw($.map(calcCmd.functionExamples(method), htmlEscape).join("</pre><pre>")) + "</pre>";
+      $("#calc_helper_method_examples").html(html);
     });
 
     $("#equations_dialog_tabs").tabs();
@@ -3564,7 +3568,7 @@ define([
       }
       // if there are not any options besides the default "<option class="shown_when_no_other_options_available" value='0'>[ Enter Answer Variables Above ]</option>" one
       if (!$select.find("option:not(.shown_when_no_other_options_available)").length) {
-        $select.append("<option class='shown_when_no_other_options_available' value='0'>" + I18n.t('enter_answer_variable_above', "[ Enter Answer Variables Above ]") + "</option>");
+        $select.append("<option class='shown_when_no_other_options_available' value='0'>" + htmlEscape(I18n.t('enter_answer_variable_above', "[ Enter Answer Variables Above ]")) + "</option>");
       }
       $select.find("option.to_be_removed").remove();
       $select.change();
@@ -3720,12 +3724,12 @@ define([
               });
               var $td = $("<td/>");
               $td.addClass('final_answer');
-              var text = solution.rawText();
+              var html = htmlEscape(solution.rawText());
               var tolerance = answer_tolerance;
               if (tolerance) {
-                text += " <span style='font-size: 0.8em;'>+/-</span> " + tolerance;
+                html += " <span style='font-size: 0.8em;'>+/-</span> " + htmlEscape(tolerance);
               }
-              $td.html(text);
+              $td.html(html);
               $result.append($td);
               succeeded++;
               failedCount = 0;
@@ -3804,7 +3808,7 @@ define([
       val = Math.round(val * data.rounder) / (data.rounder);
       $variable.attr('data-value', val);
       if (!options || options.template) {
-        $variable.find(".value").html(val);
+        $variable.find(".value").text(val);
       }
       if (!options || options.recompute) {
         $question.find(".supercalc").superCalc('recalculate');
@@ -3844,7 +3848,8 @@ define([
             if (!matchHash[variable]) {
               var $variable = $question.find('.variables tr.variable[data-name="' + variable + '"]');
               if ($variable.length === 0) {
-                var label_id = "label_for_var_" + variable;
+                var label_id = htmlEscape("label_for_var_" + variable);
+                // xsslint safeString.identifier label_id
 
                 $variable = $("<tr class='variable'>"
                               + "<th id='" + label_id + "' class='name'></th>"

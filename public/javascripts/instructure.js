@@ -324,15 +324,15 @@ define([
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
-            .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + externalLink + '"/>')
-            .append('<span class="screenreader-only">&nbsp;(' + externalLink + ')</span>');
+            .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
+            .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
         }).end()
           .find("a.instructure_file_link").each(function() {
               var $link = $(this),
                   $span = $("<span class='instructure_file_link_holder link_holder'/>");
               $link.removeClass('instructure_file_link').before($span).appendTo($span);
               if($link.attr('target') != '_blank') {
-            $span.append("<a href='" + $link.attr('href') + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
+            $span.append("<a href='" + htmlEscape($link.attr('href')) + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
                 "' style='padding-left: 5px;'><img src='/images/popout.png' alt='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) + "'/></a>");
           }
         });
@@ -341,7 +341,7 @@ define([
           var $link = $(this);
           if ( $.trim($link.text()) ) {
             var $span = $("<span class='instructure_scribd_file_holder link_holder'/>"),
-                        $scribd_link = $("<a class='scribd_file_preview_link' aria-hidden='true' tabindex='-1' href='" + $link.attr('href') + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
+                        $scribd_link = $("<a class='scribd_file_preview_link' aria-hidden='true' tabindex='-1' href='" + htmlEscape($link.attr('href')) + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
                             "' style='padding-left: 5px;'><img src='/images/preview.png' alt='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) + "'/></a>");
                     $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
                     $span.append($scribd_link);
@@ -364,10 +364,10 @@ define([
               id = $.youTubeID(href || "");
           if($link.hasClass('inline_disabled')) {
           } else if(id) {
-            var $after = $('<a href="'+ href +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + id + '/2.jpg)"/></a>')
+            var $after = $('<a href="'+ htmlEscape(href) +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + htmlEscape(id) + '/2.jpg)"/></a>')
               .click(function(event) {
                 event.preventDefault();
-                var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
+                var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
                 $video.find(".hide_youtube_embed_link").click(function(event) {
                   event.preventDefault();
                   $video.remove();

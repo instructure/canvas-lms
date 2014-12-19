@@ -17,7 +17,7 @@ define [
   'compiled/str/convertApiUserContent'
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], ($, _, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStats, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
+], ($, _, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStatsTemplate, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
 
   class EntryView extends Backbone.View
 
@@ -124,11 +124,11 @@ define [
       stats = @countPosterity()
       html = """
         <div class='new-and-total-badge'>
-          <span class="new-items">#{stats.unread}</span>
-          <span class="total-items">#{stats.total}</span>
+          <span class="new-items">#{htmlEscape stats.unread}</span>
+          <span class="total-items">#{htmlEscape stats.total}</span>
         </div>
         """
-      @$headerBadges.append entryStats({stats})
+      @$headerBadges.append entryStatsTemplate({stats})
       @addedCountsToHeader = true
 
     toggleDeleted: (model, deleted) =>
@@ -179,10 +179,10 @@ define [
 
     renderDescendantsLink: ->
       stats = @countPosterity()
-      @descendantsLink = $ '<div/>'
-      @descendantsLink.html entryStats({stats, showMore: yes})
-      @descendantsLink.addClass 'showMore loadDescendants'
-      @$replies.append @descendantsLink
+      @$descendantsLink = $ '<div/>'
+      @$descendantsLink.html entryStatsTemplate({stats, showMore: yes})
+      @$descendantsLink.addClass 'showMore loadDescendants'
+      @$replies.append @$descendantsLink
 
     countPosterity: ->
       stats = unread: 0, total: 0

@@ -2,13 +2,14 @@ define [
   'i18n!gradebook2'
   'jquery'
   'jst/CurveGradesDialog'
+  'str/htmlEscape'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'compiled/jquery/fixDialogButtons'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, curveGradesDialogTemplate) ->
+], (I18n, $, curveGradesDialogTemplate, htmlEscape) ->
 
   class CurveGradesDialog
     constructor: ({@assignment, @students, context_url}) ->
@@ -133,12 +134,12 @@ define [
             pct = (users.length / maxCount)
             cnt = users.length
           color = (if idx == 0 then "#a03536" else "#007ab8")
-          $("#results_list").prepend "<td style='padding: 1px;'><div title='" + cnt + " student" + (if cnt == 1 then "" else "s") + " will get " + idx + " points' style='border: 1px solid #888; background-color: " + color + "; width: " + width + "px; height: " + (100 * pct) + "px; margin-top: " + (100 * (1 - pct)) + "px;'>&nbsp;</div></td>"
-          $("#results_values").prepend "<td style='text-align: center;'>" + idx + "</td>"
+          $("#results_list").prepend "<td style='padding: 1px;'><div title='" + htmlEscape(I18n.t({one: "1 student will get %{num} points", other: "%{count} students will get %{num} points"}, {count: cnt, num: idx})) + "' style='border: 1px solid #888; background-color: " + htmlEscape(color) + "; width: " + htmlEscape(width) + "px; height: " + htmlEscape(100 * pct) + "px; margin-top: " + htmlEscape(100 * (1 - pct)) + "px;'>&nbsp;</div></td>"
+          $("#results_values").prepend "<td style='text-align: center;'>" + htmlEscape(idx) + "</td>"
           skipCount = 0
         else
           skipCount++
         idx--
-      $("#results_list").prepend "<td><div style='height: 100px; position: relative; width: 30px; font-size: 0.8em;'><img src='/images/number_of_students.png' alt='# of students'/><div style='position: absolute; top: 0; right: 3px;'>" + maxCount + "</div><div style='position: absolute; bottom: 0; right: 3px;'>0</div></div></td>"
+      $("#results_list").prepend "<td><div style='height: 100px; position: relative; width: 30px; font-size: 0.8em;'><img src='/images/number_of_students.png' alt='" + htmlEscape(I18n.t("# of students")) + "'/><div style='position: absolute; top: 0; right: 3px;'>" + htmlEscape(maxCount) + "</div><div style='position: absolute; bottom: 0; right: 3px;'>0</div></div></td>"
       $("#results_values").prepend "<td>&nbsp;</td>"
       finalScores

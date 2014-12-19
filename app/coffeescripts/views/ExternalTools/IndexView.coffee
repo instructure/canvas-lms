@@ -123,7 +123,7 @@ define [
       view = @$(event.currentTarget).closest('.external_tool_item').data('view')
       tool = view.model
       msg = I18n.t 'remove_tool', "Are you sure you want to remove this tool?"
-      dialog = $("<div>#{msg}</div>").dialog
+      dialog = $("<div>#{htmlEscape msg}</div>").dialog
         modal: true,
         resizable: false
         title: I18n.t('delete', 'Delete') + ' ' + tool.get('name') + '?'

@@ -5,6 +5,10 @@ define [
   'str/htmlEscape'
 ], (I18n, $, _, h) ->
 
+  ###
+  xsslint safeString.identifier i
+  ###
+
   builders =
     year: (options, htmlOptions) ->
       step = if options.startYear < options.endYear then 1 else -1
@@ -56,12 +60,11 @@ define [
     for i in [0...options.order.length]
       type = options.order[i]
       tName = name.replace(/(\]?)$/, "(" + position[type] + "i)$1")
-      $result.append(
-        builders[type](
-          options,
-          _.extend({name: tName}, htmlOptions),
-          dateSettings
-        )
+      html = builders[type](
+        options,
+        _.extend({name: tName}, htmlOptions),
+        dateSettings
       )
+      $result.append(html)
       delete htmlOptions.id
     $result

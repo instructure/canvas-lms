@@ -80,7 +80,7 @@ define([
         return;
       }
       $member_list = $('<ul/>').addClass('member_list');
-      var $loader = $('<li/>').addClass('loader').html(I18n.t('loading', 'loading group roster...'));
+      var $loader = $('<li/>').addClass('loader').text(I18n.t('loading', 'loading group roster...'));
       $member_list.append($loader);
       $member_list.pageless({
         container: $member_list,
@@ -92,7 +92,7 @@ define([
         scrape: function(data, xhr) {
           students = $.parseJSON(data)
           for (idx in students) {
-            $('<li/>').addClass('student').html(students[idx].display_name).insertBefore($loader);
+            $('<li/>').addClass('student').text(students[idx].display_name).insertBefore($loader);
           }
           return '';
         }

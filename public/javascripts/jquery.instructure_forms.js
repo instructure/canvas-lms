@@ -222,7 +222,7 @@ define([
         });
       } else if(doUploadFile) {
         var id            = _.uniqueId(formId + "_"),
-            $frame        = $("<div style='display: none;' id='box_" + id + "'><iframe id='frame_" + id + "' name='frame_" + id + "' src='about:blank' onload='$(\"#frame_" + id + "\").triggerHandler(\"form_response_loaded\");'></iframe>")
+            $frame        = $("<div style='display: none;' id='box_" + htmlEscape(id) + "'><iframe id='frame_" + htmlEscape(id) + "' name='frame_" + htmlEscape(id) + "' src='about:blank' onload='$(\"#frame_" + htmlEscape(id) + "\").triggerHandler(\"form_response_loaded\");'></iframe>")
                                 .appendTo("body").find("#frame_" + id),
             formMethod    = method,
             priorTarget   = $form.attr('target'),
@@ -515,6 +515,7 @@ define([
     }
     if(window.FormData && !hasFakeFile) {
       var fd = new FormData();
+      // xsslint xssable.receiver.whitelist fd
       for(var idx in params) {
         var param = params[idx];
         if(window.FileList && (param instanceof FileList)) {
@@ -935,17 +936,17 @@ define([
       if($form.find(":input[name='" + i + "'],:input[name*='[" + i + "]']").length > 0) {
         $.each(val, function(idx, msg) {
           if(!errors[i]) {
-            errors[i] = msg;
+            errors[i] = htmlEscape(msg);
           } else {
-            errors[i] += "<br/>" + msg;
+            errors[i] += "<br/>" + htmlEscape(msg);
           }
         });
       } else {
         $.each(val, function(idx, msg) {
           if(!errors.general) {
-            errors.general = msg;
+            errors.general = htmlEscape(msg);
           } else {
-            errors.general += "<br/>" + msg;
+            errors.general += "<br/>" + htmlEscape(msg);
           }
         });
       }
@@ -966,7 +967,7 @@ define([
       }
       errorDetails[name] = {object: $obj, message: msg};
       hasErrors = true;
-      var offset = $obj.errorBox(msg).offset();
+      var offset = $obj.errorBox($.raw(msg)).offset();
       if (offset.top > highestTop) {
         highestTop = offset.top;
       }
@@ -1010,7 +1011,7 @@ define([
       var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
 
       // If our message happens to be a safe string, parse it as such. Otherwise, clean it up. //
-      $box.find(".error_text").html(htmlEscape(message).toString());
+      $box.find(".error_text").html(htmlEscape(message));
 
       var offset = $obj.offset();
       var height = $box.outerHeight();

@@ -199,7 +199,7 @@ define([
             if(section_type == "rich_text") { 
               code = $(this).find(".edit_section").editorBox('get_code');
             }
-            $(this).find(".section_content").html(code);
+            $(this).find(".section_content").html($.raw(code));
           } else if(!$(this).hasClass('read_only')) {
             $(this).remove();
           }
@@ -416,7 +416,7 @@ define([
       },
       error: function(data) {
         var $section = $(this).data("section");
-        $section.find(".uploading_file").html(I18n.t('errors.upload_failed', "Upload Failed."));
+        $section.find(".uploading_file").text(I18n.t('errors.upload_failed', "Upload Failed."));
         $section.addClass('failed');
         $section.formErrors(data.errors || data);
       }

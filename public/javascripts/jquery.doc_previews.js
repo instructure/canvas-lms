@@ -126,7 +126,7 @@ define([
             url: opts.public_url
           });
           if (!opts.ajax_valid || opts.ajax_valid()){
-            $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
+            $('<iframe src="' + htmlEscape(googleDocPreviewUrl) + '" height="' + opts.height  + '" width="100%" />')
               .appendTo($this)
               .load(function(){
                 tellAppIViewedThisInline('google');

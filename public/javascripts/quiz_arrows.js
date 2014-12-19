@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// xsslint jqueryObject.identifier /Tpl$/
+
 define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
   // Create and append right/wrong arrows to all appropriate
   // answers on a quiz results page.

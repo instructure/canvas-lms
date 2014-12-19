@@ -48,7 +48,7 @@ define [
 
     createCancelButton: ->
       $('<a/>')
-        .html(I18n.t('cancel', 'Cancel'))
+        .text(I18n.t('cancel', 'Cancel'))
         .css(marginLeft: '5px')
         .attr('href', 'javascript:')
         .addClass('cancel_button')

@@ -131,10 +131,10 @@ define [
       @setSelectedImage src: $(event.currentTarget).val()
 
     generateImageHtml: ->
-      img_tag = @editor.dom.createHTML("img", @getAttributes())
+      imgHtml = @editor.dom.createHTML("img", @getAttributes())
       if @flickr_link
-        img_tag = "<a href='#{@flickr_link}'>#{img_tag}</a>"
-      img_tag
+        imgHtml = "<a href='#{h @flickr_link}'>#{imgHtml}</a>"
+      imgHtml
         
     update: =>
       @editor.selection.moveToBookmark(@prevSelection)

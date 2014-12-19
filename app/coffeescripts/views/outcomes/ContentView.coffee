@@ -58,10 +58,11 @@ define [
 
     render: ->
       @attachEvents()
-      @$el.html if @innerView
+      html = if @innerView
           @innerView.render().el
         else if @renderInstructions
           @instructionsTemplate()
+      @$el.html html
       this
 
     attachEvents: ->

@@ -730,7 +730,7 @@ define([
     data.description = $event.data('description');
     $box.fillTemplateData({data: data, htmlValues: ['description']});
     if (data.lock_info) {
-      $box.find(".lock_explanation").html(INST.lockExplanation(data.lock_info, 'assignment'));
+      $box.find(".lock_explanation").html(htmlEscape(INST.lockExplanation(data.lock_info, 'assignment')));
     }
     if ($editEvent.data('dialog')) $editEvent.dialog('close');
     $box.find(".description").css("max-height", Math.max($(window).height() - 200, 150));

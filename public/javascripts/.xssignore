@@ -1,0 +1,16 @@
+# top level, and plugin ones too
+jst
+/bower
+/jsx/.module-cache
+/jsx/sample.js
+/mediaelement
+/tinymce/jscripts/tiny_mce/langs
+/tinymce/jscripts/tiny_mce/plugins/*
+!/tinymce/jscripts/tiny_mce/plugins/instructure*
+/tinymce/jscripts/tiny_mce/themes
+/tinymce/jscripts/tiny_mce/tiny_mce*.js
+/tinymce/jscripts/tiny_mce/utils
+/vendor
+
+# need better hinting, skipping this atm due to false positives in vendor code
+/client_apps

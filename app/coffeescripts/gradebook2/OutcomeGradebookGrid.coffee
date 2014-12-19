@@ -9,6 +9,10 @@ define [
   'jst/gradebook2/outcome_gradebook_student_cell'
 ], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
+  ###
+  xsslint safeString.method cellHtml
+  ###
+
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']
 
