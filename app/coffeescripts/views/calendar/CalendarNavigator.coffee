@@ -10,10 +10,11 @@ define [
     template: template
 
     els:
-      '.navigation_title'     : '$title'
-      '.navigation_buttons'   : '$buttons'
-      '.date_field'           : '$dateField'
-      '.date_field_wrapper'   : '$dateWrapper'
+      '.navigation_title'      : '$title'
+      '.navigation_title_text' : '$titleText'
+      '.navigation_buttons'    : '$buttons'
+      '.date_field'            : '$dateField'
+      '.date_field_wrapper'    : '$dateWrapper'
 
     events:
       'click .navigate_prev'        : '_triggerPrev'
@@ -56,7 +57,8 @@ define [
     hide: => @show(false)
 
     setTitle: (new_text) =>
-      @$title.text(new_text)
+      # need to use .html instead of .text so &ndash; will render correctly
+      @$titleText.html(new_text)
 
     showPicker: (visible = true) ->
       @_pickerShowing = visible
