@@ -46,6 +46,15 @@ describe EnrollmentsFromUserList do
       expect(enrollments.length).to eql(3)
     end
 
+    it "should respect the section option when a user is already enrolled in another section" do
+      othersection = @course.course_sections.create! name: 'othersection'
+      @teacher.pseudonyms.create! unique_id: 'teacher@example.com'
+      @el = UserList.new('teacher@example.com')
+      enrollments = EnrollmentsFromUserList.process(@el, @course, course_section_id: othersection.to_param, enrollment_type: 'TeacherEnrollment')
+      expect(enrollments.map(&:course_section_id)).to eq([othersection.id])
+      expect(@teacher.teacher_enrollments.where(course_id: @course).pluck(:course_section_id)).to match_array([@course.default_section.id, othersection.id])
+    end
+
   end
   
   context "EnrollmentsFromUserList.process" do
