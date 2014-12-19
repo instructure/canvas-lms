@@ -133,7 +133,7 @@
     // Add privacy notices
     utils.onPage(/^\/courses\/\d+\/collaborations\/?$/, function () {
         $('<div class="pia-notice">')
-            .appendTo('#collaborate_authorize_google_docs')
+            .appendTo('#google_docs_description td')
             .append('<p><em>Google Docs notice for instructors</em></p>')
             .append('<p><strong>Is your use of Google Docs privacy compliant?</strong> There are <strong>personal ' +
                 'legal consequences</strong> if you use an app that discloses and stores students&rsquo; personal ' +
