@@ -101,10 +101,14 @@
       </td>
     </tr>
   <% end %>
-  <% if !@password_pseudonyms.empty? %>
   <tr class="edit_data_row select_change_password_row" style="display: none;">
     <td><%= before_label(:password, "Password") %></td>
-    <td><label for="change_password_checkbox" class="checkbox"><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/><%= t('labels.change_password', "Change Password") %></label></td>
+    <td><a href="<%=beyondz_app_url(:change_password_path)%>"><%= t('labels.change_password', "Change Password") %></a></td>
+  </tr>
+  <% if false && !@password_pseudonyms.empty? %>
+  <tr class="edit_data_row select_change_password_row" style="display: none;">
+    <td><%= before_label(:password, "password") %></td>
+    <td><label for="change_password_checkbox" class="checkbox"><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/><%= t('labels.change_password', "change password") %></label></td>
   </tr>
   <% end %>
   <tr class="change_password_row" style="display: none;">

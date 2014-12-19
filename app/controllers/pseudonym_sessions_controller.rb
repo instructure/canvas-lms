@@ -81,7 +81,11 @@ class PseudonymSessionsController < ApplicationController
             logger.warn "Received CAS login for unknown user: #{st.user}"
             reset_session
             session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.user
-            redirect_to(cas_client.logout_url(cas_login_url :no_auto => true))
+            # redirect_to(cas_client.logout_url(cas_login_url :no_auto => true))
+
+            # Send a non-existent user back to the beyondz main site so our
+            # regular application can figure out where they should be
+            redirect_to(beyondz_app_url(:nonexistent_user_path))
             return
           end
         else
