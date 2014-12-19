@@ -96,7 +96,7 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
 
 .btn,       // <-- deprecated- do not use
 .Button {
-  @include canvas-button(darken($canvas-light, 3%), $textColor, true);
+  @include canvas-button(darken($canvas-light, 3%), $textColor);
   border-radius: $baseBorderRadius;
   transition: background-color 0.2s ease-in-out;
   display: inline-block;
@@ -193,7 +193,7 @@ input[type="button"] {
 
 .btn-primary, // <-- deprecated- do not use
 .Button--primary {
-  @include canvas-button($canvas-primary, $canvas-light, false);
+  @include canvas-button($canvas-primary, $canvas-light);
   @if $use_high_contrast {
     &:focus { @include button-focus($canvas-action); }
   }
@@ -201,22 +201,22 @@ input[type="button"] {
 // Warning appears are orange
 .btn-warning, // <-- deprecated- do not use
 .Button--warning {
-  @include canvas-button($canvas-alert, $canvas-light, false);
+  @include canvas-button($canvas-alert, $canvas-light);
 }
 // Danger and error appear as red
 .btn-danger, // <-- deprecated- do not use
 .Button--danger {
-  @include canvas-button($canvas-danger, $canvas-light, false);
+  @include canvas-button($canvas-danger, $canvas-light);
 }
 // Success appears as green
 .btn-success, // <-- deprecated- do not use
 .Button--success {
-  @include canvas-button($canvas-success, $canvas-light, false);
+  @include canvas-button($canvas-success, $canvas-light);
 }
 // Info appears as a neutral blue
 .btn-info, // <-- deprecated- do not use
 .Button--secondary {
-  @include canvas-button($canvas-secondary, $canvas-light, false);
+  @include canvas-button($canvas-secondary, $canvas-light);
 }
 
 // Inverse appears as dark gray <-- deprecated- do not use
