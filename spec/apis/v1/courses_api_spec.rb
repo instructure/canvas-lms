@@ -1319,6 +1319,25 @@ describe CoursesController, type: :request do
                       { :state => ['unpublished'] })
       expect(json.collect{ |c| c['id'].to_i }.sort).to eq [@course3.id, @course4.id]
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "returns courses for out-of-shard users" do
+        pend_with_bullet
+        @shard1.activate { @user = User.create!(name: 'outofshard') }
+        enrollment = @course1.enroll_student(@user)
+
+        @me = @user
+
+        json = api_call(:get, "/api/v1/courses.json",
+          { :controller => 'courses', :action => 'index', :format => 'json' },
+          { :state => ['available'] })
+
+        expect(json.size).to eq(1)
+        expect(json.first['id']).to eq(@course1.id)
+      end
+    end
   end
 
   describe "root account filter" do

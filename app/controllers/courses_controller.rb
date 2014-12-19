@@ -382,7 +382,7 @@ class CoursesController < ApplicationController
           conditions = states.map{ |state|
             Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
           }.compact.join(" OR ")
-          enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions)
+          enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions).shard(@current_user)
         else
           enrollments = @current_user.cached_current_enrollments(preload_courses: true)
         end
