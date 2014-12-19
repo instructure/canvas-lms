@@ -1,6 +1,4 @@
 require 'nokogiri'
-require 'canvas/migration'
-require 'workers/qti_worker'
 require 'qti/qti_plugin_validator'
 
 module Qti

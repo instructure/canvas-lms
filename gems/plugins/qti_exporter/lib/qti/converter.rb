@@ -1,5 +1,3 @@
-require_dependency 'qti/respondus_settings'
-
 module Qti
 class Converter < Canvas::Migration::Migrator
 
