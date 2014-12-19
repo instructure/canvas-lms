@@ -59,6 +59,12 @@ define [
         }).$el.appendTo(@$folderTree)
       super
 
+    destroyView: ->
+      @undelegateEvents()
+      @$el.removeData().unbind()
+      @remove()
+      Backbone.View.prototype.remove.call(@)
+
     # Set the focus from one tree item to another.
     setFocus: ($to, $from) ->
       if not $to?.length or $from?.is? $to
