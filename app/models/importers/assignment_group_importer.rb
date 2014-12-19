@@ -38,6 +38,7 @@ module Importers
       return nil if hash[:migration_id] && hash[:assignment_groups_to_import] && !hash[:assignment_groups_to_import][hash[:migration_id]]
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
+      item ||= context.assignment_groups.where(name: hash[:title], migration_id: nil).first
       item ||= context.assignment_groups.new
       migration.add_imported_item(item) if migration
       item.migration_id = hash[:migration_id]

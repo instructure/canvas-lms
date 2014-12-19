@@ -43,6 +43,26 @@ describe "Importing Assignment Groups" do
     end
   end
 
+  it "should reuse existing empty assignment groups with the same name" do
+    course_model
+    assignment_group = @course.assignment_groups.create! name: 'teh group'
+    assignment_group_json = { 'title' => 'teh group', 'migration_id' => '123' }
+    Importers::AssignmentGroupImporter.import_from_migration(assignment_group_json, @course)
+    expect(assignment_group.reload.migration_id).to eq('123')
+    expect(@course.assignment_groups.count).to eq 1
+  end
+
+  it "should not match assignment groups with migration ids by name" do
+    course_model
+    assignment_group = @course.assignment_groups.create name: 'teh group'
+    assignment_group.migration_id = '456'
+    assignment_group.save!
+    assignment_group_json = { 'title' => 'teh group', 'migration_id' => '123' }
+    Importers::AssignmentGroupImporter.import_from_migration(assignment_group_json, @course)
+    expect(assignment_group.reload.migration_id).to eq('456')
+    expect(@course.assignment_groups.count).to eq 2
+  end
+
   it "should get attached to an assignment" do
     data = get_import_data('bb8', 'assignment_group')
     context = get_import_context('bb8')
