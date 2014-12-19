@@ -64,10 +64,11 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-view-month")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
-        skip "needs CNVS-17128 to be fixed"
         @da_assignment.grade_student(@student, {:grade => 10})
         get "/calendar"
-        expect(f(".fc-view-month")).to include_text(@da_assignment.title)
+        f("#undated-events-section .element_toggler").click
+        wait_for_ajaximations
+        expect(f("#undated_events_list")).to include_text(@da_assignment.title)
       end
     end
   end
@@ -132,10 +133,11 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-view-month")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
-        skip "needs CNVS-17128 to be fixed"
         @da_assignment.grade_student(@student, {:grade => 10})
         get "/calendar"
-        expect(f(".fc-view-month")).to include_text(@da_assignment.title)
+        f("#undated-events-section .element_toggler").click
+        wait_for_ajaximations
+        expect(f("#undated_events_list")).to include_text(@da_assignment.title)
       end
     end
   end
