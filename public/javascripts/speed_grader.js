@@ -1268,8 +1268,11 @@ define([
 
     showSubmissionDetails: function(){
       //if there is a submission
-      if (this.currentStudent.submission && this.currentStudent.submission.submitted_at) {
+      var currentSubmission = this.currentStudent.submission;
+      if (currentSubmission && currentSubmission.submitted_at) {
         this.refreshSubmissionsToView();
+        var lastIndex = currentSubmission.submission_history.length - 1;
+        $("#submission_to_view option:eq(" + lastIndex + ")").attr("selected", "selected");
         $submission_details.show();
       }
       else { //there's no submission
