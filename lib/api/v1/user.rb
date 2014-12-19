@@ -147,7 +147,8 @@ module Api::V1::User
   def enrollment_json(enrollment, user, session, includes = [])
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
-      json[:role] = enrollment.role
+      json[:role] = enrollment.role.name
+      json[:role_id] = enrollment.role_id
       json[:sis_source_id] = enrollment.sis_source_id # SFU MOD - CANVAS-224
       json[:sis_batch_id] = enrollment.sis_batch_id
       json[:last_activity_at] = enrollment.last_activity_at

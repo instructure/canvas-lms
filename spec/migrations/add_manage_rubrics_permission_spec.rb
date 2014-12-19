@@ -8,14 +8,14 @@ describe "AddManageRubricsPermission" do
       accounts << account_model(:parent_account => Account.default)
     end
 
-    enrollment_types = ['TeacherEnrollment', 'TaEnrollment', 'AccountAdmin', 'AccountMembership']
+    roles = ['TeacherEnrollment', 'TaEnrollment', 'AccountAdmin', 'AccountMembership'].map{|n| Role.get_built_in_role(n)}
     bool = true
 
     role_overrides = []
     accounts.each do |account|
-      enrollment_types.each do |enrollment_type|
+      roles.each do |role|
         role_overrides << RoleOverride.create!(:context => account, :permission => 'manage_grades',
-          :enrollment_type => enrollment_type, :enabled => bool)
+          :role => role, :enabled => bool)
         bool = !bool
       end
     end
@@ -29,7 +29,7 @@ describe "AddManageRubricsPermission" do
       new_role_override = new_role_overrides.find{|ro|
         ro.context_id == old_role_override.context_id &&
         ro.context_type == old_role_override.context_type &&
-        ro.enrollment_type == old_role_override.enrollment_type
+        ro.role_id == old_role_override.role_id
       }
       expect(new_role_override).not_to be_nil
 

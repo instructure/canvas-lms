@@ -28,7 +28,7 @@ class EnrollmentsFromUserList
   def initialize(course, opts={})
     @course = course
     @enrollment_type = opts[:enrollment_type] || 'StudentEnrollment'
-    @role_name = opts[:role_name]
+    @role = opts[:role]
     @limit = opts[:limit]
     @section = (opts[:course_section_id].present? ? @course.course_sections.active.where(id: opts[:course_section_id].to_i).first : nil) || @course.default_section
     @limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
@@ -57,7 +57,7 @@ class EnrollmentsFromUserList
     return unless user
     return if @enrolled_users.has_key?(user.id)
     @enrolled_users[user.id] = true
-    @course.enroll_user(user, @enrollment_type, :section => @section, :limit_privileges_to_course_section => @limit_privileges_to_course_section, :role_name => @role_name).tap do |e|
+    @course.enroll_user(user, @enrollment_type, :section => @section, :limit_privileges_to_course_section => @limit_privileges_to_course_section, :role => @role).tap do |e|
       @enrollments << e if e
     end
   end

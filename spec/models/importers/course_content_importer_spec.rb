@@ -201,9 +201,9 @@ describe Course do
 
     Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
-    aqb1 = @course.assessment_question_banks.where(migration_id: "i7c16375e1a00381824d060d3d4f9acc4").first
+    aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
     expect(aqb1.assessment_questions.count).to eq 3
-    aqb2 = @course.assessment_question_banks.where(migration_id: "i966491408fab70dfc76ae02b197938a3").first
+    aqb2 = @course.assessment_question_banks.where(migration_id: "iaac763df0de1199ef143b2ab8f237e76").first
     expect(aqb2.assessment_questions.count).to eq 2
   end
 
@@ -213,7 +213,7 @@ describe Course do
     json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
     data = JSON.parse(json).with_indifferent_access
 
-    params = {"copy" => {"assessment_question_banks" => {"i7c16375e1a00381824d060d3d4f9acc4" => true},
+    params = {"copy" => {"assessment_question_banks" => {"i05dab0b3d55dae214bd0c4787bd6d20f" => true},
                          "quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true,
                                        "ife86eb19e30869506ee219b17a6a1d4e" => true}}}
 
@@ -224,7 +224,7 @@ describe Course do
     Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
     expect(@course.assessment_question_banks.count).to eq 1
-    aqb1 = @course.assessment_question_banks.where(migration_id: "i7c16375e1a00381824d060d3d4f9acc4").first
+    aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
     expect(aqb1.assessment_questions.count).to eq 3
     expect(@course.assessment_questions.count).to eq 3
 

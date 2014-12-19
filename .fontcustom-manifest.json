@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "bc7417f957ee16e48bc6ceadfda4de71eefb6620c4651d1e0bc43b44fb07c551",
-    "current": "bc7417f957ee16e48bc6ceadfda4de71eefb6620c4651d1e0bc43b44fb07c551"
+    "previous": "277306b3d0959e94cf9c09fa2c354a0365bb8de8bed8456a4b1b23e34cd4e398",
+    "current": "277306b3d0959e94cf9c09fa2c354a0365bb8de8bed8456a4b1b23e34cd4e398"
   },
   "fonts": [
     "public/font/canvas/canvas-icons.ttf",
@@ -71,7 +71,7 @@
       "source": "public/font/icons/bookmark.svg"
     },
     "calendar-day": {
-      "codepoint": 61880,
+      "codepoint": 62027,
       "source": "public/font/icons/calendar-day.svg"
     },
     "calendar-days": {
@@ -101,6 +101,10 @@
     "clock": {
       "codepoint": 61887,
       "source": "public/font/icons/clock.svg"
+    },
+    "cloud-lock": {
+      "codepoint": 62024,
+      "source": "public/font/icons/cloud-lock.svg"
     },
     "collapse": {
       "codepoint": 61698,
@@ -205,6 +209,10 @@
     "export-content": {
       "codepoint": 61905,
       "source": "public/font/icons/export-content.svg"
+    },
+    "eye": {
+      "codepoint": 62025,
+      "source": "public/font/icons/eye.svg"
     },
     "facebook": {
       "codepoint": 61836,
@@ -688,6 +696,10 @@
     "config": "config/fontcustom.yml",
     "css_selector": ".icon-{{glyph}}",
     "debug": false,
+    "font_ascent": 448,
+    "font_descent": 64,
+    "font_design_size": 16,
+    "font_em": 512,
     "font_name": "canvas-icons",
     "force": false,
     "input": {

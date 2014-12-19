@@ -68,6 +68,7 @@ class Pseudonym < ActiveRecord::Base
     config.perishable_token_valid_for = 30.minutes
     config.validates_length_of_login_field_options = {:within => 1..MAX_UNIQUE_ID_LENGTH}
     config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| (p.unique_id_changed? || p.workflow_state_changed?) && p.active? } }
+    config.crypto_provider = Authlogic::CryptoProviders::Sha512
   end
 
   attr_writer :require_password
@@ -232,9 +233,73 @@ class Pseudonym < ActiveRecord::Base
     state :deleted
   end
 
+  set_policy do
+    # an admin can only create and update pseudonyms when they have
+    # :manage_user_logins permission on the pseudonym's account, :read
+    # permission on the pseudonym's owner, and a superset of hte pseudonym's
+    # owner's rights (if any) on the pseudonym's account. some fields of the
+    # pseudonym may require additional conditions to update (see below)
+    given do |user|
+      self.account.grants_right?(user, :manage_user_logins) &&
+      self.user.has_subset_of_account_permissions?(user, self.account) &&
+      self.user.grants_right?(user, :read)
+    end
+    can :create and can :update
+
+    # any user (admin or not) can change their own canvas password. if the
+    # pseudonym's account does not allow canvas authentication (i.e. it uses
+    # and requires delegated authentication), there is no canvas password to
+    # change.
+    given do |user|
+      self.user_id == user.try(:id) &&
+      self.account.canvas_authentication?
+    end
+    can :change_password
+
+    # an admin can set the initial canvas password (if there is one, see above)
+    # on another user's new pseudonym.
+    given do |user|
+      self.new_record? &&
+      self.account.canvas_authentication? &&
+      self.grants_right?(user, :create)
+    end
+    can :change_password
+
+    # an admin can only change another user's canvas password (if there is one,
+    # see above) on an existing pseudonym when :admins_can_change_passwords is
+    # enabled.
+    given do |user|
+      self.account.settings[:admins_can_change_passwords] &&
+      self.account.canvas_authentication? &&
+      self.grants_right?(user, :update)
+    end
+    can :change_password
+
+    # an admin can only update a pseudonym's SIS ID when they have :manage_sis
+    # permission on the pseudonym's account
+    given do |user|
+      self.account.grants_right?(user, :manage_sis) &&
+      self.grants_right?(user, :update)
+    end
+    can :manage_sis
+
+    # an admin can delete any non-SIS pseudonym that they can update
+    given do |user|
+      !self.system_created? &&
+      self.grants_right?(user, :update)
+    end
+    can :delete
+
+    # an admin can only delete an SIS pseudonym if they also can :manage_sis
+    given do |user|
+      self.system_created? &&
+      self.grants_right?(user, :manage_sis)
+    end
+    can :delete
+  end
+
   alias_method :destroy!, :destroy
-  def destroy(even_if_managed_password=false)
-    raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
+  def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     result = self.save

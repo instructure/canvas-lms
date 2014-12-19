@@ -195,7 +195,7 @@ class GradebooksController < ApplicationController
       :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
       :context_id => @context.id,
       :context_code => @context.asset_string,
-      :context_integration_id => @context.integration_id,
+      :context_sis_id => @context.sis_source_id,
       :group_weighting_scheme => @context.group_weighting_scheme,
       :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
       :course_is_concluded => @context.completed?,

@@ -914,5 +914,33 @@ describe ContextExternalTool do
         end
       end
     end
+
+    describe "#has_placement?" do
+
+      it 'returns true for module item if it has selectable, and a url' do
+        tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        expect(tool.has_placement?(:module_item)).to eq true
+      end
+
+      it 'returns true for module item if it has selectable, and a domain' do
+        tool = @course.context_external_tools.create!(:name => "a", :domain => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        expect(tool.has_placement?(:module_item)).to eq true
+      end
+
+      it 'returns false for module item if it is not selectable' do
+        tool = @course.context_external_tools.create!(:name => "a", not_selectable: true, :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        expect(tool.has_placement?(:module_item)).to eq false
+      end
+
+       it 'returns false for module item if it has selectable, and no domain or url' do
+        tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
+        tool.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+        tool.save!
+        expect(tool.has_placement?(:module_item)).to eq false
+      end
+
+    end
+
+
   end
 end

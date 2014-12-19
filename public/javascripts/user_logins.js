@@ -91,8 +91,10 @@ $(document).ready(function() {
       $sis_row.show();
     }
     var passwordable = $(this).parents(".links").hasClass('passwordable');
+    var delegated = passwordable && $(this).parents(".links").hasClass('delegated-auth');
     $form.toggleClass('passwordable', passwordable);
     $form.find("tr.password").showIf(passwordable);
+    $form.find("tr.delegated").showIf(delegated);
     $form.find(".account_id").hide();
     var $account_select = $form.find(".account_id select");
     var accountId = $(this).data("accountId");

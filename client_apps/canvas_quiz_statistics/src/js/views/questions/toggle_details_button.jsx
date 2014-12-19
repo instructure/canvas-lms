@@ -40,6 +40,7 @@ define(function(require) {
         <button
           title={label}
           onClick={this.props.onClick}
+          disabled={this.props.disabled}
           className="btn"
           aria-live="polite">
           <ScreenReaderContent children={label} />

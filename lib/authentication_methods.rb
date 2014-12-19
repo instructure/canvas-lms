@@ -83,9 +83,18 @@ module AuthenticationMethods
     end
   end
 
+  def masked_authenticity_token
+    session_options = CanvasRails::Application.config.session_options
+    options = session_options.slice(:domain, :secure)
+    options[:httponly] = HostUrl.is_file_host?(request.host_with_port)
+    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies, options)
+  end
+  private :masked_authenticity_token
+
   def load_user
     @current_user = @current_pseudonym = nil
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies) # ensure that the cookie is set
+
+    masked_authenticity_token # ensure that the cookie is set
 
     load_pseudonym_from_access_token
 

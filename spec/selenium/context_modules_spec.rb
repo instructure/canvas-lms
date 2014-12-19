@@ -5,6 +5,7 @@ describe "context_modules" do
   context "as a teacher" do
     before (:each) do
       course_with_teacher_logged_in
+      set_course_draft_state
 
       #have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
@@ -21,41 +22,24 @@ describe "context_modules" do
       @course.reload
     end
 
-    def create_modules(number_to_create, workflow_state = "unpublished")
-
+    def create_modules(number_to_create, published=false)
       modules = []
 
       number_to_create.times do |i|
         m = @course.context_modules.create!(:name => "module #{i}")
-        m.workflow_state = workflow_state
-        expect(m.workflow_state).to eq workflow_state
+        m.unpublish! unless published
         modules << m
       end
       modules
     end
 
-    def open_admin_module_menu
-      fj('#context_modules .admin-links.al-trigger').click
-      wait_for_ajaximations
-      sleep 1
-    end
-
-    def change_workflow_state_module
-      fj('#context_modules .change-workflow-state-link').click()
-      wait_for_ajaximations
-    end
-
     def publish_module
-      fj('#context_modules .admin-links.al-trigger').click
-      keep_trying_until { expect(f("#ui-id-2")).to have_class('ui-state-open') }
-      fj('#context_modules .change-workflow-state-link').click
+      fj('#context_modules .publish-icon-publish').click
       wait_for_ajaximations
     end
 
     def unpublish_module
-      fj('#context_modules .admin-links.al-trigger').click
-      keep_trying_until { expect(f("#ui-id-1")).to have_class('ui-state-open') }
-      fj('#context_modules .change-workflow-state-link').click
+      fj('#context_modules .publish-icon-published').click
       wait_for_ajaximations
     end
 
@@ -93,179 +77,46 @@ describe "context_modules" do
     end
 
     it "publishes an unpublished module" do
-      skip
       get "/courses/#{@course.id}/modules"
 
       add_module('New Module')
+      expect(f('.context_module')).to have_class('unpublished_module')
+
+      expect(@course.context_modules.count).to eq 1
+      mod = @course.context_modules.first
+      expect(mod.name).to eq 'New Module'
       publish_module
-      open_admin_module_menu
-      keep_trying_until { expect(f('#context_modules .change-workflow-state-link').text).to eq "Unpublish" }
+      mod.reload
+      expect(mod).to be_published
+      expect(f('#context_modules .publish-icon-published')).to be_displayed
     end
 
     it "unpublishes a published module" do
-      skip
       get "/courses/#{@course.id}/modules"
 
       add_module('New Module')
+      mod = @course.context_modules.first
       publish_module
-      open_admin_module_menu
-      keep_trying_until { expect(f('#context_modules .change-workflow-state-link').text).to eq "Unpublish" }
-      change_workflow_state_module
-      open_admin_module_menu
-      keep_trying_until { expect(f('#context_modules .change-workflow-state-link').text).to eq "Publish" }
-    end
-
-    it "add unpublished_module css class when creating new module" do
-      skip
-      get "/courses/#{@course.id}/modules"
-
-      add_module('New Module')
-      expect(f('.context_module')).to have_class('unpublished_module')
-      expect(@course.context_modules.first.workflow_state).to eq "unpublished"
-    end
-
-    it "allows you to publish a newly created module without reloading the page" do
-      skip
-      get "/courses/#{@course.id}/modules"
-
-      add_module('New Module')
-      expect(f('.context_module')).to have_class('unpublished_module')
-      expect(@course.context_modules.first.workflow_state).to eq "unpublished"
-
-      keep_trying_until do
-        f('.admin-links.al-trigger').click
-        hover_and_click('#context_modules .change-workflow-state-link')
-        wait_for_ajax_requests
-        expect(f('.context_module')).to have_class('published_module')
-      end
-    end
-
-    it "should display all available modules in course through student progression" do
-      new_student = student_in_course.user
-      modules = create_modules(2, "active")
-
-      #attach 1 assignment to module 1 and 2 assignments to module 2
-      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-      modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
-      modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
-
-      get "/courses/#{@course.id}/modules"
-
-      wait_for_ajax_requests
-      f('.module_progressions_link').click
-      wait_for_ajaximations
-      expect(f(".student_list")).to be_displayed
-
-      #validates the modules are displayed, are in the expected state, and include the correct student including current in progress module
-      expect(f(".module_#{modules[0].id} .progress")).to include_text("no information")
-      expect(f(".module_#{modules[1].id} .progress")).to include_text("no information")
-      student_list = f(".student_list")
-      keep_trying_until do
-        expect(student_list).to include_text(new_student.name)
-        expect(student_list).to include_text("none in progress")
-      end
-    end
-
-    it "should refresh student progression page and display as expected" do
-      new_student = student_in_course.user
-      modules = create_modules(2, "active")
-
-      #attach 1 assignment to module 1 and 2 assignments to module 2
-      @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-      modules[0].completion_requirements = {@tag_1.id => {:type => 'must_view'}}
-      modules[0].save!
-      expect(modules[0].completion_requirements.to_s).to include_text("must_view")
-
-      modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
-      @tag_3 = modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
-      modules[1].completion_requirements = {@tag_3.id => {:type => 'must_submit'}}
-      modules[1].save!
-      expect(modules[1].completion_requirements.to_s).to include_text("must_submit")
-
-      get "/courses/#{@course.id}/modules"
-
-      #opens the student progression link and validates all modules have no information"
-      wait_for_ajaximations
-      f('.module_progressions_link').click
-      wait_for_ajaximations
-
-      student_list = f(".student_list")
-      expect(student_list).to be_displayed
-      expect(student_list).to include_text(new_student.name)
-      expect(student_list).to include_text("none in progress")
-      expect(f(".module_#{modules[0].id} .progress")).to include_text("no information")
-      expect(f(".module_#{modules[1].id} .progress")).to include_text("no information")
-
-      #updates the state for @assignment in module_1 for new_student be completed
-      modules[0].update_for(new_student, :read, @tag_1)
-
-      f('.refresh_progressions_link').click
-      wait_for_ajaximations
-      # fj for last 3 lines to avoid selenium caching
-      expect(fj(".student_list")).to be_displayed
-      keep_trying_until do
-        expect(fj(".module_#{modules[0].id} .progress")).to include_text("completed")
-        expect(fj(".module_#{modules[1].id} .progress")).to include_text("in progress")
-        expect(student_list).to include_text(new_student.name)
-      end
-    end
-    #student_list.should include_text("module 2") ****Should update to module 2 but doesn't until renavigating to the page****
-
-    it "should allow selecting specific student progression and update module state on screen" do
-      skip('broken')
-
-      new_student = student_in_course.user
-      new_student2 = student_in_course.user
-
-      modules = create_modules(2, "active")
-
-      #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-      @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-      modules[0].completion_requirements = {@tag_1.id => {:type => 'must_view'}}
-
-      @tag_2 = modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
-      @tag_3 = modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
-      modules[1].completion_requirements = {@tag_3.id => {:type => 'must_submit'}}
-
-      modules[0].save!
-      modules[1].save!
-
-      #updates new_student module state by completing @assignment
-      modules[0].update_for(new_student, :read, @tag_1)
-
-      get "/courses/#{@course.id}/modules"
-
-      fj('.module_progressions_link').click
-      wait_for_ajaximations
-      expect(fj(".student_list")).to be_displayed
-
-
-      #validates the second student has been selected and that the modules information is displayed as expected
-      keep_trying_until do
-        #selects the second student
-        ffj(".student_list .student")[2].click
-        wait_for_ajaximations
-
-        expect(f(".module_#{modules[0].id} .progress")).to include_text("completed")
-        expect(f(".module_#{modules[1].id} .progress")).to include_text("in progress")
-      end
+      mod.reload
+      expect(mod).to be_published
+      unpublish_module
+      mod.reload
+      expect(mod).to be_unpublished
     end
 
     it "should rearrange child objects in same module" do
-      get "/courses/#{@course.id}/modules"
-
-      modules = create_modules(1, "active")
+      modules = create_modules(1, true)
 
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
       modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
 
-      refresh_page
+      get "/courses/#{@course.id}/modules"
       sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
       #setting gui drag icons to pass to driver.action.drag_and_drop
-      a1_img = fj('.context_module_items .context_module_item:first .move_item_link img')
-      a2_img = fj('.context_module_items .context_module_item:last .move_item_link img')
+      a1_img = fj('.context_module_items .context_module_item:first .move_item_link i')
+      a2_img = fj('.context_module_items .context_module_item:last .move_item_link i')
 
       #performs the change position
       driver.action.drag_and_drop(a2_img, a1_img).perform
@@ -279,19 +130,18 @@ describe "context_modules" do
     end
 
     it "should rearrange child object to new module" do
-      skip('drag and drop selenium not working')
-      modules = create_modules(2, "active")
+      modules = create_modules(2, true)
 
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
       modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
 
-      refresh_page
+      get "/courses/#{@course.id}/modules"
       sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
       #setting gui drag icons to pass to driver.action.drag_and_drop
-      a1_img = fj('#context_modules .context_module:first-child .context_module_items .context_module_item:first .move_item_link img')
-      a2_img = fj('#context_modules .context_module:last-child .context_module_items .context_module_item:first .move_item_link img')
+      a1_img = fj('#context_modules .context_module:first-child .context_module_items .context_module_item:first .move_item_link i')
+      a2_img = fj('#context_modules .context_module:last-child .context_module_items .context_module_item:first .move_item_link i')
 
       #performs the change position
       driver.action.drag_and_drop(a2_img, a1_img).perform
@@ -306,8 +156,6 @@ describe "context_modules" do
     end
 
     it "should only display out-of on an assignment min score restriction when the assignment has a total" do
-      get "/courses/#{@course.id}/modules"
-
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => @course)
       a1.points_possible = 10
@@ -331,10 +179,10 @@ describe "context_modules" do
       content_tag_1 = make_content_tag.call a1
       content_tag_2 = make_content_tag.call a2
 
-      refresh_page
+      get "/courses/#{@course.id}/modules"
 
       keep_trying_until do
-        f('.admin-links.al-trigger').click
+        f('.ig-header-admin  .al-trigger').click
         hover_and_click('#context_modules .edit_module_link')
         wait_for_ajax_requests
         expect(f('#add_context_module_form')).to be_displayed
@@ -354,30 +202,12 @@ describe "context_modules" do
       expect(driver.execute_script('return $(".points_possible_parent:visible").length')).to eq 0
     end
 
-    it "should show progressions link" do
-      get "/courses/#{@course.id}/modules"
-
-      add_module('New Module')
-
-      expect(f('.module_progressions_link')).to be_displayed
-    end
-
-    it "should not show progressions link for large rosters (MOOCs)" do
-      @course.large_roster = true
-      @course.save!
-      get "/courses/#{@course.id}/modules"
-
-      add_module('New Module')
-
-      expect(f('.module_progressions_link')).to be_nil
-    end
-
     it "should delete a module" do
       get "/courses/#{@course.id}/modules"
 
       add_module('Delete Module')
       driver.execute_script("$('.context_module').addClass('context_module_hover')")
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.delete_module_link').click
       expect(driver.switch_to.alert).not_to be_nil
@@ -394,7 +224,7 @@ describe "context_modules" do
       add_module('Edit Module')
       context_module = f('.context_module')
       driver.action.move_to(context_module).perform
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       f('.edit_module_link').click
       expect(f('.ui-dialog')).to be_displayed
       edit_form = f('#add_context_module_form')
@@ -413,7 +243,7 @@ describe "context_modules" do
       # add completion criterion
       context_module = f('.context_module')
       driver.action.move_to(context_module).perform
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
@@ -436,7 +266,7 @@ describe "context_modules" do
 
       # delete the criterion, then cancel the form
       driver.action.move_to(context_module).perform
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
@@ -450,7 +280,7 @@ describe "context_modules" do
       # now delete the criterion frd
       # (if the previous step did even though it shouldn't have, this will error)
       driver.action.move_to(context_module).perform
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
@@ -467,7 +297,7 @@ describe "context_modules" do
 
       # and also make sure the form remembers that it's gone (#8329)
       driver.action.move_to(context_module).perform
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       f('.edit_module_link').click
       expect(f('.ui-dialog')).to be_displayed
       edit_form = f('#add_context_module_form')
@@ -478,7 +308,7 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      driver.execute_script("$('.context_module_item').addClass('context_module_item_hover')")
+      f('.context_module_item .al-trigger').click()
       wait_for_ajaximations
       f('.delete_item_link').click
       expect(driver.switch_to.alert).not_to be_nil
@@ -644,7 +474,7 @@ describe "context_modules" do
 
       header_text = 'new header text'
       add_module('Text Header Module')
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
       keep_trying_until do
@@ -674,7 +504,7 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
 
       add_module 'Test module'
-      f('.admin-links.al-trigger').click
+      f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.add_module_item_link').click
       wait_for_ajaximations
@@ -713,7 +543,7 @@ describe "context_modules" do
       db_module = ContextModule.last
       context_module = f("#context_module_#{db_module.id}")
       driver.action.move_to(context_module).perform
-      f("#context_module_#{db_module.id} .admin-links.al-trigger").click
+      f("#context_module_#{db_module.id} .ig-header-admin .al-trigger").click
       f("#context_module_#{db_module.id} .edit_module_link").click
       expect(f('.ui-dialog')).to be_displayed
       wait_for_ajaximations
@@ -729,9 +559,9 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
       sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
-      m1_img = fj('#context_modules .context_module:first-child .reorder_module_link img')
-      m2_img = fj('#context_modules .context_module:last-child .reorder_module_link img')
-      driver.action.drag_and_drop(m2_img, m1_img).perform
+      m1_a = fj('#context_modules .context_module:first-child .reorder_module_link a')
+      m2_a = fj('#context_modules .context_module:last-child .reorder_module_link a')
+      driver.action.drag_and_drop(m2_a, m1_a).perform
       wait_for_ajax_requests
 
       m1.reload
@@ -820,7 +650,7 @@ describe "context_modules" do
       end
 
       it "should indicate when course sections have multiple due dates" do
-        modules = create_modules(1, "active")
+        modules = create_modules(1, true)
         modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
         cs1 = @course.default_section
@@ -837,7 +667,7 @@ describe "context_modules" do
 
       it "should not indicate multiple due dates if the sections' dates are the same" do
         skip("needs to ignore base if all visible sections are overridden")
-        modules = create_modules(1, "active")
+        modules = create_modules(1, true)
         modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
         cs1 = @course.default_section
@@ -855,7 +685,7 @@ describe "context_modules" do
       end
 
       it "should use assignment due date if there is no section override" do
-        modules = create_modules(1, "active")
+        modules = create_modules(1, true)
         modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
         cs1 = @course.default_section
@@ -875,7 +705,7 @@ describe "context_modules" do
 
       it "should only use the sections the user is restricted to" do
         skip("needs to ignore base if all visible sections are overridden")
-        modules = create_modules(1, "active")
+        modules = create_modules(1, true)
         modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
         cs1 = @course.default_section
@@ -919,7 +749,7 @@ describe "context_modules" do
     end
 
     it "should show a vdd tooltip summary for assignments with multiple due dates" do
-      selector = "table.Assignment_#{@assignment2.id} .due_date_display"
+      selector = "li.Assignment_#{@assignment2.id} .due_date_display"
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       wait_for_ajaximations
@@ -1041,6 +871,7 @@ describe "context_modules" do
 
     before (:each) do
       course_with_teacher_logged_in
+      set_course_draft_state
       #adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course
@@ -1347,7 +1178,6 @@ describe "context_modules" do
   end
 
   context "new module items", :priority => "2" do
-
     def verify_persistence(title)
       refresh_page
       expect(f('#context_modules')).to include_text(title)
@@ -1355,6 +1185,7 @@ describe "context_modules" do
 
     before (:each) do
       course_with_teacher_logged_in
+      set_course_draft_state
       get "/courses/#{@course.id}/modules"
     end
 

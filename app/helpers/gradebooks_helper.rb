@@ -17,43 +17,54 @@
 #
 
 module GradebooksHelper
-  UNGRADED_SUBMISSION_ICON_ATTRIBUTES = {
-    'online_url' => {
-      :icon_class => 'icon-link',
-      :screenreader_text => I18n.t('icons.online_url_submission', 'Online Url Submission')
-    },
-    'online_text_entry' => {
-      :icon_class => 'icon-text',
-      :screenreader_text => I18n.t('icons.text_entry_submission', 'Text Entry Submission')
-    },
-    'online_upload' => {
-      :icon_class => 'icon-document',
-      :screenreader_text => I18n.t('icons.file_upload_submission', 'File Upload Submission')
-    },
-    'discussion_topic' => {
-      :icon_class => 'icon-discussion',
-      :screenreader_text => I18n.t('icons.discussion_submission', 'Discussion Submission')
-    },
-    'online_quiz' => {
-      :icon_class => 'icon-quiz',
-      :screenreader_text => I18n.t('icons.quiz_submission', 'Quiz Submission')
-    },
-    'media_recording' => {
-      :icon_class => 'icon-filmstrip',
-      :screenreader_text => I18n.t('icons.media_submission', 'Media Submission')
-    },
-  }
+  def ungraded_submission_icon_attributes_for(submission_type)
+    case submission_type
+    when 'online_url'
+      {
+        :icon_class => 'icon-link',
+        :screenreader_text => I18n.t('icons.online_url_submission', 'Online Url Submission')
+      }
+    when 'online_text_entry'
+      {
+        :icon_class => 'icon-text',
+        :screenreader_text => I18n.t('icons.text_entry_submission', 'Text Entry Submission')
+      }
+    when 'online_upload'
+      {
+        :icon_class => 'icon-document',
+        :screenreader_text => I18n.t('icons.file_upload_submission', 'File Upload Submission')
+      }
+    when 'discussion_topic'
+      {
+        :icon_class => 'icon-discussion',
+        :screenreader_text => I18n.t('icons.discussion_submission', 'Discussion Submission')
+      }
+    when 'online_quiz'
+      {
+        :icon_class => 'icon-quiz',
+        :screenreader_text => I18n.t('icons.quiz_submission', 'Quiz Submission')
+      }
+    when 'media_recording'
+      {
+        :icon_class => 'icon-filmstrip',
+        :screenreader_text => I18n.t('icons.media_submission', 'Media Submission')
+      }
+    end
+  end
 
-  PASS_FAIL_ICON_ATTRIBUTES = {
-    pass: {
+  def pass_icon_attributes
+    {
       icon_class: 'icon-check',
       screenreader_text: I18n.t('#gradebooks.grades.complete', 'Complete'),
-    },
-    fail: {
+    }
+  end
+
+  def fail_icon_attributes
+    {
       icon_class: 'icon-x',
       screenreader_text: I18n.t('#gradebooks.grades.incomplete', 'Incomplete'),
-    },
-  }
+    }
+  end
 
   def display_grade(grade)
     grade.blank? ? "--" : grade
@@ -84,7 +95,7 @@ module GradebooksHelper
   end
 
   def ungraded_submission_display(submission_type)
-    sub_score = UNGRADED_SUBMISSION_ICON_ATTRIBUTES[submission_type]
+    sub_score = ungraded_submission_icon_attributes_for(submission_type)
     if sub_score
       screenreadable_icon(sub_score, %w{submission_icon})
     else
@@ -94,9 +105,9 @@ module GradebooksHelper
 
   def pass_fail_icon(score, grade)
     if score && score > 0 || grade == "complete"
-      icon_attrs = PASS_FAIL_ICON_ATTRIBUTES[:pass]
+      icon_attrs = pass_icon_attributes
     else
-      icon_attrs = PASS_FAIL_ICON_ATTRIBUTES[:fail]
+      icon_attrs = fail_icon_attributes
     end
     screenreadable_icon(icon_attrs, %w{graded_icon})
   end

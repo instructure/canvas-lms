@@ -195,7 +195,7 @@ describe "scheduler" do
       gc = @course.group_categories.create!(:name => "Blah Groups")
       title = create_appointment_group :sub_context_codes => [gc.asset_string],
                                        :title => "group ag"
-      ag = AppointmentGroup.find_by_title(title)
+      ag = AppointmentGroup.where(title: title).first
       2.times do |i|
         student_in_course(:course => @course, :active_all => true)
         group = Group.create! :group_category => gc,

@@ -21,6 +21,7 @@ class WikiPagesController < ApplicationController
 
   before_filter :require_context
   before_filter :get_wiki_page
+  before_filter :set_pandapub_read_token
   before_filter :set_js_rights, :only => [:pages_index, :show_page, :edit_page, :page_revisions]
   before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page, :page_revisions]
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
@@ -40,6 +41,18 @@ class WikiPagesController < ApplicationController
 
   def js_rights
     [:wiki, :page]
+  end
+
+  def set_pandapub_read_token
+    if is_authorized_action?(@page, @current_user, :read)
+      if CanvasPandaPub.enabled?
+        channel = "/private/wiki_page/#{@page.global_id}/update"
+        js_env :WIKI_PAGE_PANDAPUB => {
+          :CHANNEL => channel,
+          :TOKEN => CanvasPandaPub.generate_token(channel, true)
+        }
+      end
+    end
   end
 
   def show

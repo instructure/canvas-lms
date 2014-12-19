@@ -103,7 +103,7 @@ class ApplicationController < ActionController::Base
       @js_env = {
         :current_user_id => @current_user.try(:id),
         :current_user => user_display_json(@current_user, :profile),
-        :current_user_roles => @current_user.try(:roles),
+        :current_user_roles => @current_user.try(:roles, @domain_root_account),
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
         :SETTINGS => {
@@ -152,6 +152,11 @@ class ApplicationController < ActionController::Base
     @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles)
   end
   helper_method 'use_new_styles?'
+
+  def multiple_grading_periods?
+    @domain_root_account && @domain_root_account.feature_enabled?(:multiple_grading_periods)
+  end
+  helper_method 'multiple_grading_periods?'
 
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
@@ -515,7 +520,7 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      courses = @context.enrollments.current.shard(@context).select { |e| e.state_based_on_date == :active }.map(&:course).uniq
       groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
           g.context.concluded?} : []
       if only_contexts.present?
@@ -1108,7 +1113,7 @@ class ApplicationController < ActionController::Base
   end
 
   def form_authenticity_token
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies)
+    masked_authenticity_token
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
@@ -1136,11 +1141,7 @@ class ApplicationController < ActionController::Base
     end
     return if @page || !@page_name
 
-    if params[:action] != 'create'
-      @page = @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s).first ||
-              @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s.to_url).first ||
-              @wiki.wiki_pages.not_deleted.where(id: @page_name.to_i).first
-    end
+    @page = @wiki.find_page(@page_name) if params[:action] != 'create'
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
@@ -1161,7 +1162,7 @@ class ApplicationController < ActionController::Base
     if tag.content_type == 'Assignment'
       redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
-      redirect_to named_context_url(context, :context_wiki_page_url, tag.content.url, url_params)
+      redirect_to named_context_url(context, :context_named_page_url, tag.content.url, url_params)
     elsif tag.content_type == 'Attachment'
       redirect_to named_context_url(context, :context_file_url, tag.content_id, url_params)
     elsif tag.content_type_quiz?
@@ -1170,6 +1171,8 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
     elsif tag.content_type == 'Rubric'
       redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
+    elsif tag.content_type == 'Lti::MessageHandler'
+      redirect_to named_context_url(context, :context_basic_lti_launch_request_url, tag.content_id, url_params)
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module
@@ -1200,11 +1203,11 @@ class ApplicationController < ActionController::Base
 
         success_url = case tag_type
         when :assignments
-          named_context_url(@context, :context_assignments_url)
+          named_context_url(@context, :context_assignments_url, include_host: true)
         when :modules
-          named_context_url(@context, :context_context_modules_url)
+          named_context_url(@context, :context_context_modules_url, include_host: true)
         else
-          named_context_url(@context, :context_url)
+          named_context_url(@context, :context_url, include_host: true)
         end
         if tag.new_tab
           @lti_launch.launch_type = 'window'
@@ -1364,12 +1367,16 @@ class ApplicationController < ActionController::Base
     @features_enabled[feature] ||= begin
       if [:question_banks].include?(feature)
         true
+      elsif feature == :yo
+        Canvas::Plugin.find(:yo).try(:enabled?)
       elsif feature == :twitter
         !!Twitter::Connection.config
       elsif feature == :facebook
         !!Facebook::Connection.config
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
+      elsif feature == :diigo
+        !!Diigo::Connection.config
       elsif feature == :google_docs
         !!GoogleDocs::Connection.config
       elsif feature == :etherpad

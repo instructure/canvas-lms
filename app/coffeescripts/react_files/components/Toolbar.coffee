@@ -114,15 +114,17 @@ define [
           Router.Link  {
               to: @getPreviewRoute()
               query: @getPreviewQuery()
-              splat: @props.currentFolder?.urlPath()
+              params: {splat: @props.currentFolder?.urlPath()}
               className: 'ui-button btn-view'
               title: I18n.t('view', 'View')
+              'aria-label': I18n.t('view', 'View')
               'data-tooltip': ''
             },
-            i className: 'icon-search'
+            i className: 'icon-eye'
 
           if @props.userCanManageFilesForContext
             button {
+              type: 'button'
               disabled: !showingButtons
               className: 'ui-button btn-restrict',
               onClick: @openRestrictedDialog
@@ -130,9 +132,10 @@ define [
               'aria-label': I18n.t('restrict_access', 'Restrict Access')
               'data-tooltip': ''
             },
-              i className: 'icon-unpublished'
+              i className: 'icon-cloud-lock'
 
           button {
+            type: 'button'
             disabled: !showingButtons
             className: 'ui-button btn-download'
             onClick: @downloadSelectedAsZip
@@ -144,6 +147,7 @@ define [
 
           if @props.userCanManageFilesForContext
             button {
+              type: 'button'
               disabled: !showingButtons
               className: 'ui-button btn-move'
               onClick: (event) =>
@@ -160,6 +164,7 @@ define [
 
           if @props.userCanManageFilesForContext
             button {
+              type: 'button'
               disabled: !showingButtons
               className: 'ui-button btn-delete'
               onClick: => deleteStuff(@props.selectedItems)
@@ -176,6 +181,7 @@ define [
           div className: 'text-right',
             span className: 'ui-buttonset',
               button {
+                type: 'button'
                 onClick: @addFolder
                 className:'btn btn-add-folder'
                 'aria-label': I18n.t('add_folder', 'Add Folder')

@@ -39,7 +39,7 @@ define [
 
     year         = (new Date()).getFullYear()
     position     = {year: 1, month: 2, day: 3}
-    dateSettings = I18n.lookup('#date')
+    dateSettings = I18n.lookup('date')
 
     if options.type is 'birthdate'
       _.defaults options,

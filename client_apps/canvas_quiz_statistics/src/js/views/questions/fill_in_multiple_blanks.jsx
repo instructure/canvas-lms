@@ -34,17 +34,20 @@ define(function(require) {
       return answerSet.answers;
     },
 
-    componentDidUpdate: function(prevProps, prevState) {
+    componentDidMount: function() {
       // Make sure we always have an active answer set:
-      if (!this.state.answerSetId && this.props.answerSets) {
-        this.setState({ answerSetId: (this.props.answerSets[0] || {}).id });
-      }
+      this.ensureAnswerSetSelection(this.props);
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+      this.ensureAnswerSetSelection(nextProps);
     },
 
     render: function() {
       var crr = calculateResponseRatio(this.getAnswerPool(), this.props.participantCount, {
         questionType: this.props.questionType
       });
+      var answerPool = this.getAnswerPool();
 
       return(
         <Question expanded={this.props.expanded}>
@@ -68,10 +71,10 @@ define(function(require) {
                 ratio: round(crr * 100.0, 0)
               })} />
 
-            <AnswerBars answers={this.getAnswerPool()} />
+            <AnswerBars answers={answerPool} />
           </div>
 
-          {this.props.expanded && <Answers answers={this.getAnswerPool()} />}
+          {this.props.expanded && <Answers answers={answerPool} />}
         </Question>
       );
     },
@@ -89,6 +92,12 @@ define(function(require) {
           className={className}
           children={answerSet.text} />
       );
+    },
+
+    ensureAnswerSetSelection: function(props) {
+      if (!this.state.answerSetId && props.answerSets.length) {
+        this.setState({ answerSetId: props.answerSets[0].id });
+      }
     },
 
     switchAnswerSet: function(answerSetId, e) {

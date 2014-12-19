@@ -212,7 +212,7 @@ class AssignmentGroup < ActiveRecord::Base
       scope = user.assignments_visibile_in_course(context).
               where(:assignment_group_id => assignment_groups).published
     end
-    includes.any? ? scope.includes(includes) : scope
+    includes.any? ? scope.preload(includes) : scope
   end
 
   def move_assignments_to(move_to_id)

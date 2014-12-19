@@ -139,6 +139,7 @@ describe PseudonymSessionsController do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(flash[:notice]).to be_present
     end
 
     it "should login for a user with multiple identical pseudonyms" do

@@ -3,34 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 describe "Wiki pages and Tiny WYSIWYG editor Files" do
   include_examples "in-process server selenium tests"
 
-  def add_file_to_rce
-    wiki_page_tools_file_tree_setup
-    wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-    fj('.wiki_switch_views_link:visible').click
-    wiki_page_body = clear_wiki_rce
-    fj('.wiki_switch_views_link:visible').click
-    f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-    root_folders = @tree1.find_elements(:css, 'li.folder')
-    root_folders.first.find_element(:css, '.sign.plus').click
-    wait_for_ajaximations
-    expect(root_folders.first.find_elements(:css, '.file.text').length).to eq 1
-    root_folders.first.find_elements(:css, '.file.text span').first.click
-
-    in_frame "wiki_page_body_ifr" do
-      expect(f('#tinymce')).to include_text('txt')
-    end
-    fj('.wiki_switch_views_link:visible').click
-    expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-    wait_for_ajax_requests
-  end
-
-
   context "wiki and tiny files as a student" do
     before (:each) do
       course(:active_all => true, :name => 'wiki course')
+      set_course_draft_state
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @teacher = user_with_pseudonym(:active_user => true, :username => 'teacher@example.com', :name => 'teacher@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept
@@ -41,8 +17,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       login_as(@teacher.name)
 
       add_file_to_rce
+      @course.wiki.wiki_pages.first.publish!
       login_as(@student.name)
-      get "/courses/#{@course.id}/wiki"
+      get "/courses/#{@course.id}/pages/front-page"
       expect(fj('a[title="text_file.txt"]')).to be_displayed
       #check_file would be good to do here but the src on the file in the wiki body is messed up
     end
@@ -51,6 +28,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
   context "wiki sidebar files and locking/hiding" do
     before (:each) do
       course_with_teacher(:active_all => true, :name => 'wiki course')
+      set_course_draft_state
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept
       user_session(@student)
@@ -145,6 +123,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
   context "wiki sidebar images and locking/hiding" do
     before (:each) do
       course_with_teacher(:active_all => true, :name => 'wiki course')
+      set_course_draft_state
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept
       user_session(@student)

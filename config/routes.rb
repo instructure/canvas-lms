@@ -1,7 +1,7 @@
 full_path_glob = '(/*full_path)'
 
 # allow plugins to prepend routes
-Dir["vendor/plugins/*/config/pre_routes.rb"].each { |pre_routes|
+Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
   load pre_routes
 }
 
@@ -70,12 +70,12 @@ CanvasRails::Application.routes.draw do
       get 'contents' => 'files#attachment_content', as: :attachment_content
       get 'file_preview' => 'file_previews#show'
       collection do
-        get "folder#{full_path_glob}" => 'files#ember_app', format: false
-        get "search" => 'files#ember_app', format: false
+        get "folder#{full_path_glob}" => 'files#react_files', format: false
+        get "search" => 'files#react_files', format: false
         get :quota
         post :reorder
       end
-      get ':file_path' => 'files#show_relative', as: :relative_path, file_path: /.+/ #needs to stay below ember_app route
+      get ':file_path' => 'files#show_relative', as: :relative_path, file_path: /.+/ #needs to stay below react_files route
     end
   end
 
@@ -305,7 +305,6 @@ CanvasRails::Application.routes.draw do
       get :submission_versions
       get :history
       get :statistics
-      get :statistics_cqs
       get :read_only
       get :submission_html
 
@@ -523,7 +522,8 @@ CanvasRails::Application.routes.draw do
     get 'users/:user_id/delete' => 'accounts#confirm_delete_user', as: :confirm_delete_user
     delete 'users/:user_id' => 'accounts#remove_user', as: :delete_user
 
-    resources :users
+    # create/delete are handled by specific routes just above
+    resources :users, only: [:index, :new, :edit, :show, :update]
     resources :account_notifications, only: [:create, :destroy]
     concerns :announcements
     resources :assignments
@@ -534,7 +534,7 @@ CanvasRails::Application.routes.draw do
     get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
     get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
     get 'test_ldap_searches' => 'account_authorization_configs#test_ldap_search'
-    get 'test_ldap_logins' => 'account_authorization_configs#test_ldap_login'
+    match 'test_ldap_logins' => 'account_authorization_configs#test_ldap_login', via: [:get, :post]
     get 'saml_testing' => 'account_authorization_configs#saml_testing'
     get 'saml_testing_stop' => 'account_authorization_configs#saml_testing_stop'
 
@@ -617,6 +617,7 @@ CanvasRails::Application.routes.draw do
   get 'services' => 'users#services'
   get 'search/bookmarks' => 'users#bookmark_search', as: :bookmark_search
   get 'search/rubrics' => 'search#rubrics'
+  get 'search/all_courses' => 'search#all_courses'
   delete 'tours/dismiss/:name' => 'tours#dismiss', as: :dismiss_tour
   delete 'tours/dismiss/session/:name' => 'tours#dismiss_session', as: :dismiss_tour_session
   resources :users do
@@ -710,8 +711,8 @@ CanvasRails::Application.routes.draw do
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   post 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', as: :switch_calendar
   get 'files' => 'files#index'
-  get "files/folder#{full_path_glob}", controller: 'files', action: 'ember_app', format: false
-  get "files/search", controller: 'files', action: 'ember_app', format: false
+  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
+  get "files/search", controller: 'files', action: 'react_files', format: false
   get 'files/s3_success/:id' => 'files#s3_success', as: :s3_success
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   get 'files/preflight' => 'files#preflight', as: :file_preflight
@@ -816,6 +817,9 @@ CanvasRails::Application.routes.draw do
       get  'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
       put  'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
+
+      get 'courses/:course_id/link_validation', action: :link_validation
+      post 'courses/:course_id/link_validation', action: :start_link_validation
     end
 
     scope(controller: :account_notifications) do
@@ -892,6 +896,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :submissions_api) do
       def submissions_api(context, path_prefix = context)
+        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
+        delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :index, as: "#{path_prefix}_assignment_submissions"
         get "#{context.pluralize}/:#{context}_id/students/submissions", controller: :submissions_api, action: :for_students, as: "#{path_prefix}_student_submissions"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", action: :show, as: "#{path_prefix}_assignment_submission"
@@ -1031,7 +1037,6 @@ CanvasRails::Application.routes.draw do
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create
       get 'accounts/:account_id/users', action: :index, as: 'account_users'
-      delete 'accounts/:account_id/users/:id', action: :destroy
 
       put 'users/:id', action: :update
       post 'users/:user_id/files', action: :create_file
@@ -1080,6 +1085,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
       get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
+      delete 'accounts/:account_id/users/:user_id', action: :remove_user
     end
 
     scope(controller: :sub_accounts) do
@@ -1088,11 +1094,11 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :role_overrides) do
       get 'accounts/:account_id/roles', action: :api_index, as: 'account_roles'
-      get 'accounts/:account_id/roles/:role', role: /[^\/]+/, action: :show
+      get 'accounts/:account_id/roles/:id', action: :show
       post 'accounts/:account_id/roles', action: :add_role
-      post 'accounts/:account_id/roles/:role/activate', role: /[^\/]+/, action: :activate_role
-      put 'accounts/:account_id/roles/:role', role: /[^\/]+/, action: :update
-      delete 'accounts/:account_id/roles/:role', role: /[^\/]+/, action: :remove_role
+      post 'accounts/:account_id/roles/:id/activate', action: :activate_role
+      put 'accounts/:account_id/roles/:id', action: :update
+      delete 'accounts/:account_id/roles/:id', action: :remove_role
     end
 
     scope(controller: :account_reports) do
@@ -1230,6 +1236,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :search) do
       get 'search/rubrics', action: 'rubrics', as: 'search_rubrics'
       get 'search/recipients', action: 'recipients', as: 'search_recipients'
+      get 'search/all_courses', action: 'all_courses', as: 'search_all_courses'
     end
 
     post 'files/:id/create_success', controller: :files, action: :api_create_success, as: 'files_create_success'
@@ -1372,6 +1379,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'quizzes/course_quiz_extensions') do
       post 'courses/:course_id/quiz_extensions', action: :create
+    end
+
+    scope(controller: "quizzes/quiz_submission_events") do
+      post "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :create, as: 'course_quiz_submission_events'
     end
 
     scope(controller: 'quizzes/quiz_submission_questions') do
@@ -1558,6 +1569,17 @@ CanvasRails::Application.routes.draw do
     get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', as: :crocodoc_session
     get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
 
+    scope(controller: :grading_periods) do
+      %w(course account).each do |context|
+        content_prefix = "#{context.pluralize}/:#{context}_id"
+        prefix = "#{content_prefix}/grading_periods"
+        get prefix, action: :index, as: "#{context}_grading_periods"
+        get "#{prefix}/:id", action: :show, as: "#{context}_grading_period"
+        post prefix, action: :create, as: "#{context}_grading_period_create"
+        put "#{prefix}/:id", action: :update, as: "#{context}_grading_period_update"
+        delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
+      end
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

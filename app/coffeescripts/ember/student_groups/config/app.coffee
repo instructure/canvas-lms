@@ -1,7 +1,7 @@
 define [
   'ember'
   '../../shared/components/form_dialog_component'
-  'ic-lazy-list'
+  '../components/groups_lazy_list_component'
 ], (Ember, FormDialogComponent) ->
 
   Ember.onLoad 'Ember.Application', (Application) ->

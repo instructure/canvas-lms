@@ -28,11 +28,6 @@ var baseOptions = {
 
   wrap: {
     start: [
-      // The following declaration must be set at the very first line of the
-      // output for i18n extraction to allow multiple scopes within the same
-      // file.
-      "/* canvas_precompiled_asset: amd */",
-
       // App name and version, for cools.
       "/* <%= grunt.moduleId %> <%= grunt.config.get('pkg.version') %> */",
 

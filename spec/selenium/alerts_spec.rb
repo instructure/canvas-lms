@@ -167,7 +167,7 @@ describe "Alerts" do
     end
 
     it "should not show the add link when all recipients are already there" do
-      alert = @alerts.create!(:recipients => [:student, :teachers, 'AccountAdmin'], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+      alert = @alerts.create!(:recipients => [:student, :teachers, {:role_id => admin_role.id}], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
       get "/accounts/#{@context.id}/settings"
 
       f('#tab-alerts-link').click
@@ -193,6 +193,34 @@ describe "Alerts" do
       # Clicking cancel should restore the LIs
       alertElement.find_element(:css, '.cancel_button').click
       expect(alertElement.find_elements(:css, '.recipients li').length).to eq 3
+    end
+
+    it "should work with custom roles" do
+      role1 = custom_account_role('these rolls are delicious', :account => @context)
+      role2 = custom_account_role('your just jelly', :account => @context)
+
+      alert = @alerts.create!(:recipients => [{:role_id => role1.id}], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+      get "/accounts/#{@context.id}/settings"
+
+      f('#tab-alerts-link').click
+      wait_for_ajaximations
+      alertElement = f("#edit_alert_#{alert.id}")
+      alertElement.find_element(:css, ".edit_link").click
+      wait_for_ajaximations
+
+      recipients = ff("#edit_alert_#{alert.id} .recipients li")
+      expect(recipients.count).to eq 1
+      expect(recipients.first.text).to match_ignoring_whitespace(role1.name)
+      expect(f("#edit_alert_#{alert.id} .recipients li input")["value"].to_s).to eq role1.id.to_s
+
+      set_value(f("#edit_alert_#{alert.id} .add_recipients_line select"), role2.id.to_s)
+      fj("#edit_alert_#{alert.id} .add_recipient_link").click
+
+      submit_form("#edit_alert_#{alert.id}")
+      wait_for_ajaximations
+
+      alert.reload
+      expect(alert.recipients.map{|r| r[:role_id]}.sort).to eq [role1.id, role2.id].sort
     end
   end
 end

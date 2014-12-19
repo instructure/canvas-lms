@@ -6,7 +6,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "differentiated_assignments" do
   def course_with_da_flag(feature_method=:enable_feature!)
     @course = Course.create!
-    @course.enable_feature! :draft_state
     @course.send(feature_method, :differentiated_assignments)
     @user = user_model
     @course.enroll_user(@user)

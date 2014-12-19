@@ -28,6 +28,8 @@ class WikiPage < ActiveRecord::Base
 
   include SearchTermHelper
 
+  after_update :post_to_pandapub_when_revised
+
   belongs_to :wiki, :touch => true
   belongs_to :user
 
@@ -427,6 +429,16 @@ class WikiPage < ActiveRecord::Base
       self.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if context.is_a?(Course)
       self.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if context.is_a?(Group)
       self.workflow_state = 'active'
+    end
+  end
+
+  def post_to_pandapub_when_revised
+    if revised_at_changed?
+      CanvasPandaPub.post_update(
+        "/private/wiki_page/#{self.global_id}/update", {
+          revised_at: self.revised_at,
+          revision: self.versions.current.number
+        })
     end
   end
 end

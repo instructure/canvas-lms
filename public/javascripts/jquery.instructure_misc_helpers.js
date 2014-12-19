@@ -66,12 +66,10 @@ define([
   };
 
   // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
-  // note that raw returns a String object, so you may want to call toString
+  // note that raw returns a SafeString object, so you may want to call toString
   // if you're using it elsewhere
   $.raw = function(str) {
-    str = new String(str);
-    str._icHTMLSafe = true;
-    return str;
+    return new htmlEscape.SafeString(str);
   }
 
   $.replaceOneTag = function(text, name, value) {

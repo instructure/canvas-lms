@@ -8,7 +8,7 @@ define(function(require) {
 
   var ChartMixin = {
     defaults: {
-      updateChart: function(props) {
+      updateChart: function(svg, props) {
         this.removeChart();
         this.__svg = this.createChart(getChartNode(this), props);
       },
@@ -26,11 +26,11 @@ define(function(require) {
     },
 
     addTitle: function(svg, title) {
-      svg.append('title').text(title);
+      return svg.append('title').text(title);
     },
 
     addDescription: function(svg, description) {
-      svg.append('text')
+      return svg.append('text')
         .attr('fill', 'transparent')
         .attr('font-size', '0px')
         .text(description);
@@ -56,7 +56,7 @@ define(function(require) {
       },
 
       shouldComponentUpdate: function(nextProps/*, nextState*/) {
-        this.updateChart(nextProps);
+        this.updateChart(this.__svg, nextProps);
         return false;
       },
 

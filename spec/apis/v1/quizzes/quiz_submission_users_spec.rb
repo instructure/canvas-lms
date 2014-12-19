@@ -139,7 +139,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
         user_ids = json['users'].map { |h| h['id'] }
         expect(user_ids).not_to include @student2.id.to_s
 
-        create_section_override_for_quiz(@quiz, {course_section: @student2.current_enrollments.first.course_section})
+        create_section_override_for_quiz(@quiz, {course_section: @student2.enrollments.current.first.course_section})
 
         json = get_submitted_users(submitted: false)
         expect(response).to be_success

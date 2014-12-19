@@ -169,6 +169,11 @@ module DataFixup
         @start_time ||= Time.new(2014, 6, 14)
       end
 
+      # The date the audit logs were enabled.
+      def end_time
+        @end_time ||= Time.new(2014, 8, 20)
+      end
+
       def index
         @index
       end
@@ -229,11 +234,12 @@ module DataFixup
         need_tombstone = []
         updates = []
         oldest_bucket = index.bucket_for_time(start_time)
+        newest_bucket = index.bucket_for_time(end_time)
 
         # Check each row to see if we need to update it or inspect it.
         rows.each do |row|
           row = format_row(row)
-          next if row['bucket'] < oldest_bucket
+          next if row['bucket'] < oldest_bucket || row['bucket'] > newest_bucket
           current_id, timestamp, key = extract_row_keys(index, row)
           actual_id = query_corrected_id(current_id, timestamp)
           if actual_id.nil?

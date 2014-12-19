@@ -526,7 +526,7 @@ class WikiPagesApiController < ApplicationController
     @page = if is_front_page_action
       @wiki.front_page
     else
-      @wiki.wiki_pages.not_deleted.where(url: url).first
+      @wiki.find_page(url)
     end
 
     # create a new page if the page was not found

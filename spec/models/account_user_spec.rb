@@ -20,6 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AccountUser do
 
+  before :once do
+    @role1 = custom_account_role('role1', :account => Account.default)
+    @role2 = custom_account_role('role2', :account => Account.default)
+  end
+
   shared_examples_for "touching" do
     it "should recache permissions when created" do
       enable_cache do
@@ -71,8 +76,8 @@ describe AccountUser do
   describe "all_permissions_for" do
     it "should include granted permissions from multiple roles" do
       user = User.create!
-      account_admin_user_with_role_changes(:user => user, :membership_type => 'role1', :role_changes => {:manage_sis => true})
-      account_admin_user_with_role_changes(:user => user, :membership_type => 'role2', :role_changes => {:manage_wiki => true})
+      account_admin_user_with_role_changes(:user => user, :role => @role1, :role_changes => {:manage_sis => true})
+      account_admin_user_with_role_changes(:user => user, :role => @role2, :role_changes => {:manage_wiki => true})
 
       permissions = AccountUser.all_permissions_for(user, Account.default)
       expect(permissions.delete(:manage_sis)).not_to be_empty
@@ -85,10 +90,10 @@ describe AccountUser do
     before :once do
       @user1 = User.create!
       @user2 = User.create!
-      @ro1 = Account.default.role_overrides.create!(:enrollment_type => 'role1', :permission => 'manage_sis', :enabled => true)
-      @ro2 = Account.default.role_overrides.create!(:enrollment_type => 'role2', :permission => 'manage_sis', :enabled => true)
-      @au1 = Account.default.account_users.create!(user: @user1, membership_type: 'role1')
-      @au2 = Account.default.account_users.create!(user: @user2, membership_type: 'role2')
+      @ro1 = Account.default.role_overrides.create!(:role => @role1, :permission => 'manage_sis', :enabled => true)
+      @ro2 = Account.default.role_overrides.create!(:role => @role2, :permission => 'manage_sis', :enabled => true)
+      @au1 = Account.default.account_users.create!(user: @user1, role: @role1)
+      @au2 = Account.default.account_users.create!(user: @user2, role: @role2)
     end
 
     it "should be symmetric for applies_to everything" do
@@ -140,13 +145,15 @@ describe AccountUser do
 
   describe "set_policy" do
     it "should not allow a lesser admin to create" do
-      account_admin_user_with_role_changes(membership_type: 'lesser', role_changes: { manage_account_memberships: true })
-      au = Account.default.account_users.build(user: @user, membership_type: 'AccountAdmin')
+      lesser_role = custom_account_role('lesser', :account => Account.default)
+
+      account_admin_user_with_role_changes(role: lesser_role, role_changes: { manage_account_memberships: true })
+      au = Account.default.account_users.build(user: @user, role: admin_role)
       expect(au.grants_right?(@user, :create)).to be_falsey
       u2 = User.create!
-      au = Account.default.account_users.build(user: u2, membership_type: 'lesser')
+      au = Account.default.account_users.build(user: u2, role: lesser_role)
       expect(au.grants_right?(@user, :create)).to be_truthy
-      au = Account.default.account_users.build(user: u2, membership_type: 'AccountAdmin')
+      au = Account.default.account_users.build(user: u2, role: admin_role)
       expect(au.grants_right?(@user, :create)).to be_falsey
     end
   end

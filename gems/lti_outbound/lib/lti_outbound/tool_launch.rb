@@ -69,7 +69,6 @@ module LtiOutbound
       hash['resource_link_id'] = link_code
       hash['resource_link_title'] = overrides['resource_link_title'] || tool.name
       hash['user_id'] = user.opaque_identifier
-      hash['user_image'] = user.avatar_url
       hash['text'] = CGI::escape(selected_html) if selected_html
 
       hash['roles'] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
@@ -86,6 +85,7 @@ module LtiOutbound
         hash['lis_person_contact_email_primary'] = user.email
       end
       if tool.public?
+        hash['user_image'] = user.avatar_url
         hash['custom_canvas_user_id'] = '$Canvas.user.id'
         hash['lis_person_sourcedid'] = user.sis_source_id if user.sis_source_id
         hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'

@@ -54,7 +54,7 @@ describe "/shared/_select_content_dialog" do
     @account = Account.default
     course_with_ta account: @account, active_all: true
     existing_quiz = @course.quizzes.create! title: 'existing quiz'
-    @account.role_overrides.create! enrollment_type: 'TaEnrollment', permission: 'manage_assignments', enabled: false
+    @account.role_overrides.create! role: ta_role, permission: 'manage_assignments', enabled: false
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)

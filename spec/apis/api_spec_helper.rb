@@ -151,7 +151,7 @@ end
 
 # passes the cb a piece of user content html text. the block should return the
 # response from the api for that field, which will be verified for correctness.
-def should_translate_user_content(course)
+def should_translate_user_content(course, include_verifiers=true)
   attachment = attachment_model(:context => course)
   content = %{
     <p>
@@ -166,10 +166,11 @@ def should_translate_user_content(course)
   doc = Nokogiri::HTML::DocumentFragment.parse(html)
   img1 = doc.at_css('img#1')
   expect(img1).to be_present
-  expect(img1['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview?verifier=#{attachment.uuid}"
+  params = include_verifiers ? "?verifier=#{attachment.uuid}" : ""
+  expect(img1['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview#{params}"
   img2 = doc.at_css('img#2')
   expect(img2).to be_present
-  expect(img2['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download?verifier=#{attachment.uuid}"
+  expect(img2['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
   video = doc.at_css('video')
   expect(video).to be_present
   expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})

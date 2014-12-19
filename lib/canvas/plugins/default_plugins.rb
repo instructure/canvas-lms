@@ -22,6 +22,16 @@ Canvas::Plugin.register('linked_in', nil, {
   :settings_partial => 'plugins/linked_in_settings',
   :validator => 'LinkedInValidator'
 })
+Canvas::Plugin.register('diigo', nil, {
+  :name => lambda{ t :name, 'Diigo' },
+  :description => lambda{ t :description, 'Diigo integration' },
+  :website => 'https://www.diigo.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/diigo_settings',
+  :validator => 'DiigoValidator'
+})
 Canvas::Plugin.register('twitter', nil, {
   :name => lambda{ t :name, 'Twitter' },
   :description => lambda{ t :description, 'Twitter notifications' },
@@ -31,6 +41,16 @@ Canvas::Plugin.register('twitter', nil, {
   :version => '1.0.0',
   :settings_partial => 'plugins/twitter_settings',
   :validator => 'TwitterValidator'
+})
+Canvas::Plugin.register('yo', nil, {
+  :name => lambda{ t :name, 'Yo'},
+  :description => lambda{ t :description, 'Just Yo' },
+  :website => 'http://www.justyo.co',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/yo_settings',
+  :validator => 'YoValidator'
 })
 Canvas::Plugin.register('scribd', nil, {
   :name => lambda{ t :name, 'Scribd' },
@@ -273,4 +293,18 @@ Canvas::Plugin.register('app_center', nil, {
     },
     :validator => 'AppCenterValidator'
 })
-
+Canvas::Plugin.register('pandapub', nil, {
+  :name => lambda{ t :name, 'PandaPub' },
+  :description => lambda{ t :description, 'Pub/Sub service' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings => {
+    :base_url => nil,
+    :application_id => nil,
+    :key_id => nil,
+    :key_secret => nil
+  },
+  :settings_partial => 'plugins/panda_pub_settings',
+  :validator => 'PandaPubValidator'
+})

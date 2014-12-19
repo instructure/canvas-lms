@@ -500,8 +500,12 @@ class Submission < ActiveRecord::Base
 
   def submit_attachments_to_canvadocs
     if attachment_ids_changed?
-      attachments = attachment_associations.map(&:attachment)
-      attachments.each do |a|
+      attachments.includes(:crocodoc_document).each do |a|
+        if Canvas::Crocodoc.enabled? && a.crocodocable?
+          # indicates a crocodoc preview is coming
+          a.crocodoc_document || a.create_crocodoc_document
+        end
+
         a.send_later_enqueue_args :submit_to_canvadocs, {
           :n_strand     => 'canvadocs',
           :max_attempts => 1,
@@ -761,7 +765,8 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit
-    Auditors::GradeChange.record(self) if self.grade_changed?
+    return true unless self.grade_changed?
+    connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
   include Workflow
@@ -967,28 +972,41 @@ class Submission < ActiveRecord::Base
     @group_broadcast_submission = false
   end
 
-  def past_due?
-    return false if cached_due_date.nil?
-    check_time = submitted_at || Time.now
-    check_time -= 60.seconds if submission_type == 'online_quiz'
-    cached_due_date < check_time
-  end
-  alias_method :past_due, :past_due?
+  # in a module so they can be included in other Submission-like objects. the
+  # contract is that the including class must have the following attributes:
+  #
+  #  * assignment (Assignment)
+  #  * submission_type (String)
+  #  * workflow_state (String)
+  #  * cached_due_date (Time)
+  #  * submitted_at (Time)
+  #  * score (Fixnum)
+  #
+  module Tardiness
+    def past_due?
+      return false if cached_due_date.nil?
+      check_time = submitted_at || Time.now
+      check_time -= 60.seconds if submission_type == 'online_quiz'
+      cached_due_date < check_time
+    end
+    alias_method :past_due, :past_due?
 
-  def late?
-    submitted_at.present? && past_due?
-  end
-  alias_method :late, :late?
+    def late?
+      submitted_at.present? && past_due?
+    end
+    alias_method :late, :late?
 
-  def missing?
-    return false if !past_due? || submitted_at.present?
-    assignment.expects_submission? || !(self.graded? && self.score > 0)
-  end
-  alias_method :missing, :missing?
+    def missing?
+      return false if !past_due? || submitted_at.present?
+      assignment.expects_submission? || !(self.graded? && self.score > 0)
+    end
+    alias_method :missing, :missing?
 
-  def graded?
-    !!self.score && self.workflow_state == 'graded'
+    def graded?
+      !!self.score && self.workflow_state == 'graded'
+    end
   end
+  include Tardiness
 
   def current_submission_graded?
     self.graded? && (!self.submitted_at || (self.graded_at && self.graded_at >= self.submitted_at))
@@ -1144,6 +1162,8 @@ class Submission < ActiveRecord::Base
   def change_read_state(new_state, current_user)
     return nil unless current_user
     return true if new_state == self.read_state(current_user)
+
+    StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
 
     ContentParticipation.create_or_update({
       :content => self,

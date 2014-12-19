@@ -196,36 +196,4 @@ describe "varied due dates" do
       end
     end
   end
-
-  context "on the assignments page" do
-
-    def formatted_date(string)
-      TextHelper.date_string(string)
-    end
-
-    context "an assignment that has a course due date and a section due date" do
-
-      describe "as an account admin, accessing the course assignments page" do
-        before do
-          account_admin_user(active_all: true)
-          user_session(@admin)
-        end
-
-        context "with overrides" do
-          it "shows multiple due dates" do
-            get course_assignments_path(@course)
-            expect(response.body).to include multiple_due_dates
-          end
-        end
-
-        context "with no overrides" do
-          it "shows the course due date" do
-            AssignmentOverride.delete_all
-            get course_assignments_path(@course)
-            expect(response.body).to include formatted_date(@course_due_date)
-          end
-        end
-      end
-    end
-  end
 end

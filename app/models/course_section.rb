@@ -107,6 +107,10 @@ class CourseSection < ActiveRecord::Base
     }
     can :read
 
+    given { |user, session| self.course.grants_right?(user, session, :manage_grades) }
+    can :manage_grades
+
+
     given { |user, session| self.course.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
   end

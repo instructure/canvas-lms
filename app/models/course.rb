@@ -209,6 +209,7 @@ class Course < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
   has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
+  has_many :grading_periods, dependent: :destroy
 
   include Profile::Association
 
@@ -718,7 +719,6 @@ class Course < ActiveRecord::Base
       self.course_code = res.compact.join(" ")
     end
     @group_weighting_scheme_changed = self.group_weighting_scheme_changed?
-    self.indexed = nil unless self.is_public
     if self.account_id && self.account_id_changed?
       infer_root_account
     end
@@ -1568,46 +1568,49 @@ class Course < ActiveRecord::Base
       row << read_only if self.grading_standard_enabled?
       csv << row
 
-      if da_enabled = feature_enabled?(:differentiated_assignments)
-        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments.map(&:user_id), course_id: id)
-      end
+      student_enrollments.each_slice(100) do |student_enrollments_batch|
 
-      student_enrollments.each do |student_enrollment|
-        student = student_enrollment.user
-        student_sections = student_section_names[student.id].sort.to_sentence
-        student_submissions = assignments.map do |a|
-          if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
-            "N/A"
-          else
-            submission = submissions[[student.id, a.id]]
-            submission.try(:score)
+        if da_enabled = feature_enabled?(:differentiated_assignments)
+          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments_batch.map(&:user_id), course_id: id)
+        end
+
+        student_enrollments_batch.each do |student_enrollment|
+          student = student_enrollment.user
+          student_sections = student_section_names[student.id].sort.to_sentence
+          student_submissions = assignments.map do |a|
+            if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
+              "N/A"
+            else
+              submission = submissions[[student.id, a.id]]
+              submission.try(:score)
+            end
           end
-        end
-        #Last Row
-        row = [student.last_name_first, student.id]
-        if options[:include_sis_id]
-          pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
-          row << pseudonym.try(:sis_user_id)
-          pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
-          row << pseudonym.try(:unique_id)
-          row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
-        end
+          #Last Row
+          row = [student.last_name_first, student.id]
+          if options[:include_sis_id]
+            pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
+            row << pseudonym.try(:sis_user_id)
+            pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
+            row << pseudonym.try(:unique_id)
+            row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
+          end
 
-        row << student_sections
-        row.concat(student_submissions)
+          row << student_sections
+          row.concat(student_submissions)
 
-        (current_info, current_group_info),
-          (final_info, final_group_info) = grades.shift
-        groups.each do |g|
-          row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
-          row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
+          (current_info, current_group_info),
+            (final_info, final_group_info) = grades.shift
+          groups.each do |g|
+            row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
+            row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
+          end
+          row << current_info[:total] << final_info[:total] if include_points
+          row << current_info[:grade] << final_info[:grade]
+          if self.grading_standard_enabled?
+            row << score_to_grade(final_info[:grade])
+          end
+          csv << row
         end
-        row << current_info[:total] << final_info[:total] if include_points
-        row << current_info[:grade] << final_info[:grade]
-        if self.grading_standard_enabled?
-          row << score_to_grade(final_info[:grade])
-        end
-        csv << row
       end
     end
   end
@@ -1642,7 +1645,9 @@ class Course < ActiveRecord::Base
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
-    role_name = opts[:role_name]
+
+    role = opts[:role] || Enrollment.get_built_in_role_for_type(type)
+
     start_at = opts[:start_at]
     end_at = opts[:end_at]
     self_enrolled = opts[:self_enrolled]
@@ -1655,11 +1660,11 @@ class Course < ActiveRecord::Base
     end
     Course.unique_constraint_retry do
       if opts[:allow_multiple_enrollments]
-        e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id, course_section_id: section.id).first
+        e = self.all_enrollments.where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id, course_section_id: section.id).first
       else
         # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
         e = self.all_enrollments.
-          where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id).
+          where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id).
           order("course_section_id<>#{section.id}").
           first
       end
@@ -1688,7 +1693,7 @@ class Course < ActiveRecord::Base
 
       end
       e.associated_user_id = associated_user_id
-      e.role_name = role_name
+      e.role = role
       e.self_enrolled = self_enrolled
       e.start_at = start_at
       e.end_at = end_at
@@ -2201,22 +2206,22 @@ class Course < ActiveRecord::Base
       else scope.none
     end
   end
-
+  
   def sections_visible_to(user, sections = active_course_sections)
     visibilities = section_visibilities_for(user)
+    visibility = enrollment_visibility_level_for(user, visibilities)
     section_ids = visibilities.map{ |s| s[:course_section_id] }
-    case enrollment_visibility_level_for(user, visibilities)
-    when :full, :limited
-      if visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
-        sections.where(:id => section_ids)
+    is_scope = sections.respond_to?(:where)
+
+    if [:full, :limited, :sections].include?(visibility)
+      if visibility == :sections || visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
+        is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
       else
         sections
       end
-    when :sections
-      sections.where(:id => section_ids)
     else
       # return an empty set, but keep it as a scope for downstream consistency
-      sections.none
+      is_scope ? sections.none : []
     end
   end
 
@@ -2337,7 +2342,11 @@ class Course < ActiveRecord::Base
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]
-      external_tabs = (opts[:include_external] && external_tool_tabs(opts)) || []
+      external_tabs = if opts[:include_external]
+                        external_tool_tabs(opts) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
+                      else
+                        []
+                      end
       tabs = tabs.map do |tab|
         default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
         if default_tab

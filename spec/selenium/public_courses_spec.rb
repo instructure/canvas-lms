@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "public courses" do
+  before :once do
+    Account.default.enable_feature!(:draft_state)
+  end
+
   include_examples "in-process server selenium tests"
 
   def ensure_logged_out

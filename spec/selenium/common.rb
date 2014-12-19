@@ -209,7 +209,16 @@ module SeleniumTestsHelperMethods
     end
   end
 
-# short for find with jquery
+  # short for find with link
+  def fln(link_text, scope = nil)
+    begin
+      (scope || driver).find_element :link, link_text
+    rescue
+      nil
+    end
+  end
+
+  # short for find with jquery
   def fj(selector, scope = nil)
     begin
       find_with_jquery selector, scope
@@ -746,6 +755,10 @@ shared_examples_for "all selenium tests" do
         replace_content(input, value)
     end
     driver.execute_script(input['onchange']) if input['onchange']
+  end
+
+  def get_options(selector, scope=nil)
+    Selenium::WebDriver::Support::Select.new(f(selector, scope)).options
   end
 
   def click_option(select_css, option_text, select_by = :text)

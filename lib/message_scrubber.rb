@@ -40,6 +40,10 @@ class MessageScrubber
     @logger     = options.fetch(:logger, Rails.logger)
   end
 
+  def self.scrub
+    new.scrub
+  end
+
   # Public: Delete old delayed messages on the current shard.
   #
   # options - A settings hash that accepts:

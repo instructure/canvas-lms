@@ -136,3 +136,16 @@
 #doc_preview_holder > iframe {
     border: none;
 }
+
+/* !-- PIA notice styles -- */
+
+.pia-notice {
+    margin: 2em 0;
+    padding: 1em 1.5em;
+    border: 1px solid #CCC;
+    background: #EFEFEF;
+}
+
+.pia-notice hr {
+    border-top: 1px solid #CCC;
+}

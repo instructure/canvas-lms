@@ -11,7 +11,6 @@ grunt.loadNpmTasks('grunt-connect-proxy');
 grunt.loadNpmTasks('grunt-contrib-jasmine');
 grunt.loadNpmTasks('grunt-jsduck');
 grunt.loadNpmTasks('grunt-contrib-jshint');
-grunt.loadNpmTasks('grunt-notify');
 grunt.loadNpmTasks('grunt-newer');
 grunt.loadNpmTasks('grunt-sass');
 

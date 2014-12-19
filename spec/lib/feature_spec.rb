@@ -154,7 +154,12 @@ end
 describe "Feature.register" do
   before do
     # unregister the default features
+    @old_features = Feature.instance_variable_get(:@features)
     Feature.instance_variable_set(:@features, nil)
+  end
+
+  after do
+    Feature.instance_variable_set(:@features, @old_features)
   end
 
   let(:t_feature_hash) do

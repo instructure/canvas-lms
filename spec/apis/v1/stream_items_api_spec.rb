@@ -273,6 +273,7 @@ describe UsersController, type: :request do
     assign_json['title'] = @assignment.title
     expect(json).to eq [{
       'id' => StreamItem.last.id,
+      'submission_id' => @sub.id,
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
@@ -375,6 +376,7 @@ describe UsersController, type: :request do
     assign_json['title'] = @assignment.title
     expect(json).to eq [{
       'id' => StreamItem.last.id,
+      'submission_id' => @sub.id,
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',

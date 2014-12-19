@@ -1497,28 +1497,6 @@
         }
       }
     },
-    "grunt-notify": {
-      "version": "0.3.1",
-      "from": "grunt-notify@0.3.1",
-      "resolved": "https://registry.npmjs.org/grunt-notify/-/grunt-notify-0.3.1.tgz",
-      "dependencies": {
-        "semver": {
-          "version": "3.0.1",
-          "from": "semver@>=3.0.1-0 <4.0.0-0",
-          "resolved": "https://registry.npmjs.org/semver/-/semver-3.0.1.tgz"
-        },
-        "stack-parser": {
-          "version": "0.0.1",
-          "from": "stack-parser@>=0.0.1-0 <0.1.0-0",
-          "resolved": "https://registry.npmjs.org/stack-parser/-/stack-parser-0.0.1.tgz"
-        },
-        "which": {
-          "version": "1.0.5",
-          "from": "which@>=1.0.5-0 <1.1.0-0",
-          "resolved": "https://registry.npmjs.org/which/-/which-1.0.5.tgz"
-        }
-      }
-    },
     "grunt-react": {
       "version": "0.9.0",
       "from": "grunt-react@0.9.0",

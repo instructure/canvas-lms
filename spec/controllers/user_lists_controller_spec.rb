@@ -21,7 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe UserListsController do
   it "should not fail for permission to add students" do
     course
-    account_admin_user_with_role_changes(:membership_type => 'myadmin', :role_changes => { :manage_students => true })
+    role = custom_account_role('myadmin', :account => @course.account)
+    account_admin_user_with_role_changes(:role => role, :role_changes => { :manage_students => true })
     user_session(@user)
 
     post 'create', :course_id => @course.id, :user_list => '', :format => "json"

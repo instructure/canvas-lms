@@ -63,7 +63,7 @@ module Lti
     def all_roles
       if @user
         context_roles = course_enrollments.map { |enrollment| LIS_ROLE_MAP[enrollment.class] }
-        institution_roles = @user.roles.map { |role| LIS_ROLE_MAP[role] }
+        institution_roles = @user.roles(@root_account).map { |role| LIS_ROLE_MAP[role] }
         if Account.site_admin.account_users_for(@user).present?
           institution_roles << LIS_ROLE_MAP['siteadmin']
         end
@@ -95,7 +95,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @context.is_a?(Course) && @user ? @user.concluded_enrollments.where(course_id: @context.id).shard(@context.shard) : []
+          @context.is_a?(Course) && @user ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
     end
 
     def concluded_lis_roles
@@ -103,7 +103,7 @@ module Lti
     end
 
     def current_canvas_roles
-      (course_enrollments.map(&:role) + account_enrollments.map(&:readable_type)).uniq.join(',')
+      (course_enrollments.map(&:role).map(&:name) + account_enrollments.map(&:readable_type)).uniq.join(',')
     end
 
     def enrollment_state

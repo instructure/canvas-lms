@@ -46,7 +46,6 @@ describe "/quizzes/quizzes/new" do
 
   context "with course and quiz" do
     before :each do
-      Account.default.enable_feature!(:draft_state)
       course_with_teacher_logged_in(:active_all => true)
       @quiz = course_quiz
       assigns[:quiz] = @quiz

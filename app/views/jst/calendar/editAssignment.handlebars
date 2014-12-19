@@ -31,6 +31,18 @@
           </select>
         </td>
       </tr>
+      <tr class="context_select">
+        <td>{{#t "publish"}}Publish:{{/t}}</td>
+        <td>
+         <div class="ic-Toggle ic-Toggle--success">
+            <input id="assignment_published" name="assignment[published]" type="checkbox">
+            <label for="assignment_published">
+              <div class="ic-Toggle__switch" data-checked="YES" data-unchecked="NO"></div>
+              <div class="screenreader-only">Publish:</div>
+            </label>
+          </div>
+        </td>
+      </tr>
     </table>
   </div>
   <div class="popover-links-holder event-details-footer pull-right">

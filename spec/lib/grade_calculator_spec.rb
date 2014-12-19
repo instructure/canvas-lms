@@ -286,15 +286,16 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_current_score).to eql(60.0)
       expect(@user.enrollments.first.computed_final_score).to eql(60.0)
     end
-    
+
     it "should recalculate all cached grades when an assignment is deleted/restored" do
       two_graded_assignments
       @assignment2.destroy
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(40.0) # 2/5
       expect(@user.enrollments.first.computed_final_score).to eql(40.0)
-      
+
       @assignment2.restore
+      @assignment2.publish if @assignment2.unpublished?
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(60.0)
       expect(@user.enrollments.first.computed_final_score).to eql(60.0)

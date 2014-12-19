@@ -99,7 +99,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   set_policy do
     given { |user| user && user.id == self.user_id }
-    can :read
+    can :read and can :record_events
 
     given { |user| user && user.id == self.user_id && self.untaken? }
     can :update
@@ -143,7 +143,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     result = alignment.learning_outcome_results.
       for_association(quiz).
       for_associated_asset(question).
-      find_or_initialize_by_user_id(user.id)
+      where(user_id: user.id).
+      first_or_initialize
 
     # force the context and artifact
     result.artifact = self

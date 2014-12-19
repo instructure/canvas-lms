@@ -1,5 +1,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+
+def modifier
+  @_modifier ||= determine_modifier
+end
+
+def determine_modifier
+  if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
+    :meta
+  else
+    :control
+  end
+end
+
+def get_conversations
+  get conversations_path
+  wait_for_ajaximations
+end
+
 def conversation_setup
   course_with_teacher_logged_in
 
@@ -13,213 +31,129 @@ def conversation_setup
   @user.save
 end
 
-def new_conversation(reload=true)
-  if reload
-    get "/conversations"
-    keep_trying_until { fj("#create_message_form form:visible") }
-  else
-    f("#action_compose_message").click
-    wait_for_ajaximations
-  end
-
-
-  @input = fj("#create_message_form input:visible")
-  @browser = fj("#create_message_form .browser:visible")
-  @level = 1
-  @elements = nil
+def conversation_elements
+  ff('.messages > li')
 end
 
-def add_recipient(search, input_selector=".recipients")
-  input = driver.execute_script("return $('#{input_selector}').data('token_input').$input[0]")
-  input.send_keys(search)
-  keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.list.query.search") == search }
+def get_view_filter
+  f('.type-filter.bootstrap-select')
+end
+
+def get_course_filter
+  skip('course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing')
+  #try to make it load the courses first so it doesn't randomly refresh
+  selector = '.course-filter.bootstrap-select'
+  driver.execute_script(%{$('#{selector}').focus();})
   wait_for_ajaximations
-  input.send_keys(:return)
+  f(selector)
 end
 
-def browse_menu
-  @browser.click
-  wait_for_ajaximations(500)
-  keep_trying_until { expect(ffj('.autocomplete_menu:visible .list').size).to eq @level }
-  wait_for_ajaximations(500)
+def get_message_course
+  fj('.message_course.bootstrap-select')
 end
 
-def browse(*names)
-  name = names.shift
-  @level += 1
-  prev_elements = elements
-  element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
-  element.first.click
-  wait_for_ajaximations(500)
-  keep_trying_until { expect(ffj('.autocomplete_menu:visible .list').size).to eq @level }
-  @elements = nil
-
-  if names.present?
-    browse(*names, &Proc.new)
-  else
-    yield
-  end
-
-  @level -= 1
-  @elements = nil
-  @input.send_keys(:arrow_left) unless ffj('.autocomplete_menu:visible .list').empty?
-  sleep 1
+def get_message_recipients_input
+  fj('.compose_form #compose-message-recipients')
 end
 
-def elements
-  wait_for_js
-  @elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map { |e|
-    [e, (e.find_element(:tag_name, :b).text rescue e.text)]
-  }
+def get_message_subject_input
+  fj('#compose-message-subject')
 end
 
-def menu
-  elements.map(&:last)
+def get_message_body_input
+  fj('.conversation_body')
 end
 
-def toggleable
-  with_class("toggleable")
+def get_bootstrap_select_value(element)
+  f('.selected .text', element).attribute('data-value')
 end
 
-def toggled
-  with_class("on")
+def set_bootstrap_select_value(element, new_value)
+  f('.dropdown-toggle', element).click()
+  f(%{.text[data-value="#{new_value}"]}, element).click()
 end
 
-def with_class(klass)
-  elements.select { |e| e.first.attribute('class') =~ /(\A| )#{klass}(\z| )/ }.map(&:last)
-end
-
-def click(name)
-  element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
-  element.first.click
-end
-
-def toggle(name)
-  element = elements.detect { |e| e.last == name } or raise "menu item does not exist"
-  element.first.find_element(:class, 'toggle').click
-end
-
-def tokens
-  ffj("#create_message_form .token_input li div").map(&:text)
-end
-
-def search(text, input_selector=".recipients")
-  @input.send_keys(text)
-  keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.list.query.search") == text }
+def select_view(new_view)
+  set_bootstrap_select_value(get_view_filter, new_view)
   wait_for_ajaximations
-  @elements = nil
-  yield
-  @elements = nil
-  if input_selector == ".recipients"
-    @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
-    keep_trying_until do
-      driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 || driver.execute_script("return $('#{input_selector}').data('token_input').selector.list.query.search") == ''
-    end
+end
+
+def select_course(new_course)
+  set_bootstrap_select_value(get_course_filter, new_course)
+  wait_for_ajaximations
+end
+
+def click_star_toggle_menu_item
+  keep_trying_until do
+    driver.execute_script(%q{$('#admin-btn').hover().click()})
+    sleep 1
+    driver.execute_script(%q{$('#star-toggle-btn').hover().click()})
     wait_for_ajaximations
   end
 end
 
-def submit_message_form(opts={})
-  opts[:message] ||= "Test Message"
-  opts[:attachments] ||= []
-  opts[:add_recipient] = true unless opts.has_key?(:add_recipient)
-  opts[:group_conversation] = true unless opts.has_key?(:group_conversation)
-  opts[:existing_conversation] = false unless opts.has_key?(:existing_conversation)
-
-  if opts[:add_recipient] && browser = fj("#create_message_form .browser:visible")
-    browser.click
-    wait_for_ajaximations(500)
-    fj('.autocomplete_menu .selectable:visible').click
-    wait_for_ajaximations(500)
-    fj('.autocomplete_menu .toggleable:visible .toggle').click
-    wait_for_ajaximations(500)
-    expect(ff('.token_input ul li').length).to be > 0
-    fj("#create_message_form input:visible").send_keys("\t")
-  end
-
-  fj("#create_message_form textarea").send_keys(opts[:message])
-
-  opts[:attachments].each_with_index do |fullpath, i|
-    f(".action_add_attachment").click
-
-    keep_trying_until { ffj("#create_message_form .file_input:visible")[i] }.send_keys(fullpath)
-  end
-
-  if opts[:media_comment]
-    driver.execute_script <<-JS
-        $("#create_message_form input[name=media_comment_id]").val(#{opts[:media_comment].first.inspect})
-        $("#create_message_form input[name=media_comment_type]").val(#{opts[:media_comment].last.inspect})
-        $("#create_message_form .media_comment").show()
-        $("#create_message_form .action_media_comment").hide()
-    JS
-  end
-
-  group_conversation_link = f(".group_conversation")
-  group_conversation_link.click if group_conversation_link && group_conversation_link.displayed? && opts[:group_conversation]
-
-  expect {
-    submit_form('#create_message_form form')
-    # file uploads can trigger multiple ajax requests, so we just wait for the
-    # sent notification
-    assert_message_status("sent", opts[:message][0, 10])
-  }.to change(ConversationMessage, :count).by_at_least(opts[:group_conversation] ? 1 : ff('.token_input li').size)
-
-  @elements = nil
-
-  if opts[:group_conversation]
-    message = ConversationMessage.last
-    # whether the message should be visible depends on whether we were appending to an already visible conversation
-    if opts[:existing_conversation]
-      expect(f("#message_#{message.id}")).not_to be_nil
-    else
-      expect(f("#message_#{message.id}")).to be_nil
-    end
-    message
+def click_unread_toggle_menu_item
+  keep_trying_until do
+    driver.execute_script(%q{$('#admin-btn').hover().click()})
+    sleep 1
+    driver.execute_script(%q{$('#mark-unread-btn').hover().click()})
+    wait_for_ajaximations
   end
 end
 
-def assert_message_status(status = "sent", text = '')
+def click_read_toggle_menu_item
+  keep_trying_until do
+    driver.execute_script(%q{$('#admin-btn').hover().click()})
+    sleep 1
+    driver.execute_script(%q{$('#mark-read-btn').hover().click()})
+    wait_for_ajaximations
+  end
+end
+
+def select_message_course(new_course, is_group = false)
+  new_course = new_course.name if new_course.respond_to? :name
+  fj('.dropdown-toggle', get_message_course).click
+  if is_group
+    wait_for_ajaximations
+    fj("a:contains('Groups')", get_message_course).click
+  end
+  fj("a:contains('#{new_course}')", get_message_course).click
+end
+
+def add_message_recipient(to)
+  synthetic = !(to.instance_of?(User) || to.instance_of?(String))
+  to = to.name if to.respond_to?(:name)
+  get_message_recipients_input.send_keys(to)
+  keep_trying_until { fj(".ac-result:contains('#{to}')") }.click
+  return unless synthetic
+  keep_trying_until { fj(".ac-result:contains('All in #{to}')") }.click
+end
+
+def set_message_subject(subject)
+  get_message_subject_input.send_keys(subject)
+end
+
+def set_message_body(body)
+  get_message_body_input.send_keys(body)
+end
+
+def click_send
+  f('.compose-message-dialog .send-message').click
   wait_for_ajaximations
-  keep_trying_until {
-    e = ff('#message_status li').last
-    expect(e.text.downcase).to include("#{status} #{text.downcase}") #rescue false
-  }
 end
 
-def get_messages(load_convo = true, keep_trying = true)
-  if load_convo
-    get "/conversations"
-    get_conversations.first.click
-  end
-  elements = nil
-  keep_trying_until do
-    elements = ff("div#messages > ul.messages > li")
-    elements.size > 0
-  end
-  elements
+def compose(options={})
+  fj('#compose-btn').click
+  wait_for_ajaximations
+  select_message_course(options[:course]) if options[:course]
+  (options[:to] || []).each {|recipient| add_message_recipient recipient}
+  set_message_subject(options[:subject]) if options[:subject]
+  set_message_body(options[:body]) if options[:body]
+  click_send if options[:send].nil? || options[:send]
 end
 
-def get_conversations(keep_trying = true)
-  elements = nil
-  keep_trying_until do
-    elements = driver.execute_script("return $('#conversations .conversations > ul > li').not('.scrollable-list-item-loading,.scrollable-list-item-deleting,.scrollable-list-item-moving').toArray();")
-    return elements unless keep_trying
-    elements.size > 0
-  end
-  elements
+def run_progress_job
+  return unless progress = Progress.where(tag: 'conversation_batch_update').first
+  job = Delayed::Job.find(progress.delayed_job_id)
+  job.invoke_job
 end
-
-def delete_selected_messages(confirm_conversation_deleted = true)
-  orig_size = get_conversations.size
-
-  wait_for_ajaximations(500)
-  delete = f('#action_delete')
-  expect(delete).to be_displayed
-  delete.click
-  driver.switch_to.alert.accept
-
-  if confirm_conversation_deleted
-    keep_trying_until { expect(get_conversations(false).size).to eq orig_size - 1 }
-  end
-end
-

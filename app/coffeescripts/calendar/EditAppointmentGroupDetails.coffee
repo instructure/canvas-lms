@@ -223,7 +223,7 @@ define [
           contextCode = contextCodes[0]
           text = @contextsHash[contextCode].name
           if contextCodes.length > 1
-            text += I18n.t('and_n_contexts', ' and %{n} others', n: contextCodes.length - 1)
+            text += " " + I18n.t('and_n_contexts', 'and %{n} others', n: contextCodes.length - 1)
           @form.find('.ag_contexts_selector').text(text)
         if sectionCodes.length > 0
           sectionCode = sectionCodes[0]
@@ -234,7 +234,7 @@ define [
                      .value()
           text = section.name
           if sectionCodes.length > 1
-            text += I18n.t('and_n_sectionCodes', ' and %{n} others', n: sectionCodes.length - 1)
+            text += " " + I18n.t('and_n_sectionCodes', 'and %{n} others', n: sectionCodes.length - 1)
           @form.find('.ag_contexts_selector').text(text)
 
       # group selector

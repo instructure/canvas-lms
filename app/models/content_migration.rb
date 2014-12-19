@@ -239,7 +239,7 @@ class ContentMigration < ActiveRecord::Base
 
   def add_import_warning(item_type, item_name, warning)
     item_name = CanvasTextHelper.truncate_text(item_name || "", :max_length => 150)
-    add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
+    add_warning(t('errors.import_error', "Import Error:") + " #{item_type} - \"#{item_name}\"", warning)
   end
 
   def fail_with_error!(exception_or_info)
@@ -609,7 +609,7 @@ class ContentMigration < ActiveRecord::Base
       if item[:missing_links].any?
         add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{item[:class]} #{item[:field]}",
           {:error_message => "#{item[:class]} #{item[:field]} - " + t(:missing_content_links_message,
-            "The following references could not be resolved: ") + " " + item[:missing_links].join(', '),
+            "The following references could not be resolved:") + " " + item[:missing_links].join(', '),
             :fix_issue_html_url => item[:url]})
       end
     end

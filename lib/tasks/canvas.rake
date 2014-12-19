@@ -105,18 +105,22 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets, :generate_documentation, :check_syntax do |t, args|
-    args.with_defaults(:generate_documentation => true, :check_syntax => false)
+  task :compile_assets, :generate_documentation, :check_syntax, :compile_css, :build_js do |t, args|
+    args.with_defaults(:generate_documentation => true, :check_syntax => false, :compile_css => true, :build_js => true)
     truthy_values = [true, 'true', '1']
     generate_documentation = truthy_values.include?(args[:generate_documentation])
     check_syntax = truthy_values.include?(args[:check_syntax])
+    compile_css = truthy_values.include?(args[:compile_css])
+    build_js = truthy_values.include?(args[:build_js])
 
     require 'parallel'
     processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
     puts "working in #{processes} processes"
 
-    tasks = {
-      "Compile sass and make jammit css bundles" => -> {
+    tasks = Hash.new
+
+    if compile_css
+      tasks["Compile sass and make jammit css bundles"] = -> {
         log_time('npm run compile-sass') do
           half_of_avilable_cores = (processes / 2).ceil.to_s
           raise unless system({"CANVAS_SASS_STYLE" => "compressed", "CANVAS_BUILD_CONCURRENCY" => half_of_avilable_cores}, "npm run compile-sass")
@@ -126,16 +130,25 @@ namespace :canvas do
           require 'jammit'
           Jammit.package!
         end
-      },
-      "css:styleguide" => -> {
+      }
+      tasks["css:styleguide"] = -> {
         Rake::Task['css:styleguide'].invoke
-      },
-      "compile coffee, js 18n, and run r.js optimizer" => -> {
+      }
+    end
+
+    if build_js
+      tasks["compile coffee, js 18n, and run r.js optimizer"] = -> {
         ['js:generate', 'i18n:generate_js', 'js:build'].each do |name|
           log_time(name) { Rake::Task[name].invoke }
         end
       }
-    }
+    else
+      tasks["compile coffee"] = -> {
+        ['js:generate'].each do |name|
+          log_time(name) { Rake::Task[name].invoke }
+        end
+      }
+    end
 
     if check_syntax
       tasks["check JavaScript syntax"] = -> {

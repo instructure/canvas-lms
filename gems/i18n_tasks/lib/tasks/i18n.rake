@@ -2,161 +2,41 @@ require 'i18n_tasks'
 require 'i18n_extraction'
 
 namespace :i18n do
-  EXCLUDED_JAVASCRIPT_SOURCES = /
-    \A\.\/public\/javascripts\/(
-      i18nObj.js|
-      i18n.js|
-      .*jst\/|
-      translations\/|
-      compiled\/handlebars_helpers.js|
-      tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js)
-    )
-  /x
-
-  def infer_scope(filename)
-    case filename
-      when /app\/views\/.*\.handlebars\z/
-        filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').gsub(/plugins\/([^\/]*)\//, '').underscore.gsub(/\/_?/, '.')
-      when /app\/controllers\//
-        scope = filename.gsub(/.*app\/controllers\/|controller.rb/, '').gsub(/\/_?|_\z/, '.')
-        scope == 'application.' ? '' : scope
-      when /app\/messages\//
-        filename.gsub(/.*app\/|erb/, '').gsub(/\/_?/, '.')
-      when /app\/models\//
-        scope = filename.gsub(/.*app\/models\/|rb/, '')
-        STI_SUPERCLASSES.include?(scope) ? '' : scope
-      when /app\/views\//
-        filename.gsub(/.*app\/views\/|(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')
-      else
-        ''
-    end
-  end
-
   desc "Verifies all translation calls"
-  task :check => :environment do
-    require 'ya2yaml'
+  task :check => :i18n_environment do
+    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
-    only = if ENV['ONLY']
-      ENV['ONLY'].split(',').map{ |path|
-        path = '**/' + path if path =~ /\*/
-        path = './' + path unless path =~ /\A.?\//
-        if path =~ /\*/
-          path = Dir.glob(path)
-        elsif path !~ /\.(e?rb|js)\z/
-          path = Dir.glob(path + '/**/*')
-        end
-        path
-      }.flatten
-    end
-
-    STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`.split("\n") - ['OpenStruct', 'Tableless']).
-      map{ |name| name.underscore + '.' }
-
-    COLOR_ENABLED = ($stdout.tty? rescue false)
-    def color(text, color_code)
-      COLOR_ENABLED ? "#{color_code}#{text}\e[0m" : text
-    end
-
-    def green(text)
-      color(text, "\e[32m")
-    end
-
-    def red(text)
-      color(text, "\e[31m")
-    end
-
-    @errors = []
-    def process_files(files)
-      files.each do |file|
-        begin
-          print green "." if yield file
-        rescue SyntaxError, StandardError
-          @errors << "#{$!}\n#{file}"
-          print red "F"
-        end
-      end
-    end
-
-    t = Time.now
-
-    I18n.available_locales
-    stringifier = proc { |hash, (key, value)|
-      hash[key.to_s] = value.is_a?(Hash) ?
-        value.inject({}, &stringifier) :
-        value
-      hash
-    }
-    @translations = I18n.backend.direct_lookup('en').inject({}, &stringifier)
-
-
-    # Ruby
-    files = (Dir.glob('./*') - ['./vendor'] + ['./vendor/plugins/*'] - ['./guard', './tmp']).map { |d| Dir.glob("#{d}/**/*rb") }.flatten.
-      reject{ |file| file =~ %r{\A\./(rb-fsevent|db|spec)/} }
-    files &= only if only
-    file_count = files.size
-    rb_extractor = I18nExtraction::RubyExtractor.new(:translations => @translations)
-    process_files(files) do |file|
-      source = File.read(file)
-      source = ActionView::Template::Handlers::Erubis.new(source).src if file =~ /\.erb\z/
-
-      # add a magic comment since that's the best way to convince RubyParser
-      # 3.x it should treat the source as utf-8 (it ignores the source string encoding)
-      # see https://github.com/seattlerb/ruby_parser/issues/101
-      # unforunately this means line numbers in error messages are off by one
-      sexps = RubyParser.for_current_ruby.parse("#encoding:utf-8\n#{source}", file, 300)
-      rb_extractor.scope = infer_scope(file)
-      rb_extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
-      rb_extractor.process(sexps)
+    def I18nliner.manual_translations
+      I18n.backend.direct_lookup('en')
     end
 
 
-    # JavaScript
-    files = (
-      Dir.glob('./public/javascripts/{,**/*/**/}*.js') +
-      Dir.glob('./app/views/**/*.erb')
-    )
-    files = files.reject { |file| file =~ EXCLUDED_JAVASCRIPT_SOURCES }
-    files &= only if only
-    js_extractor = I18nExtraction::JsExtractor.new(:translations => @translations)
-    process_files(files) do |filename|
-      rc = true
-      started_at = Time.now
-      options = { erb: filename =~ /\.erb\z/, filename: filename }
-
-      I18nTasks::Utils.extract_js_scripts(File.read(filename)).each do |script|
-        rc = rc && js_extractor.process(script, options)
-      end
-
-      file_count += 1 if rc
-      puts "#{filename} #{Time.now - started_at}" if Time.now - started_at > 1
-      rc
+    puts "\nJS/HBS..."
+    system "./gems/canvas_i18nliner/bin/i18nliner export"
+    if $?.exitstatus > 0
+      $stderr.puts "Error extracting JS/HBS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
+      exit $?.exitstatus
     end
+    js_translations = JSON.parse(File.read("config/locales/generated/en.json"))["en"].flatten_keys
 
-    # Handlebars
-    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
-    files &= only if only
-    handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
-    process_files(files) do |file|
-      file_count += 1 if handlebars_extractor.process(File.read(file), infer_scope(file))
+    puts "\nRuby..."
+    require 'i18nliner/commands/check'
+
+    options = {:only => ENV['ONLY']}
+    @command = I18nliner::Commands::Check.run(options)
+    @command.success? or exit 1
+    @translations = @command.translations
+
+    # merge js in
+    js_translations.each do |key, value|
+      @translations[key] = value
     end
-
-    print "\n\n"
-    failure = @errors.size > 0
-
-    @errors.each_index do |i|
-      puts "#{i+1})"
-      puts red @errors[i]
-      print "\n"
-    end
-
-    print "Finished in #{Time.now - t} seconds\n\n"
-    total_strings = rb_extractor.total_unique + js_extractor.total_unique + handlebars_extractor.total_unique
-    puts send((failure ? :red : :green), "#{file_count} files, #{total_strings} strings, #{@errors.size} failures")
-    raise "check command encountered errors" if failure
   end
 
   desc "Generates a new en.yml file for all translations"
   task :generate => :check do
+    require 'ya2yaml'
+
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
@@ -166,8 +46,9 @@ namespace :i18n do
     print "Wrote new #{yaml_file}\n\n"
   end
 
-  desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
-  task :generate_js do
+  # like the top-level :environment, but just the i18n-y stuff we need.
+  # also it's faster and doesn't require a db \o/
+  task :i18n_environment do
     # This is intentionally requiring things individually rather than just
     # loading the rails+canvas environment, because that environment isn't
     # available during the deploy process. Don't change this out for a call to
@@ -182,6 +63,7 @@ namespace :i18n do
     # set up rails i18n paths ... normally rails env does this for us :-/
     require 'action_controller'
     require 'active_record'
+    require 'will_paginate'
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
     require 'i18nema'
@@ -189,10 +71,11 @@ namespace :i18n do
     I18n.backend = I18nema::Backend.new
     I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
     I18n.backend.init_translations
+  end
 
+  desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
+  task :generate_js => :i18n_environment do
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
-
-    file_translations = {}
 
     locales = I18n.available_locales - [:en]
     # allow passing of extra, empty locales by including a comma-separated
@@ -208,58 +91,12 @@ namespace :i18n do
       exit 0
     end
 
-    # Process a single script
-    process_file = lambda do |extractor, file, filename, arg_block|
-      extractor.translations = {}
-
-      begin
-        unless extractor.process(file, *arg_block.call(filename))
-          return
-        end
-      rescue Exception => e
-        puts e
-        raise "Error reading #{file}: #{$!}\nYou should probably run `rake i18n:check' first"
-      end
-
-      translations = extractor.translations.flatten_keys.keys
-
-      unless translations.empty?
-        scope = extractor.scope
-
-        file_translations[scope] ||= {}
-        locales.each do |locale|
-          file_translations[scope].update flat_translations.slice(*translations.map{ |k| k.gsub(/\A/, "#{locale}.") })
-        end
-      end
+    system "./gems/canvas_i18nliner/bin/i18nliner generate_js"
+    if $?.exitstatus > 0
+      $stderr.puts "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works"
+      exit $?.exitstatus
     end
-
-    process_files = lambda do |extractor, files, arg_block, has_precompiled|
-      # Process any number of scripts that may be contained in a single file
-      files.each do |filename|
-        scripts = if has_precompiled
-          I18nTasks::Utils.extract_js_scripts(File.read(filename))
-        else
-          [ File.read(filename) ]
-        end
-
-        scripts.each do |script|
-          process_file.call(extractor, script, filename, arg_block)
-        end
-      end
-    end
-
-    # JavaScript
-    files = Dir.glob('./public/javascripts/{,**/*/**/}*.js').reject do |file|
-      file =~ EXCLUDED_JAVASCRIPT_SOURCES
-    end
-
-    js_extractor = I18nExtraction::JsExtractor.new
-    process_files.call(js_extractor, files, lambda{ |file| [{:filename => file}] }, true)
-
-    # Handlebars
-    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
-    handlebars_extractor = I18nExtraction::HandlebarsExtractor.new
-    process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] }, false)
+    file_translations = JSON.parse(File.read("config/locales/generated/js_bundles.json"))
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
@@ -269,7 +106,11 @@ namespace :i18n do
       end
     end
 
-    file_translations.each do |scope, translations|
+    file_translations.each do |scope, keys|
+      translations = {}
+      locales.each do |locale|
+        translations.update flat_translations.slice(*keys.map{ |k| k.gsub(/\A/, "#{locale}.") })
+      end
       dump_translations.call(scope, translations.expand_keys)
     end
 

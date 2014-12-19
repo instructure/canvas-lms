@@ -80,9 +80,8 @@ The publish button has two states on click (publish and published) and a hover s
 }
 
 .publish-icon {
-  display: inline-block;
-  @if $use_high_contrast { color: $canvas-neutral; }
-  @else { color: darken($canvas-neutral, 30%); }
+  display: inline-block;  
+  color: darken($canvas-neutral, 30%);
   
   cursor: pointer;
   &:focus { @include button-focus; }

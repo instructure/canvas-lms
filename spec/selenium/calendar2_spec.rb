@@ -57,7 +57,7 @@ describe "calendar2" do
     datepicker_current(middle_number)
   end
 
-  def create_assignment_event(assignment_title, should_add_date = false)
+  def create_assignment_event(assignment_title, should_add_date = false, publish = false)
     middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
     find_middle_day.click
     edit_event_dialog = f('#edit_event_tabs')
@@ -68,6 +68,7 @@ describe "calendar2" do
     keep_trying_until { title.displayed? }
     replace_content(title, assignment_title)
     add_date(middle_number) if should_add_date
+    edit_assignment_form.find_element(:id, 'assignment_published').click if publish
     submit_form(edit_assignment_form)
     keep_trying_until { expect(f('.fc-view-month .fc-event-title')).to include_text(assignment_title) }
   end
@@ -214,6 +215,11 @@ describe "calendar2" do
         create_assignment_event(name)
       end
 
+      def create_published_middle_day_assignment
+        get "/calendar2"
+        create_assignment_event(name = 'new assignment', false, true)
+      end
+
       it "should remember the selected calendar view" do
         get "/calendar2"
         expect(f("#month")).to have_class('active')
@@ -285,6 +291,15 @@ describe "calendar2" do
         driver.execute_script("$('.edit_event_link').hover().click()")
         expect_new_page_load { driver.execute_script("$('.more_options_link').hover().click()") }
         expect(f('#assignment_name').attribute(:value)).to include(name)
+      end
+
+      it "should publish a new assignment when toggle is clicked" do
+        create_published_middle_day_assignment
+        wait_for_ajax_requests
+        fj('.fc-event.assignment').click
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        driver.execute_script("$('.more_options_link').hover().click()")
+        expect(f('#assignment-draft-state')).not_to include_text("Not Published")
       end
 
       it "should delete an event" do

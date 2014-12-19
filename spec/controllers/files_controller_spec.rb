@@ -196,6 +196,7 @@ describe FilesController do
 
     it "should require authorization" do
       get 'show', :course_id => @course.id, :id => @file.id
+      assert_unauthorized
     end
 
     it "should assign variables" do

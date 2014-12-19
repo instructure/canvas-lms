@@ -35,7 +35,6 @@
     "grunt-contrib-watch": "0.6.1",
     "grunt-jsduck": "1.0.1",
     "grunt-newer": "0.7.0",
-    "grunt-notify": "0.3.1",
     "grunt-sass": "0.14.1",
     "grunt-template-jasmine-requirejs": "git://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0",
     "jasmine_react": "1.1.0",

@@ -13,7 +13,9 @@ define [
   './CurrentUploads'
   './FilePreview'
   './UploadDropZone'
-], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone) ->
+  '../utils/forceScreenreaderToReparse'
+], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone, forceScreenreaderToReparse) ->
+
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
@@ -71,6 +73,9 @@ define [
       setTimeout =>
         @props.onResolvePath({currentFolder:undefined, rootTillCurrentFolder:undefined})
 
+    componentDidUpdate: ->
+      # hooray for a11y
+      forceScreenreaderToReparse(@getDOMNode())
 
     componentWillReceiveProps: (newProps) ->
       @unregisterListeners()
@@ -91,6 +96,7 @@ define [
         ColumnHeaders {
           to: (if @props.params.splat then 'folder' else 'rootFolder')
           query: @props.query
+          params: @props.params
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
           splat: @props.params.splat

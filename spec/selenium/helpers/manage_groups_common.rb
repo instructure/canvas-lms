@@ -31,7 +31,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     end
     submit_form(form)
     keep_trying_until { expect(find_with_jquery("#add_category_form:visible")).to be_nil }
-    category = course.group_categories.find_by_name(name)
+    category = course.group_categories.where(name: name).first
     expect(category).not_to be_nil
     keep_trying_until { fj("#category_#{category.id} .student_links:visible") }
     category
@@ -95,7 +95,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wait_for_ajaximations
     submit_form("#edit_group_form")
     wait_for_ajaximations
-    context.groups.find_by_name(name)
+    context.groups.where(name: name).first
   end
 
   def add_groups_in_category (category, i=3)

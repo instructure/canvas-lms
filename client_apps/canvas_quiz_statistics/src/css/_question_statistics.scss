@@ -1,22 +1,16 @@
-#question-statistics-section {
-  // The sorting <ic-menu />
-  header ic-menu {
-    position: relative;
-
-    ic-menu-list {
-      top: auto;
-      right: auto;
-      z-index: 1;
-    }
-  }
-}
-
 .question-statistics {
-  border: 1px solid #CAD0D7;
+  border: 1px solid $borderColor;
   border-radius: 6px;
-  padding: 10px 20px 0;
   position: relative;
-  margin-bottom: 20px;
+
+  padding: $whitespace*2;
+
+  // Answer drilldown will provide the padding if necessary, otherwise we want
+  // the charts to be on the "baseline" of the question box:
+  padding-bottom: 0;
+
+  // Some space between questions:
+  margin-bottom: $whitespace * 2;
 
   section {
     display: inline-block;
@@ -29,8 +23,7 @@
   }
 
   .question-text {
-    margin-top: -5px;
-    margin-bottom: 20px;
+    margin: $whitespace*2 0;
     font-size: 1.25em;
   }
 
@@ -43,7 +36,7 @@
   }
 
   &:hover, &.with-details {
-    background-color: #f4f4f4;
+    background-color: $activeOrHoverQuestionBoxBg;
 
     aside {
       pointer-events: inherit;
@@ -71,7 +64,7 @@
       height: 80px;
 
       .background {
-        fill: #ddd;
+        fill: $borderColor;
       }
 
       .foreground {
@@ -96,15 +89,8 @@
     margin-bottom: -1px;
 
     .chart {
-      .axis path,
-      .axis line {
-        fill: none;
-        stroke: #000;
-        shape-rendering: crispEdges;
-      }
-
       .bar {
-        fill: #2a333b;
+        fill: $contrastColor;
 
         &.bar-highlighted {
           fill: $highlightColor;
@@ -127,7 +113,7 @@
       }
 
       .y.axis {
-        fill: $muteTextColor;
+        fill: $muteFg;
 
         path {
           display: none;
@@ -150,7 +136,7 @@
       font-style: normal;
 
       &.negative {
-        color: red;
+        color: $negativeColor;
       }
 
       &.positive {
@@ -162,7 +148,7 @@
 
     .chart {
       .bar {
-        fill: #2a333b;
+        fill: $contrastColor;
       }
       .bar.correct {
         fill: $highlightColor;
@@ -173,7 +159,7 @@
       position: absolute;
       top: 0;
       right: 0;
-      color: $muteTextColor;
+      color: $muteFg;
     }
   }
 
@@ -182,7 +168,7 @@
     height: 120px;
 
     path.score-line, circle {
-      stroke: #349e67;
+      stroke: $highlightColor;
       shape-rendering: geometricPrecision;
       image-rendering: optimizeQuality;
     }
@@ -193,31 +179,36 @@
     }
 
     .area {
-      fill: #9ddbbb;
+      fill: lighten($highlightColor, 35%);
     }
 
     circle {
       stroke-width: 4px;
       stroke: white;
-      fill: #349e67;
+      fill: $highlightColor;
     }
   }
 
   .answer-drilldown {
+    $tearSize: 40px;
+
     list-style-type: none;
     margin: 0;
-    padding: 20px 0;
-    border-top: 1px solid #ddd;
+    padding: $whitespace*2 0;
+    padding-bottom: 0; // spacing is already provided by the tears
+    border-top: 1px solid $borderColor;
 
     li {
       display: inline-block;
       width: 45%;
-      margin-bottom: 20px;
-      min-height: 40px;
+      margin-bottom: $whitespace*2;
+      min-height: $tearSize;
       vertical-align: top;
 
       &.correct .answer-response-ratio {
         background-color: $highlightColor;
+        box-shadow: none;
+        color: white;
       }
 
       &:nth-of-type(2n) {
@@ -226,18 +217,18 @@
     }
 
     .answer-text {
-      margin-left: 55px; /* for the answer response ratio label */
+      margin-left: $tearSize + $whitespace; /* for the answer response ratio label */
     }
 
     .answer-response-ratio {
-      background-color: #2a333b;
       display: inline-block;
       position: absolute;
-      background: #2a333b;
-      color: white;
+      box-shadow: 0 0 0 2px $contrastColor inset;
+      background: transparent;
       border-radius: 50% 0 50% 50%;
-      width: 40px;
-      line-height: 40px;
+      width: $tearSize;
+      height: $tearSize;
+      line-height: $tearSize;
       text-align: center;
       font-weight: bold;
       z-index: 0; /* otherwise selecting the answer text gets crazy */

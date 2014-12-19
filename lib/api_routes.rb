@@ -25,7 +25,7 @@ CanvasRails::Application.routes.disable_clear_and_finalize = true
 
 # load routing files, including those in plugins
 require 'config/routes'
-Dir.glob('vendor/plugins/*/config/routes.rb').each do |plugin_routes|
+Dir.glob('{gems,vendor}/plugins/*/config/routes.rb').each do |plugin_routes|
   require plugin_routes.gsub(/\.rb$/, '')
 end
 

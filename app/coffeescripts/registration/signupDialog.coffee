@@ -16,14 +16,26 @@ define [
   $nodes = {}
   templates = {teacherDialog, studentDialog, parentDialog}
 
+  # we do this in coffee because of this hbs 1.3 bug:
+  # https://github.com/wycats/handlebars.js/issues/748
+  # https://github.com/fivetanley/i18nliner-handlebars/commit/55be26ff
+  termsHtml = ({terms_of_use_url, privacy_policy_url}) ->
+    I18n.t(
+      "teacher_dialog.agree_to_terms_and_pp"
+      "You agree to the *terms of use* and acknowledge the **privacy policy**."
+      wrappers: [
+        "<a href=\"#{terms_of_use_url}\" target=\"_blank\">$1</a>"
+        "<a href=\"#{privacy_policy_url}\" target=\"_blank\">$1</a>"
+      ]
+    )
+
   signupDialog = (id, title) ->
     return unless templates[id]
     $node = $nodes[id] ?= $('<div />')
     $node.html templates[id](
       account: ENV.ACCOUNT.registration_settings
       terms_required: ENV.ACCOUNT.terms_required
-      terms_url: ENV.ACCOUNT.terms_of_use_url
-      privacy_url: ENV.ACCOUNT.privacy_policy_url
+      terms_html: termsHtml(ENV.ACCOUNT)
     )
     $node.find('.date-field').datetime_field()
 

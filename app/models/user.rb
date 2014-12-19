@@ -62,16 +62,6 @@ class User < ActiveRecord::Base
   has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:active), :readonly => false
-  has_many :invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:invited), :readonly => false
-  has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course],
-          :conditions => enrollment_conditions(:current_and_invited), :readonly => false
-  has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course],
-          :conditions => enrollment_conditions(:current_and_future), :readonly => false
-  has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :readonly => false
-  has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
-          :conditions => enrollment_conditions(:current_and_concluded), :readonly => false
-
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :multishard => true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
@@ -79,11 +69,7 @@ class User < ActiveRecord::Base
   has_many :observers, :through => :user_observers, :class_name => 'User'
   has_many :user_observees, :class_name => 'UserObserver', :foreign_key => :observer_id, :dependent => :delete_all
   has_many :observed_users, :through => :user_observees, :source => :user
-  has_many :courses, :through => :current_enrollments, :uniq => true
-  has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
-  has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
-  has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
   has_many :polls, class_name: 'Polling::Poll'
@@ -300,6 +286,26 @@ class User < ActiveRecord::Base
   before_save :record_acceptance_of_terms
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
+
+  def courses_for_enrollments(enrollment_scope)
+    Course.joins(:all_enrollments).merge(enrollment_scope.except(:joins)).uniq
+  end
+
+  def courses
+    courses_for_enrollments(enrollments.current)
+  end
+
+  def current_and_invited_courses
+    courses_for_enrollments(enrollments.current_and_invited)
+  end
+
+  def concluded_courses
+    courses_for_enrollments(enrollments.concluded)
+  end
+
+  def current_and_concluded_courses
+    courses_for_enrollments(enrollments.current_and_concluded)
+  end
 
   def self.skip_updating_account_associations(&block)
     @skip_updating_account_associations = true
@@ -809,34 +815,55 @@ class User < ActiveRecord::Base
   end
 
   alias_method :destroy!, :destroy
-  def destroy(even_if_managed_passwords=false)
-    ActiveRecord::Base.transaction do
-      self.workflow_state = 'deleted'
-      self.deleted_at = Time.now.utc
-      self.save
-      self.pseudonyms.each{|p| p.destroy(even_if_managed_passwords) }
-      self.communication_channels.each{|cc| cc.destroy }
-      self.delete_enrollments
-    end
+  def destroy
+    self.remove_from_root_account(:all)
+    self.workflow_state = 'deleted'
+    self.deleted_at = Time.now.utc
+    self.save
   end
 
   # avoid extraneous callbacks when enrolled in multiple sections
-  def delete_enrollments
-    courses_to_update = self.enrollments.active.select(:course_id).uniq.map(&:course_id)
+  def delete_enrollments(enrollment_scope=self.enrollments)
+    courses_to_update = enrollment_scope.active.uniq.pluck(:course_id)
     Enrollment.suspend_callbacks(:update_cached_due_dates) do
-      self.enrollments.each { |e| e.destroy }
+      enrollment_scope.each{ |e| e.destroy }
     end
     courses_to_update.each do |course|
       DueDateCacher.recompute_course(course)
     end
   end
 
-  def remove_from_root_account(account)
-    self.enrollments.where(root_account_id: account).each(&:destroy)
-    self.pseudonyms.active.where(account_id: account).each { |p| p.destroy(true) }
-    self.account_users.where(account_id: account).each(&:destroy)
-    self.save
-    self.update_account_associations
+  def remove_from_root_account(root_account)
+    ActiveRecord::Base.transaction do
+      if root_account == :all
+        # make sure to hit all shards
+        enrollment_scope = self.enrollments.shard(self)
+        pseudonym_scope = self.pseudonyms.active.shard(self)
+        account_user_scope = self.account_users.shard(self)
+        has_other_root_accounts = false
+      else
+        # make sure to do things on the root account's shard. but note,
+        # root_account.enrollments won't include the student view user's
+        # enrollments, so we need to fetch them off the user instead; the
+        # student view user won't be cross shard, so that will still be the
+        # right shard
+        enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
+        pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
+        account_user_scope = root_account.account_users.where(user_id: self)
+        has_other_root_accounts = self.associated_accounts.shard(self).where('accounts.id <> ?', root_account).exists?
+      end
+
+      self.delete_enrollments(enrollment_scope)
+      pseudonym_scope.each(&:destroy)
+      account_user_scope.each(&:destroy)
+
+      # only delete the user's communication channels when the last account is
+      # removed (they don't belong to any particular account). they will always
+      # be on the user's shard
+      self.communication_channels.each(&:destroy) unless has_other_root_accounts
+
+      self.update_account_associations
+    end
   end
 
   def associate_with_shard(shard, strength = :strong)
@@ -1005,15 +1032,20 @@ class User < ActiveRecord::Base
          self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
       )
     end
-    can :manage_user_details and can :manage_logins and can :rename
+    can :manage_user_details and can :rename
+
+    given{ |user| self.pseudonyms.with_each_shard.any?{ |p| p.grants_right?(user, :update) } }
+    can :merge
 
     given do |user|
-      user && (
-        self.grants_right?(user, :manage_logins) ||
-          (self.grants_right?(user, :manage) && self.pseudonyms.none? {|p| p.system_created?})
-      )
+      # a user can reset their own MFA, but only if the setting isn't required
+      (self == user && self.mfa_settings != :required) ||
+
+      # an admin can reset another user's MFA only if they can manage *all*
+      # of the user's pseudonyms
+      (self != user && self.pseudonyms.with_each_shard.all?{ |p| p.grants_right?(user, :update) })
     end
-    can :delete
+    can :reset_mfa
   end
 
   def can_masquerade?(masquerader, account)
@@ -1033,6 +1065,12 @@ class User < ActiveRecord::Base
     account_users.all? do |account_user|
       account_user.is_subset_of?(user)
     end
+  end
+
+  def allows_user_to_remove_from_account?(account, other_user)
+    Pseudonym.new(account: account, user: self).grants_right?(other_user, :delete) &&
+    (Pseudonym.new(account: account, user: self).grants_right?(other_user, :manage_sis) ||
+     !account.pseudonyms.active.where(user_id: self).where('sis_user_id IS NOT NULL').exists?)
   end
 
   def self.infer_id(obj)
@@ -1572,33 +1610,37 @@ class User < ActiveRecord::Base
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-          relation = association(actual_association).scoped
-          shards = in_region_associated_shards
-          relation.with_each_shard do |scope|
-            next unless shards.include?(Shard.current)
-
-            # Limit favorite courses based on current shard.
-            if association == :favorite_courses
-              local_ids = self.favorite_context_ids("Course")
-              next if local_ids.length < 1
-              scope = scope.where(:id => local_ids)
+          scope = send(actual_association)
+          # Limit favorite courses based on current shard.
+          if association == :favorite_courses
+            ids = self.favorite_context_ids("Course")
+            if ids.empty?
+              scope = scope.none
+            else
+              shards = in_region_associated_shards
+              ids = ids.select { |id| shards.include?(Shard.shard_for(id)) }
+              # let the relation auto-determine which shards to query
+              scope.shard_source_value = :implicit
+              scope = scope.where(id: ids)
             end
-
-            courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
-                order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
-                distinct_on(:id).to_a
-
-            unless options[:include_completed_courses]
-              enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all
-              courses_hash = courses.index_by(&:id)
-              # prepopulate the reverse association
-              enrollments.each { |e| e.course = courses_hash[e.course_id] }
-              Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
-              date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
-              courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
-            end
-            courses
+          else
+            scope = scope.shard(in_region_associated_shards)
           end
+
+          courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+              order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
+              distinct_on(:id).to_a
+
+          unless options[:include_completed_courses]
+            enrollments = Enrollment.where(:id => courses.map { |c| Shard.relative_id_for(c.primary_enrollment_id, c.shard, Shard.current) }).all
+            courses_hash = courses.index_by(&:id)
+            # prepopulate the reverse association
+            enrollments.each { |e| e.course = courses_hash[e.course_id] }
+            Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+            date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
+            courses.reject! { |course| date_restricted_ids.include?(Shard.relative_id_for(course.primary_enrollment_id, course.shard, Shard.current)) }
+          end
+          courses
         end
         result.dup
       end
@@ -1650,7 +1692,7 @@ class User < ActiveRecord::Base
   def cached_current_enrollments(opts={})
     enrollments = self.shard.activate do
       res = Rails.cache.fetch([self, 'current_enrollments3', opts[:include_future], ApplicationController.region ].cache_key) do
-        scope = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments)
+        scope = (opts[:include_future] ? self.enrollments.current_and_future : self.enrollments.current_and_invited)
         scope.shard(in_region_associated_shards).to_a
       end
       if opts[:include_enrollment_uuid] && !res.find { |e| e.uuid == opts[:include_enrollment_uuid] } &&
@@ -2096,13 +2138,14 @@ class User < ActiveRecord::Base
     roles.last
   end
 
-  def roles
+  def roles(root_account)
     return @roles if @roles
-    res = ['user']
-    res << 'student' if self.cached_current_enrollments.any?(&:student?)
-    res << 'teacher' if self.cached_current_enrollments.any?(&:admin?)
-    res << 'admin' unless self.all_accounts.empty?
-    @roles = res
+    @roles = ['user']
+    enrollment_types = root_account.enrollments.where(type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'], user_id: self, workflow_state: 'active').uniq.pluck(:type)
+    @roles << 'student' if enrollment_types.include?('StudentEnrollment')
+    @roles << 'teacher' unless (enrollment_types & ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).empty?
+    @roles << 'admin' unless root_account.all_account_users_for(self).empty?
+    @roles
   end
 
   def eportfolios_enabled?
@@ -2250,10 +2293,10 @@ class User < ActiveRecord::Base
       end
     end
 
-    # Return ids relative for the current shard and only the ids for the current shard.
+    # Return ids relative for the current shard
     context_ids.map { |id|
-      Shard.relative_id_for(id, Shard.current, Shard.current) if Shard.current == Shard.shard_for(id)
-    }.compact
+      Shard.relative_id_for(id, self.shard, Shard.current)
+    }
   end
 
   def menu_courses(enrollment_uuid = nil)

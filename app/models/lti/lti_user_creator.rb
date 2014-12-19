@@ -70,7 +70,7 @@ module Lti
     def current_course_enrollments
       return [] unless @canvas_context.is_a?(Course)
 
-      @current_course_enrollments ||= @canvas_user.current_enrollments.where(course_id: @canvas_context).to_a
+      @current_course_enrollments ||= @canvas_user.enrollments.current.where(course_id: @canvas_context).to_a
     end
 
     def current_account_enrollments()
@@ -86,7 +86,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @canvas_context.is_a?(Course) ? @canvas_user.concluded_enrollments.where(course_id: @canvas_context).to_a : []
+          @canvas_context.is_a?(Course) ? @canvas_user.enrollments.concluded.where(course_id: @canvas_context).to_a : []
     end
   end
 end

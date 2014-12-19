@@ -62,6 +62,16 @@ define(function(require) {
      */
     __reset__: function() {
       this._callbacks = [];
+      this.state = this.getInitialState();
+    },
+
+    getInitialState: function() {
+      return {};
+    },
+
+    setState: function(newState) {
+      extend(this.state, newState);
+      this.emitChange();
     }
   });
 

@@ -135,24 +135,16 @@ describe Pseudonym do
 
   it "should allow deleting pseudonyms" do
     user_with_pseudonym(:active_all => true)
-    expect(@pseudonym.destroy(true)).to eql(true)
+    expect(@pseudonym.destroy).to eql(true)
     expect(@pseudonym).to be_deleted
   end
 
-  it "should not allow deleting system-generated pseudonyms by default" do
+  it "should allow deleting system-generated pseudonyms" do
     user_with_pseudonym(:active_all => true)
     @pseudonym.sis_user_id = 'something_cool'
     @pseudonym.save!
     @pseudonym.account.account_authorization_configs.create!(:auth_type => 'ldap')
-    expect{ @pseudonym.destroy}.to raise_error("Cannot delete system-generated pseudonyms")
-    expect(@pseudonym).not_to be_deleted
-  end
-
-  it "should not allow deleting system-generated pseudonyms by default" do
-    user_with_pseudonym(:active_all => true)
-    @pseudonym.sis_user_id = 'something_cool'
-    @pseudonym.save!
-    expect(@pseudonym.destroy(true)).to eql(true)
+    expect(@pseudonym.destroy).to eql(true)
     expect(@pseudonym).to be_deleted
   end
 
@@ -401,6 +393,238 @@ describe Pseudonym do
         expect(new_pseudonym.verify_unique_sis_user_id).to be_falsey
       end
 
+    end
+  end
+
+  describe "permissions" do
+    let(:account1) {
+      a = Account.default
+      a.settings[:admins_can_view_notifications] = true
+      a.save!
+      a
+    }
+    let(:account2) { Account.create! }
+
+    let(:sally) { account_admin_user(
+      user: student_in_course(account: account2).user,
+      account: account1) }
+
+    let(:bob) { student_in_course(
+      user: student_in_course(account: account2).user,
+      course: course(account: account1)).user }
+
+    let(:charlie) { student_in_course(account: account2).user }
+
+    let(:alice) {
+      account_admin_user_with_role_changes(
+      account: account1,
+      role: custom_account_role('StrongerAdmin', account: account1),
+      role_changes: { view_notifications: true }) }
+
+    describe ":create" do
+      it "should grant admins :create for themselves on the account" do
+        expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :create)
+      end
+
+      it "should grant admins :create for others on the account" do
+        expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :create)
+      end
+
+      it "should not grant non-admins :create for themselves on the account" do
+        expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(bob, :create)
+      end
+
+      it "should only grant admins :create on accounts they admin" do
+        expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :create)
+        expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :create)
+      end
+
+      it "should not grant admins :create for others from other accounts" do
+        expect(account1.pseudonyms.build(user: charlie)).not_to be_grants_right(sally, :create)
+      end
+
+      it "should not grant subadmins :create on stronger admins" do
+        expect(account1.pseudonyms.build(user: alice)).not_to be_grants_right(sally, :create)
+      end
+    end
+
+    describe ":update" do
+      it "should grant admins :update for their own pseudonyms" do
+        expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :update)
+      end
+
+      it "should grant admins :update for others on the account" do
+        expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :update)
+      end
+
+      it "should not grant non-admins :update for their own pseudonyms" do
+        expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(bob, :update)
+      end
+
+      it "should only grant admins :update for others on accounts they admin" do
+        expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :update)
+      end
+
+      it "should not grant admins :update for their own pseudonyms on accounts they don't admin" do
+        expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :update)
+      end
+
+      it "should not grant subadmins :update on stronger admins" do
+        expect(account1.pseudonyms.build(user: alice)).not_to be_grants_right(sally, :update)
+      end
+    end
+
+    describe ":change_password" do
+      context "with :admins_can_change_passwords true on the account" do
+        before do
+          account1.settings[:admins_can_change_passwords] = true
+          account1.save!
+        end
+
+        it "should grant admins :change_password for others on the account" do
+          expect(pseudonym(bob, account: account1)).to be_grants_right(sally, :change_password)
+        end
+
+        it "should grant non-admins :change_password for their own pseudonyms" do
+          expect(pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
+        end
+
+        it "should grant admins :change_password for their own pseudonyms on accounts they don't admin" do
+          expect(pseudonym(sally, account: account2)).to be_grants_right(sally, :change_password)
+        end
+      end
+
+      context "with :admins_can_change_passwords false on the account" do
+        before do
+          account1.settings[:admins_can_change_passwords] = false
+          account1.save!
+        end
+
+        it "should no longer grant admins :change_password for existing pseudonyms for others on the account" do
+          expect(pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
+        end
+
+        it "should still longer grant admins :change_password for new pseudonym for others on the account" do
+          expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :change_password)
+        end
+
+        it "should still grant admins :change_password for their own pseudonym" do
+          expect(pseudonym(sally, account: account1)).to be_grants_right(sally, :change_password)
+        end
+
+        it "should still grant non-admins :change_password for their own pseudonym" do
+          expect(pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
+        end
+      end
+
+      context "with managed passwords and :admins_can_change_passwords true" do
+        before do
+          account1.settings[:admins_can_change_passwords] = true
+          account1.save!
+        end
+
+        context "with canvas authentication enabled on the account" do
+          before do
+            account1.change_root_account_setting!(:canvas_authentication, true)
+          end
+
+          it "should still grant admins :change_password for others on the account" do
+            expect(managed_pseudonym(bob, account: account1)).to be_grants_right(sally, :change_password)
+          end
+
+          it "should still grant admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(sally, account: account1)).to be_grants_right(sally, :change_password)
+          end
+
+          it "should still grant non-admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
+          end
+        end
+
+        context "without canvas authentication enabled on the account" do
+          before do
+            account1.change_root_account_setting!(:canvas_authentication, false)
+          end
+
+          it "should no longer grant admins :change_password for others on the account" do
+            expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
+          end
+
+          it "should no longer grant admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(sally, account: account1)).not_to be_grants_right(sally, :change_password)
+          end
+
+          it "should no longer grant non-admins :change_password for their own pseudonym" do
+            expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(bob, :change_password)
+          end
+        end
+      end
+    end
+
+    describe ":manage_sis" do
+      context "with :manage_sis permission on account" do
+        before do
+          account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: true)
+        end
+
+        it "should grant admins :manage_sis for their own pseudonyms on that account" do
+          expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :manage_sis)
+        end
+
+        it "should grant admins :manage_sis for others on that account" do
+          expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :manage_sis)
+        end
+
+        it "should not grant admins :manage_sis for others on other accounts" do
+          expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :manage_sis)
+        end
+
+        it "should not grant admins :manage_sis for their own pseudonyms on other accounts" do
+          expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :manage_sis)
+        end
+      end
+
+      context "without :manage_sis permission on account" do
+        before do
+          account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: false)
+        end
+
+        it "should not grant admins :manage_sis for others" do
+          expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :manage_sis)
+        end
+
+        it "should not grant admins :manage_sis even for their own pseudonyms" do
+          expect(account1.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :manage_sis)
+        end
+      end
+    end
+
+    describe ":delete" do
+      it "should grants users :delete on pseudonyms they can update" do
+        expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :delete)
+        expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :delete)
+        expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(bob, :delete)
+        expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :delete)
+        expect(account1.pseudonyms.build(user: alice)).not_to be_grants_right(sally, :delete)
+      end
+
+      context "system-created pseudonyms" do
+        let(:system_pseudonym) do
+          p = account1.pseudonyms.build(user: sally)
+          p.sis_user_id = 'sis'
+          p
+        end
+
+        it "should grant admins :delete if they can :manage_sis" do
+          account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: true)
+          expect(system_pseudonym).to be_grants_right(sally, :manage_sis)
+        end
+
+        it "should not grant admins :delete if they can't :manage_sis" do
+          account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: false)
+          expect(system_pseudonym).not_to be_grants_right(sally, :manage_sis)
+        end
+      end
     end
   end
 end

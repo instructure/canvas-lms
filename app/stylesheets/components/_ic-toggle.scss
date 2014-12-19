@@ -1,0 +1,406 @@
+/*
+@styleguide Toggle
+
+### Regular old checkboxes that look and feel like toggle switches
+
+No javascript is required for the **.ic-Toggle** component. However, including all the right markup is important for it to function properly. The id of the checkbox input must match the "for" attribute of the label, for example.
+
+The **.ic-Toggle** component was designed to be as accessible as a regular checkbox. It supports both *:focus* and *disabled* states. Once in focus, it can be toggled via the keyboard by pressing SPACE.
+
+#### **Basic usage**
+
+This is the basic .ic-Toggle component, without any special additions. By default, the component defaults to Canvas colors and branding.
+
+```html
+<div class="ic-Toggle">
+  <input id="ic-Toggle-demo-1" type="checkbox">
+  <label for="ic-Toggle-demo-1">
+    <div class="ic-Toggle__switch" data-checked="On" data-unchecked="Off"></div>
+    <div class="ic-Toggle__label-text">.ic-Toggle</div>
+  </label>
+</div>
+<div class="ic-Toggle">
+  <input id="ic-Toggle-demo-8" type="checkbox" disabled>
+  <label for="ic-Toggle-demo-8">
+    <div class="ic-Toggle__switch" data-checked="On" data-unchecked="Off"></div>
+    <div class="ic-Toggle__label-text">.ic-Toggle [disabled]</div>
+  </label>
+</div>
+```
+
+#### **Go big or go, uh, small**
+
+Adding **.ic-Toggle--size-large** or **.ic-Toggle--size-small** to the **.ic-Toggle** component will give you slightly bigger or small toggles.
+
+```html
+
+<div class="content-box">
+  <div class="grid-row middle-xs">
+      <div class="col-xs-12 col-md-4">
+
+        <div class="ic-Toggle ic-Toggle--size-large">
+          <input id="ic-Toggle-demo-2" type="checkbox" checked>
+          <label for="ic-Toggle-demo-2">
+            <div class="ic-Toggle__switch" data-checked="On" data-unchecked="Off"></div>
+            <div class="ic-Toggle__label-text">I'm a little bigger.</div>
+          </label>
+        </div>
+
+      </div>
+      <div class="col-xs-12 col-md-4">
+
+        <div class="ic-Toggle">
+          <input id="ic-Toggle-demo-4" type="checkbox" checked>
+          <label for="ic-Toggle-demo-4">
+            <div class="ic-Toggle__switch" data-checked="On" data-unchecked="Off"></div>
+            <div class="ic-Toggle__label-text">I'm the default size.</div>
+          </label>
+        </div>
+
+      </div>
+      <div class="col-xs-12 col-md-4">
+
+        <div class="ic-Toggle ic-Toggle--size-small">
+          <input id="ic-Toggle-demo-3" type="checkbox" checked>
+          <label for="ic-Toggle-demo-3">
+            <div class="ic-Toggle__switch" data-checked="On" data-unchecked="Off"></div>
+            <div class="ic-Toggle__label-text">I'm a little smaller.</div>
+          </label>
+        </div>
+
+      </div>
+  </div>
+</div>
+
+```
+
+#### **Customizing your toggle switch**
+
+The **.ic-Toggle** class exposes two mixins for you to use to customize its appearance.
+
+To customize the colors and transition-timing-function, include the **ic-Toggle-branding** mixin in your new class. Let's call our modifier class **.ic-Toggle--i-love-ugly-colors**, for example:
+
+<pre>
+<code>
+  .ic-Toggle.ic-Toggle--i-love-ugly-colors {
+    @include ic-Toggle-branding (
+      red, // off state color
+      green, // on state color
+      white, // inactive text color
+      ease-in-out // transition timing function
+    )
+  }
+</code>
+</pre>
+
+The SCSS above would give you the toggle below.
+
+```html
+<div class="ic-Toggle ic-Toggle--i-love-ugly-colors">
+  <input id="ic-Toggle-demo-5" type="checkbox">
+  <label for="ic-Toggle-demo-5">
+    <div class="ic-Toggle__switch" data-checked="On" data-unchecked="Off"></div>
+    <div class="ic-Toggle__label-text">Nice colors, bro.</div>
+  </label>
+</div>
+```
+
+The **ic-Toggle-appearance** mixin works the same way, giving you control over the toggle's width, height, and a lot more. Simply add a modifier class (in this case **.ic-Toggle--i-love-big-toggles**) to the **.ic-Toggle** base class, and include the ic-Toggle-appearance mixin. Then overwrite the mixin's default variable values until you get the look you're going for.
+
+<pre>
+<code>
+  .ic-Toggle.ic-Toggle--i-love-big-toggles {
+    @include ic-Toggle-appearance
+    (
+      200px, // Toggle width
+      100px,  // Toggle height
+      100px,   // Toggle border radius
+      2px,   // Offset (distance btw switch and box)
+      16px,  // Label font size
+      18px,  // Switch font size
+      0px 4px 6px rgba(black, 0.4), // Switch shadow on hover/focus
+      10px // Bottom padding on main element to make sure switch shadow always shows
+    );
+  }
+</code>
+</pre>
+The SCSS above would give you the toggle below.
+
+```html
+<div class="ic-Toggle ic-Toggle--i-love-big-toggles">
+  <input id="ic-Toggle-demo-6" type="checkbox">
+  <label for="ic-Toggle-demo-6">
+    <div class="ic-Toggle__switch" data-checked="On" data-unchecked="Off"></div>
+    <div class="ic-Toggle__label-text">IS THIS TOGGLE BIG ENOUGH??!!</div>
+  </label>
+</div>
+```
+
+*/
+
+@mixin ic-Toggle-branding (
+  $ic-Toggle-off-color: lighten($canvas-dark, 15%),
+  $ic-Toggle-on-color: $canvas-primary,
+  $ic-Toggle-inactive-text: rgba($canvas-light, 0.6),
+  $ic-Toggle-transition: cubic-bezier(0,1,0.5,1)
+) {
+
+  input[type="checkbox"] {
+
+    &[disabled] ~ label { color: rgba($ic-Toggle-off-color, 0.5); }
+
+    &:focus ~ label, &:hover ~ label {
+      .ic-Toggle__switch {
+        background-color: $ic-Toggle-off-color;
+        &:after { color: darken($ic-Toggle-off-color, 10%); }
+      }
+    }
+
+    &:hover ~label { color: darken($ic-Toggle-off-color, 5%); }
+
+    &:checked {
+      ~ label {
+        &:hover { color: darken($ic-Toggle-on-color, 3%); }
+
+        .ic-Toggle__switch {
+          background-color: $ic-Toggle-on-color;
+          &:after { color: darken($ic-Toggle-on-color, 5%); }
+        }
+      }
+
+      &:focus, &:hover {
+        ~ label {
+          .ic-Toggle__switch {
+            background-color: $ic-Toggle-on-color;
+            &:after { color: darken($ic-Toggle-on-color, 10%); }
+          }
+        }
+      }
+
+    }
+  }
+
+  label {
+    .ic-Toggle__label-text { flex: 1; }
+
+    .ic-Toggle__switch {
+      transition: background-color 0.3s $ic-Toggle-transition;
+      background: $ic-Toggle-off-color;
+      &:before { color: $ic-Toggle-inactive-text; }
+      &:after {
+        // Autoprefixer choked here, so making the prefixes explicit
+        -webkit-transition: -webkit-transform 0.3s $ic-Toggle-transition;
+        transition: transform 0.3s $ic-Toggle-transition;
+        color: $ic-Toggle-off-color;
+      }
+    }
+
+  }
+}
+
+@mixin ic-Toggle-appearance (
+  $ic-Toggle-width: 134px,
+  $ic-Toggle-height: 36px,
+  $ic-Toggle-border-radius: 4px,
+  $ic-Toggle-offset: 2px,
+  $ic-Toggle-label-font-size: 14px,
+  $ic-Toggle-switch-font-size: 12px,
+  $ic-Toggle-shadow: 0 2px 4px rgba(black, 0.4),
+  $ic-Toggle-bottom-padding: 6px
+){
+
+  $ic-Toggle-switch-width: $ic-Toggle-width/2;
+  padding-bottom: $ic-Toggle-bottom-padding;
+
+  input[type="checkbox"] {
+
+    &:focus ~ label, &:hover ~ label {
+      .ic-Toggle__switch {
+        &:after { box-shadow: $ic-Toggle-shadow; }
+      }
+    }
+
+    &:checked {
+      ~ label {
+        .ic-Toggle__switch {
+          &:after { transform: translate3d($ic-Toggle-width - ($ic-Toggle-switch-width + $ic-Toggle-offset),0,0); }
+        }
+      }
+      &:focus, &:hover {
+        ~ label {
+          .ic-Toggle__switch { &:after { box-shadow: $ic-Toggle-shadow; } }
+        }
+      }
+    }
+  }
+
+  label {
+    font-size: $ic-Toggle-label-font-size;
+
+    .ic-Toggle__switch {
+      height: $ic-Toggle-height;
+      flex: 0 0 $ic-Toggle-width;
+      border-radius: $ic-Toggle-border-radius;
+
+      &:before {
+        left: $ic-Toggle-width/2;
+        font-size: $ic-Toggle-switch-font-size;
+        line-height: $ic-Toggle-height;
+        width: $ic-Toggle-width/2;
+        padding: 0 12px;
+      }
+
+      &:after {
+        top: $ic-Toggle-offset; left: $ic-Toggle-offset;
+        border-radius: $ic-Toggle-border-radius/2;
+        width: $ic-Toggle-switch-width - $ic-Toggle-offset;
+        line-height: $ic-Toggle-height - ($ic-Toggle-offset*2);
+        font-size: $ic-Toggle-switch-font-size;
+      }
+
+      &:hover {
+        &:after { box-shadow: $ic-Toggle-shadow; }
+      }
+    }
+  }
+}
+
+.ic-Toggle {
+  position: relative;
+
+  *, *:before, *:after { box-sizing: border-box; }
+
+  input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    top: 0; left: 0;
+    margin: 0; padding: 0;
+
+    &[disabled] ~ label {
+      pointer-events: none;
+      .ic-Toggle__switch { opacity: 0.4; }
+    }
+
+    &:checked {
+      ~ label {
+        .ic-Toggle__switch {
+
+          &:before {
+            content: attr(data-unchecked);
+            left: 0;
+          }
+
+          &:after { content: attr(data-checked); }
+        }
+      }
+    }
+  }
+
+  label {
+    user-select: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: baseline !important;
+    line-height: normal !important;
+
+    .ic-Toggle__label-text {
+      flex: 1;
+      padding-left: 32px;
+    }
+
+    .ic-Toggle__switch {
+      position: relative;
+
+      &:before {
+        content: attr(data-checked);
+        position: absolute;
+        top: 0;
+        text-transform: uppercase;
+        text-align: center;
+      }
+
+      &:after {
+        content: attr(data-unchecked);
+        position: absolute;
+        z-index: 5;
+        text-transform: uppercase;
+        text-align: center;
+        background: white;
+        transform: translate3d(0,0,0);
+      }
+
+    }
+
+  }
+
+  // Call all the mixins to set up the default toggle, using the mixins' defaults
+  @include ic-Toggle-branding;
+  @include ic-Toggle-appearance;
+
+  // Creating variations on the component is simple.
+  // Just add a class below and modify the branding and/or appearance default values
+
+  &.ic-Toggle--size-small {
+    @include ic-Toggle-appearance (
+      90px, // Toggle width
+      28px,  // Toggle height
+      2px,   // Toggle border radius
+      1px,   // Offset (distance btw switch and box)
+      13px,  // Label font size
+      10px,  // Switch font size
+      0 1px 2px rgba(black, 0.4), // Switch shadow on hover/focus
+      2px // Bottom padding on main element to make sure switch shadow always shows
+    );
+  }
+
+  &.ic-Toggle--size-large {
+    @include ic-Toggle-appearance (
+      160px, // Toggle width
+      50px,  // Toggle height
+      4px,   // Toggle border radius
+      2px,   // Offset (distance btw switch and box)
+      14px,  // Label font size
+      14px,  // Switch font size
+      0 4px 4px rgba(black, 0.4), // Switch shadow on hover/focus
+      8px // Bottom padding on main element to make sure switch shadow always shows
+    );
+  }
+
+  // Standard toggle with on-state in $canvas-success (green)
+  &.ic-Toggle--success {
+    @include ic-Toggle-branding (
+      lighten($canvas-dark, 15%), // off state color
+      $canvas-success, // on state color
+      $canvas-light, // inactive text color
+      cubic-bezier(0,1,0.5,1) // transition timing function
+    )
+  }
+
+  // Ugly example styles for toggle component demo in styleguide. Put it here because styleguide.scss compiles before this.
+  &.ic-Toggle--i-love-ugly-colors {
+    @include ic-Toggle-branding (
+      red,
+      green,
+      white,
+      ease-in-out
+    )
+  }
+
+  &.ic-Toggle--i-love-big-toggles {
+    @include ic-Toggle-appearance (
+      200px, // Toggle width
+      100px,  // Toggle height
+      100px,   // Toggle border radius
+      2px,   // Offset (distance btw switch and box)
+      16px,  // Label font size
+      18px,  // Switch font size
+      0px 4px 6px rgba(black, 0.4), // Switch shadow on hover/focus
+      10px // Bottom padding on main element to make sure switch shadow always shows
+    );
+  }
+  // End styleguide demo styles
+
+}

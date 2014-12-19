@@ -1,21 +1,18 @@
 require 'fileutils'
+require 'handlebars_tasks/template_precompiler'
 
 # Precompiles handlebars templates into JavaScript function strings
 module HandlebarsTasks
   class EmberHbs
     class << self
+      include HandlebarsTasks::TemplatePrecompiler
+
       def compile_file(path)
-        name = parse_name(path)
         dest = parse_dest(path)
-        template_string = prepare_with_i18n(File.read(path), scopify(path))
-        precompiled = compile_template(name, template_string)
+        precompiled = compile_template(path)
         dir = File.dirname(dest)
         FileUtils.mkdir_p(dir) unless File.exists?(dir)
         File.open(dest, 'w') { |f| f.write precompiled }
-      end
-
-      def scopify(path)
-        path.gsub(/^app\/coffeescripts\/ember\//, '').sub(/^_/, '').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').tr("-", "_").downcase.gsub(/\/_?/, '.')
       end
 
       def parse_dest(path)
@@ -26,32 +23,19 @@ module HandlebarsTasks
         path.gsub(/^.+?\/templates\//, '').gsub(/\.hbs$/, '')
       end
 
-      def prepare_with_i18n(source, scope)
-        @extractor = I18nExtraction::HandlebarsExtractor.new
-        @extractor.scan(source, :method => :gsub) do |data|
-          wrappers = data[:wrappers].map { |value, delimiter| " w#{delimiter.size-1}=#{value.inspect}" }.join
-          "{{{t #{data[:key].inspect} #{data[:value].inspect} scope=#{scope.inspect}#{wrappers}#{data[:options]}}}}"
-        end
-      end
+      def compile_template(path)
+        source = File.read(path)
+        name = parse_name(path)
+        dependencies = ['ember', 'compiled/ember/shared/helpers/common']
+        data = precompile_template(path, source, ember: true)
+        dependencies << "i18n!#{data["scope"]}" if data["translationCount"] > 0
 
-      def compile_template(name, template_string)
-        require "execjs"
-        handlebars_source = File.read(File.expand_path(File.join(__FILE__, '../../../../../', 'public/javascripts/bower/handlebars/handlebars.js')))
-        # execjs has no "exports" and global "var foo" does not land on "this.foo"
-        shims = "; this.Handlebars = Handlebars; exports = {};"
-        precompiler_source = File.read(File.expand_path(File.join(__FILE__, '../../../../../', 'public/javascripts/bower/ember/ember-template-compiler.js')))
-        context = ExecJS.compile(handlebars_source + shims + precompiler_source)
-        precompiled = context.eval "exports.precompile(#{template_string.inspect}).toString()", template_string
         template_module = <<-END
-define(['ember', 'compiled/ember/shared/helpers/common'], function(Ember) {
-  Ember.TEMPLATES['#{name}'] = Ember.Handlebars.template(#{precompiled});
+define(#{MultiJson.dump dependencies}, function(Ember) {
+  Ember.TEMPLATES['#{name}'] = Ember.Handlebars.template(#{data["template"]});
 });
         END
         template_module
-      end
-
-      def extract_i18n
-
       end
     end
   end

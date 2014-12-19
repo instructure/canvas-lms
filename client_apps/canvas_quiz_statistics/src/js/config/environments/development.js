@@ -1,5 +1,4 @@
 define(function(require) {
-  var rawAjax = require('../../util/xhr_request');
   var $ = require('canvas_packages/jquery');
   var Root = this;
   var DEBUG = {
@@ -15,10 +14,6 @@ define(function(require) {
     DEBUG.app = app;
     DEBUG.update = app.update;
   });
-
-  DEBUG.expose('react', 'React');
-  DEBUG.expose('util/round', 'round');
-  DEBUG.expose('stores/statistics', 'statisticsStore');
 
   Root.DEBUG = DEBUG;
   Root.d = DEBUG;

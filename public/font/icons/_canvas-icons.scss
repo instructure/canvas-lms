@@ -270,6 +270,10 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-quiz-stats-deviation"></i> icon-quiz-stats-deviation</span>
   <span class="span3"><i class="icon-quiz-stats-time"></i> icon-quiz-stats-time</span>
 </div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-cloud-lock"></i> icon-cloud-lock</span>
+  <span class="span3"><i class="icon-eye"></i> icon-eye</span>
+</div>
 */
 
 
@@ -280,8 +284,8 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
         url('/font/canvas/canvas-icons.woff') format('woff'),   
         url('/font/canvas/canvas-icons.ttf') format('truetype'),    
         url('/font/canvas/canvas-webfont.svg#canvasregular') format('svg');   
-  font-weight: normal;    
-  font-style: normal;   
+  font-weight: normal;
+  font-style: normal;
 }
 
 

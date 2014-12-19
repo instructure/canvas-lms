@@ -150,9 +150,12 @@ $(document).ready(function() {
       item_data['item[title]'] = $("#content_tag_create_title").val();
       submit(item_data);   
     } else if(item_type == 'context_external_tool') {
+      var tool = $("#context_external_tools_select .tools .tool.selected").data('tool');
+      var tool_type = tool ? tool.definition_type :$("#add_module_item_select").val()
+      var tool_id = tool ? tool.definition_id : 0
       var item_data = {
-        'item[type]': $("#add_module_item_select").val(),
-        'item[id]': $("#context_external_tools_select .tools .tool.selected").data('id'),
+        'item[type]': tool_type,
+        'item[id]': tool_id,
         'item[new_tab]': $("#external_tool_create_new_tab").attr('checked') ? '1' : '0',
         'item[indent]': $("#content_tag_indent").val()
       }
@@ -244,8 +247,8 @@ $(document).ready(function() {
     if($tool.hasClass('resource_selection')) {
       var tool = $tool.data('tool');
       var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
-      var width = tool.resource_selection.selection_width || tool.selection_width;
-      var height = tool.resource_selection.selection_height || tool.selection_height;
+      var width = tool.placements.resource_selection.selection_width;
+      var height = tool.placements.resource_selection.selection_height;
       var $dialog = $("#resource_selection_dialog");
       if($dialog.length == 0) {
         $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
@@ -297,13 +300,14 @@ $(document).ready(function() {
         .dialog('option', 'height', height || frameHeight || 400)
         .dialog('open');
       $dialog.triggerHandler('dialogresize');
-      var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.id);
+      var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
       $dialog.find("iframe").attr('src', url);
     } else {
-      $("#external_tool_create_url").val($tool.data('url') || '');
-      $("#context_external_tools_select .domain_message").showIf($tool.data('domain'))
-        .find(".domain").text($tool.data('domain'));
-      $("#external_tool_create_title").val($tool.data('name'));
+        var module_item_placement = $tool.data('tool').placements.module_item;
+      $("#external_tool_create_url").val(module_item_placement.url || '');
+      $("#context_external_tools_select .domain_message").showIf($tool.data('tool').domain)
+        .find(".domain").text($tool.data('tool').domain);
+      $("#external_tool_create_title").val(module_item_placement.title);
     }
   });
   var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();
@@ -321,16 +325,14 @@ $(document).ready(function() {
           $select.find(".tools").empty();
           for(var idx in data) {
             var tool = data[idx];
-            if(tool.url || tool.domain || tool.resource_selection) {
-              var $tool = $tool_template.clone(true);
-              $tool.toggleClass('resource_selection', !!tool.resource_selection);
-              $tool.fillTemplateData({
-                data: tool,
-                dataValues: ['id', 'url', 'domain', 'name']
-              });
-              $tool.data('tool', tool);
-              $select.find(".tools").append($tool.show());
-            }
+            var $tool = $tool_template.clone(true);
+            $tool.toggleClass('resource_selection', 'resource_selection' in tool.placements);
+            $tool.fillTemplateData({
+              data: tool,
+              dataValues: ['definition_type', 'definition_id', 'domain', 'name', 'placements']
+            });
+            $tool.data('tool', tool);
+            $select.find(".tools").append($tool.show());
           }
         }, function(data) {
           $select.find(".message").text(I18n.t('errors.loading_failed', "Loading Failed"));

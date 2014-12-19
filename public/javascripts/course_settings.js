@@ -266,15 +266,11 @@ define([
         handleFragmentType("TeacherEnrollment");
       }
     });
-    $(".edit_course_link").click(function(event) {
-      event.preventDefault();
-      $("#course_form").addClass('editing').find(":text:first").focus().select();
-      $("#course_account_id_lookup").autocomplete({
-        source: $("#course_account_id_url").attr('href'),
-        select: function(event, ui){
-          $("#course_account_id").val(ui.item.id);
-        }
-      });
+    $("#course_account_id_lookup").autocomplete({
+      source: $("#course_account_id_url").attr('href'),
+      select: function (event, ui) {
+        $("#course_account_id").val(ui.item.id);
+      }
     });
     $(".move_course_link").click(function(event) {
       event.preventDefault();
@@ -307,48 +303,20 @@ define([
         return data;
       },
       beforeSubmit: function(data) {
-        $(this).loadingImage().removeClass('editing');
+        $(this).loadingImage();
         $(this).find(".readable_license,.account_name,.term_name,.grading_scheme_set").text("...");
         $(this).find(".storage_quota_mb").text(data['course[storage_quota_mb]']);
         $(".course_form_more_options").hide();
       },
       success: function(data) {
-        var course = data.course;
-        course.start_at = $.datetimeString(course.start_at, {localized: false});
-        course.conclude_at = $.datetimeString(course.conclude_at, {localized: false});
-        course.is_public = course.is_public ? I18n.t('public_course', 'Public') : I18n.t('private_course', 'Private');
-        course.indexed = course.indexed ? I18n.t('indexed_course', "Included in public course index") : "";
-        course.grading_scheme_set = course.grading_standard_title || (course.grading_standard_id ? I18n.t('grading_standard_set', "Currently Set") : I18n.t('grading_standard_unset', "Not Set"));
-        course.restrict_dates = course.restrict_enrollments_to_course_dates ? I18n.t('course_dates_enforced', "Users can only participate in the course between these dates") : I18n.t('course_dates_unenforced', "These dates will not affect course availability");
-        course.locale = $("#course_locale option[value='" + (course.locale || '') + "']").text();
-        if (course.locale != $course_form.find('.locale').text()) {
-          location.reload();
-          return;
-        }
-        $(this).loadingImage('remove');
-        $("#course_form .public_options").showIf(course.is_public);
-        $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
-        $("#course_form").fillTemplateData({data: course});
-        if (course.self_enrollment_code) {
-          $("#course_form .self_enrollment_message b").each(function() {
-            $(this).text($.replaceTags($(this).text(), 'self_enrollment_code', course.self_enrollment_code));
-          });
-        }
+        $('#course_reload_form').submit();
       },
       error: function(data) {
         $(this).loadingImage('remove');
-        $(".edit_course_link").click();
         $(this).formErrors(data);
-      }
+      },
+      disableWhileLoading: true
     })
-    .find(".cancel_button")
-      .click(function() {
-        $course_form.removeClass('editing');
-        $(".course_form_more_options").hide();
-      }).end()
-    .find(":text:not(.date_entry)").keycodes('esc', function() {
-      $course_form.find(".cancel_button:first").click();
-    });
     $(".associated_user_link").click(function(event) {
       event.preventDefault();
       var $user = $(this).parents(".user");
@@ -369,7 +337,6 @@ define([
       if (event.target.nodeName == "INPUT") {
         return;
       }
-      $(".edit_course_link:first").click();
       var $obj = $(this).parents("td").find(".course_form");
       if($obj.length) {
         $obj.focus().select();
@@ -433,9 +400,6 @@ define([
     $("#enrollment_type").change(function() {
       $(".teacherless_invite_message").showIf($(this).find(":selected").hasClass('teacherless_invite'));
     });
-    $(".is_public_checkbox").change(function() {
-      $(".public_options").showIf($(this).attr('checked'));
-    }).change();
 
     $(".self_enrollment_checkbox").change(function() {
       $(".open_enrollment_holder").showIf($(this).attr('checked'));

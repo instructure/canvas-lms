@@ -177,8 +177,8 @@ describe WikiPage do
       before :once do
         course_with_teacher(:active_all => true)
         course_with_ta(:course => @course, :active_all => true)
-        @course.account.role_overrides.create!(:enrollment_type => 'TeacherEnrollment', :permission => 'manage_wiki', :enabled => false)
-        @course.account.role_overrides.create!(:enrollment_type => 'TaEnrollment', :permission => 'manage_wiki', :enabled => false)
+        @course.account.role_overrides.create!(:role => teacher_role, :permission => 'manage_wiki', :enabled => false)
+        @course.account.role_overrides.create!(:role => ta_role, :permission => 'manage_wiki', :enabled => false)
       end
 
       it 'does not grant teachers or TAs edit rights when editing roles are "Only teachers"' do

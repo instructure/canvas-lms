@@ -68,17 +68,17 @@
 <div id="grading_type_selector"></div>
 
 {{#if postToSISEnabled}}
-<div class="form-column-left"></div>
+<div class="form-column-left">Post Grades to SIS</div>
 <div class="form-column-right">
-    <fieldset>
-        <label class="checkbox">
-          {{checkbox "postToSIS"
-          id="assignment_post_to_sis"
-          name="post_to_sis"
-          }}
-          {{#t "post_to_sis"}}Post to SIS{{/t}}
-        </label>
-    </fieldset>
+  <fieldset>
+    <label class="checkbox">
+      {{checkbox "postToSIS"
+      id="assignment_post_to_sis"
+      name="post_to_sis"
+      }}
+      {{#t "post_to_sis"}}Include this assignment's grades when posting to your school's Student Information System{{/t}}
+    </label>
+  </fieldset>
 </div>
 {{/if}}
 

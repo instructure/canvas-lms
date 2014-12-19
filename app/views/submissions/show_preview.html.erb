@@ -3,25 +3,36 @@
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
     <p>
-      <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
-        <%= t('group_discussion_submission_description',
-                "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
-                :user => context_user_name(@context, @submission.user),
-                :wrapper => "<a href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
+      <% if assignment_visible_to_user = @assignment.visible_to_user?(@current_user)%>
+        <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
+          <%= t('group_discussion_submission_description',
+                  "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
+                  :user => context_user_name(@context, @submission.user),
+                  :wrapper => "<a href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
+        <% else %>
+          <%= t('discussion_submission_description',
+                  "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
+                  :user => context_user_name(@context, @submission.user),
+                  :wrapper => "<a href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
+        <% end %>
       <% else %>
-        <%= t('discussion_submission_description',
-                "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
-                :user => context_user_name(@context, @submission.user),
-                :wrapper => "<a href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
+        <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
+          <%= t('group_discussion_submission_description_without_link',
+                  "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}.",
+                  :user => context_user_name(@context, @submission.user)) %>
+        <% else %>
+          <%= t('discussion_submission_description_without_link',
+                  "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}.",
+                  :user => context_user_name(@context, @submission.user)) %>
+        <% end %>
       <% end %>
-
     </p>
     <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
     <% if @assignment.discussion_topic.for_group_discussion? %>
       <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
     <% end %>
     <% @entries.each do |entry| %>
-      <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true} %>
+      <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :assignment_visible_to_user => assignment_visible_to_user} %>
     <% end %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
       <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>

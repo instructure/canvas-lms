@@ -44,7 +44,7 @@ describe "speed grader" do
     @assignment.submission_types = 'online_quiz'
     @assignment.title = 'Anonymous Graded Quiz'
     @assignment.save!
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @quiz.update_attribute(:anonymous_submissions, true)
     student_in_course
     qs = @quiz.generate_submission(@student)
@@ -63,7 +63,7 @@ describe "speed grader" do
     @assignment.submission_types = 'online_quiz'
     @assignment.title = 'Anonymous Graded Quiz'
     @assignment.save!
-    q = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    q = Quizzes::Quiz.where(assignment_id: @assignment).first
     q.quiz_questions.create!(:quiz => q, :question_data => {:position => 1, :question_type => "true_false_question", :points_possible => 3, :question_name => "true false question"})
     q.quiz_questions.create!(:quiz => q, :question_data => {:position => 2, :question_type => "essay_question", :points_possible => 7, :question_name => "essay question"})
     q.generate_quiz_data
@@ -92,7 +92,7 @@ describe "speed grader" do
     @assignment.title = 'Anonymous Graded Quiz'
     @assignment.save!
 
-    q = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    q = Quizzes::Quiz.where(assignment_id: @assignment).first
     q.quiz_questions.create!(:quiz => q, :question_data => {
         :position => 1,
         :question_type => "true_false_question",
@@ -123,7 +123,7 @@ describe "speed grader" do
       @assignment.update_attributes! points_possible: 10,
                                      submission_types: 'online_quiz',
                                      title: "Quiz"
-      @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+      @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
 
       student_in_course
       2.times do |i|
@@ -190,7 +190,7 @@ describe "speed grader" do
     #create discussion entries
     first_message = 'first student message'
     second_message = 'second student message'
-    discussion_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+    discussion_topic = DiscussionTopic.where(assignment_id: @assignment).first
     entry = discussion_topic.discussion_entries.
         create!(:user => student, :message => first_message)
     entry.update_topic

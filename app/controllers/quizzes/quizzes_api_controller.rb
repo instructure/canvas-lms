@@ -97,6 +97,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "show_correct_answers_last_attempt": {
+#           "description": "restrict the show_correct_answers option above to apply only to the last submitted attempt of a quiz that allows multiple attempts. only valid if show_correct_answers=true and allowed_attempts > 1",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "show_correct_answers_at": {
 #           "description": "when should the correct answers be visible by students? only valid if show_correct_answers=true",
 #           "example": "2013-01-23T23:59:00-07:00",
@@ -288,7 +293,7 @@ class Quizzes::QuizzesApiController < ApplicationController
                    params[:search_term], params[:page], params[:per_page]
                   ].cache_key
 
-      json = Rails.cache.fetch(cache_key) do
+      value = Rails.cache.fetch(cache_key) do
         api_route = api_v1_course_quizzes_url(@context)
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
 
@@ -299,15 +304,24 @@ class Quizzes::QuizzesApiController < ApplicationController
         unless is_authorized_action?(@context, @current_user, :manage_assignments)
           scope = scope.available
         end
-        json = if accepts_jsonapi?
-          jsonapi_quizzes_json(scope: scope, api_route: api_route)
+
+        if accepts_jsonapi?
+          {
+            json: jsonapi_quizzes_json(scope: scope, api_route: api_route)
+          }
         else
           @quizzes = Api.paginate(scope, self, api_route)
-          quizzes_json(@quizzes, @context, @current_user, session)
+
+          {
+            json: quizzes_json(@quizzes, @context, @current_user, session),
+            link: response.headers["Link"].to_s
+          }
         end
       end
 
-      render json: json
+      response.headers["Link"] = value[:link] if value[:link]
+
+      render json: value[:json]
     end
   end
 
@@ -359,6 +373,12 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   Only valid if hide_results=null
   #   If false, hides correct answers from students when quiz results are viewed.
   #   Defaults to true.
+  #
+  # @argument quiz[show_correct_answers_last_attempt] [Boolean]
+  #   Only valid if show_correct_answers=true and allowed_attempts > 1
+  #   If true, hides correct answers from students when quiz results are viewed
+  #   until they submit the last attempt for the quiz.
+  #   Defaults to false.
   #
   # @argument quiz[show_correct_answers_at] [Timestamp]
   #   Only valid if show_correct_answers=true

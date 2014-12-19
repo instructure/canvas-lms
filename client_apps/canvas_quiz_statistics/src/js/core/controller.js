@@ -7,6 +7,7 @@ define(function(require) {
   var onChange = function() {
     update({
       quizStatistics: quizStatistics.get(),
+      isLoadingStatistics: quizStatistics.isLoading(),
       quizReports: quizReports.getAll(),
     });
   };

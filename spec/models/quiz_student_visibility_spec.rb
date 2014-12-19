@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "differentiated_assignments" do
   def course_with_da_flag(feature_method=:enable_feature!)
     @course = Course.create!
-    @course.enable_feature! :draft_state
     @course.send(feature_method, :differentiated_assignments)
     @user = user_model
     @course.enroll_user(@user)
@@ -142,8 +141,10 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
 
-        it "should not keep the quiz visible if there is no grade" do
-          @quiz.assignment.grade_student(@user, {grade: nil})
+        it "should not keep the quiz visible if there is no score, even if it has a grade" do
+          @quiz.assignment.grade_student(@user, {grade: 10})
+          @quiz.assignment.submissions.last.update_attribute("score", nil)
+          @quiz.assignment.submissions.last.update_attribute("grade", 10)
           @user.enrollments.each(&:destroy!)
           enroller_user_in_section(@section_bar, {user: @user})
           ensure_user_does_not_see_quiz

@@ -264,11 +264,6 @@ describe AssignmentsApiController, type: :request do
         @assignment.save!
       end
 
-      it "should exclude published flag for accounts that do not have enabled_draft" do
-        @json = api_get_assignment_in_course(@assignment, @course)
-        expect(@json.has_key?('published')).to be_falsey
-      end
-
       it "should include published flag for accounts that do have enabled_draft" do
         @course.account.enable_feature!(:draft_state)
 
@@ -814,7 +809,7 @@ describe AssignmentsApiController, type: :request do
       @override_due_at = Time.parse('2002 Jun 22 12:00:00')
 
       @user = @teacher
-      api_call(:post,
+      json = api_call(:post,
                "/api/v1/courses/#{@course.id}/assignments.json",
                {
                  :controller => 'assignments_api',
@@ -830,6 +825,9 @@ describe AssignmentsApiController, type: :request do
                    }
                  }
                  })
+      assignment = Assignment.find(json['id'])
+      assignment.publish if assignment.unpublished?
+
       expect(@student.messages.detect{|m| m.notification_id == notification.id}.body).
         to be_include 'Jun 22'
       expect(@ta.messages.detect{|m| m.notification_id == notification.id}.body).

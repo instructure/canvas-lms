@@ -276,10 +276,7 @@ a.screenreader-toggle
   width: 0
   overflow: hidden
   border-style: solid
-  @if $use_high_contrast
-    border-color: $canvas-neutral
-  @else
-    border-color: #888
+  border-color: darken($canvas-neutral, 38)
 
 div.rubric-toggle
   :padding-bottom 5px

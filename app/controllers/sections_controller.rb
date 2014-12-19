@@ -58,7 +58,7 @@
 #         "sis_course_id": {
 #           "description": "The unique SIS identifier for the course in which the section belongs. This field is only included if the user has permission to view SIS information.",
 #           "example": 7,
-#           "type": "integer"
+#           "type": "string"
 #         },
 #         "start_at": {
 #           "description": "the start date for the section, if applicable",

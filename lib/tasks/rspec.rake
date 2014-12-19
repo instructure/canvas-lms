@@ -20,7 +20,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 #{"*" * 80}
 *  You are trying to run an rspec rake task defined in
 *  #{__FILE__},
-*  but rspec can not be found in vendor/gems, vendor/plugins or system gems.
+*  but rspec can not be found in vendor/gems or system gems.
 #{"*" * 80}
               MSG
             end
@@ -96,7 +96,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
     desc "Print Specdoc for all plugin examples"
     klass.new(:plugin_doc) do |t|
       t.spec_opts = ["--format", "specdoc", "--dry-run"]
-      t.send(spec_files_attr, FileList['vendor/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*'))
+      t.send(spec_files_attr, FileList['{gems,vendor}/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*'))
     end
 
     [:models, :services, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
@@ -107,7 +107,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
       end
     end
 
-    desc "Run the code examples in vendor/plugins (except RSpec's own)"
+    desc "Run the code examples in {gems,vendor}/plugins (except RSpec's own)"
     klass.new(:coverage) do |t|
       t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
       t.send(spec_files_attr, FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium'))

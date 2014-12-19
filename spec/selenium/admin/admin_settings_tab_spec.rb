@@ -146,7 +146,7 @@ describe "admin settings tab" do
       expect(fj('#account_settings_global_includes_settings:visible')).to be_nil
     end
 
-    it "a sub-account should have a global includes section if enabled by the parrent" do
+    it "a sub-account should have a global includes section if enabled by the parent" do
       Account.default.settings = Account.default.settings.merge({ :global_includes => true })
       Account.default.settings = Account.default.settings.merge({ :sub_account_includes => true })
       Account.default.save!
@@ -284,11 +284,6 @@ describe "admin settings tab" do
       check_box_verifier("#account_services_delicious", {:allowed_services => :delicious})
     end
 
-    it "should unclick and then click on diigo" do
-      check_box_verifier("#account_services_diigo", {:allowed_services => :diigo}, false)
-      check_box_verifier("#account_services_diigo", {:allowed_services => :diigo})
-    end
-
     it "should unclick and click on google docs previews" do
       check_box_verifier("#account_services_google_docs_previews", {:allowed_services => :google_docs_previews}, false)
       check_box_verifier("#account_services_google_docs_previews", {:allowed_services => :google_docs_previews})
@@ -322,7 +317,7 @@ describe "admin settings tab" do
     end
   end
 
-  context "who can create wew courses" do
+  context "who can create new courses" do
 
     it "should check on teachers" do
       check_box_verifier("#account_settings_teachers_can_create_courses", :teachers_can_create_courses)

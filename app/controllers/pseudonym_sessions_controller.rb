@@ -44,6 +44,7 @@ class PseudonymSessionsController < ApplicationController
     end
 
     if cookies['canvas_sa_delegated'] && !params['canvas_login']
+      @real_domain_root_account = @domain_root_account
       @domain_root_account = Account.site_admin
     end
 
@@ -632,9 +633,8 @@ class PseudonymSessionsController < ApplicationController
       @user = @current_user
     else
       @user = User.find(params[:user_id])
-      return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     end
-    return render_unauthorized_action if @user == @current_user && @user.mfa_settings == :required
+    return unless authorized_action(@user, @current_user, :reset_mfa)
 
     @user.otp_secret_key = nil
     @user.otp_communication_channel = nil
@@ -657,6 +657,12 @@ class PseudonymSessionsController < ApplicationController
         session[:pending_otp] = true
         return otp_login(true)
       end
+    end
+
+    if pseudonym.account_id != (@real_domain_root_account || @domain_root_account).id
+      flash[:notice] = t("You are logged in at %{institution1} using your credentials from %{institution2}",
+        institution1: (@real_domain_root_account || @domain_root_account).name,
+        institution2: pseudonym.account.name)
     end
 
     if pseudonym.account_id == Account.site_admin.id && Account.site_admin.account_authorization_config.try(:delegated_authentication?)

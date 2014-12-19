@@ -36,7 +36,6 @@ define [
       @props.model.save(name: @refs.newName.getDOMNode().value)
       @setState(editing: false)
 
-
     cancelEditingName: ->
       @props.model.collection.remove(@props.model) if @props.model.isNew()
       @setState(editing: false)
@@ -49,7 +48,7 @@ define [
                    #{'activeDragTarget' if @state.isActiveDragTarget}"
         role: 'row'
         'aria-selected': @props.isSelected
-        draggable: true
+        draggable: !@state.editing
         onDragStart: =>
           @props.toggleSelected() unless @props.isSelected
           @props.dndOptions.onItemDragStart arguments...

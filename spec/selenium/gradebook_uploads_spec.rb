@@ -17,6 +17,20 @@ describe "gradebook uploads" do
     get_file(filename, rows.join("\n"))
   end
 
+  it "should correctly update grades for assignments with GPA Scale grading type" do
+    assignment = @course.assignments.create!(:title => "GPA Scale Assignment",
+      :grading_type => "gpa_scale", :points_possible => 5)
+    assignment.grade_student(@student, :grade => "D")
+    filename, fullpath, data = gradebook_file("gradebook0.csv",
+      "Student Name,ID,Section,GPA Scale Assignment",
+      "User,#{@student.id},,4")
+    @upload_element.send_keys(fullpath)
+    @upload_form.submit
+    submit_form('#gradebook_grid_form')
+    expect(assignment.submissions.last.grade).to eq "B-"
+    expect(assignment.submissions.last.score).to eq 4
+  end
+
   it "should say no changes if no changes" do
     assignment = @course.assignments.create!(:title => "Assignment 1")
     assignment.grade_student(@student, :grade => 10)

@@ -62,5 +62,31 @@ describe "Importing assignments" do
     a = Assignment.where(migration_id: assignment_hash[:migration_id]).first
     expect(a.points_possible).to eq rubric.points_possible
   end
+
+  it "should infer the default name when importing a nameless assignment" do
+    course_model
+    nameless_assignment_hash = {
+        "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+        "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+        "grading_standard_migration_id" => nil,
+        "rubric_migration_id" => nil,
+        "rubric_id" => nil,
+        "quiz_migration_id" => nil,
+        "workflow_state" => "published",
+        "title" => "",
+        "grading_type" => "points",
+        "submission_types" => "none",
+        "peer_reviews" => false,
+        "automatic_peer_reviews" => false,
+        "muted" => false,
+        "due_at" => 1401947999000,
+        "peer_reviews_due_at" => 1401947999000,
+        "position" => 6,
+        "peer_review_count" => 0
+    }
+    Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course)
+    assignment = @course.assignments.where(migration_id: 'ib4834d160d180e2e91572e8b9e3b1bc6').first
+    expect(assignment.title).to eq 'untitled assignment'
+  end
   
 end

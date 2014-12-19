@@ -100,7 +100,6 @@ module Lti
 
     def process_resources(tp, tool_proxy)
       resource_handlers = tp.tool_profile.resource_handlers
-
       if tp.tool_profile.messages.present?
         product_name = tp.tool_profile.product_instance.product_info.product_name
         rh = IMS::LTI::Models::ResourceHandler.new.from_json(
@@ -115,11 +114,20 @@ module Lti
 
       resource_handlers.each do |rh|
         resource_handler = create_resource_handler(rh, tool_proxy)
+        create_placements(rh, resource_handler)
         rh.messages.each do |mh|
           create_message_handler(mh, tp.tool_profile.base_message_url, resource_handler)
         end
 
       end
+    end
+
+    def create_placements(rh, resource_handler)
+      rh.ext_placements.each do |p|
+        if placement = ResourcePlacement::PLACEMENT_LOOKUP[p]
+          resource_handler.placements.create(placement: placement)
+        end
+      end if rh.ext_placements
     end
 
     private

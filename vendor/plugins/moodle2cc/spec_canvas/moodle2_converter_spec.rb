@@ -46,7 +46,7 @@ describe Moodle::Converter do
     it "should convert assignments" do
       expect(@course.assignments.count).to eq 2
 
-      assignment2 = @course.assignments.find_by_title 'Hidden Assignmnet'
+      assignment2 = @course.assignments.where(title: 'Hidden Assignmnet').first
       expect(assignment2.description).to eq "<p>This is a hidden assignment</p>"
       expect(assignment2.unpublished?).to eq true
     end
@@ -58,7 +58,7 @@ describe Moodle::Converter do
       expect(wiki).not_to be_nil
       expect(wiki.wiki_pages.count).to eq 12
 
-      page1 = wiki.wiki_pages.find_by_title 'Hidden Section'
+      page1 = wiki.wiki_pages.where(title: 'Hidden Section').first
       expect(page1.body).to eq '<p>This is a Hidden Section, with hidden items</p>'
       expect(page1.unpublished?).to eq true
     end
@@ -74,13 +74,13 @@ describe Moodle::Converter do
     end
 
     it "should convert Moodle Quiz module to a quiz" do
-      quiz = @course.quizzes.find_by_title "Quiz Name"
+      quiz = @course.quizzes.where(title: "Quiz Name").first
       expect(quiz.description).to match /Quiz Description/
       expect(quiz.quiz_questions.count).to eq 11
     end
 
     it "should convert Moodle Questionnaire module to a quiz" do
-      quiz = @course.quizzes.find_by_title "Questionnaire Name"
+      quiz = @course.quizzes.where(title: "Questionnaire Name").first
       expect(quiz.description).to match /Sumary/
       expect(quiz.quiz_type).to eq 'survey'
       expect(quiz.quiz_questions.count).to eq 10

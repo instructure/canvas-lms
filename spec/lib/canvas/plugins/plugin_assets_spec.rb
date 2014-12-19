@@ -17,12 +17,12 @@ describe PluginAssets do
 
       describe '#asset_matcher' do
         subject { super().asset_matcher }
-        it { is_expected.to eq 'vendor/plugins/*/config/assets.yml' }
+        it { is_expected.to eq '{gems,vendor}/plugins/*/config/assets.yml' }
       end
 
       describe '#plugin_matcher' do
         subject { super().plugin_matcher }
-        it { is_expected.to eq %r{^vendor/plugins/(.*)/config/assets\.yml$} }
+        it { is_expected.to eq %r{^(?:gems|vendor)/plugins/(.*)/config/assets\.yml$} }
       end
     end
 
@@ -120,8 +120,12 @@ describe PluginAssets do
   end
 
   describe '#plugin_name_for' do
-    it 'pulls the plugin name out of well formed paths' do
+    it 'pulls the plugin name out of well formed vendor/plugin paths' do
       expect(plugin_assets.plugin_name_for('vendor/plugins/analytics/config/assets.yml')).to eq 'analytics'
+    end
+
+    it 'pulls the plugin name out of well formed gems/plugin paths' do
+      expect(plugin_assets.plugin_name_for('gems/plugins/analytics/config/assets.yml')).to eq 'analytics'
     end
 
     it 'errors on badly formed paths' do

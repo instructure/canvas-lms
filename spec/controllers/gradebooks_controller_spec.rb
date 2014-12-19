@@ -480,11 +480,6 @@ describe GradebooksController do
         expect(response).not_to be_redirect
       end
 
-      it "does not redirect if draft state isn't enabled" do
-        get 'speed_grader', course_id: @course, assignment_id: @assign.id
-        expect(response).not_to be_redirect
-      end
-
     end
   end
 

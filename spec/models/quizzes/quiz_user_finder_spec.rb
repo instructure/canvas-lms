@@ -72,7 +72,7 @@ describe Quizzes::QuizUserFinder do
     it "(#all_students_with_visibility) filters students if DA is on" do
       @course.enable_feature!(:differentiated_assignments)
       expect(@finder.unsubmitted_students).not_to include(@unsubmitted_student)
-      create_section_override_for_quiz(@quiz, {course_section: @unsubmitted_student.current_enrollments.first.course_section})
+      create_section_override_for_quiz(@quiz, {course_section: @unsubmitted_student.enrollments.current.first.course_section})
       expect(@finder.unsubmitted_students).to include(@unsubmitted_student)
     end
 

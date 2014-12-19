@@ -92,6 +92,7 @@ define [
             Link {
               to: 'search'
               query: @props.query
+              params: {splat: ''}
             },
               span {
                 className: 'ellipsis'

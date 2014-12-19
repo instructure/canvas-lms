@@ -20,7 +20,7 @@ shared_examples_for "settings basic tests" do
       expect(user).to be_present
       admin = AccountUser.where(user_id: user).first
       expect(admin).to be_present
-      expect(admin.membership_type).to eq "AccountAdmin"
+      expect(admin.role_id).to eq admin_role.id
       expect(f("#enrollment_#{admin.id} .email").text).to eq address
       admin.id
     end

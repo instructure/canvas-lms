@@ -192,8 +192,8 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
 
       root_folder_name = get_root_folder_name(context)
       Folder.where(:id => [extra_folder1, extra_folder2]).update_all(:parent_folder_id => nil)
-      context.folders.find_by_name(root_folder_name).delete
-      expect(context.folders.find_by_name(root_folder_name)).to be_nil
+      context.folders.where(name: root_folder_name).first.delete
+      expect(context.folders.where(name: root_folder_name).first).to be_nil
 
       expect(Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
                                    context.class.to_s, context).count).to eq 2
@@ -206,7 +206,7 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
                                    c.class.to_s, c).count).to eq 1
 
       root_folder_name = get_root_folder_name(c)
-      expect(c.folders.find_by_name(root_folder_name)).not_to be_nil
+      expect(c.folders.where(name: root_folder_name).first).not_to be_nil
     end
 
     extra_folders.each do |folder|

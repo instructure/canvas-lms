@@ -37,7 +37,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     :require_lockdown_browser_for_results, :context, :notify_of_update,
     :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
     :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-    :one_time_results, :only_visible_to_overrides
+    :one_time_results, :only_visible_to_overrides, :show_correct_answers_last_attempt
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -99,10 +99,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
 
-  before_save :generate_quiz_data_on_publish, :if => :needs_republish?
+  before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?
   before_save :build_assignment
   before_save :set_defaults
-  before_save :flag_columns_that_need_republish
   after_save :update_assignment
   after_save :touch_context
   after_save :regrade_if_published
@@ -139,10 +138,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
     if !self.show_correct_answers
+      self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil
       self.hide_correct_answers_at = nil
     end
     self.allowed_attempts = 1 if self.allowed_attempts == nil
+    if self.allowed_attempts <= 1
+      self.show_correct_answers_last_attempt = false
+    end
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= self.lock_at if self.lock_at.present?
     self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?
@@ -179,30 +182,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
   private :generate_quiz_data_on_publish
 
-  # @return [Boolean] Whether the quiz has unsaved changes due for a republish.
-  def needs_republish?
-    # TODO: remove this conditional and the non-DS scenario once Draft State is
-    # permanently turned on
-    if context.feature_enabled?(:draft_state)
-      return true if @publishing || workflow_state_changed?
-
-    # pre-draft state we need ability to republish things. Since workflow_state
-    # stays available, we need to flag when we're forcing to publish!
-    else
-      return true if @publishing
-    end
-  end
-
-  # some attributes require us to republish for non-draft state
-  # We can safely remove this when draft state is permanent
-  def flag_columns_that_need_republish
-    return if context.feature_enabled?(:draft_state)
-
-    if shuffle_answers_changed? && !shuffle_answers
-      self.last_edited_at = Time.now.utc
-    end
-  end
-
   protected :set_defaults
 
   def new_assignment_id?
@@ -235,14 +214,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def build_assignment
-    if (context.feature_enabled?(:draft_state) || self.available?) &&
-      !self.assignment_id && self.graded? && ![:assignment, :clone, :migration].include?(@saved_by)
+    if !self.assignment_id && self.graded? && ![:assignment, :clone, :migration].include?(@saved_by)
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
       assignment.only_visible_to_overrides = self.only_visible_to_overrides
       assignment.saved_by = :quiz
-      if context.feature_enabled?(:draft_state) && !deleted?
+      unless deleted?
         assignment.workflow_state = self.published? ? 'published' : 'unpublished'
       end
       assignment.save
@@ -378,7 +356,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     return true if self.grants_right?(user, :grade) &&
       (submission && submission.user && submission.user != user)
 
-    return false if !self.show_correct_answers
+    return false unless self.show_correct_answers
+
+    if user.present? && self.show_correct_answers_last_attempt && quiz_submission = user.quiz_submissions.where(quiz_id: self.id).first
+      return quiz_submission.attempts_left == 0
+    end
 
     # If we're showing the results only one time, and are letting students
     # see their correct answers, don't take the showAt/hideAt dates into
@@ -441,7 +423,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
         a.workflow_state = 'published' if a.deleted?
-        if context.feature_enabled?(:draft_state) && !deleted?
+        unless deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
         @notify_of_update ||= a.workflow_state_changed? && a.published?
@@ -1111,8 +1093,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     can :submit
 
     given do |user, session|
-      (feature_enabled?(:draft_state) ? published? : true) &&
-        context.grants_right?(user, session, :read)
+      published? && context.grants_right?(user, session, :read)
     end
     can :read
 
@@ -1133,6 +1114,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
 
+  # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda {|student_ids, course_ids|
     joins(:quiz_student_visibilities).
     where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
@@ -1213,10 +1195,8 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def publish!
-    @publishing = true
     publish
     save!
-    @publishing = false
     self
   end
 
@@ -1301,9 +1281,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     question_regrades.count
   end
 
-  # override for draft state
   def available?
-    feature_enabled?(:draft_state) ? published? : workflow_state == 'available'
+    published?
   end
 
   delegate :feature_enabled?, to: :context

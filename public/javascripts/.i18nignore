@@ -1,0 +1,8 @@
+/bower
+/compiled/handlebars_helpers.js
+/i18n.js
+/i18nObj.js
+/tinymce/jscripts/tiny_mce/langs
+/tinymce/jscripts/tiny_mce/tiny_mce*.js
+/translations
+/vendor

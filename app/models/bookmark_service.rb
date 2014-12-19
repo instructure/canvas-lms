@@ -17,7 +17,7 @@
 #
 
 class BookmarkService < UserService
-  include DeliciousDiigo
+  include Delicious
   
   def post_bookmark(opts)
     url = opts[:url]
@@ -29,7 +29,7 @@ class BookmarkService < UserService
       if(self.service == 'delicious')
         delicious_post_bookmark(self, url, title, description, tags)
       elsif(self.service == 'diigo')
-        diigo_post_bookmark(self, url, title, description, tags)
+        Diigo::Connection.diigo_post_bookmark(self, url, title, description, tags)
       end
     rescue => e
       # Should probably save the data to try again if it fails... at least one more try
@@ -46,5 +46,45 @@ class BookmarkService < UserService
       Rails.cache.write('last_diigo_lookup', Time.now)
     end
     bookmark_search(self, query)
+  end
+
+  def bookmark_search(service, query)
+    bookmarks = []
+    if service.service == 'diigo'
+      data = Diigo::Connection.diigo_get_bookmarks(service)
+      if data.class == Array and data.first.is_a?(Hash)
+        data.each do |bookmark|
+          bookmarks << {
+            :title => bookmark['title'],
+            :url => bookmark['url'],
+            :description => bookmark['desc'],
+            :tags => bookmark['tags'].split(/\s/).join(",")
+          }
+        end
+      else
+        bookmarks
+      end
+    elsif service.service == 'delicious'
+      #This needs to be rewritten with new API and moved into a gem. (Currently not working and no way to test without updating the API.)
+      url = "https://api.del.icio.us/v1/posts/all?tag=#{query}"
+      http,request = delicious_generate_request(url, 'GET', service.service_user_name, service.decrypted_password)
+      response = http.request(request)
+      case response
+      when Net::HTTPSuccess
+        require 'libxml'
+        document = LibXML::XML::Parser.string(response.body).parse
+        document.find('/posts/post').each do |post|
+          bookmarks << {
+            :title => post['description'],
+            :url => post['href'],
+            :description => post['description'],
+            :tags => post['tags']
+          }
+        end
+      else
+        response.error!
+      end
+    end
+    bookmarks
   end
 end

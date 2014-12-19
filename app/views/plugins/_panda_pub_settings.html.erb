@@ -1,0 +1,39 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t(:description, <<-TEXT)
+          PandaPub is a pub/sub service which, when configured, allows
+          some parts of Canvas to receive notifications of events within
+          the browser, rather than polling for changes.
+          TEXT
+        %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :base_url, :en => "Base URL" %></td>
+      <td>
+        <%= f.text_field :base_url %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :application_id, :en => "Application Id" %></td>
+      <td>
+        <%= f.text_field :application_id %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :key_id, :en => "Key ID" %></td>
+      <td>
+        <%= f.text_field :key_id %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :key_secret, :en => "Key Secret" %></td>
+      <td>
+        <%= f.password_field :key_secret %>
+      </td>
+    </tr>
+  </table>
+<% end %>
+

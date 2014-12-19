@@ -59,7 +59,9 @@ module Lti
       end
 
       if @current_user
-        pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account)
+        sis_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account)
+        logged_in_pseudonym = @current_pseudonym
+
         substitutions.merge!(
             {
                 '$Person.name.full' => @current_user.name,
@@ -73,13 +75,24 @@ module Lti
                 '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
             }
         )
-        if pseudonym
+        if sis_pseudonym
+          # Substitutions for the primary pseudonym for the user for the account
+          # This should hold all the SIS information for the user
+          # This may not be the pseudonym the user is actually logged in with
           substitutions.merge!(
               {
-                  '$User.username' => pseudonym.unique_id,
-                  '$Canvas.user.loginId' => pseudonym.unique_id,
-                  '$Canvas.user.sisSourceId' => pseudonym.sis_user_id,
-                  '$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) },
+                  '$User.username' => sis_pseudonym.unique_id,
+                  '$Canvas.user.loginId' => sis_pseudonym.unique_id,
+                  '$Canvas.user.sisSourceId' => sis_pseudonym.sis_user_id,
+              }
+          )
+        end
+        if logged_in_pseudonym
+          # This is the pseudonym the user is actually logged in as
+          # it may not hold all the sis info needed in other launch substitutions
+          substitutions.merge!(
+              {
+                  '$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, logged_in_pseudonym)) },
               }
           )
         end

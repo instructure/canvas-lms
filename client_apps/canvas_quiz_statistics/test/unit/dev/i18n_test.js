@@ -1,6 +1,14 @@
 define(function(require) {
   var I18n = require('i18n!something');
   describe('I18n.t', function() {
+    it('should work with just a string default', function() {
+      expect(I18n.t('Foo')).toBe('Foo');
+    });
+
+    it('should work with a default object and an options object', function() {
+      expect(I18n.t({one: "1 person", other: "%{count} people"}, {count: 2})).toBe('2 people');
+    });
+
     it('should work with two params', function() {
       expect(I18n.t('foo', 'Foo')).toBe('Foo');
     });

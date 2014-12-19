@@ -137,10 +137,6 @@ module Api::V1::Assignment
       hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
     end
 
-    if assignment.discussion_topic
-      hash['discussion_topic_id'] = assignment.discussion_topic.id
-    end
-
     if assignment.allowed_extensions.present?
       hash['allowed_extensions'] = assignment.allowed_extensions
     end

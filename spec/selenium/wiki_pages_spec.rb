@@ -24,6 +24,7 @@ describe "Navigating to wiki pages" do
   describe "Permissions" do
     before do
       course_with_teacher
+      set_course_draft_state
     end
 
     it "displays public content to unregistered users" do
@@ -35,8 +36,8 @@ describe "Navigating to wiki pages" do
       title = "foo"
       wikiPage = @course.wiki.wiki_pages.create!(:title => title, :body => "bar")
 
-      get "/courses/#{@course.id}/wiki/#{title}"
-      expect(f('#wiki_body')).not_to be_nil
+      get "/courses/#{@course.id}/pages/#{title}"
+      expect(f('#wiki_page_show')).not_to be_nil
     end
   end
 

@@ -22,7 +22,7 @@ class SearchController < ApplicationController
   include SearchHelper
   include Api::V1::Conversation
 
-  before_filter :require_user
+  before_filter :require_user, :except => [:all_courses]
   before_filter :get_context, except: :recipients
 
   def rubrics
@@ -163,6 +163,60 @@ class SearchController < ApplicationController
       end
 
       render :json => conversation_recipients_json(recipients, @current_user, session)
+    end
+  end
+
+  # @API List all courses
+  # List all courses visible in the public index
+  #
+  # @argument search [String]
+  #   Search terms used for matching users/courses/groups (e.g. "bob smith"). If
+  #   multiple terms are given (separated via whitespace), only results matching
+  #   all terms will be returned.
+  #
+  # @argument public_only [Optional, Boolean]
+  #   Only return courses with public content. Defaults to false.
+  #
+  # @argument open_enrollment_only [Optional, Boolean]
+  #   Only return courses that allow self enrollment. Defaults to false.
+  #
+  def all_courses
+    unless @domain_root_account.feature_enabled?(:course_catalog)
+      return render status: 404, template: "shared/errors/404_message"
+    end
+
+    @courses = Course
+      .where(root_account_id: @domain_root_account)
+      .where(indexed: true)
+      .where(workflow_state: 'available')
+      .order('created_at')
+    @search = params[:search]
+    if @search.present?
+      @courses = @courses.where(@courses.wildcard('name', @search))
+    end
+    @public_only = params[:public_only]
+    if @public_only
+      @courses = @courses.where(is_public: true)
+    end
+    @open_enrollment_only = params[:open_enrollment_only]
+    if @open_enrollment_only
+      @courses = @courses.where(open_enrollment: true)
+    end
+    pagination_args = {}
+    pagination_args[:per_page] = 12 unless request.format == :json
+    ret = Api.paginate(@courses, self, '/search/all_courses/', pagination_args, {enhanced_return: true})
+    @courses = ret[:collection]
+
+    if request.format == :json
+      return render :json => @courses.as_json
+    end
+
+    @prevPage = ret[:hash][:prev]
+    @nextPage = ret[:hash][:next]
+    @contentHTML = render_to_string(partial: "all_courses_inner")
+
+    if request.xhr?
+      return render :text => @contentHTML
     end
   end
 

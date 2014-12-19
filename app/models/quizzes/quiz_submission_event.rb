@@ -40,11 +40,17 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     # is EVT_ANSWERED.
     :event_type,
 
+    # @property [Hash|String|Nil] data
+    #
+    # The extra serialized data for this event.
+    :data,
+
     # @property [Integer] attempt
     #
     # The quiz submission attempt in which the event was recorded.
     :created_at
   ]
+
 
   # An event describing the student choosing an answer to a question.
   EVT_ANSWERED = 'answered'.freeze
@@ -55,10 +61,10 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   serialize :answers, JSON
 
   scope :predecessor_of, ->(event) {
-    where('quiz_submission_id=:id AND attempt=:attempt AND created_at < :timestamp', {
+    where('quiz_submission_id=:id AND attempt=:attempt AND created_at < :created_at', {
       id: event.quiz_submission_id,
       attempt: event.attempt,
-      timestamp: event.created_at
+      created_at: event.created_at
     }).order('created_at DESC').limit(1)
   }
 

@@ -51,6 +51,8 @@ describe DataFixup::FixAuditLogUuidIndexes do
     # Truncate the mapping and last batch tables.
     @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::MAPPING_TABLE}")
     @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::LAST_BATCH_TABLE}")
+
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.stubs(:end_time).returns(Time.now + 1.month)
   end
 
   def check_event_stream(event_id, stream_table, expected_total)
@@ -244,5 +246,22 @@ describe DataFixup::FixAuditLogUuidIndexes do
     expect(events.size).to eq 1
 
     expect(events.first.attributes['created_at'].to_i).to eq first_event_at
+  end
+
+  it "should skip records after the bug fix was released" do
+    # Create bad data
+    stream_checks = {}
+    stream_checks['grade_changes'] = corrupt_grade_changes
+    stream_checks['courses'] = corrupt_course_changes
+    stream_checks['authentications'] = corrupt_authentications
+
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.stubs(:end_time).returns(Time.now - 1.month)
+
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:create_tombstone).never
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:create_index_entry).never
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:delete_index_entry).never
+
+    # Run Fix
+    DataFixup::FixAuditLogUuidIndexes::Migration.run
   end
 end

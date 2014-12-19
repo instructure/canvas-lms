@@ -29,14 +29,14 @@ describe ContextModule do
       course_with_teacher_logged_in active_all: true
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML(response.body)
-      expect(doc.at_css('.context-modules-main-toolbar .add_module_link')).not_to be_nil
+      expect(doc.at_css('.add_module_link')).not_to be_nil
 
-      @course.account.role_overrides.create! enrollment_type: 'TaEnrollment', permission: 'manage_content', enabled: false
+      @course.account.role_overrides.create! role: ta_role, permission: 'manage_content', enabled: false
       course_with_ta course: @course
       user_session(@ta)
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML(response.body)
-      expect(doc.at_css('.context-modules-main-toolbar .add_module_link')).to be_nil
+      expect(doc.at_css('.add_module_link')).to be_nil
     end
   end
 
@@ -170,6 +170,8 @@ describe ContextModule do
         html = Nokogiri::HTML(response.body)
         if @is_attachment
           expect(html.at_css('#file_content')['src']).to match %r{#{@test_url}}
+        elsif @is_wiki_page
+          expect(html.css('#wiki_page_show').length).to eq 1
         else
           expect(html.css('#test_content').length).to eq 1
         end
@@ -214,10 +216,12 @@ describe ContextModule do
     it "should progress to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
+          set_course_draft_state
           page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
-          @test_url = "/courses/#{@course.id}/wiki/#{page.url}"
+          @test_url = "/courses/#{@course.id}/pages/#{page.url}"
           @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
           expect(@tag2).to be_published
+          @is_wiki_page = true
         end
       end
     end

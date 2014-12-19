@@ -294,7 +294,7 @@ describe "manage groups students" do
       f("#group_name").send_keys(name)
       submit_form("#edit_group_form")
       wait_for_ajaximations
-      group = @course.groups.find_by_name(name)
+      group = @course.groups.where(name: name).first
       expect(group).not_to be_nil
     end
 

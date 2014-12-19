@@ -1,7 +1,17 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  def write_attribute(*args)
+  def write_attribute(attr_name, *args)
+    if CANVAS_RAILS3
+      column = column_for_attribute(attr_name)
+
+      unless column || @attributes.has_key?(attr_name)
+        raise "You're trying to create an attribute `#{attr_name}'. Writing arbitrary " \
+              "attributes on a model is deprecated. Please just use `attr_writer` etc." \
+              "from #{caller.first}"
+      end
+    end
+
     value = super
     value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
   end
@@ -56,6 +66,7 @@ class ActiveRecord::Base
     @from_files ||= Dir[
       "#{Rails.root}/app/models/**/*.rb",
       "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+      "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
     ].sort.collect { |file|
       model = file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
       next unless model < ActiveRecord::Base
@@ -810,16 +821,19 @@ ActiveRecord::Relation.class_eval do
     where(sql, *values.map { |value| [value, value.class.base_class.name] }.flatten)
   end
 
-  def touch_all
+  def not_recently_touched
     scope = self
-    now = Time.now.utc
     if((personal_space = Setting.get('touch_personal_space', 0).to_i) != 0)
       personal_space -= 1
       # truncate to seconds
-      bound = Time.at(now.to_i - personal_space).utc
+      bound = Time.at(Time.now.to_i - personal_space).utc
       scope = scope.where("updated_at<?", bound)
     end
-    scope.update_all(updated_at: now)
+    scope
+  end
+
+  def touch_all
+    not_recently_touched.update_all(updated_at: Time.now.utc)
   end
 
   def distinct_on(*args)
@@ -834,6 +848,7 @@ ActiveRecord::Relation.class_eval do
     relation = clone
     old_select = relation.select_values
     relation.select_values = ["DISTINCT ON (#{args.join(', ')}) "]
+    relation.uniq_value = false
     if old_select.empty?
       relation.select_values.first << "*"
     else
@@ -936,69 +951,12 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
           col
     }
   end
-
-  def after_transaction_commit(&block)
-    if open_transactions <= base_transaction_level
-      block.call
-    else
-      @after_transaction_commit ||= []
-      @after_transaction_commit << block
-    end
-  end
-
-  def after_transaction_commit_callbacks
-    @after_transaction_commit || []
-  end
-
-  # the alias_method_chain needs to happen in the subclass, since they all
-  # override commit_db_transaction
-  def commit_db_transaction_with_callbacks
-    commit_db_transaction_without_callbacks
-    run_transaction_commit_callbacks
-  end
-
-  # this will only be chained in in Rails.env.test?, but we still
-  # sometimes stub Rails.env.test? in specs to specifically
-  # test behavior like this, so leave the check in this code
-  def release_savepoint_with_callbacks
-    release_savepoint_without_callbacks
-    return unless Rails.env.test?
-    return if open_transactions > base_transaction_level
-    run_transaction_commit_callbacks
-  end
-
-  def base_transaction_level
-    return 0 unless Rails.env.test?
-    return 1 unless defined?(Onceler)
-    Onceler.base_transactions
-  end
-
-  def rollback_db_transaction_with_callbacks
-    rollback_db_transaction_without_callbacks
-    @after_transaction_commit = [] if @after_transaction_commit
-  end
-
-  def run_transaction_commit_callbacks
-    return unless @after_transaction_commit.present?
-    # the callback could trigger a new transaction on this connection,
-    # and leaving the callbacks in @after_transaction_commit could put us in an
-    # infinite loop.
-    # so we store off the callbacks to a local var here.
-    callbacks = @after_transaction_commit
-    @after_transaction_commit = []
-    callbacks.each { |cb| cb.call() }
-  ensure
-    @after_transaction_commit = [] if @after_transaction_commit
-  end
 end
 
 module MySQLAdapterExtensions
   def self.included(klass)
     klass::NATIVE_DATABASE_TYPES[:primary_key] = "bigint DEFAULT NULL auto_increment PRIMARY KEY".freeze
     klass.alias_method_chain :configure_connection, :pg_compat
-    klass.alias_method_chain :commit_db_transaction, :callbacks
-    klass.alias_method_chain :rollback_db_transaction, :callbacks
-    klass.alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 
   def rename_index(table_name, old_name, new_name)
@@ -1153,17 +1111,6 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
 end
 
-if CANVAS_RAILS3
-  ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
-else
-  module HasManyAllowJoins
-    def valid_options
-      super + [:joins]
-    end
-  end
-  ActiveRecord::Associations::Builder::HasMany.send(:prepend, HasManyAllowJoins)
-end
-
 ActiveRecord::Associations::HasOneAssociation.class_eval do
   def create_scope
     scope = scoped.scope_for_create.stringify_keys
@@ -1205,14 +1152,6 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       type_to_sql_without_text_to_varchar(type, limit, *args)
     end
     alias_method_chain :type_to_sql, :text_to_varchar
-  end
-end
-
-if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
-  ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
-    alias_method_chain :commit_db_transaction, :callbacks
-    alias_method_chain :rollback_db_transaction, :callbacks
-    alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 end
 
@@ -1274,10 +1213,6 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
         ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, [], orders)
       end
     end
-
-    alias_method_chain :commit_db_transaction, :callbacks
-    alias_method_chain :rollback_db_transaction, :callbacks
-    alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 end
 
@@ -1459,6 +1394,7 @@ class ActiveRecord::Migrator
 end
 
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]
+ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   def add_index_with_length_raise(table_name, column_name, options = {})
     unless options[:name].to_s =~ /^temp_/
@@ -1537,15 +1473,25 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
 end
 
-ActiveRecord::Associations::CollectionAssociation.class_eval do
-  # CollectionAssociation implements uniq for :uniq option, in its
-  # own special way. re-implement, but as a relation if it's not an
-  # internal use of it
-  def uniq(records = true)
-    if records.is_a?(Array)
-      records.uniq
-    else
-      scoped.uniq(records)
+if CANVAS_RAILS3
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    # CollectionAssociation implements uniq for :uniq option, in its
+    # own special way. re-implement, but as a relation if it's not an
+    # internal use of it
+    def uniq(records = true)
+      if records.is_a?(Array)
+        records.uniq
+      else
+        scoped.uniq(records)
+      end
+    end
+  end
+else
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    # CollectionAssociation implements uniq for :uniq option, in its
+    # own special way. re-implement, but as a relation
+    def distinct
+      scope.distinct
     end
   end
 end
@@ -1595,3 +1541,29 @@ module UnscopeCallbacks
 end
 
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
+
+if CANVAS_RAILS3
+  [ActiveRecord::DynamicFinderMatch, ActiveRecord::DynamicScopeMatch].each do |klass|
+    klass.class_eval do
+      class << self
+        def match_with_discard(method)
+          result = match_without_discard(method)
+          return nil if result && (result.is_a?(ActiveRecord::DynamicScopeMatch) || result.finder != :first || result.instantiator? || result.bang?)
+          result
+        end
+        alias_method_chain :match, :discard
+      end
+    end
+  end
+else
+  ActiveRecord::DynamicMatchers::Method.class_eval do
+    class << self
+      def match_with_discard(model, name)
+        result = match_without_discard(model, name)
+        return nil if result && !result.is_a?(ActiveRecord::DynamicMatchers::FindBy)
+        result
+      end
+      alias_method_chain :match, :discard
+    end
+  end
+end

@@ -1,0 +1,81 @@
+/* Red circle next to input fields indicating an error */
+.error-circle{
+    position: absolute;
+    z-index: 10;
+    margin-left: -15px;
+    margin-top: 11px;
+
+    border-radius: 50%;
+    width: 4px;
+    height: 4px;
+
+    background: #f00;
+    border: 1px solid #f00;
+}
+
+/* For green check mark when row is valid */
+.success-mark {
+    color: #33802a;
+    position: absolute;
+    margin-left: -35px;
+    margin-top: 7px;
+}
+
+/* When a row is ignored, dim it */
+.ignore-row {
+    opacity: 0.5;
+}
+
+/* NeedsGrading page has clickable table rows */
+.clickable-row {
+    cursor: pointer;
+}
+
+/* Link buttons are blue by default, make the ignore icon gray */
+.btn-ignore {
+    color: #c5c5c5;
+    position: absolute;
+    margin-left: 208px;
+    margin-top: 1px;
+}
+
+/* Provide enough extra space on bottom of row for hints and datefields */
+.correction-row {
+    margin-left: 14px;
+    height: 52px;
+}
+.title-row {
+    margin-left: 14px;
+}
+
+/* Used as the header 'lead' text on each dialog page */
+.lead {
+    margin-bottom: 20px;
+    font-weight: 200;
+    line-height: 30px;
+}
+
+/* Need an input that is a little smaller than input-xlarge */
+.input-mlarge {
+    width: 250px;
+}
+
+/* Without this, hint-text overlaps the input slightly */
+input + .hint-text {
+    margin-top: 0;
+}
+
+.post-summary {
+    margin-top: 120px
+}
+
+.post-summary h1 {
+    color: #aaaaaa;
+    font-size: 28px
+}
+
+.assignments-to-post-count {
+    padding: 0 10px;
+    color: #000;
+    font-weight: 300;
+}

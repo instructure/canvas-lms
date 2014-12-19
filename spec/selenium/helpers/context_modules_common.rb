@@ -6,7 +6,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_existing_module_item(item_select_selector, module_name, item_name)
     add_module(module_name + 'Module')
-    f('.admin-links.al-trigger').click
+    f('.ig-header-admin .al-trigger').click
     wait_for_ajaximations
     f('.add_module_item_link').click
     wait_for_ajaximations
@@ -26,7 +26,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def new_module_form
     keep_trying_until do
-      driver.execute_script("$('.context-modules-main-toolbar .btn-primary').trigger('click')")
+      driver.execute_script("$('.add_module_link').trigger('click')")
       wait_for_ajaximations
       expect(f('.ui-dialog')).to be_displayed
     end
@@ -46,7 +46,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_new_module_item(item_select_selector, module_name, new_item_text, item_title_text)
     add_module(module_name + 'Module')
-    f('.admin-links.al-trigger').click
+    f('.ig-header-admin .al-trigger').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', module_name)
     select_module_item(item_select_selector + ' .module_item_select', new_item_text)
@@ -66,7 +66,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_new_external_item(module_name, url_text, page_name_text)
     add_module(module_name + 'Module')
-    f('.admin-links.al-trigger').click
+    f('.ig-header-admin .al-trigger').click
     wait_for_ajaximations
     f('.add_module_item_link').click
     wait_for_ajaximations
@@ -90,7 +90,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def edit_module_item(module_item)
-    driver.execute_script("$(arguments[0]).addClass('context_module_item_hover')", module_item)
+    module_item.find_element(:css, '.al-trigger').click
+    wait_for_ajaximations
     module_item.find_element(:css, '.edit_item_link').click
     edit_form = f('#edit_item_form')
     yield edit_form

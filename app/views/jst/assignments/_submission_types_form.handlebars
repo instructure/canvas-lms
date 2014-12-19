@@ -150,6 +150,14 @@
             value="{{externalToolUrl}}"
             {{disabledIfIncludes frozenAttributes "submission_types"}}/>
         </div>
+          <input id="assignment_external_tool_tag_attributes_content_type"
+                 name="external_tool_tag_attributes[content_type]"
+                 type="text"
+                 style="display: none"/>
+        <input id="assignment_external_tool_tag_attributes_content_id"
+               name="external_tool_tag_attributes[content_id]"
+               type="text"
+               style="display: none"/>
         <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
           {{checkbox "externalToolNewTab"
             id="assignment_external_tool_tag_attributes_new_tab"

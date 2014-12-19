@@ -1078,6 +1078,29 @@ describe Submission do
       sub.get_web_snapshot
     end
   end
+
+  describe '#submit_attachments_to_canvadocs' do
+    it 'creates crocodoc documents' do
+      Canvas::Crocodoc.stubs(:enabled?).returns true
+      s = @assignment.submit_homework(@user,
+                                      submission_type: "online_text_entry",
+                                      body: "hi")
+
+      # creates crocodoc documents
+      a1 = crocodocable_attachment_model context: @user
+      s.attachments = [a1]
+      s.save
+      cd = a1.crocodoc_document
+      expect(cd).not_to be_nil
+
+      # shouldn't mess with existing crocodoc documents
+      a2 = crocodocable_attachment_model context: @user
+      s.attachments = [a1, a2]
+      s.save
+      expect(a1.crocodoc_document(true)).to eq cd
+      expect(a2.crocodoc_document).to eq a2.crocodoc_document
+    end
+  end
 end
 
 def submission_spec_model(opts={})

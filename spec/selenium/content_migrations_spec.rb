@@ -283,7 +283,7 @@ describe "content migrations", :non_parallel do
         run_migration
 
         expect(@course.assessment_question_banks.count).to eq 2
-        new_bank = @course.assessment_question_banks.find_by_title('new bank naem')
+        new_bank = @course.assessment_question_banks.where(title: 'new bank naem').first
         expect(new_bank.assessment_questions.count).to eq 1
       end
 
@@ -305,7 +305,7 @@ describe "content migrations", :non_parallel do
         run_migration
 
         expect(@course.assessment_question_banks.count).to eq 2
-        new_bank = @course.assessment_question_banks.find_by_title(AssessmentQuestionBank.default_imported_title)
+        new_bank = @course.assessment_question_banks.where(title: AssessmentQuestionBank.default_imported_title).first
         expect(new_bank.assessment_questions.count).to eq 1
       end
     end

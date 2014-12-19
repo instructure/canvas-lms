@@ -49,7 +49,12 @@ class FilePreviewsController < ApplicationController
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.
   def show
-    @file = @context.attachments.active.find(params[:file_id])
+    @file = @context.attachments.not_deleted.find_by_id(params[:file_id])
+    unless @file
+      @headers = false
+      @show_left_side = false
+      return render template: 'shared/errors/404_message', status: :not_found
+    end
     if authorized_action(@file, @current_user, :download)
       # mark item seen for module progression purposes
       @file.context_module_action(@current_user, :read) if @current_user

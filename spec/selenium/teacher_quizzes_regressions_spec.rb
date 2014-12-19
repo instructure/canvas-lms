@@ -99,7 +99,7 @@ describe "quizzes regressions" do
       click_save_settings_button
       wait_for_ajax_requests
     end
-    compare_assignment_times(Quizzes::Quiz.find_by_title('VDD Quiz'))
+    compare_assignment_times(Quizzes::Quiz.where(title: 'VDD Quiz').first)
   end
 
   it "loads existing due date data into the form" do

@@ -126,10 +126,10 @@ describe "handlebars" do
 
     expect(run_template(template, {}, 'fr')).to eq <<-HTML
       <p>
-        <b> Je voudrais un croissant</b>
+        <b>Je voudrais un croissant</b>
       </p>
       <p>
-        <i> Yes, that's true, he would </i>
+        <i> Yes, that&#39;s true, he would </i>
       </p>
     HTML
   end

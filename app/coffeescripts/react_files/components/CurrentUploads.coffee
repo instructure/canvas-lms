@@ -11,21 +11,14 @@ define [
 
     getInitialState: ->
       currentUploads: []
-      isOpen: false
 
     componentWillMount: ->
       UploadQueue.onChange = =>
         @screenReaderUploadStatus()
         @setState(currentUploads: UploadQueue.getAllUploaders())
 
-    componentWillUnMount: ->
-      UploadQueue.onChange = ->
-        #noop
-    handleCloseClick: ->
-      @setState isOpen: false
-
-    handleBrowseClick: ->
-      console.log('browse click')
+    componentWillUnmount: ->
+      UploadQueue.onChange = -> #noop
 
     screenReaderUploadStatus: ->
       currentUploader = UploadQueue.getCurrentUploader()
@@ -34,23 +27,13 @@ define [
       percent = currentUploader.roundProgress()
       $.screenReaderFlashMessage "#{name} - #{percent}%"
 
-    shouldDisplay: ->
-      !!@state.isOpen || @state.currentUploads.length
-
-    buildProgressViews: ->
-      progressBars = @state.currentUploads.map (uploader) ->
-        UploadProgress uploader: uploader, key: uploader.getFileName(), removeUploader: UploadQueue.remove
-      div className: 'current_uploads__uploaders',
-        progressBars
-
-    buildContent: ->
-      if @state.currentUploads.length
-        @buildProgressViews()
-      else if !!@state.isOpen
-        div {}, ''
-
     render: withReactDOM ->
-      divName = ''
-      divName = 'current_uploads' if @shouldDisplay()
-      div className: divName,
-        @buildContent()
+      div className: ('current_uploads' if @state.currentUploads.length),
+        if @state.currentUploads.length
+          div className: 'current_uploads__uploaders',
+            @state.currentUploads.map (uploader) ->
+              UploadProgress {
+                uploader: uploader
+                key: uploader.getFileName()
+                removeUploader: -> UploadQueue.remove(uploader)
+              }

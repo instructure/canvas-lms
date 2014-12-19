@@ -43,7 +43,7 @@
     submission_data = @submission.data
     submission_data_hash = {}
     submission_data.each{|d| submission_data_hash[d[:question_id]] = d }
-    submission_questions = @submission.questions_as_object 
+    submission_questions = @submission.questions_as_object
     submission_questions_hash = {}
     submission_questions.each{|q| submission_questions_hash[q[:id]] = q }
 %>

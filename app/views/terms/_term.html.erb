@@ -41,12 +41,14 @@
         <td>
           <%= mt :term_runs_from, "**Term Runs** from" %>&nbsp;
         </td>
-        <%= render :partial => 'timespan', :locals => { :object => term, :key => '', :start_tooltip => t('titles.term_starts', "Term starts"), :end_tooltip => t('titles.term_ends', "Term ends") } %>
+        <%= render :partial => 'timespan', :locals => { :object => term, :key => '', :start_tooltip => t('titles.term_starts', "Term starts"),
+                                                        :end_tooltip => t('titles.term_ends', "Term ends"), :whenever => [true, true] } %>
       </tr>
     <% types.each do |type| %>
       <% override = term.enrollment_dates_overrides.where(context_type: @context.class.to_s, context_id: @context, enrollment_type: type.to_s).first if term %>
       <% override ||= EnrollmentDatesOverride.new %>
       <% type_string = type.to_s.underscore %>
+      <% start_whenever = true %>
       <tr class="<%= "#{type_string}_dates"%>">
         <td>
           <% case type_string
@@ -54,6 +56,7 @@
                 start_tooltip = t 'tooltips.term_starts_students', "For students the term starts"
                 end_tooltip = t 'tooltips.term_ends_students', "For students the term ends"
                 access_label = mt 'labels.students_can_access_from', "**Students** can access from"
+                start_whenever = false
               when 'teacher_enrollment'
                 start_tooltip = t 'tooltips.term_starts_teachers', "For teachers the term starts"
                 end_tooltip = t 'tooltips.term_ends_teachers', "For teachers the term ends"
@@ -71,7 +74,9 @@
           <%= access_label %>
           &nbsp;
         </td>
-        <%= render :partial => 'timespan', :locals => { :object => override, :key => "[overrides][#{type_string}]", :start_tooltip => start_tooltip, :end_tooltip => end_tooltip, :date_class_prefix => "#{type_string}_" } %>
+        <%= render :partial => 'timespan', :locals => { :object => override, :key => "[overrides][#{type_string}]",
+                                                        :start_tooltip => start_tooltip, :end_tooltip => end_tooltip,
+                                                        :date_class_prefix => "#{type_string}_", :whenever => [start_whenever, false] } %>
       </tr>
     <% end %>
     </table>

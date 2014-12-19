@@ -3,28 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "gradebook2" do
   include_examples "in-process server selenium tests"
 
-  ASSIGNMENT_1_POINTS = "10"
-  ASSIGNMENT_2_POINTS = "5"
-  ASSIGNMENT_3_POINTS = "50"
-  ATTENDANCE_POINTS = "15"
-
-  STUDENT_NAME_1 = "student 1"
-  STUDENT_NAME_2 = "student 2"
-  STUDENT_NAME_3 = "student 3"
-  STUDENT_SORTABLE_NAME_1 = "1, student"
-  STUDENT_SORTABLE_NAME_2 = "2, student"
-  STUDENT_SORTABLE_NAME_3 = "3, student"
-  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
-  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
-  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  DEFAULT_PASSWORD = "qwerty"
-
   context "as a teacher" do
     before(:each) do
-      data_setup
+      gradebook_data_setup
     end
 
     it "hides unpublished/shows published assignments" do
@@ -76,7 +57,7 @@ describe "gradebook2" do
     end
 
     it "should not show concluded enrollments in active courses by default" do
-      @student_1.enrollments.find_by_course_id(@course.id).conclude
+      @student_1.enrollments.where(course_id: @course).first.conclude
 
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
@@ -238,7 +219,7 @@ describe "gradebook2" do
       group_assignment = @course.assignments.create!({
                                                          :title => 'group assignment',
                                                          :due_at => (Time.now + 1.week),
-                                                         :points_possible => ASSIGNMENT_3_POINTS,
+                                                         :points_possible => @assignment_3_points,
                                                          :submission_types => 'online_text_entry',
                                                          :assignment_group => @group,
                                                          :group_category => GroupCategory.create!(:name => "groups", :context => @course),
@@ -369,12 +350,12 @@ describe "gradebook2" do
         f('[data-action="messageStudentsWho"]').click
         visible_students = ffj('.student_list li:visible')
         expect(visible_students.size).to eq 1
-        expect(visible_students[0].text.strip).to eq STUDENT_NAME_3
+        expect(visible_students[0].text.strip).to eq @student_name_3
         click_option('#message_assignment_recipients .message_types', "Haven't been graded")
         visible_students = ffj('.student_list li:visible')
         expect(visible_students.size).to eq 2
-        expect(visible_students[0].text.strip).to eq STUDENT_NAME_2
-        expect(visible_students[1].text.strip).to eq STUDENT_NAME_3
+        expect(visible_students[0].text.strip).to eq @student_name_2
+        expect(visible_students[1].text.strip).to eq @student_name_3
       end
 
       it "should create separate conversations" do
@@ -406,22 +387,24 @@ describe "gradebook2" do
 
       switch_to_section(@course.default_section)
       meta_cells = find_slick_cells(0, f('.grid-canvas'))
-      expect(meta_cells[0]).to include_text STUDENT_NAME_1
+      expect(meta_cells[0]).to include_text @student_name_1
 
       switch_to_section(@other_section)
       meta_cells = find_slick_cells(0, f('.grid-canvas'))
-      expect(meta_cells[0]).to include_text STUDENT_NAME_1
+      expect(meta_cells[0]).to include_text @student_name_1
     end
 
     it "should display for users with only :view_all_grades permissions" do
       user_logged_in
-      RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+
+      role = custom_account_role('CustomAdmin', :account => Account.default)
+      RoleOverride.create!(:role => role,
                            :permission => 'view_all_grades',
                            :context => Account.default,
                            :enabled => true)
       AccountUser.create!(:user => @user,
                           :account => Account.default,
-                          :membership_type => 'CustomAdmin')
+                          :role => role)
 
       get "/courses/#{@course.id}/gradebook2"
       expect(flash_message_present?(:error)).to be_falsey
@@ -429,13 +412,14 @@ describe "gradebook2" do
 
     it "should display for users with only :manage_grades permissions" do
       user_logged_in
-      RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+      role = custom_account_role('CustomAdmin', :account => Account.default)
+      RoleOverride.create!(:role => role,
                            :permission => 'manage_grades',
                            :context => Account.default,
                            :enabled => true)
       AccountUser.create!(:user => @user,
                           :account => Account.default,
-                          :membership_type => 'CustomAdmin')
+                          :role => role)
 
       get "/courses/#{@course.id}/gradebook2"
       expect(flash_message_present?(:error)).to be_falsey
@@ -755,7 +739,7 @@ describe "gradebook2" do
         @da_assignment = assignment_model({
           :course => @course,
           :name => 'DA assignment',
-          :points_possible => ASSIGNMENT_1_POINTS,
+          :points_possible => @assignment_1_points,
           :submission_types => 'online_text_entry',
           :assignment_group => @group,
           :only_visible_to_overrides => true
@@ -793,7 +777,9 @@ describe "gradebook2" do
   end
 
   describe "outcome gradebook" do
-    before(:each) { data_setup }
+    before(:each) do
+      gradebook_data_setup
+    end
 
     it "should not be visible by default" do
       get "/courses/#{@course.id}/gradebook2"
@@ -812,24 +798,21 @@ describe "gradebook2" do
   end
 
   describe "post_grades" do
-    before(:each) { data_setup }
+    before(:each) do
+      gradebook_data_setup
+    end
 
     it "should not be visible by default" do
       get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 0
+      expect(ff('.post-grades-placeholder').length).to eq 0
     end
 
-    it "should be visible when enabled" do
+    it "should be visible when enabled on course with sis_source_id" do
       Account.default.set_feature_flag!('post_grades', 'on')
-      @course.integration_id = 'xyz'
+      @course.sis_source_id = 'xyz'
       @course.save
       get "/courses/#{@course.id}/gradebook2"
-
-      wait_for_ajaximations
-      expect(ff('.gradebook-navigation').length).to eq 2
-      f('#post-grades-button').click
-      wait_for_ajaximations
-      expect(f('#post-grades-container')).not_to be_nil
+      expect(ff('.post-grades-placeholder').length).to eq 1
     end
   end
 end

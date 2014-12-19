@@ -17,6 +17,7 @@
           <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
         </a>
       </li>
+      {{#unless for_submission}}
       <li>
         <div class="inline-block" role="application">
           <a href="#"
@@ -48,6 +49,7 @@
           </ul>
         </div>
       </li>
+      {{/unless}}
     </ul>
   </div>
 

@@ -87,5 +87,11 @@ describe CanvadocSessionsController do
       get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
+
+    it "fails gracefulishly when canvadocs times out" do
+      Canvadocs::API.any_instance.stubs(:session).raises(Timeout::Error)
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      assert_status(503)
+    end
   end
 end

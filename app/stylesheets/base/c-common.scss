@@ -1,5 +1,15 @@
 // Compiler for Canvas
+//=======================
+
+// Variables (including Bootstrap and jQuery UI), mixins, and functions
 @import "base/environment";
+
+// Heavily customized vendor styles
+@import "vendor/jqueryui/jquery.ui.all";
+@import "base/custom_bootstrap";
+@import "vendor/flexboxgrid";
+
+// Canvas components and area-specific styles
 @import "components/g_base";
 @import "components/g_instructure";
 @import "components/g_assignments";

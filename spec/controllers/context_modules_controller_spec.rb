@@ -186,9 +186,11 @@ describe ContextModulesController do
 
       tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
       expect(tag1.content_id).to eq @tool1.id
+      tag1.publish if tag1.unpublished?
       tag2 = @module.add_item :type => 'context_external_tool', :id => @tool2.id, :url => @tool2.url
       expect(tag2.content_id).to eq @tool2.id
-      
+      tag2.publish if tag2.unpublished?
+
       get 'item_redirect', :course_id => @course.id, :id => tag1.id
       expect(response).not_to be_redirect
       expect(assigns[:tool]).to eq @tool1
@@ -205,6 +207,7 @@ describe ContextModulesController do
       @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
       tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
+      tag1.publish if tag1.unpublished?
       @tool1.update_attribute(:url, 'http://www.example.com')
       
       get 'item_redirect', :course_id => @course.id, :id => tag1.id
@@ -247,7 +250,8 @@ describe ContextModulesController do
       quiz.publish!
 
       tag = @module.add_item :type => 'quiz', :id => quiz.id
-      
+      tag.publish if tag.unpublished?
+
       get 'item_redirect', :course_id => @course.id, :id => tag.id
       expect(response).to be_redirect
       expect(response).to redirect_to course_quiz_url(@course, quiz, :module_item_id => tag.id)
@@ -257,6 +261,7 @@ describe ContextModulesController do
       user_session(@student)
       @module = @course.context_modules.create!
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
+      tag.publish if tag.unpublished?
       @module.completion_requirements = { tag.id => { :type => 'must_view' }}
       @module.save!
       expect(@module.evaluate_for(@user)).to be_unlocked

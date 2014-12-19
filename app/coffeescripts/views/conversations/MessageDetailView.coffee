@@ -35,7 +35,6 @@ define [
         context.starToggleMessage = if @model.starred() then @messages['unstar'] else @messages['star']
         context.archiveToggleMessage = if @model.get('workflow_state') == 'archived' then @messages['unarchive'] else @messages['archive']
         $template = $(template(context))
-
         @model.messageCollection.each (message) =>
           message.set('conversation_id', context.id) unless message.get('conversation_id')
           childView = new MessageItemView(model: message).render()

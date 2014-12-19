@@ -167,7 +167,8 @@ module Api::V1::ContextModule
       else
         ''
     end
-    locked_json(details, item, current_user, item_type)
+    lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
+    locked_json(details, lock_item, current_user, item_type)
 
     details
   end

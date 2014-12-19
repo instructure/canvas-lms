@@ -83,7 +83,8 @@ module Api::V1
         enrollments.map do |e|
           h = {
             :type => e.sis_type,
-            :role => e.role,
+            :role => e.role.name,
+            :role_id => e.role.id,
             :enrollment_state => e.workflow_state
           }
           if include_total_scores && e.student?

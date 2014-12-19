@@ -5,8 +5,9 @@ define [
   'i18n!pages'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/str/splitAssetString'
+  'compiled/util/PandaPubPoller'
   'compiled/jquery.rails_flash_notifications'
-], ($, _, Backbone, I18n, DefaultUrlMixin, splitAssetString) ->
+], ($, _, Backbone, I18n, DefaultUrlMixin, splitAssetString, PandaPubPoller) ->
 
   pageRevisionOptions = ['contextAssetString', 'page', 'pageUrl', 'latest', 'summary']
 
@@ -36,19 +37,32 @@ define [
       super options
 
     pollForChanges: (interval=30000) ->
-      @polling = true
       unless @_poller
-        poll = =>
-          return unless @polling
-          @fetch().done (data, status, xhr) ->
-            status = xhr.status.toString()
-            poll() unless status[0] == '4' || status[0] == '5'
-        @_poller = poll = _.throttle poll, interval, leading: false
 
-      @_poller()
+        # When an update arrives via pandapub, we're just going to trigger a
+        # normal poll. However, updates might arrive quickly, and we don't want
+        # to poll any more than the normal interval, so we created a throttled
+        # version of our poll method.
+        throttledPoll = _.throttle @doPoll, interval
+
+        @_poller = new PandaPubPoller interval, interval * 10, throttledPoll
+        if pp = window.ENV.WIKI_PAGE_PANDAPUB
+          @_poller.setToken pp.CHANNEL , pp.TOKEN
+        @_poller.setOnData => throttledPoll()
+        @_poller.start()
 
     stopPolling: ->
-      @polling = false
+      @_poller.stop() if @_poller
+
+    doPoll: (done) =>
+      return unless @_poller and @_poller.isRunning()
+
+      @fetch().done (data, status, xhr) ->
+        status = xhr.status.toString()
+        if status[0] == '4' || status[0] == '5'
+          @_poller.stop()
+
+        done() if done
 
     parse: (response, options) ->
       response.id = response.url if response.url

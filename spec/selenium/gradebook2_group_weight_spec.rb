@@ -2,25 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "group weights" do
   include_examples "in-process server selenium tests"
 
-  ASSIGNMENT_1_POINTS = "10"
-  ASSIGNMENT_2_POINTS = "5"
-  ASSIGNMENT_3_POINTS = "50"
-  ATTENDANCE_POINTS = "15"
-
-  STUDENT_NAME_1 = "student 1"
-  STUDENT_NAME_2 = "student 2"
-  STUDENT_NAME_3 = "student 3"
-  STUDENT_SORTABLE_NAME_1 = "1, student"
-  STUDENT_SORTABLE_NAME_2 = "2, student"
-  STUDENT_SORTABLE_NAME_3 = "3, student"
-  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
-  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
-  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  DEFAULT_PASSWORD = "qwerty"
-
   def get_group_points
     group_points_holder = keep_trying_until do
       group_points_holder = ff('div.assignment-points-possible')
@@ -98,8 +79,8 @@ describe "group weights" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    group_1 = AssignmentGroup.find_by_name(@group1.name)
-    group_2 = AssignmentGroup.find_by_name(@group2.name)
+    group_1 = AssignmentGroup.where(name: @group1.name).first
+    group_2 = AssignmentGroup.where(name: @group2.name).first
 
     #set and check the group weight of the first assignment group
     set_group_weight(group_1, weight_numbers[0])

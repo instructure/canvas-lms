@@ -36,7 +36,7 @@ module DatesOverridable
   end
 
   def has_overrides?
-    assignment_overrides.exists?
+    assignment_overrides.loaded? ? assignment_overrides.any? : assignment_overrides.exists?
   end
 
   def has_active_overrides?

@@ -27,17 +27,20 @@ define [
     onItemDragStart: (event) ->
       itemsToDrag = @itemsToDrag()
       event.dataTransfer.effectAllowed = 'move'
-      event.dataTransfer.setData('canvaslms/custom-dnd-move', true)
 
-      # make it so you can drag stuff to other apps and it will at least copy a list of urls
-      # see: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Recommended_Drag_Types#link
-      event.dataTransfer.setData('text/uri-list', itemsToDrag.map((item) -> item.get('url')).join('\n'))
+      event.dataTransfer.setData('Text', 'in_a_dndMixin_drag')
 
-      # replace the default ghost dragging element with a transparent gif
-      # since we are going to use our own custom drag image
-      img = new Image
-      img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      event.dataTransfer.setDragImage(img, 150, 150)
+      # IE 10 can't do this stuff:
+      try
+        # make it so you can drag stuff to other apps and it will at least copy a list of urls
+        # see: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Recommended_Drag_Types#link
+        event.dataTransfer.setData('text/uri-list', itemsToDrag.map((item) -> item.get('url')).join('\n'))
+
+        # replace the default ghost dragging element with a transparent gif
+        # since we are going to use our own custom drag image
+        img = new Image
+        img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        event.dataTransfer.setDragImage(img, 150, 150)
 
       @renderDragFeedback(event)
 
@@ -46,16 +49,16 @@ define [
         'dragend.MultiDraggableMixin': @removeDragFeedback
 
     onItemDragEnterOrOver: (event, callback) ->
-      return unless 'canvaslms/custom-dnd-move' in event.dataTransfer.types
+      return unless 'Text' in event.dataTransfer.types or 'text/plain' in event.dataTransfer.types
       event.preventDefault()
       callback(event) if callback
 
     onItemDragLeaveOrEnd: (event, callback) ->
-      return unless 'canvaslms/custom-dnd-move' in event.dataTransfer.types
+      return unless 'Text' in event.dataTransfer.types or 'text/plain' in event.dataTransfer.types
       callback(event) if callback
 
     onItemDrop: (event, destinationFolder, callback) ->
-      return unless 'canvaslms/custom-dnd-move' in event.dataTransfer.types
+      return unless (event.dataTransfer.getData('Text') or event.dataTransfer.getData('text/plain')) is 'in_a_dndMixin_drag'
       event.preventDefault()
       moveStuff(@itemsToDrag(), destinationFolder)
       @clearSelectedItems()

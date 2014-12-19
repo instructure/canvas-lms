@@ -19,6 +19,18 @@ define(function(require) {
         options.data = JSON.stringify(options.data);
       }
 
+      //>>excludeStart("production", pragmas.production);
+      if (config.fakeXHRDelay) {
+        var svc = RSVP.defer();
+
+        setTimeout(function() {
+          RSVP.Promise.cast(ajax(options)).then(svc.resolve, svc.reject);
+        }, config.fakeXHRDelay);
+
+        return svc.promise;
+      }
+      //>>excludeEnd("production");
+
       return RSVP.Promise.cast(ajax(options));
     }
   };

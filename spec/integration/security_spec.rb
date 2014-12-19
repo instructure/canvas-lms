@@ -578,19 +578,20 @@ describe "security" do
 
   describe "admin permissions" do
     before(:each) do
-      account_admin_user(:account => Account.site_admin, :membership_type => 'Limited Admin')
+      @role = custom_account_role('Limited Admin', :account => Account.site_admin)
+      account_admin_user(:account => Account.site_admin, :role => @role)
       user_session(@admin)
     end
 
     def add_permission(permission)
       Account.site_admin.role_overrides.create!(:permission => permission.to_s,
-        :enrollment_type => 'Limited Admin',
+        :role => @role,
         :enabled => true)
     end
 
-    def remove_permission(permission, enrollment_type)
+    def remove_permission(permission, role)
       Account.default.role_overrides.create!(:permission => permission.to_s,
-              :enrollment_type => enrollment_type,
+              :role => role,
               :enabled => false)
     end
 
@@ -777,7 +778,7 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         expect(response).to be_success
         html = Nokogiri::HTML(response.body)
-        expect(html.css('.edit_course_link')).not_to be_empty
+        expect(html.css('#course_form')).not_to be_empty
         expect(html.css('#tab-navigation')).not_to be_empty
       end
 
@@ -974,8 +975,8 @@ describe "security" do
         expect(response.body).to match /Export Course Content/
         expect(response.body).not_to match /Delete this Course/
         expect(response.body).not_to match /End this Course/
-        expect(html.css('#course_account_id')).to be_empty
-        expect(html.css('#course_enrollment_term_id')).to be_empty
+        expect(html.css('input#course_account_id')).to be_empty
+        expect(html.css('input#course_enrollment_term_id')).to be_empty
 
         delete "/courses/#{@course.id}"
         assert_status(401)
@@ -1045,7 +1046,7 @@ describe "security" do
 
       it 'manage_sections' do
         course_with_teacher_logged_in(:active_all => 1)
-        remove_permission(:manage_sections, 'TeacherEnrollment')
+        remove_permission(:manage_sections, teacher_role)
 
         get "/courses/#{@course.id}/settings"
         expect(response).to be_success
@@ -1063,7 +1064,7 @@ describe "security" do
 
       it 'change_course_state' do
         course_with_teacher_logged_in(:active_all => 1)
-        remove_permission(:change_course_state, 'TeacherEnrollment')
+        remove_permission(:change_course_state, teacher_role)
 
         get "/courses/#{@course.id}/settings"
         expect(response).to be_success

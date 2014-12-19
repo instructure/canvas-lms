@@ -142,6 +142,9 @@ module Canvas
             'handlebars': {
               deps: ['bower/handlebars/handlebars.runtime.amd'],
               exports: 'Handlebars'
+            },
+            'vendor/i18n': {
+              exports: 'I18n'
             }
           }
         JS

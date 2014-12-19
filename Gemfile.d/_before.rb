@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-required_bundler_version = '1.6.0'..'1.7.3'
+required_bundler_version = '1.6.0'..'1.7.4'
 gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
 
 unless required_bundler_version.include?(Bundler::VERSION)
@@ -100,11 +100,11 @@ end
 Bundler::Runtime.send(:include, CanvasBundlerRuntime)
 
 if RUBY_VERSION >= '2.2'
-  gem 'syck', github: 'tenderlove/syck'
+  gem 'syck', '1.0.4'
   gem 'iconv', '1.0.4'
 else
   platforms :ruby_20, :ruby_21 do
-    gem 'syck', '1.0.3'
+    gem 'syck', '1.0.4'
     gem 'iconv', '1.0.4'
   end
 end

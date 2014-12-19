@@ -118,15 +118,18 @@ module I18nTasks
       #   blockquotes, e.g. "> some text"
       #   reference links, e.g. "[an example][id]"
       #   indented code
-      (
-      scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
-          scan_and_report(dashed_str, /(\*+|_+|`+)[^\s].*?[^\s]?\1/).map { |m| "#{m[0]}-wrap" } +
-          scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" } +
-          scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" } +
-          scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0]=='=' ? 'h1' : 'h2' } +
-          scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" } +
-          scan_and_report(dashed_str, /^ {0,3}(\d+\.|\*|\+|\-)\s/).map { |m| m.first =~ /\d/ ? "1." : "*" }
-      ).sort
+      matches = scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) # escaped special char
+        .concat(scan_and_report(dashed_str, /(\*+|_+|`+)[^\s].*?[^\s]?\1/).map { |m| "#{m[0]}-wrap" }) # wrappers
+        .concat(scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" }) # links
+
+      # only do fancy markdown checks on multi-line strings
+      if dashed_str =~ /\n/
+        matches.concat(scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" }) # headings
+               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0]=='=' ? 'h1' : 'h2' }) # moar headings
+               .concat(scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" })
+               .concat(scan_and_report(dashed_str, /^ {0,3}(\d+\.|\*|\+|\-)\s/).map { |m| m.first =~ /\d/ ? "1." : "*" })
+      end
+      matches.uniq.sort
     end
 
     def placeholders(str)

@@ -914,28 +914,23 @@ describe "Users API", type: :request do
     end
   end
 
-  describe "user deletion" do
+  describe "removing user from account" do
     before :once do
       @admin = account_admin_user
       course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'student@example.com'))
       @student = @user
       @user = @admin
       @path = "/api/v1/accounts/#{Account.default.id}/users/#{@student.id}"
-      @path_options = { :controller => 'users', :action => 'destroy',
-        :format => 'json', :id => @student.to_param,
+      @path_options = { :controller => 'accounts', :action => 'remove_user',
+        :format => 'json', :user_id => @student.to_param,
         :account_id => Account.default.to_param }
     end
 
     context "a user with permissions" do
       it "should be able to delete a user" do
         json = api_call(:delete, @path, @path_options)
-        expect(@student.reload).to be_deleted
-        expect(json).to eq({
-          'id' => @student.id,
-          'name' => 'Student',
-          'short_name' => 'Student',
-          'sortable_name' => 'Student'
-        })
+        expect(@student.associated_accounts).not_to include(Account.default)
+        expect(json.to_json).to eq @student.reload.to_json
       end
 
       it "should be able to delete a user by SIS ID" do
@@ -943,22 +938,17 @@ describe "Users API", type: :request do
         id_param = "sis_user_id:#{@student.pseudonyms.first.sis_user_id}"
 
         path = "/api/v1/accounts/#{Account.default.id}/users/#{id_param}"
-        path_options = @path_options.merge(:id => id_param)
+        path_options = @path_options.merge(:user_id => id_param)
         api_call(:delete, path, path_options)
         expect(response.code).to eql '200'
-        expect(@student.reload).to be_deleted
+        expect(@student.associated_accounts).not_to include(Account.default)
       end
 
       it 'should be able to delete itself' do
         path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@user.id}"
-        json = api_call(:delete, path, @path_options.merge(:id => @user.to_param))
-        expect(@user.reload).to be_deleted
-        expect(json).to eq({
-          'id' => @user.id,
-          'name' => @user.name,
-          'short_name' => @user.short_name,
-          'sortable_name' => @user.sortable_name
-        })
+        json = api_call(:delete, path, @path_options.merge(:user_id => @user.to_param))
+        expect(@user.associated_accounts).not_to include(Account.default)
+        expect(json.to_json).to eq @user.reload.to_json
       end
     end
 
@@ -970,24 +960,10 @@ describe "Users API", type: :request do
       end
     end
 
-    context 'a student with no SIS ID' do
-      it 'should be able to delete itself' do
-        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
-        json = api_call_as_user(@student, :delete, path, @path_options.merge(:id => @student.to_param))
-        expect(@student.reload).to be_deleted
-      end
-    end
-
-    context 'a student with SIS ID' do
-      before(:once) do
-        @student.pseudonym.update_attribute(:sis_user_id, '12345')
-      end
-
+    context 'a non-admin user' do
       it 'should not be able to delete itself' do
         path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
-        json = api_call_as_user(@student, :delete, path, @path_options.merge(:id => @student.to_param),
-                                {}, {}, {expected_status: 401})
-        expect(@student.reload).not_to be_deleted
+        api_call_as_user(@student, :delete, path, @path_options.merge(:user_id => @student.to_param), {}, {}, expected_status: 401)
       end
     end
   end

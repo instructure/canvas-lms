@@ -111,7 +111,7 @@ describe integration do
       expect(response).to redirect_to(user_profile_url(@user))
       expect(flash[:error]).to be_blank
       expect(flash[:notice]).to be_present
-      us = UserService.find_by_service_and_user_id(integration.underscore, @user.id)
+      us = UserService.where(service: integration.underscore, user_id: @user).first
       expect(us).to be_present
       expect(us.service_user_id).to eq "test_user_id"
       expect(us.service_user_name).to eq "test_user_name"
@@ -140,7 +140,7 @@ describe integration do
       expect(response).to redirect_to(user_profile_url(@user))
       expect(flash[:error]).to be_present
       expect(flash[:notice]).to be_blank
-      us = UserService.find_by_service_and_user_id(integration.underscore, @user.id)
+      us = UserService.where(service: integration.underscore, user_id: @user).first
       expect(us).not_to be_present
     end
   end

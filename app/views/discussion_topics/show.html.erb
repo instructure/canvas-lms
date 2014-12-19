@@ -268,12 +268,13 @@
         <div class="headerBar" data-sticky>
           <div class="row-fluid form-inline" style="overflow: visible;">
             <div class="span9">
+              <label id="discussion-search-label" class="screenreader-only" for="discussion-search"><%= t("search_entries_placeholder", "Search entries or author") %></label>
               <input
-                id          = "discussion-search"
-                type        = "text"
-                aria-label  = "<%= t("filter_replies", "Filter replies by search term") %>"
-                placeholder = "<%= t("search_entries_placeholder", "Search entries or author") %>"
-                size        = 50
+                id               = "discussion-search"
+                type             = "text"
+                aria-labelledby  = "discussion-search-label"
+                placeholder      = "<%= t("search_entries_placeholder", "Search entries or author") %>"
+                size             = 50
               >
 
               <input

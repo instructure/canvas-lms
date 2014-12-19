@@ -1,0 +1,258 @@
+// PUTTING STUFF IN THIS FILE IS CONSIDERED BAD!
+// you should put it in it's own css file named after
+// the React Component you're using it in.
+
+
+$ef-thumbnail-size: 36px;
+
+
+@mixin hideForPhone {
+  @media (max-width:800px){
+    display: none;
+  }
+}
+
+
+
+.ef-main-buttons{
+  .ui-buttonset, .ui-button {
+    display: inline-block;
+  }
+}
+
+.ef-header{
+  padding: $base-content-padding $base-content-padding 8px;
+  border-bottom: 1px solid $base-border-color;
+  > * {
+    display: block;
+    margin-bottom: 0
+  }
+  input[type='search'] {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.ef-main{
+  min-height: 300px;
+  display: flex;
+
+  .ef-folder-content{
+    border-right: 1px solid $base-border-color;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    padding: 0px;
+
+    .folderTree {
+      margin: 10px
+    }
+
+    [aria-selected=true] > .ef-folder-header{
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .ef-folder-header{
+      padding-top: 5px;
+      padding-bottom: 5px;
+
+      &:hover{
+        background-color: #f2f2f2;
+      }
+    }
+
+    .ef-folder-list{
+      flex: 10 10 0;
+      font-size: 12px;
+      overflow: auto;
+    }
+
+    .ef-folder-totals{
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex: 1 1 0;
+      height: 30px;
+      font-size: 16px;
+      border-top: 1px solid $base-border-color;
+      padding-left: 20px;
+    }
+  }
+}
+.ef-directory{
+  position: relative;
+  margin: 10px;
+  flex: 3 3 0;
+  display: flex;
+  flex-direction: column;
+
+}
+.ef-directory-header{
+  display: flex;
+  padding: 5px;
+  border-bottom: 1px solid $base-border-color;
+}
+
+.ef-plain-link, .ef-plain-link:hover { color: $base-font-color-dark; }
+
+
+.ef-item-row{
+  display: flex;
+  padding: 5px;
+  user-select: none; /* so that we can shift-click to select */
+  margin-bottom: 1px;
+  border-radius: 3px;
+  line-height: $ef-thumbnail-size;
+
+  // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
+  &:hover            { background-color: $base-list-item-background--hover }
+  &.ef-item-selected { background-color: $base-list-item-background--selected }
+
+  .al-trigger { opacity: 0 }
+  &:hover .al-trigger, .al-trigger.ui-state-active { opacity: 1 }
+
+  .btn-link { border-width: 0 }
+}
+.ef-big-icon {
+  width: $ef-thumbnail-size !important;
+  color: $base-font-color-dark;
+  &:before {
+    font-size: $ef-thumbnail-size - 7px !important;
+  }
+}
+
+.ef-name-col{
+  flex: 8 8 0;
+}
+
+.ef-date-created-col{
+  flex: 3 3 0;
+  @include hideForPhone;
+}
+
+.ef-date-modified-col{
+  flex: 3 3 0;
+  @include hideForPhone;
+}
+
+.ef-modified-by-col{
+  flex: 3 3 0;
+  @include hideForPhone;
+}
+
+.ef-size-col{
+  flex: 2 2 0;
+  @include hideForPhone;
+}
+
+.ef-links-col{
+  display: flex;
+  width: 63px;
+}
+
+
+.ef-thumbnail {
+  width: $ef-thumbnail-size;
+  height: $ef-thumbnail-size;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+}
+
+.ef-edit-name-form {
+  position: relative;
+  margin-bottom: 0;
+}
+.ef-edit-name-cancel {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.ef-footer {
+  border-top: 1px solid $base-border-color;
+  padding: 0 $base-content-padding;
+  line-height: 33px;
+  .ef-quota-usage {
+    min-width: 330px;
+  }
+}
+
+
+.file-rename-form__form-label {
+  float: left;
+  margin-top: 5px;
+  padding-right: 5px;
+}
+
+.progress-bar__bar-container {
+  height: 9px;
+  margin-bottom: 12px;
+  border: solid $canvas-primary 1px;
+  border-radius: 20px;
+  margin-top: 10px;
+
+  &.almost-done {
+    border: solid $canvas-success 1px;
+  }
+}
+.progress-bar__bar {
+  position: relative;
+  background: $canvas-primary;
+  border: none;
+  height: 9px;
+  border-radius: 20px;
+
+  &.almost-done {
+    background: $canvas-success;
+  }
+}
+.current_uploads {
+  border-radius: 10px;
+  border: dashed $canvas-neutral 2px;
+  padding: 10px 10px 10px 10px;
+}
+
+.ef-breadcrumb-popover {
+  display: block;
+  left: -9999px;
+  top: 15px;
+  opacity: 0;
+  transition: opacity .2s;
+  width: auto;
+  &.open {
+    left: -23px;
+    opacity: 1;
+  }
+  &.popover > .arrow {
+    left: 53px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+  }
+}
+
+.activeDragTarget {
+  background-color: $base-list-item-background--selected !important;
+  box-shadow: inset 0 0 0px 2px $canvas-primary;
+}
+
+.DragFeedback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+
+  > * {
+    position: absolute;
+  }
+}
+
+// Hack, Hack, Hack!
+// to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files
+#footer { min-height: 80px }

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -37,9 +37,10 @@ describe AccountNotification do
 
   it "should find announcements only if user has a role in the list of roles to which the announcement is restricted" do
     @announcement.destroy
-    account_notification(:roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    role_ids = ["TeacherEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name).id}
+    account_notification(:role_ids => role_ids, :message => "Announcement 1")
     @a1 = @announcement
-    account_notification(:account => @account, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
     @a2 = @announcement
     account_notification(:account => @account, :message => "Announcement 3") # no roles, should go to all
     @a3 = @announcement
@@ -57,9 +58,9 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
     expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
 
-    account_notification(:account => Account.site_admin, :roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    account_notification(:account => Account.site_admin, :role_ids => role_ids, :message => "Announcement 1")
     @a4 = @announcement
-    account_notification(:account => Account.site_admin, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => Account.site_admin, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
     @a5 = @announcement
     account_notification(:account => Account.site_admin, :message => "Announcement 3") # no roles, should go to all
     @a6 = @announcement
@@ -116,6 +117,32 @@ describe AccountNotification do
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-07-02'))).to eq false
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-09-02'))).to eq true
       end
+    end
+
+    it "should exclude students on surveys if the account restricts a student" do
+      flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
+      @survey = account_notification(:required_account_service => flag, :account => Account.site_admin)
+      @a1 = account_model
+      @a1.enable_service(flag)
+      @a1.settings[:include_students_in_global_survey] = false
+      @a1.save!
+
+      @unenrolled = @user
+      course_with_teacher(account: @a1)
+      @student_teacher = @user
+      course_with_student(course: @course, user: @student_teacher)
+      course_with_teacher(course: @course, :account => @a1)
+      @teacher = @user
+      account_admin_user(:account => @a1)
+      @admin = @user
+      course_with_student(:course => @course)
+      @student = @user
+
+      expect(AccountNotification.for_user_and_account(@teacher, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@admin, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@student, @a1).map(&:id).sort).to eq []
+      expect(AccountNotification.for_user_and_account(@student_teacher, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@unenrolled, @a1).map(&:id).sort).to eq [@survey.id]
     end
   end
 

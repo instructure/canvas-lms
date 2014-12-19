@@ -441,34 +441,58 @@ describe UserMerge do
     let!(:user1) { user_model }
     let!(:user2) { user_model }
 
-    it "should update submission versions" do
-      other_user = user_model
+    context "submissions" do
+      it "updates the versions table" do
+        other_user = user_model
 
-      a1 = assignment_model(:submission_types => 'online_text_entry')
-      a1.submit_homework(user2, {
-        :submission_type => 'online_text_entry',
-        :body => 'hi'
-      })
-      s1 = a1.submit_homework(user2, {
-        :submission_type => 'online_text_entry',
-        :body => 'hi again'
-      })
-      s_other = a1.submit_homework(other_user, {
-        :submission_type => 'online_text_entry',
-        :body => 'hi again'
-      })
+        a1 = assignment_model(:submission_types => 'online_text_entry')
+        a1.submit_homework(user2, {
+          :submission_type => 'online_text_entry',
+          :body => 'hi'
+        })
+        s1 = a1.submit_homework(user2, {
+          :submission_type => 'online_text_entry',
+          :body => 'hi again'
+        })
+        s_other = a1.submit_homework(other_user, {
+          :submission_type => 'online_text_entry',
+          :body => 'hi again'
+        })
 
-      expect(s1.versions.count).to eql(2)
-      s1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
-      expect(s_other.versions.first.model.user_id).to eql(other_user.id)
+        expect(s1.versions.count).to eql(2)
+        s1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
+        expect(s_other.versions.first.model.user_id).to eql(other_user.id)
 
-      UserMerge.from(user2).into(user1)
-      s1 = Submission.find(s1.id)
-      s_other.reload
+        UserMerge.from(user2).into(user1)
+        s1 = Submission.find(s1.id)
+        s_other.reload
 
-      expect(s1.versions.count).to eql(2)
-      s1.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
-      expect(s_other.versions.first.model.user_id).to eql(other_user.id)
+        expect(s1.versions.count).to eql(2)
+        s1.versions.each{ |v| expect(v.model.user_id).to eql(user1.id) }
+        expect(s_other.versions.first.model.user_id).to eql(other_user.id)
+      end
+
+      it "updates the submission_versions table" do
+        assignment = assignment_model(submission_types: 'online_text_entry')
+        assignment.submit_homework(user2, {
+          submission_type: 'online_text_entry',
+          body: 'submission whoo'
+        })
+        submission = assignment.submit_homework(user2, {
+          submission_type: 'online_text_entry',
+          body: 'another submission!'
+        })
+
+        versions = SubmissionVersion.where(version_id: submission.versions)
+
+        expect(versions.count).to eql(2)
+        versions.each { |v| expect(v.user_id).to eql(user2.id) }
+        UserMerge.from(user2).into(user1)
+
+        versions.reload
+        expect(versions.count).to eql(2)
+        versions.each { |v| expect(v.user_id).to eql(user1.id) }
+      end
     end
 
     it "should update quiz submissions" do

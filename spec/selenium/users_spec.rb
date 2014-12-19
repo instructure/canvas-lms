@@ -61,7 +61,7 @@ describe "users" do
       page_view(:user => @student, :course => @course, :participated => true, :url => student_in_course(:name => second_student_name).user.id.to_s)
       refresh_page # in order to get the generated page view
       page_view_url = f('#page_view_results a')
-      second_student = User.find_by_name(second_student_name)
+      second_student = User.where(name: second_student_name).first
       expect(page_view_url.text).to eq second_student.id.to_s
       expect_new_page_load { page_view_url.click }
       expect(f('.user_details .name').text).to eq second_student.name

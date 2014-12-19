@@ -36,7 +36,7 @@ describe "quizzes students" do
       driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
 
       keep_trying_until { expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed }
-      quiz_sub = @fake_student.reload.submissions.find_by_assignment_id(quiz.assignment.id)
+      quiz_sub = @fake_student.reload.submissions.where(assignment_id: quiz.assignment).first
       expect(quiz_sub).to be_present
       expect(quiz_sub.workflow_state).to eq "graded"
     end

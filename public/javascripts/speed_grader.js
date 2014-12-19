@@ -1002,9 +1002,9 @@ define([
       header.init();
       initKeyCodes();
 
-      $('#hide_no_annotation_warning').click(function(e){
+      $('.dismiss_alert').click(function(e){
         e.preventDefault();
-        $no_annotation_warning.hide();
+        $(this).closest(".alert").hide();
       });
 
       $window.bind('hashchange', EG.handleFragmentChange);
@@ -1049,10 +1049,21 @@ define([
 
     next: function(){
       this.skipRelativeToCurrentIndex(1);
+      var studentInfo = this.getStudentNameAndGrade();
+      $("#aria_name_alert").text(studentInfo);
     },
 
     prev: function(){
       this.skipRelativeToCurrentIndex(-1);
+      var studentInfo = this.getStudentNameAndGrade();
+      $("#aria_name_alert").text(studentInfo);
+    },
+
+    getStudentNameAndGrade: function(){
+      var hideStudentNames = utils.shouldHideStudentNames();
+      var studentName = hideStudentNames ? I18n.t('student_index', "Student %{index}", { index: EG.currentIndex() + 1 }) : EG.currentStudent.name;
+      var submissionStatus = classNameBasedOnStudent(EG.currentStudent);
+      return studentName + " " + submissionStatus.formatted;
     },
 
     resizeFullHeight: function(){
@@ -1369,7 +1380,7 @@ define([
         I18n.t('gradee_index_of_total', '%{gradee} %{x} of %{y}', {
           gradee: gradeeLabel,
           x: EG.currentIndex() + 1,
-          y: jsonData.context.students.length
+          y: this.totalStudentCount()
         })
       );
 
@@ -1413,10 +1424,18 @@ define([
       );
     },
 
+    totalStudentCount: function(){
+      if (sectionToShow) {
+        return _.filter(jsonData.context.students, function(student) {return _.contains(student.section_ids, sectionToShow)}).length;
+      } else {
+        return jsonData.context.students.length;
+      };
+    },
+
     loadAttachmentInline: function(attachment){
       clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
-      $no_annotation_warning.hide();
+      $(".speedgrader_alert").hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
@@ -1437,6 +1456,12 @@ define([
             }
           };
         }
+
+        if (attachment &&
+            attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
+          $("#crocodoc_pending").show();
+        }
+
         if (attachment && attachment.crocodoc_url) {
           var crocodocStart = new Date()
           ,   sessionLimit = 60 * 60 * 1000
@@ -1737,13 +1762,17 @@ define([
         $queryIcon = $query.find(".speedgrader-selectmenu-icon");
 
         if(className.raw == "graded" && this == EG.currentStudent){
+          var studentInfo = EG.getStudentNameAndGrade()
           $queryIcon.text("").append("<i class='icon-check'></i>");
           $status.addClass("graded");
           $statusIcon.text("").append("<i class='icon-check'></i>");
+          $("#aria_name_alert").text(studentInfo);
         }else if(className.raw == "not_graded" && this == EG.currentStudent){
+          var studentInfo = EG.getStudentNameAndGrade()
           $queryIcon.text("").append("&#9679;");
           $status.removeClass("graded");
           $statusIcon.text("").append("&#9679;");
+          $("#aria_name_alert").text(studentInfo);
         }else{
           $status.removeClass("graded");
         }

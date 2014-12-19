@@ -109,8 +109,8 @@ define([
       $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
         if ($.ajaxJSON.isUnauthenticated(request)) {
           var message = I18n.t('errors.logged_out', "You are not currently logged in, possibly due to a long period of inactivity.")
-          message += "<br\/><a href='/login' target='_new'>" + htmlEscape(I18n.t('links.login', 'Login')) + "<\/a>";
-          $.flashError(message, 30000);
+          message += "<br\/><a href='/login' target='_new'>" + I18n.t('links.login', 'Login') + "<\/a>";
+          $.flashError({ html: message }, 30000);
         } else {
           ajaxErrorFlash(I18n.t('errors.unhandled', "Oops! The last request didn't work out."), request);
         }
