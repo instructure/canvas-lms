@@ -206,7 +206,7 @@ class ApiController < ApplicationController
 
   def sandbox_for(user)
     # Find user's courses with sis_source_id that starts with 'sandbox'
-    courses = Course.find(:all, :conditions => ['id IN (?) AND sis_source_id LIKE ?', user.course_ids, 'sandbox%'])
+    courses = Course.find(:all, :conditions => ['id IN (?) AND sis_source_id LIKE ?', user.courses.map(&:id), 'sandbox%'])
     courses.map do |course|
       {
         :id => course.id,
