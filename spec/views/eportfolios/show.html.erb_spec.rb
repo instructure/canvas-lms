@@ -49,5 +49,12 @@ describe "/eportfolios/show" do
     expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
     expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).to be_nil
   end
+
+  it "should show the share link explicitly" do
+    assigns[:owner_view] = true
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css('#eportfolio_share_link').text).to match %r{https?://.*/eportfolios/#{@portfolio.id}\?verifier=.*}
+  end
 end
 
