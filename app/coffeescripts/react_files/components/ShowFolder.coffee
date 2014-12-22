@@ -29,7 +29,7 @@ define [
       @forceUpdate() if @isMounted()
     , 0
 
-    previousFolderId: null
+    previousIdentifier: ""
 
     registerListeners: (props) ->
       return unless props.currentFolder
@@ -67,6 +67,7 @@ define [
           parsedResponse = $.parseJSON(jqXHR.responseText)
         if parsedResponse
           @setState errorMessages: parsedResponse.errors
+          @redirectToCourseFiles() if @props.query.preview?
 
     componentWillMount: ->
       @registerListeners(@props)
@@ -80,7 +81,7 @@ define [
 
     componentDidUpdate: ->
       # hooray for a11y
-      @redirectToCourseFiles() if @props.currentFolder?.get('locked_for_user')
+      @redirectToCourseFiles() if not @props.currentFolder? or @props.currentFolder?.get('locked_for_user')
       forceScreenreaderToReparse(@getDOMNode())
 
     componentWillReceiveProps: (newProps) ->
@@ -91,14 +92,19 @@ define [
         updateAPIQuerySortParams(collection, newProps.query)
 
     redirectToCourseFiles: ->
-      if @props.currentFolder? and (@previousFolderId?.toString() isnt @props.currentFolder.get('id').toString())
-        @previousFolderId = @props.currentFolder.get('id')
-        message = I18n.t('This folder is currently locked and unavailable to view.')
-        $.flashError message
-        $.screenReaderFlashMessage message
+      isntPreviousFolder = @props.currentFolder? and (@previousIdentifier? isnt @props.currentFolder.get('id').toString())
+      isPreviewForFile = @props.name isnt 'rootFolder' and @props.query.preview? and @previousIdentifier isnt @props.query.preview
+
+      if isntPreviousFolder or isPreviewForFile
+        @previousIdentifier = @props.currentFolder?.get('id').toString() or @props.query.preview.toString()
+
+        unless isPreviewForFile
+          message = I18n.t('This folder is currently locked and unavailable to view.')
+          $.flashError message
+          $.screenReaderFlashMessage message
 
         setTimeout(=>
-          @transitionTo filesEnv.baseUrl, {}, {}
+          @transitionTo filesEnv.baseUrl, {}, @props.query
         , 0)
 
     render: withReactDOM ->
