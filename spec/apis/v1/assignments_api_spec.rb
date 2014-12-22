@@ -796,7 +796,7 @@ describe AssignmentsApiController, type: :request do
           action: 'show',
           format:'json',
           course_id: @course.id.to_s,
-          id: assignment_id.to_s 
+          id: assignment_id.to_s
         }, {needs_grading_count_by_section: 'true'})
       expect(show_json.keys).to include("needs_grading_count_by_section")
     end
@@ -1799,6 +1799,17 @@ describe AssignmentsApiController, type: :request do
         expect(json['due_at']).to eq @assignment.due_at.iso8601.to_s
         expect(json['unlock_at']).to eq @assignment.unlock_at.iso8601.to_s
         expect(json['lock_at']).to eq @assignment.lock_at.iso8601.to_s
+      end
+
+      it "returns has_overrides correctly" do
+        @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
+        json = api_get_assignment_in_course(@assignment, @course)
+        expect(json['has_overrides']).to eq false
+
+        @section = @course.course_sections.create! :name => "afternoon delight"
+        create_override_for_assignment
+        json = api_get_assignment_in_course(@assignment, @course)
+        expect(json['has_overrides']).to eq true
       end
 
       it "returns all_dates when requested" do

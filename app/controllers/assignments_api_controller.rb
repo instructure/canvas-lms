@@ -256,6 +256,11 @@
 #           "example": "2012-07-01T23:59:00-06:00",
 #           "type": "datetime"
 #         },
+#         "has_overrides": {
+#           "description": "whether this assignment has overrides",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "all_dates": {
 #           "description": "(Optional) all dates associated with the assignment, if applicable",
 #           "type": "array",
