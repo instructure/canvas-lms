@@ -25,6 +25,9 @@ exclude
 /www/images
 /www/src
 /www/vendor
+/www/node_modules
 /vendor/js/rsvp.js
 /src/js/config/environments/development_local.js
+/src/js/bundles/notifications.js
 /dist
+npm-debug.log

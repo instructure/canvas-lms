@@ -131,15 +131,21 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
-  def external_tools_display_hashes(type)
-    tools = ContextExternalTool.all_tools_for(@context, :type => type,
+  def external_tools_display_hashes(type, context=@context, custom_settings=[])
+    context = context.account if context.is_a?(User)
+    tools = ContextExternalTool.all_tools_for(context, :type => type,
       :root_account => @domain_root_account, :current_user => @current_user)
+
+    extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
-      {
+      hash = {
           :title => tool.label_for(type),
-          :icon_url => tool.extension_setting(type, :icon_url),
-          :base_url => course_external_tool_path(@context, tool, :launch_type => type)
+          :base_url => named_context_url(context, :context_external_tool_path, tool, :launch_type => type)
       }
+      extension_settings.each do |setting|
+        hash[setting] = tool.extension_setting(type, setting)
+      end
+      hash
     end
   end
 
@@ -1044,6 +1050,8 @@ class ApplicationController < ActionController::Base
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{message: 'Invalid access token.'}] }
+    when ActionController::ParameterMissing
+      data = { errors: [{message: "#{exception.param} is missing"}] }
     else
       if status_code.is_a?(Symbol)
         status_code_string = status_code.to_s
@@ -1172,6 +1180,7 @@ class ApplicationController < ActionController::Base
     elsif tag.content_type == 'Rubric'
       redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
     elsif tag.content_type == 'Lti::MessageHandler'
+      url_params[:resource_link_fragment] = "ContentTag:#{tag.id}"
       redirect_to named_context_url(context, :context_basic_lti_launch_request_url, tag.content_id, url_params)
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
@@ -1219,11 +1228,21 @@ class ApplicationController < ActionController::Base
                  :redirect_return_cancel_url => success_url)
         end
 
+        substitutions = common_variable_substitutions
+        if tag.tag_type == 'context_module'
+          substitutions.merge!(
+              {
+                  '$Canvas.module.id' => tag.context_module_id,
+                  '$Canvas.moduleItem.id' => tag.id,
+              }
+          )
+        end
+
         opts = {
             launch_url: @resource_url,
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
-            custom_substitutions: common_variable_substitutions
+            custom_substitutions: substitutions
         }
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
 
@@ -1530,6 +1549,7 @@ class ApplicationController < ActionController::Base
   end
 
   def destroy_session
+    logger.info "Destroying session: #{session[:session_id]}"
     @pseudonym_session.destroy rescue true
     reset_session
   end

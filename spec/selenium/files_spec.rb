@@ -87,7 +87,7 @@ describe "common file behaviors" do
 
   before(:each) do
     course_with_teacher_logged_in
-    get "/dashboard/files"
+    get "/files"
   end
 
   context "when creating new folders" do
@@ -173,7 +173,7 @@ describe "files without s3 and forked tests" do
   before (:each) do
     @folder_name = "my folder"
     course_with_teacher_logged_in
-    get "/dashboard/files"
+    get "/files"
     wait_for_ajaximations
     add_folders(@folder_name)
     wait_for_ajaximations

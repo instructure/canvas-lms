@@ -302,7 +302,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
           expect(json['quiz_submission_questions']).to be_present
           expect(json['quiz_submission_questions'].length).to eq 1
-          expect(json['quiz_submission_questions'][0]['answer']).to eq 1658
+          expect(json['quiz_submission_questions'][0]['answer']).to eq '1658'
         end
 
         it 'should answer a TrueFalse question' do
@@ -317,7 +317,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
           expect(json['quiz_submission_questions']).to be_present
           expect(json['quiz_submission_questions'].length).to eq 1
-          expect(json['quiz_submission_questions'][0]['answer']).to eq 8403
+          expect(json['quiz_submission_questions'][0]['answer']).to eq '8403'
         end
 
         it 'should answer a ShortAnswer question' do
@@ -353,8 +353,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           expect(json['quiz_submission_questions'].length).to eq 1
           expect(json['quiz_submission_questions'][0]['answer']).to eq({
             answer1: 'red',
+            answer2: nil,
             answer3: 'green',
-            answer4: 'blue'
+            answer4: 'blue',
+            answer5: nil,
+            answer6: nil
           }.with_indifferent_access)
         end
 
@@ -371,8 +374,8 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           })
 
           expect(json['quiz_submission_questions']).to be_present
-          expect(json['quiz_submission_questions'][0]['answer'].include?(9761)).to be_truthy
-          expect(json['quiz_submission_questions'][0]['answer'].include?(5194)).to be_truthy
+          expect(json['quiz_submission_questions'][0]['answer'].include?('9761')).to be_truthy
+          expect(json['quiz_submission_questions'][0]['answer'].include?('5194')).to be_truthy
         end
 
         it 'should answer an Essay question' do
@@ -404,8 +407,15 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
           expect(json['quiz_submission_questions']).to be_present
           expect(json['quiz_submission_questions'][0]['answer']).to eq({
-            structure1: 4390,
-            event2: 599
+            structure1: '4390',
+            structure2: nil,
+            structure3: nil,
+            structure4: nil,
+            structure5: nil,
+            structure6: nil,
+            structure7: nil,
+            event1: nil,
+            event2: '599'
           }.with_indifferent_access)
         end
 
@@ -428,11 +438,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
           answer = json['quiz_submission_questions'][0]['answer']
           expect(answer
-            .include?({ answer_id: 7396, match_id: 6061 }.with_indifferent_access))
+            .include?({ answer_id: '7396', match_id: '6061' }.with_indifferent_access))
             .to be_truthy
 
           expect(answer
-            .include?({ answer_id: 4224, match_id: 3855 }.with_indifferent_access))
+            .include?({ answer_id: '4224', match_id: '3855' }.with_indifferent_access))
             .to be_truthy
         end
 
@@ -477,7 +487,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
         expect(json['quiz_submission_questions']).to be_present
         expect(json['quiz_submission_questions'].length).to eq 1
-        expect(json['quiz_submission_questions'][0]['answer']).to eq 1658
+        expect(json['quiz_submission_questions'][0]['answer']).to eq '1658'
 
         json = api_answer({
           quiz_questions: [{
@@ -488,7 +498,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
         expect(json['quiz_submission_questions']).to be_present
         expect(json['quiz_submission_questions'].length).to eq 1
-        expect(json['quiz_submission_questions'][0]['answer']).to eq 2405
+        expect(json['quiz_submission_questions'][0]['answer']).to eq '2405'
       end
 
       it 'should answer according to the published state of the question' do
@@ -520,7 +530,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
         expect(json['quiz_submission_questions']).to be_present
         expect(json['quiz_submission_questions'].length).to eq 1
-        expect(json['quiz_submission_questions'][0]['answer']).to eq 1659
+        expect(json['quiz_submission_questions'][0]['answer']).to eq '1659'
       end
 
       it 'should present errors' do
@@ -583,11 +593,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         expect(json['quiz_submission_questions']).to be_present
         expect(json['quiz_submission_questions'].length).to eq 2
         expect(json['quiz_submission_questions'].detect do |q|
-          q['id'] == question1.id
-        end['answer']).to eq 1658
+          q['id'] == "#{question1.id}"
+        end['answer']).to eq '1658'
 
         expect(json['quiz_submission_questions'].detect do |q|
-          q['id'] == question2.id
+          q['id'] == "#{question2.id}"
         end['answer']).to eq 0.0025
       end
     end

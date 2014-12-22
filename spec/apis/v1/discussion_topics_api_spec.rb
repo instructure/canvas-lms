@@ -629,7 +629,10 @@ describe DiscussionTopicsController, type: :request do
         end
 
         it "should prevent a topic with posts from setting draft state" do
-          create_entry(@topic)
+          student_in_course(:course => @course, :active_all => true)
+          create_entry(@topic, :user => @student)
+
+          @user = @teacher
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                    { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
                    { :published => "false"}, {}, {:expected_status => 400})
@@ -1215,9 +1218,10 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.message).to eq @message
     end
 
-    it "should not allow creating an entry under a topic that is closed for comments" do
+    it "should not allow students to create an entry under a topic that is closed for comments" do
       @course.enable_feature!(:draft_state)
       @topic.lock!
+      student_in_course(:course => @course, :active_all => true)
       api_call(
           :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
           { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',

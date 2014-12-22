@@ -459,6 +459,34 @@ describe CommunicationChannelsController do
         expect(@logged_user.communication_channels.all? { |cc| cc.active? }).to be_truthy
       end
 
+      it "should not allow merging with someone that's observed through a UserObserver relationship" do
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
+        @not_logged_user = @user
+        user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
+        @logged_user = @user
+
+        @not_logged_user.observers << @logged_user
+
+        user_session(@logged_user, @pseudonym)
+
+        get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
+        expect(response).to render_template('confirm_failed')
+      end
+
+      it "should not allow merging with someone that's observing through a UserObserver relationship" do
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
+        @not_logged_user = @user
+        user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
+        @logged_user = @user
+
+        @logged_user.observers << @not_logged_user
+
+        user_session(@logged_user, @pseudonym)
+
+        get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
+        expect(response).to render_template('confirm_failed')
+      end
+
       it "should not allow merging with someone that's not a merge opportunity" do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
         @not_logged_user = @user

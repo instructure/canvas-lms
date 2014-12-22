@@ -43,3 +43,23 @@ require([
     }
   });
 });
+
+require([ 'core/dispatcher', 'jasmine_react' ], function(Dispatcher, ReactSuite) {
+  var actionIndex = 0;
+
+  ReactSuite.config.getSendActionSpy = function(subject) {
+    var dispatch = Dispatcher.dispatch.bind(Dispatcher);
+
+    return {
+      original: dispatch,
+      spy: spyOn(Dispatcher, 'dispatch')
+    };
+  };
+
+  ReactSuite.config.decorateSendActionRc = function(promise) {
+    return {
+      index: ++actionIndex,
+      promise: promise
+    };
+  };
+});

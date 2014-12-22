@@ -1,7 +1,6 @@
 <% unless @read_only
     account = @context && (@context.is_a?(Account) ? @context : @context.account)
     managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
-    can_manage_admin_users = managed_accounts.present?
     account ||= managed_accounts.first
     root_account = account.root_account if account
   end
@@ -47,27 +46,32 @@
       </tr>
       <% unless @read_only %>
       <%# order important: the can_do(...) check filters out contexts that don't respond to root_account (e.g. User) %>
-      <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && can_do(@context, @current_user, :manage_students) && !@user.sis_pseudonym_for(@context.root_account)) %>
+        <% first = true %>
         <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
-          <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
+          <% if @user.grants_right?(@current_user, :rename) %>
+            <% first = false %>
+            <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
+          <% end %>
+
           <% if @user != @current_user && @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account) %>
-            |
+            <%= "|" unless first %><% first = false %>
             <% if @context && !@context.is_a?(Account) %>
               <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>
             <% else %>
               <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>
             <% end %>
           <% end %>
+
           <% if @user.grants_right?(@current_user, :merge) %>
-            | 
+            <%= "|" unless first %><% first = false %>
             <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
           <% end %>
+
           <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>
-            |
+            <%= "|" unless first %>
             <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
           <% end %>
         </td>
-      <% end %>
       <% end %>
     </table>
   </fieldset>
@@ -87,7 +91,7 @@
         <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
         <td><%= f.text_field :sortable_name %></td>
       </tr>
-      <% if can_manage_admin_users %>
+      <% if @user.grants_right?(@current_user, :manage_user_details) %>
         <tr>
           <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
           <td><%= f.time_zone_select :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone, :default => (@domain_root_account.try(:default_time_zone) || "Mountain Time (US & Canada)") %></td>

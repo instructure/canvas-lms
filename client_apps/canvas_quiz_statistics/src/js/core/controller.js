@@ -1,6 +1,7 @@
 define(function(require) {
   var quizStatistics = require('../stores/statistics');
   var quizReports = require('../stores/reports');
+  var notifications = require('../stores/notifications');
   var config = require('../config');
   var update;
 
@@ -9,6 +10,7 @@ define(function(require) {
       quizStatistics: quizStatistics.get(),
       isLoadingStatistics: quizStatistics.isLoading(),
       quizReports: quizReports.getAll(),
+      notifications: notifications.getAll()
     });
   };
 
@@ -42,6 +44,7 @@ define(function(require) {
       update = onUpdate;
       quizStatistics.addChangeListener(onChange);
       quizReports.addChangeListener(onChange);
+      notifications.addChangeListener(onChange);
 
       if (config.loadOnStartup) {
         Controller.load();

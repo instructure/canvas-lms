@@ -248,7 +248,6 @@ module Importers
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
         item.position = (context_module.item_migration_position ||= context_module.content_tags.not_deleted.map(&:position).compact.max || 0)
-        item.workflow_state = 'active'
         context_module.item_migration_position += 1
         item.save!
       end

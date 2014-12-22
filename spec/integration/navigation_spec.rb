@@ -46,6 +46,21 @@ describe "navigation" do
     expect(list[0].text).not_to match /Term/ # "
   end
 
+  it "should display custom role names" do
+    custom_teacher = custom_teacher_role("CustomTeacherRole", :account => Account.default)
+
+    course_with_teacher(:course_name => "Course 1", :user => @user, :active_all => true, :role => custom_teacher)
+    course_with_teacher(:course_name => "Course 2", :user => @user, :active_all => true)
+
+    get "/"
+    page = Nokogiri::HTML(response.body)
+    list = page.css(".menu-item-drop-column-list li")
+
+    # order of tests assumes alphabetical order of list
+    expect(list[0].text).to match /CustomTeacherRole/
+    expect(list[1].text).to match /Teacher/
+  end
+
   it "should not fail on courses where the term no longer exists" do
     get "/"
     page = Nokogiri::HTML(response.body)

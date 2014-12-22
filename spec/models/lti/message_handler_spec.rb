@@ -165,7 +165,7 @@ module Lti
           visibility: nil,
           external: true,
           hidden: false,
-          args: [account.id, @mh1.id]
+          args: {:message_handler_id=>@mh1.id, :resource_link_fragment=>"nav", "account_id"=>account.id}
         })
       end
 

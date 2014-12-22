@@ -9,8 +9,7 @@ define(function(require) {
     },
 
     parse: function(payload) {
-      var attrs = pickAndNormalize(payload, K.PROGRESS_ATTRS);
-      return attrs;
+      return pickAndNormalize(payload, K.PROGRESS_ATTRS);
     },
   });
 });

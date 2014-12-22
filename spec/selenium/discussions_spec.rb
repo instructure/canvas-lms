@@ -739,8 +739,14 @@ describe "discussions" do
         f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
         expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments'
-        expect(ff('.discussion-reply-action')).to be_empty
         expect(DiscussionTopic.last.locked?).to be_truthy
+
+        expect(ff('.discussion-reply-action')).to_not be_empty # should let teachers reply
+
+        student_in_course(:course => @course, :active_all => true)
+        user_session(@student)
+        get url
+        expect(ff('.discussion-reply-action')).to be_empty
       end
 
       it "should validate reopening the discussion for comments" do

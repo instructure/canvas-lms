@@ -71,7 +71,7 @@ require [
     model: course
     resendInvitationsUrl: ENV.resend_invitations_url
     canResend: ENV.permissions.manage_students or ENV.permissions.manage_admin_users
-  groupCategories = new (GroupCategoryCollection.extend({url: "/api/v1/courses/#{ENV.course?.id}/group_categories"}))
+  groupCategories = new (GroupCategoryCollection.extend({url: "/api/v1/courses/#{ENV.course?.id}/group_categories?per_page=50"}))
 
   rosterTabsView = new RosterTabsView
     collection: groupCategories

@@ -1,0 +1,303 @@
+/*
+@styleguide Tables
+
+### Default table
+
+```html
+<table class="ic-Table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email address</th>
+      <th>Section</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+### Row-hover table
+
+Adding **.ic-Table--hover-row** to the table element will produce a background color when the user hovers over each table row in the table body.
+
+```html
+<table class="ic-Table ic-Table--hover-row">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email address</th>
+      <th>Section</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+### Striped table
+
+Add **.ic-Table--striped** to the table element to produce a striped table among rows in the table body.
+
+```html
+<table class="ic-Table ic-Table--hover-row ic-Table--striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email address</th>
+      <th>Section</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+  </tbody>
+</table>
+```
+### Row background color options
+
+We will reserve $canvas-primary (traditionally blue) for the hover state background color.
+
+```html
+<table class="ic-Table ic-Table--hover-row">
+  <thead>
+    <tr class="ic-Table__row--bg-neutral">
+      <th>Name</th>
+      <th>Email address</th>
+      <th>Section</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="ic-Table__row--bg-success">
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr class="ic-Table__row--bg-alert">
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr class="ic-Table__row--bg-danger">
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+### Condensed table
+
+Add **.ic-Table--condensed** to the table element to reduce the default cell padding.
+
+```html
+<table class="ic-Table ic-Table--condensed">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email address</th>
+      <th>Section</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+### Table with cog (admin link dropdown)
+
+Enclose our standard Cog Dropdown within a **div class="ic-Table--actions** to right-align the button and make sure the cog dropdown appears in the right place.
+
+```html
+<table class="ic-Table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email address</th>
+      <th>Section</th>
+      <th>Role</th>
+      <th><span class="screenreader-only">Actions</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#">Paul Howard</a></td>
+      <td>paulhowardemail@gmail.com</td>
+      <td>Advanced students</td>
+      <td>Student</td>
+      <td>
+        <div class="ic-Table__actions">
+          <a class="al-trigger btn btn-small" role="button" href="#">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">Actions</span>
+          </a>
+          <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+            <li role="presentation">
+              <a href="#" class="icon-edit" id="toolbar-2" tabindex="-1" role="menuitem">Edit student</a>
+            </li>
+            <li role="presentation">
+              <a href="#" class="icon-trash" id="toolbar-3" tabindex="-1" role="menuitem">Delete student</a>
+            </li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+```
+
+*/
+
+$sp-table: 14px; // Will replace this with global spacing variable, when it hits master
+
+//ic-Tab__Panel--is-open
+
+.ic-Table {
+  max-width: 100%;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  th, td {
+    padding: $sp-table $sp-table/2;
+    line-height: 1.3;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+  }
+
+  tr {
+    &.ic-Table__row--bg-neutral { background-color: $can-bg-light-neutral; }
+    &.ic-Table__row--bg-success { background-color: $can-bg-light-success; }
+    &.ic-Table__row--bg-alert { background-color: $can-bg-light-alert; }
+    &.ic-Table__row--bg-danger { background-color: $can-bg-light-danger; }
+  }
+  
+  th {
+    border-bottom-color: $can-border-dark;
+    padding-bottom: $sp-table/2;
+    font-weight: bold;
+  }
+  
+  td { 
+    border-bottom-color: $can-border-light;
+    // If you need to add admin links to the far-right cell, enclose them in .ic-Table--actions
+    .ic-Table__actions {
+      position: relative;
+      text-align: right;
+    }
+  }
+  
+  &.ic-Table--condensed {
+    th, td { padding: $sp-table/2; }
+    th { padding-bottom: $sp-table/4; }
+  }
+  
+  &.ic-Table--striped {
+    tbody {
+      tr:nth-child(odd) { background-color: $can-bg-light-neutral; }
+    }
+  }
+  
+  &.ic-Table--hover-row {
+    tbody {
+      // High contrast UI uses left and right borders to show row hover state
+      @if $use_high_contrast {
+        tr {
+          transition: border-color 0.3s;
+          border: 4px solid transparent;
+          border-top: none; border-bottom: none;
+          &:hover { border-color: $canvas-primary; }
+        }
+      }
+      
+      // Regular UI uses zebra stripes
+      @else {
+        tr { transition: background-color 0.3s; }
+        tr,
+        tr.ic-Table__row--bg-neutral,
+        tr.ic-Table__row--bg-success,
+        tr.ic-Table__row--bg-alert,
+        tr.ic-Table__row--bg-danger {
+          &:hover { background-color: $can-bg-light-primary; }
+        }
+      }
+    
+    }  
+  }
+}

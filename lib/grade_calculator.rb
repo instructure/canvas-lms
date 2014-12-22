@@ -26,9 +26,8 @@ class GradeCalculator
       @course = course :
       @course = Course.find(course)
     @course_id = @course.id
-    assignment_scope = AssignmentGroup.assignment_scope_for_draft_state(@course)
-    @groups = @course.assignment_groups.active.includes(assignment_scope)
-    @assignments = @groups.flat_map(&assignment_scope).select(&:graded?)
+    @groups = @course.assignment_groups.active.includes(:published_assignments)
+    @assignments = @groups.flat_map(&:published_assignments).select(&:graded?)
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}
     @final_updates = {}

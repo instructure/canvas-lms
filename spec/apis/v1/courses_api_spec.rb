@@ -2151,6 +2151,20 @@ describe CoursesController, type: :request do
         { :controller => "courses", :action => "create_file", :format => "json", :course_id => @course.to_param, },
         { :name => 'failboat.txt' }, {}, :expected_status => 401)
     end
+
+    it "should create the file in unlocked state if :usage_rights_required is disabled" do
+      @course.disable_feature! 'usage_rights_required'
+      preflight({ :name => 'test' })
+      attachment = Attachment.order(:id).last
+      expect(attachment.locked).to be_falsy
+    end
+
+    it "should create the file in locked state if :usage_rights_required is enabled" do
+      @course.enable_feature! 'usage_rights_required'
+      preflight({ :name => 'test' })
+      attachment = Attachment.order(:id).last
+      expect(attachment.locked).to be_truthy
+    end
   end
 
   describe "/settings" do

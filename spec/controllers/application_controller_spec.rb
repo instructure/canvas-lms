@@ -370,6 +370,20 @@ describe ApplicationController do
       end
     end
   end
+
+  describe 'content_tag_redirect' do
+
+    it 'redirects for lti_message_handler' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Lti::MessageHandler')
+      controller.expects(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {:module_item_id => 42, resource_link_fragment: 'ContentTag:42'}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+
+    end
+
+  end
+
 end
 
 describe ApplicationController do

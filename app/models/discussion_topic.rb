@@ -602,15 +602,16 @@ class DiscussionTopic < ActiveRecord::Base
     true
   end
 
-  def can_unpublish?
+  def can_unpublish?(opts={})
     if self.assignment
       !self.assignment.has_student_submissions?
-    elsif self.for_group_discussion?
-      self.child_topics.all? do |child|
-        child.discussion_subentry_count == 0
-      end
     else
-      self.discussion_subentry_count == 0
+      student_ids = opts[:student_ids] || self.context.all_real_students.pluck(:id)
+      if self.for_group_discussion?
+        !(self.child_topics.any? { |child| child.discussion_entries.active.where(:user_id => student_ids).exists? })
+      else
+        !self.discussion_entries.active.where(:user_id => student_ids).exists?
+      end
     end
   end
 
@@ -753,7 +754,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.closed_for_comment_for?(user) }
+    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.closed_for_comment_for?(user, :check_policies => true) }
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
@@ -765,11 +766,11 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.active? && self.context.grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.active? && !self.closed_for_comment_for?(user) &&
+    given { |user, session| !self.closed_for_comment_for?(user, :check_policies => true) &&
         self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :reply and can :read
 
-    given { |user, session| self.active? && self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :read
 
     given { |user, session|
@@ -850,7 +851,7 @@ class DiscussionTopic < ActiveRecord::Base
     tags_to_update = self.context_module_tags.to_a
     if self.for_assignment?
       tags_to_update += self.assignment.context_module_tags
-      self.ensure_submission(user) if assignment.grants_right?(user, :submit) && action == :contributed
+      self.ensure_submission(user) if context.grants_right?(user, :participate_as_student) && assignment.visible_to_user?(user) && action == :contributed
     end
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
@@ -984,7 +985,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def closed_for_comment_for?(user, opts={})
-    return true if self.locked?
+    return true if self.locked? && !(opts[:check_policies] && self.grants_right?(user, :update))
     lock = self.locked_for?(user, opts)
     return false unless lock
     return false if self.draft_state_enabled? && lock.include?(:unlock_at)

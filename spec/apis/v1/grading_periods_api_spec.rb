@@ -20,21 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe GradingPeriodsController, type: :request do
   before :once do
-    @account = Account.default
-    @account.set_feature_flag!(:multiple_grading_periods, 'on')
-    account_admin_user(account: @account)
-    user_session(@admin)
+    account_with_grading_periods
   end
 
   describe 'GET index' do
-    before :once do
-      now = Time.zone.now
-      gps = 3.times.map do |n|
-        @account.grading_periods.create!(weight: 50, start_date: n.month.since(now), end_date: (n+1).month.since(now))
-      end
-      gps.last.destroy
-    end
-
     def get_index(raw = false, data = {}, headers = {})
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
@@ -51,8 +40,6 @@ describe GradingPeriodsController, type: :request do
 
       periods_json.each do |period|
         expect(period).to have_key('id')
-        expect(period).to have_key('account_id')
-        expect(period).to have_key('course_id')
         expect(period).to have_key('weight')
         expect(period).to have_key('start_date')
         expect(period).to have_key('end_date')
@@ -71,9 +58,7 @@ describe GradingPeriodsController, type: :request do
 
   describe 'GET show' do
     before :once do
-      now = Time.zone.now
-      @grading_period = @account.grading_periods.create!(weight: 50, start_date: 1.month.since(now), end_date: 2.month.since(now),
-        title: "Grading Period Title")
+      @grading_period = @account.grading_periods.first
     end
 
     def get_show(raw = false, data = {})
@@ -81,8 +66,8 @@ describe GradingPeriodsController, type: :request do
       helper.call(:get,
                   "/api/v1/accounts/#{@account.id}/grading_periods/#{@grading_period.id}",
       { controller: 'grading_periods', action: 'show', format: 'json',
-        account_id: @account.id.to_s,
-        id: @grading_period.id.to_s,
+        account_id: @account.id,
+        id: @grading_period.id,
       }, data)
     end
 
@@ -90,7 +75,6 @@ describe GradingPeriodsController, type: :request do
       json = get_show
       period = json['grading_periods'].first
       expect(period['id']).to eq(@grading_period.id.to_s)
-      expect(period['account_id']).to eq(@account.id.to_s)
       expect(period['weight']).to eq(@grading_period.weight)
       expect(period['title']).to eq(@grading_period.title)
     end
@@ -107,21 +91,21 @@ describe GradingPeriodsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/accounts/#{@account.id}/grading_periods",
-                  { controller: 'grading_periods', action: 'create', format: 'json', account_id: @account.id },
+                  { controller: 'grading_periods', action: 'create', format: 'json',
+                    account_id: @account.id },
                   { grading_periods: [params] }, {}, {})
     end
 
     it "creates a grading period successfully" do
       now = Time.zone.now
       post_create(weight: 99, start_date: 1.month.since(now), end_date: 2.month.since(now))
-      expect(@account.grading_periods.first.weight).to eq(99)
+      expect(@account.grading_periods.last.weight).to eq(99)
     end
   end
 
   describe 'PUT update' do
     before :once do
-      now = Time.zone.now
-      @grading_period = @account.grading_periods.create!(weight: 50, start_date: 1.month.since(now), end_date: 2.month.since(now))
+      @grading_period = @account.grading_periods.find { |g| g.workflow_state == "active" }
     end
 
     def put_update(params, raw=false)
@@ -130,13 +114,14 @@ describe GradingPeriodsController, type: :request do
       helper.call(:put,
                   "/api/v1/accounts/#{@account.id}/grading_periods/#{@grading_period.id}",
       { controller: 'grading_periods', action: 'update', format: 'json',
-        account_id: @account.id.to_s,
-        id: @grading_period.id.to_s },
+        account_id: @account.id,
+        id: @grading_period.id },
         { grading_periods: [params] }, {}, {})
 
     end
 
     it "updates a grading period successfully" do
+      expect(@grading_period.weight).to_not eq(80)
       put_update(weight: 80)
       expect(@grading_period.reload.weight).to eq(80)
     end
@@ -150,8 +135,7 @@ describe GradingPeriodsController, type: :request do
 
   describe 'DELETE destroy' do
     before :once do
-      now = Time.zone.now
-      @grading_period = @account.grading_periods.create!(weight: 50, start_date: 1.month.since(now), end_date: 2.month.since(now))
+      @grading_period = @account.grading_periods.find { |g| g.workflow_state == "active" }
     end
 
     def delete_destroy

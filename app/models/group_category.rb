@@ -80,8 +80,10 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  Bookmarker = BookmarkedCollection::SimpleBookmarker.new(GroupCategory, :name, :id)
+  
+  scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(:deleted_at => nil) }
-
   scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
 
   class << self
@@ -149,7 +151,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def protected?
-    self.role.present?
+    self.role.present? && self.role != 'imported'
   end
 
   # Group categories generally restrict students to only be in one group per
@@ -192,6 +194,10 @@ class GroupCategory < ActiveRecord::Base
 
   def group_for(user)
     groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
+  end
+
+  def is_member?(user)
+    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).any?
   end
 
   alias_method :destroy!, :destroy

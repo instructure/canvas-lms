@@ -16,7 +16,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
   end
 
   let :input do
-    [ 9761 ]
+    [ '9761' ]
   end
 
   let :output do

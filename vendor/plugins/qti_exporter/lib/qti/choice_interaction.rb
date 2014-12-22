@@ -182,7 +182,7 @@ class ChoiceInteraction < AssessmentItemConverter
     end
 
     #Check if there are correct answers explicitly specified
-    @doc.css('correctResponse > value').each do |correct_id|
+    @doc.css('correctResponse > value, correctResponse > Value').each do |correct_id|
       correct_id = correct_id.text if correct_id
       if correct_id && answer = answers_hash[correct_id]
         answer[:weight] = DEFAULT_CORRECT_WEIGHT

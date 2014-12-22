@@ -41,8 +41,7 @@ class AccountUser < ActiveRecord::Base
 
   alias_method :context, :account
 
-  DEFAULT_BASE_ROLE_TYPE = 'AccountMembership'
-  BASE_ROLE_TYPES = ['AccountAdmin', 'AccountMembership']
+
 
   def update_account_associations_if_changed
     if (self.account_id_changed? || self.user_id_changed?)

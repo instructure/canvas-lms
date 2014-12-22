@@ -73,18 +73,12 @@ shared_examples_for "settings basic tests" do
       course_quota_input = f('[name="default_storage_quota_mb"]')
       expect(course_quota_input).to have_value(course_quota.to_s)
 
-      user_quota = account.default_user_storage_quota_mb
-      user_quota_input = f('[name="default_user_storage_quota_mb"]')
-      expect(user_quota_input).to have_value(user_quota.to_s)
-
       group_quota = account.default_group_storage_quota_mb
       group_quota_input = f('[name="default_group_storage_quota_mb"]')
       expect(group_quota_input).to have_value(group_quota.to_s)
 
       course_quota += 25
       replace_content(course_quota_input, course_quota.to_s)
-      user_quota += 15
-      replace_content(user_quota_input, user_quota.to_s)
       group_quota += 42
       replace_content(group_quota_input, group_quota.to_s)
 
@@ -95,16 +89,39 @@ shared_examples_for "settings basic tests" do
       account.reload
       expect(account.default_storage_quota_mb).to eq course_quota
       expect(account.default_storage_quota).to eq course_quota * 1048576
-      account.default_user_storage_quota_mb == user_quota
-      expect(account.default_user_storage_quota).to eq user_quota * 1048576
       account.default_group_storage_quota_mb == group_quota
       expect(account.default_group_storage_quota).to eq group_quota * 1048576
 
       # ensure the new value is reflected after a refresh
       get account_settings_url
       expect(fj('[name="default_storage_quota_mb"]')).to have_value(course_quota.to_s) # fj to avoid selenium caching
-      expect(fj('[name="default_user_storage_quota_mb"]')).to have_value(user_quota.to_s) # fj to avoid selenium caching
       expect(fj('[name="default_group_storage_quota_mb"]')).to have_value(group_quota.to_s) # fj to avoid selenium caching
+    end
+
+    it "should change the default user quota" do
+      if account.root_account?
+        f('#tab-quotas-link').click
+
+        # update the quotas
+        user_quota = account.default_user_storage_quota_mb
+        user_quota_input = f('[name="default_user_storage_quota_mb"]')
+        expect(user_quota_input).to have_value(user_quota.to_s)
+
+        user_quota += 15
+        replace_content(user_quota_input, user_quota.to_s)
+
+        submit_form('#default-quotas')
+        wait_for_ajax_requests
+
+        # ensure the account was updated properly
+        account.reload
+        account.default_user_storage_quota_mb == user_quota
+        expect(account.default_user_storage_quota).to eq user_quota * 1048576
+
+        # ensure the new value is reflected after a refresh
+        get account_settings_url
+        expect(fj('[name="default_user_storage_quota_mb"]')).to have_value(user_quota.to_s) # fj to avoid selenium caching
+      end
     end
 
     it "should manually change a course quota" do

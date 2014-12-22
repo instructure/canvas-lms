@@ -8,6 +8,18 @@ define(function(require) {
   var fudgeDateForProfileTimezone = DateTimeHelpers.fudgeDateForProfileTimezone;
 
   return {
+    getLabel: function(reportType) {
+      if (reportType === STUDENT_ANALYSIS) {
+        return I18n.t('student_analysis', 'Student Analysis');
+      }
+      else if (reportType === ITEM_ANALYSIS) {
+        return I18n.t('item_analysis', 'Item Analysis');
+      }
+      else {
+        return reportType;
+      }
+    },
+
     getInteractionLabel: function(report) {
       var label;
       var type = report.reportType;

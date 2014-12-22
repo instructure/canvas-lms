@@ -38,6 +38,7 @@ class ActiveRecord::Base
     'enrollment_terms' => %w(sis_data sis_name ignore_term_date_restrictions),
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections role_name),
     'failed_jobs' => %w(original_id),
+    'grading_periods' => %w(course_id account_id),
     'groups' => %w(sis_name type groupable_id groupable_type),
     'notification_policies' => %w(user_id broadcast),
     'page_views' => %w(contributed),

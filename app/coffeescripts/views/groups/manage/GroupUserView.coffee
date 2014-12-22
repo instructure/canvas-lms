@@ -1,8 +1,9 @@
 define [
+  'i18n!groups'
   'underscore'
   'Backbone'
   'jst/groups/manage/groupUser'
-], (_, {View}, template) ->
+], (I18n, _, {View}, template) ->
 
   class GroupUserView extends View
 
@@ -14,6 +15,8 @@ define [
     className: 'group-user'
 
     template: template
+    attributes:
+      "data-tooltip": "top"
 
     els:
       '.al-trigger': '$userActions'
@@ -25,6 +28,7 @@ define [
       @model.on 'change', @render, this
 
     afterRender: ->
+      @$el.attr("title", I18n.t('Sections: %{sections}', sections: @model.get('sections')))
       @$el.data('model', @model)
 
     highlight: ->

@@ -59,8 +59,9 @@ module Lti
                              when Account
                                :account_basic_lti_launch_request_path
                            end
-
       apps.sort_by(&:id).map do |app|
+        args = {message_handler_id: app.id, resource_link_fragment: "nav"}
+        args["#{context.class.name.downcase}_id"] = context.id
         {
           :id => app.asset_string,
           :label => app.resource_handler.name,
@@ -69,7 +70,7 @@ module Lti
           :visibility => nil,
           :external => true,
           :hidden => false,
-          :args => [context.id, app.id]
+          :args => args
         }
       end
     end

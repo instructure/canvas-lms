@@ -273,6 +273,24 @@ describe SIS::CSV::UserImporter do
     expect(p.valid_ssha?('changedpassword')).to be_truthy
   end
 
+  it "should recognize integration_id and work" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status,ssha_password,integration_id",
+        "user_2,user2,User,Dos,user@example.com,active,#{gen_ssha_password("password")}, 9000"
+    )
+    user2 = Pseudonym.by_unique_id('user2').first.user
+    expect(user2.pseudonym.integration_id).to eq "9000"
+  end
+
+  it "should recognize there's no integration_id and still work" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status,ssha_password",
+        "user_2,user2,User,Dos,user@example.com,active,#{gen_ssha_password("password")}"
+    )
+    user2 = Pseudonym.by_unique_id('user2').first.user
+    expect(user2.pseudonym.integration_id).to be_nil
+  end
+
   it "should allow setting and resetting of passwords" do
     expect(CommunicationChannel.by_path("user1@example.com").first).to be_nil
     expect(CommunicationChannel.by_path("user2@example.com").first).to be_nil

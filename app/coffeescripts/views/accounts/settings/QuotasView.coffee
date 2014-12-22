@@ -31,6 +31,11 @@ define [
       @on('fail', @submitFail)
       super
 
+    toJSON: ->
+      data = super
+      data.root_account = @model.get('root_account')
+      data
+
     submitSuccess: ->
       $.flashMessage(I18n.t('default_account_quotas_updated', 'Default account quotas updated'))
 

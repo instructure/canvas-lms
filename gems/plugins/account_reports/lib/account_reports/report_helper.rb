@@ -104,7 +104,15 @@ module AccountReports::ReportHelper
     end
   end
 
-  def add_course_sub_account_scope(scope,table = 'courses')
+  def add_course_scope(scope, table = 'courses')
+    if course
+      scope.where(table => {:id => course.id})
+    else
+      scope
+    end
+  end
+
+  def add_course_sub_account_scope(scope, table = 'courses')
     if account != root_account
       scope.where("EXISTS (SELECT course_id
                            FROM course_account_associations caa

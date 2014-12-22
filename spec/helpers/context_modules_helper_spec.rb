@@ -45,9 +45,10 @@ describe ContextModulesHelper do
       topic = t_course.discussion_topics.create
       topic.workflow_state = 'active'
       topic.save!
+      student_in_course(:course => t_course)
       item = t_module.add_item(type: 'discussion_topic', id: topic.id)
       expect(module_item_unpublishable?(item)).to be_truthy
-      topic.discussion_entries.create!
+      topic.discussion_entries.create!(:user => @student)
       expect(module_item_unpublishable?(item)).to be_falsey
     end
   end

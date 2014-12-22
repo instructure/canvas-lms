@@ -141,7 +141,7 @@
 
 .btn-group > [class*="btn"].active {
   &:focus {
-    @include button-focus;
+    @if $use_high_contrast { @include button-focus; }
   }
 
 }

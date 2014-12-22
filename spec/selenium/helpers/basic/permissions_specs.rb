@@ -59,24 +59,63 @@ shared_examples_for "permission tests" do
       role_name = "an account role"
 
       f("#account_role_link").click
-      f('#account-roles-tab .new-role a.dropdown-toggle').click
-      f('#account-roles-tab .new-role form input').send_keys(role_name)
-      f('#account-roles-tab .new-role button').click
+      f('#account-roles-tab a.add_role_link').click
+      wait_for_ajaximations
+      fj('form input:visible').send_keys(role_name)
+      fj('form button.btn-primary:visible').click
       wait_for_ajaximations
 
       expect(f('#account-roles-tab')).to include_text(role_name)
+      new_role = Role.last
+      expect(new_role.name).to eq role_name
+      expect(new_role.account_role?).to be_truthy
     end
 
     it "adds a new course role" do
       role_name = "a course role"
 
       f("#course_role_link").click
-      f('#course-roles-tab .new-role a.dropdown-toggle').click
-      f('#course-roles-tab .new-role form input').send_keys(role_name)
-      f('#course-roles-tab .new-role button').click
+      f('#course-roles-tab a.add_role_link').click
+      fj('form input:visible').send_keys(role_name)
+      fj('form button.btn-primary:visible').click
       wait_for_ajaximations
 
       expect(f('#course-roles-tab')).to include_text(role_name)
+      new_role = Role.last
+      expect(new_role.name).to eq role_name
+      expect(new_role.course_role?).to be_truthy
+    end
+  end
+
+  describe "Editing roles" do
+    it "edits an account role" do
+      role = add_new_account_role("name")
+      get url
+      f("#account_role_link").click
+      fj(".roleHeader a.edit_role:visible").click
+      fj('form input:visible').clear
+      fj('form input:visible').send_keys("newname")
+      fj('form button.btn-primary:visible').click
+      wait_for_ajaximations
+
+      expect(f('#account-roles-tab')).to include_text("newname")
+      role.reload
+      expect(role.name).to eq "newname"
+    end
+
+    it "edits a course role" do
+      role = add_new_course_role("name")
+      get url
+      f("#course_role_link").click
+      fj(".roleHeader a.edit_role:visible").click
+      fj('form input:visible').clear
+      fj('form input:visible').send_keys("newname")
+      fj('form button.btn-primary:visible').click
+      wait_for_ajaximations
+
+      expect(f('#course-roles-tab')).to include_text("newname")
+      role.reload
+      expect(role.name).to eq "newname"
     end
   end
 
@@ -85,17 +124,19 @@ shared_examples_for "permission tests" do
       let!(:role_name) { "delete this account role" }
 
       before do
-        add_new_account_role role_name
+        @role = add_new_account_role(role_name)
         get url
       end
 
       it "deletes a role" do
         f("#account_role_link").click
-        f(".roleHeader a").click
+        f(".roleHeader a.delete_role").click
         driver.switch_to.alert.accept
         wait_for_ajaximations
 
         expect(f('#account-roles-tab')).not_to include_text(role_name)
+        @role.reload
+        expect(@role.inactive?).to be_truthy
       end
     end
 
@@ -103,17 +144,19 @@ shared_examples_for "permission tests" do
       let!(:role_name) { "delete this course role" }
 
       before do
-        add_new_course_role role_name
+        @role = add_new_course_role(role_name)
         get url
       end
 
       it "deletes a role" do
         f("#course_role_link").click
-        f(".roleHeader a").click
+        f(".roleHeader a.delete_role").click
         driver.switch_to.alert.accept
         wait_for_ajaximations
 
         expect(f('#course-roles-tab')).not_to include_text(role_name)
+        @role.reload
+        expect(@role.inactive?).to be_truthy
       end
     end
   end

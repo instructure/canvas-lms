@@ -49,16 +49,17 @@ define([
         "correction-row": true,
         "ignore-row": assignment.please_ignore
       })
+      var nameTooLongError = assignmentUtils.nameTooLong(assignment) && !assignment.please_ignore
       var nameError = assignmentUtils.notUniqueName(assignmentList, assignment) && !assignment.please_ignore
       var dueAtError = !assignment.due_at && !assignment.please_ignore
-      var anyError = nameError || dueAtError
+      var anyError = nameError || dueAtError || nameTooLongError
       return (
         <div className={rowClass}>
           <div className="span3 input-container">
             {anyError || assignment.please_ignore ? null : <i className="success-mark icon-check" />}
             <div
               className={React.addons.classSet({
-                "error-circle": nameError
+                "error-circle": nameError || nameTooLongError
               })}
             />
             <input
@@ -70,6 +71,7 @@ define([
               onChange={this.updateAssignmentName}
             />
             {nameError ? <div className="hint-text">The assignment name must be unique</div> : ""}
+            {nameTooLongError ? <div className="hint-text">The name must be under 30 characters</div> : ""}
           </div>
 
           <div className="span2 date_field_container input-container">

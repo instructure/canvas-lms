@@ -110,7 +110,7 @@ class Announcement < DiscussionTopic
     :topic_is_announcement
   end
 
-  def can_unpublish?
+  def can_unpublish?(opts=nil)
     false
   end
 

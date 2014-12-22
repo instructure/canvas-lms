@@ -50,6 +50,7 @@ module.exports = function() {
   grunt.appName = 'Canvas Quiz Statistics';
   grunt.moduleId = 'canvas_quiz_statistics';
   grunt.paths = {
+    root: __dirname,
     canvasPackageShims: 'tmp/canvas_package_shims.json'
   };
 

@@ -14,7 +14,7 @@ define [
     @optionProperty 'category'
 
     url: ->
-      @url = "/api/v1/groups/#{@group.id}/users?per_page=50"
+      @url = "/api/v1/groups/#{@group.id}/users?per_page=50&include[]=sections&exclude[]=pseudonym"
 
     initialize: (models) ->
       super

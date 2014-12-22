@@ -82,7 +82,7 @@ define [
 
     loginErrors: (errors) ->
       errors = errors.base
-      error = errors[errors.length - 1].message
+      error = errors[errors.length - 1]
       {'pseudonym[password]': error}
 
     enrollErrors: (errors) =>

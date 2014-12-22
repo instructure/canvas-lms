@@ -25,7 +25,7 @@ module Lti
     def show
       uuid = "339b6700-e4cb-47c5-a54f-3ee0064921a9" #Hard coded until we start persisting the tcp
       profile = Lti::ToolConsumerProfileCreator.new(@context, tool_consumer_profile_url(uuid)).create
-      render json: profile.to_json, :content_type => 'application/json'
+      render json: profile.to_json, :content_type => 'application/vnd.ims.lti.v2.toolconsumerprofile+json'
     end
 
     private

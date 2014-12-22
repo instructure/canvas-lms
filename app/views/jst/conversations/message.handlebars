@@ -1,14 +1,14 @@
-<b class="author">{{list participants propName="name" limit=2}}</b>
+<h2 class="author">{{list participants propName="name" limit=2}}</h2>
 
 <span class="date pull-right">{{friendlyDatetime timestamp}}</span>
 
-<p class="subject">
+<h3 class="subject">
   {{#if subject}}
     {{subject}}
   {{else}}
     ({{#t "no_subject"}}No subject{{/t}})
   {{/if}}
-</p>
+</h3>
 
 <span class="message-count label">
   {{message_count}}

@@ -176,43 +176,63 @@ describe ContextModulesController do
       get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
       assert_unauthorized
     end
-    
-    it "should find a matching tool" do
-      user_session(@student)
-      
-      @module = @course.context_modules.create!
-      @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool2 = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
-      tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
-      expect(tag1.content_id).to eq @tool1.id
-      tag1.publish if tag1.unpublished?
-      tag2 = @module.add_item :type => 'context_external_tool', :id => @tool2.id, :url => @tool2.url
-      expect(tag2.content_id).to eq @tool2.id
-      tag2.publish if tag2.unpublished?
+    context 'ContextExternalTool' do
+      it "should find a matching tool" do
+        user_session(@student)
 
-      get 'item_redirect', :course_id => @course.id, :id => tag1.id
-      expect(response).not_to be_redirect
-      expect(assigns[:tool]).to eq @tool1
-      
-      get 'item_redirect', :course_id => @course.id, :id => tag2.id
-      expect(response).not_to be_redirect
-      expect(assigns[:tool]).to eq @tool2
-    end
-    
-    it "should fail if there is no matching tool" do
-      user_session(@student)
-      
-      @module = @course.context_modules.create!
-      @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @module = @course.context_modules.create!
+        @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool2 = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
-      tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
-      tag1.publish if tag1.unpublished?
-      @tool1.update_attribute(:url, 'http://www.example.com')
-      
-      get 'item_redirect', :course_id => @course.id, :id => tag1.id
-      expect(response).to be_redirect
-      expect(assigns[:tool]).to eq nil
+        tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
+        expect(tag1.content_id).to eq @tool1.id
+        tag1.publish if tag1.unpublished?
+        tag2 = @module.add_item :type => 'context_external_tool', :id => @tool2.id, :url => @tool2.url
+        expect(tag2.content_id).to eq @tool2.id
+        tag2.publish if tag2.unpublished?
+
+        get 'item_redirect', :course_id => @course.id, :id => tag1.id
+        expect(response).not_to be_redirect
+        expect(assigns[:tool]).to eq @tool1
+
+        get 'item_redirect', :course_id => @course.id, :id => tag2.id
+        expect(response).not_to be_redirect
+        expect(assigns[:tool]).to eq @tool2
+      end
+
+      it "generate lti params" do
+        user_session(@student)
+
+        @module = @course.context_modules.create!
+        @tool = @course.context_external_tools.create!(
+            :name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret',
+            custom_fields: {'canvas_module_id' => '$Canvas.module.id', 'canvas_module_item_id' => '$Canvas.moduleItem.id'}
+        )
+
+        tag = @module.add_item :type => 'context_external_tool', :id => @tool.id, :url => @tool.url
+        tag.publish if tag.unpublished?
+
+        get 'item_redirect', :course_id => @course.id, :id => tag.id
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['custom_canvas_module_id']).to eq @module.id.to_s
+        expect(lti_launch.params['custom_canvas_module_item_id']).to eq tag.id.to_s
+      end
+
+      it "should fail if there is no matching tool" do
+        user_session(@student)
+
+        @module = @course.context_modules.create!
+        @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+
+        tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => @tool1.url
+        tag1.publish if tag1.unpublished?
+        @tool1.update_attribute(:url, 'http://www.example.com')
+
+        get 'item_redirect', :course_id => @course.id, :id => tag1.id
+        expect(response).to be_redirect
+        expect(assigns[:tool]).to eq nil
+      end
     end
     
     it "should redirect to an assignment page" do

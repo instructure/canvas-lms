@@ -124,6 +124,20 @@ describe Quizzes::QuizStatistics do
     expect(stats.generate_csv).to eq attachment
   end
 
+  it 'could possibly tell whether CSV generation has gone bananas' do
+    stats = @quiz.current_statistics_for 'student_analysis'
+
+    Quizzes::QuizStatistics::StudentAnalysis.any_instance.stubs(:to_csv) {
+      throw 'totally bananas'
+    }
+
+    stats.generate_csv_in_background
+    run_jobs
+    stats.reload
+
+    expect(stats.csv_generation_failed?).to be_truthy
+  end
+
   describe 'self#large_quiz?' do
     let :quiz_questions do
       Object.new.tap { |o| o.stubs(size: 50) }

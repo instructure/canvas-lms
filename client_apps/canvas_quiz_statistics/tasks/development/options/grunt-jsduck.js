@@ -12,6 +12,7 @@ module.exports = {
       'tests': false,
       'processes': 2,
       'warnings': [],
+      'guides': 'doc/guides.json',
       'tags': grunt.file.expand('doc/ext/jsduck/tags/*.rb'),
       'external': [
         'React',

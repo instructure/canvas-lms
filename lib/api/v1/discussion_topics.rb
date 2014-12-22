@@ -39,10 +39,10 @@ module Api::V1::DiscussionTopics
   # session - The current session.
   #
   # Returns an array of hashes.
-  def discussion_topics_api_json(topics, context, user, session)
+  def discussion_topics_api_json(topics, context, user, session, opts={})
     topics.inject([]) do |result, topic|
       if topic.visible_for?(user, check_policies: true)
-        result << discussion_topic_api_json(topic, context, user, session)
+        result << discussion_topic_api_json(topic, context, user, session, opts)
       end
 
       result
@@ -64,8 +64,9 @@ module Api::V1::DiscussionTopics
       override_dates: true
     )
 
+    opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
     json = api_json(topic, user, session, {only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
-    json.merge!(serialize_additional_topic_fields(topic, context, user))
+    json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
 
     if hold = topic.subscription_hold(user, @context_enrollment, session)
       json[:subscription_hold] = hold
@@ -87,7 +88,7 @@ module Api::V1::DiscussionTopics
   # user - Requesting user.
   #
   # Returns a hash.
-  def serialize_additional_topic_fields(topic, context, user)
+  def serialize_additional_topic_fields(topic, context, user, opts={})
     attachments = topic.attachment ? [attachment_json(topic.attachment, user)] : []
     html_url    = named_context_url(context, :context_discussion_topic_url,
                                     topic, include_host: true)
@@ -103,7 +104,8 @@ module Api::V1::DiscussionTopics
       user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
       read_state: topic.read_state(user), unread_count: topic.unread_count(user),
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
-      attachments: attachments, published: topic.published?, can_unpublish: topic.can_unpublish?,
+      attachments: attachments, published: topic.published?,
+      can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
       locked: topic.locked?, can_lock: topic.can_lock?,
       author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,

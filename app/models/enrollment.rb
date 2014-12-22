@@ -18,7 +18,6 @@
 
 class Enrollment < ActiveRecord::Base
 
-  BASE_ROLE_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"]
   SIS_TYPES = {
       'TeacherEnrollment' => 'teacher',
       'TaEnrollment' => 'ta',

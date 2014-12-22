@@ -516,7 +516,7 @@ describe User do
 
 
       # only four, in the right order (type, then name), and with the top type per course
-      expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}).to eql [
+      expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eql [
         [@course5.id, 'TeacherEnrollment'],
         [@course2.id, 'TeacherEnrollment'],
         [@course3.id, 'TeacherEnrollment'],
@@ -725,7 +725,7 @@ describe User do
       @admin = user_model
       @student = user_model
       tie_user_to_account(@admin, :role => admin_role)
-      role = custom_account_role('Student', :account => Account.default)
+      role = custom_account_role('CustomStudent', :account => Account.default)
       tie_user_to_account(@student, :role => role)
       set_up_course_with_users
     end

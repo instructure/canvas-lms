@@ -148,7 +148,7 @@
 #           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping'], ...]",
 #           "type": "array",
 #           "items": {
-#             "$ref": "Array"
+#             "type": "string"
 #           }
 #         },
 #         "processing_errors": {
@@ -156,7 +156,7 @@
 #           "example": "[['students.csv','Error while importing CSV. Please contact support.'], ...]",
 #           "type": "array",
 #           "items": {
-#             "$ref": "Array"
+#             "type": "string"
 #           }
 #         },
 #         "batch_mode": {

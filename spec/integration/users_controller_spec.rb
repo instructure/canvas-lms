@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe UsersController do
   describe "#teacher_activity" do
@@ -107,6 +107,21 @@ describe UsersController do
       get user_course_teacher_activity_url(@teacher, @course)
       expect(response).to be_success
       expect(response.body).to match(/studentname1/)
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should show activity for students located on another shard" do
+        @shard1.activate do
+          @student = user(:name => "im2spoopy4u")
+        end
+        course_with_student(:course => @course, :user => @student, :active_all => true)
+
+        get user_student_teacher_activity_url(@teacher, @student)
+        expect(response).to be_success
+        expect(response.body).to include(@student.name)
+      end
     end
   end
 

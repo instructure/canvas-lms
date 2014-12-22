@@ -82,9 +82,14 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     desc "Run non-selenium files in a single thread"
-    klass.new(:single) do |t|
+    klass.new(:plugin_non_parallel) do |t|
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
       t.send(spec_files_attr, ParallelExclude::AVAILABLE_FILES)
+    end
+
+    klass.new(:selenium_non_parallel, :test_files) do |t,test_files|
+      t.rspec_opts = ["--format", "doc", "--tag non_parallel"]
+      t.send(spec_files_attr, test_files)
     end
 
     desc "Print Specdoc for all specs (excluding plugin specs)"
@@ -123,7 +128,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 
     # Setup specs for stats
     task :statsetup do
-      require 'code_statistics'
+      require 'rails/code_statistics'
       ::STATS_DIRECTORIES << %w(Model\ specs spec/models) if File.exist?('spec/models')
       ::STATS_DIRECTORIES << %w(Service\ specs spec/services) if File.exist?('spec/services')
       ::STATS_DIRECTORIES << %w(View\ specs spec/views) if File.exist?('spec/views')

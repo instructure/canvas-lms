@@ -149,6 +149,8 @@
             <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item_from_module', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %> <%= t('links.remove_item', %{Remove}) %></a></li>
             <% menu_type_to_class = {
                 :assignment_menu => Assignment,
+                :discussion_topic_menu => DiscussionTopic,
+                :file_menu => Attachment,
                 :quiz_menu => Quizzes::Quiz,
                 :wiki_page_menu => WikiPage
               }

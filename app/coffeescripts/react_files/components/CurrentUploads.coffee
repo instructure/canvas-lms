@@ -32,8 +32,6 @@ define [
         if @state.currentUploads.length
           div className: 'current_uploads__uploaders',
             @state.currentUploads.map (uploader) ->
-              UploadProgress {
+              UploadProgress
                 uploader: uploader
                 key: uploader.getFileName()
-                removeUploader: -> UploadQueue.remove(uploader)
-              }

@@ -52,9 +52,13 @@ define [
         when 'tabUploaded'
           loadTab (done) =>
             require [
-              'compiled/views/FileBrowserView'
-            ], (FileBrowserView) =>
-              new FileBrowserView(contentTypes: 'image').render().$el.appendTo(ui.panel)
+              'compiled/views/TreeBrowserView'
+              'compiled/views/RootFoldersFinder'
+            ], (TreeBrowserView, RootFoldersFinder) =>
+              rootFoldersFinder = new RootFoldersFinder({
+                contentTypes: 'image'
+              })
+              new TreeBrowserView(rootModelsFinder: rootFoldersFinder).render().$el.appendTo(ui.panel)
               done()
         when 'tabFlickr'
           loadTab (done) =>

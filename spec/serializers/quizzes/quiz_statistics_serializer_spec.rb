@@ -84,13 +84,11 @@ describe Quizzes::QuizStatisticsSerializer do
       correct_count_average
       duration_average
       incorrect_count_average
-      logged_out_users
       score_average
       score_high
       score_low
       score_stdev
       unique_count
-      user_ids
     ]
 
     expect(@json['submission_statistics'].keys.map(&:to_s).sort & keys).to eq keys

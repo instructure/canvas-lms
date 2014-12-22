@@ -32,7 +32,9 @@ module Lti
         rh = create_resource_handler(tp)
         mh = create_message_handler(rh)
 
-        placements = []
+        placements = ResourcePlacement::DEFAULT_PLACEMENTS
+        placements.each { |p| rh.placements.create!(placement: p) }
+
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
@@ -42,9 +44,15 @@ module Lti
           :definition_type => mh.class.name,
           :definition_id => mh.id,
           :name => rh.name,
+          :description => rh.description,
           :domain => "samplelaunch",
           :placements => {
-            :module_item => {
+            :link_selection => {
+              :message_type => "basic-lti-launch-request",
+              :url => "https://samplelaunch/blti",
+              :title => rh.name
+            },
+            :assignment_selection => {
               :message_type => "basic-lti-launch-request",
               :url => "https://samplelaunch/blti",
               :title => rh.name
@@ -56,7 +64,7 @@ module Lti
 
       it 'returns an external tool definition' do
         tool = new_valid_external_tool(account)
-        placements = %w(module_item resource_selection)
+        placements = %w(assignment_selection link_selection resource_selection)
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
@@ -66,19 +74,26 @@ module Lti
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
+          :description => tool.description,
           :domain => nil,
           :placements => {
-            :module_item => {
+            :link_selection => {
               :message_type => "basic-lti-launch-request",
               :url => "http://www.example.com/basic_lti",
-              :title => tool.name}
+              :title => tool.name
+            },
+            :assignment_selection => {
+              :message_type => "basic-lti-launch-request",
+              :url => "http://www.example.com/basic_lti",
+              :title => tool.name
+            }
           }
         })
       end
 
       it 'returns resource_selection tools' do
         tool = new_valid_external_tool(account, true)
-        placements = %w(module_item resource_selection)
+        placements = %w(assignment_selection link_selection resource_selection)
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
@@ -88,11 +103,17 @@ module Lti
           :definition_type => tool.class.name,
           :definition_id => tool.id,
           :name => tool.name,
+          :description => tool.description,
           :domain => nil,
           :placements => {
-            :module_item => {
-              :message_type => "resource_selection",
-              :url => "http://example.com/selection_test",
+            :assignment_selection => {
+              :message_type => "basic-lti-launch-request",
+              :url => "http://www.example.com/basic_lti",
+              :title => tool.name
+            },
+            :link_selection => {
+              :message_type => "basic-lti-launch-request",
+              :url => "http://www.example.com/basic_lti",
               :title => tool.name
             },
             :resource_selection => {
@@ -110,10 +131,11 @@ module Lti
         tp = create_tool_proxy
         tp.bindings.create(context: account)
         rh = create_resource_handler(tp)
+        ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| rh.placements.create(placement: p) }
         create_message_handler(rh)
         new_valid_external_tool(account)
 
-        placements = %w(module_item resource_selection)
+        placements = %w(assignment_selection link_selection resource_selection)
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
@@ -130,11 +152,12 @@ module Lti
             tp = create_tool_proxy
             tp.bindings.create(context: account)
             rh = create_resource_handler(tp)
+            ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| rh.placements.create(placement: p) }
             create_message_handler(rh)
           end
           3.times { |_| new_valid_external_tool(account) }
 
-          placements = %w(module_item resource_selection)
+          placements = %w(assignment_selection link_selection resource_selection)
           collection = described_class.bookmarked_collection(account, placements)
           per_page = 3
           page1 = collection.paginate(per_page: per_page)
@@ -162,7 +185,7 @@ module Lti
     end
 
     def create_resource_handler(tool_proxy, opts = {})
-      default_opts = {resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, tool_proxy: tool_proxy}
+      default_opts = {resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, description: 'foo', tool_proxy: tool_proxy}
       ResourceHandler.create(default_opts.merge(opts))
     end
 
@@ -172,9 +195,10 @@ module Lti
     end
 
     def new_valid_external_tool(context, resource_selection = false)
-      tool = context.context_external_tools.new(:name => (0...8).map { (65 + rand(26)).chr }.join,
-                                                :consumer_key => "key",
-                                                :shared_secret => "secret")
+      tool = context.context_external_tools.new(name: (0...8).map { (65 + rand(26)).chr }.join,
+                                                description: "foo",
+                                                consumer_key: "key",
+                                                shared_secret: "secret")
       tool.url = "http://www.example.com/basic_lti"
       tool.resource_selection = {:url => "http://example.com/selection_test", :selection_width => 500, :selection_height => 500} if resource_selection
       tool.save!

@@ -499,7 +499,7 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the list of assignments for the current context.
-  # @argument include[] [String, "submission"|"assignment_visibility"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on.
   # @argument search_term [String]
@@ -532,7 +532,9 @@ class AssignmentsApiController < ApplicationController
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
 
-      if Array(params[:include]).include?('submission')
+      include_params = Array(params[:include])
+
+      if include_params.include?('submission')
         submissions = Hash[
           @context.submissions.
             where(:assignment_id => assignments).
@@ -543,15 +545,17 @@ class AssignmentsApiController < ApplicationController
         submissions = {}
       end
 
+      include_all_dates = include_params.include?('all_dates')
+
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
-      if override_dates
+      if override_dates || include_all_dates
         ActiveRecord::Associations::Preloader.new(assignments, :assignment_overrides).run
         assignments.select{ |a| a.assignment_overrides.size == 0 }.
           each { |a| a.has_no_overrides = true }
       end
 
-      include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
 
       if include_visibility && da_enabled
         assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
@@ -567,7 +571,9 @@ class AssignmentsApiController < ApplicationController
                         submission: submission, override_dates: override_dates,
                         include_visibility: include_visibility,
                         assignment_visibilities: visibility_array,
-                        needs_grading_count_by_section: needs_grading_count_by_section)
+                        needs_grading_count_by_section: needs_grading_count_by_section,
+                        include_all_dates: include_all_dates
+                        )
       end
 
       render :json => hashes
@@ -583,6 +589,8 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
+  # @argument all_dates [Boolean]
+  #   All dates associated with the assignment, if applicable
   # @returns Assignment
   def show
     @assignment = @context.active_assignments.find(params[:id],
@@ -595,6 +603,7 @@ class AssignmentsApiController < ApplicationController
       end
 
       include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      include_all_dates = value_to_boolean(params[:all_dates] || false)
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -607,7 +616,8 @@ class AssignmentsApiController < ApplicationController
                   submission: submission,
                   override_dates: override_dates,
                   include_visibility: include_visibility,
-                  needs_grading_count_by_section: needs_grading_count_by_section)
+                  needs_grading_count_by_section: needs_grading_count_by_section,
+                  include_all_dates: include_all_dates)
     end
   end
 

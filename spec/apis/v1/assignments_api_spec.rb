@@ -410,6 +410,23 @@ describe AssignmentsApiController, type: :request do
       )
     end
 
+    it "includes all_dates with include flag" do
+      course_with_student_logged_in(:active_all => true)
+      @course.assignments.create!(:title => "all_date_test", :submission_types => "online_url")
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/assignments.json",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['all_dates']
+             )
+      assign = json.first
+      expect(assign['all_dates']).not_to be_nil
+    end
+
 
     it "returns due dates as they apply to the user" do
         course_with_student(:active_all => true)
@@ -1788,6 +1805,18 @@ describe AssignmentsApiController, type: :request do
         expect(json['lock_at']).to eq @assignment.lock_at.iso8601.to_s
       end
 
+      it "returns all_dates when requested" do
+        @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+                        { :controller => "assignments_api", :action => "show",
+                          :format => "json", :course_id => @course.id.to_s,
+                          :id => @assignment.id.to_s,
+                          :all_dates => true},
+                        {:override_assignment_dates => 'false'})
+        expect(json['all_dates']).not_to be_nil
+      end
+
       it "does not fulfill requirements when description isn't returned" do
         @assignment = @course.assignments.create!(
           :title => "Locked Assignment",
@@ -2046,10 +2075,10 @@ describe AssignmentsApiController, type: :request do
 
       it "assignment_visibility includes the correct user_ids" do
         json = visibility_api_request @assignment1
-        expect(json["assignment_visibility"].include?(@student1.id)).to eq true
+        expect(json["assignment_visibility"].include?("#{@student1.id}")).to eq true
         json = visibility_api_request @assignment2
-        expect(json["assignment_visibility"].include?(@student2.id)).to eq true
-        expect(json["assignment_visibility"].include?(@student3.id)).to eq true
+        expect(json["assignment_visibility"].include?("#{@student2.id}")).to eq true
+        expect(json["assignment_visibility"].include?("#{@student3.id}")).to eq true
       end
 
       context "as a student" do
@@ -2068,6 +2097,13 @@ describe AssignmentsApiController, type: :request do
             { :controller => "assignments_api", :action => "show",
             :format => "json", :course_id => @course.id.to_s,
             :id => @assignment1.id.to_s }, {}, {}, {:expected_status => 401})
+        end
+
+        it "should not include assignment_visibility data when requested" do
+          user_session @student1
+          @user = @student1
+          json = visibility_api_request @assignment1
+          expect(json.has_key?("assignment_visibility")).to eq false
         end
       end
     end

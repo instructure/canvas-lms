@@ -10,9 +10,9 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
 
   let :input do
     [
-      { answer_id: 7396, match_id: 6061 }.with_indifferent_access,
-      { answer_id: 4224, match_id: 3855 }.with_indifferent_access
-    ]
+      { answer_id: '7396', match_id: '6061' },
+      { answer_id: '4224', match_id: '3855' }
+    ].map(&:with_indifferent_access)
   end
 
   let :output do
@@ -26,6 +26,28 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
     {
       answer_parser_compatibility: true
     }
+  end
+
+  describe '#deserialize (full)' do
+    it 'includes all answer/match pairs' do
+      output = subject.deserialize({
+        "question_5_answer_7396" => "6061",
+        "question_5_answer_6081" => nil,
+        "question_5_answer_4224" => "3855",
+        "question_5_answer_7397" => nil,
+        "question_5_answer_7398" => nil,
+        "question_5_answer_7399" => nil,
+      }.as_json, true).as_json.sort_by { |v| v['answer_id'] }
+
+      expect(output).to eq([
+        { answer_id: '4224', match_id: '3855' },
+        { answer_id: '6081', match_id: nil },
+        { answer_id: '7396', match_id: '6061' },
+        { answer_id: '7397', match_id: nil },
+        { answer_id: '7398', match_id: nil },
+        { answer_id: '7399', match_id: nil },
+      ].as_json)
+    end
   end
 
   context 'validations' do

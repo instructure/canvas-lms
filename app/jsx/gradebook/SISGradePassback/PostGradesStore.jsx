@@ -24,6 +24,15 @@ define([
         return this.getState().selected.sis_id
       },
 
+      hasAssignments () {
+        var assignments = this.getState().assignments
+        if (assignments != undefined && assignments.length > 0) {
+          return true
+        } else {
+          return false
+        }
+      },
+
       getSISSectionId (section_id) {
         var sections = this.getState().sections
         return (sections && sections[section_id]) ?

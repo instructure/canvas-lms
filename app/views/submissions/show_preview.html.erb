@@ -1,3 +1,4 @@
+<% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : context_user_name(@context, @submission.user) %>
 <% content_for :page_title do %><%= join_title @assignment.title, context_user_name(@context, @submission.user) %><% end %>
 
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
@@ -7,23 +8,23 @@
         <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
           <%= t('group_discussion_submission_description',
                   "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
-                  :user => context_user_name(@context, @submission.user),
-                  :wrapper => "<a href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
+                  :user => user_name,
+                  :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1)}\"><b>\\1</b></a>") %>
         <% else %>
           <%= t('discussion_submission_description',
                   "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
-                  :user => context_user_name(@context, @submission.user),
-                  :wrapper => "<a href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
+                  :user => user_name,
+                  :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1)}\"><b>\\1</b></a>") %>
         <% end %>
       <% else %>
         <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
           <%= t('group_discussion_submission_description_without_link',
                   "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}.",
-                  :user => context_user_name(@context, @submission.user)) %>
+                  :user => user_name) %>
         <% else %>
           <%= t('discussion_submission_description_without_link',
                   "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}.",
-                  :user => context_user_name(@context, @submission.user)) %>
+                  :user => user_name) %>
         <% end %>
       <% end %>
     </p>
@@ -32,7 +33,7 @@
       <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
     <% end %>
     <% @entries.each do |entry| %>
-      <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :assignment_visible_to_user => assignment_visible_to_user} %>
+      <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
     <% end %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
       <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
@@ -48,7 +49,7 @@
       <%= t('entry_no_image', 'Keep in mind that this page may have changed since the submission originally occurred.') %>
     <% end %>
     <div style="font-size: 1.4em; margin: 10px;">
-      <a href="<%= @submission.url %>" class="not_external"><%= t('view_original_submission', 'View the Original Submission for %{user}', :user => context_user_name(@context, @submission.user)) %></a>
+      <a href="<%= @submission.url %>" class="not_external"><%= t('view_original_submission', 'View the Original Submission for %{user}', :user => user_name) %></a>
     </div>
     <div style="font-size: 1.4em; margin: 10px;">
       <a href="<%= @submission.url %>" class="not_external"><%= @submission.url %></a>
@@ -75,7 +76,7 @@
     <div class="centered-block-wrap">
       <div class="centered-block-inner">
         <ul class="ui-listview" style="margin-top: 30px">
-          <li class="ui-listview-header"><%= mt('file_uploads_for_user', 'File Uploads for **%{user}**', :user => params[:hide_student_name] ? t('student', 'Student') : @submission.user.name) %></li>
+          <li class="ui-listview-header"><%= mt('file_uploads_for_user', 'File Uploads for **%{user}**', :user => user_name) %></li>
           <% if @submission.attachments.empty? %>
             <li>
               <div class="ui-listview-text ui-listview-right"></div>
@@ -124,7 +125,7 @@
   <% js_bundle 'legacy/submissions_show_preview_upload' %>
 <% elsif @submission.submission_type == "online_quiz" %>
   <% content_for :stylesheets do %>
-    <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version) %>"/>
+    <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
   <% end %>
   <div style="text-align: center;">
     <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>

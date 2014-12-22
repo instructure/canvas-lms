@@ -99,7 +99,7 @@ describe "add content box" do
       add_html
       f("#right-side .edit_content_link").click
       hover_and_click("#page_section_1 .delete_page_section_link")
-      try_to_close_modal
+      accept_alert
       wait_for_ajaximations
       submit_form(".form_content")
       wait_for_ajaximations

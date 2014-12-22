@@ -1,3 +1,5 @@
+@import "base/environment"
+
 @mixin dashboard-message-icon($left)
   background-image: url(/images/dashboard_message_icons.png)
   background-position: $left -4px
@@ -14,7 +16,7 @@
     font-weight: bold
 
   .image-block-image
-    margin-right: 20px
+    margin-right: 18px
 
   .warning-icon
     @include dashboard-message-icon(-4px)
@@ -39,3 +41,15 @@
 
   .btn
     min-width: 100px
+
+.icon-invitation.is-invitation-icon
+  width: 32px
+  height: 32px
+  &:before
+    font-size: 32px
+    width: 32px
+    height: 32px
+    @if $use_high_contrast
+      color: $canvas-dark
+    @else
+      color: darken($canvas-light, 30%)

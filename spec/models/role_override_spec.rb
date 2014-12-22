@@ -305,7 +305,7 @@ describe RoleOverride do
     end
 
     context "course roles" do
-      RoleOverride.enrollment_types.each do |base_role|
+      RoleOverride.enrollment_type_labels.each do |base_role|
         context "#{base_role[:name]} enrollments" do
           before do
             @base_role_name = base_role[:name]

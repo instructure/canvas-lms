@@ -40,7 +40,7 @@ describe RoleOverridesController do
 
     it "fails when given an existing role type" do
       role = @account.roles.build(:name => 'NewRole')
-      role.base_role_type = AccountUser::DEFAULT_BASE_ROLE_TYPE
+      role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
       role.workflow_state = 'active'
       role.save!
       post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
@@ -50,7 +50,7 @@ describe RoleOverridesController do
 
   it "should deactivate a role" do
     role = @account.roles.build(:name => 'NewRole')
-    role.base_role_type = AccountUser::DEFAULT_BASE_ROLE_TYPE
+    role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
     role.workflow_state = 'active'
     role.save!
     delete 'remove_role', :account_id => @account.id, :id => role.id
@@ -62,7 +62,7 @@ describe RoleOverridesController do
       @role_name = 'NewRole'
       @permission = 'read_reports'
       @role = @account.roles.build(:name => @role_name)
-      @role.base_role_type = AccountUser::DEFAULT_BASE_ROLE_TYPE
+      @role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
       @role.workflow_state = 'active'
       @role.save!
     end

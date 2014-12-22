@@ -445,14 +445,11 @@ describe FilesController do
       test_path("course files/a/b/c%20dude/d/e/f.gif")
     end
 
-    it "should fail if the file path doesn't match" do
-      assert_page_not_found do
-        get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
-      end
-
-      assert_page_not_found do
-        get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
-      end
+    it "should render unauthorized access page if the file path doesn't match" do
+      get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      expect(response).to render_template("shared/errors/file_not_found")
+      get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      expect(response).to render_template("shared/errors/file_not_found")
     end
 
     it "should ignore bad file_ids" do
@@ -531,6 +528,26 @@ describe FilesController do
       @file.reload
       expect(@file.size).to eql new_content.size
       expect(@file.user).to eql @teacher
+    end
+
+    context "usage_rights_required" do
+      before do
+        @course.enable_feature! :usage_rights_required
+        user_session(@teacher)
+        @file.update_attribute(:locked, true)
+      end
+
+      it "should not publish if usage_rights unset" do
+        put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:locked => "false"}
+        expect(@file.reload).to be_locked
+      end
+
+      it "should publish if usage_rights set" do
+        @file.usage_rights = @course.usage_rights.create! use_justification: 'public_domain'
+        @file.save!
+        put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:locked => "false"}
+        expect(@file.reload).not_to be_locked
+      end
     end
   end
 
@@ -658,6 +675,28 @@ describe FilesController do
 
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].context).to eq group
+    end
+
+    it "should create the file in unlocked state if :usage_rights_required is disabled" do
+      @course.disable_feature! :usage_rights_required
+      user_session(@teacher)
+      post 'create_pending', {:attachment => {
+          :context_code => @course.asset_string,
+          :filename => "bob.txt"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment].locked).to be_falsy
+    end
+
+    it "should create the file in locked state if :usage_rights_required is enabled" do
+      @course.enable_feature! :usage_rights_required
+      user_session(@teacher)
+      post 'create_pending', {:attachment => {
+          :context_code => @course.asset_string,
+          :filename => "bob.txt"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment].locked).to be_truthy
     end
 
     context "sharding" do

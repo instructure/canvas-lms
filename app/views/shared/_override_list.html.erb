@@ -3,14 +3,17 @@
   <% presenter.visible_due_dates.each do |due_date| %>
     <tr>
       <td <%= context_sensitive_datetime_title(due_date[:raw][:due_at], assignment.context) %>>
-        <%= due_date[:due_at] %>
+        <span aria-hidden="true"><%= due_date[:due_at] %></span>
+        <span class="screenreader-only"><%= context_sensitive_datetime_title(due_date[:raw][:due_at], assignment.context, just_text: true, default_text: t('N/A')) %></span>
       </td>
       <td><%= due_date[:due_for] %></td>
       <td <%= context_sensitive_datetime_title(due_date[:raw][:unlock_at], assignment.context) %>>
-        <%= due_date[:unlock_at] %>
+        <span aria-hidden="true"><%= due_date[:unlock_at] %></span>
+        <span class="screenreader-only"><%= context_sensitive_datetime_title(due_date[:raw][:unlock_at], assignment.context, just_text: true, default_text: t('N/A')) %></span>
       </td>
       <td <%= context_sensitive_datetime_title(due_date[:raw][:lock_at], assignment.context) %>>
-        <%= due_date[:lock_at] %>
+        <span aria-hidden="true"><%= due_date[:lock_at] %></span>
+        <span class="screenreader-only"><%= context_sensitive_datetime_title(due_date[:raw][:lock_at], assignment.context, just_text: true, default_text: t('N/A')) %></span>
       </td>
     </tr>
   <% end %>

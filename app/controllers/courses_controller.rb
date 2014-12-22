@@ -693,7 +693,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       #backcompat limit param
-      params[:per_page] ||= params.delete(:limit)
+      params[:per_page] ||= params[:limit]
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type)
       search_term = search_params[:search_term].presence
@@ -706,7 +706,7 @@ class CoursesController < ApplicationController
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.
       # We delete it from params so that it is not maintained in pagination links.
-      user_id = params.delete(:user_id)
+      user_id = params[:user_id]
       if user_id.present? && user = users.where(:users => { :id => user_id }).first
         position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
         position = position_scope.count(:select => "users.id", :distinct => true)
@@ -965,7 +965,6 @@ class CoursesController < ApplicationController
              })
 
       @alerts = @context.alerts
-      @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       js_env :APP_CENTER => {
         enabled: Canvas::Plugin.find(:app_center).enabled?
@@ -1524,7 +1523,6 @@ class CoursesController < ApplicationController
 
     custom_role = nil
     if params[:role_id].present? || !Role.get_built_in_role(params[:enrollment_type])
-      # TODO: update UI to use role_id
       custom_role = @context.account.get_role_by_id(params[:role_id]) if params[:role_id].present?
       custom_role ||= @context.account.get_role_by_name(params[:enrollment_type]) # backwards compatibility
       if custom_role && custom_role.course_role?
@@ -1535,7 +1533,7 @@ class CoursesController < ApplicationController
           params[:enrollment_type] = custom_role.base_role_type
         end
       else
-        render :json => t('errors.role_not_found', "No role named '%{role}' exists.", :role => params[:enrollment_type]), :status => :bad_request
+        render :json => t('errors.role_not_found', "Could not find role"), :status => :bad_request
         return
       end
     end
@@ -1662,7 +1660,7 @@ class CoursesController < ApplicationController
       @content_migration = @course.content_migrations.build(:user => @current_user, :source_course => @context, :context => @course, :migration_type => 'course_copy_importer', :initiated_source => api_request? ? :api : :manual)
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.workflow_state = 'created'
-      if (adjust_dates = params.delete(:adjust_dates)) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
+      if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = '1'
       end
       @content_migration.set_date_shift_options(params[:date_shift_options])
@@ -1893,7 +1891,7 @@ class CoursesController < ApplicationController
         @course.attributes = params[:course]
         changes = changed_settings(@course.changes, @course.settings, old_settings)
 
-        if !@course.changed? || @course.save
+        if params[:for_reload] || @course.save
           Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
           @current_user.touch
           if params[:update_default_pages]

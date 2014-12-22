@@ -599,7 +599,7 @@ describe "quizzes question creation" do
       expect_new_page_load {
         f('.save_quiz_button').click
         wait_for_ajaximations
-        keep_trying_until { expect(f('.admin-links')).to be_displayed }
+        keep_trying_until { expect(f('#quiz_title')).to be_displayed }
       }
 
       expect(Quizzes::Quiz.last.allowed_attempts).to eq attempts.to_i

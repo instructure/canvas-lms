@@ -47,6 +47,8 @@ define [
       @_noItemsViewIfEmpty()
 
     modifyPlaceholder: (e, ui) =>
+      # Prevent the sortstart action from propagating up.
+      e.stopPropagation()
       $(ui.placeholder).data("group", @groupId)
 
     # If there are no children within the group,

@@ -68,6 +68,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     !!match
   end
 
+  # TODO: remove once new stats is on for everybody
   def stats(responses)
     super
 

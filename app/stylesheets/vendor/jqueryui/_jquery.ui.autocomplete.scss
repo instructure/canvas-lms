@@ -47,10 +47,10 @@
       &.ui-state-hover,
       &.ui-state-active,
       &.ui-state-focus {
-        @include vertical-gradient($gradientTopActive, $gradientBottomActive);
+        background: $canvas-primary;
         font-weight: normal;
         margin: -1px;
-        text-shadow: 0 -1px 0 rgba(#000, 0.25);
+        color: white;
       }
     }
   }

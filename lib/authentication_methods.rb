@@ -115,6 +115,7 @@ module AuthenticationMethods
           (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
           session_refreshed_at < invalid_before
 
+          logger.info "Invalidating session: Session created before user logged out."
           destroy_session
           @current_pseudonym = nil
           if api_request? || request.format.json?
@@ -128,6 +129,7 @@ module AuthenticationMethods
          @current_pseudonym.cas_ticket_expired?(session[:cas_session]) &&
          @domain_root_account.cas_authentication?
 
+        logger.info "Invalidating session: CAS ticket expired - #{session[:cas_session]}."
         destroy_session
         @current_pseudonym = nil
 
