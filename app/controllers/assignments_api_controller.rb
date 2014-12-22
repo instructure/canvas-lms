@@ -105,11 +105,26 @@
 #           "type": "integer"
 #         },
 #         "id": {
+#           "description": "The id of rubric criteria.",
 #           "example": "crit1",
+#           "type": "string"
+#         },
+#         "outcome_id": {
+#           "description": "(Optional) The id of the learning outcome this criteria uses, if any.",
+#           "example": "1234",
+#           "type": "string"
+#         },
+#         "vendor_guid": {
+#           "description": "(Optional) The 3rd party vendor's GUID for the outcome this criteria references, if any.",
+#           "example": "abdsfjasdfne3jsdfn2",
 #           "type": "string"
 #         },
 #         "description": {
 #           "example": "Criterion 1",
+#           "type": "string"
+#         },
+#         "long_description": {
+#           "example": "Criterion 1 more details",
 #           "type": "string"
 #         },
 #         "ratings": {
