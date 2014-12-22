@@ -1,0 +1,15 @@
+<% if association.lock_at || association.unlock_at %>
+  <li>
+    <span class="title"><%= t('headers.available', "Available") %></span>
+    <span class="value">
+      <% if association.lock_at && association.unlock_at %>
+        <%= mt(:quiz_available_through, "%{start_time} - %{end_time}", :start_time => datetime_string(association.unlock_at), :end_time => datetime_string(association.lock_at)) %>
+        <span style="font-size: 0.8em;"><%= time_ago_in_words(Time.now + (association.lock_at - association.unlock_at)) rescue "" %></span>
+      <% elsif association.lock_at %>
+        <%= t(:quiz_available_until, "until %{end_time}", :end_time => datetime_string(association.lock_at)) %>
+      <% else %>
+        <%= t(:quiz_available_after, "after %{start_time}", :start_time => datetime_string(association.unlock_at)) %>
+      <% end %>
+    </span>
+  </li>
+<% end %>
