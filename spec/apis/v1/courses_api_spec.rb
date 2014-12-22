@@ -2215,7 +2215,11 @@ describe CoursesController, type: :request do
         'allow_student_forum_attachments' => false,
         'allow_student_discussion_editing' => true,
         'grading_standard_enabled' => false,
-        'grading_standard_id' => nil
+        'grading_standard_id' => nil,
+        'allow_student_organized_groups' => true,
+        'hide_distribution_graphs' => false,
+        'hide_final_grades' => false,
+        'lock_all_announcements' => false
       })
     end
 
@@ -2230,19 +2234,31 @@ describe CoursesController, type: :request do
       }, {
         :allow_student_discussion_topics => false,
         :allow_student_forum_attachments => true,
-        :allow_student_discussion_editing => false
+        :allow_student_discussion_editing => false,
+        :allow_student_organized_groups => false,
+        :hide_distribution_graphs => true,
+        :hide_final_grades => true,
+        :lock_all_announcements => true
       })
       expect(json).to eq({
         'allow_student_discussion_topics' => false,
         'allow_student_forum_attachments' => true,
         'allow_student_discussion_editing' => false,
         'grading_standard_enabled' => false,
-        'grading_standard_id' => nil
+        'grading_standard_id' => nil,
+        'allow_student_organized_groups' => false,
+        'hide_distribution_graphs' => true,
+        'hide_final_grades' => true,
+        'lock_all_announcements' => true
       })
       @course.reload
       expect(@course.allow_student_discussion_topics).to eq false
       expect(@course.allow_student_forum_attachments).to eq true
       expect(@course.allow_student_discussion_editing).to eq false
+      expect(@course.allow_student_organized_groups).to eq false
+      expect(@course.hide_distribution_graphs).to eq true
+      expect(@course.hide_final_grades).to eq true
+      expect(@course.lock_all_announcements).to eq true
     end
   end
 

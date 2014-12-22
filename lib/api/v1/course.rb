@@ -28,6 +28,11 @@ module Api::V1::Course
     settings[:allow_student_discussion_editing] = course.allow_student_discussion_editing?
     settings[:grading_standard_enabled] = course.grading_standard_enabled?
     settings[:grading_standard_id] = course.grading_standard_id
+    settings[:allow_student_organized_groups] = course.allow_student_organized_groups?
+    settings[:hide_final_grades] = course.hide_final_grades?
+    settings[:hide_distribution_graphs] = course.hide_distribution_graphs?
+    settings[:lock_all_announcements] = course.lock_all_announcements?
+
     settings
   end
 
