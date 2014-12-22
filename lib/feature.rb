@@ -291,8 +291,7 @@ END
 List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings.
 END
       applies_to: 'Course',
-      state: 'allowed',
-      development: true
+      state: 'allowed'
     },
     'usage_rights_required' =>
     {
