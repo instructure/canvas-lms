@@ -25,6 +25,7 @@ define [
         'click a.switch_views': 'switchViews'
         'click .delete_page': 'deleteWikiPage'
         'click .form-actions .cancel': 'cancel'
+        'click .form-actions .save_and_publish': 'saveAndPublish'
 
     template: template
     className: "form-horizontal edit-form validated-form-view"
@@ -162,6 +163,19 @@ define [
 
       @reloadView?.stopPolling()
       super
+
+    saveAndPublish: (event) ->
+      @shouldPublish = true
+      @submit(event)
+
+    onSaveFail: (xhr) =>
+      @shouldPublish = false
+      super(xhr)
+
+    getFormData: ->
+      data = super
+      data.published = true if @shouldPublish
+      data
 
     cancel: (event) ->
       event?.preventDefault()

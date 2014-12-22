@@ -17,6 +17,7 @@ define [
 
     events: _.extend {}, @::events,
       'click .dialog_closer': 'close'
+      'click .save_and_publish': 'saveAndPublish'
       'click .more_options': 'moreOptions'
 
     template: template
@@ -39,7 +40,18 @@ define [
       data = super
       unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
       data.due_at = unfudged.toISOString() if unfudged?
+      data.published = true if @shouldPublish
       return data
+
+    saveAndPublish: (event) ->
+      @shouldPublish = true
+      @disableWhileLoadingOpts = {buttons: ['.save_and_publish']}
+      @submit(event)
+
+    onSaveFail: (xhr) =>
+      @shouldPublish = false
+      @disableWhileLoadingOpts = {}
+      super(xhr)
 
     moreOptions: ->
       valid = ['submission_types', 'name', 'due_at', 'points_possible', 'assignment_group_id']

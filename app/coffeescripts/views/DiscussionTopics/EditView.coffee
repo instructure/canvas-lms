@@ -43,6 +43,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
+      'click .save_and_publish': 'saveAndPublish'
       'change #use_for_grading' : 'toggleAvailabilityOptions'
       'change #discussion_topic_assignment_points_possible' : 'handlePointsChange'
     )
@@ -67,6 +68,9 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
 
     isAnnouncement: => @model.constructor is Announcement
 
+    canPublish: =>
+      !@isAnnouncement() && !@model.get('published') && @permissions.CAN_MODERATE
+
     toJSON: ->
       data = super
       json = _.extend data, @options,
@@ -74,6 +78,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         useForGrading: @model.get('assignment')?
         isTopic: @isTopic()
         isAnnouncement: @isAnnouncement()
+        canPublish: @canPublish()
         contextIsCourse: @options.contextType is 'courses'
         canAttach: @permissions.CAN_ATTACH
         canModerate: @permissions.CAN_MODERATE
@@ -202,6 +207,8 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       # these options get passed to Backbone.sync in ValidatedFormView
       @saveOpts = multipart: !!data.attachment, proxyAttachment: true
 
+      data.published = true if @shouldPublish
+
       data
 
     updateAssignment: (data) =>
@@ -248,6 +255,16 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       AssignmentGroupSelector::fieldSelectors,
       GroupCategorySelector::fieldSelectors
     )
+
+    saveAndPublish: (event) ->
+      @shouldPublish = true
+      @disableWhileLoadingOpts = {buttons: ['.save_and_publish']}
+      @submit(event)
+
+    onSaveFail: (xhr) =>
+      @shouldPublish = false
+      @disableWhileLoadingOpts = {}
+      super(xhr)
 
     validateBeforeSave: (data, errors) =>
       if data.delay_posting == "0"

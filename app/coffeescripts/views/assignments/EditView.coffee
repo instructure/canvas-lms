@@ -84,6 +84,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
     events: _.extend({}, @::events, do ->
       events = {}
       events["click .cancel_button"] = 'handleCancel'
+      events["click .save_and_publish"] = 'saveAndPublish'
       events["change #{SUBMISSION_TYPE}"] = 'handleSubmissionTypeChange'
       events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
       events["click #{ADVANCED_TURNITIN_SETTINGS}"] = 'showTurnitinDialog'
@@ -238,6 +239,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       if ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
         data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
+      data.published = true if @shouldPublish
       return data
 
     submit: (event) =>
@@ -262,6 +264,16 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         missingDateDialog.render()
       else
         super
+
+    saveAndPublish: (event) ->
+      @shouldPublish = true
+      @disableWhileLoadingOpts = {buttons: ['.save_and_publish']}
+      @submit(event)
+
+    onSaveFail: (xhr) =>
+      @shouldPublish = false
+      @disableWhileLoadingOpts = {}
+      super(xhr)
 
     _inferSubmissionTypes: (assignmentData) =>
       if assignmentData.grading_type == 'not_graded'
