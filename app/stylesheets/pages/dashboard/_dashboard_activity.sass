@@ -33,19 +33,23 @@
     width: 10px
     height: 10px
     margin-left: -15px
-    background-color: $highlight-color
+    @if $use_high_contrast
+      background-color: $canvas-primary
+    @else
+      background-color: darken($canvas-primary, 10%)
     border-radius: 5px
 
 .stream_header
   padding: 10px 0 10px 10px
   cursor: pointer
   display: table
-  +user-select(none)
+  user-select: none
   .toggle-details
     text-transform: uppercase
     font-size: 0.75em
   &:hover
-    background: $hover-color
+    @if $use_high_contrast == false
+      background: $hover-color
     .toggle-details
       text-indent: 0
       text-align: right
@@ -77,8 +81,10 @@ $ignore-col-width: 50px
   tr
     border-top: 1px solid #eee
     line-height: 250%
-    &:hover
-      background: $hover-color
+    // remove hover color on high contrast and use link underlines on hover instead (a11y)
+    @if $use_high_contrast == false
+      &:hover
+        background: $hover-color
 
   .date
     font-size: 11px
@@ -98,8 +104,13 @@ $ignore-col-width: 50px
 .content_summary
   display: block
   color: inherit
-  &:hover
+  @if $use_high_contrast
     text-decoration: none
+    &:hover
+      text-decoration: underline
+  @else
+    &:hover
+      text-decoration: none
 
 .fake-link
   color: $linkColor
@@ -123,5 +134,8 @@ $dashboardIconSize: 32px
   font-size: $dashboardIconSize
   line-height: $dashboardIconSize
   &:before
-    color: #ccc
+    @if $use_high_contrast
+      color: $canvas-dark
+    @else
+      color: darken($canvas-light, 30%)
     font-size: $dashboardIconSize

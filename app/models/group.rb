@@ -62,6 +62,7 @@ class Group < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
+  has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
   belongs_to :avatar_attachment, :class_name => "Attachment"
   belongs_to :leader, :class_name => "User"
 
@@ -104,6 +105,10 @@ class Group < ActiveRecord::Base
     user_ids ?
       participating_users_association.where(:id =>user_ids) :
       participating_users_association
+  end
+
+  def all_real_students
+    self.context.all_real_students.where("users.id IN (?)", self.users.pluck(:id))
   end
 
   def wiki_with_create
@@ -284,6 +289,18 @@ class Group < ActiveRecord::Base
     # permissions for this user in the group are probably different now
     clear_permissions_cache(user)
     return member
+  end
+
+  def set_users(users)
+    user_ids = users.map(&:id)
+    memberships = []
+    transaction do
+      self.group_memberships.where("user_id NOT IN (?)", user_ids).destroy_all
+      users.each do |user|
+        memberships << invite_user(user)
+      end
+    end
+    memberships
   end
 
   def bulk_add_users_to_group(users, options = {})
@@ -629,6 +646,7 @@ class Group < ActiveRecord::Base
 
   def account_chain
     @account_chain ||= Account.account_chain(account_id)
+    @account_chain.dup
   end
 
   def sortable_name

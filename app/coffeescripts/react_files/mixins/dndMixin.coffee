@@ -5,7 +5,8 @@ define [
   '../utils/moveStuff'
   'compiled/models/Folder'
   'jquery'
-], (I18n, React, DragFeedback, moveStuff, Folder, $) ->
+  'underscore'
+], (I18n, React, DragFeedback, moveStuff, Folder, $, _) ->
 
   dndMixin =
 
@@ -25,16 +26,12 @@ define [
       @dragHolder = null
 
     onItemDragStart: (event) ->
-      itemsToDrag = @itemsToDrag()
-      event.dataTransfer.effectAllowed = 'move'
-
-      event.dataTransfer.setData('Text', 'in_a_dndMixin_drag')
-
       # IE 10 can't do this stuff:
       try
         # make it so you can drag stuff to other apps and it will at least copy a list of urls
         # see: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Recommended_Drag_Types#link
-        event.dataTransfer.setData('text/uri-list', itemsToDrag.map((item) -> item.get('url')).join('\n'))
+        itemsToDrag = @itemsToDrag()
+        event.dataTransfer.setData('text/uri-list', itemsToDrag.map((item) -> item.get('url')).join("\n")) if itemsToDrag.length and _.isArray(itemsToDrag)
 
         # replace the default ghost dragging element with a transparent gif
         # since we are going to use our own custom drag image
@@ -43,18 +40,22 @@ define [
         event.dataTransfer.setDragImage(img, 150, 150)
 
       @renderDragFeedback(event)
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData('Text', 'in_a_dndMixin_drag')
 
       $(document).on
         'dragover.MultiDraggableMixin': (event) => @renderDragFeedback(event.originalEvent)
         'dragend.MultiDraggableMixin': @removeDragFeedback
 
     onItemDragEnterOrOver: (event, callback) ->
-      return unless 'Text' in event.dataTransfer.types or 'text/plain' in event.dataTransfer.types
+      types = event.dataTransfer.types or []
+      return unless 'Text' in types or 'text/plain' in types
       event.preventDefault()
       callback(event) if callback
 
     onItemDragLeaveOrEnd: (event, callback) ->
-      return unless 'Text' in event.dataTransfer.types or 'text/plain' in event.dataTransfer.types
+      types = event.dataTransfer.types or []
+      return unless 'Text' in types or 'text/plain' in types
       callback(event) if callback
 
     onItemDrop: (event, destinationFolder, callback) ->

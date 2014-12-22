@@ -16,13 +16,14 @@ define [
   'jquery'
   'compiled/fn/preventDefault'
   'compiled/views/calendar/MissingDateDialogView'
+  'compiled/views/editor/KeyboardShortcuts'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, wikiSidebar,
-htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog) ->
+htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts) ->
 
   class EditView extends ValidatedFormView
 
@@ -107,11 +108,14 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@renderPeerReviewOptions)
       _.defer(@renderPostToSisOptions) if ENV.POST_GRADES
       _.defer(@watchUnload)
+      _.defer(@attachKeyboardShortcuts)
 
       @$(".datetime_field").datetime_field()
 
-
       this
+
+    attachKeyboardShortcuts: =>
+        $('.rte_switch_views_link').first().before((new KeyboardShortcuts()).render().$el)
 
     renderAssignmentGroupOptions: =>
       @assignmentGroupSelector = new AssignmentGroupSelector

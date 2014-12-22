@@ -663,27 +663,27 @@ class Quizzes::Quiz < ActiveRecord::Base
     q
   end
 
-  # Generates a submission for the specified user on this quiz, based
-  # on the SAVED version of the quiz.  Does not consider permissions.
-  def generate_submission(user, preview=false)
-    submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
-    submission.retake
-    submission.attempt = (submission.attempt + 1) rescue 1
+  def build_user_questions(preview)
     user_questions = []
     @submission_question_index = 0
     @stored_questions = nil
-    @submission_questions = self.stored_questions
+    submission_questions = self.stored_questions
     if preview
-      @submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
+      submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
     end
 
-    exclude_ids = @submission_questions.map { |q| q[:assessment_question_id] }.compact
-    @submission_questions.each do |q|
-      if q[:pick_count] #Quizzes::QuizGroup
+    exclude_ids = submission_questions.map { |q| q[:assessment_question_id] }.compact
+    submission_questions.each do |q|
+      # pulling from question group
+      if q[:pick_count]
+
+        # pulling from question bank
         if q[:assessment_question_bank_id]
           bank = ::AssessmentQuestionBank.where(id: q[:assessment_question_bank_id]).first if q[:assessment_question_bank_id].present?
           if bank
             questions = bank.select_for_submission(q[:pick_count], exclude_ids)
+            exclude_ids.concat(questions.map {|q| q.id })
+
             questions = questions.map { |aq| aq.data }
             questions.each do |question|
               if question[:answers]
@@ -695,55 +695,96 @@ class Quizzes::Quiz < ActiveRecord::Base
               user_questions << generate_submission_question(question)
             end
           end
+
+        # a group with questions
         else
-          questions = q[:questions].shuffle
-          q[:pick_count].times do |i|
-            if questions[i]
-              question = questions[i]
-              question[:points_possible] = q[:question_points]
-              user_questions << generate_submission_question(question)
-            end
+          questions = q[:questions].shuffle.slice(0, q[:pick_count])
+          questions.each do |question|
+            question[:points_possible] = q[:question_points]
+            user_questions << generate_submission_question(question)
           end
         end
-      else #just a question
+
+      # just a question
+      else
         user_questions << generate_submission_question(q)
       end
     end
 
-    submission.score = nil
-    submission.fudge_points = nil
-    submission.quiz_data = user_questions
-    submission.quiz_version = self.version_number
-    submission.started_at = ::Time.now
-    submission.score_before_regrade = nil
-    submission.end_at = nil
-    submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
+    user_questions
+  end
+
+  def build_submission_end_at(submission)
+    course = context
+    user   = submission.user
+    end_at = nil
+
+    if self.time_limit
+      end_at = submission.started_at + (self.time_limit.to_f * 60.0)
+    end
+
+    # add extra time
+    if end_at && submission.extra_time
+      end_at += (submission.extra_time * 60.0)
+    end
+
     # Admins can take the full quiz whenever they want
-    unless user.is_a?(::User) && self.grants_right?(user, :grade)
-      submission.end_at = lock_at if lock_at && !submission.manually_unlocked && (!submission.end_at || lock_at < submission.end_at)
+    return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
+
+    # set to lock date
+    if lock_at && !submission.manually_unlocked
+      if !end_at || lock_at < end_at
+        end_at = lock_at
+      end
+
+    # set to course end
+    elsif course.end_at && course.restrict_enrollments_to_course_dates
+      if !end_at || course.end_at < end_at
+        end_at = course.end_at
+      end
+
+    # set to enrollment term end
+    elsif course.enrollment_term.end_at
+      if !end_at || course.enrollment_term.end_at < end_at
+        end_at = course.enrollment_term.end_at
+      end
     end
-    submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
-    if context.end_at && context.restrict_enrollments_to_course_dates
-      submission.end_at ||= context.end_at
-      submission.end_at = context.end_at if context.end_at && context.end_at < submission.end_at
-    else
-      submission.end_at ||= context.enrollment_term.end_at
-      submission.end_at = context.end_at if context.enrollment_term.end_at && context.enrollment_term.end_at < submission.end_at
-    end
-    submission.finished_at = nil
-    submission.submission_data = {}
-    submission.workflow_state = 'preview' if preview
-    submission.was_preview = preview
-    if preview || submission.untaken?
-      submission.save
-    else
-      submission.with_versioning(true, &:save!)
+
+    end_at
+  end
+
+  # Generates a submission for the specified user on this quiz, based
+  # on the SAVED version of the quiz.  Does not consider permissions.
+  def generate_submission(user, preview=false)
+    submission = nil
+
+    transaction do
+      submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
+      submission.retake
+      submission.attempt = (submission.attempt + 1) rescue 1
+      submission.score = nil
+      submission.fudge_points = nil
+      submission.quiz_data = build_user_questions(preview)
+      submission.quiz_version = self.version_number
+      submission.started_at = ::Time.now
+      submission.score_before_regrade = nil
+      submission.end_at = build_submission_end_at(submission)
+      submission.finished_at = nil
+      submission.submission_data = {}
+      submission.workflow_state = 'preview' if preview
+      submission.was_preview = preview
+
+      if preview || submission.untaken?
+        submission.save!
+      else
+        submission.with_versioning(true, &:save!)
+      end
+
     end
 
     # Make sure the submission gets graded when it becomes overdue (if applicable)
-    submission.grade_when_overdue unless preview || !submission.end_at
+    submission.grade_when_overdue if submission && submission.end_at && !preview
     submission
-
   end
 
   def generate_submission_for_participant(quiz_participant)
@@ -1011,7 +1052,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     quiz_stats_opts = {
       :report_type => report_type,
-      :includes_all_versions => options[:includes_all_versions],
+      :includes_all_versions => !!options[:includes_all_versions],
       :anonymous => anonymous_submissions?
     }
 

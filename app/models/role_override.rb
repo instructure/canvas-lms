@@ -41,8 +41,9 @@ class RoleOverride < ActiveRecord::Base
     result.presence
   end
 
+  ACCOUNT_ADMIN_LABEL = lambda { t('roles.account_admin', "Account Admin") }
   def self.account_membership_types(account)
-    res = [{:id => Role.get_built_in_role("AccountAdmin").id, :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => t('roles.account_admin', "Account Admin")}]
+    res = [{:id => Role.get_built_in_role("AccountAdmin").id, :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => ACCOUNT_ADMIN_LABEL.call}]
     account.available_custom_account_roles.each do |r|
       res << {:id => r.id, :name => r.name, :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => r.name}
     end
@@ -71,7 +72,6 @@ class RoleOverride < ActiveRecord::Base
       :manage_wiki => {
         :label => lambda { t('permissions.manage_wiki', "Manage wiki (add / edit / delete pages)") },
         :available_to => [
-          'StudentEnrollment', # SFU MOD - Enable student permissions needed for Ad Hoc Spaces
           'TaEnrollment',
           'TeacherEnrollment',
           'DesignerEnrollment',
@@ -422,7 +422,6 @@ class RoleOverride < ActiveRecord::Base
       :manage_files => {
         :label => lambda { t('permissions.manage_files', "Manage (add / edit / delete) course files") },
         :available_to => [
-          'StudentEnrollment', # SFU MOD - Enable student permissions needed for Ad Hoc Spaces
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
@@ -441,7 +440,6 @@ class RoleOverride < ActiveRecord::Base
       :manage_assignments => {
         :label => lambda { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
         :available_to => [
-          'StudentEnrollment', # SFU MOD - Enable student permissions needed for Ad Hoc Spaces
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',

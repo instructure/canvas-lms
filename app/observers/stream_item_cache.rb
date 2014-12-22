@@ -37,6 +37,10 @@ class StreamItemCache < ActiveRecord::Observer
     Rails.cache.delete context_key
   end
 
+  def self.invalidate_all_recent_stream_items(user_ids, context_type, context_id)
+    user_ids.each {|user_id| self.invalidate_recent_stream_items(user_id, context_type, context_id)}
+  end
+
   def self.invalidate_context_stream_item_key(context_type, context_id)
     Rails.cache.delete ["context_stream_item_key", context_type, context_id].cache_key
   end

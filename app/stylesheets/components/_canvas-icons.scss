@@ -273,6 +273,15 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 <div class="row-fluid">
   <span class="span3"><i class="icon-cloud-lock"></i> icon-cloud-lock</span>
   <span class="span3"><i class="icon-eye"></i> icon-eye</span>
+  <span class="span3"><i class="icon-files-copyright"></i> icon-files-copyright</span>
+</div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-files-creative-commons"></i> icon-files-creative-commons</span>  
+  <span class="span3"><i class="icon-files-fair-use"></i> icon-files-fair-use</span>  
+  <span class="span3"><i class="icon-files-obtained-permission"></i>icon-files-obtained-permission</span>  
+</div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-files-public-domain"></i> icon-files-public-domain</span>  
 </div>
 */
 
@@ -419,6 +428,11 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-eye:before { content: "\f249"; }
 .icon-facebook:before { content: "\f18c"; }
 .icon-facebook-boxed:before { content: "\f1d2"; }
+.icon-files-copyright:before { content: "\f252"; }
+.icon-files-creative-commons:before { content: "\f253"; }
+.icon-files-fair-use:before { content: "\f254"; }
+.icon-files-obtained-permission:before { content: "\f258"; }
+.icon-files-public-domain:before { content: "\f256"; }
 .icon-filmstrip:before { content: "\f1d3"; }
 .icon-flag:before { content: "\f18d"; }
 .icon-folder:before { content: "\f1d4"; }

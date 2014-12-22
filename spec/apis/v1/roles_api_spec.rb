@@ -70,7 +70,8 @@ describe "Roles API", type: :request do
           { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param })
 
         expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles.map(&:name)).sort
-        expect(json.find{|role| role['role'] == "StudentEnrollment"}['workflow_state']).to eq 'active'
+        expect(json.find{|role| role['role'] == "StudentEnrollment"}['workflow_state']).to eq 'built_in'
+        expect(json.find{|role| role['role'] == "NewRole"}['workflow_state']).to eq 'active'
       end
 
       it "should paginate" do
@@ -123,7 +124,7 @@ describe "Roles API", type: :request do
           { :controller => 'role_overrides', :action => 'show', :format => 'json', :account_id => @account.id.to_param, :id => admin_role.id.to_param })
         expect(json['role']).to eq 'AccountAdmin'
         expect(json['base_role_type']).to eq 'AccountMembership'
-        expect(json['workflow_state']).to eq 'active'
+        expect(json['workflow_state']).to eq 'built_in'
       end
 
       it "should show a custom role" do
@@ -247,7 +248,7 @@ describe "Roles API", type: :request do
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
         { :role => @role_name, :base_role_type => "notagoodbaserole" })
       assert_status(400)
-      expect(JSON.parse(response.body)).to eq({"message" => "Base role type is invalid"})
+      expect(JSON.parse(response.body)["errors"]["base_role_type"].first["message"]).to eq("is invalid")
     end
 
     it "should fail for a course role with a reserved name" do
@@ -255,7 +256,7 @@ describe "Roles API", type: :request do
                    { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
                    { :role => 'student', :base_role_type => "StudentEnrollment" })
       assert_status(400)
-      expect(JSON.parse(response.body)).to eq({"message" => "Name is reserved"})
+      expect(JSON.parse(response.body)["errors"]["name"].first["message"]).to eq("is reserved")
     end
 
     it "should not create an override for course role for account-only permissions" do
@@ -498,6 +499,37 @@ describe "Roles API", type: :request do
         user_with_pseudonym
         raw_api_call(:put, @path, @path_options, @permissions)
         expect(response.code).to eql '401'
+      end
+    end
+
+    context "updating name" do
+      it "should be able to update role name for custom roles" do
+        role = custom_account_role("Roll", :account => @account)
+        json = api_call(:put, "/api/v1/accounts/#{@account.id}/roles/#{role.id}",
+                        { :controller => 'role_overrides', :action => 'update',
+                          :account_id => @account.id.to_param, :format => 'json',
+                          :id => role.id }, {:label => "newname"})
+        expect(json['label']).to eq "newname"
+        role.reload
+        expect(role.name).to eq "newname"
+      end
+
+      it "should not be able to update role name for inherited roles" do
+        role = custom_account_role("Roll", :account => @account)
+        sub_account = @account.sub_accounts.create!(:name => "sub")
+        json = api_call(:put, "/api/v1/accounts/#{sub_account.id}/roles/#{role.id}",
+                            { :controller => 'role_overrides', :action => 'update',
+                              :account_id => sub_account.id.to_param, :format => 'json',
+                              :id => role.id }, {:label => "newname"}, {} ,{:expected_status => 400})
+        expect(json['message']).to eq "cannot update the 'label' for an inherited role"
+      end
+
+      it "should not be able to update role name for built-in roles" do
+        json = api_call(:put, "/api/v1/accounts/#{@account.id}/roles/#{admin_role.id}",
+                            { :controller => 'role_overrides', :action => 'update',
+                              :account_id => @account.id.to_param, :format => 'json',
+                              :id => admin_role.id }, {:label => "newname"}, {}, {:expected_status => 400})
+        expect(json['message']).to eq "cannot update the 'label' for a built-in role"
       end
     end
   end

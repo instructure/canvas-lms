@@ -38,6 +38,10 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   validates_inclusion_of :report_type, :in => REPORTS
 
+  after_initialize do
+    self.includes_all_versions ||= false
+  end
+
   # Test a given quiz if it's within the sanity limits for generating stats.
   # You should not generate stats for this quiz if this returns true.
   #
@@ -73,7 +77,6 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
       build_csv_attachment(options).tap do |attachment|
         attachment.content_type = 'text/csv'
         attachment.save!
-        complete_progress
       end
     end
   end
@@ -81,25 +84,58 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   # Queues a job for generating the CSV version of this report unless a job has
   # already been queued, or the attachment had been generated previously.
   def generate_csv_in_background
-    return if csv_attachment.present? || generating_csv?
+    return if csv_attachment.present? || progress.present?
 
-    start_progress
-    strand_id = Shard.birth.activate { quiz_id }
-    send_later_enqueue_args :generate_csv, :strand => "quiz_statistics_#{strand_id}"
+    build_progress
+
+    progress.tag = self.class.name
+    progress.completion = 0
+    progress.workflow_state = 'queued'
+    progress.save!
+
+    progress.process_job(self, :__process_csv_job, {
+      strand: csv_job_strand_id
+    })
   end
 
-  # Whether the CSV attachment is currently being generated.
+  def __process_csv_job(progress)
+    generate_csv
+  end
+
+  # Whether the CSV attachment is currently being generated, or is about to be.
   def generating_csv?
-    self.progress.present? && !self.progress.completed?
+    progress.present? && progress.pending?
   end
 
-  def start_progress
-    return if progress
-    build_progress(:tag => self.class.name, :completion => 0)
-    progress.start
+  def csv_generation_abortable?
+    progress.present? && (progress.queued? || csv_generation_failed?)
+  end
+
+  def csv_generation_failed?
+    progress.present? && progress.failed?
+  end
+
+  def abort_csv_generation
+    self.progress.destroy
+    self.reload
+
+    Delayed::Job.where({ strand: self.csv_job_strand_id }).destroy_all
+  end
+
+  def self.csv_job_tag
+    'Quizzes::QuizStatistics#__process_csv_job'
+  end
+
+  def csv_job_strand_id
+    Shard.birth.activate { "quiz_statistics_#{quiz_id}_#{self.id}" }
   end
 
   def update_progress(i, n)
+    # the report generators will always attempt to update the progress as they
+    # do their work, but we don't always track progress (e.g, non-async) so in
+    # that case we just ignore the updates:
+    return if progress.nil?
+
     # TODO: smarter updates?  maybe 10 updates isn't enough for quizzes with
     # hundreds of submissions
     increment = 10
@@ -108,11 +144,6 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
     if (percent / increment) > (progress.completion / increment)
       progress.update_completion! percent
     end
-  end
-
-  def complete_progress
-    progress.complete
-    progress.save!
   end
 
   def readable_type

@@ -19,7 +19,7 @@ define([
     render () {
       var navClass = React.addons.classSet({
         "gradebook-navigation": true,
-        "hidden": !this.props.store.isEnabled()
+        "hidden": !this.props.store.isEnabled() || !this.props.store.hasAssignments()
       });
       return (
         <nav className={navClass}>

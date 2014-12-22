@@ -31,16 +31,20 @@ define [
       folder.fetch()
       folder
 
-  filesEnv.userHasPermission = (folderOrFile, action) ->
-    return false unless folderOrFile
-
+  filesEnv.contextFor = (folderOrFile) ->
+    if folderOrFile.collection?.parentFolder
+      folderOrFile = folderOrFile.collection.parentFolder
     if folderOrFile instanceof Folder
       folder =  folderOrFile
       assetString = (folder?.get('context_type') + 's_' + folder?.get('context_id')).toLowerCase()
     else if folderOrFile.contextType and folderOrFile.contextId
       assetString = "#{folderOrFile.contextType}_#{folderOrFile.contextId}".toLowerCase()
+    filesEnv.contextsDictionary?[assetString]
 
-    filesEnv.contextsDictionary?[assetString]?.permissions?[action]
+  filesEnv.userHasPermission = (folderOrFile, action) ->
+    return false unless folderOrFile
+
+    filesEnv.contextFor(folderOrFile)?.permissions?[action]
 
   filesEnv.baseUrl =  if filesEnv.showingAllContexts
                         '/files'

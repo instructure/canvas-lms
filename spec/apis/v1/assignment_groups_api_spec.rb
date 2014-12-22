@@ -439,6 +439,25 @@ describe AssignmentGroupsApiController, type: :request do
       end
     end
 
+    it "should not include assignment_visibility when requested as a student" do
+      student_in_course(:active_all => true)
+      @course.enable_feature!(:differentiated_assignments)
+      @course.assignments.create!(:title => "test", :assignment_group => @group, :points_possible => 10)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}.json",
+        {
+          :controller => 'assignment_groups_api',
+          :action => 'show',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :assignment_group_id => @group.id.to_s
+        },
+        :include => ['assignments', 'assignment_visibility']
+      )
+      json['assignments'].each do |a|
+        expect(a.has_key?("assignment_visibility")).to eq false
+      end
+    end
+
     it 'should return never_drop rules as strings with Accept header' do
       rules = {'never_drop' => ["1","2"], 'drop_lowest' => 1, 'drop_highest' => 1}
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {

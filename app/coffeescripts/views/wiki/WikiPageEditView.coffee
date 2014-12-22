@@ -8,9 +8,10 @@ define [
   'compiled/views/wiki/WikiPageDeleteDialog'
   'compiled/views/wiki/WikiPageReloadView'
   'i18n!pages'
+  'compiled/views/editor/KeyboardShortcuts'
   'compiled/tinymce'
   'tinymce.editor_box'
-], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n) ->
+], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
@@ -18,6 +19,7 @@ define [
         '[name="body"]': '$wikiPageBody'
         '.header-bar-outer-container': '$headerBarOuterContainer'
         '.page-changed-alert': '$pageChangedAlert'
+        '.help_dialog': '$helpDialog'
 
       events:
         'click a.switch_views': 'switchViews'
@@ -103,6 +105,9 @@ define [
       @reloadView.on 'reload', =>
         @render()
       @reloadView.pollForChanges()
+
+      @$helpDialog.html((new KeyboardShortcuts()).render().$el)
+
 
     # Initialize the wiki sidebar
     # @api private

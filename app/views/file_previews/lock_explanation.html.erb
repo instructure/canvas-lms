@@ -1,0 +1,15 @@
+<% content_for :head, include_common_stylesheets %>
+<%= render :partial => "layouts/head" %>
+<body>
+<div id="content" class="file_preview_container">
+  <h2><%= @file.display_name %></h2>
+  <div>
+    <% if @file.folder && @file.folder.locked? %>
+      <%= t 'messages.folder_locked', "The folder \"%{folder},\" which includes this file, has been locked.", :folder => @file.folder.name %>
+    <% else %>
+      <%= @lock_info.is_a?(Hash) ? lock_explanation(@lock_info, 'file', @context) : t('messages.file_locked', "This file has not been unlocked yet.") %>
+    <% end %>
+  </div>
+</div>
+<%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+</body>

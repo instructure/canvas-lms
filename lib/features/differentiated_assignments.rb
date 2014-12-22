@@ -39,10 +39,10 @@ Sections that are not given an assignment will not see it in their course conten
 calculated without those points.
 END
     applies_to: 'Course',
-    state: 'hidden',
+    state: 'allowed',
     root_opt_in: true,
     beta: true,
-    development: true,
+    development: false,
     custom_transition_proc: ->(user, context, from_state, transitions) do
       if context.is_a?(Course) && from_state == 'on'
         transitions['off']['message'] = I18n.t('features.differentiated_assignments_course_disable_warning', <<END)

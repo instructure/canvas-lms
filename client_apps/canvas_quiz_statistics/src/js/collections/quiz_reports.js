@@ -4,6 +4,10 @@ define(function(require) {
   var fromJSONAPI = require('../models/common/from_jsonapi');
   var config = require('../config');
   var Adapter = require('../core/adapter');
+  var SORT_ORDER = [
+    'student_analysis',
+    'item_analysis'
+  ];
 
   return Backbone.Collection.extend({
     model: QuizReport,
@@ -31,6 +35,10 @@ define(function(require) {
         var quizReports = this.add(payload, { parse: true, merge: true });
         return quizReports[0];
       }.bind(this));
+    },
+
+    comparator: function(model) {
+      return SORT_ORDER.indexOf(model.get('reportType'));
     }
   });
 });

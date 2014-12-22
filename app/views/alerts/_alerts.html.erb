@@ -58,7 +58,7 @@
       }
     }
   }
-  @role_types.each do |role|
+  (@account_roles || []).each do |role|
     alert_data[:POSSIBLE_RECIPIENTS_ORDER] << role[:id]
     alert_data[:POSSIBLE_RECIPIENTS][role[:id]] = {:label => role[:label]}
   end

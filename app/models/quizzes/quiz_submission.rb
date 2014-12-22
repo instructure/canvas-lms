@@ -26,6 +26,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   include Workflow
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
+  attr_accessor :grader_id
 
   GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
 
@@ -123,11 +124,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def sanitize_responses
     questions && questions.select { |q| q['question_type'] == 'essay_question' }.each do |q|
       question_id = q['id']
-      if submission_data.is_a?(Array)
+      if graded?
         if submission = submission_data.find { |s| s[:question_id] == question_id }
           submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE)
         end
-      elsif submission_data.is_a?(Hash)
+      else
         question_key = "question_#{question_id}"
         if submission_data[question_key]
           submission_data[question_key] = Sanitize.clean(submission_data[question_key] || "", CanvasSanitize::SANITIZE)
@@ -182,7 +183,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def temporary_data
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
-    raise "Cannot view temporary data for completed quiz" if self.submission_data && !self.submission_data.is_a?(Hash)
+    raise "Cannot view temporary data for completed quiz" if graded?
     res = (self.submission_data || {}).with_indifferent_access
     res
   end
@@ -203,9 +204,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def data
     raise "Cannot view data for uncompleted quiz" unless self.completed?
-    raise "Cannot view data for uncompleted quiz" if self.submission_data && !self.submission_data.is_a?(Array)
-    res = self.submission_data || []
-    res
+    raise "Cannot view data for uncompleted quiz" if !graded?
+
+    self.submission_data
   end
 
   def results_visible?
@@ -248,7 +249,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       true
     elsif self.untaken? && self.end_at && self.end_at < Time.now
       true
-    elsif self.completed? && self.submission_data && self.submission_data.is_a?(Hash)
+    elsif self.completed? && !graded?
       true
     else
       false
@@ -277,22 +278,40 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     params = sanitize_params(params)
 
-    conn = Quizzes::QuizSubmission.connection
-    new_params = params
-    if self.submission_data.is_a?(Hash) && self.submission_data[:attempt] == self.attempt
-      new_params = self.submission_data.deep_merge(params) rescue params
+    new_params = if !graded? && self.submission_data[:attempt] == self.attempt
+      self.submission_data.deep_merge(params) rescue params
+    else
+      params
     end
+
     new_params[:attempt] = self.attempt
+
+    # take a snapshot every 5 other saves:
     new_params[:cnt] ||= 0
     new_params[:cnt] = (new_params[:cnt].to_i + 1) % 5
     snapshot!(params) if new_params[:cnt] == 1
-    conn.execute("UPDATE quiz_submissions SET user_id=#{self.user_id || 'NULL'}, submission_data=#{conn.quote(new_params.to_yaml)} WHERE workflow_state NOT IN ('complete', 'pending_review') AND id=#{self.id}")
+
+    connection.execute <<-SQL
+      UPDATE quiz_submissions
+         SET user_id=#{self.user_id || 'NULL'},
+             submission_data=#{connection.quote(new_params.to_yaml)}
+       WHERE workflow_state NOT IN ('complete', 'pending_review')
+         AND id=#{self.id}
+    SQL
+
+    record_answer(new_params)
+
     new_params
+  end
+
+  def record_answer(submission_data)
+    extractor = Quizzes::LogAuditing::QuestionAnsweredEventExtractor.new
+    extractor.create_event!(submission_data, self)
   end
 
   def sanitize_params(params)
     # if the submission has already been graded
-    if !self.submission_data.is_a?(Hash)
+    if graded?
       return params.merge({:_already_graded => true})
     end
 
@@ -372,9 +391,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     return if self.manually_scored || @skip_after_save_score_updates
 
     if self.completed?
-      if self.submission_data && self.submission_data.is_a?(Hash)
+      if self.submission_data && !graded?
         Quizzes::SubmissionGrader.new(self).grade_submission
       end
+
       self.kept_score = score_to_keep
     end
   end
@@ -404,7 +424,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.grade_matches_current_submission = true
       @assignment_submission.quiz_submission_id = self.id
       @assignment_submission.graded_at = [self.end_at, Time.zone.now].compact.min
-      @assignment_submission.grader_id = "-#{self.quiz_id}".to_i
+      @assignment_submission.grader_id = self.grader_id || "-#{self.quiz_id}".to_i
       @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
       @assignment_submission.user_id = self.user_id
       @assignment_submission.submission_type = "online_quiz"
@@ -620,6 +640,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_scores(params)
     params = (params || {}).with_indifferent_access
     self.manually_scored = false
+    self.grader_id = params[:grader_id]
+
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]

@@ -657,7 +657,7 @@ describe Account do
       expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
-    it "should not include external tools if not configured for course navigation" do
+    it "should not include external tools if not configured for account navigation" do
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -708,6 +708,20 @@ describe Account do
       expect(tab[:label]).to eq tool.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
       expect(tab[:args]).to eq [@account.id, tool.id]
+    end
+
+    it "should not include external tools for non-admins if visibility is set" do
+      course_with_teacher(:account => @account)
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
+      tool.account_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => "admins"}
+      tool.save!
+      expect(tool.has_placement?(:account_navigation)).to eq true
+      tabs = @account.tabs_available(@teacher)
+      expect(tabs.map{|t| t[:id] }).to_not be_include(tool.asset_string)
+
+      admin = account_admin_user(:account => @account)
+      tabs = @account.tabs_available(admin)
+      expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     end
 
     it 'includes message handlers' do
@@ -1093,6 +1107,53 @@ describe Account do
       account.ensure_defaults
       expect(account.lti_guid).to eq '12345'
     end
+  end
 
+  it 'should format a referer url' do
+    account = Account.new
+    expect(account.format_referer(nil)).to be_nil
+    expect(account.format_referer('')).to be_nil
+    expect(account.format_referer('not a url')).to be_nil
+    expect(account.format_referer('http://example.com/')).to eq 'http://example.com'
+    expect(account.format_referer('http://example.com/index.html')).to eq 'http://example.com'
+    expect(account.format_referer('http://example.com:80')).to eq 'http://example.com'
+    expect(account.format_referer('https://example.com:443')).to eq 'https://example.com'
+    expect(account.format_referer('http://example.com:3000')).to eq 'http://example.com:3000'
+  end
+
+  it 'should format trusted referers when set' do
+    account = Account.new
+    account.trusted_referers = 'https://example.com/,http://example.com:80,http://example.com:3000'
+    expect(account.settings[:trusted_referers]).to eq 'https://example.com,http://example.com,http://example.com:3000'
+
+    account.trusted_referers = nil
+    expect(account.settings[:trusted_referers]).to be_nil
+
+    account.trusted_referers = ''
+    expect(account.settings[:trusted_referers]).to be_nil
+  end
+
+  describe 'trusted_referer?' do
+    let!(:account) do
+      account = Account.new
+      account.settings[:trusted_referers] = 'https://example.com,http://example.com,http://example.com:3000'
+      account
+    end
+
+    it 'should be true when a referer is trusted' do
+      expect(account.trusted_referer?('http://example.com')).to be_truthy
+      expect(account.trusted_referer?('http://example.com:3000')).to be_truthy
+      expect(account.trusted_referer?('http://example.com:80')).to be_truthy
+      expect(account.trusted_referer?('https://example.com:443')).to be_truthy
+    end
+
+    it 'should be false when a referer is not provided' do
+      expect(account.trusted_referer?(nil)).to be_falsey
+      expect(account.trusted_referer?('')).to be_falsey
+    end
+
+    it 'should be false when a referer is not trusted' do
+      expect(account.trusted_referer?('https://example.com:5000')).to be_falsey
+    end
   end
 end

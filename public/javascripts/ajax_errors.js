@@ -129,13 +129,14 @@ define([
         $body.append(text);
         $("#instructure_ajax_error_box").hide();
         var pre = "";
+        message = htmlEscape(message);
         if(debugOnly) {
           message = message + "<br\/><span style='font-size: 0.7em;'>(Development Only)<\/span>";
         }
         if(debugOnly || INST.environment != "production") {
           message += "<br\/><a href='#' class='last_error_details_link'>" + htmlEscape(I18n.t('links.details', 'details...')) + "<\/a>";
         }
-        $.flashError(message);
+        $.flashError({ html: message });
       };
       window.ajaxErrorFlash = ajaxErrorFlash;
       var data = $.ajaxJSON.findRequest(request);

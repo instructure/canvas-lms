@@ -149,8 +149,8 @@ define(function(require) {
     renderAnswerTooltip: function(point) {
       return (
         <div
-          key={'point-' + point.score}
-          ref={'point_' + point.score}
+          key={'point-' + point.score + '-' + point.count}
+          ref={'point_' + point.score + '_' + point.count}
           className="answer-distribution-tooltip-content">
           <p>
             <span className="answer-response-ratio">{round(point.ratio)}%</span>
@@ -172,8 +172,8 @@ define(function(require) {
       );
     },
 
-    getAnswerTooltip: function(answerId) {
-      return this.refs['point_' + answerId].getDOMNode();
+    getAnswerTooltip: function(__answerId, point) {
+      return this.refs['point_' + point.score + '_' + point.count].getDOMNode();
     }
   });
 

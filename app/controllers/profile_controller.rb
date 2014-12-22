@@ -189,9 +189,9 @@ class ProfileController < ApplicationController
   def settings
     if api_request?
       # allow querying this basic profile data for the current user, or any
-      # user the current user has view_statistics access to
+      # user the current user has renaming rights for (their teachers and admins)
       @user = api_find(User, params[:user_id])
-      return unless @user == @current_user || authorized_action(@user, @current_user, :view_statistics)
+      return unless @user == @current_user || authorized_action(@user, @current_user, :rename)
     else
       @user = @current_user
       @user.dismiss_bouncing_channel_message!

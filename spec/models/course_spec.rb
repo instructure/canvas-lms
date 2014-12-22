@@ -3023,11 +3023,11 @@ describe Course, "section_visibility" do
       expect(@course.students_visible_to(@student1)).to eq [@student1]
     end
 
-    it "should return no sections" do
-      expect(@course.sections_visible_to(@observer)).to eq []
+    it "should return student's sections" do
+      expect(@course.sections_visible_to(@observer)).to eq [@course.default_section]
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :role => student_role, :enabled => false)
-      expect(@course.sections_visible_to(@student1)).to eq []
+      expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
     end
   end
 

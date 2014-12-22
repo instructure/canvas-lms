@@ -79,9 +79,9 @@ module Api::V1::QuizSubmissionQuestion
     answer_serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(qq)
 
     data = {}
-    data[:id] = qq.id
+    data[:id] = qq.id.to_s
     data[:flagged] = to_boolean(submission_data["question_#{qq.id}_marked"])
-    data[:answer] = answer_serializer.deserialize(submission_data)
+    data[:answer] = answer_serializer.deserialize(submission_data, true)
     data
   end
 

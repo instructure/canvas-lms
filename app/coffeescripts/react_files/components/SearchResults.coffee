@@ -66,7 +66,7 @@ define [
         forceUpdate = =>
           @setState({errors: null})
           @forceUpdate() if @isMounted()
-          $.screenReaderFlashMessage I18n.t('results_count', "Showing %{num_results} search results", {num_results: @state.collection.length})
+          $.screenReaderFlashMessageExclusive I18n.t('results_count', "Showing %{num_results} search results", {num_results: @state.collection.length})
         @state.collection.fetch({data: props.query, error: @onFetchError}).then(forceUpdate)
           # TODO: use scroll position to only fetch the pages we need
           .then getAllPages.bind(null, @state.collection, forceUpdate)
@@ -103,6 +103,8 @@ define [
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
               userCanManageFilesForContext: @props.userCanManageFilesForContext
+              externalToolsForContext: @props.externalToolsForContext
+              previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
           LoadingIndicator isLoading: !@state.collection.loadedAll
 

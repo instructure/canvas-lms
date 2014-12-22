@@ -4,16 +4,14 @@ define(function(require) {
   var Adapter = require('../core/adapter');
   var K = require('../constants');
   var config = require('../config');
+  var pickAndNormalize = require('../models/common/pick_and_normalize');
 
   var fetchProgress = function(url) {
     return Adapter.request({
       type: 'GET',
       url: url,
     }).then(function(payload) {
-      return {
-        completion: payload.completion,
-        workflowState: payload.workflow_state,
-      };
+      return pickAndNormalize(payload, K.PROGRESS_ATTRS);
     });
   };
 
@@ -30,7 +28,7 @@ define(function(require) {
     poll = function() {
       fetchProgress(url).then(function(data) {
         if (options.onTick) {
-          options.onTick(data.completion, data.workflowState);
+          options.onTick(data.completion, data);
         }
 
         if (data.workflowState === K.PROGRESS_FAILED) {

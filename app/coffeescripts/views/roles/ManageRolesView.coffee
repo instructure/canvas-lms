@@ -11,6 +11,8 @@ define [
     template: template
     className: 'manage-roles-table'
 
+    @optionProperty 'base_role_types'
+
     # Method Summary
     #   When a new Role is added/removed from the collection, re-draw the table.
     initialize: -> 
@@ -40,9 +42,10 @@ define [
     renderHeader: -> 
       @$el.find('thead tr').html "<th>#{I18n.t('permissions', 'Permissions')}</th>"
 
-      @collection.each (role) => 
+      @collection.each (role) =>
         roleHeaderView = new RoleHeaderView
           model: role
+          base_role_types: @base_role_types
 
         @$el.find('thead tr').append roleHeaderView.render().el
 

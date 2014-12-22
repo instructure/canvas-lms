@@ -25,7 +25,7 @@ unless SHARDING_ENABLED
   module ShardRSpecHelper
     def self.included(klass)
       klass.before do
-        pending "needs a sharding implementation"
+        skip "needs a sharding implementation"
       end
       require File.expand_path(File.dirname(__FILE__) + '/support/onceler/noop') unless defined?(Onceler::Noop)
       klass.send(:include, Onceler::Noop)

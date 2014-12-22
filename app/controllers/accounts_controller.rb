@@ -334,7 +334,7 @@ class AccountsController < ApplicationController
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
             next unless quota_settings.has_key?(quota_type)
 
-            quota_value = quota_settings[quota_type].strip
+            quota_value = quota_settings[quota_type].to_s.strip
             if INTEGER_REGEX !~ quota_value.to_s
               @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
             else
@@ -462,6 +462,12 @@ class AccountsController < ApplicationController
           end
         end
 
+        if params[:account][:settings] && params[:account][:settings].has_key?(:trusted_referers)
+          if trusted_referers = params[:account][:settings].delete(:trusted_referers)
+            @account.trusted_referers = trusted_referers if @account.root_account?
+          end
+        end
+
         if sis_id = params[:account].delete(:sis_source_id)
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
@@ -471,6 +477,8 @@ class AccountsController < ApplicationController
             end
           end
         end
+
+        process_external_integration_keys
 
         can_edit_email = params[:account][:settings].try(:delete, :edit_institution_email)
         if @account.root_account? && !can_edit_email.nil?
@@ -515,9 +523,12 @@ class AccountsController < ApplicationController
       end
       @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
-      @role_types = RoleOverride.account_membership_types(@account)
-      @enrollment_types = RoleOverride.enrollment_type_labels
+
+      @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
+      @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
+
       @announcements = @account.announcements
+      @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
       js_env :APP_CENTER => {
         enabled: Canvas::Plugin.find(:app_center).enabled?
       }
@@ -833,4 +844,18 @@ class AccountsController < ApplicationController
     end
   end
 
+  def process_external_integration_keys
+    if params_keys = params[:account][:external_integration_keys]
+      ExternalIntegrationKey.indexed_keys_for(@account).each do |key_type, key|
+        next unless params_keys.key?(key_type)
+        next unless key.grants_right?(@current_user, :write)
+        unless params_keys[key_type].blank?
+          key.key_value = params_keys[key_type]
+          key.save!
+        else
+          key.delete
+        end
+      end
+    end
+  end
 end

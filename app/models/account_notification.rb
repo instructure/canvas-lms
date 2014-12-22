@@ -35,14 +35,14 @@ class AccountNotification < ActiveRecord::Base
     ActiveRecord::Associations::Preloader.new(current, [:account, :account_notification_roles]).run
     user_role_ids = {}
 
-    enrollment_types = user.enrollments.shard(user).active.uniq.pluck(:type)
+    enrollment_role_ids = user.enrollments.shard(user).active.uniq.pluck(:role_id)
     current.select! do |announcement|
 
       role_ids = announcement.account_notification_roles.map(&:role_id)
       unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
         if announcement.account.site_admin?
           # roles user holds with respect to courses
-          user_role_ids[announcement.account_id] = enrollment_types.map{|type| Role.get_built_in_role(type).id}
+          user_role_ids[announcement.account_id] = enrollment_role_ids
           # announcements intended for users not enrolled in any courses have the NilEnrollment role type
           user_role_ids[announcement.account_id] = [nil] if user_role_ids[announcement.account_id].empty?
           # roles user holds with respect to accounts
@@ -80,7 +80,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      roles = enrollment_types.map { |type| Role.get_built_in_role(type) }.map(&:base_role_type).uniq
+      roles = enrollment_role_ids.map { |id| Role.get_role_by_id(id) }.map(&:base_role_type).uniq
 
       if roles == ['StudentEnrollment'] && !account.include_students_in_global_survey?
         current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }

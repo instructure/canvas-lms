@@ -229,11 +229,11 @@ describe "Standard Common Cartridge importing" do
       expect(@course.context_modules.count).to eq 3
 
       mod1 = @course.context_modules.where(migration_id: "I_00000").first
-      expect(mod1.content_tags.active.count).to eq(Qti.qti_enabled? ? 5 : 4)
+      expect(mod1.content_tags.count).to eq(Qti.qti_enabled? ? 9 : 7)
       expect(mod1.name).to eq "Your Mom, Research, & You"
-      tag = mod1.content_tags.active[0]
+      tag = mod1.content_tags[0]
       expect(tag.content_type).to eq 'Attachment'
-      expect(tag.content_id).to eq @course.attachments.active.where(migration_id: "I_00001_R").first.id
+      expect(tag.content_id).to eq @course.attachments.where(migration_id: "I_00001_R").first.id
     end
   end
 

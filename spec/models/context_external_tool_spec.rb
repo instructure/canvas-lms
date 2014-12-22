@@ -118,6 +118,19 @@ describe ContextExternalTool do
     expect(@tool.has_placement?(:course_navigation)).to eq true
   end
 
+  it "should allow accept_media_types setting exclusively for file_menu extension" do
+    @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @tool.course_navigation = {
+        :accept_media_types => "types"
+    }
+    @tool.file_menu = {
+        :accept_media_types => "types"
+    }
+    @tool.save!
+    expect(@tool.extension_setting(:course_navigation, :accept_media_types)).to be_blank
+    expect(@tool.extension_setting(:file_menu, :accept_media_types)).to eq "types"
+  end
+
   it "should clear disabled extensions" do
     @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
     @tool.course_navigation = {
@@ -394,6 +407,18 @@ describe ContextExternalTool do
       tools = ContextExternalTool.all_tools_for(@course, selectable: true)
       expect(tools.count).to eq 2
     end
+
+    it 'returns multiple requested placements' do
+      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool2.save!
+      tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
+      tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
+      tool3.save!
+      placements = Lti::ResourcePlacement::DEFAULT_PLACEMENTS + ['resource_selection']
+      expect(ContextExternalTool.all_tools_for(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
+    end
   end
 
   describe "placements" do
@@ -406,7 +431,8 @@ describe ContextExternalTool do
       tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.save!
-      expect(ContextExternalTool.all_tools_for(@course).placements('module_item', 'resource_selection').to_a).to eql([tool1, tool3].sort_by(&:name))
+      placements = Lti::ResourcePlacement::DEFAULT_PLACEMENTS + ['resource_selection']
+      expect(ContextExternalTool.all_tools_for(@course).placements(*placements).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
     it 'it only returns a single requested placements' do
@@ -429,7 +455,7 @@ describe ContextExternalTool do
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.not_selectable = true
       tool3.save!
-      expect(ContextExternalTool.all_tools_for(@course).placements('module_item').to_a).to eql([tool1])
+      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::DEFAULT_PLACEMENTS).to_a).to eql([tool1])
     end
 
   end
@@ -919,24 +945,24 @@ describe ContextExternalTool do
 
       it 'returns true for module item if it has selectable, and a url' do
         tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
-        expect(tool.has_placement?(:module_item)).to eq true
+        expect(tool.has_placement?(:link_selection)).to eq true
       end
 
       it 'returns true for module item if it has selectable, and a domain' do
         tool = @course.context_external_tools.create!(:name => "a", :domain => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
-        expect(tool.has_placement?(:module_item)).to eq true
+        expect(tool.has_placement?(:link_selection)).to eq true
       end
 
       it 'returns false for module item if it is not selectable' do
         tool = @course.context_external_tools.create!(:name => "a", not_selectable: true, :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
-        expect(tool.has_placement?(:module_item)).to eq false
+        expect(tool.has_placement?(:link_selection)).to eq false
       end
 
        it 'returns false for module item if it has selectable, and no domain or url' do
         tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
         tool.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
         tool.save!
-        expect(tool.has_placement?(:module_item)).to eq false
+        expect(tool.has_placement?(:link_selection)).to eq false
       end
 
     end

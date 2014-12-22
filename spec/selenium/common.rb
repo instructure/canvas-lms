@@ -34,7 +34,7 @@ MAX_SERVER_START_TIME = 60
 #NEED BETTER variable handling
 THIS_ENV = ENV['TEST_ENV_NUMBER'].to_i
 THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
-ENV['WEBSERVER'].nil? ? WEBSERVER = 'thin' : WEBSERVER = ENV['WEBSERVER']
+ENV['WEBSERVER'].nil? ? WEBSERVER = 'webrick' : WEBSERVER = ENV['WEBSERVER']
 #set WEBSERVER ENV to webrick to change webserver
 
 $server_port = nil
@@ -82,6 +82,7 @@ module SeleniumTestsHelperMethods
     caps = Selenium::WebDriver::Remote::Capabilities.ie
     caps.version = "10"
     caps.platform = :WINDOWS
+    caps[:unexpectedAlertBehaviour] = 'ignore'
 
     Selenium::WebDriver.for(
         :remote,
@@ -92,16 +93,14 @@ module SeleniumTestsHelperMethods
 
   def firefox_driver
     puts "using FIREFOX driver"
-    options = {}
     profile = firefox_profile
-    options[:profile] = profile
-    caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
-    caps.native_events = true
+    caps = Selenium::WebDriver::Remote::Capabilities.firefox(:unexpectedAlertBehaviour => 'ignore')
 
     if SELENIUM_CONFIG[:host_and_port]
+      caps.firefox_profile = profile
       stand_alone_server_firefox_driver(caps)
     else
-      ruby_firefox_driver(options)
+      ruby_firefox_driver(profile: profile, desired_capabilities: caps)
     end
   end
 
@@ -314,7 +313,50 @@ module SeleniumTestsHelperMethods
       use Rails::Rack::Debugger unless Rails.env.test?
       run CanvasRails::Application
     end.to_app
-    return app
+
+    lambda do |env|
+      nope = [503, {}, [""]]
+      return nope unless allow_requests?
+
+      # wrap request in a mutex so we can ensure it doesn't span spec
+      # boundaries (see clear_requests!)
+      result = request_mutex.synchronize { app.call(env) }
+
+      # check if the spec just finished while we ran, and if so prevent
+      # side effects like redirects (and thus moar requests)
+      if allow_requests?
+        result
+      else
+        # make sure we clean up the body of requests we throw away
+        # https://github.com/rack/rack/issues/658#issuecomment-38476120
+        result.last.close if result.last.respond_to?(:close)
+        nope
+      end
+    end
+  end
+
+  class << self
+    def disallow_requests!
+      # ensure the current in-flight request (if any, AJAX or otherwise)
+      # finishes up its work, and prevent any subsequent requests before the
+      # next spec gets underway. otherwise race conditions can cause sadness
+      # with our shared conn and transactional fixtures (e.g. special
+      # accounts and their caching)
+      @allow_requests = false
+      request_mutex.synchronize { }
+    end
+
+    def allow_requests!
+      @allow_requests = true
+    end
+
+    def allow_requests?
+      @allow_requests
+    end
+
+    def request_mutex
+      @request_mutex ||= Mutex.new
+    end
   end
 
   def self.start_in_process_thin_server
@@ -438,7 +480,7 @@ shared_examples_for "all selenium tests" do
       logout_link = f('#identity .logout a')
       if logout_link
         if logout_link.displayed?
-          expect_new_page_load { logout_link.click() }
+          expect_new_page_load(:accept_alert) { logout_link.click() }
         else
           get '/'
           destroy_session(true)
@@ -464,6 +506,11 @@ shared_examples_for "all selenium tests" do
   def course_with_student_logged_in(opts={})
     user_logged_in(opts)
     course_with_student({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  end
+
+  def course_with_observer_logged_in(opts={})
+    user_logged_in(opts)
+    course_with_observer({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
   end
 
   def course_with_ta_logged_in(opts={})
@@ -499,10 +546,17 @@ shared_examples_for "all selenium tests" do
     wait_for_ajaximations
   end
 
-  def expect_new_page_load
+  def expect_new_page_load(accept_alert = false)
     driver.execute_script("INST.still_on_old_page = true;")
     yield
-    keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
+    keep_trying_until do
+      begin
+        driver.execute_script("return INST.still_on_old_page;") == nil
+      rescue Selenium::WebDriver::Error::UnhandledAlertError
+        raise unless accept_alert
+        driver.switch_to.alert.accept
+      end
+    end
     wait_for_ajaximations
   end
 
@@ -853,18 +907,14 @@ shared_examples_for "all selenium tests" do
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
     #handles any modals prompted by navigating from the current page
-    try_to_close_modal
+    close_modal_if_present
     wait_for_ajaximations if waitforajaximations
   end
 
-  def try_to_close_modal
-    begin
-      driver.switch_to.alert.accept
-      expect(driver.switch_to.alert).to be nil
-      true
-    rescue Exception => e
-      return false
-    end
+  def close_modal_if_present
+    driver.title # if an alert is present, this will trigger the error below
+  rescue Selenium::WebDriver::Error::UnhandledAlertError
+    driver.switch_to.alert.accept
   end
 
   def refresh_page
@@ -1048,15 +1098,6 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
-  after(:each) do
-    begin
-      wait_for_ajax_requests
-    rescue Selenium::WebDriver::Error::WebDriverError
-      # we want to ignore selenium errors when attempting to wait here
-    end
-    truncate_all_tables unless self.use_transactional_fixtures
-  end
-
   unless EncryptedCookieStore.respond_to?(:test_secret)
     EncryptedCookieStore.class_eval do
       cattr_accessor :test_secret
@@ -1088,7 +1129,7 @@ shared_examples_for "all selenium tests" do
         default_url_options[:host] = $app_host_and_port
         retry unless (tries -= 1).zero?
       else
-        raise('spec run time crashed')
+        raise # preserve original error
       end
     end
   end
@@ -1096,11 +1137,27 @@ shared_examples_for "all selenium tests" do
   append_before (:all) do
     $selenium_driver ||= setup_selenium
     default_url_options[:host] = $app_host_and_port
+    close_modal_if_present
     resize_screen_to_normal
+  end
+
+  prepend_before :all do
+    SeleniumTestsHelperMethods.allow_requests!
+  end
+
+  prepend_before :each do
+    SeleniumTestsHelperMethods.allow_requests!
   end
 
   after(:each) do
     clear_timers!
+    begin # while disallow_requests! would generally get these, there's a small window between the ajax request starting up and the middleware actually processing it
+      wait_for_ajax_requests
+    rescue Selenium::WebDriver::Error::WebDriverError
+      # we want to ignore selenium errors when attempting to wait here
+    end
+    SeleniumTestsHelperMethods.disallow_requests!
+    truncate_all_tables unless self.use_transactional_fixtures
   end
 
   def clear_timers!

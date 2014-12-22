@@ -23,6 +23,7 @@ define([
   'compiled/views/GoogleDocsTreeView',
   'jst/assignments/homework_submission_tool',
   'compiled/external_tools/HomeworkSubmissionLtiContainer',
+  'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */,
   'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
@@ -35,7 +36,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool, HomeworkSubmissionLtiContainer) {
+], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool, HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts) {
 
   window.submissionAttachmentIndex = -1;
 
@@ -44,6 +45,10 @@ define([
         submissionForm = $('.submit_assignment_form');
 
     var homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer('#submit_from_external_tool_form');
+
+    // Add the Keyboard shortcuts info button
+    var keyboardShortcutsView = new RCEKeyboardShortcuts();
+    keyboardShortcutsView.render().$el.insertBefore($(".switch_text_entry_submission_views:first"));
 
     // grow and shrink the comments box on focus/blur if the user
     // hasn't entered any content.

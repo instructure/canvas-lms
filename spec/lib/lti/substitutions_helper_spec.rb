@@ -126,6 +126,26 @@ module Lti
         helper = SubstitutionsHelper.new(course, root_account, nil)
         expect(helper.all_roles).to eq [LtiOutbound::LTIRoles::System::NONE]
       end
+
+      it 'converts multiple roles for lis 2' do
+        subject.stubs(:course_enrollments).returns([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
+        user.stubs(:roles).returns(['user', 'student', 'teacher', 'admin'])
+        roles = subject.all_roles('lis2')
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant'
+      end
+
+      it "returns none if no user for lis 2" do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.all_roles('lis2')).to eq ['http://purl.imsglobal.org/vocab/lis/v2/person#None']
+      end
     end
 
     describe '#course_enrollments' do
@@ -325,6 +345,32 @@ module Lti
         expect(subject.previous_lti_context_ids).to eq 'abc'
       end
     end
+
+    describe "section substitutions" do
+      before do
+        course.save!
+        @sec1 = course.course_sections.create(:name => 'sec1')
+        @sec1.sis_source_id = 'def'
+        @sec1.save!
+        @sec2 = course.course_sections.create!(:name => 'sec2')
+        @sec2.sis_source_id = 'abc'
+        @sec2.save!
+        # course.reload
+
+        user.save!
+        multiple_student_enrollment(user, @sec1, course: course)
+        multiple_student_enrollment(user, @sec2, course: course)
+      end
+
+      it "should return all canvas section ids" do
+        expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
+      end
+
+      it "should return all canvas section sis ids" do
+        expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(',')
+      end
+    end
+
 
   end
 end

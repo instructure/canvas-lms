@@ -24,7 +24,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     end
 
     # @return [BigDecimal|NilClass]
-    def deserialize(submission_data)
+    def deserialize(submission_data, full=false)
       answer = submission_data[question_key]
 
       if answer.present?

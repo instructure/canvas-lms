@@ -19,12 +19,10 @@ define [
       @state = @buildDefaultState()
 
     buildDefaultState: ->
-      return {
-        resolvedNames: []
-        nameCollisions: []
-        zipOptions: []
-        newOptions: false
-      }
+      resolvedNames: []
+      nameCollisions: []
+      zipOptions: []
+      newOptions: false
 
     queueUploads: (contextId, contextType) ->
       @state.resolvedNames.forEach (f) =>
@@ -32,38 +30,28 @@ define [
       @setState({newOptions: false})
 
     toFilesOptionArray: (fList) ->
-      files = []
-      i = 0
-      while i < fList.length
-        files.push {file: fList.item(i)}
-        i++
-      files
+      [].slice.call(fList, 0).map((file) -> {file})
 
     fileNameExists: (name) ->
-      found = _.find @folder.files.models, (f) ->
-        f.get('display_name') == name
+      _.find @folder.files.models, (f) -> f.get('display_name') is name
 
     isZipFile: (file) ->
       !!file.type?.match(/zip/)
 
     # divide into existing naming collisions and resolved ones
     segregateOptionBuckets: (selectedFiles) ->
-      i = 0
-      collisions = []
-      resolved = []
-      zips = []
-      while i < selectedFiles.length
-        fileOptions = selectedFiles[i]
-        nameToTest = fileOptions.name || fileOptions.file.name
-        if (@isZipFile(fileOptions.file) && fileOptions.expandZip == undefined)
-          zips.push fileOptions
+      [collisions, resolved, zips] = [[], [], []]
+      for file in selectedFiles
+        nameToTest = file.name || file.file.name
+        if (@isZipFile(file.file) and typeof file.expandZip is 'undefined')
+          zips.push file
         # only mark as collision if it is a collision that hasn't been resolved, or is is a zip that will be expanded
-        else if @fileNameExists(nameToTest) && (fileOptions.dup != 'overwrite' && (!fileOptions.expandZip? || fileOptions.expandZip == false))
-          collisions.push fileOptions
+        else if @fileNameExists(nameToTest) && (file.dup != 'overwrite' && (!file.expandZip? || file.expandZip is false))
+          collisions.push file
         else
-          resolved.push fileOptions
-        i++
-      {collisions:collisions, resolved:resolved, zips:zips}
+          resolved.push file
+
+      {collisions, resolved, zips}
 
     handleAddFilesClick: ->
       this.refs.addFileInput.getDOMNode().click()

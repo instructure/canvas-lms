@@ -991,7 +991,7 @@ class MessageableUser
     def student_courses
       @student_courses_by_shard ||= {}
       @student_courses_by_shard[Shard.current] ||= all_courses.
-        select{ |course| course.primary_enrollment == 'StudentEnrollment' }
+        select{ |course| course.primary_enrollment_type == 'StudentEnrollment' }
     end
 
     def visible_section_ids_in_courses(courses)

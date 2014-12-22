@@ -18,7 +18,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     end
 
     def deserialize_blank_answer(answer_id)
-      answer_id.to_i
+      answer_id
     end
   end
 end

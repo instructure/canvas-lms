@@ -40,7 +40,6 @@ define [
       @refreshTabs()
       @loadTabFromUrl()
 
-
     refreshTabs: ->
       if @collection.length > 0
         @$tabs.find('ul.ui-tabs-nav li.static').remove()
@@ -132,6 +131,7 @@ define [
       @loadPanelView($panel)
 
     loadPanelView: ($panel) ->
+      # there is a bug here where we load the first tab, then immediately load the tab from the hash
       if !$panel.data('loaded')
         model = $panel.data('model')
         categoryView = new GroupCategoryView model: model

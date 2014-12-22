@@ -2,7 +2,7 @@
 
 def should_make_folders_in_the_menu_droppable
   course_with_teacher_logged_in
-  get "/dashboard/files"
+  get "/files"
   wait_for_ajaximations
 
   keep_trying_until do

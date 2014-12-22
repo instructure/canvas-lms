@@ -46,8 +46,10 @@ class ContextExternalTool < ActiveRecord::Base
     :user_navigation, :course_navigation, :account_navigation, :resource_selection,
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
     :course_settings_sub_navigation, :global_navigation,
-    :assignment_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu
+    :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu
   ]
+
+  CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types]}
 
   EXTENSION_TYPES.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -79,6 +81,9 @@ class ContextExternalTool < ActiveRecord::Base
 
     extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url,
                       :selection_height, :selection_width, :text, :url, :message_type]
+    if custom_keys = CUSTOM_EXTENSION_KEYS[type]
+      extension_keys += custom_keys
+    end
     extension_keys += {
         :visibility => lambda{|v| %w{members admins}.include?(v)}
     }.to_a
@@ -93,7 +98,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    if type.to_s == 'module_item'
+    if Lti::ResourcePlacement::DEFAULT_PLACEMENTS.include? type.to_s
       !!(self.selectable && (self.domain || self.url))
     else
       self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
@@ -452,12 +457,20 @@ class ContextExternalTool < ActiveRecord::Base
   private_class_method :contexts_to_search
 
   LOR_TYPES = [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation,
-               :assignment_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu]
+               :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu,
+               :wiki_page_menu]
   def self.all_tools_for(context, options={})
-    if LOR_TYPES.include?(options[:type])
-      return [] unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
-          (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+    #options[:type] is deprecated, use options[:placements] instead
+    placements =* options[:placements] || options[:type]
+
+    #special LOR feature flag
+    unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
+        (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+      valid_placements = placements.select{|placement| !LOR_TYPES.include?(placement.to_sym)}
+      return [] if valid_placements.size == 0 && placements.size > 0
+      placements = valid_placements
     end
+
     contexts = []
     if options[:user]
       contexts << options[:user]
@@ -466,7 +479,7 @@ class ContextExternalTool < ActiveRecord::Base
     return nil if contexts.empty?
 
     scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
-    scope = scope.having_setting(options[:type]) if options[:type]
+    scope = scope.placements(*placements)
     scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
     scope.order(ContextExternalTool.best_unicode_collation_key('name'))
   end
@@ -523,15 +536,15 @@ class ContextExternalTool < ActiveRecord::Base
       where("context_external_tool_placements.placement_type = ?", setting) : scoped }
 
   scope :placements, lambda { |*placements|
-    if placements
-      module_item_sql = if placements.include? 'module_item'
+    if placements.present?
+      default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::DEFAULT_PLACEMENTS).present?
                           "(context_external_tools.not_selectable IS NOT TRUE AND
                            ((COALESCE(context_external_tools.url, '') <> '' ) OR
                            (COALESCE(context_external_tools.domain, '') <> ''))) OR "
                         else
                           ''
                         end
-      where(module_item_sql + 'EXISTS (
+      where(default_placement_sql + 'EXISTS (
               SELECT * FROM context_external_tool_placements
               WHERE context_external_tools.id = context_external_tool_placements.context_external_tool_id
               AND context_external_tool_placements.placement_type IN (?) )', placements || [])

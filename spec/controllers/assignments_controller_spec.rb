@@ -250,6 +250,24 @@ describe AssignmentsController do
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
       expect(assigns[:assignment]).to be_unpublished
     end
+
+    it "should assign to a group" do
+      user_session(@student)
+      group2 = @course.assignment_groups.create!(name: 'group2')
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => group2.to_param}
+      expect(assigns[:assignment]).not_to be_nil
+      expect(assigns[:assignment].title).to eql("some assignment")
+      expect(assigns[:assignment].context_id).to eql(@course.id)
+      expect(assigns[:assignment].assignment_group).to eq group2
+    end
+
+    it "should not assign to a group from a different course" do
+      user_session(@student)
+      course2 = Account.default.courses.create!
+      group2 = course2.assignment_groups.create!(name: 'group2')
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => group2.to_param}
+      expect(response).to be_not_found
+    end
   end
 
   describe "GET 'edit'" do

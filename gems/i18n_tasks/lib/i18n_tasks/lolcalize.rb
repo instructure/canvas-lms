@@ -1,11 +1,12 @@
 module I18nTasks
   module Lolcalize
-    def translate_with_lols(key, options = {})
+    def translate(*args)
+      key, options = I18nliner::CallHelpers.infer_arguments(args)
       if options[:default]
         key = :lols # so that it doesn't find a real translation
         options[:default] = let_there_be_lols(options[:default]) if options[:default].present?
       end
-      translate_without_lols(key, options)
+      super(key, options)
     end
 
     # see also app/coffeescripts/str/i18nLolcalize.coffee
@@ -32,7 +33,6 @@ module I18nTasks
     def self.extended(klass)
       klass.class_eval do
         class << self
-          alias_method_chain :translate, :lols
           alias_method :t, :translate
         end
       end

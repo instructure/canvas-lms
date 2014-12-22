@@ -1200,6 +1200,13 @@ describe Quizzes::QuizzesController do
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
       assert_unauthorized
     end
+
+    it "should include banks hash" do
+      user_session(@teacher)
+      get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
+      expect(response).to be_success
+      expect(assigns[:banks_hash]).not_to be_nil
+    end
   end
 
   describe "DELETE 'destroy'" do

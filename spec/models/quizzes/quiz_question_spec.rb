@@ -43,6 +43,23 @@ describe Quizzes::QuizQuestion do
     expect(data[:answers][0][:weight]).to eq 100
     expect(data[:answers][1][:weight]).to eql(0.0)
   end
+  context "blank answers for fill_in[_multiple]_blank[s] questions" do
+    before :once do
+      answers = [{"answer_text" => "True", 'id' => 1,}, {'id' => 2, "answer_text" => ""}]
+      course_with_teacher
+
+      @quiz = @course.quizzes.create
+      @short_answer_data = { :question_name   => 'test question',
+                :points_possible => '1',
+                :question_type   => 'short_answer_question',
+                :answers         => answers }
+      @question = @quiz.quiz_questions.create(:question_data => @short_answer_data)
+    end
+    it "should clear blanks before saving" do
+      expect(@question.question_data.answers.size).to eq 1
+      expect(@question.question_data.answers.first['text']).to eq @short_answer_data[:answers].first["answer_text"]
+    end
+  end
 
   describe "#question_data=" do
     before do

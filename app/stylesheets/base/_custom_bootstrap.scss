@@ -23,10 +23,7 @@
 @import "vendor/bootstrap/component-animations";
 @import "vendor/bootstrap/close";
 
-
-// Components: Buttons & Alerts
-@import "vendor/bootstrap/buttons";
-//@import "vendor/bootstrap/button-groups"; //use jquerUI buttonsets
+// Components: Alerts
 @import "vendor/bootstrap/alerts";
 
 // Components: Nav
@@ -63,7 +60,6 @@
 // RESPONSIVE CLASSES
 // ------------------
 @import "vendor/bootstrap/responsive-utilities";
-
 
 // MEDIA QUERIES
 // ------------------

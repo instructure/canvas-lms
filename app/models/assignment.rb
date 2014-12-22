@@ -38,7 +38,7 @@ class Assignment < ActiveRecord::Base
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id,
+    :external_tool_tag_attributes, :freeze_on_copy,
     :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data
 
   EXPORTABLE_ATTRIBUTES = [

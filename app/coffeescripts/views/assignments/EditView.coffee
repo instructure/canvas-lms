@@ -14,6 +14,7 @@ define [
   'compiled/views/assignments/AssignmentGroupSelector'
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/jquery/toggleAccessibly'
+  'compiled/views/editor/KeyboardShortcuts'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jqueryui/dialog'
@@ -21,7 +22,7 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
 userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
-AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
+AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts) ->
 
   class EditView extends ValidatedFormView
 
@@ -172,6 +173,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     afterRender: =>
       @_attachEditorToDescription()
       $ @_initializeWikiSidebar
+      @addTinyMCEKeyboardShortcuts()
       this
 
     toJSON: =>
@@ -197,6 +199,10 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         wikiSidebar.init()
         $.scrollSidebar()
       wikiSidebar.attachToEditor(@$description).show()
+
+    addTinyMCEKeyboardShortcuts: =>
+      keyboardShortcutsView = new RCEKeyboardShortcuts()
+      keyboardShortcutsView.render().$el.insertBefore($(".rte_switch_views_link:first"))
 
     # -- Data for Submitting --
     getFormData: =>

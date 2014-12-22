@@ -210,6 +210,41 @@ describe Quizzes::QuizSubmission do
       expect(qs.score).to be_nil
       expect(qs.kept_score).to eq 3
     end
+
+    it "should assign a grader for a submission update" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "2405" }
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      # the default value for grader is a negative quiz_id... since forever
+      expect(qs.submission.grader_id).to eq "-#{qs.quiz_id}".to_i
+
+      qs.update_scores(:grader_id => @user.id, :fudge_points => 1, :question_score_1 => 0)
+
+      # now when a score is updated we have a real grader associated!
+      expect(qs.submission.reload.grader_id).to eq @user.id
+    end
+  end
+
+  describe '#backup_submission_data' do
+    it 'records an event with the answers' do
+      event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
+
+      qq1 = @quiz.quiz_questions.create!({ question_data: multiple_choice_question_data })
+      qq2 = @quiz.quiz_questions.create!({ question_data: true_false_question_data })
+
+      @quiz.publish!
+
+      quiz_submission = @quiz.generate_submission(user)
+      quiz_submission.backup_submission_data({
+        "question_#{qq1.id}" => "1",
+        "question_#{qq2.id}" => "",
+        "question_#{qq1.id}_marked" => false,
+        "question_#{qq2.id}_marked" => false
+      })
+
+      expect(quiz_submission.events.where(event_type: event_type).count).to eq 1
+    end
   end
 
   it "should not allowed grading on an already-graded submission" do

@@ -45,6 +45,8 @@ define [
       @deferred = $.Deferred()
       @deferred.fail (failReason) =>
         @error = failReason
+        $.screenReaderFlashError(@error.message) if @error?.message
+
       $.ajaxJSON(@getPreflightUrl(), 'POST', @createPreFlightParams(), @onPreflightComplete, @deferred.reject)
       @deferred.promise()
 
@@ -54,6 +56,7 @@ define [
       @_xhr.upload.addEventListener('progress', @trackProgress, false)
       @_xhr.onload = @onUploadPosted
       @_xhr.onerror = @deferred.reject
+      @_xhr.onabort = @deferred.reject
       @_xhr.open 'POST', @uploadData.upload_url, true
       @_xhr.send @createFormData()
 

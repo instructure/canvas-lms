@@ -85,6 +85,24 @@ describe "Standard Common Cartridge importing" do
       expect(url.url).to eq "http://www.imsglobal.org/developers/BLTI/tool.php"
     end
 
+    it "should mark teacher role content as unpublished" do
+      m = @course.context_modules.first
+
+      # assignment
+      expect(m.content_tags[0].content.workflow_state).to eq 'unpublished'
+      # discussion
+      expect(m.content_tags[1].content.workflow_state).to eq 'unpublished'
+      # weblink
+      expect(m.content_tags[2].workflow_state).to eq 'unpublished'
+      # lti launch
+      expect(m.content_tags[3].workflow_state).to eq 'unpublished'
+    end
+
+    it "should mark teacher role webcontent as locked and hidden" do
+      att = @course.attachments.where(migration_id: 'Resource5').first
+      expect(att.locked?).to eq true
+    end
+
   end
 
   context 'variant support' do

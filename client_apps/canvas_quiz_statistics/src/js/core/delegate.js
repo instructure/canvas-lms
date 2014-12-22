@@ -76,5 +76,15 @@ define(function(require) {
   exports.reload = reload;
   exports.unmount = unmount;
 
+  //>>excludeStart("production", pragmas.production);
+  // You can use this in development to read the props of the app layout
+  // directly in console.
+  //
+  //     require([ 'core/delegate' ], function(Delegate) {
+  //       Delegate.__getLayout__().props; // {}
+  //     });
+  exports.__getLayout__ = function() { return layout; }
+  //>>excludeEnd("production");
+
   return exports;
 });

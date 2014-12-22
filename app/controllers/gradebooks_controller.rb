@@ -189,7 +189,7 @@ class GradebooksController < ApplicationController
       :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
       :outcome_links_url => api_v1_course_outcome_group_links_url(@context),
       :outcome_rollups_url => api_v1_course_outcome_rollups_url(@context, :per_page => 100),
-      :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
+      :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", :include =>[:visibility]),
       :context_url => named_context_url(@context, :context_url),
       :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
       :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
@@ -216,7 +216,8 @@ class GradebooksController < ApplicationController
       :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
       :sis_app_url => Setting.get('sis_app_url', nil),
-      :sis_app_token => Setting.get('sis_app_token', nil)
+      :sis_app_token => Setting.get('sis_app_token', nil),
+      :list_students_by_sortable_name_enabled => @context.feature_enabled?(:gradebook_list_students_by_sortable_name)
     }
   end
 
@@ -473,8 +474,7 @@ class GradebooksController < ApplicationController
 
 
   def assignment_groups_json(opts={})
-    assignment_scope = AssignmentGroup.assignment_scope_for_draft_state(@context)
-    @context.assignment_groups.active.includes(assignment_scope).map { |g|
+    @context.assignment_groups.active.includes(:published_assignments).map { |g|
       assignment_group_json(g, @current_user, session, ['assignments'], {
         stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?
       })

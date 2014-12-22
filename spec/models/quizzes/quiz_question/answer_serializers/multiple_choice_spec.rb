@@ -10,7 +10,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleChoice do
   include_examples 'Answer Serializers'
 
   let :input do
-    2405
+    '2405'
   end
 
   let :output do

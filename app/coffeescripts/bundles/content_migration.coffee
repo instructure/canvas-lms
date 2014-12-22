@@ -63,7 +63,7 @@ require [
   ConverterViewControl.setModel new ContentMigrationModel
                                  course_id: ENV.COURSE_ID
                                  daySubCollection: daySubCollection
-  
+
   daySubCollection          = new DaySubstitutionCollection
   daySubCollectionView      = new CollectionView
                                  collection: daySubCollection
@@ -96,14 +96,15 @@ require [
   dfd = progressingMigCollection.fetch()
   progressingCollectionView.$el.disableWhileLoading dfd
 
-  # Migration has now started and is being processed at this point. 
-  $.subscribe 'migrationCreated', (migrationModelData) -> 
+  # Migration has now started and is being processed at this point.
+  $.subscribe 'migrationCreated', (migrationModelData) ->
     progressingMigCollection.add migrationModelData
+    $.screenReaderFlashMessageExclusive(I18n.t('Content migration queued'))
 
-  # Registers any subviews with any changes that happen 
+  # Registers any subviews with any changes that happen
   # when selecting a converter. Give it the value to
-  # look for then the subview to insert. Works like 
-  # this 
+  # look for then the subview to insert. Works like
+  # this
   #
   # ie   ConverterChange.register key: 'some_dropdown_value', view: new BackboneView
 
@@ -114,14 +115,14 @@ require [
                                    model: ConverterViewControl.getModel()
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
-            folderPicker:        new FolderPickerView 
+            folderPicker:        new FolderPickerView
                                    model: ConverterViewControl.getModel()
                                    folderOptions: ENV.FOLDER_OPTIONS
 
-  ConverterViewControl.register 
+  ConverterViewControl.register
     key: 'course_copy_importer'
     view: new CopyCourseView
-            courseFindSelect: new CourseFindSelectView 
+            courseFindSelect: new CourseFindSelectView
                                 current_user_id: ENV.current_user_id
                                 model: ConverterViewControl.getModel()
 

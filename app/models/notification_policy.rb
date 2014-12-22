@@ -51,23 +51,6 @@ class NotificationPolicy < ActiveRecord::Base
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
-  def self.spam_blocked_by(user)
-    NotificationPolicy.where(:communication_channel_id => user.communication_channels.pluck(:id)).delete_all
-    cc = user.communication_channel
-    cc.confirm
-    Notification.all.each do |notification|
-      if notification.category == "Message"
-        NotificationPolicy.create(:notification => notification, :communication_channel => cc, :frequency => 'immediately')
-      else
-        NotificationPolicy.create(:notification => notification, :communication_channel => cc, :frequency => 'never')
-      end
-    end
-    true
-  rescue => e
-    puts e.to_s
-    false
-  end
-
   def self.setup_for(user, params)
     # Check for user preference settings first. Some communication related options are available on the page.
     # Handle those if given.
@@ -163,16 +146,27 @@ class NotificationPolicy < ActiveRecord::Base
     end
   end
 
-  def self.find_all_for(communication_channel)
+  # frequencies is an optional hash; key is notification_name (underscore)
+  def self.find_all_for(communication_channel, frequencies = {})
+    frequencies = Hash[frequencies.map { |name, frequency| [BroadcastPolicy.notification_finder.by_name(name.titleize), frequency] }]
     communication_channel.shard.activate do
-      policies = communication_channel.notification_policies.all
+      policies = communication_channel.notification_policies.to_a
       Notification.all.each do |notification|
-        next if policies.find { |p| p.notification_id == notification.id }
+        policy = policies.find { |p| p.notification_id == notification.id }
+        if policy
+          if frequencies[notification]
+            policy.frequency = frequencies[policy.notification]
+            policy.save! if policy.changed?
+          end
+          next
+        end
+        np = nil
         NotificationPolicy.transaction(requires_new: true) do
-          np = nil
           begin
             np = communication_channel.notification_policies.build(notification: notification)
-            np.frequency = if communication_channel == communication_channel.user.communication_channel
+            np.frequency = if frequencies[notification]
+                             frequencies[notification]
+                           elsif communication_channel == communication_channel.user.communication_channel
                              notification.default_frequency(communication_channel.user)
                            else
                              'never'
@@ -182,9 +176,9 @@ class NotificationPolicy < ActiveRecord::Base
             np = nil
             raise ActiveRecord::Rollback
           end
-          np ||= communication_channel.notification_policies.where(notification_id: notification).first
-          policies << np
         end
+        np ||= communication_channel.notification_policies.where(notification_id: notification).first
+        policies << np
       end
       policies
     end

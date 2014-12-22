@@ -33,9 +33,10 @@
 -%>
 <%= render :partial => "layouts/head" %>
 <body class="<%= (@body_classes).uniq.join(" ") %>">
+<%# Flash messages must be outside of #application or they won't work in screenreaders with modals open. %>
+<%= render :partial => 'shared/flash_notices' %>
 <div id="application">
   <noscript><div role="alert" class="ic-flash-static ic-flash-error"><h1><%= t :javascript_required, "You need to have JavaScript enabled in order to access this site." %></h1></div></noscript>
-  <%= render :partial => 'shared/flash_notices' %>
 
   <% if @current_user.try(:show_bouncing_channel_message?) %>
     <div role="alert" class="ic-flash-static ic-flash-warning">
@@ -52,7 +53,7 @@
         <a class="canvas-logo-area__logo-link" href="<%= dashboard_url %>">
           <span class="screenreader-only"><%= t 'links.dashboard', "My Dashboard" %></span>
           <%= render(:partial => 'shared/svg/svg_canvas_logo') %>
-        </a> 
+        </a>
       </div>
       <div class="canvas-customer-area">
         <div class="canvas-customer-area__content">
@@ -74,7 +75,7 @@
     </div>
   </header>
   <%# End alternate markup for K-12 Canvas header %>
-  
+
   <%# Begin default Canvas header %>
   <% else %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">

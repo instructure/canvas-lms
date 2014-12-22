@@ -17,7 +17,7 @@ define [
       'Content-Type': 'application/json'
     }, JSON.stringify(json)]
 
-  groupsResponse =   # GET "/api/v1/group_categories/20/groups?per_page=50"
+  groupsResponse =   # GET "/api/v1/group_categories/20/groups?per_page=50&include[]=sections"
     [
       {
         "description": null,
@@ -146,7 +146,7 @@ define [
       #   and one GET request for "/api/v1/group_categories/20/users?unassigned=true&per_page=50"
       server.respondWith("GET", "/api/v1/group_categories/20/groups?per_page=50",
         [200, { "Content-Type": "application/json" }, JSON.stringify(groupsResponse)])
-      server.respondWith("GET", "/api/v1/group_categories/20/users?per_page=50&unassigned=true",
+      server.respondWith("GET", "/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true",
         [200, { "Content-Type": "application/json" }, JSON.stringify(unassignedUsersResponse)])
 
       view.render()
@@ -202,7 +202,7 @@ define [
     sendResponse("GET", "/api/v1/group_categories/20?includes[]=unassigned_users_count&includes[]=groups_count", JSON.stringify(_.extend({}, groupCategoryResponse, {groups_count: 1, unassigned_users_count: 0})))
     server.respondWith("GET", "/api/v1/group_categories/20/groups?per_page=50",
       [200, { "Content-Type": "application/json" }, JSON.stringify(groupsResponse)])
-    server.respondWith("GET", "/api/v1/group_categories/20/users?per_page=50&unassigned=true",
+    server.respondWith("GET", "/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true",
       [200, { "Content-Type": "application/json" }, JSON.stringify([])])
     server.respond()
 

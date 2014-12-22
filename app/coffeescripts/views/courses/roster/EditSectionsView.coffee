@@ -63,7 +63,7 @@ define [
       $link.attr('href', '#')
       $link.attr('title', I18n.t("remove_user_from_course_section", "Remove user from %{course_section}", course_section: $token.find('div').attr('title')))
       $screenreader_span = $('<span class="screenreader-only"></span>').append(I18n.t("remove_user_from_course_section",
-        "Remove user from %{course_section}", course_section: $token.find('div').attr('title')))
+        "Remove user from %{course_section}", course_section: h($token.find('div').attr('title'))))
       $link.append($screenreader_span)
 
     update: (e) =>

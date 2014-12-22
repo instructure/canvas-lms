@@ -79,7 +79,7 @@ define [
       super
 
       timeField = @$el.find(".datetime_field")
-      if @model.multipleDueDates()
+      if @model.multipleDueDates() || @model.isOnlyVisibleToOverrides()
         timeField.tooltip
           position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
           tooltipClass: 'center bottom vertical',

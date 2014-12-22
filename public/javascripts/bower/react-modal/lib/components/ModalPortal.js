@@ -2,6 +2,7 @@ var React = require('react');
 var div = React.DOM.div;
 var focusManager = require('../helpers/focusManager');
 var scopeTab = require('../helpers/scopeTab');
+var cx = require('react/lib/cx');
 
 // so that our CSS is statically analyzable
 var CLASS_NAMES = {
@@ -33,19 +34,34 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   componentDidMount: function() {
-    this.handleProps(this.props);
-    this.maybeFocus();
+    // Focus needs to be set when mounting and already open
+    if (this.props.isOpen) {
+      this.setFocusAfterRender(true);
+      this.open();
+    }
   },
 
   componentWillReceiveProps: function(newProps) {
-    this.handleProps(newProps);
+    // Focus only needs to be set once when the modal is being opened
+    if (!this.props.isOpen && newProps.isOpen) {
+      this.setFocusAfterRender(true);
+    }
+
+    if (newProps.isOpen === true)
+      this.open();
+    else if (newProps.isOpen === false)
+      this.close();
   },
 
-  handleProps: function(props) {
-    if (props.isOpen === true)
-      this.open();
-    else if (props.isOpen === false)
-      this.close();
+  componentDidUpdate: function () {
+    if (this.focusAfterRender) {
+      this.focusContent();
+      this.setFocusAfterRender(false);
+    }
+  },
+
+  setFocusAfterRender: function (focus) {
+    this.focusAfterRender = focus;
   },
 
   open: function() {
@@ -63,15 +79,6 @@ var ModalPortal = module.exports = React.createClass({
       this.closeWithTimeout();
     else
       this.closeWithoutTimeout();
-  },
-
-  componentDidUpdate: function() {
-    this.maybeFocus();
-  },
-
-  maybeFocus: function() {
-    if (this.props.isOpen)
-      this.focusContent();
   },
 
   focusContent: function() {
@@ -97,8 +104,8 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   handleKeyDown: function(event) {
-    if (event.key == 9 /*tab*/) scopeTab(this.getDOMNode(), event);
-    if (event.key == 27 /*esc*/) this.requestClose();
+    if (event.keyCode == 9 /*tab*/) scopeTab(this.getDOMNode(), event);
+    if (event.keyCode == 27 /*esc*/) this.requestClose();
   },
 
   handleOverlayClick: function() {
@@ -109,7 +116,7 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   requestClose: function() {
-    if (this.ownerHandlesClose)
+    if (this.ownerHandlesClose())
       this.props.onRequestClose();
   },
 
@@ -135,13 +142,14 @@ var ModalPortal = module.exports = React.createClass({
   render: function() {
     return this.shouldBeClosed() ? div() : (
       div({
-        className: this.buildClassName('overlay'),
+        ref: "overlay",
+        className: cx(this.buildClassName('overlay'), this.props.overlayClassName),
         style: this.overlayStyles,
         onClick: this.handleOverlayClick
       },
         div({
           ref: "content",
-          className: this.buildClassName('content'),
+          className: cx(this.buildClassName('content'), this.props.className),
           tabIndex: "-1",
           onClick: stopPropagation,
           onKeyDown: this.handleKeyDown
@@ -152,4 +160,3 @@ var ModalPortal = module.exports = React.createClass({
     );
   }
 });
-

@@ -14,7 +14,7 @@ define [
   ,
     displayName: I18n.t('kind', 'Kind')
     property: 'content-type'
-    className: 'screenreader-only'
+    className: 'ef-hidden-flex'
   ,
     displayNameShort: I18n.t('created_at_short', 'Created')
     displayName: I18n.t('created_at', 'Date Created')
@@ -33,6 +33,10 @@ define [
     displayName: I18n.t('size', 'Size')
     property: 'size'
     className: 'ef-size-col'
+  ,
+    displayName: I18n.t('Usage Rights')
+    property: 'usage_rights'
+    className: 'ef-usage-rights-col'
   ]
 
   ColumnHeaders = React.createClass
@@ -58,7 +62,7 @@ define [
       order = @props.query.order or 'asc'
 
       header className:'ef-directory-header', role: 'row',
-        label className: 'screenreader-only', role: 'columnheader',
+        label className: 'ef-hidden-flex', role: 'columnheader',
           input {
             type: 'checkbox'
             checked: @props.areAllItemsSelected()
@@ -66,6 +70,9 @@ define [
           },
           I18n.t('select_all', 'Select All')
         columns.map (column) =>
+          # don't show any usage rights related stuff to people that don't have the feature flag on
+          return if (column.property is 'usage_rights') and !@props.usageRightsRequiredForContext
+
           isSortedCol = sort is column.property
           div {
             key: column.property
@@ -78,8 +85,13 @@ define [
               className: 'ef-plain-link'
             }, @props),
 
-              span className: ('visible-desktop' if column.displayNameShort),
-                column.displayName
+              span className: ("#{'visible-desktop' if column.displayNameShort} #{'ef-usage-rights-col-offset' if column.property == 'usage_rights'}"),
+                if (column.property == 'usage_rights')
+                  i {className: 'icon-files-copyright'},
+                    span {className: 'screenreader-only'},
+                      I18n.t('Usage Rights')
+                else
+                  column.displayName
               if column.displayNameShort
                 span className: 'hidden-desktop',
                   column.displayNameShort

@@ -79,7 +79,8 @@ class Account < ActiveRecord::Base
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
   has_many :content_migrations, :as => :context
-  has_many :grading_periods, dependent: :destroy
+  has_many :grading_period_groups, dependent: :destroy
+  has_many :grading_periods, through: :grading_period_groups
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
@@ -103,6 +104,7 @@ class Account < ActiveRecord::Base
   has_many :alerts, :as => :context, :include => :criteria
   has_many :user_account_associations
   has_many :report_snapshots
+  has_many :external_integration_keys, :as => :context, :dependent => :destroy
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -214,6 +216,7 @@ class Account < ActiveRecord::Base
   add_setting :product_name, root_only: true
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: true
+  add_setting :trusted_referers, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -495,7 +498,7 @@ class Account < ActiveRecord::Base
   end
 
   def quota
-    Rails.cache.fetch(['current_quota', self].cache_key) do
+    Rails.cache.fetch(['current_quota', self.id].cache_key) do
       read_attribute(:storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
         Setting.get('account_default_quota', 500.megabytes.to_s).to_i
@@ -503,7 +506,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota
-    Rails.cache.fetch(['default_storage_quota', self].cache_key) do
+    Rails.cache.fetch(['default_storage_quota', self.id].cache_key) do
       read_attribute(:default_storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
         Setting.get('account_default_quota', 500.megabytes.to_s).to_i
@@ -526,6 +529,8 @@ class Account < ActiveRecord::Base
     if parent_account && parent_account.default_storage_quota == val
       val = nil
     end
+    clear_sub_account_quota_cache('default_storage_quota')
+    clear_sub_account_quota_cache('current_quota')
     write_attribute(:default_storage_quota, val)
   end
 
@@ -549,13 +554,20 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota
-    read_attribute(:default_group_storage_quota) ||
+    Rails.cache.fetch(['default_group_storage_quota', self.id].cache_key) do
+      read_attribute(:default_group_storage_quota) ||
+        (self.parent_account.default_group_storage_quota rescue nil) ||
         Group.default_storage_quota
+    end
   end
 
   def default_group_storage_quota=(val)
     val = val.to_i
-    val = nil if val == Group.default_storage_quota || val <= 0
+    if (val == Group.default_storage_quota) || (val <= 0) ||
+        (self.parent_account && self.parent_account.default_group_storage_quota == val)
+      val = nil
+    end
+    clear_sub_account_quota_cache('default_group_storage_quota')
     write_attribute(:default_group_storage_quota, val)
   end
 
@@ -565,6 +577,15 @@ class Account < ActiveRecord::Base
 
   def default_group_storage_quota_mb=(val)
     self.default_group_storage_quota = val.try(:to_i).try(:megabytes)
+  end
+
+  def clear_sub_account_quota_cache(quota_key)
+    return unless self.id
+    account_ids = Account.sub_account_ids_recursive(self.id)
+    account_ids << self.id
+    account_ids.each do |account_id|
+      Rails.cache.delete([quota_key, account_id].cache_key)
+    end
   end
 
   def turnitin_shared_secret=(secret)
@@ -982,14 +1003,6 @@ class Account < ActiveRecord::Base
     self.pseudonyms.map{|p| p.user }.select{|u| u.name.match(string) }
   end
 
-  def self.site_admin
-    get_special_account(:site_admin, 'Site Admin')
-  end
-
-  def self.default
-    get_special_account(:default, 'Default Account')
-  end
-
   class << self
     def special_accounts
       @special_accounts ||= {}
@@ -1008,7 +1021,18 @@ class Account < ActiveRecord::Base
     def clear_special_account_cache!(force = false)
       special_account_timed_cache.clear(force)
     end
+
+    def define_special_account(key, name = nil)
+      name ||= key.to_s.titleize
+      instance_eval <<-RUBY
+        def self.#{key}(force_create = false)
+          get_special_account(:#{key}, #{name.inspect}, force_create)
+        end
+      RUBY
+    end
   end
+  define_special_account(:default, 'Default Account')
+  define_special_account(:site_admin)
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache
@@ -1024,7 +1048,7 @@ class Account < ActiveRecord::Base
     account
   end
 
-  def self.get_special_account(special_account_type, default_account_name)
+  def self.get_special_account(special_account_type, default_account_name, force_create = false)
     Shard.birth.activate do
       account = special_accounts[special_account_type]
       unless account
@@ -1039,7 +1063,7 @@ class Account < ActiveRecord::Base
           account = special_accounts[special_account_type] = Account.where(id: special_account_id).first
         end
       end
-      if !account && default_account_name
+      if !account && default_account_name && ((!special_account_id && !Rails.env.production?) || force_create)
         # TODO i18n
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
@@ -1197,6 +1221,7 @@ class Account < ActiveRecord::Base
         :id => tool.asset_string,
         :label => tool.label_for(:account_navigation, opts[:language]),
         :css_class => tool.asset_string,
+        :visibility => tool.account_navigation(:visibility),
         :href => :account_external_tool_path,
         :external => true,
         :args => [self.id, tool.id]
@@ -1237,6 +1262,7 @@ class Account < ActiveRecord::Base
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
     tabs << { :id => TAB_ADMIN_TOOLS, :label => t('#account.tab_admin_tools', "Admin Tools"), :css_class => 'admin_tools', :href => :account_admin_tools_path } if can_see_admin_tools_tab?(user)
     tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }
+    tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, :manage)
     tabs
   end
 
@@ -1501,4 +1527,30 @@ class Account < ActiveRecord::Base
   end
 
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Account, :name, :id)
+
+  def format_referer(referer_url)
+    begin
+      referer = URI(referer_url || '')
+    rescue URI::InvalidURIError
+      return
+    end
+    return unless referer.host
+
+    referer_with_port = "#{referer.scheme}://#{referer.host}"
+    referer_with_port += ":#{referer.port}" unless referer.port == (referer.scheme == 'https' ? 443 : 80)
+    referer_with_port
+  end
+
+  def trusted_referers=(value)
+    self.settings[:trusted_referers] = unless value.blank?
+      value.split(',').map { |referer_url| format_referer(referer_url) }.compact.join(',')
+    end
+  end
+
+  def trusted_referer?(referer_url)
+    return if !self.settings.has_key?(:trusted_referers) || self.settings[:trusted_referers].empty?
+    if referer_with_port = format_referer(referer_url)
+      self.settings[:trusted_referers].split(',').include?(referer_with_port)
+    end
+  end
 end

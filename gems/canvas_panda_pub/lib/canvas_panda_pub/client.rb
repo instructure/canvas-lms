@@ -18,6 +18,7 @@
 
 require 'uri'
 require 'jwt'
+require 'json'
 
 module CanvasPandaPub
 

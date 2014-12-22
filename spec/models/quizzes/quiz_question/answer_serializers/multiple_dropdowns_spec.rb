@@ -11,8 +11,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleDropdowns do
 
   let :input do
     {
-      structure1: 4390,
-      event2: 599
+      structure1: '4390',
+      event2: '599'
     }.with_indifferent_access
   end
 

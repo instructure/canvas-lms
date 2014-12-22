@@ -131,6 +131,7 @@ class Quizzes::QuizQuestion::Base
     user_answer
   end
 
+  # TODO: remove once new stats is on for everybody
   def stats(responses)
     answers = @question_data.answers
 

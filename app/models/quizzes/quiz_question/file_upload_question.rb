@@ -22,7 +22,7 @@ class Quizzes::QuizQuestion::FileUploadQuestion < Quizzes::QuizQuestion::Base
     true
   end
 
-
+  # TODO: remove once new stats is on for everybody
   def stats(responses)
     stats = {:file_upload_responses => []}
 

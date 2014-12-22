@@ -602,6 +602,25 @@
                     <xs:element name="display_name" type="xs:string" minOccurs="0"/>
                     <xs:element name="hidden" type="xs:boolean" minOccurs="0"/>
                     <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="usage_rights" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:attribute name="use_justification" type="xs:string" use="required"/>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="public_domain"/>
+                              <xs:enumeration value="own_copyright"/>
+                              <xs:enumeration value="used_by_permission"/>
+                              <xs:enumeration value="fair_use"/>
+                              <xs:enumeration value="creative_commons"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:all minOccurs="0">
+                          <xs:element name="legal_copyright" type="xs:string" minOccurs="0"/>
+                          <xs:element name="license" type="xs:string" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
                   </xs:all>
                   <xs:attribute name="identifier" type="xs:string" use="required"/>
                 </xs:complexType>

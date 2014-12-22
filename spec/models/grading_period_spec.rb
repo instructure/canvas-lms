@@ -23,18 +23,6 @@ describe GradingPeriod do
     @grading_period = GradingPeriod.create(course_id: 1, weight: 25.0, start_date: Time.zone.now, end_date: 1.day.from_now)
   end
 
-  context "associations" do
-    it "should belong to a course" do
-      association = GradingPeriod.reflect_on_association(:course)
-      expect(association.macro).to eq :belongs_to
-    end
-
-    it "should belong to an account" do
-      association = GradingPeriod.reflect_on_association(:account)
-      expect(association.macro).to eq :belongs_to
-    end
-  end
-
   context "validation" do
     it "should be valid with appropriate input" do
       expect(@grading_period).to be_valid

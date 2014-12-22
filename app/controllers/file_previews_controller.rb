@@ -55,7 +55,11 @@ class FilePreviewsController < ApplicationController
       @show_left_side = false
       return render template: 'shared/errors/404_message', status: :not_found
     end
-    if authorized_action(@file, @current_user, :download)
+    if authorized_action(@file, @current_user, :read)
+      unless @file.grants_right?(@current_user, :download)
+        @lock_info = @file.locked_for?(@current_user)
+        return render template: 'file_previews/lock_explanation', layout: false
+      end
       # mark item seen for module progression purposes
       @file.context_module_action(@current_user, :read) if @current_user
       @file.record_inline_view

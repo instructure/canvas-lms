@@ -1,9 +1,11 @@
 define [
+  'i18n!folder_tree'
   'react'
   'react-router'
-  'compiled/views/FileBrowserView'
+  'compiled/views/TreeBrowserView'
+  'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
-], (React, Router, FileBrowserView, customPropTypes) ->
+], (I18n, React, Router, TreeBrowserView, RootFoldersFinder, customPropTypes) ->
 
   FolderTree = React.createClass
     displayName: 'FolderTree'
@@ -15,9 +17,12 @@ define [
     mixins: [Router.Navigation, Router.ActiveState]
 
     componentDidMount: ->
-      new FileBrowserView({
-        onlyShowFolders: true,
+      rootFoldersFinder = new RootFoldersFinder({
         rootFoldersToShow: @props.rootFoldersToShow
+      })
+      new TreeBrowserView({
+        onlyShowFolders: true,
+        rootModelsFinder: rootFoldersFinder
         onClick: @onClick
         dndOptions: @props.dndOptions
         href: @hrefFor
@@ -35,7 +40,13 @@ define [
       event.preventDefault()
       $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @focusStyleClass).each( (key, value) => $(value).removeClass(@focusStyleClass))
       $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @selectedStyleClass).each( (key, value) => $(value).removeClass(@selectedStyleClass))
-      @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+      if folder.get('locked_for_user')
+        message = I18n.t('This folder is currently locked and unavailable to view.')
+        $.flashError message
+        $.screenReaderFlashMessage message
+      else
+        @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+
 
 
     hrefFor: (folder) ->

@@ -37,6 +37,7 @@ define [
       uploader.cancel = =>
         uploader._xhr?.abort()
         @_queue = _.without(@_queue, uploader)
+        @currentUploader = null if @currentUploader is uploader
         @onChange()
 
       uploader

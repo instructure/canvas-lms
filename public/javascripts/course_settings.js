@@ -315,7 +315,7 @@ define([
         $(this).loadingImage('remove');
         $(this).formErrors(data);
       },
-      disableWhileLoading: true
+      disableWhileLoading: 'spin_on_success'
     })
     $(".associated_user_link").click(function(event) {
       event.preventDefault();

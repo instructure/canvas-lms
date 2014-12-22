@@ -30,9 +30,16 @@ describe FilePreviewsController do
   end
 
   it "should require authorization to view the file" do
-    attachment_model locked: true
+    course_model
+    attachment_model
     get :show, course_id: @course.id, file_id: @attachment.id
     expect(response.status).to eq 401
+  end
+
+  it "should render lock information for the file" do
+    attachment_model locked: true
+    get :show, course_id: @course.id, file_id: @attachment.id
+    expect(response).to render_template 'lock_explanation'
   end
 
   it "should 404 (w/o canvas chrome) if the file doesn't exist" do

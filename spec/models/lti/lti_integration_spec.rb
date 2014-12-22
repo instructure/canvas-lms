@@ -108,12 +108,12 @@ describe "LTI integration tests" do
     expect(post_payload['launch_presentation_document_target']).to eq 'iframe'
     expect(post_payload['launch_presentation_locale']).to eq 'en'
     expect(post_payload['launch_presentation_return_url']).to eq '/return/url'
-    expect(post_payload['lis_course_offering_sourcedid']).to eq canvas_course.sis_source_id
+    expect(post_payload['lis_course_offering_sourcedid']).to eq '$CourseSection.sourcedId'
     expect(post_payload['lis_person_contact_email_primary']).to eq canvas_user.email
     expect(post_payload['lis_person_name_family']).to eq canvas_user.last_name
     expect(post_payload['lis_person_name_full']).to eq canvas_user.name
     expect(post_payload['lis_person_name_given']).to eq canvas_user.first_name
-    expect(post_payload['lis_person_sourcedid']).to eq pseudonym.sis_user_id
+    expect(post_payload['lis_person_sourcedid']).to eq '$Person.sourcedId'
     expect(post_payload['lti_message_type']).to eq 'basic-lti-launch-request'
     expect(post_payload['lti_version']).to eq 'LTI-1p0'
     expect(post_payload['oauth_callback']).to eq 'about:blank'
@@ -176,12 +176,12 @@ describe "LTI integration tests" do
       expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
       expect(hash['custom_canvas_course_id']).to eq @course.id.to_s
       expect(hash['custom_canvas_api_domain']).to eq '$Canvas.api.domain'
-      expect(hash['lis_course_offering_sourcedid']).to eq 'coursesis'
+      expect(hash['lis_course_offering_sourcedid']).to eq '$CourseSection.sourcedId'
       expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
       expect(hash['lis_person_name_full']).to eq 'A Name'
       expect(hash['lis_person_name_family']).to eq 'Name'
       expect(hash['lis_person_name_given']).to eq 'A'
-      expect(hash['lis_person_sourcedid']).to eq 'testfun'
+      expect(hash['lis_person_sourcedid']).to eq '$Person.sourcedId'
       expect(hash['launch_presentation_locale']).to eq I18n.default_locale.to_s
       expect(hash['launch_presentation_document_target']).to eq 'iframe'
       expect(hash['launch_presentation_return_url']).to eq 'http://www.google.com'
@@ -233,7 +233,7 @@ describe "LTI integration tests" do
 
       hash['custom_canvas_account_id'] = sub_account.id.to_s
       hash['custom_canvas_account_sis_id'] = 'accountsis'
-      expect(hash['lis_person_sourcedid']).to eq 'testfun'
+      expect(hash['lis_person_sourcedid']).to eq '$Person.sourcedId'
       expect(hash['custom_canvas_user_id']).to eq '$Canvas.user.id'
       expect(hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end

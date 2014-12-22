@@ -62,13 +62,14 @@ describe CanvasPandaPub::Client do
 
   describe "generate_token" do
     it "should generate a token" do
-      token = @client.generate_token "/foo", true, true, Time.at(1409948989)
+      expires = Time.now + 60
+      token = @client.generate_token "/foo", true, true, expires
       payload, _ = JWT.decode(token, "secret")
       payload['keyId'].should eq("key")
       payload['channel'].should eq("/qwerty/foo")
       payload['pub'].should be true
       payload['sub'].should be true
-      payload['exp'].should eq(1409948989)
+      payload['exp'].should eq(expires.to_i)
     end
   end
 end

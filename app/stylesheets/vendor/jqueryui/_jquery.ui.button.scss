@@ -32,11 +32,14 @@ We use jQuery UI button set
 // make .ui-button mimic .btn styles
 .ui-button {
   position: relative;
-  @extend .btn;
-  &.ui-state-hover { @extend .btn:hover }
-  &.ui-state-focus { @extend .btn:focus }
-  &.ui-state-active { @extend .btn:active }
-  &.ui-state-disabled { @extend .btn:active }
+  @extend .Button;
+  &.ui-state-hover { @extend .Button:hover }
+  &.ui-state-focus { @extend .Button:focus }
+  &.ui-state-active { 
+    @extend .Button--active;
+    &:hover { @extend .Button--active; }
+  }
+  &.ui-state-disabled { @extend .Button--active; }
 }
 
 .ui-buttonset {

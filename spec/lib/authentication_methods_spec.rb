@@ -55,6 +55,7 @@ describe AuthenticationMethods do
         controller.expects(:destroy_session).once
         controller.expects(:redirect_to_login).once
         controller.session[:cas_session] = cas_ticket
+        controller.stubs(:logger).returns(stub(info: nil))
 
         @pseudonym.expects(:cas_ticket_expired?).with(cas_ticket).once.returns(true)
         controller.stubs(:load_pseudonym_from_access_token)
@@ -143,6 +144,7 @@ describe AuthenticationMethods do
       @controller = RSpec::MockController.new(nil, @request)
       @controller.stubs(:load_pseudonym_from_access_token)
       @controller.stubs(:api_request?).returns(false)
+      @controller.stubs(:logger).returns(stub(info: nil))
     end
 
     context "with active session" do

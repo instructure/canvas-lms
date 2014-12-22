@@ -54,7 +54,7 @@
  * @author Klaus Hartl/klaus.hartl@stilbuero.de
  */
 
-define(['jquery'], function($) {
+define(['vendor/jquery-1.7.2'], function(jQuery) {
 
 jQuery.cookie = function(name, value, options) {
     if (typeof value != 'undefined') { // name and value given, set cookie
