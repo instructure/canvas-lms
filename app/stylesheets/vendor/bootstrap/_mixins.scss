@@ -124,7 +124,9 @@
 @mixin input-block-level {
   display: block;
   width: 100%;
-  min-height: $inputHeight; // Make inputs at least the height of their button counterpart (base line-height + padding + border)
+  // Make inputs at least the height of their button counterpart (base line-height + padding + border) we add +8
+  // to accommodate the 8px of padding added with the new buttons
+  min-height: $inputHeight + 8;
   @include box-sizing(border-box); // Makes inputs behave like true block-level elements
 }
 
@@ -456,7 +458,10 @@
     width: 100%;
     @include clearfix();
     [class*="span"] {
-      @include input-block-level();
+      display: block;
+      width: 100%;
+      min-height: $inputHeight;
+      @include box-sizing(border-box);
       float: left;
       margin-left: $fluidGridGutterWidth;
       *margin-left: $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
