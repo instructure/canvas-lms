@@ -30,7 +30,7 @@ define [
       _open: ( event, target, content ) ->
         # Converts arguments to an array
         args = Array.prototype.slice.call(arguments, 0)
-        args.splice(2, 1, htmlEscape(content))
+        args.splice(2, 1, htmlEscape(content).toString())
         # if you move very fast, it's possible that
         # @timeout will be defined
         return if @timeout
@@ -126,9 +126,9 @@ define [
 
     opts.position.using ||= using
 
-    if $this.data('tooltip-title')
-      opts.content = -> $(this).data('tooltip-title')
-      opts.items = '[data-tooltip-title]'
+    if $this.data('html-tooltip-title')
+      opts.content = -> $.raw($(this).data('html-tooltip-title'))
+      opts.items = '[data-html-tooltip-title]'
 
     if $this.data('tooltip-class')
         opts.tooltipClass = $this.data('tooltip-class')
