@@ -26,6 +26,7 @@ describe "/courses/index" do
     assigns[:current_enrollments] = [@enrollment]
     assigns[:past_enrollments] = []
     assigns[:future_enrollments] = []
+    assigns[:visible_groups] = []
     render "courses/index"
     expect(response).not_to be_nil
   end
@@ -37,6 +38,7 @@ describe "/courses/index" do
     assigns[:current_enrollments] = [@enrollment]
     assigns[:past_enrollments] = []
     assigns[:future_enrollments] = []
+    assigns[:visible_groups] = [@group]
     render "courses/index"
     doc = Nokogiri::HTML.parse(response.body)
     expect(doc.at_css('#my_groups_table tr:first span.subtitle').text).to eq @course.name

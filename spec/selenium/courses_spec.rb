@@ -372,6 +372,7 @@ describe "courses" do
     it "should display user groups on courses page" do
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@student)
+      enroll_student(@student, true)
 
       login_as(@student.name)
       get '/courses'

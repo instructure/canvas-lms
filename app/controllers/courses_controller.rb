@@ -357,6 +357,8 @@ class CoursesController < ApplicationController
           end
         end
 
+        @visible_groups = @current_user.visible_groups
+
         @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
         [@current_enrollments, @future_enrollments].each{|list| list.sort_by!{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }}
       }

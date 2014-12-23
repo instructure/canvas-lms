@@ -2796,4 +2796,31 @@ describe User do
     end
 
   end
+
+  describe 'visible_groups' do
+    it "should include groups in published courses" do
+      course_with_student active_all:true
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 1
+    end
+
+    it "should not include groups that belong to unpublished courses" do
+      course_with_student
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 0
+    end
+
+    it "should include account groups" do
+      account = account_model(:parent_account => Account.default)
+      student = user active_all: true
+      @group = Group.create! context: account, name: "GroupOne"
+      @group.users << student
+      @group.save!
+      expect(student.visible_groups.size).to eq 1
+    end
+  end
 end

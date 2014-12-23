@@ -581,6 +581,16 @@ class User < ActiveRecord::Base
     where("groups.workflow_state <> 'deleted'")
   end
 
+  # Returns an array of groups which are currently visible for the user.
+  def visible_groups
+    @visible_groups ||= begin
+      enrollments = self.cached_current_enrollments(preload_courses: true)
+      visible_groups = self.current_groups.select do |group|
+        group.context_type != 'Course' || enrollments.any? { |en| en.course == group.context && (en.admin? || en.course.available?)}
+      end
+    end
+  end
+
   def <=>(other)
     self.name <=> other.name
   end
