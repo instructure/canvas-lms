@@ -956,7 +956,7 @@ class DiscussionTopicsController < ApplicationController
       extra_params = {
         :headless => 1,
         :hide_student_names => params[:hide_student_names],
-        student_id => params[:student_id]
+        :student_id => params[:student_id]
       }
     end
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
