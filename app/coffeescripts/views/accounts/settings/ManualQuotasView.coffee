@@ -132,7 +132,7 @@ define [
       @showErrors(errors)
 
     findSuccess: =>
-      @$link.html(@model.get('name'))
+      @$link.text(@model.get('name'))
       @$link.attr('href', @model.path + '/' + @model.get('id'))
 
       @$quota.val(@model.get('storage_quota_mb'))
