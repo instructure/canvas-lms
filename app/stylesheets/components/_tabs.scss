@@ -60,7 +60,7 @@ $("#styleguide-tabs-demo-minimal").tabs()
       border-color: transparent;
       box-shadow: none;
       a {
-        color: $linkColor;
+        color: $ic-link-color;
         font-weight: normal;
         padding: 8px 14px;
         text-shadow: none;
@@ -77,7 +77,7 @@ $("#styleguide-tabs-demo-minimal").tabs()
           @if $use_high_contrast { text-decoration: none; }
           
           // special handling for Calendar tabs with solid-color header backgrounds
-          #edit_event & { color: $linkColor; }
+          #edit_event & { color: $ic-link-color; }
         }
       }
       &.ui-state-focus,

@@ -143,13 +143,13 @@ table.criterion td
 h5, .h5
   margin-top: 0
   margin-bottom: 10px
-  color: $linkColor
+  color: $ic-link-color
   font-weight: normal
   min-height: 1em
   &.total
     font-weight: bold
     @if $use_high_contrast
-      color: $textColor
+      color: $ic-text-color
 
 table.criterion .edit
   display: none
@@ -174,16 +174,16 @@ table.criterion .insert
   cursor: pointer
   a
     @if $use_high_contrast
-      color: $textColor
+      color: $ic-text-color
     @else
       color: $grayLight
 
     text-decoration: none
   &:hover
     a
-      color: $linkColor
+      color: $ic-link-color
     span
-      border-top-color: $linkColor
+      border-top-color: $ic-link-color
 
 .arrow-icon
   width: 0
@@ -196,7 +196,7 @@ table.criterion .insert
   border-top-style: solid
   display: block
   @if $use_high_contrast
-    border-top-color: $textColor
+    border-top-color: $ic-text-color
   @else
     border-top-color: $grayLight
 

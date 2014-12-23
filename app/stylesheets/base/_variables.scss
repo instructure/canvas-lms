@@ -61,9 +61,9 @@ $canvas-danger:                   #ad393a; // red
 $canvas-alert:                    #c48506; // gold
 @if $use_high_contrast { $canvas-alert: #9e6b05; }
 
-$canvas-light:                    #ffffff; // white
+$canvas-light:                    #fff; // white
 
-$canvas-dark:                     #333333;
+$canvas-dark:                     #333;
 
 
 
@@ -142,13 +142,6 @@ $course-sidenav_list-item--inactive-font-color: #ccc;
 $course-sidenav_list-item--hover-bg-color: #0099e0;
 @if $use_high_contrast {$course-sidenav_list-item--hover-bg-color: #333;}
 
-// Ulility Variables
-//=======================
-// Variables we can reuse to make Canvas behave more consistently, in terms of how far things are
-// spaced and what transitions feel like, etc.
-
-$can-sp: 12px; // use this variable -- or multiples of it -- to space things out and add padding, etc.
-$can-transition: cubic-bezier(0,1,0.5,1); // this is a pleasing transition that can be used when you need a transition timing function
 
 // Legacy Variables
 //=======================
@@ -253,6 +246,9 @@ $wellBackground: #e8ecef;
 //==================================================================================
 //
 
+$can-sp: 12px; // use this variable -- or multiples of it -- to space things out and add padding, etc.
+$can-transition: cubic-bezier(0,1,0.5,1); // this is a pleasing transition that can be used when you need a transition timing function
+
 /// Global light background colors
 //================================
 
@@ -285,8 +281,17 @@ $can-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color ex
 @if $use_new_styles { $can-border-dark: lighten($canvas-secondary, 25%); }
 @else { $can-border-dark: lighten(#4b5662, 20%); }
 
+
 /// Link-color-related variables
 //==============================
+
+$ic-link-color: darken($canvas-primary, 5%);
+@if $use_high_contrast { $ic-link-color: darken($canvas-primary, 2%); }
+$ic-link-color-hover: darken($ic-link-color, 10%);
+
+// linkColor is a deprecated Bootstrap 2 variable. Please use $ic-link-color!
+$linkColor: $ic-link-color; // deprecated - do not use
+$linkColorHover: $ic-link-color-hover; // deprecated - do not use
 
 $ic-icon-link-color-hover: lighten($canvas-dark, 15%);
 @if $use_high_contrast { $ic-icon-link-color-hover: $canvas-dark; }
@@ -295,8 +300,10 @@ $ic-icon-link-color: lighten($canvas-dark, 30%);
 @if $use_high_contrast { $ic-icon-link-color: lighten($canvas-dark, 12%); }
 
 
+/// Text-color variables
+//======================
+$ic-text-color: $canvas-dark;
 
-
-
-
+// textColor is a deprecated Bootstrap 2 variable. Please use $ic-text-color!
+$textColor: $ic-text-color; // deprecated - do not use
 

@@ -241,10 +241,10 @@ input[type="button"] {
 .Button--link {
   border-color: transparent;
   cursor: pointer;
-  color: $linkColor;
+  color: $ic-link-color;
 
   &:hover {
-    color: $linkColorHover;
+    color: $ic-link-color-hover;
     text-decoration: underline;
     background: transparent;
   }
@@ -253,7 +253,7 @@ input[type="button"] {
     background: rgba($canvas-dark, 0.05);
     box-shadow: none;
     border-color: transparent;
-    color: $linkColor;
+    color: $ic-link-color;
   }
 
   &.disabled, &[disabled] {
