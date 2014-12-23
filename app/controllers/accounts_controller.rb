@@ -245,6 +245,9 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"]
+  #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read)
@@ -302,10 +305,14 @@ class AccountsController < ApplicationController
       end
     end
 
+    includes = Set.new(Array(params[:include]))
+    # We only want to return the permissions for single courses and not lists of courses.
+    includes.delete 'permissions'
+
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
 
     ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account])
-    render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
+    render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end
 
   # Delegated to by the update action (when the request is an api_request?)

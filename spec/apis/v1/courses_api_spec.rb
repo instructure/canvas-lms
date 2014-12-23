@@ -58,6 +58,11 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [teacher_enrollment]).has_key?("needs_grading_count")).to be_truthy
     end
 
+    it 'should return storage_quota_used_mb if requested' do
+      pp @test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment])
+      expect(@test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment]).has_key?("storage_quota_used_mb")).to be_truthy
+    end
+
     it 'should not honor needs_grading_count for designers' do
       @designer_enrollment = @course1.enroll_designer(@me)
       @designer_enrollment.accept!

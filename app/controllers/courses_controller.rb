@@ -207,6 +207,10 @@ require 'set'
 #           "example": 5,
 #           "type": "integer"
 #         },
+#         "storage_quota_used_mb": {
+#           "example": 5,
+#           "type": "float"
+#         },
 #         "hide_final_grades": {
 #           "example": false,
 #           "type": "boolean"
@@ -291,7 +295,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -329,6 +333,7 @@ class CoursesController < ApplicationController
   #     Returns an array of hashes containing the section ID (id), section name
   #     (name), start and end dates (start_at, end_at), as well as the enrollment
   #     type (enrollment_role, e.g. 'StudentEnrollment').
+  #   - "storage_quota_used_mb": The amount of storage space used by the files in this course
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
