@@ -89,7 +89,7 @@ gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
 gem 'net-ldap', '0.10.1'
 gem 'ruby-duration', '3.2.0'
-gem 'ruby-saml-mod', '0.2.1'
+gem 'ruby-saml-mod', '0.2.2'
 gem 'rubycas-client', '2.3.9'
 gem 'rubyzip', '1.1.1', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
