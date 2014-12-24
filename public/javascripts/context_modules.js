@@ -27,6 +27,7 @@ define([
   'jst/_vddTooltip',
   'compiled/models/Publishable',
   'compiled/views/PublishButtonView',
+  'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
@@ -40,7 +41,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView) {
+], function(PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -262,7 +263,7 @@ define([
         $("#context_modules .context_module").each(function() {
           var id = $(this).attr('id').substring('context_module_'.length);
           var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
-          moduleSelectOptions.push('<option value="' + id + '">' + name + '</option>');
+          moduleSelectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
         $('#move_module_item_module_select').empty();
         $('#move_module_item_module_select').append(moduleSelectOptions.join(''));
@@ -301,7 +302,7 @@ define([
           }
           var id = $(this).attr('id').substring('context_module_'.length);
           var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
-          selectOptions.push('<option value="' + id + '">' + name + '</option>');
+          selectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
 
         var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
@@ -329,37 +330,37 @@ define([
       },
       submitMoveModuleItem: function () {
         var beforeOrAfterVal = $('[name="item_move_location"]:checked').val();
-        var currentItem = $('#move_module_item_form').data('current_item');
+        var $currentItem = $('#move_module_item_form').data('current_item');
         var relativeToId = $('#move_module_item_select').val();
         var selectedModuleId = $('#move_module_item_module_select').val();
 
 
         if (beforeOrAfterVal === 'before') {
-          $('#context_module_item_' + relativeToId).before(currentItem);
+          $('#context_module_item_' + relativeToId).before($currentItem);
         }
         if (beforeOrAfterVal === 'after') {
-          $('#context_module_item_' + relativeToId).after(currentItem);
+          $('#context_module_item_' + relativeToId).after($currentItem);
         }
         if ($('#move_module_item_select').children().length === 0) {
           // In this case, we are moving it into a currently empty module.
-          $('#context_module_content_' + selectedModuleId + ' .context_module_items').append(currentItem);
+          $('#context_module_content_' + selectedModuleId + ' .context_module_items').append($currentItem);
         }
 
         modules.hideMoveModuleItem();
-        modules.updateModuleItemPositions(null, {item: currentItem});
+        modules.updateModuleItemPositions(null, {item: $currentItem});
 
 
       },
       submitMoveModule: function () {
         var beforeOrAfterVal = $('[name="move_location"]:checked').val();
-        var currentModule = $('#move_context_module_form').data('current_module');
+        var $currentModule = $('#move_context_module_form').data('current_module');
         var relativeToId = $('#move_context_module_select').val();
 
         if (beforeOrAfterVal === 'before') {
-          $('#context_module_' + relativeToId).before(currentModule);
+          $('#context_module_' + relativeToId).before($currentModule);
         }
         if (beforeOrAfterVal === 'after') {
-          $('#context_module_' + relativeToId).after(currentModule);
+          $('#context_module_' + relativeToId).after($currentModule);
         }
         modules.hideMoveModule();
         modules.updateModulePositions();
@@ -451,11 +452,11 @@ define([
         data.graded = data.graded ? '1' : '0';
         var $item, $olditem = (data.id != 'new') ? $("#context_module_item_" + data.id) : [];
         if($olditem.length) {
-          var admin = $olditem.find('.ig-admin');
-          if (admin.length) { admin.detach(); }
+          var $admin = $olditem.find('.ig-admin');
+          if ($admin.length) { $admin.detach(); }
           $item = $olditem.clone(true);
-          if (admin.length) {
-            $item.find('.ig-row').append(admin)
+          if ($admin.length) {
+            $item.find('.ig-row').append($admin)
           };
         } else {
           $item = $("#context_module_item_blank").clone(true).removeAttr('id');
@@ -804,16 +805,16 @@ define([
         } else if (data.type == 'wiki_page') {
           displayType = I18n.t('optgroup.wiki_pages', "Wiki Pages");
         }
-        var group = $optgroups[displayType]
-        if (!group) {
-          group = $optgroups[displayType] = $(document.createElement('optgroup'))
-          group.attr('label', displayType)
-          $select.append(group)
+        var $group = $optgroups[displayType]
+        if (!$group) {
+          $group = $optgroups[displayType] = $(document.createElement('optgroup'))
+          $group.attr('label', displayType)
+          $select.append($group)
         }
         var titleDesc = data.title;
         var $option = $(document.createElement('option'));
         $option.val(data.id).text(titleDesc);
-        group.append($option);
+        $group.append($option);
       });
       $pre.find(".option").empty().append($option);
       $option.slideDown();
@@ -957,7 +958,7 @@ define([
         }
         var id = $(item).attr('id').substring('context_module_item_'.length);
         var name = $(item).children().find('span.title').text();
-        selectItemOptions.push('<option value="' + id + '">' + name + '</option>');
+        selectItemOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
       });
       $('#move_module_item_select').append(selectItemOptions.join(''));
 
@@ -1544,11 +1545,11 @@ define([
               }
             }
             if(!met) {
-              unfulfilled.push($req.find(".title:first").text());
+              unfulfilled.push(htmlEscape($req.find(".title:first").text()));
             }
           });
           $row.find(".still_need_completing")
-            .append("<b>"+I18n.t('still_needs_completing', 'Still Needs to Complete')+"</b><br/>")
+            .append("<b>"+htmlEscape(I18n.t('still_needs_completing', 'Still Needs to Complete'))+"</b><br/>")
             .append(unfulfilled.join("<br/>"));
         }
         $row.removeClass('locked').removeClass('in_progress').removeClass('completed')
