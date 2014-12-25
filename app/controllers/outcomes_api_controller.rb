@@ -211,7 +211,7 @@ class OutcomesApiController < ApplicationController
   def update
     return unless authorized_action(@outcome, @current_user, :update)
 
-    @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid))
+    @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid, :calculation_method, :calculation_int))
 
     if params[:mastery_points] || params[:ratings]
       criterion = @outcome.data && @outcome.data[:rubric_criterion]
@@ -225,21 +225,6 @@ class OutcomesApiController < ApplicationController
         criterion[:ratings] = params[:ratings]
       end
       @outcome.rubric_criterion = criterion
-    end
-
-    if params[:calculation_method] || params[:calculation_int]
-      unless @outcome.assessed?
-        if params[:calculation_method] && @outcome.valid_calculation_method?(params[:calculation_method])
-          @outcome.calculation_method = params[:calculation_method]
-        end
-        # in this if statement, check 'calculation_int' validity based on '@outcome.calculation_method'
-        # instead of 'params[:calculation_method]' since 'params[:calculation_method]' might not be
-        # valid.  '@outcome.calculation_method' will still be current if being set to something
-        # valid in this call, since it gets set immediately above ^^
-        if params[:calculation_int] && @outcome.valid_calculation_int?(params[:calculation_int].to_i)
-          @outcome.calculation_int = params[:calculation_int].to_i
-        end
-      end
     end
 
     if @outcome.save

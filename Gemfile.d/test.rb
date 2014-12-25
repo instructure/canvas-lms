@@ -15,6 +15,7 @@ group :test do
   gem 'rspec', '3.1.0'
   gem 'rspec-rails', '3.1.0'
   gem 'rspec-legacy_formatters', '1.0.0'
+  gem 'rspec-collection_matchers', '1.1.2'
   gem 'once-ler', '0.0.15'
 
   gem 'sequel', '4.5.0', :require => false

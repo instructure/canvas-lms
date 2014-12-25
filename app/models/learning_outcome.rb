@@ -30,13 +30,23 @@ class LearningOutcome < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
   serialize :data
 
-  before_create :infer_default_calculation_options
-  before_save :infer_defaults, :validate_calculation_options
+  before_validation :adjust_calculation_int
+  before_save :infer_defaults
+  before_create :infer_calculation_method_defaults
 
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :short_description, :maximum => maximum_string_length
   validates_presence_of :short_description, :workflow_state
   sanitize_field :description, CanvasSanitize::SANITIZE
+  validate :validate_calculation_options
+
+  CALCULATION_METHODS = %w[decaying_average n_mastery highest latest]
+  VALID_CALCULATION_INTS = {
+    "decaying_average" => (1..99),
+    "n_mastery" => (2..5),
+    "highest" => [],
+    "latest" => [],
+  }
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -61,69 +71,110 @@ class LearningOutcome < ActiveRecord::Base
       self.data[:rubric_criterion][:description] = self.short_description
     end
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+
+    # if we are changing the calculation_method but not the calculation_int, set the int to the default value
+    if calculation_method_changed? && !calculation_int_changed?
+      self.calculation_int = default_calculation_int
+    end
   end
 
-  def infer_default_calculation_options
-    self.calculation_method ||= default_calculation_method
-    self.calculation_int ||= default_calculation_int
+  def infer_calculation_method_defaults
+      self.calculation_method ||= default_calculation_method
+      self.calculation_int ||= default_calculation_int
   end
 
   def validate_calculation_options
-    if self.assessed?
-      # if we've been used to assess a student, refuse to accept any changes to our calculation options
-      self.calculation_method = self.calculation_method_was
-      self.calculation_int = self.calculation_int_was
+    if assessed?
+      validate_calculation_changes_after_asessing
     else
-      # if we previously had a calculation_method, don't let it be set to nil
-      if self.calculation_method.nil? && ! self.calculation_method_was.nil?
-        self.calculation_method = self.calculation_method_was
-      end
+      validate_calculation_method
+      validate_calculation_int
+    end
+  end
 
-      # if we are changing the calculation_method but not the calculation_int, set the int to the default value
-      if self.calculation_method != self.calculation_method_was && self.calculation_int == self.calculation_int_was
-        self.calculation_int = default_calculation_int
-      end
+  def validate_calculation_changes_after_asessing
+    # if we've been used to assess a student, refuse to accept any changes to our calculation options
+    if calculation_method_changed?
+      errors.add(:calculation_method, t(
+        "This outcome has been used to assess a student. Calculation method is fixed at %{old_value}",
+        :old_value => calculation_method_was
+      ))
+    end
 
-      # if calculation_method is nil, leave it alone so we don't inadvertently change existing learning outcomes
-      # that were created before we added a calculation_method.  If it is invalid, set it back to what it was before,
-      # unless the previous setting was invalid too.  In that case, set it to the default.  Do the same for the int
-      if self.calculation_method.nil? || ! valid_calculation_method?(self.calculation_method)
-        if self.calculation_method_was.nil? && self.calculation_method.nil?
-          # if calculation_method is nil, and it isn't being set in this transaction,
-          # leave it alone so we don't inadvertently change existing learning outcomes
-        elsif valid_calculation_method?(self.calculation_method_was)
-          self.calculation_method = self.calculation_method_was
-        else
-          self.calculation_method = default_calculation_method
-        end
-      end
+    if calculation_int_changed?
+      errors.add(:calculation_int, t(
+        "This outcome has been used to assess a student. Calculation int is fixed at %{old_value}",
+        :old_value => calculation_int_was
+      ))
+    end
+  end
 
-      # If the new calculation_int is invalid, set it back to what it was before,
-      # unless the previous setting was invalid too.  In that case, set it to the default
-      unless valid_calculation_int?(self.calculation_int)
-        if valid_calculation_int?(self.calculation_int_was)
-          self.calculation_int = self.calculation_int_was
-        else
-          self.calculation_int = default_calculation_int
+  def validate_calculation_method_nil
+    # don't let the calculation_method be set to nil, unless we are a new record (in which case the default
+    # will be inferred), or we previously were nil
+    if calculation_method.nil?
+      # In the case we were previously nil, it is ok to leave it nil because we want to preserve the old behavior
+      # of using 'highest' as the calculation method (the new default is "decaying_average"
+      # Having a nil calculation_method is how we identify learning outcomes that existed before we added
+      # the learning outcome calculation_method and calculation_int
+      unless new_record?
+        unless calculation_method_was.nil?
+          errors.add(:calculation_method, t(
+            "Calculation method cannot be set to nil. A sensible default is %{default_calculation_method}",
+            :default_calculation_method => default_calculation_method
+          ))
         end
       end
     end
   end
 
-  def valid_calculation_method?(method)
-    %w[n_mastery decaying_average latest highest].include?(method)
+  def validate_calculation_method
+    # Don't add the error message for a nil calculation method because one is already added
+    # in our explicit check for nil
+    if calculation_method.nil?
+      validate_calculation_method_nil
+    else
+      unless valid_calculation_method?(calculation_method)
+        errors.add(:calculation_method, t(
+          "'%{calculation_method}' is not a valid calculation_method. Valid options are %{valid_options}",
+          :calculation_method => calculation_method, :valid_options => CALCULATION_METHODS.to_s
+        ))
+      end
+    end
+  end
+
+  def validate_calculation_int
+    unless valid_calculation_int?(calculation_int, calculation_method)
+      errors.add(:calculation_int, t(
+        "'%{calculation_int}' is not a valid calculation_int for calculation_method of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'",
+        :calculation_int => calculation_int, :calculation_method => calculation_method,
+        :valid_calculation_ints => valid_calculation_ints
+      ))
+    end
+  end
+
+  def valid_calculation_method?(method=self.calculation_method)
+    CALCULATION_METHODS.include?(method)
+  end
+
+  def valid_calculation_ints(method=self.calculation_method)
+    VALID_CALCULATION_INTS[method]
   end
 
   def valid_calculation_int?(int, method=self.calculation_method)
-    case method
-    when 'decaying_average'
-      (1..99).include?(int)
-    when 'n_mastery'
-      (2..5).include?(int)
-    when 'latest', 'highest', nil
-      int.nil?
+    if valid_calculation_method?(method)
+      valid_ints = valid_calculation_ints(method)
+      (int.nil? && valid_ints.to_a.empty?) || valid_ints.include?(int)
     else
-      false
+      true
+    end
+  end
+
+  def adjust_calculation_int
+    # If we are setting calculation_method to latest or highest,
+    # set calculation_int nil unless it is a new record (meaning it was set explicitly)
+    if %w[highest latest].include?(calculation_method) && calculation_method_changed?
+      self.calculation_int = nil unless new_record?
     end
   end
 
