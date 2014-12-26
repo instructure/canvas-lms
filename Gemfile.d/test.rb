@@ -4,7 +4,7 @@ group :test do
   gem 'simplecov', '0.8.2', :require => false
     gem 'docile', '1.1.3'
   gem 'simplecov-rcov', '0.2.3', :require => false
-  gem 'bluecloth', '2.0.10' # for generating api docs
+  gem 'bluecloth', '2.2.0' # for generating api docs
     gem 'redcarpet', '3.0.0'
   gem 'bullet_instructure', '4.0.3', :require => 'bullet'
   gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
