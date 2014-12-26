@@ -793,6 +793,33 @@ describe CoursesController, type: :request do
     end
   end
 
+  describe "reset content" do
+    before :once do
+      @user = @teacher
+      @path = "/api/v1/courses/#{@course.id}/reset_content"
+      @params = { :controller => 'courses', :action => 'reset_content', :format => 'json', :course_id => @course.id.to_s }
+    end
+    context "an authorized user" do
+      it "should be able to reset a course" do
+        Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
+
+        json = api_call(:post, @path, @params)
+        @course.reload
+        expect(@course.workflow_state).to eql 'deleted'
+        new_course = Course.find(json['id'])
+        expect(new_course.workflow_state).to eql 'created'
+        expect(json['workflow_state']).to eql 'unpublished'
+      end
+    end
+    context "an unauthorized user" do
+      it "should return 401" do
+        @user = @student
+        raw_api_call(:post, @path, @params)
+        expect(response.code).to eql '401'
+      end
+    end
+  end
+
   describe "batch edit" do
     before :once do
       @account = Account.default
