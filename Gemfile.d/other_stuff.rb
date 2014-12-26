@@ -62,7 +62,7 @@ gem 'json', '1.8.1'
 gem 'oj', '2.5.5'
 
 # native xml parsing, diigo
-gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
+gem 'libxml-ruby', '2.7.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
   gem 'treetop', '1.4.15'
