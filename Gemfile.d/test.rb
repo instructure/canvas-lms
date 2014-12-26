@@ -11,9 +11,9 @@ group :test do
     gem 'metaclass', '0.0.2'
   gem 'thin', '1.6.3'
     if RUBY_VERSION >= '2.2'
-      gem 'eventmachine', :github => 'eventmachine/eventmachine'
+      gem 'eventmachine', '1.0.4'
     else
-      gem 'eventmachine', '1.0.3'
+      gem 'eventmachine', '1.0.4'
     end
 
   gem 'rspec', '3.1.0'
