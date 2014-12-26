@@ -41,8 +41,6 @@ define [
       unless @files
         @files = new FilesCollection [], parentFolder: this
 
-
-
     expand: (force=false, options={}) ->
       @isExpanded = true
       @trigger 'expanded'
