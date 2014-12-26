@@ -121,6 +121,9 @@ class SectionsController < ApplicationController
   # @argument course_section[end_at] [DateTime]
   #   Section end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   #
+  # @argument course_section[restrict_enrollments_to_section_dates] [Boolean]
+  #   Set to true to restrict user enrollments to the start and end dates of the section.
+  #
   # @returns Section
   def create
     if authorized_action(@context.course_sections.scoped.new, @current_user, :create)

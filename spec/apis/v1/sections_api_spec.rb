@@ -318,13 +318,14 @@ describe SectionsController, type: :request do
 
       it "should modify section data by id" do
         json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
-          { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z' }})
+          { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :restrict_enrollments_to_section_dates => '1' }})
         expect(json['id']).to eq @section.id
         @section.reload
         expect(@section.name).to eq 'New Name'
         expect(@section.sis_source_id).to eq 'SISsy'
         expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
         expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
+        expect(@section.restrict_enrollments_to_section_dates).to be_truthy
       end
 
       it "should modify section data by sis id" do
