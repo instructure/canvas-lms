@@ -38,6 +38,8 @@ if RUBY_VERSION == "2.0.0"
   ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
 elsif RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
+elsif RUBY_VERSION >= "2.2" && CANVAS_RAILS3
+  fail "Ruby newer than 2.1 is UNSUPPORTED unless running Rails 4"
 elsif RUBY_VERSION >= "2.2"
   warn "Ruby newer than 2.1 is very UNSUPPORTED"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
