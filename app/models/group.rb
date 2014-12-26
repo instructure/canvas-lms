@@ -451,7 +451,10 @@ class Group < ActiveRecord::Base
     given { |user| self.group_category.try(:communities?) }
     can :create
 
-    given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
+    given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
+    can :participate_as_student
+
+    given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
     can :create
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }

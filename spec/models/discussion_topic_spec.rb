@@ -983,6 +983,27 @@ describe DiscussionTopic do
       expect(@student.submissions.first.submission_type).to eq 'discussion_topic'
     end
 
+    it "should create submissions for existing entries in group topics when setting the assignment (even if locked)" do
+      group_category = @course.group_categories.create!(:name => "category")
+      @group1 = @course.groups.create!(:name => "group 1", :group_category => group_category)
+
+      @topic.group_category = group_category
+      @topic.save!
+
+      child_topic = @topic.child_topics.first
+      child_topic.context.add_user(@student)
+      child_topic.reply_from(:user => @student, :text => "entry")
+      @student.reload
+      expect(@student.submissions).to be_empty
+
+      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago)
+      @topic.assignment = @assignment
+      @topic.save
+      @student.reload
+      expect(@student.submissions.size).to eq 1
+      expect(@student.submissions.first.submission_type).to eq 'discussion_topic'
+    end
+
     it "should have the correct submission date if submission has comment" do
       @assignment = @course.assignments.create!(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
