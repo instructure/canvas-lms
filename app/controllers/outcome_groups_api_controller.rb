@@ -406,6 +406,12 @@ class OutcomeGroupsApiController < ApplicationController
   # @argument ratings[][points] [Integer]
   #   The points corresponding to a rating level for the embedded rubric criterion.
   #
+  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
+  #   The new calculation method.
+  #
+  # @argument calculation_int [Integer]
+  #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"
+  #
   # @returns OutcomeLink
   #
   # @example_request
@@ -422,13 +428,15 @@ class OutcomeGroupsApiController < ApplicationController
   #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9000' \
-  #        -F 'mastery_points=3' \ 
-  #        -F 'ratings[][description]=Exceeds Expectations' \ 
-  #        -F 'ratings[][points]=5' \ 
-  #        -F 'ratings[][description]=Meets Expectations' \ 
-  #        -F 'ratings[][points]=3' \ 
-  #        -F 'ratings[][description]=Does Not Meet Expectations' \ 
-  #        -F 'ratings[][points]=0' \ 
+  #        -F 'mastery_points=3' \
+  #        -F 'calculation_method=decaying_average' \
+  #        -F 'calculation_int=75' \
+  #        -F 'ratings[][description]=Exceeds Expectations' \
+  #        -F 'ratings[][points]=5' \
+  #        -F 'ratings[][description]=Meets Expectations' \
+  #        -F 'ratings[][points]=3' \
+  #        -F 'ratings[][description]=Does Not Meet Expectations' \
+  #        -F 'ratings[][points]=0' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_request
@@ -461,7 +469,7 @@ class OutcomeGroupsApiController < ApplicationController
         return
       end
     else
-      @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name))
+      @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name, :calculation_method, :calculation_int))
       unless @outcome.valid?
         render :json => @outcome.errors, :status => :bad_request
         return
@@ -669,8 +677,10 @@ class OutcomeGroupsApiController < ApplicationController
   def context_create_outcome(data)
     scope = @context ? @context.created_learning_outcomes : LearningOutcome.global
     outcome = scope.build(data.slice(:title, :display_name, :description, :vendor_guid))
-    if data[:ratings]
-      outcome.rubric_criterion = data.slice(:ratings, :mastery_points)
+    outcome.rubric_criterion = data.slice(:ratings, :mastery_points) if data[:ratings]
+    if data[:calculation_method]
+      outcome.calculation_method = data[:calculation_method]
+      outcome.calculation_int = data[:calculation_int]
     end
     outcome.save
     outcome

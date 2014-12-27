@@ -916,6 +916,120 @@ describe "Outcome Groups API", type: :request do
       expect(@group.child_outcome_links.count).to eq 1
       expect(@group.child_outcome_links.first.content).to eq @outcome
     end
+
+    context "creating with calculation options specified" do
+      it "should create a new outcome with calculation options specified" do
+        LearningOutcome.update_all(:workflow_state => 'deleted')
+        api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
+                 { :controller => 'outcome_groups_api',
+                   :action => 'link',
+                   :account_id => @account.id.to_s,
+                   :id => @group.id.to_s,
+                   :format => 'json' },
+                 { :title => "My Outcome",
+                   :display_name => "Friendly Name",
+                   :description => "Description of my outcome",
+                   :mastery_points => 5,
+                   :ratings => [
+                     { :points => 5, :description => "Exceeds Expectations" },
+                     { :points => 3, :description => "Meets Expectations" },
+                     { :points => 0, :description => "Does Not Meet Expectations" }
+                   ],
+                   :calculation_method => 'n_mastery',
+                   :calculation_int => 4,
+                 })
+        expect(LearningOutcome.active.count).to eq 1
+        @outcome = LearningOutcome.active.first
+        expect(@outcome.title).to eq "My Outcome"
+        expect(@outcome.display_name).to eq "Friendly Name"
+        expect(@outcome.description).to eq "Description of my outcome"
+        expect(@outcome.data[:rubric_criterion]).to eq({
+          :description => 'My Outcome',
+          :mastery_points => 5,
+          :points_possible => 5,
+          :ratings => [
+            { :points => 5, :description => "Exceeds Expectations" },
+            { :points => 3, :description => "Meets Expectations" },
+            { :points => 0, :description => "Does Not Meet Expectations" }
+          ]
+        })
+        expect(@outcome.calculation_method).to eq("n_mastery")
+        expect(@outcome.calculation_int).to eq(4)
+      end
+
+      it "should fail (400) to create a new outcome with illegal calculation options" do
+        LearningOutcome.update_all(:workflow_state => 'deleted')
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
+                 { :controller => 'outcome_groups_api',
+                   :action => 'link',
+                   :account_id => @account.id.to_s,
+                   :id => @group.id.to_s,
+                   :format => 'json' },
+                 { :title => "My Outcome",
+                   :display_name => "Friendly Name",
+                   :description => "Description of my outcome",
+                   :mastery_points => 5,
+                   :ratings => [
+                     { :points => 5, :description => "Exceeds Expectations" },
+                     { :points => 3, :description => "Meets Expectations" },
+                     { :points => 0, :description => "Does Not Meet Expectations" }
+                   ],
+                   :calculation_method => 'foo bar baz qux',
+                   :calculation_int => 1500,
+                 },
+                 {},
+                 { :expected_status => 400 })
+        expect(LearningOutcome.active.count).to eq 0
+        expect(json).not_to be_nil
+        expect(json["errors"]).not_to be_nil
+        expect(json["errors"]["calculation_method"]).not_to be_nil
+        expect(json["errors"]["calculation_method"][0]).not_to be_nil
+        expect(json["errors"]["calculation_method"][0]["message"]).not_to be_nil
+        expect(json["errors"]["calculation_method"][0]["message"]).to include("not a valid calculation_method")
+      end
+
+      context "should fail (400) to create a new outcome with an illegal calculation_int" do
+        methods = [
+          'decaying_average',
+          'n_mastery',
+          'highest',
+          'latest'
+        ]
+
+        methods.each do |method|
+          it "should fail (400) to create a new outcome with an illegal calculation_int" do
+            LearningOutcome.update_all(:workflow_state => 'deleted')
+            json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
+                     { :controller => 'outcome_groups_api',
+                       :action => 'link',
+                       :account_id => @account.id.to_s,
+                       :id => @group.id.to_s,
+                       :format => 'json' },
+                     { :title => "My Outcome",
+                       :display_name => "Friendly Name",
+                       :description => "Description of my outcome",
+                       :mastery_points => 5,
+                       :ratings => [
+                         { :points => 5, :description => "Exceeds Expectations" },
+                         { :points => 3, :description => "Meets Expectations" },
+                         { :points => 0, :description => "Does Not Meet Expectations" }
+                       ],
+                       :calculation_method => method,
+                       :calculation_int => 1500,
+                     },
+                     {},
+                     { :expected_status => 400 })
+            expect(LearningOutcome.active.count).to eq 0
+            expect(json).not_to be_nil
+            expect(json["errors"]).not_to be_nil
+            expect(json["errors"]["calculation_int"]).not_to be_nil
+            expect(json["errors"]["calculation_int"][0]).not_to be_nil
+            expect(json["errors"]["calculation_int"][0]["message"]).not_to be_nil
+            expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid calculation_int")
+          end
+        end
+      end
+    end
   end
 
   describe "unlink" do

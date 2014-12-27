@@ -178,14 +178,14 @@ class OutcomesApiController < ApplicationController
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9001' \
   #        -F 'mastery_points=3' \
+  #        -F 'calculation_method=decaying_average' \
+  #        -F 'calculation_int=75' \
   #        -F 'ratings[][description]=Exceeds Expectations' \
   #        -F 'ratings[][points]=5' \
   #        -F 'ratings[][description]=Meets Expectations' \
   #        -F 'ratings[][points]=3' \
   #        -F 'ratings[][description]=Does Not Meet Expectations' \
   #        -F 'ratings[][points]=0' \
-  #        -F 'calculation_method=decaying_average' \
-  #        -F 'calculation_int=75' \
   #        -F 'ratings[][points]=0' \
   #        -H "Authorization: Bearer <token>"
   #
