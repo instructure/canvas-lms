@@ -484,38 +484,30 @@ describe LearningOutcome do
       expect(@outcome.calculation_method).to eq('latest')
     end
 
-    it "should not let you set calculation_int to nil if calculation_method is n_mastery" do
-      @outcome.calculation_method = 'n_mastery'
-      @outcome.calculation_int = 4
-      @outcome.save!
-      expect(@outcome.calculation_method).to eq('n_mastery')
-      expect(@outcome.calculation_int).to eq(4)
-      expect(@outcome).to have(:no).errors
-      @outcome.calculation_int = nil
-      @outcome.save
-      expect(@outcome).to have(1).error_on(:calculation_int)
-      expect(@outcome).to have(1).errors
-      expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-      @outcome.reload
-      expect(@outcome.calculation_method).to eq('n_mastery')
-      expect(@outcome.calculation_int).to eq(4)
-    end
+    context "should not let you set calculation_int to nil for certain calculation methods" do
+      calc_method = [
+        'decaying_average',
+        'n_mastery'
+      ]
 
-    it "should not let you set calculation_int to nil if calculation_method is decaying_average" do
-      @outcome.calculation_method = 'decaying_average'
-      @outcome.calculation_int = 66
-      @outcome.save!
-      expect(@outcome.calculation_method).to eq('decaying_average')
-      expect(@outcome.calculation_int).to eq(66)
-      expect(@outcome).to have(:no).errors
-      @outcome.calculation_int = nil
-      @outcome.save
-      expect(@outcome).to have(1).error_on(:calculation_int)
-      expect(@outcome).to have(1).errors
-      expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-      @outcome.reload
-      expect(@outcome.calculation_method).to eq('decaying_average')
-      expect(@outcome.calculation_int).to eq(66)
+      calc_method.each do |method|
+        it "should not let you set calculation_int to nil if calculation_method is #{method}" do
+          @outcome.calculation_method = method
+          @outcome.calculation_int = 4
+          @outcome.save!
+          expect(@outcome.calculation_method).to eq(method)
+          expect(@outcome.calculation_int).to eq(4)
+          expect(@outcome).to have(:no).errors
+          @outcome.calculation_int = nil
+          @outcome.save
+          expect(@outcome).to have(1).error_on(:calculation_int)
+          expect(@outcome).to have(1).errors
+          expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq(method)
+          expect(@outcome.calculation_int).to eq(4)
+        end
+      end
     end
 
     context "should set calculation_int to default if the calculation_method is changed and calculation_int isn't set" do
@@ -569,92 +561,37 @@ describe LearningOutcome do
     end
 
     context "illegal calculation ints" do
-      it "should reject creation of a learning outcome with an illegal calculation_int for calculation_method of 'decaying_average'" do
-        @outcome = @course.created_learning_outcomes.create(
-          :title => 'outcome',
-          :calculation_method => 'decaying_average',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+      context "per method" do
+        calc_method = [
+          'decaying_average',
+          'n_mastery',
+          'highest',
+          'latest'
+        ]
 
-        @outcome = LearningOutcome.new(
-          :title => 'outcome',
-          :calculation_method => 'decaying_average',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-      end
+        calc_method.each do |method|
+          it "should reject creation of a learning outcome with an illegal calculation_int for calculation_method of '#{method}'" do
+            @outcome = @course.created_learning_outcomes.create(
+              :title => 'outcome',
+              :calculation_method => method,
+              :calculation_int => '1500'
+            )
+            expect(@outcome).not_to be_valid
+            expect(@outcome).to have(1).error
+            expect(@outcome).to have(1).error_on(:calculation_int)
+            expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
 
-      it "should reject creation of a learning outcome with an illegal calculation_int for calculation_method of 'n_mastery'" do
-        @outcome = @course.created_learning_outcomes.create(
-          :title => 'outcome',
-          :calculation_method => 'n_mastery',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-
-        @outcome = LearningOutcome.new(
-          :title => 'outcome',
-          :calculation_method => 'n_mastery',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-      end
-
-      it "should reject creation of a learning outcome with an illegal calculation_int for calculation_method of 'highest'" do
-        @outcome = @course.created_learning_outcomes.create(
-          :title => 'outcome',
-          :calculation_method => 'highest',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-
-        @outcome = LearningOutcome.new(
-          :title => 'outcome',
-          :calculation_method => 'highest',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-      end
-
-      it "should reject creation of a learning outcome with an illegal calculation_int for calculation_method of 'latest'" do
-        @outcome = @course.created_learning_outcomes.create(
-          :title => 'outcome',
-          :calculation_method => 'latest',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-
-        @outcome = LearningOutcome.new(
-          :title => 'outcome',
-          :calculation_method => 'latest',
-          :calculation_int => '1500'
-        )
-        expect(@outcome).not_to be_valid
-        expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_int)
-        expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            @outcome = LearningOutcome.new(
+              :title => 'outcome',
+              :calculation_method => method,
+              :calculation_int => '1500'
+            )
+            expect(@outcome).not_to be_valid
+            expect(@outcome).to have(1).error
+            expect(@outcome).to have(1).error_on(:calculation_int)
+            expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+          end
+        end
       end
     end
   end
@@ -735,26 +672,24 @@ describe LearningOutcome do
         expect(@outcome.calculation_method).to eq('n_mastery')
       end
 
-      it "should allow setting a calculation_int for decaying_average" do
-        expect(@outcome.calculation_int).not_to eq(85)
-        @outcome.calculation_method = 'decaying_average'
-        @outcome.calculation_int = 85
-        @outcome.save
-        expect(@outcome).to have(:no).errors
-        @outcome.reload
-        expect(@outcome.calculation_method).to eq('decaying_average')
-        expect(@outcome.calculation_int).to eq(85)
-      end
+      context "setting a calculation_int" do
+        method_to_int = {
+          "decaying_average" => 85,
+          "n_mastery" => 2,
+        }
 
-      it "should allow setting a calculation_int for n_mastery" do
-        expect(@outcome.calculation_int).not_to eq(7)
-        @outcome.calculation_method = 'n_mastery'
-        @outcome.calculation_int = 2
-        @outcome.save
-        expect(@outcome).to have(:no).errors
-        @outcome.reload
-        expect(@outcome.calculation_method).to eq('n_mastery')
-        expect(@outcome.calculation_int).to eq(2)
+        method_to_int.each do |method, int|
+          it "should allow setting a calculation_int for #{method}" do
+            expect(@outcome.calculation_int).not_to eq(85)
+            @outcome.calculation_method = method
+            @outcome.calculation_int = int
+            @outcome.save
+            expect(@outcome).to have(:no).errors
+            @outcome.reload
+            expect(@outcome.calculation_method).to eq(method)
+            expect(@outcome.calculation_int).to eq(int)
+          end
+        end
       end
 
       it "should allow updating the calculation_int and calculation_method together" do
@@ -811,76 +746,31 @@ describe LearningOutcome do
       end
 
       context "reject illegal calculation_int s" do
-        it "should reject an illegal calculation_int for decaying_average" do
-          @outcome.calculation_method = 'decaying_average'
-          @outcome.calculation_int = 68
-          @outcome.save
-          expect(@outcome).to have(:no).errors
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('decaying_average')
-          expect(@outcome.calculation_int).to eq(68)
-          @outcome.calculation_int = 15000
-          @outcome.save
-          expect(@outcome).to have(1).error_on(:calculation_int)
-          expect(@outcome).to have(1).errors
-          expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('decaying_average')
-          expect(@outcome.calculation_int).to eq(68)
-        end
+        method_to_int = {
+          'decaying_average' => 68,
+          'n_mastery' => 4,
+          'highest' => nil,
+          'latest' => nil,
+        }
 
-        it "should reject an illegal calculation_int for n_mastery" do
-          @outcome.calculation_method = 'n_mastery'
-          @outcome.calculation_int = 4
-          @outcome.save
-          expect(@outcome).to have(:no).errors
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('n_mastery')
-          expect(@outcome.calculation_int).to eq(4)
-          @outcome.calculation_int = 15000
-          @outcome.save
-          expect(@outcome).to have(1).error_on(:calculation_int)
-          expect(@outcome).to have(1).errors
-          expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('n_mastery')
-          expect(@outcome.calculation_int).to eq(4)
-        end
-
-        it "should reject an illegal calculation_int for highest" do
-          @outcome.calculation_method = 'highest'
-          @outcome.calculation_int = nil
-          @outcome.save
-          expect(@outcome).to have(:no).errors
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('highest')
-          expect(@outcome.calculation_int).to be_nil
-          @outcome.calculation_int = 15000
-          @outcome.save
-          expect(@outcome).to have(1).error_on(:calculation_int)
-          expect(@outcome).to have(1).errors
-          expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('highest')
-          expect(@outcome.calculation_int).to be_nil
-        end
-
-        it "should reject an illegal calculation_int for latest" do
-          @outcome.calculation_method = 'latest'
-          @outcome.calculation_int = nil
-          @outcome.save
-          expect(@outcome).to have(:no).errors
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('latest')
-          expect(@outcome.calculation_int).to be_nil
-          @outcome.calculation_int = 15000
-          @outcome.save
-          expect(@outcome).to have(1).error_on(:calculation_int)
-          expect(@outcome).to have(1).error
-          expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq('latest')
-          expect(@outcome.calculation_int).to be_nil
+        method_to_int.each do |method, int|
+          it "should reject an illegal calculation_int for #{method}" do
+            @outcome.calculation_method = method
+            @outcome.calculation_int = int
+            @outcome.save
+            expect(@outcome).to have(:no).errors
+            @outcome.reload
+            expect(@outcome.calculation_method).to eq(method)
+            expect(@outcome.calculation_int).to eq(int)
+            @outcome.calculation_int = 15000
+            @outcome.save
+            expect(@outcome).to have(1).error_on(:calculation_int)
+            expect(@outcome).to have(1).errors
+            expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            @outcome.reload
+            expect(@outcome.calculation_method).to eq(method)
+            expect(@outcome.calculation_int).to eq(int)
+          end
         end
       end
     end

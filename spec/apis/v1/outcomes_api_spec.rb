@@ -449,38 +449,49 @@ describe "Outcomes API", type: :request do
           expect(@outcome.calculation_int).to eql(3)
         end
 
-        it "should not allow updating the calculation_int to an illegal value for the calculation_method" do
-          expect {
-            api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                   { :controller => 'outcomes_api',
-                     :action => 'update',
-                     :id => @outcome.id.to_s,
-                     :format => 'json' },
-                   { :title => "New Title",
-                     :description => "New Description",
-                     :vendor_guid => "vendorguid9000",
-                     :calculation_method => "n_mastery",
-                     :calculation_int => 3 })
-            @outcome.reload
-          }.to change{@outcome.calculation_int}.to(3)
+        context "should not allow updating the calculation_int to an illegal value for the calculation_method" do
+          method_to_int = {
+            "decaying_average" => { good: 67, bad: 125 },
+            "n_mastery" => { good: 4, bad: 29 },
+            "highest" => { good: nil, bad: 4 },
+            "latest" => { good: nil, bad: 79 },
+          }
 
-          expect {
-            api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                   { :controller => 'outcomes_api',
-                     :action => 'update',
-                     :id => @outcome.id.to_s,
-                     :format => 'json' },
-                   { :title => "New Title",
-                     :description => "New Description",
-                     :vendor_guid => "vendorguid9000",
-                     :calculation_method => "n_mastery",
-                     :calculation_int => 99 },
-                   {},
-                   { :expected_status => 400 })
-            @outcome.reload
-          }.to_not change{@outcome.calculation_int}
+          method_to_int.each do |method, int|
+            it "should not allow updating the calculation_int to an illegal value for the calculation_method '#{method}'" do
+              expect {
+                api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                       { :controller => 'outcomes_api',
+                         :action => 'update',
+                         :id => @outcome.id.to_s,
+                         :format => 'json' },
+                       { :title => "New Title",
+                         :description => "New Description",
+                         :vendor_guid => "vendorguid9000",
+                         :calculation_method => method,
+                         :calculation_int => int[:good] })
+                @outcome.reload
+              }.to change{@outcome.calculation_int}.to(int[:good])
 
-          expect(@outcome.calculation_method).to eql('n_mastery')
+              expect {
+                api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                       { :controller => 'outcomes_api',
+                         :action => 'update',
+                         :id => @outcome.id.to_s,
+                         :format => 'json' },
+                       { :title => "New Title",
+                         :description => "New Description",
+                         :vendor_guid => "vendorguid9000",
+                         :calculation_method => method,
+                         :calculation_int => int[:bad] },
+                       {},
+                       { :expected_status => 400 })
+                @outcome.reload
+              }.to_not change{@outcome.calculation_int}
+
+              expect(@outcome.calculation_method).to eql(method)
+            end
+          end
         end
 
         it "should not set a default calculation_method if the record is being re-saved (previously created)" do
@@ -531,148 +542,48 @@ describe "Outcomes API", type: :request do
         end
 
         context "sensible error message for an incorrect calculation_int" do
-          it "should return a sensible error message for an incorrect calculation_int when calculation_method is decaying_average" do
-            calc_meth = 'decaying_average'
-            good_calc_int = 77
-            bad_calc_int = 1500
+          method_to_int = {
+            "decaying_average" => 77,
+            "n_mastery" => 4,
+            "highest" => nil,
+            "latest" => nil,
+          }
+          error_message = "not a valid calculation_int"
+          bad_calc_int = 1500
 
-            @outcome.calculation_method = calc_meth
-            @outcome.calculation_int = good_calc_int
-            @outcome.save!
-            @outcome.reload
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
+          method_to_int.each do |method, int|
+            it "should return a sensible error message for an incorrect calculation_int when calculation_method is #{method}" do
 
-            json = api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                     { :controller => 'outcomes_api',
-                       :action => 'update',
-                       :id => @outcome.id.to_s,
-                       :format => 'json' },
-                     { :title => "New Title",
-                       :description => "New Description",
-                       :vendor_guid => "vendorguid9000",
-                       # :calculation_method => bad_calc_method,
-                       :calculation_int => bad_calc_int },
-                     {}, # Empty headers dict
-                     { :expected_status => 400 })
+              @outcome.calculation_method = method
+              @outcome.calculation_int = int
+              @outcome.save!
+              @outcome.reload
+              expect(@outcome.calculation_method).to eq(method)
+              expect(@outcome.calculation_int).to eq(int)
 
-            @outcome.reload
-            expect(json).not_to eq(outcome_json)
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
-            expect(json["errors"]).not_to be_nil
-            expect(json["errors"]["calculation_int"]).not_to be_nil
-            # make sure there's no errors except on calculation_method
-            expect(json["errors"].except("calculation_int")).to be_empty
-            expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid calculation_int")
-          end
+              json = api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                       { :controller => 'outcomes_api',
+                         :action => 'update',
+                         :id => @outcome.id.to_s,
+                         :format => 'json' },
+                       { :title => "New Title",
+                         :description => "New Description",
+                         :vendor_guid => "vendorguid9000",
+                         # :calculation_method => bad_calc_method,
+                         :calculation_int => bad_calc_int },
+                       {}, # Empty headers dict
+                       { :expected_status => 400 })
 
-          it "should return a sensible error message for an incorrect calculation_int when calculation_method is n_mastery" do
-            calc_meth = 'n_mastery'
-            good_calc_int = 4
-            bad_calc_int = 1500
-
-            @outcome.calculation_method = calc_meth
-            @outcome.calculation_int = good_calc_int
-            @outcome.save!
-            @outcome.reload
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
-
-            json = api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                     { :controller => 'outcomes_api',
-                       :action => 'update',
-                       :id => @outcome.id.to_s,
-                       :format => 'json' },
-                     { :title => "New Title",
-                       :description => "New Description",
-                       :vendor_guid => "vendorguid9000",
-                       # :calculation_method => bad_calc_method,
-                       :calculation_int => bad_calc_int },
-                     {}, # Empty headers dict
-                     { :expected_status => 400 })
-
-            @outcome.reload
-            expect(json).not_to eq(outcome_json)
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
-            expect(json["errors"]).not_to be_nil
-            expect(json["errors"]["calculation_int"]).not_to be_nil
-            # make sure there's no errors except on calculation_method
-            expect(json["errors"].except("calculation_int")).to be_empty
-            expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid calculation_int")
-          end
-
-          it "should return a sensible error message for an incorrect calculation_int when calculation_method is highest" do
-            calc_meth = 'highest'
-            good_calc_int = nil
-            bad_calc_int = 1500
-
-            @outcome.calculation_method = calc_meth
-            @outcome.calculation_int = good_calc_int
-            @outcome.save!
-            @outcome.reload
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
-
-            json = api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                     { :controller => 'outcomes_api',
-                       :action => 'update',
-                       :id => @outcome.id.to_s,
-                       :format => 'json' },
-                     { :title => "New Title",
-                       :description => "New Description",
-                       :vendor_guid => "vendorguid9000",
-                       # :calculation_method => bad_calc_method,
-                       :calculation_int => bad_calc_int },
-                     {}, # Empty headers dict
-                     { :expected_status => 400 })
-
-            @outcome.reload
-            expect(json).not_to eq(outcome_json)
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
-            expect(json["errors"]).not_to be_nil
-            expect(json["errors"]["calculation_int"]).not_to be_nil
-            # make sure there's no errors except on calculation_method
-            expect(json["errors"].except("calculation_int")).to be_empty
-            expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid calculation_int")
-          end
-
-          it "should return a sensible error message for an incorrect calculation_int when calculation_method is latest" do
-            calc_meth = 'latest'
-            good_calc_int = nil
-            bad_calc_int = 1500
-
-            @outcome.calculation_method = calc_meth
-            @outcome.calculation_int = good_calc_int
-            @outcome.save!
-            @outcome.reload
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
-
-            json = api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                     { :controller => 'outcomes_api',
-                       :action => 'update',
-                       :id => @outcome.id.to_s,
-                       :format => 'json' },
-                     { :title => "New Title",
-                       :description => "New Description",
-                       :vendor_guid => "vendorguid9000",
-                       # :calculation_method => bad_calc_method,
-                       :calculation_int => bad_calc_int },
-                     {}, # Empty headers dict
-                     { :expected_status => 400 })
-
-            @outcome.reload
-            expect(json).not_to eq(outcome_json)
-            expect(@outcome.calculation_method).to eq(calc_meth)
-            expect(@outcome.calculation_int).to eq(good_calc_int)
-            expect(json["errors"]).not_to be_nil
-            expect(json["errors"]["calculation_int"]).not_to be_nil
-            # make sure there's no errors except on calculation_method
-            expect(json["errors"].except("calculation_int")).to be_empty
-            expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid calculation_int")
+              @outcome.reload
+              expect(json).not_to eq(outcome_json)
+              expect(@outcome.calculation_method).to eq(method)
+              expect(@outcome.calculation_int).to eq(int)
+              expect(json["errors"]).not_to be_nil
+              expect(json["errors"]["calculation_int"]).not_to be_nil
+              # make sure there's no errors except on calculation_method
+              expect(json["errors"].except("calculation_int")).to be_empty
+              expect(json["errors"]["calculation_int"][0]["message"]).to include(error_message)
+            end
           end
         end
       end
