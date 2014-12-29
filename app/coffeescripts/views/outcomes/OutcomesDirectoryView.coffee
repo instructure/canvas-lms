@@ -34,13 +34,13 @@ define [
 
   # The outcome group "directory" browser.
   class OutcomesDirectoryView extends PaginatedView
-
     tagName: 'ul'
     className: 'outcome-level'
 
     # if opts includes 'outcomeGroup', an instance of OutcomeGroup,
     # then the groups and the outcomes for the outcomeGroup will be fetched.
     initialize: (opts) ->
+      @inFindDialog = opts.inFindDialog
       @readOnly = opts.readOnly
       @parent = opts.parent
       # the way the event listeners work between OutcomeIconView, OutcomesDirectoryView
@@ -227,11 +227,18 @@ define [
       @$el.empty()
       return @reset() if @needsReset
       _.each @views(), (v) => @$el.append v.render().el
+      @handleWarning() if @inFindDialog
       @initDroppable() unless @readOnly
       # Make the first <li /> tabbable for accessibility purposes.
       @$('li:first').attr('tabindex', 0)
       @$el.data 'view', this
       this
+
+    handleWarning: =>
+      if !@parent && _.isEmpty(@groups.models) && _.isEmpty(@outcomes.models) && _.isEmpty(@views())
+        $.publish("renderNoOutcomeWarning")
+      else
+        $.publish("clearNoOutcomeWarning")
 
     # private
     _viewsFor: (models, viewClass) ->
