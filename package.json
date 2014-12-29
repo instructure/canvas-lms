@@ -28,7 +28,7 @@
     "karma-safari-launcher": "~0.1.1",
     "loom": "~2.0.0",
     "testem": "~0.3.30",
-    "xsslint": "0.0.2"
+    "xsslint": "0.1.0"
   },
   "repository": {
     "type": "git",

@@ -35,9 +35,21 @@ Linter.prototype.isSafeString = function(node) {
 process.chdir("public/javascripts");
 var ignores = fs.readFileSync(".xssignore").toString().trim().split(/\r?\n|\r/);
 var files = globby.select(["*.js"]).reject(ignores).files;
-//var files = ["./script/test.js"];
+var warningCount = 0;
 
+console.log("Checking for potential XSS vulnerabilities...");
 files.forEach(function(file) {
-  XSSLint.run(file);
+  var warnings = XSSLint.run(file);
+  warningCount += warnings.length;
+  for (var i = 0, len = warnings.length; i < len; i++) {
+    var warning = warnings[i];
+    console.error(file + ":" + warning.line + ": possibly XSS-able " + (warning.method == "+" ? "HTML string concatenation" : "argument to `" + warning.method + "`"));
+  }
 });
 
+if (warningCount) {
+  console.error("\033[31mFound " + warningCount + " potential vulnerabilities\033[0m");
+  process.exit(1)
+} else {
+  console.log("No problems found!")
+}
