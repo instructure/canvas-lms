@@ -1,7 +1,6 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
 
-
-describe "threaded discussions" do
+context "threaded discussions" do
   include_examples "in-process server selenium tests"
 
   before (:each) do
