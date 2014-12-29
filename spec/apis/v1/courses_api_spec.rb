@@ -108,6 +108,13 @@ describe Api::V1::Course do
       })
     end
 
+    it "should include the total amount of invited and active students if 'total_students' flag is given" do
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
+    end
+
     context "total_scores" do
       before do
         @enrollment.computed_current_score = 95.0;

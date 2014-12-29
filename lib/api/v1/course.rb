@@ -74,6 +74,7 @@ module Api::V1::Course
       hash['course_progress'] = CourseProgress.new(course, user).to_json if includes.include?('course_progress')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
+      hash['total_students'] = course.students.count if includes.include?('total_students')
       add_helper_dependant_entries(hash, course, builder)
     end
   end

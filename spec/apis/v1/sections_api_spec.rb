@@ -64,6 +64,27 @@ describe SectionsController, type: :request do
       expect(json.find { |s| s['name'] == section2.name }['students'][0]['enrollments'][0]["user_id"]).to eq(user2.id)
     end
 
+    it "should return the count of active and invited students if 'total_students' flag is given" do
+      user1 = @user
+      user2 = User.create!(:name => 'Bernard')
+      user3 = User.create!(:name => 'Hoagie')
+      user4 = User.create!(:name => 'Laverne')
+      section1 = @course2.default_section
+      section2 = @course2.course_sections.create!(:name => 'Section 31')
+
+      @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
+      @course2.enroll_user(user3, 'StudentEnrollment', :section => section2).accept!
+      @course2.enroll_user(user4, 'StudentEnrollment', :section => section2)
+
+      @user = @me
+
+      json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
+                      { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => 'total_students' })
+
+      expect(json.first).to include('total_students')
+      expect(json.first['total_students']).to eq 3
+    end
+
     it "should not return deleted sections" do
       section1 = @course2.default_section
       section2 = @course2.course_sections.create!(:name => 'Section B')

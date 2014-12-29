@@ -42,6 +42,7 @@ module Api::V1::Section
           user_json(e.user, user, session, includes, @context, enrollments)
         }
     end
+    res['total_students'] = section.students.count if includes.include?('total_students')
     res
   end
 end
