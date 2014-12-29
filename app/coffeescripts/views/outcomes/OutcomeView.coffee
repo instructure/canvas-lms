@@ -117,6 +117,9 @@ define [
         close: -> $(e.target).focus()
       ).dialog('open')
 
+    screenreaderTitleFocus: ->
+      @$(".screenreader-outcome-title").focus()
+
     render: ->
       data = @model.toJSON()
       data.html_url = ENV.CONTEXT_URL_ROOT+'/outcomes/'+data.id
@@ -149,5 +152,5 @@ define [
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER
-      @$('input:first').focus()
+      @screenreaderTitleFocus()
       this

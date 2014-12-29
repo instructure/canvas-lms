@@ -55,6 +55,7 @@ define [
         else if viewOpts.model instanceof OutcomeGroup
           new OutcomeGroupView viewOpts
       @render()
+      @innerView.screenreaderTitleFocus() if @innerView instanceof OutcomeView
 
     render: ->
       @attachEvents()
