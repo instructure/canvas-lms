@@ -9,7 +9,6 @@
 
   background-color: $tooltipBackground;
   color: $tooltipColor;
-  @include opacity(80);
 
   .qtip-titlebar { // TODO: port from jQueryUI dialog
     background-color: #FFEF93;

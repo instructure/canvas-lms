@@ -101,3 +101,27 @@
     }
   }
 }
+.canvas-quiz-statistics-noload {
+  position: relative;
+  #sad-panda {
+    display: flex;
+    flex-direction: column;
+    top: 150%;
+    left: 50%;
+    position: absolute;
+    float: none;
+    transform: translate(-50%, -20%)
+  }
+  p {
+    text-align: center;
+    margin: 13px 0 10px 0;
+  }
+  .links {
+    margin: 0 auto;
+  }
+  img {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+}

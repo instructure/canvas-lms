@@ -23,7 +23,8 @@ define(function(require) {
         })
 
         setProps({
-          quizStatistics: Statistics.get()
+          quizStatistics: Statistics.get(),
+          canBeLoaded: true
         });
 
         expect(function() {
@@ -42,7 +43,8 @@ define(function(require) {
         })
 
         setProps({
-          quizStatistics: _.extend(Statistics.get(), { expandingAll: true })
+          quizStatistics: _.extend(Statistics.get(), { expandingAll: true }),
+          canBeLoaded: true
         });
 
         expect(function() {
@@ -61,7 +63,8 @@ define(function(require) {
         })
 
         setProps({
-          quizStatistics: Statistics.get()
+          quizStatistics: Statistics.get(),
+          canBeLoaded: true
         });
 
         expect(function() {
@@ -80,7 +83,8 @@ define(function(require) {
         })
 
         setProps({
-          quizStatistics: _.extend(Statistics.get(), { expanded: [ '1' ] })
+          quizStatistics: _.extend(Statistics.get(), { expanded: [ '1' ] }),
+          canBeLoaded: true
         });
 
         expect(function() {
@@ -89,5 +93,10 @@ define(function(require) {
       });
     });
 
+    it("should render too big page when limits are exceeded", function() {
+      setProps({canBeLoaded: false});
+      expect(subject.isMounted()).toEqual(true);
+      expect('.#sad-panda').toExist();
+    })
   });
 });

@@ -13,7 +13,8 @@ define(function(require) {
   var store = new Store('statistics', {
     getInitialState: function() {
       return {
-        loading: false
+        loading: false,
+        stats_can_load: true
       };
     },
 
@@ -34,10 +35,18 @@ define(function(require) {
 
       this.setState({ loading: true });
 
-      return quizStats.fetch().then(function onLoad(payload) {
+      return quizStats.fetch({
+        success: this.checkForStatsNoLoad.bind(this),
+      }).then(function onLoad(payload) {
         this.populate(payload);
         this.setState({ loading: false });
       }.bind(this));
+    },
+
+    checkForStatsNoLoad: function(collection, response) {
+      if (response == null) {
+        this.setState({stats_can_load: false});
+      }
     },
 
     /**
@@ -77,6 +86,10 @@ define(function(require) {
 
     isLoading: function() {
       return this.state.loading;
+    },
+
+    canBeLoaded: function() {
+      return this.state.stats_can_load;
     },
 
     getSubmissionStatistics: function() {

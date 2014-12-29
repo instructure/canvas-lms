@@ -58,14 +58,6 @@ describe Quizzes::QuizStatisticsService do
       Quizzes::QuizStatistics.unstub(:large_quiz?)
     end
 
-    it 'should not generate for all versions of a large course' do
-      Quizzes::QuizStatistics.stubs(:large_quiz?).returns true
-
-      expect {
-        subject.generate_aggregate_statistics(true)
-      }.to raise_error(RequestError, 'operation not available for large quizzes')
-    end
-
     it 'should generate for all quiz versions' do
       Quizzes::QuizStatistics.stubs(:large_quiz?).returns false
 

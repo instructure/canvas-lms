@@ -9,6 +9,7 @@ define(function(require) {
     update({
       quizStatistics: quizStatistics.get(),
       isLoadingStatistics: quizStatistics.isLoading(),
+      canBeLoaded: quizStatistics.canBeLoaded(),
       quizReports: quizReports.getAll(),
       notifications: notifications.getAll()
     });
