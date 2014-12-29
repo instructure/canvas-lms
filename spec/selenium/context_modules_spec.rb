@@ -756,6 +756,34 @@ describe "context_modules" do
     end
   end
 
+  context "logged out" do
+    before (:each) do
+      @course = course(:active_all => true)
+      course_module
+      @course.is_public = true
+      @course.save!
+      @course.reload
+      remove_user_session
+    end
+
+    def assert_page_loads
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+
+      expect(f('.name').text).to eq "some module"
+    end
+
+    it "loads page with differentiated assignments on" do
+      @course.enable_feature!(:differentiated_assignments)
+      assert_page_loads
+    end
+
+    it "loads page with differentiated assignments on" do
+      @course.disable_feature!(:differentiated_assignments)
+      assert_page_loads
+    end
+  end
+
   context "as an observer" do
     before (:each) do
       @course = course(:active_all => true)
