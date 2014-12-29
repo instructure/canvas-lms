@@ -630,6 +630,7 @@ define([
     // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
       data.context_module.displayed_unlock_at = $.datetimeString(data.context_module.unlock_at);
+      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at, { localized: false });
       var $module = $("#context_module_" + data.context_module.id);
       $module.attr('aria-label', data.context_module.name);
       $module.find(".header").fillTemplateData({
@@ -696,6 +697,8 @@ define([
           data["context_module[completion_requirements][" + id + "][type]"] = $(this).find(".type").val();
           data["context_module[completion_requirements][" + id + "][min_score]"] = $(this).find(".min_score").val();
         });
+        var date = $.datetime.parse(data['context_module[unlock_at]']);
+        data['context_module[unlock_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
         return data;
       },
       beforeSubmit: function(data) {
