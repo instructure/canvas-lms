@@ -250,7 +250,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
           da_enabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-          success: =>
+          success: (dateDialog) =>
+            dateDialog.dialog('close').remove()
             ValidatedFormView::submit.call(this)
         missingDateDialog.cancel = (e) ->
           missingDateDialog.$dialog.dialog('close').remove()
