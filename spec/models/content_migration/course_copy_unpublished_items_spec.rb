@@ -19,6 +19,21 @@ describe ContentMigration do
       expect(cm2_2.workflow_state).to eq 'unpublished'
     end
 
+    it "should preserve published state of contentless module items" do
+      cm = @copy_from.context_modules.create!(name: "eh module")
+      pu = cm.add_item(type: 'external_url', title: 'published', url: 'http://published.example.com')
+      pu.publish!
+      uu = cm.add_item(type: 'external_url', title: 'unpublished', url: 'http://unpublished.example.com')
+      expect(uu).to be_unpublished
+
+      run_course_copy
+
+      pu2 = @copy_to.context_module_tags.where(migration_id: mig_id(pu)).first
+      expect(pu2).to be_active
+      uu2 = @copy_to.context_module_tags.where(migration_id: mig_id(uu)).first
+      expect(uu2).to be_unpublished
+    end
+
     it "should copy links to unpublished items in modules" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       page = @copy_from.wiki.wiki_pages.create(:title => "some page")
