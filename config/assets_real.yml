@@ -161,6 +161,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/all_courses.css
   external_tool_full_width:
     - public/stylesheets/compiled/pages/external_tools/full_width.css
+  terms:
+    - public/stylesheets/compiled/pages/terms.css
   # Client Apps:
   canvas_quizzes:
     - public/stylesheets/compiled/client_apps/canvas_quizzes.css
