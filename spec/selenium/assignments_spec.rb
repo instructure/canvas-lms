@@ -65,6 +65,8 @@ describe "assignments" do
 
     it "should create an assignment using main add button" do
       assignment_name = 'first assignment'
+      time = Timecop.freeze(2015,1,7,2,13)
+      due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
@@ -72,13 +74,18 @@ describe "assignments" do
       f(".new_assignment").click
       wait_for_ajaximations
       f('#assignment_name').send_keys(assignment_name)
-      f('#assignment_text_entry').click
-      submit_assignment_form
-
-      #make sure assignment was added to correct assignment group
-      keep_trying_until do
-        expect(f('h1.title')).to include_text(assignment_name)
+      f('#assignment_points_possible').send_keys('10')
+      ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
+        f(element).click
       end
+      driver.find_element(:name, 'due_at').send_keys(due_at)
+      submit_assignment_form
+      #confirm all our settings were saved and are now displayed
+      wait_for_ajaximations
+      expect(f('h1.title')).to include_text(assignment_name)
+      expect(fj('#assignment_show .points_possible')).to include_text('10')
+      expect(f('#assignment_show fieldset')).to include_text('a text entry box, a website url, or a file upload')
+      expect(f('.assignment_dates')).to include_text(due_at)
     end
 
     it "only allows an assignment editor to edit points and title if assignment " +
@@ -116,6 +123,9 @@ describe "assignments" do
     it "should create an assignment with more options" do
       enable_cache do
         expected_text = "Assignment 1"
+        time = Timecop.freeze(2015,1,7,2,13)
+        due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+        points = '25'
 
         get "/courses/#{@course.id}/assignments"
         group = @course.assignment_groups.first
@@ -123,11 +133,14 @@ describe "assignments" do
         first_stamp = group.reload.updated_at.to_i
         f('.add_assignment').click
         wait_for_ajaximations
+        replace_content(f("#ag_#{group.id}_assignment_name"), expected_text)
+        replace_content(f("#ag_#{group.id}_assignment_due_at"), due_at)
+        replace_content(f("#ag_#{group.id}_assignment_points"), points)
         expect_new_page_load { f('.more_options').click }
-        f("#assignment_name").send_keys(expected_text)
+        expect(f('#assignment_name').attribute(:value)).to include_text(expected_text)
+        expect(f('#assignment_points_possible').attribute(:value)).to include_text(points)
+        expect(driver.find_element(:name, 'due_at').attribute(:value)).to eq due_at
         click_option('#assignment_submission_type', 'No Submission')
-        assignment_points_possible = f("#assignment_points_possible")
-        replace_content(assignment_points_possible, "5")
         submit_assignment_form
         expect(@course.assignments.count).to eq 1
         get "/courses/#{@course.id}/assignments"
