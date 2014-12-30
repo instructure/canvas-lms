@@ -649,6 +649,10 @@ class PseudonymSessionsController < ApplicationController
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'login')
 
+    if !params.has_key?(request_forgery_protection_token) && @domain_root_account.trusted_referer?(request.referer)
+      response.headers['X-Account-Trusted-Referrer'] = 'true'
+    end
+
     otp_passed ||= @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'], request.remote_ip)
     if !otp_passed
       mfa_settings = @current_user.mfa_settings
