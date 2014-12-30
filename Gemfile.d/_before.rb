@@ -17,11 +17,14 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-required_bundler_version = '1.6.0'..'1.7.9'
-gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
+required_bundler_version = '1.6.0'..'1.7.10'
+bundler_requirements = [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
+gem 'bundler', bundler_requirements
 
-unless required_bundler_version.include?(Bundler::VERSION)
-  if Bundler::VERSION < required_bundler_version.first
+# we still manually do this check because older bundler versions don't validate the version requirement
+# of the bundler gem once the bundle has been initially installed
+unless Gem::Requirement.new(*bundler_requirements).satisfied_by?(Gem::Version.new(Bundler::VERSION))
+  if Gem::Version.new(Bundler::VERSION) < Gem::Version.new(required_bundler_version.first)
     bundle_command = "gem install bundler -v #{required_bundler_version.last}"
   else
     require 'shellwords'
