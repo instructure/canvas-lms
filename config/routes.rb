@@ -485,7 +485,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :terms
+    resources :terms, except: [:show, :new, :edit]
     resources :sub_accounts
 
     get :avatars
@@ -833,6 +833,12 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :terms_api) do
       get 'accounts/:account_id/terms', action: :index, as: 'enrollment_terms'
+    end
+
+    scope(controller: :terms) do
+      post 'accounts/:account_id/terms', action: :create
+      put 'accounts/:account_id/terms/:id', action: :update
+      delete 'accounts/:account_id/terms/:id', action: :destroy
     end
 
     scope(controller: :authentication_audit_api) do

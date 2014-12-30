@@ -28,17 +28,19 @@ describe TermsApiController, type: :request do
       @term2 = @account.enrollment_terms.create(name: "Term 2")
     end
 
-    def get_terms(options={})
+    def get_terms(body_params={})
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
                { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param },
-               options)
+               body_params)
       json['enrollment_terms']
     end
 
     describe "filtering by state" do
-      it "should list all active terms by default" do
+      before :once do
         @term2.destroy
+      end
 
+      it "should list all active terms by default" do
         json = get_terms
         names = json.map{ |t| t['name'] }
         expect(names).to include(@term1.name)
@@ -46,8 +48,6 @@ describe TermsApiController, type: :request do
       end
 
       it "should list active terms with state=active" do
-        @term2.destroy
-
         json = get_terms(workflow_state: 'active')
         names = json.map{ |t| t['name'] }
         expect(names).to include(@term1.name)
@@ -55,8 +55,6 @@ describe TermsApiController, type: :request do
       end
 
       it "should list deleted terms with state=deleted" do
-        @term2.destroy
-
         json = get_terms(workflow_state: 'deleted')
         names = json.map{ |t| t['name'] }
         expect(names).not_to include(@term1.name)
@@ -64,8 +62,6 @@ describe TermsApiController, type: :request do
       end
 
       it "should list all terms, active and deleted, with state=all" do
-        @term2.destroy
-
         json = get_terms(workflow_state: 'all')
         names = json.map{ |t| t['name'] }
         expect(names).to include(@term1.name)
@@ -73,8 +69,6 @@ describe TermsApiController, type: :request do
       end
 
       it "should list all terms, active and deleted, with state=[all]" do
-        @term2.destroy
-
         json = get_terms(workflow_state: ['all'])
         names = json.map{ |t| t['name'] }
         expect(names).to include(@term1.name)
@@ -87,11 +81,9 @@ describe TermsApiController, type: :request do
         @term1.update_attributes(start_at: 1.day.ago, end_at: 5.days.from_now)
         @term2.update_attributes(start_at: 2.days.ago, end_at: 6.days.from_now)
 
-        json = api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
-                        { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param })
-
-        expect(json['enrollment_terms'].first['name']).to eq @term2.name
-        expect(json['enrollment_terms'].last['name']).to eq @term1.name
+        json = get_terms
+        expect(json.first['name']).to eq @term2.name
+        expect(json.last['name']).to eq @term1.name
       end
 
       it "should order by end_at second" do
@@ -99,11 +91,9 @@ describe TermsApiController, type: :request do
         @term1.update_attributes(start_at: start_at, end_at: 6.days.from_now)
         @term2.update_attributes(start_at: start_at, end_at: 5.days.from_now)
 
-        json = api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
-                        { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param })
-
-        expect(json['enrollment_terms'].first['name']).to eq @term2.name
-        expect(json['enrollment_terms'].last['name']).to eq @term1.name
+        json = get_terms
+        expect(json.first['name']).to eq @term2.name
+        expect(json.last['name']).to eq @term1.name
       end
 
       it "should order by id last" do
@@ -112,11 +102,9 @@ describe TermsApiController, type: :request do
         @term1.update_attributes(start_at: start_at, end_at: end_at)
         @term2.update_attributes(start_at: start_at, end_at: end_at)
 
-        json = api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
-                        { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param })
-
-        expect(json['enrollment_terms'].first['name']).to eq @term1.name
-        expect(json['enrollment_terms'].last['name']).to eq @term2.name
+        json = get_terms
+        expect(json.first['name']).to eq @term1.name
+        expect(json.last['name']).to eq @term2.name
       end
     end
 
@@ -125,6 +113,153 @@ describe TermsApiController, type: :request do
       expect(json.size).to eq 1
       expect(response.headers).to include('Link')
       expect(response.headers['Link']).to match(/rel="next"/)
+    end
+
+    describe "authorization" do
+      def expect_terms_index_401
+        api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
+          { controller: 'terms_api', action: 'index', format: 'json', account_id: @account.to_param },
+          {},
+          {},
+          { expected_status: 401 })
+      end
+
+      it "should require auth for the right account" do
+        other_account = Account.create(name: 'other')
+        account_admin_user(account: other_account)
+        expect_terms_index_401
+      end
+
+      it "should require root domain auth" do
+        subaccount = @account.sub_accounts.create!(name: 'subaccount')
+        account_admin_user(account: subaccount)
+        expect_terms_index_401
+      end
+    end
+  end
+end
+
+describe TermsController, type: :request do
+  before :once do
+    @account = Account.create(name: 'new')
+    account_admin_user(account: @account)
+    @account.enrollment_terms.scoped.delete_all
+    @term1 = @account.enrollment_terms.create(name: "Term 1")
+  end
+
+  describe "create" do
+    it "should allow creating a term" do
+      start_at = 3.days.ago
+      end_at = 3.days.from_now
+      json = api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
+        { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
+        { enrollment_term: { name: 'Term 2', start_at: start_at.iso8601, end_at: end_at.iso8601 } })
+
+      expect(json['id']).to be_present
+      expect(json['name']).to eq 'Term 2'
+      expect(json['start_at']).to eq start_at.iso8601
+      expect(json['end_at']).to eq end_at.iso8601
+
+      new_term = @account.reload.enrollment_terms.find(json['id'])
+      expect(new_term.name).to eq 'Term 2'
+      expect(new_term.start_at.to_i).to eq start_at.to_i
+      expect(new_term.end_at.to_i).to eq end_at.to_i
+    end
+
+    describe "authorization" do
+      def expect_terms_create_401
+        api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
+          { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
+          { enrollment_term: { name: 'Term 2' } },
+          {},
+          { expected_status: 401 })
+      end
+
+      it "should require auth for the right account" do
+        other_account = Account.create(name: 'other')
+        account_admin_user(account: other_account)
+        expect_terms_create_401
+      end
+
+      it "should require root domain auth" do
+        subaccount = @account.sub_accounts.create!(name: 'subaccount')
+        account_admin_user(account: subaccount)
+        expect_terms_create_401
+      end
+    end
+  end
+
+  describe "update" do
+    it "should allow updating a term" do
+      start_at = 3.days.ago
+      end_at = 3.days.from_now
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+        { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+        { enrollment_term: { name: 'Term 2', start_at: start_at.iso8601, end_at: end_at.iso8601 } })
+
+      expect(json['id']).to eq @term1.id
+      expect(json['name']).to eq 'Term 2'
+      expect(json['start_at']).to eq start_at.iso8601
+      expect(json['end_at']).to eq end_at.iso8601
+
+      @term1.reload
+      expect(@term1.name).to eq 'Term 2'
+      expect(@term1.start_at.to_i).to eq start_at.to_i
+      expect(@term1.end_at.to_i).to eq end_at.to_i
+    end
+
+    describe "authorization" do
+      def expect_terms_update_401
+        api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param},
+          { enrollment_term: { name: 'Term 2' } },
+          {},
+          { :expected_status => 401 })
+      end
+
+      it "should require auth for the right account" do
+        other_account = Account.create(name: 'other')
+        account_admin_user(account: other_account)
+        expect_terms_update_401
+      end
+
+      it "should require root domain auth" do
+        subaccount = @account.sub_accounts.create!(name: 'subaccount')
+        account_admin_user(account: subaccount)
+        expect_terms_update_401
+      end
+    end
+  end
+
+  describe "destroy" do
+    it "should allow deleting a term" do
+      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+        { controller: 'terms', action: 'destroy', format: 'json', account_id: @account.to_param, id: @term1.to_param })
+
+      expect(json['id']).to eq @term1.id
+      expect(@term1.reload).to be_deleted
+    end
+
+    describe "authorization" do
+      def expect_terms_destroy_401
+        api_call(:delete, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'destroy', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+          {},
+          {},
+          { :expected_status => 401 })
+      end
+
+      it "should require auth for the right account" do
+        other_account = Account.create(name: 'other')
+        account_admin_user(account: other_account)
+        expect_terms_destroy_401
+      end
+
+      it "should require root domain auth" do
+        subaccount = @account.sub_accounts.create!(name: 'subaccount')
+        account_admin_user(account: subaccount)
+        expect_terms_destroy_401
+      end
     end
   end
 end
