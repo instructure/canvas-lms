@@ -138,8 +138,9 @@
 #
 class SubmissionsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
-  batch_jobs_in_actions :only => :update, :batch => { :priority => Delayed::LOW_PRIORITY }
+  batch_jobs_in_actions :only => [:update], :batch => { :priority => Delayed::LOW_PRIORITY }
 
+  include Api::V1::Progress
   include Api::V1::Submission
 
   # @API List assignment submissions
@@ -652,6 +653,47 @@ class SubmissionsApiController < ApplicationController
       }
       render :json => json
     end
+  end
+
+  # @API Grade multiple submissions for an assignment
+  #
+  # Update the grading for multiple student's assignment submissions in
+  # an asynchronous job.
+  #
+  # The user must have permission to manage grades in the appropriate context
+  # (course or section).
+  #
+  # @argument grade_data[<student_id>][posted_grade] [String]
+  #   See documentation for the posted_grade argument in the
+  #   {api:SubmissionsApiController#update Submissions Update} documentation
+  #
+  # @argument grade_data[<student_id>][rubric_assessment] [RubricAssessment]
+  #   See documentation for the rubric_assessment argument in the
+  #   {api:SubmissionsApiController#update Submissions Update} documentation
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/submissions/update_grades' \
+  #        -X POST \
+  #        -F 'grade_data[3][posted_grade]=88' \
+  #        -F 'grade_data[4][posted_grade]=95' \
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @returns Progress
+  def bulk_update
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+
+    unless @assignment.published? && @context.grants_right?(@current_user, session, :manage_grades)
+      return render_unauthorized_action
+    end
+
+    grade_data = params[:grade_data]
+    unless grade_data.is_a?(Hash) && grade_data.present?
+      return render :json => "'grade_data' parameter required", :status => :bad_request
+    end
+
+    progress = Submission.queue_bulk_update(@context, @section, @assignment, @current_user, grade_data)
+    render :json => progress_json(progress, @current_user, session)
   end
 
   # @API Mark submission as read
