@@ -10,11 +10,7 @@ group :test do
   gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
     gem 'metaclass', '0.0.2'
   gem 'thin', '1.6.3'
-    if RUBY_VERSION >= '2.2'
-      gem 'eventmachine', '1.0.4'
-    else
-      gem 'eventmachine', '1.0.4'
-    end
+    gem 'eventmachine', '1.0.4'
 
   gem 'rspec', '3.1.0'
   gem 'rspec-rails', '3.1.0'
