@@ -3209,6 +3209,18 @@ describe Assignment do
       a2.group_category = nil
       expect(a2).not_to be_valid
     end
+
+    it "recognizes if it has submissions and belongs to a deleted group category" do
+      a1.group_category = @group_category
+      a1.submit_homework @student, body: "hello, world"
+      expect(a1.group_category_deleted_with_submissions?).to eq false
+      a1.group_category.destroy
+      expect(a1.group_category_deleted_with_submissions?).to eq true
+
+      a2 = assignment(@group_category)
+      a2.group_category.destroy
+      expect(a2.group_category_deleted_with_submissions?).to eq false
+    end
   end
 end
 

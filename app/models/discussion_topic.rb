@@ -259,6 +259,10 @@ class DiscussionTopic < ActiveRecord::Base
     DiscussionTopic::MaterializedView.for(self).update_materialized_view
   end
 
+  def group_category_deleted_with_entries?
+    self.group_category.try(:deleted_at?) && !can_group?
+  end
+
   # If no join record exists, assume all discussion enrties are unread, and
   # that a join record will be created the first time one is marked as read.
   attr_accessor :current_user

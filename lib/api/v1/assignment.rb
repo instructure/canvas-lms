@@ -387,7 +387,7 @@ module Api::V1::Assignment
       assignment.assignment_group = assignment.context.assignment_groups.where(id: ag_id).first
     end
 
-    if update_params.has_key?("group_category_id")
+    if update_params.has_key?("group_category_id") && !assignment.group_category_deleted_with_submissions?
       gc_id = update_params.delete("group_category_id").presence
       assignment.group_category = assignment.context.group_categories.where(id: gc_id).first
     end

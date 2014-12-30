@@ -1901,6 +1901,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def group_category_deleted_with_submissions?
+    self.group_category.try(:deleted_at?) && self.has_student_submissions?
+  end
+
   def self.with_student_submission_count
     joins("LEFT OUTER JOIN submissions s ON
            s.assignment_id = assignments.id AND

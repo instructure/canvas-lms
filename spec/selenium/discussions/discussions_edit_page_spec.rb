@@ -104,6 +104,43 @@ describe "discussions" do
         end
       end
 
+      context "with a group attached" do
+        let(:graded_topic) { assignment_topic }
+        before do
+          @gc = GroupCategory.create(:name => "Sharks", :context => @course)
+          @student = student_in_course(:course => @course, :active_all => true).user
+          group = @course.groups.create!(:group_category => @gc)
+          group.users << @student
+        end
+
+        it "group discussions with entries should lock and display the group name" do
+          topic.group_category = @gc
+          topic.save!
+          topic.child_topics[0].reply_from({:user => @student, :text => "I feel pretty"})
+          @gc.destroy
+          get url
+          wait_for_ajaximations
+
+          expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+          expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
+        end
+
+        context "graded" do
+          let(:topic) { assignment_topic }
+          it "graded group discussions with submissions should lock and display the group name" do
+            topic.group_category = @gc
+            topic.save!
+            topic.reply_from({:user => @student, :text => "I feel pretty"})
+            @gc.destroy
+            get url
+            wait_for_ajaximations
+
+            expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+            expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
+          end
+        end
+      end
+
       it "should save and display all changes" do
         course.require_assignment_group
 

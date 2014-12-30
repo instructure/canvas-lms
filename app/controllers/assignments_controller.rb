@@ -381,6 +381,13 @@ class AssignmentsController < ApplicationController
         select { |c| !c.student_organized? }.
         map { |c| { :id => c.id, :name => c.name } }
 
+      # if assignment has student submissions and is attached to a deleted group category,
+      # add that category to the ENV list so it can be shown on the edit page.
+      if @assignment.group_category_deleted_with_submissions?
+        locked_category = @assignment.group_category
+        group_categories << { :id => locked_category.id, :name => locked_category.name }
+      end
+
       json_for_assignment_groups = assignment_groups.map do |group|
         assignment_group_json(group, @current_user, session, [], {stringify_json_ids: true})
       end
