@@ -41,7 +41,13 @@ define [
       @props.currentFolder?.off(null, null, this)
 
     buildFolderPath: (splat) ->
-      encodeURI('/' + (splat || ''))
+      # We don't want the slashes to go away so we are doing some magic here
+      if (splat)
+        splat = splat.split('/').map((splatPiece) ->
+          encodeURIComponent(splatPiece)
+        ).join('/')
+
+      '/' + (splat || '')
 
     getCurrentFolder: ->
       path = @buildFolderPath(@props.params.splat)
