@@ -166,6 +166,31 @@ describe TermsController, type: :request do
       expect(new_term.end_at.to_i).to eq end_at.to_i
     end
 
+    describe "sis_term_id" do
+      it "allows specifying sis_term_id with :manage_sis permission" do
+        expect(@account.grants_right?(@user, :manage_sis)).to be_truthy
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
+          { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
+          { enrollment_term: { name: 'Term 2', sis_term_id: 'SIS Term 2' } })
+
+        expect(json['sis_term_id']).to eq 'SIS Term 2'
+        new_term = @account.reload.enrollment_terms.find(json['id'])
+        expect(new_term.sis_source_id).to eq 'SIS Term 2'
+      end
+
+      it "rejects sis_term_id without :manage_sis permission" do
+        account_with_role_changes(account: @account, role_changes: { manage_sis: false })
+        expect(@account.grants_right?(@user, :manage_sis)).to be_falsey
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
+          { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
+          { enrollment_term: { name: 'Term 2', sis_term_id: 'SIS Term 2' } })
+
+        expect(json['sis_term_id']).to be_nil
+        new_term = @account.reload.enrollment_terms.find(json['id'])
+        expect(new_term.sis_source_id).to be_nil
+      end
+    end
+
     describe "authorization" do
       def expect_terms_create_401
         api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
@@ -206,6 +231,41 @@ describe TermsController, type: :request do
       expect(@term1.name).to eq 'Term 2'
       expect(@term1.start_at.to_i).to eq start_at.to_i
       expect(@term1.end_at.to_i).to eq end_at.to_i
+    end
+
+    describe "sis_term_id" do
+      it "allows specifying sis_term_id with :manage_sis permission" do
+        expect(@account.grants_right?(@user, :manage_sis)).to be_truthy
+        json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+          { enrollment_term: { name: 'Term 2', sis_term_id: 'SIS Term 2' } })
+
+        expect(json['sis_term_id']).to eq 'SIS Term 2'
+        expect(@term1.reload.sis_source_id).to eq 'SIS Term 2'
+      end
+
+      it "allows removing sis_term_id with :manage_sis permission" do
+        @term1.update_attributes(sis_source_id: 'SIS Term 2')
+        expect(@account.grants_right?(@user, :manage_sis)).to be_truthy
+        json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+          { enrollment_term: { name: 'Term 2', sis_term_id: '' } })
+
+        expect(json.keys).to include 'sis_term_id'
+        expect(json['sis_term_id']).to be_nil
+        expect(@term1.reload.sis_source_id).to be_nil
+      end
+
+      it "rejects sis_term_id without :manage_sis permission" do
+        account_with_role_changes(account: @account, role_changes: { manage_sis: false })
+        expect(@account.grants_right?(@user, :manage_sis)).to be_falsey
+        json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
+          { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },
+          { enrollment_term: { name: 'Term 2', sis_term_id: 'SIS Term 2' } })
+
+        expect(json['sis_term_id']).to be_nil
+        expect(@term1.reload.sis_source_id).to be_nil
+      end
     end
 
     describe "authorization" do

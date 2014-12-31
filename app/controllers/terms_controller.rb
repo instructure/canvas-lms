@@ -42,11 +42,16 @@ class TermsController < ApplicationController
   #   The day/time the term ends.
   #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
   #
+  # @argument enrollment_term[sis_term_id] [String]
+  #   The unique SIS identifier for the term.
+  #
   # @returns EnrollmentTerm
   #
   def create
     overrides = params[:enrollment_term].delete(:overrides) rescue nil
     @term = @context.enrollment_terms.active.build(params[:enrollment_term])
+    sis_id = params[:enrollment_term].delete(:sis_source_id) || params[:enrollment_term].delete(:sis_term_id)
+    handle_sis_id_param(sis_id)
     if @term.save
       @term.set_overrides(@context, overrides)
       if api_request?
@@ -74,21 +79,16 @@ class TermsController < ApplicationController
   #   The day/time the term ends.
   #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
   #
+  # @argument enrollment_term[sis_term_id] [String]
+  #   The unique SIS identifier for the term.
+  #
   # @returns EnrollmentTerm
   #
   def update
     overrides = params[:enrollment_term].delete(:overrides) rescue nil
     @term = api_find(@context.enrollment_terms.active, params[:id])
-    root_account = @context.root_account
-    if sis_id = params[:enrollment_term].delete(:sis_source_id)
-      if sis_id != @account.sis_source_id && root_account.grants_right?(@current_user, session, :manage_sis)
-        if sis_id == ''
-          @term.sis_source_id = nil
-        else
-          @term.sis_source_id = sis_id
-        end
-      end
-    end
+    sis_id = params[:enrollment_term].delete(:sis_source_id) || params[:enrollment_term].delete(:sis_term_id)
+    handle_sis_id_param(sis_id)
     if @term.update_attributes(params[:enrollment_term])
       @term.set_overrides(@context, overrides)
       if api_request?
@@ -114,6 +114,15 @@ class TermsController < ApplicationController
       render :json => enrollment_term_json(@term, @current_user, session)
     else
       render :json => @term
+    end
+  end
+
+  private
+  def handle_sis_id_param(sis_id)
+    if !sis_id.nil? &&
+        sis_id != @account.sis_source_id &&
+        @context.root_account.grants_right?(@current_user, session, :manage_sis)
+      @term.sis_source_id = sis_id.presence
     end
   end
 end

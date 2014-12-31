@@ -481,7 +481,7 @@ RSpec.configure do |config|
     @course
   end
 
-  def account_admin_user_with_role_changes(opts={})
+  def account_with_role_changes(opts={})
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
@@ -494,6 +494,10 @@ RSpec.configure do |config|
       end
     end
     RoleOverride.clear_cached_contexts
+  end
+
+  def account_admin_user_with_role_changes(opts={})
+    account_with_role_changes(opts)
     account_admin_user(opts)
   end
 
