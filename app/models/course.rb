@@ -1337,8 +1337,8 @@ class Course < ActiveRecord::Base
     scope = self.student_enrollments.not_fake
     scope = scope.where(user_id: user_ids_to_publish) if user_ids_to_publish
     scope.update_all(:grade_publishing_status => "pending",
-                                        :grade_publishing_message => nil,
-                                        :last_publish_attempt_at => last_publish_attempt_at)
+                     :grade_publishing_message => nil,
+                     :last_publish_attempt_at => last_publish_attempt_at)
 
     send_later_if_production(:send_final_grades_to_endpoint, publishing_user, user_ids_to_publish)
     send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
