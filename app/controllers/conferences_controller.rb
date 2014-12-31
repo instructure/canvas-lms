@@ -63,6 +63,11 @@
 #           "example": "AdobeConnect",
 #           "type": "string"
 #         },
+#         "conference_key": {
+#           "description": "The 3rd party's ID for the conference",
+#           "example": "abcdjoelisgreatxyz",
+#           "type": "string"
+#         },
 #         "description": {
 #           "description": "The description for the conference",
 #           "example": "Conference Description",
