@@ -4,9 +4,9 @@
 <h1 class='screenreader-only'><%= @context.name %></h1>
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context_enrollment.feed_code, :atom), {:title => "Course Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context_enrollment.feed_code, :atom), {:title => t("Course Atom Feed")}) %>
   <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context.feed_code, :atom), {:title => "Course Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context.feed_code, :atom), {:title => t("Course Atom Feed")}) %>
   <% end %>
 <% end %>
 
@@ -123,7 +123,7 @@
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
   <% elsif @course_home_view != 'wiki' %>
-    <% locals = {:title => "Coming Up", :display_count => 3, :period => "the next week", :contexts_to_link_to => @context, :upcoming => true} %>
+    <% locals = {:title => t("Coming Up"), :display_count => 3, :period => "the next week", :contexts_to_link_to => @context, :upcoming => true} %>
     <% if @current_user %>
       <% cache(safe_cache_key([@current_user, @contexts, 'course_upcoming_events' ])) do %>
         <%= render :partial => "shared/event_list", :object => @current_user.upcoming_events(:contexts => @contexts), :locals => locals %>
