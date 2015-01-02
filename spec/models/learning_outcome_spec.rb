@@ -456,6 +456,7 @@ describe LearningOutcome do
     end
 
     it "should not let you change calculation_int if it has been used to assess a student" do
+      @outcome.calculation_method = 'decaying_average'
       @outcome.calculation_int = 24
       @outcome.save!
       expect(@outcome.calculation_int).to eq(24)
@@ -470,7 +471,7 @@ describe LearningOutcome do
       expect(@outcome.calculation_int).to eq(24)
     end
 
-    it "should not let you set the calculation_method to nil if it has been set to seomthing else" do
+    it "should not let you set the calculation_method to nil if it has been set to something else" do
       @outcome.calculation_method = 'latest'
       @outcome.save!
       expect(@outcome.calculation_method).to eq('latest')
@@ -479,7 +480,7 @@ describe LearningOutcome do
       @outcome.save
       expect(@outcome).to have(1).error_on(:calculation_method)
       expect(@outcome).to have(1).error
-      expect(outcome_errors(:calculation_method).first).to include("Calculation method cannot be set to nil")
+      expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
       @outcome.reload
       expect(@outcome.calculation_method).to eq('latest')
     end
@@ -548,7 +549,7 @@ describe LearningOutcome do
       expect(@outcome).not_to be_valid
       expect(@outcome).to have(1).error
       expect(@outcome).to have(1).error_on(:calculation_method)
-      expect(outcome_errors(:calculation_method).first).to include("not a valid calculation_method")
+      expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
 
       @outcome = LearningOutcome.new(
         :title => 'outcome',
@@ -557,7 +558,7 @@ describe LearningOutcome do
       expect(@outcome).not_to be_valid
       expect(@outcome).to have(1).error
       expect(@outcome).to have(1).error_on(:calculation_method)
-      expect(outcome_errors(:calculation_method).first).to include("not a valid calculation_method")
+      expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
     end
 
     context "illegal calculation ints" do
@@ -726,7 +727,7 @@ describe LearningOutcome do
         @outcome.save
         expect(@outcome).to have(1).error_on(:calculation_method)
         expect(@outcome).to have(1).errors
-        expect(outcome_errors(:calculation_method).first).to include("not a valid calculation_method")
+        expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
         @outcome.reload
         expect(@outcome.calculation_method).not_to eq('foo bar baz qux')
         expect(@outcome.calculation_method).to eq('highest')
@@ -739,7 +740,7 @@ describe LearningOutcome do
         @outcome.save
         expect(@outcome).to have(1).error
         expect(@outcome).to have(1).error_on(:calculation_method)
-        expect(outcome_errors(:calculation_method).first).to include("method cannot be set to nil")
+        expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
         @outcome.reload
         expect(@outcome.calculation_method).not_to be_nil
         expect(@outcome.calculation_method).to eq('highest')
@@ -776,9 +777,9 @@ describe LearningOutcome do
     end
 
     context "default values" do
-      it "should default calculation_method to decaying_average" do
+      it "should default calculation_method to highest" do
         @outcome = LearningOutcome.create!(:title => 'outcome')
-        expect(@outcome.calculation_method).to eql('decaying_average')
+        expect(@outcome.calculation_method).to eql('highest')
       end
 
       it "should default calculation_int to nil for highest" do
@@ -801,7 +802,7 @@ describe LearningOutcome do
 
       # This is to prevent changing behavior of existing outcomes made before we added the
       # ability to set a calculation_method
-      it "should not set default values for calculation_method if the record is pre-existing and nil" do
+      it "should set calculation_method to highest if the record is pre-existing and nil" do
         @outcome = LearningOutcome.create!(:title => 'outcome')
         @outcome.update_column(:calculation_method, nil)
         @outcome.reload
@@ -810,7 +811,7 @@ describe LearningOutcome do
         @outcome.save!
         @outcome.reload
         expect(@outcome.description).to eq("foo bar baz qux")
-        expect(@outcome.calculation_method).to be_nil
+        expect(@outcome.calculation_method).to eq('highest')
       end
     end
   end

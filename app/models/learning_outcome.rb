@@ -30,15 +30,8 @@ class LearningOutcome < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
   serialize :data
 
-  before_validation :adjust_calculation_int
+  before_validation :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults
-  before_create :infer_calculation_method_defaults
-
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :short_description, :maximum => maximum_string_length
-  validates_presence_of :short_description, :workflow_state
-  sanitize_field :description, CanvasSanitize::SANITIZE
-  validate :validate_calculation_options
 
   CALCULATION_METHODS = %w[decaying_average n_mastery highest latest]
   VALID_CALCULATION_INTS = {
@@ -47,6 +40,14 @@ class LearningOutcome < ActiveRecord::Base
     "highest" => [],
     "latest" => [],
   }
+
+  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :short_description, :maximum => maximum_string_length
+  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS
+  validates_presence_of :short_description, :workflow_state
+  sanitize_field :description, CanvasSanitize::SANITIZE
+  validate :calculation_changes_after_asessing, if: :assessed?
+  validate :validate_calculation_int, unless: :assessed?
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -78,21 +79,7 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
 
-  def infer_calculation_method_defaults
-      self.calculation_method ||= default_calculation_method
-      self.calculation_int ||= default_calculation_int
-  end
-
-  def validate_calculation_options
-    if assessed?
-      validate_calculation_changes_after_asessing
-    else
-      validate_calculation_method
-      validate_calculation_int
-    end
-  end
-
-  def validate_calculation_changes_after_asessing
+  def calculation_changes_after_asessing
     # if we've been used to assess a student, refuse to accept any changes to our calculation options
     if calculation_method_changed?
       errors.add(:calculation_method, t(
@@ -106,40 +93,6 @@ class LearningOutcome < ActiveRecord::Base
         "This outcome has been used to assess a student. Calculation int is fixed at %{old_value}",
         :old_value => calculation_int_was
       ))
-    end
-  end
-
-  def validate_calculation_method_nil
-    # don't let the calculation_method be set to nil, unless we are a new record (in which case the default
-    # will be inferred), or we previously were nil
-    if calculation_method.nil?
-      # In the case we were previously nil, it is ok to leave it nil because we want to preserve the old behavior
-      # of using 'highest' as the calculation method (the new default is "decaying_average"
-      # Having a nil calculation_method is how we identify learning outcomes that existed before we added
-      # the learning outcome calculation_method and calculation_int
-      unless new_record?
-        unless calculation_method_was.nil?
-          errors.add(:calculation_method, t(
-            "Calculation method cannot be set to nil. A sensible default is %{default_calculation_method}",
-            :default_calculation_method => default_calculation_method
-          ))
-        end
-      end
-    end
-  end
-
-  def validate_calculation_method
-    # Don't add the error message for a nil calculation method because one is already added
-    # in our explicit check for nil
-    if calculation_method.nil?
-      validate_calculation_method_nil
-    else
-      unless valid_calculation_method?(calculation_method)
-        errors.add(:calculation_method, t(
-          "'%{calculation_method}' is not a valid calculation_method. Valid options are %{valid_options}",
-          :calculation_method => calculation_method, :valid_options => CALCULATION_METHODS.to_s
-        ))
-      end
     end
   end
 
@@ -170,6 +123,14 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
 
+  def infer_default_calculation_method
+    # If we are a new record, or are not changing our calculation_method (such as on a pre-existing
+    # record or an import), then assume the default of highest
+    if new_record? || !calculation_method_changed?
+      self.calculation_method ||= default_calculation_method
+    end
+  end
+
   def adjust_calculation_int
     # If we are setting calculation_method to latest or highest,
     # set calculation_int nil unless it is a new record (meaning it was set explicitly)
@@ -179,7 +140,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def default_calculation_method
-    "decaying_average"
+    "highest"
   end
 
   def default_calculation_int(method=self.calculation_method)

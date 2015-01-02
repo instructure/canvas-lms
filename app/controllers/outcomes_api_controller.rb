@@ -192,7 +192,7 @@ class OutcomesApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
-  #        -X PUT \ 
+  #        -X PUT \
   #        --data-binary '{
   #              "title": "Outcome Title",
   #              "display_name": "Title for reporting",
@@ -204,8 +204,8 @@ class OutcomesApiController < ApplicationController
   #                { "description": "Meets Expectations", "points": 3 },
   #                { "description": "Does Not Meet Expectations", "points": 0 }
   #              ]
-  #            }' \ 
-  #        -H "Content-Type: application/json" \ 
+  #            }' \
+  #        -H "Content-Type: application/json" \
   #        -H "Authorization: Bearer <token>"
   #
   def update

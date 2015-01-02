@@ -898,8 +898,8 @@ describe "Outcome Groups API", type: :request do
           { :points => 0, :description => "Does Not Meet Expectations" }
         ]
       })
-      expect(@outcome.calculation_method).to eq("decaying_average")
-      expect(@outcome.calculation_int).to eq(75)
+      expect(@outcome.calculation_method).to eq("highest")
+      expect(@outcome.calculation_int).to be_nil
     end
 
     it "should link the new outcome into the group" do
@@ -985,7 +985,7 @@ describe "Outcome Groups API", type: :request do
         expect(json["errors"]["calculation_method"]).not_to be_nil
         expect(json["errors"]["calculation_method"][0]).not_to be_nil
         expect(json["errors"]["calculation_method"][0]["message"]).not_to be_nil
-        expect(json["errors"]["calculation_method"][0]["message"]).to include("not a valid calculation_method")
+        expect(json["errors"]["calculation_method"][0]["message"]).to include("inclusion")
       end
 
       context "should fail (400) to create a new outcome with an illegal calculation_int" do

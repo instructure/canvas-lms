@@ -246,8 +246,7 @@ describe "Outcomes API", type: :request do
           "description" => @outcome.description,
           "points_possible" => 5,
           "mastery_points" => 3,
-          "calculation_method" => "decaying_average",
-          "calculation_int" => 75,
+          "calculation_method" => "highest",
           "ratings" => [
             { "points" => 5, "description" => "Exceeds Expectations" },
             { "points" => 3, "description" => "Meets Expectations" },
@@ -450,6 +449,13 @@ describe "Outcomes API", type: :request do
         end
 
         context "should not allow updating the calculation_int to an illegal value for the calculation_method" do
+          before :once do
+            # outcome calculation_method needs to be something not used as a test case
+            @outcome.calculation_method = 'decaying_average'
+            @outcome.calculation_int = 75
+            @outcome.save!
+          end
+
           method_to_int = {
             "decaying_average" => { good: 67, bad: 125 },
             "n_mastery" => { good: 4, bad: 29 },
@@ -494,7 +500,7 @@ describe "Outcomes API", type: :request do
           end
         end
 
-        it "should not set a default calculation_method if the record is being re-saved (previously created)" do
+        it "should set a default calculation_method of 'highest' if the record is being re-saved (previously created)" do
           # The order here is intentional.  We don't want to trigger any callbacks on LearningOutcome
           # because it will take away our nil calculation_method.  The nil is required in order to
           # simulate pre-existing learning outcome records that have nil calculation_methods
@@ -511,7 +517,7 @@ describe "Outcomes API", type: :request do
                      :calculation_method => nil })
 
           @outcome.reload
-          expect(@outcome.calculation_method).to be_nil
+          expect(@outcome.calculation_method).to eq('highest')
         end
 
         it "should return a sensible error message for an incorrect calculation_method" do
@@ -538,7 +544,7 @@ describe "Outcomes API", type: :request do
           expect(json["errors"]["calculation_method"]).not_to be_nil
           # make sure there's no errors except on calculation_method
           expect(json["errors"].except("calculation_method")).to be_empty
-          expect(json["errors"]["calculation_method"][0]["message"]).to include("not a valid calculation_method")
+          expect(json["errors"]["calculation_method"][0]["message"]).to include("inclusion")
         end
 
         context "sensible error message for an incorrect calculation_int" do
