@@ -33,6 +33,12 @@ class FeatureFlag < ActiveRecord::Base
     false
   end
 
+  def unhides_feature?
+    return false unless Feature.definitions[feature].hidden?
+    return true if context.is_a?(Account) && context.site_admin?
+    Account.find(context.feature_flag_account_ids.last).lookup_feature_flag(feature, true).hidden?
+  end
+
   def enabled?
     state == 'on'
   end

@@ -28,7 +28,7 @@
 </div>
 
 <%
-  count = "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />".html_safe
+  count = "%{count}" # we'll replace this with an input in js-land
   alert_data = {
     :DATA => @alerts,
     :POSSIBLE_RECIPIENTS_ORDER => [':student', ':teachers'],
