@@ -93,6 +93,10 @@ module BasicLTI
         @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
       end
 
+      def result_total_score
+        @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultTotalScore > textString').try(:content)
+      end
+
       def result_data_text
         @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > text').try(:content)
       end
@@ -164,6 +168,7 @@ module BasicLTI
       def handle_replaceResult(tool, course, assignment, user)
         text_value = self.result_score
         new_score = Float(text_value) rescue false
+        raw_score = Float(self.result_total_score) rescue false
         error_message = nil
         submission_hash = {:submission_type => 'external_tool'}
 
@@ -175,7 +180,9 @@ module BasicLTI
           submission_hash[:submission_type] = 'online_url'
         end
 
-        if new_score
+        if raw_score
+          submission_hash[:grade] = raw_score
+        elsif new_score
           if (0.0 .. 1.0).include?(new_score)
             submission_hash[:grade] = "#{new_score * 100}%"
           else
@@ -202,7 +209,7 @@ to because the assignment has no points possible.
             @submission = assignment.submit_homework(user, submission_hash.clone)
           end
 
-          if new_score
+          if new_score || raw_score
             @submission = assignment.grade_student(user, submission_hash).first
           end
 

@@ -66,7 +66,12 @@ describe LtiApiController, type: :request do
     assert_status(401)
   end
 
-  def replace_result(score=nil, sourceid = nil, result_data=nil)
+  def replace_result(opts={})
+    score = opts[:score]
+    sourceid = opts[:sourceid]
+    result_data = opts[:result_data]
+    raw_score = opts[:raw_score]
+
     sourceid ||= source_id()
     
     score_xml = ''
@@ -76,6 +81,16 @@ describe LtiApiController, type: :request do
             <language>en</language>
             <textString>#{score}</textString>
           </resultScore>
+      XML
+    end
+
+    raw_score_xml = ''
+    if raw_score
+      raw_score_xml = <<-XML
+          <resultTotalScore>
+            <language>en</language>
+            <textString>#{raw_score}</textString>
+          </resultTotalScore>
       XML
     end
     
@@ -106,6 +121,7 @@ describe LtiApiController, type: :request do
         <result>
           #{score_xml}
           #{result_data_xml}
+          #{raw_score_xml}
         </result>
       </resultRecord>
     </replaceResultRequest>
@@ -189,7 +205,7 @@ XML
     
     it "should allow updating the submission score" do
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
-      make_call('body' => replace_result('0.6'))
+      make_call('body' => replace_result(score: '0.6'))
       check_success
       
       verify_xml(response)
@@ -203,7 +219,7 @@ XML
     end
     
     it "should set the submission data text" do
-      make_call('body' => replace_result('0.6', nil, {:text =>"oioi"}))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text =>"oioi"}))
       check_success
     
       verify_xml(response)
@@ -214,7 +230,7 @@ XML
     
     it "should set complex submission text" do
       text = CGI::escapeHTML("<p>stuff</p>")
-      make_call('body' => replace_result('0.6', nil, {:text => "<![CDATA[#{text}]]>" }))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text => "<![CDATA[#{text}]]>" }))
       check_success
     
       verify_xml(response)
@@ -224,7 +240,7 @@ XML
     end
     
     it "should set the submission data url" do
-      make_call('body' => replace_result('0.6', nil, {:url =>"http://www.example.com/lti"}))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:url =>"http://www.example.com/lti"}))
       check_success
     
       verify_xml(response)
@@ -235,7 +251,7 @@ XML
     end
     
     it "should set the submission data text even with no score" do
-      make_call('body' => replace_result(nil, nil, {:text =>"oioi"}))
+      make_call('body' => replace_result(score: nil, sourceid: nil, result_data: {:text =>"oioi"}))
       check_success
     
       verify_xml(response)
@@ -245,7 +261,7 @@ XML
     end
     
     it "should fail if no score and not submission data" do
-      make_call('body' => replace_result(nil, nil))
+      make_call('body' => replace_result(score: nil, sourceid: nil))
       expect(response).to be_success
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
@@ -255,7 +271,7 @@ XML
     end
     
     it "should fail if bad score given" do
-      make_call('body' => replace_result('1.5', nil))
+      make_call('body' => replace_result(score: '1.5', sourceid: nil))
       expect(response).to be_success
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
@@ -266,7 +282,7 @@ XML
 
     it "should fail if assignment has no points possible" do
       @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
-      make_call('body' => replace_result('0.75', nil))
+      make_call('body' => replace_result(score: '0.75', sourceid: nil))
       expect(response).to be_success
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
@@ -275,7 +291,7 @@ XML
 
     it "should notify users if it fails because the assignment has no points" do
       @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
-      make_call('body' => replace_result('0.75', nil))
+      make_call('body' => replace_result(score: '0.75', sourceid: nil))
       expect(response).to be_success
       submissions = @assignment.submissions.where(user_id: @student).to_a
       comments    = submissions.first.submission_comments
@@ -289,18 +305,18 @@ to because the assignment has no points possible.
 
     it "should reject out of bound scores" do
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
-      make_call('body' => replace_result('-1'))
+      make_call('body' => replace_result(score: '-1'))
       check_failure('failure')
-      make_call('body' => replace_result('1.1'))
+      make_call('body' => replace_result(score: '1.1'))
       check_failure('failure')
 
-      make_call('body' => replace_result('0.0'))
+      make_call('body' => replace_result(score: '0.0'))
       check_success
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission).to be_present
       expect(submission.score).to eq 0
 
-      make_call('body' => replace_result('1.0'))
+      make_call('body' => replace_result(score: '1.0'))
       check_success
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission).to be_present
@@ -309,9 +325,43 @@ to because the assignment has no points possible.
 
     it "should reject non-numeric scores" do
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
-      make_call('body' => replace_result("OHAI SCORES"))
+      make_call('body' => replace_result(score: "OHAI SCORES"))
       check_failure('failure')
     end
+
+    context "sending raw score" do
+      it "should set the raw score" do
+        make_call('body' => replace_result(raw_score: '65'))
+        check_success
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission.score).to eq 65
+      end
+
+      it "should ignore resultScore if raw score is sent" do
+        make_call('body' => replace_result(score: '1', raw_score: '70'))
+        check_success
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission.score).to eq 70
+      end
+
+      it "should reject non-numeric scores" do
+        expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
+        make_call('body' => replace_result(raw_score: "OHAI SCORES"))
+        check_failure('failure')
+      end
+
+      it "should allow negative scores" do
+        make_call('body' => replace_result(raw_score: '-7'))
+        check_success
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission.score).to eq -7
+      end
+
+    end
+
   end
 
   describe "readResult" do
@@ -378,7 +428,7 @@ to because the assignment has no points possible.
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
     tag.save!
-    make_call('body' => replace_result('0.5'))
+    make_call('body' => replace_result(score: '0.5'))
     check_failure('failure', 'Assignment is no longer associated with this tool')
   end
 
@@ -389,19 +439,19 @@ to because the assignment has no points possible.
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
     tag.save!
-    make_call('body' => replace_result('0.5'))
+    make_call('body' => replace_result(score: '0.5'))
     check_failure('failure', 'Assignment is no longer associated with this tool')
   end
 
   it "should reject if the assignment is no longer a tool assignment" do
     @assignment.update_attributes(:submission_types => 'online_upload')
     @assignment.reload.external_tool_tag.destroy!
-    make_call('body' => replace_result('0.5'))
+    make_call('body' => replace_result(score: '0.5'))
     check_failure('failure', 'Assignment is no longer associated with this tool')
   end
 
   it "should verify the sourcedid is correct for this tool launch" do
-    make_call('body' => replace_result('0.6', 'BAD SOURCE ID'))
+    make_call('body' => replace_result(score: '0.6', sourceid: 'BAD SOURCE ID'))
     check_failure('failure', 'Invalid sourcedid')
   end
 
@@ -423,7 +473,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if course is deleted" do
-    opts = {'body' => replace_result('0.6')}
+    opts = {'body' => replace_result(score: '0.6')}
     @course.destroy
     make_call(opts)
 
@@ -431,7 +481,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if assignment is deleted" do
-    opts = {'body' => replace_result('0.6')}
+    opts = {'body' => replace_result(score: '0.6')}
     @assignment.destroy
     make_call(opts)
 
@@ -439,7 +489,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if user enrollment is deleted" do
-    opts = {'body' => replace_result('0.6')}
+    opts = {'body' => replace_result(score: '0.6')}
     @course.student_enrollments.active.where(user_id: @student.id).first.destroy
     make_call(opts)
 
@@ -447,7 +497,7 @@ to because the assignment has no points possible.
   end
 
   it "fails if tool is deleted" do
-    opts = {'body' => replace_result('0.6')}
+    opts = {'body' => replace_result(score: '0.6')}
     @tool.destroy
     make_call(opts)
 
