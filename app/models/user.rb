@@ -1623,25 +1623,22 @@ class User < ActiveRecord::Base
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
           scope = send(actual_association)
+
+          shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
             ids = self.favorite_context_ids("Course")
             if ids.empty?
               scope = scope.none
             else
-              shards = in_region_associated_shards
-              ids = ids.select { |id| shards.include?(Shard.shard_for(id)) }
-              # let the relation auto-determine which shards to query
-              scope.shard_source_value = :implicit
+              shards = shards & ids.map { |id| Shard.shard_for(id) }
               scope = scope.where(id: ids)
             end
-          else
-            scope = scope.shard(in_region_associated_shards)
           end
 
           courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
               order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
-              distinct_on(:id).to_a
+              distinct_on(:id).with_each_shard(*shards)
 
           unless options[:include_completed_courses]
             enrollments = Enrollment.where(:id => courses.map { |c| Shard.relative_id_for(c.primary_enrollment_id, c.shard, Shard.current) }).all

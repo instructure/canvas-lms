@@ -569,6 +569,18 @@ describe User do
         expect(alice.courses_with_primary_enrollment.size).to eq 0
       end
 
+      it 'works with favorite_courses' do
+        @user = User.create!(:name => 'user')
+        @shard1.activate do
+          account = Account.create!
+          @course = account.courses.build
+          @course.workflow_state = 'available'
+          @course.save!
+          StudentEnrollment.create!(:course => @course, :user => @user, :workflow_state => 'active')
+        end
+        @user.favorites.create!(:context => @course)
+        expect(@user.courses_with_primary_enrollment(:favorite_courses)).to eq [@course]
+      end
     end
   end
 
