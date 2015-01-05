@@ -48,20 +48,8 @@ class TermsController < ApplicationController
   # @returns EnrollmentTerm
   #
   def create
-    overrides = params[:enrollment_term].delete(:overrides) rescue nil
-    @term = @context.enrollment_terms.active.build(params[:enrollment_term])
-    sis_id = params[:enrollment_term].delete(:sis_source_id) || params[:enrollment_term].delete(:sis_term_id)
-    handle_sis_id_param(sis_id)
-    if @term.save
-      @term.set_overrides(@context, overrides)
-      if api_request?
-        render :json => enrollment_term_json(@term, @current_user, session)
-      else
-        render :json => @term.as_json(:include => :enrollment_dates_overrides)
-      end
-    else
-      render :json => @term.errors, :status => :bad_request
-    end
+    @term = @context.enrollment_terms.active.build
+    save_and_render_response
   end
   
   # @API Update enrollment term
@@ -85,20 +73,8 @@ class TermsController < ApplicationController
   # @returns EnrollmentTerm
   #
   def update
-    overrides = params[:enrollment_term].delete(:overrides) rescue nil
     @term = api_find(@context.enrollment_terms.active, params[:id])
-    sis_id = params[:enrollment_term].delete(:sis_source_id) || params[:enrollment_term].delete(:sis_term_id)
-    handle_sis_id_param(sis_id)
-    if @term.update_attributes(params[:enrollment_term])
-      @term.set_overrides(@context, overrides)
-      if api_request?
-        render :json => enrollment_term_json(@term, @current_user, session)
-      else
-        render :json => @term.as_json(:include => :enrollment_dates_overrides)
-      end
-    else
-      render :json => @term.errors, :status => :bad_request
-    end
+    save_and_render_response
   end
   
   # @API Delete enrollment term
@@ -118,11 +94,31 @@ class TermsController < ApplicationController
   end
 
   private
+  def save_and_render_response
+    overrides = params[:enrollment_term].delete(:overrides)
+    sis_id = params[:enrollment_term].delete(:sis_source_id) || params[:enrollment_term].delete(:sis_term_id)
+    handle_sis_id_param(sis_id)
+    if @term.update_attributes(params[:enrollment_term])
+      @term.set_overrides(@context, overrides)
+      render :json => serialized_term
+    else
+      render :json => @term.errors, :status => :bad_request
+    end
+  end
+
   def handle_sis_id_param(sis_id)
     if !sis_id.nil? &&
         sis_id != @account.sis_source_id &&
         @context.root_account.grants_right?(@current_user, session, :manage_sis)
       @term.sis_source_id = sis_id.presence
+    end
+  end
+
+  def serialized_term
+    if api_request?
+      enrollment_term_json(@term, @current_user, session)
+    else
+      @term.as_json(:include => :enrollment_dates_overrides)
     end
   end
 end
