@@ -354,7 +354,7 @@ class Course < ActiveRecord::Base
 
   def unpublishable?
     ids = self.all_real_students.pluck :id
-    !self.submissions.with_point_data.where(:user_id => ids).exists?
+    !self.submissions.with_assignment.with_point_data.where(:user_id => ids).exists?
   end
 
   def self.update_account_associations(courses_or_course_ids, opts = {})

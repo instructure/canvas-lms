@@ -792,6 +792,8 @@ class Submission < ActiveRecord::Base
     state :graded
   end
 
+  scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
+
   scope :graded, -> { where("submissions.grade IS NOT NULL") }
 
   scope :ungraded, -> { where(:grade => nil).includes(:assignment) }
