@@ -2681,26 +2681,27 @@ define([
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
         }
       } else if (questionData.question_type == "fill_in_multiple_blanks_question" || questionData.question_type == "short_answer_question") {
-        // Scan each answer for non-blank answers.
         function checkForNotBlanks(elements) {
           return elements.filter(function(i,element) {
             return !!element.value;
           }).length;
         }
-        var $validAnswers = $answers.filter("div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer");
         if (questionData.question_type == "fill_in_multiple_blanks_question") {
-          var multipleBlankCount = $form.find(".blank_id_select > option").length;
-          var checkEachBlankArray = []
-          for(var j=0; j < multipleBlankCount; j++) {checkEachBlankArray.push(j) }
-          $validAnswers.each(function(i, element) {
-            var $validInputs = $(element).find( $("input[name='answer_text']")).not(".disabled_answer")
-            var i = element.className.match(/answer_idx_(\d+)/)[1];
-            if (checkForNotBlanks($validInputs) > 0) {checkEachBlankArray.splice(parseInt(i-1),1)}
+          var $variables = $form.find(".blank_id_select > option");
+          $variables.each(function(i, answer_blank) {
+            var blankCount = 0;
+            $answers.filter(".answer_idx_" + i).each(function(i, element) {
+              var $validInputs = $(element).find( $("input[name='answer_text']")).not(".disabled_answer");
+              if (checkForNotBlanks($validInputs) > 0) {blankCount += 1;}
+            });
+            if (blankCount == 0) {error_text = I18n.t("Please add at least one non-blank answer for each variable.");}
           });
-          if(checkEachBlankArray.length > 0) {error_text = I18n.t("Please add at least one non-blank answer for each variable.");}
         } else {
-          var $validInputs = $validAnswers.find( $("input[name='answer_text']")).not(".disabled_answer")
-          if (checkForNotBlanks($validInputs) == 0) {error_text = I18n.t("Please add at least one non-blank answer.");}
+          var $validAnswers = $answers.filter("div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer");
+          var $validInputs = $validAnswers.find( $("input[name='answer_text']")).not(".disabled_answer");
+          if (checkForNotBlanks($validInputs) == 0) {
+            error_text = I18n.t("Please add at least one non-blank answer.");
+          }
         }
       }
 
