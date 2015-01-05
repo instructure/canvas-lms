@@ -149,7 +149,7 @@ class Wiki < ActiveRecord::Base
     given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items)}
     can :view_unpublished_items
 
-    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
+    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.respond_to?(:allow_student_wiki_edits) && self.context.allow_student_wiki_edits}
     can :read and can :create_page and can :update_page and can :update_page_content
 
     given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
