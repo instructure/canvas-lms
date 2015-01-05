@@ -65,4 +65,18 @@ describe "course sections" do
     wait_for_ajaximations
     expect(f('#section_name')).to include_text(edit_name)
   end
+
+  it "should parse dates" do
+    get "/courses/#{@course.id}/sections/#{@section.id}"
+
+    f('.edit_section_link').click
+    edit_form = f('#edit_section_form')
+    replace_content(edit_form.find_element(:id, 'course_section_start_at'), '1/2/15')
+    replace_content(edit_form.find_element(:id, 'course_section_end_at'), '04 Mar 2015')
+    submit_form(edit_form)
+    wait_for_ajax_requests
+    @section.reload
+    expect(@section.start_at).to eq(Date.new(2015, 1, 2))
+    expect(@section.end_at).to eq(Date.new(2015, 3, 4))
+  end
 end
