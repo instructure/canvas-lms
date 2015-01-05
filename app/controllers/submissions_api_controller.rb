@@ -640,7 +640,8 @@ class SubmissionsApiController < ApplicationController
       includes.concat(Array.wrap(params[:include]) & ["visibility"])
 
       da_enabled = @context.feature_enabled?(:differentiated_assignments)
-      if includes.include?("visibility") && da_enabled
+      visiblity_included = includes.include?("visibility")
+      if visiblity_included && da_enabled
         user_ids = @submissions.map(&:user_id)
         users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
       end
@@ -648,7 +649,11 @@ class SubmissionsApiController < ApplicationController
 
       includes.delete("submission_comments")
       json[:all_submissions] = @submissions.map { |submission|
-        submission.visible_to_user = da_enabled ? users_with_visibility.include?(submission.user_id) : true
+
+        if visiblity_included
+          submission.visible_to_user = da_enabled ? users_with_visibility.include?(submission.user_id) : true
+        end
+
         submission_json(submission, @assignment, @current_user, session, @context, includes)
       }
       render :json => json

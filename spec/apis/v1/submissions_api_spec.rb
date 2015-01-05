@@ -176,6 +176,19 @@ describe 'Submissions API', type: :request do
       expect(json["all_submissions"][0]["assignment_visible"]).to eq true
     end
 
+    it "should be able to handle an update without visibility when DA is on" do
+      @course.enable_feature!(:differentiated_assignments)
+      json = api_call(:put,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
+        { :controller => 'submissions_api', :action => 'update',
+        :format => 'json', :section_id => @section.id.to_s,
+        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
+        { :submission => { :posted_grade => '75%' }})
+      expect(json["assignment_visible"]).to be_nil
+      expect(json["all_submissions"][0]["assignment_visible"]).to be_nil
+      expect(json["assignment_id"]).to eq @a1.id
+    end
+
     it "should return submissions for a section" do
       json = api_call(:get,
             "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
