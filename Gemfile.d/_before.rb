@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-required_bundler_version = '1.7.10'..'1.7.10'
+required_bundler_version = '1.7.10'..'1.7.11'
 bundler_requirements = [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
 gem 'bundler', bundler_requirements
 
