@@ -56,7 +56,8 @@ define [
       resolvedUserAction = false
 
     componentDidUpdate: (prevState) ->
-      if @state.nameCollisions.length == 0 && @state.resolvedNames.length > 0 && FileOptionsCollection.hasNewOptions()
+      
+      if @state.zipOptions.length == 0 && @state.nameCollisions.length == 0 && @state.resolvedNames.length > 0 && FileOptionsCollection.hasNewOptions()
         @queueUploads()
       else
         resolvedUserAction = false
