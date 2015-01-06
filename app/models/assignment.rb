@@ -1734,6 +1734,10 @@ class Assignment < ActiveRecord::Base
     submission_types == 'on_paper' || submission_types == 'external_tool'
   end
 
+  def non_digital_submission?
+    ["on_paper","none","not_graded",""].include?(submission_types.strip)
+  end
+
   def allow_google_docs_submission?
     self.submission_types &&
       self.submission_types.match(/online_upload/) &&
