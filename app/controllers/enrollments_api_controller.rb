@@ -240,7 +240,7 @@ class EnrollmentsApiController < ApplicationController
     enrollments = enrollments.joins(:course) if has_courses
 
     enrollments = Api.paginate(
-      enrollments,
+      enrollments.shard(@current_user),
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
     ActiveRecord::Associations::Preloader.new(enrollments, [:user, :course, :course_section]).run
