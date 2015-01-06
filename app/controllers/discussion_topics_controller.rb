@@ -1003,7 +1003,7 @@ class DiscussionTopicsController < ApplicationController
 
       if !hash[:assignment].nil?
         if params[:due_at]
-          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null"  ? nil : params[:due_at].to_date
+          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null"  ? nil : params[:due_at]
         end
         hash[:assignment][:points_possible] = params[:points_possible] if params[:points_possible]
         hash[:assignment][:assignment_group_id] = params[:assignment_group_id] if params[:assignment_group_id]
