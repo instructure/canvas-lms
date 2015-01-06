@@ -17,7 +17,13 @@
 #
 
 class SisPostGradesStatus < ActiveRecord::Base
+  ALLOWED_STATUSES = %w{success warning failed}
   belongs_to :course
   belongs_to :course_section
   belongs_to :user
+
+  validates :course, presence: true
+  validates :grades_posted_at, presence: true
+  validates :message, presence: true
+  validates :status, presence: true, inclusion: {in: ALLOWED_STATUSES}
 end
