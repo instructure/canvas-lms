@@ -226,8 +226,8 @@
 <% if @context.public_license? %>
   <div class="public-license" style="margin-top: 20px;">
 
-    <a href="<%= @context.license_url %>"><%= image_tag "cc/#{@context.license}.png", :style => "float: left; padding-right: 5px;", :alt => @context.readable_license   %></a>
-    <span style="font-size: 0.8em; display: block; line-height: 1.5em;"><%= t 'license_notice', %{This course content is offered under a %{license_type} license.  Content in this course can be considered under this license unless otherwise noted.}, :license_type => content_tag('b', link_to(@context.readable_license, @context.license_url)) %></span>
+    <a class="public-license-image-link" href="<%= @context.license_url %>"><%= image_tag "cc/#{@context.license}.png", :alt => @context.readable_license   %></a>
+    <span class="public-license-text"><%= t 'license_notice', %{This course content is offered under a %{license_type} license.  Content in this course can be considered under this license unless otherwise noted.}, :license_type => content_tag('b', link_to(@context.readable_license, @context.license_url)) %></span>
     <div class="clear"></div>
   </div>
 <% end %>
