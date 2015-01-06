@@ -21,7 +21,7 @@
   <tbody>
     {{#each dates}}
     <tr class="date{{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}}">
-      <th scope="row" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}" {{ contextSensitiveDatetimeTitle date }}>
+      <th scope="row" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}">
         {{#if date}}
           {{tDateToString date "medium_with_weekday"}}
         {{/if}}
