@@ -58,7 +58,7 @@ define [
       if justText
         new Handlebars.SafeString titleText
       else
-        new Handlebars.SafeString "data-tooltip title=\"#{titleText}\""
+        new Handlebars.SafeString "data-tooltip data-html-tooltip-title=\"#{htmlEscape titleText}\""
 
     # expects: a Date object or an ISO string
     friendlyDatetime : (datetime, {hash: {pubdate, contextSensitive}}) ->
@@ -69,9 +69,9 @@ define [
       if contextSensitive and ENV and ENV.CONTEXT_TIMEZONE
         timeTitle = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, hash: {justText: true})
       else
-        timeTitle = $.datetimeString(datetime)
+        timeTitle = htmlEscape $.datetimeString(datetime)
 
-      new Handlebars.SafeString "<time data-tooltip title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{$.friendlyDatetime(fudged)}</time>"
+      new Handlebars.SafeString "<time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{$.friendlyDatetime(fudged)}</time>"
 
 
 

@@ -91,15 +91,15 @@ define [
 
   test 'can take an ISO string', ->
     equal helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false}).string,
-      "<time data-tooltip title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+      "<time data-tooltip data-html-tooltip-title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
 
   test 'can take a date object', ->
     equal helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
-      "<time data-tooltip title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+      "<time data-tooltip data-html-tooltip-title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
 
   test 'should parse non-qualified string relative to profile timezone', ->
     equal helpers.friendlyDatetime('1970-01-01 00:00:00', hash: {pubDate: false}).string,
-      "<time data-tooltip title='Jan 1, 1970 at 12:00am' datetime='1970-01-01T05:00:00.000Z' undefined>Jan 1, 1970</time>"
+      "<time data-tooltip data-html-tooltip-title='Jan 1, 1970 at 12:00am' datetime='1970-01-01T05:00:00.000Z' undefined>Jan 1, 1970</time>"
 
   module 'contextSensitive FriendlyDatetime',
     setup: ->
@@ -131,7 +131,7 @@ define [
   test 'reverts to friendly display when there is no contextual timezone', ->
     ENV.CONTEXT_TIMEZONE = null
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false, contextSensitive: true}).string
-    equal timeTag, "<time data-tooltip title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+    equal timeTag, "<time data-tooltip data-html-tooltip-title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
 
 
 
@@ -179,7 +179,7 @@ define [
   test "produces the html attributes if you dont specify just_text", ->
     ENV.CONTEXT_TIMEZONE = null
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: undefined})
-    equal titleText, "data-tooltip title=\"Dec 31, 1969 at  7:00pm\""
+    equal titleText, "data-tooltip data-html-tooltip-title=\"Dec 31, 1969 at  7:00pm\""
 
 
 
