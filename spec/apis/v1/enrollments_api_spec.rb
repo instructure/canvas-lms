@@ -18,6 +18,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe EnrollmentsApiController, type: :request do
   describe "enrollment creation" do
@@ -1019,6 +1020,29 @@ describe EnrollmentsApiController, type: :request do
         json = api_call(:get, @path, @params)
         json.each do |res|
           %w{sis_user_id sis_login_id login_id}.each { |key| expect(res['user']).not_to include(key) }
+        end
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "returns enrollments for out-of-shard users" do
+          pend_with_bullet
+
+          # create a user on a different shard
+          @shard1.activate { @user = User.create!(name: 'outofshard') }
+
+          @course.enroll_student(@user)
+
+          # query own enrollment(s) as the out-of-shard user
+          @path = "#{@path}?user_id=self"
+          @params[:user_id] = 'self'
+
+          json = api_call(:get, @path, @params)
+
+          expect(json.length).to eq 1
+          expect(json.first['course_id']).to eq(@course.id)
+          expect(json.first['user_id']).to eq(@user.global_id)
         end
       end
     end
