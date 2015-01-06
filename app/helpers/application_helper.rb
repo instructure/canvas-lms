@@ -297,6 +297,9 @@ module ApplicationHelper
           end
         end
         return '' if tabs.empty?
+
+        inactive_element = "<span id='inactive_nav_link' class='screenreader-only'>#{I18n.t('* No content has been added')}</span>"
+
         html << '<nav role="navigation" aria-label="context"><ul id="section-tabs">'
         tabs.each do |tab|
           path = nil
@@ -311,10 +314,14 @@ module ApplicationHelper
           class_name = tab[:css_class].downcase.replace_whitespace("-")
           class_name += ' active' if @active_tab == tab[:css_class]
 
+          if hide
+            tab[:label] += inactive_element
+          end
+
           if tab[:screenreader]
-            link = link_to(tab[:label], path, :class => class_name, "aria-label" => tab[:screenreader])
+            link = "<a href='#{path}' class='#{class_name}' aria-label='#{tab[:screenreader]}'>#{tab[:label]}</a>"
           else
-            link = link_to(tab[:label], path, :class => class_name)
+            link = "<a href='#{path}' class='#{class_name}'>#{tab[:label]}</a>"
           end
 
           html << "<li class='section #{"section-tab-hidden" if hide }'>" + link + "</li>" if tab[:href]
