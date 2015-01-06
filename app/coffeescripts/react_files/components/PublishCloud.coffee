@@ -12,11 +12,15 @@ define [
     displayName: 'PublishCloud'
 
     propTypes:
+      togglePublishClassOn: React.PropTypes.object
       model: customPropTypes.filesystemObject
       userCanManageFilesForContext: React.PropTypes.bool.isRequired
 
     # == React Functions == #
     getInitialState: -> @extractStateFromModel( @props.model )
+
+    componentDidMount: -> @updatePublishClassElements() if @props.togglePublishClassOn
+    componentDidUpdate: -> @updatePublishClassElements() if @props.togglePublishClassOn
 
     componentWillMount: ->
       setState = (model) => @setState(@extractStateFromModel( model ))
@@ -24,6 +28,12 @@ define [
 
     componentWillUnmount: ->
       @props.model.off(null, null, this)
+
+    updatePublishClassElements: ->
+      if @state.published
+        @props.togglePublishClassOn.classList.add('ig-published')
+      else
+        @props.togglePublishClassOn.classList.remove('ig-published')
 
     getRestrictedText: ->
       if @props.model.get('unlock_at') and @props.model.get('lock_at')

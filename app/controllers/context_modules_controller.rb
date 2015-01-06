@@ -17,6 +17,8 @@
 #
 
 class ContextModulesController < ApplicationController
+  include Api::V1::ContextModule
+
   before_filter :require_context  
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
   before_filter { |c| c.active_tab = "modules" }
@@ -45,7 +47,16 @@ class ContextModulesController < ApplicationController
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
-      js_env :course_id => @context.id
+
+      @modules_json = @modules.map{|mod| module_json(mod, @current_user, session, nil, ['content_details', 'items']) }
+
+      js_env :course_id => @context.id,
+             :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
+             :MODULES => @modules_json,
+             :MODULE_FILE_PERMISSIONS => {
+               usage_rights_required: @context.feature_enabled?(:usage_rights_required),
+               manage_files: @context.grants_right?(@current_user, session, :manage_files)
+             }
     end
   end
 
@@ -344,7 +355,8 @@ class ContextModulesController < ApplicationController
           published: @tag.published?,
           publishable_id: module_item_publishable_id(@tag),
           unpublishable:  module_item_unpublishable?(@tag),
-          graded: @tag.graded?
+          graded: @tag.graded?,
+          content_details: content_details(@tag, @current_user)
         )
       render json: json
     end

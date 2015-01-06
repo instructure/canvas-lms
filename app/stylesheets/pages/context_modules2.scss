@@ -1,8 +1,26 @@
+@import "./react_files/DialogPreview";
+
+
+.permissions-dialog-form{
+  .radio{
+    margin-top: 15px;
+  }
+}
+
 .no-wrap {
   white-space: nowrap;
 }
 
+.ig-admin [data-module-type="attachment"]{
+  margin-right: 14px;
+}
+
+.RestrictedDialogForm__form .form-controls .btn:first-of-type{
+  margin-right: 10px;
+}
+
 .context_modules2 {
+
   .publish-button {
     &.published {
       color: #007711; /* green */

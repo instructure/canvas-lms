@@ -17,6 +17,10 @@
  */
 
 define([
+  'underscore',
+  'compiled/models/ModuleFile',
+  'compiled/react_files/components/PublishCloud',
+  'react',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
   'INST' /* INST */,
@@ -41,7 +45,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
+], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -690,7 +694,7 @@ define([
 
         // Set this module up with correct data attributes
         $module.data('moduleId', data.context_module.id);
-        $module.data('module-url', "/courses/" + data.context_module.context_id + "/modules/" + data.context_module.id);
+        $module.data('module-url', "/courses/" + data.context_module.context_id + "/modules/" + data.context_module.id + "items?include[]=content_details");
         $module.data('workflow-state', data.context_module.workflow_state);
         if(data.context_module.workflow_state == "unpublished"){
           $module.find('.workflow-state-action').text("Publish");
@@ -1022,6 +1026,7 @@ define([
           $trigger.focus();
         };
         options.submit = function(item_data) {
+          item_data.content_details = ['items']
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
           $module.find(".context_module_items.ui-sortable").sortable('refresh').sortable('disable');
@@ -1148,13 +1153,67 @@ define([
       courseId: data.context_id,
       published: data.published,
       publishable: data.publishable,
-      unpublishable: data.unpublishable
+      unpublishable: data.unpublishable,
+      content_details: data.content_details,
+      isNew: true
     };
+
     initPublishButton($item.find('.publish-icon'), publishData);
   }
 
-  function initPublishButton($el, data) {
+  var initPublishButton = function($el, data) {
     data = data || $el.data();
+
+    if(data.moduleType == 'attachment'){
+      // Module isNew if it was created with an ajax request vs being loaded when the page loads
+      var moduleItem = {};
+
+      if (data.isNew){
+        // Data will have content_details on the object
+        moduleItem = data || {};
+
+        // make sure styles are applied to new module items
+        $el.attr('data-module-type', "attachment");
+      }else{
+        var module = _.find(ENV.MODULES, function(module){
+          return parseInt(module.id, 10) == parseInt(data.moduleId, 10);
+        });
+
+        // Find the matching module items with content_details
+        moduleItem = _.find(module.items, function(item){
+          return parseInt(data.moduleItemId, 10) == parseInt(item.id, 10);
+        });
+      }
+
+      // Make sure content_details isn't empty. You don't want to break something.
+      moduleItem.content_details = moduleItem.content_details || {};
+
+      var file = new ModuleFile({
+          id: moduleItem.content_id || moduleItem.id,
+          locked: moduleItem.content_details.locked,
+          hidden: moduleItem.content_details.hidden,
+          unlock_at: moduleItem.content_details.unlock_at,
+          lock_at: moduleItem.content_details.lock_at,
+          display_name: moduleItem.content_details.display_name,
+          thumbnail_url: moduleItem.content_details.thumbnail_url,
+          usage_rights: moduleItem.content_details.usage_rights
+        });
+
+      file.url = function(){
+        return "/api/v1/files/" + this.id;
+      }
+
+      var props = {
+        model: file,
+        togglePublishClassOn: $el.parents('.ig-row')[0],
+        userCanManageFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files,
+        usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required
+      }
+
+      React.renderComponent(PublishCloud(props), $el[0]);
+      return {model: file} // Pretending this is a backbone view
+    }
+
     var model = new PublishableModuleItem({
       module_type: data.moduleType,
       content_id: data.contentId,
@@ -1166,8 +1225,10 @@ define([
       publishable: data.publishable,
       unpublishable: data.unpublishable
     });
+
     var view = new PublishIconView({model: model, el: $el[0]});
     var row = $el.closest('.ig-row');
+
     if (data.published) { row.addClass('ig-published'); }
     // TODO: need to go find this item in other modules and update their state
     model.on('change:published', function() {
@@ -1269,8 +1330,7 @@ define([
   };
 
   $(document).ready(function() {
-
-    if (ENV.IS_STUDENT) {
+   if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
     }

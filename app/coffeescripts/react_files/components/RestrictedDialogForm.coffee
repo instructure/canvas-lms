@@ -96,8 +96,6 @@ define [
       else
         @setRestrictedAccess()
 
-
-
     setRestrictedAccess: ->
       attributes = @extractFormValues()
       promises = @props.models.map (item) ->
