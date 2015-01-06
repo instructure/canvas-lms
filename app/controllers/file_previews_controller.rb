@@ -63,6 +63,7 @@ class FilePreviewsController < ApplicationController
       # mark item seen for module progression purposes
       @file.context_module_action(@current_user, :read) if @current_user
       @file.record_inline_view
+      log_asset_access(@file, "files", "files")
       # redirect to or render content for the file according to its type
       # crocodocs (if annotation requested)
       if Canvas::Plugin.value_to_boolean(params[:annotate]) && (url = @file.crocodoc_url(@current_user))
@@ -81,6 +82,7 @@ class FilePreviewsController < ApplicationController
         return render template: 'file_previews/media_preview', layout: false
       # no preview available
       else
+        @accessed_asset = nil # otherwise it will double-log when they download the file
         return render template: 'file_previews/no_preview', layout: false
       end
     end
