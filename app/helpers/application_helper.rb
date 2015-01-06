@@ -746,7 +746,7 @@ module ApplicationHelper
     context = opts[:context]
     tag_type = opts.fetch(:tag_type, :time)
     if datetime.present?
-      attributes[:title] ||= context_sensitive_datetime_title(datetime, context, just_text: true)
+      attributes['data-html-tooltip-title'] ||= context_sensitive_datetime_title(datetime, context, just_text: true)
       attributes['data-tooltip'] ||= 'top'
     end
 
@@ -764,12 +764,12 @@ module ApplicationHelper
     if context.present?
       course_time = datetime_string(datetime, :event, nil, false, context.time_zone)
       if course_time != local_time
-        text = "#{I18n.t('#helpers.local', "Local")}: #{local_time}<br>#{I18n.t('#helpers.course', "Course")}: #{course_time}".html_safe
+        text = "#{h I18n.t('#helpers.local', "Local")}: #{h local_time}<br>#{h I18n.t('#helpers.course', "Course")}: #{h course_time}".html_safe
       end
     end
 
     return text if just_text
-    "data-tooltip title=\"#{text}\"".html_safe
+    "data-tooltip data-html-tooltip-title=\"#{text}\"".html_safe
   end
 
   # render a link with a tooltip containing a summary of due dates
