@@ -16,16 +16,17 @@ require [
     ), ->
       $(this).removeClass "submission-hover"
 
-    #    $(document).mouseover(function(event) {
-    #      if(!$(event.target).hasClass('peer_review')) {
-    #        $(".peer_review.submission-hover").removeClass('submission-hover');
-    #      }
-    #    });
     $(".peer_review .delete_review_link").click (event) ->
       event.preventDefault()
       $(this).parents(".peer_review").confirmDelete
         url: $(this).attr("href")
         message: I18n.t("messages.cancel_peer_review", "Cancel this peer review?")
+        success: ->
+          $(this).fadeOut 'slow', () ->
+            $parent = $(this).parents(".peer_reviews")
+            $(this).remove()
+            if $parent.find(".assigned").length is 0
+              $parent.find(".no_requests_message").show()
 
     $(".assign_peer_review_link").click (event) ->
       event.preventDefault()
