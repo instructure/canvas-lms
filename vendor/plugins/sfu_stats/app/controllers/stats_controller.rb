@@ -90,7 +90,7 @@ class StatsController < ApplicationController
     types = ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment']
     total_enrollments = prep_enrollment_hash
     courses.each do |c|
-      enrollments = c.enrollments.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id', :conditions => 'enrollments.role_name IS NULL')
+      enrollments = c.enrollments.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id')
       enrollments.each do |type, num|
         total_enrollments[type] = (total_enrollments[type] + num)
       end
