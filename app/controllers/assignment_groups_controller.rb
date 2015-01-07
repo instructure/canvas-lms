@@ -99,6 +99,10 @@ class AssignmentGroupsController < ApplicationController
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
+  # @argument grading_period_id [Integer]
+  #   The id of the grading period in which assignment groups are being requested
+  #   (Requires the Multiple Grading Periods account feature turned on)
+  #
   # @returns [AssignmentGroup]
   def index
     if authorized_action(@context.assignment_groups.scoped.new, @current_user, :read)
@@ -113,6 +117,10 @@ class AssignmentGroupsController < ApplicationController
 
         all_visible_assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups, assignment_includes)
         .with_student_submission_count
+
+        if params[:grading_period_id] && multiple_grading_periods?
+          all_visible_assignments = GradingPeriod.find(params[:grading_period_id]).assignments(all_visible_assignments)
+        end
 
         da_enabled = @context.feature_enabled?(:differentiated_assignments)
         include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
@@ -152,11 +160,12 @@ class AssignmentGroupsController < ApplicationController
         format.json {
           json = @groups.map { |g|
             g.context = @context
+            assignments = assignments_by_group[g.id] || []
             assignment_group_json(g, @current_user, session, params[:include],
                                   stringify_json_ids: stringify_json_ids?,
                                   override_assignment_dates: override_dates,
                                   preloaded_user_content_attachments: user_content_attachments,
-                                  assignments: assignments_by_group[g.id],
+                                  assignments: assignments,
                                   assignment_visibilities: assignment_visibilities,
                                   differentiated_assignments_enabled: da_enabled
                                   )

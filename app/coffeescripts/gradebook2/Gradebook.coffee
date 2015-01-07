@@ -31,6 +31,7 @@ define [
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
   'compiled/views/gradebook/SectionMenuView'
+  'compiled/views/gradebook/GradingPeriodMenuView'
   'compiled/gradebook2/GradebookKeyboardNav'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
@@ -44,7 +45,10 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesStore, PostGradesApp, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradebookKeyboardNav) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
+  $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog,
+  SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesStore, PostGradesApp, columnHeaderTemplate,
+  groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav) ->
 
   class Gradebook
     columnWidths =
@@ -80,11 +84,15 @@ define [
       @show_concluded_enrollments = true if @options.course_is_concluded
       @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
+      @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
+      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.grading_periods
+      @gradingPeriodToShow = userSettings.contextGet('gradebook_current_grading_period') || ENV.GRADEBOOK_OPTIONS.current_grading_period_id
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
       $.subscribe 'currentSection/change',            @updateCurrentSection
+      $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
       enrollmentsUrl = if @show_concluded_enrollments
         'students_url_with_concluded_enrollments'
@@ -96,9 +104,13 @@ define [
       # this method should be removed after a month in production
       @alignCoursePreferencesWithLocalStorage()
 
+      assignmentGroupsParams = {}
+      if @mgpEnabled && @gradingPeriodToShow != '0'
+        assignmentGroupsParams = {grading_period_id: @gradingPeriodToShow}
+
       ajax_calls = [
         $.ajaxJSON(@options[enrollmentsUrl], "GET")
-      , $.ajaxJSON(@options.assignment_groups_url, "GET", {}, @gotAssignmentGroups)
+      , $.ajaxJSON(@options.assignment_groups_url, "GET", assignmentGroupsParams, @gotAssignmentGroups)
       , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
       ]
 
@@ -461,6 +473,7 @@ define [
           params =
             student_ids: (student.id for student in students)
             response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state']
+          params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow != '0'
           $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
           @chunk_start += @options.chunk_size
 
@@ -820,6 +833,21 @@ define [
       else
         false
 
+    gradingPeriodList: ->
+      _.map @gradingPeriods, (period) =>
+        { title: period.title, id: period.id, checked: @gradingPeriodToShow == period.id }
+
+    drawGradingPeriodSelectButton: () ->
+      @gradingPeriodMenu = new GradingPeriodMenuView(
+        el: $('.multiple-grading-periods-selector-placeholder'),
+        periods: @gradingPeriodList(),
+        currentGradingPeriod: @gradingPeriodToShow)
+      @gradingPeriodMenu.render()
+
+    updateCurrentGradingPeriod: (period) =>
+      userSettings.contextSet 'gradebook_current_grading_period', period
+      window.location.reload()
+
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
         course:
@@ -837,6 +865,7 @@ define [
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled || @course
+      @drawGradingPeriodSelectButton() if @mgpEnabled
 
       $settingsMenu = $('#gradebook_settings').next()
       $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (i, setting) =>

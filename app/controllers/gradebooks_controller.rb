@@ -141,6 +141,7 @@ class GradebooksController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       respond_to do |format|
         format.html {
+          set_current_grading_period if multiple_grading_periods?
           set_js_env
           case @current_user.preferred_gradebook_version
           when "2"
@@ -172,6 +173,17 @@ class GradebooksController < ApplicationController
 
   def gradebook2
     redirect_to action: :show
+  end
+
+  def set_current_grading_period
+    unless @current_grading_period_id = params[:grading_period_id]
+      return unless current = @context.grading_periods.active.current
+      @current_grading_period_id = current.first.try(:id)
+    end
+  end
+
+  def get_grading_periods
+    @context.grading_periods.active.map { |gp| {id: gp.id, title: gp.title} }
   end
 
   def set_js_env
@@ -207,6 +219,9 @@ class GradebooksController < ApplicationController
       :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
+      :multiple_grading_periods_enabled => multiple_grading_periods?,
+      :grading_periods => get_grading_periods,
+      :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
       :custom_column_url => api_v1_course_custom_gradebook_column_url(@context, ":id"),

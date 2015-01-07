@@ -27,7 +27,7 @@ $cell_height: 33px;
 .container_0,
 .container_1 {
   .slick-cell {
-    border-bottom: 1px dotted #ccc; 
+    border-bottom: 1px dotted #ccc;
     border-right: 1px dotted #ccc;
     padding: 0;
     overflow: visible;
@@ -59,7 +59,7 @@ $cell_height: 33px;
 }
 
 .student-grades-link {
-  @if $use_high_contrast { color: darken($ic-link-color, 5%); } 
+  @if $use_high_contrast { color: darken($ic-link-color, 5%); }
 }
 
 .meta-cell .avatar {
@@ -130,7 +130,7 @@ $cell_height: 33px;
   }
   a.assignment-name {
     font-weight: normal;
-    
+
     text-shadow: white 0 0 1px;
     //this is for the ellipses
     overflow: hidden;
@@ -397,7 +397,7 @@ $cell_height: 33px;
       background-size: 17px 105px;
     }
   }
-  
+
 
   #gradebook_grid.editable &:hover,
   #gradebook_grid.editable &:focus {
@@ -565,8 +565,12 @@ $gradebook_checkbox_width: 16px;
   border-right: none;
 }
 
+.gradebook_dropdowns {
+  display: inline-block;
+}
+
 .gradebook_filter {
-  position: absolute;
+  display: inline-block;
   input {
     width: 300px;
   }

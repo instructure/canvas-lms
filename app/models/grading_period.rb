@@ -21,6 +21,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   scope :active, -> { where workflow_state: "active" }
+  scope :current, -> { where("start_date <= ? AND end_date >= ?", Time.now, Time.now) }
 
   alias_method :destroy!, :destroy
   def destroy
