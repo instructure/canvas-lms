@@ -100,7 +100,7 @@ define([
     if (force == true || this.getState().isLoadedExternalTools == false) {
       this.setState({ isLoadingExternalTools: true });
       var externalTools = new ExternalToolCollection();
-      //externalTools.setParam('per_page', 20);
+      externalTools.setParam('per_page', 100);
       externalTools.fetch({
         success: this.fetchExternalToolsSuccessHandler.bind(this),
         error: this.fetchExternalToolsErrorHandler.bind(this)
