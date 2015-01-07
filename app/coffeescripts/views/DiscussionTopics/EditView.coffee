@@ -38,7 +38,8 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
     els:
       '#availability_options': '$availabilityOptions'
       '#use_for_grading': '$useForGrading'
-      '#discussion_point_change_warning' : '$assignmentPointsPossible'
+      '#discussion_topic_assignment_points_possible' : '$assignmentPointsPossible'
+      '#discussion_point_change_warning' : '$discussionPointPossibleWarning'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
@@ -85,16 +86,15 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
-      data = @getFormData()
-      @$assignmentPointsPossible.toggleAccessibly(data.assignment.pointsPossible() != (@initialPointsPossible + ""))
+      if @assignment.hasSubmittedSubmissions()
+        @$discussionPointPossibleWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@initialPointsPossible}")
 
     render: =>
       super
-
-      unless wikiSidebar.inited
-        wikiSidebar.init()
-        $.scrollSidebar()
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
+
+      @_initializeWikiSidebar ($textarea)
+
       _.defer ->
         $textarea.editorBox()
         $('.rte_switch_views_link').click (event) ->
@@ -104,10 +104,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
           # hide the clicked link, and show the other toggle link.
           # todo: replace .andSelf with .addBack when JQuery is upgraded.
           $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
-      wikiSidebar.attachToEditor $textarea
-
-      wikiSidebar.show()
-
       if @assignmentGroupCollection
         (@assignmentGroupFetchDfd ||= @assignmentGroupCollection.fetch()).done @renderAssignmentGroupOptions
 
@@ -124,6 +120,13 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
 
     attachKeyboardShortcuts: =>
         $('.rte_switch_views_link').first().before((new KeyboardShortcuts()).render().$el)
+
+    _initializeWikiSidebar:(textarea) =>
+      unless wikiSidebar.inited
+        wikiSidebar.init()
+        $.scrollSidebar()
+      wikiSidebar.attachToEditor textarea
+      wikiSidebar.show()
 
     renderAssignmentGroupOptions: =>
       @assignmentGroupSelector = new AssignmentGroupSelector
