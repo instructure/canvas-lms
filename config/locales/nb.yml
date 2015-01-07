@@ -1359,7 +1359,6 @@ nb:
       lock_for_comments: "Lås kommentering"
       make_sure_all_search_terms_are_spelled_correctly: "Pass på at alle søkeord er stavet riktig."
       rss_feed: RSS-strøm
-      search_title_body_or_author: "Søk tittel, innholdstekst eller forfatter"
       suggestions: "Forslag:"
       there_are_no_announcements_show: "Ingen kunngjøringer å vise"
       try_different_more_general_or_fewer_keywords: "Prøv andre, mer generelle eller færre søkeord"
@@ -1516,41 +1515,6 @@ nb:
     unmuting_assignment: "Viser oppgaven..."
   assignment_name_b2d87383: Oppgavenavn
   assignments: 
-    add_assignment_form: 
-      assignment_name: "Oppgavens navn"
-      labels: 
-        due: "leveres innen:"
-        points: "poeng:"
-        quiz_points: prøvepoeng
-        type: type
-      links: 
-        full_edit: "Full redigering"
-        more_options: "Flere alternativer"
-      options: 
-        assignment: Oppgave
-        attendance: Oppmøte
-        discussion: Diskusjon
-        external_tool: "Eksternt verktøy"
-        not_graded: "Ikke vurdert"
-        quiz: Prøve
-      tooltips: 
-        assignment_is_quiz: "Denne oppgaven er en prøve, så maksimalt resultat er gitt av spørsmålene og kan ikke stilles inn manuelt."
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "%{scores} resultat for hver student"
-      labels: 
-        assignments: Oppgaver
-        group_name: Gruppenavn
-      links: 
-        add_grading_rule: "Legg til regel for karaktersetting"
-        delete_assignment: Slett
-      options: 
-        drop_highest: "Fjern den høyeste"
-        drop_lowest: "Fjern den laveste"
-        equally_weighted: "Likt vektet"
-        never_drop: "Aldri fjern"
-        no_assignments: "[Ingen oppgaver]"
-        weighted_by_points: "Vektet med poeng"
-      percent_of_total_grade: "% av totalkarakter"
     assignment_count: 
       one: "1 oppgave"
       other: "%{count} oppgaver"
@@ -1605,10 +1569,6 @@ nb:
       not_yet_graded: "*Ikke vurdert enda*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} poeng"
       score_with_points_possible_screenreader: "Resultat: %{score} av %{pointsPossible} poeng."
-    assignment_locked: 
-      assignment_locked: "Denne oppgaven låses med virkning fra *%{lock_at}*"
-      assignment_unlocked_from: "Denne oppgaven er låst inntil *%{unlock_at}*"
-      assignment_unlocked_from_to: "Denne oppgaven er tilgjengelig fra *%{unlock_at}* til *%{lock_at}*"
     assignment_settings: 
       cancel: Avbryt
       save: Lagre
@@ -1617,51 +1577,13 @@ nb:
     assignment_sidebar: 
       links: 
         submit: "Legg til oppgave"
-    assignments_content: 
-      buttons: 
-        delete_group: "Slett gruppe"
-      labels: 
-        class_weighting_policy: "Sluttkarakteren vektes basert på oppgavegrupper"
-        delete_assignments_in_group: "Slett oppgaver i denne gruppen"
-        move_assignments_to: "Flytt oppgaver fra denne gruppen til"
-      options: 
-        select_group: "[ Velg gruppe ]"
-      titles: 
-        delete_assignment_group: "Slett oppgavegruppe?"
-      tooltips: 
-        target_group: "Velg en gruppe som du vil flytte denne oppgaven til"
-      warnings: 
-        delete_assignment_group: |-
-            Oppgavegruppen %{group} har %{assignment_count} oppgaver i seg. Du kan enten slette disse oppgavene eller flytte dem til en annen
-             oppgavegruppe.
-    assignments_list_content: 
-      assignments: 
-        graded: "Denne besvarelsen er vurdert"
-        needs_grading_count: "%{needs_grading_count} innleveringer for denne oppgaven må rettes"
-        overdue: "Innleveringsfrist for oppgaven er passert"
-      no_assignments: "Ingen oppgaver er opprettet for dette kurset."
-      titles: 
-        assignments: Oppgaver
-        course_assignments: Kursoppgaver
-        overdue_assignments: "Oppgaver med passert innleveringsdato"
-        past_assignments: "Tidligere oppgaver"
-        undated_assignments: "Udaterte oppgaver"
-        ungraded_assignments: "Ikke vurderte oppgaver"
-        upcoming_assignments: "Kommende oppgaver"
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "Gruppeoppgaver sortert etter type"
-        just_show_assignment_list: "Vis kun oppgaveoversikten"
         manage_assignments: "Administrer oppgaver"
         see_current_grades: "Se mine karakterer så langt"
       titles: 
         show_only_assignments_from: "Vis kun oppgaver fra"
         upcoming_assignments: "Kommende oppgaver"
-    assignments_right_side: 
-      add_assignment_to_group: "*Legg til oppgave* i %{group}"
-      assignment_groups_wrapper: "( i %{number_of_groups})"
-      links: 
-        add_assignment_group: "Legg til oppgavegruppe"
     available_date_description: 
       available_until: "Tilgjengelig til"
       closed: Låst
@@ -1848,28 +1770,6 @@ nb:
         total: Total
     higher_than_max: "Du kan ikke bruke et tall som er større enn antall oppgaver"
     incomplete: Ufullstendig
-    index: 
-      assignment_locked: "Denne oppgaven er for tiden låst. Se siden med informasjon om oppgaver for flere opplysninger."
-      assignment_locked_tooltip: låst
-      keycode_descriptions: 
-        add_assignment_or_group: "Legg til oppgave i denne gruppen"
-        close_active_dialog: "Steng den aktive dialogboksen"
-        delete_assignment_or_group: "Slett gjeldende oppgave/gruppe"
-        edit_assignment_or_group: "Rediger gjeldende oppgave/gruppe"
-        full_preview: "Full forhåndsvisning/Rediger oppgave"
-        next_assignment_or_group: "Neste oppgave/gruppe"
-        previous_assignment_or_group: "Forrige oppgave/gruppe"
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: Hvordan...?
-      page_title: Oppgaver
     index_view: 
       add_assignment: Oppgave
       add_group: Gruppe
@@ -1954,7 +1854,6 @@ nb:
         assign_peer_review: "Gi %{student} en annen innlevering for vurdering"
         back_to_assignment: "Tilbake til Oppgaven"
       messages: 
-        cancel_peer_review: "Kansellere denne hverandrevurderingen?"
         no_students_found: "Ingen studenter funnet"
       none_assigned: "Ingen tildelt"
       not_yet_submitted: "foreløpig ikke levert"
@@ -1968,8 +1867,6 @@ nb:
       title: "%{assignment} Hverandrevurderinger"
       titles: 
         automatically_assign_reviews: "Tildel \"Vurderinger\" automatisk"
-        remind: "Minn %{assessor} på oppgaven, siste påminnelse %{time}"
-        reminder: "Minn %{assessor} på vurderingen, siste påminnelse %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "Hvordan å tildele hverandrevurderere"
       labels: 
@@ -2027,10 +1924,6 @@ nb:
       locked: Låst
     status: 
       deleting_group: "Sletter gruppe..."
-    student_index: 
-      assignments: Oppgaver
-      labels: 
-        assignments: Oppgaver
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2182,40 +2075,6 @@ nb:
         settings_exclude_less_than_percent: "Mindre enn %{percentInput} av dokumentet"
     undated_assignments: "Udaterte oppgaver"
     upcoming_assignments: "Kommende oppgaver"
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: Slett oppgaven"
-        edit_icon: "%{icon}: Rediger de grunnleggende valgene på nytt"
-        move_icon: "%{icon}: Flytt oppgaven til en annen gruppe"
-        preview_icon: "%{icon}: Forhåndsvis oppgaven og rediger den i sin helhet"
-      errors: 
-        no_assignment_group: "Oops. Du må legge til en \"Oppgavegruppe\" først. Klikk \"Lag en Oppgavegruppe\" for å se hvordan."
-      instructions: 
-        wizard: 
-          details: "Det er mye mer innhold i en oppgave enn kun forfallsdatoer og poeng. Om du vil legge til en beskrivelse av oppgaven, tillate opplasting av filer, endre evalueringsformen eller mange andre muligheter, klikk på oppgavens navn eller klikk  %{edit_icon} ikonet og deretter \"flere valg\"."
-          group: 
-            screenreader_step1: "Oppgavegrupper benyttes for å organisere oppgaver. Du gir et navn til hver gruppe. Om du velger å vekte sluttkarakteren basert på grupper så kan du også sette et prosentresultat på hver gruppe. Klikk \"Legg til Oppgavegruppe\" for å lage en gruppe."
-            step1: "Oppgavegrupper benyttes for å administrere oppgaver. Du gir hver gruppe et navn. Om du velger å vekte sluttkarakteren basert på grupper (*hvor?*) så kan du også sette et prosentresultat for hver gruppe. Klikk \"Legg til oppgavegruppe\" for å lage en gruppe."
-          overview: "Denne siden er for å etablere kurset på et overordnet nivå. Du kan legge til oppgaver, gruppere dem og deretter vekte hver gruppe. Hensikten er å ha en overordnet organisering av kurset for deretter å gå mer detaljert til verks. Du kan også gjøre mye fra denne siden."
-          quizzes: "Prøver er spesielle oppgavetyper. Du kan opprette eller importere prøver ved å klikke \"Prøver\" i venstremenyen."
-          screenreader_details: "Det er mye mer innhold i en oppgave enn forfallsdato og poeng. Dersom du vil legge inn en beskrivelse av oppgaven, tillate opplasting av filer, endre opplegget for karaktersetting eller en hel masse andre ting, klikk på oppgavens navn eller klikk på \"Legg til\" knappen og deretter \"flere valg\". "
-          screenreader_step1: "Oppgaver er alltid organisert i grupper, så for å legge til en oppgave må du først bestemme hvilken gruppe den skal legges til i. Velg gruppe og klikk \"Legg til oppgave\" eller klikk \"Legg til\" for å lage en ny oppgave/gruppe."
-          step1: "Oppgaver organiseres alltid i grupper, så for å legge til en oppgave må du først bestemme hvilken gruppe den skal legges til. Velg gruppe og klikk \"Legg til oppgave\" eller klikk %{add_icon} ikonet for å legge til en oppgave for en gruppe."
-          step2: "Fint! Nå må detaljene legges inn. Du kan legge til en overskrift for oppgaven, en forfallsdato og antall oppnåelige poeng. Om du vil legge til flere detaljer er det oppnåelig etter at oppgaven er opprettet."
-          step3: "Ferdig! Oppgaven er nå lagt til gruppen. Hvis du holder musepekeren over oppgaven vil du se mange valgmuligheter. Dette er hva de betyr:"
-      links: 
-        create_assignment: "Lag en ny oppgave"
-        create_assignment_group: "Lag en oppgavegruppe"
-        create_or_import_quiz: "Opprett/importer en prøve"
-        edit_assignment_in_detail: "Detaljert redigering av oppgaver"
-        screenreader_show_me_add_assignment: "Ta meg til knappen for Legg til oppgave"
-        screenreader_show_me_add_assignment_group: "Ta meg til knappen for Legg til oppgavegruppe"
-        screenreader_show_me_weight_final_grade: "Ta meg til avkrysning for å vekte sluttkarakter"
-        show_me_where: "Vis meg hvor"
-      subtitles: 
-        edit_assignment_in_detail: "(tillat opplastinger, rediger beskrivelser, etc.)"
-      titles: 
-        wizard_box: "Jeg ønsker å:"
   assignments_api: 
     invalid_date_time: "Ugyldig datotid for %{attribute}"
     invalid_submission_types: "Ugyldige Innleverings typer"
@@ -3165,7 +3024,6 @@ nb:
       select_quizzes: "Velg prøver å eksportere"
   content_imports: 
     errors: 
-      failed: "Kursimport feilet med følgende feil:"
       import_failed: "Det oppsto en feil i overflytting av din import. Vær snill å kontakte system administrator og oppgi den følgende kode: \"%{code}\""
       no_only_and_except: "Du kan ikke benytte \"kun\" og \"unntatt\" valgene samtidig."
     files: 
@@ -3175,7 +3033,6 @@ nb:
       description: "Du kan laste opp en \"zippet\" samling med filer til kurset ditt og vi vil \"pakke de ut\" for deg. Dette er en enkel måte å flytte filer fra et annet system og inn i Canvas på."
       page_title: Importfiler
     messages: 
-      copying: "Kopierer... dette vil ta noen minutter"
       import_complete: "Importering fullført! Vender tilbake til kurssiden..."
       importing_button: "Importerer... dette kan ta en stund"
     titles: 
@@ -3551,7 +3408,7 @@ nb:
     buttons: 
       add: "Legg til Modul"
       add_item: "Legg til element"
-      add_module: "Opprett en modul"
+      add_module: Modul
       add_module_first: "Legg til en ny modul"
       update: "Oppdater Modul"
     confirm: 
@@ -3793,41 +3650,6 @@ nb:
       titles: 
         student_progression: "Modulfremdrift sortert etter Student"
     context_module: 
-      admin_links: 
-        module_options_label: "Behandle modul"
-        module_options_title: "Behandle modul"
-      context_module: 
-        draft: (Kladd)
-      images: 
-        alt: 
-          complete: ferdig
-          incomplete: ufullstendig
-          locked: låst
-        title: 
-          complete: "Modul ferdig"
-          incomplete: "Modul ikke ferdig"
-          locked: "Modul låst"
-      links: 
-        add_item: "Legg til innhold"
-        hide_contents: "Skjul modulens innhold"
-        settings: "Modulens innstillinger"
-        show_contents: "Vis modulens innhold"
-        text: 
-          delete_module: Slett
-          edit_module: Rediger
-        title: 
-          delete_module: "Slett denne modulen"
-          edit_module: Rediger
-          student_progress: "Se studentfremdrift for denne Modulen"
-      manage: "Behandle modul"
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: Modulvalg
-      module_will_unlock_at: "Låses opp *%{unlock_date}*"
-      progression_complete_count: "*%{count}* Ferdig"
-      progression_started_count: "*%{count}* Kjører"
-      reorder_modules: "Dra for å ordne moduler"
       unpublish: Depubliser
     context_module_next: 
       aria_labels: 
@@ -3865,51 +3687,6 @@ nb:
         course_modules: Kursmoduler
     module_complete: Ferdig
     module_empty: "Det er ingen elementer i modulen \"%{module}\""
-    module_item: 
-      drag_to_reorder: "Dra for å ordne eller flytte elementet til en annen modul"
-      images: 
-        alt: 
-          complete: ferdig
-          incomplete: ufullstendig
-          max_score: "resultat på maks"
-          min_score: "minimal resultat"
-          must_contribute: "må delta"
-          must_submit: "må levere inn"
-          must_view: "må se"
-        title: 
-          complete: "Modulelement ferdig"
-          incomplete: "Modulelement ikke ferdig"
-          max_score: "Studenter må ikke overskride maksimum resultat på dette elementet før modulen anses som ferdig"
-          min_score: "Studenter må oppnå minimumsresultatet på dette elementet før modulen anses som ferdig"
-          must_contribute: "Studenter må bidra på dette elementet før modulen anses som ferdig"
-          must_submit: "Studenter må levere inn denne oppgaven før modulen anses som ferdig"
-          must_view: "Studenter må se på dette elementet før modulen anses som ferdig"
-      links: 
-        edit_item: "Rediger elementets detaljer"
-        edit_item_details_label: "Rediger elementets detaljer"
-        indent: "Øk innrykk"
-        indent_label: "Øk innrykk"
-        outdent: "Reduser innrykk"
-        outdent_label: "Reduser innrykk"
-        remove_item: "Fjern dette elementet fra modulen"
-        remove_item_label: "Fjern dette elementet fra modulen"
-      max_score: 
-        fulfilled: "fikk ikke mer enn %{score}"
-        unfulfilled: "må ikke ha fått mer enn %{score}"
-      min_score: 
-        fulfilled: "må minst ha fått %{score}"
-        unfulfilled: "må minst ha fått %{score}"
-      module: 
-        item_aria_label: "%{item_label} modulelement"
-      must_contribute: 
-        fulfilled: "bidro til innholdet på siden"
-        unfulfilled: "må bidra til innholdet på siden"
-      must_submit: 
-        fulfilled: "leverte inn oppgaven"
-        unfulfilled: "må levere inn oppgaven"
-      must_view: 
-        fulfilled: "så på siden"
-        unfulfilled: "må se på siden"
     module_item_next: 
       drag_to_reorder: "Dra for å ordne eller flytte elementet til en annen modul"
       images: 
@@ -4479,37 +4256,15 @@ nb:
       buttons: 
         publish: "Publiser kurs"
       details: 
-        assignments: "Legg til dine oppgaver. Du kan enkelt og greit lage en lang liste, eller sortere de i grupper - og til og med spesifisere vekting for hver gruppe med oppgaver."
         available: "Nå da du har etablert og gjort kurset ditt tilgjengelig, har du antagelig ikke behov for denne sjekklisten lenger. Men vi lar den være tilgjengelig dersom du finner ut at du vil prøve noe nytt, eller bare vil ha litt ekstra hjelp ettersom du gjør endringer i kursinnholdet."
         calendar: "Dette er en god mulighet til å bli kjent med kalenderen – og legge inn hendelser som ikke er oppgaver til kurset. Ikke vær redd, vi skal hjelpe deg med det."
         claimed: 
-          not_saved: |-
-              Flott, du har et kurs… Hva nå? Før du kunngjør det til verden bør du sjekke at du har lagt grunnlaget. Jobb deg gjennom lista til venstre for å forsikre deg om at kurset er klart til bruk.
-              
-              *Dette kurset er kun synlig for forelesere fram til det er publisert*
           saved: "Gjort! Kurset ditt, %{course}, er nå opprettet. Det er kun synlig for deg fram til det er publisert – men før du gjør det bør du gå gjennom lista til venstre for å få en anelse om hvordan Canvas fungerer og for å forsikre deg om at du er klar til å starte kurset."
-        created: 
-          not_saved: |-
-              Klassen har blitt opprettet, men ikke gjort krav på. Den blir slettet om den ikke blir gjort krav på i løpet av en uke. I mellomtiden kan du gå gjennom lista til venstre for å forsikre deg om at du er klar.
-              
-              Om du må avslutte og komme tilbake senere, bare lagre *denne lenken* for å komme tilbake hit.
-              
-              **Logg inn** eller ***registrer deg*** for å gjøre krav på dette kurset.
-          saved: |-
-              Gjort! Kurset ditt, %{course}, er nå opprettet. Det er kun synlig for deg fram til det er publisert – men før du gjør det bør du gå gjennom lista til venstre for å få en anelse om hvordan Canvas fungerer og for å forsikre deg om at du er klar til å starte kurset.
-              
-              Om du må avslutte og komme tilbake senere, bare lagre *denne lenken* for å komme tilbake hit senere.
-              
-              **Logg inn** eller ***registrer deg*** for å gjøre krav på dette kurset.
         files: "Filer-fanen er stedet du deler forelesningspresentasjoner, eksempeldokumenter, studietips – alt det studentene dine vil ønske å laste ned. Å laste opp og organisere filene er enkelt med Canvas. Vi vil vise deg hvordan du gjør det."
         home2: "Når folk besøker kurset, er dette siden de vil se. Du kan sette den til å vise en aktivitetsforløp, listen over kursmoduler, et pensum, eller en tilpasset side du skriver selv. Standard er kurset aktivitetsforløp. For å tilpasse dette, klikker du bare %{choose_home_page}."
         import: "Om du har brukt en annen læringsplattform har du sikkert saker der som du ønsker å flytte over til Canvas. Vi kan vise deg prosessen med hvordan man enkelt flytter innholdet over til Canvas."
         navigation: "Som standard er alle lenker slått på for et kurs. Studentene vil ikke se lenker til klasser som ikke har innhold. For eksempel, om du ikke har opprettet noen prøver, vil de ikke se lenka til prøver. Du kan sortere og bevisst slå av disse lenkene om det er deler av kurset du ikke vil at studentene skal ha tilgang til."
         publish: 
-          form: |-
-              Ferdig? På tide å publisere kurset ditt! Klikk på knappen nedenfor for å gjøre det offisielt.
-              
-              Publisering vil la brukerne begynne å delta i kurset.
           not_registered: "Dette kurset er gjort krav på og klart, men du må fullføre registreringsprosessen før du kan publisere kurset. Du bør ha mottatt en e-post fra Canvas med lenka for å fullføre prosessen. Om du ikke ser den, sjekk søppelpostkassen også for sikkerhets skyld."
         students: "Du kommer nok til å trenge noen av disse. Hva er moroa med å holde et kurs om ingen lytter?"
         tas: "Du kan angi studentassistenter for å hjelpe deg med kurset. Studentassistenter kan sette karakterer på innleveringer, hjelpe til å moderere diskusjonene og oppdatere innleveringsfrister og oppgavedetaljer for deg."
@@ -4587,7 +4342,6 @@ nb:
     errors: 
       create_failed: "Etablering av kurset feilet"
       role_not_active: "Kan ikke legge til brukere for ikke-aktiv rolle: '%{role}'"
-      role_not_found: "Ingen rolle ved navn '%{role}' finnes."
       unpublish: "Kurset kan ikke bli upublisert hvis student innleveringer eksistere."
     group_list: 
       headings: 
@@ -4863,19 +4617,9 @@ nb:
         stats: Kursstatistikk
         student_view: Studentvisning
     show: 
-      buttons: 
-        update_layout: "Oppdater utseende"
       change_home_page: Endre
       details: 
-        assignments: "Denne visningen viser **listen over oppgaver** i dette kurset, med kommende og nylige oppgaver øverst."
         confirm_unenroll: "Er du sikker på at du vil melde deg av dette kurset? Du vil ikke lenger se dette kurset eller kommunisere direkte med foreleserne, og vil ikke kunne se hendelsene fra kurset i strømmen din og som varsler."
-        custom_page: "Du kan **designe din egen kursforside** og inkludere de lenkene, bildene og medieelementene du ønsker."
-        modules: |-
-            Du kan organisere kurset i **moduler eller deler**, hvor hver del inneholder et beslektet sett med filer, oppgaver, sider, etc. Hvis du ønsker, kan du også sekvensiere moduler ved å definere kriterier og forutsetninger som må være ferdig før hver modul gjøres tilgjengelig.
-            
-            -Dette oppsettet er trolig best for kurs som ikke er basert på en bestemt tidsplan som en termin eller et semester.
-        recent_activity_dashboard: "**Kontrollpanelet for nylig aktivitet** lar deltakerne se de nyeste samtalene, kunngjøringer, diskusjoner og interaksjoner for dette kurset. Det er nesten tilsvarende kontrollpanelet brukerne ser når de logger inn, men viser kun  innhold for dette spesifikke kurset."
-        syllabus: "Med **Pensumvisning** kan du gi en beskrivelse av kursforventninger eller introdusere kurset med lenker, bilder, osv., og deretter også vise  kalendervisning av alle oppgaver og kurshendelser."
       draft_state: 
         buttons: 
           cancel: Avbryt
@@ -4897,27 +4641,16 @@ nb:
         choose_home_page_title: "Velg hjemmeside"
         confirm_unenroll: "Bekreft avmelding"
         importing: "Dette kurset blir importert"
-        set_layout: "Sett layout for hjemmesiden"
         unpublished: "Dette kurset er ikke publisert"
       importing: "Kurskopiering/-flytting er i gang. Dette betyr at deler av innholdet kan være utilgjengelig."
-      labels: 
-        select_content: "Når noen besøker kurssiden, vis dem"
       license_notice: "Dette kursinnholdet tilbys med en %{license_type} lisens. Innholdet i dette kurset må anses å være underlagt denne lisensen såfremt ikke annet er anført."
       links: 
-        change_layout: "Bytt layout på hjemmesiden"
         choose_home_page: "Velg hjemmeside"
         course_setup: "Sjekkliste for kursetablering"
-        course_stream: "Se kursstrøm"
         drop_course: "Dropp dette kurset"
         join_course: "Bli med på dette kurset"
         new_announcement: "Ny beskjed"
         view_course_stream: "Se kursstrøm"
-      options: 
-        assignments: Oppgavelisten
-        custom_page: "en side jeg vil designe selv"
-        modules: Kursmoduler/-seksjoner
-        recent_activity_dashboard: "Kontrollpanel for nylig aktivitet"
-        syllabus: "Oppgaver med pensum"
       period_name: "siste 2 uker"
       re_sending: "Sender på nytt..."
       send_done: "Utført! Meldingen kan ta noen minutter."
@@ -5042,7 +4775,6 @@ nb:
     stats: Statistikk
     syllabus: Pensum
     users: Brukere
-    wiki_page_revisions: Revisjoner
     wiki_pages: Sider
   csv: 
     alpha: Alfa
@@ -5172,16 +4904,16 @@ nb:
       yesterday: "I går"
     formats: 
       date_at_time: "%-d. %b %H:%M"
-      default: "%Y-%m-%d"
-      long: "%B %-d, %Y"
+      default: "%d.%m.%Y"
+      long: "%-d %B %Y"
       long_with_weekday: "%A %-d. %B"
-      medium: "%b %-d, %Y"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d. %b %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a %-d %b %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
-      short_with_weekday: "%a, %b %-d"
+      short_with_weekday: "%a %-d %b"
       weekday: "%A"
     month_names: 
       - ~
@@ -5491,7 +5223,6 @@ nb:
       make_sure_all_search_terms_are_spelled_correctly: "Pass på at alle søkeord er stavet riktig."
       new_discussion: "*Start en* diskusjon"
       rss_feed: RSS-strøm
-      search_title_body_or_author: "Søk tittel, innholdstekst eller forfatter"
       start_one_now: "Start en nå"
       suggestions: "Forslag:"
       there_are_no_discussion_topics_to_show: "Ingen diskusjonstemaer å vise"
@@ -5526,9 +5257,7 @@ nb:
     show: 
       add_rubric: "Legg til vurderingsveiledning"
       announcement_closed: "Denne kunngjøringen er stengt for kommentarer"
-      announcement_locked: "Denne kunngjøringen vil ikke bli synlig for brukerne før *%{date}*"
       announcement_locked_until: "Denne kunngjøringen er låst til %{time}"
-      announcement_not_visible: "Denne kunngjøringen er ikke synlig for brukere"
       authors_name: "Forfatterens navn"
       collapse_replies: "Skjul svar"
       confirm_delete_discussion: "Er du sikker på at du vil slette denne diskusjonen?"
@@ -5556,12 +5285,9 @@ nb:
       reply_to_message: "Svar på denne meldingen"
       reply_to_topic: "Svar på temaet"
       retrieved_from_feed: "Hentet fra %{feed}"
-      search_entries_placeholder: "Søk oppføringer eller forfatter"
       show_rubric: "Vis vurderingsveiledning"
       speed_grader: "Speed Grader"
       topic: Tema
-      topic_locked: "Dette temaet vil ikke være synlig for andre før *%{date}*"
-      topic_not_visible: "Dette temaet er ikke synlig for brukerne"
       topic_podcast_feed_link: "Podkast-strøm for tema"
       topic_subscribe: Abbonner
       topic_subscribe_tooltip: "Abonnementet ditt er avsluttet, og du vil ikke få varsler om nye kommentarer"
@@ -5658,7 +5384,6 @@ nb:
     unsubscribed: "Abonnument avsluttet"
     unsubscribed_hint: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
   display_course_catalog: "Vis søkbar liste over kurs i dette root kontoen med \"Inkluder dette kurset i den offentlige kurset indeks\" flagg aktivert."
-  draft_state_description: "Denne betafunksjonen redesigner mange deler av Canvas og lar innhold eksistere i en ny upublisert status som er usynlig for studenter og ekskluderes fra karakterberegninger. Advarsel – å slå av denne funksjonen kan føre til sletting av nylig opprettet eller redigert innhold fra foreleserens visning."
   due_date_822625d8: Frist
   due_dates: 
     due_at: "leveres innen: %{assignment_due_date_time}"
@@ -6288,15 +6013,11 @@ nb:
       feature_options: Funksjonsvalg
       no_features_available: "Ingen funksjoner er tilgjengelige for tiden."
   features: 
-    allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra innboksen"
     better_file_browsing: "Bedre filsøk"
     course_catalog: Kurskatalog
     differentiated_assignments: "Differensierte oppgaver"
     differentiated_assignments_account_disable_warning: "Å slå av denne funksjonen vil påvirke eksisterende kurs. For hjelp med å slå av denne funksjonen, kontakt din Canvasadmin."
     differentiated_assignments_course_disable_warning: "Deaktivering differensierte oppdrag vil gjøre alle publiserte oppdrag synlig for alle studenter."
-    draft_state: Kladdstatus
-    draft_state_account_disable_warning: "Å slå av denne funksjonen vil påvirke eksisterende kurs. For hjelp med å slå av denne funksjonen, kontakt din Canvasadmin."
-    draft_state_course_disable_warning: "Å slå av denne funksonen vil publisere ALLE eksisterende objekter i kurset. Vennligst sørg for at alt kladdinnhold er klart for publisering og tilgjengelig for alle brukere i kurset før du fortsetter."
     ember_modules: "Ember Moduler"
     google_docs_domain_restriction: "Domenebegrensning for Google Docs"
     high_contrast: "Bruk stiler med høy kontrast"
@@ -7882,6 +7603,7 @@ nb:
       feedback: "Klikk her for å fortelle oss hva som skjedde"
     help: Hjelp
     show_me_where: "Vis meg hvor"
+  links_14b70841: Lenker
   locales: 
     nb: "Norwegian (Bokmål)"
   logged_out_user: "Avlogget bruker %{user_counter}"
@@ -10583,7 +10305,6 @@ nb:
       description: "Appsenter for å holde oversikt over og installere eksterne verktøy i Canvas"
       name: Appsenter
     app_center_settings: 
-      description: "Appsenteret vil dukke opp i \"Apper\"-fanen på innstillingssiden til et kurs eller en konto. URL-en som oppgis nedenfor bør peke til et gyldig sluttpunkt for appsenteret (f.eks. https://lti-examples.heroku.com – husk å ikke ha med en skråstrek på slutten)"
       labels: 
         app_reviews_endpoint: "App Show Endpoint"
         apps_index_endpoint: "Apps Index Endpoint"
@@ -11516,6 +11237,20 @@ nb:
       regrade_options: "Valgmuligheter for ny vurdering *(for studenter som allerede har besvart dette spørsmålet):*"
       some_scores_reduced: "Gi kun poeng til korrekte svar (*enkelte studenters resultater kan bli redusert*)"
       update_question_without_regrading: "Oppdater spørsmålet uten å sette karakter på nytt"
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: Spørsmål
+    loading: Laster…
+    navigation: 
+      links: 
+        question: "Spørsmål %{position}"
+      questions: Spørsmål
+    session_table_headers: 
+      attempt: Forsøk
+    table_view: 
+      headers: 
+        question: "Spørsmål %{position}"
   quiz_reports: 
     cancel_generation: Avbryt
     download_item_analysis: "Last ned element analyse rapporten."
@@ -12663,7 +12398,6 @@ nb:
     folder: Mappe
     folder_browsing_tree: "Mappen Blar gjennom treet"
     folder_name: "Mappe Navn"
-    kind: Snill
     labels: 
       select: "Velg denne varen"
     loading_more_results: "Laster inn flere resultater..."
@@ -13084,7 +12818,9 @@ nb:
     enrollments_tas: Læringsassistenter
     enrollments_teachers: Forelesere
     student_groups: Studentgrupper
+  search_entries_or_author_63fb0a86: "Søk oppføringer eller forfatter"
   search_groups_or_people_6c15d6ad: "Søk i grupper eller personer"
+  search_title_body_or_author_1d26711f: "Søk tittel, innholdstekst eller forfatter"
   section: 
     confirms: 
       delete_enrollment: "Er du sikker på at du vil slette denne påmeldingen permanent?"
@@ -13782,10 +13518,6 @@ nb:
       topic_notice: "Velg temaet du vil assosiere med denne *modulen*, eller legg til et nytt ved å velge \"Nytt tema\"."
       wiki_page_notice: "Velg wikisiden du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge \"Ny side\"."
       wiki_page_select_label: "Velg wiki siden du ønsker å assosiere, eller legge til en ny side ved å velge \"Ny side\"."
-    sequence_footer: 
-      full_course_sequence: "se hele kurssekvensen"
-      next: Neste
-      previous: Forrige
     submission_comment: 
       assignment: Oppgave
       grading_alt: karaktersetting
@@ -14357,9 +14089,9 @@ nb:
     due_date: "%{date} innen %{time}"
     event: "%{date} %{time}"
     formats: 
-      default: "%a %-d. %b %Y %H:%M:%S %z"
-      long: "%-d. %B %Y %H:%M"
-      short: "%-d. %b %H:%M"
+      default: "%a %d %b %Y %H:%M:%S %z"
+      long: "%d %B %Y %H:%M"
+      short: "%d %b %H:%M"
       tiny: "%H:%M"
       tiny_on_the_hour: "%H"
     less_than_a_minute_ago: "under et minutt siden"
@@ -14368,7 +14100,6 @@ nb:
       different_days: "%{start_date_and_time} til %{end_date_and_time}"
       same_day: "%{date} fra %{start_time} til %{end_time}"
       times: "%{start_time} til %{end_time}"
-    unknown_date: "Ukjent dato"
     with_ago: "%{time} siden"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -15113,8 +14844,6 @@ nb:
   wiki_page: 
     atom_author: Wikiside
     atom_entry_title: "Wikiside, %{course_or_group_name}: %{page_title}"
-    cannot_hide_page: "kan ikke skjule forsiden"
-    cannot_set_hidden_front_page: "kunne ikke sette som forside fordi den er skjult"
     cannot_set_unpublished_front_page: "kunne ikke sette som forside fordi den ikke er publisert"
     defaults: 
       no_content: "intet innhold"
@@ -15123,107 +14852,25 @@ nb:
       title_characters: "Tittelen må inneholde minst én bokstav eller ett tall"
       title_too_long: "Tittelen kan ikke være lengre enn %{max_characters} "
     unknown_user_name: Ukjent
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: "Tilbake til gjeldende versjon"
-      page_edited_by_with_link: "av [%{user_name}](%{link})"
-      page_imported: "av innholdsimportør"
-      titles: 
-        revisions_for_page: "Revisjoner av: %{title}"
-    notices: 
-      page_rolled_back: "Siden ble tilbakestilt til forrige versjon."
-    show: 
-      buttons: 
-        roll_back_version: "Tilakestill til denne versjonen"
-      imported_at: "Importert: *%{time_ago}*"
-      labels: 
-        by_content_importer: "av innholdsimportør"
-        by_user: "av %{user}"
-        on_date: "*%{date_time}*"
-      links: 
-        back_to_history: "Tilbake til revisjonshistorikk"
-        go_to_latest: "Gå til nyeste versjon"
-      not_most_recent_version_warning: "Dette er IKKE den nyeste versjonen"
-      saved_by: "Lagret: *%{time_ago}* av %{user}"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: "Lagre endringer"
-        start_editing: "Start redigering nå"
-      course_editing_roles: 
-        anyone: "Hvem som helst"
-        only_teachers: "Kun forelesere"
-        teachers_and_students: "Faglærer og studenter"
-      course_home_wiki_page_description: "Du kan bruke denne siden for å organisere eller introdusere kurset ditt som du vil. Du kan enkelt lenke til oppgaver, filer, osv. ved å bruke \"Sideverktøy\" elementet som ligger til høyre når du begynner å redigere."
-      course_wiki_page_description: "Du kan bruke denne wikien til å lage supplementære sider eller beskrivelser til kursmateriellet ditt. Du kan enkelt lenke til wikisider fra oppgaver, eller lenke til annet kursmateriell og filer fra enhver wikiside. Dette gjør det til et bra sted å forklare vanskelige konsepter, tilrettelegging av gruppeprosjekter, eller å skape akkurat den typen side du trenger i kurset ditt."
-      default_wiki_page_description: "Dette siden er wikihjemmesiden, og er den siden studentene vil se når de klikker på \"Sider\"-fanen for dette kurset."
-      default_wiki_page_is_course_home_page_warning: "Akkurat nå er siden også hjemmesiden for kurset, så den er det første besøkende til kurset ditt vil se. Du kan endre det på [denne siden](%{link})."
-      editing_content: "Redigerer innhold."
-      editing_roles: 
-        anyone: "Hvem som helst"
-        only_members: "Kun medlemmer"
-        prompt: "%{options} kan redigere denne siden"
-      group_wiki_warning: "Denne siden er del av gruppewikien, *ikke* kurswikien. Om du ser etter kurswikien, [klikk her](%{link})."
-      labels: 
-        hide_from_students: "Skjul denne siden for studentene"
-        last_edited: "Sist redigert av %{name} for %{time_ago} siden"
-        notify_of_update: "Varsle brukere om at dette innholdet er endret"
-      links: 
-        page_history: Sidehistorikk
-      notices: 
-        page_deleted: "Denne siden har blitt slettet."
-        page_does_not_exist: "Denne siden finnes ikke ennå."
-        page_edited_while_viewing: "Denne siden har blitt oppdatert av noen andre etter at du åpnet den. [Klikk her for å laste siden på nytt.](%{link})"
-        page_edited_while_viewing_detailed: "Noen andre har redigert denne siden etter at du åpnet den, og om du lagrer nå vil du overskrive endringene deres. Du bør vurdere å laste siden på nytt og gjøre endringene dine på nytt for ikke å spolere andres arbeid."
-      welcome_message: "Velkommen til kurswikien"
-    edit_page: 
+    edit: 
       page_header_title: "Rediger %{page_name}"
-    errors: 
-      cannot_delete_front_page: "Du kan ikke slette forsiden."
-    front_page: Forside
+    index: 
+      titles: 
+        pages: Sider
     notices: 
       cannot_edit: "Du kan ikke redigere siden \"%{title}\"."
       cannot_read_revisions: "Du har ikke tillatelse til å ga gjennom historiske revisjoner av \"%{title}\"."
       create_non_existent_page: "Siden \"%{title}\" finnes ikke, men du kan opprette den nedenfor"
       page_deleted: "Siden \"%{title}\" har blitt slettet."
       page_does_not_exist: "Siden \"%{title}\" finnes ikke."
-      page_updated: "Siden ble oppdatert."
-    page_link: 
-      link_hidden_from_students_warning: "Studentene vil ikke se denne lenken"
-    page_revisions: 
+    revisions: 
       page_revisions_title: "%{title} revisjoner: %{context_name}"
-    pages_index: 
-      titles: 
-        pages: Sider
-    wiki_right_side: 
-      buttons: 
-        create: Lag
-        rename: "Døp om"
-      delete_page_confirmation: "Er du sikker på at du vil slette denne siden? Dette kan ikke angres."
-      headers: 
-        all_pages: "Alle sider"
-        common_pages: "Vanlige sider"
-        page_tools: Sideverktøy
-        recent_changes: "Siste endringer"
-      links: 
-        create_page: "Opprett en ny side"
-        delete_page: "Slett denne siden"
-        edit_page: "Rediger denne siden"
-        more: mer...
-        rename_page: "Døp om denne siden"
-        show_all: "vis alle..."
-      title: "Ny sidetittel"
-      wiki_description_for_course: "Tenk på det som et åpent sted å oppbevare innhold. Du kan bruke det til å beskrive kurset ditt, gi nyttige forklaringer av vanskelige temaer, eller la studentene samarbeide om skriveprosjekter."
-      wiki_description_for_group: "Tenk på det som et åpent sted å oppbevare innhold. Du kan bruke det til å beskrive kurset ditt, gi nyttige forklaringer av vanskelige temaer, eller la studentene samarbeide om skriveprosjekter."
-      wiki_description_header: "Hvilken nytte har en wiki?"
   wiki_pages_api: 
     cannot_delete_front_page: "Forsiden kan ikke slettes"
-    cannot_have_hidden_front_page: "Forsiden kan ikke skjules"
     cannot_have_unpublished_front_page: "Forsiden kan ikke fjernes fra publisering"
     cannot_update_editing_roles: "Du kan ikke oppdatere redigeringsrollene til denne wikisiden"
     cannot_update_front_page: "Du kan ikke endre wikiforsiden"
-    cannot_update_hide_from_students: "Du har ikke tillatelse til å oppdatere flagget som indikerer at wiki-siden er skjult for studenter"
     cannot_update_published: "Du kan ikke oppdatere publiseringsstatusen til denne wikisiden"
     cannot_update_title: "Du kan ikke oppdatere tittelen til denne wikisiden"
     invalid_editing_roles: "De gitte redigeringsrollene er ugyldige"
