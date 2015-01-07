@@ -43,7 +43,11 @@ class LearningOutcome < ActiveRecord::Base
 
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :short_description, :maximum => maximum_string_length
-  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS
+  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS,
+    :message => t(
+      "calculation_method must be one of the following: %{calc_methods}",
+      :calc_methods => CALCULATION_METHODS.to_s
+    )
   validates_presence_of :short_description, :workflow_state
   sanitize_field :description, CanvasSanitize::SANITIZE
   validate :calculation_changes_after_asessing, if: :assessed?
@@ -98,11 +102,19 @@ class LearningOutcome < ActiveRecord::Base
 
   def validate_calculation_int
     unless valid_calculation_int?(calculation_int, calculation_method)
-      errors.add(:calculation_int, t(
-        "'%{calculation_int}' is not a valid calculation_int for calculation_method of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'",
-        :calculation_int => calculation_int, :calculation_method => calculation_method,
-        :valid_calculation_ints => valid_calculation_ints
-      ))
+      if valid_calculation_ints.to_a.empty?
+        errors.add(:calculation_int, t(
+          "'calculation_int' is not used with calculation_method '%{calculation_method}'",
+          :calculation_method => calculation_method,
+        ))
+      else
+        errors.add(:calculation_int, t(
+          "'%{calculation_int}' is not a valid calculation_int for calculation_method of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'",
+          :calculation_int => calculation_int,
+          :calculation_method => calculation_method,
+          :valid_calculation_ints => valid_calculation_ints
+        ))
+      end
     end
   end
 
