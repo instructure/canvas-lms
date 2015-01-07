@@ -112,7 +112,7 @@ define(function(require) {
         break;
 
         case K.EVT_QUESTION_FLAGGED:
-          if (event.flagged) {
+          if (event.data.flagged) {
             label = I18n.t('question_flagged', 'Flagged question:');
           }
           else {
