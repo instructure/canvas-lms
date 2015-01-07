@@ -1,4 +1,5 @@
 define({
+  EVT_SESSION_STARTED: 'session_started',
   EVT_PAGE_FOCUSED: 'page_focused',
   EVT_PAGE_BLURRED: 'page_blurred',
   EVT_QUESTION_VIEWED: 'question_viewed',

@@ -68,6 +68,10 @@ define(function(require) {
       var label;
 
       switch(event.type) {
+        case K.EVT_SESSION_STARTED:
+          description = I18n.t('session_started', 'Session started');
+        break;
+
         case K.EVT_QUESTION_ANSWERED:
           label = I18n.t('question_answered', {
             one: 'Answered question:',
