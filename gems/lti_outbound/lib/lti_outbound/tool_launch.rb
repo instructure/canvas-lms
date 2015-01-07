@@ -19,7 +19,7 @@ module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,
                 :resource_type, :consumer_instance, :hash, :assignment,
-                :outgoing_email_address, :selected_html, :variable_substitutor
+                :outgoing_email_address, :selected_html, :variable_expander
 
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
@@ -34,13 +34,9 @@ module LtiOutbound
       @selected_html = options[:selected_html]
       @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
 
-      @variable_substitutor = options[:variable_substitutor]
+      @variable_expander = options[:variable_expander] || raise('VariableExpander is required for generating LTI content')
 
       @hash = {}
-    end
-
-    def variable_substitutor
-      @variable_substitutor ||= VariableSubstitutor.new
     end
 
     def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url)
@@ -123,7 +119,7 @@ module LtiOutbound
       set_resource_type_keys()
       hash['oauth_callback'] = 'about:blank'
 
-      variable_substitutor.substitute!(hash)
+      @variable_expander.expand_variables!(hash)
 
       self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
     end
@@ -137,9 +133,6 @@ module LtiOutbound
 
       hash['custom_canvas_assignment_title'] = '$Canvas.assignment.title'
       hash['custom_canvas_assignment_points_possible'] = '$Canvas.assignment.pointsPossible'
-      @variable_substitutor.add_substitution('$Canvas.assignment.id', assignment.id)
-      @variable_substitutor.add_substitution('$Canvas.assignment.title', assignment.title)
-      @variable_substitutor.add_substitution('$Canvas.assignment.pointsPossible', assignment.points_possible)
     end
 
     def set_resource_type_keys

@@ -32,7 +32,6 @@ class ApplicationController < ActionController::Base
   include LocaleSelection
   include Api::V1::User
   include Api::V1::WikiPage
-  include Lti::MessageHelper
   include LegalInformationHelper
   around_filter :set_locale
 
@@ -1242,23 +1241,18 @@ class ApplicationController < ActionController::Base
                  :redirect_return_cancel_url => success_url)
         end
 
-        substitutions = common_variable_substitutions
-        if tag.tag_type == 'context_module'
-          substitutions.merge!(
-              {
-                  '$Canvas.module.id' => tag.context_module_id,
-                  '$Canvas.moduleItem.id' => tag.id,
-              }
-          )
-        end
-
         opts = {
             launch_url: @resource_url,
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
-            custom_substitutions: substitutions
         }
-        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
+        variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
+                                                        current_user: @current_user,
+                                                        current_pseudonym: @current_pseudonym,
+                                                        content_tag: tag,
+                                                        assignment: @assignment,
+                                                        tool: @tool})
+        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)
 
         if tag.try(:context_module)
           add_crumb tag.context_module.name, context_url(@context, :context_context_modules_url)

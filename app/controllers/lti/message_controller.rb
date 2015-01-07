@@ -25,7 +25,9 @@ module Lti
       if authorized_action(@context, @current_user, :update)
         @lti_launch = Launch.new
         @lti_launch.resource_url = params[:tool_consumer_url]
-        message = RegistrationRequestService.create_request(tool_consumer_profile_url, registration_return_url)
+        message = RegistrationRequestService.create_request(
+          named_context_url(context, :context_tool_consumer_profile_url, "339b6700-e4cb-47c5-a54f-3ee0064921a9", include_host: true ),
+          named_context_url(context, :context_registration_return_url, include_host: true ))
         @lti_launch.params = message.post_params
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
@@ -60,7 +62,8 @@ module Lti
           @lti_launch.launch_type = message.launch_presentation_document_target
 
           module_sequence(message_handler)
-          message.add_custom_params(custom_params(message_handler.parameters, tool_proxy, message.resource_link_id))
+          tool_setting_ids = prep_tool_settings(message_handler.parameters, tool_proxy, message.resource_link_id)
+          message.add_custom_params(custom_params(message_handler.parameters, tool_setting_ids.merge(tool: tool_proxy)))
 
           @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
 
@@ -95,32 +98,9 @@ module Lti
       end
     end
 
-    def custom_params(parameters, tool_proxy, resource_link_id)
+    def custom_params(parameters, opts = {})
       params = IMS::LTI::Models::Parameter.from_json(parameters || [])
-      IMS::LTI::Models::Parameter.process_params(params, lti2_variable_substitutions(parameters, tool_proxy, resource_link_id))
-    end
-
-    def tool_consumer_profile_url
-      tp_id = "339b6700-e4cb-47c5-a54f-3ee0064921a9" #Hard coded until we start persisting the tcp
-      case context
-        when Course
-          course_tool_consumer_profile_url(context, tp_id)
-        when Account
-          account_tool_consumer_profile_url(context, tp_id)
-        else
-          raise "Unsupported context"
-      end
-    end
-
-    def registration_return_url
-      case context
-        when Course
-          course_registration_return_url(context)
-        when Account
-          account_registration_return_url(context)
-        else
-          raise "Unsupported context"
-      end
+      IMS::LTI::Models::Parameter.process_params(params, create_variable_expander(opts))
     end
 
     def find_binding(tool_proxy)
@@ -141,18 +121,14 @@ module Lti
       Base64.urlsafe_encode64("#{resource_link_id}")
     end
 
-    def lti2_variable_substitutions(parameters, tool_proxy, resource_link_id)
-      substitutions = common_variable_substitutions.inject({}) { |hash, (k, v)| hash[k.gsub(/\A\$/, '')] = v; hash }
-      substitutions.merge!(prep_tool_settings(parameters, tool_proxy, resource_link_id))
-      if @tag
-        substitutions.merge!(
-            {
-                'Canvas.module.id' => @tag.context_module_id,
-                'Canvas.moduleItem.id' => @tag.id,
-            }
-        )
-      end
-      substitutions
+    def create_variable_expander(opts = {})
+      default_opts = {
+        current_user: @current_user,
+        current_pseudonym: @current_pseudonym,
+        content_tag: @tag,
+        assignment: nil
+      }
+      VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
     end
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
@@ -161,9 +137,9 @@ module Lti
         binding = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class.name, resource_link_id: nil).first_or_create
         proxy = tool_proxy_settings(tool_proxy)
         {
-          'LtiLink.custom.url' => show_lti_tool_settings_url(link.id),
-          'ToolProxyBinding.custom.url' => show_lti_tool_settings_url(binding.id),
-          'ToolProxy.custom.url' => show_lti_tool_settings_url(proxy.id)
+          tool_setting_link_id: link.id,
+          tool_setting_binding_id: binding.id,
+          tool_setting_proxy_id: proxy.id
         }
       else
         {}

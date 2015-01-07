@@ -942,10 +942,13 @@ class UsersController < ApplicationController
     @lti_launch = Lti::Launch.new
     opts = {
         resource_type: @resource_type,
-        link_code: @opaque_id,
-        custom_substitutions: common_variable_substitutions
+        link_code: @opaque_id
     }
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, opts)
+    variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
+                                                                        current_user: @current_user,
+                                                                        current_pseudonym: @current_pseudonym,
+                                                                        tool: @tool})
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)

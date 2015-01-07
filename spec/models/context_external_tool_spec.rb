@@ -344,15 +344,13 @@ describe ContextExternalTool do
         }
         @tool.save!
 
-        hash = {}
-        @tool.set_custom_fields(hash, type)
+        hash = @tool.set_custom_fields(type)
         expect(hash["custom_a"]).to eq "1"
         expect(hash["custom_b"]).to eq "5"
         expect(hash["custom_c"]).to eq "3"
 
-        hash = {}
         @tool.settings[type.to_sym][:custom_fields] = nil
-        @tool.set_custom_fields(hash, type)
+        hash = @tool.set_custom_fields(type)
 
         expect(hash["custom_a"]).to eq "1"
         expect(hash["custom_b"]).to eq "2"
@@ -361,31 +359,6 @@ describe ContextExternalTool do
     end
   end
 
-  describe "#substituted_custom_fields" do
-    it "substitutes custom fields for a placement" do
-      subject.user_navigation = {custom_fields: {'custom_a' => '$Custom.substitution'}}
-
-      custom_params = subject.substituted_custom_fields(:user_navigation, {'$Custom.substitution' => 'substituted_value'})
-      expect(custom_params).to eq({'custom_a' => 'substituted_value'})
-
-    end
-
-    it "executes procs" do
-      subject.course_navigation = {custom_fields: {'custom_b' => '$Custom.substitution'}}
-      custom_params = subject.substituted_custom_fields(:course_navigation, {'$Custom.substitution' => -> {'substituted_value'}})
-
-      expect(custom_params).to eq({'custom_b' => 'substituted_value'})
-    end
-
-    it "ignores constants" do
-      subject.account_navigation = {custom_fields: {'custom_c' => 'constant'}}
-      custom_params = subject.substituted_custom_fields(:account_navigation, {'$Custom.substitution' => 'substituted_value'})
-
-      expect(custom_params).to eq({'custom_c' => 'constant'})
-    end
-
-  end
-  
   describe "all_tools_for" do
     it "should retrieve all tools in alphabetical order" do
       @tools = []
