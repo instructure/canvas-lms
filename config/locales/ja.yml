@@ -1358,7 +1358,6 @@ ja:
       lock_for_comments: コメントのロック
       make_sure_all_search_terms_are_spelled_correctly: すべての検索条件について誤入力がないことを確認してください。
       rss_feed: "RSS フィード"
-      search_title_body_or_author: タイトル、本文、または作成者を検索する
       suggestions: "提案:"
       there_are_no_announcements_show: 表示するアナウンスはありません
       try_different_more_general_or_fewer_keywords: 別のキーワードや、より一般的なキーワードを指定するか、キーワードの数を減らして試してください。
@@ -1515,41 +1514,6 @@ ja:
     unmuting_assignment: 課題のミュートを解除しています...
   assignment_name_b2d87383: 課題名
   assignments: 
-    add_assignment_form: 
-      assignment_name: 課題名
-      labels: 
-        due: "期限:"
-        points: "点数:"
-        quiz_points: クイズの点数
-        type: タイプ
-      links: 
-        full_edit: 詳細編集
-        more_options: その他のオプション
-      options: 
-        assignment: 課題
-        attendance: 出欠
-        discussion: ディスカッション
-        external_tool: 外部ツール
-        not_graded: 未採点
-        quiz: クイズ
-      tooltips: 
-        assignment_is_quiz: この課題はクイズですので、配点は問題から引き出され、手動で設定することはできません。
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "それぞれの受講生に %{scores} スコア"
-      labels: 
-        assignments: 課題
-        group_name: グループ名
-      links: 
-        add_grading_rule: 採点ルールの追加
-        delete_assignment: 削除
-      options: 
-        drop_highest: 最高点を下げる
-        drop_lowest: 最低点を下げる
-        equally_weighted: 均等に重み付けする
-        never_drop: 決して下げない
-        no_assignments: "[課題なし]"
-        weighted_by_points: 点数で重み付けする
-      percent_of_total_grade: "総合成績の %"
     assignment_count: 
       one: "%{count} 個の課題"
       other: "%{count} 個の課題"
@@ -1604,10 +1568,6 @@ ja:
       not_yet_graded: "*まだ採点されていません*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} 点"
       score_with_points_possible_screenreader: "スコア: %{score}/%{pointsPossible} 点。"
-    assignment_locked: 
-      assignment_locked: "*%{lock_at}* 現在、この課題はロックされています"
-      assignment_unlocked_from: "*%{unlock_at}* まで、この課題はロックされています"
-      assignment_unlocked_from_to: "この課題は *%{unlock_at}* ～*%{lock_at}* の期間のみ、ロック解除されます"
     assignment_settings: 
       cancel: キャンセル
       save: 保存
@@ -1616,49 +1576,13 @@ ja:
     assignment_sidebar: 
       links: 
         submit: 課題の提出
-    assignments_content: 
-      buttons: 
-        delete_group: グループの削除
-      labels: 
-        class_weighting_policy: 課題グループに基づいて最終的な成績を重み付けする
-        delete_assignments_in_group: このグループの課題を削除する
-        move_assignments_to: "このグループの課題を移動する。移動先: "
-      options: 
-        select_group: "[ グループの選択 ]"
-      titles: 
-        delete_assignment_group: 課題グループを削除しますか?
-      tooltips: 
-        target_group: この課題の移動先となるグループを選択してください
-      warnings: 
-        delete_assignment_group: "課題グループ %{group} には %{assignment_count} 件含まれています。これらの課題を削除することも、別の課題グループに移動することもできます。"
-    assignments_list_content: 
-      assignments: 
-        graded: この課題は既に採点されています
-        needs_grading_count: "この課題には、採点が必要な提出物がまだ %{needs_grading_count} 件あります。"
-        overdue: この課題は期日を過ぎています
-      no_assignments: "このコースには課題が 1 つも作成されていません。"
-      titles: 
-        assignments: 課題
-        course_assignments: コースの課題
-        overdue_assignments: 期日を過ぎた課題
-        past_assignments: 過去の課題
-        undated_assignments: 日付のない課題
-        ungraded_assignments: 未採点の課題
-        upcoming_assignments: 今後予定されている課題
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "グループ課題 (タイプ別)"
-        just_show_assignment_list: 課題リストの表示のみ
         manage_assignments: 課題の管理
         see_current_grades: これまでの私の成績を確認する
       titles: 
         show_only_assignments_from: 以下に含まれる課題のみを表示
         upcoming_assignments: 今後予定されている課題
-    assignments_right_side: 
-      add_assignment_to_group: "%{group} に *課題を追加*"
-      assignment_groups_wrapper: " (%{number_of_groups} 件のグループ中)"
-      links: 
-        add_assignment_group: 課題グループの追加
     available_date_description: 
       available_until: 次の日付まで利用可能
       closed: 締切済み
@@ -1846,28 +1770,6 @@ ja:
         total: 合計
     higher_than_max: 課題数よりも大きい数字は使用できません
     incomplete: 未完了
-    index: 
-      assignment_locked: この課題は現在ロックされています。詳しくは、この課題の詳細情報のページをご覧ください。
-      assignment_locked_tooltip: ロックされています
-      keycode_descriptions: 
-        add_assignment_or_group: 現在のグループへの課題の追加
-        close_active_dialog: アクティブなダイアログを閉じる
-        delete_assignment_or_group: 現在の課題/グループの削除
-        edit_assignment_or_group: 現在の課題/グループの編集
-        full_preview: "課題のフル プレビュー/編集"
-        next_assignment_or_group: 次の課題/グループ
-        previous_assignment_or_group: 前の課題/グループ
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: Esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: どうすればいいですか...?
-      page_title: 課題
     index_view: 
       add_assignment: 課題
       add_group: グループ
@@ -1952,7 +1854,6 @@ ja:
         assign_peer_review: "%{student} に、査定すべき別の提出物を与える"
         back_to_assignment: 課題に戻る
       messages: 
-        cancel_peer_review: "このピア レビューを取り消しますか?"
         no_students_found: 受講生が見つかりません
       none_assigned: 何も割り当てられていません
       not_yet_submitted: まだ提出されていません
@@ -1966,8 +1867,6 @@ ja:
       title: "%{assignment} のピア レビュー"
       titles: 
         automatically_assign_reviews: レビューの自動割り当て
-        remind: "アセスメントについて %{assessor} に念押しする。最終通知日: %{time}"
-        reminder: "アセスメントについて %{assessor} に念押しする。最終通知日: %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "ピア レビューの割り当て方法"
       labels: 
@@ -2025,10 +1924,6 @@ ja:
       locked: ロックされています
     status: 
       deleting_group: グループを削除しています...
-    student_index: 
-      assignments: 課題
-      labels: 
-        assignments: 課題
     submission_sidebar: 
       comment_signature: "%{author}、%{created_at}"
       labels: 
@@ -2181,40 +2076,6 @@ ja:
         settings_exclude_less_than_percent: "その文書の %{percentInput} パーセント未満"
     undated_assignments: 日付のない課題
     upcoming_assignments: 今後予定されている課題
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: この課題の削除"
-        edit_icon: "%{icon}: 基本オプションを再度編集"
-        move_icon: "%{icon}: 課題を別のグループに移動"
-        preview_icon: "%{icon}: 課題をプレビューして完全に編集"
-      errors: 
-        no_assignment_group: "問題が発生しました。最初に課題グループを追加する必要があります。操作方法については、\"課題グループの作成\" をクリックしてください。"
-      instructions: 
-        wizard: 
-          details: "課題にかかわる要素は、期日や点数以外にもたくさんあります。課題の説明を入力する場合は、ファイルをアップロードできるようにし、採点の種類やその他一式を変更し、課題の名前をクリックするか、または %{edit_icon} アイコンをクリックしてから、\"詳細オプション\" をクリックします。"
-          group: 
-            screenreader_step1: "課題グループは、課題を編成するために使用するもので、グループごとに名前を設定できます。最終的な成績をグループに基づいて重み付けしたい場合は、それぞれのグループに対してパーセンテージによるスコアを設定できます。グループを作成するには \"課題グループの追加\" をクリックします。"
-            step1: "課題グループは、課題を編成するために使用します。それぞれのグループに名前を付けます。最終的な成績をグループ (*where?*) に基づいて重み付けしたい場合は、それぞれのグループに対してパーセンテージによるスコアを設定できます。グループを作成するには \"課題グループの追加\" をクリックします。"
-          overview: 高いレベルでコースを設定するためのページです。課題を追加し、課題をグループ化してから、課題グループを重み付けすることができます。まずは頭の中を整理してから詳細に進もうという考え方です。それにしても、ここで行えることはたくさんあります。
-          quizzes: "クイズは特殊なタイプの課題です。左側のサイドバーにある \"クイズ\" リンクをクリックすると、クイズを作成またはインポートすることができます。"
-          screenreader_details: "課題にかかわる要素は、期日や点数以外にもたくさんあります。課題の説明を入力する場合は、ファイルのアップロードを許可し、採点の種類やその他一式を変更し、課題の名前をクリックするか、または編集アイコンをクリックしてから、\"詳細オプション\" をクリックします。"
-          screenreader_step1: "課題は必ずグループに編成されます。そのため、課題を追加する際は、まずどのグループに追加するかを決めておく必要があります。グループに新しい課題を追加するには、まずグループを選択し、\"課題の追加\" をクリックするか、または追加アイコンをクリックします。"
-          step1: "課題は常にグループ編成されます。そのため、課題を追加する場合はまず最初に、どのグループに追加すればいいか、自分で分かっている必要があります。グループに新しい課題を追加するには、まずグループを選択し、\"課題の追加\" をクリックするか、または %{add_icon} アイコンをクリックします。"
-          step2: "OK です!次に、詳細情報を入力します。課題のタイトル、期日、および配点などを入力できます。ほかに望むことがあるにしても、まずは課題の作成が先決です。"
-          step3: 完了です!これで、課題がグループに追加されました!マウスで課題をポイントすると、オプション一式が表示されます。次のオプションがあります。
-      links: 
-        create_assignment: 新しい課題の作成
-        create_assignment_group: 課題グループの作成
-        create_or_import_quiz: クイズの作成/インポート
-        edit_assignment_in_detail: 課題の詳細の編集
-        screenreader_show_me_add_assignment: "[課題の追加] ボタンに移動"
-        screenreader_show_me_add_assignment_group: "[課題グループの追加] ボタンに移動"
-        screenreader_show_me_weight_final_grade: "[最終的な成績を重み付けする] チェックボックスに移動"
-        show_me_where: どこに表示するか
-      subtitles: 
-        edit_assignment_in_detail: " (アップロード、説明の編集、などを可能にします。)"
-      titles: 
-        wizard_box: "行う操作:"
   assignments_api: 
     invalid_date_time: "%{attribute} の日時が無効です"
     invalid_submission_types: 無効な提出物タイプ
@@ -3165,7 +3026,6 @@ ja:
       select_quizzes: エクスポートするクイズの選択
   content_imports: 
     errors: 
-      failed: "次のエラーによりコースのインポートに失敗しました:"
       import_failed: "移行のためのインポート中にエラーが発生しました。システム管理者に連絡の上、次のコードを知らせてください: \"%{code}\""
       no_only_and_except: "オプションの \"のみ\" と \"除外\" を同時に使用することはできません。"
     files: 
@@ -3175,7 +3035,6 @@ ja:
       description: "ファイル一式を zip してコースにアップロードしていただければ、当システムがすべて抽出いたします。別のシステムから Canvas にファイルを移動する場合は、この方法が簡単です。"
       page_title: ファイルのインポート
     messages: 
-      copying: コピーしています...これには数分かかります。
       import_complete: インポートが完了しました。コースのページに戻ります...
       importing_button: "インポートしています...  しばらくお待ちください"
     titles: 
@@ -3551,7 +3410,7 @@ ja:
     buttons: 
       add: モジュールの追加
       add_item: アイテムの追加
-      add_module: モジュールの作成
+      add_module: モジュール
       add_module_first: 新しいモジュールの追加
       update: モジュールの更新
     confirm: 
@@ -3792,41 +3651,6 @@ ja:
       titles: 
         student_progression: "モジュールの進捗 (受講生別)"
     context_module: 
-      admin_links: 
-        module_options_label: モジュールの管理
-        module_options_title: モジュールの管理
-      context_module: 
-        draft: (ドラフト)
-      images: 
-        alt: 
-          complete: 完了
-          incomplete: 未完了
-          locked: ロックされています
-        title: 
-          complete: モジュール完了
-          incomplete: モジュール未完了
-          locked: モジュールはロックされています
-      links: 
-        add_item: コンテンツの追加
-        hide_contents: モジュールのコンテンツの非表示
-        settings: モジュール設定
-        show_contents: モジュールのコンテンツを表示
-        text: 
-          delete_module: 削除
-          edit_module: 編集
-        title: 
-          delete_module: このモジュールを削除
-          edit_module: 編集
-          student_progress: このモジュールに対する受講生の進捗の確認
-      manage: モジュールの管理
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: "モジュール オプション"
-      module_will_unlock_at: "*%{unlock_date}* にロック解除"
-      progression_complete_count: "*%{count}* 件が完了"
-      progression_started_count: "*%{count}* 件が進行中"
-      reorder_modules: ドラッグでモジュールを並べ替え
       unpublish: 未公開
     context_module_next: 
       aria_labels: 
@@ -3864,51 +3688,6 @@ ja:
         course_modules: "コース モジュール"
     module_complete: 完了
     module_empty: "モジュール \"%{module}\" にはアイテムがありません"
-    module_item: 
-      drag_to_reorder: ドラッグして、並べ替え、またはアイテムを別のモジュールに移動
-      images: 
-        alt: 
-          complete: 完了
-          incomplete: 未完了
-          max_score: 最高スコア
-          min_score: 最低スコア
-          must_contribute: は次のものに対する貢献が必要
-          must_submit: は次のものを提出することが必要
-          must_view: は次のものを閲覧することが必要
-        title: 
-          complete: "モジュール アイテムが完了"
-          incomplete: "モジュール アイテムが未完了"
-          max_score: 受講生は、このモジュールを完了したと見なされる前に、このアイテムの最高スコアを超えてはなりません。
-          min_score: 受講生は、最低スコアに達するまで、このモジュールを完了したと見なされません。
-          must_contribute: 受講生は、このアイテムに貢献するまで、このモジュールを完了したと見なされません
-          must_submit: 受講生は、この課題を提出するまで、このモジュールを完了したと見なされません
-          must_view: 受講生は、このアイテムを閲覧するまで、このモジュールを完了したと見なされません
-      links: 
-        edit_item: アイテムの詳細情報を編集
-        edit_item_details_label: アイテムの詳細情報を編集
-        indent: インデント
-        indent_label: インデント
-        outdent: インデントを戻す
-        outdent_label: インデントを戻す
-        remove_item: このアイテムをモジュールから削除
-        remove_item_label: このアイテムをモジュールから削除
-      max_score: 
-        fulfilled: "スコアは %{score} 以下"
-        unfulfilled: "スコアは %{score} 以下でなければならない"
-      min_score: 
-        fulfilled: "スコアは最低 %{score}"
-        unfulfilled: "スコアは最低 %{score} でなければならない"
-      module: 
-        item_aria_label: "%{item_label} モジュール アイテム"
-      must_contribute: 
-        fulfilled: ページのコンテンツに貢献
-        unfulfilled: ページのコンテンツに貢献することが必要
-      must_submit: 
-        fulfilled: 課題を提出
-        unfulfilled: 課題を提出することが必要
-      must_view: 
-        fulfilled: ページを閲覧
-        unfulfilled: ページを閲覧することが必要
     module_item_next: 
       drag_to_reorder: ドラッグでアイテムを並べ替え、または別のモジュールに移動
       images: 
@@ -4478,37 +4257,15 @@ ja:
       buttons: 
         publish: コースの公開
       details: 
-        assignments: 課題を追加します。長いリストを作成するだけでもいいですし、グループ別に分割しても構いません。また、それぞれの課題グループに重み付けを指定することもできます。
         available: これでコースが設定され利用可能になりました。おそらく、このチェックリストはもはや必要ないことと思います。しかし、後日、何か新しいことへの挑戦が必要であると気付いた場合、あるいはコース内容に変更を加える際の手助けが必要になった場合のために、当システムで保管いたします。
         calendar: ここには、カレンダーの機能を知る絶好のチャンスがあります。課題以外のイベントもコースに追加できます。使い方は当システムが手助けいたしますので、心配しないでください。
         claimed: 
-          not_saved: |-
-              素晴らしい。コースの準備ができていますね。次は何をすべきでしょうか。世界に公開する前に、基本事項が整っているか、確認のためのチェックを行いたいのではないでしょうか。左側にあるリストを 1 つずつチェックして、そのコースがすぐに使用できる状態になっているか、ご確認ください。
-              
-              *このコースは、公開されるまでは講師のみに表示されます*
           saved: "すべて完了です! コース「%{course}」が正式に作成されました。公開されるまでは、ご自分にしか表示されません。ただし、公開する前に左側のリストを 1 つずつチェックして、Canvas が実際にどのような働きをするか感触を掴み、受講生に教える準備が本当に整っているか、確認してください。"
-        created: 
-          not_saved: |-
-              このクラスは既に作成されていますが、まだ使用権が請求されていません。1 週間以内に使用権が請求されない場合、自動的に削除されます。とりあえず、左側のリストを 1 つずつチェックして、公開の準備ができているかご確認ください。
-              
-              先に進む前に別のページに移動する必要がある場合は、ひとまず *このリンク* を保存し、のちほどこのページに戻ってきてください。
-              
-              このコースの使用権を請求するには、 **ログイン** または ***登録*** を行ってください。
-          saved: |-
-              すべて完了です! コース「%{course}」が正式に作成されました。公開されるまでは、ご自分にしか表示されません。ただし、公開する前に左側のリストを 1 つずつチェックして、Canvas が実際にどのような働きをするか感触を掴み、受講生に教える準備が本当に整っているか、確認してください。
-              
-              先に進む前に別のページに移動する必要がある場合は、ひとまず *このリンク* を保存し、のちほどこのページに戻ってきてください。
-              
-              このコースの使用権を請求するには、 **ログイン** または ***登録*** を行ってください。
         files: "[ファイル] タブは、講義用スライド、文書サンプル、研究支援素材など、受講生がダウンロードを希望するものを何でも共有できる場所です。ファイルのアップロードや整理は、Canvas なら簡単に行うことができます。使用方法をご覧ください。"
         home2: "コースを訪問したときに表示されるのがこのページです。アクティビティ ストリーム、コース モジュールのリスト、要綱、または独自に作成したカスタム ページを表示できます。デフォルトでは、コースのアクティビティ ストリームが表示されます。ページをカスタマイズするには、%{choose_home_page} をクリックします。"
         import: "別のコース管理システムをご利用になっていた場合は、既にその場所にできあがっているものを Canvas に移動したいとお考えではないでしょうか。当システムでは、コンテンツを簡単に Canvas に移行するためのプロセスを、順を追ってご案内しています。"
         navigation: "デフォルトでは、コース用のすべてのリンクが有効になります。受講生には、コンテンツのないセクションへのリンクは表示されません。例えば、クイズを 1 つも作成していない場合、そのクイズへのリンクは受講生には表示されません。コース内に、受講生からのアクセスを禁止したいエリアがある場合は、それらのリンクを並べ替えて明確に無効にすることができます。"
         publish: 
-          form: |-
-              すべて完了しましたか?それでは、コースを公開しましょう!下のボタンをクリックして、公式なコースにします!
-              
-              公開すると、すべてのコース ユーザに電子メールで招待状が送信され、招待状を受け取ったユーザはサインアップして参加できるようになります。
           not_registered: "このコースは使用権が請求され準備が整っていますが、コースを公開するには、その前に登録プロセスを完了する必要があります。この処理を完了するためのリンクが書かれた電子メールが、既に Canvas から送られているはずです。スパム用の受信箱も確認してみてください。"
         students: 次のうちいくつかは、必ず必要になります。もし誰も聴いていないとしたら、コースで教えることに何の面白みがあるでしょう。
         tas: "コースの手助けとして、TA を割り当てることができます。TA は、受講生の提出物の採点や、ディスカッションの管理の手助けをすることができます。また、期日や課題の詳細をあなたに代わって更新することさえできます。"
@@ -4586,7 +4343,6 @@ ja:
     errors: 
       create_failed: コースの作成に失敗しました
       role_not_active: "アクティブではない役割にはユーザを追加できません: '%{role}'"
-      role_not_found: "'%{role}' という名前の役割は存在しません。"
       unpublish: 受講生の提出物が存在する場合は、コースを未公開にできません。
     group_list: 
       headings: 
@@ -4862,19 +4618,9 @@ ja:
         stats: コースの統計情報
         student_view: 受講生ビュー
     show: 
-      buttons: 
-        update_layout: レイアウトの更新
       change_home_page: 変更
       details: 
-        assignments: "このビューには、このコースの **課題のリスト** が表示されます。これから予定されている課題、および最近の課題が一番上に表示されます。"
         confirm_unenroll: "このコースへの登録を解除してもよろしいですか?コース名簿の表示や、講師との直接の通信はできなくなります。また、コース イベントをストリームに表示したり、お知らせを受け取ったりすることもできなくなります。"
-        custom_page: "**ご自身のコースのホーム ページを設計** して、リンク、画像、リッチ メディアなど、好きなものを何でも含めることができます。"
-        modules: |-
-            コースを **モジュールまたはセクション** に編成できます。それぞれのセクションには、関連するファイル、課題、ページなどをセットにして含めます。必要であれば、それぞれのモジュールをロック解除するための基準や前提条件を定義して、モジュールの順序を制御することもできます。
-            
-            -このレイアウトは、多くの場合、期間や学期などの特定のスケジュールに基づいていないコースに最適です。
-        recent_activity_dashboard: "**最近のアクティビティ ダッシュボード** には、このコースでの最近の会話、アナウンス、ディスカッション、交流などが表示されます。ユーザが最初にログインしたときに表示されるダッシュボード ページと非常によく似ていますが、ここで表示されるのはこのコースのコンテンツのみです。"
-        syllabus: "**要綱ビュー** には、リンクや画像などを使用してコースの前提やコースの紹介を記述できます。また、課題やコース イベントを網羅したカレンダー ビューを表示するもできます。"
       draft_state: 
         buttons: 
           cancel: キャンセル
@@ -4896,27 +4642,16 @@ ja:
         choose_home_page_title: "ホーム ページの選択"
         confirm_unenroll: 登録解除の確認
         importing: このコースはインポートされています
-        set_layout: "ホーム ページのレイアウトの設定"
         unpublished: このコースは未公開です
       importing: コースのコピー/移行が進行中です。一部のコンテンツが一時的に使用できない場合があります。
-      labels: 
-        select_content: このコースのページを訪れた人に次のものを表示
       license_notice: "このコースのコンテンツは %{license_type} 使用許諾の下で提供されています。このコースのコンテンツは、特に断りのない限り、この使用許諾の下にあるものと見なされます。"
       links: 
-        change_layout: "ホーム ページのレイアウトの変更"
         choose_home_page: "ホーム ページの選択"
         course_setup: コース設定のためのチェックリスト
-        course_stream: "コース ストリームを参照"
         drop_course: このコースを中断
         join_course: このコースに参加
         new_announcement: 新しいアナウンス
         view_course_stream: "コース ストリームを表示"
-      options: 
-        assignments: 課題リスト
-        custom_page: 自分で設計するページ
-        modules: コースのモジュール/セクション
-        recent_activity_dashboard: "最近のアクティビティ ダッシュボード"
-        syllabus: 課題と要綱
       period_name: "過去 2 週間"
       re_sending: 再送信しています...
       send_done: 完了です!メッセージが送信されるまで数分かかる場合があります。
@@ -5041,7 +4776,6 @@ ja:
     stats: 統計
     syllabus: 要綱
     users: ユーザ
-    wiki_page_revisions: リビジョン
     wiki_pages: ページ
   csv: 
     alpha: アルファ
@@ -5170,17 +4904,17 @@ ja:
       tomorrow: 明日
       yesterday: 昨日
     formats: 
-      date_at_time: "%b %-d %l:%M%P"
-      default: "%Y-%m-%d"
-      long: "%B %-d, %Y"
-      long_with_weekday: "%A, %B %-d"
-      medium: "%b %e, %Y"
-      medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %e"
+      date_at_time: "%b %-d %k:%M"
+      default: "%Y年%m月%d日"
+      long: "%Y %B %-d"
+      long_with_weekday: "%A %B %-d"
+      medium: "%Y %b %-d"
+      medium_month: "%Y %b"
+      medium_with_weekday: "%a %Y %b %-d"
+      short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
-      short_with_weekday: "%a, %b %-d"
+      short_with_weekday: "%a %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -5490,7 +5224,6 @@ ja:
       make_sure_all_search_terms_are_spelled_correctly: すべての検索条件について誤入力がないことを確認してください。
       new_discussion: "ディスカッションを *開始する*"
       rss_feed: "RSS フィード"
-      search_title_body_or_author: タイトル、本文、または作成者を検索する
       start_one_now: 今すぐ開始する
       suggestions: "提案:"
       there_are_no_discussion_topics_to_show: "表示するディスカッション トピックはありません"
@@ -5525,9 +5258,7 @@ ja:
     show: 
       add_rubric: 注釈の追加
       announcement_closed: このアナウンスへのコメントは締め切られています
-      announcement_locked: "このアナウンスは *%{date}* までユーザに表示されません"
       announcement_locked_until: "このアナウンスは %{time} までロックされています"
-      announcement_not_visible: このアナウンスはユーザに表示されません
       authors_name: 作成者名
       collapse_replies: 返信を折りたたむ
       confirm_delete_discussion: このディスカッションを削除してもよろしいですか?
@@ -5555,12 +5286,9 @@ ja:
       reply_to_message: 現在のメッセージへの返信
       reply_to_topic: トピックへの返信
       retrieved_from_feed: "%{feed} から取得"
-      search_entries_placeholder: エントリまたは作成者を検索する
       show_rubric: 注釈の表示
       speed_grader: SpeedGrader
       topic: トピック
-      topic_locked: "このトピックは *%{date}* までユーザーに表示されません"
-      topic_not_visible: このトピックはユーザに表示されません
       topic_podcast_feed_link: "トピックのポッドキャスト フィード"
       topic_subscribe: 定期購読
       topic_subscribe_tooltip: 購読が中止されました。新しいコメントの通知は行われません
@@ -5657,11 +5385,6 @@ ja:
     unsubscribed: 購読中止済み
     unsubscribed_hint: このトピックを購読していません。購読するにはクリックします。
   display_course_catalog: "このルート アカウントの中で、[このコースを公開コース インデックスに含める] フラグが有効になっているコースの検索可能なリストを表示します。"
-  draft_state_description: |-
-      このベータ機能では、Canvas の多くの部分を再設計し、コンテンツを新しい未公開の状態に
-      することができます。この状態では、コンテンツは受講生に表示されず、成績の計算からも除外され
-      ます。注意: この機能を無効にすると、新しく作成または編集されたコンテンツが講師のビューに
-      表示されなくなる可能性があります。
   due_date_822625d8: 期日
   due_dates: 
     due_at: "期限: %{assignment_due_date_time}"
@@ -6290,7 +6013,6 @@ ja:
       feature_options: 機能オプション
       no_features_available: 現在利用できる機能はありません。
   features: 
-    allow_opt_out_of_inbox: ユーザに受信箱のオプトアウトを許可
     better_file_browsing: 改善されたファイル参照機能
     course_catalog: "コース カタログ"
     differentiated_assignments: 分化課題
@@ -6298,13 +6020,6 @@ ja:
         この機能をオフにすると、既存のコースに影響があります。この機能を無効にする場合は、Canvas サクセス マネージャに
         お問い合わせください。
     differentiated_assignments_course_disable_warning: 分化課題を無効にすると、公開されているすべての課題がすべての受講生に表示されます。
-    draft_state: ドラフト状態
-    draft_state_account_disable_warning: |-
-        この機能をオフにすると、既存のコースに影響があります。この機能を無効にする場合は、Canvas サクセス マネージャに
-        お問い合わせください。
-    draft_state_course_disable_warning: |-
-        この機能をオフにすると、コースのすべての既存のオブジェクトが公開されます。処理を続行する前に、すべての
-        ドラフト コンテンツを公開してすべてのユーザが利用できるようにする準備が整っていることを確認してください。
     ember_modules: "Ember モジュール"
     google_docs_domain_restriction: "Google ドキュメントのドメイン制限"
     high_contrast: "ハイ コントラスト スタイルを使用"
@@ -7881,6 +7596,7 @@ ja:
       feedback: ここをクリックして、問題を報告
     help: ヘルプ
     show_me_where: どこに表示するか
+  links_14b70841: リンク
   locales: 
     ja: 日本語
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
@@ -10586,7 +10302,6 @@ ja:
       description: "Canvas での外部ツールの追跡/インストールを扱うアプリ センター"
       name: "アプリ センター"
     app_center_settings: 
-      description: "アプリ センターは、コースまたはアカウントの設定ページの [アプリ] タブに表示されます。以下に示す URL は、有効なアプリ センターのエンドポイントを指す必要があります (たとえば、https://lti-examples.heroku.com -- 末尾のスラッシュは省いてください)。"
       labels: 
         app_reviews_endpoint: アプリの表示エンドポイント
         apps_index_endpoint: "アプリのインデックス エンドポイント"
@@ -11513,6 +11228,20 @@ ja:
       regrade_options: "再評価オプション *(すでにこの問題に回答した受講生用):*"
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: 問題
+    loading: 読み込んでいます...
+    navigation: 
+      links: 
+        question: "質問  %{position}"
+      questions: 質問
+    session_table_headers: 
+      attempt: 試行
+    table_view: 
+      headers: 
+        question: "質問  %{position}"
   quiz_reports: 
     cancel_generation: キャンセル
     download_item_analysis: アイテム分析レポートをダウンロードします。
@@ -12665,7 +12394,6 @@ ja:
     folder: フォルダ
     folder_browsing_tree: フォルダ参照ツリー
     folder_name: フォルダ名
-    kind: 種類
     labels: 
       select: このアイテムを選択
     loading_more_results: より多くの結果を読み込んでいます...
@@ -13086,7 +12814,9 @@ ja:
     enrollments_tas: 授業助手
     enrollments_teachers: 講師
     student_groups: 受講生グループ
+  search_entries_or_author_63fb0a86: エントリまたは作成者を検索する
   search_groups_or_people_6c15d6ad: グループまたはメンバーを検索
+  search_title_body_or_author_1d26711f: タイトル、本文、または作成者を検索する
   section: 
     confirms: 
       delete_enrollment: この登録を完全に削除してもよろしいですか?
@@ -13786,10 +13516,6 @@ ja:
       topic_notice: "この *モジュール* に関連付けるトピックを選択するか、\"新しいトピック\" を選択してトピックを追加します。"
       wiki_page_notice: "この *モジュール* に関連付ける Wiki ページを選択するか、\"新しいページ\" を選択してページを追加します。"
       wiki_page_select_label: "関連付ける Wiki ページを選択するか、または [新しいページ] を選択して新しいページを追加します。"
-    sequence_footer: 
-      full_course_sequence: コース全体の順序を表示
-      next: 次へ
-      previous: 前へ
     submission_comment: 
       assignment: 課題
       grading_alt: 採点
@@ -14360,18 +14086,17 @@ ja:
     due_date: "%{date} 終了日 %{time}"
     event: "%{date} 於  %{time}"
     formats: 
-      default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
-      short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      default: "%a %Y %b %d %H:%M:%S %z"
+      long: "%Y %B %d %H:%M"
+      short: "%b %d %H:%M"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "1 分前未満"
     pm: 午後
     ranges: 
       different_days: "%{start_date_and_time} ～ %{end_date_and_time}"
       same_day: "%{date} の %{start_time} ～ %{end_time}"
       times: "%{start_time} ～ %{end_time}"
-    unknown_date: 不明な日付です
     with_ago: "%{time} 前"
   time_zones: 
     abu_dhabi: アブダビ
@@ -15116,8 +14841,6 @@ ja:
   wiki_page: 
     atom_author: "Wiki ページ"
     atom_entry_title: "Wiki ページ、%{course_or_group_name}: %{page_title}"
-    cannot_hide_page: "トップ ページは非表示にできません"
-    cannot_set_hidden_front_page: "このページは非表示なので、トップ ページとして設定できませんでした"
     cannot_set_unpublished_front_page: "は未公開なので、トップ ページとして設定できませんでした"
     defaults: 
       no_content: コンテンツなし
@@ -15126,109 +14849,25 @@ ja:
       title_characters: "タイトルには、文字または数字を少なくとも 1 文字含めてください"
       title_too_long: "タイトルは %{max_characters} 文字以内にしてください"
     unknown_user_name: 不明
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: 現在のバージョンに戻る
-      page_edited_by_with_link: "編集者: [%{user_name}](%{link})"
-      page_imported: 内容インポーターによる
-      titles: 
-        revisions_for_page: "改定対象: %{title}"
-    notices: 
-      page_rolled_back: ページは正常に前のバージョンにロールバックされました。
-    show: 
-      buttons: 
-        roll_back_version: このバージョンへのロールバック
-      imported_at: "インポート済み: *%{time_ago}*"
-      labels: 
-        by_content_importer: 内容インポーターによる
-        by_user: "編集者: %{user}"
-        on_date: "日時 *%{date_time}*"
-      links: 
-        back_to_history: 改定履歴に戻る
-        go_to_latest: 最新バージョンに移動
-      not_most_recent_version_warning: これは最新のバージョンではありません
-      saved_by: "保存: *%{time_ago}* 担当者 %{user}"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: 変更内容の保存
-        start_editing: すぐに編集を開始する
-      course_editing_roles: 
-        anyone: 全員
-        only_teachers: 講師のみ
-        teachers_and_students: 講師と受講生
-      course_home_wiki_page_description: "このページをお好きなように使用して、コースを編成したり紹介したりできます。\"ページ ツール\" セクション (編集を開始すると、右側に表示されます) を使用すると、課題やファイルなどに簡単にリンクできます。"
-      course_wiki_page_description: "この Wiki を使用すると、補足ページを作成したり、コース教材についての説明を記載したりできます。課題から Wiki ページにリンクすることや、任意の Wiki ページから他のコース教材やファイルにリンクすることも、簡単です。そのため、厳格なコンセプトの説明、グループ プロジェクトの許可、あるいは、コースで必要になるさまざまな種類のページの作成といった目的に使用できる、素晴らしいい場所です。"
-      default_wiki_page_description: "このページはデフォルトの Wiki ページです。受講生がこのコースの \"ページ\" タブをクリックすると、このページが表示されます。"
-      default_wiki_page_is_course_home_page_warning: |-
-          現時点では、デフォルトのコース ページとしても設定されているので、
-          コースの訪問者に最初に表示されるページでもあります。この設定は、[コースのホーム ページ](%{link}) で変更できます。
-      editing_content: コンテンツの編集。
-      editing_roles: 
-        anyone: 全員
-        only_members: メンバーのみ
-        prompt: "%{options} はこのページを編集可能"
-      group_wiki_warning: "このページは、ご自分のコースの Wiki *ではなく*、グループの Wiki の一部です。Wiki コースを探している場合は、[ここをクリックしてください](%{link})。"
-      labels: 
-        hide_from_students: このページを受講生に非表示
-        last_edited: "最終編集者: %{name} (%{time_ago} 日前)"
-        notify_of_update: この内容が変更になったことをユーザに通知する
-      links: 
-        page_history: ページ履歴
-      notices: 
-        page_deleted: このページは削除されました。
-        page_does_not_exist: このページはまだ存在していません。
-        page_edited_while_viewing: "このページは、表示後に他の誰かによって更新されています。[ここをクリックしてページを再読み込み](%{link})"
-        page_edited_while_viewing_detailed: このページは、読み込み後に、他の誰かによって編集されています。今提出すると、それらの変更内容を上書きすることになります。他の人の作業を上書きしないようにするためには、ページを再読み込みしてから、ご自分の変更内容を再入力してください。
-      welcome_message: "Wiki コースへようこそ"
-    edit_page: 
+    edit: 
       page_header_title: "%{page_name} の編集"
-    errors: 
-      cannot_delete_front_page: " トップ ページは削除できません。"
-    front_page: "トップ ページ"
+    index: 
+      titles: 
+        pages: ページ
     notices: 
       cannot_edit: "ページ \"%{title}\" の編集は許可されていません。"
       cannot_read_revisions: "\"%{title}\" の過去のリビジョンのレビューは許可されていません。"
       create_non_existent_page: "ページ \"%{title}\" は存在しませんが、以下で作成できます"
       page_deleted: "ページ \"%{title}\" は削除されました。"
       page_does_not_exist: "ページ \"%{title}\" は存在しません。"
-      page_updated: ページは正常に更新されました。
-    page_link: 
-      link_hidden_from_students_warning: 受講生にはこのリンクは表示されません
-    page_revisions: 
+    revisions: 
       page_revisions_title: "%{title} のリビジョン: %{context_name}"
-    pages_index: 
-      titles: 
-        pages: ページ
-    wiki_right_side: 
-      buttons: 
-        create: 作成
-        rename: 名前変更
-      delete_page_confirmation: このページを削除してもよろしいですか?この処理は取り消しできません!
-      headers: 
-        all_pages: すべてのページ
-        common_pages: 共通のページ
-        page_tools: "ページ ツール"
-        recent_changes: 最近の変更内容
-      links: 
-        create_page: 新しいページの作成
-        delete_page: このページの削除
-        edit_page: このページの編集
-        more: もっと読む...
-        rename_page: このページを名前変更
-        show_all: すべて表示...
-      title: "新しいページ タイトル"
-      wiki_description_for_course: コンテンツを保持するための、自由な場であるとお考えください。この場を利用して、コースの説明を書いたり、難解なトピックの手助けとなる説明を提供したり、あるいは執筆プロジェクトに受講生を参加させることだってできます。
-      wiki_description_for_group: コンテンツを保持するための、自由な場であるとお考えください。この場を利用して、グループの説明を書いたり、難解なトピックの手助けとなる説明を提供したり、あるいは執筆プロジェクトにメンバーを参加させることだってできます。
-      wiki_description_header: "Wiki とは?"
   wiki_pages_api: 
     cannot_delete_front_page: "トップ ページは削除できません"
-    cannot_have_hidden_front_page: "トップ ページは非表示にできません"
     cannot_have_unpublished_front_page: "このトップ ページは非公開にできません"
     cannot_update_editing_roles: "この Wiki ページの編集の役割の更新は許可されていません"
     cannot_update_front_page: "Wiki のトップ ページの変更は許可されていません"
-    cannot_update_hide_from_students: "この Wiki ページの受講生に非表示フラグの更新は許可されていません"
     cannot_update_published: "この Wiki ページの公開状態の更新は許可されていません"
     cannot_update_title: "この Wiki ページのタイトルの更新は許可されていません"
     invalid_editing_roles: 指定された編集の役割は無効です
