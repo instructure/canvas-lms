@@ -2151,6 +2151,8 @@ class CoursesController < ApplicationController
         :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
       },
       :PERMISSIONS => permissions,
+      :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
+      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
     })
   end
 
