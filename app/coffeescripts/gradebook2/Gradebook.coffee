@@ -155,6 +155,7 @@ define [
       assignment.assignment_visibility = filteredVisibility
 
     onShow: ->
+      $(".post-grades-placeholder").show();
       return if @startedInitializing
       @startedInitializing = true
 
