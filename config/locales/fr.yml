@@ -1322,6 +1322,7 @@ fr:
     student_in_course: 
       analytics: Analyse
       page_title: "Analyse : %{course} -- %{student}"
+  and_count_more_43eae021: "et %{count} de plus..."
   ange_name: "Convertisseur Angel"
   angel: 
     file_copy_fail: "Impossible de copier le dossier « %{base_path} »"
@@ -1357,7 +1358,6 @@ fr:
       lock_for_comments: "Verrouiller les commentaires"
       make_sure_all_search_terms_are_spelled_correctly: "Vérifiez que tous les termes recherchés sont bien orthographiés."
       rss_feed: "Flux RSS"
-      search_title_body_or_author: "Rechercher un titre, bloc de texte ou auteur"
       suggestions: "Suggestions :"
       there_are_no_announcements_show: "Aucune annonce à afficher"
       try_different_more_general_or_fewer_keywords: "Essayez avec des mots-clés différents, plus généraux ou moins nombreux."
@@ -1514,41 +1514,6 @@ fr:
     unmuting_assignment: "Réactiver le son pour la tâche..."
   assignment_name_b2d87383: "Nom du travail"
   assignments: 
-    add_assignment_form: 
-      assignment_name: "Nom de la tâche"
-      labels: 
-        due: "Échéance :"
-        points: "points :"
-        quiz_points: "Pts quiz."
-        type: type
-      links: 
-        full_edit: "Modification complète"
-        more_options: "Plus d’options"
-      options: 
-        assignment: Tâche
-        attendance: Participation
-        discussion: Discussion
-        external_tool: "Outil externe"
-        not_graded: "Non noté"
-        quiz: Questionnaire
-      tooltips: 
-        assignment_is_quiz: "Cette tâche est un questionnaire, aussi les points proviennent des questions et ne peuvent pas être attribués manuellement."
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "%{scores} notes pour chaque étudiant"
-      labels: 
-        assignments: Tâches
-        group_name: "Nom de groupe"
-      links: 
-        add_grading_rule: "Ajouter une règle de notation"
-        delete_assignment: Supprimer
-      options: 
-        drop_highest: "Ôter la plus haute"
-        drop_lowest: "Ôter la plus basse"
-        equally_weighted: Équipondéré
-        never_drop: "Ne jamais ôter"
-        no_assignments: "[Pas de tâches]"
-        weighted_by_points: "Pondération par points"
-      percent_of_total_grade: "% de la note totale"
     assignment_count: 
       one: 1 devoir
       other: "%{count} tâches"
@@ -1603,10 +1568,6 @@ fr:
       not_yet_graded: "*Pas encore noté*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} points"
       score_with_points_possible_screenreader: "Résultat : %{score} sur %{pointsPossible} points."
-    assignment_locked: 
-      assignment_locked: "Cette tâche est verrouillée à partir du *%{lock_at}*"
-      assignment_unlocked_from: "Cette tâche est verrouillée jusqu’au *%{unlock_at}*"
-      assignment_unlocked_from_to: "Cette tâche est déverrouillée seulement du *%{unlock_at}* au *%{lock_at}*"
     assignment_settings: 
       cancel: Annuler
       save: Enregistrer
@@ -1615,49 +1576,13 @@ fr:
     assignment_sidebar: 
       links: 
         submit: "Envoyer une tâche"
-    assignments_content: 
-      buttons: 
-        delete_group: "Supprimer le groupe"
-      labels: 
-        class_weighting_policy: "Pondérer la note finale en fonction des groupes de tâches"
-        delete_assignments_in_group: "Supprimer les tâches de ce groupe"
-        move_assignments_to: "Déplacer les tâches de ce groupe vers"
-      options: 
-        select_group: "[ Sélectionner un groupe ]"
-      titles: 
-        delete_assignment_group: "Supprimer le groupe de tâches ?"
-      tooltips: 
-        target_group: "Sélectionner un groupe vers lequel déplacer cette tâche"
-      warnings: 
-        delete_assignment_group: "Le groupe de tâches %{group} contient %{assignment_count}. Vous pouvez soit supprimer ces tâches, soit les déplacer vers un autre groupe."
-    assignments_list_content: 
-      assignments: 
-        graded: "Ce travail a été noté"
-        needs_grading_count: "%{needs_grading_count} envois pour ce travail restent à noter"
-        overdue: "Ce travail est en retard."
-      no_assignments: "Aucune tâche créée pour ce cours."
-      titles: 
-        assignments: Tâches
-        course_assignments: "Tâches du cours"
-        overdue_assignments: "Tâches en retard"
-        past_assignments: "Tâches antérieures"
-        undated_assignments: "Tâches non datées"
-        ungraded_assignments: "Tâches non notées"
-        upcoming_assignments: "Prochaines tâches"
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "Grouper les tâches par type"
-        just_show_assignment_list: "Afficher seulement la liste des tâches"
         manage_assignments: "Gérer les tâches"
         see_current_grades: "Afficher mes notes jusqu’à présent"
       titles: 
         show_only_assignments_from: "Afficher uniquement les tâches pour"
         upcoming_assignments: "Prochaines tâches"
-    assignments_right_side: 
-      add_assignment_to_group: "*Ajouter le devoir* dans %{group}"
-      assignment_groups_wrapper: "( dans %{number_of_groups})"
-      links: 
-        add_assignment_group: "Ajouter un groupe de travaux"
     available_date_description: 
       available_until: "Disponibles jusqu’au"
       closed: Fermés
@@ -1844,28 +1769,6 @@ fr:
         total: Total
     higher_than_max: "Vous ne pouvez pas utiliser une valeur supérieure au nombre de travaux"
     incomplete: "Non terminé"
-    index: 
-      assignment_locked: "Cette tâche est actuellement verrouillée. Pour plus d’informations, consultez sa page d’informations."
-      assignment_locked_tooltip: verrouillé
-      keycode_descriptions: 
-        add_assignment_or_group: "Ajouter un travail au groupe actuel"
-        close_active_dialog: "Fermer la boîte de dialogue active"
-        delete_assignment_or_group: "Supprimer la tâche et/ou le groupe actuel"
-        edit_assignment_or_group: "Modifier la tâche et/ou le groupe actuel"
-        full_preview: "Aperçu complet/Modifier la tâche"
-        next_assignment_or_group: "Tâche/groupe suivant"
-        previous_assignment_or_group: "Tâche/groupe précédent"
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: Échap
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: "Comment faire pour... ?"
-      page_title: Travaux
     index_view: 
       add_assignment: Travail
       add_group: Groupe
@@ -1950,7 +1853,6 @@ fr:
         assign_peer_review: "Donner à %{student} un autre envoi à évaluer"
         back_to_assignment: "Revenir à la tâche"
       messages: 
-        cancel_peer_review: "Annuler cette révision par un pair ?"
         no_students_found: "Aucun étudiant trouvé"
       none_assigned: "Aucun attribué"
       not_yet_submitted: "pas encore envoyé"
@@ -1964,8 +1866,6 @@ fr:
       title: "Révisions par les pairs pour %{assignment}"
       titles: 
         automatically_assign_reviews: "Attribuer des révisions automatiquement"
-        remind: "Rappeler à %{assessor} les évaluations, notifiées la dernière fois le %{time}"
-        reminder: "Rappeler les évaluations à %{assessor}. Dernière notification envoyée à %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "Comment attribuer des révisions aux pairs"
       labels: 
@@ -2023,10 +1923,6 @@ fr:
       locked: Verrouillé
     status: 
       deleting_group: "Suppression du groupe..."
-    student_index: 
-      assignments: Travaux
-      labels: 
-        assignments: Tâches
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2178,40 +2074,6 @@ fr:
         settings_exclude_less_than_percent: "Moins de %{percentInput} du document"
     undated_assignments: "Travaux non datés"
     upcoming_assignments: "Prochains travaux"
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: Supprimer la tâche"
-        edit_icon: "%{icon}: Modifier de nouveau les options de base"
-        move_icon: "%{icon}: Déplacer la tâche vers un autre groupe"
-        preview_icon: "%{icon}: Afficher la tâche et la modifier complètement"
-      errors: 
-        no_assignment_group: "Erreur. Vous devez d’abord ajouter un groupe de travaux. Cliquez sur Créer un groupe de travaux pour savoir comment."
-      instructions: 
-        wizard: 
-          details: "Une tâche se compose de bien d’autres choses que des dates d’échéance et des points. Si vous souhaitez saisir une description, autoriser le téléchargement de fichiers, modifier le type de notation ou d’autres actions, cliquez sur le nom de la tâche ou sur l’icône %{edit_icon} puis sur « Plus d’options ."
-          group: 
-            screenreader_step1: "Les groupes de travaux servent à organiser les travaux. Vous attribuez un nom à chaque groupe. Si vous décidez de pondérer la note finale en fonction des groupes, vous pouvez également définir une note en pourcentage pour chacun d’eux. Cliquez sur « Ajouter un groupe de travaux » pour créer un groupe."
-            step1: "Les groupes de travaux permettent d’organiser les travaux. Vous devez fournir un nom pour chaque groupe. Si vous choisissez de pondérer la note finale en fonction des groupes (*où ?*), vous pouvez également définir une note en pourcentage pour chaque groupe. Cliquez sur « Créer un nouveau groupe » pour créer un nouveau groupe."
-          overview: "Cette page permet de paramétrer votre cours à un niveau plus avancé. Vous pouvez ajouter des tâches, les grouper puis pondérer ces groupes. L’idée étant de commencer par vous organiser puis d’entrer ensuite dans les détails. Mais pour commencer, vous pouvez déjà réaliser beaucoup."
-          quizzes: "Les questionnaires sont des types particuliers de tâches. Vous pouvez créer ou importer des questionnaires en cliquant sur le lien Questionnaires dans la barre latérale à gauche."
-          screenreader_details: "Un travail implique beaucoup plus que les dates d’échéance et les points. Si vous souhaitez fournir une description, autoriser les envois de fichiers, changer le type de notation ou tout autre attribut, cliquez sur le nom du travail ou sur l’icône de modification, puis sur « Plus d’options »."
-          screenreader_step1: "Les travaux sont toujours organisés en groupes. Aussi, pour en ajouter un, vous devez d’abord savoir dans quel groupe vous allez le placer. Sélectionnez le groupe et cliquez sur « Ajouter le travail dans » ou cliquez sur l’icône Ajouter pour commencer un nouveau travail pour un groupe."
-          step1: "Les tâches sont toujours organisées en groupes. Par conséquent, pour ajouter une tâche, vous devez commencer par connaître le groupe auquel vous souhaitez l’ajouter. Sélectionnez le groupe puis cliquez sur « Ajouter la tâche à » ou cliquez sur l’icône %{add_icon} pour commencer un nouveau travail de groupe."
-          step2: "Très bien ! À présent, complétez vos informations. Vous pouvez entrer un titre pour votre travail, une date d’échéance et le nombre de points possibles. Si vous souhaitez ajouter d’autre choses, vous le pourrez uniquement après la création de la tâche."
-          step3: "Terminé. La tâche a été ajoutée au groupe. Si vous amenez la souris sur la tâche, vous verrez apparaître un groupe d’options. Voici leur signification :"
-      links: 
-        create_assignment: "Créer une nouvelle tâche"
-        create_assignment_group: "Créer un groupe de tâches"
-        create_or_import_quiz: "Créer/Importer un questionnaire"
-        edit_assignment_in_detail: "Modifier les tâches en détail"
-        screenreader_show_me_add_assignment: "Accéder au bouton pour ajouter un travail"
-        screenreader_show_me_add_assignment_group: "Accéder au bouton pour ajouter un groupe de travaux"
-        screenreader_show_me_weight_final_grade: "Accéder à la case à cocher de la note finale pondérée"
-        show_me_where: "Me montrer où"
-      subtitles: 
-        edit_assignment_in_detail: "(autoriser les téléchargements, modifier la description, etc.)"
-      titles: 
-        wizard_box: "Je tenais à :"
   assignments_api: 
     invalid_date_time: "Date et heure non valides pour %{attribute}"
     invalid_submission_types: "Types d’envoi non valides"
@@ -3156,7 +3018,6 @@ fr:
       select_quizzes: "Sélectionnez les quizz à exporter"
   content_imports: 
     errors: 
-      failed: "L’importation du cours a échoué avec l’erreur suivante :"
       import_failed: "Une erreur est survenue lors de l’importation pour la migration.  Veuillez en informer votre administrateur système et lui fournir le code suivant : « %{code} »"
       no_only_and_except: "Vous ne pouvez pas utiliser les options « uniquement » et « excepté  en même temps."
     files: 
@@ -3166,7 +3027,6 @@ fr:
       description: "Vous pouvez télécharger un groupe de fichiers zippés dans votre cours, et nous nous chargerons d’extraire ces fichiers pour vous. Vous disposez ainsi d’un moyen simple pour déplacer des fichiers d’un autre système vers Canvas."
       page_title: "Importer les fichiers"
     messages: 
-      copying: "Copie en cours... cette opération prendra quelques minutes."
       import_complete: "Importation terminée !  Retour à la page du cours..."
       importing_button: "Importation en cours... Cette opération peut prendre du temps."
     titles: 
@@ -3542,7 +3402,7 @@ fr:
     buttons: 
       add: "Ajouter un module"
       add_item: "Ajouter un élément"
-      add_module: "Créer un module"
+      add_module: Module
       add_module_first: "Ajouter un nouveau module"
       update: "Mettre à jour le module"
     confirm: 
@@ -3783,41 +3643,6 @@ fr:
       titles: 
         student_progression: "Progression dans le module par étudiant"
     context_module: 
-      admin_links: 
-        module_options_label: "Gérer le module"
-        module_options_title: "Gérer le module"
-      context_module: 
-        draft: (Brouillon)
-      images: 
-        alt: 
-          complete: terminé
-          incomplete: incomplet
-          locked: verrouillé
-        title: 
-          complete: "Module terminé"
-          incomplete: "Module non terminé"
-          locked: "Module verrouillé"
-      links: 
-        add_item: "Ajouter un contenu"
-        hide_contents: "Masquer le contenu du module"
-        settings: "Paramètres du module"
-        show_contents: "Afficher le contenu du module"
-        text: 
-          delete_module: Supprimer
-          edit_module: Modifier
-        title: 
-          delete_module: "Supprimer ce module"
-          edit_module: Modifier
-          student_progress: "Afficher la progression de l’étudiant pour ce module"
-      manage: "Gérer le module"
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: "Options de module"
-      module_will_unlock_at: "Se déverrouillera le *%{unlock_date}*"
-      progression_complete_count: "*%{count}* terminés"
-      progression_started_count: "*%{count}* en cours"
-      reorder_modules: "Faire glisser les modules pour les classer"
       unpublish: "Annuler la publication"
     context_module_next: 
       aria_labels: 
@@ -3855,51 +3680,6 @@ fr:
         course_modules: "Modules du cours"
     module_complete: Terminé
     module_empty: "Le module %{module} ne contient aucun élément"
-    module_item: 
-      drag_to_reorder: "Faites glisser l’élément pour le classer ou le déplacer dans un autre module"
-      images: 
-        alt: 
-          complete: terminé
-          incomplete: incomplet
-          max_score: "note maximum"
-          min_score: "note minimum"
-          must_contribute: "doivent participer"
-          must_submit: "doivent envoyer"
-          must_view: "doivent consulter"
-        title: 
-          complete: "Élément du module terminé"
-          incomplete: "Élément du module non terminé"
-          max_score: "Les étudiants ne doivent pas dépasser la note maximum à cet élément avant de pouvoir considérer ce module comme terminé."
-          min_score: "Les étudiants doivent obtenir la note minimum à cet élément avant de pouvoir considérer ce module comme terminé."
-          must_contribute: "Les étudiants doivent participer à cet élément avant de pouvoir considérer ce module comme terminé."
-          must_submit: "Les étudiants doivent envoyer cette tâche avant de pouvoir considérer ce module comme terminé."
-          must_view: "Les étudiants doivent consulter cet élément avant de pouvoir considérer ce module comme terminé."
-      links: 
-        edit_item: "Modifier les informations de l’élément"
-        edit_item_details_label: "Modifier les informations de l’élément"
-        indent: "Augmenter le retrait"
-        indent_label: "Augmenter le retrait"
-        outdent: "Diminuer le retrait"
-        outdent_label: "Diminuer le retrait"
-        remove_item: "Supprimer cet élément du module"
-        remove_item_label: "Supprimer cet élément du module"
-      max_score: 
-        fulfilled: "a une note inférieure à %{score}"
-        unfulfilled: "ne doit pas avoir une note supérieure à %{score}"
-      min_score: 
-        fulfilled: "a une note au moins égale à %{score}"
-        unfulfilled: "doit avoir une note au moins égale à %{score}"
-      module: 
-        item_aria_label: "Élément de module %{item_label}"
-      must_contribute: 
-        fulfilled: "a participé au contenu de la page"
-        unfulfilled: "doit participer au contenu de la page"
-      must_submit: 
-        fulfilled: "a envoyé la tâche"
-        unfulfilled: "doit envoyer la tâche"
-      must_view: 
-        fulfilled: "a consulté la page"
-        unfulfilled: "doit consulter la page"
     module_item_next: 
       drag_to_reorder: "Faire glisser l’élément pour le classer ou le déplacer dans un autre module"
       images: 
@@ -4469,37 +4249,15 @@ fr:
       buttons: 
         publish: "Publier le cours"
       details: 
-        assignments: "Ajoutez vos travaux. Vous pouvez simplement ajouter une longue liste de cours, ou les diviser en groupes, voire même spécifier des pondérations pour chaque groupe de travaux."
         available: "À présent que votre cours est paramétré et disponible, vous n’aurez probablement plus besoin de cette liste de vérification. Toutefois, nous la conserverons au cas où vous auriez envie d’essayer quelque chose de nouveau, ou souhaiteriez un peu d’aide pour apporter des modifications au contenu de votre cours."
         calendar: "Voici l’occasion rêvée de découvrir le calendrier, et d’ajouter des événements sans tâches au cours. Pas d’inquiétude, nous allons vous aider dans cette démarche."
         claimed: 
-          not_saved: |-
-              Bien, votre cours est prêt... Oui, mais ensuite ? Eh bien, avant de le publier, vous pouvez avoir envie de vérifier que vous avez placé l’essentiel. Vérifiez les éléments de la liste située à gauche pour vous assurer que votre cours est prêt à être utilisé.
-              
-              *Ce cours est visible par les enseignants uniquement jusqu’à sa publication*
           saved: "C’est terminé. Votre cours %{course} est officiellement créé. Il est visible par vous uniquement jusqu’à sa publication ; mais avant de vous lancer, commencez par vérifier la liste de gauche pour vous familiariser avec Canvas et vérifier que vous êtes prêt à enseigner."
-        created: 
-          not_saved: |-
-              Cette classe a été créée mais pas déclarée.  En l’absence de déclaration après une semaine, elle sera supprimée. En attendant, cochez les points de la liste à votre gauche pour vérifier que vous êtes prêt à enseigner.
-              
-              Si vous souhaitez partir et revenir avant l’échéance, enregistrez *ce lien* afin de revenir ultérieurement.
-              
-              **Connectez-vous** ou ***enregistrez-vous*** pour déclarer ce cours.
-          saved: |-
-              C’est terminé. Votre cours %{course} est officiellement créé. Il est visible par vous uniquement jusqu’à sa publication ; mais avant de vous lancer, commencez par vérifier la liste de gauche pour vous familiariser avec Canvas et vérifier que vous êtes prêt à enseigner.
-              
-              Si vous souhaitez partir et revenir avant l’échéance, enregistrez *ce lien* afin de revenir ultérieurement.
-              
-              **Connectez-vous** ou ***enregistrez-vous*** pour déclarer ce cours.
         files: "L’onglet Fichier permet de partager des diapositives de conférence, des documents d’exemples, des aides à l’étude -- tout ce que vos étudiants sont susceptibles de télécharger. Le téléchargement et l’organisation de vos fichiers sont des tâches simples dans Canvas. Nous vous expliquerons comment."
         home2: "C’est la page qui s’affiche lorsque des internautes consultent le cours. Vous pouvez montrer un volet d’activités, la liste des modules du cours, un programme ou une page personnalisée de votre composition. Par défaut, c’est le volet d’activités du cours qui apparaît. Si vous voulez afficher autre chose, cliquez simplement sur %{choose_home_page}."
         import: "Si vous avez utilisé un autre système de gestion des cours, il contient probablement des documents que vous souhaiterez déplacer vers Canvas. Nous pouvons vous guider au cours du processus de migration de votre contenu vers Canvas."
         navigation: "Par défaut, tous les liens d’un cours sont activés. Les étudiants ne verront pas les liens des sections vides. Par exemple, si vous n’avez pas créé de questionnaire, ils ne verront pas ce lien. Vous pouvez trier et désactiver explicitement ces liens si vous ne souhaitez pas que les étudiants accèdent à certaines zones du cours."
         publish: 
-          form: |-
-              Vous avez terminé ? Il est temps de publier votre cours ! Cliquez sur le bouton ci-dessous pour le rendre officiel.
-              
-              La publication enverra automatiquement des e-mail d’invitation à tous les utilisateurs du cours afin qu’ils puissent s’inscrire et commencer à participer.
           not_registered: "Ce cours est déclaré et prêt, mais vous devez terminer le processus d’enregistrement avant de le publier. Vous devez avoir reçu un e-mail de Canvas contenant un lien pour terminer le processus. Pensez à vérifier votre boîte de courrier indésirable."
         students: "Vous en aurez besoin. Pourquoi donner des cours si personne ne vous écoute ?"
         tas: "Pour vous aider dans votre tâche, vous pouvez attribuer des aides-enseignants (AE) au cours. Les aides-enseignants peuvent noter les envois des étudiants, jouer le rôle de modérateur dans les discussions et même mettre à jour les dates d’échéance et les informations des tâches pour vous."
@@ -4577,7 +4335,6 @@ fr:
     errors: 
       create_failed: "Échec de la création du cours"
       role_not_active: "Impossible d’ajouter des utilisateurs à un rôle non actif : '%{role}'"
-      role_not_found: "Il n’existe aucun rôle appelé '%{role}'."
       unpublish: "Impossible d’annuler la publication du cours s’il existe des envois par les étudiants."
     group_list: 
       headings: 
@@ -4853,19 +4610,9 @@ fr:
         stats: "Statistiques du cours"
         student_view: "Affichage étudiant"
     show: 
-      buttons: 
-        update_layout: "Actualiser la disposition"
       change_home_page: Changer
       details: 
-        assignments: "Cette vue montre la **liste des travaux personnels** pour ce cours, les plus récents et ceux à venir en premier."
         confirm_unenroll: "Voulez-vous vraiment vous désinscrire de ce cours ? Vous ne pourrez plus afficher la liste des cours ou communiquer directement avec les enseignants, et vous ne pourrez plus afficher les événements du cours dans le flux ou sous forme de notifications."
-        custom_page: "Vous pouvez **créer votre propre page d’accueil de cours** et inclure les liens, images ou éléments multimédias de votre choix."
-        modules: |-
-            Vous pouvez organiser votre cours en **modules ou sections**, où chaque section contient par exemple un ensemble de fichiers, des travaux ou des pages associés. Si vous le souhaitez, vous pouvez également classer les modules en définissant des critères et des prérequis à satisfaire avant que chaque module ne soit déverrouillé.
-            
-            -Cette disposition est probablement la mieux adaptée aux cours qui ne sont pas basés sur un agenda spécifique, comme un trimestre ou un semestre.
-        recent_activity_dashboard: "Le **tableau des dernières activités** permet aux participants de voir les dernières conversations, annonces, discussions et interactions relatives à ce cours. Ce tableau ressemble à ce que les utilisateurs voient la première fois qu’ils se connectent, mais son contenu concerne uniquement ce cours."
-        syllabus: "La **vue du programme** permet de rédiger une description des attentes pour le cours, ou de le présenter en ajoutant des liens, des images, etc., et d’afficher également un calendrier de tous les travaux et événements du cours."
       draft_state: 
         buttons: 
           cancel: Annuler
@@ -4887,27 +4634,16 @@ fr:
         choose_home_page_title: "Choisir la page d’accueil"
         confirm_unenroll: "Confirmer la désinscription"
         importing: "Ce cours est en cours d’importation"
-        set_layout: "Définir la présentation de la page d’accueil du cours"
         unpublished: "La publication de ce cours a été annulée"
       importing: "Copie/migration en cours. Une partie du contenu du cours peut être temporairement indisponible."
-      labels: 
-        select_content: "Lorsque les utilisateurs consultent la page de cours, afficher"
       license_notice: "Ce contenu de cours est proposé sous licence %{license_type}. Sauf indication contraire, le contenu de ce cours est protégé par cette licence."
       links: 
-        change_layout: "Modifier la présentation de la page d’accueil du cours"
         choose_home_page: "Choisir la page d’accueil"
         course_setup: "Liste de vérification de la configuration du cours"
-        course_stream: "Voir Flux du cours"
         drop_course: "Abandonner ce cours"
         join_course: "Rejoindre ce cours"
         new_announcement: "Nouvelle annonce"
         view_course_stream: "Afficher le flux du cours"
-      options: 
-        assignments: "la liste des travaux personnels"
-        custom_page: "une page conçue par moi-même"
-        modules: "les modules/sections du cours"
-        recent_activity_dashboard: "le tableau des dernières activités"
-        syllabus: "les travaux personnels avec le programme"
       period_name: "les deux dernières semaines"
       re_sending: "Renvoi en cours..."
       send_done: "Terminé. Le message peut prendre quelques minutes à arriver."
@@ -5032,7 +4768,6 @@ fr:
     stats: Statistiques
     syllabus: Programme
     users: Utilisateurs
-    wiki_page_revisions: Révisions
     wiki_pages: Pages
   csv: 
     alpha: Alpha
@@ -5161,17 +4896,17 @@ fr:
       tomorrow: Demain
       yesterday: Hier
     formats: 
-      date_at_time: "%b %-d à %l:%M%P"
-      default: "%Y-%m-%d"
+      date_at_time: "%-d %b à %k:%M"
+      default: "%d/%m/%Y"
       long: "le %-d %B %Y"
-      long_with_weekday: "%A, %B %-d"
-      medium: "%e %b %Y"
+      long_with_weekday: "%A, %-d %B"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %-d %b %Y"
-      short: "%b %e"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
-      short_with_weekday: "%a, %b %-d"
+      short_with_weekday: "%a, %-d %b"
       weekday: "%A"
     month_names: 
       - ~
@@ -5481,7 +5216,6 @@ fr:
       make_sure_all_search_terms_are_spelled_correctly: "Vérifiez que tous les termes recherchés sont bien orthographiés."
       new_discussion: "*Commencer une* discussion"
       rss_feed: "Flux RSS"
-      search_title_body_or_author: "Rechercher un titre, corps de texte ou auteur"
       start_one_now: "En lancer un"
       suggestions: "Suggestions :"
       there_are_no_discussion_topics_to_show: "Aucun sujet de discussion à afficher"
@@ -5516,9 +5250,7 @@ fr:
     show: 
       add_rubric: "Ajouter un barème"
       announcement_closed: "Cette annonce est fermée aux commentaires"
-      announcement_locked: "Cette annonce ne sera accessible aux étudiants qu’à partir du *%{date}*"
       announcement_locked_until: "Cette annonce est verrouillée jusqu’à %{time}."
-      announcement_not_visible: "Cette annonce ne peut pas être consultée par les utilisateurs"
       authors_name: "Nom de l’auteur"
       collapse_replies: "Réduire les réponses"
       confirm_delete_discussion: "Voulez-vous vraiment supprimer cette discussion ?"
@@ -5546,12 +5278,9 @@ fr:
       reply_to_message: "Répondre au message actuel"
       reply_to_topic: "Répondre au sujet"
       retrieved_from_feed: "Récupérés de %{feed}"
-      search_entries_placeholder: "Rechercher les entrées ou l’auteur"
       show_rubric: "Afficher le barème"
       speed_grader: SpeedGrader
       topic: Sujet
-      topic_locked: "Les utilisateurs ne pourront pas voir ce sujet avant le *%{date}*."
-      topic_not_visible: "Ce sujet ne peut pas être vu par les utilisateurs"
       topic_podcast_feed_link: "Flux podcast du sujet"
       topic_subscribe: S’inscrire
       topic_subscribe_tooltip: "Vous n’êtes pas abonné et vous ne serez pas averti de la publication de nouveaux commentaires"
@@ -5648,10 +5377,6 @@ fr:
     unsubscribed: Désabonné
     unsubscribed_hint: "Vous n’êtes pas abonné à ce sujet. Cliquez pour vous abonner."
   display_course_catalog: "Affichez une liste des cours consultable dans ce compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
-  draft_state_description: |-
-      Cette fonction bêta remanie de nombreuses parties de Canvas et permet de mettre le contenu
-      dans un nouveau mode, Non publié, ce qui le rend invisible pour les étudiants et l'exclut du calcul des
-      notes. Attention : la désactivation de cette fonction risque d’empêcher l’enseignant de voir un contenu ou nouveau ou modifié.
   due_date_822625d8: "Date d’échéance"
   due_dates: 
     due_at: "échéance : %{assignment_due_date_time}"
@@ -6280,7 +6005,6 @@ fr:
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
   features: 
-    allow_opt_out_of_inbox: "Autoriser les utilisateurs à sortir de la boîte de réception"
     better_file_browsing: "Meilleure navigation dans les fichiers"
     course_catalog: "Catalogue des cours"
     differentiated_assignments: "Travaux différenciés"
@@ -6288,13 +6012,6 @@ fr:
         La désactivation de cette fonctionnalité aura un impact sur les cours existants. Pour en savoir plus sur la manière de la désactiver, contactez votre 
         responsable Canvas.
     differentiated_assignments_course_disable_warning: "La désactivation des travaux différenciés rendra tous les travaux publiés consultables par tous les étudiants."
-    draft_state: "État du brouillon"
-    draft_state_account_disable_warning: |-
-        La désactivation de cette fonctionnalité aura un impact sur les cours existants. Pour en savoir plus sur la manière de la désactiver, contactez votre 
-        mentor Canvas.
-    draft_state_course_disable_warning: |-
-        La désactivation de cette fonctionnalité entraînera la publication de TOUS les objets existants du cours. Assurez-vous que tout le contenu préliminaire
-        est prêt à être publié et disponible pour tous les utilisateurs du cours avant de continuer.
     ember_modules: "Modules Ember "
     google_docs_domain_restriction: "Restriction de domaine pour Google Docs"
     high_contrast: "Utiliser des styles à contraste élevé"
@@ -7869,6 +7586,7 @@ fr:
       feedback: "Cliquez ici pour nous indiquer ce qui s’est produit"
     help: Aide
     show_me_where: "Me montrer où"
+  links_14b70841: Liens
   locales: 
     fr: Français
   logged_out_user: "Utilisateur déconnecté %{user_counter}"
@@ -10568,7 +10286,6 @@ fr:
       description: "Centre d’applications pour le suivi/l’installation des outils externes dans Canvas"
       name: "Centre d’applications"
     app_center_settings: 
-      description: "Le centre d’applications figurera dans l’onglet « Applications » de la page des paramètres d’un cours ou d’un compte. L’URL indiquée ci-dessous doit mener à une destination valide du centre d’applications (par exemple, https://lti-examples.heroku.com -- pensez à retirer la barre oblique à la fin)."
       labels: 
         app_reviews_endpoint: "Terminal d’affichage des applications"
         apps_index_endpoint: "Terminal d’index des applications"
@@ -11518,6 +11235,20 @@ fr:
       regrade_options: "Options de recalcul de la note *(pour les étudiants qui ont déjà répondu à cette question) :*"
       some_scores_reduced: "Attribuez des points uniquement pour la réponse correcte (*la note de certains étudiants pourra baisser*)"
       update_question_without_regrading: "Actualiser la question sans reclassement"
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: Question
+    loading: Chargement...
+    navigation: 
+      links: 
+        question: "Question %{position}"
+      questions: Questions
+    session_table_headers: 
+      attempt: Tentative
+    table_view: 
+      headers: 
+        question: "Question %{position}"
   quiz_reports: 
     cancel_generation: Annuler
     download_item_analysis: "Téléchargez un rapport d’analyse des éléments."
@@ -12682,7 +12413,6 @@ fr:
     folder: Dossier
     folder_browsing_tree: "Arborescence de dossiers explorable"
     folder_name: "Nom du dossier"
-    kind: Type
     labels: 
       select: "Sélectionner cet élément"
     loading_more_results: "Chargement de résultats supplémentaires..."
@@ -13103,7 +12833,9 @@ fr:
     enrollments_tas: "Assistants d’enseignement"
     enrollments_teachers: Enseignants
     student_groups: "Groupes d’étudiants"
+  search_entries_or_author_63fb0a86: "Rechercher les entrées ou l’auteur"
   search_groups_or_people_6c15d6ad: "Rechercher des groupes ou des personnes"
+  search_title_body_or_author_1d26711f: "Rechercher un titre, bloc de texte ou auteur"
   section: 
     confirms: 
       delete_enrollment: "Voulez-vous vraiment supprimer cette inscription définitivement ?"
@@ -13802,10 +13534,6 @@ fr:
       topic_notice: "Sélectionnez le sujet que vous souhaitez associer à ce *module*, ou ajoutez un sujet en sélectionnant Nouveau sujet."
       wiki_page_notice: "Sélectionnez la page Wiki que vous souhaitez associer à ce *module*, ou ajoutez une nouvelle page en sélectionnant Nouvelle page."
       wiki_page_select_label: "Sélectionnez la page Wiki que vous souhaitez associer, ou ajoutez-en une en choisissant « Nouvelle page »."
-    sequence_footer: 
-      full_course_sequence: "voir la séquence complète du cours"
-      next: Suivant
-      previous: Précédent
     submission_comment: 
       assignment: Tâche
       grading_alt: notation
@@ -14378,17 +14106,16 @@ fr:
     event: "%{date} à %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
+      long: " %d %B, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "il y a moins d’1 minute"
     pm: après-midi
     ranges: 
       different_days: "%{start_date_and_time} jusqu’au %{end_date_and_time}"
       same_day: "%{date} de %{start_time} à %{end_time}"
       times: "%{start_time} à %{end_time}"
-    unknown_date: "Date inconnue"
     with_ago: "il y a %{time}"
   time_zones: 
     abu_dhabi: "Abou Dhabi"
@@ -15137,8 +14864,6 @@ fr:
   wiki_page: 
     atom_author: "Page Wiki"
     atom_entry_title: "Page Wiki %{course_or_group_name} : %{page_title}"
-    cannot_hide_page: "impossible de masquer la première page"
-    cannot_set_hidden_front_page: "impossible de définir cette page comme première page car elle est masquée"
     cannot_set_unpublished_front_page: "impossible de définir cette page comme première page car elle n’est pas publiée"
     defaults: 
       no_content: "aucun contenu"
@@ -15147,107 +14872,25 @@ fr:
       title_characters: "Le titre doit contenir au moins une lettre ou un nombre"
       title_too_long: "Le titre ne peut pas contenir plus de %{max_characters} caractères"
     unknown_user_name: Inconnu
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: "Revenir à la version actuelle"
-      page_edited_by_with_link: "par [%{user_name}](%{link})"
-      page_imported: "par importateur de contenu"
-      titles: 
-        revisions_for_page: "Révisions pour : %{title}"
-    notices: 
-      page_rolled_back: "La version précédente de la page a été rétablie."
-    show: 
-      buttons: 
-        roll_back_version: "Rétablir cette version"
-      imported_at: "importation : *%{time_ago}*"
-      labels: 
-        by_content_importer: "par importateur de contenu"
-        by_user: "par %{user}"
-        on_date: "le *%{date_time}*"
-      links: 
-        back_to_history: "Revenir à l’historique de révision"
-        go_to_latest: "Accéder à la dernière version"
-      not_most_recent_version_warning: "Cette version n’est PAS la plus récente"
-      saved_by: "Enregistré: *%{time_ago}* par %{user}"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: "Enregistrer les modifications"
-        start_editing: "Commencer les modifications"
-      course_editing_roles: 
-        anyone: Tous
-        only_teachers: "Uniquement les enseignants"
-        teachers_and_students: "Enseignant et étudiants"
-      course_home_wiki_page_description: "Vous pouvez utiliser cette page pour organiser ou présenter votre cours comme bon vous semble. Vous pouvez aisément créer des liens vers des tâches, des fichiers, etc. à l’aide de la section Outils de mise en page qui s’affichera à droite lorsque vous commencerez vos modifications."
-      course_wiki_page_description: "Vous pouvez utiliser ce Wiki pour créer des pages supplémentaires ou des descriptions des documents de votre cours. Vous pouvez aisément créer des liens vers des pages Wiki à partir de tâches, ou vers d’autres documents et fichiers de cours depuis n’importe quelle page Wiki. C’est l’endroit idéal pour expliquer des concepts difficiles, participer à des projets de groupe, ou créer presque n’importe quel type de page nécessaire à votre cours."
-      default_wiki_page_description: "Cette page est la page Wiki par défaut, et les étudiants la verront lorsqu’ils cliqueront sur l’onglet Pages de ce cours."
-      default_wiki_page_is_course_home_page_warning: "Pour l’instant, elle est également définie comme page par défaut, par conséquent les          visiteurs de votre cours verront cette page en premier. Vous pouvez modifier cela dans [la page d’accueil du cours](%{link})."
-      editing_content: "Modification du contenu."
-      editing_roles: 
-        anyone: Tous
-        only_members: "Uniquement les membres"
-        prompt: "%{options} peuvent modifier cette page"
-      group_wiki_warning: "Cette page appartient au groupe Wiki, *pas* à votre cours Wiki. Si vous recherchez le cours Wiki, [cliquez ici](%{link})."
-      labels: 
-        hide_from_students: "Masquer cette page aux étudiants"
-        last_edited: "Dernière modification par %{name} il y a %{time_ago}"
-        notify_of_update: "Informer les utilisateurs que ce contenu a changé"
-      links: 
-        page_history: "Historique de la page"
-      notices: 
-        page_deleted: "Cette page a été supprimée."
-        page_does_not_exist: "Cette page n’existe pas."
-        page_edited_while_viewing: "Cette page a été mise à jour par une autre personne depuis que vous l’avez affichée. [Cliquez ici pour télécharger de nouveau la page.](%{link})"
-        page_edited_while_viewing_detailed: "Une tierce personne a modifié cette page depuis que vous l’avez téléchargée ; si vous l’envoyez maintenant, les modifications seront perdues. Pour éviter cela, vous pouvez charger à nouveau la page et répéter vos modifications afin d’être sûr de ne pas effacer le travail de quelqu’un d’autre."
-      welcome_message: "Bienvenue dans le Wiki du cours"
-    edit_page: 
+    edit: 
       page_header_title: "Modifier %{page_name}"
-    errors: 
-      cannot_delete_front_page: "Vous ne pouvez pas supprimer la première page."
-    front_page: "Première page"
+    index: 
+      titles: 
+        pages: Pages
     notices: 
       cannot_edit: "Vous n’avez pas le droit de modifier la page « %{title} »."
       cannot_read_revisions: "Vous n’êtes pas autorisé à réviser les anciennes révisions de « %{title} »."
       create_non_existent_page: "La page « %{title} » n’existe pas, mais vous pouvez la créer ci-dessous."
       page_deleted: "La page %{title} a été supprimée."
       page_does_not_exist: "La page « %{title} » n’existe pas."
-      page_updated: "La page a été mise à jour."
-    page_link: 
-      link_hidden_from_students_warning: "Les étudiants ne verront pas ce lien"
-    page_revisions: 
+    revisions: 
       page_revisions_title: "Révisions %{title} : %{context_name}"
-    pages_index: 
-      titles: 
-        pages: Pages
-    wiki_right_side: 
-      buttons: 
-        create: Créer
-        rename: Renommer
-      delete_page_confirmation: "Voulez-vous vraiment supprimer cette page ? Cette opération ne peut pas être annulée."
-      headers: 
-        all_pages: "Toutes les pages"
-        common_pages: "Pages communes"
-        page_tools: "Outils de page"
-        recent_changes: "Modifications récentes"
-      links: 
-        create_page: "Créer une nouvelle page"
-        delete_page: "Supprimer cette page"
-        edit_page: "Modifier cette page"
-        more: plus...
-        rename_page: "Renommer cette page"
-        show_all: "afficher tout..."
-      title: "Nouveau titre de page"
-      wiki_description_for_course: "On peut l’imaginer comme un espace infini permettant d’y placer du contenu. Vous pouvez l’utiliser pour décrire votre cours, donner des explications utiles sur des sujets difficiles, ou laisser les étudiants travailler ensemble sur des projets rédigés."
-      wiki_description_for_group: "On peut l’imaginer comme un espace infini permettant d’y placer du contenu. Vous pouvez l’utiliser pour décrire votre groupe, donner des explications utiles sur des sujets difficiles, ou laisser les membres travailler ensemble sur des projets rédigés."
-      wiki_description_header: "Quelle est la fonction d’un Wiki ?"
   wiki_pages_api: 
     cannot_delete_front_page: "La première page ne peut pas être supprimée."
-    cannot_have_hidden_front_page: "La première page ne peut pas être masquée."
     cannot_have_unpublished_front_page: "La publication de la première page ne peut pas être annulée."
     cannot_update_editing_roles: "Vous n’avez pas le droit de mettre à jour les rôles de modification de cette page Wiki"
     cannot_update_front_page: "Vous ne pouvez pas modifier la première page Wiki."
-    cannot_update_hide_from_students: "Vous ne pouvez pas actualiser l’indicateur empêchant les étudiants de voir cette page Wiki"
     cannot_update_published: "Vous ne pouvez pas changer l’état « publié » de cette page Wiki"
     cannot_update_title: "Vous ne pouvez pas actualiser le titre de cette page Wiki"
     invalid_editing_roles: "Les rôles de modification fournis ne sont pas valides."
