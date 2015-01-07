@@ -1392,7 +1392,6 @@ ar:
       lock_for_comments: "التأمين ضد التعليقات"
       make_sure_all_search_terms_are_spelled_correctly: "تأكد من كتابة كل مصطلحات البحث بشكل صحيح إملائيًا."
       rss_feed: "موجز RSS"
-      search_title_body_or_author: "بحث في العنوان أو النص أو المؤلف"
       suggestions: "الاقتراحات:"
       there_are_no_announcements_show: "لا توجد أي إعلانات لإظهارها"
       try_different_more_general_or_fewer_keywords: "جرّب استخدام كلمات أساسية مختلفة أو أكثر تعميمًا أو أقل عددًا."
@@ -1553,41 +1552,6 @@ ar:
     unmuting_assignment: "إظهار درجة التعيين..."
   assignment_name_b2d87383: "اسم المهمة"
   assignments: 
-    add_assignment_form: 
-      assignment_name: "اسم المهمة"
-      labels: 
-        due: "موعد الاستحقاق:"
-        points: "نقاط:"
-        quiz_points: "نقاط الاختبار."
-        type: النوع
-      links: 
-        full_edit: "تحرير بالكامل"
-        more_options: "مزيد من الخيارات"
-      options: 
-        assignment: المهمة
-        attendance: الحضور
-        discussion: المناقشات
-        external_tool: "الأدوات الخارجية"
-        not_graded: "لم يتم تقييم الدرجات"
-        quiz: اختبار
-      tooltips: 
-        assignment_is_quiz: "هذه المهمة عبارة عن اختبار، لذلك من المحتمل أن تأتي النقاط من الأسئلة ولا يمكن ضبطها يدويًا."
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "%{scores} نقطة/نقاط خاصة بكل طالب"
-      labels: 
-        assignments: المهام
-        group_name: "اسم المجموعة"
-      links: 
-        add_grading_rule: "إضافة قاعدة تقييم"
-        delete_assignment: حذف
-      options: 
-        drop_highest: "إسقاط الأعلى"
-        drop_lowest: "إسقاط الأقل"
-        equally_weighted: "التقدير متساوٍ"
-        never_drop: "لا يتم الإسقاط مطلقًا"
-        no_assignments: "[بدون مهام]"
-        weighted_by_points: "التقدير حسب النقاط"
-      percent_of_total_grade: "نسبة الدرجة الإجمالية"
     assignment_count: 
       few: "%{count} من التعيينات"
       many: "%{count} من التعيينات"
@@ -1650,10 +1614,6 @@ ar:
       not_yet_graded: "*لم يتم منح درجة بعد*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} من النقاط"
       score_with_points_possible_screenreader: "الدرجة: %{score} من %{pointsPossible} من النقاط."
-    assignment_locked: 
-      assignment_locked: "تم تأمين هذه المهمة مثل *%{lock_at}*"
-      assignment_unlocked_from: "تم تأمين هذه المهمة حتى *%{unlock_at}*"
-      assignment_unlocked_from_to: "تم إلغاء تأمين هذه المهمة فقط من *%{unlock_at}* إلى *%{lock_at}*"
     assignment_settings: 
       cancel: إلغاء
       save: حفظ
@@ -1662,49 +1622,13 @@ ar:
     assignment_sidebar: 
       links: 
         submit: "إرسال المهمة"
-    assignments_content: 
-      buttons: 
-        delete_group: "حذف المجموعة"
-      labels: 
-        class_weighting_policy: "تقييم الدرجة النهائية طبقًا لمجموعات المهام"
-        delete_assignments_in_group: "حذف المهام في هذه المجموعة"
-        move_assignments_to: "نقل المهام من هذه المجموعة إلى"
-      options: 
-        select_group: "[ حدد مجموعة ]"
-      titles: 
-        delete_assignment_group: "تريد حذف مجموعة المهام؟"
-      tooltips: 
-        target_group: "تحديد مجموعة لنقل هذه المهمة إليها"
-      warnings: 
-        delete_assignment_group: "مجموعة المهام %{group} تحتوي على %{assignment_count}. يمكنك إما حذف هذه المهام أو نقلها إلى مجموعة مهام أخرى."
-    assignments_list_content: 
-      assignments: 
-        graded: "تم تقييم درجات هذه المهمة"
-        needs_grading_count: "لا يزال %{needs_grading_count} من عمليات الإرسال لهذه المهمة بحاجة إلى تقييم الدرجة"
-        overdue: "هذه المهمة متأخرة"
-      no_assignments: "لم يتم إنشاء أي مهام لهذا المساق."
-      titles: 
-        assignments: المهام
-        course_assignments: "مهام المساق"
-        overdue_assignments: "مهام متأخرة"
-        past_assignments: "مهام سابقة"
-        undated_assignments: "مهام غير مؤرخة"
-        ungraded_assignments: "مهام لم يتم تقييم درجاتها"
-        upcoming_assignments: "مهام قادمة"
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "مهام المجموعة حسب النوع"
-        just_show_assignment_list: "قم فقط بعرض قائمة المهام"
         manage_assignments: "إدارة المهام"
         see_current_grades: "مشاهدة درجاتي حتى الآن"
       titles: 
         show_only_assignments_from: "عرض المهام فقط من"
         upcoming_assignments: "مهام قادمة"
-    assignments_right_side: 
-      add_assignment_to_group: "*إضافة مهمة* إلى %{group}"
-      assignment_groups_wrapper: "( في %{number_of_groups})"
-      links: 
-        add_assignment_group: "إضافة مجموعة المهام"
     available_date_description: 
       available_until: "متوفر حتى"
       closed: مغلق
@@ -1903,28 +1827,6 @@ ar:
         total: الإجمالي
     higher_than_max: "لا يمكن استخدام عدد أكبر من عدد المهام"
     incomplete: "غير مكتمل"
-    index: 
-      assignment_locked: "تم تأمين هذه المهمة حاليًا. قم بزيارة صفحة تفاصيل المهام لمعرفة المزيد من المعلومات."
-      assignment_locked_tooltip: "تم التأمين"
-      keycode_descriptions: 
-        add_assignment_or_group: "إضافة مهمة إلى المجموعة الحالية"
-        close_active_dialog: "إغلاق الحوار النشط"
-        delete_assignment_or_group: "حذف المهمة/المجموعة الحالية"
-        edit_assignment_or_group: "تحرير المهمة/المجموعة الحالية"
-        full_preview: "المعاينة بالكامل/تحرير المهمة"
-        next_assignment_or_group: "المهمة/المجموعة القادمة"
-        previous_assignment_or_group: "المهمة/المجموعة السابقة"
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: "كيف يمكنني...؟"
-      page_title: المهام
     index_view: 
       add_assignment: المهمة
       add_group: المجموعة
@@ -2013,7 +1915,6 @@ ar:
         assign_peer_review: "إعطاء %{student} أخر إرسال لتقييمه"
         back_to_assignment: "عودة إلى المهمة"
       messages: 
-        cancel_peer_review: "تريد إلغاء المراجعة النظيرة هذه؟"
         no_students_found: "لم يتم العثور على طلاب"
       none_assigned: "لم يتم تعيين شيء"
       not_yet_submitted: "لم يتم إرسالها بعد"
@@ -2027,8 +1928,6 @@ ar:
       title: "%{assignment} المراجعات النظيرة"
       titles: 
         automatically_assign_reviews: "تعيين المراجعات تلقائيًا"
-        remind: "تذكير %{assessor} بالتقييم، آخر تذكير كان بتاريخ %{time}"
-        reminder: "تذكير %{assessor} بالتقييم، آخر إشعار كان في %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "كيفية تعيين المراجعات النظيرة"
       labels: 
@@ -2090,10 +1989,6 @@ ar:
       locked: مُؤَمّن
     status: 
       deleting_group: "جارٍ حذف المجموعة..."
-    student_index: 
-      assignments: المهام
-      labels: 
-        assignments: المهام
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2245,40 +2140,6 @@ ar:
         settings_exclude_less_than_percent: "أقل من %{percentInput} من المستند"
     undated_assignments: "مهام غير مؤرخة"
     upcoming_assignments: "مهام قادمة"
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: حذف المهمة"
-        edit_icon: "%{icon}: تحرير الخيارات الأساسية مرة أخرى"
-        move_icon: "%{icon}: نقل المهمة إلى مجموعة أخرى"
-        preview_icon: "%{icon}: معاينة المهمة وتحريرها بالكامل."
-      errors: 
-        no_assignment_group: "للأسف. إنك تحتاج إلى إضافة مجموعة المهام أولاً. انقر فوق \"إنشاء مجموعة مهام\" لمعرفة كيفية القيام بذلك."
-      instructions: 
-        wizard: 
-          details: "هناك كثير من الأشياء الأخرى المهمة التي تندرج تحت المهمة وليس فقط تواريخ الاستحقاق والنقاط. عند الرغبة في كتابة وصف المهمة، أو السماح بتحميل الملف أو تغيير نوع الدرجة أو مجموعة من أشياء أخرى، انقر فوق اسم المهمة أو انقر فوق رمز %{edit_icon} ثم \"المزيد من الخيارات\"."
-          group: 
-            screenreader_step1: "يتم استخدام مجموعات المهام لتنظيم المهام. وعليك توفير اسم لكل مجموعة. وإذا اخترت تقييم الدرجة النهائية طبقًا للمجموعات، فحينئذٍ يمكنك أيضًا ضبط مجموع نقاط النسبة المئوية لكل مجموعة. كما يمكنك النقر فوق \"إضافة مجموعة مهام\" لإنشاء مجموعة."
-            step1: "يتم استخدام مجموعات المهام لتنظيم المهام. وتقوم بتوفير اسم لكل مجموعة. عند اختيارك تقييم الدرجة النهائية طبقًا للمجموعات (*أين؟*) فحينئذ يمكنك أيضًا ضبط مجموع نقاط النسبة المئوية لكل مجموعة. انقر فوق \"إضافة مجموعة مهام\" لإنشاء مجموعة."
-          overview: "الهدف من هذه الصفحة هو إعداد المساق بمستوى عالٍ. ويمكنك إضافة مهام وتجميعها ثم القيام بتقييمها. الفكرة هي مساعدتك في التنظيم أولاً، ثم الانهماك في التفاصيل بعد ذلك. ورغم هذا، فسيظل هناك المزيد يمكنك القيام به من هنا."
-          quizzes: "تعتبر الاختبارات أنواعًا خاصة من المهام. يمكنك إنشاء اختبارات أو استيرادها عن طريق النقر فوق الارتباط \"اختبارات\" على الشريط الجانبي الأيمن."
-          screenreader_details: "يندرج الكثير من العناصر تحت المهمة بخلاف تواريخ الاستحقاق والنقاط. فإذا كنت ترغب في كتابة وصف للمهمة أو السماح بتحميلات الملفات أو تغيير نوع الدرجة أو مجموعة من أشياء أخرى، فانقر فوق اسم المهمة أو فوق رمز تحرير، ثم فوق \"المزيد من الخيارات\"."
-          screenreader_step1: "يتم تنظيم المهام دائمًا في مجموعات، لذلك عند إضافة مهمة، عليك أولاً معرفة أي مجموعة ترغب في إضافتها إليها. حدد المجموعة، ثم انقر فوق \"إضافة مهمة إلى\" أو انقر فوق رمز \"إضافة\" لبدء مهمة جديدة للمجموعة."
-          step1: "يتم تنظيم المهام دائمًا داخل مجموعات، لذلك لإضافة مهمة عليك أولاً معرفة أية مجموعة ترغب في إضافتها إليها. حدد المجموعة ثم انقر فوق \"إضافة مهمة إلى\" أو انقر فوق الرمز %{add_icon} لبدء مهمة جديدة للمجموعة."
-          step2: "رائع! قم الآن بملء التفاصيل. يمكنك إدخال عنوان للمهمة وموعد استحقاق وعدد النقاط الممكنة. إذا كنت ترغب في القيام بأشياء أكثر مما هو مطلوب الآن، فقم بذلك لكن فقط بعد إنشاء المهمة."
-          step3: "تم! تمت الآن إضافة المهمة إلى المجموعة! عند تحريك الماوس فوق المهمة، ستشاهد مجموعة من الخيارات. وفيما يلي ماذا تعني:"
-      links: 
-        create_assignment: "إنشاء مهمة جديدة"
-        create_assignment_group: "إنشاء مجموعة مهام"
-        create_or_import_quiz: "إنشاء/استيراد اختبار"
-        edit_assignment_in_detail: "تحرير مهام بالتفصيل"
-        screenreader_show_me_add_assignment: "انتقال إلى زر إضافة مهمة"
-        screenreader_show_me_add_assignment_group: "انتقال إلى زر إضافة مجموعة مهام جديدة"
-        screenreader_show_me_weight_final_grade: "انتقال إلى مربع اختيار تقدير الدرجة النهائية"
-        show_me_where: "إظهاري حيث"
-      subtitles: 
-        edit_assignment_in_detail: "(السماح بالتحميلات، تحرير الوصف، إلخ)"
-      titles: 
-        wizard_box: "أرغب في:"
   assignments_api: 
     invalid_date_time: "وقت/تاريخ غير صالح لـ %{attribute}"
     invalid_submission_types: "أنواع إرسال غير صالحة"
@@ -3239,7 +3100,6 @@ ar:
       select_quizzes: "تحديد اختبارات لتصديرها"
   content_imports: 
     errors: 
-      failed: "فشل استيراد المساق نتيجة للخطأ التالي:"
       import_failed: "حدث خطأ أثناء استيراد الترحيل الخاص بك.  الرجاء إخطار مسؤول النظام لديك وإعطاؤه الكود التالي: \"%{code}\""
       no_only_and_except: "لا يمكنك استخدام خيارات \"فقط\" و\"باستثناء\" في نفس الوقت."
     files: 
@@ -3249,7 +3109,6 @@ ar:
       description: "يمكنك تحميل مجموعة ملفات مضغوطة إلى المساق وسنقوم باستخراجها بالكامل من أجلك. وتعد هذه وسيلة سهلة لنقل الملفات من نظام آخر إلى Canvas."
       page_title: "استيراد الملفات"
     messages: 
-      copying: "النسخ... قد يستغرق الأمر بضع دقائق"
       import_complete: "اكتمل الاستيراد!  يجري الرجوع إلى صفحة المساق..."
       importing_button: "يجري الاستيراد...قد يستغرق هذا لحظات"
     titles: 
@@ -3625,7 +3484,7 @@ ar:
     buttons: 
       add: "إضافة وحدة"
       add_item: "إضافة عنصر"
-      add_module: "إضافة وحدة جديدة"
+      add_module: الوحدة
       add_module_first: "إضافة وحدة جديدة"
       update: "تحديث الوحدة"
     confirm: 
@@ -3866,41 +3725,6 @@ ar:
       titles: 
         student_progression: "التقدم في الوحدة بواسطة الطالب"
     context_module: 
-      admin_links: 
-        module_options_label: "إدارة الوحدة النمطية"
-        module_options_title: "إدارة الوحدة النمطية"
-      context_module: 
-        draft: (مسودة)
-      images: 
-        alt: 
-          complete: تم
-          incomplete: "غير كامل"
-          locked: "تم التأمين"
-        title: 
-          complete: "احجبلت الوحدة"
-          incomplete: "وحدة غير مكتملة"
-          locked: "تم تأمين الوحدة"
-      links: 
-        add_item: "إضافة عنصر إلى الوحدة"
-        hide_contents: "إخفاء محتويات الوحدة"
-        settings: "إعدادات الوحدة"
-        show_contents: "إظهار محتويات الوحدة"
-        text: 
-          delete_module: "حذف "
-          edit_module: "تحرير "
-        title: 
-          delete_module: "حذف هذه الوحدة"
-          edit_module: "تحرير إعدادات الوحدة"
-          student_progress: "مشاهدة تقدم الطلاب لهذه الوحدة"
-      manage: "إدارة الوحدة النمطية"
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: "خيارات الوحدة النمطية"
-      module_will_unlock_at: "سيتم إلغاء التأمين *%{unlock_date}*"
-      progression_complete_count: "*%{count}* مكتمل"
-      progression_started_count: "*%{count}* قيد التقدم"
-      reorder_modules: "قم بسحب الوحدات لإعادة ترتيبها"
       unpublish: "عدم النشر"
     context_module_next: 
       aria_labels: 
@@ -3938,51 +3762,6 @@ ar:
         course_modules: "وحدات المساق"
     module_complete: مكتمل
     module_empty: "لا توجد عناصر في الوحدة \"%{module}\""
-    module_item: 
-      drag_to_reorder: "قم بسحب العنصر لإعادة ترتيبه أو نقله لوحدة أخرى"
-      images: 
-        alt: 
-          complete: تم
-          incomplete: "غير كامل"
-          max_score: "حد أقصى من النقاط"
-          min_score: "أدنى حد من النقاط"
-          must_contribute: "تلزم المشاركة"
-          must_submit: "يلزم الإرسال"
-          must_view: "يلزم العرض"
-        title: 
-          complete: "اكتمل عنصر الوحدة"
-          incomplete: "عنصر الوحدة غير كامل"
-          max_score: "يجب ألا يتجاوز الطلاب الحد الأقصى من النقاط فيما يتعلق بهذا العنصر قبل اعتبار الوحدة مكتملة"
-          min_score: "يجب أن يصل الطلاب إلى الحد الأدنى من الدرجات فيما يتعلق بهذا العنصر قبل اعتبار الوحدة مكتملة"
-          must_contribute: "يجب أن يساهم الطلاب في هذا العنصر قبل اعتبار الوحدة مكتملة"
-          must_submit: "يجب أن يرسل الطلاب هذه المهمة قبل اعتبار الوحدة مكتملة"
-          must_view: "يجب أن يعرض الطلاب هذا العنصر قبل اعتبار الوحدة مكتملة"
-      links: 
-        edit_item: "تحرير تفاصيل العنصر"
-        edit_item_details_label: "تحرير تفاصيل العنصر"
-        indent: "زيادة المسافة البادئة"
-        indent_label: "زيادة المسافة البادئة"
-        outdent: "تقليل المسافة البادئة"
-        outdent_label: "تقليل المسافة البادئة"
-        remove_item: "إزالة هذا العنصر من الوحدة"
-        remove_item_label: "إزالة هذا العنصر من الوحدة"
-      max_score: 
-        fulfilled: "لم يتم تسجيل أكثر من %{score}"
-        unfulfilled: "يلزم عدم تسجيل أكثر من %{score}"
-      min_score: 
-        fulfilled: "تم تسجيل %{score} على الأقل"
-        unfulfilled: "يلزم تسجيل %{score} على الأقل"
-      module: 
-        item_aria_label: "عنصر الوحدة النمطية %{item_label}"
-      must_contribute: 
-        fulfilled: "تمت المشاركة في محتوى الصفحة"
-        unfulfilled: "تلزم المشاركة في محتوى الصفحة"
-      must_submit: 
-        fulfilled: "تم إرسال المهمة"
-        unfulfilled: "يلزم إرسال المهمة"
-      must_view: 
-        fulfilled: "تم عرض الصفحة"
-        unfulfilled: "يلزم عرض الصفحة"
     module_item_next: 
       drag_to_reorder: "سحب لإعادة ترتيب العنصر أو نقله لوحدة أخرى"
       images: 
@@ -4576,37 +4355,15 @@ ar:
       buttons: 
         publish: "نشر المساق"
       details: 
-        assignments: "إضافة المهام. يمكنك إنشاء قائمة طويلة أو تقسيمها إلى مجموعات؛ وحتى تحديد تقديرات كل مجموعة مهام."
         available: "تم الآن إعداد المساق وإتاحته، قد لا تحتاج إلى قائمة الاختيار هذه بعد ذلك.  لكننا سنحتفظ بها في مكان ما لعلك ترى لاحقًا أنك ترغب في تجريب شيء آخر جديد، أو تحتاج مزيدًا من المساعدة بينما تقوم بالتغييرات على محتوى المساق."
         calendar: "إليك فرصة رائعة للتعرف على التقويم؛ وإضافة أي أحداث أخرى بخلاف المهام مما قد تظهر لديك أثناء المساق. لا تقلق، سنساعدك في ذلك."
         claimed: 
-          not_saved: |-
-              رائع، أصبح لديك مساق الآن...  وماذا بعد هذا؟  حسنًا، قبل أن تقوم بنشره للعالم، قد ترغب في التحقق والتأكد أنك حصلت على الأساسيات المخطط لها.  واصل العمل من القائمة الموجودة على اليمين لضمان أن المساق جاهز للاستخدام.
-              
-              *يظهر هذا المساق فقط للمعلمين حتى يتم نشره*
           saved: "حسنًا لقد تم!  تم الآن إنشاء المساق الخاص بك %{course} رسميًا. لن يظهر لك حتى يتم نشره، لكن قبل أن تسارع بالبدء، ستحتاج إلى الاطلاع على القائمة الموجودة على اليمين لمعرفة كيفية عمل Canvas والتأكد من أنك جاهز بالفعل للتعليم."
-        created: 
-          not_saved: |-
-              تم إنشاء هذا الفصل، لكنه ليس مطلوبًا.  سيتم حذفه إذا لم يكن مطلوبًا خلال أسبوع.  في نفس الوقت، قم بوضع علامة في القائمة الموجودة على اليمين للتأكد من أنك جاهز للمتابعة.
-              
-              إذا كنت بحاجة إلى المغادرة والرجوع، فقم بحفظ *هذا الارتباط* للرجوع هنا لاحقًا.
-              
-              الرجاء **تسجيل الدخول** أو ***التسجيل*** للمطالبة بهذا المساق.
-          saved: |-
-              حسنًا لقد تم!  تم الآن إنشاء المساق الخاص بك %{course} رسميًا.  لن يظهر لك حتى يتم نشره، لكن قبل أن تسارع بالبدء، ستحتاج إلى الاطلاع على القائمة الموجودة على اليمين لمعرفة كيفية عمل Canvas والتأكد من أنك جاهز بالفعل للتعليم.
-              
-              إذا كنت بحاجة إلى المغادرة والرجوع، فقم بحفظ *هذا الارتباط* للرجوع هنا لاحقًا.
-              
-              الرجاء **تسجيل الدخول** أو ***التسجيل*** للمطالبة بهذا المساق.
         files: "تعتبر علامة التبويب الملفات هي المكان المناسب لمشاركة شرائح المحاضرة ومستندات الأمثلة وتعليمات الدراسة؛ وأي شيء يريد الطلاب تنزيله. إن تحميل الملفات وتنظيمها صار سهلا ً عبر Canvas. وسنوضح لك كيف ذلك."
         home2: "عندما يقوم الأشخاص بزيارة المساق، فهذه هي الصفحة التي سيشاهدونها. يمكنك إعدادها بحيث تعرض تدفق النشاط أو قائمة وحدات المساق أو المنهج الدراسي أو صفحة مخصصة تكتبها بنفسك. الإعداد الافتراضي هو تدفق نشاط المساق. لتخصيص هذا، انقر فوق %{choose_home_page}."
         import: "إذا كنت تستخدم نظام إدارة مساق آخر، فربما يكون لديك بعض الأشياء تريد نقلها إلى Canvas. يمكننا إرشادك عبر عملية ترحيل المحتوى بسهولة إلى داخل موقع Canvas."
         navigation: "وقد تم تمكين كل الارتباطات الخاصة بالمساق افتراضيًا. لن يرى الطلاب الارتباطات الخاصة بالأقسام التي ليس بها محتوى. على سبيل المثال، إذا لم تقم بإنشاء أي اختبارات، فإنهم لن يروا ارتباط الاختبارات. يمكنك فرز هذه الارتباطات وتعطيلها بشكل صريح إذا كانت هناك مناطق في المساق لا تريد أن يصل إليها الطلاب."
         publish: 
-          form: |-
-              هل تم كل شيء؟  إذن حان وقت نشر المساق!  انقر فوق الزرّ أدناه لتجعله رسميًا!
-              
-              سيؤدي النشر إلى دعوات بالبريد الإلكتروني لكل مستخدمي المساق وبذلك يمكنهم تسجيل الخروج وبدء المشاركة.
           not_registered: "يكون هذا المساق مطلوبًا وجاهزًا، لكنك ستحتاج إلى إنهاء عملية التسجيل قبل أن تتمكن من نشر المساق. كان يجب أن تتلقى بريدًا إلكترونيًا من موقع Canvas فيه ارتباط لإنهاء العملية. تأكد من مراجعة صندوق البريد العشوائي لديك."
         students: "سترغب بالتأكيد في بعض هذه الرسائل. ما المتعة في تدريس مساق لا يسمعني فيه أحد؟"
         tas: "قد ترغب في تعيين بعض مساعدي المعلمين لمساعدتك في هذا المساق. يمكن لمساعدي المعلمين تقييم إرسالات الطالب، والمساعدة في إدارة المناقشات، وتحديث مواعيد الاستحقاق وتفاصيل المهمة نيابة عنك."
@@ -4684,7 +4441,6 @@ ar:
     errors: 
       create_failed: "فشل إنشاء المساق"
       role_not_active: "لا يمكن إضافة مستخدمين لدور غير نشط: '%{role}'"
-      role_not_found: "لا يوجد دور تحت اسم '%{role}'."
       unpublish: "لا يمكن إلغاء نشر المساق في حالة وجود عمليات إرسال للطلاب."
     group_list: 
       headings: 
@@ -4964,19 +4720,9 @@ ar:
         stats: "إحصاءات المساق"
         student_view: "عرض الطالب"
     show: 
-      buttons: 
-        update_layout: "تحديث التخطيط"
       change_home_page: تغيير
       details: 
-        assignments: "يوضح هذا العرض **قائمة مهام** هذا المساق، بالمهام القادمة والحديثة بأعلى."
         confirm_unenroll: "هل ترغب بالتأكيد في إلغاء التسجيل في هذا المساق؟ لن يعود بإمكانك مشاهدة كشف المساق أو الاتصال مباشرة بالمعلمين، ولن تعود قادرًا على مشاهدة أحداث المساق في التدفق وكإعلامات."
-        custom_page: "يمكنك **تصميم الصفحة الرئيسية للمساق** وتضمين أي ارتباطات أو صور أو وسائط تريدها."
-        modules: |-
-            يمكنك تنظيم المساق في **وحدات أو أقسام**، حيث يحتوي كل قسم على مجموعة ذات صلة من الملفات والمهام والصفحات إلخ. ويمكنك، إن أردت، ترتيب الوحدات عن طريق تحديد المعايير والمتطلبات الأساسية التي تحتاج إلى استيفائها قبل إلغاء تأمين كل وحدة.
-            
-            -هذا المخطط على الأرجح هو الأفضل للمساقات التي لا تعتمد على جدول زمني معين مثل فصل دراسي أو نصف سنة دراسية.
-        recent_activity_dashboard: "تسمح **لوحة معلومات النشاط الأخير**  للمشاركين بالاطلاع على أحدث المحادثات، والإعلانات والمناقشات والتفاعلات لهذه الدورة. إنها تشبه إلى حد بعيد صفحة لوحة المعلومات التي يشاهدها المستخدمون عند تسجيل الدخول لأول مرة، لكنها تعرض فقط محتوى هذه الدورة التدريبية المحددة."
-        syllabus: "ويتيح لك **عرض المناهج** كتابة وصف توقعات المساق أو تقديم المساق مع الارتباطات والصور، ثم يعرض أيضًا عرض تقويم بكل المهام وأحداث المساق."
       draft_state: 
         buttons: 
           cancel: إلغاء
@@ -4998,27 +4744,16 @@ ar:
         choose_home_page_title: "اختيار الصفحة الرئيسية"
         confirm_unenroll: "تأكيد إلغاء التسجيل"
         importing: "يجري استيراد هذا المساق"
-        set_layout: "ضبط تخطيط الصفحة الرئيسية"
         unpublished: "هذا المساق غير منشور"
       importing: "نسخ المساق/الترحيل قيد التقدم. يعني هذا أن بعض المحتوى قد لا يتاح مؤقتًا."
-      labels: 
-        select_content: "عندما يزور الأشخاص صفحة المساق، اعرض لهم"
       license_notice: "يتوفر محتوى هذا المساق بموجب ترخيص %{license_type}. يمكن تطبيق هذا الترخيص على المحتوى الوارد في هذا المساق ما لم يذكر خلاف ذلك."
       links: 
-        change_layout: "تغيير تخطيط الصفحة الرئيسية"
         choose_home_page: "اختيار الصفحة الرئيسية"
         course_setup: "قائمة اختيار إعداد المساق"
-        course_stream: "مشاهدة تدفق المساق"
         drop_course: "إسقاط هذا المساق"
         join_course: "الانضمام لهذا المساق"
         new_announcement: "إعلان جديد"
         view_course_stream: "عرض تدفق المساق"
-      options: 
-        assignments: "قائمة المهام"
-        custom_page: "الصفحة التي سأصممها بنفسي"
-        modules: "أقسام/وحدات المساق"
-        recent_activity_dashboard: "لوحة معلومات النشاط الأخير"
-        syllabus: "المهام مع المناهج"
       period_name: "الأسبوعان الأخيران"
       re_sending: "جارٍ إعادة الإرسال..."
       send_done: "تم! قد تستغرق الرسالة بضع دقائق."
@@ -5147,7 +4882,6 @@ ar:
     stats: إحصاءات
     syllabus: المنهاج
     users: المستخدمون
-    wiki_page_revisions: المراجعات
     wiki_pages: الصفحات
   csv: 
     alpha: ألفا
@@ -5308,17 +5042,17 @@ ar:
       tomorrow: غدًا
       yesterday: أمس
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
-      default: "%Y-%m-%d"
-      long: "%B %-d، %Y"
-      long_with_weekday: "%A، %B %-d"
-      medium: "%b %e, %Y"
+      date_at_time: "%-d %b at %k:%M"
+      default: "%d/%m/%Y"
+      long: "%-d %B %Y"
+      long_with_weekday: "%A، %-d %B"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d، %Y"
-      short: "%b %e"
+      medium_with_weekday: "%a %-d %b %Y"
+      short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
-      short_with_weekday: "%a، %b %-d"
+      short_with_weekday: "%a، %-d %b"
       weekday: "%A"
     month_names: 
       - ~
@@ -5692,7 +5426,6 @@ ar:
       make_sure_all_search_terms_are_spelled_correctly: "تأكد من كتابة كل مصطلحات البحث بشكل صحيح إملائيًا."
       new_discussion: "*ابدأ* مناقشة"
       rss_feed: "موجز RSS"
-      search_title_body_or_author: "بحث في العنوان أو النص أو المؤلف"
       start_one_now: "بدء واحد الآن"
       suggestions: "الاقتراحات:"
       there_are_no_discussion_topics_to_show: "لا توجد أي موضوعات مناقشة لإظهارها"
@@ -5727,9 +5460,7 @@ ar:
     show: 
       add_rubric: "إضافة العنوان"
       announcement_closed: "هذا الإعلان مغلق للتعليقات"
-      announcement_locked: "لن يكون هذا الإعلان مرئيًا للمستخدمين حتى *%{date}*"
       announcement_locked_until: "هذا الإعلان مؤمّن حتى %{time}"
-      announcement_not_visible: "هذا الإعلان غير مرئي للمستخدمين"
       authors_name: "اسم المؤلف"
       collapse_replies: "طي الردود"
       confirm_delete_discussion: "هل تريد بالتأكيد حذف هذه المناقشة؟"
@@ -5757,12 +5488,9 @@ ar:
       reply_to_message: "الرد على الرسالة الحالية"
       reply_to_topic: "الرد على الموضوع"
       retrieved_from_feed: "تم الاسترداد من %{feed}"
-      search_entries_placeholder: "البحث في الإدخالات أو المؤلفين"
       show_rubric: "إظهار العنوان"
       speed_grader: "تقييم سريع"
       topic: الموضوع
-      topic_locked: "لن يتمكن المستخدمون من رؤية هذا الموضوع حتى *%{date}*"
-      topic_not_visible: "لا يظهر هذا الموضوع للمستخدمين"
       topic_podcast_feed_link: "موجز Podcast للموضوع"
       topic_subscribe: اشتراك
       topic_subscribe_tooltip: "أنت غير مشترك ولن يتم إعلامك بالتعليقات الجديدة"
@@ -5863,11 +5591,6 @@ ar:
     unsubscribed: "غير مشترك"
     unsubscribed_hint: "أنت غير مشترك في هذا الموضوع. انقر للاشتراك."
   display_course_catalog: "إظهار قائمة من المساقات يمكن البحث فيها في هذا الحساب الجذري مع تمكين إشارة \"تضمين هذا المساق في فهرس المساق العام\"."
-  draft_state_description: |-
-      تعمل هذه الميزة، التي في الإصدار بيتا، على إعادة تصميم العديد من أجزاء Canvas وتتيح للمحتوى أن يوجد
-      بحالة غير منشورة جديدة وغير مرئية للطلاب ويتم استبعادها من حسابات الدرجات
-      تنبيه--قد يؤدي تعطيل هذه الميزة إلى حذف المحتوى المضاف
-      أو المحرر من طريقة عرض المدرس.
   due_date_822625d8: "تاريخ الاستحقاق"
   due_dates: 
     due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
@@ -6427,6 +6150,7 @@ ar:
       all: الكل
       app_headder: "التطبيقات الخارجية"
       external_tools_note: "إن التطبيقات تعتبر وسيلة سهلة لإضافة ميزات جديدة إلى Canvas. وذلك حيث يمكن إضافتها إلى المساقات الفردية أو إلى جميع المساقات في أي حساب. وبمجرد تكوينها، يمكنك الارتباط بها عبر وحدات المساق وأإنشاء مهام لأدوات التقييم."
+      external_tools_references: "*راجع بعض أدوات LTI* التي تعمل بشكل جيد مع Canvas. ويمكنك أيضًا الاطلاع على ** موضوعات مجتمع Canvas بشأن أدوات LTI**"
       installed: مثبت
       not_installed: "غير مثبت"
       search_filter: "تصفية حسب الاسم"
@@ -6510,7 +6234,6 @@ ar:
       feature_options: "خيارات الميزة"
       no_features_available: "لا توجد ميزات متاحة حاليًا."
   features: 
-    allow_opt_out_of_inbox: "السماح للمستخدمين بإلغاء الاشتراك في صندوق الوارد"
     better_file_browsing: "استعراض أفضل للملفات"
     course_catalog: "دليل المساقات"
     differentiated_assignments: "التعيينات التمييزية"
@@ -6518,13 +6241,6 @@ ar:
         سيؤثر إيقاف تشغيل هذه الميزة على المساقات الموجودة. للحصول على المساعدة حول إيقاف تشغيل هذه الميزة، يرجى الاتصال
         بـ Canvas Success Manager لديك.
     differentiated_assignments_course_disable_warning: "سيؤدي تعطيل المهام التفاضلية إلى جعل جميع المهام المنشورة مرئية لجميع الطلاب."
-    draft_state: "حالة المسودة"
-    draft_state_account_disable_warning: |-
-        سيؤثر إيقاف تشغيل هذه الميزة على المساقات الموجودة. للحصول على المساعدة حول إيقاف تشغيل هذه الميزة، يرجى الاتصال
-        بـ Canvas Success Manager لديك.
-    draft_state_course_disable_warning: |-
-        سيؤدي إيقاف تشغيل هذه الميزة إلى نشر كل الكائنات الموجودة في المساق. يرجى التأكد من أن المحتوى الذي بحالة المسودة
-        جاهز للنشر ومتاح لكل المستخدمين في المساق قبل المتابعة.
     ember_modules: "وحدات Ember"
     google_docs_domain_restriction: "قيد على مجال Google Docs"
     high_contrast: "استخدام الأنماط العالية التباين"
@@ -8174,6 +7890,7 @@ ar:
       feedback: "انقر هنا لإخبارنا عما حدث"
     help: تعليمات
     show_me_where: "إظهاري حيث"
+  links_14b70841: ارتباطات
   locales: 
     ar: العربية
   logged_out_user: "المستخدم الذي قام بتسجيل الخروج %{user_counter}"
@@ -10951,7 +10668,6 @@ ar:
       description: "مركز التطبيقات لتتبع/تثبيت الأدوات الخارجية في Canvas"
       name: "مركز التطبيقات"
     app_center_settings: 
-      description: "سيظهر مركز التطبيقات في علامة تبويب \"التطبيقات\" على صفحة الإعدادات للمساق أو الحساب. ينبغي أن يشير URL المقدم أدناه إلى نقطة نهاية مركز تطبيقات صالح (على سبيل المثال، https://lti-examples.heroku.com -- تأكد من حذف شرطة التذييل)"
       labels: 
         app_reviews_endpoint: "إظهار نقطة نهاية التطبيقات"
         apps_index_endpoint: "فهرس نقطة نهاية التطبيقات"
@@ -11903,6 +11619,20 @@ ar:
       regrade_options: "خيارات إعادة النقييم *(للطلاب الذين أجابوا بالفعل على هذا السؤال):*"
       some_scores_reduced: "منح النقاط للإجابة الصحيحة فقط (*قد يتم تقليل بعض درجات الطلاب*)"
       update_question_without_regrading: "تحديث السؤال دون إعادة تقييم"
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: السؤال
+    loading: "جارٍ التحميل..."
+    navigation: 
+      links: 
+        question: "السؤال %{position}"
+      questions: الأسئلة
+    session_table_headers: 
+      attempt: المحاولة
+    table_view: 
+      headers: 
+        question: "السؤال %{position}"
   quiz_reports: 
     cancel_generation: إلغاء
     download_item_analysis: "تنزيل تقرير تحليل العناصر."
@@ -12346,6 +12076,7 @@ ar:
         titles: 
           add_new_question_group: "إضافة مجموعة أسئلة جديدة"
       form_answer: 
+        answer_in_range_accessible: "بين *بداية النطاق* و#نهاية النطاق#"
         answer_text: "نص الإجابة"
         answer_weight: "وزن الإجابة"
         exact_answer_with_error_margin_accessible: "*الإجابة الفعلية* مع هامش الخطأ #error margin#"
@@ -13184,7 +12915,6 @@ ar:
     folder: المجلد
     folder_browsing_tree: "شجرة استعراض المجلدات"
     folder_name: "اسم المجلد"
-    kind: النوع
     labels: 
       select: "تحديد هذا العنصر"
     loading_more_results: "جارٍ تحميل المزيد من النتائج..."
@@ -13633,7 +13363,9 @@ ar:
     enrollments_tas: "مساعدو المعلمين"
     enrollments_teachers: المعلمون
     student_groups: "مجموعات الطلاب"
+  search_entries_or_author_63fb0a86: "البحث في الإدخالات أو المؤلف"
   search_groups_or_people_6c15d6ad: "بحث عن مجموعات أو أشخاص"
+  search_title_body_or_author_1d26711f: "بحث في العنوان أو النص أو المؤلف"
   section: 
     confirms: 
       delete_enrollment: "هل ترغب بالتأكيد في حذف هذا التسجيل نهائيًا؟"
@@ -14330,6 +14062,7 @@ ar:
       file_select_label: "حدد الملف الذي تريد إقرانه، أو أضف ملفًا باختيار \"ملف جديد\"."
       indent_level: 
         one: "*مسافة بادئة لمستوى واحد*"
+        other: "*تعيين مسافة بادئة لعدد %{count} من المستويات*"
         zero: "*عدم وضع مسافة بادئة*"
       labels: 
         assignment_name: "اسم المهمة"
@@ -14360,10 +14093,6 @@ ar:
       topic_notice: "حدد الموضوع الذي تريد إقرانه بهذه *الوحدة*، أو أضف موضوعًا عن طريق تحديد \"موضوع جديد\"."
       wiki_page_notice: "حدد صفحة Wiki التي تريد إقرانها بهذه *الوحدة*، أو أضف صفحة جديدة عن طريق تحديد \"صفحة جديدة\"."
       wiki_page_select_label: "حدد صفحة wiki التي تريد إقرانها، أو أضف صفحة جديدة باختيار \"صفحة جديدة\"."
-    sequence_footer: 
-      full_course_sequence: "رؤية تسلسل المساق الكامل"
-      next: التالي
-      previous: السابق
     submission_comment: 
       assignment: المهمة
       grading_alt: "تقييم الدرجات"
@@ -14972,17 +14701,16 @@ ar:
     event: "%{date} في %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
+      long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "منذ أقل من دقيقة"
     pm: مساءً
     ranges: 
       different_days: "%{start_date_and_time} إلى %{end_date_and_time}"
       same_day: "%{date} من %{start_time} إلى %{end_time}"
       times: "%{start_time} إلى %{end_time}"
-    unknown_date: "تاريخ غير معروف"
     with_ago: "منذ %{time}"
   time_zones: 
     abu_dhabi: "أبو ظبي"
@@ -15763,8 +15491,6 @@ ar:
   wiki_page: 
     atom_author: "صفحة Wiki"
     atom_entry_title: "صفحة Wiki، %{course_or_group_name}: %{page_title}"
-    cannot_hide_page: "لا يمكن إخفاء الصفحة الأمامية"
-    cannot_set_hidden_front_page: "لا يمكن التعيين كصفحة أمامية لأنها مخفية"
     cannot_set_unpublished_front_page: "لا يمكن التعيين كصفحة أمامية لأنها غير منشورة"
     defaults: 
       no_content: "لا يوجد محتوى"
@@ -15773,109 +15499,25 @@ ar:
       title_characters: "يجب أن يحتوي العنوان على حرف أو رقم واحد على الأقل"
       title_too_long: "لا يمكن أن يتجاوز العنوان %{max_characters} حرفًا (أحرف)"
     unknown_user_name: "غير معروف"
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: "عودة إلى الإصدار الحالي"
-      page_edited_by_with_link: "بواسطة [%{user_name}](%{link})"
-      page_imported: "حسب مستورد المحتوى"
-      titles: 
-        revisions_for_page: "المراجعات الخاصة بـ: %{title}"
-    notices: 
-      page_rolled_back: "تمت إعادة الصفحة مرة أخرى إلى الإصدار السابق."
-    show: 
-      buttons: 
-        roll_back_version: "العودة مرة أخرى إلى هذا الإصدار"
-      imported_at: "تم استيراده: *%{time_ago}*"
-      labels: 
-        by_content_importer: "حسب مستورد المحتوى"
-        by_user: "بواسطة %{user}"
-        on_date: "على *%{date_time}*"
-      links: 
-        back_to_history: "العودة إلى سجل المراجعات"
-        go_to_latest: "الانتقال إلى الإصدار الأحدث"
-      not_most_recent_version_warning: "هذا \"ليس\" الإصدار الأحدث"
-      saved_by: "تم الحفظ: *%{time_ago}* بواسطة %{user}"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: "حفظ التغييرات"
-        start_editing: "بدء التحرير الآن"
-      course_editing_roles: 
-        anyone: "أي شخص"
-        only_teachers: "المعلمون فقط"
-        teachers_and_students: "المعلم والطلاب"
-      course_home_wiki_page_description: "يمكنك استخدام هذه الصفحة لتنظيم المساق أو إرساله كيفما تحب. يمكنك بسهولة الارتباط بالمهام والملفات وغير ذلك، وباستخدام القسم \"أدوات الصفحة\"، ستراها على اليمين بمجرد أن تبدأ في التحرير."
-      course_wiki_page_description: "يمكنك استخدام صفحة wiki هذه لإنشاء الصفحات التكميلية أو الأوصاف لمواد المساق الخاصة بك. ويمكنك بسهولة وضع ارتباط يؤدي إلى صفحات wiki من المهام، أو وضع ارتباط يؤدي إلى مواد وملفات المساق الأخرى من أي صفحة . وهذا يجعله مكانًا رائعًا لشرح المفاهيم الصعبة، مما يسمح بعمليات التعاون، أو فقط إنشاء أي نوع من أنواع الصفحات التي قد تحتاجها في المساق الخاص بك."
-      default_wiki_page_description: "هذه الصفحة هي صفحة wiki الافتراضية، وسيراها الطلاب عندما ينقرون فوق علامة التبويب \"الصفحات\" لهذا المساق."
-      default_wiki_page_is_course_home_page_warning: |-
-          تم الآن تعيين هذه الصفحة باعتبارها صفحة المساق الافتراضية، لذا فإن زوار المساق
-          سيرون هذه الصفحة أولاً.  يمكنك تغيير ذلك من [الصفحة الرئيسية للمساق](%{link}).
-      editing_content: "تحرير المحتوى."
-      editing_roles: 
-        anyone: "أي شخص"
-        only_members: "الأعضاء فقط"
-        prompt: "%{options} يمكنها تحرير هذه الصفحة"
-      group_wiki_warning: "تعد هذه الصفحة جزءًا من wiki الخاصة بالمجموعة, *وليست* wiki الخاصة بالمساق. إذا كنت تبحث عن wiki الخاصة بالمساق, [فانقر هنا](%{link})."
-      labels: 
-        hide_from_students: "إخفاء هذه الصفحة عن الطلاب"
-        last_edited: "تم آخر تحرير بواسطة %{name} منذ %{time_ago}"
-        notify_of_update: "إعلام المستخدمين بأن هذا المحتوى قد تغير"
-      links: 
-        page_history: "سجلات الصفحات"
-      notices: 
-        page_deleted: "تم حذف هذه الصفحة."
-        page_does_not_exist: "هذه الصفحة لم تعد موجودة."
-        page_edited_while_viewing: "تم تحديث هذه الصفحة بواسطة شخص آخر منذ أن بدأت في عرضها. [انقر هنا لإعادة تحميل الصفحة.](%{link})"
-        page_edited_while_viewing_detailed: "قام شخص ما بتحرير هذه الصفحة منذ أن قمت بتحميلها للمرة الأولى، وإذا أرسلتها الآن، فسوف تقوم بالكتابة فوق تلك التغييرات. قد ترغب في إعادة تحميل الصفحة وإعادة إدخال التغييرات للتأكد من أنك لم تفقد العمل الخاص بشخص آخر."
-      welcome_message: "مرحبًا بك في Wiki الخاص بالمساق"
-    edit_page: 
+    edit: 
       page_header_title: "تحرير %{page_name}"
-    errors: 
-      cannot_delete_front_page: "لا يمكنك حذف الصفحة الأمامية."
-    front_page: "الصفحة الأمامية"
+    index: 
+      titles: 
+        pages: الصفحات
     notices: 
       cannot_edit: "غير مسموح لك بتحرير الصفحة \"%{title}\"."
       cannot_read_revisions: "غير مسموح لك بتحرير المراجعات التاريخية لـ \"%{title}\"."
       create_non_existent_page: "الصفحة \"%{title}\" غير موجودة، ولكن يمكنك إنشاؤها أدناه"
       page_deleted: "تم حذف \"%{title}\" الصفحة."
       page_does_not_exist: "الصفحة \"%{title}\" غير موجودة."
-      page_updated: "تم تحديث الصفحة بنجاح."
-    page_link: 
-      link_hidden_from_students_warning: "لن يرى الطلاب هذا الارتباط"
-    page_revisions: 
+    revisions: 
       page_revisions_title: "مراجعات %{title}: %{context_name}"
-    pages_index: 
-      titles: 
-        pages: الصفحات
-    wiki_right_side: 
-      buttons: 
-        create: إنشاء
-        rename: "إعادة تسمية"
-      delete_page_confirmation: "هل ترغب بالتأكيد في حذف هذه الصفحة؟ لا يمكن التراجع عن هذا!"
-      headers: 
-        all_pages: "كافة الصفحات"
-        common_pages: "الصفحات المشتركة"
-        page_tools: "أدوات الصفحة"
-        recent_changes: "التغييرات الأخيرة"
-      links: 
-        create_page: "إنشاء صفحة جديدة"
-        delete_page: "حذف هذه الصفحة"
-        edit_page: "تحرير هذه الصفحة"
-        more: المزيد...
-        rename_page: "إعادة تسمية هذه الصفحة"
-        show_all: "إظهار الكل..."
-      title: "عنوان الصفحة الجديدة"
-      wiki_description_for_course: "اعتبره مكانًا مفتوحًا لوضع المحتوى فيه بحرية.  يمكنك استخدامه لوصف المساق، أو لإرسال تفسيرات مفيدة للموضوعات الصعبة، أو حتى للسماح للطلاب بالعمل معًا في كتابة المشروعات."
-      wiki_description_for_group: "اعتبره مكانًا مفتوحًا لوضع المحتوى فيه بحرية.  يمكنك استخدامه لوصف المجموعة، أو لإرسال تفسيرات مفيدة للموضوعات الصعبة، أو حتى للسماح للأعضاء بالعمل معًا في كتابة المشروعات."
-      wiki_description_header: "ما الهدف من وجود wiki؟"
   wiki_pages_api: 
     cannot_delete_front_page: "لا يمكن حذف الصفحة الأمامية"
-    cannot_have_hidden_front_page: "لا يمكن أن تكون الصفحة الأمامية مخفية"
     cannot_have_unpublished_front_page: "تعذر إلغاء نشر الصفحة الأمامية"
     cannot_update_editing_roles: "غير مسموح لك بتحديث أدوار التحرير لصفحة wiki هذه"
     cannot_update_front_page: "غير مسموح لك بتغيير صفحة wiki الأمامية"
-    cannot_update_hide_from_students: "غير مسموح لك بتحديث علامة المخفي من الطلاب الخاصة بصفحة wiki هذه"
     cannot_update_published: "غير مسموح لك بتحديث الحالة المنشورة لصفحة wiki هذه"
     cannot_update_title: "غير مسموح لك بتحديث عنوان صفحة wiki هذه"
     invalid_editing_roles: "أدوار التحرير المتوفرة غير صالحة"
