@@ -1359,7 +1359,6 @@ en-AU:
       lock_for_comments: "Lock for comments"
       make_sure_all_search_terms_are_spelled_correctly: "Make sure all search terms are spelled correctly."
       rss_feed: "RSS feed"
-      search_title_body_or_author: "Search title, body, or author"
       suggestions: "Suggestions:"
       there_are_no_announcements_show: "There are no announcements to show"
       try_different_more_general_or_fewer_keywords: "Try different, more general, or fewer keywords."
@@ -1516,41 +1515,6 @@ en-AU:
     unmuting_assignment: "Unmuting Assignment..."
   assignment_name_b2d87383: "Assignment Name"
   assignments: 
-    add_assignment_form: 
-      assignment_name: "Assignment Name"
-      labels: 
-        due: due
-        points: points
-        quiz_points: "quiz pts."
-        type: type
-      links: 
-        full_edit: "Full Edit"
-        more_options: "more options"
-      options: 
-        assignment: Assignment
-        attendance: Attendance
-        discussion: Discussion
-        external_tool: "External Tool"
-        not_graded: "Not Marked"
-        quiz: Quiz
-      tooltips: 
-        assignment_is_quiz: "This assignment is a quiz, so points possible comes from the questions and can't be set manually."
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "%{scores} scores for each student"
-      labels: 
-        assignments: Assignments
-        group_name: "Group Name"
-      links: 
-        add_grading_rule: "add grading rule"
-        delete_assignment: Delete
-      options: 
-        drop_highest: "Drop the Highest"
-        drop_lowest: "Drop the Lowest"
-        equally_weighted: "Equally Weighted"
-        never_drop: "Never Drop"
-        no_assignments: "[No Assignments]"
-        weighted_by_points: "Weighted By Points"
-      percent_of_total_grade: "% of total mark"
     assignment_count: 
       one: "1 Assignment"
       other: "%{count} Assignments"
@@ -1605,10 +1569,6 @@ en-AU:
       not_yet_graded: "*Not Yet Marked*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Score: %{score} out of %{pointsPossible} points."
-    assignment_locked: 
-      assignment_locked: "This assignment is locked as of *%{lock_at}*"
-      assignment_unlocked_from: "This assignment is locked until *%{unlock_at}*"
-      assignment_unlocked_from_to: "This assignment is only unlocked from *%{unlock_at}* to *%{lock_at}*"
     assignment_settings: 
       cancel: Cancel
       save: Save
@@ -1617,49 +1577,13 @@ en-AU:
     assignment_sidebar: 
       links: 
         submit: "Submit Assignment"
-    assignments_content: 
-      buttons: 
-        delete_group: "Delete Group"
-      labels: 
-        class_weighting_policy: "Weight the final mark based on assignment groups"
-        delete_assignments_in_group: "Delete assignments in this group"
-        move_assignments_to: "Move assignments from this group to"
-      options: 
-        select_group: "[ Select a Group ]"
-      titles: 
-        delete_assignment_group: "Delete Assignment Group?"
-      tooltips: 
-        target_group: "Select a group to move this assignment to"
-      warnings: 
-        delete_assignment_group: "The assignment group %{group} has %{assignment_count} in it. You can either delete these assignments or move them to another assignment group."
-    assignments_list_content: 
-      assignments: 
-        graded: "This assignment has been marked"
-        needs_grading_count: "%{needs_grading_count} submissions for this assignment still need grading"
-        overdue: "This assignment is overdue"
-      no_assignments: "No Assignments created for this course."
-      titles: 
-        assignments: Assignments
-        course_assignments: "Course Assignments"
-        overdue_assignments: "Overdue Assignments"
-        past_assignments: "Past Assignments"
-        undated_assignments: "Undated Assignments"
-        ungraded_assignments: "Unmarked Assignments"
-        upcoming_assignments: "Upcoming Assignments"
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "Group Assignments by Type"
-        just_show_assignment_list: "Just Show the Assignment List"
         manage_assignments: "Manage Assignments"
         see_current_grades: "See my marks so far"
       titles: 
         show_only_assignments_from: "Show Only Assignments from"
         upcoming_assignments: "Upcoming Assignments"
-    assignments_right_side: 
-      add_assignment_to_group: "*Add Assignment* to %{group}"
-      assignment_groups_wrapper: "( in %{number_of_groups})"
-      links: 
-        add_assignment_group: "Add Assignment Group"
     available_date_description: 
       available_until: "Available until"
       closed: Closed
@@ -1847,28 +1771,6 @@ en-AU:
         total: Total
     higher_than_max: "You cannot use a number greater than the number of assignments"
     incomplete: Incomplete
-    index: 
-      assignment_locked: "This assignment is currently locked. Visit the assignment details page for more information."
-      assignment_locked_tooltip: locked
-      keycode_descriptions: 
-        add_assignment_or_group: "Add Assignment to Current Group"
-        close_active_dialog: "Close the active dialog"
-        delete_assignment_or_group: "Delete Current Assignment/Group"
-        edit_assignment_or_group: "Edit Current Assignment/Group"
-        full_preview: "Full Preview/Edit Assignment"
-        next_assignment_or_group: "Next Assignment/Group"
-        previous_assignment_or_group: "Previous Assignment/Group"
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: "How Do I...?"
-      page_title: Assignments
     index_view: 
       add_assignment: Assignment
       add_group: Group
@@ -1953,7 +1855,6 @@ en-AU:
         assign_peer_review: "Give %{student} another submission to assess"
         back_to_assignment: "Back to Assignment"
       messages: 
-        cancel_peer_review: "Cancel this peer review?"
         no_students_found: "No Students Found"
       none_assigned: "None Assigned"
       not_yet_submitted: "not yet submitted"
@@ -1967,8 +1868,6 @@ en-AU:
       title: "%{assignment} Peer Reviews"
       titles: 
         automatically_assign_reviews: "Automatically Assign Reviews"
-        remind: "Remind %{assessor} about Assessment, last notified %{time}"
-        reminder: "Remind %{assessor} about Assessment, last notified %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "How to Assign Peer Reviews"
       labels: 
@@ -2026,10 +1925,6 @@ en-AU:
       locked: Locked
     status: 
       deleting_group: "Deleting Group..."
-    student_index: 
-      assignments: Assignments
-      labels: 
-        assignments: Assignments
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2182,40 +2077,6 @@ en-AU:
         settings_exclude_less_than_percent: "Less than %{percentInput} of the document"
     undated_assignments: "Undated Assignments"
     upcoming_assignments: "Upcoming Assignments"
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: Delete the assignment"
-        edit_icon: "%{icon}: Edit the basic options again"
-        move_icon: "%{icon}: Move the assignment to another group"
-        preview_icon: "%{icon}: Preview the assignment and edit it in full"
-      errors: 
-        no_assignment_group: "Oops. You need to add an assignment group first. Click \"Create an Assignment Group\" to see how."
-      instructions: 
-        wizard: 
-          details: "There's a lot more that goes into an assignment than due dates and points. If you want to type up a description of the assignment, allow file uploads, change the grading type or a bunch of other things, click the assignment's name or click the %{edit_icon} icon and then \"more options\"."
-          group: 
-            screenreader_step1: "Assignment groups are used to organise assignments. You provide a name for each group. If you choose to weight the final mark based on groups then you can also set a percentage score for each group. Click \"Add Assignment Group\" to create a group."
-            step1: "Assignment groups are used to organize assignments. You provide a name for each group. If you choose to weight the final mark based on groups (*where?*) then you can also set a percentage score for each group. Click \"Add Assignment Group\" to create a group."
-          overview: "This page is for setting up your course at a high level. You can add assignments, group them and then weight those groups. The idea is to get yourself organized first, dive into the specifics second. Even still, there's a lot you can do from here."
-          quizzes: "Quizzes are special types of assignments. You can create or import quizzes by clicking the \"Quizzes\" link on the left sidebar."
-          screenreader_details: "There's a lot more that goes into an assignment than due dates and points. If you want to type up a description of the assignment, allow file uploads, change the grading type or a bunch of other things, click the assignment's name or click the edit icon and then \"more options\"."
-          screenreader_step1: "Assignments are always organised into groups, so to add an assignment you first need to know what group you want to add it to. Select the group and click \"Add Assignment to\" or Click the add icon to start a new assignment for a group."
-          step1: "Assignments are always organized into groups, so to add an assignment you first need to know what group you want to add it to. Select the group and click \"Add Assignment to\" or Click the %{add_icon} icon to start a new assignment for a group."
-          step2: "Great! Now fill in your details. You can enter a title for your assignment, a due date and the number of points possible. If you want to do more than that you can, but only after the assignment has been created."
-          step3: "Done! The assignment is now added to the group! If you hover your mouse over the assignment, you'll see a bunch of options. Here's what they mean:"
-      links: 
-        create_assignment: "Create a New Assignment"
-        create_assignment_group: "Create an Assignment Group"
-        create_or_import_quiz: "Create/Import a Quiz"
-        edit_assignment_in_detail: "Edit Assignments in Detail"
-        screenreader_show_me_add_assignment: "Take me to the add assignment button"
-        screenreader_show_me_add_assignment_group: "Take me to the add assignment group button"
-        screenreader_show_me_weight_final_grade: "Take me to the weight final mark checkbox"
-        show_me_where: "Show Me Where"
-      subtitles: 
-        edit_assignment_in_detail: "(allow uploads, edit description, etc.)"
-      titles: 
-        wizard_box: "I would like to:"
   assignments_api: 
     invalid_date_time: "Invalid datetime for %{attribute}"
     invalid_submission_types: "Invalid submission types"
@@ -3166,7 +3027,6 @@ en-AU:
       select_quizzes: "Select Quizzes to Export"
   content_imports: 
     errors: 
-      failed: "Course Import failed with the following error:"
       import_failed: "There was an error during your migration import.  Please notify your system administrator and give them the following code: \"%{code}\""
       no_only_and_except: "You can not use \"only\" and \"except\" options at the same time."
     files: 
@@ -3176,7 +3036,6 @@ en-AU:
       description: "You can upload a zipped collection of files into your course and we'll extract them all out for you. This is an easy way to move files from another system into Canvas."
       page_title: "Import Files"
     messages: 
-      copying: "Copying... this will take a few minutes"
       import_complete: "Import Complete!  Returning to the Course Page..."
       importing_button: "Importing... this could take a while"
     titles: 
@@ -3552,7 +3411,7 @@ en-AU:
     buttons: 
       add: "Add Module"
       add_item: "Add Item"
-      add_module: "Add a New Module"
+      add_module: Module
       add_module_first: "Add a New Module"
       update: "Update Module"
     confirm: 
@@ -3793,41 +3652,6 @@ en-AU:
       titles: 
         student_progression: "Module Progression by Student"
     context_module: 
-      admin_links: 
-        module_options_label: "Manage Module"
-        module_options_title: "Manage Module"
-      context_module: 
-        draft: (Draft)
-      images: 
-        alt: 
-          complete: done
-          incomplete: incomplete
-          locked: locked
-        title: 
-          complete: "Module Completed"
-          incomplete: "Module Incomplete"
-          locked: "Module Locked"
-      links: 
-        add_item: "Add item to module"
-        hide_contents: "Hide module contents"
-        settings: "Module Settings"
-        show_contents: "Show module contents"
-        text: 
-          delete_module: Delete
-          edit_module: Edit
-        title: 
-          delete_module: "Delete this module"
-          edit_module: "Edit module settings"
-          student_progress: "See Student Progress for this Module"
-      manage: "Manage Module"
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: "Module Options"
-      module_will_unlock_at: "Will unlock *%{unlock_date}*"
-      progression_complete_count: "*%{count}* Complete"
-      progression_started_count: "*%{count}* In Progress"
-      reorder_modules: "Drag to reorder modules"
       unpublish: Unpublish
     context_module_next: 
       aria_labels: 
@@ -3865,51 +3689,6 @@ en-AU:
         course_modules: "Course Modules"
     module_complete: Complete
     module_empty: "There are no items in the module \"%{module}\""
-    module_item: 
-      drag_to_reorder: "Drag to reorder or move item to another module"
-      images: 
-        alt: 
-          complete: done
-          incomplete: incomplete
-          max_score: "maximum score"
-          min_score: "minimum score"
-          must_contribute: "must contribute"
-          must_submit: "must submit"
-          must_view: "must view"
-        title: 
-          complete: "Module Item Completed"
-          incomplete: "Module Item Incomplete"
-          max_score: "Students must not exceed the maximum score on this item before the module is considered complete"
-          min_score: "Students must reach the minimum score on this item before the module is considered complete"
-          must_contribute: "Students must contribute to this item before the module is considered complete"
-          must_submit: "Students must submit this assignment before the module is considered complete"
-          must_view: "Students must view this item before the module is considered complete"
-      links: 
-        edit_item: "Edit item details"
-        edit_item_details_label: "Edit item details"
-        indent: "Increase indent"
-        indent_label: "Increase indent"
-        outdent: "Decrease indent"
-        outdent_label: "Decrease indent"
-        remove_item: "Remove this item from the module"
-        remove_item_label: "Remove this item from the module"
-      max_score: 
-        fulfilled: "scored no more than a%{score}"
-        unfulfilled: "must score no more than a %{score}"
-      min_score: 
-        fulfilled: "scored at least a %{score}"
-        unfulfilled: "must score at least a %{score}"
-      module: 
-        item_aria_label: "%{item_label} Module Item"
-      must_contribute: 
-        fulfilled: "contributed to the content of the page"
-        unfulfilled: "must contribute to the content of the page"
-      must_submit: 
-        fulfilled: "submitted the assignment"
-        unfulfilled: "must submit the assignment"
-      must_view: 
-        fulfilled: "viewed the page"
-        unfulfilled: "must view the page"
     module_item_next: 
       drag_to_reorder: "Drag to reorder or move item to another module"
       images: 
@@ -4479,37 +4258,15 @@ en-AU:
       buttons: 
         publish: "Publish Course"
       details: 
-        assignments: "Add your assignments. You can just make a long list, or break them up into groups -- and even specify weights for each assignment group."
         available: "Now that your course is set up and available, you probably won't need this checklist anymore.  But we'll keep it around in case you realize later you want to try something new, or you just want a little extra help as you make changes to your course content."
         calendar: "Here's a great chance to get to know the calendar -- and add any non-assignment events you might have to the course. Don't worry, we'll help you through it."
         claimed: 
-          not_saved: |-
-              Great, so you've got a course...  Now what?  Well, before you go publishing it to the world, you may want to check and make sure you've got the basics laid out.  Work through the list on the left to ensure that your course is ready to use.
-              
-              *This course is visible only to teachers until it is published*
           saved: "Done and done!  Your course, %{course} is now officially created. It's only visible to you until it is published -- but before you jump the gun, you'll want to run through the list to the left to get a feel for how Canvas works and to make sure you really are ready to teach."
-        created: 
-          not_saved: |-
-              This class has been created, but not claimed.  It'll get deleted if it's not claimed within a week.  In the mean time, tick through the list to the left to make sure you're ready to go.
-              
-              If you need to leave and come back before then, just save *this link* to get back here later.
-              
-              Please **log in** or ***register*** to claim this course.
-          saved: |-
-              Done and done!  Your course, %{course} is now officially created.  It's only visible to you until it is published -- but before you jump the gun, you'll want to run through the list to the left to get a feel for how Canvas works and to make sure you really are ready to teach.
-              
-              If you need to leave and come back before then, just save *this link* to get back here later.
-              
-              Please **log in** or ***register*** to claim this course.
         files: "The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download. Uploading and organizing your files is easy with Canvas. We'll show you how."
         home2: "When people visit the course, this is the page they'll see. You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself. The default is the course activity stream. To customise this, just click %{choose_home_page}."
         import: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
         navigation: "By default all links are enabled for a course. Students won't see links to sections that don't have content. For example, if you haven't created any quizzes, they won't see the quizzes link. You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."
         publish: 
-          form: |-
-              All finished?  Time to publish your course!  Click the button below to make it official!
-              
-              Publishing will allow the users to begin participating in the course.
           not_registered: "This course is claimed and ready, but you'll need to finish the registration process before you can publish the course. You should have received an email from Canvas with a link to finish the process. Be sure to check your spam box."
         students: "You'll definitely want some of these. What's the fun of teaching a course if nobody's even listening?"
         tas: "You may want to assign some TAs to help you with the course. TAs can mark student submissions, help moderate the discussions and even update due dates and assignment details for you."
@@ -4587,7 +4344,6 @@ en-AU:
     errors: 
       create_failed: "Course creation failed"
       role_not_active: "Can't add users for non-active role: '%{role}'"
-      role_not_found: "No role named '%{role}' exists."
       unpublish: "Course cannot be unpublished if student submissions exist."
     group_list: 
       headings: 
@@ -4863,19 +4619,9 @@ en-AU:
         stats: "Course Statistics"
         student_view: "Student View"
     show: 
-      buttons: 
-        update_layout: "Update Layout"
       change_home_page: Change
       details: 
-        assignments: "This view shows the **list of assignments** for this course, with upcoming and recent assignments at the top."
         confirm_unenroll: "Are you sure you want to unenroll in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
-        custom_page: "You can **design your own course home page** and include whatever links, images or rich media you like."
-        modules: |-
-            You can organise your course into **modules or sections**, where each section contains a related set of files, assignments, pages, etc.  If you want, you can also sequence modules by defining criteria and prerequisites that need to be completed before each module is unlocked.
-            
-                        -This layout is probably best for courses that aren't based on a specific schedule like a term or semester.
-        recent_activity_dashboard: "The **recent activity dashboard** lets participants see the most recent conversations, announcements, discussions, and interactions for this course.  It's very similar to the dashboard page users see when they first log in, but only shows content for this specific course."
-        syllabus: "The **syllabus view** lets you write up a description of course expectations or introduce the course with links, images, etc. and then also shows a calendar view of all assignments and course events."
       draft_state: 
         buttons: 
           cancel: Cancel
@@ -4897,27 +4643,16 @@ en-AU:
         choose_home_page_title: "Choose Home Page"
         confirm_unenroll: "Confirm Unenrollment"
         importing: "This course is being imported"
-        set_layout: "Set Home Page Layout"
         unpublished: "This Course is Unpublished"
       importing: "Course copy/migration in progress. This means some content may be temporarily unavailable."
-      labels: 
-        select_content: "When people visit the course page, show them"
       license_notice: "This course content is offered under a %{license_type} license. Content in this course can be considered under this license unless otherwise noted."
       links: 
-        change_layout: "Change Home Page Layout"
         choose_home_page: "Choose Home Page"
         course_setup: "Course Setup Checklist"
-        course_stream: "See Course Stream"
         drop_course: "Drop this Course"
         join_course: "Join this Course"
         new_announcement: "New Announcement"
         view_course_stream: "View Course Stream"
-      options: 
-        assignments: "the Assignment List"
-        custom_page: "a Page I'll Design Myself"
-        modules: "the Course Modules/Sections"
-        recent_activity_dashboard: "the Recent Activity Dashboard"
-        syllabus: "the Assignments with Syllabus"
       period_name: "the last 2 weeks"
       re_sending: Re-Sending...
       send_done: "Done! Message may take a few minutes."
@@ -5042,7 +4777,6 @@ en-AU:
     stats: Statistics
     syllabus: Syllabus
     users: Users
-    wiki_page_revisions: Revisions
     wiki_pages: Pages
   csv: 
     alpha: Alpha
@@ -5171,8 +4905,8 @@ en-AU:
       tomorrow: Tomorrow
       yesterday: Yesterday
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
-      default: "%Y-%m-%d"
+      date_at_time: "%b %-d at %k:%M"
+      default: "%d/%m/%Y"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
@@ -5491,7 +5225,6 @@ en-AU:
       make_sure_all_search_terms_are_spelled_correctly: "Make sure all search terms are spelled correctly."
       new_discussion: "*Start a* Discussion"
       rss_feed: "RSS feed"
-      search_title_body_or_author: "Search title, body, or author"
       start_one_now: "Start One Now"
       suggestions: "Suggestions:"
       there_are_no_discussion_topics_to_show: "There are no discussion topics to show"
@@ -5526,9 +5259,7 @@ en-AU:
     show: 
       add_rubric: "Add Rubric"
       announcement_closed: "This announcement is closed for comments"
-      announcement_locked: "This announcement will not be visible to users until *%{date}*"
       announcement_locked_until: "This announcement is locked until %{time}"
-      announcement_not_visible: "This announcement is not visible to users"
       authors_name: "Author's name"
       collapse_replies: "Collapse replies"
       confirm_delete_discussion: "Are you sure you want to delete this discussion?"
@@ -5556,12 +5287,9 @@ en-AU:
       reply_to_message: "Reply to Current Message"
       reply_to_topic: "Reply to Topic"
       retrieved_from_feed: "Retrieved from %{feed}"
-      search_entries_placeholder: "Search entries or author"
       show_rubric: "Show Rubric"
       speed_grader: "Speed Grader"
       topic: Topic
-      topic_locked: "This topic will not be visible to users until *%{date}*"
-      topic_not_visible: "This topic is not visible to users"
       topic_podcast_feed_link: "Topic Podcast Feed"
       topic_subscribe: Subscribe
       topic_subscribe_tooltip: "You are unsubscribed and will not be notified of new comments"
@@ -5658,11 +5386,6 @@ en-AU:
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
   display_course_catalog: "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled."
-  draft_state_description: |-
-      This beta feature redesigns many parts of Canvas and allows content to exist in
-      a new unpublished state that is invisible to students and excluded from mark
-      calculations. Caution--disabling this feature may delete newly created or edited
-      content from the teacher's view.
   due_date_822625d8: "Due Date"
   due_dates: 
     due_at: "due: %{assignment_due_date_time}"
@@ -6292,7 +6015,6 @@ en-AU:
       feature_options: "Feature Options"
       no_features_available: "No features are currently available."
   features: 
-    allow_opt_out_of_inbox: "Allow users to opt out of the inbox"
     better_file_browsing: "Better File Browsing"
     course_catalog: "Course Catalogue"
     differentiated_assignments: "Differentiated Assignments"
@@ -6300,13 +6022,6 @@ en-AU:
         Turning this feature off will impact existing courses. For assistance in disabling this feature, please contact
         your Canvas Success Manager.
     differentiated_assignments_course_disable_warning: "Disabling differentiated assignments will make all published assignments visible to all students."
-    draft_state: "Draft State"
-    draft_state_account_disable_warning: |-
-        Turning this feature off will impact existing courses. For assistance in disabling this feature, please contact
-        your Canvas Success Manager.
-    draft_state_course_disable_warning: |-
-        Turning this feature off will publish ALL existing objects in the course. Please make sure all draft content
-        is ready to be published and available to all users in the course before continuing.
     ember_modules: "Ember Modules"
     google_docs_domain_restriction: "Google Docs Domain Restriction"
     high_contrast: "Use High Contrast Styles"
@@ -7894,6 +7609,7 @@ en-AU:
       feedback: "Click here to tell us what happened"
     help: Help
     show_me_where: "Show Me Where"
+  links_14b70841: Links
   locales: 
     en-AU: "English (Australia)"
   logged_out_user: "Logged Out User %{user_counter}"
@@ -10599,7 +10315,6 @@ en-AU:
       description: "App Centre for tracking/installing external tools in Canvas"
       name: "App Centre"
     app_center_settings: 
-      description: "App Centre will appear in the \"Apps\" tab on the setings page of either a course or account. The URL provided below should point to a valid App Centre endpoint (for example, https://lti-examples.heroku.com -- be sure to omit the trailing slash)"
       labels: 
         app_reviews_endpoint: "App Show Endpoint"
         apps_index_endpoint: "Apps Index Endpoint"
@@ -11551,6 +11266,20 @@ en-AU:
       regrade_options: "Regrade Options *(for students who have already answered this question):*"
       some_scores_reduced: "Only award points for the correct answer (*some students' scores may be reduced*)"
       update_question_without_regrading: "Update question without regrading"
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: Question
+    loading: Loading...
+    navigation: 
+      links: 
+        question: "Question %{position}"
+      questions: Questions
+    session_table_headers: 
+      attempt: Attempt
+    table_view: 
+      headers: 
+        question: "Question %{position}"
   quiz_reports: 
     cancel_generation: Cancel
     download_item_analysis: "Download item analysis report."
@@ -12701,7 +12430,6 @@ en-AU:
     folder: Folder
     folder_browsing_tree: "Folder Browsing Tree"
     folder_name: "Folder Name"
-    kind: Kind
     labels: 
       select: "Select This Item"
     loading_more_results: "Loading more results..."
@@ -13122,7 +12850,9 @@ en-AU:
     enrollments_tas: "Teaching Assistants"
     enrollments_teachers: Teachers
     student_groups: "Student Groups"
+  search_entries_or_author_63fb0a86: "Search entries or author"
   search_groups_or_people_6c15d6ad: "Search Groups or People"
+  search_title_body_or_author_1d26711f: "Search title, body, or author"
   section: 
     confirms: 
       delete_enrollment: "Are you sure you want to delete this enrollment permanently?"
@@ -13822,10 +13552,6 @@ en-AU:
       topic_notice: "Select the topic you want to associate with this *module*, or add a topic by selecting \"New Topic\"."
       wiki_page_notice: "Select the wiki page you want to associate with this *module*, or add a new page by selecting \"New Page\"."
       wiki_page_select_label: "Select the wiki page you want to associate, or add a new page by selecting \"New Page\"."
-    sequence_footer: 
-      full_course_sequence: "see full course sequence"
-      next: Next
-      previous: Previous
     submission_comment: 
       assignment: Assignment
       grading_alt: grading
@@ -14398,17 +14124,16 @@ en-AU:
     event: "%{date} at %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
+      long: " %d %B, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "less than a minute ago"
     pm: pm
     ranges: 
       different_days: "%{start_date_and_time} to %{end_date_and_time}"
       same_day: "%{date} from %{start_time} to %{end_time}"
       times: "%{start_time} to %{end_time}"
-    unknown_date: "Unknown date"
     with_ago: "%{time} ago"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -15157,8 +14882,6 @@ en-AU:
   wiki_page: 
     atom_author: "Wiki Page"
     atom_entry_title: "Wiki Page, %{course_or_group_name}: %{page_title}"
-    cannot_hide_page: "cannot hide front page"
-    cannot_set_hidden_front_page: "could not set as front page because it is hidden"
     cannot_set_unpublished_front_page: "could not set as front page because it is unpublished"
     defaults: 
       no_content: "no content"
@@ -15167,109 +14890,25 @@ en-AU:
       title_characters: "Title must contain at least one letter or number"
       title_too_long: "Title can't exceed %{max_characters} characters"
     unknown_user_name: Unknown
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: "Back to Current Version"
-      page_edited_by_with_link: "by [%{user_name}](%{link})"
-      page_imported: "by Content Importer"
-      titles: 
-        revisions_for_page: "Revisions for: %{title}"
-    notices: 
-      page_rolled_back: "Page was successfully rolled-back to previous version."
-    show: 
-      buttons: 
-        roll_back_version: "Roll-back to this Version"
-      imported_at: "Imported: *%{time_ago}*"
-      labels: 
-        by_content_importer: "by Content Importer"
-        by_user: "by %{user}"
-        on_date: "on *%{date_time}*"
-      links: 
-        back_to_history: "Back to Revision history"
-        go_to_latest: "Go to Latest Version"
-      not_most_recent_version_warning: "This is NOT the most recent version"
-      saved_by: "Saved: *%{time_ago}* by %{user}"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: "Save Changes"
-        start_editing: "Start Editing It now"
-      course_editing_roles: 
-        anyone: Anyone
-        only_teachers: "Only Teachers"
-        teachers_and_students: "Teacher and Students"
-      course_home_wiki_page_description: "You can use this page to organize or introduce your course however you like. You can easily link to assignments, files, etc. using the \"Page Tools\" section you'll see on the right once you start editing."
-      course_wiki_page_description: "You can use this wiki to create supplemental pages or descriptions for your course material. You can easily link to wiki pages from assignments, or link to other course material and files from any wiki page. This makes it a great place for explaining hard concepts, allowing group projects, or creating just about any kind of page you could need in your course."
-      default_wiki_page_description: "This page is the default wiki page, and students will see it when they click the \"Pages\" tab for this course."
-      default_wiki_page_is_course_home_page_warning: |-
-          Right now this is also set as the default course page, so visitors to your
-          course will see this page first.  You can change that from [the course home page](%{link}).
-      editing_content: "Editing Content."
-      editing_roles: 
-        anyone: Anyone
-        only_members: "Only Members"
-        prompt: "%{options} can edit this page"
-      group_wiki_warning: "This page is part of the group wiki, *not* your course wiki. If you're looking for the course wiki, [click here](%{link})."
-      labels: 
-        hide_from_students: "Hide this Page from Students"
-        last_edited: "Last edited by %{name} %{time_ago} ago"
-        notify_of_update: "Notify users that this content has changed"
-      links: 
-        page_history: "Page history"
-      notices: 
-        page_deleted: "This page has been deleted."
-        page_does_not_exist: "This page doesn't exist yet."
-        page_edited_while_viewing: "This page has been updated by someone else since you started viewing it. [Click here to reload the page.](%{link})"
-        page_edited_while_viewing_detailed: "Someone else has edited this page since you first loaded it, and if you submit now you will overwrite their changes. You may want to reload the page and re-enter your changes to make sure you don't lose some else's work."
-      welcome_message: "Welcome to the Course Wiki"
-    edit_page: 
+    edit: 
       page_header_title: "Edit %{page_name}"
-    errors: 
-      cannot_delete_front_page: "You cannot delete the front page."
-    front_page: "Front Page"
+    index: 
+      titles: 
+        pages: Pages
     notices: 
       cannot_edit: "You are not allowed to edit the page \"%{title}\"."
       cannot_read_revisions: "You are not allowed to review the historical revisions of \"%{title}\"."
       create_non_existent_page: "The page \"%{title}\" does not exist, but you can create it below"
       page_deleted: "The page \"%{title}\" has been deleted."
       page_does_not_exist: "The page \"%{title}\" does not exist."
-      page_updated: "Page was successfully updated."
-    page_link: 
-      link_hidden_from_students_warning: "Students won't see this link"
-    page_revisions: 
+    revisions: 
       page_revisions_title: "%{title} revisions: %{context_name}"
-    pages_index: 
-      titles: 
-        pages: Pages
-    wiki_right_side: 
-      buttons: 
-        create: Create
-        rename: Rename
-      delete_page_confirmation: "Are you sure you want to delete this page? This cannot be undone!"
-      headers: 
-        all_pages: "All Pages"
-        common_pages: "Common Pages"
-        page_tools: "Page Tools"
-        recent_changes: "Recent Changes"
-      links: 
-        create_page: "Create a New Page"
-        delete_page: "Delete this Page"
-        edit_page: "Edit this Page"
-        more: more...
-        rename_page: "Rename this page"
-        show_all: "show all..."
-      title: "New page title"
-      wiki_description_for_course: "Think of it as an open-ended place to hold content. You could use it to describe your course, to provide helpful explanations of difficult topics, or even to let students work together on writing projects."
-      wiki_description_for_group: "Think of it as an open-ended place to hold content. You could use it to describe your group, to provide helpful explanations of difficult topics, or even to let members work together on writing projects."
-      wiki_description_header: "What's a wiki for?"
   wiki_pages_api: 
     cannot_delete_front_page: "The front page cannot be deleted"
-    cannot_have_hidden_front_page: "The front page cannot be hidden"
     cannot_have_unpublished_front_page: "The front page cannot be unpublished"
     cannot_update_editing_roles: "You are not allowed to update the editing roles of this wiki page"
     cannot_update_front_page: "You are not allowed to change the wiki front page"
-    cannot_update_hide_from_students: "You are not allowed to update the hidden from students flag of this wiki page"
     cannot_update_published: "You are not allowed to update the published state of this wiki page"
     cannot_update_title: "You are not allowed to update the title of this wiki page"
     invalid_editing_roles: "The provided editing roles are invalid"
