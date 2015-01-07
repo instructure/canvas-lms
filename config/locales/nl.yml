@@ -1356,7 +1356,6 @@ nl:
       lock_for_comments: "Vergrendelen voor opmerkingen"
       make_sure_all_search_terms_are_spelled_correctly: "Er voor zorgen dat alle zoektermen correct gespeld zijn."
       rss_feed: RSS-feed
-      search_title_body_or_author: "Titel, hoofdtekst of auteur zoeken"
       suggestions: "Suggesties:"
       there_are_no_announcements_show: "Er zijn geen aankondigingen om te tonen"
       try_different_more_general_or_fewer_keywords: "Andere, meer algemene of minder trefwoorden proberen."
@@ -1513,41 +1512,6 @@ nl:
     unmuting_assignment: "Bezig met het ongedaan maken van opdracht..."
   assignment_name_b2d87383: "Naam van de opdracht"
   assignments: 
-    add_assignment_form: 
-      assignment_name: "Naam van opdracht"
-      labels: 
-        due: inleverdatum
-        points: punten
-        quiz_points: toetspunten
-        type: type
-      links: 
-        full_edit: "Volledig bewerken"
-        more_options: "Meer opties"
-      options: 
-        assignment: Opdracht
-        attendance: Aanwezigheid
-        discussion: Discussie
-        external_tool: "Externe tool"
-        not_graded: "Niet beoordeeld"
-        quiz: Toets
-      tooltips: 
-        assignment_is_quiz: "Deze opdracht is een toets. De vragen leveren de punten op en kunnen niet handmatig ingesteld worden worden ."
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "%{scores} scores voor elke cursist"
-      labels: 
-        assignments: Opdrachten
-        group_name: Groepsnaam
-      links: 
-        add_grading_rule: "Beoordelingsregel toevoegen"
-        delete_assignment: Verwijderen
-      options: 
-        drop_highest: "Hoogste verwijderen"
-        drop_lowest: "Laagste verwijderen"
-        equally_weighted: "Gelijk gewogen"
-        never_drop: "Nooit verwijderen"
-        no_assignments: "[Geen opdrachten]"
-        weighted_by_points: "Gewogen op basis van punten"
-      percent_of_total_grade: "% van het totale cijfer"
     assignment_count: 
       one: "1 Opdracht"
       other: "%{count} opdrachten"
@@ -1602,10 +1566,6 @@ nl:
       not_yet_graded: "*Nog niet beoordeeld*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} punten"
       score_with_points_possible_screenreader: "Score: %{score} op %{pointsPossible} punten."
-    assignment_locked: 
-      assignment_locked: "Deze opdracht is vergrendeld sinds *%{lock_at}*"
-      assignment_unlocked_from: "Deze opdracht is vergrendeld tot *%{unlock_at}*"
-      assignment_unlocked_from_to: "Deze opdracht is alleen vergrendeld van *%{unlock_at}* tot *%{lock_at}*"
     assignment_settings: 
       cancel: Annuleren
       save: Opslaan
@@ -1614,49 +1574,13 @@ nl:
     assignment_sidebar: 
       links: 
         submit: "Opdracht inleveren"
-    assignments_content: 
-      buttons: 
-        delete_group: "Groep verwijderen"
-      labels: 
-        class_weighting_policy: "Het eindcijfer wegen op basis van opdrachtgroepen"
-        delete_assignments_in_group: "Opdrachten van deze groep verwijderen"
-        move_assignments_to: "Opdrachten van deze groep verplaatsen naar"
-      options: 
-        select_group: "[ Selecteer een groep ]"
-      titles: 
-        delete_assignment_group: "Opdrachtgroep verwijderen?"
-      tooltips: 
-        target_group: "Een groep selecteren om deze opdracht te verplaatsen"
-      warnings: 
-        delete_assignment_group: "De opdrachtgroep %{group} heeft %{assignment_count} opdrachten.  Je kunt deze opdrachten of verwijderen of verplaatsen naar een andere opdrachtgroep."
-    assignments_list_content: 
-      assignments: 
-        graded: "De opdracht is beoordeeld"
-        needs_grading_count: "%{needs_grading_count} inzendingen voor deze opdracht moeten nog beoordeeld worden"
-        overdue: "De inleverdatum voor deze opdracht is verstreken"
-      no_assignments: "Er zijn geen opdrachten  voor deze cursus opgesteld."
-      titles: 
-        assignments: Opdrachten
-        course_assignments: Cursusopdrachten
-        overdue_assignments: "Achterstalige opdrachten"
-        past_assignments: "Oude opdrachten"
-        undated_assignments: "Ongedateerde opdrachten"
-        ungraded_assignments: "Niet-beoordeelde opdrachten"
-        upcoming_assignments: "Aankomende opdrachten"
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "Groepsopdrachten per type"
-        just_show_assignment_list: "De lijst met opdrachten gewoon tonen"
         manage_assignments: "Opdrachten beheren"
         see_current_grades: "Zie mijn cijfers tot nu toe"
       titles: 
         show_only_assignments_from: "Alleen opdrachten tonen vanaf"
         upcoming_assignments: "Aankomende opdrachten"
-    assignments_right_side: 
-      add_assignment_to_group: "*Opdracht* toevoegen aan %{group}"
-      assignment_groups_wrapper: "( in %{number_of_groups})"
-      links: 
-        add_assignment_group: "Opdrachtgroep toevoegen"
     available_date_description: 
       available_until: "Beschikbaar tot"
       closed: Gesloten
@@ -1839,28 +1763,6 @@ nl:
         total: Totaal
     higher_than_max: "Je kunt geen nummer gebruiken dat groter is dan het aantal opdrachten"
     incomplete: Incompleet
-    index: 
-      assignment_locked: "Deze opdracht is momenteel vergrendeld. Ga voor meer informatie naar de pagina met opdrachtdetails ."
-      assignment_locked_tooltip: vergrendeld
-      keycode_descriptions: 
-        add_assignment_or_group: "Opdracht toevoegen aan huidige groep"
-        close_active_dialog: "De actieve dialoog sluiten"
-        delete_assignment_or_group: "Huidige opdracht/groep verwijderen"
-        edit_assignment_or_group: "Huidige opdracht/groep bewerken"
-        full_preview: "Volledige voorbeeldweergave/Opdracht bewerken"
-        next_assignment_or_group: "Volgende opdracht/ groep"
-        previous_assignment_or_group: "Vorige opdracht/groep"
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: "Hoe kan ik...?"
-      page_title: Opdrachten
     index_view: 
       add_assignment: Opdracht
       add_group: Groep
@@ -1945,7 +1847,6 @@ nl:
         assign_peer_review: "%{student} nog een inzending laten beoordelen"
         back_to_assignment: "Terug naar de opdracht"
       messages: 
-        cancel_peer_review: "Deze peer review annuleren?"
         no_students_found: "Geen cursisten gevonden"
       none_assigned: "Niets toegewezen"
       not_yet_submitted: "nog niet ingeleverd"
@@ -1959,8 +1860,6 @@ nl:
       title: "%{assignment} Peer reviews"
       titles: 
         automatically_assign_reviews: "Reviews automatisch toewijzen"
-        remind: "%{assessor} Herinneren aan opdracht. Laatst herinnerd om %{time}"
-        reminder: "%{assessor} herinneren aan opdracht. Laatst herinnerd om %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "Hoe peer reviews toewijzen"
       labels: 
@@ -2018,10 +1917,6 @@ nl:
       locked: Vergrendeld
     status: 
       deleting_group: "Bezig met groep te verwijderen..."
-    student_index: 
-      assignments: Opdrachten
-      labels: 
-        assignments: Opdrachten
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2173,40 +2068,6 @@ nl:
         settings_exclude_less_than_percent: "Minder dan %{percentInput} van het document"
     undated_assignments: "Opdrachten zonder datum"
     upcoming_assignments: "Eerstvolgende opdrachten"
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: De opdracht verwijderen"
-        edit_icon: "%{icon}: De basisopties opnieuw bewerken"
-        move_icon: "%{icon}: De opdracht naar een andere groep verplaatsen"
-        preview_icon: "%{icon}: Een voorbeeld van de opdracht weergeven en deze volledig bewerken"
-      errors: 
-        no_assignment_group: "Oeps. Je moet eerst een opdrachtgroep aanmaken. Klikken op \"Een opdrachtgroep aanmaken\" als je wilt weten hoe dit werkt."
-      instructions: 
-        wizard: 
-          details: "Een opdracht is veel meer dan een inleverdata en punten. Als je een beschrijving van de opdracht wilt aangeven, het uploaden van bestanden wilt toelaten, het type eindcijfer wilt veranderen of een heleboel andere dingen wilt doen, klik dan op de naam van de opdracht of klik op de pictogram het pictogram %{edit_icon} en vervolgens op \"meer opties\"."
-          group: 
-            screenreader_step1: "Opdrachtgroepen worden gebruikt om opdrachten te ordenen. Je geeft een naam aan voor iedere groep. Als je kiest om het eindcijfer in te schatten op basis van groepen, dan kun je ook een scoringspercentage voor iedere groep instellen. Op \"Opdrachtgroep toevoegen\" klikken om een groep aan te maken."
-            step1: "Opdrachtgroepen worden gebruikt om opdrachten te ordenen. Je geeft een naam aan voor iedere groep. Als je kiest om het eindcijfer in te schatten op basis van groepen (*waar?*), dan kun je ook een scoringspercentage voor iedere groep instellen. Op \"Opdrachtgroep toevoegen\" klikken om een groep aan te maken."
-          overview: "Deze pagina kan jouw cursus op een hoog niveau tillen. Je kunt opdrachten toevoegen en groeperen, en die groepen vervolgens wegen. Het idee is om eerst alles in grote lijnen te ordenen en vervolgens in de details te duiken. Je kunt hier hoe dan ook veel doen."
-          quizzes: "Toetsen zijn een speciaal type opdrachten. Je kunt toetsen opstgellen of importeren door te klikken op de link \"Toetsen\" op de linkerzijbalk."
-          screenreader_details: "Een opdracht is veel meer dan een inleverdata en punten. Als je een beschrijving van de opdracht wilt aangeven, het uploaden van bestanden wilt toelaten, het type eindcijfer wilt veranderen of een heleboel andere dingen wilt doen, klik dan op de naam van de opdracht of klik op de pictogram bewerken en dan op \"meer opties\"."
-          screenreader_step1: "Opdrachten worden altijd in groepen georganiseerd, zodat je, als je een opdracht wilt maken, eerst moet weten welke groep je eraan wilt toevoegen. Kies de groep en op \"Opdracht toevoegen aan\" klikken of op het pictogram toevoegen klikken om een nieuwe opdracht voor een groep te starten."
-          step1: "Opdrachten worden altijd in groepen georganiseerd, zodat je, als je een opdracht wilt maken, eerst moet weten welke groep je eraan wilt toevoegen. Kies de groep en op \"Opdracht toevoegen aan\" klikken of het pictogram %{add_icon} klikken om een nieuwe opdracht voor een groep te starten."
-          step2: "Mooi! Nu jouw details invullen. Je kunt een titel, een inleverdatum en het maximale aantal punten  voor jouw opdracht invoeren. Als je nog een stap verder wilt gaan, maar dat kan pas als de opdracht is aangemaakt."
-          step3: "Klaar! De opdracht is nu aan de groep toegevoegd ! Als je  met jouw muis over de opdracht schuift, zul je een aantal opties zien. Ze betekenen het volgende:"
-      links: 
-        create_assignment: "Een nieuwe opdracht aanmaken"
-        create_assignment_group: "Een opdrachtgroep aanmaken"
-        create_or_import_quiz: "Een toets opstellen/importeren"
-        edit_assignment_in_detail: "Opdrachten in detail bewerken"
-        screenreader_show_me_add_assignment: "Neem mij naar de knop opdracht toevoegen"
-        screenreader_show_me_add_assignment_group: "Neem mij naar de knop opdrachtgroep toevoegen"
-        screenreader_show_me_weight_final_grade: "Breng me naar het keuzevakje eindcijfer wegen"
-        show_me_where: "Toon mij waar"
-      subtitles: 
-        edit_assignment_in_detail: "(hiermee kun je bestanden uploaden, de beschrijving bewerken, enzovoort)"
-      titles: 
-        wizard_box: "Ik zou graag:"
   assignments_api: 
     invalid_date_time: "Ongeldige datum voor %{attribute}"
     invalid_submission_types: "Ongeldige indieningstypen"
@@ -3143,7 +3004,6 @@ nl:
       select_quizzes: "Toetsen selecteren om te exporteren"
   content_imports: 
     errors: 
-      failed: "Cursusimport is mislukt met de volgende fout:"
       import_failed: "Er is een fout opgetreden tijdens de migratie-import. Waarschuw jouw systeembeheerder en geef de volgende code door: \"%{code}\""
       no_only_and_except: "Je kunt de opties \"alleen\" en \"behalve\" niet tegelijktijd gebruiken."
     files: 
@@ -3153,7 +3013,6 @@ nl:
       description: "Je kunt een aantal zip-bestanden uploaden in de cursus. De zipbestanden worden automatisch uitgepakt in Canvas. Dit is een eenvoudige manier om bestanden van een ander systeem naar Canvas te verplaatsen."
       page_title: "Bestanden importeren"
     messages: 
-      copying: "Kopiëren... Dit duurt enkele minuten"
       import_complete: "Import voltooid! Terug naar de cursuspagina..."
       importing_button: "Bezig met importeren... Dit kan even duren"
     titles: 
@@ -3529,7 +3388,7 @@ nl:
     buttons: 
       add: "Module toevoegen"
       add_item: "Item toevoegen"
-      add_module: "Een module maken"
+      add_module: Module
       add_module_first: "Een nieuwe module toevoegen"
       update: "Module uploaden"
     confirm: 
@@ -3770,41 +3629,6 @@ nl:
       titles: 
         student_progression: "Voortgang van module per cursist"
     context_module: 
-      admin_links: 
-        module_options_label: "Module beheren"
-        module_options_title: "Module beheren"
-      context_module: 
-        draft: (Concept)
-      images: 
-        alt: 
-          complete: klaar
-          incomplete: "niet voltooid"
-          locked: vergrendeld
-        title: 
-          complete: "Module voltooid"
-          incomplete: "Module niet voltooid"
-          locked: "Module vergrendeld"
-      links: 
-        add_item: "Inhoud toevoegen"
-        hide_contents: "Module-inhoud verbergen"
-        settings: Module-instellingen
-        show_contents: "Module-inhoud tonen"
-        text: 
-          delete_module: Verwijderen
-          edit_module: Bewerken
-        title: 
-          delete_module: "Deze module verwijderen"
-          edit_module: Bewerken
-          student_progress: "De voortgang van de cursist voor deze module weergeven"
-      manage: "Module beheren"
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: "Module opties"
-      module_will_unlock_at: "Wordt *%{unlock_date}* ontgrendeld "
-      progression_complete_count: "*%{count}* voltooid"
-      progression_started_count: "*%{count}* voortgang"
-      reorder_modules: "Slepen om modules opnieuw te ordenen"
       unpublish: "Publicatie ongedaan maken"
     context_module_next: 
       aria_labels: 
@@ -3842,51 +3666,6 @@ nl:
         course_modules: Cursusmodules
     module_complete: Voltooid
     module_empty: "Er zijn geen items in de module \"%{module}\""
-    module_item: 
-      drag_to_reorder: "Slepen om volgorde te wijzigen of om item naar een andere module te verplaatsen"
-      images: 
-        alt: 
-          complete: klaar
-          incomplete: "niet voltooid"
-          max_score: "maximum score"
-          min_score: "minimum score"
-          must_contribute: "moet bijdragen"
-          must_submit: "moet inleveren"
-          must_view: "moet bekijken"
-        title: 
-          complete: "Module-item voltooid"
-          incomplete: "Module-item niet voltooid"
-          max_score: "Cursisten mogen de maximumscore voor dit item niet overschrijden voordat de module als voltooid wordt aangemerkt"
-          min_score: "Cursisten moeten de minimumscore voor dit item behalen voordat de module als voltooid wordt aangemerkt"
-          must_contribute: "Cursisten moeten  aan dit item bijdragen voordat de module als voltooid wordt aangemerkt"
-          must_submit: "Cursisten moeten deze opdracht inleveren voordat de module als voltooid wordt aangemerkt"
-          must_view: "Cursisten moeten dit item bekijken voordat de module als voltooid wordt aangemerkt"
-      links: 
-        edit_item: "Itemdetails bewerken"
-        edit_item_details_label: "Itemdetails bewerken"
-        indent: "Inspringen vergroten"
-        indent_label: "Inspringen vergroten"
-        outdent: "Inspringen verkleinen"
-        outdent_label: "Inspringen verkleinen"
-        remove_item: "Dit item uit de module verwijderen"
-        remove_item_label: "Dit item uit de module verwijderen"
-      max_score: 
-        fulfilled: "heeft niet meer gescoord dan %{score}"
-        unfulfilled: "moet niet meer scoren dan %{score}"
-      min_score: 
-        fulfilled: "heeft minimaal een %{score} gescoord"
-        unfulfilled: "moet minimaal een %{score} scoren"
-      module: 
-        item_aria_label: "%{item_label} Module-item"
-      must_contribute: 
-        fulfilled: "heeft bijgedragen aan de inhoud van de pagina"
-        unfulfilled: "moet aan de inhoud van de pagina bijdragen"
-      must_submit: 
-        fulfilled: "de opdracht ingeleverd"
-        unfulfilled: "moet de opdracht inleveren"
-      must_view: 
-        fulfilled: "heeft de pagina bekeken"
-        unfulfilled: "moet de pagina bekijken"
     module_item_next: 
       drag_to_reorder: "Slepen om de volgorde te wijzigen of item naar een andere module te verplaatsen"
       images: 
@@ -4456,37 +4235,15 @@ nl:
       buttons: 
         publish: "Cursus publiceren"
       details: 
-        assignments: "Jouw opdrachten toevoegen. Je kunt gewoon een lange lijst maken, of de opdrachten in groepen opdelen en zelfs een specifieke weging toekennen aan iedere taakgroep."
         available: "Nu de cursus gemaakt is en beschikbaar is, zul je deze checklijst niet meer nodig hebben. Maar we zullen deze toch bij de hand houden voor het geval dat je later iets nieuws wilt uitproberen of gewoon wat extra hulp nodig hebt bij het aanbrengen van wijzigingen in jouw cursusinhoud."
         calendar: "Dit is een mooie gelegenheid om de kalender te leren kennen en om gebeurtenissen, anders dan opdrachten,  aan jouw cursus toe te voegen. Maak je geen zorgen, we helpen je hierbij."
         claimed: 
-          not_saved: |-
-              Geweldig! Je hebt dus een cursus gemaakt... Wat nu? Goed, voordat je de cursus voor iedereen publiceert, kun je het beste eerst de basis in orde maken. Gebruik de lijst aan de linkerkant om te controleren of jouw cursus klaar is voor gebruik.
-              
-              *Zolang de cursus nog niet is gepubliceerd is deze cursus alleen voor docenten zichtbaar*
           saved: "Over en uit! Jouw cursus %{course} is nu officieel gemaakt. Deze is alleen voor jou zichtbaar totdat de cursus wordt gepubliceerd. Maar voordat je de cursus echt publiceert, raden wij je aan om de lijst aan de linkerkant door te lopen om een idee te krijgen van de mogelijkheden van Canvas en om ervoor te zorgen dat je straks echt les kunt geven."
-        created: 
-          not_saved: |-
-              Deze cursus is gemaakt maar niet geclaimd. De cursus zal verwijderd worden als deze niet binnen een week geclaimd wordt. In de tussentijd kun je de lijst aan de linkerkant doorlopen om te kijken of je er klaar voor bent.
-              
-              Als je wilt starten en erop  wilt terugkomen voordat het zover is, sla *deze link* dan op om er later op terug te komen.
-              
-              **Aanmelden** of ***registreer jezelf*** om deze cursus te claimen.
-          saved: |-
-              Over en uit! Jouw cursus %{course} is nu officieel gemaakt. Deze is alleen voor jou zichtbaar totdat de cursus wordt gepubliceerd. Maar voordat je de cursus publiceert, raden we je  aan om de lijst aan de linkerkant door te lopen om een idee te krijgen van de mogelijkheden van Canvas en ervoor te zorgen dat je straks echt les kunt geven.
-              
-              Als je wilt stoppen en erop wilt terugkomen voordat het zover is, sla *deze link* dan op om er later op terug te komen.
-              
-              **Aanmelden** of ***registreer jezelf*** om deze cursus te claimen.
         files: "Op het tabblad Bestanden kunnen jouw cursisten dias over lezingen, voorbeelddocumenten en studiehulpmiddelen of enig ander materiaal die ze willen downloaden, delen. Het uploaden en indelen van bestanden is gemakkelijk in Canvas. We zullen je tonen hoe."
         home2: "Dit is de pagina, die personen die deze cursus bezoeken, zullen zien. Je kunt hem instellen om activiteiten, de lijst met cursusmodulen, een syllabus, of een aangepaste pagina die je zelf hebt geschreven te tonen.  De activeiten van de cursus zijn standaard. Klik gewoon op %{choose_home_page} om die aan te passen."
         import: "Als je hiervoor een ander cursusbeheersysteem hebt gebruikt, heb je waarschijnlijk materiaal dat je naar Canvas wilt verplaatsen. We kunnen je laten zien hoe gemakkelijk je jouw inhoud in Canvas kunt migreren."
         navigation: "Standaard zijn alle links voor een cursus geactiveerd. Cursisten krijgen geen links naar secties zonder inhoud  te zien. Als je bijvoorbeeld nog geen toetsen hebt opgesteld, zullen ze ook geen link naar toetsen zien. Je kunt de links sorteren en ze opzettelijk verbergen als er onderdelen van de cursus zijn die je  voor de cursisten wilt verbergen."
         publish: 
-          form: |-
-              Alles klaar? Tijd om jouw cursus te publiceren! Op de knop hieronder klikken om het officieel te maken!
-              
-              Na publicatie kunnen gebruikers gaan deelnemen aan deze cursus.
           not_registered: "Deze cursus is geclaimd en klaar voor gebruik. Je moet het registratieproces echter nog afronden voordat je de cursus kunt publiceren. Canvas heeft hiervoor een e-mail  met een link gestuurd om het proces af te ronden. Controleer in ieder geval jouw spambox."
         students: "Deze functies gaat u zeker gebruiken. Er moet natuurlijk wel iemand luisteren als u lesgeeft."
         tas: "Je zou enkele onderwijsassistenten willen aanwijzen om je te helpen bij jouw cursus. Onderwijsassistenten kunnen inzendingen beoordelen, discussies helpen overzien en zelfs inleverdata en details voor de opdrachten helpen bijwerken."
@@ -4564,7 +4321,6 @@ nl:
     errors: 
       create_failed: "Maken van de cursus is mislukt"
       role_not_active: "Kan gebruikers niet toevoegen voor niet-actieve functie: %{role}"
-      role_not_found: "Functie %{role} bestaat niet."
       unpublish: "Publicatie van de cursus kan niet ongedaan gemaakt worden als er inzendingen van cursisten bestaan."
     group_list: 
       headings: 
@@ -4840,16 +4596,9 @@ nl:
         stats: Cursusstatistieken
         student_view: "Weergave voor cursist"
     show: 
-      buttons: 
-        update_layout: "Lay-out bijwerken"
       change_home_page: Verander
       details: 
-        assignments: "Deze weergave toont de **lijst met opdrachten** voor deze cursus, met komende en huidige opdrachten bovenaan."
         confirm_unenroll: "Weet je zeker dat je je wilt uitschrijven voor deze cursus? Je kunt dan niet langer het cursusrooster zien of direct met de docenten communiceren. Bovendien zul je niet langer gebeurtenissen die tijdens de cursus plaatsinden  in jouw gegevensstroom en als opmerkingen zien."
-        custom_page: "Je kunt **jouw eigen startpagina voor de cursus ontwerpen** en kunt wat voor koppelingen, afbeeldingen of uitgebreide media die je maar wilt toevoegen."
-        modules: "Je kunt je cursus indelen in **modules of secties**, waar iedere sectie een set verwante bestanden, opdrachten, pagina's, etc. bevat. Als je wilt, kun je ook modules in volgorde zettten door criteria en voorwaarden te definiëren die voltooid moeten zijn voordat iedere module ontsloten wordt. Deze layout  is waarschijnlijk het beste voor cursussen die niet gebaseerd zijn op een specifiek schema zoals een periode of semester."
-        recent_activity_dashboard: "Het **dashboard met recente actviteiten** laat aan deelnemers de meest recente gesprekken, aankondigingen, discussies en interacties voor deze cursus zien. Het is zeer vergelijkbaar met de dashboard pagina die gebruikers zien als ze voor het eerst aanmelden, maar die alleen de inhoud van deze specifieke cursus toont."
-        syllabus: "De **syllabusweergave** maakt het mogelijk om een beschrijving van de cursusverwachtingen toe te voegen of de cursus te introduceren met koppelingen, afbeeldingen, etc. Ook wordt er in de agenda een overzicht van alle opdrachten en cursusgebeurtenissen getoond."
       draft_state: 
         buttons: 
           cancel: Annuleren
@@ -4871,27 +4620,16 @@ nl:
         choose_home_page_title: "Startpagina kiezen"
         confirm_unenroll: "Uitschrijving bevestigen"
         importing: "Deze cursus wordt nu geïmporteerd"
-        set_layout: "Lay-out van startpagina instellen"
         unpublished: "Deze cursus is niet gepubliceerd"
       importing: "De cursus wordt op dit moment gekopieërd of gemigreerd. Daarom is sommige inhoud tijdelijk niet beschikbaar."
-      labels: 
-        select_content: "Als personen de cursuspagina bezoeken, ze dan tonen"
       license_notice: "Deze cursusinhoud wordt aangeboden onder een %{license_type}-licentie. De inhoud van deze cursus valt onder deze licentie, tenzij anders vermeld."
       links: 
-        change_layout: "Lay-out van startpagina wijzigen"
         choose_home_page: "Startpagina kiezen"
         course_setup: "Controlelijst voor cursus-setup"
-        course_stream: "Gegevensstroom van de cursus zien"
         drop_course: "Deze cursus neerzetten"
         join_course: "Deze cursus volgen"
         new_announcement: "Nieuwe aankondiging"
         view_course_stream: "Gegevensstroom over de cursus bekijken"
-      options: 
-        assignments: "de opdrachtenlijst"
-        custom_page: "een pagina die ik zelf zal ontwerpen"
-        modules: "de cursusmodules/-secties"
-        recent_activity_dashboard: "het dashboard met recente activiteiten"
-        syllabus: "de opdrachten met syllabus"
       period_name: "de afgelopen 2 weken"
       re_sending: "Bezig met opnieuw verzenden..."
       send_done: "Klaar! Het bericht kan een paar minuten duren."
@@ -5017,7 +4755,6 @@ nl:
     stats: Statistieken
     syllabus: Syllabus
     users: Gebruikers
-    wiki_page_revisions: Revisies
     wiki_pages: Pagina's
   csv: 
     alpha: Alpha
@@ -5146,17 +4883,17 @@ nl:
       tomorrow: Morgen
       yesterday: Gisteren
     formats: 
-      date_at_time: "%b %-d om %l:%M%P"
+      date_at_time: "%b %-d om %k:%M"
       default: "%d-%m-%Y"
-      long: "%B %-d,%Y"
-      long_with_weekday: "%A, %B %-d"
-      medium: "%d %b %Y"
+      long: "%-d %B %Y"
+      long_with_weekday: "%A, %-d %B"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
+      medium_with_weekday: "%a %-d %b %Y"
       short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
-      short_with_weekday: "%a, %b %-d"
+      short_with_weekday: "%a, %-d %b"
       weekday: "%A"
     month_names: 
       - ~
@@ -5465,7 +5202,6 @@ nl:
       make_sure_all_search_terms_are_spelled_correctly: "Ervoor zorgen dat alle zoektermen correct gespeld zijn."
       new_discussion: "Een discussie *starten*"
       rss_feed: RSS-feed
-      search_title_body_or_author: "Zoeken op titel, inhoud of auteur"
       start_one_now: "Nu een starten"
       suggestions: "Suggesties:"
       there_are_no_discussion_topics_to_show: "Er zijn geen discussie-onderwerpen tonen"
@@ -5500,9 +5236,7 @@ nl:
     show: 
       add_rubric: "Rubric toevoegen"
       announcement_closed: "Deze aankondiging is voor opmerkingen gesloten"
-      announcement_locked: "Deze aankondiging is  voor gebruikers niet zichtbaar tot *%{date}*"
       announcement_locked_until: "Deze aankondiging is vergrendeld tot %{time}"
-      announcement_not_visible: "Deze aankondiging is voor gebruikers niet zichtbaar"
       authors_name: "Naam van de auteur"
       collapse_replies: "Antwoorden samenvouwen"
       confirm_delete_discussion: "Weet je zeker dat je deze discussie wilt verwijderen?"
@@ -5530,12 +5264,9 @@ nl:
       reply_to_message: "Op huidig bericht antwoorden"
       reply_to_topic: "Op onderwerp antwoorden"
       retrieved_from_feed: "Opgehaald uit %{feed}"
-      search_entries_placeholder: "Vermeldingen  of auteur zoeken"
       show_rubric: "Rubriek tonen"
       speed_grader: "Speed Grader"
       topic: Onderwerp
-      topic_locked: "Dit onderwerp is  voor gebruikers niet zichtbaar tot *%{date}*"
-      topic_not_visible: "Dit onderwerp is niet voor gebruikers zichtbaar"
       topic_podcast_feed_link: "Podcast-feed onderwerp"
       topic_subscribe: Aanmelden
       topic_subscribe_tooltip: "Je bent niet aangemeld en zult niet op de hoogte gebracht worden van nieuwe opmerkingen"
@@ -5632,11 +5363,6 @@ nl:
     unsubscribed: "Aanmelding opgeheven"
     unsubscribed_hint: "Je bent niet aangemeld voor dit onderwerp. Klikken om je aan te melden."
   display_course_catalog: "Een lijst met cursussen, die je kunt doorlopen in dit hoofdaccount aangeven met de markering \"Deze cursus opnemen in de openbare cursus index\". "
-  draft_state_description: |-
-      Deze beta functie ontwerpt veel onderdelen van Canvas opnieuw en laat de inhoud bestaan in 
-      een nieuwe niet gepubliceerde status die voor cursisten onzichtbaar is en waarin berekeningen van cijfers niet zijn 
-      opgenomen. Let op--deze functie uitschakelen kan veel van de door de docent 
-      nieuw gemaakte of bewerkte inhoud verwijderen.
   due_date_822625d8: Inleverdatum
   due_dates: 
     due_at: "inleverdatum: %{assignment_due_date_time}"
@@ -6266,7 +5992,6 @@ nl:
       feature_options: "Functie opties"
       no_features_available: "Er zijn momenteel geen functies beschikaar"
   features: 
-    allow_opt_out_of_inbox: "Gebruikers toestaan om buiten de inbox te kiezen"
     better_file_browsing: "Beter door bestanden bladderen"
     course_catalog: "Catalogus van de cursus"
     differentiated_assignments: " Gedifferentieerde opdrachten"
@@ -6274,9 +5999,6 @@ nl:
         Het uitschakelen van deze functie zal impact op bestaande cursussen hebben. Neem voor het uitschakelen van dit onderdeel contact
         met jouw Canvas Success Manager op.
     differentiated_assignments_course_disable_warning: "Gedifferentieerde opdrachten uitschakelen zal alle gepubliceerde opdrachten zichtbaar maken aan/voor alle cursisten."
-    draft_state: Conceptstatus
-    draft_state_account_disable_warning: "Het uitschakelen van deze functie zal impact hebben op bestaande cursussen. Neem bij voorbeeld bij het uitschakelen van dit onderdeel contact op met jouw Canvas Success Manager."
-    draft_state_course_disable_warning: "Door het uitschakelen van deze functie zullen alle bestaande objecten in de cursus gepubliceerd worden. Zorg ervoor dat, voordat je verder gaat, de hele concept inhoud al klaar is voor publicatie en al beschikbaar is voor alle gebruikers van de cursus."
     ember_modules: "Ember Modules"
     google_docs_domain_restriction: "Beperking van Google Docs domein"
     high_contrast: "Hoge contrast stijlen gebruiken"
@@ -7855,6 +7577,7 @@ nl:
       feedback: "Hier klikken om ons te vertellen wat er gebeurd is"
     help: Help
     show_me_where: "Aan mij tonen waar"
+  links_14b70841: Koppelingen
   locales: 
     nl: Nederlands
   logged_out_user: "Uitgelogde gebruiker %{user_counter}"
@@ -10552,7 +10275,6 @@ nl:
       description: "App Center voor installeren van externe hulpprogrammas in Canvas"
       name: "App Center"
     app_center_settings: 
-      description: "App Center verschijnt op het tabblad \"Apps\" van de instellingspagina van of een cursus of een account. De URL hieronder moet naar een geldig App Center-eindpunt (bijvoorbeeld https://lti-examples.heroku.com verwijzen, zorg ervoor dat je aan het einde geen schuine streep toevoegt)"
       labels: 
         app_reviews_endpoint: "Eindpunt app-weergave"
         apps_index_endpoint: "Eindpunt app-index"
@@ -11490,6 +11212,20 @@ nl:
       regrade_options: "Opties voor het herberekenen *(voor cursisten die deze vraag al hebben beantwoord):*"
       some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*scores van sommige cursisten kunnen verlaagd worden*)"
       update_question_without_regrading: "Vraag bijwerken zonder opnieuw te beoordelen"
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: Vraag
+    loading: "Aan het Laden..."
+    navigation: 
+      links: 
+        question: "Vraag %{position}"
+      questions: Vragen
+    session_table_headers: 
+      attempt: Poging
+    table_view: 
+      headers: 
+        question: "Vraag %{position}"
   quiz_reports: 
     cancel_generation: Annuleren
     download_item_analysis: "Onderdeel van rapport met analyses downloaden. "
@@ -12638,7 +12374,6 @@ nl:
     folder: Map
     folder_browsing_tree: "Structuur voor bladeren door mappen"
     folder_name: Mapnaam
-    kind: Soort
     labels: 
       select: "Dit item selecteren"
     loading_more_results: "Bezig met het laden van meer resultaten..."
@@ -13060,7 +12795,9 @@ nl:
     enrollments_tas: Onderwijsassistenten
     enrollments_teachers: Docenten
     student_groups: "Groepen cursisten"
+  search_entries_or_author_63fb0a86: "Vermeldingen  of auteur zoeken"
   search_groups_or_people_6c15d6ad: "Groepen of personen zoeken"
+  search_title_body_or_author_1d26711f: "Zoeken op titel, inhoud of auteur"
   section: 
     confirms: 
       delete_enrollment: "Weet je zeker dat je deze inschrijving permanent wilt verwijderen?"
@@ -13756,10 +13493,6 @@ nl:
       topic_notice: "Het onderwerp selecteren dat je  aan deze *module* wilt koppelen of een onderwerp toevoegen door \"Nieuw onderwerp\" te selecteren."
       wiki_page_notice: "De wiki-pagina selecteren die je aan deze *module*wilt koppelen  of een nieuwe pagina toevoegen door \"Nieuwe pagina\" te selecteren."
       wiki_page_select_label: "De wiki pagina selecteren die je wilt koppelen, of een nieuwe pagina toevoegen door \"Nieuwe pagina\" te selecteren."
-    sequence_footer: 
-      full_course_sequence: "Volledige cursusreeks zien"
-      next: Volgende
-      previous: Vorige
     submission_comment: 
       assignment: Opdracht
       grading_alt: beoordeling
@@ -14329,17 +14062,16 @@ nl:
     event: "%{date} om %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
+      long: "%d %B, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "minder dan een minuut geleden"
     pm: "s middags"
     ranges: 
       different_days: "%{start_date_and_time} tot %{end_date_and_time}"
       same_day: "%{date} van %{start_time} tot %{end_time}"
       times: "%{start_time} tot %{end_time}"
-    unknown_date: "Onbekende datum"
     with_ago: "%{time} geleden"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -15084,8 +14816,6 @@ nl:
   wiki_page: 
     atom_author: Wiki-pagina
     atom_entry_title: "Wiki-pagina, %{course_or_group_name}: %{page_title}"
-    cannot_hide_page: "kan voorpagina niet verbergen"
-    cannot_set_hidden_front_page: "instellen als voorpagina niet mogelijk omdat deze is verborgen"
     cannot_set_unpublished_front_page: "instellen als voorpagina niet mogelijk omdat deze niet gepubliceerd is"
     defaults: 
       no_content: "geen inhoud"
@@ -15094,109 +14824,25 @@ nl:
       title_characters: "Titel moet minstens een letter of nummer bevatten"
       title_too_long: "Titel mag maximaal %{max_characters} tekens bevatten"
     unknown_user_name: Onbekend
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: "Terug naar huidige versie"
-      page_edited_by_with_link: "door [%{user_name}](%{link})"
-      page_imported: "door importeerfunctie"
-      titles: 
-        revisions_for_page: "Revisies voor: %{title}"
-    notices: 
-      page_rolled_back: "Pagina succesvol naar vorige versie teruggedraaid."
-    show: 
-      buttons: 
-        roll_back_version: "Terugdraaien naar deze versie"
-      imported_at: "Geïmporteerd: *%{time_ago}*"
-      labels: 
-        by_content_importer: "door importeerfunctie"
-        by_user: "door %{user}"
-        on_date: "op *%{date_time}*"
-      links: 
-        back_to_history: "Terug naar voorgeschiedenis van revisie"
-        go_to_latest: "Naar nieuwste versie gaan"
-      not_most_recent_version_warning: "Dit is NIET de meest recente versie"
-      saved_by: "Opgeslagen: *%{time_ago}* door %{user}"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: "Wijzigingen opslaan"
-        start_editing: "Nu beginnen met bewerken"
-      course_editing_roles: 
-        anyone: Iedereen
-        only_teachers: "Alleen docenten"
-        teachers_and_students: "Docent en cursisten"
-      course_home_wiki_page_description: "Je kunt deze pagina gebruiken om jouw cursus te organiseren of te introduceren zoal je wilt. Je kunt hier gemakkelijk koppelen naar opdrachten, bestanden, etc. door gebruik te maken van de sectie \"Paginahulpmiddelen\" die na het starten van de bewerking aan de rechterkant te zien zal zijn."
-      course_wiki_page_description: "Je kunt gebruikmaken van deze wiki om aanvullende pagina's of beschrijvingen voor jouw cursusmateriaal te maken. Je kunt eenvoudig koppelingen maken tussen wiki-pagina's en opdrachten of vanuit elke wiki-pagina koppelingen maken naar ander cursusmateriaal en bestanden. Dit maakt het een ideale plek om moeilijke concepten uit te leggen,voor groepsprojecten, of gewoon iedere andere soort pagina te maken die je ook in jouw cursus nodig kunt hebben."
-      default_wiki_page_description: "Deze pagina is de standaard wikipagina. Cursisten zullen deze zien wanneer zij in deze cursus op het tabblad \"Pagina's\" klikken."
-      default_wiki_page_is_course_home_page_warning: |-
-          Op dit moment is deze pagina ook ingesteld als standaard cursuspagina, waardoor bezoekers
-          aan jouw cursus deze pagina als eerste zullen zien. Je kunt dat wijzigen op [de startpagina van de cursus](%{link}).
-      editing_content: "Bewerken van inhoud."
-      editing_roles: 
-        anyone: Iedereen
-        only_members: "Alleen leden"
-        prompt: "%{options} kan/kunnen deze pagina bewerken"
-      group_wiki_warning: "Deze pagina is onderdeel van de groepswiki, *niet* van de cursuswiki. [Hier klikken](%{link}) als je op zoek bent naar de cursuswiki."
-      labels: 
-        hide_from_students: "Deze pagina voor cursisten verbergen"
-        last_edited: "Laatst bewerkt: %{time_ago} geleden door %{name}"
-        notify_of_update: "Gebruikers waarschuwen dat deze inhoud is gewijzigd"
-      links: 
-        page_history: "Voorgeschiedenis van pagina"
-      notices: 
-        page_deleted: "Deze pagina is verwijderd."
-        page_does_not_exist: "Deze pagina bestaat nog niet."
-        page_edited_while_viewing: "Deze pagina is bijgewerkt door iemand anders sinds je de pagina aan het bekijken bent. [Hier klikken om de pagina opnieuw te laden.](%{link})"
-        page_edited_while_viewing_detailed: "Iemand anders heeft deze pagina bewerkt sinds je deze geüpload hebt en als je nu inzendt, zul je hun wijzigingen overschrijven. Je wilt misschien de pagina opnieuw laden en jouw wijzigingen opnieuw invoeren om er zeker van te zijn dat je het werk van iemand anders niet verliest."
-      welcome_message: "Welkom bij de cursuswiki"
-    edit_page: 
+    edit: 
       page_header_title: "%{page_name} bewerken"
-    errors: 
-      cannot_delete_front_page: "Je kunt de voorpagina niet verwijderen."
-    front_page: Voorpagina
+    index: 
+      titles: 
+        pages: Pagina's
     notices: 
       cannot_edit: "Je mag de pagina \"%{title}\" niet bewerken."
       cannot_read_revisions: "Je mag de historische revisies van \"%{title}\" niet nagekeken."
       create_non_existent_page: "De pagina \"%{title}\" bestaat (nog) niet, maar deze kun je hieronder maken"
       page_deleted: "De pagina \"%{title}\" is verwijderd."
       page_does_not_exist: "De pagina \"%{title}\" bestaat niet."
-      page_updated: "Pagina succesvol bijgewerkt."
-    page_link: 
-      link_hidden_from_students_warning: "Cursisten zullen deze koppeling niet zien"
-    page_revisions: 
+    revisions: 
       page_revisions_title: "%{title} revisies: %{context_name}"
-    pages_index: 
-      titles: 
-        pages: Pagina's
-    wiki_right_side: 
-      buttons: 
-        create: Maken
-        rename: "Naam wijzigen"
-      delete_page_confirmation: "Weet je zeker dat je deze pagina wilt verwijderen? Dit kan niet ongedaan gemaakt worden!"
-      headers: 
-        all_pages: "Alle pagina's"
-        common_pages: "Gemeenschappelijke pagina's"
-        page_tools: "Hulpprogramma voor pagina"
-        recent_changes: "Recente wijzigingen"
-      links: 
-        create_page: "Een nieuwe pagina maken"
-        delete_page: "Deze pagina verwijderen"
-        edit_page: "Deze pagina bewerken"
-        more: meer...
-        rename_page: "Naam van deze pagina wijzigen"
-        show_all: "alles tonen..."
-      title: "Nieuwe paginatitel"
-      wiki_description_for_course: "Beschouw het als een eindeloze plek om inhoud te bewaren. Je kunt het gebruiken om jouw cursus te beschrijven, nuttige uitleg over moeilijke onderwerpen te bieden of zelfs om cursisten samen aan schrijfopdrachten te laten werken."
-      wiki_description_for_group: "Beschouw het als een eindeloze plek om inhoud te bewaren. Je kunt deze gebruiken om jouw groep te beschrijven, nuttige uitleg over moeilijke onderwerpen te bieden of zelfs om cursisten samen aan schrijfopdrachten te laten werken."
-      wiki_description_header: "Waar is een wiki voor bedoeld?"
   wiki_pages_api: 
     cannot_delete_front_page: "De voorpagina kan niet verwijderd worden"
-    cannot_have_hidden_front_page: "De voorpagina kan niet verborgen worden"
     cannot_have_unpublished_front_page: "Publicatie van de voorpagina kan niet ongedaan worden gemaakt"
     cannot_update_editing_roles: "Je mag de bewerkingsfuncties van deze wiki-pagina niet bijwerken."
     cannot_update_front_page: "Je mag de wiki-voorpagina niet wijzigen"
-    cannot_update_hide_from_students: "Je mag de voor cursisten verborgen markering van deze wiki-pagina niet bijwerken"
     cannot_update_published: "Je mag de gepubliceerde status van deze wiki-pagina niet bijwerken"
     cannot_update_title: "Je mag de titel van deze wiki-pagina niet bijwerken"
     invalid_editing_roles: "De voorgeschreven bewerkingsfuncties zijn ongeldig"
