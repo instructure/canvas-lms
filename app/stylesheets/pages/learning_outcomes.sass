@@ -1,11 +1,20 @@
 @import base/environment
 @import pages/rubrics.scss
 
+#main
+  max-width: none
+
 .outcomes-browser
   min-width: 840px
-  .toolbar
+  margin-top: 0px
+  .outcomes-toolbar
     padding: 5px
+    margin-top: 0px
     height: 38px
+    background-image: none
+    background-color: #d4dce2
+    border-radius: 5px 5px 0px 0px
+    border: none
     .manage_rubrics
       float: right
     .search
@@ -14,7 +23,7 @@
       i
         margin-bottom: -3px
   .outcomes-main
-    height: 500px
+    height: 625px
     padding: 0
     overflow: hidden
     background-color: white
@@ -22,24 +31,31 @@
       clear: both
   .outcomes-sidebar
     float: left
-    height: 485px
+    height: 610px
     width: 201px
     background-color: $lightBackground
-    overflow-x: scroll
+    overflow-x: auto
     overflow-y: hidden
     padding-bottom: 15px
+    border: none
+    border-radius: 0px 0px 0px 5px
     .wrapper
       width: 201px
   .outcomes-content
-    height: 500px
+    height: 625px
     border-left: 1px solid $borderColor
-    overflow: scroll
+    overflow-x: auto
+    overflow-y: auto
     position: relative
+    border: none
+    border-radius: 0px 0px 5px 0px
+    background-color: #fbfbfb
     .learning_outcome
       label.span3
         margin-left: 0px
     .wrapper
       padding: 15px
+      padding-top: 10px
       width: 600px
       min-height: 300px
     label
@@ -49,15 +65,17 @@
       margin-bottom: -3px
     .delete_button, .edit_button
       margin-right: 1em
+    .edit_group_button
+      margin-right: 1em
 ul.outcome-level
   padding: 0
   margin: 0
-  border-right: 1px solid #ccc
+  border-right: 1px solid #ddd
   float: left
-  height: 485px
+  height: 625px
   width: 200px
   overflow-x: hidden
-  overflow-y: scroll
+  overflow-y: auto
   &.outcome-level-hover, &.outcome-level-hover li
     background: white
   li
@@ -76,8 +94,6 @@ ul.outcome-level
     a
       text-decoration: none
       display: block
-      border-top: 1px solid white
-      border-bottom: 1px solid #e4e5e7
       padding: 4px 12px
       color: #555555
       white-space: nowrap
@@ -90,8 +106,6 @@ ul.outcome-level
     &.selected
       a
         background-color: $toolbarBackgroundLight
-        border-bottom-color: lighten($borderColor, 15%)
-        border-top-color: lighten($activeBG, 2%)
         &:hover
           background-color: $activeBG
       &.droppable
@@ -101,8 +115,6 @@ ul.outcome-level
     &.droppable
       a
         background-color: $activeBG
-        border-bottom-color: lighten($borderColor, 15%)
-        border-top-color: lighten($activeBG, 2%)
     a.loading-more
       background-color: darken($lightBackground, 3%)
     &[aria-grabbed=true] a, &[aria-grabbed=true] i
