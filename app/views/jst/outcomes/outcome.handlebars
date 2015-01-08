@@ -27,20 +27,6 @@
   </tr>
 </table>
 
-{{#unless readOnly}}
-<a href="#" style="float:right" class="move_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-  {{#t}}Move Outcome{{/t}}
-</a>
-{{#if native}}
-<a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-  {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
-</a>
-{{/if}}
-<a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-  {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
-</a>
-{{/unless}}
-
 {{#if setQuizMastery}}
   <label for="outcome_mastery_at">
     {{#t "mastery_at_label"}}Set mastery for any score at or above:{{/t}}
@@ -54,7 +40,71 @@
       {{#t "use_for_scoring"}}Use this criterion for scoring{{/t}}
     </label>
   {{else}}
-    <p>{{#t "point_mastery"}}Mastery at {{mastery_points}} points{{/t}}</p>
+    <p>{{#t "point_mastery"}}Mastery: {{mastery_points}} Points{{/t}}</p>
   {{/if}}
 {{/if}}
+
+<div id="calculation_method" data-calculation-method="{{calculation_method}}">{{#t}}Calculation Method{{/t}}: {{calc_method_str}}</div>
+
+<div class="content-box">
+  <div class="grid-row">
+    <div class="col-xs-2"></div>
+    <div class="col-xs-10">
+      <div class="content-box border border-trbl border-round" id="calculation_int_container">
+        <div class="grid-row" style="padding: 10px">
+          <div class="col-xs-4 border border-r" id="calculation_int_left_side">
+            <div id="calculation_int_left_side_top">
+              <span id="calculation_int_label"></span>
+              <span id="calculation_int">{{calculation_int}}</span>
+            </div>
+            <div id="calculation_int_left_side_bottom">
+              <span id="calculation_int_range_info" class="outcomes-calculation-int-italics"></span>
+            </div>
+          </div>
+          <div class="col-xs-8" id="calculation_int_right_side">
+            <div class="content-box" style="margin:0px">
+              <div class="grid-row">
+                <div class="col-xs-2">
+                  <span class="outcomes-calculation-int-italics">{{#t "example"}}Example:{{/t}}</span>
+                </div>
+                <div class="col-xs-10">
+                  <span id="calculation_int_example" class="outcomes-calculation-int-italics"></span>
+                </div>
+              </div>
+              <div class="grid-row">
+                <div class="col-xs-12">
+                  <span id="calculation_int_example_line_1" class="outcomes-calculation-int-italics"></span>
+                </div>
+              </div>
+              <div class="grid-row">
+                <div class="col-xs-12">
+                  <span id="calculation_int_example_line_2" class="outcomes-calculation-int-italics"></span>
+                </div>
+              </div>
+              <div class="grid-row">
+                <div class="col-xs-12">
+                  <span id="calculation_int_example_line_3" class="outcomes-calculation-int-italics"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#unless readOnly}}
+  <a href="#" style="float:right" class="move_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+    {{#t}}Move Outcome{{/t}}
+  </a>
+    {{#if native}}
+    <a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+      {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
+    </a>
+    {{/if}}
+  <a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+    {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
+  </a>
+{{/unless}}
 

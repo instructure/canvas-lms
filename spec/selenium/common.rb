@@ -1263,7 +1263,7 @@ def alert_present?
 end
 
 def scroll_page_to_top
-  driver.execute_script("window.scrollTo(0, 0")
+  driver.execute_script("window.scrollTo(0, 0)")
 end
 
 def scroll_page_to_bottom

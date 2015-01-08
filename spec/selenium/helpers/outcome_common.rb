@@ -257,7 +257,13 @@ def should_validate_short_description_presence
   f('.outcome_title').clear
   f('.submit_button').click
   wait_for_ajaximations
-  expect(fj('.error_text div').text).to eq "Cannot be blank"
+  scroll_page_to_top
+  driver.execute_script("$('.outcomes-content').scrollTo(0, 0)")
+  wait_for_ajaximations
+
+  keep_trying_until {
+    expect(fj('.error_text div').text).to eq "Cannot be blank"
+  }
 end
 
 def should_validate_short_description_length
