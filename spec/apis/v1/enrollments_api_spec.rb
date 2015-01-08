@@ -83,6 +83,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section_id).to eql @section.id
         expect(new_enrollment.workflow_state).to eql 'active'
         expect(new_enrollment.course_id).to eql @course.id
+        expect(new_enrollment.self_enrolled).to eq nil
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
       end
 
@@ -168,6 +169,11 @@ describe EnrollmentsApiController, type: :request do
       it "should assume a StudentEnrollment if no type is given" do
         api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id } }
         expect(JSON.parse(response.body)['type']).to eql 'StudentEnrollment'
+      end
+
+      it "should allow creating self-enrollments" do
+        json = api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id, :self_enrolled => true } }
+        expect(@unenrolled_user.enrollments.find(json['id']).self_enrolled).to eq(true)
       end
 
       it "should return an error if an invalid type is given" do

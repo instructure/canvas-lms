@@ -307,6 +307,10 @@ class EnrollmentsApiController < ApplicationController
   #   enrollment_state will be set to 'active' and all other arguments
   #   will be ignored.
   #
+  # @argument enrollment[self_enrolled] [Boolean]
+  #   If true, marks the enrollment as a self-enrollment, which gives
+  #   students the ability to drop the course if desired. Defaults to false.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
   #     -X POST \
