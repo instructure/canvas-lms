@@ -412,9 +412,7 @@ class PageView < ActiveRecord::Base
     end
 
     def cassandra
-      user.shard.activate do
-        PageView::EventStream.database
-      end
+      PageView::EventStream.database
     end
 
     def run
