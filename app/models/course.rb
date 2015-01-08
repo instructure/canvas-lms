@@ -38,6 +38,7 @@ class Course < ActiveRecord::Base
                   :conclude_at,
                   :grading_standard_id,
                   :is_public,
+                  :is_public_to_auth_users,
                   :allow_student_wiki_edits,
                   :show_public_context_messages,
                   :syllabus_body,
@@ -1009,7 +1010,7 @@ class Course < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| self.available? && self.is_public }
+    given { |user, session| self.available? && (self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id)))  }
     can :read and can :read_outcomes and can :read_syllabus
 
     given { |user| self.available? && self.public_syllabus }
@@ -2124,7 +2125,7 @@ class Course < ActiveRecord::Base
       else scope.none
     end
   end
-  
+
   def sections_visible_to(user, sections = active_course_sections)
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
@@ -2450,6 +2451,7 @@ class Course < ActiveRecord::Base
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :course_format
+  add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -2516,7 +2518,7 @@ class Course < ActiveRecord::Base
       self.save!
       # Assign original course profile to the new course (automatically saves it)
       new_course.profile = self.profile unless self.profile.new_record?
-      
+
       Course.find(new_course.id)
     end
   end

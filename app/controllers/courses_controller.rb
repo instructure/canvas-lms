@@ -200,6 +200,10 @@ require 'set'
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "is_public_to_auth_users": {
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "public_syllabus": {
 #           "example": true,
 #           "type": "boolean"
@@ -455,6 +459,9 @@ class CoursesController < ApplicationController
   # @argument course[is_public] [Boolean]
   #   Set to true if course if public.
   #
+  # @argument course[is_public_to_auth_users] [Boolean]
+  #   Set to true if course if public to authenticated users.
+  #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
   #
@@ -574,7 +581,7 @@ class CoursesController < ApplicationController
             @current_user,
             session,
             [:start_at, course_end, :license,
-             :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
+             :is_public, :is_public_to_auth_users, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
              :restrict_enrollments_to_course_dates, :hide_final_grades], nil)

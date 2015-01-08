@@ -246,6 +246,12 @@ TEXT
             <%= f.label :is_public, :en => "Make this course publicly visible" %>
             <span class="aside checklabelfix"><%= t('help.public_course', %{(student data will remain private)}) %></span>
           </div>
+          <div>
+            <span>
+              <%= f.check_box :is_public_to_auth_users %>
+              <%= f.label :is_public_to_auth_users, :en => "Make this course visible to authenticated users" %>
+            </span>
+          </div>
           <div class="public_options">
             <%= f.check_box :indexed %>
             <%= f.label :indexed, :en => "Include this course in the public course index" %>
