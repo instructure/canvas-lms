@@ -1,11 +1,13 @@
 define [
+  'jquery'
   'i18n!folder_tree'
   'react'
   'react-router'
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
-], (I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes) ->
+  'compiled/jquery.rails_flash_notifications'
+], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes) ->
 
   FolderTree = React.createClass
     displayName: 'FolderTree'
@@ -52,6 +54,7 @@ define [
         $.flashError message
         $.screenReaderFlashMessage message
       else
+        $.screenReaderFlashMessageExclusive I18n.t('File list updated')
         @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
 
