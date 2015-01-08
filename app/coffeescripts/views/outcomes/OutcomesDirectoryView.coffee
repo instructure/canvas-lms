@@ -43,6 +43,11 @@ define [
     initialize: (opts) ->
       @readOnly = opts.readOnly
       @parent = opts.parent
+      # the way the event listeners work between OutcomeIconView, OutcomesDirectoryView
+      # and SidebarView can cause items to become unselectable following a move. The
+      # below attribute is using brute-force to make the view reset to address this problem
+      # until we can find a better solution
+      @needsReset = false
 
       if @outcomeGroup = opts.outcomeGroup
         unless @groups
@@ -86,7 +91,7 @@ define [
       @loadDfd.promise()
 
     # Public: move a model from some dir to this
-    moveModelHere: (model) =>
+    moveModelHere: (model, originalDir) =>
       model.collection.remove model
       if model instanceof OutcomeGroup
         @groups.add model
@@ -94,7 +99,9 @@ define [
       else
         @outcomes.add model
         dfd = @changeLink model, @outcomeGroup.toJSON()
-      dfd.done -> model.trigger 'select'
+      dfd.done ->
+        model.trigger 'select'
+        originalDir.needsReset = true if originalDir
 
     # Internal: change the outcome link to the newGroup
     changeLink: (outcome, newGroup) ->
@@ -192,6 +199,7 @@ define [
       @_views
 
     reset: =>
+      @needsReset = false
       @_clearViews()
       @render()
 
@@ -217,6 +225,7 @@ define [
 
     render: =>
       @$el.empty()
+      return @reset() if @needsReset
       _.each @views(), (v) => @$el.append v.render().el
       @initDroppable() unless @readOnly
       # Make the first <li /> tabbable for accessibility purposes.
