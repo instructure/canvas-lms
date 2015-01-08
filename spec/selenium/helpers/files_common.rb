@@ -121,4 +121,10 @@ def unzip_from_form_to_folder()
     expect(sub.attachments.active.map(&:display_name)).to eq ["second_entry.txt"]
   end
 
+  def confirm_delete_on_dialog
+    driver.switch_to.alert.accept
+  end
 
+  def cancel_delete_on_dialog
+    driver.switch_to.alert.dismiss
+  end
