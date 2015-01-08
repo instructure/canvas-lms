@@ -234,6 +234,17 @@ describe QuizzesHelper do
       expect(html).to match /value='fixing'/
       expect(html).to match /value='protein'/
     end
+    it "should sanitize the answer blocks in the noisy question data" do
+      broken_question_text = "<p><span>\"Roses are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0'\n value='{{question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0}}' />\n, violets are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_01731fa53c4cf2f32e893d5c3dbae9c1'\n value='{{question_244_01731fa53c4cf2f32e893d5c3dbae9c1}}' />\n\")</span></p>"
+      html = fill_in_multiple_blanks_question(
+        question: {question_text: ActiveSupport::SafeBuffer.new(broken_question_text)},
+        answer_list: [
+          {:blank_id=>"color1", :answer=>"red"},
+          {:blank_id=>"color2", :answer=>"black"}
+        ], answers: @answers
+      )
+      expect(html).not_to match "{{"
+    end
   end
 
   context "multiple_dropdowns_question" do

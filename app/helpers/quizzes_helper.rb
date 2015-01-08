@@ -410,7 +410,8 @@ module QuizzesHelper
     answer_list.each do |entry|
       entry[:blank_id] = AssessmentQuestion.variable_id(entry[:blank_id])
     end
-    res.gsub! %r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>} do |match|
+    # Requires mutliline option to be robust
+    res.gsub!(%r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>}m) do |match|
       blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
       blank.gsub!(/\\/,'')
       answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
@@ -418,7 +419,7 @@ module QuizzesHelper
 
       # If given answer list, insert the values into the text inputs for displaying user's answers.
       if answer_list.any?
-        #  Replace the {{question_BLAH}} template text with the user's answer text.
+        #  Replace the {{question_IDNUM_VARIABLEID}} template text with the user's answer text.
         match = match.sub(/\{\{question_.*?\}\}/, answer.to_s).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/*>\Z/, readonly_markup)
