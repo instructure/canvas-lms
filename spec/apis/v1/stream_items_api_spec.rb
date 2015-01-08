@@ -342,6 +342,7 @@ describe UsersController, type: :request do
         'workflow_state' => 'available',
         'public_syllabus' => false,
         'is_public' => @course.is_public,
+        'is_public_to_auth_users' => @course.is_public_to_auth_users,
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false
       },
@@ -447,6 +448,7 @@ describe UsersController, type: :request do
         'workflow_state' => 'available',
         'public_syllabus' => false,
         'is_public' => @course.is_public,
+        'is_public_to_auth_users' => @course.is_public_to_auth_users,
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false
       },
