@@ -43,12 +43,12 @@
             <td class="dates{{#unless last}} not_last{{/unless}}">
               {{#if start_at}}
                 {{#if due_at}}
-                  due by <span {{contextSensitiveDatetimeTitle due_at}} >{{tTimeHours due_at}}</span>
+                  due by <span {{contextSensitiveDatetimeTitle (unfudge due_at)}} >{{tTimeHours due_at}}</span>
                 {{else}}
-                  <span {{contextSensitiveDatetimeTitle start_at}} >{{tTimeHours start_at}}</span>
+                  <span {{contextSensitiveDatetimeTitle (unfudge start_at)}} >{{tTimeHours start_at}}</span>
                   {{#unless same_time}}
                     to
-                    <span {{contextSensitiveDatetimeTitle end_at}} >
+                    <span {{contextSensitiveDatetimeTitle (unfudge end_at)}} >
                       {{#if same_day}}
                         {{tTimeHours end_at}}
                       {{else}}
