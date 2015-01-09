@@ -28,7 +28,7 @@ module Lti
       tool_proxy_collection = BookmarkedCollection.wrap(ToolProxyNameBookmarker, tool_proxy_scope)
       BookmarkedCollection.merge(
         ['external_tools', external_tools_collection],
-        ['message)handlers', tool_proxy_collection]
+        ['message_handlers', tool_proxy_collection]
       )
     end
 

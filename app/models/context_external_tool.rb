@@ -480,7 +480,7 @@ class ContextExternalTool < ActiveRecord::Base
     scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
     scope = scope.placements(*placements)
     scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
-    scope.order(ContextExternalTool.best_unicode_collation_key('name'))
+    scope.order("#{ContextExternalTool.best_unicode_collation_key('context_external_tools.name')}, context_external_tools.id")
   end
 
   def self.find_external_tool_by_id(id, context)
