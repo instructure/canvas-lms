@@ -416,6 +416,7 @@ var speakMessage = function ($this, message) {
         if (!$this.val()) { text = ""; }
         if (d != null) {
           $this.data('date', fudged_d);
+          $this.data('unfudged-date', d);
           if ($this.data('hiddenInput')) {
             $this.data('hiddenInput').val(fudged_d);
           }

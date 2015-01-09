@@ -63,8 +63,8 @@ define [
 
     extractFormValues: ->
       hidden   : @state.selectedOption is 'link_only'
-      unlock_at: @state.selectedOption is 'date_range' && @refs.unlock_at.getDOMNode().value or ''
-      lock_at  : @state.selectedOption is 'date_range' && @refs.lock_at.getDOMNode().value or ''
+      unlock_at: @state.selectedOption is 'date_range' && $(@refs.unlock_at.getDOMNode()).data('unfudged-date') or ''
+      lock_at  : @state.selectedOption is 'date_range' && $(@refs.lock_at.getDOMNode()).data('unfudged-date') or ''
       locked: @state.selectedOption is 'unpublished'
 
     # Function Summary
