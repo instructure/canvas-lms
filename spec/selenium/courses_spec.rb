@@ -77,6 +77,7 @@ describe "courses" do
     end
 
     it "should properly hide the wizard and remember its hidden state" do
+      pending
       course_with_teacher_logged_in
 
       create_new_course
@@ -95,6 +96,7 @@ describe "courses" do
     end
 
     it "should open and close wizard after initial close" do
+      pending
       def find_wizard_box
         wizard_box = keep_trying_until do
           wizard_box = f("#wizard_box")

@@ -910,7 +910,7 @@ define([
       });
       setTimeout(function() {
         if(!userSettings.get('hide_wizard_' + pathname)) {
-          $(".wizard_popup_link.auto_open:first").click();
+           // $(".wizard_popup_link.auto_open:first").click();
         }
       }, 500);
     });
