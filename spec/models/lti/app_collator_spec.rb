@@ -58,7 +58,8 @@ module Lti
                                    app_id: tool_proxy.id,
                                    name: tool_proxy.name,
                                    description: tool_proxy.description,
-                                   installed_locally: true
+                                   installed_locally: true,
+                                   enabled: true
                                  })
 
       end
@@ -75,7 +76,8 @@ module Lti
                                     app_id: external_tool.id,
                                     name: external_tool.name,
                                     description: external_tool.description,
-                                    installed_locally: true
+                                    installed_locally: true,
+                                    enabled: true
                                   })
       end
 
