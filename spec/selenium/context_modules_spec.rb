@@ -59,7 +59,9 @@ describe "context_modules" do
       get "/courses/#{@course.id}"
       wait_for_ajaximations
 
-      expect(f('.module_progressions_link')).to be_displayed
+      link = f('.module_progressions_link')
+      expect(link).to be_displayed
+      expect_new_page_load { link.click }
     end
 
     it "should not show progressions link in modules home page for large rosters (MOOCs)" do

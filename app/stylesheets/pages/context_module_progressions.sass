@@ -1,14 +1,13 @@
 @import "base/environment"
 
-.context_modules2
-  #breadcrumbs
-    border-bottom-color: rgb(182, 186, 191)
-  #content
-    padding: 0
+#breadcrumbs
+  border-bottom: solid 1px $listBorderColor
+#content
+  padding: 0
 
 #progression_modules
   min-height: 450px
-  .student-header
+  .message, .student-header
     margin-left: 25px
   .collectionViewItems
     list-style-type: none
@@ -40,6 +39,9 @@
 #progression_students
   background-color: $tableBackgroundAccent
   border-left: solid 1px $listBorderColor
+  height: 450px
+  p
+    padding: 8px
   .header
     border-bottom: solid 1px $listBorderColor
     h3
@@ -55,7 +57,7 @@
   .collectionViewItems
     list-style-type: none
     margin-left: 0
-    overflow-y: scroll
+    overflow-y: auto
     .student
       cursor: pointer
       border-top: solid 1px transparent
