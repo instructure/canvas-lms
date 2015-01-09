@@ -7,8 +7,9 @@ define([
   'react-modal',
   './InfoFrame',
   './Checklist',
+  'compiled/userSettings',
   'compiled/jquery.rails_flash_notifications'
-], function($, React, I18n, ReactModal, InfoFrame, Checklist) {
+], function($, React, I18n, ReactModal, InfoFrame, Checklist, userSettings) {
 
   var CourseWizard = React.createClass({
       displayName: 'CourseWizard',
@@ -55,6 +56,9 @@ define([
         if (event) {
           event.preventDefault()
         };
+
+        var pathname = window.location.pathname;
+        userSettings.set('hide_wizard_' + pathname, true);
 
         this.setState({
           showWizard: false

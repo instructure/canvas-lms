@@ -14,13 +14,6 @@ require [
 
   pathname = window.location.pathname
 
-  $(".close_wizard_link").click((event) ->
-      event.preventDefault()
-      userSettings.set('hide_wizard_' + pathname, true)
-      $(".wizard_popup_link").slideDown('fast')
-      $('.wizard_popup_link').focus()
-  )
-
   $(".wizard_popup_link").click((event) ->
       React.renderComponent(CourseWizard({
         overlayClassName:'CourseWizard__modalOverlay',

@@ -83,12 +83,12 @@ describe "courses" do
 
       wizard_box = f(".ic-wizard-box")
       keep_trying_until { expect(wizard_box).to be_displayed }
-      hover_and_click(".ic-wizard-box__close a")
+      f(".ic-wizard-box__close a").click
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
-      wizard_box = f("#wizard_box")
-      expect(wizard_box).not_to be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
 
       # un-remember the setting
       driver.execute_script "localStorage.clear()"
