@@ -159,10 +159,22 @@
 
 <% js_bundle 'legacy/courses_show' %>
 <% if @context.created? || @context.claimed? %>
-  <div class="reminder" style='text-align:center;'>
-  <h2><%= t('headings.unpublished', %{This Course is Unpublished}) %></h2>
-  <div class="body"><%= t 'teachers_only', "Only teachers can see this course until it is *published*", :wrapper => (can_do(@context, @current_user, :update) ? '<a href="#" class="publish_course_in_wizard_link"><b>\1</b></a>' : '\1') %>
-  </div>
+  <div class="reminder Reminder__course-setup">
+    <h2 class="Reminder__course-setup-title">
+      <%= t('headings.unpublished', %{This Course is Unpublished}) %>
+
+      <span class="Reminder__course-setup-subttitle">
+        <%= t 'teachers_only', "Only teachers can see this course until it is *published*", :wrapper => (can_do(@context, @current_user, :update) ? '<a href="#" class="publish_course_in_wizard_link"><b>\1</b></a>' : '\1') %>
+      </span>
+    </h2>
+    <div class="body Reminder__course-setup-body">
+      <p>Need help setting up your course?</p>
+      <br/>
+      <a href="#" class="btn btn-primary wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
+        <%= t("Setup Checklist") %>
+      </a>
+      <!-- <button class="btn btn-primary">Setup Checklist</button> -->
+    </div>
   </div>
 <% end %>
 <% if @context.has_open_course_imports? %>
@@ -207,6 +219,7 @@
 <% end %>
 
 <div id="course_home_content">
+
   <% if @course_home_view == 'wiki' %>
     <% js_bundle :wiki_page_show %>
     <div id="wiki_page_show"></div>
