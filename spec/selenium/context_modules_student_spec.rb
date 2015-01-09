@@ -237,6 +237,7 @@ describe "context_modules" do
     context "next and previous buttons", :priority => "2" do
 
       def verify_next_and_previous_buttons_display
+        wait_for_ajaximations
         expect(f('.module-sequence-footer a.pull-left')).to be_displayed
         expect(f('.module-sequence-footer a.pull-right')).to be_displayed
       end

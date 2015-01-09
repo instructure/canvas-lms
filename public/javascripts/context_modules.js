@@ -106,35 +106,8 @@ define([
         );
       },
 
-      refreshProgressions: function(show_links) {
-        if (ENV.NO_MODULE_PROGRESSIONS) return;
-
-        $("#context_modules .context_module:visible").each(function() {
-          var $module = $(this);
-          var id = $module.find(".header").getTemplateData({textValues: ['id']});
-          var data = {progression_complete_count: 0, progression_started_count: 0};
-          $("#progression_list .progression_" + id).each(function() {
-            var state = $(this).getTemplateData({textValues: ['workflow_state']}).workflow_state;
-            if(state == 'completed') {
-              data.progression_complete_count++;
-            } else if(state == 'unlocked' || state == 'started') {
-              data.progression_started_count++;
-            }
-          });
-          $module.find(".progression_details_link").showIf(data.progression_complete_count || data.progression_started_count);
-          $module.find(".footer").fillTemplateData({data: data})
-            .find(".progression_details_link").showIf(data.progression_complete_count || data.progression_started_count).end()
-            .find(".progression_complete").showIf(data.progression_complete_count > 0).end()
-            .find(".progression_started").showIf(data.progression_started_count > 0);
-        });
-
-        $(".context_module .progression_complete").showIf($(".context_module .prerequisites_footer:visible,.context_module_item .criterion img.not_blank").length > 0);
-        if(show_links) {
-          $(".loading_module_progressions_link").remove();
-          $(".module_progressions_link").showIf($(".editable_context_module").length > 0 || $(".context_module .progression_complete:visible").length > 0 || $(".context_module_item.completed_item").length > 0);
-        }
-      },
       updateProgressions: function(user_id, callback) {
+        if (!ENV.IS_STUDENT) return;
         var url = $(".progression_list_url").attr('href');
         if(user_id) {
           url = url + "?user_id=" + user_id;
@@ -164,7 +137,6 @@ define([
                 modules.updateProgressionState($(this));
               });
             }
-            modules.refreshProgressions(!user_id);
             if(callback) { callback(); }
           }
           var progressionCnt = 0;
@@ -1397,7 +1369,6 @@ define([
     }
 
     modules.updateProgressions();
-    modules.refreshProgressions();
     modules.updateAssignmentData();
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
@@ -1493,133 +1464,6 @@ define([
           $("#student_progression_dialog").find(".student.selected_side_tab:first").click();
         });
       }
-    });
-    $("#student_progression_dialog").delegate('.student', 'click', function(event) {
-      $("#student_progression_dialog").find(".selected_side_tab").removeClass('selected_side_tab');
-      $(this).addClass('selected_side_tab');
-      event.preventDefault();
-      var id = $(this).getTemplateData({textValues: ['id']}).id;
-      var $studentWithProgressions = $("#progression_list .student_" + id + ":first");
-      $("#context_modules .context_module:visible").each(function() {
-        var $module = $(this);
-        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
-        var $row = $("#student_progression_dialog .module_" + moduleData.id);
-
-        moduleData.progress = $studentWithProgressions.find(".progression_" + moduleData.id + ":first").getTemplateData({textValues: ['workflow_state']}).workflow_state;
-        moduleData.progress = moduleData.progress || "no information";
-        var type = "nothing";
-        if(moduleData.progress == "unlocked") {
-          type = "in_progress";
-          moduleData.progress = "in progress";
-        } else if(moduleData.progress == "started") {
-          type = "in_progress";
-          moduleData.progress = "in progress";
-        } else if(moduleData.progress == "completed") {
-          type = "completed";
-        } else if(moduleData.progress == "locked") {
-          type = "locked";
-        }
-        $row.find(".still_need_completing").empty();
-        if(moduleData.progress == "in progress") {
-          var $requirements = $("#context_module_" + moduleData.id + " .context_module_item.progression_requirement");
-          var progression = $studentWithProgressions.find(".progression_" + moduleData.id).data('progression');
-          var unfulfilled = [];
-          $requirements.each(function() {
-            var $req = $(this);
-            var req = {id: $req.attr('id').substring(20)};
-            if($req.hasClass('must_view_requirement')) {
-              req.type = 'must_view';
-            } else if($req.hasClass('min_score_requirement')) {
-              req.type = 'min_score';
-            } else if($req.hasClass('max_score_requirement')) {
-              req.type = 'max_score';
-            } else if($req.hasClass('must_contribute_requirement')) {
-              req.type = 'must_contribute';
-            } else if($req.hasClass('must_submit_requirement')) {
-              req.type = 'must_submit';
-            }
-            var met = false;
-            if(progression && progression.requirements_met) {
-              for(var jdx = 0; jdx < progression.requirements_met.length; jdx++) {
-                var compare = progression.requirements_met[jdx];
-                if(compare.id == req.id && compare.type == req.type) {
-                  met = true;
-                }
-              }
-            }
-            if(!met) {
-              unfulfilled.push(htmlEscape($req.find(".title:first").text()));
-            }
-          });
-          $row.find(".still_need_completing")
-            .append("<b>"+htmlEscape(I18n.t('still_needs_completing', 'Still Needs to Complete'))+"</b><br/>")
-            .append($.raw(unfulfilled.join("<br/>")));
-        }
-        $row.removeClass('locked').removeClass('in_progress').removeClass('completed')
-          .addClass(type);
-        moduleData.progressString = moduleData.progress;
-        $row.fillTemplateData({data: moduleData});
-      });
-    });
-    $(".module_progressions_link").click(function(event) {
-      event.preventDefault();
-      var $dialog = $("#student_progression_dialog");
-      var $student_list = $dialog.find(".student_list");
-      $student_list.find(".student:not(.blank)").remove();
-      $dialog.find(".side_tabs_content tbody .module:not(.blank)").remove();
-      var $visible_modules = $("#context_modules .context_module:visible");
-      var module_ids = [];
-      $visible_modules.each(function() {
-        var $mod = $(this);
-        var id = $mod.attr('id').substring(15);
-        module_ids.push(id);
-      });
-      $("#progression_list .student").each(function() {
-        var $student = $dialog.find(".student.blank:first").clone(true).removeClass('blank');
-        var $studentWithProgressions = $(this);
-        var data = $studentWithProgressions.getTemplateData({textValues: ['name', 'id', 'current_module']});
-        data.current_module = data.current_module || I18n.t('none_in_progress', "none in progress");
-        $student.find("a").attr('href', '#' + data.id);
-        $student.fillTemplateData({data: data});
-        $student_list.append($student.show())
-      });
-      $visible_modules.each(function() {
-        var $module = $(this);
-        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
-        var $template = $dialog.find(".module.blank:first").clone(true).removeClass('blank');
-
-        $template.addClass('module_' + moduleData.id);
-        $template.fillTemplateData({data: moduleData});
-        $dialog.find(".side_tabs_content tbody").append($template.show());
-      });
-
-      $("#student_progression_dialog").dialog({
-        width: 800,
-        open: function() {
-          $(this).find(".student:not(.blank):first .name").click();
-        }
-      });
-    });
-    $(".context_module .progression_details_link").click(function(event) {
-      event.preventDefault();
-      var data = $(this).parents(".context_module").find(".header").getTemplateData({textValues: ['id', 'name']});
-      data.module_name = data.name;
-      var $dialog = $("#module_progression_dialog");
-      $dialog.fillTemplateData({data: data});
-      $dialog.find("ul").empty();
-      $dialog.find(".progression_list").hide();
-      $("#progression_list .student").each(function() { //.progressions .progression_" + data.id).each(function() {
-        var $progression = $(this).find(".progressions .progression_" + data.id);
-        var progressionData = $progression.getTemplateData({textValues: ['context_module_id', 'workflow_state']});
-        progressionData.workflow_state = progressionData.workflow_state || "locked";
-        progressionData.name = $(this).getTemplateData({textValues: ['name']}).name;
-        $dialog.find("." + progressionData.workflow_state + "_list").show()
-          .find("ul").show().append($("<li />").text(progressionData.name));
-      });
-      $("#module_progression_dialog").dialog({
-        title: I18n.t('titles.student_progress', "Student Progress for Module"),
-        width: 500
-      });
     });
     $(document).fragmentChange(function(event, hash) {
       if (hash == '#student_progressions') {

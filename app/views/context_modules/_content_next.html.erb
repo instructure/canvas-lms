@@ -4,6 +4,7 @@
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
     :CAN_MANAGE_MODULES => can_do(@context, @current_user, :manage_content),
+    :IS_STUDENT => can_do(@context, @current_user, :participate_as_student),
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
   })
