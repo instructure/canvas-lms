@@ -11,7 +11,7 @@
 
 <div
   class="item-group-condensed context_module
-    <%= 'editable_context_module' if editable %> <%= 'student-view' unless editable %>"
+    <%= 'editable_context_module' if editable %>"
     aria-label="<%= context_module ? context_module.name : "" %>"
     data-workflow-state="<%= context_module ? context_module.workflow_state : "{{ workflow_state }}"%>"
     data-module-url="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
@@ -153,7 +153,7 @@
         </div>
       </div><!-- progression_container -->
 
-      <%= render :partial => "context_modules/prerequisits_footer", :locals => {:editable => editable, :context_module => context_module} %>
+      <%= render :partial => "context_modules/prerequisites_footer", :locals => {:editable => editable, :context_module => context_module} %>
     </div><!-- footer -->
   </div>
 </div>

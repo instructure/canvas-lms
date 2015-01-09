@@ -1269,6 +1269,12 @@ define([
   };
 
   $(document).ready(function() {
+
+    if (ENV.IS_STUDENT) {
+      $('.context_module').addClass('student-view');
+      $('.context_module_item .ig-row').addClass('student-view');
+    }
+
     $('.publish-icon:visible').each(function(index, el) {
       var view = initPublishButton($(el));
       overrideModel(view.model, view);
