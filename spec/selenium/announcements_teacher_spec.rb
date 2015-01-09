@@ -1,22 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
 
 describe "announcements" do
   include_examples "in-process server selenium tests"
-
-  def create_announcement(message = 'announcement message')
-    @context = @course
-    @announcement = announcement_model(:title => 'new announcement', :message => message)
-  end
-
-  def create_announcement_manual(css_checkbox)
-    expect_new_page_load { f('.btn-primary').click }
-    replace_content(f('input[name=title]'), "First Announcement")
-
-    type_in_tiny('textarea[name=message]', 'Hi, this is my first announcement')
-    if css_checkbox != nil
-      f(css_checkbox).click
-    end
-  end
 
   context "announcements as a teacher" do
     before (:each) do
@@ -36,22 +22,6 @@ describe "announcements" do
         get url
         wait_for_ajaximations
         @checkboxes = ff('.toggleSelected')
-      end
-
-      def update_attributes_and_validate(attribute, update_value, search_term = update_value, expected_results = 1)
-        what_to_create.last.update_attributes(attribute => update_value)
-        refresh_page # in order to get the new topic information
-        replace_content(f('#searchTerm'), search_term)
-        expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq expected_results
-      end
-
-      def refresh_and_filter(filter_type, filter, expected_text, expected_results = 1)
-        refresh_page # in order to get the new topic information
-        wait_for_ajaximations
-        keep_trying_until { expect(ff('.toggleSelected').count).to eq what_to_create.count }
-        filter_type == :css ? driver.execute_script("$('#{filter}').click()") : replace_content(f('#searchTerm'), filter)
-        expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq expected_results
-        expected_results > 1 ? ff('.discussionTopicIndexList .discussion-topic').each { |topic| expect(topic).to include_text(expected_text) } : (expect(f('.discussionTopicIndexList .discussion-topic')).to include_text(expected_text))
       end
 
       it "should bulk delete topics" do
@@ -105,22 +75,6 @@ describe "announcements" do
     describe "shared main page topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
-
-      def add_attachment_and_validate
-        filename, fullpath, data = get_file("testfile5.zip")
-        f('input[name=attachment]').send_keys(fullpath)
-        type_in_tiny('textarea[name=message]', 'file attachement discussion')
-        expect_new_page_load { submit_form('.form-actions') }
-        wait_for_ajaximations
-        expect(f('.zip')).to include_text(filename)
-      end
-
-      def edit(title, message)
-        replace_content(f('input[name=title]'), title)
-        type_in_tiny('textarea[name=message]', message)
-        expect_new_page_load { submit_form('.form-actions') }
-        expect(f('#discussion_topic .discussion-title').text).to eq title
-      end
 
       before (:each) do
         @topic_title = 'new discussion'
@@ -196,7 +150,7 @@ describe "announcements" do
     it "should create a delayed announcement" do
       skip("193")
       get course_announcements_path(@course)
-      create_announcement_manual('input[type=checkbox][name=delay_posting]')
+      create_announcement_option('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
       datepicker_next
       f('.ui-datepicker-time .ui-datepicker-ok').click
@@ -268,6 +222,73 @@ describe "announcements" do
 
       announcement = f('.discussionTopicIndexList .discussion-topic')
       expect(announcement.find_element(:css, '.discussion-summary')).to include_text(@announcement.message)
+    end
+
+    it "should always see student replies when 'initial post required' is turned on" do
+      student_entry = 'this is my reply'
+
+      create_announcement_initial
+
+      # Create reply as a student
+      enter_student_view
+      reply_to_announcement(@announcement.id, student_entry)
+      f('.logout').click
+      wait_for_ajaximations
+
+      #As a teacher, verify that you can see the student's reply even though you have not responded
+      get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+      expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
+    end
+
+    def setup_search()
+      create_announcement('day one', 'partridge')
+      create_announcement('day two', 'turtle doves')
+      create_announcement('day three', 'french hens')
+    end
+
+
+    # Search for an announcement by the content of the announcement
+    it "should search by body" do
+      setup_search
+      get "/courses/#{@course.id}/announcements/"
+      f('#searchTerm').send_keys('turtle')
+
+      # The keyword 'turtle' is in the body. Due to the layout of the html, it
+      #is more efficient to look for the title that matches the body
+      expect(f('.discussion-title')).not_to include_text("one")
+      expect(f('.discussion-title')).to include_text("two")
+      expect(f('.discussion-title')).not_to include_text("three")
+    end
+
+    # Search for an announcement by the title of the announcement
+    it "should search by title" do
+      setup_search
+      get "/courses/#{@course.id}/announcements/"
+      f('#searchTerm').send_keys('o')
+
+      #Two of our titles have an 'o' in them. There are two announcements
+      #so we store the ones we find in an array. Sorting algorithms will put
+      # "two" first and "one" second. We should not see three.
+      expect(ff('.discussion-title')[1]).to include_text("one")
+      expect(ff('.discussion-title')[0]).to include_text("two")
+      expect(f('.discussion-title')[2]).to be_nil #No 3rd one listed
+      sleep 10
+    end
+
+    # Search for an announcement by the author of the announcement
+    it "should search by author" do
+      setup_search
+      # Creating users through the rails function does not set an author.
+      # Manual setup is needed
+      create_announcement_manual("title 1", "jocoga")
+      create_announcement_manual("title 2", "hotdog")
+      get "/courses/#{@course.id}/announcements/"
+      f('#searchTerm').send_keys('nob')
+
+      # Only 2 of the 5 announcements will have an author
+      expect(ff('.discussion-author')[0]).to include_text("nobody")
+      expect(ff('.discussion-author')[1]).to include_text("nobody")
+      expect(ff('.discussion-author')[2]).to be_nil #No 3rd one listed
     end
   end
 end

@@ -1,17 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
 
 describe "announcements" do
   include_examples "in-process server selenium tests"
-
-  def create_announcement_manual(css_checkbox)
-    expect_new_page_load { f('.btn-primary').click }
-    replace_content(f('input[name=title]'), "First Announcement")
-
-    type_in_tiny('textarea[name=message]', 'Hi, this is my first announcement')
-    if css_checkbox != nil
-      f(css_checkbox).click
-    end
-  end
 
   it "should validate replies are not visible until after users post" do
     password = 'asdfasdf'
@@ -55,6 +46,11 @@ describe "announcements" do
       course_with_student_logged_in
     end
 
+    it "should not show an announcements section if there are no announcments" do
+      get "/courses/#{@course.id}"
+      expect(f(".announcements active")).to be_nil
+    end
+
     it "should not show JSON when loading more announcements via pageless" do
       50.times { @course.announcements.create!(:title => 'Hi there!', :message => 'Announcement time!') }
       get "/courses/#{@course.id}/announcements"
@@ -87,9 +83,18 @@ describe "announcements" do
       get "/groups/#{group.id}/announcements"
       wait_for_ajaximations
       expect {
-        create_announcement_manual(nil)
+        create_announcement_option(nil)
         expect_new_page_load { submit_form('.form-actions') }
       }.to change(Announcement, :count).by 1
+    end
+
+    it "should have deleted announcement removed from student account" do
+      @announcement = @course.announcements.create!(:title => 'delete me', :message => 'Here is my message')
+      get "/courses/#{@course.id}/announcements/"
+      expect(f(".discussion-title")).to include_text('delete me')
+      @announcement.destroy
+      get "/courses/#{@course.id}/announcements/"
+      expect(f(".discussion-title")).to be_nil
     end
   end
 end
