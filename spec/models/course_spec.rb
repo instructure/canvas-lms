@@ -979,12 +979,15 @@ describe Course, "gradebook_to_csv" do
     expect(rows[0][-1]).to eq "Final Grade"
     expect(rows[1][-1]).to eq "(read only)"
     expect(rows[2][-1]).to eq "A-"
-    expect(rows[0][-2]).to eq "Final Score"
+    expect(rows[0][-2]).to eq "Current Grade"
     expect(rows[1][-2]).to eq "(read only)"
-    expect(rows[2][-2]).to eq "90"
-    expect(rows[0][-3]).to eq "Current Score"
+    expect(rows[2][-2]).to eq "A-"
+    expect(rows[0][-3]).to eq "Final Score"
     expect(rows[1][-3]).to eq "(read only)"
     expect(rows[2][-3]).to eq "90"
+    expect(rows[0][-4]).to eq "Current Score"
+    expect(rows[1][-4]).to eq "(read only)"
+    expect(rows[2][-4]).to eq "90"
   end
 
   it "should include sis ids if enabled" do

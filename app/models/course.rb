@@ -1512,7 +1512,7 @@ class Course < ActiveRecord::Base
       }
       row << "Current Points" << "Final Points" if include_points
       row << "Current Score" << "Final Score"
-      row << "Final Grade" if self.grading_standard_enabled?
+      row << "Current Grade" << "Final Grade" if grading_standard_enabled?
       csv << row
 
       group_filler_length = groups.size * (include_points ? 4 : 2)
@@ -1580,6 +1580,7 @@ class Course < ActiveRecord::Base
           row << current_info[:total] << final_info[:total] if include_points
           row << current_info[:grade] << final_info[:grade]
           if self.grading_standard_enabled?
+            row << score_to_grade(current_info[:grade])
             row << score_to_grade(final_info[:grade])
           end
           csv << row
