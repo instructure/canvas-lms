@@ -1160,5 +1160,20 @@ describe Account do
     it 'should be false when a referer is not trusted' do
       expect(account.trusted_referer?('https://example.com:5000')).to be_falsey
     end
+
+    it 'should be false when the account has no trusted referer setting' do
+      account.settings.delete(:trusted_referers)
+      expect(account.trusted_referer?('https://example.com')).to be_falsey
+    end
+
+    it 'should be false when the account has nil trusted referer setting' do
+      account.settings[:trusted_referers] = nil
+      expect(account.trusted_referer?('https://example.com')).to be_falsey
+    end
+
+    it 'should be false when the account has empty trusted referer setting' do
+      account.settings[:trusted_referers] = ''
+      expect(account.trusted_referer?('https://example.com')).to be_falsey
+    end
   end
 end
