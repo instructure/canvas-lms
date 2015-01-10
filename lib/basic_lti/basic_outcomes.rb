@@ -20,21 +20,30 @@ module BasicLTI
     class Unauthorized < Exception;
     end
 
+    class InvalidSourceId < Exception;
+    end
+
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
         md = sourceid.match(SOURCE_ID_REGEX)
-        return false unless md
+        raise InvalidSourceId, 'Invalid sourcedid' unless md
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
         return false unless Canvas::Security.verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
         return false unless tool.id == md[1].to_i
-        course = Course.find(md[2])
-        assignment = course.assignments.active.find(md[3])
+        course = Course.active.where(id: md[2]).first
+        raise InvalidSourceId, 'Course is invalid' unless course
+
         user = course.student_enrollments.active.where(user_id: md[4]).first.try(:user)
-        tag = assignment.external_tool_tag
+        raise InvalidSourceId, 'User is no longer in course' unless user
+
+        assignment = course.assignments.active.where(id: md[3]).first
+        raise InvalidSourceId, 'Assignment is invalid' unless assignment
+
+        tag = assignment.external_tool_tag if assignment
         if !tag || tool != ContextExternalTool.find_external_tool(tag.url, course)
-          return false # assignment settings have changed, this tool is no longer active
+          raise InvalidSourceId, 'Assignment is no longer associated with this tool'
         end
         return course, assignment, user
       end
@@ -133,10 +142,13 @@ module BasicLTI
         # tuple of (course, assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
         source_id = self.sourcedid
-        course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id) if source_id
 
-        unless course && assignment && user
-          return false
+        begin
+          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id) if source_id
+        rescue InvalidSourceId => e
+          self.code_major = 'failure'
+          self.description = e.to_s
+          return true
         end
 
         op = self.operation_ref_identifier

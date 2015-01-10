@@ -162,10 +162,12 @@ XML
     XML
   end
 
-  def check_failure(failure_type = 'unsupported')
+  def check_failure(failure_type = 'unsupported', error_message = nil)
     expect(response).to be_success
     expect(response.content_type).to eq 'application/xml'
-    expect(Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq failure_type
+    xml = Nokogiri::XML.parse(response.body)
+    expect(xml.at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq failure_type
+    expect(xml.at_css('imsx_description').content).to eq error_message if error_message
     expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
   end
 
@@ -377,7 +379,7 @@ to because the assignment has no points possible.
     tag.content_type = 'ContextExternalTool'
     tag.save!
     make_call('body' => replace_result('0.5'))
-    check_failure
+    check_failure('failure', 'Assignment is no longer associated with this tool')
   end
 
   it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
@@ -388,19 +390,19 @@ to because the assignment has no points possible.
     tag.content_type = 'ContextExternalTool'
     tag.save!
     make_call('body' => replace_result('0.5'))
-    check_failure
+    check_failure('failure', 'Assignment is no longer associated with this tool')
   end
 
   it "should reject if the assignment is no longer a tool assignment" do
     @assignment.update_attributes(:submission_types => 'online_upload')
     @assignment.reload.external_tool_tag.destroy!
     make_call('body' => replace_result('0.5'))
-    check_failure
+    check_failure('failure', 'Assignment is no longer associated with this tool')
   end
 
   it "should verify the sourcedid is correct for this tool launch" do
     make_call('body' => replace_result('0.6', 'BAD SOURCE ID'))
-    check_failure
+    check_failure('failure', 'Invalid sourcedid')
   end
 
   if Canvas.redis_enabled?
@@ -418,6 +420,38 @@ to because the assignment has no points possible.
     make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
     assert_status(401)
     expect(response.body).to match(/expired/i)
+  end
+
+  it "fails if course is deleted" do
+    opts = {'body' => replace_result('0.6')}
+    @course.destroy
+    make_call(opts)
+
+    check_failure('failure', 'Course is invalid')
+  end
+
+  it "fails if assignment is deleted" do
+    opts = {'body' => replace_result('0.6')}
+    @assignment.destroy
+    make_call(opts)
+
+    check_failure('failure', 'Assignment is invalid')
+  end
+
+  it "fails if user enrollment is deleted" do
+    opts = {'body' => replace_result('0.6')}
+    @course.student_enrollments.active.where(user_id: @student.id).first.destroy
+    make_call(opts)
+
+    check_failure('failure', 'User is no longer in course')
+  end
+
+  it "fails if tool is deleted" do
+    opts = {'body' => replace_result('0.6')}
+    @tool.destroy
+    make_call(opts)
+
+    check_failure('failure', 'Assignment is no longer associated with this tool')
   end
 
   describe "blti extensions 0.0.4" do
@@ -471,7 +505,7 @@ to because the assignment has no points possible.
       xml
     end
 
-    def check_failure(failure_type = 'Unsupported')
+    def check_failure(failure_type = 'Failure', error_message = nil)
       expect(response).to be_success
       expect(response.content_type).to eq 'application/xml'
       xml = Nokogiri::XML.parse(response.body)
