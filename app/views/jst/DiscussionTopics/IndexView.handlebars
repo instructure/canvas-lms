@@ -41,18 +41,20 @@
       </button>
     </div>
     <div class="headerBar-left form-inline index_view_filter_form">
-      <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
       <input id="searchTerm"
-             placeholder="{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}"
+             placeholder="{{t "Search title, body, or author"}}"
+             aria-label="{{t "Search title, body, or author"}}"
              value="{{searchTerm}}"
              type="search">
       <span id="discussionsFilter">
         <input type="checkbox"
                id="onlyUnread"
-               {{#if onlyUnread}}checked{{/if}} /><label for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+               aria-label="{{t "filter discussions by unread"}}"
+               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
         <input type="checkbox"
                id="onlyGraded"
-               {{#if onlyGraded}}checked{{/if}}/><label for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
+               aria-label="{{t "filter discussions by assignments"}}"
+               {{#if onlyGraded}}checked{{/if}}/><label aria-hidden="true" for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
       </span>
     </div>
   </div>

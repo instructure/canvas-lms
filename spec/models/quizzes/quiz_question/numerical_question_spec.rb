@@ -1,9 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::NumericalQuestion do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   let(:question_data) do
     {:answers => [{:id => 1, :weight => 100, :start => 2,  :end => 3}]}

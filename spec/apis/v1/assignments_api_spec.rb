@@ -265,8 +265,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "should include published flag for accounts that do have enabled_draft" do
-        @course.account.enable_feature!(:draft_state)
-
         @json = api_get_assignment_in_course(@assignment, @course)
 
         expect(@json.has_key?('published')).to be_truthy
@@ -482,7 +480,6 @@ describe AssignmentsApiController, type: :request do
 
       before :once do
         course_with_student(:active_all => true)
-        @course.account.enable_feature!(:draft_state)
         @published = @course.assignments.create!({:name => "published assignment"})
         @published.workflow_state = 'published'
         @published.save!
@@ -925,7 +922,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should update published/unpublished" do
-      @course.account.enable_feature!(:draft_state)
       @assignment = @course.assignments.create({
         :name => "some assignment",
         :points_possible => 15
@@ -1987,7 +1983,6 @@ describe AssignmentsApiController, type: :request do
     context "draft state" do
 
       before :once do
-        @course.account.enable_feature!(:draft_state)
         @assignment = @course.assignments.create!({
           :name => "unpublished assignment",
           :points_possible => 15

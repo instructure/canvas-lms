@@ -22,7 +22,7 @@ describe "courses" do
     context 'draft state' do
 
       before(:each) do
-        course_with_teacher_logged_in({draft_state: true})
+        course_with_teacher_logged_in
       end
 
       def validate_action_button(postion, validation_text)
@@ -60,13 +60,13 @@ describe "courses" do
       end
 
       it "should not show course status if graded submissions exist" do
-        course_with_student_submissions({submission_points: true, draft_state: true})
+        course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
         expect(f('#course_status')).to be_nil
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
-        course_with_student_submissions({draft_state: true})
+        course_with_student_submissions
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
         expect_new_page_load { course_status_buttons.first.click }
@@ -77,13 +77,14 @@ describe "courses" do
     end
 
     it "should properly hide the wizard and remember its hidden state" do
+      pending
       course_with_teacher_logged_in
 
       create_new_course
 
       wizard_box = f("#wizard_box")
       keep_trying_until { expect(wizard_box).to be_displayed }
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      hover_and_click(".close_wizard_link")
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
@@ -95,6 +96,7 @@ describe "courses" do
     end
 
     it "should open and close wizard after initial close" do
+      pending
       def find_wizard_box
         wizard_box = keep_trying_until do
           wizard_box = f("#wizard_box")
@@ -109,7 +111,7 @@ describe "courses" do
 
       wait_for_ajaximations
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      hover_and_click(".close_wizard_link")
       wait_for_ajaximations
       expect(wizard_box).not_to be_displayed
       checklist_button = f('.wizard_popup_link')
@@ -118,7 +120,7 @@ describe "courses" do
       wait_for_ajaximations
       expect(checklist_button).not_to be_displayed
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      hover_and_click(".close_wizard_link")
       wait_for_ajaximations
       expect(wizard_box).not_to be_displayed
       expect(checklist_button).to be_displayed
@@ -289,7 +291,6 @@ describe "courses" do
 
       it "should display course_home_sub_navigation lti apps (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         num_tools = 2
         num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
         get "/courses/#{@course.id}"
@@ -305,7 +306,6 @@ describe "courses" do
 
       it "should include launch type parameter (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
         expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)

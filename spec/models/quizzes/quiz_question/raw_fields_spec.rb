@@ -19,9 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::RawFields do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   describe "#fetch_any" do
     let(:fields) { Quizzes::QuizQuestion::RawFields.new(answer_comment: "an answer comment", comments: "another answer comment") }

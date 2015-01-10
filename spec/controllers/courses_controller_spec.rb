@@ -579,7 +579,6 @@ describe CoursesController do
       it "should disable management and set env urls on assignment homepage" do
         @course1.default_view = "assignments"
         @course1.save!
-        @course1.account.enable_feature!(:draft_state)
         get 'show', :id => @course1.id
         expect(controller.js_env[:URLS][:new_assignment_url]).not_to be_nil
         expect(controller.js_env[:PERMISSIONS][:manage]).to be_falsey
@@ -593,7 +592,6 @@ describe CoursesController do
       it "should not show unpublished assignments to students" do
         @course1.default_view = "assignments"
         @course1.save!
-        @course1.account.enable_feature!(:draft_state)
         @a1.unpublish
         get 'show', :id => @course1.id
         expect(assigns(:assignments).map(&:id).include?(@a1.id)).to be_falsey
@@ -608,8 +606,6 @@ describe CoursesController do
       end
 
       it "should work for wiki view with draft state enabled" do
-        @course1.account.allow_feature!(:draft_state)
-        @course1.enable_feature!(:draft_state)
         @course1.default_view = "wiki"
         @course1.save!
         @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!

@@ -286,10 +286,10 @@ Canvas::Plugin.register('app_center', nil, {
     :description => lambda{ t :description, 'App Center for tracking/installing external tools in Canvas' },
     :settings_partial => 'plugins/app_center_settings',
     :settings => {
-        :base_url => 'https://www.edu-apps.org',
+        :base_url => 'https://www.eduappcenter.com',
         :token => nil,
-        :apps_index_endpoint => '/api/v1/apps',
-        :app_reviews_endpoint => '/api/v1/apps/:id/reviews'
+        :apps_index_endpoint => '/api/v1/lti_apps',
+        :app_reviews_endpoint => '/api/v1/lti_apps/:id/reviews'
     },
     :validator => 'AppCenterValidator'
 })

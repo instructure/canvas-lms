@@ -26,7 +26,7 @@
     <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
       <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="btn button-sidebar-wide"><%= image_tag "learning_outcome.png" %> <%= t 'links.user_outcomes', "Outcomes for %{user}", :user => @user.short_name %></a>
     <% end %>
-    <% if can_do(@domain_root_account, @current_user, :manage) %>
+    <% if @user.grants_right?(@current_user, :view_statistics) %>
       <a href="<%= user_path(@user.id) %>" class="btn button-sidebar-wide"><%= image_tag "information.png" %> <%= t('links.user_account_details', %{User Account Details}) %></a>
     <% end %>
   </div>

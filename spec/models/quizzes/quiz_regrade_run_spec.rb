@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizRegradeRun do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   it "validates presence of quiz_regrade_id" do
     expect(Quizzes::QuizRegradeRun.new(quiz_regrade_id: 1)).to be_valid

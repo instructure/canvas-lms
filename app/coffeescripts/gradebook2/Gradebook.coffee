@@ -203,8 +203,7 @@ define [
       for group in assignmentGroups
         # note that assignmentGroups are not yet htmlEscaped like assignments and sections
         @assignmentGroups[group.id] = group
-        if ENV.GRADEBOOK_OPTIONS.draft_state_enabled
-          group.assignments = _.select group.assignments, (a) -> a.published
+        group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
           htmlEscape(assignment)
           assignment.assignment_group = group

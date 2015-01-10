@@ -130,6 +130,9 @@ define [
       opts.content = -> $.raw($(this).data('html-tooltip-title'))
       opts.items = '[data-html-tooltip-title]'
 
+    if $this.data('tooltip-class')
+        opts.tooltipClass = $this.data('tooltip-class')
+
     $this
       .removeAttr('data-tooltip')
       .timeoutTooltip(opts)

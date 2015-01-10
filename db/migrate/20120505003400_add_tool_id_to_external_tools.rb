@@ -2,7 +2,7 @@ class AddToolIdToExternalTools < ActiveRecord::Migration
   tag :predeploy
   def self.up
     # using tool_id instead of developer_key.id lets us
-    # use the same keys as lti-examples.heroku.com for
+    # use the same keys as www.eduappcenter.com for
     # tying multiple context_external_tools to the 
     # same third-party tool
     add_column :context_external_tools, :tool_id, :string

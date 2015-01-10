@@ -670,7 +670,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"]
+  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"]
   #   - "email": Optional user email.
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
@@ -680,6 +680,7 @@ class CoursesController < ApplicationController
   #   'final_grade' values.
   #   - "locked": Optionally include whether an enrollment is locked.
   #   - "avatar_url": Optionally include avatar_url.
+  #   - "bio": Optionally include each user's bio.
   #   - "test_student": Optionally include the course's Test Student,
   #   if present. Default is to not include Test Student.
   #
@@ -688,6 +689,9 @@ class CoursesController < ApplicationController
   #   users set, the page parameter will be modified so that the page
   #   containing user_id will be returned.
   #
+  # @argument enrollment_state[] [String, "active"|"invited"|"rejected"|"completed"|"inactive"]
+  #  When set, only return users where the enrollment workflow state is of one of the given types.
+  #  "active" and "invited" enrollments are returned by default.
   # @returns [User]
   def users
     get_context
@@ -695,7 +699,7 @@ class CoursesController < ApplicationController
       #backcompat limit param
       params[:per_page] ||= params[:limit]
 
-      search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type)
+      search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state)
       search_term = search_params[:search_term].presence
 
       if search_term
@@ -1345,7 +1349,6 @@ class CoursesController < ApplicationController
 
     @context = api_find(Course.active, params[:id])
     assign_localizer
-    js_env :DRAFT_STATE => @context.feature_enabled?(:draft_state)
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         render :json => @context
@@ -1396,11 +1399,9 @@ class CoursesController < ApplicationController
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.front_page
-        if @context.feature_enabled?(:draft_state)
-          set_js_rights [:wiki, :page]
-          set_js_wiki_data :course_home => true
-          @padless = true
-        end
+        set_js_rights [:wiki, :page]
+        set_js_wiki_data :course_home => true
+        @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
         set_urls_and_permissions_for_assignment_index

@@ -113,6 +113,8 @@ module Lti
         expect(tool_proxy.lti_version).to eq 'LTI-2p0'
         expect(tool_proxy.context).to eq account
         expect(tool_proxy.workflow_state).to eq 'disabled'
+        expect(tool_proxy.name).to eq 'Acme Assessments'
+        expect(tool_proxy.description).to eq 'Acme Assessments provide an interactive test format.'
       end
 
       context 'placements' do

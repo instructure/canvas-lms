@@ -85,6 +85,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
       events["click #{EXTERNAL_TOOLS_URL}"] = 'showExternalToolsDialog'
+      events["click #{EXTERNAL_TOOLS_URL}_screenreader_button"] = 'showExternalToolsDialogForScreenreader'
       events
     )
 
@@ -148,6 +149,10 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
           @$externalToolsContentId.val(data['item[id]'])
           @$externalToolsUrl.val(data['item[url]'])
           @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
+
+    showExternalToolsDialogForScreenreader: (ev) =>
+      ev.preventDefault()
+      @showExternalToolsDialog()
 
     toggleRestrictFileUploads: =>
       @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')

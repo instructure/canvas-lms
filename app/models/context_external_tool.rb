@@ -105,17 +105,18 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def set_placement!(type, value=true)
-    raise "invalid type" unless EXTENSION_TYPES.include?(type.to_sym)
-    if value
-      self.context_external_tool_placements.new(:placement_type => type.to_s) unless has_placement?(type)
-    else
-      if self.persisted?
-        self.context_external_tool_placements.for_type(type).delete_all
-      end
-      self.context_external_tool_placements.delete_if{|p| p.placement_type == type.to_s}
+  def sync_placements!(placements)
+    old_placements = self.context_external_tool_placements.pluck(:placement_type)
+    (placements - old_placements).each do |new_placement|
+      self.context_external_tool_placements.new(:placement_type => new_placement)
+    end
+    placements_to_delete = EXTENSION_TYPES.map(&:to_s) - placements
+    if placements_to_delete.any?
+      self.context_external_tool_placements.where(placement_type: placements_to_delete).delete_all if self.persisted?
+      self.context_external_tool_placements.delete_if{|p| placements_to_delete.include?(p.placement_type)}
     end
   end
+  private :sync_placements!
 
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
@@ -338,9 +339,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     settings.delete(:editor_button) if !editor_button(:icon_url)
 
-    EXTENSION_TYPES.each do |type|
-      set_placement!(type, !!settings[type])
-    end
+    sync_placements!(EXTENSION_TYPES.select{|type| !!settings[type]}.map(&:to_s))
     true
   end
 

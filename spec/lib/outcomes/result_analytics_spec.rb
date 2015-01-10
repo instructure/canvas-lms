@@ -28,8 +28,8 @@ describe Outcomes::ResultAnalytics do
   # ResultAnalytics only uses a few fields, so use some mock stuff to avoid all
   # the surrounding database logic
   MockUser = Struct.new(:id, :name)
-  MockOutcome = Struct.new(:id)
-  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score)
+  MockOutcome = Struct.new(:id, :calculation_method, :calculation_int)
+  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :submitted_at)
     def learning_outcome_id
       learning_outcome.id
     end
@@ -42,25 +42,85 @@ describe Outcomes::ResultAnalytics do
   describe '#rollup_user_results' do
     it 'returns a rollup score for each distinct outcome_id' do
       results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 20],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 30],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 2.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 3.0],
       ]
       expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80], 20, 1),
-        RollupScore.new(MockOutcome[81], 30, 1),
+        RollupScore.new(MockOutcome[80], 2.0, 1),
+        RollupScore.new(MockOutcome[81], 3.0, 1),
+      ]
+    end
+  end
+
+  describe '#mastery calculation' do
+    it 'returns maximum score when no method is set' do
+      # this is to ensure we don't change behavior on outcomes that predate
+      # the calculations feature. decaying avg will be default for new outcomes
+      results = [
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 3.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 1.0],
+      ]
+      expect(ra.rollup_user_results(results)).to eq [
+        RollupScore.new(MockOutcome[80], 3.0, 2)
       ]
     end
 
-    it 'returns the maximum score for each outcome_id' do
+    it 'returns maximum score when highest score method is selected' do
       results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 20],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 30],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 40],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 50],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'highest'], 3.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'highest'], 1.0],
       ]
       expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80], 30, 2),
-        RollupScore.new(MockOutcome[81], 50, 2),
+        RollupScore.new(MockOutcome[80, 'highest'], 3.0, 2)
+      ]
+    end
+
+    it 'returns correct score when latest score method is selected' do
+      results = [
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 4.0, nil],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 3.0, Time.now],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 1.0, Time.now - 1.day]
+      ]
+      expect(ra.rollup_user_results(results)).to eq [
+        RollupScore.new(MockOutcome[80, 'latest'], 3.0, 3)
+      ]
+    end
+
+    it 'properly calculates results when method is n# of scores for mastery' do
+      results = [
+        #first outcome
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'n_mastery', 3], 3.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'n_mastery', 3], 1.0],
+        #second outcome
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 5], 3.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 5], 1.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 5], 3.0],
+        #third outcome
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 4.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 5.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 1.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 3.0],
+      ]
+      expect(ra.rollup_user_results(results)).to eq [
+        RollupScore.new(MockOutcome[80, 'n_mastery', 3], nil, 2),
+        RollupScore.new(MockOutcome[81, 'n_mastery', 5], nil, 3),
+        RollupScore.new(MockOutcome[82, 'n_mastery', 4], 3.25, 4),
+      ]
+    end
+
+    it 'properly calculates results when method is decaying average' do
+      results = [
+        #first outcome
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 75], 3.0, Time.now],
+        #second outcome
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 4.0, Time.now],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 5.0, Time.now - 1.day],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 1.0, Time.now - 2.days],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 3.0, nil],
+      ]
+      expect(ra.rollup_user_results(results)).to eq [
+        RollupScore.new(MockOutcome[80, 'decaying_average', 75], nil, 1),
+        RollupScore.new(MockOutcome[81, 'decaying_average', 75], 3.75, 4),
       ]
     end
   end
@@ -68,13 +128,13 @@ describe Outcomes::ResultAnalytics do
   describe '#outcome_results_rollups' do
     it 'returns a rollup for each distinct user_id' do
       results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 40],
-        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 50],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 4.0],
+        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 5.0],
       ]
       users = [MockUser[10, 'a'], MockUser[30, 'c']]
       expect(ra.outcome_results_rollups(results, users)).to eq [
-        Rollup.new(MockUser[10, 'a'], [ RollupScore.new(MockOutcome[80], 40, 1) ]),
-        Rollup.new(MockUser[20, 'b'], [ RollupScore.new(MockOutcome[80], 50, 1) ]),
+        Rollup.new(MockUser[10, 'a'], [ RollupScore.new(MockOutcome[80], 4.0, 1) ]),
+        Rollup.new(MockUser[20, 'b'], [ RollupScore.new(MockOutcome[80], 5.0, 1) ]),
         Rollup.new(MockUser[30, 'c'], []),
       ]
     end

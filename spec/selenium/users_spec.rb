@@ -255,7 +255,7 @@ describe "users" do
       f('#teacher_email').send_keys('teacher@example.com')
 
       # if instructure_misc_plugin is installed, number of registration fields increase
-      if (Dir.exists?('./vendor/plugins/instructure_misc_plugin'))
+      if (Dir.exists?('./gems/plugins/instructure_misc_plugin') || Dir.exists?('./vendor/plugins/instructure_misc_plugin'))
         set_value f('#teacher_organization_type'), 'Higher Ed'
         set_value f('#teacher_school_position'), 'Dean'
         f('#teacher_phone').send_keys('1231231234')

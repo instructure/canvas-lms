@@ -101,7 +101,6 @@ describe "external tools" do
 
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
     end
 
     it "should clear the shared secret after saving" do
@@ -826,7 +825,6 @@ describe "external tools" do
   describe 'return url redirection' do
     before do
       course_with_teacher_logged_in(active_all: true)
-      set_course_draft_state
       @tool = @course.context_external_tools.create!(
           name: "new tool",
           consumer_key: "key",

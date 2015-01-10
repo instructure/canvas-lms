@@ -9,7 +9,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
       @blank_page = @course.wiki.wiki_pages.create! :title => 'blank'
     end
 

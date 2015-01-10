@@ -21,7 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Polling::PollSubmission do
   before :once do
     course_with_student
-    @course.root_account.disable_feature!(:draft_state)
     @section = @course.course_sections.create!(name: 'Section 2')
     teacher_in_course(course: @course, active_all: true)
 

@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var child_process = require('child_process');
+
+var ROOT = path.join(__dirname, '..');
+var CANVAS_ROOT = path.join(ROOT, '..', '..');
+var DIST = path.join(ROOT, 'dist');
+
+child_process.spawn(
+  "gems/canvas_i18nliner/bin/i18nliner",
+  [ 'check', '--directory', DIST ],
+  {
+    cwd: CANVAS_ROOT,
+    detached: false,
+    stdio: 'inherit'
+  });

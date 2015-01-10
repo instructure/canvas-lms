@@ -19,7 +19,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       expect(f("#context_module_#{@module.id}")).not_to include_text(@da_quiz.title)
     end
     it "should display module items with overrides" do
-      create_section_overrides(@other_section)
+      create_section_overrides(@default_section)
       get "/courses/#{@course.id}/modules"
       expect(f("#context_module_#{@module.id}")).to include_text(@da_assignment.title)
       expect(f("#context_module_#{@module.id}")).to include_text(@da_discussion.title)
@@ -33,8 +33,8 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       expect(f("#context_module_#{@module.id}")).to include_text(@da_quiz.title)
     end
     it "should ignore completion requirements of inaccessible module items" do
-      create_section_override_for_assignment(@da_discussion.assignment, course_section: @other_section)
-      create_section_override_for_assignment(@da_quiz, course_section: @other_section)
+      create_section_override_for_assignment(@da_discussion.assignment)
+      create_section_override_for_assignment(@da_quiz)
       create_section_override_for_assignment(@da_assignment, course_section: @section1)
       @module.completion_requirements = {@tag_assignment.id => {:type => 'must_view'},
                                          @tag_discussion.id => {:type => 'must_view'},
@@ -66,7 +66,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         expect(f("#context_module_#{@module.id}")).not_to include_text(@da_quiz.title)
       end
       it "should display module items with overrides" do
-        create_section_overrides(@other_section)
+        create_section_overrides(@default_section)
         get "/courses/#{@course.id}/modules"
         expect(f("#context_module_#{@module.id}")).to include_text(@da_assignment.title)
         expect(f("#context_module_#{@module.id}")).to include_text(@da_discussion.title)

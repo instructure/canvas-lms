@@ -171,22 +171,21 @@ describe DiscussionTopicPresenter do
       expect(presenter.allows_speed_grader?).to eq false
     end
 
-    context "draft state" do
+    context "with assignment" do
 
       before do
         course = topic.context = Course.create!(name: 'Canvas')
-        course.root_account.enable_feature!(:draft_state)
         assignment.context = course
         assignment.save!
         topic.assignment = assignment
       end
 
-      it "returns false when draft state enabled and assignment unpublished" do
+      it "returns false when assignment unpublished" do
         assignment.unpublish
         expect(presenter.allows_speed_grader?).to eq false
       end
 
-      it "returns true when draft state enabled and assignment published" do
+      it "returns true when assignment published" do
         expect(presenter.allows_speed_grader?).to eq true
       end
 
