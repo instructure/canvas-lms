@@ -2,10 +2,6 @@ require 'active_support'
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizRegrader::Submission do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
-
 
   let(:regrade_options) do
     {1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
@@ -86,7 +82,7 @@ describe Quizzes::QuizRegrader::Submission do
   describe "#rescored_submission" do
     before do
       regraded_quiz_data = question_regrades.map do |key, qr|
-        Quizzes::Quiz.decorate_question_for_submission({
+        Quizzes::QuizQuestionBuilder.decorate_question_for_submission({
           id: key,
           points_possible: question_group.question_points
         }, key)

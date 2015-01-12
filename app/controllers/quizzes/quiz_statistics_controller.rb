@@ -107,15 +107,10 @@
 #       "description": "Statistics for submissions made to a specific quiz question.",
 #       "properties": {
 #         "responses": {
-#           "description": "Number of students who have answered this question.",
+#           "description": "Number of students who have provided an answer to this question. Blank or empty responses are not counted.",
 #           "example": 3,
 #           "type": "integer",
 #           "format": "int64"
-#         },
-#         "response_values": {
-#           "description": "The unique set of answers (or their IDs) that were supplied (or chosen) by students.",
-#           "example": [ "2040", "3866", "3866" ],
-#           "type": "integer[]"
 #         },
 #         "answers": {
 #           "$ref": "QuizStatisticsAnswerStatistics",

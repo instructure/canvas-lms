@@ -193,6 +193,8 @@ class AssessmentQuestion < ActiveRecord::Base
       false
     elsif self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank.default_unfiled_title
       false
+    elsif question.is_a?(Quizzes::QuizQuestion) && question.generated?
+      false
     elsif self.new_record? || (quiz_questions.count <= 1 && question.assessment_question_id == self.id)
       true
     else
@@ -200,11 +202,19 @@ class AssessmentQuestion < ActiveRecord::Base
     end
   end
 
-  def create_quiz_question
-    qq = quiz_questions.new
-    qq.migration_id = self.migration_id
-    qq.write_attribute(:question_data, question_data)
-    qq
+  def create_quiz_question(quiz_id)
+    quiz_questions.new.tap do |qq|
+      qq.write_attribute(:question_data, question_data)
+      qq.quiz_id = quiz_id
+      qq.workflow_state = 'generated'
+      qq.save_without_callbacks
+    end
+  end
+
+  def find_or_create_quiz_question(quiz_id, exclude_ids=[])
+    finder = quiz_questions.where({ quiz_id: quiz_id })
+    finder = finder.where('id NOT IN (?)', exclude_ids) if exclude_ids.any?
+    finder.first || create_quiz_question(quiz_id)
   end
 
   def self.scrub(text)

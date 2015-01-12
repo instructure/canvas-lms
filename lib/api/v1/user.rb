@@ -69,6 +69,10 @@ module Api::V1::User
         json[:email] = user.email
       end
 
+      if includes.include?('bio') && @domain_root_account.enable_profiles? && user.profile
+        json[:bio] = user.profile.bio
+      end
+
       if includes.include?('sections')
         json[:sections] = user.enrollments.
           map(&:course_section).compact.uniq.

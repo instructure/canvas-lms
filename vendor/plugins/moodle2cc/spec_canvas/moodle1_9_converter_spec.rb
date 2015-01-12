@@ -314,7 +314,7 @@ describe Moodle::Converter do
       question = quiz.quiz_questions[9]
       expect(question.question_data[:question_name]).to eq "Yes No Question"
       expect(question.question_data[:question_text]).to eq "Yes No Question Text"
-      expect(question.question_data[:question_type]).to eq 'true_false_question'
+      expect(question.question_data[:question_type]).to eq 'multiple_choice_question'
     end
 
     it "should convert Moodle Choice module to a quiz" do

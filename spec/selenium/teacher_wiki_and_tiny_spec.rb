@@ -7,7 +7,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
     end
 
     it "should add a quiz to the rce" do

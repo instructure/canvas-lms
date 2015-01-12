@@ -587,6 +587,20 @@ describe ContextExternalTool do
       expect(tool.has_placement?(:editor_button)).to be_truthy
     end
 
+    it "should remove and add placements according to configuration" do
+      tool = new_external_tool
+      tool.settings = {
+          :editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100},
+          :resource_selection => {:url => "http://www.example.com", :selection_width => 100, :selection_height => 100}
+      }
+      tool.save!
+      expect(tool.context_external_tool_placements.pluck(:placement_type)).to match_array(['editor_button', 'resource_selection'])
+      tool.settings.delete(:editor_button)
+      tool.settings[:account_navigation] = {:url => "http://www.example.com"}
+      tool.save!
+      expect(tool.context_external_tool_placements.pluck(:placement_type)).to match_array(['resource_selection', 'account_navigation'])
+    end
+
     it "should allow setting tool_id and icon_url" do
       tool = new_external_tool
       tool.tool_id = "new_tool"

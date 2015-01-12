@@ -248,5 +248,18 @@
   .Colorguide-color--alert      {@include colorguide(#9e6b05);}
   .Colorguide-color--light      {@include colorguide(#ffffff);}
   .Colorguide-color--dark       {@include colorguide(#333333);}  
-}  
+}
 
+.styleguide-section__grid-demo-element {
+  padding: 8px 16px;
+  background: lighten($linkColor, 15%);
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  height: 16px;
+}
+
+.styleguide-section__accordion-demo-element {
+  padding: $ic-sp*2;
+  color: darken($canvas-neutral, 15%);
+}

@@ -22,24 +22,16 @@ module Api::V1::WikiPage
   include Api::V1::Locked
 
   WIKI_PAGE_JSON_ATTRS = %w(url title created_at updated_at editing_roles)
-  WIKI_PAGE_JSON_METHODS = %w(hide_from_students)
 
   def wiki_page_json(wiki_page, current_user, session, include_body = true)
-    hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS, :methods => WIKI_PAGE_JSON_METHODS)
+    hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
     hash['page_id'] = wiki_page.id
     hash['editing_roles'] ||= 'teachers'
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
-    if wiki_page.context.feature_enabled?(:draft_state)
-      hash['published'] = wiki_page.active?
-    else
-      hash['published'] = true
-    end
+    hash['published'] = wiki_page.active?
+    hash['hide_from_students'] = !hash['published'] # deprecated, but still here for now
     hash['front_page'] = wiki_page.is_front_page?
-    if wiki_page.context.feature_enabled?(:draft_state)
-      hash['html_url'] = polymorphic_url([wiki_page.context, :named_page], :wiki_page_id => wiki_page)
-    else
-      hash['html_url'] = polymorphic_url([wiki_page.context, :named_wiki_page], :id => wiki_page)
-    end
+    hash['html_url'] = polymorphic_url([wiki_page.context, wiki_page])
     locked_json(hash, wiki_page, current_user, 'page')
     hash['body'] = api_user_content(wiki_page.body) if include_body && !hash['locked_for_user'] && !hash['lock_info']
     hash

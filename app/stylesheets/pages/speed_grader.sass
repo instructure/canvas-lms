@@ -1,7 +1,15 @@
 @import base/environment
 @import components/ui.selectmenu
+@import vendor/_xflex.scss
+
 #content
   padding: 0
+
+$gradebook_header_height: 52px
+
+#gradebook_header_container
+  height: $gradebook_header_height
+  overflow: hidden
 
 #gradebook_header a.ui-selectmenu:hover,
 #gradebook_header a.ui-selectmenu:focus
@@ -13,14 +21,18 @@
 #speed_grader_loading
   padding: 5px
   font-size: 24px
+
 #gradebook_header
   form
     margin: 0
-  background: url("/images/canvas/header_bg.png") repeat-x left -28px
-  :padding 8px 25px 5px 8px
+  @if $use_high_contrast
+    background-color: $canvas-dark
+  @else    
+    background-color: #4b5662
+  :padding 12px 25px 12px 12px
   :font-size 11px
   :text-align center
-  color: #fff
+  color: $canvas-light
   line-height: 15px
   position: relative
   min-width: 960px
@@ -65,25 +77,25 @@
       padding-left: 8px
     .prev, .next
       :display block
-      :background url('/images/back_forward.png') no-repeat  top left
+      :background url('/images/back_forward.png') no-repeat top left
       :text-indent -1000px
       :width 27px
       :height 23px
       :float left
       :outline none
       &:hover, &:focus
-        :background-position     left -31px
+        :background-position left -31px
       &:focus
         @if $use_high_contrast
           @include button-focus
       &:active
-        :background-position     bottom left
+        :background-position bottom left
     .next
-      :background-position     top    right
+      :background-position top right
       &:hover, &:focus
-        :background-position      right -31px
+        :background-position right -31px
       &:active
-        :background-position   bottom right
+        :background-position bottom right
 #eg-canvas-logo
   background: url(/images/canvas/header_canvas_logo.png) no-repeat
   position: absolute
@@ -99,7 +111,15 @@
     display: inline-block
     vertical-align: top
 
+#main
+  position: static
+
 #full_width_container
+  position: absolute
+  top: $gradebook_header_height
+  bottom: 0
+  left: 0
+  right: 0
   min-width: 960px
 
 .full_width
@@ -128,9 +148,12 @@
     width: 329px
 
 #left_side
-  width: 75%
-  float: left
-  position: relative
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 0
+  right: 25%
+
   #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay
     height: 100%
     width: 100%
@@ -148,30 +171,31 @@
       font-size: 0.75em
       line-height: 2em
 
-
 #width_resizer
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 0
   background: #bbb url('/images/splitpane_handle-ew.gif') no-repeat scroll 50% 50%
   cursor: pointer
-  height: 100%
   width: 7px
-  float: left
   border-right: 1px solid #838383
-  position: relative
   z-index: 2
   &.highlight
     background-color: #FBEC88
 
+#speedgrader_iframe
+  display: block
+
 #right_side
-  background-color: #f0f0f0
-  color: #444
   width: 25%
-  float: left
-  position: relative
+  position: absolute
+  top: 0
+  bottom: 0
+  right: 0
+  background-color: #f2f2f2
+  color: #444
   font-size: 12px
-  a
-    color: #124B87
-    &:hover
-      text-decoration: underline
 
   .bold
     font-weight: bold
@@ -184,52 +208,58 @@
     overflow: auto
 
   #rubric_assessments_list_and_edit_button_holder
-    padding-top: 0
     .button-container
-      display: inline
-
-
+      display: inline-block
 
   div.comment
-    margin: 3px
+    padding: 8px
     font-size: 12px
-    border-top: 1px dashed #ccc
+    border-top: 1px dashed $can-border-light
+    background: $canvas-light
+    &:first-of-type
+      border-top: none
     .comment_citation
-      color: #888888
+      @if $use_high_contrast == false
+        color: #888
       font-size: 0.8em
       text-align: right
     .delete_comment_link
       float: right
-      color: #666
-      opacity: 0.5
+      @if $use_high_contrast
+        color: lighten($canvas-dark, 12%)
+      @else
+        color: lighten($canvas-dark, 25%)
       &:hover, &:focus
-        opacity: 1
+        color: $canvas-dark
+        
 
   h2, .h2
-    background: #E3E3E3 url('/images/h2_bg.png') repeat-x scroll 0% 36%
-    border-bottom: 1px solid #838383
-    border-top: 1px solid #999
-    line-height: 25px
-    color: #555
-    font-size: 1.25em
-    margin: 0
+    background: lighten($canvas-neutral, 5%)
+    border-bottom: 1px solid $can-border-light
+    border-top: 1px solid $can-border-light
+    font-size: 1.2em
     font-weight: bold
-    padding: 2px 5px
-    font-family: arial,sans-serif
+    margin: 0
+    padding: 8px
+    line-height: 1.1
 
   .content_box
-    padding: 6px 3px
-
-
-
+    padding: 8px
+    background: $canvas-light
 
   #rightside_inner
-    position: relative
-    margin-left: 8px !important
-    // overflow-y: hidden
-    // .webkit &
-      margin-left: 0 /*for some reason webkit leaves a gap next to the scroll bar if this has margin-left: 8px but it works fine without it */
+    @extend %flex-1
+    overflow-y: auto
 
+
+.right_side_content
+  @extend %flex
+  @extend %flex-column
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 8px
+  right: 0
 
 #rubric_full h2, #rubric_full .h2, #grading h2, #grading .h2
   margin-top: 0 !important
@@ -242,8 +272,8 @@
   border-left: 7px solid #bbb
   border-bottom: 7px solid #bbb
   border-bottom-left-radius: 5px
-  background-color: #E9E9E9
   z-index: 1000
+  background-color: $canvas-light
 
   .content_box
     padding-right: 24px
@@ -281,16 +311,15 @@
     .avatar
       height: 30px
       max-width: 30px
-
+      float: left
+      margin-right: 6px
 
 #add_a_comment
-  background-color: #f0f0f0
-  border-top: 1px solid #ccc
-  padding: 0 0.5% 2px
-  width: 99%
-  position: absolute
-  bottom: 0
-  // reverse the effect that the padding on #add_a_comment has so that #media_media_recording can take up the whole width
+  border-top: 1px solid $can-border-light
+  margin: 0
+  box-sizing: border-box
+  padding: 8px
+  
   #media_media_recording
     margin: 0 -2px
   .hidden
@@ -300,11 +329,8 @@
     font-size: 10px
   label
     font-weight: bold
-  div
-    // overflow: hidden
   button
     float: right
-    margin: 2px 4px
   .attach_things
     float: left
     margin: 0
@@ -323,12 +349,14 @@
       display: block
     /////// END: fix for chrome bug.
     .prompt
-      color: #999
       font-weight: bold
       line-height: 24px
       padding-right: 4px
     li
       float: left
+      margin-right: 1px
+      &:last-of-type
+        margin-right: 0
       .icon
         display: block
         border: 1px solid #F0F0F0
@@ -357,22 +385,15 @@
       font-size: 8.5px
     a
       display: block
-      width: 16px
-      height: 16px
       float: right
-      text-indent: -9999px
-      background: url("/images/delete_circle.png") no-repeat
-      outline: none
   textarea
-    border: 1px solid #aaa
-    border-radius: 4px
-    padding: 2px
-    width: 94% /*hack for IE6 */
+    border-radius: $baseBorderRadius
     max-height: 200px
     font-size: 13px
 
 html > body #add_a_comment textarea
-  width: 97% /* for everyone else */
+  width: 100% /* for everyone else */
+  box-sizing: border-box
 
 body .ui-selectmenu-dropdown
   border-radius: 0
@@ -430,7 +451,6 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   top: 2px !important
   margin-top: 0 !important
   left: -3px
-  // opacity: 0.8
 
 .ui-selectmenu-item-icon.speedgrader-selectmenu-icon
   position: absolute
@@ -458,7 +478,10 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 .ui-selectmenu-item-header
   .not_submitted &
-    color: $grayLight
+    @if $use_high_contrast
+      color: lighten($canvas-dark, 20%)
+    @else
+      color: $grayLight
   .ui-selectmenu-status &
     margin-top: 1px
 
@@ -470,9 +493,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   border-top: 1px solid #999999
   padding: 3px 0
 #submission_details
-  border-bottom: 1px solid #999999
-  &.content_box
-    padding-top: 0
+  border-bottom: 1px solid $can-border-light
   a
     font-size: 12px
   .on_time
@@ -569,7 +590,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   height: 35px
 
 #record_button div
-  margin: 5px 10px
+  margin: 0 10px
   width: 15px
   height: 15px
 

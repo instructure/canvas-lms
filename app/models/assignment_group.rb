@@ -225,5 +225,4 @@ class AssignmentGroup < ActiveRecord::Base
     new_group.touch
     self.reload
   end
-
 end

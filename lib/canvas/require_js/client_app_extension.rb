@@ -7,20 +7,33 @@ module Canvas
 
         def paths
           app_names.reduce({}) do |paths, app_name|
-            paths[app_name] = "client_apps/#{app_name}"
+            paths[app_name] = "#{JS_DIR}/#{app_name}"
+
+            if extra_paths = load_config_file(app_name, 'paths.json')
+              paths.merge!(extra_paths)
+            end
+
             paths
           end
         end
 
         def map
           app_names.reduce({}) do |map, app_name|
-            mapfile = base_path(app_name, 'dist', "#{app_name}.map.json")
-
-            if File.exists?(mapfile)
-              map[app_name] = JSON.parse(File.read(mapfile))
+            if custom_map = load_config_file(app_name, 'map.json')
+              map[app_name] = custom_map
             end
 
             map
+          end
+        end
+
+        def bundles
+          app_names.reduce({}) do |bundles, app_name|
+            if bundle_config = load_config_file(app_name, 'bundles.json')
+              bundles.merge!(bundle_config)
+            end
+
+            bundles
           end
         end
 
@@ -34,6 +47,14 @@ module Canvas
           client_apps = Dir.glob(base_path('*'))
             .select { |file| File.directory?(file) }
             .map { |file| File.basename(file) }
+        end
+
+        def load_config_file(app_name, file_name)
+          config_file = base_path(app_name, 'dist', "#{app_name}.#{file_name}")
+
+          if File.exists?(config_file)
+            JSON.parse(File.read(config_file))
+          end
         end
       end
     end

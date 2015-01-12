@@ -114,10 +114,6 @@ class Announcement < DiscussionTopic
     false
   end
 
-  def draft_state_enabled?
-    false
-  end
-
   def published?
     true
   end

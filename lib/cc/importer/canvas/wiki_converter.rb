@@ -40,6 +40,7 @@ module CC::Importer::Canvas
       wiki[:editing_roles] = meta['editing_roles']
       wiki[:notify_of_update] = meta['notify_of_update'] == 'true'
       wiki[:workflow_state] = meta['workflow_state']
+      # should keep in case we import old packages
       wiki[:workflow_state] = 'unpublished' if meta['hide_from_students'] == 'true' && (wiki[:workflow_state].nil? || wiki[:workflow_state] == 'active')
       wiki[:front_page] = meta['front_page'] == 'true'
       wiki[:text] = body

@@ -1,0 +1,38 @@
+@import "../blocks/event_stream";
+@import "../blocks/question_anchors";
+@import "./ic_quiz_inspector/question_inspector";
+@import "./ic_quiz_inspector/question_listing";
+@import "./ic_quiz_inspector/session";
+@import "./ic_quiz_inspector/answer_matrix";
+
+#ic-QuizInspector {
+  padding: $whitespace;
+}
+
+.ic-QuizInspector__Header {
+  border-bottom: $borderColor 1px solid;
+  position: relative;
+  margin-bottom: $whitespace*2;
+  padding-bottom: $whitespace;
+}
+
+.ic-QuizInspector__HeaderControls {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 12px;
+
+  .icon-refresh:before {
+    font-size: 10px;
+  }
+
+  label {
+    margin: 0 $whitespace 0 0;
+    font-size: inherit;
+
+    input[type="checkbox"] {
+      margin-top: -1px;
+      margin-right: $whitespace / 3;
+    }
+  }
+}

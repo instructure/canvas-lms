@@ -232,9 +232,9 @@ define([
           var root_folder_id;
           for(var idx in data.folders) {
             var folder = data.folders[idx].folder;
-            if(!folders[folder.id]) {
-              folders[folder.id] = folder;
-            }
+            // merge placeholder (if any) with actual content
+            folders[folder.id] = $.extend(folder, folders[folder.id]);
+
             if(!folder.parent_folder_id) {
               root_folder_id = folder.id;
               continue;

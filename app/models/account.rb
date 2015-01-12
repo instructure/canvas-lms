@@ -1548,7 +1548,7 @@ class Account < ActiveRecord::Base
   end
 
   def trusted_referer?(referer_url)
-    return if !self.settings.has_key?(:trusted_referers) || self.settings[:trusted_referers].empty?
+    return if !self.settings.has_key?(:trusted_referers) || self.settings[:trusted_referers].blank?
     if referer_with_port = format_referer(referer_url)
       self.settings[:trusted_referers].split(',').include?(referer_with_port)
     end

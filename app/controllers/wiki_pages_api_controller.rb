@@ -47,7 +47,7 @@
 #           "type": "datetime"
 #         },
 #         "hide_from_students": {
-#           "description": "whether this page is hidden from students (note: students will never see this true; pages hidden from them will be omitted from results)",
+#           "description": "(DEPRECATED) whether this page is hidden from students (note: this is always reflected as the inverse of the published value)",
 #           "example": false,
 #           "type": "boolean"
 #         },
@@ -166,13 +166,6 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[body] [String]
   #   The content for the new page.
   #
-  # @argument wiki_page[hide_from_students] [Boolean]
-  #   Whether the page should be hidden from students.
-  #
-  #   *Note:* when draft state is enabled, attempts to set +hide_from_students+
-  #   will be ignored and the value returned will always be the inverse of the
-  #   +published+ value.
-  #
   # @argument wiki_page[editing_roles] [String, "teachers"|"students"|"members"|"public"]
   #   Which user roles are allowed to edit this page. Any combination
   #   of these roles is allowed (separated by commas).
@@ -187,10 +180,6 @@ class WikiPagesApiController < ApplicationController
   #
   # @argument wiki_page[published] [Boolean]
   #   Whether the page is published (true) or draft state (false).
-  #
-  #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be the inverse of the
-  #   +hide_from_students+ value.
   #
   # @example_request
   #     curl -X PUT -H 'Authorization: Bearer <token>' \
@@ -268,13 +257,6 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[body] [String]
   #   The content for the new page.
   #
-  # @argument wiki_page[hide_from_students] [Boolean]
-  #   Whether the page should be hidden from students.
-  #
-  #   *Note:* when draft state is enabled, attempts to set +hide_from_students+
-  #   will be ignored and the value returned will always be the inverse of the
-  #   +published+ value.
-  #
   # @argument wiki_page[editing_roles] [String, "teachers"|"students"|"members"|"public"]
   #   Which user roles are allowed to edit this page. Any combination
   #   of these roles is allowed (separated by commas).
@@ -289,10 +271,6 @@ class WikiPagesApiController < ApplicationController
   #
   # @argument wiki_page[published] [Boolean]
   #   Whether the page is published (true) or draft state (false).
-  #
-  #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be the inverse of the
-  #   +hide_from_students+ value.
   #
   # @argument wiki_page[front_page] [Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -312,6 +290,7 @@ class WikiPagesApiController < ApplicationController
     @page = @wiki.build_wiki_page(@current_user, initial_params)
     if authorized_action(@page, @current_user, :create)
       update_params = get_update_params(Set[:title, :body])
+
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         render :json => wiki_page_json(@page, @current_user, session)
@@ -349,13 +328,6 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[body] [String]
   #   The content for the new page.
   #
-  # @argument wiki_page[hide_from_students] [Boolean]
-  #   Whether the page should be hidden from students.
-  #
-  #   *Note:* when draft state is enabled, attempts to set +hide_from_students+
-  #   will be ignored and the value returned will always be the inverse of the
-  #   +published+ value.
-  #
   # @argument wiki_page[editing_roles] [String, "teachers"|"students"|"members"|"public"]
   #   Which user roles are allowed to edit this page. Any combination
   #   of these roles is allowed (separated by commas).
@@ -370,10 +342,6 @@ class WikiPagesApiController < ApplicationController
   #
   # @argument wiki_page[published] [Boolean]
   #   Whether the page is published (true) or draft state (false).
-  #
-  #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be the inverse of the
-  #   +hide_from_students+ value.
   #
   # @argument wiki_page[front_page] [Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -521,18 +489,17 @@ class WikiPagesApiController < ApplicationController
     @wiki.check_has_front_page
 
     # attempt to find an existing page
-    is_front_page_action = is_front_page_action?
-    url = is_front_page_action ? Wiki::DEFAULT_FRONT_PAGE_URL : params[:url]
-    @page = if is_front_page_action
-      @wiki.front_page
+    url = params[:url]
+    if is_front_page_action?
+      @page = @wiki.front_page
     else
-      @wiki.find_page(url)
+      @page = @wiki.find_page(url)
     end
 
     # create a new page if the page was not found
     unless @page
       @page = @wiki.build_wiki_page(@current_user, :url => url)
-      if is_front_page_action
+      if is_front_page_action?
         @page.workflow_state = 'active'
         @set_front_page = true
         @set_as_front_page = true
@@ -559,22 +526,13 @@ class WikiPagesApiController < ApplicationController
   
   def get_update_params(allowed_fields=Set[])
     # normalize parameters
-    page_params = params[:wiki_page] || {}
-    if @context.feature_enabled?(:draft_state)
-      page_params.slice!(*%w(title body notify_of_update published front_page editing_roles))
-    else
-      page_params.slice!(*%w(title body hide_from_students notify_of_update front_page editing_roles))
-      workflow_state = 'active' if @page.new_record?
-    end
+    page_params = (params[:wiki_page] || {}).slice(*%w(title body notify_of_update published front_page editing_roles))
 
-    hide_from_students_provided = page_params.has_key?(:hide_from_students)
     if page_params.has_key?(:published)
       published_value = page_params.delete(:published)
       if published_value != ''
         workflow_state = value_to_boolean(published_value) ? 'active' : 'unpublished'
       end
-    elsif hide_from_students_provided
-      workflow_state = value_to_boolean(page_params.delete(:hide_from_students)) ? 'unpublished' : 'active'
     end
 
     if page_params.has_key?(:editing_roles)
@@ -600,11 +558,7 @@ class WikiPagesApiController < ApplicationController
       allowed_fields.clear
     else
       if workflow_state && workflow_state != @page.workflow_state
-        if hide_from_students_provided
-          rejected_fields << :hide_from_students
-        else
-          rejected_fields << :published
-        end
+        rejected_fields << :published
       end
 
       if editing_roles
@@ -627,7 +581,6 @@ class WikiPagesApiController < ApplicationController
     unless rejected_fields.empty?
       @page.errors.add(:published, t(:cannot_update_published, 'You are not allowed to update the published state of this wiki page')) if rejected_fields.include?(:published)
       @page.errors.add(:title, t(:cannot_update_title, 'You are not allowed to update the title of this wiki page')) if rejected_fields.include?(:title)
-      @page.errors.add(:hide_from_students, t(:cannot_update_hide_from_students, 'You are not allowed to update the hidden from students flag of this wiki page')) if rejected_fields.include?(:hide_from_students)
       @page.errors.add(:editing_roles, t(:cannot_update_editing_roles, 'You are not allowed to update the editing roles of this wiki page')) if rejected_fields.include?(:editing_roles)
       @page.errors.add(:front_page, t(:cannot_update_front_page, 'You are not allowed to change the wiki front page')) if rejected_fields.include?(:front_page)
 
@@ -644,11 +597,7 @@ class WikiPagesApiController < ApplicationController
         valid_front_page = false
         error_message = t(:cannot_have_unpublished_front_page, 'The front page cannot be unpublished')
         @page.errors.add(:front_page, error_message) if change_front_page
-        if hide_from_students_provided
-          @page.errors.add(:hide_from_students, t(:cannot_have_hidden_front_page, 'The front page cannot be hidden'))
-        elsif workflow_state
-          @page.errors.add(:published, error_message)
-        end
+        @page.errors.add(:published, error_message) if workflow_state
       end
     end
 
@@ -682,9 +631,7 @@ class WikiPagesApiController < ApplicationController
       end
     end
 
-    if !@context.feature_enabled?(:draft_state)
-      @page.set_as_front_page! if !@wiki.has_front_page? && @page.is_front_page? && !@page.deleted?
-    end
+    @page.set_as_front_page! if !@wiki.has_front_page? && @page.is_front_page? && !@page.deleted?
 
     return true
   end

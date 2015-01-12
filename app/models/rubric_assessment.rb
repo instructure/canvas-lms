@@ -93,6 +93,7 @@ class RubricAssessment < ActiveRecord::Base
     # attempt
     if self.artifact && self.artifact.is_a?(Submission)
       result.attempt = self.artifact.attempt || 1
+      result.submitted_at = self.artifact.submitted_at
     else
       result.attempt = self.version_number
     end

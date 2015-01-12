@@ -1,0 +1,4 @@
+=== Components
+
+Any view that is being used in more than one place should go here.
+Page-specific views go under `/views` instead.

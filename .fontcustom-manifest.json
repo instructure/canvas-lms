@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "d88130ee04df2ffff871caf464b0cfdd556bc8a48ff3fcd77d9aa770585632e5",
-    "current": "d88130ee04df2ffff871caf464b0cfdd556bc8a48ff3fcd77d9aa770585632e5"
+    "previous": "ffa3a504ea4959c4faac9c1c6b15959b7a8e3b147dafd0fb6dc142dc9080c221",
+    "current": "ffa3a504ea4959c4faac9c1c6b15959b7a8e3b147dafd0fb6dc142dc9080c221"
   },
   "fonts": [
     "public/font/canvas/canvas-icons.ttf",
@@ -265,6 +265,14 @@
     "gradebook": {
       "codepoint": 61910,
       "source": "public/font/icons/gradebook.svg"
+    },
+    "gradebook-export": {
+      "codepoint": 62041,
+      "source": "public/font/icons/gradebook-export.svg"
+    },
+    "gradebook-import": {
+      "codepoint": 62042,
+      "source": "public/font/icons/gradebook-import.svg"
     },
     "group": {
       "codepoint": 61911,

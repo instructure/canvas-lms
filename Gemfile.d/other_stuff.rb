@@ -50,7 +50,7 @@ gem 'i18nema', '0.0.8', :platforms => [:mri_20, :mri_21]
 gem 'i18nema19', '0.0.8', :platform => :mri_19
 gem 'i18nliner', '0.0.9'
 gem 'icalendar', '1.5.4'
-gem 'ims-lti', '2.0.0.beta.17'
+gem 'ims-lti', '2.0.0.beta.18'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
@@ -75,7 +75,7 @@ gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false
-gem 'rake', '10.3.2'
+gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount', '1.6.8'
@@ -83,7 +83,7 @@ gem 'ritex', '1.0.1'
 
 gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
-gem 'net-ldap', '0.3.1', :require => 'net/ldap'
+gem 'net-ldap', '0.10.1'
 gem 'ruby-duration', '3.2.0'
 gem 'ruby-saml-mod', '0.2.1'
 gem 'rubycas-client', '2.3.9'

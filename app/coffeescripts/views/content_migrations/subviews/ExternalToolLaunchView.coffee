@@ -23,5 +23,5 @@ define [
       @contentReturnView.render()
 
     setUrl: (data) =>
-      @$fileName.html(data.text)
+      @$fileName.text(data.text)
       @model.set('settings', {file_url: data.url})

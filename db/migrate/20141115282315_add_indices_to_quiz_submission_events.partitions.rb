@@ -8,6 +8,12 @@ class AddIndicesToQuizSubmissionEvents < CanvasPartman::Migration
     with_each_partition do |partition|
       index_ns = partition.sub('quiz_submission_events', 'qse')
 
+      # hack until we can tell which migrations have run on which partition
+      # table
+      next if connection.index_exists?(partition, :created_at, {
+        name: "#{index_ns}_idx_on_created_at"
+      })
+
       add_index partition, :created_at,
         name: "#{index_ns}_idx_on_created_at"
 

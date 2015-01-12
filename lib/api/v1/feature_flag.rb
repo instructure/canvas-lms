@@ -24,7 +24,6 @@ module Api::V1::FeatureFlag
     hash = feature.as_json.slice('feature', 'applies_to', 'enable_at', 'root_opt_in', 'beta', 'development', 'release_notes_url')
     add_localized_attr(hash, feature, 'display_name')
     add_localized_attr(hash, feature, 'description')
-    hash['hidden'] = true if feature.hidden? && Account.site_admin.grants_right?(current_user, session, :read)
     hash
   end
 
@@ -44,6 +43,12 @@ module Api::V1::FeatureFlag
     end
     hash['transitions'] = Feature.transitions(feature_flag.feature, current_user, context, feature_flag.state)
     hash['locked'] = feature_flag.locked?(context, current_user)
+    if Account.site_admin.grants_right?(current_user, :read)
+      # return 'hidden' if the feature is hidden or if this flag is the one that unhides it
+      # (so removing it would re-hide the feature)
+      hash['hidden'] = feature_flag.hidden? ||
+          !feature_flag.default? && feature_flag.context == context && feature_flag.unhides_feature?
+    end
     hash
   end
 

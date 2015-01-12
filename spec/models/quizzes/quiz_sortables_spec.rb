@@ -18,14 +18,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSortables do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   describe ".initialize" do
-    before do
-    end
-
     it "should assign the quiz" do
       quiz = Quizzes::Quiz.new
       sortables = Quizzes::QuizSortables.new(:quiz => quiz, :order => [])

@@ -396,7 +396,7 @@ describe "speed grader" do
     expect(f("#audio_record_option")).not_to be_displayed
 
     #check for file upload comment
-    f('#add_attachment img').click
+    f('#add_attachment').click
     expect(f('#comment_attachments input')).to be_displayed
     f('#comment_attachments a').click
     expect(element_exists('#comment_attachments input')).to be_falsey

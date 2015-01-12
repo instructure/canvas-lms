@@ -20,9 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizzesApiController, type: :request do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   context 'locked api item' do
     let(:item_type) { 'quiz' }
@@ -461,8 +458,6 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       it "should not lose quiz question count when publishing with draft state" do
-        Account.default.enable_feature!(:draft_state)
-
         @quiz ||= @course.quizzes.create!(:title => 'title')
         @qq1 = @quiz.quiz_questions.create!(
           question_data: multiple_choice_question_data
