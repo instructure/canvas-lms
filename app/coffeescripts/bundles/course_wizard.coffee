@@ -21,7 +21,10 @@ require [
       }), $wizard_box[0])
   )
 
-  setTimeout( ->
-    if (!userSettings.get('hide_wizard_' + pathname))
-      $(".wizard_popup_link.auto_open:first").click()
-  , 500)
+  # We are currently not allowing the wizard to popup automatically,
+  # uncommenting the following code will re-enable that functionality.
+  #
+  # setTimeout( ->
+  #   if (!userSettings.get('hide_wizard_' + pathname))
+  #     $(".wizard_popup_link.auto_open:first").click()
+  # , 500)

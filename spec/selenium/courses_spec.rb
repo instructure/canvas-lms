@@ -77,6 +77,9 @@ describe "courses" do
     end
 
     it "should properly hide the wizard and remember its hidden state" do
+      # For now we are not allowing the wizard to popup automatically
+      # so this spec doesn't apply, it may in the future though.
+      pending
       course_with_teacher_logged_in
 
       create_new_course
@@ -95,6 +98,9 @@ describe "courses" do
     end
 
     it "should open and close wizard after initial close" do
+      # For now we are not allowing the wizard to popup automatically
+      # so this spec doesn't apply, it may in the future though.
+      pending
       def find_wizard_box
         wizard_box = keep_trying_until do
           wizard_box = f(".ic-wizard-box")
@@ -129,8 +135,13 @@ describe "courses" do
       course_with_teacher_logged_in
       create_new_course
 
+      # Because of the specs about automatically opening are currently
+      # pending, we need to cause the wizard to open by way of click. When
+      # those specs are no longer pendings, the click line should be removed.
+      f(".wizard_popup_link").click()
       wizard_box = f(".ic-wizard-box")
       keep_trying_until { expect(wizard_box).to be_displayed }
+
 
       f("#wizard_home_page").click
       f(".ic-wizard-box__message-button a").click
