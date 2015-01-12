@@ -76,6 +76,27 @@ define [
 
     gradingHistoryUrl:"#{contextUrl}/gradebook/history"
 
+    submissionsUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.submissions_url')
+
+    mgpEnabled: get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
+
+    gradingPeriods:
+      _.compact [{id: '0', title: I18n.t("all_grading_periods", "All Grading Periods")}].concat get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+
+    selectedGradingPeriod: ((key, newValue) ->
+      savedGradingPeriodId = userSettings.contextGet('gradebook_current_grading_period')
+      if savedGradingPeriodId
+        savedGP = @get('gradingPeriods').findBy('id', savedGradingPeriodId)
+      if newValue
+        userSettings.contextSet('gradebook_current_grading_period', newValue.id)
+        newValue
+      else if savedGP?
+        savedGP
+      else
+        # default to current grading period, but don't change saved setting
+        @get('gradingPeriods').findBy('id', ENV.GRADEBOOK_OPTIONS.current_grading_period_id)
+    ).property()
+
     speedGraderUrl: (->
       "#{contextUrl}/gradebook/speed_grader?assignment_id=#{@get('selectedAssignment.id')}"
     ).property('selectedAssignment')
@@ -239,6 +260,24 @@ define [
     assignmentSelectDefaultLabel: I18n.t "no_assignment", "No Assignment Selected"
     outcomeSelectDefaultLabel: I18n.t "no_outcome", "No Outcome Selected"
 
+    assignment_groups: []
+
+    fetchAssignmentGroups: (->
+      params = {}
+      gpId = @get('selectedGradingPeriod.id')
+      if @get('mgpEnabled') && gpId != '0'
+        params =
+          grading_period_id: gpId
+      @set('assignment_groups', [])
+      array = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
+        content: []
+        sortProperties: ['ag_position', 'position']
+      )
+      @set('assignments', array)
+      Ember.run.once =>
+        fetchAllPages(get(window, 'ENV.GRADEBOOK_OPTIONS.assignment_groups_url'), records: @get('assignment_groups'), data: params)
+    ).observes('selectedGradingPeriod').on('init')
+
     students: studentsUniqByEnrollments('enrollments')
 
     studentsHash: ->
@@ -258,7 +297,7 @@ define [
         return unless notYetLoaded.length
         student_ids = notYetLoaded.mapBy('id')
         fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: student_ids)
-    ).observes('students.@each').on('init')
+    ).observes('students.@each', 'selectedGradingPeriod').on('init')
 
     showNotesColumn: (->
       notes = @get('teacherNotes')
@@ -456,6 +495,7 @@ define [
         set as, 'sortable_date', Number.MAX_VALUE
 
     differentiatedAssignmentVisibleToStudent: (assignment, student_id) ->
+      return false unless assignment?
       return true unless assignment.only_visible_to_overrides
       _.include(assignment.assignment_visibility, student_id)
 
@@ -531,6 +571,7 @@ define [
 
     assignmentGroupsHash: ->
       ags = {}
+      return ags unless @get('assignment_groups')
       @get('assignment_groups').forEach (ag) ->
         ags[ag.id] = ag
       ags
