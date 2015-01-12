@@ -708,6 +708,8 @@ CanvasRails::Application.routes.draw do
 
   get 'health_check' => 'info#health_check'
 
+  get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
+
   get 'facebook' => 'facebook#index'
   post 'facebook/message/:id' => 'facebook#hide_message', as: :facebook_hide_message
   get 'facebook/settings' => 'facebook#settings'

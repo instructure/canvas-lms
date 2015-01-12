@@ -222,6 +222,11 @@ class Account < ActiveRecord::Base
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: true
   add_setting :trusted_referers, root_only: true
 
+  BRANDING_SETTINGS = [:header_image, :favicon, :apple_touch_icon,
+    :msapplication_tile_color, :msapplication_tile_square, :msapplication_tile_wide
+  ]
+  BRANDING_SETTINGS.each { |setting| add_setting(setting, root_only: true) }
+
   def settings=(hash)
     if hash.is_a?(Hash)
       hash.each do |key, val|
