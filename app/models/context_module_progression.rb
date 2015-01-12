@@ -258,6 +258,9 @@ class ContextModuleProgression < ActiveRecord::Base
     if self.locked?
       self.workflow_state = 'unlocked' if prerequisites_satisfied?
     end
+    if self.unlocked?
+      self.workflow_state = 'locked' if !prerequisites_satisfied?
+    end
     return !self.locked?
   end
   private :check_prerequisites
@@ -340,9 +343,7 @@ class ContextModuleProgression < ActiveRecord::Base
       # re-evaluating progressions that have requested our progression's evaluation can cause cyclic evaluation
       next false if dependent_module_to_skip && progression.context_module_id == dependent_module_to_skip.id
 
-      (progression.context_module.prerequisites || []).any? do |prereq|
-        prereq[:type] == 'context_module' && prereq[:id] == context_module.id
-      end
+      self.context_module.is_prerequisite_for?(progression.context_module)
     end
 
     # invalidate all, then re-evaluate each

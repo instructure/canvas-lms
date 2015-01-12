@@ -42,13 +42,18 @@ class ContextModule < ActiveRecord::Base
   after_save :invalidate_progressions
   validates_presence_of :workflow_state, :context_id, :context_type
 
-  def invalidate_progressions
+  def invalidate_progressions(invalidated_modules=[])
+    return if invalidated_modules.include?(self)
     connection.after_transaction_commit do
+      invalidated_modules << self
       context_module_progressions.update_all(current: false)
       send_later_if_production(:evaluate_all_progressions)
+
+      context.context_modules.each do |mod|
+        mod.invalidate_progressions(invalidated_modules) if self.is_prerequisite_for?(mod)
+      end
     end
   end
-  private :invalidate_progressions
 
   def evaluate_all_progressions
     current_column = 'context_module_progressions.current'
@@ -64,6 +69,10 @@ class ContextModule < ActiveRecord::Base
 
       clear_cached_visibilities if differentiated_assignments_enabled?
     end
+  end
+
+  def is_prerequisite_for?(mod)
+    (mod.prerequisites || []).any? {|prereq| prereq[:type] == 'context_module' && prereq[:id] == self.id }
   end
 
   def self.module_positions(context)
