@@ -47,7 +47,7 @@
     <% end %>
 
     <% if @can_manage_content || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
-      <div>
+      <div class="course-options">
         <% @course_home_sub_navigation_tools.each do |tool| %>
           <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
              href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
