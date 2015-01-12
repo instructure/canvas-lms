@@ -52,6 +52,7 @@ class Account < ActiveRecord::Base
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
+  has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
   has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
   has_many :account_users, :dependent => :destroy
