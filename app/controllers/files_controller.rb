@@ -477,9 +477,10 @@ class FilesController < ApplicationController
     # attachment.
     # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
-      @attachment = @context.attachments.where(:id => params[:id]).first
+      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
+      @attachment = @context.attachments.find(params[:id])
     else
-      @attachment = Attachment.where(:id => params[:id]).first
+      @attachment = Attachment.find(params[:id])
       @skip_crumb = true unless @context
     end
 
