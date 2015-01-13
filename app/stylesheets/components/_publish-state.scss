@@ -42,15 +42,16 @@ The publish button has two states on click (publish and published) and a hover s
 .btn-publish,
 .btn-published,
 .btn-unpublish {
+  transition: none; // Background transition set on default buttons was making publish transitions look flickery
   padding-left: 9px;
 
   i {
-    margin-right: 2px;
+    margin-right: 4px;
     vertical-align: text-top;
     line-height: 17px;
   }
   i:before {
-    font-size: 17px;
+    font-size: 18px;
   }
 }
 .btn-publish {
@@ -61,12 +62,16 @@ The publish button has two states on click (publish and published) and a hover s
 
 .btn-published,
 .btn-published:hover {
-  background: #35842c;
-  border: 1px solid #2a5325;
-  color: #fff;
-  text-shadow: none;
-  box-shadow: inset 0 0 6px #1b2d19;
+  background: $canvas-success;
+  border: 1px solid darken($canvas-success, 15%);
+  color: $canvas-light;
 }
+
+.btn-published:focus {
+  background: darken($canvas-success, 10%); 
+  color: $canvas-light; 
+}
+
 .btn-published.disabled,
 .btn-published.disabled:hover {
   border: 1px solid #256f1e;
