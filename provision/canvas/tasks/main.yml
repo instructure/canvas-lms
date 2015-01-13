@@ -1,6 +1,9 @@
 - name: delete vendor/bundle
   file: path=/vagrant/vendor/bundle state=absent
 
+- name: delete Gemfile.lock
+  file: path=/vagrant/Gemfile.lock state=absent
+
 - name: bundle install
   shell: >
     executable=/bin/bash source /etc/profile.d/rvm.sh;
