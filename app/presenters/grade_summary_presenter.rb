@@ -168,12 +168,9 @@ class GradeSummaryPresenter
   def assignment_stats
     @stats ||= begin
       chain = @context.assignments.active.except(:order)
-      if @context.feature_enabled?(:differentiated_assignments)
-        # if DA is on, further restrict the assignments to those visible to each student
-        # note: adding the context_id avoids a seq scan
-        chain = chain.joins(:assignment_student_visibilities).
-          where("assignment_student_visibilities.course_id = ?", @context.id)
-      end
+      # note: because a score is needed for max/min/ave we are not filtering
+      # by assignment_student_visibilities, if a stat is added that doesn't
+      # require score then add a filter when the DA feature is on
       chain.joins(:submissions)
         .where("submissions.user_id in (?)", real_and_active_student_ids)
         .group("assignments.id")
@@ -183,7 +180,7 @@ class GradeSummaryPresenter
   end
 
   def real_and_active_student_ids
-    @context.all_real_student_enrollments.where("workflow_state not in (?)", ['rejected','inactive']).pluck(:user_id).uniq
+    @context.all_real_student_enrollments.active_or_pending.pluck(:user_id).uniq
   end
 
   def assignment_presenters

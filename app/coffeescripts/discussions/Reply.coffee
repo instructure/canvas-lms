@@ -8,8 +8,9 @@ define [
   'jst/discussions/_reply_attachment'
   'compiled/fn/preventDefault'
   'compiled/views/editor/KeyboardShortcuts'
+  'str/stripTags'
   'tinymce.editor_box'
-], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts) ->
+], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts, stripTags) ->
 
   class Reply
 
@@ -87,7 +88,7 @@ define [
     submit: =>
       @hide()
       @textArea._setContentCode ''
-      @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t 'saving_reply', 'Saving reply...'}</div>"
+      @view.model.set 'notification', "<div class='alert alert-info'>#{htmlEscape I18n.t 'saving_reply', 'Saving reply...'}</div>"
       entry = new Entry @getModelAttributes()
       entry.save null,
         success: @onPostReplySuccess
@@ -112,7 +113,7 @@ define [
       now = new Date().getTime()
       # TODO: remove this summary, server should send it in create response and no further
       # work is required
-      summary: $('<div/>').html(@content).text()
+      summary: stripTags(@content)
       message: @content
       parent_id: if @options.topLevel then null else @view.model.get 'id'
       user_id: ENV.current_user_id

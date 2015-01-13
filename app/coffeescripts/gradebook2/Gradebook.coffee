@@ -155,6 +155,7 @@ define [
       assignment.assignment_visibility = filteredVisibility
 
     onShow: ->
+      $(".post-grades-placeholder").show();
       return if @startedInitializing
       @startedInitializing = true
 
@@ -203,8 +204,7 @@ define [
       for group in assignmentGroups
         # note that assignmentGroups are not yet htmlEscaped like assignments and sections
         @assignmentGroups[group.id] = group
-        if ENV.GRADEBOOK_OPTIONS.draft_state_enabled
-          group.assignments = _.select group.assignments, (a) -> a.published
+        group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
           htmlEscape(assignment)
           assignment.assignment_group = group
@@ -411,16 +411,15 @@ define [
       window.location.reload()
 
     assignmentGroupHtml: (group_name, group_weight) =>
-      escaped_group_name = htmlEscape(group_name)
       if @weightedGroups()
         percentage = I18n.toPercentage(group_weight, precision: 2)
         """
-          #{escaped_group_name}<div class='assignment-points-possible'>
-            #{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
+          #{htmlEscape(group_name)}<div class='assignment-points-possible'>
+            #{htmlEscape I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
           </div>
         """
       else
-        "#{escaped_group_name}"
+        htmlEscape(group_name)
 
     # filter, sort, and build the dataset for slickgrid to read from, then force
     # a full redraw
@@ -537,7 +536,7 @@ define [
             (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment)
 
     staticCellFormatter: (row, col, val) =>
-      "<div class='cell-content gradebook-cell'>#{val}</div>"
+      "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
 
     uneditableCellFormatter: (row, col) =>
       "<div class='cell-content gradebook-cell grayed-out'></div>"
@@ -655,7 +654,7 @@ define [
       columnDef.name = columnDef.unminimizedName
       columnDef.minimized = false
       @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
-      $columnHeader.find('.slick-column-name').html(columnDef.name)
+      $columnHeader.find('.slick-column-name').html($.raw(columnDef.name))
       @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
       userSettings.contextSet('hidden_columns', _.uniq(@assignmentsToHide))
 
@@ -679,7 +678,7 @@ define [
         # add lines for dropped, late, resubmitted
         Array::push.apply htmlLines, $.map(SubmissionCell.classesBasedOnSubmission(submission, assignment), (c)=> GRADEBOOK_TRANSLATIONS["#submission_tooltip_#{c}"])
       else if assignment.points_possible?
-        htmlLines.push I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible)
+        htmlLines.push htmlEscape(I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible))
 
       $hoveredCell.data('tooltip', $("<span />",
         class: 'gradebook-tooltip'
@@ -688,7 +687,7 @@ define [
           top: offset.top
           zIndex: 10000
           display: 'block'
-        html: htmlLines.join('<br />')
+        html: $.raw(htmlLines.join('<br />'))
       ).appendTo('body')
       .css('top', (i, top) -> parseInt(top) - $(this).outerHeight()))
 
@@ -973,7 +972,7 @@ define [
 
       @parentColumns = [
         id: 'student'
-        name: I18n.t 'student_name', 'Student Name'
+        name: htmlEscape I18n.t 'student_name', 'Student Name'
         field: 'display_name'
         width: 150
         cssClass: "meta-cell"
@@ -982,7 +981,7 @@ define [
         formatter: @htmlContentFormatter
       ,
         id: 'secondary_identifier'
-        name: I18n.t 'secondary_id', 'Secondary ID'
+        name: htmlEscape I18n.t 'secondary_id', 'Secondary ID'
         field: 'secondary_identifier'
         width: 100
         cssClass: "meta-cell secondary_identifier_cell"
@@ -1047,7 +1046,7 @@ define [
         field: "total_grade"
         formatter: @groupTotalFormatter
         name: """
-          #{total}
+          #{htmlEscape total}
           <div id=total_column_header></div>
         """
         toolTip: total
@@ -1209,6 +1208,10 @@ define [
         else
           @totalGradeWarning = null
 
+    ###
+    xsslint jqueryObject.identifier createLink
+    xsslint jqueryObject.function showLink hideLink
+    ###
     showCustomColumnDropdownOption: ->
       linkContainer = $("<li>").appendTo(".gradebook_drop_down")
 

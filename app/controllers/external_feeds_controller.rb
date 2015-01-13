@@ -84,7 +84,7 @@ class ExternalFeedsController < ApplicationController
   def index
     if authorized_action(@context.announcements.scoped.new, @current_user, :create)
       api_route = polymorphic_url([:api, :v1, @context, :external_feeds])
-      @feeds = Api.paginate(@context.external_feeds.for('announcements').order(:id), self, api_route)
+      @feeds = Api.paginate(@context.external_feeds.order(:id), self, api_route)
       render :json => external_feeds_api_json(@feeds, @context, @current_user, session)
     end
   end

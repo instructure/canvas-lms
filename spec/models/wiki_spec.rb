@@ -24,12 +24,6 @@ describe Wiki do
     @wiki = @course.wiki
   end
 
-  context "get_front_page_url" do
-    it "should return default url if front_page_url is not set" do
-      expect(@wiki.get_front_page_url).to eq Wiki::DEFAULT_FRONT_PAGE_URL # 'front-page'
-    end
-  end
-
   context "unset_front_page!" do
     it "should unset front page" do
       @wiki.unset_front_page!
@@ -51,14 +45,6 @@ describe Wiki do
   end
 
   context "front_page" do
-    it "should build a default page if not found" do
-      expect(@wiki.wiki_pages.count).to eq 0
-
-      page = @wiki.front_page
-      expect(page.new_record?).to eq true
-      expect(page.url).to eq @wiki.get_front_page_url
-    end
-
     it "should build a custom front page if not found" do
       new_url = "whyyyyy"
       @wiki.set_front_page_url!(new_url)

@@ -989,7 +989,6 @@ class Attachment < ActiveRecord::Base
       "audio/mpeg" => "audio",
       "audio/basic" => "audio",
       "audio/mid" => "audio",
-      "audio/mpeg" => "audio",
       "audio/3gpp" => "audio",
       "audio/x-aiff" => "audio",
       "audio/x-mpegurl" => "audio",

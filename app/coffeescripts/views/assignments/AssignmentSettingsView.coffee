@@ -76,7 +76,7 @@ define [
         total_weight += v.findWeight() || 0
       total_weight = round(total_weight,2)
 
-      @$el.find('#percent_total').html(total_weight + "%")
+      @$el.find('#percent_total').text(total_weight + "%")
 
     clearWeights: ->
       @weights = []
@@ -87,7 +87,7 @@ define [
       for v in @weights
         total_weight += v.findWeight() || 0
       total_weight = round(total_weight,2)
-      @$el.find('#percent_total').html(total_weight + "%")
+      @$el.find('#percent_total').text(total_weight + "%")
 
     toJSON: ->
       data = super

@@ -33,6 +33,9 @@ define [
     @child 'dateRangeSearch', '#courseDateRangeSearch'
     @child 'courseSearch', '#courseCourseSearch'
  
+    fieldSelectors:
+      'course_id': "#course_id-autocompleteField"
+
     els:
       '#courseLoggingForm': '$form'
 
@@ -48,7 +51,7 @@ define [
         collection: new Backbone.Collection null, resourceName: 'courses'
         labelProperty: $.proxy(@autoCompleteItemLabel, @)
         fieldName: 'course_id'
-        placeholder: 'Course'
+        placeholder: 'Course ID'
         sourceParameters:
           "state[]": "all"
       @resultsView = new PaginatedCollectionView
@@ -125,19 +128,18 @@ define [
       @collection.on 'setParams', @fetch
 
     fetch: =>
-      @collection.fetch().fail @onFail
+      @collection.fetch(error: @onFail)
 
-    onFail: (xhr) =>
+    onFail: (collection, xhr) =>
       # Received a 404, empty the collection and don't let the paginated
       # view try to fetch more.
-
       @collection.reset()
       @resultsView.detachScroll()
       @resultsView.$el.find(".paginatedLoadingIndicator").fadeOut()
 
       if xhr?.status? && xhr.status == 404
         errors = {}
-        errors['course_submit'] = [{
+        errors['course_id'] = [{
           type: 'required'
           message: 'A course with that ID could not be found for this account.'
         }]

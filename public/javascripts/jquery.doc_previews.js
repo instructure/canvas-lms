@@ -92,7 +92,8 @@ define([
         var iframe = $('<iframe/>', {
             src: opts.crocodoc_session_url,
             width: opts.width,
-            height: opts.height
+            height: opts.height,
+            id: opts.id
         });
         iframe.appendTo($this);
         iframe.load(function() {
@@ -107,7 +108,8 @@ define([
             width: opts.width,
             height: opts.height,
             allowfullscreen: "1",
-            css: {border: 0}
+            css: {border: 0},
+            id: opts.id
         });
         iframe.appendTo($this);
         iframe.load(function() {
@@ -124,7 +126,7 @@ define([
             url: opts.public_url
           });
           if (!opts.ajax_valid || opts.ajax_valid()){
-            $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
+            $('<iframe src="' + htmlEscape(googleDocPreviewUrl) + '" height="' + opts.height  + '" width="100%" />')
               .appendTo($this)
               .load(function(){
                 tellAppIViewedThisInline('google');

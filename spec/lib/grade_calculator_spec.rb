@@ -369,8 +369,6 @@ describe GradeCalculator do
 
     it "should not include unpublished assignments" do
       two_graded_assignments
-
-      @course.enable_feature!(:draft_state)
       @assignment2.unpublish
 
       @user.reload
@@ -585,6 +583,29 @@ describe GradeCalculator do
         @course.update_attribute :group_weighting_scheme, 'equal'
         grade = 145.0 # ((9 + 5 + 10 + 5) / (10 + 10)) * 100
         check_grades(grade, grade)
+      end
+    end
+
+    context "grading periods" do
+      before :once do
+        student_in_course active_all: true
+        @gp1, @gp2 = grading_periods count: 2
+        @a1, @a2 = [@gp1, @gp2].map { |gp|
+          @course.assignments.create! due_at: gp.start_date + 1,
+            points_possible: 100
+        }
+        @a1.grade_student(@student, grade: 25)
+        @a2.grade_student(@student, grade: 75)
+      end
+
+      it "can compute grades for a grading period" do
+        gc = GradeCalculator.new([@student.id], @course, grading_period: @gp1)
+        (current, _), _ = gc.compute_scores.first
+        expect(current[:grade]).to eql 25.0
+
+        gc = GradeCalculator.new([@student.id], @course, grading_period: @gp2)
+        (current, _), _ = gc.compute_scores.first
+        expect(current[:grade]).to eql 75.0
       end
     end
 

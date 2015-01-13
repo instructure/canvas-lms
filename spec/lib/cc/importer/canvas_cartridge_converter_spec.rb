@@ -258,8 +258,6 @@ describe "Canvas Cartridge importing" do
     ef = @copy_from.external_feeds.new
     ef.url = "http://search.twitter.com/search.atom?q=instructure"
     ef.title = "Instructure on Twitter"
-    ef.feed_type = "rss/atom"
-    ef.feed_purpose = 'announcements'
     ef.verbosity = 'full'
     ef.header_match = "canvas"
     ef.save!
@@ -277,8 +275,6 @@ describe "Canvas Cartridge importing" do
     ef_2 = @copy_to.external_feeds.where(migration_id: CC::CCHelper.create_key(ef)).first
     expect(ef_2.url).to eq ef.url
     expect(ef_2.title).to eq ef.title
-    expect(ef_2.feed_type).to eq ef.feed_type
-    expect(ef_2.feed_purpose).to eq ef.feed_purpose
     expect(ef_2.verbosity).to eq ef.verbosity
     expect(ef_2.header_match).to eq ef.header_match
   end
@@ -618,8 +614,8 @@ describe "Canvas Cartridge importing" do
     migration_id = CC::CCHelper.create_key(page)
     meta_fields = {:identifier => migration_id}
     meta_fields[:editing_roles] = page.editing_roles
-    meta_fields[:hide_from_students] = page.hide_from_students
     meta_fields[:notify_of_update] = page.notify_of_update
+    meta_fields[:workflow_state] = page.workflow_state
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, meta_fields)
     #convert to json
     doc = Nokogiri::HTML(exported_html)
@@ -634,7 +630,6 @@ describe "Canvas Cartridge importing" do
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.editing_roles).to eq page.editing_roles
-    expect(page_2.hide_from_students).to eq page.hide_from_students
     expect(page_2.notify_of_update).to eq page.notify_of_update
     expect(page_2.body).to eq (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png" \/>/, 'png">')
     expect(page_2.unpublished?).to eq true
@@ -1307,7 +1302,7 @@ XML
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to eq true
-      expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/wiki/#{wiki.url}"
+      expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/pages/#{wiki.url}"
       expect(warning.error_message).to include("body")
     end
   end

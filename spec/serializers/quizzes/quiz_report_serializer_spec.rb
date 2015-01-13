@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 shared_examples_for 'QuizReportSerializer Associations' do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   it 'should embed its attachment as :file when present' do
     statistics.generate_csv

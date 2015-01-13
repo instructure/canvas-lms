@@ -1144,7 +1144,7 @@ describe "MessageableUser::Calculator" do
         it "should include users messageable via adminned accounts" do
           user
           tie_user_to_account(@viewing_user, :role => admin_role)
-          custom_role = custom_account_role('Student', :account => Account.default)
+          custom_role = custom_account_role('CustomStudent', :account => Account.default)
           tie_user_to_account(@user, :role => custom_role)
           expect(messageable_user_ids).to include(@user.id)
         end

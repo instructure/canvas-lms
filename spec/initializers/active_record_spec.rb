@@ -93,6 +93,36 @@ module ActiveRecord
         end
       end
     end
+  end
 
+  describe Relation do
+    describe "union" do
+      shared_examples_for "query creation" do
+        it "should include conditions after the union inside of the subquery" do
+          query = base.active.where(id:99).union(User.where(id:1)).to_sql
+          sql_before_union, sql_after_union = query.split("UNION ALL")
+          expect(sql_before_union.include?("99")).to be_falsey
+          expect(sql_after_union.include?("99")).to be_truthy
+        end
+
+        it "should include conditions prior to the union outside of the subquery" do
+          query = base.active.union(User.where(id:1)).where(id:99).to_sql
+          sql_before_union, sql_after_union = query.split("UNION ALL")
+          expect(sql_before_union.include?("99")).to be_truthy
+          expect(sql_after_union.include?("99")).to be_falsey
+        end
+      end
+
+      context "directly on the table" do
+        include_examples "query creation"
+        let(:base) { User.active }
+      end
+
+      context "through a relation" do
+        include_examples "query creation"
+        a = Account.create!
+        let(:base) { Account.find(a.id).users }
+      end
+    end
   end
 end

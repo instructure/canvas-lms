@@ -1,4 +1,4 @@
-define ['i18nObj'], (I18n) ->
+define ['i18n!_core_en'], (I18n) ->
   weekMode: 'variable'
   allDayDefault: false
   # In order to display times in the time zone configured in the user's profile,

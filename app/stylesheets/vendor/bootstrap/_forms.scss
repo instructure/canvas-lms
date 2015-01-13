@@ -422,7 +422,6 @@ This is the standard form actions button bar at the bottom of every content form
 
 .help-inline {
   display: inline-block;
-  @include ie7-inline-block();
   vertical-align: middle;
   padding-left: 5px;
 }
@@ -594,7 +593,6 @@ input.search-query {
   .input-prepend,
   .input-append {
     display: inline-block;
-    @include ie7-inline-block();
     margin-bottom: 0;
     vertical-align: middle;
   }

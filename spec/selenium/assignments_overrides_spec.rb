@@ -14,7 +14,6 @@ describe "assignment groups" do
     before(:each) do
       make_full_screen
       course_with_teacher_logged_in
-      set_course_draft_state
     end
 
     it "should create an assignment with default dates" do
@@ -108,6 +107,24 @@ describe "assignment groups" do
       tooltip = fj('.vdd_tooltip_content:visible')
       expect(tooltip).to include_text 'New Section'
       expect(tooltip).to include_text 'Everyone else'
+    end
+  end
+
+  context "as a student" do
+
+    let(:unlock_at) { Time.zone.now - 2.days }
+    let(:lock_at) { Time.zone.now + 4.days }
+
+    before(:once) do
+      make_full_screen
+      course_with_student_logged_in(:active_all => true)
+    end
+
+    it "should show the available date range when overrides are set" do
+      assign = create_assignment!
+      get "/courses/#{@course.id}/assignments/#{assign.id}"
+      wait_for_ajaximations
+      expect(f('.student-assignment-overview')).to include_text 'Available'
     end
   end
 end

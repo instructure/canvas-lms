@@ -4,7 +4,7 @@
 # This file is part of Canvas.
 #
 # Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
+# the terms of the GNU Affero General Public License as published by the Fr
 # Software Foundation, version 3 of the License.
 #
 # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -25,7 +25,6 @@ class Role < ActiveRecord::Base
   ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership']
 
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
-
   KNOWN_TYPES = (BASE_TYPES +
     ['StudentViewEnrollment',
      'TeacherlessStudentEnrollment',
@@ -58,6 +57,7 @@ class Role < ActiveRecord::Base
 
   validates_inclusion_of :base_role_type, :in => BASE_TYPES, :message => 'is invalid'
   validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
+  validate :ensure_non_built_in_name
 
   def id
     if self.built_in? && self.shard != Shard.current && role = Role.get_built_in_role(self.name, Shard.current)
@@ -74,6 +74,13 @@ class Role < ActiveRecord::Base
         self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
         return false
       end
+    end
+  end
+
+  def ensure_non_built_in_name
+    if !self.built_in? && Role.built_in_roles.map(&:label).include?(self.name)
+      self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
+      return false
     end
   end
 
@@ -187,6 +194,15 @@ class Role < ActiveRecord::Base
     end
   end
 
+  # Should order course roles so we get "StudentEnrollment", custom student roles, "Teacher Enrollment", custom teacher roles, etc
+  def display_sort_index
+    if self.course_role?
+      ENROLLMENT_TYPES.index(self.base_role_type) * 2 + (self.built_in? ? 0 : 1)
+    else
+      self.built_in? ? 0 : 1
+    end
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -217,6 +233,7 @@ class Role < ActiveRecord::Base
     custom_roles = account.available_custom_course_roles(include_inactive)
     RoleOverride.enrollment_type_labels.map do |br|
       new = br.clone
+      new[:id] = Role.get_built_in_role(br[:name]).id
       new[:label] = br[:label].call
       new[:plural_label] = br[:plural_label].call
       new[:custom_roles] = custom_roles.select{|cr|cr.base_role_type == new[:base_role_name]}.map do |cr|

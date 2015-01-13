@@ -7,7 +7,8 @@ define [
   'compiled/collections/DiscussionEntriesCollection'
   'compiled/models/Assignment'
   'compiled/models/DateGroup'
-], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment, DateGroup) ->
+  'str/stripTags'
+], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment, DateGroup, stripTags) ->
 
   class DiscussionTopic extends Backbone.Model
     resourceName: 'discussion_topics'
@@ -116,7 +117,7 @@ define [
         @entries.reset(entries)
 
     summary: ->
-      $('<div/>').html(@get('message')).text() || ''
+      stripTags @get('message')
 
     # TODO: this would belong in Backbone.model, but I dont know of others are going to need it much
     # or want to commit to this api so I am just putting it here for now

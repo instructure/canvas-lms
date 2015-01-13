@@ -240,7 +240,7 @@ class EnrollmentsApiController < ApplicationController
     enrollments = enrollments.joins(:course) if has_courses
 
     enrollments = Api.paginate(
-      enrollments,
+      enrollments.shard(@current_user),
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
     ActiveRecord::Associations::Preloader.new(enrollments, [:user, :course, :course_section]).run
@@ -306,6 +306,10 @@ class EnrollmentsApiController < ApplicationController
   #   code. When self-enrolling, the user_id must be 'self'. The
   #   enrollment_state will be set to 'active' and all other arguments
   #   will be ignored.
+  #
+  # @argument enrollment[self_enrolled] [Boolean]
+  #   If true, marks the enrollment as a self-enrollment, which gives
+  #   students the ability to drop the course if desired. Defaults to false.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
@@ -459,7 +463,7 @@ class EnrollmentsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
       unless params[:state].present?
-        scope = scope.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
+        scope = scope.active_or_pending
       end
       scope
     else

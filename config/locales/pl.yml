@@ -1358,7 +1358,6 @@ pl:
       lock_for_comments: "Zablokuj wpisywanie komentarzy"
       make_sure_all_search_terms_are_spelled_correctly: "Sprawdź, czy wyszukiwane terminy są dobrze przeliterowane."
       rss_feed: "Strumień RSS"
-      search_title_body_or_author: "Wyszukaj tytuł, treść lub autora"
       suggestions: "Sugestie:"
       there_are_no_announcements_show: "Brak ogłoszeń do wyświetlenia"
       try_different_more_general_or_fewer_keywords: "Spróbuj w inny sposób, bardziej ogólny lub wpisz mniejszą liczbę słów."
@@ -1516,41 +1515,6 @@ pl:
     unmuting_assignment: "Odkrywanie zadania"
   assignment_name_b2d87383: "Nazwa zadania"
   assignments: 
-    add_assignment_form: 
-      assignment_name: "Nazwa zadania"
-      labels: 
-        due: "termin dostarczenia:"
-        points: "punkty:"
-        quiz_points: "pkt testu"
-        type: typ
-      links: 
-        full_edit: "Pełna edycja"
-        more_options: "Więcej opcji"
-      options: 
-        assignment: Zadanie
-        attendance: Obecność
-        discussion: Dyskusja
-        external_tool: "Narzędzie zewnętrzne"
-        not_graded: "Bez oceny"
-        quiz: Test
-      tooltips: 
-        assignment_is_quiz: "To zadanie ma formę testu, dlatego liczba możliwych do uzyskania punktów jest zależna od pytań i nie można ustawić jej ręcznie."
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "%{scores} punkty(-ów) dla każdego uczestnika"
-      labels: 
-        assignments: Zadania
-        group_name: "Nazwa grupy"
-      links: 
-        add_grading_rule: "Dodaj regułę oceniania"
-        delete_assignment: Usuń
-      options: 
-        drop_highest: "Pomiń najwyższe"
-        drop_lowest: "Pomiń najniższe"
-        equally_weighted: "O równej wadze"
-        never_drop: "Nigdy nie pomijaj"
-        no_assignments: "[Brak zadań]"
-        weighted_by_points: "Wyważone według punktów"
-      percent_of_total_grade: "% oceny łącznej"
     assignment_count: 
       few: "%{count} Zadania"
       one: "1 Zadanie"
@@ -1607,10 +1571,6 @@ pl:
       not_yet_graded: "*Jeszcze nie oceniono*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pkt"
       score_with_points_possible_screenreader: "Wynik: %{score} na %{pointsPossible} punktów"
-    assignment_locked: 
-      assignment_locked: "To zadanie zostało zablokowane *%{lock_at}*"
-      assignment_unlocked_from: "To zadanie jest zablokowane do *%{unlock_at}*"
-      assignment_unlocked_from_to: "To zadanie jest odblokowane tylko w terminie od *%{unlock_at}* do *%{lock_at}*"
     assignment_settings: 
       cancel: Anuluj
       save: Zapisz
@@ -1619,49 +1579,13 @@ pl:
     assignment_sidebar: 
       links: 
         submit: "Prześlij zadanie"
-    assignments_content: 
-      buttons: 
-        delete_group: "Usuń grupę"
-      labels: 
-        class_weighting_policy: "Wyważ ocenę końcową na podstawie grup zadań"
-        delete_assignments_in_group: "Usuń zadania w tej grupie"
-        move_assignments_to: "Przenieś zadania z tej grupy do"
-      options: 
-        select_group: "[ Wybierz grupę ]"
-      titles: 
-        delete_assignment_group: "Usunąć grupę zadań?"
-      tooltips: 
-        target_group: "Wybierz grupę, do której należy przenieść zadanie"
-      warnings: 
-        delete_assignment_group: "Liczba zadań w grupie %{group} wynosi %{assignment_count}. Możesz usunąć te zadania lub przenieść je do innej grupy."
-    assignments_list_content: 
-      assignments: 
-        graded: "To zadanie zostało ocenione"
-        needs_grading_count: "Liczba przesłanych zadań dla tego zadania oczekujących na ocenę: %{needs_grading_count}"
-        overdue: "To zadanie jest po terminie"
-      no_assignments: "Dla tego kursu nie utworzono żadnego zadania."
-      titles: 
-        assignments: Zadania
-        course_assignments: "Zadania dla kursu"
-        overdue_assignments: "Zadania po terminie"
-        past_assignments: "Przeszłe zadania"
-        undated_assignments: "Zadania bez daty"
-        ungraded_assignments: "Zadania bez oceny"
-        upcoming_assignments: "Nadchodzące zadania"
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "Grupy zadań według typów"
-        just_show_assignment_list: "Pokaż tylko listę zadań"
         manage_assignments: "Zarządzaj zadaniami"
         see_current_grades: "Pokaż wszystkie uzyskane do tej pory oceny"
       titles: 
         show_only_assignments_from: "Pokaż tylko oceny uzyskane od"
         upcoming_assignments: "Nadchodzące zadania"
-    assignments_right_side: 
-      add_assignment_to_group: "*Dodaj zadanie* do grupy %{group}"
-      assignment_groups_wrapper: "( spośród %{number_of_groups})"
-      links: 
-        add_assignment_group: "Dodaj grupę zadań"
     available_date_description: 
       available_until: "Dostępny do"
       closed: Zamknięte
@@ -1851,28 +1775,6 @@ pl:
         total: Łącznie
     higher_than_max: "Nie można wpisać liczby większej niż liczba zdań"
     incomplete: Niekompletne
-    index: 
-      assignment_locked: "To zadanie jest obecnie zablokowane. Odwiedź stronę ze szczegółowymi informacjami dot. zadania, aby dowiedzieć się więcej."
-      assignment_locked_tooltip: zablokowane
-      keycode_descriptions: 
-        add_assignment_or_group: "Dodaj zadanie do bieżącej grupy"
-        close_active_dialog: "Zamknij aktywny dialog"
-        delete_assignment_or_group: "Usuń bieżące zadanie/grupę"
-        edit_assignment_or_group: "Edytuj bieżące zadanie/grupę"
-        full_preview: "Pełny podgląd/edycja zadania"
-        next_assignment_or_group: "Następne zadanie/grupa"
-        previous_assignment_or_group: "Poprzednie zadanie/grupa"
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: "W jaki sposób...?"
-      page_title: Zadania
     index_view: 
       add_assignment: Zadanie
       add_group: Grupa
@@ -1958,7 +1860,6 @@ pl:
         assign_peer_review: "Przydziel uczestnikowi %{student} kolejne przesłane zadanie do oceny"
         back_to_assignment: "Powrót do zadania"
       messages: 
-        cancel_peer_review: "Anulować tę recenzję uczestnika?"
         no_students_found: "Nie znaleziono żadnego uczestnika"
       none_assigned: "Nie przypisano żadnego elementu"
       not_yet_submitted: "nie przesłano"
@@ -1972,8 +1873,6 @@ pl:
       title: "Recenzje uczestników zadania %{assignment}"
       titles: 
         automatically_assign_reviews: "Przypisuj recenzje automatycznie"
-        remind: "Przypomnij użytkownikowi %{assessor} o zadaniu; data ostatniego przypomnienia %{time}"
-        reminder: "Przypomnij użytkownikowi %{assessor} o zadaniu; data ostatniego przypomnienia %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "Jak przypisać recenzje uczestnikom"
       labels: 
@@ -2032,10 +1931,6 @@ pl:
       locked: Zablokowane
     status: 
       deleting_group: "Trwa usuwanie grupy..."
-    student_index: 
-      assignments: Zadania
-      labels: 
-        assignments: Zadania
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2188,40 +2083,6 @@ pl:
         settings_exclude_less_than_percent: "Mniej niż %{percentInput} dokumentu"
     undated_assignments: "Zadania bez daty"
     upcoming_assignments: "Nadchodzące zadania"
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: Usuń zadanie"
-        edit_icon: "%{icon}: Ponownie edytuj podstawowe opcje"
-        move_icon: "%{icon}: Przenieś zadanie do innej grupy"
-        preview_icon: "%{icon}: Pokaż podgląd zadania i przejdź do jego edycji w pełnym wymiarze"
-      errors: 
-        no_assignment_group: "Ups. Najpierw należy dodać grupę zadań. Wybierz opcję \"Utwórz grupę zadań\", aby zobaczyć, jak to zrobić."
-      instructions: 
-        wizard: 
-          details: "Tworzenie zadania obejmuje znacznie więcej niż podanie terminów oddania i liczby punktów. Jeśli chcesz zamieścić opis zadania, umożliwić przekazywanie plików, zmienić sposób oceniania lub zmodyfikować zadanie w inny sposób, kliknij nazwę zadania lub ikonę %{edit_icon}, a następnie wybierz pozycję \"więcej opcji\"."
-          group: 
-            screenreader_step1: "Podział na grupy zadań stosuje się, aby usprawnić organizację zadań. Wystarczy przypisać nazwę każdej grupie. Wyważenie oceny końcowej na podstawie grup pozwala również określić wartość procentową wyników punktowych dla każdej grupy. Kliknij opcję \"Dodaj grupę zadań\", aby utworzyć grupę."
-            step1: "Podział na grupy zadań stosuje się, aby usprawnić organizację zadań. Wystarczy przypisać nazwę każdej grupie. Wyważenie oceny końcowej na podstawie grup (*gdzie?*) pozwala również określić wartość procentową wyników punktowych dla każdej grupy. Kliknij opcję \"Dodaj grupę zadań\", aby utworzyć grupę."
-          overview: "Na tej stronie można skonfigurować zaawansowane ustawienia kursu. Można dodawać zadania, grupować je, a następnie ważyć grupy. Założeniem jest tu w pierwszej kolejności dobra organizacja, a następnie przejście do ustawień zaawansowanych. Z tego poziomu można jednak wiele zrobić."
-          quizzes: "Testy to specjalne typy zadań. Testy można tworzyć lub importować, klikając łącze \"Testy\" znajdujące się w pasku po lewej stronie."
-          screenreader_details: "Tworzenie zadania obejmuje znacznie więcej niż podanie terminów oddania i liczby punktów. Jeśli chcesz zamieścić opis zadania, umożliwić przekazywanie plików, zmienić sposób oceniania lub zmodyfikować zadanie w inny sposób, kliknij nazwę zadania lub ikonę edytowania, a następnie wybierz pozycję \"więcej opcji\"."
-          screenreader_step1: "Zadania są zawsze uporządkowane w grupach, dlatego, aby dodać zadanie, należy najpierw zdecydować, w której grupie je umieścić. Wybierz grupę i kliknij pozycję \"Dodaj zadanie do\" lub kliknij ikonę dodawania, aby przypisać zadanie do grupy."
-          step1: "Zadania są zawsze uporządkowane w grupach, dlatego, aby dodać zadanie, należy najpierw zdecydować, w której grupie je umieścić. Wybierz grupę i kliknij pozycję \"Dodaj zadanie do\" lub kliknij ikonę %{add_icon}, aby przypisać zadanie do grupy."
-          step2: "Dobrze! Teraz podaj wszystkie szczegółowe informacje. Możesz podać nazwę zadania, termin dostarczenia oraz liczbę możliwych do uzyskania punktów. Konfiguracja zaawansowanych ustawień jest możliwa po utworzeniu zadania."
-          step3: "Gotowe! Zadanie zostało dodane do grupy! Po ustawieniu kursora na zadaniu wyświetlą się dostępne opcje. Oto ich znaczenie:"
-      links: 
-        create_assignment: "Utwórz nowe zadanie"
-        create_assignment_group: "Utwórz grupę zadań"
-        create_or_import_quiz: "Utwórz/zaimportuj test"
-        edit_assignment_in_detail: "Edytuj szczegóły zadań"
-        screenreader_show_me_add_assignment: "Prowadź do przycisku Dodaj zadanie"
-        screenreader_show_me_add_assignment_group: "Prowadź do przycisku Dodaj grupę zadań"
-        screenreader_show_me_weight_final_grade: "Prowadź do pola wyboru Wyważ ocenę końcową"
-        show_me_where: "Pokaż, gdzie"
-      subtitles: 
-        edit_assignment_in_detail: "(zezwalaj na przekazywanie, edytuj opis itd.)"
-      titles: 
-        wizard_box: "Chcę:"
   assignments_api: 
     invalid_date_time: "Nieprawidłowy termin dla %{attribute}"
     invalid_submission_types: "Nieprawidłowe typy przesłanego zadania"
@@ -3169,7 +3030,6 @@ pl:
       select_quizzes: "Wybierz quizy do eksportowania"
   content_imports: 
     errors: 
-      failed: "importowanie zawartości nie powiodło się z powodu następujących błędów:"
       import_failed: "Wystąpił błąd podczas importu migracji. Powiadom administratora systemu i podaj następujący kod: \"%{code}\""
       no_only_and_except: "Opcje \"tylko\" i \"oprócz\" nie mogą być używane jednocześnie."
     files: 
@@ -3179,7 +3039,6 @@ pl:
       description: "Możesz dołączyć do kursu zbiór plików spakowanych w formacie .zip. Pliki zostaną rozpakowane. To łatwy sposób, aby przenieść pliki z innego systemu do programu Canvas."
       page_title: "Importuj pliki"
     messages: 
-      copying: "Trwa kopiowanie... może to potrwać kilka minut"
       import_complete: "Import kompletny. Powrót do strony kursu..."
       importing_button: "Importowanie... to może chwilę potrwać"
     titles: 
@@ -3555,7 +3414,7 @@ pl:
     buttons: 
       add: "Dodaj moduł"
       add_item: "Dodaj element"
-      add_module: "Utwórz moduł"
+      add_module: Moduł
       add_module_first: "Dodaj nowy moduł"
       update: "Aktualizuj moduł"
     confirm: 
@@ -3796,41 +3655,6 @@ pl:
       titles: 
         student_progression: "Postęp uczestnika w module"
     context_module: 
-      admin_links: 
-        module_options_label: "Zarządzaj modułem"
-        module_options_title: "Zarządzaj modułem"
-      context_module: 
-        draft: "(wersja robocza)"
-      images: 
-        alt: 
-          complete: ukończony
-          incomplete: nieukończony
-          locked: zablokowany
-        title: 
-          complete: "Moduł ukończony"
-          incomplete: "Moduł nieukończony"
-          locked: "Moduł zablokowany"
-      links: 
-        add_item: "Dodaj zawartość"
-        hide_contents: "Ukryj zawartość modułu"
-        settings: "Ustawienia modułu"
-        show_contents: "Pokaż zawartość modułu"
-        text: 
-          delete_module: Usuń
-          edit_module: Edytuj
-        title: 
-          delete_module: "Usuń moduł"
-          edit_module: Edytuj
-          student_progress: "Zobacz postęp uczestnika dla tego modułu"
-      manage: "Zarządzaj modułem"
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: "Opcje modułu"
-      module_will_unlock_at: "Zostanie odblokowany *%{unlock_date}*"
-      progression_complete_count: "*Zakończono %{count}*"
-      progression_started_count: "*Ukończono %{count}*"
-      reorder_modules: "Przeciągnij, aby zmienić kolejność modułów"
       unpublish: "Cofnij publikowanie"
     context_module_next: 
       aria_labels: 
@@ -3868,51 +3692,6 @@ pl:
         course_modules: "Moduły kursowe"
     module_complete: Gotowe
     module_empty: "W module \"%{module}\" nie znajdują się żadne elementy"
-    module_item: 
-      drag_to_reorder: "Przeciągnij, aby zmienić kolejność lub przenieść element do innego modułu"
-      images: 
-        alt: 
-          complete: ukończony
-          incomplete: nieukończony
-          max_score: "maksymalny wynik"
-          min_score: "minimalny wynik"
-          must_contribute: "muszą wziąć udział"
-          must_submit: "muszą przesłać"
-          must_view: "muszą obejrzeć"
-        title: 
-          complete: "Element modułu został ukończony"
-          incomplete: "Element modułu nie został ukończony"
-          max_score: "Uczestnicy nie mogą przekroczyć maksymalnego wyniku punktowego dla tego elementu, zanim moduł zostanie uznany za ukończony"
-          min_score: "Uczestnicy muszą uzyskać minimalny wynik punktowy dla tego elementu, zanim moduł zostanie uznany za ukończony"
-          must_contribute: "Uczestnicy muszą wziąć udział w pracy nad tym elementem, zanim moduł zostanie uznany za ukończony"
-          must_submit: "Uczestnicy muszą przesłać to zadanie, aby moduł został ukończony"
-          must_view: "Uczestnicy muszą wyświetlić ten element, aby moduł został ukończony"
-      links: 
-        edit_item: "Edytuj szczegółowe informacje dot. elementu"
-        edit_item_details_label: "Edytuj szczegółowe informacje dot. elementu"
-        indent: "Zwiększ wcięcie"
-        indent_label: "Zwiększ wcięcie"
-        outdent: "Zmniejsz wcięcie"
-        outdent_label: "Zmniejsz wcięcie"
-        remove_item: "Usuń element z modułu"
-        remove_item_label: "Usuń element z modułu"
-      max_score: 
-        fulfilled: "nie uzyskali więcej niż %{score}"
-        unfulfilled: "nie mogą uzyskać więcej niż %{score}"
-      min_score: 
-        fulfilled: "uzyskali co najmniej %{score}"
-        unfulfilled: "muszą uzyskać co najmniej %{score}"
-      module: 
-        item_aria_label: "%{item_label} Element modułu"
-      must_contribute: 
-        fulfilled: "brali udział w dyskusji na stronie"
-        unfulfilled: "muszą brać udział w dyskusji na stronie"
-      must_submit: 
-        fulfilled: "przesłali zadanie"
-        unfulfilled: "muszą przesłać zadanie"
-      must_view: 
-        fulfilled: "przeglądali stronę"
-        unfulfilled: "muszą wyświetlić stronę"
     module_item_next: 
       drag_to_reorder: "Przeciągnij, aby zmienić kolejność lub przenieść element do innego modułu"
       images: 
@@ -4488,37 +4267,15 @@ pl:
       buttons: 
         publish: "Publikuj kurs"
       details: 
-        assignments: "Dodaj zadania. Możesz dodać zadanie w formie długiej listy lub podzielić je na grupy, czy nawet określić wagę dla poszczególnych grup zadań."
         available: "Po utworzeniu i udostępnieniu kursu, lista kontrolna nie będzie potrzebna.  Będzie jednak w dalszym ciągu dostępna i będzie można z niej skorzystać podczas przeprowadzania nowych czynności lub po prostu do referencji podczas modyfikowania zawartości kursu."
         calendar: "To znakomita okazja, aby poznać działanie kalendarza i dodać do kursu wydarzenie, które nie jest zadaniem. Nie obawiaj się — pomożemy Ci w tym."
         claimed: 
-          not_saved: |-
-              Świetnie, udało Ci się utworzyć kurs...  Co teraz?  Zanim uczynisz go ogólnodostępnym, może warto sprawdzić i upewnić się, że wszystko zostało odpowiednio przygotowane.  Przejrzyj listę znajdującą się po lewej stronie, aby mieć pewność, że kurs nadaje się do publikacji.
-              
-              *Kurs jest widoczny tylko dla instruktorów, do momentu aż nie zostanie opublikowany*
           saved: "Gotowe!  Kurs %{course} został oficjalnie utworzony. Do momentu publikacji jest widoczny tylko dla Ciebie. Ale zanim popełnisz falstart, zechcesz z pewnością przejrzeć listę znajdującą się lewej stronie i dowiedzieć się, jak działa program Canvas oraz przekonać się, że możesz prowadzić kurs w roli instruktora."
-        created: 
-          not_saved: |-
-              Klasa została utworzona, ale nie została zgłoszona.  Zostanie automatycznie usunięta, jeśli nie zgłosisz jej w ciągu tygodnia.  W międzyczasie upewnij się, że Twoje przygotowanie jest odpowiednie, sprawdzając to z listą znajdującą się po lewej stronie.
-              
-              Jeśli musisz wcześniej opuścić tę stronę i powrócić do niej, wystarczy, że zapiszesz *to łącze*, aby skorzystać z niego w późniejszym czasie.
-              
-              **Zaloguj się** lub ***zarejestruj***, aby zgłosić klasę.
-          saved: |-
-              Gotowe!  Kurs %{course} został oficjalnie utworzony.  Do momentu publikacji jest widoczny tylko dla Ciebie. Ale zanim popełnisz falstart, zechcesz z pewnością przejrzeć listę znajdującą się lewej stronie i dowiedzieć się, jak działa program Canvas oraz przekonać się, że możesz prowadzić kurs w roli instruktora.
-              
-              Jeśli musisz wcześniej opuścić tę stronę i powrócić do niej, wystarczy, że zapiszesz *to łącze*, aby skorzystać z niego w późniejszym czasie.
-              
-              **Zaloguj się** lub ***zarejestruj***, aby zgłosić klasę.
         files: "Zakładka Pliki służy do udostępniania materiałów związanych z zajęciami, np. dokumentów, pomocy naukowych — wszystkiego, co uczestnicy mogliby pobrać. Program Canvas zapewnia łatwy sposób przesyłania i organizacji plików. Wszystko zostanie dokładnie przedstawione."
         home2: "Podczas odwiedzin tego kursu będzie widać tę stronę. Można ustawić, aby widoczne były następujące elementy: strumień aktywności, lista modułów kursu, program kursu lub inna strona. Strumień aktywności kursu jest ustawiony domyślnie. Aby zmienić ustawienie, kliknij %{choose_home_page}."
         import: "Możliwe, że chcesz przenieść swoje materiały z innego systemu zarządzania kursami do programu Canvas. Pomożemy Ci w łatwy sposób przenieść zawartość do systemu Canvas."
         navigation: "Domyślnie wszystkie łącza są aktywne dla kursu. Uczestnicy nie będą widzieć łączy do sekcji bez zawartości. Na przykład, jeśli nie utworzono żadnych testów, nie wyświetlą się łącza do testów. Możesz posortować i dezaktywować łącza, jeśli nie chcesz, aby uczestnicy mieli dostęp do określonych obszarów kursu."
         publish: 
-          form: |-
-              Wszystko gotowe?  Czas opublikować kurs!  Kliknij poniższy przycisk, aby kurs stał się oficjalnie dostępny!
-              
-              Po opublikowaniu do wszystkich użytkowników kursu zostaną wysłane wiadomości z zaproszeniami do zapisów i uczestnictwa w kursie.
           not_registered: "Kurs został zgłoszony i jest gotowy, ale zanim opublikujesz kurs, musisz wcześniej zakończyć rejestrację. Na Twoją skrzynkę została wysłana wiadomość z systemu Canvas zawierająca łącze do ukończenia tego procesu. Sprawdź również skrzynkę z wiadomościami niechcianymi."
         students: "Uczestnicy są niezbędni. Prowadzenie kursu bez uczestników to żadna przyjemność."
         tas: "Możesz wyznaczyć asystentów, którzy będę pomagać w prowadzenie kursu. Asystenci mogą oceniać zadania przesłane przez uczestników, pomagać prowadzić dyskusje, czy nawet aktualizować terminy dostarczenia i szczegółowe informacje dot. zadań."
@@ -4596,7 +4353,6 @@ pl:
     errors: 
       create_failed: "Tworzenie kursu nie powiodło się"
       role_not_active: "Nie można dodawać użytkowników do nieaktywnej roli:  '%{role}'"
-      role_not_found: "Brak roli o nazwie  '%{role}'."
       unpublish: "Nie można cofnąć publikacji, jeśli istnieją przesłane zadania uczestnika."
     group_list: 
       headings: 
@@ -4873,19 +4629,9 @@ pl:
         stats: "Statystyki dot. kursu"
         student_view: "Widok uczestnika"
     show: 
-      buttons: 
-        update_layout: "Aktualizuj układ"
       change_home_page: Zmień
       details: 
-        assignments: "Widok przedstawia **listę zadań** dla tego kursu. Nadchodzące i ostatnio zamieszczone zadania znajdują się na górze listy."
         confirm_unenroll: "Czy na pewno chcesz wypisać się z tego kursu? Stracisz możliwość wyświetlania listy kursu i komunikowania się bezpośrednio z instruktorami, i nie będziesz otrzymywać informacji o wydarzeniach związanych z kursem przesyłanych strumieniem lub w formie powiadomienia."
-        custom_page: "Możesz **stworzyć swoją własną stronę główną kursu** i umieścić na niej dowolne łącza, obrazy lub interaktywne formaty reklamowe."
-        modules: |-
-            Możesz organizować kursy, dzieląc je na **moduły lub sekcje** — każda sekcja zawiera powiązane pliki, zadania, strony itp. Jeśli chcesz, możesz również ustawiać kolejność modułów, wyznaczając kryteria i warunki, które muszą zostać spełnione zanim każdy z modułów zostanie odblokowany.
-            
-            -Ten układ jest prawdopodobnie najlepszy dla kursów, które nie opierają się na konkretnym planie w formie terminu lub semestru.
-        recent_activity_dashboard: "**Pulpit nawigacyjny ostatnich działań** pozwala użytkownikom obejrzeć ostatnie rozmowy, ogłoszenia, dyskusje oraz interakcje dla tego kursu. Jest bardzo podobny do strony panelu, który widzą użytkownicy w trakcie pierwszego logowania; pokazuje jednak tylko zawartość tego określonego kursu."
-        syllabus: "**Widok programu kursu** pozwala zamieścić opis oczekiwanego przebiegu kursu lub zaprezentować kurs za pomocą łączy, obrazów itp. oraz umożliwia przeglądanie zadań i wydarzeń zaznaczonych w kalendarzu."
       draft_state: 
         buttons: 
           cancel: Anuluj
@@ -4907,27 +4653,16 @@ pl:
         choose_home_page_title: "Wybierz stronę startową"
         confirm_unenroll: "Potwierdź wypisanie się z kursu"
         importing: "Trwa importowanie tego kursu"
-        set_layout: "Ustaw układ strony głównej"
         unpublished: "Kurs nie został opublikowany"
       importing: "Kopiowanie/migracja tego kursu w toku. Oznacza to, że część zawartości może być tymczasowo niedostępna."
-      labels: 
-        select_content: "Gdy użytkownicy odwiedzają stronę kursu, pokaż im"
       license_notice: "Zawartość kursu jest oferowana na podstawie licencji %{license_type}. Zawartość kursu może być rozpatrywana na podstawie niniejszej umowy, chyba że postanowiono inaczej."
       links: 
-        change_layout: "Zmień układ strony głównej"
         choose_home_page: "Wybierz stronę startową"
         course_setup: "Lista kontrolna konfiguracji kursu"
-        course_stream: "Zobacz strumień kursu"
         drop_course: "Wypisz się z tego kursu"
         join_course: "Zapisz się na ten kurs"
         new_announcement: "Nowe ogłoszenie"
         view_course_stream: "Pokaż strumień kursu"
-      options: 
-        assignments: "Lista zadań"
-        custom_page: "strona do własnego projektowania"
-        modules: "moduły/sekcje kursu"
-        recent_activity_dashboard: "Pulpit nawigacyjny ostatniej aktywności"
-        syllabus: "zadania z programu nauczania"
       period_name: "2 ostatnie tygodnie"
       re_sending: "Trwa ponowne wysyłanie..."
       send_done: "Gotowe! Wysłanie wiadomości może zająć kilka minut."
@@ -5053,7 +4788,6 @@ pl:
     stats: Statystyki
     syllabus: "Program kursu"
     users: Użytkownicy
-    wiki_page_revisions: Powtórki
     wiki_pages: Strony
   csv: 
     alpha: Alfa
@@ -5190,17 +4924,17 @@ pl:
       tomorrow: Jutro
       yesterday: Wczoraj
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
-      default: "%Y-%m-%d"
-      long: "%B %-d, %Y"
-      long_with_weekday: "%A, %B %-d"
-      medium: "%b %e, %Y"
+      date_at_time: "%-d %b at %k:%M"
+      default: "%d.%m.%Y"
+      long: "%-d %B %Y"
+      long_with_weekday: "%A, %-d %B"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %e"
+      medium_with_weekday: "%a %-d %b %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
-      short_with_weekday: "%a, %b %-d"
+      short_with_weekday: "%a, %-d %b"
       weekday: "%A"
     month_names: 
       - ~
@@ -5526,7 +5260,6 @@ pl:
       make_sure_all_search_terms_are_spelled_correctly: "Sprawdź, czy wyszukiwane terminy są dobrze przeliterowane."
       new_discussion: "*Rozpocznij* dyskusję"
       rss_feed: "Strumień RSS"
-      search_title_body_or_author: "Wyszukaj tytuł, treść lub autora"
       start_one_now: "Rozpocznij dyskusję teraz"
       suggestions: "Sugestie:"
       there_are_no_discussion_topics_to_show: "Brak tematów dyskusji do wyświetlenia"
@@ -5561,9 +5294,7 @@ pl:
     show: 
       add_rubric: "Dodaj kryteria ocen"
       announcement_closed: "Tego ogłoszenia nie można komentować"
-      announcement_locked: "Ogłoszenie nie będzie widoczne dla użytkowników do *%{date}*"
       announcement_locked_until: "To ogłoszenie jest zablokowane do %{time}"
-      announcement_not_visible: "Ogłoszenie nie jest widoczne dla użytkowników"
       authors_name: "Nazwa autora"
       collapse_replies: "Zwiń odpowiedzi"
       confirm_delete_discussion: "Czy na pewno usunąć tę dyskusję?"
@@ -5591,12 +5322,9 @@ pl:
       reply_to_message: "Odpowiedz na bieżącą wiadomość"
       reply_to_topic: "Odpowiedz na temat"
       retrieved_from_feed: "Pobrano z kanału %{feed}"
-      search_entries_placeholder: "Wyszukaj wpisy lub autora"
       show_rubric: "Wyświetl kryteria ocen"
       speed_grader: "Speed Grader"
       topic: Temat
-      topic_locked: "Do tematu nie można dodawać komentarzy do *%{date}*"
-      topic_not_visible: "Temat nie jest widoczny dla użytkowników"
       topic_podcast_feed_link: "Kanał informacyjny Podcast dot. tematu"
       topic_subscribe: Subskrybuj
       topic_subscribe_tooltip: "Nie masz subskrypcji i dlatego nie zostaniesz powiadomiony o nowych komentarzach."
@@ -5694,11 +5422,6 @@ pl:
     unsubscribed: "Brak subskrypcji"
     unsubscribed_hint: "Uczestnik nie ma subskrypcji do tego tematu. Kliknij, aby subskrybować."
   display_course_catalog: "Pokaż listę kursów na tym koncie źródłowym z włączoną opcją „Dołącz do publicznego katalogu kursów”."
-  draft_state_description: |-
-      Ta funkcja beta uwzględnia ponowne zaprojektowanie wielu elementów systemu Canvas i umożliwia przechowywanie treści w
-      nowym nieopublikowanym stanie, która będzie niewidoczna dla uczestników i nie będzie miała wpływu
-      na oceny. Uwaga — wyłączenie tej funkcji może spowodować usunięcie nowo utworzonej lub edytowanej
-      zawartości z podglądu instruktora.
   due_date_822625d8: "Termin do"
   due_dates: 
     due_at: "termin dostarczenia: %{assignment_due_date_time}"
@@ -6331,19 +6054,12 @@ pl:
       feature_options: "Opcje funkcji"
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
   features: 
-    allow_opt_out_of_inbox: "Pozwól uczestnikom wypisać się ze skrzynki"
     better_file_browsing: "Lepsze przeglądanie pliku"
     course_catalog: "Katalog kursu"
     differentiated_assignments: "Zadania zróżnicowane"
     differentiated_assignments_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z\n\
         Canvas Success Manager. "
     differentiated_assignments_course_disable_warning: "Wyłączenie zróżnicowanych zadań spowoduje, że uczestnicy będą widzieć wszystkie opublikowane zadania."
-    draft_state: "Wersja robocza"
-    draft_state_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z:\n\
-        Canvas Success Manager. "
-    draft_state_course_disable_warning: |-
-        Wyłączenie tej funkcji spowoduje opublikowanie WSZYSTKICH obiektów w kursie. Sprawdź, czy wersja robocza
-        jest gotowa do opublikowania i dostępna dla wszystkich użytkowników kursu przed kontynuacją.
     ember_modules: "Moduły Ember"
     google_docs_domain_restriction: "Ograniczenie domeny Google Docs"
     high_contrast: "Użyj stylów wysokiego kontrastu"
@@ -7948,6 +7664,7 @@ pl:
       feedback: "Kliknij tutaj, aby powiedzieć nam, co się stało"
     help: Pomoc
     show_me_where: "Pokaż, gdzie"
+  links_14b70841: Łącza
   locales: 
     pl: Polski
   logged_out_user: "Użytkownik wylogowany %{user_counter}"
@@ -10678,7 +10395,6 @@ pl:
       description: "Centrum aplikacji do śledzenia/instalowania narzędzi zewnętrznych w systemie Canvas"
       name: "Centrum aplikacji"
     app_center_settings: 
-      description: "Centrum aplikacji pojawi się w zakładce Aplikacje na stronie ustawień kursu lub konta. Znajdujący się poniżej adres URL powinien przekierowywać do prawidłowego punktu końcowego Centrum aplikacji (na przykład: https://lti-examples.heroku.com -- pamiętaj, aby pominąć końcowy ukośnik)"
       labels: 
         app_reviews_endpoint: "Wyświetlanie aplikacji, punkt końcowy"
         apps_index_endpoint: "Wykaz aplikacji, punkt końcowy"
@@ -11635,6 +11351,20 @@ pl:
       regrade_options: "Opcje ponownego oceniania *(w odniesieniu do uczestników, którzy już odpowiedzieli na to pytanie):*"
       some_scores_reduced: "Przydziel punkty jedynie za poprawną odpowiedź (*wyniki niektórych studentów mogą zostać zmniejszone*)"
       update_question_without_regrading: "Aktualizuj pytanie bez ponownego oceniania"
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: Pytanie
+    loading: "Trwa ładowanie..."
+    navigation: 
+      links: 
+        question: "Pytanie %{position}"
+      questions: Pytania
+    session_table_headers: 
+      attempt: Próba
+    table_view: 
+      headers: 
+        question: "Pytanie %{position}"
   quiz_reports: 
     cancel_generation: Anuluj
     download_item_analysis: "Pobierz raport analizy elementu."
@@ -12837,7 +12567,6 @@ pl:
     folder: Folder
     folder_browsing_tree: "Przeglądanie folderu"
     folder_name: "Nazwa folderu"
-    kind: Typ
     labels: 
       select: "Wybierz ten element"
     loading_more_results: "Trwa ładowanie kolejnych wyników..."
@@ -13265,7 +12994,9 @@ pl:
     enrollments_tas: "Asystenci instruktorów"
     enrollments_teachers: Instruktorzy
     student_groups: "Grupy uczestników"
+  search_entries_or_author_63fb0a86: "Wyszukaj wpisy lub autora"
   search_groups_or_people_6c15d6ad: "Wyszukaj grupy lub osoby"
+  search_title_body_or_author_1d26711f: "Wyszukaj tytuł, treść lub autora"
   section: 
     confirms: 
       delete_enrollment: "Czy na pewno chcesz na stałe usunąć te zapisy?"
@@ -13972,10 +13703,6 @@ pl:
       topic_notice: "Wybierz temat, który chcesz skojarzyć z danym *modułem* lub dodaj temat, zaznaczając opcję \"Nowy temat\"."
       wiki_page_notice: "Wybierz stronę typu Wiki, którą chcesz skojarzyć z danym *modułem* lub dodaj nową stronę, zaznaczając opcję \"Nowa strona\"."
       wiki_page_select_label: "Wybierz stronę wiki, którą chcesz powiązać lub dodaj nową stronę, wybierając „Nowa strona”."
-    sequence_footer: 
-      full_course_sequence: "wyświetl pełną sekwencje kursu"
-      next: Dalej
-      previous: Wstecz
     submission_comment: 
       assignment: Zadanie
       grading_alt: ocenianie
@@ -14557,17 +14284,16 @@ pl:
     event: "%{date} o godzinie %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
+      long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "mniej niż minutę temu"
     pm: "po południu"
     ranges: 
       different_days: "%{start_date_and_time} do %{end_date_and_time}"
       same_day: "%{date} od %{start_time} do %{end_time}"
       times: "%{start_time} do %{end_time}"
-    unknown_date: "Nieznana data"
     with_ago: "%{time} temu"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -15321,8 +15047,6 @@ pl:
   wiki_page: 
     atom_author: "Strona Wiki"
     atom_entry_title: "Strona typu Wiki — %{course_or_group_name}: %{page_title}"
-    cannot_hide_page: "nie można ukryć pierwszej strony"
-    cannot_set_hidden_front_page: "nie można ustawić jako pierwszą stronę, ponieważ jest ukryty"
     cannot_set_unpublished_front_page: "nie można ustawić jako pierwszą stronę, ponieważ jest nieopublikowane"
     defaults: 
       no_content: "brak zawartości"
@@ -15331,109 +15055,25 @@ pl:
       title_characters: "Tytuł musi zawierać co najmniej jedną literę lub cyfrę"
       title_too_long: "Tytuł nie może być dłuższy niż %{max_characters} znaków"
     unknown_user_name: Nieznany
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: "Powrót do bieżącej wersji"
-      page_edited_by_with_link: "przez użytkownika [%{user_name}](%{link})"
-      page_imported: "przez importera zawartości"
-      titles: 
-        revisions_for_page: "Korekta strony: %{title}"
-    notices: 
-      page_rolled_back: "Strona została pomyślnie przywrócona do poprzedniej wersji."
-    show: 
-      buttons: 
-        roll_back_version: "Przywróć do tej wersji"
-      imported_at: "Zaimportowano: *%{time_ago}*"
-      labels: 
-        by_content_importer: "przez importera zawartości"
-        by_user: "przez użytkownika %{user}"
-        on_date: "w dniu *%{date_time}*"
-      links: 
-        back_to_history: "Powrót do historii korekty"
-        go_to_latest: "Przejdź do najnowszej wersji"
-      not_most_recent_version_warning: "To NIE jest najnowsza wersja"
-      saved_by: "Zapisano: *%{time_ago}*przez użytkownika %{user}"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: "Zapisz zmiany"
-        start_editing: "Rozpocznij edycję teraz"
-      course_editing_roles: 
-        anyone: Wszyscy
-        only_teachers: "Tylko instruktorzy"
-        teachers_and_students: "Instruktorzy i uczestnicy"
-      course_home_wiki_page_description: "Strona ta służy do organizacji i prowadzenia kursu w dowolny sposób. Po rozpoczęciu edycji łatwy dostęp do zadań, plików itd. zapewnia sekcja \"Narzędzia strony\" widoczna po prawej stronie."
-      course_wiki_page_description: "Ta strona typu Wiki służy do tworzenia dodatkowych stron lub opisów uzupełniających materiały kursowe. W prosty sposób można przejść do takich stron od stron z zadaniem lub uzyskać za ich pośrednictwem dostęp do innych materiałów i plików z kursu. Są one świetnym rozwiązaniem umożliwiającym wyjaśnianie trudnych pojęć, organizowanie projektów grupowych oraz tworzenie dowolnego typu stron potrzebnych na kursie."
-      default_wiki_page_description: "Jest to domyślna strona typu Wiki, która zostanie wyświetlona, gdy uczestnik kliknie zakładkę \"Strony\" w tym kursie."
-      default_wiki_page_is_course_home_page_warning: |-
-          Obecnie jest to także domyślna strona kursu, co oznacza, że wyświetla się ona jako pierwsza dla 
-          odwiedzających stronę tego kursu.  To ustawienie można zmienić na [stronie głównej kursu](%{link}).
-      editing_content: "Edytowanie zawartości."
-      editing_roles: 
-        anyone: Wszyscy
-        only_members: "Tylko członkowie"
-        prompt: "Stronę można edytować za pomocą opcji %{options}"
-      group_wiki_warning: "Ta strona jest częścią grupowej strony typu Wiki, a *nie* stroną typu Wiki poświęconą temu kursowi. Jeśli szukasz strony typu Wiki poświęconej kursowi, [kliknij tutaj](%{link})."
-      labels: 
-        hide_from_students: "Ukryj tę stronę przed uczestnikami"
-        last_edited: "Ostatnio edytowana przez użytkownika %{name} %{time_ago} temu"
-        notify_of_update: "Powiadom użytkowników o zmianie tej zawartości"
-      links: 
-        page_history: "Historia strony"
-      notices: 
-        page_deleted: "Strona została usunięta."
-        page_does_not_exist: "Dana strona jeszcze nie istnieje."
-        page_edited_while_viewing: "Po wyświetleniu przez Ciebie tej strony została ona zaktualizowana przez kogoś innego. [Kliknij tutaj, aby ponownie załadować stronę.](%{link})"
-        page_edited_while_viewing_detailed: "Po pierwszym załadowaniu przez Ciebie tej strony ktoś inny ją edytował, jeśli teraz prześlesz zastąpisz dokonane zmiany. Możliwe jest ponowne załadowanie strony i wprowadzenie zmian od nowa, aby upewnić się, że nie usuniesz wyników cudzej pracy."
-      welcome_message: "Witamy na stronie typu Wiki poświęconej kursowi"
-    edit_page: 
+    edit: 
       page_header_title: "Edytuj stronę %{page_name}"
-    errors: 
-      cannot_delete_front_page: "Nie masz uprawnień, aby usunąć pierwszą stronę."
-    front_page: "Pierwsza strona"
+    index: 
+      titles: 
+        pages: Strony
     notices: 
       cannot_edit: "Brak uprawnień, aby edytować stronę zatytułowaną \"%{title}\"."
       cannot_read_revisions: "Brak uprawnień, aby przeglądać historię korekt dla tytułu\"%{title}\"."
       create_non_existent_page: "Strona zatytułowana \"%{title}\" nie istnieje, ale można ją utworzyć poniżej"
       page_deleted: "Strona zatytułowana \"%{title}\" została usunięta."
       page_does_not_exist: "Strona zatytułowana \"%{title}\" nie istnieje."
-      page_updated: "Strona została pomyślnie zaktualizowana."
-    page_link: 
-      link_hidden_from_students_warning: "Uczestnicy nie będą widzieć tego łącza"
-    page_revisions: 
+    revisions: 
       page_revisions_title: "Korekty %{title}: %{context_name}"
-    pages_index: 
-      titles: 
-        pages: Strony
-    wiki_right_side: 
-      buttons: 
-        create: Utwórz
-        rename: "Zmień nazwę"
-      delete_page_confirmation: "Czy na pewno chcesz usunąć tę stronę? Tej operacji nie można cofnąć!"
-      headers: 
-        all_pages: "Wszystkie strony"
-        common_pages: "Popularne strony"
-        page_tools: "Narzędzia strony"
-        recent_changes: "Ostatnie zmiany"
-      links: 
-        create_page: "Utwórz nową stronę"
-        delete_page: "Usuń tę stronę"
-        edit_page: "Edytuj tę stronę"
-        more: więcej...
-        rename_page: "Zmień nazwę strony"
-        show_all: "wyświetl wszystko..."
-      title: "Nowy tytuł strony"
-      wiki_description_for_course: "Myśl o nich jak o otwartym pudełku do przechowywania zawartości. Możesz ich użyć do opisu kursu, zapewniania pomocnych wyjaśnień trudnych tematów, a nawet to tworzenia projektów współpracy, pisanych wspólnie przez uczestników."
-      wiki_description_for_group: "Myśl o nich jak o otwartym pudełku do przechowywania zawartości. Możesz ich użyć do opisu grupy, zapewniania pomocnych wyjaśnień trudnych tematów, a nawet to tworzenia projektów współpracy, pisanych wspólnie przez członków grupy."
-      wiki_description_header: "Do czego służą strony typu Wiki?"
   wiki_pages_api: 
     cannot_delete_front_page: "Nie można usunąć pierwszej strony"
-    cannot_have_hidden_front_page: "Nie można ukryć pierwszej strony"
     cannot_have_unpublished_front_page: "Nie można cofnąć publikacji pierwszej strony"
     cannot_update_editing_roles: "Brak uprawnień, aby aktualizować role edytowania tej strony typu wiki"
     cannot_update_front_page: "Brak uprawnień, aby zmieniać pierwszą stronę typu wiki"
-    cannot_update_hide_from_students: "Brak uprawnień, aby aktualizować flagi ukryte przed uczestnikami tej strony typu wiki"
     cannot_update_published: "Brak uprawnień, aby aktualizować stan publikowanych tej strony typu wiki"
     cannot_update_title: "Brak uprawnień, aby aktualizować tytuł tej strony typu wiki"
     invalid_editing_roles: "Dostarczone role edytowania są nieprawidłowe"

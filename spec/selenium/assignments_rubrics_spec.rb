@@ -40,11 +40,6 @@ describe "assignment rubrics" do
       expect(rubric.data.first[:points]).to eq initial_points
       expect(rubric.data.first[:ratings].first[:points]).to eq initial_points
       expect(f('#rubrics .rubric .rubric_title .displaying .title')).to include_text(rubric_name)
-
-      #Commented out because we still want this test to run but this is the part where the bug is
-      #BUG 7193 - Rubric total overwrites assignment total despite choosing to leave them different
-      #get "/courses/#{@course.id}/assignments"
-      #f('.points_text').should include_text(initial_points.to_s)
     end
 
     it "should carry decimal values through rubric to grading" do

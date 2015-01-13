@@ -18,6 +18,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe EnrollmentsApiController, type: :request do
   describe "enrollment creation" do
@@ -83,6 +84,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section_id).to eql @section.id
         expect(new_enrollment.workflow_state).to eql 'active'
         expect(new_enrollment.course_id).to eql @course.id
+        expect(new_enrollment.self_enrolled).to eq nil
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
       end
 
@@ -168,6 +170,11 @@ describe EnrollmentsApiController, type: :request do
       it "should assume a StudentEnrollment if no type is given" do
         api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id } }
         expect(JSON.parse(response.body)['type']).to eql 'StudentEnrollment'
+      end
+
+      it "should allow creating self-enrollments" do
+        json = api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id, :self_enrolled => true } }
+        expect(@unenrolled_user.enrollments.find(json['id']).self_enrolled).to eq(true)
       end
 
       it "should return an error if an invalid type is given" do
@@ -781,12 +788,6 @@ describe EnrollmentsApiController, type: :request do
               expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
             end
 
-            it "should still work even when the role_id is null (to cover the post-migration, pre-job case)" do
-              @original_course.enrollments.update_all(:role_id => nil)
-              json = api_call(:get, "#{@user_path}?role_id=#{student_role.id}", @user_params.merge(:role_id => student_role.id))
-              expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
-            end
-
             it "should filter by custom role" do
               json = api_call(:get, "#{@user_path}?role_id=#{@role.id}", @user_params.merge(:role_id => @role.id))
               expect(json.map{ |e| e['course_id'].to_i }).to eq [@course.id]
@@ -1019,6 +1020,29 @@ describe EnrollmentsApiController, type: :request do
         json = api_call(:get, @path, @params)
         json.each do |res|
           %w{sis_user_id sis_login_id login_id}.each { |key| expect(res['user']).not_to include(key) }
+        end
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "returns enrollments for out-of-shard users" do
+          pend_with_bullet
+
+          # create a user on a different shard
+          @shard1.activate { @user = User.create!(name: 'outofshard') }
+
+          @course.enroll_student(@user)
+
+          # query own enrollment(s) as the out-of-shard user
+          @path = "#{@path}?user_id=self"
+          @params[:user_id] = 'self'
+
+          json = api_call(:get, @path, @params)
+
+          expect(json.length).to eq 1
+          expect(json.first['course_id']).to eq(@course.id)
+          expect(json.first['user_id']).to eq(@user.global_id)
         end
       end
     end

@@ -290,3 +290,19 @@ $ef-thumbnail-size: 36px;
     margin: 0 0 0 5px;
   }
 }
+
+// Putting this here because it's used in two components...
+.ShowFolder__accessbilityMessage, .SearchResults__accessbilityMessage {
+  @include accessibility-prompt($is-link: false);
+  // We need to override these to effetively hide it until it is given focus.
+  height: 0;
+  padding: 0;
+  border: 0;
+  margin: 0;
+
+  &:focus {
+    // We'll bring back in all the defaults on focus as well as bring the height back
+    @include accessibility-prompt($is-link: false);
+    height: auto;
+  }
+}

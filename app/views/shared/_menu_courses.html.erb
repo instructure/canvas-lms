@@ -1,9 +1,11 @@
 <td class="menu-item-drop-column" id="menu_enrollments">
-  <span class="menu-item-heading">
-    <%= title %>
-  </span>
-  <div class="menu-item-customize">
-    <%= link_to "#{link_text} (#{collection_size})", more_link_for_over_max, {:class => "customListOpen"} %>
+  <div class="menu-item-header-container">
+    <span class="menu-item-heading">
+      <%= title %>
+    </span>
+    <div class="menu-item-customize">
+      <%= link_to "#{link_text} (#{collection_size})", more_link_for_over_max, {:class => "customListOpen"} %>
+    </div>
   </div>
   <ul class="menu-item-drop-column-list">
     <%= render :partial => 'shared/menu_course', :collection => collection %>

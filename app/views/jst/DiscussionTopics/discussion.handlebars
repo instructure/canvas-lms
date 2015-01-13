@@ -49,7 +49,7 @@
     </div>
 
     <div class="discussion-status">
-      <span id="publish-icon" class="publish-icon" {{#if ENV.DRAFT_STATE}} data-view="publishIcon" {{/if}}></span>
+      <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>
       <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler">
         <span class="screenreader-only">
           {{#if subscribed}}
@@ -88,7 +88,7 @@
 
     <div class="discussion-actions">
       {{#if permissions.delete}}
-        <a href="#" class="al-trigger" role="button" id="manage_link">
+        <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
         </a>

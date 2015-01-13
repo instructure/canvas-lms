@@ -18,7 +18,7 @@
 
 class OutcomeGroupsController < ApplicationController
   before_filter :require_context
-  
+
   def create
     if authorized_action(@context, @current_user, :manage_outcomes)
       parent_id = params[:learning_outcome_group].delete(:learning_outcome_group_id)
@@ -33,7 +33,7 @@ class OutcomeGroupsController < ApplicationController
       end
     end
   end
-  
+
   def import
     if authorized_action(@context, @current_user, :manage_outcomes)
       data = JSON.parse(params[:file].read).with_indifferent_access rescue nil
@@ -54,7 +54,7 @@ class OutcomeGroupsController < ApplicationController
       end
     end
   end
-  
+
   def update
     if authorized_action(@context, @current_user, :manage_outcomes)
       @outcome_group = @context.learning_outcome_groups.active.find(params[:id])
@@ -70,7 +70,7 @@ class OutcomeGroupsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     if authorized_action(@context, @current_user, :manage_outcomes)
       @outcome_group = @context.learning_outcome_groups.active.find(params[:id])
@@ -80,7 +80,7 @@ class OutcomeGroupsController < ApplicationController
       render :json => @outcome_group
     end
   end
-  
+
   def reorder
     if authorized_action(@context, @current_user, :manage_outcomes)
       @outcome_group = @context.learning_outcome_groups.active.find(params[:outcome_group_id])

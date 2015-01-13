@@ -159,8 +159,8 @@ define [
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
-    ok this.$testEl.find('a').first().data('tooltip-title').match('Module C'), "displays previous module tooltip"
-    ok this.$testEl.find('a').last().data('tooltip-title').match('Module B'), "displays next module tooltip"
+    ok this.$testEl.find('a').first().data('html-tooltip-title').match('Module C'), "displays previous module tooltip"
+    ok this.$testEl.find('a').last().data('html-tooltip-title').match('Module B'), "displays next module tooltip"
 
   itemTooltipData =
      {
@@ -209,8 +209,8 @@ define [
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
-    ok this.$testEl.find('a').first().data('tooltip-title').match('Project 1'), "displays previous item tooltip"
-    ok this.$testEl.find('a').last().data('tooltip-title').match('Project 33'), "displays next item tooltip"
+    ok this.$testEl.find('a').first().data('html-tooltip-title').match('Project 1'), "displays previous item tooltip"
+    ok this.$testEl.find('a').last().data('html-tooltip-title').match('Project 33'), "displays next item tooltip"
 
   test 'if url has a module_item_id use that as the assetID and ModuleItem as the type instead', ->
     @server.respondWith "GET",

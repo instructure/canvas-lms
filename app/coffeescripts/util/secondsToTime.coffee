@@ -2,7 +2,8 @@ define [], () ->
   {floor} = Math
 
   pad = (duration) ->
-    ('00' + duration).slice(-2)
+    padding = if duration >= 0 && duration < 10 then '0' else ''
+    padding + duration.toFixed()
 
   # Format a duration given in seconds into a stopwatch-style timer, e.g:
   #

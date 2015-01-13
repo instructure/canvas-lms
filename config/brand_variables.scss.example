@@ -1,0 +1,25 @@
+/*
+This is an expirimental feature to preview how branding canvas with your own colors will work.
+It's not ready yet, and should only be used on dev machines.
+
+To use, copy this file to `config/brand_variables.sass` (remove the `.example`).
+You can set values to whatever you want here and they will be used in the
+'new_styles_normal_contrast' and 'k12_normal_contrast' variants when they are compiled on
+your computer.
+remember, anything that you want to be able to set in this file, needs to have a "!default"
+next to it where it is declared in the real sass sheet.
+
+As we decide upon new variables that we want to be able to set, remember to add them to
+both "config/brand_variables.sass.example" as well as your "config/brand_variables.sass" locally.
+*/
+
+
+$canvas-primary: orange;
+$canvas-secondary: indigo;
+$linkColor: deeppink;
+
+
+// this is the blue color that we use all over the place when not in a gradiant
+$highlight-color: fuchsia;
+// light blue hover color
+$hover-color: mistyrose;

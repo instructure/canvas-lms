@@ -79,7 +79,7 @@
       <% end %>
       <% if !only || only.include?(:external_tools) %>
       <div id="context_external_tools_select" class="module_item_option">
-        <div style="font-size: 0.8em;">
+        <div style="font-size: 0.8em;" tabindex="0" aria-alert="true">
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
@@ -138,9 +138,8 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          <%= before_label :page_name, "Page Name" %>
           <input type="text" name="wiki_page[title]" class="item_title" aria-label="<%= before_label :page_name, "Page Name" %>"/>
-          <a href="<%= context_url(@context, :context_wiki_pages_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
+          <a href="<%= polymorphic_url([:api_v1, @context, :wiki_pages]) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <% end %>
@@ -271,9 +270,7 @@
         <div class="new" style="margin-top: 5px;">
           <%= before_label :topic_name, "Topic Name" %>
           <input type="text" name="title" class="item_title" aria-label="<%= before_label :topic_name, "Topic Name" %>" />
-          <% if @context.feature_enabled? :draft_state %>
-            <input type="hidden" name="published" value="false"/>
-          <% end %>
+          <input type="hidden" name="published" value="false"/>
           <a href="<%= context_url(@context, :api_v1_context_discussion_topics_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>

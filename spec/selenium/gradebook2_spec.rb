@@ -9,7 +9,6 @@ describe "gradebook2" do
     end
 
     it "hides unpublished/shows published assignments" do
-      @course.root_account.enable_feature!(:draft_state)
       assignment = @course.assignments.create! title: 'unpublished'
       assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"
@@ -824,6 +823,22 @@ describe "gradebook2" do
       @course.save
       get "/courses/#{@course.id}/gradebook2"
       expect(ff('.post-grades-placeholder').length).to eq 1
+    end
+
+    it "should not be displayed if viewing outcome gradebook" do
+      Account.default.set_feature_flag!('post_grades', 'on')
+      Account.default.set_feature_flag!('outcome_gradebook', 'on')
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      f('a[data-id=outcome]').click
+      wait_for_ajaximations
+      expect(f('.post-grades-placeholder')).not_to be_displayed
+
+      f('a[data-id=assignment]').click
+      wait_for_ajaximations
+
+      expect(f('.post-grades-placeholder')).to be_displayed
     end
   end
 end

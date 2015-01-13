@@ -5,7 +5,12 @@ define [
   'underscore'
   'jquery'
   'compiled/behaviors/authenticity_token'
-], (Backbone, _, $, authenticity_token) ->
+  'str/htmlEscape'
+], (Backbone, _, $, authenticity_token, htmlEscape) ->
+  ###
+  xsslint safeString.identifier iframeId httpMethod
+  xsslint jqueryObject.identifier el
+  ###
 
   Backbone.syncWithoutMultipart = Backbone.sync
   Backbone.syncWithMultipart = (method, model, options) ->
@@ -35,7 +40,7 @@ define [
           $el[0]
       _.flatten(inputs)
     $form = $("""
-      <form enctype='multipart/form-data' target='#{iframeId}' action='#{options.url ? model.url()}' method='POST'>
+      <form enctype='multipart/form-data' target='#{iframeId}' action='#{htmlEscape options.url ? model.url()}' method='POST'>
       </form>
     """).hide()
 
@@ -43,7 +48,7 @@ define [
     if options.proxyAttachment
       $form.prepend """
         <input type='hidden' name='_method' value='#{httpMethod}' />
-        <input type='hidden' name='authenticity_token' value='#{authenticity_token()}' />
+        <input type='hidden' name='authenticity_token' value='#{htmlEscape authenticity_token()}' />
         """
 
     _.each toForm(model.toJSON()), (el) ->

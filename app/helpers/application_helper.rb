@@ -297,6 +297,9 @@ module ApplicationHelper
           end
         end
         return '' if tabs.empty?
+
+        inactive_element = "<span id='inactive_nav_link' class='screenreader-only'>#{I18n.t('* No content has been added')}</span>"
+
         html << '<nav role="navigation" aria-label="context"><ul id="section-tabs">'
         tabs.each do |tab|
           path = nil
@@ -311,10 +314,14 @@ module ApplicationHelper
           class_name = tab[:css_class].downcase.replace_whitespace("-")
           class_name += ' active' if @active_tab == tab[:css_class]
 
+          if hide
+            tab[:label] += inactive_element
+          end
+
           if tab[:screenreader]
-            link = link_to(tab[:label], path, :class => class_name, "aria-label" => tab[:screenreader])
+            link = "<a href='#{path}' class='#{class_name}' aria-label='#{tab[:screenreader]}'>#{tab[:label]}</a>"
           else
-            link = link_to(tab[:label], path, :class => class_name)
+            link = "<a href='#{path}' class='#{class_name}'>#{tab[:label]}</a>"
           end
 
           html << "<li class='section #{"section-tab-hidden" if hide }'>" + link + "</li>" if tab[:href]
@@ -746,7 +753,7 @@ module ApplicationHelper
     context = opts[:context]
     tag_type = opts.fetch(:tag_type, :time)
     if datetime.present?
-      attributes[:title] ||= context_sensitive_datetime_title(datetime, context, just_text: true)
+      attributes['data-html-tooltip-title'] ||= context_sensitive_datetime_title(datetime, context, just_text: true)
       attributes['data-tooltip'] ||= 'top'
     end
 
@@ -764,12 +771,12 @@ module ApplicationHelper
     if context.present?
       course_time = datetime_string(datetime, :event, nil, false, context.time_zone)
       if course_time != local_time
-        text = "#{I18n.t('#helpers.local', "Local")}: #{local_time}<br>#{I18n.t('#helpers.course', "Course")}: #{course_time}".html_safe
+        text = "#{h I18n.t('#helpers.local', "Local")}: #{h local_time}<br>#{h I18n.t('#helpers.course', "Course")}: #{h course_time}".html_safe
       end
     end
 
     return text if just_text
-    "data-tooltip title=\"#{text}\"".html_safe
+    "data-tooltip data-html-tooltip-title=\"#{text}\"".html_safe
   end
 
   # render a link with a tooltip containing a summary of due dates

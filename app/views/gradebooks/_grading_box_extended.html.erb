@@ -2,13 +2,13 @@
   submission ||= nil
 %>
 <% if assignment.grading_type == "points" %>
-  <input type="text" style="width: 35px;" maxlength="254"/>
+  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/>
 <% elsif assignment.grading_type == "percent" %>
-  <input type="text" style="width: 35px;" maxlength="254"/> %
+  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/> %
 <% elsif assignment.grading_type == "letter_grade" %>
-  <input type="text" style="width: 35px;" maxlength="254"/>
+  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/>
 <% elsif assignment.grading_type == "gpa_scale" %>
-  <input type="text" style="width: 35px;" maxlength="254"/>
+  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/>
 <% elsif assignment.grading_type == "pass_fail" %>
   <select>
     <option value="">---</option>

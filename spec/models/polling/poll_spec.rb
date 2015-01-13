@@ -21,7 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Polling::Poll do
   before :once do
     course
-    @course.root_account.disable_feature!(:draft_state)
     teacher_in_course(course: @course, active_all: true)
   end
 

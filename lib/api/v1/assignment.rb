@@ -100,6 +100,7 @@ module Api::V1::Assignment
                                            opts[:preloaded_user_content_attachments] || {})
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
+    hash['has_overrides'] = assignment.has_overrides?
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag
@@ -192,10 +193,8 @@ module Api::V1::Assignment
       hash['module_ids'] = thing_in_module.context_module_tags.map(&:context_module_id) if thing_in_module
     end
 
-    if assignment.context.feature_enabled?(:draft_state)
-      hash['published'] = ! assignment.unpublished?
-      hash['unpublishable'] = assignment.can_unpublish?
-    end
+    hash['published'] = ! assignment.unpublished?
+    hash['unpublishable'] = assignment.can_unpublish?
 
     if opts[:differentiated_assignments_enabled] || (opts[:differentiated_assignments_enabled] != false && assignment.context.feature_enabled?(:differentiated_assignments))
       hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
@@ -423,11 +422,9 @@ module Api::V1::Assignment
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
-    if assignment.context.feature_enabled?(:draft_state)
-      if assignment_params.has_key? "published"
-        published = value_to_boolean(assignment_params['published'])
-        assignment.workflow_state = published ? 'published' : 'unpublished'
-      end
+    if assignment_params.has_key? "published"
+      published = value_to_boolean(assignment_params['published'])
+      assignment.workflow_state = published ? 'published' : 'unpublished'
     end
 
     if assignment.context.feature_enabled?(:differentiated_assignments)

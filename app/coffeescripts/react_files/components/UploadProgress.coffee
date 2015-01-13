@@ -18,11 +18,6 @@ define [
         file: React.PropTypes.instanceOf(File).isRequired
       })
 
-    handleCancelUpload: (event) ->
-      event.preventDefault()
-      @props.uploader.abort()
-      @props.removeUploader(@props.uploader)
-
     render: withReactDOM ->
       div className: "ef-item-row #{'text-error' if @props.uploader.error}",
         div className: 'col-xs-6',
@@ -52,7 +47,7 @@ define [
 
         button {
           type: 'button'
-          onClick: @props.uploader.cancel,
+          onClick: @props.uploader.cancel
           'aria-label': I18n.t('cancel', 'Cancel')
           className: 'btn-link upload-progress-view__button'
         },

@@ -120,9 +120,7 @@ describe ContentMigration do
         expect(new_mod.end_at).to be_nil
       end
 
-      it "should not create broken assignments from unpublished quizzes in draft state" do
-        @copy_to.enable_feature!(:draft_state)
-
+      it "should not create broken assignments from unpublished quizzes" do
         options = {
             :everything => true,
             :remove_dates => true,

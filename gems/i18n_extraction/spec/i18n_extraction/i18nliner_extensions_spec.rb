@@ -61,8 +61,12 @@ describe I18nliner::Extractors::RubyExtractor do
           {'plugins.dim_dim.name' => "DimDim"}
     end
 
-    it "should require explicit keys if there is no scope" do
+    it "should require explicit keys if a key is provided and there is no scope" do
       lambda { extract("t 'foo', 'Foo'", I18nliner::Scope.root) }.should raise_error /ambiguous translation key/
+    end
+
+    it "should not require explicit keys if the key is inferred and there is no scope" do
+      extract("t 'Foo'", I18nliner::Scope.root).should == {'foo_f44ad75d' => 'Foo'}
     end
 
     it "should not scope inferred keys" do

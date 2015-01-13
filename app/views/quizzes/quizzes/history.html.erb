@@ -119,6 +119,13 @@
     <% else %>
       <%= t(:unnamed_quiz_results, "Quiz Results for %{user}", :user => user_name) %>
     <% end %>
+
+    <% if @context.feature_enabled?(:quiz_log_auditing) %>
+      <%= link_to t(:view_log, 'View Log'),
+        course_quiz_quiz_submission_events_url(@context, @quiz, @submission),
+        { "class" => "pull-right" }
+      %>
+    <% end %>
   </h2>
 </header>
 <div id="feel_free_to_toggle_message">

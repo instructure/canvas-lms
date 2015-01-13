@@ -22,7 +22,7 @@ describe "courses" do
     context 'draft state' do
 
       before(:each) do
-        course_with_teacher_logged_in({draft_state: true})
+        course_with_teacher_logged_in
       end
 
       def validate_action_button(postion, validation_text)
@@ -60,13 +60,13 @@ describe "courses" do
       end
 
       it "should not show course status if graded submissions exist" do
-        course_with_student_submissions({submission_points: true, draft_state: true})
+        course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
         expect(f('#course_status')).to be_nil
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
-        course_with_student_submissions({draft_state: true})
+        course_with_student_submissions
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
         expect_new_page_load { course_status_buttons.first.click }
@@ -81,14 +81,14 @@ describe "courses" do
 
       create_new_course
 
-      wizard_box = f("#wizard_box")
+      wizard_box = f(".ic-wizard-box")
       keep_trying_until { expect(wizard_box).to be_displayed }
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      f(".ic-wizard-box__close a").click
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
-      wizard_box = f("#wizard_box")
-      expect(wizard_box).not_to be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
 
       # un-remember the setting
       driver.execute_script "localStorage.clear()"
@@ -97,7 +97,7 @@ describe "courses" do
     it "should open and close wizard after initial close" do
       def find_wizard_box
         wizard_box = keep_trying_until do
-          wizard_box = f("#wizard_box")
+          wizard_box = f(".ic-wizard-box")
           expect(wizard_box).to be_displayed
           wizard_box
         end
@@ -109,26 +109,41 @@ describe "courses" do
 
       wait_for_ajaximations
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      f(".ic-wizard-box__close a").click
       wait_for_ajaximations
-      expect(wizard_box).not_to be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
       checklist_button = f('.wizard_popup_link')
       expect(checklist_button).to be_displayed
       checklist_button.click
       wait_for_ajaximations
-      expect(checklist_button).not_to be_displayed
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      f(".ic-wizard-box__close a").click
       wait_for_ajaximations
-      expect(wizard_box).not_to be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
       expect(checklist_button).to be_displayed
+    end
+
+    it "should open up the choose home page dialog from the wizard" do
+      course_with_teacher_logged_in
+      create_new_course
+
+      wizard_box = f(".ic-wizard-box")
+      keep_trying_until { expect(wizard_box).to be_displayed }
+
+      f("#wizard_home_page").click
+      f(".ic-wizard-box__message-button a").click
+      wait_for_ajaximations
+      modal = f("#edit_course_home_content_form")
+      expect(modal).to be_displayed
     end
 
     it "should correctly update the course quota" do
       course_with_admin_logged_in
 
       # first try setting the quota explicitly
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       f("#ui-id-1").click
       form = f("#course_form")
       expect(form).to be_displayed
@@ -140,7 +155,7 @@ describe "courses" do
       expect(value).to eq "10"
 
       # then try just saving it (without resetting it)
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       form = f("#course_form")
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
@@ -151,7 +166,7 @@ describe "courses" do
       expect(value).to eq "10"
 
       # then make sure it's right after a reload
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
       @course.reload
@@ -289,7 +304,6 @@ describe "courses" do
 
       it "should display course_home_sub_navigation lti apps (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         num_tools = 2
         num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
         get "/courses/#{@course.id}"
@@ -305,7 +319,6 @@ describe "courses" do
 
       it "should include launch type parameter (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
         expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
@@ -374,6 +387,7 @@ describe "courses" do
     it "should display user groups on courses page" do
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@student)
+      enroll_student(@student, true)
 
       login_as(@student.name)
       get '/courses'

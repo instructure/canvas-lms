@@ -119,6 +119,8 @@ define([
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
       $no_annotation_warning = $('#no_annotation_warning'),
+      $comment_submitted = $('#comment_submitted'),
+      $comment_submitted_message = $('#comment_submitted_message'),
       $selectmenu = null,
       browserableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -263,23 +265,24 @@ define([
     return {raw: raw, formatted: formatted};
   }
 
+  // xsslint safeString.identifier MENU_PARTS_DELIMITER
   var MENU_PARTS_DELIMITER = '----☃----'; // something random and unlikely to be in a person's name
 
   function initDropdown(){
     var hideStudentNames = utils.shouldHideStudentNames();
     $("#hide_student_names").attr('checked', hideStudentNames);
-    var options = $.map(jsonData.studentsWithSubmissions, function(s, idx){
-      var name = htmlEscape(s.name).replace(MENU_PARTS_DELIMITER, ""),
+    var optionsHtml = $.map(jsonData.studentsWithSubmissions, function(s, idx){
+      var name = s.name.replace(MENU_PARTS_DELIMITER, ""),
           className = classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
         name = I18n.t('nth_student', "Student %{n}", {'n': idx + 1});
       }
 
-      return '<option value="' + s.id + '" class="' + className.raw + ' ui-selectmenu-hasIcon">' + name + MENU_PARTS_DELIMITER + className.formatted + MENU_PARTS_DELIMITER + className.raw + '</option>';
+      return '<option value="' + s.id + '" class="' + htmlEscape(className.raw) + ' ui-selectmenu-hasIcon">' + htmlEscape(name) + MENU_PARTS_DELIMITER + htmlEscape(className.formatted) + MENU_PARTS_DELIMITER + htmlEscape(className.raw) + '</option>';
     }).join("");
 
-    $selectmenu = $("<select id='students_selectmenu'>" + options + "</select>")
+    $selectmenu = $("<select id='students_selectmenu'>" + optionsHtml + "</select>")
       .appendTo("#combo_box_container")
       .selectmenu({
         style:'dropdown',
@@ -291,6 +294,7 @@ define([
         EG.handleStudentChanged();
       });
 
+    // xsslint safeString.function getIcon
     function getIcon(helper_text){
       var icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>";
       if(helper_text == "graded"){
@@ -306,9 +310,9 @@ define([
           $menu = $("#section-menu");
 
 
-      $menu.find('ul').append($.map(jsonData.context.active_course_sections, function(section, i){
+      $menu.find('ul').append($.raw($.map(jsonData.context.active_course_sections, function(section, i){
         return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ htmlEscape(section.name) +'</a></li>';
-      }).join(''));
+      }).join('')));
 
       $menu.insertBefore($selectmenu_list).bind('mouseenter mouseleave', function(event){
         $(this)
@@ -470,7 +474,7 @@ define([
           this.spinMute();
           $.ajaxJSON(this.muteUrl(), 'put', { status: true }, $.proxy(function(res){
             this.elements.spinner.stop();
-            this.elements.mute.label.html(label);
+            this.elements.mute.label.text(label);
             this.elements.mute.icon
               .removeClass('ui-icon-volume-off')
               .addClass('ui-icon-volume-on')
@@ -484,7 +488,7 @@ define([
           this.spinMute();
           $.ajaxJSON(this.muteUrl(), 'put', { status: false }, $.proxy(function(res){
             this.elements.spinner.stop();
-            this.elements.mute.label.html(label);
+            this.elements.mute.label.text(label);
             this.elements.mute.icon
               .removeClass('ui-icon-volume-on')
               .addClass('ui-icon-volume-off')
@@ -499,9 +503,7 @@ define([
 
   function initCommentBox(){
     //initialize the auto height resizing on the textarea
-    $('#add_a_comment textarea').elastic({
-      callback: EG.resizeFullHeight
-    });
+    $('#add_a_comment textarea').elastic();
 
     $(".media_comment_link").click(function(event) {
       event.preventDefault();
@@ -511,7 +513,6 @@ define([
       }, function() {
         EG.revertFromFormSubmit();
       }, true);
-      EG.resizeFullHeight();
     });
 
     $("#media_recorder_container a").live('click', hideMediaRecorderContainer);
@@ -634,8 +635,9 @@ define([
           $('#record_button').attr("recording", false).attr("aria-label", I18n.t('dialog_button.aria_record_reset', "Click to record"));
         }
 
+        // xsslint safeString.function linebreak
         function linebreak(transcript){
-          return transcript.replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>');
+          return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>');
         }
       }
     }
@@ -643,7 +645,6 @@ define([
 
   function hideMediaRecorderContainer(){
     $("#media_media_recording").hide().removeData('comment_id').removeData('comment_type');
-    EG.resizeFullHeight();
   }
 
   function isAssessmentEditableByMe(assessment){
@@ -674,7 +675,6 @@ define([
     $rubric_assessments_select.change(function(){
       var selectedAssessment = getSelectedAssessment();
       rubricAssessment.populateRubricSummary($("#rubric_summary_holder .rubric_summary"), selectedAssessment, isAssessmentEditableByMe(selectedAssessment));
-      EG.resizeFullHeight();
     });
 
     $rubric_full_resizer_handle.draggable({
@@ -695,7 +695,6 @@ define([
             windowWidth = $window.width();
         $rubric_full.width(windowWidth - offset.left);
         $rubric_full_resizer_handle.css("left","0");
-        EG.resizeFullHeight();
       },
       stop: function(event, ui) {
         event.stopImmediatePropagation();
@@ -785,92 +784,6 @@ define([
     $("#submission_group_comment").prop({checked: true, disabled: true});
   }
 
-  function resizingFunction(){
-    var windowHeight = $window.height(),
-        delta,
-        deltaRemaining,
-        headerOffset = $right_side.offset().top,
-        fixedBottomHeight = $fixed_bottom.height(),
-        fullHeight = Math.max(minimumWindowHeight, windowHeight) - headerOffset - fixedBottomHeight,
-        resizableElements = [
-          { element: $submission_files_list,    data: { newHeight: 0 } },
-          { element: $rubric_summary_container, data: { newHeight: 0 } },
-          { element: $comments,                 data: { newHeight: 0 } }
-        ],
-        visibleResizableElements = $.grep(resizableElements, function(e, i){
-          return e && e.element.is(':visible');
-        });
-    $rubric_full.css({ 'maxHeight': fullHeight - 50, 'overflow': 'auto' });
-
-    $.each(visibleResizableElements, function(){
-      this.data.autoHeight = this.element.height("auto").height();
-      this.element.height(0);
-    });
-
-    var spaceLeftForResizables = fullHeight - $rightside_inner.height("auto").height() - $add_a_comment.outerHeight();
-
-    $full_height.height(fullHeight);
-    delta = deltaRemaining = spaceLeftForResizables;
-    var step = 1;
-    var didNothing;
-    if (delta > 0) { //the page got bigger
-      while(deltaRemaining > 0){
-        didNothing = true;
-        var shortestElementHeight = 10000000;
-        var shortestElement = null;
-        $.each(visibleResizableElements, function(){
-          if (this.data.newHeight < shortestElementHeight && this.data.newHeight < this.data.autoHeight) {
-            shortestElement = this;
-            shortestElementHeight = this.data.newHeight;
-          }
-        });
-        if (shortestElement) {
-          shortestElement.data.newHeight = shortestElementHeight + step;
-          deltaRemaining = deltaRemaining - step;
-          didNothing = false;
-        }
-        if (didNothing) {
-          break;
-        }
-      }
-    }
-    else { //the page got smaller
-      var tallestElementHeight, tallestElement;
-      while(deltaRemaining < 0){
-        didNothing = true;
-        tallestElementHeight = 0;
-        tallestElement = null;
-        $.each(visibleResizableElements, function(){
-          if (this.data.newHeight > 30 > tallestElementHeight && this.data.newHeight >= this.data.autoHeight ) {
-            tallestElement = this;
-            tallestElementHeight = this.data.newHeight;
-          }
-        });
-        if (tallestElement) {
-          tallestElement.data.newHeight = tallestElementHeight - step;
-          deltaRemaining = deltaRemaining + step;
-          didNothing = false;
-        }
-        if (didNothing) {
-          break;
-        }
-      }
-    }
-
-    $.each(visibleResizableElements, function(){
-      this.element.height(this.data.newHeight);
-    });
-
-    if (deltaRemaining > 0) {
-      $comments.height( windowHeight - Math.floor($comments.offset().top) - $add_a_comment.outerHeight() );
-    }
-    // This will cause the page to flicker in firefox if there is a scrollbar in both the comments and the rubric summary.
-    // I would like it not to, I tried setTimeout(function(){ $comments.scrollTop(1000000); }, 800); but that still doesnt work
-    if(!INST.browser.ff && $comments.height() > 100) {
-      $comments.scrollTop(1000000);
-    }
-  }
-
   $.extend(INST, {
     refreshGrades: function(){
       var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
@@ -923,9 +836,6 @@ define([
     currentStudent: null,
 
     domReady: function(){
-      //attach to window resize and
-      $window.bind('resize orientationchange', EG.resizeFullHeight).resize();
-
       function makeFullWidth(){
         $full_width_container.addClass("full_width");
         $left_side.css("width",'');
@@ -967,7 +877,6 @@ define([
             $left_side.width("0%" );
             $right_side.width('100%');
           }
-          EG.resizeFullHeight();
         },
         stop: function(event, ui) {
           event.stopImmediatePropagation();
@@ -1066,13 +975,6 @@ define([
       return studentName + " " + submissionStatus.formatted;
     },
 
-    resizeFullHeight: function(){
-      if (resizeTimeOut) {
-        clearTimeout(resizeTimeOut);
-      }
-      resizeTimeOut = setTimeout(resizingFunction, 0);
-    },
-
     toggleFullRubric: function(force){
       // if there is no rubric associated with this assignment, then the edit
       // rubric thing should never be shown.  the view should make sure that
@@ -1083,7 +985,6 @@ define([
       if ($rubric_full.filter(":visible").length || force === "close") {
         $("#grading").height("auto").children().show();
         $rubric_full.fadeOut();
-        this.resizeFullHeight();
         $(".toggle_full_rubric").focus()
       } else {
         $rubric_full.fadeIn();
@@ -1099,7 +1000,6 @@ define([
 
       rubricAssessment.populateRubric($rubric_full.find(".rubric"), getSelectedAssessment() );
       $("#grading").height($rubric_full.height());
-      this.resizeFullHeight();
     },
 
     handleFragmentChange: function(){
@@ -1162,6 +1062,7 @@ define([
         "student_id": this.currentStudent.id
       }));
 
+      $rightside_inner.scrollTo(0);
       this.showGrade();
       this.showDiscussion();
       this.showRubric();
@@ -1316,7 +1217,6 @@ define([
         $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
         // if the submission was after the due date, mark it as late
-        this.resizeFullHeight();
         $submission_late_notice.showIf(submission['late']);
       } catch(e) {
         INST.log_error({
@@ -1360,7 +1260,7 @@ define([
                                          {user_id: this.currentStudent.id})
         });
       }
-      $multiple_submissions.html(innerHTML);
+      $multiple_submissions.html($.raw(innerHTML));
     },
 
     showSubmissionDetails: function(){
@@ -1376,7 +1276,7 @@ define([
     },
 
     updateStatsInHeader: function(){
-      $x_of_x_students.html(
+      $x_of_x_students.text(
         I18n.t('gradee_index_of_total', '%{gradee} %{x} of %{y}', {
           gradee: gradeeLabel,
           x: EG.currentIndex() + 1,
@@ -1410,13 +1310,13 @@ define([
           return Math.round(number*coefficient)/coefficient;
         }
         var outOf = jsonData.points_possible ? ([" / ", jsonData.points_possible, " (", Math.round( 100 * (avg(scores) / jsonData.points_possible)), "%)"].join("")) : "";
-        $average_score.html( [roundWithPrecision(avg(scores), 2) + outOf].join("") );
+        $average_score.text( [roundWithPrecision(avg(scores), 2) + outOf].join("") );
       }
       else { //there are no submissions that have been graded.
         $average_score_wrapper.hide();
       }
 
-      $grded_so_far.html(
+      $grded_so_far.text(
         I18n.t('portion_graded', '%{x} / %{y} Graded', {
           x: gradedStudents.length,
           y: jsonData.context.students.length
@@ -1446,14 +1346,12 @@ define([
         if (attachment) {
           var previewOptions = {
             height: '100%',
+            id: "speedgrader_iframe",
             mimeType: attachment.content_type,
             attachment_id: attachment.id,
             submission_id: this.currentStudent.submission.id,
             attachment_view_inline_ping_url: attachment.view_inline_ping_url,
-            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing',
-            ready: function(){
-              EG.resizeFullHeight();
-            }
+            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
           };
         }
 
@@ -1504,12 +1402,12 @@ define([
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
 	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
 	                  .replace("{{attachmentId}}", attachment.id);
-	        $iframe_holder.html('<iframe src="'+src+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
+	        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
 	      }
 	      else {
 	        //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
-	        $iframe_holder.html(
-            '<iframe id="speedgrader_iframe" src="/courses/' + jsonData.context_id  +
+	        $iframe_holder.html($.raw(
+            '<iframe id="speedgrader_iframe" src="' + htmlEscape('/courses/' + jsonData.context_id  +
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
@@ -1521,7 +1419,7 @@ define([
               ''
             ) + (
               utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
-            ) + '" frameborder="0"></iframe>')
+            )) + '" frameborder="0"></iframe>'))
             .show();
 	      }
   	  }
@@ -1541,7 +1439,7 @@ define([
 
         $rubric_assessments_select.find("option").remove();
         $.each(this.currentStudent.rubric_assessments, function(){
-          $rubric_assessments_select.append('<option value="' + this.id + '">' + htmlEscape(this.assessor_name) + '</option>');
+          $rubric_assessments_select.append('<option value="' + htmlEscape(this.id) + '">' + htmlEscape(this.assessor_name) + '</option>');
         });
 
         // show a new option if there is not an assessment by me
@@ -1582,7 +1480,7 @@ define([
           var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
           if (hideStudentName) { comment.author_name = I18n.t('student', "Student"); }
           var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
-          $comment.find('span.comment').html(htmlEscape(comment.comment).replace(/\n/g, "<br />"));
+          $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
           if (comment.avatar_path && !hideStudentName) {
             $comment.find(".avatar").attr('src', comment.avatar_path).show();
           }
@@ -1624,7 +1522,6 @@ define([
 
     revertFromFormSubmit: function() {
         EG.showDiscussion();
-        EG.resizeFullHeight();
         $add_a_comment_textarea.val("");
         // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
         // type it the textarea after you do that.  but I put it in a setTimeout it works.  so this is a hack for webkit,
@@ -1636,10 +1533,13 @@ define([
           disableGroupCommentCheckbox();
         }
 
+        $comment_submitted.show();
+        $comment_submitted_message.attr("tabindex",-1).focus();
         $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
     },
 
     handleCommentFormSubmit: function(){
+      $comment_submitted.hide();
       if (
         !$.trim($add_a_comment_textarea.val()).length &&
         !$("#media_media_recording").data('comment_id') &&
@@ -1668,6 +1568,9 @@ define([
           EG.setOrUpdateSubmission(this.submission);
         });
         EG.revertFromFormSubmit();
+        window.setTimeout(function() {
+          $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500);
+        });
       }
       if($add_a_comment.find("input[type='file']:visible").length) {
         $.ajaxJSONFiles(url + ".text", method, formData, $add_a_comment.find("input[type='file']:visible"), formSuccess);
@@ -1800,12 +1703,10 @@ define([
         $attachment.find("input").attr('name', 'attachments[' + fileIndex + '][uploaded_data]');
         fileIndex++;
         $("#comment_attachments").append($attachment.show());
-        EG.resizeFullHeight();
       });
       $comment_attachment_input_blank.find("a").click(function(event) {
         event.preventDefault();
         $(this).parents(".comment_attachment_input").remove();
-        EG.resizeFullHeight();
       });
       $right_side.delegate(".play_comment_link", 'click', function() {
         if($(this).data('media_comment_id')) {

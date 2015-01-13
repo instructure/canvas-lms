@@ -265,8 +265,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "should include published flag for accounts that do have enabled_draft" do
-        @course.account.enable_feature!(:draft_state)
-
         @json = api_get_assignment_in_course(@assignment, @course)
 
         expect(@json.has_key?('published')).to be_truthy
@@ -482,7 +480,6 @@ describe AssignmentsApiController, type: :request do
 
       before :once do
         course_with_student(:active_all => true)
-        @course.account.enable_feature!(:draft_state)
         @published = @course.assignments.create!({:name => "published assignment"})
         @published.workflow_state = 'published'
         @published.save!
@@ -799,7 +796,7 @@ describe AssignmentsApiController, type: :request do
           action: 'show',
           format:'json',
           course_id: @course.id.to_s,
-          id: assignment_id.to_s 
+          id: assignment_id.to_s
         }, {needs_grading_count_by_section: 'true'})
       expect(show_json.keys).to include("needs_grading_count_by_section")
     end
@@ -925,7 +922,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should update published/unpublished" do
-      @course.account.enable_feature!(:draft_state)
       @assignment = @course.assignments.create({
         :name => "some assignment",
         :points_possible => 15
@@ -1805,6 +1801,17 @@ describe AssignmentsApiController, type: :request do
         expect(json['lock_at']).to eq @assignment.lock_at.iso8601.to_s
       end
 
+      it "returns has_overrides correctly" do
+        @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
+        json = api_get_assignment_in_course(@assignment, @course)
+        expect(json['has_overrides']).to eq false
+
+        @section = @course.course_sections.create! :name => "afternoon delight"
+        create_override_for_assignment
+        json = api_get_assignment_in_course(@assignment, @course)
+        expect(json['has_overrides']).to eq true
+      end
+
       it "returns all_dates when requested" do
         @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
         json = api_call(:get,
@@ -1987,7 +1994,6 @@ describe AssignmentsApiController, type: :request do
     context "draft state" do
 
       before :once do
-        @course.account.enable_feature!(:draft_state)
         @assignment = @course.assignments.create!({
           :name => "unpublished assignment",
           :points_possible => 15

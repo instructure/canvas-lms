@@ -76,7 +76,7 @@ class CountsReport
             data[:users] = enrollment_scope.count(:user_id, :distinct => true)
 
             # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
-            data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.id]).first.map(&:to_i)
+            data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace IN ('account_%s','account_%s') AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.local_id, account.global_id]).first.map(&:to_i)
             data[:media_files], data[:media_files_size] = MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
             data[:media_files_size] *= 1000
           end

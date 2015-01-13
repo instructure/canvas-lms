@@ -5,7 +5,7 @@
 
 <% if @locked && !@locked[:due_at] %>
   <% js_bundle :module_sequence_footer %>
-    
+
   <h1><%= @assignment.title %></h1>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
@@ -25,13 +25,11 @@
         </h1>
       </div>
       <div class='edit-content'>
-        <% if @context.feature_enabled?(:draft_state) %>
-          <button
-            id="assignment_publish_button"
-            data-id='<%= @assignment.id %>'
-            class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @assignment.has_student_submissions? %>'>
-          </button>
-        <% end %>
+        <button
+          id="assignment_publish_button"
+          data-id='<%= @assignment.id %>'
+          class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @assignment.has_student_submissions? %>'>
+        </button>
         <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
           <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
         </a>
@@ -94,6 +92,7 @@
           </li>
         <% end %>
       <% end %>
+      <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
       <div class="clear"></div>
     </ul>
   <% end %>

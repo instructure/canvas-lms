@@ -53,12 +53,12 @@ define [
         courseText = I18n.t('#helpers.course', 'Course')
         courseDatetime = $.datetimeString(datetime, timezone: ENV.CONTEXT_TIMEZONE)
         if localDatetime != courseDatetime
-          titleText = "#{localText}: #{localDatetime}<br>#{courseText}: #{courseDatetime}"
+          titleText = "#{htmlEscape localText}: #{htmlEscape localDatetime}<br>#{htmlEscape courseText}: #{htmlEscape courseDatetime}"
 
       if justText
         new Handlebars.SafeString titleText
       else
-        new Handlebars.SafeString "data-tooltip title=\"#{titleText}\""
+        new Handlebars.SafeString "data-tooltip data-html-tooltip-title=\"#{htmlEscape titleText}\""
 
     # expects: a Date object or an ISO string
     friendlyDatetime : (datetime, {hash: {pubdate, contextSensitive}}) ->
@@ -69,9 +69,9 @@ define [
       if contextSensitive and ENV and ENV.CONTEXT_TIMEZONE
         timeTitle = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, hash: {justText: true})
       else
-        timeTitle = $.datetimeString(datetime)
+        timeTitle = htmlEscape $.datetimeString(datetime)
 
-      new Handlebars.SafeString "<time data-tooltip title='#{timeTitle}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(fudged)}</time>"
+      new Handlebars.SafeString "<time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{$.friendlyDatetime(fudged)}</time>"
 
 
 
@@ -79,7 +79,7 @@ define [
     formattedDate : (datetime, format, {hash: {pubdate}}) ->
       return unless datetime?
       datetime = tz.parse(datetime) unless _.isDate datetime
-      new Handlebars.SafeString "<time data-tooltip title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
+      new Handlebars.SafeString "<time data-tooltip title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{htmlEscape datetime.toString(format)}</time>"
 
     # IMPORTANT: these next two handlebars helpers emit profile-timezone
     # human-formatted strings. don't send them as is to the server (you can
@@ -332,11 +332,11 @@ define [
       attributes = for key, val of inputProps when val?
         "#{htmlEscape key}=\"#{htmlEscape val}\""
 
-      hiddenDisabled = if inputProps.disabled then "disabled" else ""
+      hiddenDisabledHtml = if inputProps.disabled then "disabled" else ""
 
       new Handlebars.SafeString """
-        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" #{hiddenDisabled}>
-        <input #{attributes.join ' '} />
+        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" #{hiddenDisabledHtml}>
+        <input #{$.raw attributes.join ' '} />
       """
 
     toPercentage: (number) ->

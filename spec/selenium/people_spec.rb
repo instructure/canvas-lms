@@ -312,7 +312,7 @@ describe "people" do
 
       expect(f('#create-users-step-1')).to be_displayed
       replace_content(f('#user_list_textarea'), 'student@example.com')
-      click_option('#enrollment_type', 'TaEnrollment', :value)
+      click_option('#role_id', ta_role.id.to_s, :value)
       click_option('#course_section_id', 'Unnamed Course', :text)
       f('#limit_privileges_to_course_section').click
       f('#next-step').click
@@ -325,7 +325,7 @@ describe "people" do
       #verify form and options have not changed
       expect(f('#create-users-step-1')).to be_displayed
       expect(f('#user_list_textarea').text).to eq 'student@example.com'
-      expect(first_selected_option(f('#enrollment_type')).text).to eq 'TA'
+      expect(first_selected_option(f('#role_id')).text).to eq 'TA'
       expect(first_selected_option(f('#course_section_id')).text).to eq 'Unnamed Course'
       is_checked('#limit_privileges_to_course_section') == true
     end

@@ -1,6 +1,7 @@
 define [
   'underscore'
   'react'
+  'react-router'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/filesEnv'
@@ -14,7 +15,7 @@ define [
   './FilePreview'
   './UploadDropZone'
   '../utils/forceScreenreaderToReparse'
-], (_, React, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone, forceScreenreaderToReparse) ->
+], (_, React, Router, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone, forceScreenreaderToReparse) ->
 
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
@@ -22,9 +23,13 @@ define [
   ShowFolder = React.createClass
     displayName: 'ShowFolder'
 
+    mixins: [Router.Navigation]
+
     debouncedForceUpdate: _.debounce ->
       @forceUpdate() if @isMounted()
     , 0
+
+    previousIdentifier: ""
 
     registerListeners: (props) ->
       return unless props.currentFolder
@@ -36,7 +41,13 @@ define [
       @props.currentFolder?.off(null, null, this)
 
     buildFolderPath: (splat) ->
-      encodeURI('/' + (splat || ''))
+      # We don't want the slashes to go away so we are doing some magic here
+      if (splat)
+        splat = splat.split('/').map((splatPiece) ->
+          encodeURIComponent(splatPiece)
+        ).join('/')
+
+      '/' + (splat || '')
 
     getCurrentFolder: ->
       path = @buildFolderPath(@props.params.splat)
@@ -62,6 +73,7 @@ define [
           parsedResponse = $.parseJSON(jqXHR.responseText)
         if parsedResponse
           @setState errorMessages: parsedResponse.errors
+          @redirectToCourseFiles() if @props.query.preview?
 
     componentWillMount: ->
       @registerListeners(@props)
@@ -75,6 +87,7 @@ define [
 
     componentDidUpdate: ->
       # hooray for a11y
+      @redirectToCourseFiles() if not @props.currentFolder? or @props.currentFolder?.get('locked_for_user')
       forceScreenreaderToReparse(@getDOMNode())
 
     componentWillReceiveProps: (newProps) ->
@@ -84,6 +97,22 @@ define [
       [newProps.currentFolder.folders, newProps.currentFolder.files].forEach (collection) ->
         updateAPIQuerySortParams(collection, newProps.query)
 
+    redirectToCourseFiles: ->
+      isntPreviousFolder = @props.currentFolder? and (@previousIdentifier? isnt @props.currentFolder.get('id').toString())
+      isPreviewForFile = @props.name isnt 'rootFolder' and @props.query.preview? and @previousIdentifier isnt @props.query.preview
+
+      if isntPreviousFolder or isPreviewForFile
+        @previousIdentifier = @props.currentFolder?.get('id').toString() or @props.query.preview.toString()
+
+        unless isPreviewForFile
+          message = I18n.t('This folder is currently locked and unavailable to view.')
+          $.flashError message
+          $.screenReaderFlashMessage message
+
+        setTimeout(=>
+          @transitionTo filesEnv.baseUrl, {}, @props.query
+        , 0)
+
     render: withReactDOM ->
       if @state?.errorMessages
         return div {},
@@ -91,9 +120,17 @@ define [
             div className: 'muted', error.message
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
       div role: 'grid',
+
+        div {
+          ref: 'accessibilityMessage'
+          className: 'ShowFolder__accessbilityMessage col-xs',
+          tabIndex: 0
+        },
+          I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")
         UploadDropZone(currentFolder: @props.currentFolder)
         CurrentUploads({})
         ColumnHeaders {
+          ref: 'columnHeaders'
           to: (if @props.params.splat then 'folder' else 'rootFolder')
           query: @props.query
           params: @props.params
@@ -123,6 +160,7 @@ define [
         # As long as ?preview is present in the url.
         if @props.query.preview?
           FilePreview
+            usageRightsRequiredForContext: @props.usageRightsRequiredForContext
             currentFolder: @props.currentFolder
             params: @props.params
             query: @props.query

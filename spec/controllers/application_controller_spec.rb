@@ -417,7 +417,7 @@ describe WikiPagesController do
       course_with_teacher_logged_in :active_all => true
       controller.instance_variable_set(:@context, @course)
 
-      get 'pages_index', :course_id => @course.id
+      get 'index', :course_id => @course.id
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
       expect(controller.js_env[:WIKI_RIGHTS]).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]

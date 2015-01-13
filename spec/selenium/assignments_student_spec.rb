@@ -11,7 +11,6 @@ describe "assignments" do
     end
 
     before do
-      Account.default.enable_feature!(:draft_state)
       @due_date = Time.now.utc + 2.days
       @assignment = @course.assignments.create!(:title => 'default assignment', :name => 'default assignment', :due_at => @due_date)
     end
@@ -80,19 +79,6 @@ describe "assignments" do
 
       expect(f('.ui-state-error')).to be_displayed
       expect(f('#assignment_show')).to be_nil
-    end
-
-    it "should verify student creatable group creation" do
-      new_group_name = 'student created group'
-      get "/courses/#{@course.id}/groups"
-
-      f('.add_group_link').click
-      wait_for_ajaximations
-      f('#group_name').send_keys(new_group_name)
-      submit_form('#add_group_form')
-      wait_for_ajaximations
-      expect(f('.group_list')).to include_text(new_group_name)
-      expect(Group.where(name: new_group_name).first).to be_present
     end
 
     it "should verify lock until date is enforced" do

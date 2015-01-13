@@ -23,6 +23,9 @@ define [
       $this.stop(true, true).remove()
   initFlashContainer() # look for the container on script load
 
+  ###
+  xsslint safeString.function escapeContent
+  ###
   escapeContent = (content) ->
     if content.hasOwnProperty('html') then content.html else htmlEscape(content)
 
@@ -37,10 +40,10 @@ define [
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
-      <li class="ic-flash-#{type}">
+      <li class="ic-flash-#{htmlEscape(type)}">
         <i></i>
         #{escapeContent(content)}
-        <a href="#" class="close_link icon-end">#{I18n.t("close", "Close")}</a>
+        <a href="#" class="close_link icon-end">#{htmlEscape I18n.t("close", "Close")}</a>
       </li>
     """)
 

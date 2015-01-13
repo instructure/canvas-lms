@@ -52,22 +52,22 @@ define([
           $publish_grades_error = $("#publish_grades_error");
       if (GradePublishing.status == 'published') {
         $publish_grades_error.hide();
-        $publish_grades_link.html(I18n.t('links.republish', "Republish grades to SIS"));
+        $publish_grades_link.text(I18n.t('links.republish', "Republish grades to SIS"));
         $publish_grades_link.removeClass("disabled");
       } else if (GradePublishing.status == 'publishing' || GradePublishing.status == 'pending') {
         $publish_grades_error.hide();
-        $publish_grades_link.html(I18n.t('links.publishing', "Publishing grades to SIS..."));
+        $publish_grades_link.text(I18n.t('links.publishing', "Publishing grades to SIS..."));
         if (!requestInProgress) {
           setTimeout(GradePublishing.checkup, 5000);
         }
         $publish_grades_link.addClass("disabled");
       } else if (GradePublishing.status == 'unpublished') {
         $publish_grades_error.hide();
-        $publish_grades_link.html(I18n.t('links.publish', "Publish grades to SIS"));
+        $publish_grades_link.text(I18n.t('links.publish', "Publish grades to SIS"));
         $publish_grades_link.removeClass("disabled");
       } else {
         $publish_grades_error.show();
-        $publish_grades_link.html(I18n.t('links.republish', "Republish grades to SIS"));
+        $publish_grades_link.text(I18n.t('links.republish', "Republish grades to SIS"));
         $publish_grades_link.removeClass("disabled");
       }
       $messages = $("#publish_grades_messages");

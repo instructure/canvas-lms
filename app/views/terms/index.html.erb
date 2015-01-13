@@ -1,68 +1,21 @@
 <% @active_tab = "terms" %>
 <% content_for :page_title do %><%= t :page_title, "%{account} Terms", :account => @context.name %><% end %>
 
-<style>
-#wrapper-container {
-  min-width: 1100px;
-}
-.term .edit_term {
-  display: none;
-}
-.term.editing_term .show_term {
-  display: none;
-}
-.term.editing_term .edit_term {
-  display: block;
-}
-#terms .term td.header {
-  font-size: 1.2em;
-  padding-right: 20px;
-}
-.term .permissions {
-  font-size: 0.8em;
-}
-#terms {
-  border-collapse: collapse;
-  width: 100%;
-}
-#terms td {
-  vertical-align: top;
-}
-#terms td.header, #terms td.permissions, #terms td.links {
-  border-bottom: 1px solid #aaa;
-  padding: 2px 0;
-}
-#terms td.links {
-  padding-left: 5px;
-}
-#terms form.enrollment_term_form {
-  width: 80%;
-}
-#terms form.enrollment_term_form .control-group {
-  margin-bottom: 0px;
-}
-#terms form.enrollment_term_form label {
-  margin-bottom: 0px;
-}
-#terms form.enrollment_term_form .edit_term_buttons {
-  text-align: right;
-  width: 286px;
-}
-</style>
-
 <% js_bundle 'legacy/terms_index' %>
+<% jammit_css :terms %>
+
 <h1><%= t 'titles.term_details', "Term Details" %></h1>
-<div style="margin: 0 10px; width: auto;">
-<table id="terms">
-  <% @terms.each do |term| %>
-    <%= render :partial => "term", :object => term %>
-  <% end %>
-  <%= render :partial => "term", :object => nil %>
-  <tr>
-    <td colspan="3">
-      <a href="#" class="icon-add add_term_link"><%= t 'links.add_new_term', "Add New Term" %></a>
-    </td>
-  </tr>
-</table>
+<div class="terms-wrapper">
+  <table id="terms">
+    <% @terms.each do |term| %>
+      <%= render :partial => "term", :object => term %>
+    <% end %>
+    <%= render :partial => "term", :object => nil %>
+    <tr>
+      <td colspan="3">
+        <a href="#" class="icon-add add_term_link"><%= t 'links.add_new_term', "Add New Term" %></a>
+      </td>
+    </tr>
+  </table>
 </div>
 <a href="<%= context_url(@context, :context_term_url, "{{ id }}") %>" class="term_url" style="display: none;">&nbsp;</a>

@@ -185,7 +185,7 @@ a {
     top: -10px;
     left: 50%;
     margin-left: -11px;
-    @include rotate(45deg);
+    transform: rotate(45deg);
     border: 1px solid #bbb;
     border-right: none;
     border-bottom: none;

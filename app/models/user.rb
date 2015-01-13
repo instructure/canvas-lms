@@ -138,6 +138,7 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
   has_many :sis_batches
+  has_many :sis_post_grades_statuses
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
@@ -580,6 +581,16 @@ class User < ActiveRecord::Base
     where("groups.workflow_state <> 'deleted'")
   end
 
+  # Returns an array of groups which are currently visible for the user.
+  def visible_groups
+    @visible_groups ||= begin
+      enrollments = self.cached_current_enrollments(preload_courses: true)
+      visible_groups = self.current_groups.select do |group|
+        group.context_type != 'Course' || enrollments.any? { |en| en.course == group.context && (en.admin? || en.course.available?)}
+      end
+    end
+  end
+
   def <=>(other)
     self.name <=> other.name
   end
@@ -973,19 +984,19 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :read and can :read_as_admin and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
+    can :read and can :read_profile and can :read_as_admin and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
 
     given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
-    can :rename and can :create_user_notes and can :read_user_notes
+    can :read_profile and can :create_user_notes and can :read_user_notes
 
     # by default this means that the user we are given is an administrator
     # of an account of one of the courses that this user is enrolled in, or
     # an admin (teacher/ta/designer) in the course
     given { |user| self.check_courses_right?(user, :read_reports) }
-    can :rename and can :remove_avatar and can :read_reports
+    can :read_profile and can :remove_avatar and can :read_reports
 
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
@@ -1015,7 +1026,7 @@ class User < ActiveRecord::Base
         self.associated_accounts.any? {|a| a.grants_right?(user, :manage_students) }
       )
     end
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read and can :read_reports and can :manage_feature_flags
+    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and can :view_statistics and can :read and can :read_reports and can :manage_feature_flags
 
     given do |user|
       user && (
@@ -1033,7 +1044,7 @@ class User < ActiveRecord::Base
          self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
       )
     end
-    can :manage_user_details and can :rename
+    can :manage_user_details and can :rename and can :read_profile
 
     given{ |user| self.pseudonyms.with_each_shard.any?{ |p| p.grants_right?(user, :update) } }
     can :merge
@@ -1612,25 +1623,22 @@ class User < ActiveRecord::Base
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
           scope = send(actual_association)
+
+          shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
             ids = self.favorite_context_ids("Course")
             if ids.empty?
               scope = scope.none
             else
-              shards = in_region_associated_shards
-              ids = ids.select { |id| shards.include?(Shard.shard_for(id)) }
-              # let the relation auto-determine which shards to query
-              scope.shard_source_value = :implicit
+              shards = shards & ids.map { |id| Shard.shard_for(id) }
               scope = scope.where(id: ids)
             end
-          else
-            scope = scope.shard(in_region_associated_shards)
           end
 
           courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
               order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
-              distinct_on(:id).to_a
+              distinct_on(:id).with_each_shard(*shards)
 
           unless options[:include_completed_courses]
             enrollments = Enrollment.where(:id => courses.map { |c| Shard.relative_id_for(c.primary_enrollment_id, c.shard, Shard.current) }).all
@@ -1717,9 +1725,13 @@ class User < ActiveRecord::Base
     end
   end
 
+  def group_membership_key
+    [self, 'current_group_memberships', ApplicationController.region].cache_key
+  end
+
   def cached_current_group_memberships
     self.shard.activate do
-      @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships', ApplicationController.region].cache_key) do
+      @cached_current_group_memberships = Rails.cache.fetch(group_membership_key) do
         self.current_group_memberships.shard(self.in_region_associated_shards).to_a
       end
     end

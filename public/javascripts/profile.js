@@ -266,7 +266,7 @@ define([
     var $dialog = $("#token_details_dialog");
     var url = $(this).attr('rel');
     $dialog.dialog({
-      width: 600
+      width: 700
     });
     var $token = $(this).parents(".access_token");
     $dialog.data('token', $token);

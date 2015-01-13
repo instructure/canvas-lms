@@ -1,4 +1,4 @@
-define(['jquery', 'i18n!LongTextEditor'], function($, I18n) {
+define(['jquery', 'i18n!LongTextEditor', 'str/htmlEscape'], function($, I18n, htmlEscape) {
 
   /*
    * this is just LongTextEditor from slick.editors.js but with i18n and a
@@ -15,12 +15,12 @@ define(['jquery', 'i18n!LongTextEditor'], function($, I18n) {
       $wrapper = $("<DIV class=dontblur style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
           .appendTo($container);
 
-      $input = $("<TEXTAREA hidefocus maxlength="+args.maxLength+" rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
+      $input = $("<TEXTAREA hidefocus maxlength="+htmlEscape(args.maxLength)+" rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
           .appendTo($wrapper);
 
       var saveText = I18n.t("save", "Save");
       var cancelText = I18n.t("cancel", "Cancel");
-      $("<DIV style='text-align:right'><BUTTON>"+saveText+"</BUTTON><BUTTON>"+cancelText+"</BUTTON></DIV>")
+      $("<DIV style='text-align:right'><BUTTON>"+htmlEscape(saveText)+"</BUTTON><BUTTON>"+htmlEscape(cancelText)+"</BUTTON></DIV>")
           .appendTo($wrapper);
 
       $wrapper.find("button:first").bind("click", this.save);

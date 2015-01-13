@@ -57,7 +57,7 @@ class EnrollmentsFromUserList
     return unless user
     return if @enrolled_users.has_key?(user.id)
     @enrolled_users[user.id] = true
-    @course.enroll_user(user, @enrollment_type, :section => @section, :limit_privileges_to_course_section => @limit_privileges_to_course_section, :role => @role).tap do |e|
+    @course.enroll_user(user, @enrollment_type, :section => @section, :limit_privileges_to_course_section => @limit_privileges_to_course_section, :allow_multiple_enrollments => true, :role => @role).tap do |e|
       @enrollments << e if e
     end
   end

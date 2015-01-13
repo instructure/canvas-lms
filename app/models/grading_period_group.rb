@@ -5,15 +5,15 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   # Naive permissions, need to be fleshed out
   set_policy do
-    given { |user, http_session| (course || account).grants_right?(user, http_session, :read) }
+    given { |user| (course || account).grants_right?(user, :read) }
     can :read
 
-    given do |user, http_session|
+    given do |user|
       return false unless (course || account).root_account.feature_enabled?(:multiple_grading_periods)
       if course
-        course.grants_right?(user, http_session, :update)
+        course.grants_right?(user, :update)
       elsif account
-        account.grants_right?(user, http_session, :manage_courses)
+        account.grants_right?(user, :manage_courses)
       end
     end
     can :read and can :update and can :create and can :delete

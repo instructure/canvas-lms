@@ -411,6 +411,7 @@ describe "Accounts API", type: :request do
         expect(json.first['id']).to eq @c1.id
         expect(json.first['name']).to eq 'c1'
         expect(json.first['account_id']).to eq @c1.account_id
+        expect(json.first['is_public']).to eq true
 
         expect(json.last['id']).to eq @c2.id
         expect(json.last['name']).to eq 'c2'
@@ -431,6 +432,13 @@ describe "Accounts API", type: :request do
         expect(json.first['account_id']).to eq @c2.account_id
 
       end
+    end
+
+    it "should honor the includes[]" do
+      @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb",
+                      { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :include => ['storage_quota_used_mb'] }, {})
+      expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
     end
 
     describe "courses filtered by state[]" do

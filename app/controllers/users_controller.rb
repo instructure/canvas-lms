@@ -101,6 +101,11 @@
 #           "description": "Optional: This field is only returned in ceratin API calls, and will return the IANA time zone name of the user's preferred timezone.",
 #           "example": "America/Denver",
 #           "type": "string"
+#         },
+#         "bio": {
+#           "description": "Optional: The user's bio.",
+#           "example": "I like the Muppets.",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -621,6 +626,7 @@ class UsersController < ApplicationController
     @courses = @query.present? ?
       @context.manageable_courses_name_like(@query, include_concluded) :
       @context.manageable_courses(include_concluded).limit(500)
+    @courses = @courses.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key')
 
     cancel_cache_buster
     expires_in 30.minutes

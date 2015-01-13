@@ -37,6 +37,7 @@ class ActiveRecord::Base
     'discussion_topics' => %w(authorization_list_id),
     'enrollment_terms' => %w(sis_data sis_name ignore_term_date_restrictions),
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections role_name),
+    'external_feeds' => %w(body_match feed_type feed_purpose),
     'failed_jobs' => %w(original_id),
     'grading_periods' => %w(course_id account_id),
     'groups' => %w(sis_name type groupable_id groupable_type),
@@ -48,7 +49,8 @@ class ActiveRecord::Base
     'quizzes' => %w(root_quiz_id),
     'stream_items' => %w{context_code item_asset_string},
     'stream_item_instances' => %w(context_code),
-    'submissions' => %w(changed_since_publish late)
+    'submissions' => %w(changed_since_publish late),
+    'wiki_pages' => %w(hide_from_students)
   }.freeze
 
   def self.columns_with_remove_dropped_columns

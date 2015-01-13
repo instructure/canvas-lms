@@ -41,7 +41,7 @@ class Wiki < ActiveRecord::Base
 
   def set_has_no_front_page_default
     if self.has_no_front_page.nil? && self.id && context
-      self.has_no_front_page = true if context.feature_enabled?(:draft_state)
+      self.has_no_front_page = true
     end
   end
   private :set_has_no_front_page_default
@@ -102,8 +102,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def get_front_page_url
-    return nil unless self.has_front_page? || !context.feature_enabled?(:draft_state)
-    self.front_page_url || DEFAULT_FRONT_PAGE_URL
+    self.front_page_url if self.has_front_page?
   end
 
   def unset_front_page!
@@ -150,7 +149,7 @@ class Wiki < ActiveRecord::Base
     given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items)}
     can :view_unpublished_items
 
-    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
+    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.respond_to?(:allow_student_wiki_edits) && self.context.allow_student_wiki_edits}
     can :read and can :create_page and can :update_page and can :update_page_content
 
     given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
@@ -196,8 +195,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def path
-    if self.context.respond_to?(:feature_enabled?)
-      self.context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'
-    end
+    # was a shim for draft state, can be removed
+    'pages'
   end
 end

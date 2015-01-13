@@ -40,8 +40,6 @@ module CC
           feeds_node.externalFeed(:identifier=>migration_id) do |feed_node|
             feed_node.title feed.title if feed.title
             feed_node.url feed.url
-            feed_node.feed_type feed.feed_type
-            feed_node.purpose feed.feed_purpose
             feed_node.verbosity feed.verbosity
             feed_node.header_match feed.header_match unless feed.header_match.blank?
           end

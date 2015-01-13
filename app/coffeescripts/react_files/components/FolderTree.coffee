@@ -1,10 +1,13 @@
 define [
+  'jquery'
+  'i18n!folder_tree'
   'react'
   'react-router'
-  'compiled/views/TreeBrowserView'
+  '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
-], (React, Router, TreeBrowserView, RootFoldersFinder, customPropTypes) ->
+  'compiled/jquery.rails_flash_notifications'
+], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes) ->
 
   FolderTree = React.createClass
     displayName: 'FolderTree'
@@ -19,27 +22,41 @@ define [
       rootFoldersFinder = new RootFoldersFinder({
         rootFoldersToShow: @props.rootFoldersToShow
       })
-      new TreeBrowserView({
-        onlyShowFolders: true,
-        rootModelsFinder: rootFoldersFinder
-        onClick: @onClick
-        dndOptions: @props.dndOptions
-        href: @hrefFor
-        focusStyleClass: @focusStyleClass
-        selectedStyleClass: @selectedStyleClass
-      }).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode())
+
+      @treeBrowserId = BBTreeBrowserView.create({
+          onlyShowFolders: true,
+          rootModelsFinder: rootFoldersFinder
+          onClick: @onClick
+          dndOptions: @props.dndOptions
+          href: @hrefFor
+          focusStyleClass: @focusStyleClass
+          selectedStyleClass: @selectedStyleClass
+        },
+        {
+          render: true
+          element: @refs.FolderTreeHolder.getDOMNode()
+        }).index
+
       @expandTillCurrentFolder(@props)
 
+    componentWillUnmount: ->
+      BBTreeBrowserView.remove(@treeBrowserViewId)
 
     componentWillReceiveProps: (newProps) ->
       @expandTillCurrentFolder(newProps)
-
 
     onClick: (event, folder) ->
       event.preventDefault()
       $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @focusStyleClass).each( (key, value) => $(value).removeClass(@focusStyleClass))
       $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @selectedStyleClass).each( (key, value) => $(value).removeClass(@selectedStyleClass))
-      @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+      if folder.get('locked_for_user')
+        message = I18n.t('This folder is currently locked and unavailable to view.')
+        $.flashError message
+        $.screenReaderFlashMessage message
+      else
+        $.screenReaderFlashMessageExclusive I18n.t('File list updated')
+        @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+
 
 
     hrefFor: (folder) ->

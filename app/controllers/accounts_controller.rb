@@ -245,6 +245,9 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"]
+  #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read)
@@ -302,10 +305,14 @@ class AccountsController < ApplicationController
       end
     end
 
+    includes = Set.new(Array(params[:include]))
+    # We only want to return the permissions for single courses and not lists of courses.
+    includes.delete 'permissions'
+
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
 
     ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account])
-    render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
+    render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end
 
   # Delegated to by the update action (when the request is an api_request?)
@@ -462,6 +469,12 @@ class AccountsController < ApplicationController
           end
         end
 
+        if params[:account][:settings] && params[:account][:settings].has_key?(:trusted_referers)
+          if trusted_referers = params[:account][:settings].delete(:trusted_referers)
+            @account.trusted_referers = trusted_referers if @account.root_account?
+          end
+        end
+
         if sis_id = params[:account].delete(:sis_source_id)
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
@@ -517,8 +530,10 @@ class AccountsController < ApplicationController
       end
       @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
-      @role_types = RoleOverride.account_membership_types(@account)
-      @enrollment_types = RoleOverride.enrollment_type_labels
+
+      @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
+      @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
+
       @announcements = @account.announcements
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
       js_env :APP_CENTER => {

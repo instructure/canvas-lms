@@ -23,6 +23,29 @@ describe CanvasPartman::Concerns::Partitioned do
       expect(count_records('partman_animals_2014_12')).to eq 1
     end
 
+    context 'with UTC timestamps' do
+      before do
+        @original_tz = Time.zone
+        Time.zone = "MST"
+      end
+
+      after do
+        Time.zone = @original_tz
+      end
+
+      it 'should locate the correct partition table' do
+        subject.create_partition(Time.new(2014, 12))
+        subject.create_partition(Time.new(2015, 1))
+
+        expect {
+          # this would be at new years of 2015 in UTC: 1/1/2015 00:00:00
+          Animal.create({
+            created_at: Time.zone.local(2014, 12, 31, 17, 0, 0, 0)
+          })
+        }.not_to raise_error
+      end
+    end
+
     context 'via an association scope' do
       it 'works' do
         subject.create_partition(Time.new(2014, 11))

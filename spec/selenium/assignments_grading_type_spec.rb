@@ -15,12 +15,11 @@ describe "assignments" do
     yield if block_given?
     f('.btn-primary[type=submit]').click
     wait_for_ajaximations
-    expect(fj('.error_text div').text).to eq "Points possible must be more than 0 for selected grading type"
+    expect(fj('.error_text div').text).to eq "Points possible must be 0 or more for selected grading type"
   end
 
   before(:each) do
-      course_with_teacher_logged_in(:draft_state => true)
-      set_course_draft_state
+    course_with_teacher_logged_in
   end
 
   %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
@@ -41,12 +40,6 @@ describe "assignments" do
     end
   end
 
-  it "should validate points for percentage grading (> 0)" do
-    point_validation {
-      click_option('#assignment_grading_type', 'Percentage')
-    }
-  end
-
   it "should validate points for percentage grading (!= '')" do
     point_validation {
       click_option('#assignment_grading_type', 'Percentage')
@@ -61,12 +54,6 @@ describe "assignments" do
     }
   end
 
-  it "should validate points for letter grading (> 0)" do
-    point_validation {
-      click_option('#assignment_grading_type', 'Letter Grade')
-    }
-  end
-
   it "should validate points for letter grading (!= '')" do
     point_validation {
       click_option('#assignment_grading_type', 'Letter Grade')
@@ -78,12 +65,6 @@ describe "assignments" do
     point_validation {
       click_option('#assignment_grading_type', 'Letter Grade')
       replace_content f('#assignment_points_possible'), ('taco')
-    }
-  end
-
-  it "should validate points for GPA scale grading (> 0)" do
-    point_validation {
-      click_option('#assignment_grading_type', 'GPA Scale')
     }
   end
 

@@ -28,7 +28,8 @@ describe FeatureFlag do
       'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount'),
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account'),
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course'),
-      'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User')
+      'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User'),
+      'hidden_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course')
     })
   end
 
@@ -107,6 +108,35 @@ describe FeatureFlag do
           expect(t_flag.locked?(t_root_account)).to be_truthy
         end
       end
+    end
+  end
+
+  describe "unhides_feature?" do
+    it "should be true on a site admin feature flag" do
+      Account.site_admin.allow_feature! :hidden_feature
+      expect(Account.site_admin.lookup_feature_flag(:hidden_feature)).to be_unhides_feature
+    end
+
+    it "should be true on a root account feature flag with no site admin flag set" do
+      t_root_account.allow_feature! :hidden_feature
+      expect(t_root_account.lookup_feature_flag(:hidden_feature)).to be_unhides_feature
+    end
+
+    it "should be false on a root account feature flag with site admin flag set" do
+      Account.site_admin.allow_feature! :hidden_feature
+      t_root_account.enable_feature! :hidden_feature
+      expect(t_root_account.lookup_feature_flag(:hidden_feature)).not_to be_unhides_feature
+    end
+
+    it "should be true on a sub-account feature flag with no root or site admin flags set" do
+      t_sub_account.allow_feature! :hidden_feature
+      expect(t_sub_account.lookup_feature_flag(:hidden_feature)).to be_unhides_feature
+    end
+
+    it "should be false on a sub-account feature flag with a root flag set" do
+      t_root_account.allow_feature! :hidden_feature
+      t_sub_account.enable_feature! :hidden_feature
+      expect(t_sub_account.lookup_feature_flag(:hidden_feature)).not_to be_unhides_feature
     end
   end
 end

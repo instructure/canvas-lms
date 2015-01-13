@@ -211,7 +211,10 @@ class Course < ActiveRecord::Base
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
   has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
   has_many :grading_period_groups, dependent: :destroy
+  has_many :grading_periods, through: :grading_period_groups
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
+
+  has_many :sis_post_grades_statuses
 
   include Profile::Association
 
@@ -351,7 +354,7 @@ class Course < ActiveRecord::Base
 
   def unpublishable?
     ids = self.all_real_students.pluck :id
-    !self.submissions.with_point_data.where(:user_id => ids).exists?
+    !self.submissions.with_assignment.with_point_data.where(:user_id => ids).exists?
   end
 
   def self.update_account_associations(courses_or_course_ids, opts = {})
@@ -967,6 +970,10 @@ class Course < ActiveRecord::Base
     self.storage_quota = val.try(:to_i).try(:megabytes)
   end
 
+  def storage_quota_used_mb
+    Attachment.get_quota(self)[:quota_used].to_f / 1.megabyte
+  end
+
   def storage_quota
     return read_attribute(:storage_quota) ||
       (self.account.default_storage_quota rescue nil) ||
@@ -1334,8 +1341,8 @@ class Course < ActiveRecord::Base
     scope = self.student_enrollments.not_fake
     scope = scope.where(user_id: user_ids_to_publish) if user_ids_to_publish
     scope.update_all(:grade_publishing_status => "pending",
-                                        :grade_publishing_message => nil,
-                                        :last_publish_attempt_at => last_publish_attempt_at)
+                     :grade_publishing_message => nil,
+                     :last_publish_attempt_at => last_publish_attempt_at)
 
     send_later_if_production(:send_final_grades_to_endpoint, publishing_user, user_ids_to_publish)
     send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
@@ -1463,7 +1470,9 @@ class Course < ActiveRecord::Base
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = calc.assignments
+    assignments = calc.assignments.sort_by { |a|
+      [a.assignment_group_id, a.position, a.due_at, a.title]
+    }
     groups = calc.groups
 
     read_only = t('csv.read_only_field', '(read only)')
@@ -1723,56 +1732,6 @@ class Course < ActiveRecord::Base
       self.grading_standard_id ||= 0
     else
       self.grading_standard = self.grading_standard_id = nil
-    end
-  end
-
-  def add_aggregate_entries(entries, feed)
-    if feed.feed_purpose == 'announcements'
-      entries.each do |entry|
-        user = entry.user || feed.user
-        # If already existed and has been updated
-        if entry.entry_changed? && entry.asset
-          entry.asset.update_attributes(
-            :title => entry.title,
-            :message => entry.message
-          )
-        elsif !entry.asset
-          announcement = self.announcements.build(
-            :title => entry.title,
-            :message => entry.message
-          )
-          announcement.user = user
-          announcement.save
-          entry.update_attributes(:asset => announcement)
-        end
-      end
-    elsif feed.feed_purpose == 'calendar'
-      entries.each do |entry|
-        user = entry.user || feed.user
-        # If already existed and has been updated
-        if entry.entry_changed? && entry.asset
-          event = entry.asset
-          event.attributes = {
-            :title => entry.title,
-            :description => entry.message,
-            :start_at => entry.start_at,
-            :end_at => entry.end_at
-          }
-          event.workflow_state = 'cancelled' if entry.cancelled?
-          event.save
-        elsif entry.active? && !entry.asset
-          event = self.calendar_events.build(
-            :title => entry.title,
-            :description => entry.message,
-            :start_at => entry.start_at,
-            :end_at => entry.end_at
-          )
-          event.workflow_state = 'read_only'
-          event.workflow_state = 'cancelled' if entry.cancelled?
-          event.save
-          entry.update_attributes(:asset => event)
-        end
-      end
     end
   end
 
@@ -2152,9 +2111,10 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def users_visible_to(user, include_priors=false)
+  def users_visible_to(user, include_priors=false, opts={})
     visibilities = section_visibilities_for(user)
     scope = include_priors ? users : current_users
+    scope =  scope.where(:enrollments => {:workflow_state => opts[:enrollment_state]}) if opts[:enrollment_state]
     # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case enrollment_visibility_level_for(user, visibilities)
       when :full then scope
@@ -2251,7 +2211,7 @@ class Course < ActiveRecord::Base
       { :id => TAB_DISCUSSIONS, :label => t('#tabs.discussions', "Discussions"), :css_class => 'discussions', :href => :course_discussion_topics_path },
       { :id => TAB_GRADES, :label => t('#tabs.grades', "Grades"), :css_class => 'grades', :href => :course_grades_path, :screenreader => t('#tabs.course_grades', "Course Grades") },
       { :id => TAB_PEOPLE, :label => t('#tabs.people', "People"), :css_class => 'people', :href => :course_users_path },
-      { :id => TAB_PAGES, :label => t('#tabs.pages', "Pages"), :css_class => 'pages', :href => :course_wiki_pages_path },
+      { :id => TAB_PAGES, :label => t('#tabs.pages', "Pages"), :css_class => 'pages', :href => :course_wiki_path },
       { :id => TAB_FILES, :label => t('#tabs.files', "Files"), :css_class => 'files', :href => :course_files_path },
       { :id => TAB_SYLLABUS, :label => t('#tabs.syllabus', "Syllabus"), :css_class => 'syllabus', :href => :syllabus_course_assignments_path },
       { :id => TAB_OUTCOMES, :label => t('#tabs.outcomes', "Outcomes"), :css_class => 'outcomes', :href => :course_outcomes_path },
@@ -2526,9 +2486,10 @@ class Course < ActiveRecord::Base
   def reset_content
     Course.transaction do
       new_course = Course.new
-      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id].include?(k.to_sym) }.each do |key, val|
+      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id, :workflow_state].include?(k.to_sym) }.each do |key, val|
         new_course.write_attribute(key, val)
       end
+      new_course.workflow_state = 'created'
       # there's a unique constraint on this, so we need to clear it out
       self.self_enrollment_code = nil
       self.self_enrollment = false
@@ -2554,8 +2515,8 @@ class Course < ActiveRecord::Base
       self.workflow_state = 'deleted'
       self.save!
       # Assign original course profile to the new course (automatically saves it)
-      new_course.profile = self.profile
-
+      new_course.profile = self.profile unless self.profile.new_record?
+      
       Course.find(new_course.id)
     end
   end

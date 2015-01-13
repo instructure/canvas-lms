@@ -26,9 +26,9 @@ describe "settings tabs" do
     yield if block_given?
     submit_form("#add_notification_form")
     wait_for_ajax_requests
-    notification = AccountNotification.first    
+    notification = AccountNotification.first
     expect(notification.message).to include_text("this is a message")
-    expect(notification.subject).to include_text(subject)      
+    expect(notification.subject).to include_text(subject)
     expect(f("#tab-announcements .user_content").text).to eq "this is a message"
     login_text = f("#header .user_name").text
     expect(f("#tab-announcements .announcement-details").text).to include_text(login_text)

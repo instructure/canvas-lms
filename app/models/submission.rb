@@ -271,6 +271,7 @@ class Submission < ActiveRecord::Base
     strip_tags((self.body || "").gsub(/\<\s*br\s*\/\>/, "\n<br/>").gsub(/\<\/p\>/, "</p>\n"))
   end
 
+  TURNITIN_STATUS_RETRY = 11
   def check_turnitin_status(attempt=1)
     self.turnitin_data ||= {}
     turnitin = nil
@@ -283,7 +284,7 @@ class Submission < ActiveRecord::Base
       data = self.turnitin_data[asset_string]
       next unless data && data.is_a?(Hash) && data[:object_id]
       if data[:similarity_score].blank?
-        if attempt < TURNITIN_RETRY
+        if attempt < TURNITIN_STATUS_RETRY
           turnitin ||= Turnitin::Client.new(*self.context.turnitin_settings)
           res = turnitin.generateReport(self, asset_string)
           if res[:similarity_score]
@@ -310,7 +311,7 @@ class Submission < ActiveRecord::Base
       self.turnitin_data[asset_string] = data
     end
 
-    send_at((5 * attempt).minutes.from_now, :check_turnitin_status, attempt + 1) if needs_retry
+    send_at((2 ** attempt).minutes.from_now, :check_turnitin_status, attempt + 1) if needs_retry
     self.turnitin_data_changed!
     self.save
   end
@@ -791,6 +792,8 @@ class Submission < ActiveRecord::Base
     state :graded
   end
 
+  scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
+
   scope :graded, -> { where("submissions.grade IS NOT NULL") }
 
   scope :ungraded, -> { where(:grade => nil).includes(:assignment) }
@@ -1198,5 +1201,61 @@ class Submission < ActiveRecord::Base
 
   def without_graded_submission?
     !self.has_submission? && !self.graded?
+  end
+
+  def self.queue_bulk_update(context, section, assignment, grader, grade_data)
+    progress = Progress.create!(:context => assignment, :tag => "submissions_update")
+    progress.process_job(self, :process_bulk_update, {}, context, section, assignment, grader, grade_data)
+    progress
+  end
+
+  def self.process_bulk_update(progress, context, section, assignment, grader, grade_data)
+    missing_ids = []
+
+    scope = assignment.students_with_visibility(context.students_visible_to(grader))
+    if section
+      scope = scope.where(:enrollments => { :course_section_id => section })
+    end
+
+    preloaded_users = scope.where(:id => grade_data.map{|id, data| id})
+
+    Delayed::Batch.serial_batch(:priority => Delayed::LOW_PRIORITY) do
+      grade_data.each do |user_id, user_data|
+
+        user = preloaded_users.detect{|u| u.global_id == Shard.global_id_for(user_id)}
+        if !user && (params = Api.sis_find_params_for_collection(scope, [user_id], context.root_account)) && params != :not_found
+          params[:limit] = 1
+          user = scope.all(params).first
+        end
+        unless user
+          missing_ids << user_id
+          next
+        end
+
+        if grade = user_data[:posted_grade]
+          submissions = assignment.grade_student(user, { :grader => grader, :grade => grade})
+          submission = submissions.first
+        else
+          submission = assignment.find_or_create_submission(user)
+        end
+
+        assessment = user_data[:rubric_assessment]
+        if assessment.is_a?(Hash) && assignment.rubric_association
+          # prepend each key with "criterion_", which is required by the current
+          # RubricAssociation#assess code.
+          assessment.keys.each do |crit_name|
+            assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
+          end
+          assignment.rubric_association.assess(
+            :assessor => grader, :user => user, :artifact => submission,
+            :assessment => assessment.merge(:assessment_type => 'grading'))
+        end
+      end
+    end
+    if missing_ids.any?
+      progress.message = "Couldn't find User(s) with API ids #{missing_ids.map{|id| "'#{id}'"}.join(", ")}"
+      progress.save
+      progress.fail
+    end
   end
 end

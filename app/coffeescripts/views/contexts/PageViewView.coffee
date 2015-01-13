@@ -36,8 +36,8 @@ define [
     #
     # Returns nothing.
     render: ->
-      html = _.map(@collection.models, @renderPageView)
-      @$el.append(html.join(''))
+      html = _.map(@collection.models, @renderPageView).join('')
+      @$el.append(html)
       super
 
     # Public: Return HTML for a given record.

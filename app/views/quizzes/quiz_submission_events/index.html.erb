@@ -1,0 +1,3 @@
+<% content_for :page_title, join_title(@quiz_submission.id, t(:page_title, "Event Log")) %>
+<% jammit_css :quizzes, :canvas_quizzes %>
+<% js_bundle :quiz_submission_events %>

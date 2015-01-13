@@ -12,4 +12,7 @@
   @else if $breakpoint == wide {
     @media only screen and (min-width: 1024px) { @content; }
   }
+  @else if $breakpoint == short {
+    @media only screen and (max-height: 600px) { @content; }
+  }
 }

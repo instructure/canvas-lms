@@ -105,11 +105,26 @@
 #           "type": "integer"
 #         },
 #         "id": {
+#           "description": "The id of rubric criteria.",
 #           "example": "crit1",
+#           "type": "string"
+#         },
+#         "outcome_id": {
+#           "description": "(Optional) The id of the learning outcome this criteria uses, if any.",
+#           "example": "1234",
+#           "type": "string"
+#         },
+#         "vendor_guid": {
+#           "description": "(Optional) The 3rd party vendor's GUID for the outcome this criteria references, if any.",
+#           "example": "abdsfjasdfne3jsdfn2",
 #           "type": "string"
 #         },
 #         "description": {
 #           "example": "Criterion 1",
+#           "type": "string"
+#         },
+#         "long_description": {
+#           "example": "Criterion 1 more details",
 #           "type": "string"
 #         },
 #         "ratings": {
@@ -255,6 +270,11 @@
 #           "description": "the unlock date (assignment is unlocked after this date) returns null if not present NOTE: If this assignment has assignment overrides, this field will be the unlock date as it applies to the user requesting information from the API.",
 #           "example": "2012-07-01T23:59:00-06:00",
 #           "type": "datetime"
+#         },
+#         "has_overrides": {
+#           "description": "whether this assignment has overrides",
+#           "example": true,
+#           "type": "boolean"
 #         },
 #         "all_dates": {
 #           "description": "(Optional) all dates associated with the assignment, if applicable",
@@ -521,7 +541,7 @@ class AssignmentsApiController < ApplicationController
       fake = @context.assignments.scoped.new
       fake.workflow_state = 'unpublished'
 
-      if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
+      unless fake.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
         scope = scope.published
       end
@@ -760,7 +780,7 @@ class AssignmentsApiController < ApplicationController
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
-    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
+    @assignment.workflow_state = 'unpublished'
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response
     end

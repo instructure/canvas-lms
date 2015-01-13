@@ -68,7 +68,6 @@ define [
 
     update: (newData) =>
       $.extend @submission, newData
-      @submission.submission_history[0] = @submission
       @submission.moreThanOneSubmission = @submission.submission_history.length > 1
       @submission.loading = false
       for submission in @submission.submission_history

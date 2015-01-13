@@ -73,13 +73,13 @@ class Quizzes::QuizRegrader::Submission
     submission.quiz_data.map do |question|
       id = question[:id]
 
-      pos += 1 unless question[:question_type] == Quizzes::QuizQuestion::TEXT_ONLY
+      pos += 1 unless question[:question_type] == Quizzes::QuizQuestion::Q_TEXT_ONLY
 
       if submitted_answer_ids.include?(id)
         question.keep_if {|k, v| REGRADE_KEEP_FIELDS.include?(k.to_s) }
 
         quiz_question = question_regrades[id].quiz_question
-        data  = Quizzes::Quiz.decorate_question_for_submission(
+        data  = Quizzes::QuizQuestionBuilder.decorate_question_for_submission(
           quiz_question.question_data,
           pos
         )

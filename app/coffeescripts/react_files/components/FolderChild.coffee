@@ -13,16 +13,20 @@ define [
   'compiled/fn/preventDefault'
   './PublishCloud'
   './UsageRightsIndicator'
+  'compiled/jquery.rails_flash_notifications'
 ], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator) ->
 
+  classSet = React.addons.classSet
 
   FolderChild = React.createClass
     displayName: 'FolderChild'
 
-    mixins: [BackboneMixin('model')],
+    mixins: [BackboneMixin('model')]
 
     getInitialState: ->
       editing: @props.model.isNew()
+      hideKeyboardCheck: true
+      isSelected: @props.isSelected
 
     componentDidMount: ->
       @focusNameInput() if @state.editing
@@ -57,11 +61,16 @@ define [
       @setState editing: false, @focusPreviousElement
 
     getAttributesForRootNode: ->
+
+      classNameString = classSet({
+        'ef-item-row': true
+        'ef-item-selected': @props.isSelected
+        'activeDragTarget': @state.isActiveDragTarget
+      })
+
       attrs =
         onClick: @props.toggleSelected
-        className: "ef-item-row
-                   #{'ef-item-selected' if @props.isSelected}
-                   #{'activeDragTarget' if @state.isActiveDragTarget}"
+        className: classNameString
         role: 'row'
         'aria-selected': @props.isSelected
         draggable: !@state.editing
@@ -80,18 +89,37 @@ define [
           @props.dndOptions.onItemDrop(event, @props.model, toggleActive(false))
       attrs
 
-
+    checkForAccess: (event) ->
+      if @props.model.get('locked_for_user')
+        event.preventDefault()
+        message = I18n.t('This folder is currently locked and unavailable to view.')
+        $.flashError message
+        $.screenReaderFlashMessage message
+        return false
 
     render: withReactDOM ->
+
+      keyboardCheckboxClass = classSet({
+        'screenreader-only': @state.hideKeyboardCheck
+        'multiselectable-toggler': true
+      })
+
+      keyboardLabelClass = classSet({
+        'screenreader-only': !@state.hideKeyboardCheck
+      })
+
       div @getAttributesForRootNode(),
-        label className: 'screenreader-only', role: 'gridcell',
+        label className: keyboardCheckboxClass, role: 'gridcell',
           input {
             type: 'checkbox'
-            className: 'multiselectable-toggler'
+            onFocus: => @setState({hideKeyboardCheck: false})
+            onBlur: => @setState({hideKeyboardCheck: true})
+            className: keyboardCheckboxClass
             checked: @props.isSelected
             onChange: -> #noop, will be caught by 'click' on root node
           }
-          I18n.t('labels.select', 'Select This Item')
+          span {className: keyboardLabelClass},
+            I18n.t('labels.select', 'Select This Item')
 
         div className:'ef-name-col ellipsis', role: 'rowheader',
           if @state.editing
@@ -117,6 +145,7 @@ define [
               ref: 'nameLink'
               to: 'folder'
               className: 'media'
+              onClick: @checkForAccess
               params: {splat: @props.model.urlPath()}
             },
               span className: 'pull-left',
@@ -134,12 +163,6 @@ define [
                 FilesystemObjectThumbnail(model: @props.model)
               span className: 'media-body',
                 @props.model.displayName()
-
-        div className: 'screenreader-only', role: 'gridcell',
-          if @props.model instanceof Folder
-            I18n.t('folder', 'Folder')
-          else
-            @props.model.get('content-type')
 
 
         div className:'ef-date-created-col', role: 'gridcell',

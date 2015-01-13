@@ -10,7 +10,6 @@ describe "external tool assignments" do
   end
 
   it "should allow creating through index" do
-    @course.enable_feature!(:draft_state)
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
@@ -30,12 +29,12 @@ describe "external tool assignments" do
   end
 
   it "should allow creating through the 'More Options' link" do
-    @course.enable_feature!(:draft_state)
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
     f('.add_assignment').click
     expect_new_page_load { f('.more_options').click }
+
     f('#assignment_name').send_keys('test1')
     click_option('#assignment_submission_type', 'External Tool')
     f('#assignment_external_tool_tag_attributes_url').click

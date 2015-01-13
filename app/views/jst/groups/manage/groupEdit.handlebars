@@ -20,7 +20,7 @@
 <div class="control-group">
   <label class="control-label" for="group_max_membership">{{#t "group_max_membership"}}Limit groups to{{/t}}</label>
   <div class="controls">
-    <input type="number" id="group_max_membership" name='max_membership' value="{{max_membership}}" class="input-mini">
+    <input type="number" id="group_max_membership" name='max_membership' value="{{max_membership}}" class="input-mini" min="2">
     <span>{{#t "group_max_membership_members"}}members{{/t}}</span>
     <span class="hint-text">{{#t "group_max_membership_help"}}(Leave blank to use group set max){{/t}}</span>
   </div>

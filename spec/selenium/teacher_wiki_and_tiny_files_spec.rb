@@ -7,7 +7,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
     end
 
     after(:each) do
@@ -348,7 +347,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
   context "wiki sidebar images and locking/hiding" do
     before (:each) do
       course_with_teacher_logged_in(:active_all => true, :name => 'wiki course')
-      set_course_draft_state
       @root_folder = Folder.root_folders(@course).first
       @sub_folder = @root_folder.sub_folders.create!(:name => "subfolder", :context => @course)
 

@@ -63,12 +63,12 @@ define [
 
       visibleFile = props.query.preview and _.findWhere(files, {id: props.query.preview})
 
-      if !visibleFile and files.length
+      if !visibleFile
         new File({id: props.query.preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include":"usage_rights"}) if props.usageRightsRequiredForContext).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
-        initialItem = visibleFile or files[0]
+        initialItem = visibleFile or (files[0] if files.length)
         cb?({initialItem, otherItems})
 
     stateProperties: (items, props) ->
@@ -170,8 +170,8 @@ define [
                 },
                   i {className: 'icon-download'}
                   ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
-              button {
-                type: 'button'
+              a {
+                role: 'button'
                 className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"
                 onClick: @toggle('showInfoPanel')
               },
@@ -190,12 +190,18 @@ define [
             @renderArrowLink('left') if @state.otherItems?.length > 0
             if @state.displayedItem
               iframe {
-                src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
+                src: @state.displayedItem.get 'preview_url'
                 className: 'ef-file-preview-frame'
               }
+            else # file was not found
+              div className: 'ef-file-not-found ef-file-preview-frame',
+                i className:'media-object ef-not-found-icon FilesystemObjectThumbnail mimeClass-file'
+                I18n.t "File not found"
+
             @renderArrowLink('right') if @state.otherItems?.length > 0
 
             if @state.showInfoPanel
               FilePreviewInfoPanel
                 displayedItem: @state.displayedItem
                 getStatusMessage: @getStatusMessage
+                usageRightsRequiredForContext: @props.usageRightsRequiredForContext

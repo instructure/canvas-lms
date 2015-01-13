@@ -1,2 +1,1 @@
-require ['grading_standards']
-
+require ['jsx/grading/tab_container']

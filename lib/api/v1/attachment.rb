@@ -94,6 +94,9 @@ module Api::V1::Attachment
       hash['preview_url'] = attachment.crocodoc_url(user) ||
                             attachment.canvadoc_url(user)
     end
+    if includes.include? 'enhanced_preview_url'
+      hash['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0)
+    end
     if includes.include? 'usage_rights'
       hash['usage_rights'] = usage_rights_json(attachment.usage_rights, user)
     end

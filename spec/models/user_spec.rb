@@ -569,6 +569,18 @@ describe User do
         expect(alice.courses_with_primary_enrollment.size).to eq 0
       end
 
+      it 'works with favorite_courses' do
+        @user = User.create!(:name => 'user')
+        @shard1.activate do
+          account = Account.create!
+          @course = account.courses.build
+          @course.workflow_state = 'available'
+          @course.save!
+          StudentEnrollment.create!(:course => @course, :user => @user, :workflow_state => 'active')
+        end
+        @user.favorites.create!(:context => @course)
+        expect(@user.courses_with_primary_enrollment(:favorite_courses)).to eq [@course]
+      end
     end
   end
 
@@ -725,7 +737,7 @@ describe User do
       @admin = user_model
       @student = user_model
       tie_user_to_account(@admin, :role => admin_role)
-      role = custom_account_role('Student', :account => Account.default)
+      role = custom_account_role('CustomStudent', :account => Account.default)
       tie_user_to_account(@student, :role => role)
       set_up_course_with_users
     end
@@ -1642,8 +1654,7 @@ describe User do
         expect(events.first.title).to eql 'test appointment'
       end
 
-      it "should not include unpublished assignments when draft_state is enabled" do
-        @course.enable_feature!(:draft_state)
+      it "should not include unpublished assignments" do
         as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
         as.publish
         as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
@@ -1679,8 +1690,7 @@ describe User do
         expect(events.second).to eq assignment
       end
 
-      it "doesn't show unpublished assignments if draft_state is enabled" do
-        @course.enable_feature!(:draft_state)
+      it "doesn't show unpublished assignments" do
         assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
         assignment.unpublish
         assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
@@ -1738,7 +1748,6 @@ describe User do
   describe "assignments_visibile_in_course" do
     before do
       @teacher_enrollment = course_with_teacher(:active_course => true)
-      @course.enable_feature!(:draft_state)
       @course_section = @course.course_sections.create
       @student1 = User.create
       @student2 = User.create
@@ -1895,9 +1904,8 @@ describe User do
       end
     end
 
-    it "should not include unpublished assignments when draft_state is enabled" do
+    it "should not include unpublished assignments" do
       course_with_student_logged_in(:active_all => true)
-      @course.enable_feature!(:draft_state)
       assignment_quiz([], :course => @course, :user => @user)
       @assignment.unpublish
       @quiz.unlock_at = 1.hour.ago
@@ -2799,5 +2807,32 @@ describe User do
       expect(@student.group_memberships_for(@course).size).to eq 0
     end
 
+  end
+
+  describe 'visible_groups' do
+    it "should include groups in published courses" do
+      course_with_student active_all:true
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 1
+    end
+
+    it "should not include groups that belong to unpublished courses" do
+      course_with_student
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 0
+    end
+
+    it "should include account groups" do
+      account = account_model(:parent_account => Account.default)
+      student = user active_all: true
+      @group = Group.create! context: account, name: "GroupOne"
+      @group.users << student
+      @group.save!
+      expect(student.visible_groups.size).to eq 1
+    end
   end
 end

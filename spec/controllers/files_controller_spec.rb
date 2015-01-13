@@ -290,6 +290,18 @@ describe FilesController do
       expect(response).to be_redirect
     end
 
+    it "should find overwritten files" do
+      @old_file = @course.attachments.build(display_name: 'old file')
+      @old_file.file_state = 'deleted'
+      @old_file.replacement_attachment = @file
+      @old_file.save!
+
+      user_session(@teacher)
+      get 'show', course_id: @course.id, id: @old_file.id, preview: 1
+      expect(response).to be_redirect
+      expect(response.location).to match /\/courses\/#{@course.id}\/files\/#{@file.id}/
+    end
+
     describe "as a student" do
       before do
         user_session(@student)
@@ -412,6 +424,12 @@ describe FilesController do
         @file.save!
         get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
         expect(json_parse['attachment']['canvadoc_session_url']).to be_nil
+      end
+
+      it "is included in newly uploaded files" do
+        user_session(@teacher)
+        post 'create', :format => 'json', :course_id => @course.id, :attachment => {:display_name => "bob", :uploaded_data => io}
+        expect(json_parse['attachment']['canvadoc_session_url']).to be_present
       end
     end
   end

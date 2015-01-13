@@ -17,7 +17,7 @@ define [
           #{h(I18n.t('other', 'other', count: strOrArray.length))}
           <span>
             <ul>
-              #{(('<li>' + h(str) + '</li>') for str in strOrArray).join('')}
+              #{$.raw (('<li>' + h(str) + '</li>') for str in strOrArray).join('')}
             </ul>
           </span>
         </span>

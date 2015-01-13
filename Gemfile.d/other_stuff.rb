@@ -14,7 +14,7 @@ else
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
 end
-gem 'encrypted_cookie_store-instructure', '1.1.8', :require => 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.1.10', :require => 'encrypted_cookie_store'
 gem 'active_model_serializers', '0.9.0alpha1',
   :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.4.2'
@@ -46,11 +46,11 @@ gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
 gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.9'
-gem 'i18nema', '0.0.8', :platforms => [:mri_20, :mri_21]
-gem 'i18nema19', '0.0.8', :platform => :mri_19
+gem 'i18nema', '0.0.8', :platforms => [:ruby_20, :ruby_21, :ruby_22]
+gem 'i18nema19', '0.0.8', :platform => :ruby_19
 gem 'i18nliner', '0.0.9'
 gem 'icalendar', '1.5.4'
-gem 'ims-lti', '2.0.0.beta.17'
+gem 'ims-lti', '2.0.0.beta.18'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
@@ -58,7 +58,7 @@ gem 'json', '1.8.1'
 gem 'oj', '2.5.5'
 
 # native xml parsing, diigo
-gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
+gem 'libxml-ruby', '2.7.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
   gem 'treetop', '1.4.15'
@@ -75,7 +75,7 @@ gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false
-gem 'rake', '10.3.2'
+gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount', '1.6.8'
@@ -83,9 +83,9 @@ gem 'ritex', '1.0.1'
 
 gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
-gem 'net-ldap', '0.3.1', :require => 'net/ldap'
+gem 'net-ldap', '0.10.1'
 gem 'ruby-duration', '3.2.0'
-gem 'ruby-saml-mod', '0.2.1'
+gem 'ruby-saml-mod', '0.2.2'
 gem 'rubycas-client', '2.3.9'
 gem 'rubyzip', '1.1.1', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace

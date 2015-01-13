@@ -63,8 +63,8 @@ define [
 
     extractFormValues: ->
       hidden   : @state.selectedOption is 'link_only'
-      unlock_at: @state.selectedOption is 'date_range' && @refs.unlock_at.getDOMNode().value or ''
-      lock_at  : @state.selectedOption is 'date_range' && @refs.lock_at.getDOMNode().value or ''
+      unlock_at: @state.selectedOption is 'date_range' && $(@refs.unlock_at.getDOMNode()).data('unfudged-date') or ''
+      lock_at  : @state.selectedOption is 'date_range' && $(@refs.lock_at.getDOMNode()).data('unfudged-date') or ''
       locked: @state.selectedOption is 'unpublished'
 
     # Function Summary
@@ -130,6 +130,12 @@ define [
     ###
     allFolders: ->
       @props.models.every (model) -> model instanceof Folder
+
+    ###
+    # Returns true if all the models passed in are folders.
+    ###
+    anyFolders: ->
+      @props.models.filter((model) -> model instanceof Folder).length
 
     renderUsageRightsWarning: ->
       div {className: 'RestrictedDialogForm__banner col-xs-12'},
@@ -208,7 +214,13 @@ define [
                   onChange: (event) =>
                       @setState selectedOption: 'link_only'
                 },
-                I18n.t("options.hiddenInput.description", "Only available to students with link. Not visible in student files.")
+                if @allFolders()
+                  I18n.t("Hidden, files inside will be available with links.")
+                else if @props.models.length > 1 and @anyFolders()
+                  I18n.t("Files and folder contents only available to students with link. Not visible in student files.")
+                else
+                  I18n.t("options.hiddenInput.description", "Only available to students with link. Not visible in student files.")
+
             div className: "radio",
               label {},
                  input {

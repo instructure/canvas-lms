@@ -73,7 +73,6 @@ describe Assignment do
   describe "#has_student_submissions?" do
     before :once do
       setup_assignment_with_students
-      @assignment.context.root_account.enable_feature!(:draft_state)
     end
 
     it "does not allow itself to be unpublished if it has student submissions" do
@@ -1232,7 +1231,6 @@ describe Assignment do
 
   context "quizzes" do
     before :once do
-      @course.enable_feature!(:draft_state)
       assignment_model(:submission_types => "online_quiz", :course => @course)
     end
 
@@ -1852,7 +1850,6 @@ describe Assignment do
   describe "sections_with_visibility" do
    before(:once) do
      course_with_teacher(:active_all => true)
-     @course.enable_feature!(:draft_state)
      @section = @course.course_sections.create!
      @student = student_in_section(@section, opts={})
      @assignment, @assignment2, @assignment3 = (1..3).map{|a|@course.assignments.create!}
@@ -2880,18 +2877,14 @@ describe Assignment do
 
   describe "#restore" do
     it "should restore to unpublished if draft state w/ no submissions" do
-      @course.enable_feature!(:draft_state)
       assignment_model course: @course
-      @a.context.root_account.enable_feature!(:draft_state)
       @a.destroy
       @a.restore
       expect(@a.reload).to be_unpublished
     end
 
     it "should restore to published if draft state w/ submissions" do
-      @course.enable_feature!(:draft_state)
       setup_assignment_with_homework
-      @assignment.context.root_account.enable_feature!(:draft_state)
       @assignment.destroy
       @assignment.restore
       expect(@assignment.reload).to be_published
@@ -2933,6 +2926,78 @@ describe Assignment do
       @assignment.due_at = 1.hour.ago
       @assignment.description = 'blah'
       @assignment.save!
+    end
+  end
+
+  describe "#update_submission" do
+    let(:assignment) { assignment_model(course: @course) }
+
+    it "raises an error if original_student is nil" do
+      expect {
+        assignment.update_submission(nil)
+      }.to raise_error "Student Required"
+    end
+
+    it "raises an error if no submission is associated with the student" do
+      expect {
+        assignment.update_submission(@student)
+      }.to raise_error "No submission found for that student"
+    end
+
+    context "when the student is not in a group" do
+      let!(:associate_student_and_submission) {
+        assignment.submissions.create user: @student
+      }
+      let(:update_submission_response) { assignment.update_submission(@student) }
+
+      it "returns an Array" do
+        expect(update_submission_response.class).to eq Array
+      end
+
+      it "returns a collection of submissions" do
+        assignment.update_submission(@student).first
+        expect(update_submission_response.first.class).to eq Submission
+      end
+    end
+
+    context "when the student is in a group" do
+      let!(:create_a_group_with_a_submitted_assignment) {
+        setup_assignment_with_group
+        @assignment.submit_homework(@u1,
+                                    submission_type: "online_text_entry",
+                                    body: "Some text for you")
+      }
+
+      context "when a comment is submitted" do
+        let(:update_assignment_with_comment) {
+          @assignment.update_submission @u2,
+                                        "comment" => "WAT?",
+                                        "group_comment" => true,
+                                        user_id: @course.teachers.first.id
+        }
+
+        it "returns an Array" do
+          expect(update_assignment_with_comment.class).to eq Array
+        end
+
+        it "creates a comment for each student in the group" do
+          expect {
+            update_assignment_with_comment
+          }.to change{SubmissionComment.count}.by(@u1.groups.first.users.count)
+        end
+
+        it "creates comments with the same group_comment_id" do
+          update_assignment_with_comment
+          comments = SubmissionComment.last(@u1.groups.first.users.count)
+          expect(comments.first.group_comment_id).to eq comments.last.group_comment_id
+        end
+      end
+
+      context "when a comment is not submitted" do
+        it "returns an Array" do
+          expect(@assignment.update_submission(@u2).class).to eq Array
+        end
+      end
     end
   end
 
@@ -3109,7 +3174,7 @@ end
 
 def setup_differentiated_assignments(opts={})
   if !opts[:course]
-    course_with_teacher(draft_state: true, active_all: true, differentiated_assignments: true)
+    course_with_teacher(active_all: true, differentiated_assignments: true)
   end
 
   @section1 = @course.course_sections.create!(name: 'Section One')

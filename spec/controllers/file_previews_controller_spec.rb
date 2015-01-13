@@ -103,7 +103,6 @@ describe FilePreviewsController do
   end
 
   it "should fulfill module completion requirements" do
-    @course.enable_feature!(:draft_state)
     attachment_model content_type: 'application/msword'
     mod = @course.context_modules.create!(:name => "some module")
     tag = mod.add_item(:id => @attachment.id, :type => 'attachment')
@@ -112,6 +111,22 @@ describe FilePreviewsController do
     expect(mod.evaluate_for(@user).workflow_state).to eq "unlocked"
     get :show, course_id: @course.id, file_id: @attachment.id
     expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
+  end
+
+  it "should log asset accesses when previewable" do
+    Setting.set('enable_page_views', 'db')
+    attachment_model content_type: 'image/png'
+    get :show, course_id: @course.id, file_id: @attachment.id
+    access = AssetUserAccess.for_user(@user).first
+    expect(access.asset).to eq @attachment
+  end
+
+  it "should not log asset accesses when not previewable" do
+    Setting.set('enable_page_views', 'db')
+    attachment_model content_type: 'unknown/unknown'
+    get :show, course_id: @course.id, file_id: @attachment.id
+    access = AssetUserAccess.for_user(@user)
+    expect(access).to be_empty
   end
 
   it "should work with hidden files" do

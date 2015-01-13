@@ -231,6 +231,9 @@ define [
         $course_syllabus.loadingImage()
 
       success: (data) ->
+        ###
+        xsslint safeString.property syllabus_body
+        ###
         $course_syllabus.loadingImage('remove').html data.course.syllabus_body
         $course_syllabus.data('syllabus_body', data.course.syllabus_body)
         $course_syllabus_details.hide()

@@ -419,7 +419,7 @@ RSpec.configure do |config|
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb rescue nil
+      Canvas.redis.flushdb
     end
     Canvas.redis_used = false
   end
@@ -446,21 +446,18 @@ RSpec.configure do |config|
     @account
   end
 
-  def account_with_grading_periods
-    @account = Account.default
-    @account.set_feature_flag!(:multiple_grading_periods, 'on')
-    grading_period_group = @account.grading_period_groups.create!()
-    account_admin_user(account: @account)
-    user_session(@admin)
+  def grading_periods(opts = {})
+    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
+    ctx = opts[:context] || @course || course
+    count = opts[:count] || 2
+
+    gpg = ctx.grading_period_groups.create!
     now = Time.zone.now
-    gps = 3.times.map do |n|
-      grading_period_group.
-        grading_periods.create!(weight: 50, start_date: n.month.since(now),
-                                end_date: (n+1).month.since(now),
-                                title: "Grading Period #{n+1}")
-    end
-    gps.last.destroy
-    @account
+    count.times.map { |n|
+      gpg.grading_periods.create! start_date: n.months.since(now),
+        end_date: (n+1).months.since(now),
+        weight: 1
+    }
   end
 
   def course(opts={})
@@ -476,10 +473,6 @@ RSpec.configure do |config|
         e.save!
         @teacher = u
       end
-      if opts[:draft_state]
-        account.allow_feature!(:draft_state)
-        @course.enable_feature!(:draft_state)
-      end
       if opts[:differentiated_assignments]
         account.allow_feature!(:differentiated_assignments)
         @course.enable_feature!(:differentiated_assignments)
@@ -488,7 +481,7 @@ RSpec.configure do |config|
     @course
   end
 
-  def account_admin_user_with_role_changes(opts={})
+  def account_with_role_changes(opts={})
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
@@ -501,6 +494,10 @@ RSpec.configure do |config|
       end
     end
     RoleOverride.clear_cached_contexts
+  end
+
+  def account_admin_user_with_role_changes(opts={})
+    account_with_role_changes(opts)
     account_admin_user(opts)
   end
 
@@ -673,16 +670,6 @@ RSpec.configure do |config|
       submission = assignment.submissions.create!(:assignment_id => assignment.id, :user_id => @student.id)
       submission.update_attributes!(score: '5') if opts[:submission_points]
     end
-  end
-
-  def set_course_draft_state(enabled=true, opts={})
-    course = opts[:course] || @course
-    account = opts[:account] || course.account
-
-    account.allow_feature!(:draft_state)
-    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
-
-    enabled
   end
 
   def add_section(section_name)
@@ -919,7 +906,11 @@ RSpec.configure do |config|
 
   def outcome_with_rubric(opts={})
     @outcome_group ||= @course.root_outcome_group
-    @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
+    @outcome = @course.created_learning_outcomes.create!(
+      :description => '<p>This is <b>awesome</b>.</p>',
+      :short_description => 'new outcome',
+      :calculation_method => 'highest'
+    )
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
@@ -1500,7 +1491,7 @@ RSpec.configure do |config|
     if user = options[:enroll_user]
       section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})
       type = options[:enrollment_type] || "TeacherEnrollment"
-      create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active'}})
+      create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}})
     end
     course_data
   end
@@ -1530,7 +1521,7 @@ RSpec.configure do |config|
 
     section_id = options[:section_id] || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
-    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active'}}, options[:return_type])
+    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}}, options[:return_type])
   end
 
   def create_assignments(course_ids, count_per_course = 1, fields = {})

@@ -7,7 +7,7 @@ describe "enhanceable_content" do
     stub_kaltura
     course_with_teacher_logged_in
 
-    page = @course.wiki.front_page
+    page = @course.wiki.wiki_pages.build(:title => 'title')
     page.body = %{
       <div id="dialog_for_link1" class="enhanceable_content dialog">dialog for link 1</div>
       <a href="#dialog_for_link1" id="link1">link 1</a>

@@ -764,6 +764,38 @@ describe "Users API", type: :request do
       end
     end
 
+    context "non-account-admin user" do
+      before :once do
+        user_with_pseudonym name: "Earnest Lambert Watkins"
+        course_with_teacher user: @user, active_all: true
+      end
+
+      context "with users_can_edit_name enabled" do
+        before :once do
+          @course.root_account.settings = { users_can_edit_name: true }
+          @course.root_account.save!
+        end
+
+        it "should allow user to rename self" do
+          json = api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id),
+                          { user: { name: "Blue Ivy Carter" } })
+          expect(json["name"]).to eq "Blue Ivy Carter"
+        end
+      end
+
+      context "with users_can_edit_name disabled" do
+        before :once do
+          @course.root_account.settings = { users_can_edit_name: false }
+          @course.root_account.save!
+        end
+
+        it "should not allow user to rename self" do
+          api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id),
+                   { user: { name: "Ovaltine Jenkins" } }, {}, { expected_status: 401 })
+        end
+      end
+    end
+
     context "an unauthorized user" do
       it "should receive a 401" do
         user

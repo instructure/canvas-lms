@@ -130,6 +130,9 @@ define [
 
       delete @image
 
+      ###
+      xsslint xssable.receiver.whitelist req
+      ###
       req.append(k, v) for k, v of preflightResponse.upload_params
       req.append(preflightResponse.file_param, image, 'profile.jpg')
       dataType = if preflightResponse.success_url then 'xml' else 'json'

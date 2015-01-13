@@ -208,11 +208,12 @@ module SimplyVersioned
           if simply_versioned_options[:explicit] && !@simply_versioned_explicit_enabled && versioned?
             version = self.versions.current
             version.yaml = self.attributes.except( *simply_versioned_options[:exclude] ).to_yaml
-            simply_versioned_options[:on_update].try(:call, self, version)
-            version.save
+            if version.save
+              simply_versioned_options[:on_update].try(:call, self, version)
+            end
           else
             version = self.versions.create( :yaml => self.attributes.except( *simply_versioned_options[:exclude] ).to_yaml )
-            if version
+            if version.valid?
               simply_versioned_options[:on_create].try(:call, self, version)
               self.versions.clean_old_versions( simply_versioned_options[:keep].to_i ) if simply_versioned_options[:keep]
             end

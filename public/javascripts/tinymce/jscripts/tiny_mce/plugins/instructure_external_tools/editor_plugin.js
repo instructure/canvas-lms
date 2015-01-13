@@ -45,6 +45,7 @@ define([
       function buttonSelected(button) {
         var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
         if(!$dialog) {
+          // xsslint safeString.identifier frameHeight
           $dialog = $('<div id="external_tool_button_dialog" style="padding: 0; overflow-y: hidden;"/>')
             .hide()
             .html("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>" +
