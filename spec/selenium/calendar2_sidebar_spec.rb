@@ -78,7 +78,6 @@ describe "calendar2" do
           get "/calendar2"
 
           f("#undated-events-button").click
-          f("#undated-events-button").click
           wait_for_ajaximations
           undated_events = ff("#undated-events > ul > li")
           expect(undated_events.size).to eq 1
@@ -89,7 +88,6 @@ describe "calendar2" do
           make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
           get "/calendar2"
 
-          f("#undated-events-button").click
           f("#undated-events-button").click
           wait_for_ajaximations
           undated_events = ff("#undated-events > ul > li")
