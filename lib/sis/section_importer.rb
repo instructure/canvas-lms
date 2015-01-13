@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -69,17 +69,17 @@ module SIS
         section.name = name if section.new_record? || !section.stuck_sis_fields.include?(:name)
 
         # update the course id if necessary
-        if section.course_id != course.id && !section.stuck_sis_fields.include?(:course_id)
+        if section.course_id != course.id
           if section.nonxlist_course_id
             # this section is crosslisted
-            if section.nonxlist_course_id != course.id
+            if (section.nonxlist_course_id != course.id && !section.stuck_sis_fields.include?(:course_id)) || (section.course.workflow_state == 'deleted' && !!(status =~ /\Aactive/))
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
               @course_ids_to_update_associations.merge [course.id, section.course_id, section.nonxlist_course_id]
               section.uncrosslist(:run_jobs_immediately)
               section.move_to_course(course, :run_jobs_immediately)
             end
-          else
+          elsif !section.stuck_sis_fields.include?(:course_id)
             # this section isn't crosslisted and lives on the wrong course. move
             @course_ids_to_update_associations.merge [section.course_id, course.id]
             section.move_to_course(course, :run_jobs_immediately)
