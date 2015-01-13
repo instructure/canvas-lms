@@ -110,6 +110,8 @@ define [
       if @model.isExpanded
         unless @$folderContents
           @$folderContents = $("<ul role='group' class='folderContents'/>").appendTo(@$el)
+          # TODO: make the scrollContainer generic, not specific to a certain
+          # type of modal dialog
           subtreesView = new PaginatedCollectionView(
             collection: @model.folders
             itemView: TreeView
@@ -124,10 +126,12 @@ define [
             tagName: 'li'
             className: 'folders'
             template: collectionTemplate
-            scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
+            scrollContainer: @$folderContents.closest('div[role=tabpanel]')
           )
           @$folderContents.append(subtreesView.render().el)
           unless @onlyShowFolders
+            # TODO: make the scrollContainer generic, not specific to a certain
+            # type of modal dialog
             itemsView = new PaginatedCollectionView(
               collection: @model.files
               itemView: TreeItemView
@@ -135,7 +139,7 @@ define [
               tagName: 'li'
               className: 'files'
               template: collectionTemplate
-              scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
+              scrollContainer: @$folderContents.closest('div[role=tabpanel]')
             )
             @$folderContents.append(itemsView.render().el)
         @$('> .folderContents').removeClass('hidden')

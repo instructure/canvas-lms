@@ -36,6 +36,7 @@ describe "Enrollment::QueryBuilder" do
           type: type,
           workflow_state: e_state,
           course_section_id: section_ids[i],
+          role_id: Role.get_built_in_role(type).id,
           root_account_id: account_id
         }
       })

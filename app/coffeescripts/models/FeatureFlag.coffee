@@ -84,9 +84,11 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
         releaseNotesUrl: json.release_notes_url
         state: json.feature_flag?.state
         labels: []
-      feature.flag = json.feature_flag if json.feature_flag
-      feature.state = json.feature_flag.state if json.feature_flag
+      if json.feature_flag
+        feature.flag = json.feature_flag
+        feature.state = json.feature_flag.state
+        feature.hidden = json.feature_flag.hidden
       feature.labels.push(FeatureFlag::LABEL.beta)        if json.beta
-      feature.labels.push(FeatureFlag::LABEL.hidden)      if json.hidden
+      feature.labels.push(FeatureFlag::LABEL.hidden)      if feature.hidden
       feature.labels.push(FeatureFlag::LABEL.development) if json.development
       _.extend(json, feature)
