@@ -109,7 +109,6 @@ class Account < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
-  before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
 
   before_save :setup_quota_cache_invalidation
@@ -339,6 +338,11 @@ class Account < ActiveRecord::Base
   def ensure_defaults
     self.uuid ||= CanvasSlug.generate_securish_uuid
     self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if self.respond_to?(:lti_guid)
+    self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
+    self.root_account_id ||= self.parent_account_id
+    self.parent_account_id ||= self.root_account_id
+    Account.invalidate_cache(self.id) if self.id
+    true
   end
 
   def verify_unique_sis_source_id
@@ -359,17 +363,8 @@ class Account < ActiveRecord::Base
     false
   end
 
-  def set_update_account_associations_if_changed
-    self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
-    self.root_account_id ||= self.parent_account_id
-    self.parent_account_id ||= self.root_account_id
-    Account.invalidate_cache(self.id) if self.id
-    @should_update_account_associations = self.parent_account_id_changed? || self.root_account_id_changed?
-    true
-  end
-
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations
+    send_later_if_production(:update_account_associations) if self.parent_account_id_changed? || self.root_account_id_changed?
   end
 
   def equella_settings

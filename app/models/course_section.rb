@@ -51,7 +51,6 @@ class CourseSection < ActiveRecord::Base
 
   has_many :sis_post_grades_statuses
 
-  before_save :set_update_account_associations_if_changed
   before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
 
@@ -117,13 +116,8 @@ class CourseSection < ActiveRecord::Base
     can :read_as_admin
   end
 
-  def set_update_account_associations_if_changed
-    @should_update_account_associations = self.course_id_changed? || self.nonxlist_course_id_changed?
-    true
-  end
-
   def update_account_associations_if_changed
-    if @should_update_account_associations && !Course.skip_updating_account_associations?
+    if (self.course_id_changed? || self.nonxlist_course_id_changed?) && !Course.skip_updating_account_associations?
       Course.send_later_if_production(:update_account_associations,
                                       [self.course_id, self.course_id_was, self.nonxlist_course_id, self.nonxlist_course_id_was].compact.uniq)
     end
