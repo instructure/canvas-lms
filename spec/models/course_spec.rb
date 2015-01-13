@@ -4000,3 +4000,32 @@ describe Course, "default_section" do
     expect(c.course_sections.pluck(:id)).to be_empty
   end
 end
+
+describe Course, 'touch_root_folder_if_necessary' do
+  before(:once) do
+    course_with_student(active_all: true)
+    @root_folder = Folder.root_folders(@course).first
+  end
+
+  it "should invalidate cached permissions on the root folder when hiding or showing the files tab" do
+    enable_cache do
+      Timecop.freeze(2.minutes.ago) do
+        @root_folder.touch
+        expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
+      end
+
+      Timecop.freeze(1.minute.ago) do
+        @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
+        @course.save!
+        AdheresToPolicy::Cache.clear # this happens between requests; we're testing the Rails cache
+        expect(@root_folder.reload.grants_right?(@student, :read_contents)).to be_falsy
+      end
+
+      @course.tab_configuration = [{"id" => Course::TAB_FILES}]
+      @course.save!
+      AdheresToPolicy::Cache.clear
+      expect(@root_folder.reload.grants_right?(@student, :read_contents)).to be_truthy
+    end
+  end
+
+end
