@@ -338,15 +338,17 @@ class Account < ActiveRecord::Base
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
     if self.root_account?
       self.errors.add(:sis_source_id, t('#account.root_account_cant_have_sis_id', "SIS IDs cannot be set on root accounts"))
       return false
     end
 
-    root = self.root_account
-    existing_account = Account.where(root_account_id: root, sis_source_id: self.sis_source_id).first
+    scope = root_account.all_accounts.where(sis_source_id:  self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
 
-    return true if !existing_account || existing_account.id == self.id
+    return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
