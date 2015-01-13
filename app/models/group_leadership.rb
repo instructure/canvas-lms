@@ -39,7 +39,7 @@ class GroupLeadership
   def select_leader(strategy)
     return users.first if strategy == "first"
     return users.sample if strategy == "random"
-    raise(ArgumentError, "Unkown auto leader strategy: '#{strategy}'")
+    raise(ArgumentError, "Unknown auto leader strategy: '#{strategy}'")
   end
 
   def valid_leader_in_place?

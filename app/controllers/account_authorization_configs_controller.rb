@@ -183,7 +183,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   An alternate SSO URL for logging into CAS. You probably should not set
   #   this.
   #
-  # - unkown_user_url [Optional]
+  # - unknown_user_url [Optional]
   #
   #   A url to redirect to when a user is authorized through CAS but is not
   #   found in Canvas.
@@ -211,7 +211,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   Forgot Password URL. Leave blank for default Canvas behavior.
   #
-  # - unkown_user_url [Optional]
+  # - unknown_user_url [Optional]
   #
   #   A url to redirect to when a user is authorized through SAML but is not
   #   found in Canvas.
