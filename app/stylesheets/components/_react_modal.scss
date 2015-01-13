@@ -1,34 +1,74 @@
-/* @styleguide React Modal
+/* @styleguide Modal Dialog - React (new!)
 
-See `app/jsx/examples/ReactModalExample.jsx` for example usages.
+### Default Canvas modal
+
+React Modal comes with very few default classes to make it as themeable as possible. If you want plain-vanilla Canvas modal styles, be sure to specify `className: 'ReactModal__Content--canvas'` when you initialize the modal, as follows:
+
+```javascript
+React.renderComponent(
+  ReactModalExample(
+    { className: 'ReactModal__Content--canvas'
+      overlayClassName: 'ReactModal__Overlay--canvas' }
+  ), document.getElementById('react-modal-example')
+);
+```
+
+```html
+<p>
+  <div id="react-modal-example"></div>
+</p>
+```
+
+See `app/jsx/styleguide/ReactModalExample.jsx` for complete example usage.
+
+<br />
+### Mini Canvas modal
+
+For small dialogs like Confirms, the default Canvas modal width might seem too much. The **.ReactModal__Content--mini-modal** class can be appended to the **.ReactModal__Content--canvas** class to render a less wide modal dialog.
+
+```javascript
+React.renderComponent(
+  ReactModalExample(
+    { label: 'Trigger Confirm Dialog',
+      className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal',
+      overlayClassName: 'ReactModal__Overlay--canvas' }
+  ), document.getElementById('react-modal-confirm-example')
+);
+```
+
+```html
+<p>
+  <div id="react-modal-confirm-example"></div>
+</p>
+```
+
+See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
+
 */
 
+// Global styles for any React modal.
+// Do not change these or your name will be cursed for generations.
 .ReactModal__Overlay {
+  transition: opacity 0.2s ease-out;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba($canvas-secondary, 0.75);
   z-index: 150;
   opacity: 0;
 
-  &--after-open {
+  &.ReactModal__Overlay--after-open {
     opacity: 1;
-    transition: opacity 150ms ease-out;
-  }
-
-  &--before-close {
-    opacity: 0;
-    transition: opacity 150ms ease-out;
   }
 }
 
+
+@mixin ReactModalPadding {
+  padding: 6px;
+  @include breakpoint(tablet) { padding: 12px; }
+  @include breakpoint(desktop) { padding: 16px; }
+}
+
 .ReactModal__Content {
-  @extend .modal-dialog;
-  background-color: transparent;
-  border: none;
-  margin: 30px auto;
-  position: relative;
-  width: 600px;
-  opacity: 0;
 
   // To accomodate different kinds of modals, styles for 
   // the regular Canvas modal have been scoped under the
@@ -61,33 +101,25 @@ See `app/jsx/examples/ReactModalExample.jsx` for example usages.
 
     }
 
-  &--before-close {
-    opacity: 0;
-    transition: opacity 150ms ease-in;
-  }
-
-  &--confirm {
-    width: 350px;
-    .modal-body {
-      padding-top: 25px !important;
-      padding-bottom: 25px !important;
+    &.ReactModal__Content--after-open .ReactModal__Layout {
+      @include breakpoint(tablet) {
+        opacity: 1;
+        transform: rotateX(0) scale(1);
+      } 
     }
-  }
 
-  .modal-content {
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    box-shadow: rgba(0, 0, 0, 0.5) 0 5px 15px 0;
-    position: relative;
+    &.ReactModal__Content--mini-modal {
+      .ReactModal__Layout {
+        @include breakpoint(tablet) { max-width: 384px; }
+      }  
+    }
 
-    .modal-header {
-      border-bottom: 1px solid #E5E5E5;
-      padding: 5px 15px;
-      .close {
-        position: relative;
-        top: 8px;
-      }
+    // ReactModal__InnerSection class exists so that even if
+    // a modal has no header or footer, it still gets nice
+    // rounded corners
+    .ReactModal__InnerSection {
+      &:first-of-type { border-top-left-radius: $baseBorderRadius; border-top-right-radius: $baseBorderRadius; }
+      &:last-of-type { border-bottom-left-radius: $baseBorderRadius; border-bottom-right-radius: $baseBorderRadius; }
     }
 
     .ReactModal__Header {
@@ -102,13 +134,13 @@ See `app/jsx/examples/ReactModalExample.jsx` for example usages.
       }
     }
 
-      label {
-        font-weight: bold;
-      }
+    .ReactModal__Header-Title {
+      flex: 1;
+      // remove margin from heading elements
+      * { margin: 0; }
+    }
 
-      textarea {
-        margin-bottom: 0;
-      }
+    .ReactModal__Header-Actions { text-align: right; }
 
     .ReactModal__Body {
       padding: 6px;
@@ -121,22 +153,30 @@ See `app/jsx/examples/ReactModalExample.jsx` for example usages.
       }
     }
 
-      .error .hint-text {
-        color: #b94a48;
+    .ReactModal__Footer {
+      @include ReactModalPadding;
+      background: lighten($canvas-neutral, 5%);
+      border-top: 1px solid $can-border-light;
+      
+      @include breakpoint(mini-tablet) {
+        display: flex;
+        align-items: center;
       }
     }
 
-    .modal-footer {
-      border-top: 1px solid #E5E5E5;
-      padding: 15px;
-      text-align: right;
-      background-color: #efefef;
-      border-bottom-right-radius: 6px;
-      border-bottom-left-radius: 6px;
-
-      .btn {
-        margin-left: 3px;
+    .ReactModal__Footer-Actions {
+      @include breakpoint(mini-tablet) {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+      }
+      
+      .Button, .btn { 
+        margin-left: 4px;
+        &:first-of-type { margin-left: 0; }
       }
     }
+
   }
+
 }
