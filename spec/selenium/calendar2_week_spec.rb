@@ -27,10 +27,7 @@ describe "calendar2" do
         expect(calendar_events.title).to eq "super important"
         expect(@assignment.due_date).to eq (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
 
-        get "/calendar2"
-        wait_for_ajaximations
-
-        f('#week').click
+        load_week_view
         keep_trying_until do
           events = ff('.fc-event').select { |e| e.text =~ /due.*super important/ }
           # shows on monday night and tuesday morning
@@ -42,9 +39,7 @@ describe "calendar2" do
         noon = Time.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
 
-        get "/calendar2"
-        wait_for_ajax_requests
-        f('#week').click
+        load_week_view
 
         elt = fj('.fc-event:visible')
         expect(elt.size.height).to be >= 18
@@ -56,10 +51,7 @@ describe "calendar2" do
         second_start = first_event.start_at + 6.minutes
         second_event = @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
 
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         elts = ffj('.fc-event:visible')
         expect(elts.size).to eql(2)
@@ -72,10 +64,7 @@ describe "calendar2" do
         skip("dragging events doesn't seem to work")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         elt = fj('.fc-event:visible')
         driver.action.drag_and_drop_by(elt, 0, 50)
@@ -88,10 +77,7 @@ describe "calendar2" do
         skip("dragging events doesn't seem to work")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         resize_handle = fj('.fc-event:visible .ui-resizable-handle')
         driver.action.drag_and_drop_by(resize_handle, 0, 50).perform
@@ -104,10 +90,7 @@ describe "calendar2" do
       it "should show the right times in the tool tips for short events" do
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         elt = fj('.fc-event:visible')
         expect(elt.attribute('title')).to match(/12:00.*12:05/)
@@ -126,6 +109,30 @@ describe "calendar2" do
       old_header_title = get_header_text
       change_calendar(:prev)
       expect(old_header_title).not_to eq get_header_text
+    end
+
+    it "should create event by clicking on week calendar" do
+      title = "from clicking week calendar"
+      load_week_view
+
+      #Clicking on the second row so it is not set as an all day event
+      ff('.fc-widget-content')[1].click #click on calendar
+
+      event_from_modal(title,false,false)
+      expect(f('.fc-event-time').text).to include title
+    end
+
+    it "should create all day event on week calendar" do
+      title = "all day event title"
+      load_week_view
+
+      #Clicking on the first instance of .fc-widget-content clicks in all day row
+      f('.fc-widget-content').click #click on calendar
+
+      event_from_modal(title,false,false)
+
+      # Only all day events have the .fc-event-title class
+      expect(f('.fc-event-title').text).to include title
     end
   end
 end
