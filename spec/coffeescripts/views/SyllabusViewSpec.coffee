@@ -202,7 +202,7 @@ define [
 
       event_ts = $('.events_2012_01_01 .related-appointment_group_1 .dates > span:nth-child(1)')
       equal event_ts.text(), " 8am", "event - local time in table"
-      equal event_ts.data('html-tooltip-title'), "Local: Jan 1 at  8:00am<br>Course: Jan 1 at 10:00am", 'event - correct local and course times given'
+      equal event_ts.data('html-tooltip-title'), "Local: Jan 1 at 8:00am<br>Course: Jan 1 at 10:00am", 'event - correct local and course times given'
 
   test 'render (user public course)', ->
     @view.can_read = true # public course -- can read
@@ -214,21 +214,21 @@ define [
   test 'render (anonymous public course)', ->
     @view.can_read = true # public course -- can read
     @view.is_valid_user = false # anonymous
-    
+
     @render()
     @renderAssertions()
 
   test 'render (user public syllabus)', ->
     @view.can_read = false # public syllabus -- cannot read
     @view.is_valid_user = true # user - non-enrolled (cannot read)
-    
+
     @render()
     @renderAssertions()
 
   test 'render (anonymous public syllabus)', ->
     @view.can_read = false # public syllabus -- cannot read
     @view.is_valid_user = false # anonymous
-    
+
     @render()
     @renderAssertions()
 

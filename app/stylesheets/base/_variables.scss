@@ -1,6 +1,6 @@
 /// TOC
 //============================================================================================
-// 
+//
 // - Brand Variants
 // - Color Variables
 // - Layout Variables
@@ -10,8 +10,8 @@
 // Canvas Brand Variants
 //=======================
 // This imports the variables needed to support new styles {$use_new_styles}
-// accessibility ($use_high_contrast) and k12 ($is-k12). 
-// You can also use the sass function that helps ensure color contrast ratio. 
+// accessibility ($use_high_contrast) and k12 ($is-k12).
+// You can also use the sass function that helps ensure color contrast ratio.
 // Look in /sass-functions/ for more information on how that is used
 @import "variant_variables";
 
@@ -42,7 +42,7 @@
 
 
 $canvas-primary:                  #0099e0 !default; // light blue
-@if $use_high_contrast { $canvas-primary: #0073ac; } 
+@if $use_high_contrast { $canvas-primary: #0073ac; }
 
 $canvas-secondary:                #5b6c79 !default; // dark blue
 @if $use_high_contrast { $canvas-secondary: #343c44; }
@@ -69,7 +69,7 @@ $canvas-dark:                     #333;
 
 // Bootstrap Color Variable Overwrites
 //=======================
-// These overwrite the variables used by bootstrap using our 
+// These overwrite the variables used by bootstrap using our
 // custom colors above
 
 // When the new_style feature flag is available to use, we
@@ -109,8 +109,8 @@ $base-content-background-color: $canvas-light;
 $base-content-padding: 15px;
 $ic-base-header-background: $canvas-secondary;
 @if $use_high_contrast {$ic-base-header-background: #333;}
-      
-    
+
+
 
 $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
@@ -221,7 +221,7 @@ $activeBG:                      #d6ecfc;
   $k12-header-primary-height: $k12-sp*8;
   $k12-header-secondary-height: $k12-sp*4;
   $k12-header-text: white;
-  $k12-transition: cubic-bezier(0,1,0.5,1);  
+  $k12-transition: cubic-bezier(0,1,0.5,1);
 }
 
 // Font Sizes
@@ -241,7 +241,7 @@ $wellBackground: #e8ecef;
 @if $is-k12 { $orange: #f55e22; }
 
 
-// 
+//
 // New-component variables that will eventually phase out the legacy stuff above
 //==================================================================================
 //
@@ -256,14 +256,14 @@ $can-transition: cubic-bezier(0,1,0.5,1); // this is a pleasing transition that 
 $can-bg-light-neutral: lighten($canvas-neutral, 6%);
 
 // $can-bg-light-primary
-$can-bg-light-primary: lighten($canvas-primary, 52%); 
+$can-bg-light-primary: lighten($canvas-primary, 52%);
 @if $use_high_contrast { $can-bg-light-primary: lighten($canvas-primary, 64%); }
 
 // $can-bg-light-success
 $can-bg-light-success: lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
 
 // $can-bg-light-alert
-$can-bg-light-alert: lighten($canvas-alert, 50%); 
+$can-bg-light-alert: lighten($canvas-alert, 50%);
 @if $use_high_contrast { $can-bg-light-alert: lighten($canvas-alert, 66%); }
 
 // $can-bg-light-danger
@@ -273,7 +273,7 @@ $can-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color ex
 /// Global border colors
 //======================
 
-// If it's a light border, it should be this color. 
+// If it's a light border, it should be this color.
 @if $use_new_styles { $can-border-light: lighten($canvas-secondary, 42%); }
 @else { $can-border-light: $menu-border-color; }
 

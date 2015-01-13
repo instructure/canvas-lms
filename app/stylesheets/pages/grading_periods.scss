@@ -1,0 +1,27 @@
+@import "base/environment";
+
+#grading_periods {
+  .grading-period:nth-child(n+2) {
+    border-top: none;
+  }
+  .input-grading-period-date {
+    width: 160px;
+  }
+  .icon-delete-grading-period::before {
+    padding: 9px 0px;
+    height: 20px;
+    font-size: 20px;
+  }
+  .update-button {
+    width: 98px;
+  }
+  .icon-delete-container {
+    width: 20px;
+  }
+  .buttons-grid-row {
+    width: 250px;
+  }
+  label {
+    font-weight: bold;
+  }
+}
