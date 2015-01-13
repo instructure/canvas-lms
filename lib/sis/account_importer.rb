@@ -83,6 +83,7 @@ module SIS
           end
         end
 
+        return unless account.changed?
         update_account_associations = account.root_account_id_changed? || account.parent_account_id_changed?
         if account.save
           account.update_account_associations if update_account_associations
