@@ -54,6 +54,10 @@ class Assignment < ActiveRecord::Base
     :rubric, :context, :grading_standard, :group_category
   ]
 
+  ALLOWED_GRADING_TYPES = %w(
+    pass_fail percent letter_grade gpa_scale points not_graded
+  )
+
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
   attr_reader :assignment_changed
@@ -181,6 +185,8 @@ class Assignment < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
+  validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES },
+    allow_nil: true, on: :create
 
   acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5

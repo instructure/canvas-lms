@@ -70,6 +70,17 @@ describe Assignment do
     expect(@submission.versions.length).to eql(1)
   end
 
+  it "should validate grading_type inclusion" do
+    @invalid_grading_type = "invalid"
+    @assignment = Assignment.new(assignment_valid_attributes.merge({
+      course: @course,
+      grading_type: @invalid_grading_type
+    }))
+
+    expect(@assignment).not_to be_valid
+    expect(@assignment.errors[:grading_type]).not_to be_nil
+  end
+
   describe "#has_student_submissions?" do
     before :once do
       setup_assignment_with_students
