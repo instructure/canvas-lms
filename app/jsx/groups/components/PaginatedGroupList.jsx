@@ -21,7 +21,7 @@ define([
                                                      onJoin={() => this.props.onJoin(g)}
                                                      onManage={() => this.props.onManage(g)} />);
       return (
-        <div>
+        <div role="list" aria-label={I18n.t("Groups")}>
           {groups}
         </div>);
     }

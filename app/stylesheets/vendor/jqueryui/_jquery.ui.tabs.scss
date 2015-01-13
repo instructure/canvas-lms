@@ -33,7 +33,6 @@
         text-decoration: none;
         font-weight: bold;
         text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-        &:focus { outline: none; }
       }
       &.ui-tabs-active { margin-bottom: 0; padding-bottom: 1px;
         background: $bgColorContent;

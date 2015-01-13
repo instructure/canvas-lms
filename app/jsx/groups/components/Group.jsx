@@ -21,6 +21,27 @@ define([
       });
     },
 
+    handleKeyDown(e) {
+      switch(e.which)
+      {
+        case 13:
+          this.toggleOpen();
+          break;
+        case 32:
+          e.preventDefault();
+          break;
+      }
+    },
+
+    handleKeyUp(e) {
+      switch(e.which)
+      {
+        case 32:
+          this.toggleOpen();
+          break;
+      }
+    },
+
     _onManage(e) {
       e.stopPropagation();
       e.preventDefault();
@@ -51,6 +72,7 @@ define([
                            this.props.group.group_category.self_signup === 'restricted');
       var isFull = (this.props.group.max_membership != null) && this.props.group.users.length >= this.props.group.max_membership;
       var isAllowedToJoin = this.props.group.permissions.join;
+      var hasUsers = this.props.group.users.length > 0;
       var shouldSwitch = this.props.group.group_category.is_member && this.props.group.group_category.role !== 'student_organized';
 
       var visitLink = isMember ? <a href={`/groups/${this.props.group.id}`}
@@ -62,14 +84,18 @@ define([
                                      aria-label={I18n.t('Manage group %{group_name}', {group_name: groupName})}
                                      onClick={this._onManage}>Manage</a> : null;
 
-      var arrowDown = this.state.open || this.props.group.users.length == 0;
-      var arrow = <i className={`icon-mini-arrow-${arrowDown ? 'down' : 'right'}`}
-                     aria-hidden="true" />;
-
       var showBody = this.state.open && this.props.group.users.length > 0;
+      var arrowDown = this.state.open || this.props.group.users.length == 0;
+      var studentGroupId = "student-group-body-" + this.props.group.id;
+      var arrow = <i className={`icon-mini-arrow-${arrowDown ? 'down' : 'right'}`}
+                     role="button" onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp}
+                     aria-label={arrowDown ? I18n.t("Collapse list of group members for %{groupName}", {groupName: groupName}) :
+                                             I18n.t("Expand list of group members for %{groupName}", {groupName: groupName})}
+                     aria-expanded={showBody} aria-controls={studentGroupId} tabIndex={hasUsers ? "0" : "-1"} />;
+
       var body = (
-        <div className={`student-group-body${showBody ? '' : ' hidden'}`} aria-expanded={showBody}>
-          <ul ref="memberList" className="student-group-list clearfix" aria-label={I18n.t('group members')} tabIndex="0" role="region">
+        <div id={studentGroupId} className={`student-group-body${showBody ? '' : ' hidden'}`}>
+          <ul ref="memberList" className="student-group-list clearfix" aria-label={I18n.t('group members')} tabIndex="0" role="list">
             {this.props.group.users.map(u => {
             var isLeader = u.id == leaderId;
             var name = u.name || u.display_name;
@@ -102,22 +128,24 @@ define([
           toolTip = I18n.t('Group is joined by invitation only');
           ariaLabel = I18n.t('Group %{group_name} is joined by invitation only', {group_name: groupName});
         }
-        membershipAction = <i className="icon-lock" aria-label={ariaLabel} title={toolTip} data-tooltip="left" tabIndex="0"></i>;
+        membershipAction = <span id="membership-action" tabIndex="0" title={toolTip} data-tooltip="left" aria-label={ariaLabel}>
+          <i className="icon-lock"></i>
+        </span>;
       };
 
       return (
-        <div className={`accordion student-groups content-box${showBody ? ' show-body' : ''}`} onClick={this.toggleOpen}>
+        <div role="listitem" className={`accordion student-groups content-box${showBody ? ' show-body' : ''}`} onClick={this.toggleOpen}>
           <div className="student-group-header clearfix">
-            {arrow}
             <div ref="groupTitle" className="student-group-title">
-              <h3 aria-expanded={showBody} aria-controls="student-group-body" role="button" aria-label={groupName}>
+              <h3 aria-label={groupName}>
                 {this.props.group.name}
                 <small>&nbsp;{this.props.group.group_category.name}</small>
               </h3>
+              {arrow}
               {visitLink}&nbsp;{manageLink}
             </div>
-            <span className="student-group-join">&nbsp;{membershipAction}</span>
             <span className="student-group-students">{leaderBadge}{I18n.t('student', {count: this.props.group.users.length})}</span>
+            <span className="student-group-join">&nbsp;{membershipAction}</span>
           </div>
           {body}
         </div>);

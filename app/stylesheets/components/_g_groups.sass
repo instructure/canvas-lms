@@ -39,6 +39,7 @@
     padding: 16px 16px 16px 10px
   .icon-mini-arrow-right, .icon-mini-arrow-down
     float: left
+    order: 1
   .icon-mini-arrow-down
     display: none
   &.show-body
@@ -46,18 +47,21 @@
       background-color: #f5f5f5
       border-bottom: 1px solid #c1c7cf
       cursor: pointer
+      position: relative
     .icon-mini-arrow-right
       display: none
     .icon-mini-arrow-down
       display: block
   .student-group-title
     float: left
+    display: inline-flex
     h3
       margin: 0 7px 0 5px
       font-weight: bold
       font-size: 14px
       float: left
       line-height: 18px
+      order: 2
 
       small
         font-size: 12px
@@ -68,17 +72,19 @@
       position: relative
       top: -1px
       padding-right: 5px
+      order: 2
   .student-group-students
     i
       padding-right: 5px
-    float: right
+    position: absolute
+    right: 175px
     color: #555
     font-weight: normal
   .student-group-join
-    float: right
+    position: absolute
     text-transform: uppercase
     font-weight: bold
-    width: 175px
+    right: 10px
     text-align: right
   .student-group-body
     padding: 16px 16px 16px 36px
