@@ -135,8 +135,12 @@ class CourseSection < ActiveRecord::Base
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
-    existing_section = CourseSection.where(root_account_id: self.root_account_id, sis_source_id: self.sis_source_id).first
-    return true if !existing_section || existing_section.id == self.id
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
+    scope = root_account.course_sections.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
+
+    return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
