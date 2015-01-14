@@ -392,7 +392,7 @@ define([
       $("a.scribd_file_preview_link").live('click', function(event) {
         event.preventDefault();
         var $link = $(this).loadingImage({image_size: 'small'}).hide();
-        $.ajaxJSON($link.attr('href').replace(/\/download.*/, ""), 'GET', {}, function(data) {
+        $.ajaxJSON($link.attr('href').replace(/\/download/, ""), 'GET', {}, function(data) {
           var attachment = data && data.attachment;
           $link.loadingImage('remove');
           if (attachment &&

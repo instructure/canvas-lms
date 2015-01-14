@@ -502,7 +502,7 @@ class FilesController < ApplicationController
       end
       return
     end
-    if (params[:download] && params[:verifier] && params[:verifier] == @attachment.uuid) ||
+    if (params[:verifier] && params[:verifier] == @attachment.uuid) ||
         @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } ||
         authorized_action(@attachment, @current_user, :read)
       if params[:download]
@@ -545,10 +545,16 @@ class FilesController < ApplicationController
         end
         format.html { render :action => 'show' }
       end
-      if request.format == :json
-        options = {:permissions => {:user => @current_user}}
-        can_download = attachment.grants_right?(@current_user, session, :download)
-        if can_download
+      format.json do
+        json = {
+          :attachment => {
+            :workflow_state => attachment.workflow_state,
+            :content_type => attachment.content_type
+          }
+        }
+
+        if (params[:verifier] && params[:verifier] == attachment.uuid) ||
+            attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
           # some form.
@@ -558,18 +564,15 @@ class FilesController < ApplicationController
             attachment.context_module_action(@current_user, :read)
             attachment.record_inline_view
           end
-          options[:methods] = []
-          options[:methods] << :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
+          if url = service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
+            json[:attachment][:authenticated_s3_url] = url
+          end
+          json[:attachment].merge! doc_preview_json(attachment, @current_user)
+
           log_asset_access(attachment, "files", "files")
         end
+        render :json => json
       end
-      format.json {
-        render :json => attachment.as_json(options).tap { |json|
-          if can_download
-            json['attachment'].merge! doc_preview_json(attachment, @current_user)
-          end
-        }
-      }
     end
   end
   protected :render_attachment
