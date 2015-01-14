@@ -70,6 +70,23 @@ describe "calendar2" do
           f('#calendar-feed a').click
           expect(f('#calendar_feed_box')).to be_displayed
         end
+
+        it "should remove calendar item if calendar is unselected" do
+          title = "blarg"
+          make_event :context => @course, :start => Time.now, :title => title
+          load_month_view
+
+          #expect event to be on the calendar
+          expect(f('.fc-event-title').text).to include title
+
+          # Click the toggle button. First button should be user, second should be course
+          ff(".context-list-toggle-box")[1].click
+          expect(f('.fc-event-title')).to be_nil
+
+          #Turn back on the calendar and verify that your item appears
+          ff(".context-list-toggle-box")[1].click
+          expect(f('.fc-event-title').text).to include title
+        end
       end
 
       describe "undated calendar items" do
