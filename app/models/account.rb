@@ -111,6 +111,10 @@ class Account < ActiveRecord::Base
   before_save :ensure_defaults
   before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
+
+  before_save :setup_quota_cache_invalidation
+  after_save :invalidate_quota_caches_if_changed
+
   after_create :default_enrollment_term
 
   serialize :settings, Hash
@@ -500,6 +504,27 @@ class Account < ActiveRecord::Base
     nil
   end
 
+  def setup_quota_cache_invalidation
+    @quota_invalidations = []
+    unless self.new_record?
+      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.default_storage_quota_changed?
+      @quota_invalidations << 'default_group_storage_quota' if self.default_group_storage_quota_changed?
+    end
+  end
+
+  def invalidate_quota_caches_if_changed
+    Account.send_later_if_production(:invalidate_quota_caches, self.id, @quota_invalidations) if @quota_invalidations.present?
+  end
+
+  def self.invalidate_quota_caches(account_id, keys)
+    account_ids = Account.sub_account_ids_recursive(account_id) + [account_id]
+    keys.each do |quota_key|
+      account_ids.each do |id|
+        Rails.cache.delete([quota_key, id].cache_key)
+      end
+    end
+  end
+
   def quota
     Rails.cache.fetch(['current_quota', self.id].cache_key) do
       read_attribute(:storage_quota) ||
@@ -532,8 +557,6 @@ class Account < ActiveRecord::Base
     if parent_account && parent_account.default_storage_quota == val
       val = nil
     end
-    clear_sub_account_quota_cache('default_storage_quota')
-    clear_sub_account_quota_cache('current_quota')
     write_attribute(:default_storage_quota, val)
   end
 
@@ -570,7 +593,6 @@ class Account < ActiveRecord::Base
         (self.parent_account && self.parent_account.default_group_storage_quota == val)
       val = nil
     end
-    clear_sub_account_quota_cache('default_group_storage_quota')
     write_attribute(:default_group_storage_quota, val)
   end
 
@@ -580,15 +602,6 @@ class Account < ActiveRecord::Base
 
   def default_group_storage_quota_mb=(val)
     self.default_group_storage_quota = val.try(:to_i).try(:megabytes)
-  end
-
-  def clear_sub_account_quota_cache(quota_key)
-    return unless self.id
-    account_ids = Account.sub_account_ids_recursive(self.id)
-    account_ids << self.id
-    account_ids.each do |account_id|
-      Rails.cache.delete([quota_key, account_id].cache_key)
-    end
   end
 
   def turnitin_shared_secret=(secret)

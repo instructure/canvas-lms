@@ -1176,4 +1176,39 @@ describe Account do
       expect(account.trusted_referer?('https://example.com')).to be_falsey
     end
   end
+
+  context "quota cache" do
+    it "should only clear the quota cache if something changes" do
+      account = account_model
+
+      Account.expects(:invalidate_quota_caches).once
+
+      account.default_storage_quota = 10.megabytes
+      account.save! # clear here
+
+      account.reload
+      account.save!
+
+      account.default_storage_quota = 10.megabytes
+      account.save!
+    end
+
+    it "should inherit from a parent account's default_storage_quota" do
+      enable_cache do
+        account = account_model
+        subaccount = account.sub_accounts.create!
+
+        account.default_storage_quota = 10.megabytes
+        account.save!
+
+        expect(subaccount.default_storage_quota).to eq 10.megabytes
+
+        # should reload
+        account.default_group_storage_quota = 20.megabytes
+        account.save!
+
+        expect(subaccount.default_storage_quota).to eq 10.megabytes
+      end
+    end
+  end
 end
