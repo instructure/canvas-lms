@@ -170,4 +170,20 @@ describe SIS::CSV::AccountImporter do
     expect(errors).to eq []
     expect(warnings).to eq ["Setting account A001's parent to A002 would create a loop"]
   end
+
+  it 'should update batch id on unchanging accounts' do
+    process_csv_data_cleanly(
+      "Account_ID,Parent_Account_ID,Name,Status",
+      "A001,,Humanities,active"
+    )
+    batch = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "Account_ID,Parent_Account_ID,Name,Status",
+      "A001,,Humanities,active",
+      batch: batch
+    )
+    a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
+    expect(a1).not_to be_nil
+    expect(a1.sis_batch_id).to eq batch.id
+  end
 end
