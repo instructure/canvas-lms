@@ -145,10 +145,14 @@ class SisBatch < ActiveRecord::Base
   scope :importing, -> { where(:workflow_state => 'importing') }
 
   def self.process_all_for_account(account)
+    start_time = Time.now
     loop do
-      batches = account.sis_batches.needs_processing.limit(1000).order(:created_at).all
+      batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
       break if batches.empty?
-      batches.each { |batch| batch.process_without_send_later }
+      batches.each do |batch|
+        batch.process_without_send_later
+        return if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+      end
     end
   end
 
