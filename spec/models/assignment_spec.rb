@@ -1364,6 +1364,20 @@ describe Assignment do
       @a.unpublish
       expect(@a.quiz.reload).not_to be_published
     end
+
+    context "#quiz?" do
+      it "knows that it is a quiz" do
+        @a.reload
+        expect(@a.quiz?).to be true
+      end
+
+      it "knows that an assignment is not a quiz" do
+        @a.reload
+        @a.quiz = nil
+        @a.submission_types = 'postal_delivery_of_an_elephant'
+        expect(@a.quiz?).to be false
+      end
+    end
   end
 
   context "topics" do

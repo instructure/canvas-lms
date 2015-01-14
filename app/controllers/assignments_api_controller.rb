@@ -291,6 +291,11 @@
 #           "example": "https://...",
 #           "type": "string"
 #         },
+#         "submissions_download_url": {
+#           "description": "the URL to download all submissions as a zip",
+#           "example": "https://example.com/courses/:course_id/assignments/:id/submissions?zip=1",
+#           "type": "string"
+#         },
 #         "assignment_group_id": {
 #           "description": "the ID of the assignment's group",
 #           "example": 2,

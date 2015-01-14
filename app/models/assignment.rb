@@ -1950,4 +1950,8 @@ class Assignment < ActiveRecord::Base
   ensure
     @new_record = new_record if @simply_versioned_version_model
   end
+
+  def quiz?
+    self.submission_types == 'online_quiz' && self.quiz.present?
+  end
 end

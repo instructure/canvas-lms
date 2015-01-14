@@ -24,11 +24,22 @@ require 'nokogiri'
 class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics
-  def feeds_topic_format_path(topic_id, code, format); "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"; end
 
-  def named_context_url(*args); "named_context_url(#{args.inspect[1..-2]})"; end
+  def feeds_topic_format_path(topic_id, code, format)
+    "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"
+  end
 
-  def course_assignment_url(*args); "course_assignment_url(#{args.inspect[1..-2]})"; end
+  def named_context_url(*args)
+    "named_context_url(#{args.inspect[1..-2]})"
+  end
+
+  def course_assignment_submissions_url(*args)
+    "course_assignment_submissions_url(#{args.inspect[1..-2]})"
+  end
+
+  def course_assignment_url(*args)
+    "course_assignment_url(#{args.inspect[1..-2]})"
+  end
 end
 
 describe Api::V1::DiscussionTopics do
@@ -46,7 +57,7 @@ describe Api::V1::DiscussionTopics do
     expect {
       data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, {})
     }.not_to raise_error
-    expect(data[:podcast_url]).to match /feeds_topic_format_path/
+    expect(data[:podcast_url]).to match(/feeds_topic_format_path/)
   end
 
   it "should set can_post_attachments" do
@@ -1235,7 +1246,7 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.parent_entry).to be_nil
       expect(@entry.message).to eq @message
     end
-    
+
     it "should not allow students to create an entry under a topic that is closed for comments" do
       @topic.lock!
       student_in_course(:course => @course, :active_all => true)
