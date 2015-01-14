@@ -23,6 +23,18 @@ describe "calendar2" do
         account.save!
       end
 
+      it "should create a new event" do
+        get '/calendar2'
+        wait_for_ajaximations
+        f('#agenda').click
+        wait_for_ajaximations
+        expect(fj('.agenda-wrapper:visible')).to be_present
+        f('#create_new_event_link').click
+        fj('.ui-dialog:visible .btn-primary').click
+        wait_for_ajaximations
+        expect(ffj('.ig-row').length).to eq 1 #expects there to be one new event on Agenda index page
+      end
+
       it "should display agenda events" do
         get '/calendar2'
         wait_for_ajaximations
