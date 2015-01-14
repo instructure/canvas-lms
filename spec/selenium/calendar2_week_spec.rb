@@ -134,5 +134,23 @@ describe "calendar2" do
       # Only all day events have the .fc-event-title class
       expect(f('.fc-event-title').text).to include title
     end
+
+    it "should have a working today button" do
+      load_week_view
+
+      # Mini calendar on the right of page has this html element I am looking for so
+      #   when checking for "today", we need to look for the second instance of the class
+
+      # Check for highlight to be present on this week
+      expect(ff(".fc-today")[1]).not_to be_nil
+
+      # Change calendar week and make sure that the highlight is not there
+      change_calendar
+      expect(ff(".fc-today")[1]).to be_nil
+
+      # Back to today. Make sure that the highlight is present s
+      change_calendar(:today)
+      expect(ff(".fc-today")[1]).not_to be_nil
+    end
   end
 end

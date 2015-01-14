@@ -171,6 +171,28 @@ describe "calendar2" do
         f('.ig-row').click()
         expect(fj('.event-details:visible time')).to include_text('11:59')
       end
+
+      it "should have a working today button" do
+        get "/calendar2"
+        wait_for_ajaximations
+        f('#month').click
+        wait_for_ajaximations
+        #Go to a future calendar date to test going back
+        change_calendar
+
+        #Get the current date and make sure it is not in the header
+        @date = Time.now.utc
+        date = @date.strftime("%b %d")
+        expect(f('.navigation_title_text').text).not_to include(date)
+
+        #Go the agenda view and click the today button
+        f('#agenda').click
+        wait_for_ajaximations
+        change_calendar(:today)
+
+        #Make sure that today's date is in the header
+        expect(f('.navigation_title_text').text).to include(date)
+      end
     end
   end
 end

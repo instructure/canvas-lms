@@ -193,6 +193,24 @@ describe "calendar2" do
         expect(details.text).to include(@course.default_section.name)
         expect(details.find_element(:css, '.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
+
+      it "should have a working today button" do
+        get "/calendar2"
+        wait_for_ajaximations
+        f('#month').click
+        wait_for_ajaximations
+
+        #Check for highlight to be present on this month
+        expect(f(".fc-state-highlight")).not_to be_nil
+
+        # Switch the month and verify that there is no highlighted day
+        change_calendar
+        expect(f(".fc-state-highlight")).to be_nil
+
+        # Go back to the present month. Verify that there is a highlighted day
+        change_calendar(:today)
+        expect(f(".fc-state-highlight")).not_to be_nil
+      end
     end
   end
 end
