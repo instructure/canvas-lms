@@ -1,3 +1,9 @@
+- name: Add nodesource
+  sudo: yes
+  shell: >
+    executable=/bin/bash source /etc/profile.d/rvm.sh;
+    curl -sL https://deb.nodesource.com/setup | bash -
+
 - name: Install dependencies
   sudo: yes
   apt: pkg={{ item }} state=installed
@@ -14,8 +20,8 @@
     - build-essential
     - openjdk-7-jre
     - unzip
-    - nodejs-legacy
-    - npm
+    - python-software-properties
+    - nodejs
     - git
 
 - name: Remove system ruby

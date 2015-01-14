@@ -25,4 +25,4 @@
     - apache
     - passenger
     - postgres
-    - canvas
+    # - canvas

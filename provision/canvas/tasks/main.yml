@@ -1,15 +1,20 @@
-- name: delete vendor/bundle
-  file: path=/vagrant/vendor/bundle state=absent
+# - name: delete vendor/bundle
+#   file: path=/vagrant/vendor/bundle state=absent
 
-- name: delete Gemfile.lock
-  file: path=/vagrant/Gemfile.lock state=absent
+# - name: delete Gemfile.lock
+#   file: path=/vagrant/Gemfile.lock state=absent
 
-- name: bundle install
+# - name: bundle install
+#   shell: >
+#     executable=/bin/bash source /etc/profile.d/rvm.sh;
+#     bundle install --path=vendor/bundle --without=sqlite mysql
+#   args:
+#     chdir: /vagrant
+
+- name: disable npm spinner
   shell: >
     executable=/bin/bash source /etc/profile.d/rvm.sh;
-    bundle install --path=vendor/bundle --without=sqlite mysql
-  args:
-    chdir: /vagrant
+    npm config set spin=false
 
 - name: npm install
   shell: >
@@ -17,6 +22,7 @@
     npm install
   args:
     chdir: /vagrant
+  remote_user: vagrant
 
 - name: compile assets
   shell: >
@@ -24,6 +30,7 @@
     RAILS_ENV=production bundle exec rake canvas:compile_assets[false]
   args:
     chdir: /vagrant
+  remote_user: vagrant
 
 - name: init databases
   shell: >

@@ -11,7 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = "canvas.dev"
   config.hostsupdater.aliases = ["files.canvas.dev"]
 
-  config.vm.synced_folder '.', '/vagrant', nfs: true
+  config.vm.synced_folder '.', '/vagrant'#, nfs: true
 
   config.vm.provider "virtualbox" do |v|
     host = RbConfig::CONFIG['host_os']
@@ -35,9 +35,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision "ansible" do |ansible|
+    ansible.verbose  = "vvv"
     ansible.playbook = "provision/vagrant.yml"
   end
 
-  config.vm.provision :shell, :inline => "sudo service canvas_init start && sudo service apache2 restart", run: "always"
+  config.vm.provision :shell, :inline => "sudo service canvas_init start && sudo service apache2 restart"#, run: "always"
 
 end
