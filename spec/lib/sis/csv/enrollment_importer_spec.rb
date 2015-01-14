@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,10 +28,11 @@ describe SIS::CSV::EnrollmentImporter do
     user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
     before_count = Enrollment.count
     importer = process_csv_data(
-      "course_id,user_id,role,section_id,status",
+      "course_id,user_id,role,section_id,status,associated_user_id",
       ",U001,student,,active",
       "C001,,student,1B,active",
       "C001,U001,cheater,1B,active",
+      "C001,U001,observer,1B,active,NONEXISTENT",
       "C001,U001,student,1B,semi-active"
     )
     expect(Enrollment.count).to eq before_count
@@ -44,7 +45,8 @@ describe SIS::CSV::EnrollmentImporter do
     expect(warnings).to eq ["No course_id or section_id given for an enrollment",
                       "No user_id given for an enrollment",
                       "Improper status \"semi-active\" for an enrollment",
-                      "Improper role \"cheater\" for an enrollment"]
+                      "Improper role \"cheater\" for an enrollment",
+                      "An enrollment referenced a non-existent associated user NONEXISTENT"]
   end
 
   it 'should warn about inconsistent data' do
