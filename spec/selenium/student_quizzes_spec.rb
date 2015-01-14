@@ -145,6 +145,39 @@ describe "quizzes" do
     end
   end
 
+  context "multiple fill in the blanks" do
+    it "should display mfitb responses in their respective boxes on submission view page" do
+      # create new multiple fill in the blank quiz and question
+      course_with_student_logged_in
+      @quiz = quiz_model({
+                             :course => @course,
+                             :time_limit => 5
+                         })
+
+      @quiz.quiz_questions.create!(:question_data => fill_in_multiple_blanks_question_data )
+      @quiz.generate_quiz_data
+      @quiz.tap(&:save)
+
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
+      f('#take_quiz_link').click
+      wait_for_ajaximations
+      mfitb_fields = ffj('.question_input')
+      # fill out all the blanks with random info selenium gives us, map the string value to an array
+      mfitb_array = mfitb_fields.map do |element|
+        value = element.to_s
+        set_value(element, value)
+        element = value
+      end
+      f('.quiz-header').click
+      f('#submit_quiz_button').click
+      # upon page refresh, check the answer blanks and store those in an array, then compare to our previous array
+      wait_for_ajax_requests
+      answer_fields = ff('.question_input')
+      answer_array = answer_fields.map { |element| driver.execute_script("return $(arguments[0]).val()", element) }
+      expect(answer_array).to eq mfitb_array
+    end
+  end
+
   context "who closes the session without submitting" do
     it "should automatically grade the submission when it becomes overdue" do
       skip('disabled because of regression')
