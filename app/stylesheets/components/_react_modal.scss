@@ -30,10 +30,36 @@ See `app/jsx/examples/ReactModalExample.jsx` for example usages.
   width: 600px;
   opacity: 0;
 
-  &--after-open {
-    opacity: 1;
-    transition: opacity 150ms ease-in;
-  }
+  // To accomodate different kinds of modals, styles for 
+  // the regular Canvas modal have been scoped under the
+  // .ReactModal__Content--canvas class. So if you want a
+  // normal modal, remember to add className='ReactModal__Content--canvas'
+  // when you initialize the modal in your JSX.
+  // This className will append itself to the .ReactModal__Content
+  // element, and you will get all the nice styles below.
+
+  &.ReactModal__Content--canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 6px;
+    @include breakpoint(mini-tablet) { padding: 12px; }
+    @include breakpoint(tablet) { padding: 0; }
+    
+    .ReactModal__Layout {
+      border-radius: $baseBorderRadius;
+      box-shadow: 0 1px 4px 1px rgba($canvas-secondary, 0.95);
+      
+      @include breakpoint(tablet) { 
+        width: 696px;
+        transition: all 0.5s cubic-bezier(0,1,0.5,1);
+        opacity: 0;
+        transform: rotateX(60deg) scale(0.8);
+      }
+
+    }
 
   &--before-close {
     opacity: 0;
@@ -64,9 +90,17 @@ See `app/jsx/examples/ReactModalExample.jsx` for example usages.
       }
     }
 
-    .modal-body {
-      padding: 0 15px;
-      position: relative;
+    .ReactModal__Header {
+      @include ReactModalPadding;
+      display: flex;
+      align-items: center;
+      background: $canvas-light;
+      border-bottom: 1px solid $can-border-light;
+      // Adding this class for cases where header is called in separately from InnerSection
+      &.ReactModal__Header--force-no-corners {
+        border-bottom-left-radius: 0; border-bottom-right-radius: 0;  
+      }
+    }
 
       label {
         font-weight: bold;
@@ -76,9 +110,16 @@ See `app/jsx/examples/ReactModalExample.jsx` for example usages.
         margin-bottom: 0;
       }
 
-      .hint-text {
-        font-size: 12px;
+    .ReactModal__Body {
+      padding: 6px;
+      background: $canvas-light;
+      @include breakpoint(tablet) { padding: 16px; }
+      @include breakpoint(desktop) { padding: 24px; }
+      // Adding this class for cases where header is called in separately from InnerSection
+      &.ReactModal__Body--force-no-corners {
+        border-top-left-radius: 0; border-top-right-radius: 0;  
       }
+    }
 
       .error .hint-text {
         color: #b94a48;

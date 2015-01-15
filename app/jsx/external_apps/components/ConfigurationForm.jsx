@@ -139,17 +139,17 @@ define([
     render() {
       return (
         <form className="ConfigurationForm">
-          <div className="modal-body">
+          <div className="ReactModal__InnerSection ReactModal__Body--force-no-corners ReactModal__Body">
             {this.configurationTypeSelector()}
             <div className="formFields">
-              <div className={this.props.showConfigurationSelector ? 'well content-box' : 'content-box'}>
-                {this.form()}
-              </div>
+              {this.form()}
             </div>
           </div>
-          <div className="modal-footer">
-            {this.props.children}
-            <button type="submit" className="btn btn-primary" onClick={this.handleSubmit}>{I18n.t('Submit')}</button>
+          <div className="ReactModal__InnerSection ReactModal__Footer">
+            <div className="ReactModal__Footer-Actions">
+              {this.props.children}
+              <button type="submit" className="btn btn-primary" onClick={this.handleSubmit}>{I18n.t('Submit')}</button>
+            </div>
           </div>
         </form>
       )

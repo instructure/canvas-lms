@@ -18,7 +18,7 @@ define([
     render() {
       return (
         <div className="ConfigurationsTypeSelector">
-          <div className="form-group" style={{ 'margin-top': 10 }}>
+          <div className="form-group">
             <label>{I18n.t('Configuration Type')}</label>
             <select ref="configurationType" defaultValue={this.props.configurationType} className="form-control input-block-level" onChange={this.props.handleChange}>
               <option value="manual">{I18n.t('Manual Entry')}</option>
