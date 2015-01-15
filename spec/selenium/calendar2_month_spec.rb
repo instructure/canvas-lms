@@ -211,6 +211,32 @@ describe "calendar2" do
         change_calendar(:today)
         expect(f(".fc-state-highlight")).not_to be_nil
       end
+
+      it "should show the location when clicking on a calendar event" do
+        location_name = "brighton"
+        location_address = "cottonwood"
+        make_event(:location_name => location_name, :location_address => location_address)
+        load_month_view
+
+        #Click calendar item to bring up event summary
+        f(".fc-event-title").click
+
+        #expect to find the location name and address
+        expect(f('.event-details-content').text).to include_text(location_name)
+        expect(f('.event-details-content').text).to include_text(location_address)
+      end
+
+      it "should bring up a calendar date picker when clicking on the month" do
+        load_month_view
+
+        #Click on the month header
+        f('.navigation_title').click
+
+        # Expect that a the event picker is present
+        # Check various elements to verify that the calendar looks good
+        expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
+        expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+      end
     end
   end
 end

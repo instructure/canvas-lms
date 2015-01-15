@@ -235,6 +235,5 @@ describe "calendar2" do
         expect(f("#context-list li[data-context=user_#{@user.id}]")).to have_class('not-checked')
       end
     end
-
   end
 end

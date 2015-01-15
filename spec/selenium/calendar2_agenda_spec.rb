@@ -193,6 +193,32 @@ describe "calendar2" do
         #Make sure that today's date is in the header
         expect(f('.navigation_title_text').text).to include(date)
       end
+
+      it "should show the location when clicking on a calendar event" do
+        location_name = "brighton"
+        location_address = "cottonwood"
+        make_event(:location_name => location_name, :location_address => location_address)
+        load_agenda_view
+
+        #Click calendar item to bring up event summary
+        f(".ig-row").click
+
+        #expect to find the location name and address
+        expect(f('.event-details-content').text).to include_text(location_name)
+        expect(f('.event-details-content').text).to include_text(location_address)
+      end
+
+      it "should bring up a calendar date picker when clicking on the agenda range" do
+        load_agenda_view
+
+        #Click on the agenda header
+        f('.navigation_title').click
+
+        # Expect that a the event picker is present
+        # Check various elements to verify that the calendar looks good
+        expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
+        expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+      end
     end
   end
 end
