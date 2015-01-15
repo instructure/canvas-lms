@@ -41,10 +41,6 @@ define [
     submit: ->
       values = @refs.usageSelection.getValues()
 
-      # No copyright specified
-      if (@refs.usageSelection.refs.copyright? and !values.copyright)
-        $(@refs.usageSelection.refs.copyright.getDOMNode()).errorBox(I18n.t('You must specify the copyright holder.'))
-        return false
       # They didn't choose a copyright
       if (values.use_justification == 'choose')
         $(@refs.usageSelection.refs.usageRightSelection.getDOMNode()).errorBox(I18n.t('You must specify a usage right.'))
@@ -74,7 +70,7 @@ define [
         'choose'
 
     defaultCopyright: ->
-      copyright = @props.itemsToManage[0].get('usage_rights')?.legal_copyright || @props.itemsToManage[0].get('usage_rights')?.license
+      copyright = @props.itemsToManage[0].get('usage_rights')?.legal_copyright || ''
       if @props.itemsToManage.every((item) -> (item.get('usage_rights')?.legal_copyright == copyright) || (item.get('usage_rights')?.license == copyright))
         copyright
       else
