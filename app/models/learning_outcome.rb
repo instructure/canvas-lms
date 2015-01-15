@@ -196,8 +196,12 @@ class LearningOutcome < ActiveRecord::Base
     tags
   end
 
-  def remove_alignment(asset, context, opts={})
-    tag = self.alignments.where(content_id: asset, content_type: asset.class.to_s, tag_type: 'learning_outcome', context_id: context, context_type: context.class.to_s).first
+  def remove_alignment(alignment_id, context)
+    tag = self.alignments.where({
+      context_id: context,
+      context_type: context.class_name,
+      id: alignment_id
+    }).first
     tag.destroy if tag
     tag
   end

@@ -534,6 +534,21 @@ describe LearningOutcome do
         end
       end
     end
+
+    it "should destroy provided alignment" do
+      @alignment = ContentTag.create({
+        content: @outcome,
+        context: @outcome.context,
+        tag_type: 'learning_outcome'
+      })
+      @outcome.alignments << @alignment
+
+      expect {
+        @outcome.remove_alignment(@alignment.id, @outcome.context)
+      }.to change {
+        @outcome.alignments.count
+      }.from(1).to(0)
+    end
   end
 
   context "Don't create outcomes with illegal values" do
