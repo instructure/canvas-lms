@@ -19,7 +19,7 @@
 module Api::V1::QuizSubmissionQuestion
   include Api::V1::QuizQuestion
 
-  Includables = %w[ quiz_question ]
+  INCLUDABLES = %w[ quiz_question ]
 
   # @param [Array<QuizQuestion>] quiz_questions
   # @param [Hash] submission_data
@@ -27,25 +27,27 @@ module Api::V1::QuizSubmissionQuestion
   # @param [Array<String>] meta[:includes]
   # @param [User] meta[:user]
   # @param [Hash] meta[:session]
-  def quiz_submission_questions_json(quiz_questions, submission_data, meta = {})
+  # @param [Boolean] meta[:censored] if answer correctness should be censored out
+  def quiz_submission_questions_json(quiz_questions, quiz_submission, meta = {})
     quiz_questions = [ quiz_questions ] unless quiz_questions.kind_of?(Array)
-    includes = (meta[:includes] || []) & Includables
+    includes = (meta[:includes] || []) & INCLUDABLES
 
     data = {}
     data[:quiz_submission_questions] = quiz_questions.map do |qq|
-      quiz_submission_question_json(qq, submission_data)
+      quiz_submission_question_json(qq, quiz_submission, meta)
     end
 
-    if includes.include? 'quiz_question'
+    if includes.include?('quiz_question')
       data[:quiz_questions] = questions_json(quiz_questions,
-        meta[:user],
-        meta[:session])
+                                             meta[:user],
+                                             meta[:session],
+                                             nil, [],
+                                             meta[:censored],
+                                             quiz_submission.quiz_data)
     end
 
     unless includes.empty?
-      data[:meta] = {
-        primaryCollection: 'quiz_submission_questions'
-      }
+      data[:meta] = { primaryCollection: 'quiz_submission_questions' }
     end
 
     data
@@ -58,13 +60,16 @@ module Api::V1::QuizSubmissionQuestion
   #   - its "flagged" status
   #   - a representation of its answer which depends on the type of question it
   #     is. See QuizQuestion::AnswerSerializers for possible answer formats.
+  #   - if the answer is correct when applicable.
   #
   # @param [QuizQuestion] qq
   #   A question of a Quiz.
   #
-  # @param [Hash] submission_data
-  #   The QuizSubmission#submission_data in which the question's answer record
+  # @param [QuizSubmission] qs
+  #   The QuizSubmission from which the question's answer record
   #   will be looked up and serialized.
+  # @param [Hash] meta
+  #   Conditional option settings, including :quiz_data, :censored, :includes, :user, and :session parameters.
   #
   # @return [Hash]
   #   The question's answer record. See example for what it contains.
@@ -75,18 +80,24 @@ module Api::V1::QuizSubmissionQuestion
   #     flagged: true,
   #     answer: 123
   #   }
-  def quiz_submission_question_json(qq, submission_data)
+  def quiz_submission_question_json(qq, qs, meta={})
     answer_serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(qq)
-
-    data = {}
-    data[:id] = qq.id.to_s
-    data[:flagged] = to_boolean(submission_data["question_#{qq.id}_marked"])
-    data[:answer] = answer_serializer.deserialize(submission_data, true)
+    meta[:includes] ||= []
+    data = question_json(qq, meta[:user], meta[:session], nil, meta[:includes], meta[:censored], qs[:quiz_data] )
+    if qs.submission_data.is_a? Hash #ungraded
+      data[:flagged] = to_boolean(qs.submission_data["question_#{qq.id}_marked"])
+      data[:answer] = answer_serializer.deserialize(qs.submission_data, true)
+    else
+      question_data = qs.submission_data.select {|h| h[:question_id] == qq.id}
+      return data if question_data.empty?
+      data[:flagged] = false
+      data[:correct] = question_data.first[:correct]
+    end
     data
   end
 
-  private
 
+  private
   def to_boolean(v)
     Canvas::Plugin.value_to_boolean(v)
   end
