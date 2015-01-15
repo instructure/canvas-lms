@@ -228,13 +228,17 @@ fieldset.rate_app_wrapper {
   margin: 0px;
 }
 
-fieldset.add-app-modal {
-  padding: 10px;
+.ConfigurationForm {
+  margin: 0px;
 }
 
-.ExternalAppsRoot, .ReactModal__Content--external_tools {
+.ExternalAppsRoot, .ReactModal__Content--canvas {
   .control-group {
     margin-bottom: 2px;
+  }
+
+  textarea {
+    margin-bottom: 0;
   }
 
   label {
@@ -247,8 +251,12 @@ fieldset.add-app-modal {
     }
 
     .hint-text {
+      font-size: 12px;
       font-weight: normal;
       display: block;
     }
+  }
+  .error .hint-text {
+    color: $canvas-danger;
   }
 }

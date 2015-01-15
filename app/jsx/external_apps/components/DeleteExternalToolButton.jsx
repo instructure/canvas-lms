@@ -31,14 +31,14 @@ define([
 
     openModal(e) {
       e.preventDefault();
-      this.setState({ modalIsOpen: true });
+      this.setState({modalIsOpen: true});
     },
 
     closeModal(cb) {
       if (typeof cb === 'function') {
-        this.setState({ modalIsOpen: false }, cb);
+        this.setState({modalIsOpen: false}, cb);
       } else {
-        this.setState({ modalIsOpen: false });
+        this.setState({modalIsOpen: false});
       }
     },
 
@@ -54,24 +54,37 @@ define([
     render() {
       return (
         <span className="DeleteExternalToolButton">
-          <a href="#" role="button" aria-label={I18n.t('Delete %{toolName} App', { toolName: this.props.tool.attributes.name })} className="delete_tool_link lm" onClick={this.openModal}>
+          <a href="#" role="button" aria-label={I18n.t('Delete %{toolName} App', {toolName: this.props.tool.attributes.name})} className="delete_tool_link lm" onClick={this.openModal}>
             <i className="icon-trash btn"></i>
           </a>
-          <Modal className="ReactModal__Content--external_tools ReactModal__Content--confirm" closeTimeoutMS={CLOSE_TIMEOUT} isOpen={this.state.modalIsOpen} onRequestClose={this.closeModal}>
-            <div className="modal-content">
-              <div className="modal-header">
-                <button type="button" className="close" onClick={this.closeModal}>
-                  <span aria-hidden="true">&times;</span>
-                  <span className="screenreader-only">{I18n.t('Close')}</span>
-                </button>
-                <h4 className="modal-title">{I18n.t('Delete %{tool} App?', {tool: this.props.tool.attributes.name})}</h4>
+          <Modal className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
+            overlayClassName="ReactModal__Overlay--canvas"
+            isOpen={this.state.modalIsOpen}
+            onRequestClose={this.closeModal}>
+
+            <div className="ReactModal__Layout">
+
+              <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
+                <div className="ReactModal__Header-Title">
+                  <h4>{I18n.t('Delete %{tool} App?', {tool: this.props.tool.attributes.name})}</h4>
+                </div>
+                <div className="ReactModal__Header-Actions">
+                  <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
+                    <i className="icon-x"></i>
+                    <span className="screenreader-only">Close</span>
+                  </button>
+                </div>
               </div>
-              <div className="modal-body">
+
+              <div className="ReactModal__InnerSection ReactModal__Body">
                 {I18n.t('Are you sure you want to remove this tool?')}
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
-                <button type="button" className="btn btn-danger" onClick={this.deleteTool}>{I18n.t('Delete')}</button>
+
+              <div className="ReactModal__InnerSection ReactModal__Footer">
+                <div className="ReactModal__Footer-Actions">
+                  <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
+                  <button type="button" className="btn btn-danger" onClick={this.deleteTool}>{I18n.t('Delete')}</button>
+                </div>
               </div>
             </div>
           </Modal>
