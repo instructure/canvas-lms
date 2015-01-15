@@ -15,6 +15,7 @@ define [
     @optionProperty 'href'
     @optionProperty 'focusStyleClass'
     @optionProperty 'selectedStyleClass'
+    @optionProperty 'autoFetch'
 
     # Handle keyboard events for accessibility.
     events:
@@ -56,6 +57,7 @@ define [
           dndOptions: @dndOptions
           href: @href
           selectedStyleClass: @selectedStyleClass
+          autoFetch: @autoFetch
         }).$el.appendTo(@$folderTree)
       super
 
