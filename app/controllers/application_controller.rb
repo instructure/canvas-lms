@@ -341,6 +341,10 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  def run_login_hooks
+    LoginHooks.run_hooks(request)
+  end
+
   # checks the authorization policy for the given object using
   # the vendor/plugins/adheres_to_policy plugin.  If authorized,
   # returns true, otherwise renders unauthorized messages and returns
@@ -374,6 +378,9 @@ class ApplicationController < ActionController::Base
 
   def render_unauthorized_action
     respond_to do |format|
+      @needs_login = (!@current_user && !@files_domain)
+      run_login_hooks if @needs_login
+
       @show_left_side = false
       clear_crumbs
       params = request.path_parameters
@@ -952,6 +959,7 @@ class ApplicationController < ActionController::Base
   # Custom error catching and message rendering.
   def rescue_action_in_public(exception)
     response_code = exception.response_status if exception.respond_to?(:response_status)
+    @show_left_side = exception.show_left_side if exception.respond_to?(:show_left_side)
     response_code ||= response_code_for_rescue(exception) || 500
     begin
       status_code = interpret_status(response_code)
@@ -1008,15 +1016,21 @@ class ApplicationController < ActionController::Base
     load_account unless @domain_root_account
     session[:last_error_id] = error.id rescue nil
     if request.xhr? || request.format == :text
-      render_xhr_exception(error, nil, status, status_code)
+      message = exception.xhr_message if exception.respond_to?(:xhr_message)
+      render_xhr_exception(error, message, status, status_code)
     else
       request.format = :html
-      erbfile = "#{status.to_s[0,3]}_message.html.erb"
-      erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
-      erbfile = "500_message.html.erb" unless File.exists?(erbpath)
+      template = exception.error_template if exception.respond_to?(:error_template)
+      unless template
+        erbfile = "#{status.to_s[0,3]}_message.html.erb"
+        erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
+        erbfile = "500_message.html.erb" unless File.exists?(erbpath)
+        template = "shared/errors/#{erbfile}"
+      end
+
       @status_code = status_code
       message = exception.is_a?(RequestError) ? exception.message : nil
-      render :template => "shared/errors/#{erbfile}",
+      render :template => template,
         :layout => 'application',
         :status => status,
         :locals => {

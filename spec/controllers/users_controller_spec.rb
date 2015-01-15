@@ -1018,4 +1018,22 @@ describe UsersController do
       end
     end
   end
+
+  describe "login hooks" do
+    before :each do
+      a = Account.default
+      a.settings = { :self_registration => true }
+      a.save!
+    end
+
+    it "should hook on new" do
+      controller.expects(:run_login_hooks).once
+      get "new"
+    end
+
+    it "should hook on failed create" do
+      controller.expects(:run_login_hooks).once
+      post "create"
+    end
+  end
 end

@@ -959,6 +959,7 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
+    run_login_hooks
     js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
            :PASSWORD_POLICY => @domain_root_account.password_policy
     render :layout => 'bare'
@@ -1035,6 +1036,7 @@ class UsersController < ApplicationController
   #
   # @returns User
   def create
+    run_login_hooks
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
