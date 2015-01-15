@@ -151,7 +151,13 @@ class SisBatch < ActiveRecord::Base
       break if batches.empty?
       batches.each do |batch|
         batch.process_without_send_later
-        return if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+        if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+          # requeue the job to continue processing more batches
+          work = SisBatch::Work.new(SisBatch, :process_all_for_account, [self.account])
+          Delayed::Job.enqueue(work, job_args)
+
+          return
+        end
       end
     end
   end
