@@ -62,7 +62,8 @@ module SIS
           @accounts_cache[parent.sis_source_id] = parent
         end
 
-        account = @root_account.all_accounts.where(sis_source_id: account_id).first
+        account = @accounts_cache[account_id]
+        account ||= @root_account.all_accounts.where(sis_source_id: account_id).first
         if account.nil?
           raise ImportError, "No name given for account #{account_id}, skipping" if name.blank?
           raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless status =~ /\A(active|deleted)/i
@@ -87,6 +88,8 @@ module SIS
           end
         end
 
+        @accounts_cache[account.sis_source_id] = account
+
         unless account.changed?
           self.accounts_to_set_sis_batch_ids << account.id unless account.sis_batch_id == @batch.try(:id)
           return
@@ -97,7 +100,6 @@ module SIS
         update_account_associations = account.root_account_id_changed? || account.parent_account_id_changed?
         if account.save
           account.update_account_associations if update_account_associations
-          @accounts_cache[account.sis_source_id] = account
 
           @success_count += 1
         else
