@@ -834,9 +834,9 @@ define([
         }
       });
     } else {
-      var draft_state_msf = $('#sequence_footer.draft_state_enabled')
-      if (draft_state_msf.length) {
-        var el = $(draft_state_msf[0]);
+      var sf = $('#sequence_footer')
+      if (sf.length) {
+        var el = $(sf[0]);
         el.moduleSequenceFooter({
           courseID: el.attr("data-course-id"),
           assetType: el.attr("data-asset-type"),
@@ -910,7 +910,7 @@ define([
       });
       setTimeout(function() {
         if(!userSettings.get('hide_wizard_' + pathname)) {
-          $(".wizard_popup_link.auto_open:first").click();
+           // $(".wizard_popup_link.auto_open:first").click();
         }
       }, 500);
     });

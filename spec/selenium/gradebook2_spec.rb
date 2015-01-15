@@ -9,7 +9,6 @@ describe "gradebook2" do
     end
 
     it "hides unpublished/shows published assignments" do
-      @course.root_account.enable_feature!(:draft_state)
       assignment = @course.assignments.create! title: 'unpublished'
       assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"

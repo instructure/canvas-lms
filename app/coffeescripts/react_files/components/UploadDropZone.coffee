@@ -46,8 +46,6 @@ define [
 
     onDrop: (e) ->
       @setState({active: false})
-      unless @shouldAcceptDrop(e.dataTransfer, true)
-        return $.flashError I18n.t('Uploading folders is currently unsupported.')
       FileOptionsCollection.setFolder(@props.currentFolder)
       FileOptionsCollection.setOptionsFromFiles(e.dataTransfer.files, true)
       e.preventDefault()
@@ -68,9 +66,8 @@ define [
     killWindowDrop: (e) ->
       e.preventDefault()
 
-    shouldAcceptDrop: (dataTransfer, isDropEvent = false) ->
-      typesArr = [].slice.call(dataTransfer?.types, 0)
-      return 'Files' in typesArr and !!(if isDropEvent then dataTransfer?.files?.length and [].slice.call(dataTransfer?.files, 0).filter((item) -> item.type).length else true)
+    shouldAcceptDrop: (dataTransfer) ->
+      return 'Files' in dataTransfer?.types
 
     getParent: ->
       @getDOMNode().parentElement

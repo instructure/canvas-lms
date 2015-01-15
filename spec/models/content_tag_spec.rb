@@ -294,11 +294,7 @@ describe ContentTag do
     expect(@assignment.title).to eq 'some assignment (renamed)'
   end
 
-  describe ".update_for with draft state enabled" do
-    before do
-      Course.any_instance.stubs(:draft_state_enabled?).returns(true)
-    end
-
+  describe ".update_for" do
     context "when updating a quiz" do
       before do
         course
@@ -357,8 +353,6 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
-    Account.default.enable_feature!(:draft_state)
-
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
@@ -381,8 +375,6 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
-    Account.default.enable_feature!(:draft_state)
-
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
@@ -411,7 +403,6 @@ describe ContentTag do
   end
 
   it "should publish content via publish!" do
-    Account.default.enable_feature!(:draft_state)
     assignment_model
     @assignment.unpublish!
     @module = @course.context_modules.create!
@@ -423,7 +414,6 @@ describe ContentTag do
   end
 
   it "should unpublish content via unpublish!" do
-    Account.default.enable_feature!(:draft_state)
     quiz_model
     @module = @course.context_modules.create!
     @tag = @module.add_item(type: 'Quiz', id: @quiz.id)

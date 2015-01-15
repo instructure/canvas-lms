@@ -2,7 +2,7 @@
   {{#t 'download_submissions'}}Download all submissions{{/t}}
 </button>
 <div id="submissions_download_dialog" {{bind-attr class="isOpened::hidden"}} >
-  <div class="ui-dialog ui-widget ui-widget-content ui-corner-all" role="dialog" tabindex="-1" style="position: fixed; z-index: 1002; height: 260px;">
+  <div class="ui-dialog ui-widget ui-widget-content ui-corner-all" tabindex="-1" style="position: fixed; z-index: 1002; height: 260px;">
     <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
       <span class="ui-dialog-title" role="heading">Download Assignment Submissions</span>
       <a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button" tabindex="0" {{action 'closeDialog'}}>

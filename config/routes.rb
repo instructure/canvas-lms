@@ -117,43 +117,15 @@ CanvasRails::Application.routes.draw do
     resources :discussion_entries
   end
 
-  concern :wikis do
-    ####
-    ## Leaving these routes here for when we need them later :)
-    ##
-    ## Aside from the /wiki route itself, all new routes will be /pages. The /wiki route will be reused to redirect
-    ## the user to the wiki front page, if configured, or the wiki page list otherwise.
-    ####
-    # get 'wiki' => 'wiki_pages#front_page'
-
-    ####
-    ## Placing these routes above the /wiki routes below will cause the helper functions to generate urls and paths
-    ## pointing to /pages rather than the legacy /wiki.
-    ####
-    # resources :wiki_pages, path: :pages do
-    #   get 'revisions/latest' => 'wiki_page_revisions#latest_version_number', as: :latest_version_number
-    #   resources :wiki_page_revisions, as: "revisions"
-    # end
-    #
-    ####
-    ## We'll just do specific routes below until we can swap /pages and /wiki completely.
-    ####
-    get 'pages' => 'wiki_pages#pages_index'
-    get 'pages/:wiki_page_id' => 'wiki_pages#show_page', wiki_page_id: /[^\/]+/, as: :named_page
-    get 'pages/:wiki_page_id/edit' => 'wiki_pages#edit_page', wiki_page_id: /[^\/]+/, as: :edit_named_page
-    get 'pages/:wiki_page_id/revisions' => 'wiki_pages#page_revisions', wiki_page_id: /[^\/]+/, as: :named_page_revisions
-
-    resources :wiki_pages, path: :wiki do
-      get 'revisions/latest' => 'wiki_page_revisions#latest_version_number', as: :latest_version_number
-      resources :wiki_page_revisions, path: :revisions
+  concern :pages do
+    resources :wiki_pages, path: :pages, except: [:update, :destroy] do
+      get 'revisions' => 'wiki_pages#revisions', as: :revisions
     end
 
-    ####
-    ## This will cause the helper functions to generate /pages urls, but will still allow /wiki routes to work properly
-    ####
-    #get 'pages/:id' => 'wiki_pages#show', id: /[^\/]+/, as: :named_wiki_page
-
-    get 'wiki/:id' => 'wiki_pages#show', as: :named_wiki_page, id: /[^\/]+/
+    get 'wiki' => 'wiki_pages#front_page', as: :wiki
+    get 'wiki/:id' => 'wiki_pages#show_redirect', id: /[^\/]+/
+    get 'wiki/:id/revisions' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
+    get 'wiki/:id/revisions/:revision_id' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
   end
 
   concern :conferences do
@@ -293,7 +265,7 @@ CanvasRails::Application.routes.draw do
 
     concerns :files, :file_images, :relative_files, :folders
     concerns :groups
-    concerns :wikis
+    concerns :pages
     concerns :conferences
     concerns :question_banks
 
@@ -316,6 +288,7 @@ CanvasRails::Application.routes.draw do
           get :record_answer
           post :record_answer
         end
+        resources :events, controller: 'quizzes/quiz_submission_events', path: :log
       end
 
       post 'extensions/:user_id' => 'quizzes/quiz_submissions#extensions', as: :extensions
@@ -480,7 +453,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    concerns :wikis
+    concerns :pages
     concerns :conferences
     concerns :media
 
@@ -823,6 +796,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :account_notifications) do
       post 'accounts/:account_id/account_notifications', action: :create, as: 'account_notification'
+      get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
+      delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
     end
 
     scope(controller: :tabs) do
@@ -999,6 +974,16 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/lti_apps') do
       def et_routes(context)
         get "#{context}s/:#{context}_id/lti_apps/launch_definitions", action: :launch_definitions, as: "#{context}_launch_definitions"
+        get "#{context}s/:#{context}_id/lti_apps", action: :index, as: "#{context}_app_definitions"
+      end
+      et_routes("course")
+      et_routes("account")
+    end
+
+    scope(controller: 'lti/tool_proxy') do
+      def et_routes(context)
+        delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :destroy, as: "#{context}_delete_tool_proxy"
+        put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :update, as: "#{context}_update_tool_proxy"
       end
       et_routes("course")
       et_routes("account")
@@ -1382,8 +1367,9 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/quiz_extensions', action: :create
     end
 
-    scope(controller: "quizzes/quiz_submission_events") do
-      post "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :create, as: 'course_quiz_submission_events'
+    scope(controller: "quizzes/quiz_submission_events_api") do
+      get "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :index, as: 'course_quiz_submission_events'
+      post "courses/:course_id/quizzes/:quiz_id/submissions/:id/events", action: :create, as: 'create_quiz_submission_events'
     end
 
     scope(controller: 'quizzes/quiz_submission_questions') do
@@ -1616,15 +1602,15 @@ CanvasRails::Application.routes.draw do
   ApiRouteSet.draw(self, "/api/lti") do
     ['course', 'account'].each do |context|
       prefix = "#{context}s/:#{context}_id"
-      get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/tool_consumer_profile', action: 'show', as: "#{context}_tool_consumer_profile"
-      post "#{prefix}/tool_proxy", controller: 'lti/tool_proxy', action: :create, as: "create_#{context}_lti_tool_proxy"
+      get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/ims/tool_consumer_profile', action: 'show', as: "#{context}_tool_consumer_profile"
+      post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :create, as: "create_#{context}_lti_tool_proxy"
     end
     #Tool Setting Services
-    get "tool_settings/:tool_setting_id",  controller: 'lti/tool_setting', action: :show, as: 'show_lti_tool_settings'
-    put "tool_settings/:tool_setting_id",  controller: 'lti/tool_setting', action: :update, as: 'update_lti_tool_settings'
+    get "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :show, as: 'show_lti_tool_settings'
+    put "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :update, as: 'update_lti_tool_settings'
 
     #Tool Proxy Services
-    get  "tool_proxy/:tool_proxy_guid", controller: 'lti/tool_proxy', action: :show, as: "show_lti_tool_proxy"
+    get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
 
   end
 end

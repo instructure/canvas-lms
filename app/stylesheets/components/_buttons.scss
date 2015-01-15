@@ -94,10 +94,9 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
 ```
 */
 
-.btn, // <-- deprecated- do not use
+.btn,       // <-- deprecated- do not use
 .Button {
-  @if $use_new_styles { @include canvas-button(darken($canvas-neutral, 1%), $textColor, true); }
-  @else { @include canvas-button(darken($canvas-light, 3%), $textColor, true); }
+  @include canvas-button(darken($canvas-light, 3%), $textColor, true);
   border-radius: $baseBorderRadius;
   transition: background-color 0.2s ease-in-out;
   display: inline-block;
@@ -122,6 +121,12 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
   }
   // If not high-contrast, the "canvas-button" mixin has the :focus state share the same styles as :hover
   @else { &:focus { outline: none; } }
+
+  &.disabled, &[disabled] {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+  }
 
 }
 
@@ -180,9 +185,7 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
 input[type="submit"],
 input[type="reset"],
 input[type="button"] {
-  &.btn-block {
-    width: 100%;
-  }
+  &.btn-block, &.Button--block { width: 100%; }
 }
 
 // Set the backgrounds
@@ -257,4 +260,20 @@ input[type="button"] {
     color: $textColor;
     background: transparent;
   }
+}
+
+
+// Handle jQueryUI-generated button classes
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { @extend .ui-helper-hidden-accessible; }
+
+.ui-button {
+  position: relative;
+  @extend .Button;
+  &.ui-state-hover { @extend .Button:hover }
+  &.ui-state-focus { @extend .Button:focus }
+  &.ui-state-active { 
+    @extend .Button--active;
+    &:hover { @extend .Button--active; }
+  }
+  &.ui-state-disabled { @extend .Button.disabled; }
 }

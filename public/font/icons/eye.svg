@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="19px" height="13px" viewBox="0 0 19 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
-    <title>Oval 143</title>
+<svg width="512px" height="512px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2 (9961) - http://www.bohemiancoding.com/sketch -->
+    <title>512</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Setting-Permissions" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="Muli-File-Selected" sketch:type="MSArtboardGroup" transform="translate(-673.000000, -149.000000)" fill="#5B6C79">
-            <g id="btn-group-3" sketch:type="MSLayerGroup" transform="translate(499.000000, 137.000000)">
-                <g id="btn-preview" transform="translate(158.000000, 0.000000)" sketch:type="MSShapeGroup">
-                    <path d="M25.5,25 C30.7467051,25 35,18.5 35,18.5 C35,18.5 30.7467051,12 25.5,12 C20.2532949,12 16,18.5 16,18.5 C16,18.5 20.2532949,25 25.5,25 Z M25.5,22 C27.4329966,22 29,20.4329966 29,18.5 C29,16.5670034 27.4329966,15 25.5,15 C23.5670034,15 22,16.5670034 22,18.5 C22,20.4329966 23.5670034,22 25.5,22 Z M25.5,21 C26.8807119,21 28,19.8807119 28,18.5 C28,17.1192881 26.8807119,16 25.5,16 C24.1192881,16 23,17.1192881 23,18.5 C23,19.8807119 24.1192881,21 25.5,21 Z" id="Oval-143"></path>
-                </g>
-            </g>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="512" sketch:type="MSArtboardGroup" fill="#000000">
+            <path d="M256,431 C397.384895,431 512,256 512,256 C512,256 397.384895,81 256,81 C114.615105,81 0,256 0,256 C0,256 114.615105,431 256,431 L256,431 Z M256.533333,350.969512 C308.669013,350.969512 350.933333,308.689085 350.933333,256.533537 C350.933333,204.377988 308.669013,162.097561 256.533333,162.097561 C204.397654,162.097561 162.133333,204.377988 162.133333,256.533537 C162.133333,308.689085 204.397654,350.969512 256.533333,350.969512 L256.533333,350.969512 Z M256,323.22561 C293.113536,323.22561 323.2,293.12768 323.2,256 C323.2,218.87232 293.113536,188.77439 256,188.77439 C218.886464,188.77439 188.8,218.87232 188.8,256 C188.8,293.12768 218.886464,323.22561 256,323.22561 L256,323.22561 Z" id="eye" sketch:type="MSShapeGroup"></path>
         </g>
     </g>
 </svg>

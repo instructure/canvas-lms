@@ -7,7 +7,7 @@
   differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable, true, differentiated_assignments_on, @current_user) do %>
+<% cache_if_module(context_module, editable, differentiated_assignments_on, @current_user) do %>
 
 <div
   class="item-group-condensed context_module

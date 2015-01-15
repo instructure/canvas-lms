@@ -122,6 +122,19 @@ describe UsersController do
     expect(courses.map { |c| c['id'] }).to eq [course2.id]
   end
 
+  it "should sort the results of manageable_courses by name" do
+    course_with_teacher_logged_in(:course_name => "B", :active_all => 1)
+    %w(c d a).each do |name|
+      course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1)
+    end
+
+    get 'manageable_courses', :user_id => @teacher.id
+    expect(response).to be_success
+
+    courses = json_parse
+    expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
+  end
+
   context "GET 'delete'" do
     it "should fail when the user doesn't exist" do
       account_admin_user

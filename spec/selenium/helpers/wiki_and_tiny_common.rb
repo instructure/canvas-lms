@@ -17,8 +17,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def wiki_page_tools_file_tree_setup
     @root_folder = Folder.root_folders(@course).first
-    @sub_folder = @root_folder.sub_folders.create!(:name => 'subfolder', :context => @course);
-    @sub_sub_folder = @sub_folder.sub_folders.create!(:name => 'subsubfolder', :context => @course);
+    @sub_folder = @root_folder.sub_folders.create!(:name => 'subfolder', :context => @course)
+    @sub_sub_folder = @sub_folder.sub_folders.create!(:name => 'subsubfolder', :context => @course)
     @text_file = @root_folder.attachments.create!(:filename => 'text_file.txt', :context => @course) { |a| a.content_type = 'text/plain' }
     @image1 = @root_folder.attachments.build(:context => @course)
     path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')

@@ -19,9 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::SubmissionManager do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   describe '#find_or_create_submission' do
     let(:test_user) { user }

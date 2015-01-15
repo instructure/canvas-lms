@@ -216,6 +216,54 @@ describe ContentMigration do
       expect(ans_count).to eql(4)
     end
 
+    it "should make true-false question answers consistent" do
+      q = @copy_from.quizzes.create!(:title => "test quiz")
+      tf = q.quiz_questions.create!
+      tf.write_attribute(:question_data, {
+           points_possible: 1,
+           question_type: "true_false_question",
+           question_name: "tf",
+           name: "tf",
+           question_text: "this statement is false.",
+           answers: [{ text: "false", weight: 0, id: 9093 },
+                     { text: "true", weight: 100, id: 9608 }]
+       }.with_indifferent_access)
+      tf.save!
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
+      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["True", "False"]
+      expect(q2.quiz_data.first["answers"].map { |a| a["weight"] }).to eq [100, 0]
+    end
+
+    it "should import invalid true-false questions as multiple choice" do
+      q = @copy_from.quizzes.create!(:title => "test quiz")
+      tf_bad = q.quiz_questions.create!
+      tf_bad.write_attribute(:question_data, {
+          points_possible: 1,
+          question_type: "true_false_question",
+          question_name: "tf",
+          name: "tf",
+          question_text: "this statement is false.",
+          answers: [{ text: "foo", weight: 0, id: 9093 },
+                    { text: "tr00", weight: 100, id: 9608 }]
+      }.with_indifferent_access)
+      tf_bad.save!
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
+      expect(q2.quiz_data.first["question_type"]).to eq "multiple_choice_question"
+      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["foo", "tr00"]
+    end
+
     it "should copy quizzes as published if they were published before" do
       g = @copy_from.assignment_groups.create!(:name => "new group")
       asmnt_unpub = @copy_from.quizzes.create!(:title => "asmnt unpub", :quiz_type => "assignment", :assignment_group_id => g.id)

@@ -46,10 +46,9 @@ We don't use Bootstraps modal dialog, please use jQuery UI `ui-dialog` with our 
   padding: 0;
 
   .ui-dialog-titlebar-close {
-    span { background: url(/images/jqueryui/icon_sprite.png) 0 -16px no-repeat; }
+    span { background: url(/images/modal_close.svg) 0 0 no-repeat; background-size: 16px 16px; }
     &:hover, &:focus {
       border-color: transparent;
-      span { background-position: -16px -16px; }
     }
   }
 }

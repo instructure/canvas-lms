@@ -135,7 +135,7 @@ define [
       @$wrapper = $(@cellWrapper("""
         <div class="overflow-wrapper">
           <div class="grade-and-outof-wrapper">
-            <input type="number" #{@ariaLabel(submission.submission_type)} class="grade"/><span class="outof"><span class="divider">/</span>#{@opts.column.object.points_possible}</span>
+            <input type="text" #{@ariaLabel(submission.submission_type)} class="grade"/><span class="outof"><span class="divider">/</span>#{@opts.column.object.points_possible}</span>
           </div>
         </div>
       """, { classes: 'gradebook-cell-out-of-formatter' })).appendTo(@opts.container)

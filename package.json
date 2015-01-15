@@ -11,6 +11,7 @@
     "lodash": "^2.4.1",
     "mkdirp": "^0.5.0",
     "node-sass": "0.9.3",
+    "coffee-script": "1.6.2",
     "react-tools": "0.11.2"
   },
   "devDependencies": {

@@ -61,23 +61,5 @@ require [
         $("#wizard_box").slideDown "slow", ->
           $(this).find(".option.publish_step").click()
 
-    unless ENV.DRAFT_STATE
-      $("#edit_course_home_content_select").change(->
-        $(this).parents("form").find(".options_details").hide().end().find("." + $(this).val() + "_details").show().end().find(".select_details").show()
-      ).triggerHandler "change"
-      
-    $(".edit_course_home_content_link").click (event) ->
-      event.preventDefault()
-      $("#edit_course_home_content").show()
-      $("#course_home_content").hide()
-
-    $("#edit_course_home_content .cancel_button").click ->
-      $("#edit_course_home_content").hide()
-      $("#course_home_content").show()
-
-    $("[aria-controls=edit_course_home_content_form]").click ->
-      setTimeout (->
-        $("#edit_course_home_content_select").focus()
-      ), 0
 
 

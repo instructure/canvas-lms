@@ -172,9 +172,6 @@ describe SubmissionList do
     end
   end
   context "regrading" do
-    before :each do
-    end
-
     it 'should include regrade events in the final data' do
       # Figure out how to manually regrade a test piece of data
       interesting_submission_data

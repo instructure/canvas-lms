@@ -8,7 +8,7 @@ define [
   'jquery.disableWhileLoading'
 ], ($, Backbone, _, template, autocompleteItemTemplate) ->
   class CourseFindSelectView extends Backbone.View
-    @optionProperty 'current_user_id'
+    @optionProperty 'current_user_id', 'show_select'
     template: template
 
     els: 
@@ -48,6 +48,7 @@ define [
       json = super
       json.terms = @coursesByTerms
       json.include_concluded = @includeConcludedCourses
+      json.show_select = @options.show_select
       json
 
     # Grab a list of courses from the server via the managebleCourseUrl. Disable
@@ -97,7 +98,7 @@ define [
 
     updateSelect: (event, ui) => 
       @setSourceCourseId ui.item.id
-      @$courseSelect.val ui.item.id
+      @$courseSelect.val ui.item.id if @$courseSelect.length
 
     # After selecting a course via the dropdown menu, update the search
     # field to keep the inputs in sync. Also set the source course id

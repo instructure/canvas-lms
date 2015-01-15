@@ -235,7 +235,7 @@ describe UserContent, type: :request do
   end
 
   it "should not choke on funny email addresses" do
-    @wiki_page = @course.wiki.front_page
+    @wiki_page = @course.wiki.wiki_pages.build(:title => "title")
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = 'active'
     @wiki_page.save!
@@ -247,13 +247,15 @@ describe UserContent, type: :request do
   context "data api endpoints" do
     context "course context" do
       it "should process links to each type of object" do
-        @wiki_page = @course.wiki.front_page
+        @wiki_page = @course.wiki.wiki_pages.build(:title => "title")
         @wiki_page.body = <<-HTML
         <p>
           <a href='/courses/#{@course.id}/assignments'>assignments index</a>
           <a href='/courses/#{@course.id}/assignments/9~123'>assignment</a>
           <a href='/courses/#{@course.id}/wiki'>wiki index</a>
           <a href='/courses/#{@course.id}/wiki/test-wiki-page'>wiki page</a>
+          <a href='/courses/#{@course.id}/pages'>wiki index</a>
+          <a href='/courses/#{@course.id}/pages/test-wiki-page'>wiki page</a>
           <a href='/courses/#{@course.id}/discussion_topics'>discussion index</a>
           <a href='/courses/#{@course.id}/discussion_topics/456'>discussion topic</a>
           <a href='/courses/#{@course.id}/files'>files index</a>
@@ -276,6 +278,8 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments/9~123",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
           "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",
@@ -286,7 +290,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
         expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
-            %w([Assignment] Assignment [Page] Page [Discussion] Discussion Folder File File [Quiz] Quiz SessionlessLaunchUrl)
+            %w([Assignment] Assignment [Page] Page [Page] Page [Discussion] Discussion Folder File File [Quiz] Quiz SessionlessLaunchUrl)
         )
       end
     end
@@ -294,11 +298,13 @@ describe UserContent, type: :request do
     context "group context" do
       it "should process links to each type of object" do
         group_with_user(:active_all => true)
-        @wiki_page = @group.wiki.front_page
+        @wiki_page = @group.wiki.wiki_pages.build(:title => "title")
         @wiki_page.body = <<-HTML
         <p>
           <a href='/groups/#{@group.id}/wiki'>wiki index</a>
           <a href='/groups/#{@group.id}/wiki/some-page'>wiki page</a>
+          <a href='/groups/#{@group.id}/pages'>wiki index</a>
+          <a href='/groups/#{@group.id}/pages/some-page'>wiki page</a>
           <a href='/groups/#{@group.id}/discussion_topics'>discussion index</a>
           <a href='/groups/#{@group.id}/discussion_topics/1~123'>discussion topic</a>
           <a href='/groups/#{@group.id}/files'>files index</a>
@@ -315,13 +321,15 @@ describe UserContent, type: :request do
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
             "http://www.example.com/api/v1/groups/#{@group.id}/pages",
             "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
+            "http://www.example.com/api/v1/groups/#{@group.id}/pages",
+            "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
             "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics",
             "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics/1~123",
             "http://www.example.com/api/v1/groups/#{@group.id}/folders/root",
             "http://www.example.com/api/v1/files/789"
         ]
         expect(doc.css('a').collect{ |att| att['data-api-returntype'] }).to eq(
-            %w([Page] Page [Discussion] Discussion Folder File)
+            %w([Page] Page [Page] Page [Discussion] Discussion Folder File)
         )
       end
     end

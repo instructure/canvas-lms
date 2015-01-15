@@ -87,7 +87,7 @@
     <td>
       <span class="time_zone display_data">
         <% if name = @user.time_zone.try(:name) %>
-          <%= I18n.send(:translate, I18nTimeZone[name].keyify, name) %>
+          <%= I18n.send(:translate, I18nTimeZone[name].keyify, name.dup) %>
         <% else %>
           <%= t(:none, "None") %>
         <% end %>

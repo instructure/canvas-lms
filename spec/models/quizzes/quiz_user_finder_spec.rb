@@ -18,9 +18,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizUserFinder do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   before :once do
     course_with_teacher_logged_in(course: @course, active_all: true)

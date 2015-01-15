@@ -128,28 +128,20 @@ describe DiscussionTopic do
 
   describe "visibility" do
     before(:once) do
-      #course_with_teacher(:active_all => 1, :draft_state => false) # this does not disable draft state if it is switched on at the account level
       #student_in_course(:active_all => 1)
-      @course.disable_feature!(:draft_state)
       @topic = @course.discussion_topics.create!(:user => @teacher)
     end
 
-    context "with draft state enabled" do
-      before(:once) do
-        @course.enable_feature!(:draft_state)
-      end
+    it "should be visible to author when unpublished" do
+      @topic.unpublish!
+      expect(@topic.visible_for?(@teacher)).to be_truthy
+    end
 
-      it "should be visible to author when unpublished" do
-        @topic.unpublish!
-        expect(@topic.visible_for?(@teacher)).to be_truthy
-      end
-
-      it "should be visible when published even when for delayed posting" do
-        @topic.delayed_post_at = 5.days.from_now
-        @topic.workflow_state = 'post_delayed'
-        @topic.save!
-        expect(@topic.visible_for?(@student)).to be_truthy
-      end
+    it "should be visible when published even when for delayed posting" do
+      @topic.delayed_post_at = 5.days.from_now
+      @topic.workflow_state = 'post_delayed'
+      @topic.save!
+      expect(@topic.visible_for?(@student)).to be_truthy
     end
 
     it "should not be visible when unpublished even when it is active" do
@@ -161,16 +153,16 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(@student)).to be_truthy
     end
 
-    it "should not be visible to students when topic delayed_post_at is in the future" do
+    it "should be visible to students when topic delayed_post_at is in the future" do
       @topic.delayed_post_at = 5.days.from_now
       @topic.save!
-      expect(@topic.visible_for?(@student)).to @topic.draft_state_enabled? ? be_truthy : be_falsey
+      expect(@topic.visible_for?(@student)).to be_truthy
     end
 
-    it "should not be visible to students when topic is for delayed posting" do
+    it "should be visible to students when topic is for delayed posting" do
       @topic.workflow_state = 'post_delayed'
       @topic.save!
-      expect(@topic.visible_for?(@student)).to @topic.draft_state_enabled? ? be_truthy : be_falsey
+      expect(@topic.visible_for?(@student)).to be_truthy
     end
 
     it "should be visible to students when topic delayed_post_at is in the past" do
@@ -185,7 +177,7 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(@student)).to be_truthy
     end
 
-    it "should not be visible when no delayed_post but assignment unlock date in future" do
+    it "should be visible when no delayed_post but assignment unlock date in future" do
       @topic.delayed_post_at = nil
       group_category = @course.group_categories.create(:name => "category")
       @topic.group_category = group_category
@@ -197,7 +189,7 @@ describe DiscussionTopic do
       @topic.assignment.saved_by = :discussion_topic
       @topic.save
 
-      expect(@topic.visible_for?(@student)).to @topic.draft_state_enabled? ? be_truthy : be_falsey
+      expect(@topic.visible_for?(@student)).to be_truthy
     end
 
     it "should be visible to all teachers in the course" do
@@ -991,6 +983,27 @@ describe DiscussionTopic do
       expect(@student.submissions.first.submission_type).to eq 'discussion_topic'
     end
 
+    it "should create submissions for existing entries in group topics when setting the assignment (even if locked)" do
+      group_category = @course.group_categories.create!(:name => "category")
+      @group1 = @course.groups.create!(:name => "group 1", :group_category => group_category)
+
+      @topic.group_category = group_category
+      @topic.save!
+
+      child_topic = @topic.child_topics.first
+      child_topic.context.add_user(@student)
+      child_topic.reply_from(:user => @student, :text => "entry")
+      @student.reload
+      expect(@student.submissions).to be_empty
+
+      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago)
+      @topic.assignment = @assignment
+      @topic.save
+      @student.reload
+      expect(@student.submissions.size).to eq 1
+      expect(@student.submissions.first.submission_type).to eq 'discussion_topic'
+    end
+
     it "should have the correct submission date if submission has comment" do
       @assignment = @course.assignments.create!(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
@@ -1392,7 +1405,6 @@ describe DiscussionTopic do
     end
 
     it "should restore to unpublished state if draft mode is enabled" do
-      @course.root_account.enable_feature!(:draft_state)
       @topic.destroy
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once

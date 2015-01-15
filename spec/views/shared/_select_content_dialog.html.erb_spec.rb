@@ -35,7 +35,6 @@ describe "/shared/_select_content_dialog" do
   end
 
   it "should include unpublished wiki pages" do
-    Account.default.enable_feature!(:draft_state)
     course_with_teacher
     published_page = @course.wiki.wiki_pages.build title: 'published_page'
     published_page.workflow_state = 'active'
@@ -73,7 +72,7 @@ describe "/shared/_select_content_dialog" do
   end
 
   it "should create new topics in unpublished state if draft state is enabled" do
-    course_with_teacher(active_all: true, draft_state: true)
+    course_with_teacher(active_all: true)
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)

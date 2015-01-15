@@ -47,7 +47,7 @@ describe "course settings" do
     end
 
     it "should show the correct status with a tooltip when published and graded submissions" do
-      course_with_student_submissions({submission_points: true, draft_state: true})
+      course_with_student_submissions({submission_points: true})
       get "/courses/#{@course.id}/settings"
       course_status = f('#course-status')
       expect(course_status.text).to eq 'Course is Published'

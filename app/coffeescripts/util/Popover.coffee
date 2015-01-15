@@ -27,7 +27,7 @@ define [
                 # if the user hits the escape key, reset the focus to what it was.
                 if event.keyCode is $.ui.keyCode.ESCAPE
                   @hide()
-                  @previousTarget.focus() if @previousTarget and @previousTarget.is(':visible')
+                  @previousTarget.focus() if @previousTarget and $(@previousTarget).is(':visible')
                 # If the user tabs or shift-tabs away, close.
                 return unless event.keyCode is $.ui.keyCode.TAB
                 tabbables = $ ":tabbable", @el
@@ -39,11 +39,11 @@ define [
                 else
                   @hide() if index == tabbables.length-1
 
-      @el.delegate '.popover_close', 'click', (event) =>
+      @el.delegate '.popover_close', 'keyclick click', (event) =>
         event.preventDefault()
         @hide()
         # set focus back to the previously focused item.
-        @previousTarget.focus() if @previousTarget and @previousTarget.is(':visible')
+        @previousTarget.focus() if @previousTarget and $(@previousTarget).is(':visible')
 
       @show(clickEvent)
 

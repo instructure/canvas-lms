@@ -848,7 +848,11 @@ ActiveRecord::Relation.class_eval do
     relation = clone
     old_select = relation.select_values
     relation.select_values = ["DISTINCT ON (#{args.join(', ')}) "]
-    relation.uniq_value = false
+    if CANVAS_RAILS3
+      relation.uniq_value = false
+    else
+      relation.distinct_value = false
+    end
     if old_select.empty?
       relation.select_values.first << "*"
     else
@@ -856,6 +860,17 @@ ActiveRecord::Relation.class_eval do
     end
 
     relation
+  end
+end
+
+ActiveRecord::Relation.class_eval do
+  # if this sql is constructed on one shard then executed on another it wont work
+  # dont use it for cross shard queries
+  def union(*scopes)
+    uniq_identifier = "#{table_name}.#{primary_key}"
+    scopes << self
+    sub_query = (scopes).map {|s| s.except(:select).select(uniq_identifier).to_sql}.join(" UNION ALL ")
+    engine.where("#{uniq_identifier} IN (#{sub_query})")
   end
 end
 

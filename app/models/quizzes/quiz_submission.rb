@@ -24,6 +24,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   include Workflow
+
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
   attr_accessor :grader_id
@@ -169,6 +170,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     result.title = "#{user.name}, #{quiz.title}: #{cached_question[:name]}"
 
     result.assessed_at = Time.now
+    result.submitted_at = self.finished_at
+
     result.save_to_version(result.attempt)
     result
   end
@@ -543,8 +546,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     Quizzes::QuizSubmissionHistory.new(self)
   end
 
+  # Load the model for this quiz submission at a given attempt.
+  #
+  # @return [Quizzes::QuizSubmission|NilClass]
+  #   The submission model at that attempt, or nil if there's no such attempt.
+  def model_for_attempt(attempt)
+    attempts.model_for(attempt)
+  end
+
   def questions_regraded_since_last_attempt
-    return unless last_attempt = attempts.last
+    return if attempts.last.nil?
 
     version = attempts.last.versions.first
     quiz.questions_regraded_since(version.created_at)
@@ -863,5 +874,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     participant.anonymous? ?
         where(temporary_user_code: participant.user_code) :
         where(user_id: participant.user.id)
+  end
+
+  def ensure_question_reference_integrity!
+    fixer = ::Quizzes::QuizSubmission::QuestionReferenceDataFixer.new
+    fixer.run!(self)
   end
 end

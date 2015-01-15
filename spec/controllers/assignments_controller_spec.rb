@@ -55,10 +55,6 @@ describe AssignmentsController do
     end
 
     context "draft state" do
-      before :once do
-        @course.root_account.enable_feature!(:draft_state)
-      end
-
       it "should create a default group if none exist" do
         user_session(@student)
 
@@ -204,7 +200,6 @@ describe AssignmentsController do
     end
 
     it "should default to unpublished for draft state" do
-      @course.root_account.enable_feature!(:draft_state)
       @course.require_assignment_group
 
       get 'new', :course_id => @course.id
@@ -246,7 +241,6 @@ describe AssignmentsController do
     end
 
     it "should default to unpublished if draft state is enabled" do
-      Account.default.enable_feature!(:draft_state)
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
       expect(assigns[:assignment]).to be_unpublished
     end

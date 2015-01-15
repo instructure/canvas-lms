@@ -1,0 +1,46 @@
+#ic-QuizInspector__Session {
+  th {
+    text-align: left;
+    padding-right: $whitespace;
+  }
+}
+
+#ic-QuizInspector__AttemptController {
+  box-shadow: 0 0 0 1px $borderColor;
+  display: inline-block;
+  border-radius: 2px;
+  background: $inactiveBg;
+}
+
+.ic-AttemptController__Attempt {
+  display: inline-block;
+  width: 32px;
+  text-align: center;
+  line-height: 24px;
+
+  &, &:hover {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &:first-of-type {
+    border-radius: 2px 0 0 2px;
+  }
+
+  &:last-of-type {
+    border-radius: 0 2px 2px 0;
+  }
+}
+
+.ic-AttemptController__Attempt--is-active {
+  $bg: $canvas-secondary;
+  background: $bg;
+  box-shadow: 0 0 0 1px $bg;
+  margin-right: 1px;
+  margin-left: 1px;
+
+  &, &:hover {
+    color: white;
+    cursor: text;
+  }
+}
