@@ -91,6 +91,7 @@ module SIS
         @accounts_cache[account.sis_source_id] = account
 
         unless account.changed?
+          @success_count += 1
           self.accounts_to_set_sis_batch_ids << account.id unless account.sis_batch_id == @batch.try(:id)
           return
         end
