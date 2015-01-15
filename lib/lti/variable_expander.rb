@@ -260,6 +260,10 @@ module Lti
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_proxy_id) },
                        -> { @tool_setting_proxy_id }
 
+    register_expansion 'ToolConsumerProfile.url', [],
+                       -> { @controller.named_context_url(@tool.context, :context_tool_consumer_profile_url, "339b6700-e4cb-47c5-a54f-3ee0064921a9", include_host: true )},
+                       -> { @tool }
+
     private
 
     def sis_pseudonym

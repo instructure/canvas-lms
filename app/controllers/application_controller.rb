@@ -189,6 +189,25 @@ class ApplicationController < ActionController::Base
     rescue_action_in_public(request.env['action_dispatch.exception'])
   end
 
+  # used to generate context-specific urls without having to
+  # check which type of context it is everywhere
+  def named_context_url(context, name, *opts)
+    if context.is_a?(UserProfile)
+      name = name.to_s.sub(/context/, "profile")
+    else
+      klass = context.class.base_class
+      name = name.to_s.sub(/context/, klass.name.underscore)
+      opts.unshift(context)
+    end
+    opts.push({}) unless opts[-1].is_a?(Hash)
+    include_host = opts[-1].delete(:include_host)
+    if !include_host
+      opts[-1][:host] = context.host_name rescue nil
+      opts[-1][:only_path] = true
+    end
+    self.send name, *opts
+  end
+
   protected
 
   def assign_localizer
@@ -268,25 +287,6 @@ class ApplicationController < ActionController::Base
       reset_session
       redirect_to login_url
     end
-  end
-
-  # used to generate context-specific urls without having to
-  # check which type of context it is everywhere
-  def named_context_url(context, name, *opts)
-    if context.is_a?(UserProfile)
-      name = name.to_s.sub(/context/, "profile")
-    else
-      klass = context.class.base_class
-      name = name.to_s.sub(/context/, klass.name.underscore)
-      opts.unshift(context)
-    end
-    opts.push({}) unless opts[-1].is_a?(Hash)
-    include_host = opts[-1].delete(:include_host)
-    if !include_host
-      opts[-1][:host] = context.host_name rescue nil
-      opts[-1][:only_path] = true
-    end
-    self.send name, *opts
   end
 
   def user_url(*opts)

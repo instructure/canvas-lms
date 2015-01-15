@@ -28,9 +28,11 @@ module Lti
     let(:tool) do
       m = mock('tool')
       m.stubs(:id).returns(1)
+      m.stubs(:context).returns(root_account)
       shard_mock = mock('shard')
       shard_mock.stubs(:settings).returns({encription_key: 'abc'})
       m.stubs(:shard).returns(shard_mock)
+      m
     end
     let(:controller) do
       request_mock = mock('request')
@@ -39,10 +41,11 @@ module Lti
       m = mock('controller')
       m.stubs(:request).returns(request_mock)
       m.stubs(:logged_in_user).returns(user)
+      m.stubs(:named_context_url).returns('url')
       m
     end
 
-    subject { described_class.new(root_account, account, controller, current_user: user) }
+    subject { described_class.new(root_account, account, controller, current_user: user, tool: tool) }
 
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(subject.lti_helper).not_to be nil
@@ -386,6 +389,11 @@ module Lti
           expect(exp_hash[:test]).to eq 7878
         end
 
+        it 'has substitution for ToolConsumerProfile.url' do
+          exp_hash = {test: '$ToolConsumerProfile.url'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'url'
+        end
       end
     end
 
