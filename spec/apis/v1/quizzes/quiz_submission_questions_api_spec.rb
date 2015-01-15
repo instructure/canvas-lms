@@ -38,13 +38,16 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       qq
     end
 
-    def ask_and_answer_stuff
+    def create_question_set
       @qq1 = create_question 'multiple_choice'
       @qq2 = create_question 'true_false'
+      create_answers
+    end
 
+    def create_answers(opts={correct: true})
       @quiz_submission.submission_data = {
-        "question_#{@qq1.id}" => "1658",
-        "question_#{@qq2.id}" => "8950"
+        "question_#{@qq1.id}" => opts[:correct] ? "1658" : "2405",
+        "question_#{@qq2.id}" => opts[:correct] ? "8950" : "8403"
       }
     end
 
@@ -53,7 +56,8 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       params = { :controller => 'quizzes/quiz_submission_questions',
                  :action => 'index',
                  :format => 'json',
-                 :quiz_submission_id => @quiz_submission.id.to_s }
+                 :quiz_submission_id => @quiz_submission.id.to_s,
+                 :quiz_submission_attempt => options[:quiz_submission_attempt]}
       if options[:raw]
         raw_api_call(:get, url, params, data)
       else
@@ -135,37 +139,56 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   include Helpers
 
+
   describe 'GET /quiz_submissions/:quiz_submission_id/questions [index]' do
-    before :each do
+    before :all do
       course_with_student(:active_all => true)
-      @quiz = quiz_model(course: @course)
+      @quiz = @course.quizzes.create!({
+          title: 'test quiz',
+          show_correct_answers: true,
+          show_correct_answers_last_attempt: true,
+          allowed_attempts: 2
+        })
       @quiz_submission = @quiz.generate_submission(@student)
     end
 
-    it 'should be unauthorized' do
+    it 'should be authorized for student' do
       json = api_index({}, { raw: true })
-      assert_status(401)
+      assert_status(200)
     end
 
     it 'should return an empty list' do
-      skip
       json = api_index
       expect(json.has_key?('quiz_submission_questions')).to be_truthy
       expect(json['quiz_submission_questions'].size).to eq 0
     end
 
-    it 'should list all items' do
-      skip
-      ask_and_answer_stuff
+    describe "with data" do
+      before :all do
+        create_question_set
+      end
+      it 'should list all items' do
+        json = api_index
+        expect(json['quiz_submission_questions'].size).to eq 2
+      end
 
-      json = api_index
-      expect(json['quiz_submission_questions'].size).to eq 2
+      it "should return questions for a previous version of the quiz" do
+        @quiz.generate_quiz_data
+        @quiz.save!
+        @quiz_submission = @quiz.generate_submission(@student)
+        @quiz_submission.complete!(create_answers)
+        @quiz_submission = @quiz.generate_submission(@student)
+        @quiz_submission.complete!(create_answers({correct: false}))
+        json = api_index
+        expect(json['quiz_submission_questions'].map {|q| q['correct']}.all?).to be_falsey
+        json = api_index({}, {quiz_submission_attempt: 2})
+        expect(json['quiz_submission_questions'].map {|q| q['correct']}.all?).to be_truthy
+      end
     end
 
-    it 'should restrict access to itself' do
-      skip
+    it "should deny access to another student" do
       student_in_course
-      json = api_index({}, { raw: true })
+      api_index({}, {raw: true})
       assert_status(401)
     end
   end
@@ -176,11 +199,12 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
 
-      ask_and_answer_stuff
+      create_question_set
       @question = @qq1
     end
 
     it 'should be unauthorized' do
+      skip
       json = api_show({}, { raw: true })
       assert_status(401)
     end
@@ -590,11 +614,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         expect(json['quiz_submission_questions']).to be_present
         expect(json['quiz_submission_questions'].length).to eq 2
         expect(json['quiz_submission_questions'].detect do |q|
-          q['id'] == "#{question1.id}"
+          q['id'] == question1.id
         end['answer']).to eq '1658'
 
         expect(json['quiz_submission_questions'].detect do |q|
-          q['id'] == "#{question2.id}"
+          q['id'] == question2.id
         end['answer']).to eq 0.0025
       end
     end
@@ -616,6 +640,13 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       expect(json['quiz_submission_questions'].length).to eq 1
       expect(json['quiz_submission_questions'][0]['flagged']).to eq true
     end
+
+    it "should prevent unauthorized flagging" do
+      @question = create_question('multiple_choice')
+      student_in_course
+      api_flag({}, {raw: true})
+      assert_status(403)
+    end
   end
 
   describe 'PUT /quiz_submissions/:quiz_submission_id/questions/:id/unflag [unflag]' do
@@ -633,6 +664,13 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       expect(json['quiz_submission_questions']).to be_present
       expect(json['quiz_submission_questions'].length).to eq 1
       expect(json['quiz_submission_questions'][0]['flagged']).to eq false
+    end
+
+    it "should prevent unauthorized unflagging" do
+      @question = create_question('multiple_choice')
+      student_in_course
+      api_unflag({}, {raw: true})
+      assert_status(403)
     end
   end
 end
