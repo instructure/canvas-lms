@@ -18,9 +18,8 @@
 
 module Lti
   class MessageController < ApplicationController
-    before_filter :require_context, except: :registration_return
-    skip_before_filter :require_user, only: :registration_return
-    skip_before_filter :load_user, only: :registration_return
+
+    before_filter :require_context
 
     def registration
       if authorized_action(@context, @current_user, :update)
