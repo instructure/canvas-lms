@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::User
   include Api::V1::WikiPage
   include Lti::MessageHelper
+  include LegalInformationHelper
   around_filter :set_locale
 
   helper :all
