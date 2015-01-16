@@ -82,10 +82,6 @@ define [
         if (values.use_justification == 'choose')
           $(@refs.usageSelection.refs.usageRightSelection.getDOMNode()).errorBox(I18n.t('You must specify a usage right.'))
           return false
-        # No copyright specified
-        if (!values.copyright and @refs.usageSelection.refs.copyright?)
-          $(@refs.usageSelection.refs.copyright.getDOMNode()).errorBox(I18n.t('You must specify the copyright holder.'))
-          return false
 
         # We need to first set usage rights before handling the setting of
         # restricted access things.
@@ -141,7 +137,7 @@ define [
       div {className: 'RestrictedDialogForm__banner col-xs-12'},
         span {className: 'alert'},
           i {className: 'icon-warning RestrictedDialogForm__warning'}
-          I18n.t('Before publishing you must set usage rights on your files. This is set by your account admin. If you have problems please contact them.')
+          I18n.t('Before publishing, you must set usage rights on your files.')
 
     ###
     # Renders out the restricted access form
