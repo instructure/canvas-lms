@@ -20,7 +20,7 @@ define([
       return (
         <div className="grid-row">
           <div className="col-xs-12">
-            <label className="checkbox text-left">
+            <label className="checkbox">
               <input type="checkbox" data-rel={this.props.name} onChange={this.props.handleChange} /> {this.props.description}
             </label>
           </div>
@@ -32,14 +32,16 @@ define([
       return (
         <div className="grid-row">
           <div className="col-xs-12">
-            <label className="text-left">{this.props.description}</label>
-            <input type="text"
-              className="form-control input-block-level"
-              placeholder={this.props.description}
-              defaultValue={this.props.value}
-              required={this.props.required}
-              data-rel={this.props.name}
-              onChange={this.props.handleChange} />
+            <label>
+              {this.props.description}
+              <input type="text"
+                className="form-control input-block-level"
+                placeholder={this.props.description}
+                defaultValue={this.props.value}
+                required={this.props.required}
+                data-rel={this.props.name}
+                onChange={this.props.handleChange} />
+            </label>
           </div>
         </div>
       );
