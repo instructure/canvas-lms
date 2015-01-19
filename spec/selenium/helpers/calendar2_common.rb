@@ -154,21 +154,18 @@ end
 
 def load_week_view
   get "/calendar2"
-  wait_for_ajaximations
   f('#week').click
   wait_for_ajaximations
 end
 
 def load_month_view
   get "/calendar2"
-  wait_for_ajaximations
   f('#month').click
   wait_for_ajaximations
 end
 
 def load_agenda_view
   get "/calendar2"
-  wait_for_ajaximations
   f('#agenda').click
   wait_for_ajaximations
 end

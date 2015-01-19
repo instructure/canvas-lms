@@ -17,6 +17,12 @@ describe "calendar2" do
     end
 
     context "week view" do
+
+      it "should navigate to week view when week button is clicked", :priority => "2" do
+        load_week_view
+        expect(fj('.fc-view-agendaWeek:visible')).to be_present
+      end
+
       it "should render assignments due just before midnight" do
         skip("fails on event count validation")
         assignment_model(:course => @course,

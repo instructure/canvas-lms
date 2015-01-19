@@ -24,11 +24,7 @@ describe "calendar2" do
       end
 
       it "should create a new event" do
-        get '/calendar2'
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
-        expect(fj('.agenda-wrapper:visible')).to be_present
+        load_agenda_view
         f('#create_new_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
         wait_for_ajaximations
@@ -36,10 +32,7 @@ describe "calendar2" do
       end
 
       it "should display agenda events" do
-        get '/calendar2'
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
         expect(fj('.agenda-wrapper:visible')).to be_present
       end
 
@@ -47,22 +40,15 @@ describe "calendar2" do
         start_date = Time.now.beginning_of_day + 12.hours
         event = @course.calendar_events.create!(title: "ohai",
                                                 start_at: start_date, end_at: start_date + 1.hour)
-        get '/calendar2'
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
         expect(f('.navigation_title').text).to match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{4}/)
-        sleep 30
       end
 
       it "should respect context filters" do
         start_date = Time.now.utc.beginning_of_day + 12.hours
         event = @course.calendar_events.create!(title: "ohai",
                                                 start_at: start_date, end_at: start_date + 1.hour)
-        get '/calendar2'
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
         expect(ffj('.ig-row').length).to eq 1
         fj('.context-list-toggle-box:last').click
         wait_for_ajaximations
@@ -72,10 +58,7 @@ describe "calendar2" do
       it "should be navigable via the jump-to-date control" do
         yesterday = 1.day.ago
         event = make_event(start: yesterday)
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
         expect(ffj('.ig-row').length).to eq 0
         quick_jump_to_date(yesterday.strftime("%b %-d %Y"))
         wait_for_ajaximations
@@ -85,10 +68,7 @@ describe "calendar2" do
       it "should be navigable via the minical" do
         yesterday = 1.day.ago
         event = make_event(start: yesterday)
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
         expect(ffj('.ig-row').length).to eq 0
         f('.fc-button-prev').click
         f('#right-side .fc-day-number').click
@@ -97,9 +77,7 @@ describe "calendar2" do
       end
 
       it "should persist the start date across reloads" do
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#agenda').click
+        load_agenda_view
         next_year = 1.year.from_now.strftime("%Y")
         quick_jump_to_date(next_year)
         refresh_page
@@ -109,8 +87,7 @@ describe "calendar2" do
 
       it "should transfer the start date when switching views" do
         get "/calendar2"
-        wait_for_ajaximations
-        f('.navigate_next').click()
+        f('.navigate_next').click
         f('#agenda').click
         expect(f('.navigation_title')).to include_text(1.month.from_now.strftime("%b"))
         next_year = 1.year.from_now.strftime("%Y")
@@ -122,32 +99,23 @@ describe "calendar2" do
       it "should display the displayed date range in the header" do
         tomorrow = 1.day.from_now
         event = make_event(start: tomorrow)
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
         expect(f('.navigation_title')).to include_text(Time.now.utc.strftime("%b %-d, %Y"))
         expect(f('.navigation_title')).to include_text(tomorrow.utc.strftime("%b %-d, %Y"))
       end
 
       it "should not display a date range if no events are found" do
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
         expect(f('.navigation_title')).not_to include_text('Invalid')
       end
 
       it "should allow editing events" do
         tomorrow = 1.day.from_now
         event = make_event(start: tomorrow)
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#agenda').click
-        wait_for_ajaximations
-        f('.ig-row').click()
-        f('.event-details .delete_event_link').click()
-        fj('.ui-dialog:visible .btn-primary').click()
+        load_agenda_view
+        f('.ig-row').click
+        f('.event-details .delete_event_link').click
+        fj('.ui-dialog:visible .btn-primary').click
         wait_for_ajaximations
         expect(ffj('.ig-row').length).to eq 0
       end
@@ -161,14 +129,10 @@ describe "calendar2" do
         expect(calendar_events.title).to eq "super important"
         expect(@assignment.due_date).to eq (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
 
-        get "/calendar2"
-        wait_for_ajaximations
-
-        f('#agenda').click
-        wait_for_ajaximations
+        load_agenda_view
 
         expect(f('.ig-details')).to include_text('11:59')
-        f('.ig-row').click()
+        f('.ig-row').click
         expect(fj('.event-details:visible time')).to include_text('11:59')
       end
 
