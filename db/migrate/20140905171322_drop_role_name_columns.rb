@@ -57,9 +57,7 @@ class DropRoleNameColumns < ActiveRecord::Migration
     change_column_null :account_users, :role_id, false
     change_column_null :role_overrides, :role_id, false
 
-    DataFixup::AddRoleIdToBaseEnrollments.send_later_if_production(:run)
-
-    # TODO after datafixup: change enrollments role_id to NOT NULL
+    DataFixup::AddRoleIdToBaseEnrollments.run
   end
 
   def down
