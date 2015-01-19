@@ -1,13 +1,7 @@
 class SortsAssignments
 
-  AssignmentsSortedByDueDate = Struct.new(
-    :past,
-    :overdue,
-    :undated,
-    :ungraded,
-    :upcoming,
-    :future
-  )
+  VALID_BUCKETS = %i(past overdue undated ungraded upcoming future)
+  AssignmentsSortedByDueDate = Struct.new(*VALID_BUCKETS)
 
   def self.by_due_date(opts)
     assignments = opts.fetch( :assignments )
@@ -91,6 +85,27 @@ class SortsAssignments
     assignments = past(assignments)
     user_allowed_to_submit(assignments, user, session) &
       without_graded_submission(assignments, submissions)
+  end
+
+  def self.bucket_filter(given_scope, bucket, session, user, context, submissions_for_user)
+    overridden_assignments = given_scope.map{|a| a.overridden_for(user)}
+
+    observed_students = ObserverEnrollment.observed_students(context, user)
+    user_for_sorting = if observed_students.count == 1
+      observed_students.keys.first
+    else
+      user
+    end
+
+    sorted_assignments = self.by_due_date(
+      :assignments => overridden_assignments,
+      :user => user_for_sorting,
+      :session => session,
+      :submissions => submissions_for_user
+    )
+
+    filtered_assignment_ids = sorted_assignments.send(bucket).map(&:id)
+    given_scope.where(id: filtered_assignment_ids)
   end
 
   private

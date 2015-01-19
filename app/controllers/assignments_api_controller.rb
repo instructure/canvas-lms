@@ -529,6 +529,9 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides for each assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
+  # @argument bucket [String]
+  #   If included, only return certain assignments depending on due date and submission status.
+  #   Valid buckets are "past", "overdue", "undated", "ungraded", "upcoming", and "future".
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
@@ -551,20 +554,17 @@ class AssignmentsApiController < ApplicationController
         scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
       end
 
-      assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
+      if params[:bucket]
+        return invalid_bucket_error unless SortsAssignments::VALID_BUCKETS.include?(params[:bucket].to_sym)
 
+        submissions_for_user = scope.with_submissions_for_user(@current_user).flat_map(&:submissions)
+        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, @current_user, @context, submissions_for_user)
+      end
+
+      assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
       include_params = Array(params[:include])
 
-      if include_params.include?('submission')
-        submissions = Hash[
-          @context.submissions.
-            where(:assignment_id => assignments).
-            for_user(@current_user).
-            map { |s| [s.assignment_id,s] }
-        ]
-      else
-        submissions = {}
-      end
+      submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
       include_all_dates = include_params.include?('all_dates')
 
@@ -593,7 +593,8 @@ class AssignmentsApiController < ApplicationController
                         include_visibility: include_visibility,
                         assignment_visibilities: visibility_array,
                         needs_grading_count_by_section: needs_grading_count_by_section,
-                        include_all_dates: include_all_dates
+                        include_all_dates: include_all_dates,
+                        bucket: params[:bucket]
                         )
       end
 
@@ -946,5 +947,28 @@ class AssignmentsApiController < ApplicationController
       errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
       render :json => {errors: errors}, status: :bad_request
     end
+  end
+
+  private
+
+  def submissions_hash(include_params, assignments, submissions_for_user=nil)
+    return {} unless include_params.include?('submission')
+    subs_list = if submissions_for_user
+      assignment_ids = assignments.map(&:id).to_set
+      submissions_for_user.select{ |s|
+        assignment_ids.include?(s.assignment_id)
+      }
+    else
+      @context.submissions.
+        where(:assignment_id => assignments).
+        for_user(@current_user)
+    end
+    Hash[subs_list.map{|s| [s.assignment_id, s]}]
+  end
+
+  def invalid_bucket_error
+    err_msg = t("bucket name must be one of the following: %{bucket_names}", bucket_names: SortsAssignments::VALID_BUCKETS.join(", "))
+    @context.errors.add('bucket', err_msg, :att_name => 'bucket')
+    return render :json => @context.errors, :status => :bad_request
   end
 end
