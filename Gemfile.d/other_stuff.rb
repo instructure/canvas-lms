@@ -54,7 +54,7 @@ gem 'ims-lti', '2.0.0.beta.18'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
-gem 'json', '1.8.1'
+gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 
 # native xml parsing, diigo
