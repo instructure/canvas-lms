@@ -45,6 +45,23 @@ describe "calendar2" do
         end
       end
 
+      it "should show the event in the mini calendar", :priority => "1", :test_id => 140224 do
+        assignment_model(:course => @course,
+                         :title => "ricochet",
+                         :due_at => Time.zone.now - 1.month)
+        get "/calendar2"
+        wait_for_ajax_requests
+
+        #Because it is in a past month, it should not be on the mini calendar
+        expect(f(".event")).to be_nil
+
+        #Go back a month
+        f(".fc-button-prev").click
+
+        #look for the event on the mini calendar
+        expect(f(".event").text).to include_text(Time.now.utc.strftime("%-d"))
+      end
+
       describe "contexts list" do
         it "should toggle event display when context is clicked" do
           make_event :context => @course, :start => Time.now

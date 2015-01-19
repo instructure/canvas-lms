@@ -97,5 +97,19 @@ describe "scheduler" do
       fj('.fc-event:visible').click
       expect(ff('#reservations').size).to be_zero
     end
+
+    it "should check index page for correct element", :priority => "1", :test_id => 85933 do
+      title = "blarg"
+      location = "brighton"
+
+      create_appointment_group(:location_name => location, :title => title)
+      get "/calendar2"
+      click_scheduler_link
+
+      # Index page should show correct elements for appointment groups
+      expect(f(".view_calendar_link").text).to include_text(title)
+      expect(f(".ag-context").text).to include @course.name.to_s #include context
+      expect(f(".ag-location").text).to include_text(location)
+    end
   end
 end

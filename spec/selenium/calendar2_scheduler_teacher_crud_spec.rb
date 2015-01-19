@@ -136,5 +136,21 @@ describe "scheduler" do
       delete_appointment_group
       keep_trying_until { expect(element_exists('.fc-event-bg')).to be_falsey }
     end
+
+    it "should check index page for correct element", :priority => "1" do
+      title = "blarg"
+      location = "brighton"
+
+      create_appointment_group(:location_name => location, :title => title)
+      get "/calendar2"
+      click_scheduler_link
+
+      # Index page should show correct elements for appointment groups
+      expect(f(".view_calendar_link").text).to include_text(title)
+      expect(f(".ag-context").text).to include @course.name.to_s #include context
+      expect(f(".ag-location").text).to include location
+      expect(f(".ag-x-of-x-signed-up").text).to include "people have signed up"
+      expect(f(".icon-settings")).not_to be_nil #Gear icon present
+    end
   end
 end
