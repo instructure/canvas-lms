@@ -23,7 +23,10 @@
     - python-software-properties
     - nodejs
     - git
+    - ruby1.9.3
+    - ruby-dev
+    - redis-server
 
-- name: Remove system ruby
+- name: Remove ruby 2.0
   sudo: yes
-  apt: pkg=ruby state=absent
+  apt: pkg=ruby2.0 state=absent
