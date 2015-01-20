@@ -145,6 +145,34 @@ describe "quizzes" do
     end
   end
 
+  context "multiple fill in the blanks" do
+    it "should display mfitb responses in their respective boxes on submission view page" do
+      # create new multiple fill in the blank quiz and question
+      course_with_student_logged_in
+      @quiz = quiz_model({
+                             :course => @course,
+                             :time_limit => 5
+                         })
+
+      question = @quiz.quiz_questions.create!(:question_data => fill_in_multiple_blanks_question_data )
+      @quiz.generate_quiz_data
+      @quiz.tap(&:save)
+      # create and grade a submission on our mfitb quiz
+      qs = @quiz.generate_submission(@student)
+      # this generates 6 answers on our submission for each blank in fill_in_multiple_blanks_question_data
+      (1..6).each do |var|
+        qs.submission_data["question_#{question.id}_#{AssessmentQuestion.variable_id("answer#{var}")}"] = ("this is my answer ##{var}")
+      end
+      response_array = qs.submission_data.values
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/"
+      wait_for_ajaximations
+      answer_fields = ff('.question_input')
+      answer_array = answer_fields.map { |element| driver.execute_script("return $(arguments[0]).val()", element) }
+      expect(answer_array).to eq response_array
+    end
+  end
+
   context "who closes the session without submitting" do
     it "should automatically grade the submission when it becomes overdue" do
       skip('disabled because of regression')

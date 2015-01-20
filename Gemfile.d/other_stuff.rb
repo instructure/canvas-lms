@@ -21,7 +21,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4'
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.2.22'
+gem 'switchman', '1.2.25'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
 
@@ -54,7 +54,7 @@ gem 'ims-lti', '2.0.0.beta.18'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
-gem 'json', '1.8.1'
+gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 
 # native xml parsing, diigo

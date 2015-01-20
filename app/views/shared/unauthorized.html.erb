@@ -8,11 +8,10 @@
 <% end %>
 <% @show_left_side = false %>
 <% @show_embedded_chat = false %>
-<% needs_login = (!@current_user && !@files_domain) %>
 <div id="unauthorized_holder">
 <% if (@unauthorized_user && @current_user && @current_user != @unauthorized_user) || @unauthorized_user || @unauthorized_message || @context || @needs_cookies %>
-  <div id="unauthorized_message" class="<%= 'ui-state-error' if needs_login %>">
-    <h2 class="<%= 'ui-state-error' unless needs_login %>">
+  <div id="unauthorized_message" class="<%= 'ui-state-error' if @needs_login %>">
+    <h2 class="<%= 'ui-state-error' unless @needs_login %>">
       <% if @needs_cookies -%>
         <%= t('headings.needs_cookies', %{Cookies Required}) %>
       <% elsif !@files_domain && (!@current_user || @unauthorized_user) -%>
@@ -51,7 +50,7 @@
     <% end %>
   </div>
 <% end %>
-<% if needs_login %>
+<% if @needs_login %>
   <%= render :partial => "shared/login", :locals => {:hide_self_reg_banner => true} %>
 <% end %>
 </div>

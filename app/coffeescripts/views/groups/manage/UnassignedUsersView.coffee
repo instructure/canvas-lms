@@ -28,6 +28,9 @@ define [
 
     @mixin Scrollable
 
+    elementIndex: -1
+    fromAddButton: false
+
     dropOptions:
       accept: '.group-user'
       activeClass: 'droppable'
@@ -38,6 +41,7 @@ define [
       @collection.on 'reset', @render
       @collection.on 'remove', @render
       @collection.on 'moved', @highlightUser
+      @on 'renderedItems', @realAfterRender
 
       @collection.once 'fetch', => @$noResultsWrapper.hide()
       @collection.on 'fetched:last', => @$noResultsWrapper.show()
@@ -50,6 +54,12 @@ define [
       @scrollContainer = @heightContainer = @$el
       @$scrollableElement = @$el.find("ul")
 
+    realAfterRender: =>
+      listElements = $("ul.collectionViewItems li.group-user", @$el)
+      if @elementIndex > -1 and listElements.length > 0
+        focusElement = $(listElements[@elementIndex] || listElements[listElements.length - 1])
+        focusElement.find("a.assign-to-group").focus()
+
     toJSON: ->
       loading: !@collection.loadedAll
       count: @collection.length
@@ -60,21 +70,53 @@ define [
       super
 
     events:
-      'click .assign-to-group': 'showAssignToGroup'
+      'click .assign-to-group': 'focusAssignToGroup'
       'focus .assign-to-group': 'showAssignToGroup'
       'blur .assign-to-group':  'hideAssignToGroup'
       'scroll':                 'hideAssignToGroup'
 
-    showAssignToGroup: (e) ->
+    focusAssignToGroup: (e) ->
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
-      @assignToGroupMenu ?= new AssignToGroupMenu collection: @groupsCollection
-      @assignToGroupMenu.model = @collection.get($target.data('user-id'))
-      @assignToGroupMenu.showBy $target
+      @fromAddButton = true
+      assignToGroupMenu = @_getAssignToGroup()
+      assignToGroupMenu.model = @collection.get($target.data('user-id'))
+      assignToGroupMenu.showBy($target, true)
 
-    hideAssignToGroup: ->
-      @assignToGroupMenu?.hide()
+    showAssignToGroup: (e) ->
+      if @elementIndex == -1
+        e.preventDefault()
+        e.stopPropagation()
+      $target = $(e.currentTarget)
+
+      assignToGroupMenu = @_getAssignToGroup()
+      assignToGroupMenu.model = @collection.get($target.data('user-id'))
+      assignToGroupMenu.showBy($target)
+
+
+    _getAssignToGroup: ->
+      if(!@assignToGroupMenu)
+        @assignToGroupMenu = new AssignToGroupMenu collection: @groupsCollection
+        @assignToGroupMenu.on("open", (options) =>
+          @elementIndex = Array.prototype.indexOf.apply($("ul.collectionViewItems li.group-user", @$el), $(options.target).parent("li"))
+        )
+        @assignToGroupMenu.on("close", (options) =>
+          studentElements = $("li.group-user a.assign-to-group", @$el)
+          if @elementIndex != -1 and options.escapePressed and studentElements.length > 0
+            focusElement = $(studentElements[@elementIndex] || studentElements[studentElements.length - 1])
+            focusElement.focus()
+            @elementIndex = -1
+        )
+      return @assignToGroupMenu
+
+    hideAssignToGroup: (e) ->
+      if !@fromAddButton
+        @assignToGroupMenu?.hide()
+        setTimeout => # Element with next focus will not get focus until _after_ 'focusout' and 'blur' have been called.
+          @elementIndex = -1 if !@$el.find("a.assign-to-group").is(":focus")
+        , 100
+      @fromAddButton = false
 
     setFilter: (search_term, options) ->
       searchDefer = @collection.search(search_term, options)
@@ -95,3 +137,8 @@ define [
       user = ui.draggable.data('model')
       setTimeout =>
         @category.reassignUser(user, null)
+
+    _initDrag: (view) ->
+      super
+      view.$el.on 'dragstart', (event, ui) =>
+        @elementIndex = -1

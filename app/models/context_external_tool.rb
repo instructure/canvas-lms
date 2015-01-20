@@ -589,7 +589,8 @@ class ContextExternalTool < ActiveRecord::Base
   def self.serialization_excludes; [:shared_secret,:settings]; end
 
   # sets the custom fields from the main tool settings, and any on individual resource type settings
-  def set_custom_fields(hash, resource_type)
+  def set_custom_fields(resource_type)
+    hash = {}
     fields = [settings[:custom_fields] || {}]
     fields << (settings[resource_type.to_sym][:custom_fields] || {}) if resource_type && settings[resource_type.to_sym]
     fields.each do |field_set|
@@ -602,21 +603,7 @@ class ContextExternalTool < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def substituted_custom_fields(placement, substitutions)
-    custom_fields = {}
-    set_custom_fields(custom_fields, placement)
-
-    custom_fields.each do |k,v|
-      if substitutions.has_key?(v)
-        if substitutions[v].respond_to?(:call)
-          custom_fields[k] = substitutions[v].call
-        else
-          custom_fields[k] = substitutions[v]
-        end
-      end
-    end
+    hash
   end
 
   def resource_selection_settings

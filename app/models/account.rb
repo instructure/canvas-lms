@@ -502,8 +502,8 @@ class Account < ActiveRecord::Base
   def setup_quota_cache_invalidation
     @quota_invalidations = []
     unless self.new_record?
-      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.default_storage_quota_changed?
-      @quota_invalidations << 'default_group_storage_quota' if self.default_group_storage_quota_changed?
+      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
+      @quota_invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
     end
   end
 

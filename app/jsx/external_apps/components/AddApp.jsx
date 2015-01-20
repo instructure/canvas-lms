@@ -34,12 +34,12 @@ define([
 
       fields['name'] = {
         type: 'text',
-        value: this.props.app.attributes.name,
+        value: this.props.app.name,
         required: true,
         description: I18n.t('Name')
       };
 
-      if (this.props.app.attributes.requires_secret) {
+      if (this.props.app.requires_secret) {
         fields['consumer_key'] = {
           type: 'text',
           value: '',
@@ -54,7 +54,7 @@ define([
         };
       }
 
-      this.props.app.attributes.config_options.map(function(opt) {
+      this.props.app.config_options.map(function(opt) {
         fields[opt.name] = {
           type: opt.param_type,
           value: opt.default_value,
@@ -111,7 +111,7 @@ define([
     },
 
     configUrl() {
-      var url = this.props.app.attributes.config_xml_url;
+      var url = this.props.app.config_xml_url;
 
       var queryParams = {};
       _.map(this.state.fields, function(v, k) {
@@ -129,7 +129,7 @@ define([
       newTool.on('sync', this.onSaveSuccess, this);
       newTool.on('error', this.onSaveFail, this);
 
-      if (this.props.app.attributes.requires_secret) {
+      if (this.props.app.requires_secret) {
         newTool.set('consumer_key', this.state.fields.consumer_key.value);
         newTool.set('shared_secret', this.state.fields.shared_secret.value);
       } else {
@@ -164,6 +164,8 @@ define([
         return (
           <ConfigOptionField name={k}
             type={v.type}
+            ref={'option_' + k}
+            key={'option_' + k}
             value={v.value}
             require={v.required}
             description={v.description}

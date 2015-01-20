@@ -127,7 +127,7 @@ define([
       groupModel.set('users', _.reject(groupModel.get('users'), (u) => u.id === userId ));
       // If user was a leader, unset the leader attribute.
       var leader = groupModel.get("leader");
-      if (leader.id == userId) {
+      if (leader && leader.id == userId) {
         groupModel.set("leader", null);
       }
     },

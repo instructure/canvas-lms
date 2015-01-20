@@ -48,6 +48,7 @@ module BroadcastPolicy
     def generate_prior_version
       obj = self.class.new
       self.attributes.each do |attr, value|
+        next unless obj.column_for_attribute(attr)
         value = changed_attributes[attr] if changed_attributes.key?(attr)
         obj.write_attribute(attr, value)
       end

@@ -60,7 +60,7 @@
             <td>
               <input type="text" name="url" id="content_tag_create_url" style="width: 200px;"/>
               <div id="content_tag_services">
-              
+
               </div>
             </td>
           </tr>
@@ -138,6 +138,7 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
+          <%= before_label :wiki_page_name, "Page Name" %>
           <input type="text" name="wiki_page[title]" class="item_title" aria-label="<%= before_label :page_name, "Page Name" %>"/>
           <a href="<%= polymorphic_url([:api_v1, @context, :wiki_pages]) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
@@ -247,7 +248,7 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          <%= before_label :assignment_name, "Assignment Name" %>
+          <%= before_label :wiki_page_namem, "Assignment Name" %>
           <input type="text" name="assignment[title]" class="item_title" style="margin-bottom: 5px;" aria-label="<%= before_label :assignment_name, "Assignment Name" %>"/>
           <a href="<%= context_url(@context, :context_assignments_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>

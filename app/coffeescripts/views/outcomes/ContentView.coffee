@@ -28,14 +28,20 @@ define [
   'compiled/views/TreeBrowserView'
   'compiled/views/RootOutcomesFinder'
   'jst/MoveOutcomeDialog'
-], ($, _, I18n, Backbone, Outcome, OutcomeGroup, OutcomeView, OutcomeGroupView, TreeBrowserView, RootOutcomesFinder, dialogTemplate) ->
+  'jst/outcomes/noOutcomesWarning'
+  'compiled/backbone-ext/DefaultUrlMixin'
+  'str/htmlEscape'
+], ($, _, I18n, Backbone, Outcome, OutcomeGroup, OutcomeView, OutcomeGroupView, TreeBrowserView, RootOutcomesFinder, dialogTemplate, noOutcomesWarning, DefaultUrlMixin, htmlEscape) ->
 
   # This view is a wrapper for showing details for outcomes and groups.
   # It uses OutcomeView and OutcomeGroupView to render
   class ContentView extends Backbone.View
+    @mixin DefaultUrlMixin
 
     initialize: ({@readOnly, @setQuizMastery, @useForScoring, @instructionsTemplate, @renderInstructions}) ->
       super
+      $.subscribe "renderNoOutcomeWarning", @renderNoOutcomeWarning
+      $.subscribe "clearNoOutcomeWarning", @clearNoOutcomeWarning
       @render()
 
     # accepts: Outcome and OutcomeGroup
@@ -130,3 +136,12 @@ define [
 
     remove: ->
       @innerView?.off 'addSuccess'
+
+    renderNoOutcomeWarning: =>
+      @$el?.empty()
+      contextPath = htmlEscape(@_contextPath())
+      noOutcomesLinkLabel = I18n.t("You have no outcomes. Click here to go to the outcomes page.")
+      @$el?.append($.raw(noOutcomesWarning(addOutcomesUrl: "/#{contextPath}/outcomes", noOutcomesLinkLabel: noOutcomesLinkLabel)))
+
+    clearNoOutcomeWarning: =>
+      @$el?.empty()

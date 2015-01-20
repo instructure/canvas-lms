@@ -53,6 +53,7 @@ require [
     onFindOutcome: (e) =>
       e.preventDefault()
       @$els.dialog.show()
+      @$els.dialog.$el.find('.alert').focus()
 
     onOutcomeImport: (model) ->
       rubricEditing.onFindOutcome(model)

@@ -238,9 +238,10 @@ class EnrollmentsApiController < ApplicationController
 
     has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
     enrollments = enrollments.joins(:course) if has_courses
+    enrollments = enrollments.shard(@shard_scope) if @shard_scope
 
     enrollments = Api.paginate(
-      enrollments.shard(@current_user),
+      enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
     ActiveRecord::Associations::Preloader.new(enrollments, [:user, :course, :course_section]).run
@@ -506,6 +507,8 @@ class EnrollmentsApiController < ApplicationController
       # on unpublished courses.
       enrollments = enrollments.where(workflow_state: %w{active invited}) unless params[:state].present?
     end
+
+    @shard_scope = user
 
     enrollments
   end

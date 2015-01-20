@@ -24,6 +24,7 @@ define([
               <option value="manual">{I18n.t('Manual Entry')}</option>
               <option value="url">{I18n.t('By URL')}</option>
               <option value="xml">{I18n.t('Paste XML')}</option>
+              { ENV.ENABLE_LTI2 ? <option value="lti2">{I18n.t('By LTI 2 Registration URL')}</option> : null }
             </select>
           </div>
         </div>

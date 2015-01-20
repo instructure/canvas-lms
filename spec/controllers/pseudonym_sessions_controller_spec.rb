@@ -1581,4 +1581,21 @@ describe PseudonymSessionsController do
     end
 
   end
+
+  describe "login hooks" do
+    it "should hook on new" do
+      controller.expects(:run_login_hooks).once
+      get "new"
+    end
+
+    it "should hook on failed create" do
+      controller.expects(:run_login_hooks).once
+      post "create"
+    end
+
+    it "should hook on successful create" do
+      controller.expects(:run_login_hooks).once
+      post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
+    end
+  end
 end

@@ -10,5 +10,11 @@
     "i18nliner": "0.0.15",
     "i18nliner-handlebars": "0.0.11",
     "minimist": "^1.1.0"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.5"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/jasmine-node ./test"
   }
 }

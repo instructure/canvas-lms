@@ -5,20 +5,19 @@ define([
   'i18n!external_tools',
   'underscore',
   'react',
-  'jsx/external_apps/mixins/FormHelpersMixin',
+  'jsx/external_apps/components/TextInput',
+  'jsx/external_apps/components/TextAreaInput',
   'compiled/jquery.rails_flash_notifications'
-], function ($, I18n, _, React, FormHelpersMixin) {
+], function ($, I18n, _, React, TextInput, TextAreaInput) {
 
   return React.createClass({
     displayName: 'ConfigurationFormXml',
 
-    mixins: [FormHelpersMixin],
-
     propTypes: {
-      name         : React.PropTypes.string.isRequired,
-      consumerKey  : React.PropTypes.string.isRequired,
-      sharedSecret : React.PropTypes.string.isRequired,
-      xml          : React.PropTypes.string.isRequired
+      name         : React.PropTypes.string,
+      consumerKey  : React.PropTypes.string,
+      sharedSecret : React.PropTypes.string,
+      xml          : React.PropTypes.string
     },
 
     getInitialState: function() {
@@ -34,7 +33,7 @@ define([
 
       var errors = {};
       fields.forEach(function(field) {
-        var value = this.refs[field].getDOMNode().value.trim();
+        var value = this.refs[field].state.value;
         if (!value) {
           errors[field] = 'This field is required';
           formErrors.push(I18n.t('This field "%{name}" is required.', { name: field }));
@@ -52,32 +51,48 @@ define([
 
     getFormData() {
       return {
-        name         : this.refs.name.getDOMNode().value,
-        consumerKey  : this.refs.consumerKey.getDOMNode().value,
-        sharedSecret : this.refs.sharedSecret.getDOMNode().value,
-        xml          : this.refs.xml.getDOMNode().value
+        name         : this.refs.name.state.value,
+        consumerKey  : this.refs.consumerKey.state.value,
+        sharedSecret : this.refs.sharedSecret.state.value,
+        xml          : this.refs.xml.state.value
       };
     },
 
     render() {
       return (
         <div className="ConfigurationFormXml">
-          <div className="form-group">
-            {this.renderTextInput('name', this.props.name, I18n.t('Name'))}
-          </div>
-          <div className="form-group">
-            <div className="grid-row">
-              <div className="col-xs-6">
-                {this.renderTextInput('consumerKey', this.props.consumerKey, I18n.t('Consumer Key'))}
-              </div>
-              <div className="col-xs-6">
-                {this.renderTextInput('sharedSecret', this.props.sharedSecret, I18n.t('Shared Secret'))}
-              </div>
+          <TextInput
+            ref="name"
+            id="name"
+            defaultValue={this.props.name}
+            label={I18n.t('Name')}
+            required={true}
+            errors={this.state.errors} />
+          <div className="grid-row">
+            <div className="col-xs-6">
+              <TextInput
+                ref="consumerKey"
+                id="consumerKey"
+                defaultValue={this.props.consumerKey}
+                label={I18n.t('Consumer key')}
+                errors={this.state.errors} />
+            </div>
+            <div className="col-xs-6">
+              <TextInput
+                ref="sharedSecret"
+                id="sharedSecret"
+                defaultValue={this.props.sharedSecret}
+                label={I18n.t('Shared Secret')}
+                errors={this.state.errors} />
             </div>
           </div>
-          <div className="form-group">
-            {this.renderTextarea('xml', this.props.xml, I18n.t('XML Configuration'), '', 12)}
-          </div>
+          <TextAreaInput
+            ref="xml"
+            id="xml"
+            defaultValue={this.props.xml}
+            label={I18n.t('XML Configuration')}
+            rows={12}
+            errors={this.state.errors} />
         </div>
       );
     }

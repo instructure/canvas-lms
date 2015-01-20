@@ -107,6 +107,39 @@ module Lti
         end
 
       end
+
+      context "navigation tabs caching" do
+
+        it 'clears the cache for apps that have navigation placements' do
+          enable_cache do
+            nav_cache = Lti::NavigationCache.new(account.root_account)
+            cache_key = nav_cache.cache_key
+
+            account_admin_user(account: account)
+            tp = create_tool_proxy(context: account)
+            resource = create_resource_handler(tp)
+            resource.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION )
+            api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+                     {controller: 'lti/tool_proxy', action: 'update', format: 'json', account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: 'disabled'}, {}, {}, {domain_root_account: account} )
+
+            expect(nav_cache.cache_key).to_not eq cache_key
+          end
+        end
+
+        it 'does not clear the cache for apps that do not have navigation placements' do
+          enable_cache do
+            nav_cache = Lti::NavigationCache.new(account.root_account)
+            cache_key = nav_cache.cache_key
+
+            account_admin_user(account: account)
+            tp = create_tool_proxy(context: account)
+            api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+                     {controller: 'lti/tool_proxy', action: 'update', format: 'json', account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: 'disabled'})
+
+            expect(nav_cache.cache_key).to eq cache_key
+          end
+        end
+      end
     end
 
   end

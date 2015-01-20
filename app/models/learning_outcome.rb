@@ -94,7 +94,7 @@ class LearningOutcome < ActiveRecord::Base
 
     if calculation_int_changed?
       errors.add(:calculation_int, t(
-        "This outcome has been used to assess a student. Calculation int is fixed at %{old_value}",
+        "This outcome has been used to assess a student. Calculation integer is fixed at %{old_value}",
         :old_value => calculation_int_was
       ))
     end
