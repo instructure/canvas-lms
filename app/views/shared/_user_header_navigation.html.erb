@@ -2,8 +2,6 @@
   <% if (identity = (yield :identity).presence) %>
     <%= identity %>
   <% else %>
-    <%- cache_if(!@real_current_user, [@current_user || 'nobody', 'identity-15m'], :expires_in => 15.minutes) do -%>
-      <%= render(:partial => 'shared/identity') %>
-    <%- end -%>
+    <%= render(:partial => 'shared/identity') %>
   <% end %>
 </div>
