@@ -1,8 +1,6 @@
 - name: Add nodesource
   sudo: yes
-  shell: >
-    executable=/bin/bash source /etc/profile.d/rvm.sh;
-    curl -sL https://deb.nodesource.com/setup | bash -
+  shell: curl -sL https://deb.nodesource.com/setup | bash -
 
 - name: Install dependencies
   sudo: yes
