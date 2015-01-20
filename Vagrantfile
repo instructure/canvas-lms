@@ -5,13 +5,13 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu64-501"
 
   config.vm.network :private_network, ip: '192.168.50.50'
   config.vm.hostname = "canvas.dev"
   config.hostsupdater.aliases = ["files.canvas.dev"]
 
-  config.vm.synced_folder '.', '/vagrant'#, nfs: true
+  config.vm.synced_folder ".", "/vagrant", type: :nfs
 
   config.vm.provider "virtualbox" do |v|
     host = RbConfig::CONFIG['host_os']
@@ -33,6 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ["modifyvm", :id, "--memory", mem]
     v.customize ["modifyvm", :id, "--cpus", cpus]
   end
+
 
   config.vm.provision "ansible" do |ansible|
     ansible.verbose  = "vvv"
