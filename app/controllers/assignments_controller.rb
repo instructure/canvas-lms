@@ -141,7 +141,12 @@ class AssignmentsController < ApplicationController
       @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
       @has_mark_done_requirement = params[:module_item_id].present? && @assignment.has_mark_done_requirement?(params[:module_item_id].to_i)
-      @content_tag = @context.context_modules.map {|i| i.content_tags.find {|j| j.content_id == @assignment.id && j.content_type== "Assignment"}}.first(&:nil?)
+      # FIXME duplicated in wiki_pages_controller + UGLY
+      @content_tag = @context.context_modules.map do |i|
+        i.content_tags.find do |j|
+          j.content_id == @assignment.id
+        end
+      end.find(&:present?)
 
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz
