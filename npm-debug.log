@@ -1,0 +1,26 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'run', 'compile-sass' ]
+2 info using npm@1.4.3
+3 info using node@v0.10.26
+4 verbose run-script [ 'precompile-sass', 'compile-sass', 'postcompile-sass' ]
+5 info precompile-sass canvas-lms@0.0.0
+6 info compile-sass canvas-lms@0.0.0
+7 verbose unsafe-perm in lifecycle true
+8 info canvas-lms@0.0.0 Failed to exec compile-sass script
+9 error canvas-lms@0.0.0 compile-sass: `node script/compile-sass.js`
+9 error Exit status 1
+10 error Failed at the canvas-lms@0.0.0 compile-sass script.
+10 error This is most likely a problem with the canvas-lms package,
+10 error not with npm itself.
+10 error Tell the author that this fails on your system:
+10 error     node script/compile-sass.js
+10 error You can get their info via:
+10 error     npm owner ls canvas-lms
+10 error There is likely additional logging output above.
+11 error System Darwin 14.0.0
+12 error command "node" "/usr/local/bin/npm" "run" "compile-sass"
+13 error cwd /Users/cpalmer/instructure/canvas-lms
+14 error node -v v0.10.26
+15 error npm -v 1.4.3
+16 error code ELIFECYCLE
+17 verbose exit [ 1, true ]

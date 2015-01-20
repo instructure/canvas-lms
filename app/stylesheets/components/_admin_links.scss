@@ -2,9 +2,13 @@
 /*
 @styleguide Cogs (Admin Dropdowns)
 
+<br/>
+
 Admin "cog" dropdowns should only be used if there is **more than one action** you want the user to choose from. If there's only one action, please use a regular button.
 
-### Toolbar Cog (button + cog)
+<br/>
+
+## Toolbar Cog (button + cog)
 
 Admin dropdowns come in two flavors: If the dropdown is to be used in a header/toolbar, please follow the example below:
 
@@ -12,7 +16,7 @@ Admin dropdowns come in two flavors: If the dropdown is to be used in a header/t
 <div style="text-align: center;">
   
   <!-- Begin dropdown markup -->
-  <div class="al-dropdown__container">
+  <div class="al-dropdown__container" style="position: relative;">
     <a class="al-trigger btn" role="button" href="#">
       <i class="icon-settings"></i>
       <i class="icon-mini-arrow-down"></i>
@@ -35,7 +39,8 @@ Admin dropdowns come in two flavors: If the dropdown is to be used in a header/t
 </div>
 ```
 
-### Content cog
+## Content cog
+
 For admin dropdowns that appear in main content areas, such as item groups, please use the example below:
 
 ```html

@@ -1,7 +1,9 @@
 @import "base/environment";
 
 /*
-@styleguide Forms: Inline
+@styleguide Forms
+
+## Inline
 
 ```html
 <form class="form-inline">
@@ -13,22 +15,8 @@
   <button type="submit" class="btn">Sign in</button>
 </form>
 ```
-*/
 
-input[type=text].loading {
-  background-image: url('/images/ajax-reload-animated.gif');
-  background-repeat: no-repeat;
-  background-position: 98% center;
-}
-
-.loadingIndicator, .paginatedLoadingIndicator {
-  background-image: url('/images/ajax-reload-animated.gif');
-  background-repeat: no-repeat;
-  background-position: center center;
-  height: 20px;
-}
-
-/* @styleguide Forms: Hint Text
+## Hint Text
 
 For text beneath a form elements that give further explanation about the field.
 This was added for some legacy code, not sure if it'll work well elsewhere.
@@ -36,34 +24,8 @@ This was added for some legacy code, not sure if it'll work well elsewhere.
 ```html
 <input type="text" placeholder="Sortable Name"> <div class="hint-text">The name displayed in sorted lists</div>
 ```
-*/
 
-.hint-text {
-  font-size: 10px;
-  color: $hintTextColor;
-}
-
-input + .hint-text {
-  /* pull up into the input */
-  margin-top: -10px;
-  /* replace the inputs margin-bottom */
-  margin-bottom: 10px;
-}
-
-/* @styleguide Form Table
-
-We want to deprecate this in favor of `form-horizontal`.
-
-*/
-
-.formtable {
-  td:first-child {
-    /* lines-up label in first cell with input in second */
-    padding-top: 6px;
-  }
-}
-
-/* @styleguide Forms: Dialog Form
+## Dialog Form
 
 Add the class `form-dialog` to get the `form-controls` to display properly in a
 dialog form and proper overflow scrolling of content. No need to use
@@ -87,6 +49,44 @@ controls on the bottom required this.
 ```
 
 */
+
+input[type=text].loading {
+  background-image: url('/images/ajax-reload-animated.gif');
+  background-repeat: no-repeat;
+  background-position: 98% center;
+}
+
+.loadingIndicator, .paginatedLoadingIndicator {
+  background-image: url('/images/ajax-reload-animated.gif');
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 20px;
+}
+
+// Hint Text
+
+.hint-text {
+  font-size: 10px;
+  color: $hintTextColor;
+}
+
+input + .hint-text {
+  /* pull up into the input */
+  margin-top: -10px;
+  /* replace the inputs margin-bottom */
+  margin-bottom: 10px;
+}
+
+// Form Table
+
+.formtable {
+  td:first-child {
+    /* lines-up label in first cell with input in second */
+    padding-top: 6px;
+  }
+}
+
+// Dialog Form
 
 .form-dialog {
   padding-bottom: 70px !important;

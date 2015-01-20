@@ -1,5 +1,31 @@
 @import "base/environment";
 
+/* Tour Popups
+- give a `<div>` classes of `tour` and `popover`.
+- use `controls` for buttons at the bottom of the popover
+- everything else is just html
+
+(inline styles in this demo are not desired, obviously)
+
+```html
+<div class="popover tour top" style="position:static; margin-top: 10px; display: block;">
+  <div class="arrow"></div>
+  <div class="popover-content">
+    <h1 class="h4">Canvas just got better!</h1>
+    <p>
+      It’s now possible to set the read/unread status of your discussion posts manually.
+    </p>
+
+    <div class="controls clearfix">
+      <div class="pull-right">
+        <a href="#" class="btn">No thanks</a>
+        <a href="#" class="btn btn-primary">Show me how</a>
+      </div>
+    </div>
+  </div>
+</div>
+```
+*/
 .popover.tour {
   z-index: 1000; // yeah, one thousand
   width: 350px;

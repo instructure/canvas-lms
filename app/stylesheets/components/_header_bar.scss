@@ -1,13 +1,18 @@
 /*
 @styleguide Header Bar
 
-- Actions is the header bar should exist on the right - cog menus should always be the most right.
-- Many actions should be grouped by related function, IE (edit/delete content) and (preview/publish content)
-- Left side should be used for filtering and searching content.
+<br/>
 
-**Add body class `.padless-content` to the body when using `.header-bar` so that header-bar extends full width. Add padding or margin to containers below header-bar.**
+### tl;dr
+  - Actions is the header bar should exist on the right 
+  - Cog menus should always be the most right
+  - Many actions should be grouped by related function, IE (edit/delete content) and (preview/publish content)
+  - Left side should be used for filtering and searching content
+  - Add body class `.padless-content` to the body when using `.header-bar` so that header-bar extends full width.
+  - Add padding or margin to containers below header-bar
 
-### Actions on the right; primary and secondary actions
+
+## Actions on the right; primary and secondary actions
 
 ```html
 
@@ -20,7 +25,7 @@
 
 ```
 
-### Actions on the right; primary, secondary and cog
+## Actions on the right; primary, secondary and cog
 
 ```html
 
@@ -45,7 +50,7 @@
 ```
 
 
-### Actions grouped by related function
+## Actions grouped by related function
 
 ```html
 
@@ -74,7 +79,7 @@
 
 ```
 
-### Actions on the right, filters and search on the left
+## Actions on the right, filters and search on the left
 
 ```html
 

@@ -1,14 +1,13 @@
 /*
 @styleguide Tab Navigation
 
-For accessibility reasons, we use jQuery UI tabs.
 
-### Regular Tabs
-Our default tabs come complete with a panel attached to the tabs that displays the content inside each tab. jQueryUI adds all the classes, once you initialize the tabs using the script and markup below:
+## Regular Tabs
 
-```javascript
-$("#styleguide-tabs-demo-regular").tabs()
-```
+Our default tabs come complete with a panel attached to the tabs that displays the content inside each tab. 
+
+jQueryUI adds all the classes, once you initialize the tabs using the script and markup.
+
 
 ```html
 <div id="styleguide-tabs-demo-regular">
@@ -22,14 +21,13 @@ $("#styleguide-tabs-demo-regular").tabs()
   <div id="tabs-3">Tab 3 content</div>
 </div>
 ```
+      $("#styleguide-tabs-demo-regular").tabs()
 
-### Minimal Tabs
+## Minimal Tabs
 
-Don't want the bordered box around each tab panel? Simply add the **.ui-tabs-minimal** class to the parent tab element, as we've done in the example below:
+Don't want the bordered box around each tab panel? 
 
-```javascript
-$("#styleguide-tabs-demo-minimal").tabs()
-```
+Simply add the **.ui-tabs-minimal** class to the parent tab element.
 
 ```html
 <div id="styleguide-tabs-demo-minimal" class="ui-tabs-minimal">
@@ -43,6 +41,10 @@ $("#styleguide-tabs-demo-minimal").tabs()
   <div id="tabs-3">Tab 3 content</div>
 </div>
 ```
+
+
+      $("#styleguide-tabs-demo-minimal").tabs()
+
 
 */
 

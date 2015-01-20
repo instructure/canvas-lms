@@ -1,8 +1,10 @@
-/* @styleguide Modal Dialog - React (new!)
+/* @styleguide Modal Dialog
 
-### Default Canvas modal
+## Default Canvas modal
 
 React Modal comes with very few default classes to make it as themeable as possible. If you want plain-vanilla Canvas modal styles, be sure to specify `className: 'ReactModal__Content--canvas'` when you initialize the modal, as follows:
+
+<br/>
 
 ```javascript
 React.renderComponent(
@@ -22,9 +24,14 @@ React.renderComponent(
 See `app/jsx/styleguide/ReactModalExample.jsx` for complete example usage.
 
 <br />
-### Mini Canvas modal
 
-For small dialogs like Confirms, the default Canvas modal width might seem too much. The **.ReactModal__Content--mini-modal** class can be appended to the **.ReactModal__Content--canvas** class to render a less wide modal dialog.
+## Mini Canvas modal
+
+For small dialogs like Confirms, the default Canvas modal width might seem too much. 
+
+The `.ReactModal__Content--mini-modal` class can be appended to the `.ReactModal__Content--canvas` class to render a less wide modal dialog.
+
+<br/>
 
 ```javascript
 React.renderComponent(

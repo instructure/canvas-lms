@@ -11,87 +11,116 @@
 /*
 @styleguide Buttons
 
-### Button Styles
+## The Basic Button
 
 ```html
-<p>
-  <button class="Button" type="button">.Button</button>
-  &nbsp;
-  <button class="Button" type="button" disabled>&[disabled]</button>
-  &nbsp;
-  <button class="Button Button--active" type="button" style="pointer-events: none">&.Button--active</button>
-</p>
-<p>
-  <button class="Button Button--primary" type="button">.Button.Button--primary</button>
-  &nbsp;
-  <button class="Button Button--primary" type="button" disabled>&[disabled]</button>
-  &nbsp;
-  <button class="Button Button--primary Button--active" type="button" style="pointer-events: none">&.Button--active</button>
-</p>
-<p>
-  <button class="Button Button--secondary" type="button">.Button.Button--secondary</button>
-  &nbsp;
-  <button class="Button Button--secondary" type="button" disabled>&[disabled]</button>
-  &nbsp;
-  <button class="Button Button--secondary Button--active" type="button" style="pointer-events: none">&.Button--active</button>
-</p>
-<p>
-  <button class="Button Button--success" type="button">.Button.Button--success</button>
-  &nbsp;
-  <button class="Button Button--success" type="button" disabled>&[disabled]</button>
-  &nbsp;
-  <button class="Button Button--success Button--active" type="button" style="pointer-events: none">&.Button--active</button>
-</p>
-<p>
-  <button class="Button Button--warning" type="button">.Button.Button--danger</button>
-  &nbsp;
-  <button class="Button Button--warning" type="button" disabled>&[disabled]</button>
-  &nbsp;
-  <button class="Button Button--warning Button--active" type="button" style="pointer-events: none">&.Button--active</button>
-</p>
-<p>
-  <button class="Button Button--danger" type="button">.Button.Button--danger</button>
-  &nbsp;
-  <button class="Button Button--danger" type="button" disabled>&[disabled]</button>
-  &nbsp;
-  <button class="Button Button--danger Button--active" type="button" style="pointer-events: none">&.Button--active</button>
-</p>
-<p>
-  <button class="Button Button--link" type="button">.Button.Button--link</button>
-  &nbsp;
-  <button class="Button Button--link" type="button" disabled>&[disabled]</button>
-  &nbsp;
-  <button class="Button Button--link Button--active" type="button" style="pointer-events: none">&.Button--active</button>
-</p>
+<button class="Button" type="button">My Awesome Button</button>
 ```
+## Button Styles
 
-### Button Sizes
+By adding on a modifier class, you can get the style of the button you need.
 
-Add an additional class `.btn-large`, `.btn-small`, `.btn-mini` to change button sizes
+<table class="ic-Table">
+  <thead>
+    <th>Class</th>
+    <th>Normal State</th>
+    <th>Active State</th>
+    <th>Disabled State</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>default</td>
+      <td><button class="Button" type="button">.Button</button></td>
+      <td><button class="Button Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
+      <td><button class="Button" type="button" disabled>&[disabled]</button></td>      
+    </tr>
+    <tr>
+      <td>.Button--primary</td>
+      <td><button class="Button Button--primary" type="button">.Button--primary</button></td>
+      <td><button class="Button Button--primary Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
+      <td><button class="Button Button--primary" type="button" disabled>&[disabled]</button></td>
+    </tr>
+    <tr>
+      <td>.Button--secondary</td>
+      <td><button class="Button Button--secondary" type="button">.Button--secondary</button></td>
+      <td><button class="Button Button--secondary Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
+      <td><button class="Button Button--secondary" type="button" disabled>&[disabled]</button></td>
+    </tr>
+    <tr>
+      <td>.Button--success</td>
+      <td><button class="Button Button--success" type="button">.Button--success</button></td>
+      <td><button class="Button Button--success Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
+      <td><button class="Button Button--success" type="button" disabled>&[disabled]</button></td>
+    </tr>
+    <tr>
+      <td>.Button--warning</td>
+      <td><button class="Button Button--warning" type="button">.Button--warning</button></td>
+      <td><button class="Button Button--warning Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
+      <td><button class="Button Button--warning" type="button" disabled>&[disabled]</button></td>
+    </tr>
+    <tr>
+      <td>.Button--danger</td>
+      <td><button class="Button Button--danger" type="button">.Button--danger</button></td>
+      <td><button class="Button Button--danger Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
+      <td><button class="Button Button--danger" type="button" disabled>&[disabled]</button></td>        
+    </tr>
+    <tr>
+      <td>.Button--link</td>
+      <td><button class="Button Button--link" type="button">.Button--link</button></td>
+      <td><button class="Button Button--link Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
+      <td><button class="Button Button--link" type="button" disabled>&[disabled]</button></td>
+    </tr>  
+  </tbody>
+</table>
 
 ```html
-<p>
-  <button class="btn btn-large" type="button">Large button</button>
-</p>
-<p>
-  <button class="btn" type="button">Default button</button>
-</p>
-<p>
-  <button class="btn btn-small" type="button">Small button</button>
-</p>
-<p>
-  <button class="btn btn-mini" type="button">Mini button</button>
-</p>
+<button class="Button Button--primary" type="button">Hey, I have a blue button!</button>
 ```
 
-### Artificial buttons
+## Button Sizes
+
+If you need to change a button's size, you can do so by adding the appropriate class
+
+<table class="ic-Table">
+  <thead>
+    <th>Class</th>
+    <th>Size</th>  
+  </thead>
+  <tbody>
+    <tr>
+      <td>default</td>
+      <td><button class="Button" type="button">.Button</button></td>
+    </tr>
+    <tr>
+      <td>.Button.Button--large</td>
+      <td><button class="Button Button--large" type="button">.Button-large</button></td>
+    </tr>    
+    <tr>
+      <td>.Button.Button--small</td>
+      <td><button class="Button Button--small" type="button">.Button-small</button></td>
+    </tr>
+    <tr>
+      <td>.Button.Button--mini</td>
+      <td><button class="Button Button--mini" type="button">.Button-mini</button></td>
+    </tr>    
+  </tbody>
+</table>
+
+```html
+<button class="Button Button--large" type="button">This is a massive button!</button>
+```
+
+
+## Artificial button
 
 To create something that acts like a button when you can't use a button element,
-listen to the "click" and "keyclick" events and add tabindex="0" and role="button".
+
+listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="button"`
 
 ```html
 <div class="btn" tabindex="0" role="button">Activate me</div>
 ```
+
 */
 
 .btn,       // <-- deprecated- do not use
