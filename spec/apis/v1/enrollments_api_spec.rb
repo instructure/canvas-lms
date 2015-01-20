@@ -781,12 +781,6 @@ describe EnrollmentsApiController, type: :request do
               expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
             end
 
-            it "should still work even when the role_id is null (to cover the post-migration, pre-job case)" do
-              @original_course.enrollments.update_all(:role_id => nil)
-              json = api_call(:get, "#{@user_path}?role_id=#{student_role.id}", @user_params.merge(:role_id => student_role.id))
-              expect(json.map{ |e| e['course_id'].to_i }).to eq [@original_course.id]
-            end
-
             it "should filter by custom role" do
               json = api_call(:get, "#{@user_path}?role_id=#{@role.id}", @user_params.merge(:role_id => @role.id))
               expect(json.map{ |e| e['course_id'].to_i }).to eq [@course.id]

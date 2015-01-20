@@ -8,7 +8,7 @@ class Quizzes::QuizSubmissionEventPartitioner < ActiveRecord::Base
 
       partman = CanvasPartman::PartitionManager.new(Quizzes::QuizSubmissionEvent)
 
-      [ Time.now, 1.month.from_now ].each do |date|
+      [ Time.now.utc, 1.month.from_now(Time.now.utc) ].each do |date|
         log "Looking for a table for partition #{date.strftime('%Y/%m')}..."
 
         if partman.partition_exists?(date)
@@ -20,7 +20,7 @@ class Quizzes::QuizSubmissionEventPartitioner < ActiveRecord::Base
         end
       end
 
-      [ 5.months.ago(Time.now.beginning_of_month) ].each do |date|
+      [ 5.months.ago(Time.now.utc.beginning_of_month) ].each do |date|
         log "Looking for old partition table (#{date.strftime('%Y/%m')})..."
 
         if partman.partition_exists?(date)
