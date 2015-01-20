@@ -1,40 +1,39 @@
-# - name: delete vendor/bundle
-#   file: path=/vagrant/vendor/bundle state=absent
+- name: delete vendor/bundle
+  file: path=/vagrant/vendor/bundle state=absent
 
-# - name: delete Gemfile.lock
-#   file: path=/vagrant/Gemfile.lock state=absent
+- name: delete Gemfile.lock
+  file: path=/vagrant/Gemfile.lock state=absent
 
-# - name: bundle install
-#   shell: >
-#     executable=/bin/bash source /etc/profile.d/rvm.sh;
-#     bundle install --path=vendor/bundle --without=sqlite mysql
-#   args:
-#     chdir: /vagrant
+- name: bundle install
+  sudo: no
+  remote_user: vagrant
+  shell: >
+    bundle install --path=vendor/bundle --without=sqlite mysql
+  args:
+    chdir: /vagrant
 
 - name: disable npm spinner
   shell: >
-    executable=/bin/bash source /etc/profile.d/rvm.sh;
-    npm config set spin=false
+      npm config set spin=false
+  remote_user: vagrant
+  sudo: no
 
 - name: npm install
-  shell: >
-    executable=/bin/bash source /etc/profile.d/rvm.sh;
-    npm install
+  shell: npm install
   args:
     chdir: /vagrant
   remote_user: vagrant
+  sudo: no
 
 - name: compile assets
-  shell: >
-    executable=/bin/bash source /etc/profile.d/rvm.sh;
-    RAILS_ENV=production bundle exec rake canvas:compile_assets[false]
+  shell: RAILS_ENV=production bundle exec rake canvas:compile_assets[false]
   args:
     chdir: /vagrant
   remote_user: vagrant
+  sudo: no
 
 - name: init databases
   shell: >
-    executable=/bin/bash source /etc/profile.d/rvm.sh;
     RAILS_ENV=production \
     CANVAS_LMS_ADMIN_EMAIL=vagrant@localhost \
     CANVAS_LMS_ADMIN_PASSWORD=canvas4me \
@@ -47,7 +46,7 @@
 - name: symlink canvas_init script
   sudo: yes
   file:
-    src=/vagrant/scripts/canvas_init
+    src=/vagrant/script/canvas_init
     dest=/etc/init.d/canvas_init
     state=link
   notify:
