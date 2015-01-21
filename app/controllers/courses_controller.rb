@@ -363,7 +363,7 @@ class CoursesController < ApplicationController
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.each do |e|
           if [:completed, :rejected].include?(e.state_based_on_date)
-            @past_enrollments << e
+            @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
