@@ -1,5 +1,5 @@
 db_names:
-  - canvas_production
-  - canvas_queue_production
+  - canvas
+  - canvas_queue
 db_user: canvas
 db_password: canvas4me
