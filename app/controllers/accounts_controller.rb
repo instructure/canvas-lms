@@ -540,7 +540,7 @@ class AccountsController < ApplicationController
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         ENABLE_LTI2: @account.root_account.feature_enabled?(:lti2_ui),
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
-        CONTEXT_BASE_URL: "/api/v1/accounts/#{@context.id}"
+        CONTEXT_BASE_URL: "/accounts/#{@context.id}"
       })
     end
   end

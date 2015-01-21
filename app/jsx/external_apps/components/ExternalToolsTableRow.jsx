@@ -6,9 +6,10 @@ define([
   'react',
   'jsx/external_apps/components/EditExternalToolButton',
   'jsx/external_apps/components/DeleteExternalToolButton',
+  'jsx/external_apps/components/ConfigureExternalToolButton',
   'jsx/external_apps/lib/classMunger',
   'jquery.instructure_misc_helpers'
-], function(_, I18n, React, EditExternalToolButton, DeleteExternalToolButton, classMunger) {
+], function(_, I18n, React, EditExternalToolButton, DeleteExternalToolButton, ConfigureExternalToolButton, classMunger) {
 
   return React.createClass({
     displayName: 'ExternalToolsTableRow',
@@ -19,8 +20,13 @@ define([
 
     renderButtons() {
       if (this.props.tool.installed_locally) {
+        var configureButton = null;
+        if (this.props.tool.tool_configuration) {
+          configureButton = <ConfigureExternalToolButton ref="configureExternalToolButton" tool={this.props.tool} />;
+        }
         return (
           <td className="links text-right" nowrap="nowrap">
+            {configureButton}
             <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
             <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} />
           </td>

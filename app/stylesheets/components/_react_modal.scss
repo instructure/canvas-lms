@@ -158,6 +158,9 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       &.ReactModal__Body--force-no-corners {
         border-top-left-radius: 0; border-top-right-radius: 0;  
       }
+      &.ReactModal__Body--force-no-padding {
+        padding: 0;
+      }
     }
 
     .ReactModal__Footer {

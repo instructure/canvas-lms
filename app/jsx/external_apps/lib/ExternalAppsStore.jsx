@@ -44,7 +44,7 @@ define([
   };
 
   store.fetch = function() {
-    var url = this.getState().links.next || ENV.CONTEXT_BASE_URL + '/lti_apps?per_page=' + PER_PAGE;
+    var url = this.getState().links.next || '/api/v1' + ENV.CONTEXT_BASE_URL + '/lti_apps?per_page=' + PER_PAGE;
     this.setState({ isLoading: true });
     $.ajax({
       url: url,
@@ -56,10 +56,10 @@ define([
 
   store.fetchWithDetails = function(tool) {
     if (tool.app_type === 'ContextExternalTool') {
-      return $.getJSON(ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id);
+      return $.getJSON('/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id);
     } else {
       // DOES NOT EXIST YET
-      return $.getJSON(ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id);
+      return $.getJSON('/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id);
     }
   };
 
@@ -68,10 +68,10 @@ define([
 
     var params = this._generateParams(configurationType, data);
 
-    var url = ENV.CONTEXT_BASE_URL + '/external_tools';
+    var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools';
     var method = 'POST';
     if (data.app_id) {
-      url = ENV.CONTEXT_BASE_URL + '/external_tools/' + data.app_id;
+      url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/' + data.app_id;
       method = 'PUT';
     }
     $.ajax({
@@ -87,9 +87,9 @@ define([
     var url;
 
     if (tool.app_type === 'ContextExternalTool') {
-      url = ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id;
+      url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id;
     } else { // Lti::ToolProxy
-      url = ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
+      url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
     }
 
     var tools = _.filter(this.getState().externalTools, function(t) { return t.app_id !== tool.app_id; });
@@ -104,7 +104,7 @@ define([
   };
 
   store.activate = function(tool, success, error) {
-    var url = ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
+    var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
     var tools = _.map(this.getState().externalTools, function(t) {
       if (t.app_id === tool.app_id) {
         t['enabled'] = true;
@@ -123,7 +123,7 @@ define([
   };
 
   store.deactivate = function(tool, success, error) {
-    var url = ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
+    var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
     var tools = _.map(this.getState().externalTools, function(t) {
       if (t.app_id === tool.app_id) {
         t['enabled'] = false;
@@ -133,7 +133,7 @@ define([
     this.setState({ externalTools: sort(tools) });
 
     $.ajax({
-      url: ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id,
+      url: '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id,
       data: { workflow_state: 'disabled' },
       type: 'PUT',
       success: success.bind(this),

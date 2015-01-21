@@ -518,8 +518,10 @@ CanvasRails::Application.routes.draw do
     resources :external_tools do
       get :finished
       get :resource_selection
+      collection do
+        get :retrieve
+      end
     end
-
 
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration

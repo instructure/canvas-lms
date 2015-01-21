@@ -59,7 +59,8 @@ module Lti
                                    name: tool_proxy.name,
                                    description: tool_proxy.description,
                                    installed_locally: true,
-                                   enabled: true
+                                   enabled: true,
+                                   tool_configuration: nil
                                  })
 
       end
@@ -77,7 +78,8 @@ module Lti
                                     name: external_tool.name,
                                     description: external_tool.description,
                                     installed_locally: true,
-                                    enabled: true
+                                    enabled: true,
+                                    tool_configuration: nil
                                   })
       end
 
