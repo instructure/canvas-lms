@@ -4,7 +4,7 @@ define([
   'jquery',
   'i18n!external_tools',
   'underscore',
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/external_apps/components/TextInput',
   'jsx/external_apps/components/TextAreaInput',
   'compiled/jquery.rails_flash_notifications'

@@ -2,8 +2,8 @@
 
 define([
   'i18n!external_tools',
-  'react',
-  'react-router',
+  'old_unsupported_dont_use_react',
+  'old_unsupported_dont_use_react-router',
   'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/components/AppTile',
   'jsx/external_apps/components/Header',

@@ -3,7 +3,7 @@
 define([
   'underscore',
   'i18n!external_tools',
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/external_apps/components/EditExternalToolButton',
   'jsx/external_apps/components/DeleteExternalToolButton',
   'jsx/external_apps/components/ConfigureExternalToolButton',

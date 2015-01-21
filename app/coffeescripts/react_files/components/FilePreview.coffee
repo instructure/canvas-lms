@@ -1,9 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'react'
-  'react-router'
-  'react-modal'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
+  'old_unsupported_dont_use_react-modal'
   '../modules/customPropTypes'
   'i18n!file_preview'
   './FriendlyDatetime'

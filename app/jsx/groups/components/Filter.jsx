@@ -2,7 +2,7 @@
 
 define([
   'i18n!student_groups',
-  'react'
+  'old_unsupported_dont_use_react'
 ], (I18n, React) => {
   var Filter = React.createClass({
     render() {

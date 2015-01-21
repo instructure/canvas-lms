@@ -20,7 +20,7 @@ define([
   'underscore',
   'compiled/models/ModuleFile',
   'compiled/react_files/components/PublishCloud',
-  'react',
+  'old_unsupported_dont_use_react',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
   'INST' /* INST */,

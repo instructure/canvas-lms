@@ -2,7 +2,7 @@ define [
   'jquery'
   'underscore'
   'i18n!react_files'
-  'react'
+  'old_unsupported_dont_use_react'
   '../modules/customPropTypes'
   '../modules/filesEnv'
   '../utils/omitEmptyValues'

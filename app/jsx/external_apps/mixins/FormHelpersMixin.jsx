@@ -2,7 +2,7 @@
 
 define([
   'underscore',
-  'react'
+  'old_unsupported_dont_use_react'
 ], function(_, React) {
 
   function $c(staticClassName, conditionalClassNames) {

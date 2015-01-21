@@ -1,6 +1,6 @@
 define [
-  'react'
-  'react-modal'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-modal'
   'jsx/external_apps/components/DeleteExternalToolButton'
   'jsx/external_apps/lib/ExternalAppsStore'
 ], (React, Modal, DeleteExternalToolButton, store) ->

@@ -1,5 +1,5 @@
 define [
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/models/Folder'
   'compiled/models/FilesystemObject'
 ], (React, Folder, FilesystemObject) ->

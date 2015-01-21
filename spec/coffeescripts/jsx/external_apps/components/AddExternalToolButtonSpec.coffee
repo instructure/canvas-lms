@@ -1,6 +1,6 @@
 define [
-  'react'
-  'react-modal'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-modal'
   'jsx/external_apps/components/AddExternalToolButton'
 ], (React, Modal, AddExternalToolButton) ->
 

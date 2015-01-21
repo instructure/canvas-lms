@@ -1,6 +1,6 @@
 require [
   'jquery'
-  'react'
+  'old_unsupported_dont_use_react'
   'jsx/external_apps/routes'
 ], ($, React, routes) ->
   alreadyRendered = false

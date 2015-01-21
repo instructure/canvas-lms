@@ -1,5 +1,5 @@
 require [
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react_files/routes'
 ], (React, routes) ->
 

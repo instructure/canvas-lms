@@ -1,6 +1,6 @@
 define [
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/str/splitAssetString'

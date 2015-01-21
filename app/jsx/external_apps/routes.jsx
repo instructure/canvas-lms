@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'react-router',
+  'old_unsupported_dont_use_react-router',
   'jsx/external_apps/components/Root',
   'jsx/external_apps/components/AppList',
   'jsx/external_apps/components/AppDetails',

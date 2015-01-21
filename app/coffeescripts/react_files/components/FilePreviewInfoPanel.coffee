@@ -1,5 +1,5 @@
 define [
-  'react'
+  'old_unsupported_dont_use_react'
   'i18n!file_preview'
   './FriendlyDatetime'
   'compiled/util/friendlyBytes'

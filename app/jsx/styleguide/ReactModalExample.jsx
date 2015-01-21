@@ -1,8 +1,8 @@
 /** @jsx React.DOM */
 
 define([
-  'react',
-  'react-modal'
+  'old_unsupported_dont_use_react',
+  'old_unsupported_dont_use_react-modal'
 ], function (React, Modal) {
 
   var ReactModalExample = React.createClass({

@@ -3,8 +3,8 @@
 define([
   'underscore',
   'i18n!external_tools',
-  'react',
-  'react-router'
+  'old_unsupported_dont_use_react',
+  'old_unsupported_dont_use_react-router'
 ], function (_, I18n, React, {Link}) {
 
   return React.createClass({

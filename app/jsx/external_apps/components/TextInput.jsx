@@ -3,7 +3,7 @@
 define([
   'i18n!external_tools',
   'jquery',
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/external_apps/mixins/InputMixin'
 ], function (I18n, $, React, InputMixin) {
 

@@ -1,6 +1,6 @@
 define [
   'jquery'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react/shared/utils/withReactDOM'
   'i18n!broccoli_cloud'
   'compiled/models/FilesystemObject'

@@ -1,6 +1,6 @@
 define [
   'underscore'
-  'react'
+  'old_unsupported_dont_use_react'
   '../components/MoveDialog'
   '../modules/filesEnv'
   'jquery'

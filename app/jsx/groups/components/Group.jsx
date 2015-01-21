@@ -3,7 +3,7 @@
 define([
   'i18n!student_groups',
   'underscore',
-  'react',
+  'old_unsupported_dont_use_react',
   'compiled/util/natcompare'
 ], (I18n, _, React, natcompare) => {
   var Group = React.createClass({

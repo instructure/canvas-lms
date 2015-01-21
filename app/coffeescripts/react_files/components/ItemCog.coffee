@@ -1,6 +1,6 @@
 define [
   'i18n!react_files'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'

@@ -3,7 +3,7 @@
 define([
   'i18n!external_tools',
   'underscore',
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/external_apps/components/TextInput'
 ], function (I18n, _, React, TextInput) {
 

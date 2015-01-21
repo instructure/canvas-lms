@@ -1,7 +1,7 @@
 define [
   'underscore'
   'i18n!react_files'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/models/Folder'
   'compiled/collections/FilesCollection'
   'compiled/react/shared/utils/withReactDOM'

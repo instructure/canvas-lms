@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'react',
+  'old_unsupported_dont_use_react',
   'jquery',
   'i18n!external_tools',
   'jquery.instructure_date_and_time'

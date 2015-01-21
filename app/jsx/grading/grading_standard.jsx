@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/grading/data_row',
   'jquery',
   'i18n!external_tools'

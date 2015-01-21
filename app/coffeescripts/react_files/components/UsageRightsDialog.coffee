@@ -1,7 +1,7 @@
 define [
   'jquery'
   'underscore'
-  'react'
+  'old_unsupported_dont_use_react'
   'i18n!usage_rights_modal'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'

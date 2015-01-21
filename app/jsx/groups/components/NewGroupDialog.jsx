@@ -4,7 +4,7 @@ define([
   'i18n!student_groups',
   'underscore',
   'jquery',
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/groups/mixins/BackboneState',
   'jsx/groups/components/PaginatedUserCheckList',
   'jsx/groups/mixins/InfiniteScroll',

@@ -1,7 +1,7 @@
 require [
   'jquery'
   'underscore'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/fn/preventDefault'
   'compiled/views/PublishButtonView'
   'compiled/views/PublishIconView'

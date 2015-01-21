@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/grading/grading_standard',
   'jsx/grading/grading_period',
   'jquery',

@@ -1,6 +1,6 @@
 define [
   'underscore'
-  'react'
+  'old_unsupported_dont_use_react'
   'i18n!usage_rights_dialog'
   '../components/UsageRightsDialog'
   '../modules/filesEnv'

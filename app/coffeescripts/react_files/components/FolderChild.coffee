@@ -1,8 +1,8 @@
 define [
   'underscore'
   'i18n!react_files'
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   '../mixins/BackboneMixin'
   'compiled/react/shared/utils/withReactDOM'
   './FriendlyDatetime'

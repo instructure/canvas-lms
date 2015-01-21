@@ -1,7 +1,7 @@
 define [
   'jquery'
   'i18n!upload_drop_zone'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/FileOptionsCollection'
   'compiled/models/Folder'

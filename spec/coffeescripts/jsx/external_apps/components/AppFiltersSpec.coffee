@@ -1,5 +1,5 @@
 define [
-  'react'
+  'old_unsupported_dont_use_react'
   'jsx/external_apps/lib/AppCenterStore'
   'jsx/external_apps/components/AppFilters'
 ], (React, store, AppFilters) ->
