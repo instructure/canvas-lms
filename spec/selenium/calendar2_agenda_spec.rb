@@ -25,6 +25,8 @@ describe "calendar2" do
 
       it "should create a new event" do
         load_agenda_view
+
+        expect(fj('.agenda-wrapper:visible')).to be_present
         f('#create_new_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
         wait_for_ajaximations
@@ -113,9 +115,11 @@ describe "calendar2" do
         tomorrow = 1.day.from_now
         event = make_event(start: tomorrow)
         load_agenda_view
+
         f('.ig-row').click
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
+
         wait_for_ajaximations
         expect(ffj('.ig-row').length).to eq 0
       end
@@ -137,17 +141,13 @@ describe "calendar2" do
       end
 
       it "should have a working today button" do
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#month').click
-        wait_for_ajaximations
+        load_month_view
         #Go to a future calendar date to test going back
         change_calendar
 
         #Get the current date and make sure it is not in the header
-        @date = Time.now.utc
-        date = @date.strftime("%b %d")
-        expect(f('.navigation_title_text').text).not_to include(date)
+        date = Time.now.strftime("%b %-d, %Y")
+        expect(f('.navigation_title').text).not_to include(date)
 
         #Go the agenda view and click the today button
         f('#agenda').click
@@ -155,7 +155,7 @@ describe "calendar2" do
         change_calendar(:today)
 
         #Make sure that today's date is in the header
-        expect(f('.navigation_title_text').text).to include(date)
+        expect(f('.navigation_title').text).to include(date)
       end
 
       it "should show the location when clicking on a calendar event" do
