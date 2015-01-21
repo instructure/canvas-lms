@@ -1,0 +1,12 @@
+test:
+  domain: localhost
+
+development:
+  domain: "canvas.dev"
+  ssl: false
+  files_domain: "files.canvas.dev"
+
+production:
+  domain: "canvas.dev"
+  ssl: false
+  files_domain: "files.canvas.dev"

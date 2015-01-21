@@ -1,0 +1,21 @@
+production:
+  workers:
+  - queue: canvas_queue
+    workers: 2
+    max_priority: 10
+  - queue: canvas_queue
+    workers: 4
+  # if set, workers will process this many jobs and then die, causing the pool
+  # to spawn another worker. this can help return memory to the OS.
+  # worker_max_job_count: 20
+  #
+  # if set, workers will die and re-spawn of they exceed this memory usage
+  # threshold. they will only die between jobs, not during a job.
+  # worker_max_memory_usage: 1073741824
+  #
+  # disable periodic jobs auditor -- this isn't normally necessary
+  # disable_periodic_jobs: true
+
+default:
+  workers:
+  - queue: canvas_queue
