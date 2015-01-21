@@ -154,27 +154,22 @@ describe "quizzes" do
                              :time_limit => 5
                          })
 
-      @quiz.quiz_questions.create!(:question_data => fill_in_multiple_blanks_question_data )
+      question = @quiz.quiz_questions.create!(:question_data => fill_in_multiple_blanks_question_data )
       @quiz.generate_quiz_data
       @quiz.tap(&:save)
-
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
-      f('#take_quiz_link').click
-      wait_for_ajaximations
-      mfitb_fields = ffj('.question_input')
-      # fill out all the blanks with random info selenium gives us, map the string value to an array
-      mfitb_array = mfitb_fields.map do |element|
-        value = element.to_s
-        set_value(element, value)
-        element = value
+      # create and grade a submission on our mfitb quiz
+      qs = @quiz.generate_submission(@student)
+      # this generates 6 answers on our submission for each blank in fill_in_multiple_blanks_question_data
+      (1..6).each do |var|
+        qs.submission_data["question_#{question.id}_#{AssessmentQuestion.variable_id("answer#{var}")}"] = ("this is my answer ##{var}")
       end
-      f('.quiz-header').click
-      f('#submit_quiz_button').click
-      # upon page refresh, check the answer blanks and store those in an array, then compare to our previous array
-      wait_for_ajax_requests
+      response_array = qs.submission_data.values
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/"
+      wait_for_ajaximations
       answer_fields = ff('.question_input')
       answer_array = answer_fields.map { |element| driver.execute_script("return $(arguments[0]).val()", element) }
-      expect(answer_array).to eq mfitb_array
+      expect(answer_array).to eq response_array
     end
   end
 
