@@ -25,10 +25,40 @@ describe LegalInformationController do
       get 'terms_of_use'
       expect(response).to redirect_to controller.terms_of_use_url
     end
+
+    it "should work with authorization" do
+      user
+      user_session @user
+      get 'terms_of_use'
+      expect(response).to redirect_to controller.terms_of_use_url
+    end
+
+    it "should not require acceptance of terms" do
+      user
+      user_session @user
+      session[:require_terms] = true
+      get 'terms_of_use'
+      expect(response).to redirect_to controller.terms_of_use_url
+    end
   end
 
   describe "GET 'privacy_policy'" do
     it "should redirect to privacy_policy_url, no authorization required" do
+      get 'privacy_policy'
+      expect(response).to redirect_to controller.privacy_policy_url
+    end
+
+    it "should work with authorization" do
+      user
+      user_session @user
+      get 'privacy_policy'
+      expect(response).to redirect_to controller.privacy_policy_url
+    end
+
+    it "should not require acceptance of terms" do
+      user
+      user_session @user
+      session[:require_terms] = true
       get 'privacy_policy'
       expect(response).to redirect_to controller.privacy_policy_url
     end

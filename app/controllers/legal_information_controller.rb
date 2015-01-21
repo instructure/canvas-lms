@@ -17,6 +17,8 @@
 #
 
 class LegalInformationController < ApplicationController
+  skip_before_filter :require_reacceptance_of_terms
+
   def terms_of_use
     redirect_to terms_of_use_url
   end
