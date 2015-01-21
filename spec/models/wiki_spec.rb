@@ -60,6 +60,14 @@ describe Wiki do
       @wiki.set_front_page_url!(page.url)
       expect(page).to eq @wiki.front_page
     end
+
+    it "should find front_page by default url (legacy support)" do
+      page = @wiki.wiki_pages.create!(:title => "front page")
+      page.update_attribute(:url, Wiki::DEFAULT_FRONT_PAGE_URL )
+      @wiki.update_attribute(:has_no_front_page, false)
+
+      expect(page).to eq @wiki.front_page
+    end
   end
 
   context 'set policy' do
