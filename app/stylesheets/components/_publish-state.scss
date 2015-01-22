@@ -111,7 +111,8 @@ The publish button has two states on click (publish and published) and a hover s
 .published-status {
   &.published {
     font-weight: bold;
-    color: $canvas-success;
+    @if $use_high_contrast { color: darken($canvas-success, 4%); }
+    @else { color: $canvas-success; }
   }
 
   &.unpublished {

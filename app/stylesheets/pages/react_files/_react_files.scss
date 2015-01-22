@@ -106,10 +106,21 @@ $ef-thumbnail-size: 36px;
   margin-bottom: 1px;
   border-radius: 3px;
   line-height: $ef-thumbnail-size;
-
+  box-sizing: border-box;
+  @if $use_high_contrast { border: 1px solid transparent; }
+  
   // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
-  &:hover            { background-color: $base-list-item-background--hover }
-  &.ef-item-selected { background-color: $base-list-item-background--selected }
+  &:hover {
+    @if $use_high_contrast { 
+      border-color: $canvas-dark;
+      border-style: dotted;
+    }
+    @else { background-color: $can-bg-light-primary; }
+  }
+  &.ef-item-selected { 
+    @if $use_high_contrast { border-color: $canvas-primary; }
+    @else { background-color: darken($can-bg-light-primary, 4%); } 
+  }
 
   .al-trigger { opacity: 0 }
 
@@ -145,6 +156,9 @@ $ef-thumbnail-size: 36px;
 
 .ef-name-col{
   flex: 8;
+  a {
+    @if $use_high_contrast { @extend .ef-plain-link; }
+  }
 }
 
 .ef-date-created-col{
