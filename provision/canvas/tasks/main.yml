@@ -70,11 +70,13 @@
 
 - name: db migrate
   shell: RAILS_ENV=production bundle exec rake db:migrate
-  when: canvas_db_setup_done.exists
+  args:
+    chdir: /vagrant
 
 - name: load notifications
   shell: RAILS_ENV=production bundle exec rake db:load_notifications
-  when: canvas_db_setup_done.exists
+  args:
+    chdir: /vagrant
 
 - name: symlink canvas_init script
   sudo: yes
