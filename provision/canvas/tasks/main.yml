@@ -52,10 +52,6 @@
   remote_user: vagrant
   sudo: no
 
-- name: check if database setup has been completed
-  stat: path=/home/vagrant/CanvasDBSetupDone
-  register: canvas_db_setup_done
-
 - name: init databases
   shell: >
     RAILS_ENV=production \
@@ -63,10 +59,10 @@
     CANVAS_LMS_ADMIN_PASSWORD=canvas4me \
     CANVAS_LMS_ACCOUNT_NAME="Simon Fraser University" \
     CANVAS_LMS_STATS_COLLECTION=opt_out \
-    bundle exec rake db:initial_setup && sudo touch /home/vagrant/CanvasDBSetupDone
+    bundle exec rake db:initial_setup && touch /home/vagrant/CanvasDBSetupDone
   args:
     chdir: /vagrant
-  when: canvas_db_setup_done.exists == false
+    creates: /home/vagrant/CanvasDBSetupDone
 
 - name: db migrate
   shell: RAILS_ENV=production bundle exec rake db:migrate
