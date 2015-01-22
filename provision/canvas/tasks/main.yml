@@ -8,6 +8,15 @@
 
 - name: stop jobs
   service: name=canvas_init state=stopped
+  ignore_errors: yes
+
+- name: wait for all vendor/bundle files to close
+  shell: lsof | grep "vendor/bundle" | wc -l
+  register: lsof_output
+  ignore_errors: true
+  until: lsof_output.stdout.find("0") != -1
+  retries: 10
+  delay: 5
 
 - name: delete vendor/bundle
   file: path=/vagrant/vendor/bundle state=absent force=yes
