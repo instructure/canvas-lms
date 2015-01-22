@@ -65,6 +65,7 @@ describe "assignments" do
 
     it "should create an assignment using main add button" do
       assignment_name = 'first assignment'
+      # freeze for a certain time, so we don't get unexpected ui complications
       time = Timecop.freeze(2015,1,7,2,13)
       due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
 
@@ -86,6 +87,8 @@ describe "assignments" do
       expect(fj('#assignment_show .points_possible')).to include_text('10')
       expect(f('#assignment_show fieldset')).to include_text('a text entry box, a website url, or a file upload')
       expect(f('.assignment_dates')).to include_text(due_at)
+      # unfreeze time
+      Timecop.return
     end
 
     it "only allows an assignment editor to edit points and title if assignment " +
@@ -123,6 +126,7 @@ describe "assignments" do
     it "should create an assignment with more options" do
       enable_cache do
         expected_text = "Assignment 1"
+        # freeze time to avoid ui complications
         time = Timecop.freeze(2015,1,7,2,13)
         due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
         points = '25'
@@ -147,6 +151,8 @@ describe "assignments" do
         expect(f('.assignment')).to include_text(expected_text)
         group.reload
         expect(group.updated_at.to_i).not_to eq first_stamp
+        # unfreeze time
+        Timecop.return
       end
     end
 
