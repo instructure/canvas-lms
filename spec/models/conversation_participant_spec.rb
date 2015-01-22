@@ -444,6 +444,24 @@ describe ConversationParticipant do
           expect(cp2.shard).to eq @shard1
         end
       end
+
+      describe "for_masquerading_user scope" do
+        it "finds participants with global ids in root_account_ids" do
+          @a1 = Account.create
+          @admin_user = user
+          @a1.account_users.create!(user: @admin_user)
+          @target_user = user
+          @c1 = @target_user.initiate_conversation([user])
+          @c1.add_message("foo", :root_account_id => @a1.id)
+
+          # not sure how this happens in prod, but it does
+          @c1.update_attribute(:root_account_ids, [@a1.id, @a1.global_id].sort.join(","))
+
+          convos = @target_user.conversations.for_masquerading_user(@admin_user)
+          expect(convos.size).to eql 1
+          expect(convos.sort_by(&:id)).to eql [@c1]
+        end
+      end
     end
   end
 end
