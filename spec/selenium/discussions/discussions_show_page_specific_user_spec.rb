@@ -35,7 +35,6 @@ describe "discussions" do
       it "should not show admin options in gear menu to students who've created a discussion" do
         entry
         get url
-        wait_for_ajax_requests
         expect(f('.headerBar .admin-links')).not_to be_nil
         expect(f('.mark_all_as_read')).not_to be_nil
         #f('.mark_all_as_unread').should_not be_nil
@@ -55,7 +54,6 @@ describe "discussions" do
           course.allow_student_discussion_topics = false
           course.save!
           get url
-          wait_for_ajax_requests
           new_student_entry_text = "'ello there"
           expect(f('#content')).not_to include_text(new_student_entry_text)
           add_reply new_student_entry_text
@@ -68,7 +66,6 @@ describe "discussions" do
           topic.save!
 
           get url
-          wait_for_ajaximations
           expect(f('.topic-unsubscribe-button')).not_to be_displayed
           expect(f('.topic-subscribe-button')).not_to be_displayed
 
@@ -83,7 +80,6 @@ describe "discussions" do
         it "should validate that a student can see it and reply to a discussion" do
           new_student_entry_text = 'new student entry'
           get url
-          wait_for_ajax_requests
           expect(f('.message_wrapper')).to include_text('teacher')
           expect(f('#content')).not_to include_text(new_student_entry_text)
           add_reply new_student_entry_text
@@ -96,7 +92,6 @@ describe "discussions" do
           topic.save
           entry
           get url
-          wait_for_ajax_requests
           # shouldn't see the existing entry until after posting
           expect(f('#content')).not_to include_text("new entry from teacher")
           add_reply new_student_entry_text

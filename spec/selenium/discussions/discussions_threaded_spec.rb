@@ -12,7 +12,6 @@ context "threaded discussions" do
 
   it "should create a threaded discussion" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajaximations
 
     expect(f('.discussion-title').text).to eq @topic_title
   end
@@ -20,7 +19,6 @@ context "threaded discussions" do
   it "should reply to the threaded discussion" do
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
 
     add_reply(entry_text)
     last_entry = DiscussionEntry.last
@@ -33,7 +31,6 @@ context "threaded discussions" do
     reply_depth = 10
     reply_depth.times { |i| @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply #{i} from student", :parent_entry => DiscussionEntry.last) }
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
     expect(DiscussionEntry.last.depth).to eq reply_depth
   end
 
@@ -42,7 +39,6 @@ context "threaded discussions" do
     entry       = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded reply from student')
     child_entry = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded child reply from student', :parent_entry => entry)
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
     edit_entry(entry, edit_text)
     expect(entry.reload.message).to match(edit_text)
   end
@@ -51,14 +47,12 @@ context "threaded discussions" do
     edit_text = 'edit message '
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
     edit_entry(entry, edit_text)
   end
 
   it "should delete a reply" do
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajaximations
     delete_entry(entry)
   end
 
@@ -66,7 +60,6 @@ context "threaded discussions" do
     edit_text = 'edit message '
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
     edit_entry(entry, edit_text)
     expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
   end
@@ -74,7 +67,6 @@ context "threaded discussions" do
   it "should support repeated editing" do
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajaximations
     edit_entry(entry, 'New text 1')
     expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
     # second edit
@@ -86,7 +78,6 @@ context "threaded discussions" do
   it "should display editor name and timestamp after delete" do
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
 
     add_reply(entry_text)
     entry = DiscussionEntry.last

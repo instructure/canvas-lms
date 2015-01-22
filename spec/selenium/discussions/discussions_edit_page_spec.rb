@@ -37,7 +37,6 @@ describe "discussions" do
           assign_group_2 = course.assignment_groups.create!(:name => "Group 2")
 
           get url
-          wait_for_ajaximations
 
           click_option("#assignment_group_id", assign_group_2.name)
 
@@ -47,7 +46,6 @@ describe "discussions" do
 
         it "should allow editing the grading type" do
           get url
-          wait_for_ajaximations
 
           click_option("#assignment_grading_type", "Letter Grade")
 
@@ -58,7 +56,6 @@ describe "discussions" do
         it "should allow editing the group category" do
           group_cat = course.group_categories.create!(:name => "Groupies")
           get url
-          wait_for_ajaximations
 
           f("#has_group_category").click
           click_option("#assignment_group_category_id", group_cat.name)
@@ -69,7 +66,6 @@ describe "discussions" do
 
         it "should allow editing the peer review" do
           get url
-          wait_for_ajaximations
 
           f("#assignment_peer_reviews").click
 
@@ -79,7 +75,6 @@ describe "discussions" do
 
         it "should allow editing the due dates" do
           get url
-          wait_for_ajaximations
 
           due_at = Time.zone.now + 3.days
           unlock_at = Time.zone.now + 2.days
@@ -121,7 +116,7 @@ describe "discussions" do
 
       it "should toggle checkboxes when clicking their labels" do
         get url
-        wait_for_ajaximations
+
         expect(is_checked('input[type=checkbox][name=threaded]')).not_to be_truthy
         driver.execute_script(%{$('input[type=checkbox][name=threaded]').parent().click()})
         expect(is_checked('input[type=checkbox][name=threaded]')).to be_truthy
@@ -157,7 +152,6 @@ describe "discussions" do
           topic.save!
 
           get url
-          wait_for_ajaximations
 
           delayed_post_at = Time.zone.now - 10.days
           lock_at = Time.zone.now - 5.days
@@ -183,7 +177,6 @@ describe "discussions" do
           topic.save!
 
           get url
-          wait_for_ajaximations
 
           delayed_post_at = Time.zone.now - 5.days
           date_format = '%b %-d, %Y'
