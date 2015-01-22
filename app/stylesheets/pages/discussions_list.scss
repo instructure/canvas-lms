@@ -7,6 +7,10 @@ $announcements_disscussion-summary-color: $canvas-dark;
 #main { min-width: 700px; }
 
 .discussionTopicIndexList {
+  .discussion-actions {
+    float: right;
+    padding: 11px 10px 0px 0px;
+  }
   .discussion-topic {
     cursor: pointer;
     display: table;

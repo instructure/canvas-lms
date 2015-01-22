@@ -80,6 +80,39 @@ describe "announcements" do
         @context = @course
       end
 
+      it "should have a lock that appears and disappears when the cog menu is used to lock/unlock the announcement for comments" do
+        title = "My announcement"
+        announcement_model(:title => title, :user => @user)
+        get url
+
+        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+        f('.discussion-actions .al-trigger').click
+        wait_for_ajaximations
+        f('.al-options li a.icon-lock').click
+        wait_for_ajaximations
+        expect(f('.discussion-info-icons .icon-lock')).not_to be_nil
+        f('.discussion-actions .al-trigger').click
+        wait_for_ajaximations
+        f('.al-options li a.icon-lock').click
+        wait_for_ajaximations
+        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+      end
+
+      it "should remove an announcement when it is deleted from the delete option in the cog menu" do
+        title = "My announcement"
+        announcement_model(:title => title, :user => @user)
+        get url
+
+        expect(f('.discussion-topic')).not_to be_nil
+        f('.discussion-actions .al-trigger').click
+        f('.al-options li a.icon-trash').click
+        alert_present?
+        alert = driver.switch_to.alert
+        expect(alert.text).to match "Are you sure you want to delete this announcement?"
+        alert.accept
+        expect(f('.discussion-topic')).to be_nil
+      end
+
       it "should start a new topic" do
         get url
 
