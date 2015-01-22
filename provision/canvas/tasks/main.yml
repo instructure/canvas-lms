@@ -3,8 +3,14 @@
   with_fileglob:
     - '*.yml'
 
+- name: stop apache2
+  service: name=apache2 state=stopped
+
+- name: stop jobs
+  service: name=canvas_init state=stopped
+
 - name: delete vendor/bundle
-  file: path=/vagrant/vendor/bundle state=absent
+  file: path=/vagrant/vendor/bundle state=absent force=yes
 
 - name: delete Gemfile.lock
   file: path=/vagrant/Gemfile.lock state=absent
@@ -37,6 +43,10 @@
   remote_user: vagrant
   sudo: no
 
+- name: check if database setup has been completed
+  stat: path=/home/vagrant/CanvasDBSetupDone
+  register: canvas_db_setup_done
+
 - name: init databases
   shell: >
     RAILS_ENV=production \
@@ -44,9 +54,18 @@
     CANVAS_LMS_ADMIN_PASSWORD=canvas4me \
     CANVAS_LMS_ACCOUNT_NAME="Simon Fraser University" \
     CANVAS_LMS_STATS_COLLECTION=opt_out \
-    bundle exec rake db:initial_setup
+    bundle exec rake db:initial_setup && sudo touch /home/vagrant/CanvasDBSetupDone
   args:
     chdir: /vagrant
+  when: canvas_db_setup_done.exists == false
+
+- name: db migrate
+  shell: RAILS_ENV=production bundle exec rake db:migrate
+  when: canvas_db_setup_done.exists
+
+- name: load notifications
+  shell: RAILS_ENV=production bundle exec rake db:load_notifications
+  when: canvas_db_setup_done.exists
 
 - name: symlink canvas_init script
   sudo: yes
