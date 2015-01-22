@@ -214,6 +214,15 @@ shared_examples_for "quiz question selenium tests" do
     submit_finished_quiz
   end
 
+  def check_if_cant_go_back
+    it_should_be_on_first_question
+    answer_the_question_correctly
+
+    click_next_button
+    it_should_be_on_second_question
+    it_should_not_show_previous_button
+  end
+
   def answers_flow
     answer_the_question_correctly
     click_next_button

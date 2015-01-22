@@ -108,7 +108,6 @@ describe "quizzes" do
 
     context "who gets logged out while taking a quiz" do
       it "should be notified and able to relogin" do
-        skip('193')
         # setup a quiz and start taking it
         quiz_with_new_questions(!:goto_edit)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -119,7 +118,6 @@ describe "quizzes" do
         ff('.answers .answer_input input')[0].click
         wait_for_ajaximations
         expect(f('#last_saved_indicator').text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
-
         # now kill our session (like logging out)
         destroy_session(false)
 
