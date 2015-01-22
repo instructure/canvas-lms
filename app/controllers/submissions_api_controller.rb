@@ -660,10 +660,10 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API Grade multiple submissions for an assignment
+  # @API Grade or comment on multiple submissions for an assignment
   #
-  # Update the grading for multiple student's assignment submissions in
-  # an asynchronous job.
+  # Update the grading and comments on multiple student's assignment
+  # submissions in an asynchronous job.
   #
   # The user must have permission to manage grades in the appropriate context
   # (course or section).
@@ -674,6 +674,14 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument grade_data[<student_id>][rubric_assessment] [RubricAssessment]
   #   See documentation for the rubric_assessment argument in the
+  #   {api:SubmissionsApiController#update Submissions Update} documentation
+  #
+  # @argument grade_data[<student_id>][text_comment] [String]
+  # @argument grade_data[<student_id>][group_comment] [Boolean]
+  # @argument grade_data[<student_id>][media_comment_id] [String]
+  # @argument grade_data[<student_id>][media_comment_type] [String, "audio"|"video"]
+  # @argument grade_data[<student_id>][file_ids][] [Integer]
+  #   See documentation for the comment[] arguments in the
   #   {api:SubmissionsApiController#update Submissions Update} documentation
   #
   # @example_request
