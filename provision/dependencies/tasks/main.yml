@@ -28,3 +28,7 @@
 - name: Remove ruby 2.0
   sudo: yes
   apt: pkg=ruby2.0 state=absent
+
+- name: Update npm to latest
+  sudo: yes
+  shell: npm -g install npm
