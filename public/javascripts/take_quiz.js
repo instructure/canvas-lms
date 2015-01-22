@@ -26,6 +26,7 @@ define([
   'worker!compiled/workers/quizzes/quiz_taking_police',
   'compiled/quizzes/log_auditing',
   'compiled/quizzes/dump_events',
+  'compiled/views/editor/KeyboardShortcuts',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.toJSON',
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
@@ -37,7 +38,10 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _, LDBLoginPopup, QuizTakingPolice, QuizLogAuditing, QuizLogAuditingEventDumper) {
+], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _,
+            LDBLoginPopup, QuizTakingPolice, QuizLogAuditing,
+            QuizLogAuditingEventDumper, KeyboardShortcuts) {
+
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
   var showDeauthorizedDialog;
@@ -754,4 +758,6 @@ define([
     QuizLogAuditing.start();
     QuizLogAuditingEventDumper(false);
   });
+
+  $('.essay_question .answers').before((new KeyboardShortcuts()).render().el);
 });
