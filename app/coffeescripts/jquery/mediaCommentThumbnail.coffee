@@ -46,6 +46,7 @@ define [
         $link.empty()
 
       $a
+        .prop('href', '#')
         .addClass('instructure_inline_media_comment')
         .append($thumbnail)
         .css
