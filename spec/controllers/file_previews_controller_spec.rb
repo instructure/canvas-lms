@@ -74,7 +74,7 @@ describe FilePreviewsController do
     attachment_model content_type: 'application/msword'
     get :show, course_id: @course.id, file_id: @attachment.id
     expect(response).to be_redirect
-    expect(response.location).to match %r{\A//docs.google.com/viewer}
+    expect(response.location).to match %r{\A//docview.sfu.ca/viewer} # SFU MOD - CANVAS-205
   end
 
   it "should render a download link if no previews are available" do
