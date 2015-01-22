@@ -20,17 +20,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if host =~ /darwin/
       cpus = `sysctl -n hw.ncpu`.to_i
       # sysctl returns Bytes and we need to convert to MB
-      mem = `sysctl -n hw.memsize`.to_i / 1024 / 1024 / 4
+      # host_mem = `sysctl -n hw.memsize`.to_i / 1024 / 1024
     elsif host =~ /linux/
       cpus = `nproc`.to_i
       # meminfo shows KB and we need to convert to MB
-      mem = `grep 'MemTotal' /proc/meminfo | sed -e 's/MemTotal://' -e 's/ kB//'`.to_i / 1024 / 4
+      # host_mem = `grep 'MemTotal' /proc/meminfo | sed -e 's/MemTotal://' -e 's/ kB//'`.to_i / 1024
     else # sorry Windows folks, I can't help you
       cpus = 2
-      mem = 1024
+      mem = 2048
     end
 
-    v.customize ["modifyvm", :id, "--memory", mem]
+    v.customize ["modifyvm", :id, "--memory", 4096]
     v.customize ["modifyvm", :id, "--cpus", cpus]
   end
 
@@ -40,6 +40,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.playbook = "provision/vagrant.yml"
   end
 
-  # config.vm.provision :shell, :inline => "sudo service canvas_init restart && sudo service apache2 restart", run: "always"
+  config.vm.provision :shell, :inline => "sudo service canvas_init restart && sudo service apache2 restart", run: "always"
 
 end
