@@ -103,7 +103,7 @@ class UserMerge
       Pseudonym.where(:user_id => from_user).update_all(["user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|
-        Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)
+        Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)
       end
       [
         [:quiz_id, :'quizzes/quiz_submissions'],
