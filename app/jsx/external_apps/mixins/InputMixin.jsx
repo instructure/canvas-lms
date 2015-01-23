@@ -2,7 +2,7 @@
 
 define([
   'underscore',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/external_apps/lib/classMunger'
 ], function(_, React, classMunger) {
 

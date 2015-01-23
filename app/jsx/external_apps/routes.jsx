@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react-router',
+  'react-router',
   'jsx/external_apps/components/Root',
   'jsx/external_apps/components/AppList',
   'jsx/external_apps/components/AppDetails',
@@ -14,13 +14,11 @@ define([
     , baseUrl = matches[0];
 
   return (
-    <Routes location="history">
-      <Route name='root' handler={Root}>
-        <Route name='appList' path={baseUrl + '/?'} handler={AppList} />
-        <Route name='appDetails' path={baseUrl + '/app/:shortName'} handler={AppDetails} />
-        <Route name='configurations' path={baseUrl + '/configurations'} handler={Configurations} />
-      </Route>
-    </Routes>
+    <Route name='root' handler={Root}>
+      <Route name='appList' path={baseUrl + '/?'} handler={AppList} />
+      <Route name='appDetails' path={baseUrl + '/app/:shortName'} handler={AppDetails} />
+      <Route name='configurations' path={baseUrl + '/configurations'} handler={Configurations} />
+    </Route>
   );
 
 });

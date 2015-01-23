@@ -3,7 +3,7 @@
 define([
   'i18n!external_tools',
   'jquery',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/external_apps/components/ConfigurationFormManual',
   'jsx/external_apps/components/ConfigurationFormUrl',
   'jsx/external_apps/components/ConfigurationFormXml',

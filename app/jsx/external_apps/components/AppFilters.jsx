@@ -2,7 +2,7 @@
 
 define([
   'i18n!external_tools',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/external_apps/lib/AppCenterStore'
 ], function (I18n, React, store) {
 

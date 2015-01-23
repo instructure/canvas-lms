@@ -4,7 +4,7 @@ define([
   'i18n!external_tools',
   'underscore',
   'jquery',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/external_apps/components/TextInput',
   'jsx/external_apps/components/TextAreaInput',
   'jsx/external_apps/components/SelectInput',

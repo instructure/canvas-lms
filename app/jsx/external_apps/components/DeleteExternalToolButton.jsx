@@ -3,8 +3,8 @@
 define([
   'jquery',
   'i18n!external_tools',
-  'old_unsupported_dont_use_react',
-  'old_unsupported_dont_use_react-modal',
+  'react',
+  'react-modal',
   'jsx/external_apps/lib/ExternalAppsStore'
 ], function ($, I18n, React, Modal, store) {
 

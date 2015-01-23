@@ -3,8 +3,8 @@
 define([
   'jquery',
   'i18n!external_tools',
-  'old_unsupported_dont_use_react',
-  'old_unsupported_dont_use_react-modal',
+  'react',
+  'react-modal',
   'compiled/models/ExternalTool',
   'jsx/external_apps/lib/ExternalAppsStore',
   'jsx/external_apps/components/ConfigurationForm',

@@ -3,7 +3,7 @@
 define([
   'underscore',
   'i18n!external_tools',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/external_apps/lib/ExternalAppsStore',
   'jsx/external_apps/components/ExternalToolsTableRow',
   'jsx/external_apps/components/InfiniteScroll'

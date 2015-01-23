@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react'
+  'react'
 ], function (React) {
 
   return React.createClass({

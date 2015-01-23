@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jsx/external_apps/components/SelectInput'
 ], (React, SelectInput) ->
 

@@ -2,7 +2,7 @@
 
 define([
   'i18n!external_tools',
-  'old_unsupported_dont_use_react',
+  'react',
   'str/htmlEscape'
 ], function (I18n, React, htmlEscape) {
 

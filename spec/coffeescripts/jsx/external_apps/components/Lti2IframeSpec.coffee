@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jsx/external_apps/components/Lti2Iframe'
 ], (React, Lti2Iframe) ->
 

@@ -2,8 +2,8 @@
 
 define([
   'i18n!external_tools',
-  'old_unsupported_dont_use_react',
-  'old_unsupported_dont_use_react-router',
+  'react',
+  'react-router',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/ExternalToolsTable',
   'jsx/external_apps/components/AddExternalToolButton'

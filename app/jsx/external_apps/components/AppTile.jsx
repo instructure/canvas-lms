@@ -3,8 +3,8 @@
 define([
   'i18n!external_tools',
   'jquery',
-  'old_unsupported_dont_use_react',
-  'old_unsupported_dont_use_react-router'
+  'react',
+  'react-router'
 ], function (I18n, $, React, {Navigation}) {
 
   return React.createClass({
