@@ -1,0 +1,1626 @@
+/*
+@styleguide Forms
+
+## Basic example
+
+```html
+<div class="ic-Form-control">
+  <label for="demo-text-input-1" class="ic-Label">This is a label</label>
+  <input type="text" id="demo-text-input-1" class="ic-Input" placeholder="Don't forget a helpful placeholder">
+</div>
+<div class="ic-Form-control">
+  <label for="demo-text-input-2" class="ic-Label">This is another label</label>
+  <select class="ic-Input" id="demo-text-input-2">
+    <option>This is an option</option>
+    <option>This is another option</option>
+    <option>This is yet another option</option>
+  </select>
+</div>
+```
+
+## Multiple inputs within a single form control
+
+This is a common UI pattern in Canvas, made much easier with flexbox.
+
+```html
+<div class="ic-Form-control">
+  <label for="demo-text-input-3" class="ic-Label">Favorite 2 colors</label>
+  <div class="ic-Form-control__Multi-input">
+    <input type="text" id="demo-text-input-3" class="ic-Input" placeholder="e.g., purple">
+    <span>and</span>
+    <input type="text" id="demo-text-input-4" class="ic-Input" placeholder="e.g., purple">
+  </div>
+</div>
+```
+<br/>
+Also works with ``.ic-Input-group`` (see more about ``.ic-Input-group`` below)
+<br/>
+
+```html
+<div class="ic-Form-control">
+  <label for="demo-text-input-5" class="ic-Label">Enter 2 friends' email addresses</label>
+  
+  <div class="ic-Form-control__Multi-input">
+    
+    <div class="ic-Input-group">
+      <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
+        <i class="icon-email"></i>
+      </div>
+      <input id="demo-text-input-5" class="ic-Input" placeholder="e.g., joe@site.com" type="email">
+    </div>
+    
+    <span>and</span>
+    
+    <div class="ic-Input-group">
+      <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
+        <i class="icon-email"></i>
+      </div>
+      <input id="demo-text-input-6" class="ic-Input" placeholder="e.g., joe@site.com" type="email">
+    </div>
+  
+  </div>
+
+</div>
+```
+
+
+## Custom radio buttons
+
+### Basic example: stacked radio button group
+
+```html
+<div class="ic-Form-control ic-Form-control--radio">
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-1" type="radio" value="value 1" name="ic-radio-group-1" checked>
+    <label for="demo-ic-radio-1" class="ic-Label">myValue 1</label>
+  </div>
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-2" type="radio" value="value 2" name="ic-radio-group-1">
+    <label for="demo-ic-radio-2" class="ic-Label">myValue 2</label>
+  </div>
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-3" type="radio" value="value 3" name="ic-radio-group-1">
+    <label for="demo-ic-radio-3" class="ic-Label">myValue 3</label>
+  </div>
+</div>
+```
+
+### Disabled radio buttons
+
+```html
+<div class="ic-Form-control ic-Form-control--radio">
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-4" type="radio" value="value 1" name="ic-radio-group-2" disabled>
+    <label for="demo-ic-radio-4" class="ic-Label">myValue 1</label>
+  </div>
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-5" type="radio" value="value 2" name="ic-radio-group-2" checked disabled>
+    <label for="demo-ic-radio-5" class="ic-Label">myValue 2</label>
+  </div>
+</div>
+```
+
+### Inline radio buttons
+
+```html
+<div class="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-6" type="radio" value="value 1" name="ic-radio-group-3" checked>
+    <label for="demo-ic-radio-6" class="ic-Label">myValue 1</label>
+  </div>
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-7" type="radio" value="value 2" name="ic-radio-group-3">
+    <label for="demo-ic-radio-7" class="ic-Label">myValue 2</label>
+  </div>
+  <div class="ic-Radio">
+    <input id="demo-ic-radio-8" type="radio" value="value 3" name="ic-radio-group-3">
+    <label for="demo-ic-radio-8" class="ic-Label">myValue 3</label>
+  </div>
+</div>
+```
+
+
+## Custom checkboxes
+
+For these to work properly, make sure the ``for`` attribute of the ``label`` matches the ``id`` of the ``checkbox`` element.
+
+(If you want to use default checkboxes, the existing Bootstrap 2.x styles have been left unchanged.)
+
+### Basic example: stacked checkboxes
+
+```html
+
+<div class="ic-Checkbox-group">
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-1">
+    <label class="ic-Label" for="demo-ic-check-1">Custom checkbox</label>
+  </div>
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-2" checked>
+    <label class="ic-Label" for="demo-ic-check-2">Checked custom checkbox</label>
+  </div>
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-3" checked disabled>
+    <label class="ic-Label" for="demo-ic-check-3">Checked and disabled</label>
+  </div>
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-4" disabled>
+    <label class="ic-Label" for="demo-ic-check-4">Unchecked and disabled</label>
+  </div>
+</div>
+
+```
+
+### Inline checkboxes
+
+```html
+<div class="ic-Checkbox-group ic-Checkbox-group--inline">
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-5">
+    <label class="ic-Label" for="demo-ic-check-5">Custom checkbox</label>
+  </div>
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-6" checked>
+    <label class="ic-Label" for="demo-ic-check-6">Checked custom checkbox</label>
+  </div>
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-7" checked disabled>
+    <label class="ic-Label" for="demo-ic-check-7">Checked and disabled</label>
+  </div>
+  <div class="ic-Form-control ic-Form-control--checkbox">
+    <input type="checkbox" id="demo-ic-check-8" disabled>
+    <label class="ic-Label" for="demo-ic-check-8">Unchecked and disabled</label>
+  </div>
+</div>
+```
+
+
+## Simple form example
+
+```html
+
+<div class="grid-row">
+    <div class="col-xs-12 col-md-8 off-md-2">
+      
+      <!-- Start form markup -->
+      <form class="ic-Form-group">
+        <div class="ic-Form-control">
+          <label for="demo-input-1" class="ic-Label">What's your favorite color?</label>
+          <input type="text" id="demo-input-1" class="ic-Input" placeholder="e.g., red"></input>
+        </div>
+        <div class="ic-Form-control">
+          <label for="demo-input-2" class="ic-Label">Choose your favorite season</label>
+          <select id="demo-input-2" class="ic-Input">
+            <option>Spring</option>
+            <option>Summer</option>
+            <option>Fall</option>
+            <option>Winter</option>
+          </select>
+        </div>
+        <div class="ic-Form-control">
+          <label for="demo-input-4" class="ic-Label">Write a quick essay</label>
+          <textarea id="demo-input-4"class="ic-Input" placeholder="Don't be shy. Express yourself!"></textarea>
+        </div>
+        <div class="ic-Form-control">
+          <div class="ic-Toggle">
+            <input id="demo-input-3" type="checkbox" checked>
+            <label for="demo-input-3">
+              <div class="ic-Toggle__label-text">Do you believe in Santa Claus?</div>
+              <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
+            </label>
+          </div>
+        </div>
+        <div class="ic-Checkbox-group">
+          <div class="ic-Form-control ic-Form-control--checkbox">
+            <input type="checkbox" id="demo-input-10" checked>
+            <label class="ic-Label" for="demo-input-10">Receive a free panda after work today</label>
+          </div>
+        </div>
+        <div class="ic-Form-control ic-Form-control--radio">
+          <div class="ic-Radio">
+            <input id="demo-radio-horiz-3" type="radio" value="hoodie" name="demo-radio-horiz-group-2" checked>
+            <label for="demo-radio-horiz-3" class="ic-Label">I would like a hoodie</label>
+          </div>
+          <div class="ic-Radio">
+            <input id="demo-radio-horiz-4" type="radio" value="frisbee" name="demo-radio-horiz-group-2">
+            <label for="demo-radio-horiz-4" class="ic-Label">I would like a frisbee</label>
+          </div>
+        </div>
+        <div class="ic-Form-actions">
+          <button class="Button" type="button">Cancel</button>
+          <button class="Button Button--primary" type="submit">Submit</button>
+        </div>
+      </form>
+      <!-- End form markup -->
+    
+    </div>
+</div>
+
+```
+
+### The same form with the inputs and labels displayed inline
+
+Simply add `.ic-Form-group--horizontal` to the `.ic-Form-group` element. 
+
+(Collapses into a single-column form at lower screen widths.)
+
+```html
+<div class="content-box">
+  <div class="grid-row">
+      <div class="col-xs-12 col-md-8 off-md-2">
+        
+        <!-- Start form markup -->
+        <form class="ic-Form-group ic-Form-group--horizontal">
+          <div class="ic-Form-control">
+            <label for="demo-input-5" class="ic-Label">What's your favorite color?</label>
+            <input type="text" id="demo-input-5" class="ic-Input" placeholder="e.g., red"></input>
+          </div>
+          <div class="ic-Form-control">
+            <label for="demo-input-6" class="ic-Label">Choose your favorite season</label>
+            <select id="demo-input-6" class="ic-Input">
+              <option>Spring</option>
+              <option>Summer</option>
+              <option>Fall</option>
+              <option>Winter</option>
+            </select>
+          </div>
+          <div class="ic-Form-control">
+            <label for="demo-input-7" class="ic-Label">Write a quick essay</label>
+            <textarea id="demo-input-7"class="ic-Input" placeholder="Don't be shy. Express yourself!"></textarea>
+          </div>
+          <div class="ic-Form-control">
+            <div class="ic-Toggle">
+              <input id="demo-input-8" type="checkbox" checked>
+              <label for="demo-input-8">
+                <div class="ic-Toggle__label-text">Do you believe in Santa Claus?</div>
+                <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
+              </label>
+            </div>
+          </div>
+          <div class="ic-Checkbox-group">
+            <div class="ic-Form-control ic-Form-control--checkbox">
+              <input type="checkbox" id="demo-input-9" checked>
+              <label class="ic-Label" for="demo-input-9">Receive a free panda after work today</label>
+            </div>
+          </div>
+          <div class="ic-Form-control ic-Form-control--radio">
+            <div class="ic-Radio">
+              <input id="demo-radio-horiz-1" type="radio" value="hoodie" name="demo-radio-horiz-group" checked>
+              <label for="demo-radio-horiz-1" class="ic-Label">I would like a hoodie</label>
+            </div>
+            <div class="ic-Radio">
+              <input id="demo-radio-horiz-2" type="radio" value="frisbee" name="demo-radio-horiz-group">
+              <label for="demo-radio-horiz-2" class="ic-Label">I would like a frisbee</label>
+            </div>
+          </div>
+          <div class="ic-Form-actions">
+            <button class="Button" type="button">Cancel</button>
+            <button class="Button Button--primary" type="submit">Submit</button>
+          </div>
+        </form>
+        <!-- End form markup -->
+      
+      </div>
+  </div>
+</div>
+
+```
+
+## Inline forms
+
+At tablet screen-width, this form spreads out in a single row. Simply add ``.ic-Form-group--inline`` to the ``.ic-Form-group`` class.
+
+**Use this one sparingly. Add too many inputs, and it won't look good or work well for the user.**
+
+```html
+<div class="content-box">
+  <form class="ic-Form-group ic-Form-group--inline">
+    <div class="ic-Form-control">
+      <label for="demo-input-6" class="ic-Label">Your name</label>
+      <input type="text" id="demo-input-6" class="ic-Input"></input>
+    </div>
+    <div class="ic-Form-control">
+      <label class="ic-Label">Select a season</label>
+      <select class="ic-Input">
+        <option>Spring</option>
+        <option>Summer</option>
+        <option>Fall</option>
+        <option>Winter</option>
+      </select>
+    </div>
+    <div class="ic-Checkbox-group">
+      <div class="ic-Form-control ic-Form-control--checkbox">
+        <input type="checkbox" id="demo-ic-check-9">
+        <label class="ic-Label" for="demo-ic-check-9">Remember me</label>
+      </div>
+    </div>
+    <div class="ic-Form-actions">
+      <button class="Button" type="button">Cancel</button>
+      <button class="Button Button--primary" type="submit">Submit</button>
+    </div>
+  </form>
+</div>
+```
+
+## Forms inside React Modal
+
+```html
+<!-- Do not use this modal markup in production. See the docs below for React Modal! -->
+<div class="ReactModal__Content ReactModal__Content--canvas ReactModal__Content--demo-styleguide">
+  <div class="ReactModal__Layout">
+    <div class="ReactModal__InnerSection ReactModal__Header">
+      <div class="ReactModal__Header-Title">
+        <h4>Add external tool</h4>
+      </div>
+      <div class="ReactModal__Header-Actions">
+        <button class="Button Button--icon-action" type="button">
+          <i class="icon-x" role="presentation"></i>
+          <span class="screenreader-only">Close</span>
+        </button>
+      </div>
+    </div>
+    <div class="ReactModal__InnerSection ReactModal__Body">
+<!-- end do not use markup -->
+
+<!-- You CAN use this markup to put a form into a React Modal body (or any modal) -->
+        <div class="ic-Form-group">
+          <div class="ic-Form-control">
+            <label class="ic-Label" for="demo-react-modal-1">Custom fields</label>
+            <textarea class="ic-Input" id="demo-react-modal-1" placeholder="Separated by commas"></textarea>
+          </div> 
+        </div>
+        
+        <div class="grid-row">
+          <div class="col-xs-12 col-md-6">
+            <div class="ic-Form-group">
+              <div class="ic-Form-control">
+                <label for="demo-react-modal-2" class="ic-Label">Consumer key</label>
+                <input type="text" id="demo-react-modal-2" class="ic-Input" placeholder="At least 5 letters and 3 numbers"></input>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="ic-Form-group">
+              <div class="ic-Form-control">
+                <label for="demo-react-modal-3" class="ic-Label">Shared secret</label>
+                <input type="text" id="demo-react-modal-3" class="ic-Input" placeholder="See your registation email"></input>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-row middle-md">
+          <div class="col-xs-12 col-md-6">
+            <div class="ic-Form-group">
+              <div class="ic-Form-control">
+                <label for="demo-react-modal-4" class="ic-Label">Canvas instance</label>
+                <select class="ic-Input" id="demo-react-modal-4">
+                  <option>Instance 1</option>
+                  <option>Instance 2</option>
+                  <option>Instance 3</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="ic-Form-group">
+              <div class="ic-Form-control">
+                <div class="ic-Toggle">
+                  <input id="demo-react-modal-5" type="checkbox" checked>
+                  <label for="demo-react-modal-5">
+                    <div class="ic-Toggle__label-text">Visible to public</div>
+                    <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
+                  </label>
+                </div>  
+              </div>
+            </div>
+          </div>
+        </div>
+<!-- End markup you can use -->
+
+<!-- Do not use this modal markup in production. See the docs below for React Modal! -->
+    </div>
+    <div class="ReactModal__InnerSection ReactModal__Footer">
+      <div class="ReactModal__Footer-Actions">
+        <button type="button" class="Button">Cancel</button>
+        <button type="button" class="Button Button--primary">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end do not use markup -->
+```
+
+## The amazing **.ic-Input-group**
+
+Like Bootstrap's, but better! Combine ``.ic-Input`` -styled inputs with buttons, labels, icons or just plain text characters to produce user-friendly form fields.
+
+### Simple example: make a payment input easier to use:
+
+```html
+<div class="ic-Form-control">
+  <label class="ic-Label" for="demo-your-donation">Your donation</label>
+  <div class="ic-Input-group">
+    <div class="ic-Input-group__add-on">$</div>
+    <input type="number" id="demo-your-donation" class="ic-Input"></input>
+    <div class="ic-Input-group__add-on">.00</div>
+  </div>
+</div>
+```
+### Add some spice with an icon!
+
+```html
+
+<div class="ic-Form-control">
+  <label class="ic-Label" for="demo-group-name">Group name</label>
+  <div class="ic-Input-group">
+    <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
+      <i class="icon-group-new-dark" role="presentation"></i>
+    </div>
+    <input type="text" id="demo-group-name" class="ic-Input" placeholder="e.g., Team Awesomeness"></input> 
+  </div>
+</div>
+```
+
+### Inline labels and buttons!
+
+Put ``.ic-Label`` inside ``ic-Input-group`` to make an inline label. Yes, it even works with selects.
+
+```html
+<div class="ic-Form-control">
+  <div class="ic-Input-group">
+    <label class="ic-Label" for="demo-your-email">
+      <i class="icon-email" role="presentation"></i>&nbsp;Your email
+    </label>
+    <input type="email" id="demo-your-email" class="ic-Input"></input>
+    <button class="Button Button--primary" type="button">Save</button>
+  </div>
+</div>
+
+<div class="ic-Form-control">
+  <div class="ic-Input-group">
+    <label class="ic-Label" for="demo-choose-quiz">
+      <i class="icon-quiz" role="presentation"></i>&nbsp;Choose quiz
+    </label>
+    <select class="ic-Input" id="demo-choose-quiz">
+      <option>English 101 Pop Quiz</option>
+      <option>Midterm exam</option>
+      <option>Long-form essay</option>
+      <option>Final exam</option>
+    </select>
+    <button class="Button" type="button">Go</button>
+  </div>
+</div>
+```
+
+### Putting some form and grid modules together for a multi-column responsive layout
+
+```html
+<form>
+  <div class="grid-row">
+    <div class="col-xs-12 col-md-6">
+      
+      <div class="ic-Form-control">
+        <label for="demo-responsive-1" class="ic-Label">Full name</label>
+        <input type="text" id="demo-responsive-1" class="ic-Input" placeholder="First and last, please."></input>
+      </div>
+      <div class="ic-Form-control">
+        <label for="demo-responsive-2" class="ic-Label">Email address</label>
+        <div class="ic-Input-group">
+          <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
+            <i class="icon-email"></i>
+          </div>
+          <input id="demo-responsive-2" class="ic-Input" placeholder="joe@example.com" type="email">
+        </div>
+      </div>
+      <div class="ic-Form-control">
+        <label for="demo-responsive-3" class="ic-Label">Personal website</label>
+        <div class="ic-Input-group">
+          <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
+            <i class="icon-home"></i>
+          </div>
+          <input id="demo-responsive-3" class="ic-Input" placeholder="yoursite@domain.com" type="url">
+        </div>
+      </div>
+
+    </div>
+    <div class="col-xs-12 col-md-6">
+      
+      <div class="ic-Form-control">
+        <label for="demo-responsive-8" class="ic-Label">Preferred working hours</label>
+        <div class="ic-Form-control__Multi-input">
+          <input type="time" class="ic-Input" id="demo-responsive-8" aria-label="Start time" placeholder="Start time">
+          <span>to</span>
+          <input type="time" class="ic-Input" aria-label="End time" placeholder="End time">
+        </div>
+      </div>
+
+      <div class="ic-Form-control">
+        <label for="demo-responsive-5" class="ic-Label">How did you hear about us?</label>
+        <textarea id="demo-responsive-5" class="ic-Input"></textarea>
+      </div>
+      <div class="ic-Checkbox-group">
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="demo-responsive-6" checked>
+          <label class="ic-Label" for="demo-responsive-6">I'd like to receive email updates</label>
+        </div>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="demo-responsive-7">
+          <label class="ic-Label" for="demo-responsive-7">I'd like to make an in-person appointment</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="ic-Form-actions">
+    <button class="Button" type="button">Cancel</button>
+    <button class="Button Button--primary" type="submit">Submit</button>
+  </div>
+
+</form>
+```
+
+## .ic-Action-header
+
+New and improved version of a common Canvas UI: a header with action buttons on the right-hand side.
+
+### Simple header with no content on the left side; just buttons.
+
+```html
+<div class="ic-Action-header">
+  <div class="ic-Action-header__Secondary">
+    <button class="Button Button--primary">+ Widget</button>
+    <div class="al-dropdown__container">
+      <a class="al-trigger Button" role="button" href="#">
+        <i class="icon-settings" role="presentation"></i>
+        <i class="icon-mini-arrow-down" role="presentation"></i>
+        <span class="screenreader-only">Settings</span>
+      </a>
+      <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+        <li>
+          <a href="#" class="icon-edit" tabindex="-1" role="menuitem">Edit settings</a>
+        </li>
+        <li>
+          <a href="#" class="icon-upload" tabindex="-1" role="menuitem">Import widgets</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+```
+
+### **.ic-Action-header** with a heading on the left side and buttons on the right.
+
+```html
+<div class="ic-Action-header">
+  <div class="ic-Action-header__Primary">
+    <h3 class="ic-Action-header__Heading">This is a header!</h3>
+  </div>
+  <div class="ic-Action-header__Secondary">
+    <button class="Button Button--primary">+ Widget</button>
+    <div class="al-dropdown__container">
+      <a class="al-trigger Button" role="button" href="#">
+        <i class="icon-settings" role="presentation"></i>
+        <i class="icon-mini-arrow-down" role="presentation"></i>
+        <span class="screenreader-only">Settings</span>
+      </a>
+      <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+        <li>
+          <a href="#" class="icon-edit" tabindex="-1" role="menuitem">Edit</a>
+        </li>
+        <li>
+          <a href="#" class="icon-trash" tabindex="-1" role="menuitem">Delete</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+```
+
+### **.ic-Action-header** with form element on the left side and buttons on the right.
+
+```html
+<div class="ic-Action-header">
+  <div class="ic-Action-header__Primary">
+    <div class="ic-Input-group">
+      <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
+        <i class="icon-search"></i>
+      </div>
+      <input class="ic-Input" placeholder="Search widgets" aria-label="Search widgets" value="" type="search">
+    </div>
+  </div>
+  <div class="ic-Action-header__Secondary">
+    <button class="Button Button--primary">+ Widget</button>
+    <div class="al-dropdown__container">
+      <a class="al-trigger Button" role="button" href="#">
+        <i class="icon-settings" role="presentation"></i>
+        <i class="icon-mini-arrow-down" role="presentation"></i>
+        <span class="screenreader-only">Settings</span>
+      </a>
+      <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+        <li>
+          <a href="#" class="icon-edit" tabindex="-1" role="menuitem">Edit</a>
+        </li>
+        <li>
+          <a href="#" class="icon-trash" tabindex="-1" role="menuitem">Delete</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+```
+### **.ic-action-box**
+
+This responsive pattern is useful for when you need to build instances of things using form elements. It features an area on the right for interactions with the form, such as Delete.
+
+Reduce the width of your screen to see how the example components below both scale down for smaller screens.
+
+```html
+<div class="ic-Form-action-box">
+  
+  <div class="ic-Form-action-box__Form">
+    <div class="ic-Form-control">
+      <div class="ic-Input-group">
+        <label class="ic-Label" for="demo-action-box-1">
+          Name
+        </label>
+        <input type="text" id="demo-action-box-1" class="ic-Input"></input>  
+      </div>  
+    </div>
+    <div class="ic-Form-control">
+      <div class="ic-Input-group">
+        <label class="ic-Label" for="demo-action-box-2">
+          Start date
+        </label>
+        <input type="datetime" id="demo-action-box-2" class="ic-Input"></input>
+        <button type="button" class="Button" aria-hidden="true" tabindex="-1">
+          <i class="icon-calendar-month"></i>
+        </button>  
+      </div>  
+    </div>
+    <div class="ic-Form-control">
+      <div class="ic-Toggle">
+        <input id="demo-action-box-3" type="checkbox" checked>
+        <label for="demo-action-box-3">
+          <div class="ic-Toggle__label-text">Teaching assistant</div>
+          <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
+        </label>
+      </div> 
+    </div>
+
+  </div>
+  
+  <div class="ic-Form-action-box__Actions">
+    <button type="button" class="Button Button--icon-action">
+      <span class="screenreader-only">Delete row</span>
+      <i class="icon-trash" role="presentation"></i>
+    </button>
+  </div>
+
+</div>
+
+<div class="ic-Form-action-box">
+  
+  <div class="ic-Form-action-box__Form">
+
+    <div class="ic-Form-control">
+      <select class="ic-Input" id="demo-action-box-4" aria-label="Choose a section">
+        <option>All sections</option>
+        <option>Section 1</option>
+        <option>Section 2</option>
+        <option>Section 3</option>
+      </select>
+    </div>
+    <div class="ic-Form-control">
+      <div class="ic-Input-group">
+        <input type="datetime" class="ic-Input" id="demo-action-box-5" placeholder="Due date" aria-label="Due date"></input>
+        <button type="button" class="Button" aria-hidden="true" tabindex="-1">
+          <i class="icon-calendar-month"></i>
+        </button>  
+      </div>  
+    </div>
+    <div class="ic-Form-control">
+      <div class="ic-Input-group">
+        <input type="datetime" class="ic-Input" id="demo-action-box-6" placeholder="Available from" aria-label="Available from"></input>
+        <button type="button" class="Button" aria-hidden="true" tabindex="-1">
+          <i class="icon-calendar-month"></i>
+        </button>  
+      </div>  
+    </div>
+    <div class="ic-Form-control">
+      <div class="ic-Input-group">
+        <input type="datetime" class="ic-Input" id="demo-action-box-7" placeholder="Until" aria-label="Until"></input>
+        <button type="button" class="Button" aria-hidden="true" tabindex="-1">
+          <i class="icon-calendar-month"></i>
+        </button>  
+      </div>  
+    </div>
+
+  </div>
+  
+  <div class="ic-Form-action-box__Actions">
+    <button type="button" class="Button Button--icon-action">
+      <span class="screenreader-only">Delete row</span>
+      <i class="icon-trash" role="presentation"></i>
+    </button>
+  </div>
+
+</div>
+
+```
+
+## Alernate input states and form messages
+
+### Warning, Error and Success states
+
+```html
+      
+<!-- Start form markup -->
+
+<div class="ic-Form-control ic-Form-control--has-error">
+  <label for="demo-states-1" class="ic-Label">Enter a new password</label>
+  <input type="password" id="demo-states-1" class="ic-Input ic-Input--has-error" placeholder="At least 8 characters and 2 numbers"></input>
+  <div class="ic-Form-message ic-Form-message--error">
+    <div class="ic-Form-message__Layout">
+      <i class="icon-warning" role="presentation"></i>
+      You have not entered a password yet
+    </div>
+  </div>
+</div>
+
+<div class="ic-Form-control ic-Form-control--has-warning">
+  <label for="demo-states-6" class="ic-Label">Enter a new password</label>
+  <input type="password" id="demo-states-6" class="ic-Input ic-Input--has-warning" placeholder="At least 8 characters and 2 numbers" value="password"></input>
+  <div class="ic-Form-message ic-Form-message--warning">
+    <div class="ic-Form-message__Layout">
+      <i class="icon-lock" role="presentation"></i>
+      Your password is "password" - frd?
+    </div>
+  </div>
+</div>
+
+<div class="ic-Form-control ic-Form-control--has-success">
+  <label for="demo-states-5" class="ic-Label">Enter a new password</label>
+  <input type="password" id="demo-states-5" class="ic-Input ic-Input--has-success" placeholder="At least 8 characters and 2 numbers" value="grillmaster@1975"></input>
+  <div class="ic-Form-message ic-Form-message--success">
+    <div class="ic-Form-message__Layout">
+      <i class="icon-check" role="presentation"></i>
+      Your password meets our requirements!
+    </div>
+  </div>
+</div>
+```
+
+### Alternate states and messages applied to horizontal form controls
+
+```html
+
+<div class="ic-Form-group ic-Form-group--horizontal">
+
+  <div class="ic-Form-control ic-Form-control--has-error">
+    <label for="demo-states-2" class="ic-Label">What's your favorite color?</label>
+    <input type="text" id="demo-states-2" class="ic-Input ic-Input--has-error" placeholder="e.g., red" value="Breakfast burrito"></input>
+    <div class="ic-Form-message ic-Form-message--error">
+      <div class="ic-Form-message__Layout">
+        <i class="icon-warning" role="presentation"></i>
+        This is not a valid color.
+      </div>
+    </div>
+  </div>
+
+  <div class="ic-Form-control ic-Form-control--has-success">
+    <label for="demo-states-3" class="ic-Label">What's your favorite color?</label>
+    <input type="text" id="demo-states-3" class="ic-Input ic-Input--has-success" placeholder="e.g., red" value="Blue">
+    <div class="ic-Form-message ic-Form-message--success">
+      <div class="ic-Form-message__Layout">
+        <i class="icon-check" role="presentation"></i>
+        Awesome. Blue is a wonderful color.
+      </div>
+    </div>
+  </div>
+
+  <div class="ic-Form-control ic-Form-control--has-warning">
+    <label class="ic-Label" for="demo-states-17">Group name</label>
+    <div class="ic-Input-group">
+      <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
+        <i class="icon-group-new-dark"></i>
+      </div>
+      <input type="text" id="demo-states-17" class="ic-Input" placeholder="e.g., Team Awesomeness" value="The Cool Kidz">
+      <button type="submit" class="Button">Save</button>
+    </div>
+    <div class="ic-Form-message ic-Form-message--warning">
+      <div class="ic-Form-message__Layout">
+        <i class="icon-warning" role="presentation"></i>
+        There is already a group with that name. Are you sure?
+      </div>
+    </div>
+  </div>
+
+</div>
+```
+
+### Alternate states and messages applied to custom radio buttons
+
+```html
+<div class="ic-Form-control ic-Form-control--radio ic-Form-control--has-error">
+  <div class="ic-Radio">
+    <input id="demo-states-9" type="radio" value="value 1" name="demo-states-radio">
+    <label for="demo-states-9" class="ic-Label">myValue 1</label>
+  </div>
+  <div class="ic-Radio">
+    <input id="demo-states-10" type="radio" value="value 2" name="demo-states-radio">
+    <label for="demo-states-10" class="ic-Label">myValue 2</label>
+  </div>
+  <div class="ic-Radio">
+    <input id="demo-states-11" type="radio" value="value 3" name="demo-states-radio">
+    <label for="demo-states-11" class="ic-Label">myValue 3</label>
+  </div>
+
+  <div class="ic-Form-message ic-Form-message--error">
+    <div class="ic-Form-message__Layout">
+      <i class="icon-warning" role="presentation"></i>
+      Please select a value.
+    </div>
+  </div>
+
+</div>
+```
+
+### Alternate states and messages applied to custom checkboxes
+
+```html
+<div class="ic-Form-control ic-Form-control--checkbox">
+  <input type="checkbox" id="demo-states-13" checked>
+  <label class="ic-Label" for="demo-states-13">Salsa</label>
+</div>
+
+<div class="ic-Form-control ic-Form-control--checkbox ic-Form-control--has-warning">
+  <input type="checkbox" id="demo-states-12">
+  <label class="ic-Label" for="demo-states-12">Free taco <strong>TODAY ONLY!</strong></label>
+  <div class="ic-Form-message ic-Form-message--warning">
+    <div class="ic-Form-message__Layout">
+      <i class="icon-warning" role="presentation"></i>
+      Are you sure you don't want a free taco?
+    </div>
+  </div>
+</div>
+
+<div class="ic-Form-control ic-Form-control--checkbox">
+  <input type="checkbox" id="demo-states-14" checked>
+  <label class="ic-Label" for="demo-states-14">Refried beans</label>
+</div>
+```
+
+### Alternate states and messages applied to inline custom checkboxes
+
+```html
+<div class="ic-Checkbox-group ic-Checkbox-group--inline">
+  
+  <div class="ic-Form-control ic-Form-control--checkbox ic-Form-control--has-error">
+    <input type="checkbox" id="demo-states-15" checked>
+    <label class="ic-Label" for="demo-states-15">Super Skooool LMS</label>
+    <div class="ic-Form-message ic-Form-message--error">
+      <div class="ic-Form-message__Layout">
+        <i class="icon-warning" role="presentation"></i>
+        Dreadful choice. Reconsider.
+      </div>
+    </div>
+  </div>
+
+  <div class="ic-Form-control ic-Form-control--checkbox ic-Form-control--has-warning">
+    <input type="checkbox" id="demo-states-17" checked>
+    <label class="ic-Label" for="demo-states-17">Kool Skool Toolz</label>
+    <div class="ic-Form-message ic-Form-message--warning">
+      <div class="ic-Form-message__Layout">
+        <i class="icon-instructure" role="presentation"></i>
+        You can do better.
+      </div>
+    </div>
+  </div>
+
+  <div class="ic-Form-control ic-Form-control--checkbox ic-Form-control--has-success">
+    <input type="checkbox" id="demo-states-16" checked>
+    <label class="ic-Label" for="demo-states-16">Canvas by Instructure</label>
+    <div class="ic-Form-message ic-Form-message--success">
+      <div class="ic-Form-message__Layout">
+        <i class="icon-check" role="presentation"></i>
+        Excellent choice, my friend!
+      </div>
+    </div>
+  </div>
+
+</div>
+```
+
+### Alternate states and messages applied to toggle checkbox
+
+```html
+<div class="grid-row">
+  <div class="col-xs-12 col-md-6">
+
+    <!-- Begin sample forms markup -->
+    <div class="ic-Form-control ic-Form-control--has-warning">
+      <div class="ic-Toggle">
+        <input id="demo-states-18" type="checkbox" checked>
+        <label for="demo-states-18">
+          <div class="ic-Toggle__label-text">Publish assignment immediately</div>
+          <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
+        </label>
+      </div>
+      <div class="ic-Form-message ic-Form-message--warning">
+        <div class="ic-Form-message__Layout">
+          <i class="icon-warning" role="presentation"></i>
+          Are you sure you want to do this?
+        </div>
+      </div>
+    </div>
+    <!-- End sample forms markup -->
+
+  </div>
+</div>
+```
+
+*/
+
+@mixin ic-input-variant($border-color: $can-border-light, $color: $canvas-primary) {
+  border-color: $border-color;
+  &:focus {
+    border-color: lighten($color, 10%);
+    border-color: $color;
+    @if $use_high_contrast == false { outline-color: rgba($color, 0.2); }
+  }
+}
+
+@mixin high-contrast-focus {
+  @if $use_high_contrast { 
+    outline: 1px dotted $canvas-dark;
+    outline-offset: -1px;
+  }
+}
+
+select, textarea, 
+input[type="text"], input[type="password"],
+input[type="datetime"], input[type="datetime-local"],
+input[type="date"], input[type="month"],
+input[type="time"], input[type="week"],
+input[type="number"], input[type="email"],
+input[type="url"], input[type="search"],
+input[type="tel"], input[type="color"], .uneditable-input {
+  
+  // .ic-Input is the base class for the updated form controls.
+  
+  &.ic-Input {
+    // Overwrite legacy forms styles from Bootstrap 2.
+    width: 100%; height: auto;
+    display: block;
+    margin: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+
+    // Establish the basic styles for Canvas text-type inputs
+    transition: all 0.2s ease-out;
+    border-width: 1px;
+    border-style: solid;
+    outline-color: transparent;
+    outline-offset: -$ic-sp;
+    background: $canvas-light;
+    padding: 8px 12px;
+    -webkit-appearance: none;
+    
+    @include ic-input-variant;
+    
+    @if $use_high_contrast {
+      outline-style: dotted;
+      outline-width: 1px;
+    }
+    @else {
+      outline-style: solid;
+      outline-width: $ic-sp;
+    }
+
+    // Focus state
+    &:focus {
+      @if $use_high_contrast {
+        outline-width: 1px;
+        outline-offset: -3px;
+        outline-color: $canvas-dark;
+      }
+      @else {
+        outline-width: 2px;
+        outline-offset: -2px;
+      }
+    }
+
+    // If a form message follows the input, bump it up a bit to overlap with the input
+    ~ .ic-Form-message { transform: translate3d(0,-$ic-sp/3,0); }
+
+    // Focus then moves the form message out of the way
+    &:focus {
+      ~ .ic-Form-message { transform: translate3d(0,$ic-sp/2,0); }
+    }
+
+    // Disabled state
+    &[disabled], &[readonly] {
+      cursor: not-allowed;
+      background-color: lighten($canvas-neutral, 5%);
+      opacity: 0.8;
+    }
+
+    // Input variants
+    &.ic-Input--has-error, .ic-Form-control--has-error & { @include ic-input-variant($canvas-danger, $canvas-danger); }
+    &.ic-Input--has-warning, .ic-Form-control--has-warning & { @include ic-input-variant($canvas-alert, $canvas-alert); }
+    &.ic-Input--has-success, .ic-Form-control--has-success & { @include ic-input-variant($canvas-success, $canvas-success); }
+
+  }
+
+}
+
+// special styles for select
+select.ic-Input, input[type="file"].ic-Input {
+  height: 38px;
+  padding: 0 0 0 $ic-sp;
+}
+
+select.ic-Input {
+  // Webkit-only hack because we have removed -webkit-appearance from the
+  // selects and need to add an arrow and remove padding
+  &:not(*:root) {
+    background: url("/images/forms/ic-icon-arrow-down.svg") no-repeat calc(100% - #{$ic-sp - 4}) 50% $canvas-light;
+    background-size: 10px 5.667px;
+  }
+}
+
+.ic-Form-group {
+
+  &.ic-Form-group--inline {
+    
+    @include breakpoint(tablet) {
+      display: flex;
+      align-items: flex-end;
+
+      .ic-Form-actions {
+        margin-top: 0;
+        border: none;
+        padding: 0 0 0 $ic-sp;
+        background: transparent;
+      }
+
+      .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio),
+      .ic-Checkbox-group {
+        flex: 1;
+        margin: 0 $ic-sp/2;
+        &:first-child { margin-left: 0; }
+        &:last-child { margin-right: 0; }
+
+        .ic-Form-message { margin-left: 0; }
+      }
+
+      .ic-Toggle label .ic-Toggle__label-text { flex: 0 1 auto; }
+
+    }
+  }
+
+  &.ic-Form-group--horizontal {
+    @include breakpoint(tablet) {
+      
+      .ic-Checkbox-group, .ic-Form-control--radio { 
+        margin-left: $ic-horizontal-form-offset;
+      }
+
+      .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+
+        .ic-Label {
+          margin-bottom: 0;
+          text-align: right;
+          flex: 0 0 $ic-horizontal-form-offset;
+          padding-right: $ic-sp*2;
+        }
+
+        .ic-Input,
+        .ic-Input-group,
+        .ic-Form-control__Multi-input { flex: 1; }
+
+        .ic-Toggle {
+          label {
+            .ic-Toggle__label-text {
+              @include breakpoint(tablet) {
+                flex: 0 0 $ic-horizontal-form-offset;
+                text-align: right;
+                padding-right: $ic-sp*2;
+              }
+            }
+          }
+
+          + .ic-Form-message {
+            margin-top: $ic-sp/3;
+            .ic-Form-message__Layout { margin-left: $ic-sp*2; }
+          }
+  
+        }
+
+        .ic-Form-message {
+          display: block;
+          margin-left: 0;
+          width: 100%;
+          .ic-Form-message__Layout {
+            margin-left: $ic-horizontal-form-offset + $ic-sp;
+            display: inline-flex;
+          }
+        }
+        
+      }
+    }
+
+  }
+
+}
+
+@mixin form-message-variant($color) {
+  .ic-Form-message__Layout {
+    background: $color;
+    &:before { 
+      background: darken($color, 5%); 
+      border-right: 1px solid darken($color, 12%);
+    }
+    &:after { border-bottom-color: darken($color, 5%); }
+  }
+}
+
+.ic-Form-message {
+  display: inline-block;
+  margin-left: $ic-sp;
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s $can-transition;  
+  box-sizing: border-box;
+  &.ic-Form-message--error { @include form-message-variant($canvas-danger); }
+  &.ic-Form-message--success { @include form-message-variant($canvas-success); }
+  &.ic-Form-message--warning { @include form-message-variant($canvas-alert); }
+}
+
+.ic-Toggle + .ic-Form-message,
+.ic-Input-group + .ic-Form-message { margin-left: 0; }
+
+.ic-Form-message__Layout {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: ($ic-sp - 4) ($ic-sp - 4) ($ic-sp - 4) 0;
+  font-size: $baseFontSize - 2;
+  line-height: 1.2;
+  color: $canvas-light;
+  box-shadow: 0 2px 2px rgba(black, 0.2);
+  box-sizing: border-box;
+
+  &:before {
+    content: "";
+    width: 32px;
+    height: 100%;
+    position: absolute;
+    left: 0; top: 0;
+    box-sizing: border-box;
+  }
+
+  &:after {
+    bottom: 100%; left: 16px;
+    border: solid transparent;
+    content: "";
+    height: 0; width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(white, 0);
+    border-width: $ic-sp/2;
+    margin-left: -($ic-sp/2);
+    box-sizing: border-box;
+  }
+
+  // specifying link color here, just in case we need a link inside a form message
+  a {
+    color: $canvas-light;
+    text-decoration: underline;
+    &:hover, &:focus { 
+      color: $canvas-light;
+      text-decoration: none;
+    }
+  }
+
+  i[class*=icon-], i[class^=icon-] {
+    width: 32px; height: auto;
+    flex: 0 0 32px;
+    line-height: 1;
+    margin-right: $ic-sp - 4;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+  }
+}
+
+// Overwrite default margin on form element
+form.ic-Form-group { margin: 0; }
+
+.ic-Form-control {
+  box-sizing: border-box;
+  margin-bottom: $ic-sp*1.5;
+  position: relative;
+
+  &.ic-Form-control--checkbox-inline,
+  &.ic-Form-control--radio-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    .ic-Form-message__Layout:after { display: none; }
+    
+    &.ic-Form-control--checkbox,
+    .ic-Radio { padding-right: $ic-sp*1.5; }
+  }
+
+  &.ic-Form-control--has-error {
+    .ic-Label,
+    .ic-Input-group__add-on,
+    .ic-Toggle__label-text { color: $canvas-danger; }
+  }
+
+  &.ic-Form-control--has-warning {
+    .ic-Label,
+    .ic-Input-group__add-on,
+    .ic-Toggle__label-text { color: $canvas-alert; }
+  }
+
+  &.ic-Form-control--has-success {
+    .ic-Label,
+    .ic-Input-group__add-on,
+    .ic-Toggle__label-text { color: $canvas-success; }
+  }
+
+  .ic-Form-control__Multi-input {
+    @include breakpoint(mini-tablet) {
+      display: flex;
+      align-items: center;
+
+      > .ic-Input, 
+      > .ic-Input-group {
+        margin: 0 $ic-sp/3;
+        flex: 1;
+        &:first-child { margin-left: 0; }
+        &:last-child { margin-right: 0; }
+      }
+    }
+  }
+ 
+}
+
+.ic-Label {
+  box-sizing: border-box;
+  user-select: none;
+  margin: 0 0 $ic-sp/2;
+  display: block;
+  line-height: $ic-label-line-height;
+  font-weight: 500;
+}
+
+.ic-Form-actions {
+  box-sizing: border-box;
+  margin-top: $ic-sp;
+  border: 1px solid $can-border-light;
+  padding: $ic-sp;
+  text-align: right;
+  background: darken($canvas-light, 3%);
+  white-space: nowrap;
+}
+
+.ic-Radio {
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+
+  .ic-Label {
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    padding: $ic-sp/3 0 $ic-sp/2 $ic-radio-checkbox-left-offset;
+    font-weight: 400;
+    display: inline-block;
+
+    &:before {
+      transition: all 0.2s ease-out;
+      content: "";
+      box-sizing: border-box;
+      border-radius: 100%;
+      width: 16px; height: 16px;
+      border: 1px solid darken($can-border-light, 3%);
+      position: absolute;
+      top: 50%; left: 0;
+      margin-top: -8px;
+      background: $canvas-light;
+    }
+
+  }
+
+  ~ .ic-Form-message { margin-left: $ic-radio-checkbox-left-offset; }
+
+  input[type="radio"] {
+    opacity: 0;
+    position: absolute;
+    top: 0; left: 0;
+
+    // overwrite Bootstrap
+    ~ .ic-Label { vertical-align: baseline; }
+
+    &:not([disabled]):hover {
+      ~ .ic-Label:before { border-color: $canvas-primary; }
+    }
+
+    &:checked {
+      ~ .ic-Label:before {
+        border-color: $canvas-primary;
+        box-shadow: inset 0 0 0 3px $canvas-light;
+        background: $canvas-primary;
+      }
+    }
+
+    &:focus {
+      ~ .ic-Label {
+        @include high-contrast-focus;
+        &:before {
+          box-shadow: inset 0 0 0 2px rgba($canvas-primary, 0.3), inset 0 0 0 4px $canvas-light;
+          background: $canvas-primary;  
+        }  
+      }
+    }
+
+    &[disabled] {
+      ~ .ic-Label {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+    }
+  }
+
+}
+
+.ic-Checkbox-group {
+  margin-bottom: $ic-sp;
+
+  &.ic-Checkbox-group--inline {
+    @include breakpoint(tablet) {
+      display: flex;
+      flex-wrap: wrap;
+      .ic-Form-control.ic-Form-control--checkbox {
+        margin-right: $ic-sp*1.5;
+      }
+      .ic-Form-message { display: block; }
+    }  
+  } 
+
+}
+
+.ic-Form-control.ic-Form-control--checkbox {
+  line-height: 1;
+  margin-bottom: 0;
+
+  &.ic-Form-control--has-error,
+  &.ic-Form-control--has-success,
+  &.ic-Form-control--has-warning {
+    .ic-Label { display: block; }
+  }
+
+  .ic-Label {
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+    padding: $ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset;
+    font-weight: 400;
+    display: inline-block;
+
+    &:before {
+      content: "";
+      transition: border-color 0.2s ease-out, outline-offset 0.2s ease-out, outline-color 0.2s ease-out;
+      box-sizing: border-box;
+      position: absolute;
+      top: 50%; left: 0;
+      margin-top: -8px;
+      width: 16px; height: 16px;
+      border-radius: $baseBorderRadius;
+      background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $canvas-light;
+      background-size: 16px 48px;
+      border: 1px solid darken($can-border-light, 3%);
+      outline: 2px solid transparent;
+      outline-offset: -12px;
+    }
+  }
+
+  .ic-Form-message {
+    margin-left: $ic-radio-checkbox-left-offset;
+    vertical-align: middle;
+  }
+
+  input[type="checkbox"] {
+    margin: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0; left: 0;
+
+    &:not([disabled]):hover {
+      ~ .ic-Label:before { border-color: $canvas-primary; }
+    }
+
+    &:focus {
+      ~ .ic-Label {
+        @include high-contrast-focus;
+        &:before {
+          border-color: $canvas-primary;
+          outline-offset: -3px;
+          outline-color: rgba($canvas-primary, 0.2);
+        }
+        
+      }  
+    }
+
+    &:checked {
+      ~ .ic-Label {
+        &:before {
+          background-color: $canvas-primary;
+          background-position: center -1px;
+          border-color: $canvas-primary;
+        }
+      }
+      &:focus {
+        ~ .ic-Label:before {
+          outline-color: rgba($canvas-light, 0.35);
+        }  
+      }
+    }
+
+    &[disabled] {
+      ~ .ic-Label {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+    }
+
+  }  
+}
+
+.ic-Input-group {
+  display: flex;
+  box-sizing: border-box;
+
+  .ic-Action-header__Primary & { flex: 1; }
+
+  .ic-Input {
+    width: auto;
+    flex: 1;
+
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0; 
+    } 
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0; 
+    }  
+  }
+
+  .Button {
+    
+    &:first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-right: none; }
+    }
+    
+    &:last-child {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-left: none; }
+    }
+  }
+
+  .ic-Input-group__add-on,
+  .ic-Label {
+    height: 38px;
+    background: $canvas-light;
+    border: 1px solid $can-border-light;
+    display: flex;
+    align-items: center;
+    padding: $ic-sp/2 ($ic-sp - 4);
+
+    &:first-child { 
+      border-right: none;
+      border-top-left-radius: $baseBorderRadius;
+      border-bottom-left-radius: $baseBorderRadius;
+    }
+    &:last-child { 
+      border-left: none;
+      border-top-right-radius: $baseBorderRadius;
+      border-bottom-right-radius: $baseBorderRadius;
+    }
+  }
+
+  .ic-Input-group__add-on {
+    color: $base-font-color--subdued;
+    box-sizing: border-box; 
+  }
+
+  .ic-Label { margin-bottom: 0; }
+  
+}
+
+.ic-Action-header {
+  margin-bottom: $ic-sp*2;
+  box-sizing: border-box;
+
+  @include breakpoint(tablet) {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+
+    .ic-Action-header__Primary {
+      flex: 1;
+      display: flex;
+      margin-bottom: 0;
+      box-sizing: border-box;
+    }
+
+    .ic-Action-header__Secondary {
+      display: flex;
+      flex: 1;
+      justify-content: flex-end;
+      box-sizing: border-box;
+      .Button { margin-left: $ic-sp/3; }
+    }
+
+    .ic-Action-header__Primary + .ic-Action-header__Secondary {
+      flex: 0.64;
+      padding-left: $ic-sp*2;
+    }
+  }
+}
+
+.ic-Action-header__Heading { margin: 0; }
+
+.ic-Action-header__Primary {
+  margin-bottom: $ic-sp/2;
+}
+
+.ic-Form-action-box {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  margin-bottom: $ic-sp*2;
+
+  @include breakpoint(desktop) {
+    margin-bottom: $ic-sp;
+    .ic-Toggle label .ic-Toggle__label-text {
+      flex: 0 1 auto;
+    }
+  }
+  .ic-Form-control {
+    margin-bottom: $ic-sp/2;
+    @include breakpoint(desktop) { 
+      margin: 0 $ic-sp/3;
+      flex: 1;
+      &:first-child { margin-left: 0; }
+      &:last-of-type { margin-right: 0; }
+    }
+  }
+}
+
+.ic-Form-action-box__Form {
+  flex: 1;
+  box-sizing: border-box;
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.ic-Form-action-box__Actions {
+  box-sizing: border-box;
+  padding-left: $ic-sp*2;
+}

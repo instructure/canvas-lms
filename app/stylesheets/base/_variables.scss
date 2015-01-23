@@ -307,3 +307,8 @@ $ic-text-color: $canvas-dark;
 // textColor is a deprecated Bootstrap 2 variable. Please use $ic-text-color!
 $textColor: $ic-text-color; // deprecated - do not use
 
+/// Form-related variables
+//==============================
+$ic-horizontal-form-offset: $ic-sp*19;
+$ic-label-line-height: 1.3;
+$ic-radio-checkbox-left-offset: 22px;
