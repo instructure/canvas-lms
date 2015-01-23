@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'jquery',
   'i18n!external_tools',
   'jquery.instructure_date_and_time'
@@ -31,7 +31,7 @@ function(React, $, I18n) {
     },
 
     triggerDeleteGradingPeriod: function(event) {
-      return this.props.onDeleteGradingPeriod(event, this.props.key);
+      return this.props.onDeleteGradingPeriod(event, this.props.uniqueId);
     },
 
     prettyDate: function(uglyDate) {
@@ -43,18 +43,18 @@ function(React, $, I18n) {
         <div className="grading-period pad-box-mini border border-trbl border-round">
           <div className="grid-row pad-box-micro">
             <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={"period_title_" + this.props.key}>
+              <label htmlFor={"period_title_" + this.props.uniqueId}>
                 {I18n.t("Grading Period Name")}
               </label>
-              <input id={"period_title_" + this.props.key} type="text"
+              <input id={"period_title_" + this.props.uniqueId} type="text"
                      value={this.state.title}/>
             </div>
             <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={"period_start_date_" + this.props.key}>
+              <label htmlFor={"period_start_date_" + this.props.uniqueId}>
                 {I18n.t("Start Date")}
               </label>
               <div className="input-append">
-                <input id={"period_start_date_" + this.props.key} type="text"
+                <input id={"period_start_date_" + this.props.uniqueId} type="text"
                        className="input-grading-period-date date_field datetime_field_enabled hasDatepicker"
                        value={this.prettyDate(this.state.startDate)}/>
                 <button type="button" className="ui-datepicker-trigger btn"
@@ -64,11 +64,11 @@ function(React, $, I18n) {
               </div>
             </div>
             <div className="col-xs-12 col-sm-6 col-lg-3">
-               <label htmlFor={"period_end_date_" + this.props.key}>
+               <label htmlFor={"period_end_date_" + this.props.uniqueId}>
                  {I18n.t("End Date")}
                </label>
                <div className="input-append">
-                 <input id={"period_end_date_" + this.props.key} type="text"
+                 <input id={"period_end_date_" + this.props.uniqueId} type="text"
                         className="input-grading-period-date date_field datetime_field_enabled hasDatepicker"
                         value={this.prettyDate(this.state.endDate)}/>
                  <button type="button" className="ui-datepicker-trigger btn"

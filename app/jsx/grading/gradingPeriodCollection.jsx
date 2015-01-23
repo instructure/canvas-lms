@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/grading/gradingPeriod',
   'jquery',
   'i18n!external_tools',
@@ -25,18 +25,18 @@ function(React, GradingPeriod, $, I18n, _) {
       this.setState({periods: periods.grading_periods});
     },
 
-    deleteGradingPeriod: function(event, key) {
+    deleteGradingPeriod: function(event, uniqueId) {
       var self = this,
         $period = $(event.target).parents(".grading-period");
 
       $period.confirmDelete({
-        url: ENV.GRADING_PERIODS_URL + "/" + key,
+        url: ENV.GRADING_PERIODS_URL + "/" + uniqueId,
         message: I18n.t("Are you sure you want to delete this grading period?"),
         success: function() {
           $(this).slideUp(function() {
             $(this).remove();
           });
-          var newPeriods = _.reject(self.state.periods, function(period){ return period.id === key });
+          var newPeriods = _.reject(self.state.periods, function(period){ return period.id === uniqueId });
           self.setState({periods: newPeriods});
         },
         error: function() {
@@ -53,9 +53,9 @@ function(React, GradingPeriod, $, I18n, _) {
       }
       var self = this;
       return this.state.periods.map(function(period){
-        return (<GradingPeriod key={period.id} title={period.title} startDate={new Date(period.start_date)}
-                               endDate={new Date(period.end_date)} weight={period.weight}
-                               onDeleteGradingPeriod={self.deleteGradingPeriod}/>);
+        return (<GradingPeriod key={period.id} uniqueId={period.id} title={period.title}
+                               startDate={new Date(period.start_date)} endDate={new Date(period.end_date)}
+                               weight={period.weight} onDeleteGradingPeriod={self.deleteGradingPeriod}/>);
       });
     },
 
