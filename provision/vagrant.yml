@@ -1,5 +1,13 @@
 - hosts: all
   sudo: true
+  vars:
+    canvas_account_name: Simon Fraser University
+    canvas_admin_email: vagrant@localhost
+    canvas_admin_password: vagrant
+    canvas_database_name: canvas
+    canvas_queue_database_name: canvas_queue
+    canvas_database_user: canvas
+    canvas_database_password: D79A8D01-6904-4798-8A68-DCDA557987B8
   pre_tasks:
     - name: update apt cache
       apt: update_cache=yes
