@@ -15,16 +15,20 @@
 - name: Create databases
   sudo: yes
   sudo_user: postgres
-  with_items: db_names
+  with_items:
+    - "{{canvas_database_name}}"
+    - "{{canvas_queue_database_name}}"
   postgresql_db: name={{ item }}
 
 - name: Create database user
   sudo: yes
   sudo_user: postgres
-  postgresql_user: name={{ db_user }} password={{ db_password }} state=present role_attr_flags=NOSUPERUSER,CREATEDB
+  postgresql_user: name={{ canvas_database_user }} password={{ canvas_database_password }} state=present role_attr_flags=NOSUPERUSER,CREATEDB
 
 - name: Provide database user with permissions
   sudo: yes
   sudo_user: postgres
-  with_items: db_names
-  postgresql_user: user={{ db_user }} db={{ item }} priv=ALL
+  with_items:
+    - "{{canvas_database_name}}"
+    - "{{canvas_queue_database_name}}"
+  postgresql_user: user={{ canvas_database_user }} db={{ item }} priv=ALL
