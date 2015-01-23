@@ -244,7 +244,9 @@ class Submission < ActiveRecord::Base
 
   def update_final_score
     if score_changed?
-      connection.after_transaction_commit { Enrollment.send_later_if_production(:recompute_final_score, self.user_id, self.context.id) }
+      connection.after_transaction_commit do
+        Enrollment.send_later_if_production_enqueue_args(:recompute_final_score, { run_at: 30.seconds.from_now }, self.user_id, self.context.id)
+      end
       self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
     end
     true
