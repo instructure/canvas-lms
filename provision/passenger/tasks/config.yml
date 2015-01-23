@@ -1,6 +1,6 @@
-- name: Copy passenger.conf
+- name: Template passenger.conf
   sudo: yes
-  copy: src=passenger.conf dest=/etc/apache2/mods-available force=yes
+  template: src=passenger.conf dest=/etc/apache2/mods-available/passenger.conf backup=yes force=yes
 
 - name: Enable passenger
   sudo: yes

@@ -12,9 +12,9 @@
     - headers
     - xsendfile
 
-- name: Copy canvas.conf
+- name: Template canvas.conf
+  template: src=canvas.conf dest=/etc/apache2/sites-available/canvas.conf force=yes backup=yes
   sudo: yes
-  copy: src=canvas.conf dest=/etc/apache2/sites-available force=yes
 
 - name: Remove default virtual host
   file:

@@ -10,35 +10,34 @@ test:
 development:
   adapter: postgresql
   encoding: utf8
-  database: canvas
+  database: {{canvas_database_name}}
   host: localhost
-  username: canvas
-  password: canvas4me
+  username: {{canvas_database_user}}
+  password: {{canvas_database_password}}
   timeout: 5000
   queue:
     adapter: postgresql
     encoding: utf8
-    database: canvas_queue
+    database: {{canvas_queue_database_name}}
     host: localhost
-    username: canvas
-    password: canvas4me
+    username: {{canvas_database_user}}
+    password: {{canvas_database_password}}
     timeout: 5000
 
 
 production:
   adapter: postgresql
   encoding: utf8
-  database: canvas
+  database: {{canvas_database_name}}
   host: localhost
-  username: canvas
-  password: canvas4me
+  username: {{canvas_database_user}}
+  password: {{canvas_database_password}}
   timeout: 5000
   queue:
     adapter: postgresql
     encoding: utf8
-    database: canvas_queue
+    database: {{canvas_queue_database_name}}
     host: localhost
-    username: canvas
-    password: canvas4me
+    username: {{canvas_database_user}}
+    password: {{canvas_database_password}}
     timeout: 5000
-

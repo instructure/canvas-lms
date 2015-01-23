@@ -1,7 +1,7 @@
-- name: copy config files
-  copy: src={{ item }} dest=/vagrant/config force=yes backup=yes
+- name: template config files
+  template: src={{item}} dest=/vagrant/config force=yes
   with_fileglob:
-    - '*.yml'
+    - ../templates/*.yml
 
 - name: stop apache2
   service: name=apache2 state=stopped

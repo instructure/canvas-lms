@@ -1,9 +1,9 @@
 production:
   workers:
-  - queue: canvas_queue
+  - queue: {{canvas_queue_database_name}}
     workers: 2
     max_priority: 10
-  - queue: canvas_queue
+  - queue: {{canvas_queue_database_name}}
     workers: 4
   # if set, workers will process this many jobs and then die, causing the pool
   # to spawn another worker. this can help return memory to the OS.
@@ -18,4 +18,4 @@ production:
 
 default:
   workers:
-  - queue: canvas_queue
+  - queue: {{canvas_queue_database_name}}
