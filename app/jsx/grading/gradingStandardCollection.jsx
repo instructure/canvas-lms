@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/grading/gradingStandard',
   'jquery',
   'i18n!external_tools',
@@ -104,17 +104,17 @@ function(React, GradingStandard, $, I18n, _) {
       return formattedData;
     },
 
-    deleteGradingStandard: function(event, key) {
+    deleteGradingStandard: function(event, uniqueId) {
       var self = this,
         $standard = $(event.target).parents(".grading_standard");
       $standard.confirmDelete({
-        url: ENV.GRADING_STANDARDS_URL + "/" + key,
+        url: ENV.GRADING_STANDARDS_URL + "/" + uniqueId,
         message: I18n.t("Are you sure you want to delete this grading scheme?"),
         success: function() {
           $(this).slideUp(function() {
             $(this).remove();
           });
-          var newStandards = _.reject(self.state.standards, function(standard){ return standard.grading_standard.id === key });
+          var newStandards = _.reject(self.state.standards, function(standard){ return standard.grading_standard.id === uniqueId });
           self.setState({standards: newStandards});
         },
         error: function() {
@@ -141,8 +141,9 @@ function(React, GradingStandard, $, I18n, _) {
       }
       var self = this;
       return this.state.standards.map(function(s){
-        return (<GradingStandard key={s.grading_standard.id} standard={s.grading_standard}
-                                 editing={!!s.editing} permissions={s.grading_standard.permissions}
+        return (<GradingStandard key={s.grading_standard.id} uniqueId={s.grading_standard.id}
+                                 standard={s.grading_standard} editing={!!s.editing}
+                                 permissions={s.grading_standard.permissions}
                                  justAdded={s.justAdded} onSetEditingStatus={self.setEditingStatus}
                                  othersEditing={!s.editing && self.standardBeingEdited()}
                                  onDeleteGradingStandard={self.deleteGradingStandard}

@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'i18n!external_tools'
 ],
 function(React, I18n) {
@@ -22,7 +22,7 @@ function(React, I18n) {
 
     getRowData: function(props){
       var rowData = {name: props.row[0], minScore: props.row[1], maxScore: null};
-      rowData.maxScore = props.key === 0 ? 1.0 : props.siblingRow[1];
+      rowData.maxScore = props.uniqueId === 0 ? 1.0 : props.siblingRow[1];
       return rowData;
     },
 
@@ -47,7 +47,7 @@ function(React, I18n) {
     },
 
     triggerRowNameChange: function(event){
-      this.props.onRowNameChange(this.props.key, event.target.value);
+      this.props.onRowNameChange(this.props.uniqueId, event.target.value);
     },
 
     triggerRowMinScoreChange: function(event){
@@ -61,14 +61,14 @@ function(React, I18n) {
                          displayZeroAsBlank: inputVal === "",
                          stillEntering: lastChar === "."});
         } else{
-          this.props.onRowMinScoreChange(this.props.key, this.state.row.minScore);
+          this.props.onRowMinScoreChange(this.props.uniqueId, this.state.row.minScore);
         };
       }
     },
 
     triggerDeleteRow: function(event){
       event.preventDefault();
-      return this.props.onDeleteRow(this.props.key);
+      return this.props.onDeleteRow(this.props.uniqueId);
     },
 
     showInsertRowLink: function(){
@@ -81,7 +81,7 @@ function(React, I18n) {
 
     triggerInsertRow: function(event){
       event.preventDefault();
-      return this.props.onInsertRow(this.props.key);
+      return this.props.onInsertRow(this.props.uniqueId);
     },
 
     renderInsertRowLink: function(){
@@ -159,7 +159,7 @@ function(React, I18n) {
             <div>
               <input type="text" onChange={this.triggerRowNameChange} className="standard_name"
                      title={I18n.t('Range name')} ariaLabel={I18n.t('Range name')}
-                     name={"grading_standard[standard_data][scheme_" + this.props.key + "[name]"}
+                     name={"grading_standard[standard_data][scheme_" + this.props.uniqueId + "[name]"}
                      value={this.state.row.name}>
               </input>
             </div>
@@ -175,7 +175,7 @@ function(React, I18n) {
               <span className="range_to" ariaHidden="true">{I18n.t("to ")}</span>
               <input type="text" onChange={this.triggerRowMinScoreChange} className="standard_value"
                      title={I18n.t('Lower limit of range')} ariaLabel={I18n.t('Lower limit of range')}
-                     name={"grading_standard[standard_data][scheme_" + this.props.key + "][value]"}
+                     name={"grading_standard[standard_data][scheme_" + this.props.uniqueId + "][value]"}
                      value={this.renderMinScore()}/>
               <span ariaHidden="true"> % </span>
             </div>

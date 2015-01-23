@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/grading/dataRow',
   'jquery',
   'i18n!external_tools'
@@ -41,15 +41,15 @@ function(React, DataRow, $, I18n) {
 
     triggerEditGradingStandard: function(event) {
       event.preventDefault();
-      this.props.onSetEditingStatus(this.props.key, true);
+      this.props.onSetEditingStatus(this.props.uniqueId, true);
     },
 
     triggerStopEditingGradingStandard: function() {
-      this.props.onSetEditingStatus(this.props.key, false);
+      this.props.onSetEditingStatus(this.props.uniqueId, false);
     },
 
     triggerDeleteGradingStandard: function(event) {
-      return this.props.onDeleteGradingStandard(event, this.props.key);
+      return this.props.onDeleteGradingStandard(event, this.props.uniqueId);
     },
 
     triggerSaveGradingStandard: function() {
@@ -131,7 +131,7 @@ function(React, DataRow, $, I18n) {
       var data = this.props.editing ? this.state.editingStandard.data : this.state.standard.data;
       return data.map(function(item, idx, array){
         return (
-          <DataRow key={idx} row={item} siblingRow={array[idx - 1]} editing={this.props.editing}
+          <DataRow key={idx} uniqueId={idx} row={item} siblingRow={array[idx - 1]} editing={this.props.editing}
                    onDeleteRow={this.deleteDataRow} onInsertRow={this.insertGradingStandardRow}
                    onRowMinScoreChange={this.changeRowMinScore} onRowNameChange={this.changeRowName}/>
         );
