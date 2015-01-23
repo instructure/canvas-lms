@@ -2,9 +2,9 @@
 
 define([
   'jquery',
-  'old_unsupported_dont_use_react',
+  'react',
   'i18n!course_wizard',
-  'old_unsupported_dont_use_react-modal',
+  'react-modal',
   './InfoFrame',
   './Checklist',
   'compiled/userSettings',
