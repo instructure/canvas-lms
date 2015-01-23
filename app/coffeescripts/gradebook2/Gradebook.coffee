@@ -1,6 +1,6 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'slickgrid.long_text_editor'
   'compiled/views/KeyboardNavDialog'
   'jst/KeyboardNavDialog'
