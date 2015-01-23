@@ -256,9 +256,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at
+    reviews_due_at = self.peer_reviews_assign_at || self.due_at
+    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && reviews_due_at
       self.send_later_enqueue_args(:do_auto_peer_review, {
-        :run_at => due_at,
+        :run_at => reviews_due_at,
         :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
       })
     end
