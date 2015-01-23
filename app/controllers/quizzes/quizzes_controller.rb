@@ -324,7 +324,7 @@ class Quizzes::QuizzesController < ApplicationController
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      if params[:assignment]
+      if params[:assignment] && @context.feature_enabled?(:post_grades)
         @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
         @quiz.assignment.save
       end
@@ -379,11 +379,11 @@ class Quizzes::QuizzesController < ApplicationController
           if @quiz.assignment.present?
             old_assignment = @quiz.assignment.clone
             old_assignment.id = @quiz.assignment.id
-          end
 
-          if params[:assignment]
-            @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
-            @quiz.assignment.save
+            if params[:assignment] && @context.feature_enabled?(:post_grades)
+              @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
+              @quiz.assignment.save
+            end
           end
 
           auto_publish = @quiz.published?

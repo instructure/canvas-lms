@@ -162,7 +162,7 @@
                 <p class="option-caption"><strong>Options</strong></p>
 
                 <% if @context.feature_enabled?(:post_grades) %>
-                  <label class="checkbox" for="post_quiz_to_sis">
+                  <label class="checkbox" id=post_to_sis_option>
                     <%= check_box :assignment, :post_to_sis %>
                     <%= t(:post_to_sis, "Post Grades to SIS") %>
                   </label>
