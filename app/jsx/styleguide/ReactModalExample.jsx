@@ -1,8 +1,8 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
-  'old_unsupported_dont_use_react-modal'
+  'react',
+  'react-modal'
 ], function (React, Modal) {
 
   var ReactModalExample = React.createClass({
@@ -13,13 +13,11 @@ define([
       }
     },
 
-    openModal(e) {
-      e.preventDefault();
+    openModal() {
       this.setState({modalIsOpen: true});
     },
 
-    closeModal(e) {
-      e.preventDefault();
+    closeModal() {
       this.setState({modalIsOpen: false});
     },
 
@@ -32,7 +30,7 @@ define([
     render() {
       return (
         <div className="ReactModalExample">
-          <a href="#" role="button" aria-label="Trigger Modal" className="btn btn-primary" onClick={this.openModal}>{this.props.label || 'Trigger Modal'}</a>
+          <button type="button" className="btn btn-primary" onClick={this.openModal}>{this.props.label || 'Trigger Modal'}</button>
           <Modal isOpen={this.state.modalIsOpen}
                  onRequestClose={this.closeModal}
                  className={this.props.className}
@@ -62,7 +60,7 @@ define([
               <div className="ReactModal__InnerSection ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
                   <button type="button" className="btn btn-default" onClick={this.closeModal}>Cancel</button>
-                  <button type="button" className="btn btn-primary" onClick={this.handleSubmit}>Submit</button>
+                  <button type="submit" className="btn btn-primary" onClick={this.handleSubmit}>Submit</button>
                 </div>
               </div>
 
