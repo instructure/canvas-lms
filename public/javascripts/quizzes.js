@@ -1726,6 +1726,9 @@ define([
         'quiz[title]': quiz_title
       };
       $("#quiz_title").showIf(true);
+      var gradedQuiz = event.target.value === "assignment" ||
+                       event.target.value === "graded_survey";
+      $("#post_to_sis_option").showIf(gradedQuiz);
       $("#quiz_options_form .quiz_survey_setting").showIf(assignment_id && assignment_id.match(/survey/));
       $("#quiz_points_possible").showIf(assignment_id == 'graded_survey');
       $("#survey_instructions").showIf(assignment_id == 'survey' || assignment_id == 'graded_survey');
