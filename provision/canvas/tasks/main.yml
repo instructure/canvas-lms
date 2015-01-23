@@ -53,13 +53,9 @@
   sudo: no
 
 - name: init databases
-  shell: >
-    RAILS_ENV=production \
-    CANVAS_LMS_ADMIN_EMAIL=vagrant@localhost \
-    CANVAS_LMS_ADMIN_PASSWORD=canvas4me \
-    CANVAS_LMS_ACCOUNT_NAME="Simon Fraser University" \
-    CANVAS_LMS_STATS_COLLECTION=opt_out \
-    bundle exec rake db:initial_setup && touch /home/vagrant/CanvasDBSetupDone
+  shell: RAILS_ENV=production CANVAS_LMS_ADMIN_EMAIL="{{canvas_admin_email}}" CANVAS_LMS_ADMIN_PASSWORD="{{canvas_admin_password}}" CANVAS_LMS_ACCOUNT_NAME="{{canvas_account_name}}" CANVAS_LMS_STATS_COLLECTION=opt_out bundle exec rake db:initial_setup && touch /home/vagrant/CanvasDBSetupDone
+  remote_user: vagrant
+  sudo: no
   args:
     chdir: /vagrant
     creates: /home/vagrant/CanvasDBSetupDone
