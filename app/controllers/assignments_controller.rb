@@ -58,6 +58,7 @@ class AssignmentsController < ApplicationController
         },
         :PERMISSIONS => permissions,
         :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+        :VALID_DATE_RANGE => CourseDateRange.new(@context),
         :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
         :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
@@ -404,15 +405,7 @@ class AssignmentsController < ApplicationController
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
         :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
-        :COURSE_DATE_RANGE => {
-          :start_at => @context.start_at,
-          :end_at => @context.conclude_at,
-          :override_term_dates => @context.restrict_enrollments_to_course_dates
-        },
-        :TERM_DATE_RANGE => {
-          :start_at => @context.enrollment_term.start_at,
-          :end_at => @context.enrollment_term.end_at
-        }
+        :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)

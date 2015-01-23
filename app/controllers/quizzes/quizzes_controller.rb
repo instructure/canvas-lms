@@ -285,15 +285,7 @@ class Quizzes::QuizzesController < ApplicationController
         :CONTEXT_ACTION_SOURCE => :quizzes,
         :REGRADE_OPTIONS => regrade_options,
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
-        :COURSE_DATE_RANGE => {
-          :start_at => @context.start_at,
-          :end_at => @context.conclude_at,
-          :override_term_dates => @context.restrict_enrollments_to_course_dates
-        },
-        :TERM_DATE_RANGE => {
-          :start_at => @context.enrollment_term.start_at,
-          :end_at => @context.enrollment_term.end_at
-        }
+        :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 
       append_sis_data(hash)

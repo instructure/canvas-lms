@@ -398,15 +398,7 @@ class DiscussionTopicsController < ApplicationController
             override_course_dates: section.restrict_enrollments_to_section_dates
           }
         }
-        js_hash['COURSE_DATE_RANGE'] = {
-          start_at: @context.start_at,
-          end_at: @context.conclude_at,
-          override_term_dates: @context.restrict_enrollments_to_course_dates
-        }
-        js_hash['TERM_DATE_RANGE'] = {
-          start_at: @context.enrollment_term.start_at,
-          end_at: @context.enrollment_term.end_at
-        }
+        js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
       end
 
       append_sis_data(js_hash)
