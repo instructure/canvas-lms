@@ -86,4 +86,13 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
       expect(item.point_biserials).to be_approximately [0.5, -0.5, nil, nil]
     end
   end
+  let(:no_dev_item) do
+    simple_quiz_with_submissions %w|T T|, %w|T T|, %w|T T|, %w|T T|
+    @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+    @summary.sorted_items.last
+  end
+
+  it "should explode when the standard deviation is 0" do
+    expect(no_dev_item.point_biserials).to eq [nil, nil]
+  end
 end
