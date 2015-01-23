@@ -116,6 +116,9 @@ describe LtiOutbound::ToolLaunch do
 
   describe '#generate' do
     it 'generates correct parameters' do
+      I18n.config.available_locales_set << :en
+      I18n.stub(:localizer).and_return(-> { :en })
+
       hash = tool_launch.generate
 
       expect(hash['lti_message_type']).to eq 'basic-lti-launch-request'
@@ -189,11 +192,11 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'sets the locale if I18n.localizer exists' do
-      I18n.localizer = lambda { :es }
+      I18n.config.available_locales_set << :es
+      I18n.stub(:localizer).and_return(-> { :es })
       hash = tool_launch.generate
 
       expect(hash['launch_presentation_locale']).to eq 'es'
-      I18n.localizer = lambda { :en }
     end
 
     it 'adds account info in launch data for account navigation' do
