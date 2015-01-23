@@ -259,6 +259,7 @@ class EnrollmentsApiController < ApplicationController
   # @returns Enrollment
 
   def show
+    render_unauthorized_action and return false unless @current_user
     enrollment = Enrollment.find(params[:id])
     if enrollment.user_id == @current_user.id || enrollment.root_account == @context && authorized_action(@context, @current_user, [:read_roster])
       #render enrollment object if requesting user is the current_user or user is authorized to read enrollment.
