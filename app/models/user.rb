@@ -1010,7 +1010,7 @@ class User < ActiveRecord::Base
     can :rename
 
     given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
-    can :read_profile and can :create_user_notes and can :read_user_notes
+    can :read_profile
 
     # by default this means that the user we are given is an administrator
     # of an account of one of the courses that this user is enrolled in, or
@@ -1020,9 +1020,6 @@ class User < ActiveRecord::Base
 
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
-
-    given { |user| self.check_courses_right?(user, :read_user_notes) }
-    can :read_user_notes
 
     given do |user|
       user && (
