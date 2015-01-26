@@ -93,3 +93,32 @@ At this point, you now have a generic Canvas installation with a fresh, empty da
 
 ## Using your VM
 
+Vagrant mounts your canvas repo's working directory over NFS at /vagrant on the VM. You can edit code on your local workstation in whatever editor or IDE you like, or you can ssh to the VM (`vagrant ssh`) and edit there with vim.
+
+The vagrant VM is configured to run Canvas in development mode. In development mode, classes are reloaded on every HTTP request; while this is slow, it means that you don't need to restart the server after making a change. If you want to run in production mode; edit `/etc/apache2/sites-available/canvas.conf` (on the VM) and change the RAILS_ENV variable to `production`. Both production and development modes point at the same database.
+
+If you need to restart passenger, you can `touch tmp/restart.txt` (which you can do from your local machine or the VM) or you can restart Apache (`sudo service apache2 restart` on the VM).
+
+## Upgrading Canvas
+
+If you upgade the Canvas code, you'll need to rerun some of the provisioning steps (e.g. bundle install, compile_assets, db:migrate). The easiest way to do this is to run `vagrant provision` from your local machine. This will re-run the provisioning steps that happened the first time you ran `vagrant up`. Note that it will delete `vendor/bundle` and `Gemfile.lock` prior to re-running `bundle install`. It will not re-run the initial DB setup unless `/home/vagrant/CanvasDBSetupDone` is not present (this file gets created after the initial db setup runs the first time).
+
+You can, of course, just ssh to the VM and run the normal upgrade steps yourself.
+
+## Git Excludes
+
+Running `vagrant up` and some of the provisioning steps creates some files that should be ignored:
+
+* `.vagrant`
+* `vendor/bundle`
+* `/vendor/plugins/*/public/*/compiled/`
+
+Editing the Canvas `.gitignore` file often causes conflicts, so instead you should do one of the following:
+
+### Create a global ignore file
+
+You can create a global ignore file that will apply to all git repos on your local machine. This is a good place to put things like .DS_Store files, the .vagrant directory, etc. See [here](https://help.github.com/articles/ignoring-files/#create-a-global-gitignore) for instructions on creating a global ignore file.
+
+### Add the exludes to .git/info/excludes
+
+You can add the exluded files to `.git/info/excludes` (within the repo directory). These excludes are confined to that specific repo and are not pushed to any git remotes, so you will need to re-add them if you clone the repo elsewhere.
