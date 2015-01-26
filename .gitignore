@@ -63,3 +63,9 @@ Gemfile.lock4
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
+
+# SFU plugin generated content
+/vendor/plugins/*/public/*/compiled/
+
+# vagrant
+.vagrant
