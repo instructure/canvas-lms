@@ -258,6 +258,19 @@ describe Role do
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
       end
     end
+
+    it "should set manageable_by_user correctly with restricted permissions" do
+      course_with_ta
+      @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_admin_users)
+
+      roles = Role.role_data(@course, @ta)
+      [ta_role, teacher_role, designer_role].each do |role|
+        expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_falsey
+      end
+      [student_role, observer_role].each do |role|
+        expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+      end
+    end
   end
 
   describe "cross-shard built-in role translation" do
