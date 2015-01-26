@@ -48,7 +48,7 @@ gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.9'
 gem 'i18nema', '0.0.8', :platforms => [:ruby_20, :ruby_21, :ruby_22]
 gem 'i18nema19', '0.0.8', :platform => :ruby_19
-gem 'i18nliner', '0.0.9'
+gem 'i18nliner', '0.0.11'
 gem 'icalendar', '1.5.4'
 gem 'ims-lti', '2.0.0.beta.18'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
