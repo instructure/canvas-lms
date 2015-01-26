@@ -44,6 +44,7 @@ describe FeatureFlags do
   end
 
   it "should report feature_allowed? correctly" do
+    expect(t_sub_account.feature_allowed?(:account_feature)).to be_truthy
     expect(t_root_account.feature_allowed?(:root_account_feature)).to be_falsey
     expect(t_course.feature_allowed?(:course_feature)).to be_truthy
   end

@@ -729,7 +729,8 @@ class RoleOverride < ActiveRecord::Base
       :view_quiz_answer_audits => {
         :label => lambda { t('permissions.view_quiz_answer_audits', 'View the answer matrix in Quiz Submission Logs')},
         :true_for => %w(AccountAdmin),
-        :available_to => %w(AccountAdmin AccountMembership)
+        :available_to => %w(AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.feature_allowed?(:quiz_log_auditing)}
       }
     })
 
