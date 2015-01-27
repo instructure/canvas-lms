@@ -497,9 +497,7 @@ class ContextModuleItemsApiController < ApplicationController
   def mark_as_done
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
-      mod = @context.modules_visible_to(user).find(params[:module_id])
-      item = mod.content_tags_visible_to(user).find(params[:id])
-      item.context_module_action(user, :done)
+      _module_item(user).context_module_action(user, :done)
       render :nothing => true, :status => :no_content
     end
   end
@@ -507,15 +505,18 @@ class ContextModuleItemsApiController < ApplicationController
   def mark_as_not_done
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
-      mod = @context.modules_visible_to(user).find(params[:module_id])
-      item = mod.content_tags_visible_to(user).find(params[:id])
-      progression = item.context_module.context_module_progressions.find{|p| p[:user_id] == @current_user.id}
-      requirement = progression.requirements_met.find{|r| r[:id] == item.id}
-      progression.requirements_met.delete(requirement)
-      progression.save
+      progression = _module_item(user).progression_for_user(@current_user)
+      progression.delete_requirement(params[:id].to_i)
+      progression.evaluate
       render :nothing => true, :status => :no_content
     end
   end
+
+  def _module_item(user)
+    mod = @context.modules_visible_to(user).find(params[:module_id])
+    mod.content_tags_visible_to(user).find(params[:id])
+  end
+
 
   MAX_SEQUENCES = 10
 
