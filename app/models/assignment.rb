@@ -1264,7 +1264,6 @@ class Assignment < ActiveRecord::Base
 
     submissions = self.submissions.where(:user_id => students)
                   .includes(:submission_comments,
-                            :attachments,
                             :versions,
                             :quiz_submission)
 
@@ -1279,14 +1278,15 @@ class Assignment < ActiveRecord::Base
           :submission_comments => {
             :methods => avatar_methods,
             :only => comment_fields
-          },
-          :attachments => {
-            :only => [:mime_class, :comment_id, :id, :submitter_id ]
-          },
+          }
         },
         :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
+      json['attachments'] = sub.attachments.map{|att| att.as_json(
+          :only => [:mime_class, :comment_id, :id, :submitter_id ]
+      )}
 
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|

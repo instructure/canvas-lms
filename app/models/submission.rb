@@ -37,7 +37,6 @@ class Submission < ActiveRecord::Base
   has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
-  has_many :attachments, :through => :attachment_associations
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -749,6 +748,10 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  def attachments
+    Attachment.where(:id => self.attachment_associations.map(&:attachment_id))
+  end
+
   def attachments=(attachments)
     # Accept attachments that were already approved, those that were just created
     # or those that were part of some outside context.  This is all to prevent
@@ -1065,8 +1068,8 @@ class Submission < ActiveRecord::Base
   end
 
   def self.json_serialization_full_parameters(additional_parameters={})
-    includes = { :attachments => {}, :quiz_submission => {} }
-    methods = [ :formatted_body, :submission_history ]
+    includes = { :quiz_submission => {} }
+    methods = [ :formatted_body, :submission_history, :attachments ]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 
