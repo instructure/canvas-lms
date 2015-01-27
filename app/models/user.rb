@@ -2387,7 +2387,6 @@ class User < ActiveRecord::Base
       shards = self.associated_shards
       unless allow_implicit
         # only search the shards with trusted accounts
-
         trusted_shards = account.root_account.trusted_account_ids.map{|id| Shard.shard_for(id) }
         trusted_shards << account.root_account.shard
 

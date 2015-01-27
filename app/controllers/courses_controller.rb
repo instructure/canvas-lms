@@ -345,6 +345,7 @@ class CoursesController < ApplicationController
   #   - "storage_quota_used_mb": The amount of storage space used by the files in this course
   #   - "total_students": Optional information to include with each Course.
   #     Returns an integer for the total amount of active and invited students.
+  #   - "passback_status": Include the grade passback_status
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -362,7 +363,7 @@ class CoursesController < ApplicationController
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.each do |e|
           if [:completed, :rejected].include?(e.state_based_on_date)
-            @past_enrollments << e
+            @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
@@ -995,9 +996,14 @@ class CoursesController < ApplicationController
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
-      js_env :APP_CENTER => {
-        enabled: Canvas::Plugin.find(:app_center).enabled?
-      }
+      js_env({
+        :APP_CENTER => {
+          enabled: Canvas::Plugin.find(:app_center).enabled?
+        },
+        ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
+        LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
+        CONTEXT_BASE_URL: "/api/v1/courses/#{@context.id}"
+      })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :manage_content)

@@ -43,11 +43,6 @@ module Canvas
     end
   end
 
-  def self.cache_store_config(rails_env = :current, nil_is_nil = true)
-    rails_env = Rails.env if rails_env == :current
-    cache_stores[rails_env]
-  end
-
   def self.cache_stores
     unless @cache_stores
       # this method is called really early in the bootup process, and

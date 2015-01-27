@@ -942,10 +942,13 @@ class UsersController < ApplicationController
     @lti_launch = Lti::Launch.new
     opts = {
         resource_type: @resource_type,
-        link_code: @opaque_id,
-        custom_substitutions: common_variable_substitutions
+        link_code: @opaque_id
     }
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, opts)
+    variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
+                                                                        current_user: @current_user,
+                                                                        current_pseudonym: @current_pseudonym,
+                                                                        tool: @tool})
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)
@@ -959,6 +962,7 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
+    run_login_hooks
     js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
            :PASSWORD_POLICY => @domain_root_account.password_policy
     render :layout => 'bare'
@@ -1035,6 +1039,7 @@ class UsersController < ApplicationController
   #
   # @returns User
   def create
+    run_login_hooks
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error

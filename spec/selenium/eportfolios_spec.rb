@@ -37,6 +37,24 @@ describe "eportfolios" do
       expect(f("#wizard_box")).not_to be_displayed
     end
 
+    it "should add a new page" do
+      page_title = 'I made this page.'
+
+      get "/eportfolios/#{@eportfolio.id}"
+      f('.manage_pages_link').click
+      f('.add_page_link').click
+      replace_content(f('#page_name'), page_title)
+      f('#content').click
+      wait_for_ajaximations
+      fj('.done_editing_button:visible').click
+      wait_for_ajaximations
+      expect(f('#page_list')).to include_text(page_title)
+      get "/eportfolios/#{@eportfolio.id}/category/I_made_this_page"
+      wait_for_ajaximations
+      expect(f('#section_pages')).to include_text(page_title)
+      expect(f('#content h2')).to include_text(page_title)
+    end
+
     it "should add a section" do
       get "/eportfolios/#{@eportfolio.id}"
       f("#section_list_manage .manage_sections_link").click

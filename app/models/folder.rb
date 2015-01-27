@@ -163,7 +163,7 @@ class Folder < ActiveRecord::Base
   def prevent_duplicate_name
     return unless self.parent_folder
 
-    existing_folders = self.parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(self.name)}(\\s\\d)?$", self.id.to_i).pluck(:name)
+    existing_folders = self.parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(self.name)}(\\s\\d+)?$", self.id.to_i).pluck(:name)
 
     return unless existing_folders.include?(self.name)
 

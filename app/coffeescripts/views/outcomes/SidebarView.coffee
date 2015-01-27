@@ -41,6 +41,7 @@ define [
     # options must include rootOutcomeGroup or directoryView
     initialize: (opts) ->
       super
+      @inFindDialog = opts.inFindDialog
       @readOnly = opts.readOnly
       @selectFirstItem = opts.selectFirstItem
       @directories = []
@@ -67,7 +68,7 @@ define [
       else
         parent = _.last @directories
         directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
-        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem}
+        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem, inFindDialog: @inFindDialog}
         @firstDir = false
       @addDir dir
 

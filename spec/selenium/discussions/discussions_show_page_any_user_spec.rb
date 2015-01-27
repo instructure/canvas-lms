@@ -98,7 +98,6 @@ describe "discussions" do
           topic.create_materialized_view
 
           get url
-          wait_for_ajaximations
           expect(f('.topic-unsubscribe-button')).to be_displayed
           expect(f('.topic-subscribe-button')).not_to be_displayed
 
@@ -115,7 +114,6 @@ describe "discussions" do
           topic.create_materialized_view
 
           get url
-          wait_for_ajaximations
           f('.topic-unsubscribe-button').click
           wait_for_ajaximations
           topic.reload
@@ -127,7 +125,6 @@ describe "discussions" do
           topic.create_materialized_view
 
           get url
-          wait_for_ajaximations
           f('.topic-subscribe-button').click
           wait_for_ajaximations
           topic.reload
@@ -139,7 +136,6 @@ describe "discussions" do
           topic.require_initial_post = true
           topic.save
           get url
-          wait_for_ajax_requests
           # shouldn't see subscribe button until after posting
           expect(f('.topic-subscribe-button')).not_to be_displayed
           add_reply new_student_entry_text
@@ -166,7 +162,6 @@ describe "discussions" do
         message = %{<p><object width="425" height="350" data="http://www.example.com/swf/software/flash/about/flash_animation.swf" type="application/x-shockwave-flash</object></p>"}
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
-        wait_for_ajax_requests
         expect(f('#content object')).not_to be_present
         iframe = f('#content iframe.user_content_iframe')
         expect(iframe).to be_present
@@ -192,7 +187,6 @@ describe "discussions" do
         message = %{<object width="560" height="315"><param name="movie" value="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="560" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>}
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
-        wait_for_ajax_requests
         expect(f('#content object')).not_to be_present
         expect(f('#content embed')).not_to be_present
         iframe = f('#content iframe.user_content_iframe')
@@ -260,7 +254,6 @@ describe "discussions" do
           side_comment_number = 11
           side_comment_number.times { |i| topic.discussion_entries.create!(:user => student, :message => "new side comment #{i} from student", :parent_entry => entry) }
           get url
-          wait_for_ajaximations
           expect(DiscussionEntry.last.depth).to eq 2
           keep_trying_until do
             expect(ff('.discussion-entries .entry').count).to eq 12 # +1 because of the initial entry
@@ -272,7 +265,6 @@ describe "discussions" do
         it "should delete a side comment" do
           entry = topic.discussion_entries.create!(:user => somebody, :message => "new side comment from somebody", :parent_entry => entry)
           get url
-          wait_for_ajax_requests
           delete_entry(entry)
         end
 

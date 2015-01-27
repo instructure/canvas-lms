@@ -57,7 +57,6 @@ describe "discussions" do
           group_category
           new_section
           get url
-          wait_for_ajaximations
 
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
 
@@ -87,7 +86,6 @@ describe "discussions" do
         it "should validate that a group category is selected" do
           assignment_group
           get url
-          wait_for_ajaximations
 
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
           f('#has_group_category').click

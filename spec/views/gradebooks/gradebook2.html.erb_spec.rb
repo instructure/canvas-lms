@@ -65,10 +65,10 @@ describe "/gradebooks/gradebook2" do
       assigns[:body_classes] = []
     end
 
-    it "should not allow uploading scores for large roster courses" do
+    it "should allow uploading scores for courses" do
       render "/gradebooks/gradebook2"
       expect(response).not_to be_nil
-      expect(response.body).to match /Upload Scores \(from .csv\)/
+      expect(response.body).to match /Import/
     end
 
     it "should not allow uploading scores for large roster courses" do
@@ -77,7 +77,7 @@ describe "/gradebooks/gradebook2" do
       @course.reload
       render "/gradebooks/gradebook2"
       expect(response).not_to be_nil
-      expect(response.body).not_to match /Upload Scores \(from .csv\)/
+      expect(response.body).not_to match /Import/
     end
   end
 

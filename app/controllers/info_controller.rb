@@ -23,6 +23,7 @@ class InfoController < ApplicationController
 
   def styleguide
     js_bundle :styleguide
+    render :layout => "layouts/styleguide"
   end
 
   def message_redirect

@@ -50,5 +50,16 @@ describe "i18n js" do
         )
       end
     end
+
+    it "should not scope inferred keys" do
+      set_translations({
+        pigLatin: {
+          inferred_key_c49e3743: "Inferreday eykay",
+          test: {inferred_key_c49e3743: "Otnay isthay!"}
+        }
+      })
+      expect(require_exec('i18n!test', "I18n.locale = 'pigLatin'; i18n.t('Inferred key')"))
+        .to eq("Inferreday eykay")
+    end
   end
 end

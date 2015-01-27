@@ -94,6 +94,14 @@ describe ImportedHtmlConverter do
       test_string = %{<img src="subfolder/with+a+space/test.png" alt="nope" />}
       expect(ImportedHtmlConverter.convert(test_string, @course)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
     end
+
+    it "should find an attachment even if the link has an extraneous folder" do
+      att = make_test_att()
+      @course.attachment_path_id_lookup = {"subfolder/test.png" => att.migration_id}
+
+      test_string = %{<img src="anotherfolder/subfolder/test.png" alt="nope" />}
+      expect(ImportedHtmlConverter.convert(test_string, @course)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+    end
     
     it "should find an attachment by path if capitalization is different" do
       att = make_test_att()

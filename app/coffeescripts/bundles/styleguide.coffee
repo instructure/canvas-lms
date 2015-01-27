@@ -149,3 +149,33 @@ require [
   $("#repeat").buttonset()
 
   $(".styleguide-datetime_field-example").datetime_field()
+
+  # Smooth anchor scrolling
+
+  $(".Sg-header__Subnavigation a[href*=#]:not([href=#])").click ->
+    if location.pathname.replace(/^\//, "") is @pathname.replace(/^\//, "") and location.hostname is @hostname
+      target = $(@hash)
+      headerHeight = $(".Sg-header").height()
+      target = (if target.length then target else $("[name=" + @hash.slice(1) + "]"))
+      if target.length
+        $("html,body").animate
+          scrollTop: target.offset().top - headerHeight
+        , 3000
+        false
+  
+  #Global Navigation Hide/Show Subnav
+  selectCategory = (event) ->
+    event.preventDefault()
+    SgNavType = $(this).data('sg-category')
+    $(".Sg-header__Subnavigation section").addClass("isHidden")
+    $(".Sg-header__Subnavigation section." + SgNavType).removeClass("isHidden")
+    $(".Sg-header__Navigation a").removeClass('active')
+    $(this).addClass('active') 
+
+  $('.Sg-header__Navigation a').on('click', selectCategory);
+      
+
+
+    
+
+

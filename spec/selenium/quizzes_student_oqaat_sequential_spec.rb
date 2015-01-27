@@ -12,13 +12,12 @@ describe "One Question at a Time Quizzes as a student" do
   end
 
   it "displays one question at a time but you cant go back" do
-    skip("193")
     take_the_quiz
 
     it_should_show_cant_go_back_warning
     accept_cant_go_back_warning
 
-    sequential_flow
+    check_if_cant_go_back
   end
 
   it "saves answers and grades the quiz" do
@@ -40,8 +39,6 @@ describe "One Question at a Time Quizzes as a student" do
     
     navigate_directly_to_first_question
     it_should_be_on_second_question
-
-    submit_unfinished_quiz
   end
 
   it "warns you about submitting a quiz when you are not on the last question" do

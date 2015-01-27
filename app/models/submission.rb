@@ -1250,6 +1250,27 @@ class Submission < ActiveRecord::Base
             :assessor => grader, :user => user, :artifact => submission,
             :assessment => assessment.merge(:assessment_type => 'grading'))
         end
+
+        comment = user_data.slice(:text_comment, :file_ids, :media_comment_id, :media_comment_type, :group_comment)
+        if comment.present?
+          comment = {
+              :comment => comment[:text_comment],
+              :author => grader,
+              :hidden => assignment.muted?,
+          }.merge(
+              comment
+          ).with_indifferent_access
+
+          if file_ids = user_data[:file_ids]
+            attachments = Attachment.where(id: file_ids).to_a.select{ |a|
+              a.grants_right?(grader, :attach_to_submission_comment)
+            }
+            attachments.each { |a| a.ok_for_submission_comment = true }
+            comment[:attachments] = attachments if attachments.any?
+          end
+          assignment.update_submission(user, comment)
+        end
+
       end
     end
     if missing_ids.any?

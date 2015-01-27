@@ -94,15 +94,19 @@ class SisBatch < ActiveRecord::Base
   end
 
   def process
+    self.class.queue_job_for_account(self.account)
+  end
+
+  def self.queue_job_for_account(account)
     process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
-    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}",
+    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { account.id }}",
                  :priority => Delayed::LOW_PRIORITY,
                  :max_attempts => 1 }
     if process_delay > 0
       job_args[:run_at] = process_delay.seconds.from_now
     end
 
-    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [self.account])
+    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [account])
     Delayed::Job.enqueue(work, job_args)
   end
 
@@ -123,6 +127,7 @@ class SisBatch < ActiveRecord::Base
     if self.workflow_state == 'created'
       self.workflow_state = :importing
       self.progress = 0
+      self.started_at = Time.now.utc
       self.save
 
       import_scheme = SisBatch.valid_import_types[self.data[:import_type]]
@@ -153,9 +158,7 @@ class SisBatch < ActiveRecord::Base
         batch.process_without_send_later
         if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
           # requeue the job to continue processing more batches
-          work = SisBatch::Work.new(SisBatch, :process_all_for_account, [self.account])
-          Delayed::Job.enqueue(work, job_args)
-
+          queue_job_for_account(account)
           return
         end
       end
@@ -199,7 +202,7 @@ class SisBatch < ActiveRecord::Base
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
-    self.ended_at = Time.now
+    self.ended_at = Time.now.utc
     self.save
   end
 
@@ -248,6 +251,7 @@ class SisBatch < ActiveRecord::Base
     self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
       "created_at" => self.created_at,
+      "started_at" => self.started_at,
       "ended_at" => self.ended_at,
       "updated_at" => self.updated_at,
       "progress" => self.progress,

@@ -26,11 +26,9 @@ PreProcessor.injectScope = function(node) {
   if (!node.hash)
     node.hash = node.sexpr.hash = new HashNode([]);
   pairs = node.hash.pairs;
-  // to match our .rb scoping behavior, don't scope inferred keys
-  if (pairs.length && pairs[pairs.length - 1][0] === "i18n_inferred_key") {
-    node.hash.pairs = pairs.slice(0, pairs.length - 1);
-  }
-  else {
+  // to match our .rb scoping behavior, don't scope inferred keys...
+  // if inferred, it's always the last option
+  if (!pairs.length || pairs[pairs.length - 1][0] !== "i18n_inferred_key") {
     node.hash.pairs = pairs.concat([["scope", new StringNode(this.scope)]]);
   }
   return node;

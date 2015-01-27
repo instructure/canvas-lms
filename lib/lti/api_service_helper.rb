@@ -23,7 +23,9 @@ module Lti
   module ApiServiceHelper
     def lti_authenticate
       @tool_proxy = ToolProxy.where(guid: oauth_consumer_key).first
-      render_unauthorized_action unless @tool_proxy && oauth_authenticated_request?(@tool_proxy.shared_secret)
+      authorized = @tool_proxy && oauth_authenticated_request?(@tool_proxy.shared_secret) && authenticate_body_hash
+      authorized or render_unauthorized_api
+      authorized
     end
 
     def oauth_authenticated_request?(secret)
@@ -32,6 +34,24 @@ module Lti
 
     def oauth_consumer_key
       @oauth_consumer_key ||= OAuth::Helper.parse_header(request.authorization)['oauth_consumer_key']
+    end
+
+    def authenticate_body_hash
+      if body_hash = OAuth::Helper.parse_header(request.authorization)['oauth_body_hash']
+        request.body.rewind
+        generated_hash = Digest::SHA1.base64digest(request.body.read)
+        request.body.rewind #Be Kind Rewind
+        generated_hash == body_hash
+      else
+        true
+      end
+    end
+
+    def render_unauthorized_api
+      render json: {:status => I18n.t('lib.auth.lti.api.status_unauthorized', 'unauthorized'),
+                       :errors => [{:message => I18n.t('lib.auth.lti.api.not_unauthorized', 'unauthorized request')}]
+                             },
+             :status => :unauthorized
     end
 
   end

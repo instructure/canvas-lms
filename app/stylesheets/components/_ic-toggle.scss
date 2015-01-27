@@ -1,13 +1,16 @@
 /*
 @styleguide Toggle
 
-### Regular old checkboxes that look and feel like toggle switches
+### tl;dr
 
-No javascript is required for the **.ic-Toggle** component. However, including all the right markup is important for it to function properly. The id of the checkbox input must match the "for" attribute of the label, for example.
+  - Regular old checkboxes that look and feel like toggle switches
+  - No javascript is required for the **.ic-Toggle** component. 
+  - However, including all the right markup is important for it to function properly. 
+  - The id of the checkbox input must match the "for" attribute of the label, for example.
+  - The **.ic-Toggle** component was designed to be as accessible as a regular checkbox. 
+  - Supports both *:focus* and *disabled* states. Once in focus, it can be toggled via the keyboard by pressing SPACE.
 
-The **.ic-Toggle** component was designed to be as accessible as a regular checkbox. It supports both *:focus* and *disabled* states. Once in focus, it can be toggled via the keyboard by pressing SPACE.
-
-#### **Basic usage**
+## Basic usage
 
 This is the basic .ic-Toggle component, without any special additions. By default, the component defaults to Canvas colors and branding.
 
@@ -28,7 +31,7 @@ This is the basic .ic-Toggle component, without any special additions. By defaul
 </div>
 ```
 
-#### **Go big or go, uh, small**
+## Go big or go, uh, small
 
 Adding **.ic-Toggle--size-large** or **.ic-Toggle--size-small** to the **.ic-Toggle** component will give you slightly bigger or small toggles.
 
@@ -74,24 +77,22 @@ Adding **.ic-Toggle--size-large** or **.ic-Toggle--size-small** to the **.ic-Tog
 
 ```
 
-#### **Customizing your toggle switch**
+## Customizing your toggle switch
 
-The **.ic-Toggle** class exposes two mixins for you to use to customize its appearance.
+The `.ic-Toggle` class exposes two mixins for you to use to customize its appearance.
 
 To customize the colors and transition-timing-function, include the **ic-Toggle-branding** mixin in your new class. Let's call our modifier class **.ic-Toggle--i-love-ugly-colors**, for example:
 
-<pre>
-<code>
-  .ic-Toggle.ic-Toggle--i-love-ugly-colors {
-    @include ic-Toggle-branding (
-      red, // off state color
-      green, // on state color
-      white, // inactive text color
-      ease-in-out // transition timing function
-    )
-  }
-</code>
-</pre>
+<br/>
+    .ic-Toggle.ic-Toggle--i-love-ugly-colors {
+      @include ic-Toggle-branding (
+        red, // off state color
+        green, // on state color
+        white, // inactive text color
+        ease-in-out // transition timing function
+      )
+    }
+
 
 The SCSS above would give you the toggle below.
 
@@ -104,26 +105,25 @@ The SCSS above would give you the toggle below.
   </label>
 </div>
 ```
+<br/>
+The `ic-Toggle-appearance` mixin works the same way, giving you control over the toggle's width, height, and a lot more. Simply add a modifier class (in this case **.ic-Toggle--i-love-big-toggles**) to the **.ic-Toggle** base class, and include the ic-Toggle-appearance mixin. Then overwrite the mixin's default variable values until you get the look you're going for.
+<br/>
 
-The **ic-Toggle-appearance** mixin works the same way, giving you control over the toggle's width, height, and a lot more. Simply add a modifier class (in this case **.ic-Toggle--i-love-big-toggles**) to the **.ic-Toggle** base class, and include the ic-Toggle-appearance mixin. Then overwrite the mixin's default variable values until you get the look you're going for.
+    .ic-Toggle.ic-Toggle--i-love-big-toggles {
+      @include ic-Toggle-appearance
+      (
+        200px, // Toggle width
+        100px,  // Toggle height
+        100px,   // Toggle border radius
+        2px,   // Offset (distance btw switch and box)
+        16px,  // Label font size
+        18px,  // Switch font size
+        0px 4px 6px rgba(black, 0.4), // Switch shadow on hover/focus
+        10px // Bottom padding on main element to make sure switch shadow always shows
+      );
+    }
 
-<pre>
-<code>
-  .ic-Toggle.ic-Toggle--i-love-big-toggles {
-    @include ic-Toggle-appearance
-    (
-      200px, // Toggle width
-      100px,  // Toggle height
-      100px,   // Toggle border radius
-      2px,   // Offset (distance btw switch and box)
-      16px,  // Label font size
-      18px,  // Switch font size
-      0px 4px 6px rgba(black, 0.4), // Switch shadow on hover/focus
-      10px // Bottom padding on main element to make sure switch shadow always shows
-    );
-  }
-</code>
-</pre>
+
 The SCSS above would give you the toggle below.
 
 ```html

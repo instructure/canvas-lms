@@ -45,10 +45,6 @@ module Tour
     self.tours.values.select { |tour| yield(tour) }
   end
 
-  def self.included(klass)
-    klass.before_filter :set_tours
-  end
-
   def self.config(&block)
     instance_eval(&block)
   end
@@ -65,19 +61,18 @@ module Tour
     false
   end
 
-  def set_tours
+  def tours_to_run
     return if !@current_user || api_request?
     controller_action = "#{controller_name}##{action_name}"
-    tours_to_run = Tour.where { |tour|
+    Tour.where { |tour|
       # An tour will be included on the page if the action matches
-      next unless tour[:actions].include?(controller_action)
+      next unless tour[:actions].include?(controller_action) || tour[:actions].include?('*')
       # its not dismissed
       next if tour_is_dismissed?(tour)
       # and the block returns true (or doesn't exist)
-      !tour[:block] || instance_eval(&tour[:block])
+      next true if tour[:block].nil?
+      instance_eval(&tour[:block])
     }.map {|e| e[:js_name]}
-    # unless because of tests not starting afresh and TOURS key is taken
-    js_env(:TOURS => tours_to_run) unless tours_to_run.empty?
   end
 
 end

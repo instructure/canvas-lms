@@ -94,14 +94,22 @@ define [
     errors = view._validatePointsRequired(data, [])
     equal errors['points_possible'][0]['message'], 'Points possible must be 0 or more for selected grading type'
 
-  test 'does error message show on assignment point change', ->
-    view = editView()
+  test 'does show error message on assignment point change with submissions', ->
+    view = editView has_submitted_submissions: true
     view.$el.appendTo $('#fixtures')
     ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
     view.$el.find('#assignment_points_possible').val(1)
     view.$el.find('#assignment_points_possible').trigger("change")
     ok view.$el.find('#point_change_warning:visible').attr('aria-expanded')
     view.$el.find('#assignment_points_possible').val(0)
+    view.$el.find('#assignment_points_possible').trigger("change")
+    ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
+
+  test 'does show error message on assignment point change without submissions', ->
+    view = editView has_submitted_submissions: false
+    view.$el.appendTo $('#fixtures')
+    ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
+    view.$el.find('#assignment_points_possible').val(1)
     view.$el.find('#assignment_points_possible').trigger("change")
     ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
 

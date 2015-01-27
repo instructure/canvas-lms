@@ -132,6 +132,7 @@ define [
 
     renderItems: ->
       @collection.each @renderItem
+      @trigger "renderedItems"
 
     ##
     # Removes an item

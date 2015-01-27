@@ -43,7 +43,10 @@ def make_event(params = {})
   }.with_indifferent_access.merge(params)
   c = CalendarEvent.new :description => opts[:description],
                         :start_at => opts[:start],
-                        :title => opts[:title]
+                        :title => opts[:title],
+                        :location_name => opts[:location_name],
+                        :location_address => opts[:location_address],
+                        :all_day => opts[:all_day]
   c.context = opts[:context]
   c.save!
   c
@@ -151,7 +154,18 @@ end
 
 def load_week_view
   get "/calendar2"
-  wait_for_ajaximations
   f('#week').click
+  wait_for_ajaximations
+end
+
+def load_month_view
+  get "/calendar2"
+  f('#month').click
+  wait_for_ajaximations
+end
+
+def load_agenda_view
+  get "/calendar2"
+  f('#agenda').click
   wait_for_ajaximations
 end

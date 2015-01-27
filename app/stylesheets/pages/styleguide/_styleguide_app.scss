@@ -1,0 +1,90 @@
+// We need this id to make some of the js components style correctly
+// not sure why, but this takes off some of the width/heigh stuff we don't want
+#main.Sg-only {
+  width: 100% !important;
+  background-color: transparent;
+  border: none;
+  margin-bottom: 0;
+  min-height: 450px;
+  max-width: 100%;
+}
+.Sg-Main {
+  // This is a workaround to account for the padding around
+  // the gutters of flexgrid. It's a known problem and there's
+  // currently an issue reported. If things change we'll fix it.
+  // 
+  overflow-x:hidden;  
+}
+.Sg-Section {
+  padding-bottom: 100px; // adds some padding between our sections and headers
+}
+.Sg-header__Subnavigation-item {
+  // to account for our added "section" for canvas sg nav
+  display: inline-block;
+}
+.styleguide-section__grid-demo-element {
+  padding: 8px 16px;
+  background: lighten($ic-link-color, 15%);
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  height: 16px;
+}
+.Sg-Main .codeBlock,
+.Sg-Main .highlight {
+  &:after {
+    content: 'Code';
+  } 
+}
+.Sg-Main .codeBlock,
+.Sg-Main .highlight {
+  &:after {
+    content: 'Code';
+  } 
+}
+// For hiding sections from nav
+.isHidden {display: none;}
+.styleguide-section__accordion-demo-element {
+  padding: $ic-sp*2;
+  color: darken($canvas-neutral, 15%);
+}
+/////
+////// Styles for Colors
+/////
+.Colorguide-color {    
+  justify-content: space-between;
+  padding: 145px 0 0 0;
+  flex: 1 140px;
+  margin: 5px;
+} 
+.Colorguide-var {  
+  display: block;
+  background: $canvas-light;
+  padding: 10px;
+}
+
+@mixin colorguide ($bg-color) {
+  background: $bg-color;
+  border: 1px solid darken($bg-color, 10%);
+}
+.Colorguide-color--primary    {@include colorguide($canvas-primary);}
+.Colorguide-color--secondary  {@include colorguide($canvas-secondary);}
+.Colorguide-color--success    {@include colorguide($canvas-success);}
+.Colorguide-color--neutral    {@include colorguide($canvas-neutral);}
+.Colorguide-color--action     {@include colorguide($canvas-action);}
+.Colorguide-color--danger     {@include colorguide($canvas-danger);}
+.Colorguide-color--alert      {@include colorguide($canvas-alert);}
+.Colorguide-color--light      {@include colorguide($canvas-light);}
+.Colorguide-color--dark       {@include colorguide($canvas-dark);}
+
+.Colorguide-container--hc-theme {
+  .Colorguide-color--primary    {@include colorguide(#0073ac);}
+  .Colorguide-color--secondary  {@include colorguide(#343c44);}
+  .Colorguide-color--success    {@include colorguide(#008a14);}
+  .Colorguide-color--neutral    {@include colorguide(hsl(0,0,90%));}
+  .Colorguide-color--action     {@include colorguide(#a23891);}
+  .Colorguide-color--danger     {@include colorguide(#a03536);}
+  .Colorguide-color--alert      {@include colorguide(#9e6b05);}
+  .Colorguide-color--light      {@include colorguide(#ffffff);}
+  .Colorguide-color--dark       {@include colorguide(#333333);}  
+}

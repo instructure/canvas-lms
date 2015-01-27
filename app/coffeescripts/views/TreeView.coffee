@@ -19,6 +19,7 @@ define [
     @optionProperty 'href'
     @optionProperty 'focusStyleClass'
     @optionProperty 'selectedStyleClass'
+    @optionProperty 'autoFetch'
 
     defaults:
       nestingLevel: 1
@@ -127,6 +128,7 @@ define [
             className: 'subtrees'
             template: collectionTemplate
             scrollContainer: @$treeContents.closest('div[role=tabpanel]')
+            autoFetch: @autoFetch
           )
           @$treeContents.append(subtreesView.render().el)
           unless @onlyShowSubtrees

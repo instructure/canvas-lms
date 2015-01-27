@@ -66,7 +66,11 @@ define [
     render: withReactDOM ->
       form { ref: 'form', className: 'form-dialog', onSubmit: preventDefault(@submit)},
         div {className: 'form-dialog-content'},
-          div ref: 'FolderTreeHolder'
+          aside {
+            role: 'region'
+            'aria-label' : I18n.t('folder_browsing_tree', 'Folder Browsing Tree')
+          },
+            div ref: 'FolderTreeHolder'
         div {className: 'form-controls'},
           button {
             type: 'button'

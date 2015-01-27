@@ -113,24 +113,24 @@ shared_examples_for "quiz question selenium tests" do
 
   def click_next_button
     expect_new_page_load {
-      fj("button:contains('Next')").click
+      f("button.next-question").click
     }
     wait_for_ajaximations
   end
 
   def click_previous_button
     expect_new_page_load {
-      fj("button:contains('Previous')").click
+      f("button.previous-question").click
     }
     wait_for_ajaximations
   end
 
   def it_should_not_show_previous_button
-    expect(fj("button:contains('Previous')")).to be_nil
+    expect(f("button.previous-question")).to be_nil
   end
 
   def it_should_not_show_next_button
-    expect(fj("button:contains('Next')")).to be_nil
+    expect(f("button.next-question")).to be_nil
   end
 
   def submit_the_quiz
@@ -150,7 +150,7 @@ shared_examples_for "quiz question selenium tests" do
 
   def click_next_button_and_accept_warning
     expect_new_page_load {
-      fj("button:contains('Next')").click
+      f("button.next-question").click
       expect(driver.switch_to.alert.text).to include "leave it blank?"
       driver.switch_to.alert.accept      
     }
@@ -212,6 +212,15 @@ shared_examples_for "quiz question selenium tests" do
     answer_the_question_correctly
 
     submit_finished_quiz
+  end
+
+  def check_if_cant_go_back
+    it_should_be_on_first_question
+    answer_the_question_correctly
+
+    click_next_button
+    it_should_be_on_second_question
+    it_should_not_show_previous_button
   end
 
   def answers_flow

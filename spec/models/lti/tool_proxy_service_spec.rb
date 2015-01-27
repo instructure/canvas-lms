@@ -186,6 +186,14 @@ module Lti
         end
       end
 
+      it 'rejects tool proxies that are missing a shared secret' do
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.security_contract.shared_secret = nil
+        expect { subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid SecurityContract')do |exception|
+          expect(JSON.parse(exception.to_json)).to eq({"invalid_security_contract"=>["shared_secret"], "error"=>"Invalid SecurityContract"})
+        end
+      end
+
     end
 
   end

@@ -67,7 +67,7 @@ class Announcement < DiscussionTopic
     whenever { |record|
       record.context.available? and
         !record.context.concluded? and
-      ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
 
     dispatch :announcement_created_by_you
@@ -75,7 +75,7 @@ class Announcement < DiscussionTopic
     whenever { |record|
       record.context.available? and
         !record.context.concluded? and
-        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
   end
 

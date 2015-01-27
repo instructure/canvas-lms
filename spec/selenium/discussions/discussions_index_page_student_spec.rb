@@ -41,7 +41,6 @@ describe "discussions" do
 
       it "should allow a student to create a discussion" do
         get url
-        wait_for_ajax_requests
         expect_new_page_load { f('#new-discussion-btn').click }
         wait_for_ajax_requests
 
@@ -52,7 +51,6 @@ describe "discussions" do
         course.allow_student_discussion_topics = false
         course.save!
         get url
-        wait_for_ajax_requests
         expect(f('#new-discussion-btn')).to be_nil
       end
 
@@ -89,7 +87,6 @@ describe "discussions" do
 
           user_session(section_student)
           get url
-          wait_for_ajaximations
           expect(f('#locked-discussions .collectionViewItems .discussion')).not_to be_nil
         end
       end
@@ -100,7 +97,6 @@ describe "discussions" do
           teacher_topic.require_initial_post = true
           teacher_topic.save!
           get url
-          wait_for_ajaximations
           expect(f('.icon-discussion')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations

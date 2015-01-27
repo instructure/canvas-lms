@@ -83,7 +83,6 @@ describe "discussions" do
         it "should allow a teacher to pin a topic" do
           topic
           get(url)
-          wait_for_ajaximations
 
           f('.open.discussion-list .al-trigger').click
           fj('.icon-pin:visible').click
@@ -97,7 +96,6 @@ describe "discussions" do
           assignment_topic.pinned = true
           assignment_topic.save!
           get(url)
-          wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
           fj('.icon-pin:visible').click
@@ -114,7 +112,6 @@ describe "discussions" do
           topic = DiscussionTopic.where(context_id: course.id).order('id DESC').last
           expect(topic).not_to be_pinned
           get(url)
-          wait_for_ajaximations
           keep_trying_until { fj(".al-trigger") }
           fj("[data-id=#{topic.id}] .al-trigger").click
           fj('.icon-pin:visible').click
@@ -126,7 +123,6 @@ describe "discussions" do
           topic.pinned = true
           topic.save!
           get(url)
-          wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
           fj('.icon-lock:visible').click
@@ -138,7 +134,6 @@ describe "discussions" do
         it "should allow pinning a locked topic" do
           topic.lock!
           get(url)
-          wait_for_ajaximations
 
           f('.locked.discussion-list .al-trigger').click
           fj('.icon-pin:visible').click

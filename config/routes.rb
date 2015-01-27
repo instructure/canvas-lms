@@ -757,6 +757,9 @@ CanvasRails::Application.routes.draw do
 
   get 'courses/:course_id/outcome_rollups' => 'outcome_results#rollups', as: 'course_outcome_rollups'
 
+  get 'terms_of_use' => 'legal_information#terms_of_use', as: 'terms_of_use_redirect'
+  get 'privacy_policy' => 'legal_information#privacy_policy', as: 'privacy_policy_redirect'
+
   ### API routes ###
 
   # TODO: api routes can't yet take advantage of concerns for DRYness, because of

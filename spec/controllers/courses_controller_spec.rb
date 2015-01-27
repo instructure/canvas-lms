@@ -112,6 +112,26 @@ describe CoursesController do
         expect(assigns[:current_enrollments]).to eq [enrollment1]
         expect(assigns[:future_enrollments]).to be_empty
       end
+
+      it "should not include 'invited' enrollments whose term is past" do
+        @student = user
+
+        # by enrollment term
+        enrollment = course_with_student user: @student, course_name: 'Three', :active_course => true
+        past_term = Account.default.enrollment_terms.create! name: 'past term', start_at: 1.month.ago, end_at: 1.day.ago
+        enrollment.course.enrollment_term = past_term
+        enrollment.course.save!
+        enrollment.reload
+
+        expect(enrollment.workflow_state).to eq "invited"
+        expect(enrollment).to_not be_invited # state_based_on_date
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to be_empty
+      end
     end
 
     describe 'current_enrollments' do

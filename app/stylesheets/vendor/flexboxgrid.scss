@@ -1,19 +1,20 @@
 /*
 @styleguide Grid
 
-### Grid Styles
+<br/>
 
-**We are trying out a slightly modified version of [Flexbox Grid](http://flexboxgrid.com) as Canvas' grid solution going forward.** Flexbox Grid's default *.row* class has been changed to *.grid-row* due to previous usage of Bootstrap 2.x grid in small parts of the application.
+We use a slightly modified version of [Flexbox Grid](http://flexboxgrid.com) as Canvas' grid. 
 
-Flexbox Grid is a lot like Bootstrap 3's 12-column grid, with different column widths available for *.xs-*, *.sm-*, *.md-*, and *.lg-* screen sizes.
+*Important!* Flexbox Grid's default `.row` class has been changed to `*.grid-row*` due to previous usage of Bootstrap 2.x grid in small parts of the application.
 
-To create vertical space between grid rows, consider using the [.content-box class](#spacing:_content_box) and its variants. 
+Flexbox Grid is a lot like Bootstrap 3's 12-column grid, with different column widths available for `.xs-`, `.sm-`, `.md-`, and `.lg-` screen sizes.
 
-[Official documentation for Flexbox Grid](http://flexboxgrid.com/) by Kristofer [@dam](https://twitter.com/dam).
+To create vertical space between grid rows, consider using the `.content-box` and its variants. 
 
-#### **Basic usage** 
 
-*"Just tell me how to make 2 columns, dammit."*
+## Basic usage
+
+*"Just tell me how to make 2 columns."*
 
 ```html
 <div class="content-box">
@@ -27,7 +28,7 @@ To create vertical space between grid rows, consider using the [.content-box cla
   </div>
 </div>
 ```
-#### **Get all fancypants responsive** 
+## Get all fancypants responsive
 
 *"I want two columns, but only when the screen is wide enough"*
 
@@ -44,7 +45,7 @@ To create vertical space between grid rows, consider using the [.content-box cla
 </div>
 ```
 
-#### **Give your UI some room to breathe by adding alignment classes (.start, .center-, .end-) to the .grid-row element** 
+## Give your UI some room to breathe by adding alignment classes (.start, .center-, .end-) to the .grid-row element
 
 *"Once the screen is wide enough, limit my content to 8 columns and center it horizontally"*
 
@@ -58,7 +59,7 @@ To create vertical space between grid rows, consider using the [.content-box cla
 </div>
 ```
 
-#### **Align UI elements on a horizontal axis like it's 2014 (or later).** 
+## Align UI elements on a horizontal axis like it's 2014 (or later).
 
 Because it is, and you can use flexbox.
 
@@ -95,7 +96,7 @@ Because it is, and you can use flexbox.
 </div>
 ```
 
-#### **Use the power of flexbox to perfectly add space *.around-* or *.between-* UI elements**
+## Use the power of flexbox to perfectly add space *.around-* or *.between-* UI elements
 
 ```html
 <div class="content-box">
@@ -126,9 +127,9 @@ Because it is, and you can use flexbox.
 </div>
 ```
 
-#### **Offset grid columns**
+## Offset grid columns
 
-*"When the screen gets wide enough, offset this 2-column box by 3 grid columns."*
+"When the screen gets wide enough, offset this 2-column box by 3 grid columns."
 
 ```html
 <div class="content-box">
@@ -140,9 +141,9 @@ Because it is, and you can use flexbox.
 </div>
 ```
 
-#### **Be completely lazy**
+## Be completely lazy
 
-Never miss another game of foosball. Just let the grid evenly distribute your elements.
+"Never miss another game of foosball. Just let the grid evenly distribute your elements."
 
 ```html
 <div class="content-box">

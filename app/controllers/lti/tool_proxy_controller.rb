@@ -34,8 +34,21 @@ module Lti
     end
 
     private
+
     def update_workflow_state(workflow_state)
-      Lti::ToolProxy.find(params[:tool_proxy_id]).update_attribute(:workflow_state, workflow_state)
+      tool_proxy = Lti::ToolProxy.find(params[:tool_proxy_id])
+      tool_proxy.update_attribute(:workflow_state, workflow_state)
+
+      # this needs to be moved to whatever changes the workflow state to active
+      invalidate_nav_tabs_cache(tool_proxy)
+    end
+
+    def invalidate_nav_tabs_cache(tool_proxy)
+      placements = Set.new
+      tool_proxy.resources.each { |rh| placements.merge(rh.placements.map(&:placement)) }
+      if (placements & [ResourcePlacement::COURSE_NAVIGATION, ResourcePlacement::ACCOUNT_NAVIGATION]).count > 0
+        Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
+      end
     end
 
   end

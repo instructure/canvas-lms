@@ -35,11 +35,8 @@ $textColor:             $grayDark !default;
 
 // Links
 // -------------------------
-$linkColor:             #08c !default;
-$linkColor:             ensure-contrast($linkColor, white);
-
-$linkColorHover:        darken($linkColor, 15%) !default;
-
+$linkColor: darken(#0099e0, 5%) !default; // <-- This variable is set in /base/_variables.scss. Do not change this value.
+$linkColorHover: darken($linkColor, 10%) !default; // <-- This variable is set in /base/_variables.scss. Do not change this value.
 
 // Typography
 // -------------------------

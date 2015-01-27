@@ -75,29 +75,13 @@ class ExternalFeedAggregator
     end
     false
   end
-  
-  def request_feed(url, attempt=0)
-    return nil if attempt > 2
-    url = URI.parse url
-    http = Net::HTTP.new(url.host, url.port)
-    request = Net::HTTP::Get.new(url.path)
-    response = http.request(request)
-    case response
-    when Net::HTTPSuccess
-      return response
-    when Net::HTTPRedirection
-      return new_response = request_feed(response['Location'], attempt + 1) || response
-    else
-      return response
-    end
-  end
 
   def process_feed(feed)
     begin
       @logger.info("feed found: #{feed.url}")
       @logger.info('requesting entries')
       require 'net/http'
-      response = request_feed(feed.url)
+      response = CanvasHttp.get(feed.url)
       case response
       when Net::HTTPSuccess
         success = parse_entries(feed, response.body)

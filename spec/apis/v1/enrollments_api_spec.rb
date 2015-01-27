@@ -1022,29 +1022,6 @@ describe EnrollmentsApiController, type: :request do
           %w{sis_user_id sis_login_id login_id}.each { |key| expect(res['user']).not_to include(key) }
         end
       end
-
-      context "sharding" do
-        specs_require_sharding
-
-        it "returns enrollments for out-of-shard users" do
-          pend_with_bullet
-
-          # create a user on a different shard
-          @shard1.activate { @user = User.create!(name: 'outofshard') }
-
-          @course.enroll_student(@user)
-
-          # query own enrollment(s) as the out-of-shard user
-          @path = "#{@path}?user_id=self"
-          @params[:user_id] = 'self'
-
-          json = api_call(:get, @path, @params)
-
-          expect(json.length).to eq 1
-          expect(json.first['course_id']).to eq(@course.id)
-          expect(json.first['user_id']).to eq(@user.global_id)
-        end
-      end
     end
 
     context "a teacher" do
@@ -1120,6 +1097,47 @@ describe EnrollmentsApiController, type: :request do
       it "should return 401 unauthorize for a user requesting an enrollment object by id" do
         raw_api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
         expect(response.code).to eql '401'
+      end
+    end
+
+    describe "sharding" do
+      specs_require_sharding
+
+      context "when not scoped by a user" do
+        it "returns enrollments from the course's shard" do
+          pend_with_bullet
+
+          @shard1.activate { @user = user(active_user: true) }
+
+          account_admin_user(account: @course.account, user: @user)
+
+          json = api_call(:get, @path, @params)
+
+          enrollment_ids = json.collect { |e| e['id'] }
+          expect(enrollment_ids.sort).to eq(@course.enrollments.map(&:id).sort)
+          expect(json.length).to eq 2
+        end
+      end
+
+      context "when scoped by a user" do
+        it "returns enrollments from all of a user's associated shards" do
+          pend_with_bullet
+
+          # create a user on a different shard
+          @shard1.activate { @user = User.create!(name: 'outofshard') }
+
+          @course.enroll_student(@user)
+
+          # query own enrollment(s) as the out-of-shard user
+          @path = "#{@path}?user_id=self"
+          @params[:user_id] = 'self'
+
+          json = api_call(:get, @path, @params)
+
+          expect(json.length).to eq 1
+          expect(json.first['course_id']).to eq(@course.id)
+          expect(json.first['user_id']).to eq(@user.global_id)
+        end
       end
     end
 

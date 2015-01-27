@@ -67,7 +67,6 @@ describe "interaction with differentiated assignments on the dashboard and calen
         @da_assignment.grade_student(@student, {:grade => 10})
         get "/calendar"
         f("#undated-events-button").click
-        f("#undated-events-button").click
         wait_for_ajaximations
         expect(f("#undated_events_list")).to include_text(@da_assignment.title)
       end
@@ -136,7 +135,6 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should show assignments with a graded submission" do
         @da_assignment.grade_student(@student, {:grade => 10})
         get "/calendar"
-        f("#undated-events-button").click
         f("#undated-events-button").click
         wait_for_ajaximations
         expect(f("#undated_events_list")).to include_text(@da_assignment.title)

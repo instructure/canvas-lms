@@ -5,20 +5,18 @@ define([
   'i18n!external_tools',
   'underscore',
   'react',
-  'jsx/external_apps/mixins/FormHelpersMixin',
+  'jsx/external_apps/components/TextInput',
   'compiled/jquery.rails_flash_notifications'
-], function ($, I18n, _, React, FormHelpersMixin) {
+], function ($, I18n, _, React, TextInput) {
 
   return React.createClass({
     displayName: 'ConfigurationFormUrl',
 
-    mixins: [FormHelpersMixin],
-
     propTypes: {
-      name         : React.PropTypes.string.isRequired,
-      consumerKey  : React.PropTypes.string.isRequired,
-      sharedSecret : React.PropTypes.string.isRequired,
-      configUrl    : React.PropTypes.string.isRequired
+      name         : React.PropTypes.string,
+      consumerKey  : React.PropTypes.string,
+      sharedSecret : React.PropTypes.string,
+      configUrl    : React.PropTypes.string
     },
 
     getInitialState: function() {
@@ -33,7 +31,7 @@ define([
         , formErrors = [];
 
       fields.forEach(function(field) {
-        var value = this.refs[field].getDOMNode().value.trim();
+        var value = this.refs[field].state.value;
         if (!value) {
           errors[field] = I18n.t('This field is required');
           formErrors.push(I18n.t('This field "%{name}" is required.', { name: field }));
@@ -51,26 +49,50 @@ define([
 
     getFormData() {
       return {
-        name         : this.refs.name.getDOMNode().value,
-        consumerKey  : this.refs.consumerKey.getDOMNode().value,
-        sharedSecret : this.refs.sharedSecret.getDOMNode().value,
-        configUrl    : this.refs.configUrl.getDOMNode().value
+        name         : this.refs.name.state.value,
+        consumerKey  : this.refs.consumerKey.state.value,
+        sharedSecret : this.refs.sharedSecret.state.value,
+        configUrl    : this.refs.configUrl.state.value
       };
     },
 
     render() {
       return (
         <div className="ConfigurationFormUrl">
-          {this.renderTextInput('name', this.props.name, I18n.t('Name'))}
+          <TextInput
+            ref="name"
+            id="name"
+            defaultValue={this.props.name}
+            label={I18n.t('Name')}
+            required={true}
+            errors={this.state.errors} />
           <div className="grid-row">
             <div className="col-xs-6">
-              {this.renderTextInput('consumerKey', this.props.consumerKey, I18n.t('Consumer Key'))}
+              <TextInput
+                ref="consumerKey"
+                id="consumerKey"
+                defaultValue={this.props.consumerKey}
+                label={I18n.t('Consumer key')}
+                errors={this.state.errors} />
             </div>
             <div className="col-xs-6">
-              {this.renderTextInput('sharedSecret', this.props.sharedSecret, I18n.t('Shared Secret'))}
+              <TextInput
+                ref="sharedSecret"
+                id="sharedSecret"
+                defaultValue={this.props.sharedSecret}
+                label={I18n.t('Shared Secret')}
+                errors={this.state.errors} />
             </div>
           </div>
-          {this.renderTextInput('configUrl', this.props.configUrl, I18n.t('Config URL'), I18n.t('Example: https://example.com/config.xml'))}
+
+          <TextInput
+            ref="configUrl"
+            id="configUrl"
+            defaultValue={this.props.configUrl}
+            label={I18n.t('Config URL')}
+            hintText={I18n.t('Example: https://example.com/config.xml')}
+            required={true}
+            errors={this.state.errors} />
         </div>
       );
     }

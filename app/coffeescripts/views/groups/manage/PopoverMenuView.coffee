@@ -12,9 +12,12 @@ define [
     events:
       'click': 'cancelHide'
       'focusin': 'cancelHide'
-      'focusout': 'hide'
-      'outerclick': 'hide'
+      'focusout': 'hidePopover'
+      'outerclick': 'hidePopover'
       'keyup': 'checkEsc'
+
+    hidePopover: ->
+      @hide() #call the hide function without any arguments.
 
     showBy: ($target, focus = false) ->
       @cancelHide()
@@ -34,7 +37,9 @@ define [
             content = @$el.find '.popover-content'
             @$el.css top: coords.top, left: coords.left
             @setPopoverContentHeight(@$el, content, $('#content'))
+
         @focus?() if focus
+        @trigger("open", { "target" : $target })
       , 20
 
     setPopoverContentHeight: (popover, content, parent) ->
@@ -48,13 +53,14 @@ define [
     cancelHide: =>
       clearTimeout @hideTimeout
 
-    hide: =>
+    hide: (escapePressed = false) =>
       @hideTimeout = setTimeout =>
         @$el.detach()
+        @trigger("close", {"escapePressed": escapePressed})
       , 100
 
     checkEsc: (e) ->
-      @hide() if e.keyCode is 27 # escape
+      @hide(true) if e.keyCode is 27 # escape
 
     attachElement: ($target) ->
       @$el.insertAfter($target)

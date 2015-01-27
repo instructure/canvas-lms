@@ -149,6 +149,10 @@ module Canvas
             },
             'vendor/i18n': {
               exports: 'I18n'
+            },
+            'vendor/react-infinite-scroll.min' : {
+              deps: ['react'],
+              exports: 'InfiniteScroll'
             }
           }
         JS

@@ -294,14 +294,6 @@ class Account < ActiveRecord::Base
     true
   end
 
-  def terms_of_use_url
-    Setting.get('terms_of_use_url', 'http://www.canvaslms.com/policies/terms-of-use')
-  end
-
-  def privacy_policy_url
-    Setting.get('privacy_policy_url', 'http://www.canvaslms.com/policies/privacy-policy')
-  end
-
   def terms_required?
     Setting.get('terms_required', 'true') == 'true'
   end
@@ -502,8 +494,8 @@ class Account < ActiveRecord::Base
   def setup_quota_cache_invalidation
     @quota_invalidations = []
     unless self.new_record?
-      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.default_storage_quota_changed?
-      @quota_invalidations << 'default_group_storage_quota' if self.default_group_storage_quota_changed?
+      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
+      @quota_invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
     end
   end
 

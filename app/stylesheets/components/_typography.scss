@@ -1,0 +1,115 @@
+/*
+@styleguide Typography
+
+## Alignment
+
+`.text-right`
+
+```html
+<div>
+  <p class="text-right">align this text right</p>
+  <p class="text-left">align this text left</p>
+  <p class="text-center">align this text center</p>
+</div>
+```
+
+## Emphasis
+
+`<strong>`
+
+```html
+<p>Narwhal gastropub messenger bag viral <strong>letterpress plaid</strong>.</p>
+```
+
+`<em>`
+
+```html
+<p>Leggings whatever truffaut farm-to-table <em>portland blue bottle </em>cray selvage lo-fi marfa.</p>
+```
+
+`<small>`
+
+```html
+<p>Plaid tofu polaroid <small>banjo keffiyeh wolf etsy</small> craft beer kogi.</p>
+```
+
+## Color
+
+```html
+<p class="muted">Example of MUTED text</p>
+<p class="text-warning">Example of WARNING text <a href="" class="text-warning">with a link</a></p>
+<p class="text-error">Example of ERROR text <a href="" class="text-error">with a link</a></p>
+<p class="text-info">Example of INFO text <a href="" class="text-info">with a link</a></p>
+<p class="text-success">Example of SUCCESS text <a href="" class="text-success">with a link</a></p>
+```
+
+## Headings
+
+
+Use `<h2>` as page content heading
+
+```html
+<h1>H1 Cosby sweater vinyl street art</h1>
+<h2>H2 Cosby sweater vinyl street art</h2>
+<h3>H3 Cosby sweater vinyl street art</h3>
+<h4>H4 Cosby sweater vinyl street art</h4>
+<h5>H5 Cosby sweater vinyl street art</h5>
+<h6>H6 Cosby sweater vinyl street art</h6>
+```
+
+## Unordered Lists
+
+```html
+<ul>
+<li>Unordered List Item</li>
+<li>Unordered List Item</li>
+<li>Unordered List Item</li>
+</ul>
+```
+
+## Ordered Lists
+
+```html
+<ol>
+<li>List Item One</li>
+<li>List Item Two</li>
+<li>List Item Three</li>
+</ol>
+```
+
+## Unstyled Lists 
+
+Add `class="unstyled"`
+
+```html
+<ol class="unstyled">
+<li>List Item One</li>
+<li>List Item Two</li>
+<li>List Item Three</li>
+</ol>
+```
+
+## Definition Lists
+
+```html
+<dl>
+  <dt>Acid</dt>
+    <dd>A substance that produces H+(aq) ions in aqueous solution</dd>
+  <dt>Acid Anhydride</dt>
+    <dd>The oxide of a nonmetal that reacts with water to form an acid</dd>
+  <dt>Acid Anhydride</dt>
+    <dd>Compound produced by dehydration of a carbonic acid</dd>
+</dl>
+
+<dl class="dl-horizontal">
+  <dt>Acid</dt>
+    <dd>A substance that produces H+(aq) ions in aqueous solution</dd>
+  <dt>Acid Anhydride</dt>
+    <dd>The oxide of a nonmetal that reacts with water to form an acid</dd>
+  <dt>Acid Anhydride</dt>
+    <dd>Compound produced by dehydration of a carbonic acid</dd>
+</dl>
+```
+
+
+*/

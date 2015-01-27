@@ -202,6 +202,27 @@ module Lti
 
       end
 
+      context 'tool settings' do
+        it 'creates the tool proxy setting object' do
+          message_handler.parameters = [{ "name" => "tool_settings", "variable" => "ToolProxy.custom.url" }]
+          message_handler.save!
+          expect(ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).size).to eq 0
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          expect(ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).size).to eq 1
+        end
+
+        it 'initializes the tool proxy setting with the custom data from the tool proxy' do
+          message_handler.parameters = [{ "name" => "tool_settings", "variable" => "ToolProxy.custom.url" }]
+          message_handler.save!
+          tool_proxy.raw_data = {"custom" => {"data"=> 42}}
+          tool_proxy.save!
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          tool_setting = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).first
+          expect(tool_setting.custom).to eq({"data"=>42})
+        end
+
+      end
+
     end
   end
 end

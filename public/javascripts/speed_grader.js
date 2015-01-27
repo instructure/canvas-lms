@@ -1629,17 +1629,23 @@ define([
     },
 
     showGrade: function(){
-      $grade.val( typeof EG.currentStudent.submission != "undefined" &&
-                  EG.currentStudent.submission.grade !== null ?
-                  EG.currentStudent.submission.grade : "")
-            .attr('disabled', typeof EG.currentStudent.submission != "undefined" &&
-                              EG.currentStudent.submission.submission_type === 'online_quiz');
+      var submission;
+      var grade = "";
+      if ( EG.currentStudent.submission !== undefined ) {
+        submission = EG.currentStudent.submission;
+        if ( submission.grade !== null ) {
+          grade = round(submission.grade, 2);
+        }
+      }
+
+      $grade.val(grade)
+            .attr('disabled', typeof submission != "undefined" &&
+                              submission.submission_type === 'online_quiz');
 
       $('#submit_same_score').hide();
-      if (typeof EG.currentStudent.submission != "undefined" &&
-          EG.currentStudent.submission.score !== null) {
-        $score.text(round(EG.currentStudent.submission.score, round.DEFAULT));
-        if (!EG.currentStudent.submission.grade_matches_current_submission) {
+      if (typeof submission != "undefined" && submission.score !== null) {
+        $score.text(round(submission.score, round.DEFAULT));
+        if (!submission.grade_matches_current_submission) {
           $('#submit_same_score').show();
         }
       } else {

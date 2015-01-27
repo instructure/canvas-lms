@@ -16,6 +16,7 @@ define [
     @optionProperty 'href'
     @optionProperty 'focusStyleClass'
     @optionProperty 'selectedStyleClass'
+    @optionProperty 'autoFetch'
 
     # Handle keyboard events for accessibility.
     events:
@@ -60,6 +61,7 @@ define [
           dndOptions: @dndOptions
           href: @href
           selectedStyleClass: @selectedStyleClass
+          autoFetch: @autoFetch
         }).$el.appendTo(@$tree)
       super
 
@@ -76,6 +78,7 @@ define [
       @$tree.find('[role=treeitem]').not($to).attr('aria-selected', false).removeClass(@focusStyleClass)
       $to.attr 'aria-selected', true
       $to.addClass(@focusStyleClass)
+      $.screenReaderFlashMessageExclusive($to.attr('aria-label'))
       toId = $to.attr 'id'
       if not toId
         toId = _.uniqueId 'treenode-'

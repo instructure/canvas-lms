@@ -1,7 +1,7 @@
 /*
 @styleguide Tables
 
-### Default table
+## Default table
 
 ```html
 <table class="ic-Table">
@@ -36,7 +36,7 @@
 </table>
 ```
 
-### Row-hover table
+## Row-hover table
 
 Adding **.ic-Table--hover-row** to the table element will produce a background color when the user hovers over each table row in the table body.
 
@@ -67,7 +67,7 @@ Adding **.ic-Table--hover-row** to the table element will produce a background c
 </table>
 ```
 
-### Striped table
+## Striped table
 
 Add **.ic-Table--striped** to the table element to produce a striped table among rows in the table body.
 
@@ -103,7 +103,7 @@ Add **.ic-Table--striped** to the table element to produce a striped table among
   </tbody>
 </table>
 ```
-### Row background color options
+## Row background color options
 
 We will reserve $canvas-primary (traditionally blue) for the hover state background color.
 
@@ -140,7 +140,7 @@ We will reserve $canvas-primary (traditionally blue) for the hover state backgro
 </table>
 ```
 
-### Condensed table
+## Condensed table
 
 Add **.ic-Table--condensed** to the table element to reduce the default cell padding.
 
@@ -177,7 +177,7 @@ Add **.ic-Table--condensed** to the table element to reduce the default cell pad
 </table>
 ```
 
-### Table with cog (admin link dropdown)
+## Table with cog (admin link dropdown)
 
 Enclose our standard Cog Dropdown within a **div class="ic-Table--actions** to right-align the button and make sure the cog dropdown appears in the right place.
 
