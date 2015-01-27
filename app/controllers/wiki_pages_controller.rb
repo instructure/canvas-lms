@@ -99,8 +99,7 @@ class WikiPagesController < ApplicationController
 
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
 
-      @has_mark_done_requirement = params[:module_item_id].present? && @page.has_mark_done_requirement?(params[:module_item_id].to_i)
-      @content_tag = @context.context_modules.map {|i| i.content_tags.find {|j| j.content_id == @page.id} }.find(&:present?)
+      @mark_done = MarkDonePresenter.new(@context, @page, @current_user)
       @padless = true
     end
   end
