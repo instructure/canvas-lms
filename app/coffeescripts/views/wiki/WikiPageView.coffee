@@ -68,6 +68,8 @@ define [
       else
         @$sequenceFooter?.msfAnimation(false)
       @$sequenceFooter.appendTo(@$el) if @$sequenceFooter
+      
+      $("body").triggerHandler "wiki-page-rendered"
 
     afterRender: ->
       super

@@ -59,12 +59,7 @@
       <%= @assignment.title %>
     </h1>
 
-    <% if @has_mark_done_requirement %>
-      <div id="mark-as-done-container">
-        <input id="mark-as-done-checkbox" type="checkbox" onchange="var url = '<%= "/api/v1/courses/#{@context.id}/modules/#{@content_tag.context_module_id}/items/#{@content_tag.id}/done" %>'; if (this.checked) {$.ajaxJSON(url, 'PUT')} else {$.ajaxJSON(url, 'DELETE')}">
-        <label for="mark-as-done-checkbox"><%= t(:mark_as_done_checkbox, 'Mark as done') %></label>
-      </div>
-    <% end %>
+    <%= render "shared/mark_as_done" %>
 
     <ul class='student-assignment-overview'>
       <li>

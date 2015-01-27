@@ -147,6 +147,10 @@ class AssignmentsController < ApplicationController
           j.content_id == @assignment.id
         end
       end.find(&:present?)
+      if @has_mark_done_requirement
+        progression = @content_tag.context_module.context_module_progressions.find{|p| p[:user_id] == @current_user.id}
+        @mark_done_checked = progression.requirements_met.find{|r| r[:id] == @content_tag.id && r[:type] == "must_mark_done" } 
+      end
 
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz
