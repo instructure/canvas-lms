@@ -246,16 +246,6 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
-  def has_mark_done_requirement?(module_item_id)
-    # FIXME first() seems unsafe. Can there be more then one context
-    # module tags? How do I select the right one?
-    # FIXME Duplicate method in Assignment
-    context_module = context_module_tags.first.context_module
-    requirements   = context_module.completion_requirements
-    type = requirements.select{|i| i[:id] == module_item_id}.first[:type]
-    type == 'must_mark_done'
-  end
-
   set_policy do
     given {|user, session| self.can_read_page?(user, session)}
     can :read
