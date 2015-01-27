@@ -600,16 +600,18 @@ class Attachment < ActiveRecord::Base
     method = method.to_sym
     deleted_attachments = []
     if method == :rename
-      self.save unless self.id
+      self.save! unless self.id
 
       valid_name = false
-      while !valid_name
-        existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
-        self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
+      self.shard.activate do
+        while !valid_name
+          existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
+          self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
 
-        if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
-                            self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
-          valid_name = true
+          if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
+                              self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
+            valid_name = true
+          end
         end
       end
     elsif method == :overwrite
