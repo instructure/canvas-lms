@@ -294,14 +294,6 @@ class Account < ActiveRecord::Base
     true
   end
 
-  def terms_of_use_url
-    Setting.get('terms_of_use_url', 'http://www.canvaslms.com/policies/terms-of-use')
-  end
-
-  def privacy_policy_url
-    Setting.get('privacy_policy_url', 'http://www.canvaslms.com/policies/privacy-policy')
-  end
-
   def terms_required?
     Setting.get('terms_required', 'true') == 'true'
   end

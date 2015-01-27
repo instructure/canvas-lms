@@ -272,7 +272,6 @@ describe "announcements" do
       expect(ff('.discussion-title')[1]).to include_text("one")
       expect(ff('.discussion-title')[0]).to include_text("two")
       expect(f('.discussion-title')[2]).to be_nil #No 3rd one listed
-      sleep 10
     end
 
     # Search for an announcement by the author of the announcement

@@ -20,7 +20,6 @@ describe "discussions" do
 
     it "should show tool launch links in the gear for items on the index" do
       get "/courses/#{@course.id}/discussion_topics"
-      wait_for_ajaximations
 
       gear = fj("##{@topic.id}_discussion_content .al-trigger")
       gear.click
@@ -32,7 +31,6 @@ describe "discussions" do
 
     it "should show tool launch links in the gear for items on the show page" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_ajaximations
 
       gear = f("#discussion-managebar .al-trigger")
       gear.click

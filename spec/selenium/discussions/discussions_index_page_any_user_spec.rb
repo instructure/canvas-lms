@@ -30,7 +30,6 @@ describe "discussions" do
       context "with blank pages fetched from server" do
         it "should display empty version of view if there are no topics" do
           get url
-          wait_for_ajaximations
           ff('.no-content').each { |div| expect(div).to be_displayed }
         end
 
@@ -51,7 +50,6 @@ describe "discussions" do
                                              })
           end
           get url
-          wait_for_ajaximations
           expect(f('.btn-large')).to be_nil
         end
       end
@@ -60,7 +58,6 @@ describe "discussions" do
         it "should allow subscribing to a topic" do
           topic.unsubscribe(somebody)
           get(url)
-          wait_for_ajaximations
           expect(f('.icon-discussion')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
@@ -74,7 +71,6 @@ describe "discussions" do
         it "should allow unsubscribing from a topic" do
           topic.subscribe(somebody)
           get(url)
-          wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
           expect(f('.icon-discussion-check')).to be_displayed
           f('.subscription-toggler').click

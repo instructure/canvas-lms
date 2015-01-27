@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "ffa3a504ea4959c4faac9c1c6b15959b7a8e3b147dafd0fb6dc142dc9080c221",
-    "current": "ffa3a504ea4959c4faac9c1c6b15959b7a8e3b147dafd0fb6dc142dc9080c221"
+    "previous": "7b54209a1163cdf4c2ce19d9da268eeff3a5cc8224f537c9180a7a906de67b67",
+    "current": "7b54209a1163cdf4c2ce19d9da268eeff3a5cc8224f537c9180a7a906de67b67"
   },
   "fonts": [
     "public/font/canvas/canvas-icons.ttf",
@@ -11,711 +11,719 @@
   ],
   "glyphs": {
     "add": {
-      "codepoint": 61871,
+      "codepoint": 61696,
       "source": "public/font/icons/add.svg"
     },
     "address-book": {
-      "codepoint": 61872,
+      "codepoint": 61697,
       "source": "public/font/icons/address-book.svg"
     },
     "analytics": {
-      "codepoint": 61998,
+      "codepoint": 61698,
       "source": "public/font/icons/analytics.svg"
     },
     "android": {
-      "codepoint": 61873,
+      "codepoint": 61699,
       "source": "public/font/icons/android.svg"
     },
     "announcement": {
-      "codepoint": 61874,
+      "codepoint": 61700,
       "source": "public/font/icons/announcement.svg"
     },
     "apple": {
-      "codepoint": 61875,
+      "codepoint": 61701,
       "source": "public/font/icons/apple.svg"
     },
     "arrow-down": {
-      "codepoint": 62000,
+      "codepoint": 61702,
       "source": "public/font/icons/arrow-down.svg"
     },
     "arrow-left": {
-      "codepoint": 61870,
+      "codepoint": 61703,
       "source": "public/font/icons/arrow-left.svg"
     },
     "arrow-open-left": {
-      "codepoint": 62001,
+      "codepoint": 61704,
       "source": "public/font/icons/arrow-open-left.svg"
     },
     "arrow-open-right": {
-      "codepoint": 62002,
+      "codepoint": 61705,
       "source": "public/font/icons/arrow-open-right.svg"
     },
     "arrow-right": {
-      "codepoint": 61866,
+      "codepoint": 61706,
       "source": "public/font/icons/arrow-right.svg"
     },
     "arrow-up": {
-      "codepoint": 61876,
+      "codepoint": 61707,
       "source": "public/font/icons/arrow-up.svg"
     },
     "assignment": {
-      "codepoint": 61877,
+      "codepoint": 61708,
       "source": "public/font/icons/assignment.svg"
     },
     "audio": {
-      "codepoint": 61878,
+      "codepoint": 61709,
       "source": "public/font/icons/audio.svg"
     },
     "bookmark": {
-      "codepoint": 61879,
+      "codepoint": 61710,
       "source": "public/font/icons/bookmark.svg"
     },
     "calendar-day": {
-      "codepoint": 62027,
+      "codepoint": 61711,
       "source": "public/font/icons/calendar-day.svg"
     },
     "calendar-days": {
-      "codepoint": 62005,
+      "codepoint": 61712,
       "source": "public/font/icons/calendar-days.svg"
     },
     "calendar-month": {
-      "codepoint": 61881,
+      "codepoint": 61713,
       "source": "public/font/icons/calendar-month.svg"
     },
     "check": {
-      "codepoint": 61884,
+      "codepoint": 61714,
       "source": "public/font/icons/check.svg"
     },
     "check-dark": {
-      "codepoint": 61885,
+      "codepoint": 61715,
       "source": "public/font/icons/check-dark.svg"
     },
     "check-mark": {
-      "codepoint": 62007,
+      "codepoint": 61716,
       "source": "public/font/icons/check-mark.svg"
     },
     "check-plus": {
-      "codepoint": 61886,
+      "codepoint": 61717,
       "source": "public/font/icons/check-plus.svg"
     },
     "clock": {
-      "codepoint": 61887,
+      "codepoint": 61718,
       "source": "public/font/icons/clock.svg"
     },
     "cloud-lock": {
-      "codepoint": 62024,
+      "codepoint": 61719,
       "source": "public/font/icons/cloud-lock.svg"
     },
     "collapse": {
-      "codepoint": 61698,
+      "codepoint": 61720,
       "source": "public/font/icons/collapse.svg"
     },
     "collection": {
-      "codepoint": 61888,
+      "codepoint": 61721,
       "source": "public/font/icons/collection.svg"
     },
     "collection-save": {
-      "codepoint": 61889,
+      "codepoint": 61722,
       "source": "public/font/icons/collection-save.svg"
     },
     "complete": {
-      "codepoint": 61831,
+      "codepoint": 61723,
       "source": "public/font/icons/complete.svg"
     },
     "compose": {
-      "codepoint": 61890,
+      "codepoint": 61724,
       "source": "public/font/icons/compose.svg"
     },
     "copy-course": {
-      "codepoint": 61891,
+      "codepoint": 61725,
       "source": "public/font/icons/copy-course.svg"
     },
     "discussion": {
-      "codepoint": 61999,
+      "codepoint": 61726,
       "source": "public/font/icons/discussion.svg"
     },
     "discussion-check": {
-      "codepoint": 61892,
+      "codepoint": 61727,
       "source": "public/font/icons/discussion-check.svg"
     },
     "discussion-new": {
-      "codepoint": 61893,
+      "codepoint": 61728,
       "source": "public/font/icons/discussion-new.svg"
     },
     "discussion-reply": {
-      "codepoint": 61894,
+      "codepoint": 61729,
       "source": "public/font/icons/discussion-reply.svg"
     },
     "discussion-reply-2": {
-      "codepoint": 61895,
+      "codepoint": 61730,
       "source": "public/font/icons/discussion-reply-2.svg"
     },
     "discussion-reply-dark": {
-      "codepoint": 61896,
+      "codepoint": 61731,
       "source": "public/font/icons/discussion-reply-dark.svg"
     },
     "discussion-search": {
-      "codepoint": 61897,
+      "codepoint": 61732,
       "source": "public/font/icons/discussion-search.svg"
     },
     "discussion-x": {
-      "codepoint": 61898,
+      "codepoint": 61733,
       "source": "public/font/icons/discussion-x.svg"
     },
     "document": {
-      "codepoint": 61899,
+      "codepoint": 61734,
       "source": "public/font/icons/document.svg"
     },
     "download": {
-      "codepoint": 61900,
+      "codepoint": 61735,
       "source": "public/font/icons/download.svg"
     },
     "drag-handle": {
-      "codepoint": 61901,
+      "codepoint": 61736,
       "source": "public/font/icons/drag-handle.svg"
     },
     "drop-down": {
-      "codepoint": 61832,
+      "codepoint": 61737,
       "source": "public/font/icons/drop-down.svg"
     },
     "edit": {
-      "codepoint": 61902,
+      "codepoint": 61738,
       "source": "public/font/icons/edit.svg"
     },
     "educators": {
-      "codepoint": 61903,
+      "codepoint": 61739,
       "source": "public/font/icons/educators.svg"
     },
     "email": {
-      "codepoint": 62003,
+      "codepoint": 61740,
       "source": "public/font/icons/email.svg"
     },
     "empty": {
-      "codepoint": 61833,
+      "codepoint": 61741,
       "source": "public/font/icons/empty.svg"
     },
     "end": {
-      "codepoint": 61904,
+      "codepoint": 61742,
       "source": "public/font/icons/end.svg"
     },
     "expand": {
-      "codepoint": 61834,
+      "codepoint": 61743,
       "source": "public/font/icons/expand.svg"
     },
     "expand-items": {
-      "codepoint": 62004,
+      "codepoint": 61744,
       "source": "public/font/icons/expand-items.svg"
     },
     "export-content": {
-      "codepoint": 61905,
+      "codepoint": 61745,
       "source": "public/font/icons/export-content.svg"
     },
     "eye": {
-      "codepoint": 62025,
+      "codepoint": 61746,
       "source": "public/font/icons/eye.svg"
     },
     "facebook": {
-      "codepoint": 61836,
+      "codepoint": 61747,
       "source": "public/font/icons/facebook.svg"
     },
     "facebook-boxed": {
-      "codepoint": 61906,
+      "codepoint": 61748,
       "source": "public/font/icons/facebook-boxed.svg"
     },
     "files-copyright": {
-      "codepoint": 62034,
+      "codepoint": 61749,
       "source": "public/font/icons/files-copyright.svg"
     },
     "files-creative-commons": {
-      "codepoint": 62035,
+      "codepoint": 61750,
       "source": "public/font/icons/files-creative-commons.svg"
     },
     "files-fair-use": {
-      "codepoint": 62036,
+      "codepoint": 61751,
       "source": "public/font/icons/files-fair-use.svg"
     },
     "files-obtained-permission": {
-      "codepoint": 62040,
+      "codepoint": 61752,
       "source": "public/font/icons/files-obtained-permission.svg"
     },
     "files-public-domain": {
-      "codepoint": 62038,
+      "codepoint": 61753,
       "source": "public/font/icons/files-public-domain.svg"
     },
     "filmstrip": {
-      "codepoint": 61907,
+      "codepoint": 61754,
       "source": "public/font/icons/filmstrip.svg"
     },
     "flag": {
-      "codepoint": 61837,
+      "codepoint": 61755,
       "source": "public/font/icons/flag.svg"
     },
     "folder": {
-      "codepoint": 61908,
+      "codepoint": 61756,
       "source": "public/font/icons/folder.svg"
     },
     "forward": {
-      "codepoint": 61838,
+      "codepoint": 61757,
       "source": "public/font/icons/forward.svg"
     },
     "github": {
-      "codepoint": 61909,
+      "codepoint": 61758,
       "source": "public/font/icons/github.svg"
     },
     "gradebook": {
-      "codepoint": 61910,
+      "codepoint": 61759,
       "source": "public/font/icons/gradebook.svg"
     },
     "gradebook-export": {
-      "codepoint": 62041,
+      "codepoint": 61760,
       "source": "public/font/icons/gradebook-export.svg"
     },
     "gradebook-import": {
-      "codepoint": 62042,
+      "codepoint": 61761,
       "source": "public/font/icons/gradebook-import.svg"
     },
     "group": {
-      "codepoint": 61911,
+      "codepoint": 61762,
       "source": "public/font/icons/group.svg"
     },
     "group-new": {
-      "codepoint": 61913,
+      "codepoint": 61763,
       "source": "public/font/icons/group-new.svg"
     },
     "group-new-dark": {
-      "codepoint": 62006,
+      "codepoint": 61764,
       "source": "public/font/icons/group-new-dark.svg"
     },
     "hamburger": {
-      "codepoint": 61839,
+      "codepoint": 61765,
       "source": "public/font/icons/hamburger.svg"
     },
     "heart": {
-      "codepoint": 61914,
+      "codepoint": 61766,
       "source": "public/font/icons/heart.svg"
     },
     "home": {
-      "codepoint": 61915,
+      "codepoint": 61767,
       "source": "public/font/icons/home.svg"
     },
     "hour-glass": {
-      "codepoint": 61840,
+      "codepoint": 61768,
       "source": "public/font/icons/hour-glass.svg"
     },
     "image": {
-      "codepoint": 61916,
+      "codepoint": 61769,
       "source": "public/font/icons/image.svg"
     },
     "import-content": {
-      "codepoint": 61917,
+      "codepoint": 61770,
       "source": "public/font/icons/import-content.svg"
     },
     "indent": {
-      "codepoint": 61918,
+      "codepoint": 61771,
       "source": "public/font/icons/indent.svg"
     },
     "indent2": {
-      "codepoint": 61919,
+      "codepoint": 61772,
       "source": "public/font/icons/indent2.svg"
     },
     "info": {
-      "codepoint": 61841,
+      "codepoint": 61773,
       "source": "public/font/icons/info.svg"
     },
     "instructure": {
-      "codepoint": 61920,
+      "codepoint": 61774,
       "source": "public/font/icons/instructure.svg"
     },
     "invitation": {
-      "codepoint": 61921,
+      "codepoint": 61775,
       "source": "public/font/icons/invitation.svg"
     },
     "like": {
-      "codepoint": 61922,
+      "codepoint": 61776,
       "source": "public/font/icons/like.svg"
     },
     "link": {
-      "codepoint": 61923,
+      "codepoint": 61777,
       "source": "public/font/icons/link.svg"
     },
     "linkedin": {
-      "codepoint": 61842,
+      "codepoint": 61778,
       "source": "public/font/icons/linkedin.svg"
     },
     "lock": {
-      "codepoint": 61924,
+      "codepoint": 61779,
       "source": "public/font/icons/lock.svg"
     },
     "lti": {
-      "codepoint": 61925,
+      "codepoint": 61780,
       "source": "public/font/icons/lti.svg"
     },
     "mark-as-read": {
-      "codepoint": 61926,
+      "codepoint": 61781,
       "source": "public/font/icons/mark-as-read.svg"
     },
     "materials-required": {
-      "codepoint": 61927,
+      "codepoint": 61782,
       "source": "public/font/icons/materials-required.svg"
     },
     "materials-required-light": {
-      "codepoint": 61928,
+      "codepoint": 61783,
       "source": "public/font/icons/materials-required-light.svg"
     },
     "mature": {
-      "codepoint": 61929,
+      "codepoint": 61784,
       "source": "public/font/icons/mature.svg"
     },
     "mature-light": {
-      "codepoint": 61930,
+      "codepoint": 61785,
       "source": "public/font/icons/mature-light.svg"
     },
     "media": {
-      "codepoint": 61931,
+      "codepoint": 61786,
       "source": "public/font/icons/media.svg"
     },
     "message": {
-      "codepoint": 61932,
+      "codepoint": 61787,
       "source": "public/font/icons/message.svg"
     },
     "mini-arrow-down": {
-      "codepoint": 61933,
+      "codepoint": 61788,
       "source": "public/font/icons/mini-arrow-down.svg"
     },
     "mini-arrow-left": {
-      "codepoint": 61934,
+      "codepoint": 61789,
       "source": "public/font/icons/mini-arrow-left.svg"
     },
     "mini-arrow-right": {
-      "codepoint": 61935,
+      "codepoint": 61790,
       "source": "public/font/icons/mini-arrow-right.svg"
     },
     "mini-arrow-up": {
-      "codepoint": 61936,
+      "codepoint": 61791,
       "source": "public/font/icons/mini-arrow-up.svg"
     },
     "minimize": {
-      "codepoint": 61937,
+      "codepoint": 61792,
       "source": "public/font/icons/minimize.svg"
     },
     "module": {
-      "codepoint": 61938,
+      "codepoint": 61793,
       "source": "public/font/icons/module.svg"
     },
     "more": {
-      "codepoint": 61939,
+      "codepoint": 61794,
       "source": "public/font/icons/more.svg"
     },
     "ms-excel": {
-      "codepoint": 61940,
+      "codepoint": 61795,
       "source": "public/font/icons/ms-excel.svg"
     },
     "ms-ppt": {
-      "codepoint": 61941,
+      "codepoint": 61796,
       "source": "public/font/icons/ms-ppt.svg"
     },
     "ms-word": {
-      "codepoint": 61942,
+      "codepoint": 61797,
       "source": "public/font/icons/ms-word.svg"
     },
     "muted": {
-      "codepoint": 61943,
+      "codepoint": 61798,
       "source": "public/font/icons/muted.svg"
     },
     "next-unread": {
-      "codepoint": 61944,
+      "codepoint": 61799,
       "source": "public/font/icons/next-unread.svg"
     },
     "not-graded": {
-      "codepoint": 61945,
+      "codepoint": 61800,
       "source": "public/font/icons/not-graded.svg"
     },
     "note-dark": {
-      "codepoint": 61946,
+      "codepoint": 61801,
       "source": "public/font/icons/note-dark.svg"
     },
     "note-light": {
-      "codepoint": 61947,
+      "codepoint": 61802,
       "source": "public/font/icons/note-light.svg"
     },
     "off": {
-      "codepoint": 61948,
+      "codepoint": 61803,
       "source": "public/font/icons/off.svg"
     },
     "outdent": {
-      "codepoint": 61949,
+      "codepoint": 61804,
       "source": "public/font/icons/outdent.svg"
     },
     "outdent2": {
-      "codepoint": 61950,
+      "codepoint": 61805,
       "source": "public/font/icons/outdent2.svg"
     },
     "paperclip": {
-      "codepoint": 61951,
+      "codepoint": 61806,
       "source": "public/font/icons/paperclip.svg"
     },
     "partial": {
-      "codepoint": 61843,
+      "codepoint": 61807,
       "source": "public/font/icons/partial.svg"
     },
     "pdf": {
-      "codepoint": 61952,
+      "codepoint": 61808,
       "source": "public/font/icons/pdf.svg"
     },
     "peer-graded": {
-      "codepoint": 61953,
+      "codepoint": 61809,
       "source": "public/font/icons/peer-graded.svg"
     },
     "peer-review": {
-      "codepoint": 61954,
+      "codepoint": 61810,
       "source": "public/font/icons/peer-review.svg"
     },
     "pin": {
-      "codepoint": 61955,
+      "codepoint": 61811,
       "source": "public/font/icons/pin.svg"
     },
     "pinterest": {
-      "codepoint": 61956,
+      "codepoint": 61812,
       "source": "public/font/icons/pinterest.svg"
     },
     "plus": {
-      "codepoint": 61957,
+      "codepoint": 61813,
       "source": "public/font/icons/plus.svg"
     },
     "prerequisite": {
-      "codepoint": 61958,
+      "codepoint": 61814,
       "source": "public/font/icons/prerequisite.svg"
     },
     "printer": {
-      "codepoint": 61959,
+      "codepoint": 61815,
       "source": "public/font/icons/printer.svg"
     },
     "publish": {
-      "codepoint": 61960,
+      "codepoint": 61816,
       "source": "public/font/icons/publish.svg"
     },
     "question": {
-      "codepoint": 61844,
+      "codepoint": 61817,
       "source": "public/font/icons/question.svg"
     },
     "quiz": {
-      "codepoint": 61845,
+      "codepoint": 61818,
       "source": "public/font/icons/quiz.svg"
     },
     "quiz-stats-avg": {
-      "codepoint": 61846,
+      "codepoint": 61819,
       "source": "public/font/icons/quiz-stats-avg.svg"
     },
     "quiz-stats-deviation": {
-      "codepoint": 61847,
+      "codepoint": 61820,
       "source": "public/font/icons/quiz-stats-deviation.svg"
     },
     "quiz-stats-high": {
-      "codepoint": 61848,
+      "codepoint": 61821,
       "source": "public/font/icons/quiz-stats-high.svg"
     },
     "quiz-stats-low": {
-      "codepoint": 61849,
+      "codepoint": 61822,
       "source": "public/font/icons/quiz-stats-low.svg"
     },
     "quiz-stats-time": {
-      "codepoint": 61850,
+      "codepoint": 61823,
       "source": "public/font/icons/quiz-stats-time.svg"
     },
     "refresh": {
-      "codepoint": 61851,
+      "codepoint": 61824,
       "source": "public/font/icons/refresh.svg"
     },
     "remove-from-collection": {
-      "codepoint": 61961,
+      "codepoint": 61825,
       "source": "public/font/icons/remove-from-collection.svg"
     },
     "replied": {
-      "codepoint": 61852,
+      "codepoint": 61826,
       "source": "public/font/icons/replied.svg"
     },
     "reply-2": {
-      "codepoint": 61962,
+      "codepoint": 61827,
       "source": "public/font/icons/reply-2.svg"
     },
     "reply-all-2": {
-      "codepoint": 61963,
+      "codepoint": 61828,
       "source": "public/font/icons/reply-all-2.svg"
     },
     "reset": {
-      "codepoint": 61853,
+      "codepoint": 61829,
       "source": "public/font/icons/reset.svg"
     },
     "rss": {
-      "codepoint": 61964,
+      "codepoint": 61830,
       "source": "public/font/icons/rss.svg"
     },
     "rss-add": {
-      "codepoint": 61965,
+      "codepoint": 61831,
       "source": "public/font/icons/rss-add.svg"
     },
     "rubric": {
-      "codepoint": 61966,
+      "codepoint": 61832,
       "source": "public/font/icons/rubric.svg"
     },
     "rubric-dark": {
-      "codepoint": 61967,
+      "codepoint": 61833,
       "source": "public/font/icons/rubric-dark.svg"
     },
     "search": {
-      "codepoint": 61968,
+      "codepoint": 61834,
       "source": "public/font/icons/search.svg"
     },
     "search-address-book": {
-      "codepoint": 61969,
+      "codepoint": 61835,
       "source": "public/font/icons/search-address-book.svg"
     },
     "settings": {
-      "codepoint": 61854,
+      "codepoint": 61836,
       "source": "public/font/icons/settings.svg"
     },
     "settings-2": {
-      "codepoint": 61970,
+      "codepoint": 61837,
       "source": "public/font/icons/settings-2.svg"
     },
     "skype": {
-      "codepoint": 61971,
+      "codepoint": 61838,
       "source": "public/font/icons/skype.svg"
     },
     "speed-grader": {
-      "codepoint": 61972,
+      "codepoint": 61839,
       "source": "public/font/icons/speed-grader.svg"
     },
     "standards": {
-      "codepoint": 61855,
+      "codepoint": 61840,
       "source": "public/font/icons/standards.svg"
     },
     "star": {
-      "codepoint": 61856,
+      "codepoint": 61841,
       "source": "public/font/icons/star.svg"
     },
     "stats": {
-      "codepoint": 61973,
+      "codepoint": 61842,
       "source": "public/font/icons/stats.svg"
     },
     "student-view": {
-      "codepoint": 61857,
+      "codepoint": 61843,
       "source": "public/font/icons/student-view.svg"
     },
     "syllabus": {
-      "codepoint": 61974,
+      "codepoint": 61844,
       "source": "public/font/icons/syllabus.svg"
     },
     "tag": {
-      "codepoint": 61858,
+      "codepoint": 61845,
       "source": "public/font/icons/tag.svg"
     },
     "target": {
-      "codepoint": 61859,
+      "codepoint": 61846,
       "source": "public/font/icons/target.svg"
     },
     "text": {
-      "codepoint": 61860,
+      "codepoint": 61847,
       "source": "public/font/icons/text.svg"
     },
     "text-center": {
-      "codepoint": 61975,
+      "codepoint": 61848,
       "source": "public/font/icons/text-center.svg"
     },
     "text-left": {
-      "codepoint": 61976,
+      "codepoint": 61849,
       "source": "public/font/icons/text-left.svg"
     },
     "text-right": {
-      "codepoint": 61977,
+      "codepoint": 61850,
       "source": "public/font/icons/text-right.svg"
     },
     "timer": {
-      "codepoint": 61978,
+      "codepoint": 61851,
       "source": "public/font/icons/timer.svg"
     },
     "toggle-left": {
-      "codepoint": 61979,
+      "codepoint": 61852,
       "source": "public/font/icons/toggle-left.svg"
     },
     "toggle-right": {
-      "codepoint": 61980,
+      "codepoint": 61853,
       "source": "public/font/icons/toggle-right.svg"
     },
+    "tour-info": {
+      "codepoint": 61854,
+      "source": "public/font/icons/tour-info.svg"
+    },
+    "tour-step-counter": {
+      "codepoint": 61855,
+      "source": "public/font/icons/tour-step-counter.svg"
+    },
     "trash": {
-      "codepoint": 61981,
+      "codepoint": 61856,
       "source": "public/font/icons/trash.svg"
     },
     "trouble": {
-      "codepoint": 61861,
+      "codepoint": 61857,
       "source": "public/font/icons/trouble.svg"
     },
     "twitter": {
-      "codepoint": 61862,
+      "codepoint": 61858,
       "source": "public/font/icons/twitter.svg"
     },
     "twitter-boxed": {
-      "codepoint": 61982,
+      "codepoint": 61859,
       "source": "public/font/icons/twitter-boxed.svg"
     },
     "unknown2": {
-      "codepoint": 61984,
+      "codepoint": 61860,
       "source": "public/font/icons/unknown2.svg"
     },
     "unlock": {
-      "codepoint": 61986,
+      "codepoint": 61861,
       "source": "public/font/icons/unlock.svg"
     },
     "unmuted": {
-      "codepoint": 61987,
+      "codepoint": 61862,
       "source": "public/font/icons/unmuted.svg"
     },
     "unpublish": {
-      "codepoint": 61988,
+      "codepoint": 61863,
       "source": "public/font/icons/unpublish.svg"
     },
     "unpublished": {
-      "codepoint": 61989,
+      "codepoint": 61864,
       "source": "public/font/icons/unpublished.svg"
     },
     "updown": {
-      "codepoint": 61863,
+      "codepoint": 61865,
       "source": "public/font/icons/updown.svg"
     },
     "upload": {
-      "codepoint": 61990,
+      "codepoint": 61866,
       "source": "public/font/icons/upload.svg"
     },
     "user": {
-      "codepoint": 61991,
+      "codepoint": 61867,
       "source": "public/font/icons/user.svg"
     },
     "user-add": {
-      "codepoint": 61992,
+      "codepoint": 61868,
       "source": "public/font/icons/user-add.svg"
     },
     "video": {
-      "codepoint": 61993,
+      "codepoint": 61869,
       "source": "public/font/icons/video.svg"
     },
     "warning": {
-      "codepoint": 61994,
+      "codepoint": 61870,
       "source": "public/font/icons/warning.svg"
     },
     "windows": {
-      "codepoint": 61995,
+      "codepoint": 61871,
       "source": "public/font/icons/windows.svg"
     },
     "wordpress": {
-      "codepoint": 61996,
+      "codepoint": 61872,
       "source": "public/font/icons/wordpress.svg"
     },
     "x": {
-      "codepoint": 61997,
+      "codepoint": 61873,
       "source": "public/font/icons/x.svg"
     },
     "zipped": {
-      "codepoint": 61864,
+      "codepoint": 61874,
       "source": "public/font/icons/zipped.svg"
     }
   },

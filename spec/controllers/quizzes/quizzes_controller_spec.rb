@@ -1137,7 +1137,6 @@ describe Quizzes::QuizzesController do
 
         get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id, :all_versions => '1'
         expect(response).to be_success
-        expect(response.body).to match /Logged Out User/
         expect(response).to render_template('statistics')
       end
     end

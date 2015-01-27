@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def go_to_topic
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajaximations
   end
 
   def create_and_go_to_topic(title = 'new topic', discussion_type = 'side_comment', is_locked = false)

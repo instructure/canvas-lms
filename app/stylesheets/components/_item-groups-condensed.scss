@@ -2,12 +2,14 @@
 
 /* @styleguide Item Groups Condensed
 
-Item groups come either `item-group` or `item-group-condensed` styles.
-The `item-group` style is for draggable items and `item-group-condensed`
-is for items that are not draggable.
+<br/>
+### tl;dr
 
-The outer `item-group-container` div is optional, and adds a background
-color with a dashed line between groups.
+  - Item groups come either `item-group` or `item-group-condensed` styles
+  - The `item-group` style is for draggable items and `item-group-condensed` is for items that are not draggable
+  - The outer `item-group-container` div is optional, and adds a background color with a dashed line between groups
+
+<br/>
 
 ```html
 <div class="item-group-container">
