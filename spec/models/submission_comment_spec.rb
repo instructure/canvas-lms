@@ -31,7 +31,7 @@ describe SubmissionComment do
       :comment => "some comment"
     }
   end
-  
+
   it "should create a new instance given valid attributes" do
     SubmissionComment.create!(@valid_attributes)
   end
@@ -85,7 +85,7 @@ describe SubmissionComment do
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
     expect(@comment.messages_sent).to_not be_include('Submission Comment')
   end
-  
+
   it "should dispatch notification on create to teachers even if submission not submitted yet" do
     assignment_model
     @assignment.workflow_state = 'published'
@@ -99,7 +99,7 @@ describe SubmissionComment do
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
     expect(@comment.messages_sent).to be_include('Submission Comment For Teacher')
   end
-  
+
   it "should allow valid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     @comment = SubmissionComment.create!(@valid_attributes)
@@ -108,7 +108,7 @@ describe SubmissionComment do
     @comment.update_attributes(:attachments => [a])
     expect(@comment.attachment_ids).to eql(a.id.to_s)
   end
-  
+
   it "should reject invalid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     a.recently_created = false
@@ -116,7 +116,7 @@ describe SubmissionComment do
     @comment.update_attributes(:attachments => [a])
     expect(@comment.attachment_ids).to eql("")
   end
-  
+
   it "should render formatted_body correctly" do
     @comment = SubmissionComment.create!(@valid_attributes)
     @comment.comment = %{
@@ -130,7 +130,7 @@ This text has a http://www.google.com link in it...
     expect(body).to match(/\<a/)
     expect(body).to match(/quoted_text/)
   end
-  
+
   it "should send the submission to the stream" do
     assignment_model
     @assignment.workflow_state = 'published'
@@ -160,27 +160,53 @@ This text has a http://www.google.com link in it...
     @comment = @submission.add_comment(:author => se.user, :media_comment_type => 'audio', :media_comment_id => 'fake')
   end
 
-  it "should prevent peer reviewer from seeing other comments" do
-    @student1 = @student
-    @student2 = student_in_course(:active_all => true).user
-    @student3 = student_in_course(:active_all => true).user
+  describe "peer reviews" do
+    before(:once) do
+      @student1 = @student
+      @student2 = student_in_course(:active_all => true).user
+      @student3 = student_in_course(:active_all => true).user
 
-    @assignment.peer_reviews = true
-    @assignment.save!
-    @assignment.assign_peer_review(@student2, @student1)
-    @assignment.assign_peer_review(@student3, @student1)
+      @assignment.peer_reviews = true
+      @assignment.save!
+      @assignment.assign_peer_review(@student2, @student1)
+      @assignment.assign_peer_review(@student3, @student1)
+    end
 
-    @teacher_comment = @submission.add_comment(:author => @teacher, :comment => "some comment from teacher")
-    @reviewer_comment = @submission.add_comment(:author => @student2, :comment => "some comment from peer reviewer")
-    @my_comment = @submission.add_comment(:author => @student3, :comment => "some comment from me")
+    it "should prevent peer reviewer from seeing other comments" do
+      @teacher_comment = @submission.add_comment(:author => @teacher, :comment => "some comment from teacher")
+      @reviewer_comment = @submission.add_comment(:author => @student2, :comment => "some comment from peer reviewer")
+      @my_comment = @submission.add_comment(:author => @student3, :comment => "some comment from me")
 
-    expect(@teacher_comment.grants_right?(@student3, :read)).to be_falsey
-    expect(@reviewer_comment.grants_right?(@student3, :read)).to be_falsey
-    expect(@my_comment.grants_right?(@student3, :read)).to be_truthy
+      expect(@teacher_comment.grants_right?(@student3, :read)).to be_falsey
+      expect(@reviewer_comment.grants_right?(@student3, :read)).to be_falsey
+      expect(@my_comment.grants_right?(@student3, :read)).to be_truthy
 
-    expect(@teacher_comment.grants_right?(@student1, :read)).to be_truthy
-    expect(@reviewer_comment.grants_right?(@student1, :read)).to be_truthy
-    expect(@my_comment.grants_right?(@student1, :read)).to be_truthy
+      expect(@teacher_comment.grants_right?(@student1, :read)).to be_truthy
+      expect(@reviewer_comment.grants_right?(@student1, :read)).to be_truthy
+      expect(@my_comment.grants_right?(@student1, :read)).to be_truthy
+    end
+
+    describe "when anonymous" do
+      before(:once) do
+        @assignment.update_attribute(:anonymous_peer_reviews, true)
+        @reviewer_comment = @submission.add_comment({
+          author: @student2,
+          comment: "My peer review comment."
+        })
+      end
+
+      it "should mark submission comment as anonymous" do
+        expect(@reviewer_comment.anonymous?).to be_truthy
+      end
+
+      it "should prevent reviewed from seeing reviewer name" do
+        expect(@reviewer_comment.grants_right?(@student1, :read_author)).to be_falsey
+      end
+
+      it "should allow teacher to see reviewer name" do
+        expect(@reviewer_comment.grants_right?(@teacher, :read_author)).to be_truthy
+      end
+    end
   end
 
   describe "reply_from" do
@@ -188,8 +214,8 @@ This text has a http://www.google.com link in it...
       comment = @submission.add_comment(:user => @teacher, :comment => "some comment")
       Account.default.destroy
       comment.reload
-      expect { 
-        comment.reply_from(:user => @student, :text => "some reply") 
+      expect {
+        comment.reply_from(:user => @student, :text => "some reply")
       }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
   end

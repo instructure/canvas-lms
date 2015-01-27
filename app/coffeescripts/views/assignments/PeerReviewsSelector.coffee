@@ -16,6 +16,7 @@ define [
     AUTO_PEER_REVIEWS         = '#assignment_automatic_peer_reviews'
     PEER_REVIEWS_DETAILS      = '#peer_reviews_details'
     AUTO_PEER_REVIEWS_OPTIONS = '#automatic_peer_reviews_options'
+    ANONYMOUS_PEER_REVIEWS    = '#anonymous_peer_reviews'
 
     events: do ->
       events = {}
@@ -48,6 +49,7 @@ define [
     toJSON: =>
       frozenAttributes = @parentModel.frozenAttributes()
 
+      anonymousPeerReviews: @parentModel.anonymousPeerReviews()
       peerReviews: @parentModel.peerReviews()
       automaticPeerReviews: @parentModel.automaticPeerReviews()
       peerReviewCount: @parentModel.peerReviewCount()

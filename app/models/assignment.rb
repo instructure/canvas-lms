@@ -33,7 +33,7 @@ class Assignment < ActiveRecord::Base
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-    :group_category, :group_category_id, :peer_review_count,
+    :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
     :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled,

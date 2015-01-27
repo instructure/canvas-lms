@@ -37,6 +37,7 @@ module Api::V1::Assignment
       unlock_at
       assignment_group_id
       peer_reviews
+      anonymous_peer_reviews
       automatic_peer_reviews
       post_to_sis
       grade_group_students_individually
@@ -256,6 +257,7 @@ module Api::V1::Assignment
     assignment_group_id
     group_category_id
     peer_reviews
+    anonymous_peer_reviews
     peer_reviews_assign_at
     peer_review_count
     automatic_peer_reviews

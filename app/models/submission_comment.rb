@@ -99,6 +99,13 @@ class SubmissionComment < ActiveRecord::Base
 
     given {|user, session| self.submission.grants_right?(user, session, :grade) }
     can :read and can :delete
+
+    given { |user, session|
+      !self.anonymous? ||
+        self.author == user ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades)
+    }
+    can :read_author
   end
 
   set_broadcast_policy do |p|
@@ -172,6 +179,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def infer_details
+    self.anonymous = self.submission.assignment.anonymous_peer_reviews
     self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
@@ -181,7 +189,6 @@ class SubmissionComment < ActiveRecord::Base
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.save
   end
-
 
   def attachments
     ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
@@ -215,7 +222,7 @@ class SubmissionComment < ActiveRecord::Base
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
   end
-  
+
   def avatar_path
     "/images/users/#{User.avatar_key(self.author_id)}"
   end
