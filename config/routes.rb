@@ -1613,6 +1613,7 @@ CanvasRails::Application.routes.draw do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", controller: :lti_api, action: :legacy_grade_passback, as: "blti_legacy_grade_passback_api"
     post "xapi/:token", controller: :lti_api, action: :xapi_service, as: "lti_xapi"
+    post "caliper/:token", controller: :lti_api, action: :caliper_service, as: "lti_caliper"
     post "logout_service/:token", controller: :lti_api, action: :logout_service, as: "lti_logout_service"
   end
 

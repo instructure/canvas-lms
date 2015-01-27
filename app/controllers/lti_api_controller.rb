@@ -80,7 +80,7 @@ class LtiApiController < ApplicationController
   # * object.id will be logged as url
   # * result.duration must be an ISO 8601 duration if supplied
   def xapi_service
-    token = Lti::XapiService::Token.parse_and_validate(params[:token])
+    token = Lti::AnalyticsService::Token.parse_and_validate(params[:token])
     verify_oauth(token.tool)
 
     if request.content_type != "application/json"
@@ -88,6 +88,44 @@ class LtiApiController < ApplicationController
     end
 
     Lti::XapiService.log_page_view(token, params)
+
+    return render :text => '', :status => 200
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
+    return render :text => e, :status => 401
+  end
+
+  #
+  #  {
+  #   "@context": "http://purl.imsglobal.org/ctx/caliper/v1/ViewEvent",
+  #   "@type": "http://purl.imsglobal.org/caliper/v1/ViewEvent",
+  #   "action": "viewed",
+  #   "startedAtTime": 1402965614516,
+  #   "duration": null,
+  #   "actor": {
+  #     "@id": "(the_lti_guid_sent_for_the_user)lkasdfklasdfjklasdl",
+  #     "@type": "http://purl.imsglobal.org/caliper/v1/lis/Person"
+  #   },
+  #   "object": {
+  #     "@id": "https://example.com/my_tools/url",
+  #     "@type": "http://www.idpf.org/epub/vocab/structure/#volume", // don't know...
+  #     "name": "Some name"
+  #   },
+  #   "edApp": {
+  #     "@id": "https://example.com/some/fake/thing/for/my/app",
+  #     "@type": "http://purl.imsglobal.org/caliper/v1/SoftwareApplication",
+  #     "name": "demo app",
+  #     "properties": {},
+  #     "lastModifiedTime": 1402965614516
+  #   }
+  # }
+  #
+  # * object.@id will be logged as url
+  # * duration must be an ISO 8601 duration if supplied
+  def caliper_service
+    token = Lti::AnalyticsService::Token.parse_and_validate(params[:token])
+    verify_oauth(token.tool)
+
+    Lti::CaliperService.log_page_view(token, params)
 
     return render :text => '', :status => 200
   rescue BasicLTI::BasicOutcomes::Unauthorized => e
