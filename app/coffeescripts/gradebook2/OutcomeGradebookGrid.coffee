@@ -392,7 +392,7 @@ define [
 
       calculateRatingsTotals: (grid, column) ->
         results = Grid.View.getColumnResults(grid.getData(), column)
-        ratings = column.outcome.ratings
+        ratings = column.outcome.ratings || []
         ratings.result_count = results.length
         points = _.pluck ratings, 'points'
         counts = _.countBy results, (result) ->

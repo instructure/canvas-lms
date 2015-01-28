@@ -20,7 +20,7 @@ module Outcomes
   module ResultAnalytics
 
     Rollup = Struct.new(:context, :scores)
-    RollupScore = Struct.new(:outcome, :score, :count, :title, :submitted_at)
+    Result = Struct.new(:learning_outcome, :score, :count)
 
     # Public: Queries learning_outcome_results for rollup.
     #
@@ -79,13 +79,12 @@ module Outcomes
     def aggregate_outcome_results_rollup(results, context)
       rollups = outcome_results_rollups(results)
       rollup_scores = rollups.map(&:scores).flatten
-      outcome_scores = rollup_scores.group_by(&:outcome)
-
-      aggregate_scores = outcome_scores.map do |outcome, scores|
-        aggregate_score = scores.map(&:score).sum.to_f / scores.size
-        RollupScore.new(outcome, aggregate_score, scores.size)
+      outcome_results = rollup_scores.group_by(&:outcome).values
+      aggregate_results = outcome_results.map do |scores|
+        scores.map{|score| Result.new(score.outcome, score.score, score.count)}
       end
-      Rollup.new(context, aggregate_scores)
+      aggregate_rollups = aggregate_results.map{|result| RollupScore.new(result,{aggregate_score: true})}
+      Rollup.new(context, aggregate_rollups)
     end
 
     # Internal: Generates a rollup of the outcome results, Assuming all the
@@ -97,22 +96,7 @@ module Outcomes
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results)
       outcome_scores = user_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
-        outcome = outcome_results.first.learning_outcome
-        user_rollup_score = calculate_results(outcome_results, {
-          # || 'highest' is for outcomes created prior to this update with no
-          # method set so they'll keep their initial behavior
-          calculation_method: outcome.calculation_method || "highest",
-          calculation_int: outcome.calculation_int
-        })
-        latest_result = outcome_results.max_by{|result| result.submitted_at.to_i}
-        if !latest_result.submitted_at
-          # don't pass in a title for comparison if there are no submissions with timestamps
-          # otherwise grab the portion of the title that has the assignment/quiz's name
-          latest_result.title = nil
-        else
-          latest_result.title = latest_result.title.split(", ")[1]
-        end
-        RollupScore.new(outcome, user_rollup_score, outcome_results.size, latest_result.title, latest_result.submitted_at)
+        RollupScore.new(outcome_results)
       end
     end
 
@@ -126,42 +110,6 @@ module Outcomes
     def add_missing_user_rollups(rollups, users)
       missing_users = users - rollups.map(&:context)
       rollups + missing_users.map { |u| Rollup.new(u, []) }
-    end
-
-    def calculate_results(results, method)
-      # decaying average is default for new outcomes
-      score = case method[:calculation_method]
-        when 'decaying_average'
-          decaying_average(results, method[:calculation_int])
-        when 'n_mastery'
-          n_mastery(results, method[:calculation_int])
-        when 'latest'
-          latest(results)
-        when 'highest'
-          results.max_by{|result| result.score}.score
-      end
-      score
-    end
-    #scoring methods
-    def latest(results)
-      results.max_by{|result| result.submitted_at.to_i}.score
-    end
-
-    def n_mastery(results, n_of_scores)
-      return nil if results.length < n_of_scores
-
-      scores = results.map(&:score).sort.last(n_of_scores)
-      (scores.sum / scores.length).round(2)
-    end
-
-    def decaying_average(results, weight = 75)
-      #default grading method with weight of 75 if none selected
-      return nil if results.length < 2
-
-      scores = results.sort_by{|result| result.submitted_at.to_i}.map(&:score)
-      latestWeighted = scores.pop * (0.01 * weight)
-      olderAvgWeighted = (scores.sum / scores.length) * (0.01 * (100 - weight)).round(2)
-      latestWeighted + olderAvgWeighted
     end
 
     class << self

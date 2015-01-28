@@ -1,12 +1,32 @@
-<div class="outcome-details carat-right">
+<div class="outcome-details">
   <div class="head-content" tabindex="0">
+    {{#if path}}
+    <div class="title">{{path}}</div>
+    <div class="chart">
+      {{#if ratings.result_count}}
+        <div class="chart-image pull-left"></div>
+        <ol class="ratings pull-left">
+        {{#each ratings}}
+          <li class="rating"><span class="legend-color" style="background-color: {{color}}" /> {{description}}</li>
+        {{/each}}
+        </ol>
+      {{else}}
+        <p><img src="/images/pie-chart-disabled.png" /></p>
+        <p>{{#t "no_results"}}(no results){{/t}}</p>
+      {{/if}}
+    </div>
+    <div class="outcome-info">
+      <div class="mastery">{{#t "mastery_set_at"}}Mastery set at{{/t}}: {{mastery_points}}</div>
+      {{#if description}}<div class="description">{{{description}}}</div>{{/if}}
+    </div>
+    {{else}}
     <div class="mastery-details pull-right" aria-hidden="true">
-      {{#if scoreDefined}}
-        <span>{{score}} / {{masteryPoints}}</span>
-        {{#ifEqual masteryLevel 'mastery'}}
+      {{#if score}}
+        <span>{{score}} / {{mastery_points}}</span>
+        {{#ifEqual status 'mastery'}}
           <i class="icon-check mastery"></i>
         {{else}}
-          {{#ifEqual masteryLevel 'near'}}
+          {{#ifEqual status 'near'}}
           <i class="icon-plus near-mastery"></i>
           {{else}}
           <i class="icon-x remedial"></i>
@@ -17,16 +37,23 @@
       {{/if}}
     </div>
     <div class="recent-details">
-      <div class="last-assessment">{{#t}}Last Assessment: {{latestTitle}}{{/t}}</div>
-      <div class="submission-time">{{datetimeFormatted submissionTime}}</div>
+      <div class="last-assessment">{{#t}}Latest Assessment{{/t}}:&nbsp;
+        {{#if result_title}}
+          {{result_title}}
+        {{else}}
+          {{#t}}Not available until next submission{{/t}}
+        {{/if}}
+      </div>
+      <div class="submission-time">{{datetimeFormatted submission_time}}</div>
     </div>
     <div class="screenreader-only">
-      {{#if scoreDefined}}
+      {{#if score}}
         {{#t}}Current Mastery Score: {{score}} out of {{masteryPoints}}{{/t}}
       {{else}}
         {{#t}}No score yet{{/t}}
       {{/if}}
     </div>
+    {{/if}}
   </div>
   <div class="method-details content-box pad-box-mini border border-trbl border-round">
     <div>

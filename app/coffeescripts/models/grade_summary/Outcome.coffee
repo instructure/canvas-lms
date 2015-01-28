@@ -1,8 +1,13 @@
 define [
   'underscore'
   'Backbone'
-], (_, {Model, Collection}) ->
+  'compiled/models/grade_summary/CalculationMethodContent'
+], (_, {Model, Collection}, CalculationMethodContent) ->
+
   class Outcome extends Model
+    defaults:
+      calculation_method: "highest"
+
     initialize: ->
       super
       @set 'friendly_name', @get('display_name') || @get('title')
@@ -39,6 +44,9 @@ define [
 
     masteryPercent: ->
       @get('mastery_points')/@get('points_possible') * 100
+
+    present: ->
+      _.extend({}, @toJSON(), new CalculationMethodContent(@).present())
 
     toJSON: ->
       _.extend super,

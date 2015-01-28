@@ -24,7 +24,6 @@ describe Outcomes::ResultAnalytics do
   let(:ra) { Outcomes::ResultAnalytics }
   let(:time) { Time.now }
   Rollup = Outcomes::ResultAnalytics::Rollup
-  RollupScore = Outcomes::ResultAnalytics::RollupScore
 
   # ResultAnalytics only uses a few fields, so use some mock stuff to avoid all
   # the surrounding database logic
@@ -46,10 +45,11 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 2.0],
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 3.0],
       ]
-      expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80], 2.0, 1),
-        RollupScore.new(MockOutcome[81], 3.0, 1),
-      ]
+      rollup = ra.rollup_user_results(results)
+      expect(rollup.size).to eq 2
+      rollup.each.with_index do |ru, i|
+        expect(ru.outcome_results.first).to eq results[i]
+      end
     end
   end
 
@@ -61,9 +61,10 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 3.0],
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 1.0],
       ]
-      expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80], 3.0, 2)
-      ]
+      rollup = ra.rollup_user_results(results)
+      expect(rollup.size).to eq 1
+      expect(rollup[0].count).to eq 2
+      expect(rollup[0].score).to eq 3.0
     end
 
     it 'returns maximum score when highest score method is selected' do
@@ -71,9 +72,9 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'highest'], 3.0],
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'highest'], 1.0],
       ]
-      expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80, 'highest'], 3.0, 2)
-      ]
+      rollup = ra.rollup_user_results(results)
+      expect(rollup[0].score).to eq 3.0
+      expect(rollup[0].outcome.calculation_method).to eq "highest"
     end
 
     it 'returns correct score when latest score method is selected' do
@@ -82,9 +83,8 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 3.0, "name, o1", time],
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 1.0, "name, o1", time - 1.day]
       ]
-      expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80, 'latest'], 3.0, 3, "o1", time)
-      ]
+      rollups = ra.rollup_user_results(results)
+      expect(rollups[0].score).to eq 3.0
     end
 
     it 'properly calculates results when method is n# of scores for mastery' do
@@ -102,11 +102,9 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 1.0],
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 3.0],
       ]
-      expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80, 'n_mastery', 3], nil, 2),
-        RollupScore.new(MockOutcome[81, 'n_mastery', 5], nil, 3),
-        RollupScore.new(MockOutcome[82, 'n_mastery', 4], 3.25, 4),
-      ]
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.size).to eq 3
+      expect(rollups.map(&:score)).to eq [nil, nil, 3.25]
     end
 
     it 'properly calculates results when method is decaying average' do
@@ -119,10 +117,9 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 1.0, "name, o2", time - 2.days],
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 3.0, "name, o2", time - 3.days],
       ]
-      expect(ra.rollup_user_results(results)).to eq [
-        RollupScore.new(MockOutcome[80, 'decaying_average', 75], nil, 1, "o1", time),
-        RollupScore.new(MockOutcome[81, 'decaying_average', 75], 3.75, 4, "o2", time),
-      ]
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.size).to eq 2
+      expect(rollups.map(&:score)).to eq [nil, 3.75]
     end
   end
 
@@ -131,13 +128,14 @@ describe Outcomes::ResultAnalytics do
       results = [
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 4.0],
         MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 5.0],
+        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 3.0],
       ]
       users = [MockUser[10, 'a'], MockUser[30, 'c']]
-      expect(ra.outcome_results_rollups(results, users)).to eq [
-        Rollup.new(MockUser[10, 'a'], [ RollupScore.new(MockOutcome[80], 4.0, 1) ]),
-        Rollup.new(MockUser[20, 'b'], [ RollupScore.new(MockOutcome[80], 5.0, 1) ]),
-        Rollup.new(MockUser[30, 'c'], []),
-      ]
+      rollups = ra.outcome_results_rollups(results, users)
+      rollup_scores = ra.rollup_user_results(results).map(&:outcome_results).flatten
+      rollups.each.with_index do |rollup, i|
+        expect(rollup.scores.map(&:outcome_results).flatten).to eq rollup_scores.find_all{|score| score.user.id == rollup.context.id}
+      end
     end
   end
 
@@ -155,13 +153,10 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[40, 'd'], MockOutcome[81], 7.0],
       ]
       aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
-      expect(aggregate_result).to eq Rollup.new(
-        fake_context,
-        [
-          RollupScore.new(MockOutcome[80], 2.5, 4),
-          RollupScore.new(MockOutcome[81], 6.0, 3),
-        ]
-      )
+      expect(aggregate_result.size).to eq 2
+      expect(aggregate_result.scores.map(&:score)).to eq [2.5, 6.0]
+      expect(aggregate_result.scores[0].outcome_results.size).to eq 4
+      expect(aggregate_result.scores[1].outcome_results.size).to eq 3
     end
   end
 
