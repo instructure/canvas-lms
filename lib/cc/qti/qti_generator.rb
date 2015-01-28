@@ -193,6 +193,8 @@ module CC
           q_node.one_question_at_a_time quiz.one_question_at_a_time?
           q_node.cant_go_back quiz.cant_go_back?
           q_node.available quiz.available?
+          q_node.one_time_results quiz.one_time_results?
+          q_node.show_correct_answers_last_attempt quiz.show_correct_answers_last_attempt?
           if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = CCHelper.create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|

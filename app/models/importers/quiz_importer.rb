@@ -199,6 +199,8 @@ module Importers
         cant_go_back
         require_lockdown_browser_monitor
         lockdown_browser_monitor_data
+        one_time_results
+        show_correct_answers_last_attempt
       ].each do |attr|
         attr = attr.to_sym
         item.send("#{attr}=", hash[attr]) if hash.key?(attr)

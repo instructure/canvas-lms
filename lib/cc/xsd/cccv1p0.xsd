@@ -497,6 +497,8 @@
         <xs:element name="allowed_attempts" type="xs:integer" minOccurs="0"/>
         <xs:element name="one_question_at_a_time" type="xs:boolean" minOccurs="0"/>
         <xs:element name="cant_go_back" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="one_time_results" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="show_correct_answers_last_attempt" type="xs:boolean" minOccurs="0"/>
         <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
 
         <xs:element name="quiz_type" minOccurs="0" default="practice_quiz">
