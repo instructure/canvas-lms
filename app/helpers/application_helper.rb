@@ -736,7 +736,7 @@ module ApplicationHelper
   end
 
   def include_account_css
-    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :k12) || @domain_root_account.try(:feature_enabled?, :use_new_styles)
+    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :use_new_styles)
     includes = get_global_includes.inject([]) do |css_includes, global_include|
       css_includes << global_include[:css] if global_include[:css].present?
       css_includes
