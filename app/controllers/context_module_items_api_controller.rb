@@ -505,7 +505,6 @@ class ContextModuleItemsApiController < ApplicationController
   end
 
   def mark_as_not_done
-    # FIXME 
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
       mod = @context.modules_visible_to(user).find(params[:module_id])
@@ -513,11 +512,10 @@ class ContextModuleItemsApiController < ApplicationController
       progression = item.context_module.context_module_progressions.find{|p| p[:user_id] == @current_user.id}
       requirement = progression.requirements_met.find{|r| r[:id] == item.id}
       progression.requirements_met.delete(requirement)
+      progression.save
       render :nothing => true, :status => :no_content
     end
   end
-
-
 
   MAX_SEQUENCES = 10
 
