@@ -66,7 +66,6 @@ describe "announcements" do
       announcement_title = 'Hi there!'
       announcement = @course.announcements.create!(:title => announcement_title, :message => 'Announcement time!', :delayed_post_at => Time.now + 1.day)
       get "/courses/#{@course.id}/announcements"
-      wait_for_ajaximations
 
       expect(f('#content')).to include_text('There are no announcements to show')
       announcement.update_attributes(:delayed_post_at => nil)
@@ -81,7 +80,6 @@ describe "announcements" do
       group.add_user(@student, 'accepted')
 
       get "/groups/#{group.id}/announcements"
-      wait_for_ajaximations
       expect {
         create_announcement_option(nil)
         expect_new_page_load { submit_form('.form-actions') }

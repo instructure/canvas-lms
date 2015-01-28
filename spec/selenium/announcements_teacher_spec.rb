@@ -20,7 +20,6 @@ describe "announcements" do
           what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => @user) : announcement_model(:title => title, :user => @user)
         end
         get url
-        wait_for_ajaximations
         @checkboxes = ff('.toggleSelected')
       end
 
@@ -134,7 +133,6 @@ describe "announcements" do
       it "should reorder topics" do
         3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
         get url
-        wait_for_ajax_requests
 
         topics = ff('.discussion-topic')
         driver.action.move_to(topics[0]).perform
@@ -160,7 +158,6 @@ describe "announcements" do
 
     it "should add and remove an external feed to announcements" do
       get "/courses/#{@course.id}/announcements"
-      wait_for_ajaximations
 
       #add external feed to announcements
       feed_name = 'http://www.google.com'
