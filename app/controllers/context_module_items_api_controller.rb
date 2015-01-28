@@ -482,7 +482,18 @@ class ContextModuleItemsApiController < ApplicationController
   end
 
 
-  # FIXME Document API
+  # @API Mark module item as done/not done
+  #
+  # Mark a module item as done/not done. Use HTTP method PUT to mark as done,
+  # and DELETE to mark as not done.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id>/done \
+  #       -X Put \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @returns ModuleItem
   def mark_as_done
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
