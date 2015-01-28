@@ -30,7 +30,7 @@ define [
       if (all_dates = @get('all_dates'))?
         @set 'all_dates', new DateGroupCollection(all_dates)
       if (@postToSISEnabled())
-        unless @get('post_to_sis') == true || @get('post_to_sis') == false
+        if !@get('id') && @get('post_to_sis') != false
           @set 'post_to_sis', true
 
     isQuiz: => @_hasOnlyType 'online_quiz'

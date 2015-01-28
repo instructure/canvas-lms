@@ -35,6 +35,14 @@ module I18nTasks
           import.markdown_and_wrappers('hello *world*').should == ['*-wrap']
         end
 
+        it 'finds wrappers with whitespace' do
+          import.markdown_and_wrappers('hello * world *').should == ['*-wrap']
+        end
+
+        it 'finds nested wrappers' do
+          import.markdown_and_wrappers('hello * **world** *').should == ['**-wrap', '*-wrap']
+        end
+
         context 'a single-line string' do
           it 'doesn\'t find headings' do
             import.markdown_and_wrappers("# users").should == []

@@ -85,10 +85,12 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [String, "students"|"avatar_url"]
+  # @argument include[] [String, "students"|"avatar_url"|"enrollments"]
   #   - "students": Associations to include with the group. Note: this is only
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
+  #   - "enrollments": If 'students' is also included, return the section
+  #      enrollment for each student
   #
   # @returns [Section]
   def index

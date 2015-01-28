@@ -21,6 +21,7 @@ module Outcomes
 
     Rollup = Struct.new(:context, :scores)
     RollupScore = Struct.new(:outcome, :score, :count)
+    NullDate = Time.new('')
 
     # Public: Queries learning_outcome_results for rollup.
     #
@@ -97,7 +98,13 @@ module Outcomes
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results)
       outcome_scores = user_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
-        user_rollup_score = outcome_results.map(&:score).max
+        outcome = outcome_results.first.learning_outcome
+        user_rollup_score = calculate_results(outcome_results, {
+          # || 'highest' is for outcomes created prior to this update with no
+          # method set so they'll keep their initial behavior
+          calculation_method: outcome.calculation_method || "highest",
+          calculation_int: outcome.calculation_int
+        })
         RollupScore.new(outcome_results.first.learning_outcome, user_rollup_score, outcome_results.size)
       end
     end
@@ -112,6 +119,42 @@ module Outcomes
     def add_missing_user_rollups(rollups, users)
       missing_users = users - rollups.map(&:context)
       rollups + missing_users.map { |u| Rollup.new(u, []) }
+    end
+
+    def calculate_results(results, method)
+      # decaying average is default for new outcomes
+      score = case method[:calculation_method]
+        when 'decaying_average'
+          decaying_average(results, method[:calculation_int])
+        when 'n_mastery'
+          n_mastery(results, method[:calculation_int])
+        when 'latest'
+          latest(results)
+        when 'highest'
+          results.map(&:score).max
+      end
+      score
+    end
+    #scoring methods
+    def latest(results)
+      results.max_by{|result| result.submitted_at || NullDate}.score
+    end
+
+    def n_mastery(results, n_of_scores)
+      return nil if results.length < n_of_scores
+
+      scores = results.map(&:score).sort.last(n_of_scores)
+      (scores.sum / scores.length).round(2)
+    end
+
+    def decaying_average(results, weight = 75)
+      #default grading method with weight of 75 if none selected
+      return nil if results.length < 2
+
+      scores = results.sort_by{|result| result.submitted_at || NullDate}.map(&:score)
+      latestWeighted = scores.pop * (0.01 * weight)
+      olderAvgWeighted = (scores.sum / scores.length) * (0.01 * (100 - weight)).round(2)
+      latestWeighted + olderAvgWeighted
     end
 
     class << self

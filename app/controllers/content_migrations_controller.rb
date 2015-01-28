@@ -171,6 +171,7 @@ class ContentMigrationsController < ApplicationController
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
       js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
       js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
+      js_env(:SHOW_SELECT => @current_user.manageable_courses.count <= 100)
     end
   end
 

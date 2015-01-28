@@ -1,0 +1,60 @@
+{
+  "name": "canvas_quizzes",
+  "title": "Canvas Quizzes",
+  "description": "Quiz apps for Canvas, the LMS by Instructure.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ahmad Amireh",
+    "email": "ahmad@instructure.com",
+    "url": "http://www.instructure.com"
+  },
+  "licenses": [],
+  "keywords": [
+    "canvas",
+    "lms"
+  ],
+  "scripts": {
+    "start": "./node_modules/grunt-cli/bin/grunt",
+    "test": "./node_modules/grunt-cli/bin/grunt test",
+    "build": "./node_modules/grunt-cli/bin/grunt compile_js"
+  },
+  "files": [
+    "dist/canvas_quizzes.js",
+    "dist/canvas_quizzes/apps/events/js/main.js",
+    "dist/canvas_quizzes/apps/statistics/js/main.js",
+    "src/css/main.scss",
+    "apps/events/css/main.scss"
+  ],
+  "requirejs": {
+    "bundledDependencies": [
+      "rsvp",
+      "qtip"
+    ]
+  },
+
+  "dependencies": {
+    "fs-extra": "0.12.0",
+    "grunt-connect-proxy": "0.1.11",
+    "grunt-connect-rewrite": "0.2.1",
+    "grunt-contrib-connect": "0.8.0",
+    "grunt-contrib-jasmine": "0.8.0",
+    "grunt-contrib-jshint": "0.10.0",
+    "grunt-contrib-watch": "0.6.1",
+    "grunt-jsduck": "1.0.1",
+    "grunt-sass": "0.14.1",
+    "grunt-template-jasmine-requirejs": "git://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0",
+    "jasmine_react": "1.2.4",
+    "jasmine_rsvp": "1.0.0",
+    "jasmine_xhr": "1.0.2",
+    "jquery": "2.1.1",
+    "jshint-stylish-ex": "0.2.0",
+    "node-sass": "0.9.3",
+    "canvas_react_i18n": "1.1.1",
+    "glob": "4.0.5",
+    "grunt": "0.4.5",
+    "grunt-cli": "0.1.13",
+    "lodash": "2.4.1",
+    "react-tools": "0.11.2",
+    "shelljs": "0.1.2"
+  }
+}

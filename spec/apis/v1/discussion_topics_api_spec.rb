@@ -124,7 +124,6 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should make a basic topic" do
-      set_course_draft_state
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>" })
@@ -160,7 +159,6 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should create a topic with all the bells and whistles" do
-      set_course_draft_state
       post_at = 1.month.from_now
       lock_at = 2.months.from_now
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
@@ -1217,9 +1215,8 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.parent_entry).to be_nil
       expect(@entry.message).to eq @message
     end
-
+    
     it "should not allow students to create an entry under a topic that is closed for comments" do
-      @course.enable_feature!(:draft_state)
       @topic.lock!
       student_in_course(:course => @course, :active_all => true)
       api_call(

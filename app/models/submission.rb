@@ -271,6 +271,7 @@ class Submission < ActiveRecord::Base
     strip_tags((self.body || "").gsub(/\<\s*br\s*\/\>/, "\n<br/>").gsub(/\<\/p\>/, "</p>\n"))
   end
 
+  TURNITIN_STATUS_RETRY = 11
   def check_turnitin_status(attempt=1)
     self.turnitin_data ||= {}
     turnitin = nil
@@ -283,7 +284,7 @@ class Submission < ActiveRecord::Base
       data = self.turnitin_data[asset_string]
       next unless data && data.is_a?(Hash) && data[:object_id]
       if data[:similarity_score].blank?
-        if attempt < TURNITIN_RETRY
+        if attempt < TURNITIN_STATUS_RETRY
           turnitin ||= Turnitin::Client.new(*self.context.turnitin_settings)
           res = turnitin.generateReport(self, asset_string)
           if res[:similarity_score]
@@ -310,7 +311,7 @@ class Submission < ActiveRecord::Base
       self.turnitin_data[asset_string] = data
     end
 
-    send_at((5 * attempt).minutes.from_now, :check_turnitin_status, attempt + 1) if needs_retry
+    send_at((2 ** attempt).minutes.from_now, :check_turnitin_status, attempt + 1) if needs_retry
     self.turnitin_data_changed!
     self.save
   end

@@ -182,7 +182,7 @@ namespace :js do
       end
     end
 
-    maintain_client_app_symlinks('public/javascripts')
+    maintain_client_app_symlinks
   end
 
   desc "generates compiled coffeescript, handlebars templates and plugin extensions"

@@ -4,9 +4,9 @@
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
     :CAN_MANAGE_MODULES => can_do(@context, @current_user, :manage_content),
+    :IS_STUDENT => can_do(@context, @current_user, :participate_as_student),
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
-    :ENABLE_DRAFT => @context.feature_enabled?(:draft_state),
   })
 %>
 <% js_bundle :context_modules %>
@@ -185,8 +185,12 @@ input.move-module-label-spacer {
 <div class="header-bar">
   <% if can_do(@context, @current_user, :manage_content) %>
     <div class="header-bar-right">
-      <a class="btn btn-small module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
-      <button class="btn btn-small btn-primary add_module_link"><%= t('#context_modules.buttons.add_module', 'Create a Module') %></button>
+      <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
+      <button class="btn btn-primary add_module_link">
+        <i class="icon-plus" role="presentation"></i> 
+        <span class="screenreader-only">Add</span>
+        <%= t('#context_modules.buttons.add_module', 'Module') %>
+      </button>
     </div>
   <% end %>
 </div>

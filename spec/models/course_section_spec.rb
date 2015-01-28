@@ -273,6 +273,34 @@ describe CourseSection, "moving to new course" do
     end
   end
 
+  describe 'dependent destroys' do
+    before :once do
+      course_with_teacher
+      @course.assignments.build
+      @assignment = @course.assignments.build("title"=>"test")
+      @assignment.save!
+      @section = @course.course_sections.create!
+    end
+
+    it 'should soft destroy overrides when destroyed' do
+      @override = @assignment.assignment_overrides.build
+      @override.set = @section
+      @override.save!
+      expect(@override.workflow_state).to eq("active")
+      @section.destroy
+      @override.reload
+      expect(@override.workflow_state).to eq("deleted")
+    end
+
+    it 'should soft destroy enrollments when destroyed' do
+      @enrollment = @course.enroll_student(User.create, {section: @section})
+      expect(@enrollment.workflow_state).to eq("creation_pending")
+      @section.destroy
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq("deleted")
+    end
+  end
+
   describe 'deletable?' do
     before :once do
       course_with_teacher

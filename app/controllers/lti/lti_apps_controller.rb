@@ -18,31 +18,30 @@ module Lti
   class LtiAppsController < ApplicationController
     before_filter :require_context
     before_filter :require_user
-    include Lti::ApiServiceHelper
 
-    def launch_definitions
+    def index
       if authorized_action(@context, @current_user, :update)
-        placements = params['placements'] || []
-        collection = AppCollator.bookmarked_collection(@context, placements)
+        app_collator = AppCollator.new(@context)
+        collection = app_collator.bookmarked_collection
 
         respond_to do |format|
-          launch_defs = Api.paginate(collection, self, launch_definitions_url)
-          format.json { render :json => AppCollator.launch_definitions(launch_defs, placements) }
+          app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
+          format.json {render json: app_collator.app_definitions(app_defs)}
         end
       end
     end
 
+    def launch_definitions
+      if authorized_action(@context, @current_user, :update)
+        placements = params['placements'] || []
+        collection = AppLaunchCollator.bookmarked_collection(@context, placements)
 
-    private
-
-    def launch_definitions_url
-      if @context.is_a? Course
-        api_v1_course_launch_definitions_url(@context)
-      else
-        api_v1_account_launch_definitions_url(@context)
+        respond_to do |format|
+          launch_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true))
+          format.json { render :json => AppLaunchCollator.launch_definitions(launch_defs, placements) }
+        end
       end
     end
-
 
   end
 end

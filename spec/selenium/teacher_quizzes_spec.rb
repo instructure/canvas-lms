@@ -2,9 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes" do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"
@@ -120,7 +117,6 @@ describe "quizzes" do
 
     
     it "should republish on save" do
-      Account.default.enable_feature!(:draft_state)
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       quiz = Quizzes::Quiz.last

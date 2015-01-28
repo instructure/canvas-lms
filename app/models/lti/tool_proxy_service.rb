@@ -56,6 +56,8 @@ module Lti
       tool_proxy.shared_secret = tp.security_contract.shared_secret
       tool_proxy.product_version = tp.tool_profile.product_instance.product_info.product_version
       tool_proxy.lti_version = tp.tool_profile.lti_version
+      tool_proxy.name = tp.tool_profile.product_instance.product_info.default_name
+      tool_proxy.description = tp.tool_profile.product_instance.product_info.default_description
       tool_proxy.context = context
       tool_proxy.workflow_state = 'disabled'
       tool_proxy.raw_data = tp.as_json
@@ -181,7 +183,7 @@ module Lti
       invalid_services = []
       tp.security_contract.services.each do |service|
         id = service.service.split('#').last
-        invalid_actions = service.actions - allowed_services[id]
+        invalid_actions = service.actions - ( allowed_services[id] || [] )
         invalid_services << {id: id, actions: invalid_actions} if invalid_actions.present?
       end
       invalid_services

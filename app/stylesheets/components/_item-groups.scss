@@ -312,6 +312,10 @@ is for items that are not draggable.
   }
 }
 
+.ig-list .icon-drag-handle {
+  color: $canvas-secondary;
+}
+
 .ig-details [class^=span] {
   white-space: nowrap;
 }

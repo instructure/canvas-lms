@@ -68,4 +68,28 @@ describe GradingPeriod do
       expect(@grading_period).to_not be_destroyed
     end
   end
+
+  describe '#assignments' do
+    before :once do
+      Account.default.set_feature_flag! :multiple_grading_periods, 'on'
+      course_with_teacher active_all: true
+      gpg = @course.grading_period_groups.create!
+      now = Time.zone.now
+      @gp1, @gp2 = 2.times.map { |n|
+        gpg.grading_periods.create! start_date: n.months.since(now),
+          end_date: (n+1).months.since(now),
+          weight: 1
+      }
+      @a1, @a2 = [@gp1, @gp2].map { |gp|
+        @course.assignments.create! due_at: gp.start_date + 1
+      }
+      # no due date goes in final grading period
+      @a3 = @course.assignments.create!
+    end
+
+    it 'filters assignments for grading period' do
+      expect(@gp1.assignments(@course.assignments)).to eq [@a1]
+      expect(@gp2.assignments(@course.assignments)).to eq [@a2, @a3]
+    end
+  end
 end

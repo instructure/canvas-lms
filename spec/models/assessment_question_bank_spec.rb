@@ -44,15 +44,15 @@ describe AssessmentQuestionBank do
     end
 
     it "should return the desired count of questions" do
-      expect(@bank.select_for_submission(0).length).to eq 0
-      expect(@bank.select_for_submission(2).length).to eq 2
-      expect(@bank.select_for_submission(4).length).to eq 4
-      expect(@bank.select_for_submission(11).length).to eq 10
+      expect(@bank.select_for_submission(@quiz.id, 0).length).to eq 0
+      expect(@bank.select_for_submission(@quiz.id, 2).length).to eq 2
+      expect(@bank.select_for_submission(@quiz.id, 4).length).to eq 4
+      expect(@bank.select_for_submission(@quiz.id, 11).length).to eq 10
     end
 
     it "should exclude specified questions" do
       original = [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
-      selected_ids = @bank.select_for_submission(10, [@q1.id, @q10.id]).map {|q| q.id }
+      selected_ids = @bank.select_for_submission(@quiz.id, 10, [@q1.id, @q10.id]).map(&:assessment_question_id)
 
       expect(selected_ids.include?(@q1.id)).to be_falsey
       expect(selected_ids.include?(@q10.id)).to be_falsey
@@ -63,8 +63,8 @@ describe AssessmentQuestionBank do
     it "should return the questions in a random order" do
       original = [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
 
-      selected1 = @bank.select_for_submission(10).map {|q| q.id }
-      selected2 = @bank.select_for_submission(10).map {|q| q.id }
+      selected1 = @bank.select_for_submission(@quiz.id, 10).map(&:id)
+      selected2 = @bank.select_for_submission(@quiz.id, 10).map(&:id)
 
       # make sure at least one is shuffled
       is_shuffled1 = (original != selected1)

@@ -52,4 +52,5 @@ define [
           showMessage: true
           contextType: context.contextType
           contextId: context.contextId
+          afterChooseBlur: -> $('.uploadFileBtn')[0]
         ), $element[0])

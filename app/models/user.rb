@@ -138,6 +138,7 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
   has_many :sis_batches
+  has_many :sis_post_grades_statuses
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
@@ -1717,9 +1718,13 @@ class User < ActiveRecord::Base
     end
   end
 
+  def group_membership_key
+    [self, 'current_group_memberships', ApplicationController.region].cache_key
+  end
+
   def cached_current_group_memberships
     self.shard.activate do
-      @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships', ApplicationController.region].cache_key) do
+      @cached_current_group_memberships = Rails.cache.fetch(group_membership_key) do
         self.current_group_memberships.shard(self.in_region_associated_shards).to_a
       end
     end

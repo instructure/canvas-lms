@@ -10,8 +10,8 @@ module DataFixup::AddRoleOverridesForNewPermission
       new_overrides = RoleOverride.where(:permission => new_permission, :context_id => base_overrides.map(&:context_id))
 
       base_overrides.each do |ro|
-        new_ro = new_overrides.detect{|nro| nro.context_id == ro.context_id && nro.context_type == ro.context_type }
-        new_ro ||= RoleOverride.new
+        next if new_overrides.detect{|nro| nro.context_id == ro.context_id && nro.context_type == ro.context_type && nro.role_id == ro.role_id }
+        new_ro = RoleOverride.new
         new_ro.permission = new_permission
         attrs = ro.attributes.slice(*%w{context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env})
         new_ro.assign_attributes(attrs, :without_protection => true)

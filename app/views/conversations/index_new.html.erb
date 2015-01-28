@@ -7,10 +7,18 @@
 <div class="conversations">
   <header class="panel">
     <div class="filters">
-      <span aria-hidden="true" class="screenreader-only" id="course-filter-description"><%= t(:filter_messages_by_course, "Filter messages by course") %></span>
+      <span aria-hidden="true" class="screenreader-only" id="course-filter-description">
+        <%= t(:filter_messages_by_course, "Filter messages by course") %>
+        &nbsp;
+        <span class="current-selection-label"></span>
+      </span>
       <select class="course-filter" id="course-filter" aria-labelledby="course-filter-description"></select>
 
-      <span aria-hidden="true" class="screenreader-only" id="type-filter-description"><%= t(:filter_messages_by_type, "Filter messages by type") %></span>
+      <span aria-hidden="true" class="screenreader-only" id="type-filter-description">
+        <%= t(:filter_messages_by_type, "Filter messages by type") %>
+        &nbsp;
+        <span class="current-selection-label"></span>
+      </span>
       <select class="type-filter show-tick" id="type-filter" aria-labelledby="type-filter-description">
         <option value="inbox"><%= t(:inbox, "Inbox") %></option>
         <option value="unread"><%= t(:unread, "Unread") %></option>

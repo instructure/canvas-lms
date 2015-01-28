@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe "QuizRegrading" do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   def create_quiz_question!(data)
     question = @quiz.quiz_questions.create!

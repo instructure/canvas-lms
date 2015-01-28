@@ -19,7 +19,6 @@ define [
 
   fixtures.create()
   setup = (isDraftState=false, sortOrder='assignment_group') ->
-    window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = isDraftState
     originalWeightingScheme =  window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     @contextGetStub = sinon.stub(userSettings, 'contextGet')
     @contextSetStub = sinon.stub(userSettings, 'contextSet')
@@ -38,7 +37,6 @@ define [
       })
 
   teardown = ->
-    window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = false
     window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme = originalWeightingScheme
     @contextGetStub.restore()
     @contextSetStub.restore()

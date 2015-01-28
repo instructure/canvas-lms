@@ -1066,8 +1066,8 @@ class ConversationsController < ApplicationController
     case context
     when nil then false
     when Account then valid_account_context?(context)
-    # might want to add some validation for Course and Group.
-    else true
+    when Course, Group then context.grants_right?(@current_user, session, :send_messages)
+    else false
     end
   end
 

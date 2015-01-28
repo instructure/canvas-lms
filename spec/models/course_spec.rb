@@ -450,6 +450,7 @@ describe Course do
       @course.discussion_topics.create!
       @course.quizzes.create!
       @course.assignments.create!
+      @course.wiki.set_front_page_url!('front-page')
       @course.wiki.front_page.save!
       @course.self_enrollment = true
       @course.sis_source_id = 'sis_id'
@@ -1144,7 +1145,8 @@ describe Course, "gradebook_to_csv" do
   context "differentiated assignments" do
     def setup_DA
       @course_section = @course.course_sections.create
-      @student1, @student2, @student3 = create_users(3, return_type: :record)
+      user_attrs = [{name: 'student1'}, {name: 'student2'}, {name: 'student3'}]
+      @student1, @student2, @student3 = create_users(user_attrs, return_type: :record)
       @assignment = @course.assignments.create!(title: "a1", only_visible_to_overrides: true)
       @course.enroll_student(@student3, :enrollment_state => 'active')
       @section = @course.course_sections.create!(name: "section1")
@@ -1166,7 +1168,6 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "should insert N/A for non-visible assignments" do
-      skip('fragile')
       csv = @course.gradebook_to_csv(:user => @teacher)
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)

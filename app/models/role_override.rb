@@ -725,6 +725,11 @@ class RoleOverride < ActiveRecord::Base
         :label => lambda { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :view_quiz_answer_audits => {
+        :label => lambda { t('permissions.view_quiz_answer_audits', 'View the answer matrix in Quiz Submission Logs')},
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
       }
     })
 

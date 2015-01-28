@@ -89,12 +89,19 @@ define [
         NoResults {search_term: @props.query.search_term}
       else
         div role: 'grid',
+          div {
+            ref: 'accessibilityMessage'
+            className: 'SearchResults__accessbilityMessage col-xs'
+            tabIndex: 0
+          },
+            I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")
           ColumnHeaders {
             to: 'search'
             query: @props.query
             params: @props.params
             toggleAllSelected: @props.toggleAllSelected
             areAllItemsSelected: @props.areAllItemsSelected
+            usageRightsRequiredForContext: @props.usageRightsRequiredForContext
           }
           @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
             FolderChild
@@ -103,6 +110,7 @@ define [
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
               userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
               externalToolsForContext: @props.externalToolsForContext
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
@@ -115,3 +123,4 @@ define [
               params: @props.params
               query: @props.query
               collection: @state.collection
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext

@@ -1481,6 +1481,30 @@ describe CoursesController, type: :request do
         expect(sorted_users).to eq expected_users
       end
 
+      it "returns concluded enrollments if ?enrollment_state[]=concluded" do
+        @ta.enrollments.each(&:conclude)
+
+        json = api_call(:get, api_url, api_route, :enrollment_state => ["invited","active"], :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).to be_empty
+
+        json = api_call(:get, api_url, api_route, :enrollment_state => ["invited","active","completed"], :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).not_to be_empty
+      end
+
+      it "returns active and invited enrollments if no enrollment state is given" do
+        json = api_call(:get, api_url, api_route, :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).not_to be_empty
+
+        @ta.enrollments.each(&:conclude)
+
+        json = api_call(:get, api_url, api_route, :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).to be_empty
+      end
+
       it "accepts a list of enrollment_types" do
         ta2 = user(:name => 'SSS Helper')
         ta2_enroll1 = @course1.enroll_user(ta2, 'TaEnrollment', :section => @section1)
@@ -1510,7 +1534,12 @@ describe CoursesController, type: :request do
 
       it "should respect includes" do
         @user = @course1.teachers.first
-        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['email'])
+        @ta.profile.bio = 'hey'
+        @ta.save!
+        @course1.root_account.settings[:enable_profiles] = true
+        @course1.root_account.save!
+
+        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['email', 'bio'])
 
         expect(json).to eq [
           {
@@ -1518,7 +1547,8 @@ describe CoursesController, type: :request do
             'name' => 'TAPerson',
             'sortable_name' => 'TAPerson',
             'short_name' => 'TAPerson',
-            'email' => 'ta@ta.com'
+            'email' => 'ta@ta.com',
+            'bio' => 'hey'
           }
         ]
       end
@@ -1982,6 +2012,7 @@ describe CoursesController, type: :request do
         'end_at' => @course1.end_at,
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
+        'is_public' => @course1.is_public,
         'workflow_state' => @course1.workflow_state,
         'storage_quota_mb' => @course1.storage_quota_mb,
         'apply_assignment_group_weights' => false,

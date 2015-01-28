@@ -40,6 +40,7 @@ class Enrollment < ActiveRecord::Base
   has_many :role_overrides, :as => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
+  has_many :grading_period_grades
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :user_id, :course_id, :type, :uuid, :workflow_state, :created_at, :updated_at, :associated_user_id, :sis_source_id, :sis_batch_id, :start_at, :end_at,

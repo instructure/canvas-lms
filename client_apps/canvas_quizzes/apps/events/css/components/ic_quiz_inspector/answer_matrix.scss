@@ -1,0 +1,98 @@
+.ic-AnswerMatrix__Table {
+  tr {
+    &.active {
+      td:hover {
+        background: white;
+      }
+    }
+  }
+
+  &.expanded, tr.active {
+    td:not(:first-of-type) { text-align: left; }
+  }
+
+  th {
+    min-width: 80px;
+
+    small {
+      display: block;
+    }
+
+    &:first-of-type { width: 100px; }
+  }
+
+  th, td {
+    text-align: center;
+    vertical-align: top;
+  }
+
+  pre {
+    border: none;
+    padding: 0;
+    background: transparent;
+    text-align: left;
+    word-break: normal;
+    white-space: pre;
+  }
+
+  &.ic-Table--striped {
+    th, td {
+      border: 1px solid $can-border-light;
+      vertical-align: top;
+    }
+  }
+}
+
+#ic-AnswerMatrix {
+  .table-scroller {
+    overflow: auto;
+    position: relative;
+  }
+}
+
+.ic-AnswerMatrix__Emblem {
+  border-radius: 8px;
+  width: 12px;
+  height: 12px;
+  line-height: 1;
+  display: inline-block;
+
+  // this to negate the visual effect of the outer 2px box shadow defined
+  // on every emblem, otherwise they look 2 pixels "above the line":
+  margin-bottom: -2px;
+  margin-left: 2px;
+
+  &.is-empty {
+    box-shadow: 0 0 0 2px $primaryFg;
+  }
+
+  &.is-answered {
+    background: $primaryFg;
+    box-shadow: 0 0 0 2px $primaryFg, 0 0 0 3px white inset;
+  }
+
+  &.is-last {
+    box-shadow: 0 0 0 2px $primaryFg;
+  }
+}
+
+#ic-AnswerMatrix__Legend {
+  background: $can-bg-light-neutral;
+  padding: $whitespace;
+
+  .ic-AnswerMatrix__Emblem {
+    margin-right: 8px;
+    vertical-align: middle;
+    margin-top: -3px;
+  }
+
+  dt { // hide it visually, only show to screenreaders
+    opacity: 0;
+    position: absolute;
+  }
+
+  dd {
+    display: inline-block;
+    margin: 0 $whitespace*2 0 0;
+  }
+}

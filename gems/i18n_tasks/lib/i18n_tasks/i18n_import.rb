@@ -109,6 +109,8 @@ module I18nTasks
       end
     end
 
+    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|\-)\s/
+
     def markdown_and_wrappers(str)
       # Since underscores can be wrappers, and underscores can also be inside
       # placeholders (as placeholder names) we need to be unambiguous about
@@ -119,7 +121,7 @@ module I18nTasks
       #   reference links, e.g. "[an example][id]"
       #   indented code
       matches = scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) # escaped special char
-        .concat(scan_and_report(dashed_str, /(\*+|_+|`+)[^\s].*?[^\s]?\1/).map { |m| "#{m[0]}-wrap" }) # wrappers
+        .concat(wrappers(dashed_str))
         .concat(scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" }) # links
 
       # only do fancy markdown checks on multi-line strings
@@ -127,9 +129,29 @@ module I18nTasks
         matches.concat(scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" }) # headings
                .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0]=='=' ? 'h1' : 'h2' }) # moar headings
                .concat(scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" })
-               .concat(scan_and_report(dashed_str, /^ {0,3}(\d+\.|\*|\+|\-)\s/).map { |m| m.first =~ /\d/ ? "1." : "*" })
+               .concat(scan_and_report(dashed_str, LIST_ITEM_PATTERN).map { |m| m.first =~ /\d/ ? "1." : "*" })
       end
       matches.uniq.sort
+    end
+
+    # return array of balanced wrappers in the source string, e.g.
+    # "* **ohai** * user, *welcome*!" => ["**-wrap", "*-wrap"]
+    def wrappers(str)
+      pattern = /\*+|\++|`+/
+      str = str.gsub(LIST_ITEM_PATTERN, '') # ignore markdown lists
+      parts = scan_and_report(str, pattern)
+      stack = []
+      result = []
+      parts.each do |part|
+        next if part !~ pattern
+        if stack.last == part
+          result << "#{part}-wrap"
+          stack.pop
+        else
+          stack << part
+        end
+      end
+      result.uniq
     end
 
     def placeholders(str)

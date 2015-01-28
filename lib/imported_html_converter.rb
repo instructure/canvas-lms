@@ -54,7 +54,7 @@ class ImportedHtmlConverter
             #todo: FLAG UNFOUND REFERENCES TO re-attempt in second loop?
             if wiki_migration_id = $1
               if linked_wiki = context.wiki.wiki_pages.where(migration_id: wiki_migration_id).first
-                new_url = "#{course_path}/wiki/#{linked_wiki.url}"
+                new_url = "#{course_path}/pages/#{linked_wiki.url}"
               end
             end
           elsif val =~ /discussion_topic_migration_id=(.*)/
@@ -74,7 +74,7 @@ class ImportedHtmlConverter
             type = 'context_modules' if type == 'modules'
             type = 'pages' if type == 'wiki'
             if type == 'pages'
-              new_url = "#{course_path}/#{context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/#{migration_id}"
+              new_url = "#{course_path}/pages/#{migration_id}"
             elsif type == 'attachments'
               if att = context.attachments.where(migration_id: migration_id).first
                 new_url = "#{course_path}/files/#{att.id}/preview"

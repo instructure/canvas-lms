@@ -87,7 +87,6 @@ describe "Importers::QuizImporter" do
 
   it "should not build an assignment, instead set to unpublished" do
     context = get_import_context
-    context.enable_feature!(:draft_state)
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     data = {'assessments' => {'assessments' => [quiz_hash]}}
@@ -104,7 +103,6 @@ describe "Importers::QuizImporter" do
 
   it "should not create an extra assignment if it already references one (but not set unpublished)" do
     context = get_import_context
-    context.enable_feature!(:draft_state)
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     assignment_hash = get_import_data 'vista', 'assignment'

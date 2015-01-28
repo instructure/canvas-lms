@@ -3,7 +3,7 @@ require [
   "jquery.instructure_misc_plugins"
 ], ($, _miscPlugins) ->
   $(document).ready ->
-    $("#wizard_box").bind "wizard_opened", ->
+    $("#wizard_box").addClass("wizard-box--course").bind "wizard_opened", ->
       $(this).find(".option.intro").click()
 
     $("#wizard_box").click (event) ->
@@ -14,5 +14,3 @@ require [
 
     $(".wizard_options_list .option .header").mouseover (event) ->
       $(this).parents(".option").click()
-
-

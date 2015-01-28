@@ -49,6 +49,21 @@ describe SectionsController, type: :request do
       expect(json.find { |s| s['name'] == section2.name }['students']).to eq api_json_response([user2], :only => USER_API_FIELDS)
     end
 
+    it "should return the list of enrollments if 'students' and 'enrollments' flags are given" do
+      user1 = @user
+      user2 = User.create!(:name => 'Zombo')
+      section1 = @course2.default_section
+      section2 = @course2.course_sections.create!(:name => 'Section B')
+      @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
+      @user = @me
+
+      json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
+                      { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students','enrollments'] })
+      expect(json.size).to eq 2
+      expect(json.find { |s| s['name'] == section1.name }['students'][0]['enrollments'][0]["user_id"]).to eq(user1.id)
+      expect(json.find { |s| s['name'] == section2.name }['students'][0]['enrollments'][0]["user_id"]).to eq(user2.id)
+    end
+
     it "should not return deleted sections" do
       section1 = @course2.default_section
       section2 = @course2.course_sections.create!(:name => 'Section B')
