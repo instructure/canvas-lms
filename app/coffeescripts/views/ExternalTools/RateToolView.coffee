@@ -17,7 +17,7 @@ define [
       'textarea[name="review_text"]': '$reviewText'
 
     afterRender: ->
-      @$reviewText.html(@model.get('comments'))
+      @$reviewText.val(@model.get('comments'))
 
       @$rateAppStar.raty
         path     : '/images/raty/'

@@ -1,0 +1,12 @@
+---
+- name: apt - add key for passenger repos
+  apt_key: url=http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x561F9B9CAC40B2F7 id=AC40B2F7 state=present
+
+- name: apt - add support for https
+  apt: pkg={{ item }} state=installed update_cache=yes cache_valid_time=3600
+  with_items:
+  - apt-transport-https
+  - ca-certificates
+
+- name: apt - add passenger repo
+  apt_repository: repo='deb https://oss-binaries.phusionpassenger.com/apt/passenger {{ ansible_lsb.codename }} main' state=present update_cache=yes

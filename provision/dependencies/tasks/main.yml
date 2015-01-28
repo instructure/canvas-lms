@@ -1,0 +1,34 @@
+- name: Add nodesource
+  sudo: yes
+  shell: curl -sL https://deb.nodesource.com/setup | bash -
+
+- name: Install dependencies
+  sudo: yes
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - zlib1g-dev
+    - libxml2-dev
+    - libmysqlclient-dev
+    - libxslt1-dev
+    - imagemagick
+    - libpq-dev
+    - libxmlsec1-dev
+    - libcurl4-gnutls-dev
+    - libxmlsec1
+    - build-essential
+    - openjdk-7-jre
+    - unzip
+    - python-software-properties
+    - nodejs
+    - git
+    - ruby1.9.3
+    - ruby-dev
+    - redis-server
+
+- name: Remove ruby 2.0
+  sudo: yes
+  apt: pkg=ruby2.0 state=absent
+
+- name: Update npm to latest
+  sudo: yes
+  shell: npm -g install npm

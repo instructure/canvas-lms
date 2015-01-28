@@ -1,0 +1,4 @@
+---
+- name: canvas_init restart
+  service: name=canvas_init state=restarted
+  sudo: yes

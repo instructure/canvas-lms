@@ -38,7 +38,7 @@ define [
       rect = @get('element').getBoundingClientRect()
       x = event.originalEvent.clientX - rect.left
       ghost = $('<div class="module-ghost"/>')
-      ghost.html(@get('module.name'))
+      ghost.text(@get('module.name'))
       ghost.appendTo(document.body)
       event.dataTransfer.setDragImage(ghost[0], x, 10)
       Ember.run.later(ghost, 'remove', 0)
