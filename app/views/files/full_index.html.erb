@@ -300,13 +300,13 @@
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_until, "Lock Until" %></td>
         <td>
-          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;", :'aria-label' => t("Lock Until Date") %>
         </td>
       </tr><tr class="lock_range full_lock">
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_after, "Lock After" %></td>
         <td>
-          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;", :"aria-label" => t("Lock After Date") %>
         </td>
       </tr><tr>
         <td colspan="3">
@@ -341,13 +341,13 @@
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_until, "Lock Until" %></td>
         <td>
-          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;", :"aria-label" => t("Lock Until Date") %>
         </td>
       </tr><tr class="lock_range full_lock">
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_after, "Lock After" %></td>
         <td>
-          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;", :"aria-label" => t("Lock After Date") %>
         </td>
       </tr><tr>
         <td colspan="3">

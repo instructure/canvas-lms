@@ -11,12 +11,14 @@
   </div>
   <div class="lock-header">
     <label id="overrides_unlock_at">
-    {{#t "overrides.available_from"}}Available From{{/t}}
+    <span aria-hidden="true">{{#t "overrides.available_from"}}Available From{{/t}}</span>
+    <span class="screenreader-only">{{#t}}Available From Date{{/t}}</span>
     </label>
   </div>
   <div class="unlock-header">
     <label id="overrides_lock_at">
-    {{#t "until"}}Until{{/t}}
+    <span aria-hidden="true">{{#t "until"}}Until{{/t}}</span>
+    <span class="screenreader-only">{{#t}}Available Until Date{{/t}}</span>
     </label>
   </div>
 

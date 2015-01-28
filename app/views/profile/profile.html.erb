@@ -593,7 +593,7 @@ TEXT
         <tr>
           <td><%= f.blabel :expires_at, :en => "Expires" %></td>
           <td>
-            <div><%= f.text_field :expires_at, :class => "expires_field datetime_field", :style => "width: 120px;" %></div>
+            <div><%= f.text_field :expires_at, :class => "expires_field datetime_field", :style => "width: 120px;", :"aria-label" => t("Expires on Date") %></div>
             <div style="font-size: 0.8em;" class="hint"><%= t('hints.expires_at', "leave blank for no expiration") %></div>
           </td>
         </tr>

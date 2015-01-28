@@ -239,7 +239,7 @@ define [
                     defaultValue: $.datetimeString(@state.unlock_at) if @state.unlock_at,
                     className: 'form-control dateSelectInput',
                     type: 'text',
-                    'aria-label': I18n.t('Available From')
+                    'aria-label': I18n.t('Available From Date')
               div className: 'control-group',
                 label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('Available Until')
                   div className: 'controls dateSelectInputContainer',
@@ -248,7 +248,7 @@ define [
                     defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at,
                     className: 'form-control dateSelectInput',
                     type: 'text'
-                    'aria-label': I18n.t('Available Until')
+                    'aria-label': I18n.t('Available Until Date')
 
           div className:"form-controls",
             button {
