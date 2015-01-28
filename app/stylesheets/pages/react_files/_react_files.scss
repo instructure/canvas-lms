@@ -299,6 +299,7 @@ $ef-thumbnail-size: 36px;
   padding: 0;
   border: 0;
   margin: 0;
+  overflow: hidden;
 
   &:focus {
     // We'll bring back in all the defaults on focus as well as bring the height back
