@@ -196,8 +196,11 @@ module BasicLTI
           self.code_major = 'failure'
           self.description = error_message
         elsif assignment.points_possible.nil?
-          submission = Submission.create!(submission_hash.merge(:user => user,
-                                                                :assignment => assignment))
+
+          unless submission = Submission.where(user_id: user.id, assignment_id: assignment).first
+            submission = Submission.create!(submission_hash.merge(:user => user,
+                                                                  :assignment => assignment))
+          end
           submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<-NO_POINTS, :grade => submission_hash[:grade]))
 An external tool attempted to grade this assignment as %{grade}, but was unable
 to because the assignment has no points possible.
