@@ -554,8 +554,8 @@ describe "Outcomes API", type: :request do
             "highest" => nil,
             "latest" => nil,
           }
-          norm_error_message = "not a valid calculation_int"
-          no_calc_int_error_message = "'calculation_int' is not used with calculation_method"
+          norm_error_message = "not a valid 'calculation_int'"
+          no_calc_int_error_message = "'calculation_int' is not used with 'calculation_method'"
           bad_calc_int = 1500
 
           method_to_int.each do |method, int|

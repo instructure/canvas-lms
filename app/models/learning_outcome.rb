@@ -87,14 +87,16 @@ class LearningOutcome < ActiveRecord::Base
     # if we've been used to assess a student, refuse to accept any changes to our calculation options
     if calculation_method_changed?
       errors.add(:calculation_method, t(
-        "This outcome has been used to assess a student. Calculation method is fixed at %{old_value}",
+        "This outcome has been used to assess a student. '%{calc_int_method_name}' is fixed at %{old_value}",
+        :calc_int_method_name => "calculation_method",
         :old_value => calculation_method_was
       ))
     end
 
     if calculation_int_changed?
       errors.add(:calculation_int, t(
-        "This outcome has been used to assess a student. Calculation integer is fixed at %{old_value}",
+        "This outcome has been used to assess a student. '%{calc_int_key_name}' is fixed at %{old_value}",
+        :calc_int_key_name => "calculation_int",
         :old_value => calculation_int_was
       ))
     end
@@ -104,13 +106,17 @@ class LearningOutcome < ActiveRecord::Base
     unless valid_calculation_int?(calculation_int, calculation_method)
       if valid_calculation_ints.to_a.empty?
         errors.add(:calculation_int, t(
-          "'calculation_int' is not used with calculation_method '%{calculation_method}'",
+          "'%{calc_int_key_name}' is not used with '%{calc_method_key_name}' '%{calculation_method}'",
+          :calc_int_key_name => "calculation_int",
+          :calc_method_key_name => "calculation_method",
           :calculation_method => calculation_method,
         ))
       else
         errors.add(:calculation_int, t(
-          "'%{calculation_int}' is not a valid calculation_int for calculation_method of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'",
+          "'%{calculation_int}' is not a valid '%{calc_int_key_name}' for '%{calc_method_key_name}' of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'",
           :calculation_int => calculation_int,
+          :calc_int_key_name => "calculation_int",
+          :calc_method_key_name => "calculation_method",
           :calculation_method => calculation_method,
           :valid_calculation_ints => valid_calculation_ints
         ))
