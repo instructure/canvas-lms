@@ -686,7 +686,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       res << answer
       tally += answer["points"].to_f rescue 0
     end
-    self.score = tally
+
+    # Graded surveys always get the full points
+    if quiz && quiz.graded_survey?
+      self.score = quiz.points_possible
+    else
+      self.score = tally
+    end
+
     self.submission_data = res
 
     # the interaction in here is messy

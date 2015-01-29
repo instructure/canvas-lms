@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmission do
-
   context 'with course and quiz' do
   before(:once) do
     course
@@ -138,6 +137,29 @@ describe Quizzes::QuizSubmission do
       v = qs.versions.current.model
       expect(v.score).to eq 45
       expect(v.fudge_points).to eq -5
+    end
+
+    context 'on a graded_survey' do
+      it "should award all points for a graded_survey" do
+        @quiz.update_attributes(points_possible: 42, quiz_type: 'graded_survey')
+
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "wrong" }
+        Quizzes::SubmissionGrader.new(qs).grade_submission
+
+        # sanity check
+        qs.reload
+        expect(qs.score).to eq 42
+        expect(qs.kept_score).to eq 42
+
+        qs.update_scores({:fudge_points => -5, :question_score_1 => 50})
+        expect(qs.score).to eq 42
+        expect(qs.fudge_points).to eq -5
+        expect(qs.kept_score).to eq 42
+        v = qs.versions.current.model
+        expect(v.score).to eq 42
+        expect(v.fudge_points).to eq -5
+      end
     end
 
     it "should not allow updating scores on an uncompleted submission" do

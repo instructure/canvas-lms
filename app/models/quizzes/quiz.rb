@@ -323,11 +323,15 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def survey?
-    self.quiz_type == 'survey' || self.quiz_type == 'graded_survey'
+    self.quiz_type == 'survey' || graded_survey?
   end
 
   def graded?
-    self.quiz_type == 'assignment' || self.quiz_type == 'graded_survey'
+    self.quiz_type == 'assignment' || graded_survey?
+  end
+
+  def graded_survey?
+    self.quiz_type == 'graded_survey'
   end
 
   def ungraded?

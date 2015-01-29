@@ -127,10 +127,9 @@
               <label class="control-label" for="quiz_assignment_id"><%= t(:quiz_type, "Quiz Type") %></label>
               <div class="controls">
                 <select name="quiz[quiz_type]" id="quiz_assignment_id">
-                  <option value="practice_quiz"><%= render_quiz_type('practice_quiz') %></option>
-                  <option value="assignment" <%= 'selected' if @quiz.quiz_type == 'assignment' %> ><%= render_quiz_type('assignment') %></option>
-                  <option value="graded_survey" <%= 'selected' if @quiz.quiz_type == 'graded_survey' %> ><%= render_quiz_type('graded_survey') %></option>
-                  <option value="survey" <%= 'selected' if @quiz.quiz_type == 'survey' %> ><%= render_quiz_type('survey') %></option>
+                  <% ['practice_quiz', 'assignment', 'graded_survey', 'survey'].each do |type| %>
+                    <option value='<%= type %>' <%= 'selected' if @quiz.quiz_type == type %> ><%= render_quiz_type(type) %></option>
+                  <% end %>
                 </select>
               </div>
             </div>
@@ -148,7 +147,7 @@
               </div>
             </div>
 
-            <div class="control-group" id="quiz_points_possible" style="<%= hidden unless @quiz.quiz_type == 'graded_survey' %>">
+            <div class="control-group" id="quiz_points_possible" style="<%= hidden unless @quiz.graded_survey? %>">
               <%= label :quiz, :points_possible, :quiz_score, :en => "Score", :class => 'control-label' %>
                 <div class="controls">
                   <%= text_field :quiz, :points_possible, :style => "width: 50px;" %> pts
