@@ -58,7 +58,7 @@ class Quizzes::QuizzesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_QUIZZES)
 
-    can_manage = is_authorized_action?(@context, @current_user, :manage_assignments)
+    can_manage = @context.grants_right?(@current_user, session, :manage_assignments)
 
     scope = @context.quizzes.active.includes([ :assignment ])
 

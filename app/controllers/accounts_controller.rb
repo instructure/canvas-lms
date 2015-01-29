@@ -324,7 +324,7 @@ class AccountsController < ApplicationController
       # account settings (:manage_account_settings)
       account_settings = account_params.select {|k, v| [:name, :default_time_zone].include?(k.to_sym)}.with_indifferent_access
       unless account_settings.empty?
-        if is_authorized_action?(@account, @current_user, :manage_account_settings)
+        if @account.grants_right?(@current_user, session, :manage_account_settings)
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
@@ -337,7 +337,7 @@ class AccountsController < ApplicationController
       quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb,
                                                       :default_group_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
       unless quota_settings.empty?
-        if is_authorized_action?(@account, @current_user, :manage_storage_quotas)
+        if @account.grants_right?(@current_user, session, :manage_storage_quotas)
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
             next unless quota_settings.has_key?(quota_type)
 

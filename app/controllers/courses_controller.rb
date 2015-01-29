@@ -1430,7 +1430,7 @@ class CoursesController < ApplicationController
     end
 
     @context_enrollment ||= @pending_enrollment
-    if is_authorized_action?(@context, @current_user, :read)
+    if @context.grants_right?(@current_user, session, :read)
       log_asset_access("home:#{@context.asset_string}", "home", "other")
 
       check_incomplete_registration

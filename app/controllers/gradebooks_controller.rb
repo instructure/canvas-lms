@@ -40,7 +40,7 @@ class GradebooksController < ApplicationController
     end
 
     if !@presenter.student || !@presenter.student_enrollment
-      return authorized_action(nil, @current_user, :permission_fail)
+      return render_unauthorized_action
     end
 
     if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)

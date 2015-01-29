@@ -258,7 +258,7 @@ class SubmissionsApiController < ApplicationController
       student_ids << @current_user.id if student_ids.empty?
     end
 
-    can_view_all = is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+    can_view_all = @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     if all && can_view_all
       opts = { include_priors: true }
       if @section
@@ -275,7 +275,7 @@ class SubmissionsApiController < ApplicationController
       # can view observees
       allowed_student_ids = @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
       # can view self, if a student
-      allowed_student_ids << @current_user.id if is_authorized_action?(@context, @current_user, :participate_as_student)
+      allowed_student_ids << @current_user.id if @context.grants_right?(@current_user, session, :participate_as_student)
       return render_unauthorized_action if allowed_student_ids.empty?
       if all
         student_ids = allowed_student_ids

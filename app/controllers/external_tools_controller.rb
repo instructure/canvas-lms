@@ -816,7 +816,7 @@ class ExternalToolsController < ApplicationController
   def require_access_to_context
     if @context.is_a?(Account)
       require_user
-    elsif !is_authorized_action?(@context, @current_user, :read)
+    elsif !@context.grants_right?(@current_user, session, :read)
       render_unauthorized_action
     end
   end

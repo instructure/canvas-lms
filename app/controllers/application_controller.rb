@@ -353,29 +353,12 @@ class ApplicationController < ActionController::Base
   # if authorized_action(object, @current_user, session, :update)
   #   render
   # end
-  def authorized_action(object, *opts)
-    can_do = is_authorized_action?(object, *opts)
+  def authorized_action(object, actor, rights)
+    can_do = object.grants_any_right?(actor, session, *Array(rights))
     render_unauthorized_action unless can_do
     can_do
   end
   alias :authorized_action? :authorized_action
-
-  def is_authorized_action?(object, *opts)
-    return false unless object
-
-    user = opts.shift
-    action_session ||= session
-    action_session = opts.shift if !opts[0].is_a?(Symbol) && !opts[0].is_a?(Array)
-    actions = Array(opts.shift).flatten
-
-    begin
-      return object.grants_any_right?(user, action_session, *actions)
-    rescue => e
-      logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
-    end
-
-    false
-  end
 
   def render_unauthorized_action
     respond_to do |format|

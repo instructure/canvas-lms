@@ -40,7 +40,7 @@ class WikiPagesController < ApplicationController
   end
 
   def set_pandapub_read_token
-    if is_authorized_action?(@page, @current_user, :read)
+    if @page && @page.grants_right?(@current_user, session, :read)
       if CanvasPandaPub.enabled?
         channel = "/private/wiki_page/#{@page.global_id}/update"
         js_env :WIKI_PAGE_PANDAPUB => {
@@ -77,7 +77,7 @@ class WikiPagesController < ApplicationController
 
   def show
     if @page.new_record?
-      if is_authorized_action?(@page, @current_user, [:update, :update_content])
+      if @page.grants_any_right?(@current_user, session, :update, :update_content)
         flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
         redirect_to polymorphic_url([@context, :wiki_page], id: @page_name || @page, titleize: params[:titleize], action: :edit)
       else
@@ -104,7 +104,7 @@ class WikiPagesController < ApplicationController
   end
 
   def edit
-    if is_authorized_action?(@page, @current_user, [:update, :update_content])
+    if @page.grants_any_right?(@current_user, session, :update, :update_content)
       add_crumb(@page.title)
       @padless = true
     else
@@ -116,7 +116,7 @@ class WikiPagesController < ApplicationController
   end
 
   def revisions
-    if is_authorized_action?(@page, @current_user, :read_revisions)
+    if @page.grants_right?(@current_user, session, :read_revisions)
       add_crumb(@page.title, polymorphic_url([@context, @page]))
       add_crumb(t("#crumbs.revisions", "Revisions"))
 
