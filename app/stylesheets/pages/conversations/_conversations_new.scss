@@ -182,9 +182,11 @@
     position: relative;
 
     &.active {
-      background: lighten($canvas-neutral, 10);
+      background: $can-bg-light-primary;
     }
-
+    &:hover {
+      background: $can-bg-light-primary;
+    }
     &:hover .message-actions a, .message-actions a:focus {
       left: 0;
       outline: none;
