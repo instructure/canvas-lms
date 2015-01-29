@@ -1667,7 +1667,7 @@ class Course < ActiveRecord::Base
           order("course_section_id<>#{section.id}").
           first
       end
-      if e
+      if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
         if e.workflow_state == 'deleted'
           e.sis_batch_id = nil

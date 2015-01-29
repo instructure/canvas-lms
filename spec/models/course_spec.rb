@@ -3767,6 +3767,20 @@ describe Course do
       expect(@course.enrollments.count).to eq enrollment_count
     end
 
+    it "should not set an active enrollment back to invited on re-enrollment" do
+      course(:active_all => true)
+      user
+      enrollment = @course.enroll_user(@user)
+      enrollment.accept!
+
+      expect(enrollment).to be_active
+
+      @course.enroll_user(@user)
+
+      enrollment.reload
+      expect(enrollment).to be_active
+    end
+
     it 'should allow deleted enrollments to be resurrected as active' do
       course_with_student({ :active_enrollment => true })
       @enrollment.destroy
