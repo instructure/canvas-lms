@@ -4,6 +4,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/differentiated_as
 describe "interaction with differentiated assignments/quizzes/discusssions in modules" do
   include_examples "in-process server selenium tests"
 
+  def expect_module_to_have_items(module_item)
+    expect(f("#context_module_#{module_item.id}")).to include_text(@da_assignment.title)
+    expect(f("#context_module_#{module_item.id}")).to include_text(@da_discussion.title)
+    expect(f("#context_module_#{module_item.id}")).to include_text(@da_quiz.title)
+  end
+
+  def expect_module_to_not_have_items(module_item)
+    expect(f("#context_module_#{module_item.id}")).not_to include_text(@da_assignment.title)
+    expect(f("#context_module_#{module_item.id}")).not_to include_text(@da_discussion.title)
+    expect(f("#context_module_#{module_item.id}")).not_to include_text(@da_quiz.title)
+  end
+
   context "Student" do
     before :each do
       course_with_student_logged_in
@@ -14,23 +26,17 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
     it "should not show inaccessible module items" do
       create_section_overrides(@section1)
       get "/courses/#{@course.id}/modules"
-      expect(f("#context_module_#{@module.id}")).not_to include_text(@da_assignment.title)
-      expect(f("#context_module_#{@module.id}")).not_to include_text(@da_discussion.title)
-      expect(f("#context_module_#{@module.id}")).not_to include_text(@da_quiz.title)
+      expect_module_to_not_have_items(@module)
     end
     it "should display module items with overrides" do
       create_section_overrides(@default_section)
       get "/courses/#{@course.id}/modules"
-      expect(f("#context_module_#{@module.id}")).to include_text(@da_assignment.title)
-      expect(f("#context_module_#{@module.id}")).to include_text(@da_discussion.title)
-      expect(f("#context_module_#{@module.id}")).to include_text(@da_quiz.title)
+      expect_module_to_have_items(@module)
     end
     it "should show module items with graded submissions" do
       grade_da_assignments
       get "/courses/#{@course.id}/modules"
-      expect(f("#context_module_#{@module.id}")).to include_text(@da_assignment.title)
-      expect(f("#context_module_#{@module.id}")).to include_text(@da_discussion.title)
-      expect(f("#context_module_#{@module.id}")).to include_text(@da_quiz.title)
+      expect_module_to_have_items(@module)
     end
     it "should ignore completion requirements of inaccessible module items" do
       create_section_override_for_assignment(@da_discussion.assignment)
@@ -43,7 +49,6 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       @module.save
       expect(@module.evaluate_for(@student).workflow_state).to include_text("unlocked")
       get "/courses/#{@course.id}/modules/items/#{@tag_discussion.id}"
-      wait_for_ajaximations
       get "/courses/#{@course.id}/modules/items/#{@tag_quiz.id}"
       #confirm canvas believes this module is now completed despite the invisible assignment not having been viewed
       expect(@module.evaluate_for(@student).workflow_state).to include_text("completed")
@@ -61,23 +66,17 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       it "should not show inaccessible module items" do
         create_section_overrides(@section1)
         get "/courses/#{@course.id}/modules"
-        expect(f("#context_module_#{@module.id}")).not_to include_text(@da_assignment.title)
-        expect(f("#context_module_#{@module.id}")).not_to include_text(@da_discussion.title)
-        expect(f("#context_module_#{@module.id}")).not_to include_text(@da_quiz.title)
+        expect_module_to_not_have_items(@module)
       end
       it "should display module items with overrides" do
         create_section_overrides(@default_section)
         get "/courses/#{@course.id}/modules"
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_assignment.title)
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_discussion.title)
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_quiz.title)
+        expect_module_to_have_items(@module)
       end
       it "should show module items with graded submissions" do
         grade_da_assignments
         get "/courses/#{@course.id}/modules"
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_assignment.title)
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_discussion.title)
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_quiz.title)
+        expect_module_to_have_items(@module)
       end
     end
 
@@ -90,9 +89,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
 
       it "should display all module items" do
         get "/courses/#{@course.id}/modules"
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_assignment.title)
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_discussion.title)
-        expect(f("#context_module_#{@module.id}")).to include_text(@da_quiz.title)
+        expect_module_to_have_items(@module)
       end
     end
   end

@@ -60,7 +60,6 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should show assignments with an override" do
         create_section_override_for_assignment(@da_assignment, :due_at => Time.now)
         get "/calendar"
-        wait_for_ajaximations
         expect(f(".fc-view-month")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
@@ -123,13 +122,12 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1, :due_at => Time.now)
         get "/calendar"
-        # there should be no events for this user to see, thus .fc-event-title should be nil
+        # there should be no events for this user to see, thus .fc-event-month should be nil
         expect(f(".fc-view-month")).not_to include_text(@da_assignment.title)
       end
       it "should show assignments with an override" do
         create_section_override_for_assignment(@da_assignment, :due_at => Time.now)
         get "/calendar"
-        wait_for_ajaximations
         expect(f(".fc-view-month")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
