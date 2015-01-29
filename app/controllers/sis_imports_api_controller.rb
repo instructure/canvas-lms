@@ -202,8 +202,8 @@ class SisImportsApiController < ApplicationController
   before_filter :check_account
 
   def check_account
-    raise "SIS imports can only be executed on root accounts" unless @account.root_account?
-    raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
+    return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?
+    return render json: {errors: ["SIS imports are not enabled for this account"]}, status: :forbidden unless @account.allow_sis_import
   end
 
   # @API Get SIS import list

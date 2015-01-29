@@ -581,4 +581,27 @@ describe SisImportsApiController, type: :request do
                       :format => 'json', :account_id => @account.id.to_s })
     assert_status(200)
   end
+
+  it "should error on non-root account" do
+    subaccount = @account.sub_accounts.create!
+    json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => subaccount.id.to_s },
+                    {},
+                    {},
+                    expected_status: 400)
+    expect(json['errors'].first).to eq "SIS imports can only be executed on root accounts"
+  end
+
+  it "should error on non-enabled root account" do
+    @account.allow_sis_import = false
+    @account.save
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s },
+                    {},
+                    {},
+                    expected_status: 403)
+    expect(json['errors'].first).to eq "SIS imports are not enabled for this account"
+  end
 end
