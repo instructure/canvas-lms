@@ -322,6 +322,11 @@ class Enrollment < ActiveRecord::Base
   end
   protected :update_user_account_associations_if_necessary
 
+  def other_section_enrollment_count
+    # The number of other active sessions that the user is enrolled in.
+    self.course.student_enrollments.active.for_user(self.user).where("id != ?", self.id).count 
+  end
+
   def audit_groups_for_deleted_enrollments
     # did the student cease to be enrolled in a non-deleted state in a section?
     had_section = self.course_section_id_was.present?
@@ -337,11 +342,12 @@ class Enrollment < ActiveRecord::Base
     self.user.groups.includes(:group_category).where(
       :context_type => 'Course', :context_id => section.course_id).each do |group|
 
-      # don't bother unless the group's category has section restrictions or
-      # the enrollment was deleted
-      next unless group.group_category && group.group_category.restricted_self_signup? || self.workflow_state == 'deleted'
-
-      if self.workflow_state != 'deleted' # if deleted, we'll always remove the user
+      # check group deletion criteria if either enrollment is not a deletion 
+      # or it may be a deletion/unenrollment from a section but not from the course as a whole (still enrolled in another section)
+      if self.workflow_state != 'deleted' || other_section_enrollment_count > 0    
+        # don't bother unless the group's category has section restrictions
+        next unless group.group_category && group.group_category.restricted_self_signup?
+        
         # skip if the user is the only user in the group. there's no one to have
         # a conflicting section.
         next if group.users.count == 1
@@ -353,11 +359,11 @@ class Enrollment < ActiveRecord::Base
         next unless section.common_to_users?(group.users)
       end
 
-      # at this point, we know there's another user, and he's in the abandoned
-      # section, and a student *should* only be in one section, so there's no
-      # way for any other sections to be common between them. alternatively,
-      # we have just deleted the user's enrollment in the group's course.
-      # remove the leaving user from the group to keep the group happy
+      # at this point, the group is restricted, there's more than one user and
+      # it appears that the group is common to the section being left by the user so
+      # remove the user from the group. Or the student was only enrolled in one section and
+      # by leaving the section he/she is completely leaving the course so remove the
+      # user from any group related to the course.
       membership = group.group_memberships.where(user_id: self.user_id).first
       membership.destroy if membership
     end

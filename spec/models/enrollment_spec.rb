@@ -1076,6 +1076,142 @@ describe Enrollment do
       expect(group.users).to be_include(user2)
     end
 
+    it "should ungroup the user from all groups, restricted and unrestricted when completely unenrolling from the course" do
+      user1 = user_model :name => "Andy"  
+      user2 = user_model :name => "Bruce"
+
+      section1 = @course.course_sections.create :name => "Section 1"
+
+      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user2, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+
+      # created category for restricted groups
+      res_category = group_category :name => "restricted"
+      res_category.configure_self_signup(true, true)
+      res_category.save
+
+      # created category for unrestricted groups
+      unrestricted_category = group_category :name => "unrestricted"
+      unrestricted_category.configure_self_signup(true, false)
+      unrestricted_category.save
+
+      # Group 1 - restricted group
+      group1 = res_category.groups.create(:name => "Group1", :context => @course)
+      group1.add_user(user1)
+      group1.add_user(user2)
+
+      # Group 2 - unrestricted group
+      group2 = unrestricted_category.groups.create(:name => "Group2 (Unrestricted)", :context => @course)
+      group2.add_user(user1)
+      group2.add_user(user2)
+
+      user2.enrollments.where(:course_section_id => section1.id).first.destroy
+      group1.reload
+      group2.reload
+
+      expect(group1.users.size).to eq 1
+      expect(group2.users.size).to eq 1
+      expect(group1.users).not_to be_include(user2)
+      expect(group2.users).not_to be_include(user2)
+      expect(group1).to have_common_section
+    end
+
+    it "should ungroup the user from the restricted group when deleting enrollment to one section but user is still enrolled in another section" do
+      user1 = user_model :name => "Andy"
+      user2 = user_model :name => "Bruce"
+
+      section1 = @course.course_sections.create :name => "Section 1"
+      section2 = @course.course_sections.create :name => "Section 2"
+
+      # we should have more than one student enrolled in section to exercise common_to_section check.
+      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user2, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)      
+      # enroll user2 in a second section
+      @course.enroll_user(user2, 'StudentEnrollment', :section => section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)  
+
+      # set up a group category for restricted groups
+      # and put both users in one of its groups
+      category = group_category :name => "restricted category"
+      category.configure_self_signup(true, true)
+      category.save
+      
+      # restricted group
+      group = category.groups.create(:name => "restricted group", :context => @course)
+      group.add_user(user1)
+      group.add_user(user2)
+      
+      # remove user2 from the section (effectively unenrolled from a section of the course)
+      user2.enrollments.where(:course_section_id => section1.id).first.destroy
+      group.reload
+
+      # user2 should be removed from the group
+      expect(group.users.size).to eq 1
+      expect(group.users).not_to be_include(user2)
+      expect(group).to have_common_section
+    end
+
+    it "should not ungroup the user from unrestricted group when deleting enrollment to one section but user is still enrolled in another section" do
+      user1 = user_model :name => "Andy"
+      user2 = user_model :name => "Bruce"
+
+      section1 = @course.course_sections.create :name => "Section 1"
+      section2 = @course.course_sections.create :name => "Section 2"
+
+      # we should have more than one student enrolled in section to exercise common_to_section check.
+      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user2, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)      
+      # enroll user2 in a second section
+      @course.enroll_user(user2, 'StudentEnrollment', :section => section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)  
+
+      # set up a group category for unrestricted groups
+      unrestricted_category = group_category :name => "unrestricted category" 
+      unrestricted_category.configure_self_signup(true, false)
+      unrestricted_category.save
+      
+      # unrestricted group
+      group = unrestricted_category.groups.create(:name => "unrestricted group", :context => @course)
+      group.add_user(user1)
+      group.add_user(user2)
+      
+      # remove user2 from the section (effectively unenrolled from a section of the course)
+      user2.enrollments.where(:course_section_id => section1.id).first.destroy
+      group.reload
+
+      # user2 should not be removed from group 2
+      expect(group.users.size).to eq 2
+      expect(group.users).to be_include(user2)
+      expect(group).not_to have_common_section
+    end
+
+    it "should not ungroup the user from restricted group when there's not another user in the group and user is still enrolled in another section" do
+      user1 = user_model :name => "Andy"
+
+      section1 = @course.course_sections.create :name => "Section 1"
+      section2 = @course.course_sections.create :name => "Section 2"
+
+      # enroll user in two sections
+      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user1, 'StudentEnrollment', :section => section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)  
+
+      # set up a group category for restricted groups
+      restricted_category = group_category :name => "restricted category" 
+      restricted_category.configure_self_signup(true, true)
+      restricted_category.save
+      
+      # restricted group
+      group = restricted_category.groups.create(:name => "restricted group", :context => @course)
+      group.add_user(user1)
+      
+      # remove user from the section (effectively unenrolled from a section of the course)
+      user1.enrollments.where(:course_section_id => section1.id).first.destroy
+      group.reload
+
+      # he should not be removed from the group
+      expect(group.users.size).to eq 1
+      expect(group.users).to be_include(user1)
+      expect(group).to have_common_section
+    end
+
     it "should ungroup the user even when there's not another user in the group if the enrollment is deleted" do
       # set up course with only one user in one section
       user1 = user_model
