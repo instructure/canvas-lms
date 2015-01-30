@@ -13,9 +13,9 @@ function(React, DataRow, $, I18n) {
     getInitialState: function() {
       return {
         standard: this.props.standard,
+        permissions: this.props.permissions,
         editingStandard: $.extend(true, {}, this.props.standard),
         editing: this.props.editing,
-        can_edit_and_destroy: this.props.can_edit_and_destroy,
         saving: false,
         justAdded: this.props.justAdded
       };
@@ -24,9 +24,9 @@ function(React, DataRow, $, I18n) {
     componentWillReceiveProps: function(nextProps) {
       this.setState({
         standard: nextProps.standard,
+        permissions: nextProps.permissions,
         editingStandard: $.extend(true, {}, this.props.standard),
         editing: nextProps.editing,
-        can_edit_and_destroy: nextProps.can_edit_and_destroy,
         saving: nextProps.saving,
         justAdded: nextProps.justAdded
       });
@@ -78,7 +78,7 @@ function(React, DataRow, $, I18n) {
         .success(function(response){
           self.setState({standard: response.grading_standard, editing: false,
                          editingStandard: $.extend(true, {}, response.grading_standard),
-                         can_edit_and_destroy: true, saving: false, justAdded: false});
+                         saving: false, justAdded: false});
         })
         .error(function(){
           self.setState({saving: false});
@@ -88,11 +88,6 @@ function(React, DataRow, $, I18n) {
 
     assessedAssignment: function() {
       return this.state.standard && this.state.standard["assessed_assignment?"];
-    },
-
-    renderIdNames: function() {
-      if(this.assessedAssignment()) return "grading_standard_blank";
-      return "grading_standard_" + (this.state.standard ? this.state.standard.id : "blank");
     },
 
     deleteDataRow: function(index) {
@@ -109,6 +104,36 @@ function(React, DataRow, $, I18n) {
     titleChange: function(event) {
       this.state.editingStandard.title = event.target.value;
       this.setState({editingStandard: this.state.editingStandard});
+    },
+
+    changeRowMinScore: function(index, newMinVal) {
+      this.state.editingStandard.data[index][1] = newMinVal;
+      this.setState({editingStandard: this.state.editingStandard});
+    },
+
+    changeRowName: function(index, newRowName) {
+      this.state.editingStandard.data[index][0] = newRowName;
+      this.setState({editingStandard: this.state.editingStandard});
+    },
+
+    renderCannotManageMessage: function() {
+      if(this.state.standard.context_name){
+        return (
+          <div>
+            {I18n.t("(%{context}: %{contextName})", { context: this.state.standard.context_type.toLowerCase(), contextName: this.state.standard.context_name })}
+          </div>
+        );
+      }
+      return (
+        <div>
+          {I18n.t("(%{context} level)", { context: this.state.standard.context_type.toLowerCase() })}
+        </div>
+      );
+    },
+
+    renderIdNames: function() {
+      if(this.assessedAssignment()) return "grading_standard_blank";
+      return "grading_standard_" + (this.state.standard ? this.state.standard.id : "blank");
     },
 
     renderTitle: function() {
@@ -131,22 +156,14 @@ function(React, DataRow, $, I18n) {
       );
     },
 
-    changeRowMinScore: function(index, newMinVal) {
-      this.state.editingStandard.data[index][1] = newMinVal;
-      this.setState({editingStandard: this.state.editingStandard});
-    },
-
-    changeRowName: function(index, newRowName) {
-      this.state.editingStandard.data[index][0] = newRowName;
-      this.setState({editingStandard: this.state.editingStandard});
-    },
-
     renderDataRows: function() {
       var data = this.state.editing ? this.state.editingStandard.data : this.state.standard.data;
       return data.map(function(item, idx, array){
-        return (<DataRow key={idx} row={item} siblingRow={array[idx - 1]} editing={this.state.editing}
-                         onDeleteRow={this.deleteDataRow} onInsertRow={this.insertGradingStandardRow}
-                         onRowMinScoreChange={this.changeRowMinScore} onRowNameChange={this.changeRowName}/>);
+        return (
+          <DataRow key={idx} row={item} siblingRow={array[idx - 1]} editing={this.state.editing}
+                   onDeleteRow={this.deleteDataRow} onInsertRow={this.insertGradingStandardRow}
+                   onRowMinScoreChange={this.changeRowMinScore} onRowNameChange={this.changeRowName}/>
+        );
       }, this);
     },
 
@@ -194,7 +211,7 @@ function(React, DataRow, $, I18n) {
     },
 
     renderIconsAndTitle: function() {
-      if(this.state.can_edit_and_destroy){
+      if(this.state.permissions.manage){
         return (
           <div>
             {this.renderTitle()}
@@ -216,8 +233,8 @@ function(React, DataRow, $, I18n) {
             <i className="icon-edit standalone-icon"/>
             <i className="icon-trash standalone-icon"/>
           </div>
-          <div className="pull-left account-level-notification">
-            {I18n.t("(account level)")}
+          <div className="pull-left cannot-manage-notification">
+            {this.renderCannotManageMessage()}
           </div>
         </div>
       );

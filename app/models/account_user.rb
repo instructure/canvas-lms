@@ -81,11 +81,11 @@ class AccountUser < ActiveRecord::Base
     p.dispatch :new_account_user
     p.to {|record| record.account.users}
     p.whenever {|record| record.just_created }
-    
+
     p.dispatch :account_user_registration
     p.to {|record| record.user }
     p.whenever {|record| @account_user_registration }
-    
+
     p.dispatch :account_user_notification
     p.to {|record| record.user }
     p.whenever {|record| @account_user_notification }
@@ -99,13 +99,13 @@ class AccountUser < ActiveRecord::Base
   def readable_type
     AccountUser.readable_type(self.role.name)
   end
-  
+
   def account_user_registration!
     @account_user_registration = true
     self.save!
     @account_user_registration = false
   end
-  
+
   def account_user_notification!
     @account_user_notification = true
     self.save!
@@ -154,21 +154,21 @@ class AccountUser < ActiveRecord::Base
       type
     end
   end
-  
+
   def self.any_for?(user)
     !account_ids_for_user(user).empty?
   end
-  
+
   def self.account_ids_for_user(user)
     @account_ids_for ||= {}
     @account_ids_for[user.id] ||= Rails.cache.fetch(['account_ids_for_user', user].cache_key) do
       AccountUser.for_user(user).map(&:account_id)
     end
   end
-  
+
   def self.for_user_and_account?(user, account_id)
     account_ids_for_user(user).include?(account_id)
   end
-  
+
   scope :for_user, lambda { |user| where(:user_id => user) }
 end

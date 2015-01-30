@@ -36,12 +36,8 @@ class GradingStandardsController < ApplicationController
       respond_to do |format|
         format.html { }
         format.json {
-          editable_ids = @standards.select{ |s| s.context_type == @context.class.name &&
-                         s.context_id == @context.id }.map(&:id)
           standards_json = @standards.map do |s|
-            standard = s.as_json(methods: [:display_name, :context_code, :assessed_assignment?])
-            standard[:can_edit_and_destroy] = editable_ids.include?(s.id)
-            standard
+            s.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user})
           end
           render :json => standards_json
         }
@@ -56,7 +52,7 @@ class GradingStandardsController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end
@@ -70,7 +66,7 @@ class GradingStandardsController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.update_attributes(params[:grading_standard])
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end
@@ -83,7 +79,7 @@ class GradingStandardsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_grades)
       respond_to do |format|
         if @standard.destroy
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end

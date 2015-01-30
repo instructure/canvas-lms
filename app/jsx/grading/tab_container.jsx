@@ -21,8 +21,10 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
       $.getJSON(ENV.GRADING_STANDARDS_URL)
       .done(this.gotStandards)
 
-      $.getJSON(ENV.GRADING_PERIODS_URL)
-      .done(this.gotPeriods)
+      if(ENV.MULTIPLE_GRADING_PERIODS){
+        $.getJSON(ENV.GRADING_PERIODS_URL)
+        .done(this.gotPeriods)
+      }
     },
 
     gotStandards: function(standards) {
@@ -52,7 +54,6 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
       })
         .success(function(newStandard) {
           newStandard.editing = true;
-          newStandard.can_edit_and_destroy = true;
           newStandard.justAdded = true;
           newStandards.unshift(newStandard);
           $(this).slideDown();
@@ -98,6 +99,51 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
         });
     },
 
+    hasAdminOrTeacherRole: function() {
+      return _.intersection(ENV.current_user_roles, ["teacher", "admin"]).length > 0;
+    },
+
+    renderAddGradingStandardButton: function() {
+      if(this.hasAdminOrTeacherRole()){
+        return(
+          <div className="rs-margin-all pull-right">
+            <a href="#" onClick={this.addGradingStandard} className="btn pull-right add_standard_link">
+              <i className="icon-add"/>
+              {I18n.t(" Add grading scheme")}
+            </a>
+          </div>
+        );
+      }
+      return null;
+    },
+
+    renderGradingStandards: function() {
+      if(!this.state.standards){
+        return null;
+      } else if(this.state.standards.length === 0){
+        return <h3>{I18n.t("No grading schemes to display")}</h3>;
+      }
+      var self = this;
+      return this.state.standards.map(function(s){
+        return (<GradingStandard key={s.grading_standard.id} standard={s.grading_standard}
+                                 editing={!!s.editing} permissions={s.grading_standard.permissions}
+                                 justAdded={!!s.justAdded} onDeleteGradingStandard={self.deleteGradingStandard}
+                                 onDeleteGradingStandardNoWarning={self.deleteGradingStandardNoWarning}/>);
+      });
+    },
+
+    renderGradingPeriods: function() {
+      if(!this.state.periods){
+        return null;
+      } else if(this.state.periods.length === 0){
+        return <h3>{I18n.t("No grading periods to display")}</h3>;
+      }
+      return this.state.periods.map(function(p){
+        return (<GradingPeriod key={p.id} title={p.title} startDate={new Date(p.start_date)}
+                               endDate={new Date(p.end_date)} weight={p.weight}/>);
+      });
+    },
+
     render: function () {
       if(ENV.MULTIPLE_GRADING_PERIODS){
         return (
@@ -113,14 +159,9 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
                 </div>
               </div>
               <div id="grading-standards-tab">
-                <div className="rs-margin-all pull-right">
-                  <a href="#" onClick={this.addGradingStandard} className="btn pull-right add_standard_link">
-                    <i className="icon-add"/>
-                    {I18n.t(" Add grading scheme")}
-                  </a>
-                </div>
+                {this.renderAddGradingStandardButton()}
                 <div id="standards" className="content-box react_grading_standards">
-                  {this.renderStandards()}
+                  {this.renderGradingStandards()}
                 </div>
               </div>
             </div>
@@ -130,45 +171,13 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
         return (
           <div>
             <h1 tabIndex="0">{I18n.t("Grading Schemes")}</h1>
-            <div className="rs-margin-all pull-right">
-              <a href="#" onClick={this.addGradingStandard} className="btn pull-right add_standard_link">
-                <i className="icon-add"/>
-                {I18n.t(" Add grading scheme")}
-              </a>
-            </div>
+            {this.renderAddGradingStandardButton()}
             <div id="standards" className="content-box react_grading_standards">
-              {this.renderStandards()}
+              {this.renderGradingStandards()}
             </div>
           </div>
         );
       };
-    },
-
-    renderStandards: function() {
-      if(!this.state.standards){
-        return null;
-      } else if(this.state.standards.length === 0){
-        return <h3>{I18n.t("No grading standards to display")}</h3>;
-      }
-      var self = this;
-      return this.state.standards.map(function(s){
-        return (<GradingStandard key={s.grading_standard.id} standard={s.grading_standard}
-                 editing={!!s.editing} can_edit_and_destroy={s.can_edit_and_destroy}
-                 justAdded={!!s.justAdded} onDeleteGradingStandard={self.deleteGradingStandard}
-                 onDeleteGradingStandardNoWarning={self.deleteGradingStandardNoWarning}/>);
-      });
-    },
-
-    renderGradingPeriods: function() {
-      if(!this.state.periods){
-        return null;
-      } else if(this.state.periods.length === 0){
-        return <h3>{I18n.t("No grading periods to display")}</h3>;
-      }
-      return this.state.periods.map(function(p){
-        return (<GradingPeriod key={p.id} title={p.title} startDate={new Date(p.start_date)}
-                               endDate={new Date(p.end_date)} weight={p.weight}/>);
-      });
     }
   });
 
