@@ -98,7 +98,6 @@ module CanvasRails
       app.config.middleware.insert_before(config.session_store, 'LoadAccount')
       app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
       app.config.middleware.swap('ActionDispatch::RequestId', "RequestContextGenerator")
-      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
       app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
       app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
     end
