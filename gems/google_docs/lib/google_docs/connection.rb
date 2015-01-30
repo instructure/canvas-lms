@@ -57,12 +57,25 @@ module GoogleDocs
       access_token = retrieve_access_token
       entry = fetch_list(access_token).entries.map { |e| GoogleDocs::Entry.new(e) }.find { |e| e.document_id == document_id }
       if entry
-        response = access_token.get(entry.download_url)
-        response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
+        response = fetch_entry(access_token, entry)
+
+        # some new google spreadsheets will not download as plain 'xls', so
+        # retry the download as 'xlsx'
+        if response.is_a?(Net::HTTPBadRequest) && entry.extension == 'xls'
+          entry.reset_extension_as_xlsx
+          response = fetch_entry(access_token, entry)
+        end
+
         [response, entry.display_name, entry.extension]
       else
         [nil, nil, nil]
       end
+    end
+
+    def fetch_entry(access_token, entry)
+      response = access_token.get(entry.download_url)
+      response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
+      response
     end
 
     def fetch_list(access_token)

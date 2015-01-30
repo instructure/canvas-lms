@@ -95,6 +95,10 @@ module GoogleDocs
       }
     end
 
+    def reset_extension_as_xlsx
+      @extension = 'xlsx'
+    end
+
     private
 
     def set_document_id_from(entry)
