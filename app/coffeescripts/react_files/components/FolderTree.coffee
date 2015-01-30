@@ -31,7 +31,7 @@ define [
           href: @hrefFor
           focusStyleClass: @focusStyleClass
           selectedStyleClass: @selectedStyleClass
-          autoFetch:true
+          autoFetch: true
         },
         {
           render: true

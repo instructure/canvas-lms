@@ -54,8 +54,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
        1.upto(15) do |number_of_folders|
         folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
         create_new_folder
-        expect(get_all_files_folders.count).to eq number_of_folders
-        expect(get_all_files_folders.last.text).to match folder_regex
+        expect(get_all_folders.count).to eq number_of_folders
+        expect(get_all_folders.last.text).to match folder_regex
        end
 
        get "/courses/#{@course.id}/files"

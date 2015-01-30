@@ -134,3 +134,14 @@ end
 def cancel_delete_on_dialog
     driver.switch_to.alert.dismiss
 end
+
+def create_new_folder
+  f('.btn-add-folder').click
+  f('.ef-edit-name-form').submit
+  wait_for_ajaximations
+  get_all_folders.first
+end
+
+def get_all_folders
+  new_folder = driver.find_elements(:class, 'ef-item-row')
+end
