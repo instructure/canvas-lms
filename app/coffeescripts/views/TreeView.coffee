@@ -124,6 +124,7 @@ define [
               href: @href
               focusStyleClass: @focusStyleClass
               selectedStyleClass: @selectedStyleClass
+              autoFetch: @autoFetch
             tagName: 'li'
             className: 'subtrees'
             template: collectionTemplate
