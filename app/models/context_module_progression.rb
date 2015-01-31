@@ -152,7 +152,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
       if req[:type] == 'must_view'
         calc.view_requirement(req)
-      elsif req[:type] == 'must_contribute'
+      elsif %w(must_contribute must_mark_done).include? req[:type]
         calc.requirement_met(req, false)
       elsif req[:type] == 'must_submit'
         sub = get_submission_or_quiz_submission(tag)
