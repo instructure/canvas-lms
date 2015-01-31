@@ -23,7 +23,7 @@ class MarkDonePresenter
     @content = content
     @item = @course.context_modules.map do |i|
       i.content_tags.find do |j|
-        j.content_id == @content.id
+        j.content_id == @content.id && j.content_type == @content.class.name
       end
     end.find(&:present?)
     @module = @item.context_module
