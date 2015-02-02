@@ -1,4 +1,6 @@
 Rails.application.config.to_prepare do
+  Switchman.cache = MultiCache
+
   Switchman::Shard.class_eval do
     class << self
       alias :birth :default unless instance_methods.include?(:birth)
