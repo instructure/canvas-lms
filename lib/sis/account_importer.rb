@@ -27,6 +27,10 @@ module SIS
           yield importer
         end
       end
+      importer.accounts_to_set_sis_batch_ids.to_a.in_groups_of(1000, false) do |batch|
+        Account.where(:id => batch).update_all(:sis_batch_id => @batch)
+      end if @batch
+
       @logger.debug("Accounts took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -34,7 +38,7 @@ module SIS
   private
 
     class Work
-      attr_accessor :success_count
+      attr_reader :success_count, :accounts_to_set_sis_batch_ids
 
       def initialize(batch, root_account, logger)
         @batch = batch
@@ -42,6 +46,7 @@ module SIS
         @accounts_cache = {}
         @logger = logger
         @success_count = 0
+        @accounts_to_set_sis_batch_ids = Set.new
       end
 
       def add_account(account_id, parent_account_id, status, name, integration_id)
@@ -57,7 +62,8 @@ module SIS
           @accounts_cache[parent.sis_source_id] = parent
         end
 
-        account = @root_account.all_accounts.where(sis_source_id: account_id).first
+        account = @accounts_cache[account_id]
+        account ||= @root_account.all_accounts.where(sis_source_id: account_id).first
         if account.nil?
           raise ImportError, "No name given for account #{account_id}, skipping" if name.blank?
           raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless status =~ /\A(active|deleted)/i
@@ -73,7 +79,6 @@ module SIS
 
         account.integration_id = integration_id
         account.sis_source_id = account_id
-        account.sis_batch_id = @batch.id if @batch
 
         if status.present?
           if status =~ /active/i
@@ -83,10 +88,19 @@ module SIS
           end
         end
 
+        @accounts_cache[account.sis_source_id] = account
+
+        unless account.changed?
+          @success_count += 1
+          self.accounts_to_set_sis_batch_ids << account.id unless account.sis_batch_id == @batch.try(:id)
+          return
+        end
+
+        account.sis_batch_id = @batch.id if @batch
+
         update_account_associations = account.root_account_id_changed? || account.parent_account_id_changed?
         if account.save
           account.update_account_associations if update_account_associations
-          @accounts_cache[account.sis_source_id] = account
 
           @success_count += 1
         else

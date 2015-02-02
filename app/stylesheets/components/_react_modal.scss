@@ -93,7 +93,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       box-shadow: 0 1px 4px 1px rgba($canvas-secondary, 0.95);
       
       @include breakpoint(tablet) { 
-        max-width: 696px;
+        width: 696px;
         transition: all 0.5s cubic-bezier(0,1,0.5,1);
         opacity: 0;
         transform: rotateX(60deg) scale(0.8);
@@ -128,6 +128,10 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       align-items: center;
       background: $canvas-light;
       border-bottom: 1px solid $can-border-light;
+      // Adding this class for cases where header is called in separately from InnerSection
+      &.ReactModal__Header--force-no-corners {
+        border-bottom-left-radius: 0; border-bottom-right-radius: 0;  
+      }
     }
 
     .ReactModal__Header-Title {
@@ -143,6 +147,10 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       background: $canvas-light;
       @include breakpoint(tablet) { padding: 16px; }
       @include breakpoint(desktop) { padding: 24px; }
+      // Adding this class for cases where header is called in separately from InnerSection
+      &.ReactModal__Body--force-no-corners {
+        border-top-left-radius: 0; border-top-right-radius: 0;  
+      }
     }
 
     .ReactModal__Footer {

@@ -5,6 +5,9 @@ define [
   'jquery.ajaxJSON'
   'jqueryui/dialog'
 ], (I18n, $, Slick) ->
+  ###
+  xsslint safeString.identifier klass d out_of runtime_string
+  ###
 
   fillin_job_data = (job) ->
     $('#show-job .show-field').each (idx, field) =>

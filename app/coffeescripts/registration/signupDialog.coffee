@@ -8,10 +8,11 @@ define [
   'jst/registration/studentDialog'
   'jst/registration/parentDialog'
   'compiled/util/addPrivacyLinkToDialog'
+  'str/htmlEscape'
   'compiled/jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog) ->
+], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog, htmlEscape) ->
 
   $nodes = {}
   templates = {teacherDialog, studentDialog, parentDialog}
@@ -24,19 +25,20 @@ define [
       "teacher_dialog.agree_to_terms_and_pp"
       "You agree to the *terms of use* and acknowledge the **privacy policy**."
       wrappers: [
-        "<a href=\"#{terms_of_use_url}\" target=\"_blank\">$1</a>"
-        "<a href=\"#{privacy_policy_url}\" target=\"_blank\">$1</a>"
+        "<a href=\"#{htmlEscape terms_of_use_url}\" target=\"_blank\">$1</a>"
+        "<a href=\"#{htmlEscape privacy_policy_url}\" target=\"_blank\">$1</a>"
       ]
     )
 
   signupDialog = (id, title) ->
     return unless templates[id]
     $node = $nodes[id] ?= $('<div />')
-    $node.html templates[id](
+    html = templates[id](
       account: ENV.ACCOUNT.registration_settings
       terms_required: ENV.ACCOUNT.terms_required
       terms_html: termsHtml(ENV.ACCOUNT)
     )
+    $node.html html
     $node.find('.date-field').datetime_field()
 
     $node.find('.signup_link').click preventDefault ->

@@ -32,19 +32,29 @@ module Api::V1::Outcome
   # can_edit. full expands on that by adding description and criterion values
   # (if any).
   def outcome_json(outcome, user, session, style=:full)
+    can_edit = lambda do
+      outcome.context_id ?
+          outcome.context.grants_right?(user, session, :manage_outcomes) :
+          Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+    end
+
     json_attributes = %w(id context_type context_id vendor_guid display_name)
     api_json(outcome, user, session, :only => json_attributes, :methods => [:title]).tap do |hash|
       hash['url'] = api_v1_outcome_path :id => outcome.id
-      hash['can_edit'] = outcome.context_id ?
-        outcome.context.grants_right?(user, session, :manage_outcomes) :
-        Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
-
+      hash['can_edit'] = can_edit.call
       unless style == :abbrev
         hash['description'] = outcome.description
         if criterion = outcome.data && outcome.data[:rubric_criterion]
           hash['points_possible'] = criterion[:points_possible]
           hash['mastery_points'] = criterion[:mastery_points]
           hash['ratings'] = criterion[:ratings]
+
+          # existing outcomes that have a nil calculation method should be handled as highest
+          hash['calculation_method'] = outcome.calculation_method || 'highest'
+
+          if ["decaying_average", "n_mastery"].include? outcome.calculation_method
+            hash['calculation_int'] = outcome.calculation_int
+          end
         end
       end
     end

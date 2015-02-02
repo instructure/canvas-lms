@@ -3886,6 +3886,23 @@ describe Course do
     end
   end
 
+  context '#unpublishable?' do
+    it "should not be unpublishable if there are active graded submissions" do
+      course_with_teacher(:active_all => true)
+      @student = student_in_course(:active_user => true).user
+      expect(@course.unpublishable?).to be_truthy
+      @assignment = @course.assignments.new(:title => "some assignment")
+      @assignment.submission_types = "online_text_entry"
+      @assignment.workflow_state = "published"
+      @assignment.save
+      @submission = @assignment.submit_homework(@student, :body => 'some message')
+      expect(@course.unpublishable?).to be_truthy
+      @assignment.grade_student(@student, {:grader => @teacher, :grade => 1})
+      expect(@course.unpublishable?).to be_falsey
+      @assignment.destroy
+      expect(@course.unpublishable?).to be_truthy
+    end
+  end
 end
 
 describe Course, "multiple_sections?" do

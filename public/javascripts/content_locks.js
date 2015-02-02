@@ -82,10 +82,10 @@ define([
       }
       if ($("#context_modules_url").length > 0) {
         html += "<br/>";
-        html += "<a href='" + $("#context_modules_url").attr('href') + "'>";
-        html += I18n.t('messages.visit_modules_page_for_details', "Visit the modules page for information on how to unlock this content.");
+        html += "<a href='" + htmlEscape($("#context_modules_url").attr('href')) + "'>";
+        html += htmlEscape(I18n.t('messages.visit_modules_page_for_details', "Visit the modules page for information on how to unlock this content."));
         html += "</a>";
-        return html;
+        return $.raw(html);
       }
     }
     else {
@@ -113,7 +113,7 @@ define([
         var data = $(this).data('lock_reason');
         var type = data.type;
         var $reason = $("<div/>");
-        $reason.html(INST.lockExplanation(data, type));
+        $reason.html(htmlEscape(INST.lockExplanation(data, type)));
         var $dialog = $("#lock_reason_dialog");
         if($dialog.length === 0) {
           $dialog = $("<div/>").attr('id', 'lock_reason_dialog');

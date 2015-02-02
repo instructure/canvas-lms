@@ -22,7 +22,7 @@ class Progress < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['ContentMigration', 'Course', 'User',
-    'Quizzes::QuizStatistics', 'Account', 'GroupCategory', 'ContentExport']
+    'Quizzes::QuizStatistics', 'Account', 'GroupCategory', 'ContentExport', 'Assignment']
   belongs_to :user
   attr_accessible :context, :tag, :completion, :message
 
@@ -97,6 +97,9 @@ class Progress < ActiveRecord::Base
     end
 
     def on_permanent_failure(error)
+      error_report = ErrorReport.log_exception("Progress::Work", error)
+      @progress.message = "Unexpected error, ID: #{error_report.id rescue "unknown"}"
+      @progress.save
       @progress.fail
     end
   end

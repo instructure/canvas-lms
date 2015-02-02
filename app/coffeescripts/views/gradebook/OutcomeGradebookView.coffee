@@ -156,6 +156,7 @@ define [
       @$el.fillWindowWithMe({
         onResize: => @grid.resizeCanvas() if @grid
       })
+      $(".post-grades-placeholder").hide();
 
     # Public: Load all outcome results from API.
     #

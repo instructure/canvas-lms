@@ -71,6 +71,18 @@ define([
   $.raw = function(str) {
     return new htmlEscape.SafeString(str);
   }
+  // ensure the jquery html setters don't puke if given a SafeString
+  $.each(["html", "append", "prepend"], function(idx, method) {
+    var orig = $.fn[method];
+    $.fn[method] = function() {
+      var args = [].slice.call(arguments);
+      for (var i = 0, len = args.length; i < len; i++) {
+        if (args[i] instanceof htmlEscape.SafeString)
+          args[i] = args[i].toString();
+      }
+      return orig.apply(this, args);
+    }
+  });
 
   $.replaceOneTag = function(text, name, value) {
     if(!text) { return text; }
@@ -295,7 +307,7 @@ define([
         event.stopPropagation();
         var now = new Date();
         $dialog.find("button").attr('disabled', true);
-        $dialog.find(".results").empty().append(I18n.t('status.searching', "Searching..."));
+        $dialog.find(".results").empty().append(htmlEscape(I18n.t('status.searching', "Searching...")));
         $dialog.bind('search_results', function(event, data) {
           $dialog.find("button").attr('disabled', false);
           if(data && data.photos && data.photos.photo) {

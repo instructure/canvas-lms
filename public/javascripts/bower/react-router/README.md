@@ -11,6 +11,8 @@ Docs
 - [Guide: Overview](/docs/guides/overview.md)
 - [API](/docs/api/)
 
+[Try it out on JSBin](http://jsbin.com/sixose/1/edit)
+
 Important Notes
 ---------------
 
@@ -47,7 +49,7 @@ This library is written with CommonJS modules. If you are using
 browserify, webpack, or similar, you can consume it like anything else
 installed from npm.
 
-There is also a UMD build available on bower, find the library on
+There is also a global build available on bower, find the library on
 `window.ReactRouter`.
 
 Features
@@ -55,13 +57,16 @@ Features
 
 - Nested views mapped to nested routes
 - Modular construction of route hierarchy
-- Fully asynchronous transition hooks
+- Sync and async transition hooks
 - Transition abort / redirect / retry
 - Dynamic segments
 - Query parameters
 - Links with automatic `.active` class when their route is active
 - Multiple root routes
-- Hash or HTML5 history URLs
+- Hash or HTML5 history (with fallback) URLs
+- Declarative Redirect routes
+- Declarative NotFound routes
+- Browser scroll behavior with transitions
 
 Check out the `examples` directory to see how simple previously complex UI
 and workflows are to create.

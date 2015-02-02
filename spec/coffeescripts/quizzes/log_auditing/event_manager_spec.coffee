@@ -73,3 +73,13 @@ define [
 
     ok !evtManager.isDirty(),
       "it flushes its buffer when sync is complete"
+  test "it should drop trackers", ->
+    evtManager = new EventManager({
+      autoDeliver: false,
+      deliveryUrl: '/events'
+    })
+    evtManager.registerTracker(TestEventTracker)
+    evtManager.unregisterAllTrackers()
+    testEventFactory.trigger("change")
+
+    ok !evtManager.isDirty(), "it doesn't have any active trackers"

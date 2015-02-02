@@ -238,6 +238,7 @@ class EnrollmentsApiController < ApplicationController
 
     has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
     enrollments = enrollments.joins(:course) if has_courses
+    enrollments = enrollments.shard(@shard_scope) if @shard_scope
 
     enrollments = Api.paginate(
       enrollments,
@@ -306,6 +307,10 @@ class EnrollmentsApiController < ApplicationController
   #   code. When self-enrolling, the user_id must be 'self'. The
   #   enrollment_state will be set to 'active' and all other arguments
   #   will be ignored.
+  #
+  # @argument enrollment[self_enrolled] [Boolean]
+  #   If true, marks the enrollment as a self-enrollment, which gives
+  #   students the ability to drop the course if desired. Defaults to false.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
@@ -502,6 +507,8 @@ class EnrollmentsApiController < ApplicationController
       # on unpublished courses.
       enrollments = enrollments.where(workflow_state: %w{active invited}) unless params[:state].present?
     end
+
+    @shard_scope = user
 
     enrollments
   end

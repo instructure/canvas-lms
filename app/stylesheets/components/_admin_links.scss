@@ -1,63 +1,91 @@
 
 /*
-@styleguide Cogs (Admin Links)
+@styleguide Cogs (Admin Dropdowns)
 
-Cogs, *AKA admin links*, are generally floated to the right, make sure it's the right-most item in your UI. There are different cogs for the toolbar and content:
-<ul>
-<li>toolbar cogs are buttons with the cog and arrow inside</li>
-<li>content cogs are just the cog icon with the arrow and are generally used in the content areas, list items oir anything else that is NOT in a toolbar</li>
-</ul>
-**adding `class="admin-links"` to the container will float cog to the right**
+Admin "cog" dropdowns should only be used if there is **more than one action** you want the user to choose from. If there's only one action, please use a regular button.
 
 ### Toolbar Cog (button + cog)
 
+Admin dropdowns come in two flavors: If the dropdown is to be used in a header/toolbar, please follow the example below:
+
 ```html
-<div>
-  <a class="al-trigger btn" role="button" href="#">
-    <i class="icon-settings"></i>
-    <i class="icon-mini-arrow-down"></i>
-    <span class="screenreader-only">Settings</span>
-  </a>
-  <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
-    <li role="presentation">
-      <a href="#" class="icon-edit" id="toolbar-2" tabindex="-1" role="menuitem">Edit</a>
-    </li>
-    <li role="presentation">
-      <a href="#" class="icon-trash" id="toolbar-3" tabindex="-1" role="menuitem">Delete</a>
-    </li>
-    <li role="presentation">
-      <a href="#" class="icon-lock" id="toolbar-4" tabindex="-1" role="menuitem">Lock</a>
-    </li>
-  </ul>
+<div style="text-align: center;">
+  
+  <!-- Begin dropdown markup -->
+  <div class="al-dropdown__container">
+    <a class="al-trigger btn" role="button" href="#">
+      <i class="icon-settings"></i>
+      <i class="icon-mini-arrow-down"></i>
+      <span class="screenreader-only">Settings</span>
+    </a>
+    <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+      <li role="presentation">
+        <a href="#" class="icon-edit" id="toolbar-2" tabindex="-1" role="menuitem">Edit</a>
+      </li>
+      <li role="presentation">
+        <a href="#" class="icon-trash" id="toolbar-3" tabindex="-1" role="menuitem">Delete</a>
+      </li>
+      <li role="presentation">
+        <a href="#" class="icon-lock" id="toolbar-4" tabindex="-1" role="menuitem">Lock</a>
+      </li>
+    </ul>
+  </div>
+  <!-- End dropdown markup -->
+
 </div>
 ```
 
 ### Content cog
+For admin dropdowns that appear in main content areas, such as item groups, please use the example below:
 
 ```html
-<div>
-  <a class="al-trigger al-trigger-gray" role="button" href="#">
-    <i class="icon-settings"></i>
-    <i class="icon-mini-arrow-down"></i>
-    <span class="screenreader-only">Settings</span>
-  </a>
+<div style="text-align: center;">
+  
+  <!-- Begin dropdown markup -->
+  <div class="al-dropdown__container">
+    <a class="al-trigger al-trigger-gray" role="button" href="#">
+      <i class="icon-settings"></i>
+      <i class="icon-mini-arrow-down"></i>
+      <span class="screenreader-only">Settings</span>
+    </a>
 
-  <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
-    <li role="presentation">
-      <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
-    </li>
-    <li role="presentation">
-      <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
-    </li>
-  </ul>
+    <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+      <li role="presentation">
+        <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+      </li>
+      <li role="presentation">
+        <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+      </li>
+    </ul>
+  </div>
+  <!-- End dropdown markup -->
+
 </div>
 ```
 
 */
 
+@keyframes al-slide-down {
+  from {
+    transform: translate3d(-1px,-25%,0);
+    opacity: 0.2;
+  }
+
+  to {
+    transform: translate3d(-1px,0,0);
+    opacity: 1;
+  }
+}
+
 .admin-links {
   float: right;
 }
+
+.al-dropdown__container {
+  position: relative;
+  display: inline-block;
+}
+
 .al-options {
   display: none;
   -webkit-font-smoothing: antialiased;
@@ -67,50 +95,72 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 }
 
 .al-options {
-  background-color: transparent;
-  border: none;
-  box-shadow: 0px 3px 5px 0px rgba(0,0,0, 0.8);
+  box-sizing: border-box;
+  background-color: $canvas-light;
+  box-shadow: 0px 0px 6px rgba(black, 0.1);
   position: absolute;
-  .ui-menu-item a {
-    background-color: black; /* ie<=8 */
-    background-color: rgba(0,0,0, 0.7);
-    color: #fff;
-    text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
-    white-space: nowrap;
-  }
+  padding: 8px 0;
+  border-color: $can-border-light;
+  text-align: left;
+
+  * { box-sizing: border-box; }
+
+  &.ui-state-open {
+    animation-duration: 0.2s;
+    animation-name: al-slide-down;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0,1,0.5,1);
+  }    
+
+  .ui-menu-item {
+    a {
+      background-color: transparent;
+      color: $canvas-dark;
+      white-space: nowrap;
+      min-width: 180px;
+      padding: 6px 12px;
+      
+      &[class*=icon-]:before, 
+      &[class^=icon-]:before { margin-right: 8px; }
+    }
+
+    &:first-of-type a { 
+      border-top-left-radius: 0; 
+      border-top-right-radius: 0; 
+    }
+    &:last-child a { 
+      border-bottom-left-radius: 0; 
+      border-bottom-right-radius: 0; 
+    }
+
+  } 
+
   .ui-menu-item a.disabled,
   .ui-menu-item a.disabled.ui-state-focus {
-    background-color: black;
-    background-color: rgba(0,0,0,0.7);
-    background-image: none;
-    cursor: default;
-    color: #c0c0c0;
+    background: none;
+    cursor: not-allowed;
+    @if $use_new_styles { color: darken($canvas-neutral, 20%); }
+    @else { color: darken($canvas-neutral, 15%); }
   }
-  .ui-menu-carat {
-    border-color: transparent;
-  }
-  .ui-menu-carat span {
-    border-color: black transparent; /* ie<=8 */
-    border-color: rgba(0,0,0,0.7) transparent;
-  }
+  .ui-menu-carat span { border-color: $canvas-light transparent; }
   .ui-state-focus{
     margin: 0 !important;
     border: none;
+    text-shadow: none;
   }
 }
 
-.al-trigger-gray, .al-trigger-gray:hover {
-  color: ensure-contrast(#bbb, white);
+.al-trigger-gray {
+  @if $use_new_styles { color: lighten($canvas-dark, 10%); }
+  @else { color: lighten($canvas-dark, 20%); }
+  &:hover, &:focus { color: $canvas-dark; }
 }
 
 .admin-link-hover-area:hover .al-trigger,
 .admin-link-hover-area.active .al-trigger,
 .al-trigger.ui-state-active,
 .al-trigger:focus,
-.al-trigger:hover {
-  color: #4d4d4d;
-  text-decoration: none;
-}
+.al-trigger:hover { text-decoration: none; }
 
 .al-trigger {
   padding-left: 8px;
@@ -118,6 +168,8 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;
+  user-select: none;
+  display: inline-block;
 }
 
 .al-hover-container .al-trigger {
@@ -126,8 +178,5 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 }
 
 .al-hover-container:hover, .al-hover-container-active {
-  .al-trigger {
-    z-index: 0;
-  }
+  .al-trigger { z-index: 0; }
 }
-

@@ -31,7 +31,7 @@
 # PaginatedList expects an empty <ul> wrapped in a <div>. The element
 # passed to the constructor should be the <div>.
 
-define ['jquery', 'i18n!paginated_list', 'vendor/spin'], ($, I18n, Spinner) ->
+define ['jquery', 'i18n!paginated_list', 'vendor/spin', 'str/htmlEscape'], ($, I18n, Spinner, htmlEscape) ->
   class PaginatedList
     ##
     # I18n keys used by class
@@ -132,11 +132,11 @@ define ['jquery', 'i18n!paginated_list', 'vendor/spin'], ($, I18n, Spinner) ->
     ##
     # animate loaded results
     # @api private
-    animateInResults: (results) ->
+    animateInResults: ($results) ->
       empty = @el.list.children().length == 0
-      results.css('display', 'none')
-      @el.list.append results
-      results.slideDown()
+      $results.css('display', 'none')
+      @el.list.append $results
+      $results.slideDown()
 
     ##
     # keep track of what page we're on. when the last page
@@ -146,7 +146,7 @@ define ['jquery', 'i18n!paginated_list', 'vendor/spin'], ($, I18n, Spinner) ->
       if @hasNextPage()
         @options.requestParams.page++
         unless @pageLinkPresent
-          @el.wrapper.append @viewMoreLink()
+          @el.wrapper.append @viewMoreLinkHtml()
           @pageLinkPresent = true
       else
         @el.wrapper.find('.view-more-link').remove()
@@ -162,12 +162,12 @@ define ['jquery', 'i18n!paginated_list', 'vendor/spin'], ($, I18n, Spinner) ->
     # template for view more link
     # @return String
     # @api private
-    viewMoreLink: ->
-      '<a class="view-more-link" href="#">' + @keys.viewMore + '</a>'
+    viewMoreLinkHtml: ->
+      '<a class="view-more-link" href="#">' + htmlEscape(@keys.viewMore) + '</a>'
 
     ##
     # template for no results notification
     # @return String
     # @api private
     noResults: ->
-      @el.list.append "<li>#{@keys.noResults}</li>"
+      @el.list.append "<li>#{htmlEscape @keys.noResults}</li>"

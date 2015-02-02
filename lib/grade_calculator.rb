@@ -22,12 +22,15 @@ class GradeCalculator
   def initialize(user_ids, course, opts = {})
     opts = opts.reverse_merge(:ignore_muted => true)
 
-    @course = course.is_a?(Course) ?
-      @course = course :
-      @course = Course.find(course)
-    @course_id = @course.id
-    @groups = @course.assignment_groups.active.includes(:published_assignments)
-    @assignments = @groups.flat_map(&:published_assignments).select(&:graded?)
+    @course = course.is_a?(Course) ? course : Course.find(course)
+    @groups = @course.assignment_groups.active
+    @grading_period = opts[:grading_period]
+
+    assignment_scope = @course.assignments.published.gradeable
+    @assignments = @grading_period ?
+                     @grading_period.assignments(assignment_scope) :
+                     assignment_scope.all
+
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}
     @final_updates = {}
@@ -48,6 +51,7 @@ class GradeCalculator
     @submissions = @course.submissions.
         except(:order, :select).
         for_user(@user_ids).
+        where(assignment_id: @assignments.map(&:id)).
         select("submissions.id, user_id, assignment_id, score")
     submissions_by_user = @submissions.group_by(&:user_id)
 

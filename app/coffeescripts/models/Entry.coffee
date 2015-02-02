@@ -7,8 +7,9 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'str/stripTags'
   'jquery.ajaxJSON'
-], (I18n, $, _, Backbone) ->
+], (I18n, $, _, Backbone, stripTags) ->
 
   ##
   # Model representing an entry in discussion topic
@@ -172,8 +173,7 @@ define [
     ##
     # Computed attribute
     summary: ->
-      @escapeDiv ||= $('<div/>')
-      @escapeDiv.html(@get('message')).text()
+      stripTags @get('message')
 
     ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON

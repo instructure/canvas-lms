@@ -11,8 +11,8 @@ require [
   if ENV.DASHBOARD_SIDEBAR_URL
     rightSide = $('#right-side')
     rightSide.disableWhileLoading(
-      $.get ENV.DASHBOARD_SIDEBAR_URL , (data) ->
-        rightSide.html data
+      $.get ENV.DASHBOARD_SIDEBAR_URL , (html) ->
+        rightSide.html html
         newCourseForm()
     )
 

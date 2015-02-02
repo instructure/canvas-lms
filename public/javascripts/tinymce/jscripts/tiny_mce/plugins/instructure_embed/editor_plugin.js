@@ -34,18 +34,18 @@ define([
 
   var TRANSLATIONS = {
     click_to_embed: I18n.t('click_to_embed', 'Click to embed the image'),
-    instructions: INST.htmlEscape(I18n.t('instructions', "Paste or type the URL of the image you'd like to embed:")),
-    url: INST.htmlEscape(I18n.t('url', 'URL:')),
-    alt_text: INST.htmlEscape(I18n.t('alt_text', 'Alternate Text:')),
+    instructions: I18n.t('instructions', "Paste or type the URL of the image you'd like to embed:"),
+    url: I18n.t('url', 'URL:'),
+    alt_text: I18n.t('alt_text', 'Alternate Text:'),
     search_flickr: I18n.t('search_flickr', 'Search flickr creative commons'),
     loading: I18n.t('loading', 'Loading...'),
     embed_external: I18n.t('embed_external', 'Embed External Image'),
-    embed_image: INST.htmlEscape(I18n.t('embed_image', 'Embed Image')),
+    embed_image: I18n.t('embed_image', 'Embed Image'),
     image_not_found: I18n.t('image_not_found', 'Image not found, please try a new URL')
   };
 
   function initShared () {
-    $box = $('<div/>', {html: TRANSLATIONS.instructions + "<form id='instructure_embed_prompt_form' style='margin-top: 5px;'><table class='formtable'><tr><td>"+ TRANSLATIONS.url +"</td><td><input type='text' class='prompt' style='width: 250px;' value='http://'/></td></tr><tr><td class='nobr'>"+TRANSLATIONS.alt_text+"</td><td><input type='text' class='alt_text' style='width: 150px;' value=''/></td></tr><tr><td colspan='2' style='text-align: right;'><input type='submit' class='btn' value='Embed Image'/></td></tr></table></form><div class='actions'></div>"}).hide();
+    $box = $('<div/>', {html: htmlEscape(TRANSLATIONS.instructions) + "<form id='instructure_embed_prompt_form' style='margin-top: 5px;'><table class='formtable'><tr><td>"+ htmlEscape(TRANSLATIONS.url) +"</td><td><input type='text' class='prompt' style='width: 250px;' value='http://'/></td></tr><tr><td class='nobr'>"+htmlEscape(TRANSLATIONS.alt_text)+"</td><td><input type='text' class='alt_text' style='width: 150px;' value=''/></td></tr><tr><td colspan='2' style='text-align: right;'><input type='submit' class='btn' value='Embed Image'/></td></tr></table></form><div class='actions'></div>"}).hide();
     $altText = $box.find('.alt_text');
     $actions = $box.find('.actions');
     $userURL = $box.find('.prompt');
@@ -75,19 +75,19 @@ define([
     event.preventDefault();
     $box.dialog('close');
     $.findImageForService('flickr_creative_commons', function (data) {
-      var title = INST.htmlEscape(data.title),
-          html = '<a href="' + data.link_url + '"><img src="' + data.image_url + '" title="' + title + '"alt="' + title + '" style="max-width: 500; max-height: 500"></a>';
+      var title = data.title,
+          html = '<a href="' + htmlEscape(data.link_url) + '"><img src="' + htmlEscape(data.image_url) + '" title="' + htmlEscape(title) + '"alt="' + htmlEscape(title) + '" style="max-width: 500; max-height: 500"></a>';
       $box.dialog('close');
       $editor.editorBox('insert_code', html);
     });
   }
 
   function embedURLImage (event) {
-    var alt = INST.htmlEscape($altText.val() || ''),
-        text = INST.htmlEscape($userURL.val());
+    var alt = $altText.val() || '',
+        text = $userURL.val();
 
     event.preventDefault();
-    $editor.editorBox('insert_code', "<img src='" + text + "' alt='" + alt + "'/>");
+    $editor.editorBox('insert_code', "<img src='" + htmlEscape(text) + "' alt='" + htmlEscape(alt) + "'/>");
     $box.dialog('close');
   }
 

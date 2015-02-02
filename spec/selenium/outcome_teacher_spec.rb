@@ -79,16 +79,16 @@ describe "outcomes as a teacher" do
       end
     end
 
-    it "should display 20 initial groups" do
-      num = 21
+    it "should be able to display 20 groups" do
+      num = 20
       course_bulk_outcome_groups_course(num, num)
       get outcome_url
       wait_for_ajaximations
       keep_trying_until { expect(ff(".outcome-group").count).to eq 20 }
     end
 
-    it "should display 20 initial associated outcomes in nested group" do
-      num = 21
+    it "should be able to display 20 nested outcomes" do
+      num = 20
       course_bulk_outcome_groups_course(num, num)
       get outcome_url
       ff(".outcome-group")[0].click

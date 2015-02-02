@@ -569,6 +569,18 @@ describe User do
         expect(alice.courses_with_primary_enrollment.size).to eq 0
       end
 
+      it 'works with favorite_courses' do
+        @user = User.create!(:name => 'user')
+        @shard1.activate do
+          account = Account.create!
+          @course = account.courses.build
+          @course.workflow_state = 'available'
+          @course.save!
+          StudentEnrollment.create!(:course => @course, :user => @user, :workflow_state => 'active')
+        end
+        @user.favorites.create!(:context => @course)
+        expect(@user.courses_with_primary_enrollment(:favorite_courses)).to eq [@course]
+      end
     end
   end
 
@@ -2795,5 +2807,32 @@ describe User do
       expect(@student.group_memberships_for(@course).size).to eq 0
     end
 
+  end
+
+  describe 'visible_groups' do
+    it "should include groups in published courses" do
+      course_with_student active_all:true
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 1
+    end
+
+    it "should not include groups that belong to unpublished courses" do
+      course_with_student
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 0
+    end
+
+    it "should include account groups" do
+      account = account_model(:parent_account => Account.default)
+      student = user active_all: true
+      @group = Group.create! context: account, name: "GroupOne"
+      @group.users << student
+      @group.save!
+      expect(student.visible_groups.size).to eq 1
+    end
   end
 end

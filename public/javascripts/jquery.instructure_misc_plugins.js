@@ -35,11 +35,11 @@ define([
     }
 
     options.forEach( function(opt) {
-      escOpt = htmlEscape(opt);
-      result += "<option value=\"" + escOpt + "\">" + escOpt + "</option>";
+      var optHtml = htmlEscape(opt);
+      result += "<option value=\"" + optHtml + "\">" + optHtml + "</option>";
     });
 
-    return this.html(result);
+    return this.html($.raw(result));
   }
 
   // this function is to prevent you from doing all kinds of expesive operations on a
@@ -394,8 +394,7 @@ define([
             if (val === (val = input.val())) {return;}
 
             // Enter new content into testSubject
-            var escaped = val.replace(/&/g, '&amp;').replace(/\s/g,'&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            testSubject.html(escaped);
+            testSubject.text(val);
 
             // Calculate new width + whether to change
             var testerWidth = testSubject.width(),

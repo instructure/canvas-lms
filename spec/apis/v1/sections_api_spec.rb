@@ -64,6 +64,27 @@ describe SectionsController, type: :request do
       expect(json.find { |s| s['name'] == section2.name }['students'][0]['enrollments'][0]["user_id"]).to eq(user2.id)
     end
 
+    it "should return the count of active and invited students if 'total_students' flag is given" do
+      user1 = @user
+      user2 = User.create!(:name => 'Bernard')
+      user3 = User.create!(:name => 'Hoagie')
+      user4 = User.create!(:name => 'Laverne')
+      section1 = @course2.default_section
+      section2 = @course2.course_sections.create!(:name => 'Section 31')
+
+      @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
+      @course2.enroll_user(user3, 'StudentEnrollment', :section => section2).accept!
+      @course2.enroll_user(user4, 'StudentEnrollment', :section => section2)
+
+      @user = @me
+
+      json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
+                      { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => 'total_students' })
+
+      expect(json.first).to include('total_students')
+      expect(json.first['total_students']).to eq 3
+    end
+
     it "should not return deleted sections" do
       section1 = @course2.default_section
       section2 = @course2.course_sections.create!(:name => 'Section B')
@@ -318,13 +339,14 @@ describe SectionsController, type: :request do
 
       it "should modify section data by id" do
         json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
-          { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z' }})
+          { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :restrict_enrollments_to_section_dates => '1' }})
         expect(json['id']).to eq @section.id
         @section.reload
         expect(@section.name).to eq 'New Name'
         expect(@section.sis_source_id).to eq 'SISsy'
         expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
         expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
+        expect(@section.restrict_enrollments_to_section_dates).to be_truthy
       end
 
       it "should modify section data by sis id" do

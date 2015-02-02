@@ -192,7 +192,7 @@ define([
                       importFailed(zfi.data.errors);
                     } else if(zfi && zfi.workflow_state == 'imported') {
                       $progress.progressbar('value', 100);
-                      $dialog.append(I18n.t('messages.extraction_complete', "Extraction complete!  Updating..."));
+                      $dialog.append(htmlEscape(I18n.t('messages.extraction_complete', "Extraction complete!  Updating...")));
                       files.refreshContext(folder.context_string, function() {
                         $dialog.dialog('close');
                       });
@@ -587,6 +587,7 @@ define([
           $(ui.helper).find(".header .sub_header").html("&nbsp;");
         }
       },
+      // xsslint jqueryObject.method breadcrumb
       breadcrumb: function() {
         var folders = location.hash.substring(1).replace(/\/\//g, "\\").split("/");
         var $crumbs = $("<div/>");
@@ -1413,11 +1414,11 @@ define([
             if(node.hasClass('node')) {
               var folder_url = $.replaceTags($("." + data.context_string + "_folder_url").attr('href'), 'id', data.id);
               var cancelled = false;
-              var $no_content = $("<li class='message'>" + I18n.t('messages.folder_empty', "Nothing in this Folder") + "</li>");
+              var $no_content = $("<li class='message'>" + htmlEscape(I18n.t('messages.folder_empty', "Nothing in this Folder")) + "</li>");
               if(node.hasClass('folder')) {
                 if(!data || !data.permissions || !data.permissions.read_contents) {
                   $files_content.find(".content_panel:last")
-                                .after("<li class='message'>" + I18n.t('messages.access_denied', "You cannot read the contents of this folder.") + "</li>");
+                                .after("<li class='message'>" + htmlEscape(I18n.t('messages.access_denied', "You cannot read the contents of this folder.")) + "</li>");
                   cancelled = true;
                 } else {
                   // add a control panel to the top for adding files, folders to this

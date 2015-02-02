@@ -63,8 +63,8 @@ define [
 
     extractFormValues: ->
       hidden   : @state.selectedOption is 'link_only'
-      unlock_at: @state.selectedOption is 'date_range' && @refs.unlock_at.getDOMNode().value or ''
-      lock_at  : @state.selectedOption is 'date_range' && @refs.lock_at.getDOMNode().value or ''
+      unlock_at: @state.selectedOption is 'date_range' && $(@refs.unlock_at.getDOMNode()).data('unfudged-date') or ''
+      lock_at  : @state.selectedOption is 'date_range' && $(@refs.lock_at.getDOMNode()).data('unfudged-date') or ''
       locked: @state.selectedOption is 'unpublished'
 
     # Function Summary
@@ -81,10 +81,6 @@ define [
         # They didn't choose a use justification
         if (values.use_justification == 'choose')
           $(@refs.usageSelection.refs.usageRightSelection.getDOMNode()).errorBox(I18n.t('You must specify a usage right.'))
-          return false
-        # No copyright specified
-        if (!values.copyright and @refs.usageSelection.refs.copyright?)
-          $(@refs.usageSelection.refs.copyright.getDOMNode()).errorBox(I18n.t('You must specify the copyright holder.'))
           return false
 
         # We need to first set usage rights before handling the setting of
@@ -131,11 +127,17 @@ define [
     allFolders: ->
       @props.models.every (model) -> model instanceof Folder
 
+    ###
+    # Returns true if all the models passed in are folders.
+    ###
+    anyFolders: ->
+      @props.models.filter((model) -> model instanceof Folder).length
+
     renderUsageRightsWarning: ->
       div {className: 'RestrictedDialogForm__banner col-xs-12'},
         span {className: 'alert'},
           i {className: 'icon-warning RestrictedDialogForm__warning'}
-          I18n.t('Before publishing you must set usage rights on your files. This is set by your account admin. If you have problems please contact them.')
+          I18n.t('Before publishing, you must set usage rights on your files.')
 
     ###
     # Renders out the restricted access form
@@ -208,7 +210,13 @@ define [
                   onChange: (event) =>
                       @setState selectedOption: 'link_only'
                 },
-                I18n.t("options.hiddenInput.description", "Only available to students with link. Not visible in student files.")
+                if @allFolders()
+                  I18n.t("Hidden, files inside will be available with links.")
+                else if @props.models.length > 1 and @anyFolders()
+                  I18n.t("Files and folder contents only available to students with link. Not visible in student files.")
+                else
+                  I18n.t("options.hiddenInput.description", "Only available to students with link. Not visible in student files.")
+
             div className: "radio",
               label {},
                  input {

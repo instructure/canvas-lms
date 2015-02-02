@@ -525,6 +525,21 @@ describe SisImportsApiController, type: :request do
     })
   end
 
+  it "should filter sis imports by date if requested" do
+    batch = @account.sis_batches.create
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s, :created_since => 1.day.from_now.iso8601 })
+
+    expect(json["sis_imports"].count).to eq 0
+
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s, :created_since => 1.day.ago.iso8601 })
+
+    expect(json["sis_imports"].count).to eq 1
+  end
+
   it "should not fail when options are nil" do
     batch = @account.sis_batches.create
     expect(batch.options).to be_nil

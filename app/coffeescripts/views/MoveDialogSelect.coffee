@@ -32,9 +32,9 @@ define [
       # I'm sorry, Voiceover + jQueryUI made me do it
       # VO won't acknowledge the existance of the re-rendered view
       # but if we render just the options, it's OK
-      fragment = $(@template @toJSON())
-      opts = fragment.filter('select').find('option')
-      @$('select').empty().append(opts)
+      $fragment = $(@template @toJSON())
+      $opts = $fragment.filter('select').find('option')
+      @$('select').empty().append($opts)
 
     value: ->
       @$('select').val()

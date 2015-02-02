@@ -129,17 +129,29 @@ module CC::Importer
       end
     end
 
+    def fetch(url, limit = 10)
+      # You should choose better exception.
+      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
+
+      case response
+        when Net::HTTPRedirection then fetch(response['location'], limit - 1)
+        else
+          response
+      end
+    end
+
     def retrieve_and_convert_blti_url(url)
       begin
-        uri = URI.parse(url)
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = uri.scheme == 'https'
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        
-        request = Net::HTTP::Get.new(uri.request_uri)
-        response = http.request(request)
+        response = fetch(url)
         config_xml = response.body
-
         convert_blti_xml(config_xml)
       rescue Timeout::Error
         raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))

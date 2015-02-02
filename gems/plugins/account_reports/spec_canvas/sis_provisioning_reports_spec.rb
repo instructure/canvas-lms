@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2014 Instructure, Inc.
+# Copyright (C) 2012 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -858,7 +858,10 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["xlist"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        report = run_report("sis_export_csv", {params: parameters})
+        parsed = parse_report(report, {header: true})
+        headers = parsed.shift
+        expect(headers).to eq ['xlist_course_id', 'section_id', 'status']
         expect(parsed[0]).to eq ["SIS_COURSE_ID_2","english_section_1","active"]
         expect(parsed.length).to eq 1
       end
@@ -889,9 +892,11 @@ describe "Default Account Reports" do
         parameters["xlist"] = true
         parsed = read_report("provisioning_csv",{params: parameters, order: 1})
         expect(parsed[0]).to eq [@course1.id.to_s,"SIS_COURSE_ID_1",
-                             @section3.id.to_s,"english_section_3","active"]
+                             @section3.id.to_s,"english_section_3","active",
+                             @course2.id.to_s, @course2.sis_source_id]
         expect(parsed[1]).to eq [@course2.id.to_s,"SIS_COURSE_ID_2",
-                             @section1.id.to_s,"english_section_1","active"]
+                             @section1.id.to_s,"english_section_1","active",
+                             @course1.id.to_s, @course1.sis_source_id]
         expect(parsed.length).to eq 2
       end
 
@@ -901,9 +906,11 @@ describe "Default Account Reports" do
         parameters["xlist"] = true
         parsed = read_report("provisioning_csv",{params: parameters, order: 1})
         expect(parsed[0]).to eq [@course1.id.to_s,"SIS_COURSE_ID_1",
-                             @section3.id.to_s,"english_section_3","active"]
+                             @section3.id.to_s,"english_section_3","active",
+                             @course2.id.to_s, @course2.sis_source_id]
         expect(parsed[1]).to eq [@course2.id.to_s,"SIS_COURSE_ID_2",
-                             @section1.id.to_s,"english_section_1","active"]
+                             @section1.id.to_s,"english_section_1","active",
+                             @course1.id.to_s, @course1.sis_source_id]
         expect(parsed.length).to eq 2
       end
     end

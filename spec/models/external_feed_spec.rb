@@ -19,34 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ExternalFeed do
-  it "should add ical entries" do
-    @feed = external_feed_model(:feed_purpose => 'calendar')
-    require 'icalendar'
-    cals = Icalendar.parse ical_example
-    expect(cals[0].events.first.summary).to eql("Bastille Day Party")
-    res = @feed.add_ical_entries(cals[0])
-    expect(res).not_to be_nil
-    expect(res.length).to eql(1)
-    expect(res[0].title).to eql("Bastille Day Party")
-  end
-  
-  it "should add ical entries to a course" do
-    @course = course_model
-    @feed = external_feed_model(:feed_purpose => 'calendar', :context => @course)
-    require 'icalendar'
-    cals = Icalendar.parse ical_example
-    expect(cals[0].events.first.summary).to eql("Bastille Day Party")
-    res = @feed.add_ical_entries(cals[0])
-    expect(res).not_to be_nil
-    expect(res.length).to eql(1)
-    expect(res[0].title).to eql("Bastille Day Party")
-    @course.reload
-    expect(@course.calendar_events.length).to eql(1)
-    expect(@course.calendar_events[0]).to eql(res[0].asset)
-  end
-  
   it "should add rss entries" do
-    @feed = external_feed_model(:feed_purpose => 'announcements')
+    @feed = external_feed_model
     require 'rss/1.0'
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
@@ -62,7 +36,7 @@ describe ExternalFeed do
   
   it "should add rss entries as course announcements" do
     @course = course_model
-    @feed = external_feed_model(:feed_purpose => 'announcements', :context => @course)
+    @feed = external_feed_model(:context => @course)
     require 'rss/1.0'
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
@@ -74,7 +48,7 @@ describe ExternalFeed do
   end
   
   it "should add atom entries" do
-    @feed = external_feed_model(:feed_purpose => 'announcements')
+    @feed = external_feed_model
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
@@ -85,7 +59,7 @@ describe ExternalFeed do
   
   it "should add atom entries as course announcements" do
     @course = course_model
-    @feed = external_feed_model(:feed_purpose => 'announcements', :context => @course)
+    @feed = external_feed_model(:context => @course)
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
@@ -96,18 +70,6 @@ describe ExternalFeed do
     expect(res[0].asset).to eql(@course.announcements.first)
   end
   
-end
-
-def ical_example
-%{BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//hacksw/handcal//NONSGML v1.0//EN
-BEGIN:VEVENT
-DTSTART:19970714T170000Z
-DTEND:19970715T035959Z
-SUMMARY:Bastille Day Party
-END:VEVENT
-END:VCALENDAR}
 end
 
 def atom_example

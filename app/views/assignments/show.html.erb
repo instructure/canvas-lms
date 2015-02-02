@@ -5,7 +5,7 @@
 
 <% if @locked && !@locked[:due_at] %>
   <% js_bundle :module_sequence_footer %>
-    
+
   <h1><%= @assignment.title %></h1>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
@@ -92,6 +92,7 @@
           </li>
         <% end %>
       <% end %>
+      <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
       <div class="clear"></div>
     </ul>
   <% end %>

@@ -49,9 +49,12 @@ define [
       _.include(ENV.current_user_roles, "student")
 
     getGrades: ->
-      if @userIsStudent()
+      if @userIsStudent() || ENV.observed_student_ids.length == 1
         collection = new SubmissionCollection
-        collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
+        if @userIsStudent()
+          collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
+        else
+          collection.url = => "#{@courseSubmissionsURL}?student_ids[]=#{ENV.observed_student_ids[0]}&per_page=#{PER_PAGE_LIMIT}"
         collection.loadAll = true
         collection.on 'fetched:last', =>
           @loadGradesFromSubmissions(collection.toArray())

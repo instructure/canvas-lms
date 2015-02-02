@@ -5,12 +5,23 @@
 </button>
 
 <ul class="section-select-menu" id="section-to-show-menu">
-  <li>{{#t "choose_a_section_to_show"}}Choose a section to show{{/t}}</li>
+  {{#if showSections}}
+    <li>{{#t "choose_a_section_to_show"}}Choose a section to show{{/t}}</li>
+  {{else}}
+    <li>{{#t "showing_course"}}Showing Course{{/t}}</li>
+  {{/if}}
   {{#each sections}}
     <li>
       <a href="#">
         <label for="section_option_{{id}}">{{{name}}}</label>
         <input id="section_option_{{id}}" type="radio" value="{{id}}" name="section_to_show_radio" {{#if checked}} checked {{/if}} />
+        {{#if ../showSisSync}}
+          {{#if passback_status}}
+            <i align="right" style="font-size:12px"> -- Last Sync ({{{passback_status.sis_post_grades_status.status}}}): {{{datetimeFormatted date "short"}}}</i>
+          {{else}}
+            <i align="right" style="font-size:12px">{{#t}}-- Section not synced yet{{/t}}</i>
+          {{/if}}
+        {{/if}}
       </a>
     </li>
   {{/each}}

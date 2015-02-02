@@ -19,7 +19,7 @@
 class LearningOutcome < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :description, :short_description, :title, :display_name
-  attr_accessible :rubric_criterion, :vendor_guid
+  attr_accessible :rubric_criterion, :vendor_guid, :calculation_method, :calculation_int
 
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
@@ -29,11 +29,25 @@ class LearningOutcome < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :short_description, :context_code, :description, :data, :workflow_state, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
   EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
   serialize :data
+
+  before_validation :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults
+
+  CALCULATION_METHODS = %w[decaying_average n_mastery highest latest]
+  VALID_CALCULATION_INTS = {
+    "decaying_average" => (1..99),
+    "n_mastery" => (2..5),
+    "highest" => [],
+    "latest" => [],
+  }
+
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :short_description, :maximum => maximum_string_length
+  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS
   validates_presence_of :short_description, :workflow_state
   sanitize_field :description, CanvasSanitize::SANITIZE
+  validate :calculation_changes_after_asessing, if: :assessed?
+  validate :validate_calculation_int, unless: :assessed?
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -58,6 +72,83 @@ class LearningOutcome < ActiveRecord::Base
       self.data[:rubric_criterion][:description] = self.short_description
     end
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+
+    # if we are changing the calculation_method but not the calculation_int, set the int to the default value
+    if calculation_method_changed? && !calculation_int_changed?
+      self.calculation_int = default_calculation_int
+    end
+  end
+
+  def calculation_changes_after_asessing
+    # if we've been used to assess a student, refuse to accept any changes to our calculation options
+    if calculation_method_changed?
+      errors.add(:calculation_method, t(
+        "This outcome has been used to assess a student. Calculation method is fixed at %{old_value}",
+        :old_value => calculation_method_was
+      ))
+    end
+
+    if calculation_int_changed?
+      errors.add(:calculation_int, t(
+        "This outcome has been used to assess a student. Calculation int is fixed at %{old_value}",
+        :old_value => calculation_int_was
+      ))
+    end
+  end
+
+  def validate_calculation_int
+    unless valid_calculation_int?(calculation_int, calculation_method)
+      errors.add(:calculation_int, t(
+        "'%{calculation_int}' is not a valid calculation_int for calculation_method of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'",
+        :calculation_int => calculation_int, :calculation_method => calculation_method,
+        :valid_calculation_ints => valid_calculation_ints
+      ))
+    end
+  end
+
+  def valid_calculation_method?(method=self.calculation_method)
+    CALCULATION_METHODS.include?(method)
+  end
+
+  def valid_calculation_ints(method=self.calculation_method)
+    VALID_CALCULATION_INTS[method]
+  end
+
+  def valid_calculation_int?(int, method=self.calculation_method)
+    if valid_calculation_method?(method)
+      valid_ints = valid_calculation_ints(method)
+      (int.nil? && valid_ints.to_a.empty?) || valid_ints.include?(int)
+    else
+      true
+    end
+  end
+
+  def infer_default_calculation_method
+    # If we are a new record, or are not changing our calculation_method (such as on a pre-existing
+    # record or an import), then assume the default of highest
+    if new_record? || !calculation_method_changed?
+      self.calculation_method ||= default_calculation_method
+    end
+  end
+
+  def adjust_calculation_int
+    # If we are setting calculation_method to latest or highest,
+    # set calculation_int nil unless it is a new record (meaning it was set explicitly)
+    if %w[highest latest].include?(calculation_method) && calculation_method_changed?
+      self.calculation_int = nil unless new_record?
+    end
+  end
+
+  def default_calculation_method
+    "highest"
+  end
+
+  def default_calculation_int(method=self.calculation_method)
+    case method
+    when 'decaying_average' then 75
+    when 'n_mastery' then 5
+    else nil
+    end
   end
 
   def align(asset, context, opts={})
@@ -181,6 +272,10 @@ class LearningOutcome < ActiveRecord::Base
     save!
   end
 
+  def assessed?
+    learning_outcome_results.exists?
+  end
+
   def tie_to(context)
     @tied_context = context
   end
@@ -215,5 +310,4 @@ class LearningOutcome < ActiveRecord::Base
   }
 
   scope :global, -> { where(:context_id => nil) }
-
 end

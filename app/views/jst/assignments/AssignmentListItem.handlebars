@@ -3,15 +3,7 @@
   class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}}"
   data-item-id="{{labelId}}"
 >
-  <a href="{{htmlUrl}}" class="ig-title ellipses">
-    {{#if canManage}}
-      <span class="draggable-handle">
-        <i class="icon-drag-handle"></i>
-      </span>
-    {{/if}}
-    <i class='icon-{{iconType}}'></i>
-    {{name}}
-  </a>
+
   <div class="ig-details row-fluid">
     {{#if canManage}}
       <div class="{{spanWidth}} ellipses modules">
@@ -52,6 +44,15 @@
     </div>
 
   </div>
+  <a href="{{htmlUrl}}" class="ig-title ellipses">
+    {{#if canManage}}
+      <span class="draggable-handle">
+        <i class="icon-drag-handle"></i>
+      </span>
+    {{/if}}
+    <i class='icon-{{iconType}}'></i>
+    {{name}}
+  </a>
 
   {{#if canManage}}
     <div class="ig-admin">

@@ -55,13 +55,15 @@ define [
         else if viewOpts.model instanceof OutcomeGroup
           new OutcomeGroupView viewOpts
       @render()
+      @innerView.screenreaderTitleFocus() if @innerView instanceof OutcomeView
 
     render: ->
       @attachEvents()
-      @$el.html if @innerView
+      html = if @innerView
           @innerView.render().el
         else if @renderInstructions
           @instructionsTemplate()
+      @$el.html html
       this
 
     attachEvents: ->

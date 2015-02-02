@@ -58,11 +58,12 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   starting_cpu = Process.times()
   lag = ((Time.now - job.run_at) * 1000).round
   tag = CanvasStatsd::Statsd.escape(job.tag)
-  stats = ["delayedjob.queue", "delayedjob.queue.tag.#{tag}", "delayedjob.queue.shard.#{job.current_shard.id}"]
+  shard_id = job.current_shard.try(:id).to_i
+  stats = ["delayedjob.queue", "delayedjob.queue.tag.#{tag}", "delayedjob.queue.shard.#{shard_id}"]
   stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
   CanvasStatsd::Statsd.timing(stats, lag)
   begin
-    stats = ["delayedjob.perform", "delayedjob.perform.tag.#{tag}", "delayedjob.perform.shard.#{job.current_shard.id}"]
+    stats = ["delayedjob.perform", "delayedjob.perform.tag.#{tag}", "delayedjob.perform.shard.#{shard_id}"]
     stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
     CanvasStatsd::Statsd.time(stats) do
       block.call(worker, job)

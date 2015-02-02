@@ -190,7 +190,7 @@ define [
             @renderArrowLink('left') if @state.otherItems?.length > 0
             if @state.displayedItem
               iframe {
-                src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
+                src: @state.displayedItem.get 'preview_url'
                 className: 'ef-file-preview-frame'
               }
             else # file was not found

@@ -77,4 +77,24 @@ describe "login logout test", :priority => "2" do
     f('.login_link').click
     expect(f('#login_form')).to be_displayed
   end
+
+  it "should fail on an invalid authenticity token" do
+    user_with_pseudonym({:active_user => true})
+    destroy_session(true)
+    driver.navigate.to(app_host + '/login')
+    driver.execute_script "$.cookie('_csrf_token', '42')"
+    fill_in_login_form("nobody@example.com", 'asdfasdf')
+    assert_flash_error_message /Invalid Authenticity Token/
+  end
+
+  it "should login when a trusted referer exists" do
+    Account.any_instance.stubs(:trusted_referer?).returns(true)
+    user_with_pseudonym(active_user: true)
+    destroy_session(true)
+    driver.navigate.to(app_host + '/login')
+    driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
+    driver.execute_script "$('[name=authenticity_token]').remove()"
+    fill_in_login_form("nobody@example.com", 'asdfasdf')
+    expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
+  end
 end

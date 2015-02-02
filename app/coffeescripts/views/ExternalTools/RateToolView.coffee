@@ -70,4 +70,4 @@ define [
 
     showErrorMessage: ->
       message = I18n.t 'missing_stars', 'You must select a star rating'
-      @$el.prepend("<div class='alert alert-error'>#{message}</span>")
+      @$el.prepend("<div class='alert alert-error'>#{htmlEscape(message)}</span>")

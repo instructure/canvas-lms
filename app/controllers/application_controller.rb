@@ -813,10 +813,10 @@ class ApplicationController < ActionController::Base
     AdheresToPolicy::Cache.clear
   end
 
-  def generate_page_view
-    attributes = { :user => @current_user, :developer_key => @developer_key, :real_user => @real_current_user }
+  def generate_page_view(user=@current_user)
+    attributes = { :user => user, :developer_key => @developer_key, :real_user => @real_current_user }
     @page_view = PageView.generate(request, attributes)
-    @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.get?)
+    @page_view.user_request = true if params[:user_request] || (user && !request.xhr? && request.get?)
     @page_before_render = Time.now.utc
   end
 
@@ -843,9 +843,12 @@ class ApplicationController < ActionController::Base
   # and reports from these accesses.  This is currently being used
   # to generate access reports per student per course.
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
-    return unless @current_user && @context && asset
+    user = @current_user
+    user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
+    return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
     @accessed_asset = {
+      :user => user,
       :code => asset.is_a?(String) ? asset : asset.asset_string,
       :group_code => asset_group.is_a?(String) ? asset_group : (asset_group.asset_string rescue 'unknown'),
       :category => asset_category,
@@ -857,7 +860,8 @@ class ApplicationController < ActionController::Base
   def log_page_view
     return true if !page_views_enabled?
 
-    if @current_user && @log_page_views != false
+    user = @current_user || (@accessed_asset && @accessed_asset[:user])
+    if user && @log_page_views != false
       updated_fields = params.slice(:interaction_seconds)
       if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
         @page_view = PageView.find_for_update(params[:page_view_id])
@@ -871,14 +875,15 @@ class ApplicationController < ActionController::Base
       # or it's not an update to an already-existing page_view.  We check to make sure
       # it's not an update because if the page_view already existed, we don't want to
       # double-count it as multiple views when it's really just a single view.
-      if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.where(user_id: @current_user.id, asset_code: @accessed_asset[:code]).first_or_initialize
+
+      if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
+        @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
         @accessed_asset[:level] ||= 'view'
         access_context = @context.is_a?(UserProfile) ? @context.user : @context
         @access.log access_context, @accessed_asset
 
         if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
-          generate_page_view
+          generate_page_view(user)
         end
 
         if @page_view

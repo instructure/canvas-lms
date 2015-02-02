@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -191,7 +191,12 @@ module SIS
               elsif role_name =~ /\Aobserver\z/i
                 if associated_sis_user_id
                   pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).first
-                  associated_user_id = pseudo.user_id
+                  if pseudo
+                    associated_user_id = pseudo.user_id
+                  else
+                    @messages << "An enrollment referenced a non-existent associated user #{associated_sis_user_id}"
+                    next
+                  end
                 end
                 'ObserverEnrollment'
               elsif role_name =~ /\Adesigner\z/i

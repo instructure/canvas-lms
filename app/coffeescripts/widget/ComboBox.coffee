@@ -116,7 +116,7 @@ define [
     # @api private
     # Build an <option> tag for an item.
     _buildOption: (item) =>
-      "<option value='#{@_value item}'>#{htmlEscape @_label item}</option>"
+      "<option value='#{htmlEscape @_value item}'>#{htmlEscape @_label item}</option>"
 
     ##
     # @api private

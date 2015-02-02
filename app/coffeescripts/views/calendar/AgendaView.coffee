@@ -28,6 +28,10 @@ define [
 
     @optionProperty 'calendar'
 
+    #Can't be tied to the AgendaView object, because it must maintain persistance.
+    currentIndex = -1
+    focusedAlready = false
+
     constructor: ->
       super
       @dataSource = @options.dataSource
@@ -35,6 +39,7 @@ define [
       $.subscribe
         "CommonEvent/eventDeleted" : @refetch
         "CommonEvent/eventSaved" : @refetch
+        "CalendarHeader/createNewEvent" : @handleNewEvent
 
     fetch: (contexts, start = new Date) ->
       @$el.empty()
@@ -88,18 +93,36 @@ define [
       $firstEventDayDate = $firstEventDay.find('.agenda-date')
       $firstEventDayDate[0].focus() if $firstEventDayDate.length
 
+    refocusAfterRender: () ->
+      if ((!@collection.length  || currentIndex == -1) && focusedAlready)
+        $("#create_new_event_link").focus()
+        currentIndex = -1
+      else if(currentIndex >= 0)
+        children = @$('.ig-list').children()
+        elementToFocus = $((children[currentIndex] || children[children.length - 1])).children().first()
+        elementToFocus.focus() if elementToFocus
+
     manageEvent: (e) ->
       e.preventDefault()
       e.stopPropagation()
-      eventId = $(e.target).closest('.agenda-event').data('event-id')
+      focusedAlready = true #So we don't focus the add button right when the page loads.
+      eventEl = $(e.target).closest('.agenda-event')
+      eventId = eventEl.data('event-id')
+      currentIndex = -1 #Default currentIndex to be -1 just in case we don't find any event.
+      @collection.forEach((val, index, list) => currentIndex = index if val.id == eventId)
       event = @dataSource.eventWithId(eventId)
       new ShowEventDetailsDialog(event, @dataSource).show e
+
+    handleNewEvent: (e) ->
+      #Until we highlight an event, stay focused on the button.
+      currentIndex = -1
 
     render: =>
       super
       @$spinner.hide()
       $.publish('Calendar/colorizeContexts')
 
+      @refocusAfterRender()
       lastEvent = _.last(@collection)
       return if !lastEvent
       @trigger('agendaDateRange', @startDate, lastEvent.originalStart)

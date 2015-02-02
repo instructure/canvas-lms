@@ -277,10 +277,7 @@ var Message = React.createClass({
 ```
 
 Assuming the user navigates to `/inbox/123`, `this.props.params.messageId` is
-going to be `'123'`. Check out the [AsyncState][AsyncState] mixin to see
-how you can turn this parameter into state on your component. Or for a
-more basic approach, make an ajax call in `componentDidMount` with the
-value.
+going to be `'123'`.
 
 Important Note About Dynamic Segments
 -------------------------------------
@@ -380,6 +377,7 @@ In order for the above examples to work in a CommonJS environment you'll need to
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;
+var NotFoundRoute = Router.NotFoundRoute;
 var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
 ```

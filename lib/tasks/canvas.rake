@@ -284,6 +284,17 @@ namespace :db do
   end
 end
 
-%w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman.shardify_task(task_name) }
+Switchman::Rake.filter_database_servers do |servers, block|
+  if ENV['REGION']
+    if ENV['REGION'] == 'self'
+      servers.select!(&:in_current_region?)
+    else
+      servers.select! { |server| server.in_region?(ENV['REGION']) }
+    end
+  end
+  block.call(servers)
+end
+
+%w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
 
 end

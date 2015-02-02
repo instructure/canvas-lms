@@ -129,7 +129,6 @@ $ic-Expand-link-size: $can-sp*4;
       color: $text-color; 
     }
     &:hover, &:focus {
-      text-decoration: none;
       .ic-Expand-link__layout { background: $bg-color-hover; }
     }  
   }
@@ -164,7 +163,11 @@ $ic-Expand-link-size: $can-sp*4;
       transform: translateX(0);
     }
 
-    &:hover, &:focus { @include ic-Expand-link-active-state; }
+    &:hover, &:focus { 
+      @include ic-Expand-link-active-state;
+      text-decoration: none;
+      outline: none;
+    }
 
   }
 
@@ -213,7 +216,9 @@ $ic-Expand-link-size: $can-sp*4;
         transform: translateX(0);
       }
   
-      &:hover, &:focus { @include ic-Expand-link-active-state; }
+      &:hover, &:focus {
+        @include ic-Expand-link-active-state;
+      }
     }
     
     .ic-Expand-link__layout { padding: 0 0 0 $ic-Expand-link-size; }

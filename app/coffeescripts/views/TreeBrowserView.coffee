@@ -15,6 +15,7 @@ define [
     @optionProperty 'href'
     @optionProperty 'focusStyleClass'
     @optionProperty 'selectedStyleClass'
+    @optionProperty 'autoFetch'
 
     # Handle keyboard events for accessibility.
     events:
@@ -56,8 +57,15 @@ define [
           dndOptions: @dndOptions
           href: @href
           selectedStyleClass: @selectedStyleClass
+          autoFetch: @autoFetch
         }).$el.appendTo(@$folderTree)
       super
+
+    destroyView: ->
+      @undelegateEvents()
+      @$el.removeData().unbind()
+      @remove()
+      Backbone.View.prototype.remove.call(@)
 
     # Set the focus from one tree item to another.
     setFocus: ($to, $from) ->

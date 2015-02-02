@@ -40,10 +40,10 @@
 <% end %>
 
 <% @show_star_column = false %>
-<% unless @current_user.current_groups.empty? %>
+<% unless @visible_groups.empty? %>
   <h2><%= t('headings.my_groups', %{My Groups}) %></h2>
   <table id="my_groups_table" class="table table-bordered current_groups course-list-table">
-    <% @current_user.current_groups.each do |group| %>
+    <% @visible_groups.each do |group| %>
       <% group_name = group.name %>
       <tr>
         <td>

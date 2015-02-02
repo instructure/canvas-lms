@@ -89,10 +89,10 @@ define [
 
     insertRating: (e) =>
       e.preventDefault()
-      rating = $ criterionTemplate description: '', points: '', _index: 99
-      $(e.currentTarget).closest('.rating').after rating
-      rating.find('.show').hide().next().show(200)
-      rating.find('.edit input:first').focus()
+      $rating = $ criterionTemplate description: '', points: '', _index: 99
+      $(e.currentTarget).closest('.rating').after $rating
+      $rating.find('.show').hide().next().show(200)
+      $rating.find('.edit input:first').focus()
       @updateRatings()
 
     # Update rating form field elements and the total.
@@ -106,7 +106,7 @@ define [
           # reset indices
           $(i).attr 'name', i.name.replace /\[[0-9]+\]/, "[#{index}]"
       points = @$('.points_possible')
-      points.html points.html().replace /[0-9/.]+/, total
+      points.html $.raw points.html().replace(/[0-9/.]+/, total)
 
     showRatingDialog: (e) =>
       e.preventDefault()
@@ -116,6 +116,9 @@ define [
         width: 400
         close: -> $(e.target).focus()
       ).dialog('open')
+
+    screenreaderTitleFocus: ->
+      @$(".screenreader-outcome-title").focus()
 
     render: ->
       data = @model.toJSON()
@@ -149,5 +152,5 @@ define [
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER
-      @$('input:first').focus()
+      @screenreaderTitleFocus()
       this

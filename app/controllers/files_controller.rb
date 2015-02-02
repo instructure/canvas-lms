@@ -477,9 +477,10 @@ class FilesController < ApplicationController
     # attachment.
     # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
-      @attachment = @context.attachments.where(:id => params[:id]).first
+      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
+      @attachment = @context.attachments.find(params[:id])
     else
-      @attachment = Attachment.where(:id => params[:id]).first
+      @attachment = Attachment.find(params[:id])
       @skip_crumb = true unless @context
     end
 
@@ -701,9 +702,8 @@ class FilesController < ApplicationController
   def create_pending
     @context = Context.find_by_asset_string(params[:attachment][:context_code])
     @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
-    @attachment = @context.attachments.build
     @check_quota = true
-    permission_object = @attachment
+    permission_object = nil
     permission = :create
     intent = params[:attachment][:intent]
 
@@ -742,7 +742,8 @@ class FilesController < ApplicationController
       @check_quota = false
     end
 
-    @attachment.context = @context
+    @attachment = @context.attachments.build
+    permission_object ||= @attachment
     @attachment.user = @current_user
     if authorized_action(permission_object, @current_user, permission)
       if @context.respond_to?(:is_a_context?) && @check_quota

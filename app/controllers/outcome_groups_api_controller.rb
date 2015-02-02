@@ -221,24 +221,24 @@ class OutcomeGroupsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \
-  #        -X PUT \ 
-  #        -F 'title=Outcome Group Title' \ 
+  #        -X PUT \
+  #        -F 'title=Outcome Group Title' \
   #        -F 'description=Outcome group description' \
   #        -F 'vendor_guid=customid9000' \
-  #        -F 'parent_outcome_group_id=1' \ 
+  #        -F 'parent_outcome_group_id=1' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \
-  #        -X PUT \ 
+  #        -X PUT \
   #        --data-binary '{
   #              "title": "Outcome Group Title",
   #              "description": "Outcome group description",
   #              "vendor_guid": "customid9000",
   #              "parent_outcome_group_id": 1
-  #            }' \ 
-  #        -H "Content-Type: application/json" \ 
+  #            }' \
+  #        -H "Content-Type: application/json" \
   #        -H "Authorization: Bearer <token>"
   #
   def update
@@ -279,7 +279,7 @@ class OutcomeGroupsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \
-  #        -X DELETE \ 
+  #        -X DELETE \
   #        -H "Authorization: Bearer <token>"
   #
   def destroy
@@ -406,35 +406,43 @@ class OutcomeGroupsApiController < ApplicationController
   # @argument ratings[][points] [Integer]
   #   The points corresponding to a rating level for the embedded rubric criterion.
   #
+  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
+  #   The new calculation method.
+  #
+  # @argument calculation_int [Integer]
+  #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"
+  #
   # @returns OutcomeLink
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \
-  #        -X PUT \ 
+  #        -X PUT \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \
-  #        -X POST \ 
-  #        -F 'title=Outcome Title' \ 
+  #        -X POST \
+  #        -F 'title=Outcome Title' \
   #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9000' \
-  #        -F 'mastery_points=3' \ 
-  #        -F 'ratings[][description]=Exceeds Expectations' \ 
-  #        -F 'ratings[][points]=5' \ 
-  #        -F 'ratings[][description]=Meets Expectations' \ 
-  #        -F 'ratings[][points]=3' \ 
-  #        -F 'ratings[][description]=Does Not Meet Expectations' \ 
-  #        -F 'ratings[][points]=0' \ 
+  #        -F 'mastery_points=3' \
+  #        -F 'calculation_method=decaying_average' \
+  #        -F 'calculation_int=75' \
+  #        -F 'ratings[][description]=Exceeds Expectations' \
+  #        -F 'ratings[][points]=5' \
+  #        -F 'ratings[][description]=Meets Expectations' \
+  #        -F 'ratings[][points]=3' \
+  #        -F 'ratings[][description]=Does Not Meet Expectations' \
+  #        -F 'ratings[][points]=0' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \
-  #        -X POST \ 
+  #        -X POST \
   #        --data-binary '{
   #              "title": "Outcome Title",
   #              "display_name": "Title for reporting",
@@ -446,8 +454,8 @@ class OutcomeGroupsApiController < ApplicationController
   #                { "description": "Meets Expectations", "points": 3 },
   #                { "description": "Does Not Meet Expectations", "points": 0 }
   #              ]
-  #            }' \ 
-  #        -H "Content-Type: application/json" \ 
+  #            }' \
+  #        -H "Content-Type: application/json" \
   #        -H "Authorization: Bearer <token>"
   #
   def link
@@ -461,7 +469,7 @@ class OutcomeGroupsApiController < ApplicationController
         return
       end
     else
-      @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name))
+      @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name, :calculation_method, :calculation_int))
       unless @outcome.valid?
         render :json => @outcome.errors, :status => :bad_request
         return
@@ -483,7 +491,7 @@ class OutcomeGroupsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \
-  #        -X DELETE \ 
+  #        -X DELETE \
   #        -H "Authorization: Bearer <token>"
   #
   def unlink
@@ -545,8 +553,8 @@ class OutcomeGroupsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \
-  #        -X POST \ 
-  #        -F 'title=Outcome Group Title' \ 
+  #        -X POST \
+  #        -F 'title=Outcome Group Title' \
   #        -F 'description=Outcome group description' \
   #        -F 'vendor_guid=customid9000' \
   #        -H "Authorization: Bearer <token>"
@@ -554,13 +562,13 @@ class OutcomeGroupsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \
-  #        -X POST \ 
+  #        -X POST \
   #        --data-binary '{
   #              "title": "Outcome Group Title",
   #              "description": "Outcome group description",
   #              "vendor_guid": "customid9000"
-  #            }' \ 
-  #        -H "Content-Type: application/json" \ 
+  #            }' \
+  #        -H "Content-Type: application/json" \
   #        -H "Authorization: Bearer <token>"
   #
   def create
@@ -598,8 +606,8 @@ class OutcomeGroupsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/accounts/2/outcome_groups/3/import.json' \
-  #        -X POST \ 
-  #        -F 'source_outcome_group_id=2' \ 
+  #        -X POST \
+  #        -F 'source_outcome_group_id=2' \
   #        -H "Authorization: Bearer <token>"
   #
   def import
@@ -669,8 +677,10 @@ class OutcomeGroupsApiController < ApplicationController
   def context_create_outcome(data)
     scope = @context ? @context.created_learning_outcomes : LearningOutcome.global
     outcome = scope.build(data.slice(:title, :display_name, :description, :vendor_guid))
-    if data[:ratings]
-      outcome.rubric_criterion = data.slice(:ratings, :mastery_points)
+    outcome.rubric_criterion = data.slice(:ratings, :mastery_points) if data[:ratings]
+    if data[:calculation_method]
+      outcome.calculation_method = data[:calculation_method]
+      outcome.calculation_int = data[:calculation_int]
     end
     outcome.save
     outcome
