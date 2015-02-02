@@ -32,6 +32,13 @@ describe "calendar2" do
           title_selector = ".navigation_title"
           get "/calendar2"
 
+          # turns out that sometimes you don't have any days from other months showing
+          # whoda thunk that? (curse you february 2015!)
+          while f("#minical .fc-other-month").nil?
+            f("#minical .fc-button-prev").click
+            wait_for_ajaximations
+          end
+
           orig_titles = ff(title_selector).map(&:text)
           f("#minical .fc-other-month").click
 
