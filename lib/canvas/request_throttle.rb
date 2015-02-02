@@ -77,6 +77,10 @@ class RequestThrottle
   end
 
   def allowed?(request, bucket)
+    if Setting.get("request_throttle.skip", "false") == "true"
+      return true
+    end
+
     if whitelisted?(request)
       return true
     elsif blacklisted?(request)
@@ -225,6 +229,11 @@ class RequestThrottle
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
     def reserve_capacity(up_front_cost = self.up_front_cost)
+      if Setting.get("request_throttle.skip", "false") == "true"
+        yield
+        return
+      end
+
       increment(0, up_front_cost)
       cost = yield
     ensure
