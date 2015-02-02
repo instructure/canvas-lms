@@ -255,9 +255,9 @@
             <div>
 
               <%= form_for @quiz,
-                           url: course_quizzes_publish_path(@context),
+                           url: context_url(@context, :context_quiz_url, @quiz.id),
                            style: 'display: inline',
-                           method: :post do |f| %>
+                           method: :put do |f| %>
 
                 <%= hidden_field_tag 'quizzes[]', @quiz.id %>
                 <img src='/images/ajax-loader-black-on-white.gif' class='hidden loading' />
