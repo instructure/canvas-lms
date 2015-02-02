@@ -49,7 +49,7 @@ define([
           $dialog = $('<div id="external_tool_button_dialog" style="padding: 0; overflow-y: hidden;"/>')
             .hide()
             .html("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>" +
-                  "<iframe id='external_tool_button_frame' style='width: 800px; height: " + frameHeight +"px; border: 0;' src='/images/ajax-loader-medium-444.gif' borderstyle='0'/>")
+                  "<iframe id='external_tool_button_frame' style='width: 800px; height: " + frameHeight +"px; border: 0;' src='/images/ajax-loader-medium-444.gif' borderstyle='0' tabindex='0'/>")
             .appendTo('body')
             .dialog({
               autoOpen: false,
