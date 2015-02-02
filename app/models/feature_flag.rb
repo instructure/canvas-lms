@@ -53,7 +53,7 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def clear_cache
-    connection.after_transaction_commit { Rails.cache.delete(self.context.feature_flag_cache_key(feature)) } if self.context
+    connection.after_transaction_commit { MultiCache.delete(self.context.feature_flag_cache_key(feature), copies: MultiCache.copies('feature_flags')) } if self.context
   end
 
 private
