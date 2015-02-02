@@ -1674,7 +1674,7 @@ class ApplicationController < ActionController::Base
     @notices ||= begin
       notices = []
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
-        notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'}
+        notices << {:type => 'warning', :content => {html: unsupported_browser}, :classes => 'unsupported_browser'}
       end
       if error = flash[:error]
         flash.delete(:error)
@@ -1702,7 +1702,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("#application.warnings.unsupported_browser", "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
   end
 
   def browser_supported?
