@@ -1,5 +1,5 @@
 Rails.application.config.to_prepare do
-  Switchman.cache = MultiCache
+  Switchman.cache = -> { MultiCache.cache }
 
   Switchman::Shard.class_eval do
     class << self

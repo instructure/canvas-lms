@@ -16,20 +16,66 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module MultiCache
+class MultiCache < ActiveSupport::Cache::Store
+  def self.cache
+    if defined?(ActiveSupport::Cache::RedisStore) && Rails.cache.is_a?(ActiveSupport::Cache::RedisStore) &&
+        defined?(Redis::DistributedStore) && (store = Rails.cache.instance_variable_get(:@data)).is_a?(Redis::DistributedStore)
+      store.instance_variable_get(:@multi_cache) || store.instance_variable_set(:@multi_cache, MultiCache.new(store.ring.nodes))
+    else
+      Rails.cache
+    end
+  end
+
+  def initialize(ring)
+    @ring = ring
+    super()
+  end
+
+  def fetch(key, options = nil, &block)
+    options ||= {}
+    # this makes the node "sticky" for read/write
+    options[:node] = @ring[rand(@ring.length)]
+    super(key, options, &block)
+  end
+
+  # for compatibility
   def self.copies(key)
-    [Setting.get("#{key}_copies", 1).to_i, 1].max
+    nil
   end
 
   def self.fetch(key, options = nil, &block)
-    options ||= {}
-    Rails.cache.fetch("#{key}:#{rand(options[:copies] || copies(key))}", options, &block)
+    cache.fetch(key, options, &block)
   end
 
   def self.delete(key, options = nil)
-    options ||= {}
-    (0...(options[:copies] || copies(key))).each do |i|
-      Rails.cache.delete("#{key}:#{i}", options)
+    cache.delete(key, options)
+  end
+
+  private
+  def write_entry(key, entry, options)
+    method = options && options[:unless_exist] ? :setnx : :set
+    options[:node].send method, key, entry, options
+  rescue Errno::ECONNREFUSED, Redis::CannotConnectError
+    false
+  end
+
+  def read_entry(key, options)
+    entry = options[:node].get key, options
+    if entry
+      entry.is_a?(ActiveSupport::Cache::Entry) ? entry : ActiveSupport::Cache::Entry.new(entry)
+    end
+  rescue Errno::ECONNREFUSED, Redis::CannotConnectError
+    nil
+  end
+
+  def delete_entry(key, options)
+    nodes = options[:node] ? [options[:node]] : @ring
+    nodes.any? do |node|
+      begin
+        node.del key
+      rescue Errno::ECONNREFUSED, Redis::CannotConnectError
+        false
+      end
     end
   end
 end

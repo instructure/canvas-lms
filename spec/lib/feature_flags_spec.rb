@@ -313,7 +313,7 @@ describe FeatureFlags do
   end
 
   describe "caching" do
-    let(:t_cache_key) { "#{t_root_account.feature_flag_cache_key('course_feature')}:0" }
+    let(:t_cache_key) { t_root_account.feature_flag_cache_key('course_feature') }
     before do
       t_root_account.feature_flags.create! feature: 'course_feature', state: 'allowed'
     end
@@ -328,7 +328,7 @@ describe FeatureFlags do
     it "should cache a nil result" do
       enable_cache do
         t_root_account.feature_flag('course_feature2')
-        expect(Rails.cache).to be_exist("#{t_root_account.feature_flag_cache_key('course_feature2')}:0")
+        expect(Rails.cache).to be_exist(t_root_account.feature_flag_cache_key('course_feature2'))
         t_root_account.expects(:feature_flags).never
         t_root_account.feature_flag('course_feature2')
       end
