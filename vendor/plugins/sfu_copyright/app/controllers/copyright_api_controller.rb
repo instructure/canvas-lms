@@ -42,7 +42,7 @@ class CopyrightApiController < ApplicationController
     output[:teacher] = teacher ? { id: teacher.id, name: teacher.name, computing_id: computing_id, email: email } : nil
 
     # Only include current files, and filter out OS meta files
-    files = course.attachments.active.order('size DESC').limit(10).reject do |file|
+    files = course.attachments.active.order('size DESC').limit(200).reject do |file|
       file.folder.full_name.include?('__MACOSX') ||
           file.display_name == '.DS_Store'
     end
@@ -53,6 +53,7 @@ class CopyrightApiController < ApplicationController
           'content-type' => attachment.content_type,
           'display_name' => attachment.display_name,
           'filename' => attachment.filename,
+          'url' => file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }),
           'size' => attachment.size,
           'created_at' => attachment.created_at,
           'updated_at' => attachment.updated_at,
