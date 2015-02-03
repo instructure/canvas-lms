@@ -45,6 +45,21 @@ describe "differentiated_assignments" do
     make_assignment({date: Time.now, ovto: nil})
   end
 
+  def student_in_course_with_adhoc_override(assignment, opts={})
+    @user = opts[:user] || user_model
+    StudentEnrollment.create!(:user => @user, :course => @course)
+    ao = AssignmentOverride.new()
+    ao.assignment = assignment
+    ao.title = "ADHOC OVERRIDE"
+    ao.workflow_state = "active"
+    ao.set_type = "ADHOC"
+    ao.save!
+    override_student = ao.assignment_override_students.build
+    override_student.user = @user
+    override_student.save!
+    @user
+  end
+
   def enroller_user_in_section(section, opts={})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course, :course_section => section)
@@ -130,146 +145,176 @@ describe "differentiated_assignments" do
       add_multiple_sections
     end
     context "assignment only visibile to overrides" do
-      before do
-        assignment_with_true_only_visible_to_overrides
-        give_section_due_date(@assignment, @section_foo)
-      end
 
-      context "user in section with override who then changes sections" do
-        before{enroller_user_in_section(@section_foo)}
-        it "should keep the assignment visible if there is a grade" do
-          @assignment.grade_student(@user, {grade: 10})
-          @user.enrollments.each(&:destroy!)
-          enroller_user_in_section(@section_bar, {user: @user})
+      context "ADHOC overrides" do
+        before { assignment_with_true_only_visible_to_overrides }
+
+        it "should return a visibility for a student with an ADHOC override" do
+          student_in_course_with_adhoc_override(@assignment)
           ensure_user_sees_assignment
         end
 
-        it "should not keep the assignment visible if there is no grade" do
-          @assignment.grade_student(@user, {grade: nil})
-          @user.enrollments.each(&:destroy!)
-          enroller_user_in_section(@section_bar, {user: @user})
+        it "should work with course section and return a single visibility" do
+          student_in_course_with_adhoc_override(@assignment)
+          give_section_due_date(@assignment, @section_foo)
+          enroller_user_in_section(@section_foo)
+          ensure_user_sees_assignment
+          expect(AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).count).to eq 1
+        end
+
+        it "should not return a visibility for a student without an ADHOC override" do
+          @user = user_model
           ensure_user_does_not_see_assignment
         end
 
-        it "should keep the assignment visible if the grade is zero" do
-          @assignment.grade_student(@user, {grade: 0})
-          @user.enrollments.each(&:destroy!)
-          enroller_user_in_section(@section_bar, {user: @user})
-          ensure_user_sees_assignment
+        it "should not return a visibility if ADHOC override is deleted" do
+          student_in_course_with_adhoc_override(@assignment)
+          @assignment.assignment_overrides.all.each(&:destroy)
+          ensure_user_does_not_see_assignment
         end
       end
 
-      context "user in default section" do
-        it "should hide the assignment from the user" do
-          ensure_user_does_not_see_assignment
-        end
-      end
-      context "user in section with override" do
-        before{enroller_user_in_section(@section_foo)}
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
-        end
-        it "should not show unpublished assignments" do
-          @assignment.workflow_state = "unpublished"
-          @assignment.save!
-          ensure_user_does_not_see_assignment
-        end
-        it "should update when enrollments change" do
-          ensure_user_sees_assignment
-          enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
-          enrollments.each(&:destroy!)
-          ensure_user_does_not_see_assignment
-        end
-        it "should update when the override is deleted" do
-          ensure_user_sees_assignment
-          @assignment.assignment_overrides.all.each(&:destroy!)
-          ensure_user_does_not_see_assignment
-        end
-        it "should not return duplicate visibilities with multiple visible sections" do
-          enroller_user_in_section(@section_bar, {user: @user})
-          give_section_due_date(@assignment, @section_bar)
-          visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id)
-          expect(visibile_assignment_ids.count).to eq 1
-        end
-      end
-      context "user in section with no override" do
-        before{enroller_user_in_section(@section_bar)}
-        it "should hide the assignment from the user" do
-          ensure_user_does_not_see_assignment
-        end
-      end
-      context "user in section with override and one without override" do
+      context "section overrides" do
         before do
-          enroller_user_in_both_sections
+          assignment_with_true_only_visible_to_overrides
+          give_section_due_date(@assignment, @section_foo)
         end
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
+        context "user in section with override who then changes sections" do
+          before{enroller_user_in_section(@section_foo)}
+          it "should keep the assignment visible if there is a grade" do
+            @assignment.grade_student(@user, {grade: 10})
+            @user.enrollments.each(&:destroy!)
+            enroller_user_in_section(@section_bar, {user: @user})
+            ensure_user_sees_assignment
+          end
+
+          it "should not keep the assignment visible if there is no grade" do
+            @assignment.grade_student(@user, {grade: nil})
+            @user.enrollments.each(&:destroy!)
+            enroller_user_in_section(@section_bar, {user: @user})
+            ensure_user_does_not_see_assignment
+          end
+
+          it "should keep the assignment visible if the grade is zero" do
+            @assignment.grade_student(@user, {grade: 0})
+            @user.enrollments.each(&:destroy!)
+            enroller_user_in_section(@section_bar, {user: @user})
+            ensure_user_sees_assignment
+          end
+        end
+
+        context "user in default section" do
+          it "should hide the assignment from the user" do
+            ensure_user_does_not_see_assignment
+          end
+        end
+        context "user in section with override" do
+          before{enroller_user_in_section(@section_foo)}
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
+          it "should not show unpublished assignments" do
+            @assignment.workflow_state = "unpublished"
+            @assignment.save!
+            ensure_user_does_not_see_assignment
+          end
+          it "should update when enrollments change" do
+            ensure_user_sees_assignment
+            enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
+            enrollments.each(&:destroy!)
+            ensure_user_does_not_see_assignment
+          end
+          it "should update when the override is deleted" do
+            ensure_user_sees_assignment
+            @assignment.assignment_overrides.all.each(&:destroy!)
+            ensure_user_does_not_see_assignment
+          end
+          it "should not return duplicate visibilities with multiple visible sections" do
+            enroller_user_in_section(@section_bar, {user: @user})
+            give_section_due_date(@assignment, @section_bar)
+            visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id)
+            expect(visibile_assignment_ids.count).to eq 1
+          end
+        end
+        context "user in section with no override" do
+          before{enroller_user_in_section(@section_bar)}
+          it "should hide the assignment from the user" do
+            ensure_user_does_not_see_assignment
+          end
+        end
+        context "user in section with override and one without override" do
+          before do
+            enroller_user_in_both_sections
+          end
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
         end
       end
-    end
-    context "assignment with false only_visible_to_overrides" do
-      before do
-        assignment_with_false_only_visible_to_overrides
-        give_section_due_date(@assignment, @section_foo)
-      end
-      context "user in default section" do
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
-        end
-        it "should not show deleted assignments" do
-          @assignment.destroy
-          ensure_user_does_not_see_assignment
-        end
-      end
-      context "user in section with override" do
-        before{enroller_user_in_section(@section_foo)}
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
-        end
-      end
-      context "user in section with no override" do
-        before{enroller_user_in_section(@section_bar)}
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
-        end
-      end
-      context "user in section with override and one without override" do
+      context "assignment with false only_visible_to_overrides" do
         before do
-          enroller_user_in_both_sections
+          assignment_with_false_only_visible_to_overrides
+          give_section_due_date(@assignment, @section_foo)
         end
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
+        context "user in default section" do
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
+          it "should not show deleted assignments" do
+            @assignment.destroy
+            ensure_user_does_not_see_assignment
+          end
+        end
+        context "user in section with override" do
+          before{enroller_user_in_section(@section_foo)}
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
+        end
+        context "user in section with no override" do
+          before{enroller_user_in_section(@section_bar)}
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
+        end
+        context "user in section with override and one without override" do
+          before do
+            enroller_user_in_both_sections
+          end
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
         end
       end
-    end
-    context "assignment with null only_visible_to_overrides" do
-      before do
-        assignment_with_null_only_visible_to_overrides
-        give_section_due_date(@assignment, @section_foo)
-      end
-      context "user in default section" do
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
-        end
-      end
-      context "user in section with override" do
-        before{enroller_user_in_section(@section_foo)}
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
-        end
-      end
-      context "user in section with no override" do
-        before{enroller_user_in_section(@section_bar)}
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
-        end
-      end
-      context "user in section with override and one without override" do
+      context "assignment with null only_visible_to_overrides" do
         before do
-          enroller_user_in_both_sections
+          assignment_with_null_only_visible_to_overrides
+          give_section_due_date(@assignment, @section_foo)
         end
-        it "should show the assignment to the user" do
-          ensure_user_sees_assignment
+        context "user in default section" do
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
+        end
+        context "user in section with override" do
+          before{enroller_user_in_section(@section_foo)}
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
+        end
+        context "user in section with no override" do
+          before{enroller_user_in_section(@section_bar)}
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
+        end
+        context "user in section with override and one without override" do
+          before do
+            enroller_user_in_both_sections
+          end
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
         end
       end
     end
