@@ -120,6 +120,21 @@ describe CanvasStatsd::RequestStat do
       expect(statsd).to receive(:timing).with('request.foo.index.db', 100.2)
       rs.report
     end
+
+    it 'sends sql_count when present' do
+      statsd = double
+      payload = {
+        params: {
+          'controller' => 'foo',
+          'action'     => 'index'
+        }
+      }
+      rs = create_subject(payload, statsd)
+      rs.sql_count = 10
+      allow(statsd).to receive(:timing).with('request.foo.index.total', 1000)
+      expect(statsd).to receive(:timing).with('request.foo.index.sql', 10)
+      rs.report
+    end
   end
 
 end
