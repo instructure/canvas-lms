@@ -40,6 +40,22 @@ describe "grading periods" do
         get "/courses/#{@course.id}/grading_standards"
         expect(f("#period_title_#{grading_period.id}").attribute("value")).to eq("Account-level grading period")
       end
+
+      it "should allow grading periods to be deleted" do
+        grading_period_selector = '.grading-period'
+        grading_period_group = @course.grading_period_groups.create!
+        grading_period = grading_period_group.grading_periods.create!(title: "Delete me, please!",
+                                                                      start_date: Time.zone.now,
+                                                                      end_date: 30.days.from_now,
+                                                                      weight: 1)
+        get "/courses/#{@course.id}/grading_standards"
+        expect(ff(grading_period_selector).length).to be 1
+
+        f('.icon-delete-grading-period').click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        expect(ff(grading_period_selector).length).to be 0
+      end
     end
 
     context "with Multiple Grading Periods feature off" do

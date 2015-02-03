@@ -28,6 +28,10 @@ function(React, $, I18n) {
       });
     },
 
+    triggerDeleteGradingPeriod: function(event) {
+      return this.props.onDeleteGradingPeriod(event, this.props.key);
+    },
+
     prettyDate: function(uglyDate) {
       return $.datetimeString(uglyDate, { format: 'medium' });
     },
@@ -81,7 +85,7 @@ function(React, $, I18n) {
                   </div>
                   <div className="col-xs">
                     <div className="icon-delete-container" role="button" tabIndex="0">
-                      <i className="icon-delete-grading-period icon-x">
+                      <i title={I18n.t("Delete grading period")} className="icon-delete-grading-period hover icon-x" onClick={this.triggerDeleteGradingPeriod}>
                         <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
                       </i>
                     </div>

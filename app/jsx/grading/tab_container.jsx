@@ -65,8 +65,9 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
     },
 
     deleteGradingStandard: function(event, key) {
-      var self = this;
-      var $standard = $(event.target).parents(".grading_standard");
+      var self = this,
+        $standard = $(event.target).parents(".grading_standard");
+
       $standard.confirmDelete({
         url: ENV.GRADING_STANDARDS_URL + "/" + key,
         message: I18n.t("Are you sure you want to delete this grading scheme?"),
@@ -79,6 +80,26 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
         },
         error: function() {
           $.flashError(I18n.t("There was a problem deleting the grading scheme"));
+        }
+      });
+    },
+
+    deleteGradingPeriod: function(event, key) {
+      var self = this,
+        $period = $(event.target).parents(".grading-period");
+
+      $period.confirmDelete({
+        url: ENV.GRADING_PERIODS_URL + "/" + key,
+        message: I18n.t("Are you sure you want to delete this grading period?"),
+        success: function() {
+          $(this).slideUp(function() {
+            $(this).remove();
+          });
+          var newPeriods = _.reject(self.state.periods, function(period){ return period.id === key });
+          self.setState({periods: newPeriods});
+        },
+        error: function() {
+          $.flashError(I18n.t("There was a problem deleting the grading period"));
         }
       });
     },
@@ -138,9 +159,11 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
       } else if(this.state.periods.length === 0){
         return <h3>{I18n.t("No grading periods to display")}</h3>;
       }
+      var self = this;
       return this.state.periods.map(function(p){
         return (<GradingPeriod key={p.id} title={p.title} startDate={new Date(p.start_date)}
-                               endDate={new Date(p.end_date)} weight={p.weight}/>);
+                               endDate={new Date(p.end_date)} weight={p.weight}
+                               onDeleteGradingPeriod={self.deleteGradingPeriod}/>);
       });
     },
 
@@ -177,7 +200,7 @@ function(React, GradingStandard, GradingPeriod, $, I18n, _) {
             </div>
           </div>
         );
-      };
+      }
     }
   });
 
