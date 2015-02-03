@@ -263,6 +263,10 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         errors = @_validatePointsPossible(data, errors)
       else
         @model.set 'assignment', @model.createAssignment(set_assignment: false)
+
+      if @isAnnouncement()
+        unless data.message?.length > 0
+          errors['message'] = [{type: 'message_required_error', message: I18n.t("A message is required")}]
       errors
 
     _validatePointsPossible: (data, errors) =>

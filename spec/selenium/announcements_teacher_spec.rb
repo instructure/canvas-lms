@@ -97,6 +97,20 @@ describe "announcements" do
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
       end
 
+      it "should perform front-end validation for message" do
+        topic_title = 'new topic with file'
+        get url
+
+        expect_new_page_load { f('.btn-primary').click }
+        replace_content(f('input[name=title]'), topic_title)
+        filename, fullpath, data = get_file("testfile5.zip")
+        f('input[name=attachment]').send_keys(fullpath)
+        submit_form('.form-actions')
+        wait_for_ajaximations
+
+        expect(ff('.error_box').any?{|box| box.text.include?("A message is required")}).to be_truthy
+      end
+
       it "should add an attachment to a graded topic" do
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
         if what_to_create == DiscussionTopic
