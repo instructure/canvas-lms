@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2013 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -60,6 +60,8 @@ class Message < ActiveRecord::Base
   # Validations
   validates_length_of :body,                :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :transmission_errors, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :to, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :from, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   # Stream policy
   on_create_send_to_streams do
