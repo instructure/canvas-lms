@@ -1268,6 +1268,8 @@ CanvasRails::Application.routes.draw do
       put 'folders/:id', action: :update
       post 'folders/:folder_id/folders', action: :create, as: 'create_folder'
       post 'folders/:folder_id/files', action: :create_file
+      post 'folders/:dest_folder_id/copy_file', action: :copy_file
+      post 'folders/:dest_folder_id/copy_folder', action: :copy_folder
     end
 
     scope(controller: :favorites) do

@@ -268,11 +268,11 @@ class Folder < ActiveRecord::Base
     end
     dup.context = context
     if options[:include_subcontent] != false
-      dup.save_without_broadcasting!
+      dup.save!
       self.subcontent.each do |item|
         if options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
           if item.is_a?(Attachment)
-            file = item.clone_for(context)
+            file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
             file.folder_id = dup.id
             file.save_without_broadcasting!
           elsif item.is_a?(Folder)
