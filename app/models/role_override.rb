@@ -731,6 +731,13 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
         :account_allows => lambda {|a| a.feature_allowed?(:quiz_log_auditing)}
+      },
+      :manage_catalog => {
+        :label => lambda { t('permissions.manage_catalog', "Manage catalog") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.settings[:catalog_enabled]}
       }
     })
 

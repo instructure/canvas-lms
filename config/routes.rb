@@ -1100,6 +1100,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/roles/:id/activate', action: :activate_role
       put 'accounts/:account_id/roles/:id', action: :update
       delete 'accounts/:account_id/roles/:id', action: :remove_role
+      get 'accounts/:account_id/permissions/:permission', action: :check_account_permission
     end
 
     scope(controller: :account_reports) do
