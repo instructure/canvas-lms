@@ -730,6 +730,13 @@ class RoleOverride < ActiveRecord::Base
         :label => lambda { t('permissions.view_quiz_answer_audits', 'View the answer matrix in Quiz Submission Logs')},
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :manage_catalog => {
+        :label => lambda { t('permissions.manage_catalog', "Manage catalog") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.settings[:catalog_enabled]}
       }
     })
 

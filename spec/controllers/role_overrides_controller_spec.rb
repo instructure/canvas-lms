@@ -162,4 +162,50 @@ describe RoleOverridesController do
       end
     end
   end
+
+  describe "check_account_permission" do
+    let(:json) { JSON.parse(response.body.gsub("while(1)\;", "")) }
+
+    describe "manage_catalog permission" do
+      context "when catalog is enabled" do
+        before do
+          a = Account.default
+          a.settings[:catalog_enabled] = true
+          a.save!
+        end
+
+        context "for an admin" do
+          it "is true" do
+            get 'check_account_permission', :account_id => @account.id, :permission => 'manage_catalog'
+            expect(json['granted']).to eq(true)
+          end
+        end
+
+        context "for a non-admin" do
+          it "is false" do
+            user_session(user(account: @account))
+            get 'check_account_permission', :account_id => @account.id, :permission => 'manage_catalog'
+            expect(json['granted']).to eq(false)
+          end
+        end
+      end
+
+      context "when catalog is not enabled" do
+        context "for an admin" do
+          it "is false" do
+            get 'check_account_permission', :account_id => @account.id, :permission => 'manage_catalog'
+            expect(json['granted']).to eq(false)
+          end
+        end
+      end
+    end
+
+    describe "other permissions" do
+      it "returns 400 with an error message" do
+        get 'check_account_permission', :account_id => @account.id, :permission => 'manage_groups'
+        expect(response.code.to_i).to eq(400)
+        expect(json['message']).to be
+      end
+    end
+  end
 end
