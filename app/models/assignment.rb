@@ -522,7 +522,7 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_unmuted
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      assignment.recently_unmuted
+      assignment.context.available? && assignment.recently_unmuted
     }
 
   end
