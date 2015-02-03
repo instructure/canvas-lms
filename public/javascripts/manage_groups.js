@@ -122,7 +122,8 @@ define([
           contextGroups.insertIntoGroup($user, $group);
         }
 
-        $group.find(".loading_members").html(data['pagination_html']);
+        // xsslint safeString.property pagination_html
+        $group.find(".loading_members").html(data.pagination_html);
         $group.find(".unassigned_members_pagination a").click(function(event) {
           event.preventDefault();
           var page_regex = /page=(\d+)/

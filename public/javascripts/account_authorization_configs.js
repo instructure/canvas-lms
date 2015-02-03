@@ -61,7 +61,7 @@ define([
   $('#discovery_url_config .delete_url').click(function(){
     $.ajaxJSON( $(this).data('url'), "DELETE", {}, function(){
       $('#discovery_url_input').val("");
-      $('#discovery_url_display').html(I18n.t('no_discovery_url', "None set"));
+      $('#discovery_url_display').text(I18n.t('no_discovery_url', "None set"));
     });
   });
 

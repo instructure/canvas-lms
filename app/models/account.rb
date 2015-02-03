@@ -338,15 +338,17 @@ class Account < ActiveRecord::Base
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
     if self.root_account?
       self.errors.add(:sis_source_id, t('#account.root_account_cant_have_sis_id', "SIS IDs cannot be set on root accounts"))
       return false
     end
 
-    root = self.root_account
-    existing_account = Account.where(root_account_id: root, sis_source_id: self.sis_source_id).first
+    scope = root_account.all_accounts.where(sis_source_id:  self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
 
-    return true if !existing_account || existing_account.id == self.id
+    return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
@@ -1250,8 +1252,8 @@ class Account < ActiveRecord::Base
         tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :css_class => 'outcomes', :href => :account_outcomes_path }
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
-      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, :manage_grades)
-      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, :manage_grades)
+      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, :manage_grades)
+      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, :manage_assignments)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings

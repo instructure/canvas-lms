@@ -10,85 +10,85 @@ define [
     constructor: (title, slideshow) ->
       @title = title
       @slideshow = slideshow
-      @body = $('<li/>').addClass('slide')
-      @slideshow.slides.append(@body)
+      @$body = $('<li/>').addClass('slide')
+      @slideshow.slides.append(@$body)
 
       @prevSlide = @slideshow.slideObjects[@slideshow.slideObjects.length - 1]
       @prevSlide?.nextSlide = this
       @nextSlide = null
 
-      @indicator = $("<a/>").addClass('slide').attr('href', '#').attr('title', htmlEscape(@title)).html('&nbsp;')
-      @indicator.data('slide', this)
-      @slideshow.navigation.append(@indicator)
+      @$indicator = $("<a/>").addClass('slide').attr('href', '#').attr('title', htmlEscape(@title)).html('&nbsp;')
+      @$indicator.data('slide', this)
+      @slideshow.navigation.append(@$indicator)
       slide = this
-      @indicator.click ->
+      @$indicator.click ->
         slideshow.showSlide(slide)
         return false
 
       @hide()
 
     addParagraph: (text, klass) ->
-      paragraph = $("<p/>")
-      paragraph.addClass(klass) if klass?
-      paragraph.html(htmlEscape(text))
-      @body.append(paragraph)
+      $paragraph = $("<p/>")
+      $paragraph.addClass(klass) if klass?
+      $paragraph.html(htmlEscape(text))
+      @$body.append($paragraph)
 
     addImage: (src, klass, url) ->
-      image = $("<img/>").attr('src', src)
-      image.addClass(klass) if klass?
+      $image = $("<img/>").attr('src', src)
+      $image.addClass(klass) if klass?
       if url
-        link = $("<a/>").attr('href', url).attr('target', '_blank')
-        link.append(image)
-        @body.append(link)
+        $link = $("<a/>").attr('href', url).attr('target', '_blank')
+        $link.append($image)
+        @$body.append($link)
       else
-        @body.append(image)
+        @$body.append($image)
 
     show: ->
-      @body.show()
-      @indicator.addClass('current_slide')
+      @$body.show()
+      @$indicator.addClass('current_slide')
 
     hide: ->
-      @indicator.removeClass('current_slide')
-      @body.hide()
+      @$indicator.removeClass('current_slide')
+      @$body.hide()
 
   class Slideshow
     constructor: (id) ->
       slideshow = this
-      @dom = $('<div/>').attr('id', id)
+      @$dom = $('<div/>').attr('id', id)
 
-      @slides = $('<ul/>').addClass('slides')
-      @dom.append(@slides)
+      @$slides = $('<ul/>').addClass('slides')
+      @$dom.append(@$slides)
 
-      @separator = $("<div/>").addClass('separator')
-      @dom.append(@separator)
+      @$separator = $("<div/>").addClass('separator')
+      @$dom.append(@$separator)
 
-      @navigation = $("<div/>").addClass('navigation')
-      @dom.append(@navigation)
+      @$navigation = $("<div/>").addClass('navigation')
+      @$dom.append(@$navigation)
 
-      @backButton = $("<a/>").addClass('back').
+      @$backButton = $("<a/>").addClass('back').
         attr('href', '#').
-        attr('title', htmlEscape(I18n.t('titles.back', 'Back'))).
+        attr('title', I18n.t('titles.back', 'Back')).
         html('&nbsp;')
-      @navigation.append(@backButton)
-      @backButton.click ->
+      @$navigation.append(@$backButton)
+      @$backButton.click ->
         slideshow.showPrevSlide()
         return false
 
-      @forwardButton = $("<a/>").addClass('forward').
+      @$forwardButton = $("<a/>").addClass('forward').
         attr('href', '#').
-        attr('title', htmlEscape(I18n.t('titles.forward', 'Forward'))).
+        attr('title', I18n.t('titles.forward', 'Forward')).
         html('&nbsp;')
-      @navigation.append(@forwardButton)
-      @forwardButton.click ->
+      @$navigation.append(@$forwardButton)
+      @$forwardButton.click ->
         slideshow.showNextSlide()
         return false
 
-      @closeButton = $("<a/>").addClass('close').
+      @$closeButton = $("<a/>").addClass('close').
         attr('href', '#').
-        attr('title', htmlEscape(I18n.t('titles.close', 'Close'))).
+        attr('title', I18n.t('titles.close', 'Close')).
         html('&nbsp;')
-      @navigation.append(@closeButton)
-      @closeButton.click ->
+      @$navigation.append(@$closeButton)
+      @$closeButton.click ->
         slideshow.close()
         return false
 
@@ -102,7 +102,7 @@ define [
 
     start: ->
       @showSlide(@slideObjects[0])
-      @dialog = @dom.dialog
+      @$dialog = @$dom.dialog
         dialogClass: 'slideshow_dialog'
         height: 529
         width: 700
@@ -117,13 +117,13 @@ define [
           @slideShown = slide
           @slideShown.show()
         if @slideShown.prevSlide
-          @backButton.removeClass('inactive')
+          @$backButton.removeClass('inactive')
         else
-          @backButton.addClass('inactive')
+          @$backButton.addClass('inactive')
         if @slideShown.nextSlide
-          @forwardButton.removeClass('inactive')
+          @$forwardButton.removeClass('inactive')
         else
-          @forwardButton.addClass('inactive')
+          @$forwardButton.addClass('inactive')
 
     showPrevSlide: ->
       @showSlide(@slideShown?.prevSlide)
@@ -132,8 +132,8 @@ define [
       @showSlide(@slideShown?.nextSlide)
 
     close: ->
-      @dom.dialog('close')
-      @dom.hide()
+      @$dom.dialog('close')
+      @$dom.hide()
       @slideShown?.hide()
       @slideShown = null
 

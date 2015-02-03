@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -568,6 +568,38 @@ describe SIS::CSV::SectionImporter do
     s1.reload
     expect(s1.nonxlist_course).to be_nil
     expect(s1.course).to eql(course2)
+    expect(s1.crosslisted?).to be_falsey
+  end
+
+  it 'should uncrosslist a section if the course has been deleted' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,TC 101,Test Course 101,,,active",
+      "C002,TC 102,Test Course 102,,,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
+    process_csv_data_cleanly(
+      "xlist_course_id,section_id,status",
+      "X001,S001,active"
+    )
+    xlist_course = @account.courses.where(sis_source_id: "X001").first
+    course1 = @account.courses.where(sis_source_id: "C001").first
+    s1 = xlist_course.course_sections.where(sis_source_id: "S001").first
+    expect(s1).not_to be_nil
+    expect(s1.nonxlist_course).to eql(course1)
+    expect(s1.course).to eql(xlist_course)
+    expect(s1.crosslisted?).to be_truthy
+    xlist_course.destroy
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
+    s1.reload
+    expect(s1.nonxlist_course).to be_nil
+    expect(s1.course).to eql(course1)
     expect(s1.crosslisted?).to be_falsey
   end
 

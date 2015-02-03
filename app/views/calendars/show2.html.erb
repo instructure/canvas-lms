@@ -29,15 +29,17 @@
   </div>
   <div class="rs-section">
     <h3 class="element_toggler" aria-controls="context-list-holder" aria-expanded="true"
-     aria-label="<%= t(:toggle_calendars, "Toggle calendars") %>" tabindex="0">
+        aria-label="<%= t(:toggle_calendars, "Toggle calendars") %>" tabindex="-1">
       <i class="icon-mini-arrow-down auto_rotate"></i> <%= t(:calendars, "Calendars") %>
+      <button class="screenreader-only" id="calendar-toggle-button"><%= t "Expand or Collapse Calendars" %></button>
     </h3>
     <div id="context-list-holder"></div>
   </div>
   <div class="rs-section" id="undated-events-section">
-    <h3 class="element_toggler" aria-controls="undated-events" aria-expanded="false"
-     aria-label="<%= t(:toggle_undated_items, "Toggle undated items") %>" tabindex="0">
+    <h3 class="element_toggler" aria-controls="undated-events" aria-expanded="true"
+        aria-label="<%= t(:toggle_undated_items, "Toggle undated items") %>" tabindex="-1">
       <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated items") %>
+      <button class="screenreader-only" id="undated-events-button"><%= t "Expand or collapse Undated items" %></button>
     </h3>
     <div id="undated-events"></div>
   </div>

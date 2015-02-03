@@ -434,6 +434,13 @@ describe "Accounts API", type: :request do
       end
     end
 
+    it "should honor the includes[]" do
+      @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb",
+                      { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :include => ['storage_quota_used_mb'] }, {})
+      expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
+    end
+
     describe "courses filtered by state[]" do
       before :once do
         @me = @user

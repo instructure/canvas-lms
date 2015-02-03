@@ -80,7 +80,7 @@ zh_Hant:
     tab_courses: 課程
     tab_developer_keys: 開發人員金鑰
     tab_faculty_journal: 教職員日誌
-    tab_grading_standards: 評分配置
+    tab_grading_standards: 評分
     tab_jobs: 工作
     tab_outcomes: 結果
     tab_permissions: 權限
@@ -267,6 +267,7 @@ zh_Hant:
       logout_request_to_idp: "LogoutRequest 發送至 IdP"
       logout_response_from_idp: "LogoutResponse 來自於 IdP"
       saml_required: "需要 SAML 設定來測試 SAML"
+  account_navigation_configured_946bf47e: 帐户瀏覽已設定
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帳戶通知結束時間在開始時間之前
@@ -1228,12 +1229,18 @@ zh_Hant:
         header: 
           one: "%{count} 個錯誤禁止儲存此 %{model}"
           other: "%{count} 個錯誤禁止儲存此 %{model}"
+  add_app_baf540f: 新增應用程式
+  add_course_assignments_628ed6d0: 新增課程任務
+  add_course_calendar_events_146154a5: 新增課程月曆事件
   add_module_item: 
     add_assignment_to: "新增任務至 %{module}"
     add_file_to: "新增檔案至 %{module}"
     add_page_to: "新增頁面至 %{module}"
     add_quiz_to: "新增測驗至 %{module}"
     add_topic_to: "新增討論主題至 %{module}"
+  add_students_to_the_course_874be8fb: 新增學生至課程
+  add_tas_to_the_course_2aac6e02: 新增助教至課程
+  add_tool_4a5e66c8: 新增工具
   after_date_981cd41b: "在 %{date} 之後"
   after_last_attempt_c9168da2: 最後一次嘗試之後
   ajax_errors: 
@@ -1288,6 +1295,7 @@ zh_Hant:
       criteria_required: 至少需要一個觸發程序
       recipients_required: 至少需要一個收件者
       threshold_should_be_numeric: 這應該是一個正數
+  all_4321c3a1: 全部
   all_students_have_taken_the_quiz_b558f8b4: 所有學生均已參加該測驗
   all_students_have_taken_the_survey_494f9f42: 所有學生均已參加該調查
   allow_lor_tools: "允許使用者檢視和使用為 LOR 組態的外部工具。"
@@ -1348,7 +1356,6 @@ zh_Hant:
       lock_for_comments: 鎖定以查看註解
       make_sure_all_search_terms_are_spelled_correctly: 確保所有的搜尋詞均拼寫正確。
       rss_feed: "RSS 摘要"
-      search_title_body_or_author: 搜尋標題、正文或作者
       suggestions: 建議：
       there_are_no_announcements_show: 沒有可顯示的宣告
       try_different_more_general_or_fewer_keywords: 嘗試不同的、更普遍的或更少的關鍵字。
@@ -1358,6 +1365,7 @@ zh_Hant:
     podcast_feed_description_course: "從課程『%{course}』的宣告內連結或嵌入其中的任何媒體檔案將出現在此摘要中。"
     podcast_feed_description_group: "從群組『%{group}』的宣告內連結或嵌入其中的任何媒體檔案將出現在此摘要中。"
     podcast_feed_name: "%{course} 宣告播客資訊摘要"
+  anonymous_e1b8ad27: 匿名
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: 答案將在最後一次嘗試后顯示
   application: 
     errors: 
@@ -1412,11 +1420,14 @@ zh_Hant:
       invalid_course_section: 無效的課程章節
       invalid_group_category: 無效的群組類別
       missing_group_category: 群組約會必須有一個群組類別
+  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "應用程式是新增新功能至 Canvas 的簡便方法。它們可以被新增至單獨的課程，或者一個帳戶中的所有課程。一旦設定，就可以透過課程模組連結到它們，並創建評估工具的任務。"
   appt_calendar_event_dialog: 
     invalid_participants: 必須讓至少一個使用者參加
     title: "編輯 %{name}"
     update: 更新
   archive_3f794d7e: 封存
+  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否確定要刪除此評分配置？
+  are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否確定要移除此工具？
   aria_labels: 
     unlock_at_date: 解除鎖定日期
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 當您在這個欄位中鍵入時，群組清單將被自動篩選，以便只包括那些與您的輸入相符的名字。
@@ -1446,7 +1457,6 @@ zh_Hant:
     labels: 
       due: 截止日期
     name_is_required: 名稱是必需的！
-    points_possible_not_zero: "對於選定的評分類型，可能的點必須大於 0"
     points_possible_number: 可能的點必須是數字
     select_external_tool_dialog_title: 設定外部工具
     submission_action_take_quiz: "採用 %{title}"
@@ -1496,6 +1506,7 @@ zh_Hant:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: 無法刪除具有鎖定任務的群組。
+  assignment_menu_configured_7a5f4eec: 任務功能表已設定
   assignment_muter: 
     mute_assignment: 靜音任務
     muting_assignment: 正在進行靜音任務…
@@ -1505,41 +1516,6 @@ zh_Hant:
     unmuting_assignment: 正在進行取消靜音任務…
   assignment_name_b2d87383: 任務名稱
   assignments: 
-    add_assignment_form: 
-      assignment_name: 任務名稱
-      labels: 
-        due: 截止日期：
-        points: 點：
-        quiz_points: 測驗點
-        type: 類型
-      links: 
-        full_edit: 充分編輯
-        more_options: 更多選項
-      options: 
-        assignment: 任務
-        attendance: 考勤
-        discussion: 討論
-        external_tool: 外部工具
-        not_graded: 未評分
-        quiz: 測驗
-      tooltips: 
-        assignment_is_quiz: 此任務是一個測驗，所以點可能來源於問題，並且無法手動設置。
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "每個學生的得分 %{scores}"
-      labels: 
-        assignments: 任務
-        group_name: 群組名稱
-      links: 
-        add_grading_rule: 新增分級規則
-        delete_assignment: 刪除
-      options: 
-        drop_highest: 降低最高值
-        drop_lowest: 降低最低值
-        equally_weighted: 平均加權
-        never_drop: 切勿丟棄
-        no_assignments: "[無任務]"
-        weighted_by_points: 根據點加權
-      percent_of_total_grade: "占總成績的 %"
     assignment_count: 
       one: "%{count} 個任務"
       other: "%{count} 個任務"
@@ -1594,10 +1570,6 @@ zh_Hant:
       not_yet_graded: "*尚未評分*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} 點"
       score_with_points_possible_screenreader: "得分：%{score}，超出 %{pointsPossible} 點。"
-    assignment_locked: 
-      assignment_locked: "此任務被鎖定，截止 *%{lock_at}*"
-      assignment_unlocked_from: "此任務被鎖定，直到 *%{unlock_at}*"
-      assignment_unlocked_from_to: "此任務僅從 *%{unlock_at}* 至 *%{lock_at}* 解除鎖定"
     assignment_settings: 
       cancel: 取消
       save: 儲存
@@ -1606,49 +1578,13 @@ zh_Hant:
     assignment_sidebar: 
       links: 
         submit: 提交任務
-    assignments_content: 
-      buttons: 
-        delete_group: 刪除群組
-      labels: 
-        class_weighting_policy: 根據任務群組加權最終成績
-        delete_assignments_in_group: 刪除此群組中的任務
-        move_assignments_to: 將任務從此群組移動到
-      options: 
-        select_group: "[選擇群組]"
-      titles: 
-        delete_assignment_group: 刪除任務群組？
-      tooltips: 
-        target_group: 選擇群組以將此任務移動到
-      warnings: 
-        delete_assignment_group: "任務群組 %{group} 中有 %{assignment_count} 個。可以刪除這些任務或將其移動到另一個任務群組。"
-    assignments_list_content: 
-      assignments: 
-        graded: 此任務已經被評分
-        needs_grading_count: "此任務的 %{needs_grading_count} 份提交件還需要分級"
-        overdue: 此任務已過期
-      no_assignments: 沒有為此課程建立任何任務。
-      titles: 
-        assignments: 任務
-        course_assignments: 課程任務
-        overdue_assignments: 逾期任務
-        past_assignments: 過去的任務
-        undated_assignments: 未注日期的任務
-        ungraded_assignments: 未評分的任務
-        upcoming_assignments: 即將到來的任務
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: 按類型分組任務
-        just_show_assignment_list: 僅顯示任務清單
         manage_assignments: 管理任務
         see_current_grades: 查看我迄今為止的成績
       titles: 
         show_only_assignments_from: 僅顯示自…的任務
         upcoming_assignments: 即將到來的任務
-    assignments_right_side: 
-      add_assignment_to_group: "*新增任務* 至 %{group}"
-      assignment_groups_wrapper: "（在 %{number_of_groups} 中）"
-      links: 
-        add_assignment_group: 新增任務群組
     available_date_description: 
       available_until: 在…之前可用
       closed: 已關閉
@@ -1834,28 +1770,6 @@ zh_Hant:
         total: 總計
     higher_than_max: 不能使用大於任務數目的數字
     incomplete: 未完成
-    index: 
-      assignment_locked: 此任務目前已被鎖定。瀏覽任務詳細資料頁面以瞭解更多資訊。
-      assignment_locked_tooltip: 已鎖定
-      keycode_descriptions: 
-        add_assignment_or_group: 新增任務至當前群組
-        close_active_dialog: 關閉使用中的對話方塊
-        delete_assignment_or_group: 刪除當前任務/群組
-        edit_assignment_or_group: 編輯當前任務/群組
-        full_preview: 全預覽/編輯任務
-        next_assignment_or_group: 下一個任務/群組
-        previous_assignment_or_group: 上一個任務/群組
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: 如何做…？
-      page_title: 任務
     index_view: 
       add_assignment: 任務
       add_group: 群組
@@ -2013,10 +1927,6 @@ zh_Hant:
       locked: 已鎖定
     status: 
       deleting_group: 正在刪除群組...
-    student_index: 
-      assignments: 任務
-      labels: 
-        assignments: 任務
     submission_sidebar: 
       comment_signature: "%{author}，%{created_at}"
       labels: 
@@ -2166,40 +2076,7 @@ zh_Hant:
         settings_exclude_less_than_percent: "少於文件的 %{percentInput}"
     undated_assignments: 未注日期的任務
     upcoming_assignments: 即將到來的任務
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}：刪除任務"
-        edit_icon: "%{icon}：再次編輯基本選項"
-        move_icon: "%{icon}：將任務移動到另一個群組"
-        preview_icon: "%{icon}：預覽並完全編輯任務"
-      errors: 
-        no_assignment_group: 哎呀！您需要先新增一個任務群組。按一下『建立任務群組』以瞭解如何操作。
-      instructions: 
-        wizard: 
-          details: "進入任務的項目超過了截止日期和點。如果要輸入有關任務的說明，允許檔案上傳，修改分級類型或很多其他項目，按一下任務的名稱，或按一下 %{edit_icon} 圖示，然後選擇『更多選項』。"
-          group: 
-            screenreader_step1: 任務群組用於組織任務。為每一個群組提供一個名稱。如果選擇根據群組加權最終成績，那麼還可以為每個群組都設定百分比分數。按一下『新增任務群組』以建立群組。
-            step1: 任務群組用於組織任務。為每一個群組提供一個名稱。如果選擇根據群組（*在何處？*）加權最終成績，那麼還可以為每個群組都設定百分比分數。按一下『新增任務群組』以建立群組。
-          overview: 此頁面用於設定較高水準的課程。您可以新增任務，對其進行分組，然後對這些群組進行加權。這樣做是為了讓您自己先有條不紊，然後再深入瞭解具體情況。即便如此，還可以在此處進行很多操作。
-          quizzes: 測驗是特殊類型的任務。您可以透過按一下左側邊欄的『測驗』連結建立或匯入測驗。
-          screenreader_details: 進入任務的項目超過了截止日期和點。如果要輸入有關任務的說明，允許檔案上傳，修改分級類型或很多其他項目，按一下任務的名稱，或按一下編輯圖示，然後選擇『更多選項』。
-          screenreader_step1: 任務總是組織成群組，所以要新增任務，首先需要知道想要將其新增到哪個群組。選擇該群組，然後按一下『新增任務至』或按一下新增圖示來啟動群組的新任務。
-          step1: "任務總是組織成群組，所以要新增任務，首先需要知道想要將其新增到哪個群組。選擇該群組，然後按一下『新增任務至』或按一下 %{add_icon} 圖示來啟動群組的新任務。"
-          step2: 太好了！現在請填寫您的詳細資料。您可以為您的任務輸入一個標題、截止日期和可能的點數。如果您想要進行更多操作，那麼只能在任務建立之後進行。
-          step3: 已完成！任務現在已新增到該群組！如果在任務上面懸停滑鼠，則會看到很多選項。以下是其所代表的意思：
-      links: 
-        create_assignment: 建立新任務
-        create_assignment_group: 建立任務群組
-        create_or_import_quiz: 建立/匯入測驗
-        edit_assignment_in_detail: 詳細編輯任務
-        screenreader_show_me_add_assignment: 指引我前往新增任務按鈕
-        screenreader_show_me_add_assignment_group: 指引我前往新增任務群組按鈕
-        screenreader_show_me_weight_final_grade: 指引我前往加權最終成績核取方塊
-        show_me_where: 顯示在何處
-      subtitles: 
-        edit_assignment_in_detail: （允許上傳、編輯說明等）
-      titles: 
-        wizard_box: 我想要：
+  assignments_1e02582c: 任務
   assignments_api: 
     invalid_date_time: "%{attribute} 的無效日期時間"
     invalid_submission_types: 無效的提交件類型
@@ -2239,6 +2116,7 @@ zh_Hant:
     login: 登入
     logout: 登出
   available_from_587ce92f: 自…可用
+  back_to_app_center_95420d83: 返回應用程式中心
   bb_display: "Blackboard 學習"
   bb_file_description: "Blackboard 6/7/8/9 匯出 .zip 檔案"
   bb_name: "Blackboard 轉換器"
@@ -2356,6 +2234,7 @@ zh_Hant:
     update: 更新
     view_account_roster: 查看帳戶名單
     view_course_roster: 查看課程名單
+  by_url_a163275e: "透過 URL"
   c_modal_form: 
     close: 關閉
   calculator: 
@@ -2871,6 +2750,8 @@ zh_Hant:
       update_assignment_points: "此任務有 %{assignmentPoints} 點可能，想要更改其以有 %{rubricPoints} 點可能以與此題目相符？"
     titles: 
       update_assignment_points: 更改可能的點以與題目相符？
+  choose_a_course_home_page_8059c7b: 選擇課程首頁
+  close_d634289d: 關閉
   collaboration: 
     default_title: 未命名的協作
   collaborations: 
@@ -2948,6 +2829,7 @@ zh_Hant:
         current: 當前協作
     titles: 
       delete: 刪除協作？
+  coming_up_4348b0bd: 即將推出
   comm_messages: 
     from_beginning: 開始
     to_now: 現在
@@ -3086,11 +2968,13 @@ zh_Hant:
         new: 尚未開始
         started: "開始於 %{time}"
     type_disabled_error: "不再為此 Canvas 網站啟用這種類型的會議"
+  configuration_type_25a084a4: 設定類型
   confirm_dialog: 
     cancel: 取消
     submit: 提交
   confirm_dialog_component: 
     ok: 確定
+  consumer_key_6f94ba11: 取用者金鑰
   content_exports: 
     buttons: 
       process: 處理資料
@@ -3128,7 +3012,6 @@ zh_Hant:
       select_quizzes: 選擇要匯出的測驗
   content_imports: 
     errors: 
-      failed: 課程匯入失敗，出現以下錯誤：
       import_failed: "遷移匯入過程中出現錯誤。請通知您的系統管理員，並為他們提供下面的代碼：『%{code}』"
       no_only_and_except: 不能同時使用『唯一』和『除外』選項。
     files: 
@@ -3138,7 +3021,6 @@ zh_Hant:
       description: "您可以上傳壓縮的檔案集合到您的課程，我們會將其全部解壓縮給您。這是將檔案從其他系統移動到 Canvas 的簡單方式。"
       page_title: 匯入檔案
     messages: 
-      copying: 正在複製...這將需要幾分鐘
       import_complete: 匯入完成！正在返回課程頁面...
       importing_button: 正在匯入...這可能需要一段時間
     titles: 
@@ -3514,123 +3396,12 @@ zh_Hant:
     buttons: 
       add: 新增模組
       add_item: 新增項目
-      add_module: 建立模組
+      add_module: 模組
       add_module_first: 新增新模組
       update: 更新模組
     confirm: 
       delete: 是否確定要刪除此模組？
       delete_item: 是否確定要從模組移除此項目？
-    content: 
-      add_prerequisite: "新增先決條件至 *%{module}*"
-      assignment_points_possible: "超出 %{points_possible}"
-      buttons: 
-        add_module: 新增模組
-        add_prerequisite: 新增先決條件
-      criterion_for_assignment: "對於 %{assignment}，使用者必須 %{select_criterion}"
-      headings: 
-        add_prerequisite: "新增先決條件至 %{name}"
-        course_modules: 課程模組
-        student_progress: 學生的模組進度
-        student_progress_for_module: "學生的 %{module} 進度"
-        students_completed: 已完成模組的學生
-        students_in_progress: 正致力於學習模組的學生
-        students_locked: 尚未解除鎖定模組的學生
-        students_unlocked: 已解除鎖定（但尚未開始學習）模組的學生
-      help: 
-        create: |-
-            課程模組可用於將您的任務、頁面、檔案等整理成更小的部分或單位。模組可以圍繞一個主題為中心，專注於一個特定的主題，或者甚至只是按時間順序進行分組。
-            
-            也可以通過為每個模組定義標準和先決條件來排序模組。在學生們解除鎖定其所有先決條件之前，其將無法存取模組。這樣一來就可以防止學生存取某些內容或檔案，直到其（例如）在複習測驗中得分至少 75％。
-            
-            要開始將您的課程整理進模組，按一下右側的『%{button}』按鈕。
-        no_modules: 尚無為這門課程定義的模組。
-      images: 
-        alt: 
-          min_score: 最低分數
-          must_contribute: 必須參與
-          must_submit: 必須提交
-          must_view: 必須檢視
-        title: 
-          min_score: "在該模組被認為完成之前，就此項目而言，學生必須獲得至少 %{min_score}。"
-          must_contribute: 在該模組被認為完成之前，學生必須參與此項目。
-          must_submit: 在該模組被認為完成之前，學生必須提交此任務。
-          must_view: 在該模組被認為完成之前，學生必須檢視此項目。
-      indent: 
-        ? "n"
-        : 
-          one: "縮排 1 級"
-          other: "縮排 %{count} 級"
-          zero: 請勿縮排
-      key: 
-        description: 
-          delete: 刪除當前模組/項目
-          edit: 編輯模組/項目
-          indent: 縮排當前項目
-          new: 新模組
-          next: 下一個模組/項目
-          outdent: 凸排當前項目
-          previous: 上一個模組/項目
-      keycode_descriptions: 
-        next_module_item: 選擇下一個模組或模組項目
-        previous_module_item: 選擇上一個模組或模組項目
-        toggle_module_dragging: 選擇項目以開始拖曳或放下此前選定的項目
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: 向上
-        outdent: o
-        previous: k
-        previous_module_item: 向下
-        toggle_module_dragging: 空格
-      labels: 
-        indent: 縮排
-        module_complete_when: 此模組完成，前提是當
-        modules: 
-          before_students_view: 在學生可以檢視此模組之前
-        new_tab: 載入新標籤
-        publish_final_grade: 此模組完成時，為學生公佈最終成績
-        require_sequential_progress: 學生必須按順序瀏覽此模組的所有要求
-        sort_by: 排序方式
-        title: 標題
-        unlock_at: 解除鎖定於
-        url: URL
-      links: 
-        add_prerequisite: 新增先決條件
-        add_requirement: 新增要求
-        reload_student: 重新載入學生的進度
-        sort_by_name: 名稱
-        sort_by_progress: 進度
-        student_progress: 檢視進度
-        title: 
-          remove_prerequisite: 移除此先決條件
-      module: 模組
-      module_details: "模組按順序顯示，所以只有那些 %{name} 以上的模組可以被設定為先決條件。"
-      module_name: 模組名稱
-      modules_keyboard_hint: "要更改課程模組及模組項目的順序，先關閉螢幕閱讀程式上的游標。在 JAWS 中插入 -z。按 Tab 鍵選擇第一個模組。按向上和向下鍵來選擇一個模組或模組項目。按空格鍵選擇模組或模組項目以開始拖曳。然後按向上和向下鍵選擇目標。然後第二次按空格鍵以將選擇放在目標之後。"
-      must_complete_prerequisites: 他們必須完成
-      no_preprequisites: 沒有定義的先決條件
-      no_requirements: 沒有定義的要求
-      prerequisites: 
-        another_module: 另一個模組
-      prerequisites_need_item: 在可以指定使用者將如何完成這個模組之前，需要新增項目
-      requirements: 
-        must_contribute: 參與頁面
-        must_score_at_least: 得分至少
-        must_submit: 提交任務
-        must_view: 檢視項目
-      select_module: 
-        instructions: 選擇模組
-        name: "模組，%{module}"
-      select_prerequisite: 選擇先決條件的類型。在所有先決條件得到滿足之前，學生看不到模組。
-      student_name: 學生名稱
-      table_headings: 
-        module: 模組
-        state: 狀態
-      titles: 
-        student_progression: 學生的模組進度
     content_next: 
       add_prerequisite: "新增先決條件至 *%{module}*"
       assignment_points_possible: "超出 %{points_possible}"
@@ -3755,41 +3526,6 @@ zh_Hant:
       titles: 
         student_progression: 學生的模組進度
     context_module: 
-      admin_links: 
-        module_options_label: 管理模組
-        module_options_title: 管理模組
-      context_module: 
-        draft: （草稿）
-      images: 
-        alt: 
-          complete: 已完成
-          incomplete: 未完成
-          locked: 已鎖定
-        title: 
-          complete: 模組已完成
-          incomplete: 模組未完成
-          locked: 模組已鎖定
-      links: 
-        add_item: 新增內容
-        hide_contents: 隱藏模組內容
-        settings: 模組設定
-        show_contents: 顯示模組內容
-        text: 
-          delete_module: 刪除
-          edit_module: 編輯
-        title: 
-          delete_module: 刪除此模組
-          edit_module: 編輯
-          student_progress: 查看此模組的學生進度
-      manage: 管理模組
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: 模組選項
-      module_will_unlock_at: "將解除鎖定 *%{unlock_date}*"
-      progression_complete_count: "*%{count}* 完成"
-      progression_started_count: "*%{count}* 進行中"
-      reorder_modules: 拖曳以重新排序模組
       unpublish: 解除發佈
     context_module_next: 
       aria_labels: 
@@ -3827,51 +3563,6 @@ zh_Hant:
         course_modules: 課程模組
     module_complete: 完成
     module_empty: "模組『%{module}』中沒有任何項目"
-    module_item: 
-      drag_to_reorder: 拖曳以重新排序或移動項目至另一個模組
-      images: 
-        alt: 
-          complete: 已完成
-          incomplete: 未完成
-          max_score: 最高分數
-          min_score: 最低分數
-          must_contribute: 必須參與
-          must_submit: 必須提交
-          must_view: 必須檢視
-        title: 
-          complete: 模組項目已完成
-          incomplete: 模組項目未完成
-          max_score: 在該模組被認為完成之前，學生必須不超過此項目的最高分數
-          min_score: 在該模組被認為完成之前，學生必須達到此項目的最低分數
-          must_contribute: 在該模組被認為完成之前，學生必須參與此項目。
-          must_submit: 在該模組被認為完成之前，學生必須提交此任務。
-          must_view: 在該模組被認為完成之前，學生必須檢視此項目。
-      links: 
-        edit_item: 編輯項目詳細資料
-        edit_item_details_label: 編輯項目詳細資料
-        indent: 增加縮排
-        indent_label: 增加縮排
-        outdent: 減少縮排
-        outdent_label: 減少縮排
-        remove_item: 從模組移除此項目
-        remove_item_label: 從模組移除此項目
-      max_score: 
-        fulfilled: "得分不得超過 %{score}"
-        unfulfilled: "得分必須不得超過 %{score}"
-      min_score: 
-        fulfilled: "得分至少為 %{score}"
-        unfulfilled: "得分必須至少為 %{score}"
-      module: 
-        item_aria_label: "%{item_label} 模組項目"
-      must_contribute: 
-        fulfilled: 參與頁面的內容
-        unfulfilled: 必須參與頁面的內容
-      must_submit: 
-        fulfilled: 提交任務
-        unfulfilled: 必須提交任務
-      must_view: 
-        fulfilled: 檢視頁面
-        unfulfilled: 必須檢視頁面
     module_item_next: 
       drag_to_reorder: 拖曳以重新排序或移動項目至另一個模組
       images: 
@@ -3918,7 +3609,6 @@ zh_Hant:
     module_locked: 已鎖定
     module_started: 進行中
     module_unlocked: 已解除鎖定
-    none_in_progress: 無進行中的任何事項
     optgroup: 
       assignments: 任務
       discussion_topics: 討論
@@ -3928,7 +3618,7 @@ zh_Hant:
       quizzes: 測驗
       wiki_pages: "Wiki 頁面"
     points_possible_short: "%{points} 點"
-    prerequisits_footer: 
+    prerequisites_footer: 
       default_module_name: 模組
       labels: 
         prerequisites: 先決條件
@@ -3939,14 +3629,12 @@ zh_Hant:
       titles: 
         student_progress: 學生進度
         student_progression: 學生的模組進度
-    still_needs_completing: 仍需完成
     titles: 
       add: 新增模組
       add_item: "新增項目至 %{module}"
       add_prerequisite: "新增先決條件至 %{module}"
       edit: 編輯模組設定
       edit_item: 編輯項目詳細資料
-      student_progress: 學生的模組進度
     url_show: 
       new_tab: 此網站需要在新的瀏覽器視窗中打開。
       open_url_button: "在新視窗中打開 %{title}。"
@@ -4250,6 +3938,7 @@ zh_Hant:
       file: 未知檔案
       topic: 未知主題
       wiki_page: "未知 Wiki 頁面"
+  course_home_sub_navigation_configured_5b80b8bf: 課程首頁子瀏覽已設定
   course_list: 
     favorited_tooltip: 按一下以從課程功能表中移除。
     nonfavorited_tooltip: 按一下以新增至課程功能表。
@@ -4327,6 +4016,7 @@ zh_Hant:
       wiki_id: "Wiki ID"
       workflow_state: 工作流程狀態
   course_members_are_free_to_join_9b2603d4: 課程成員可自由加入
+  course_navigation_configured_a48400fe: 課程瀏覽已設定
   course_restore: 
     restore_error: 嘗試還原課程時出現錯誤。課程沒有還原。
   course_search: 
@@ -4376,6 +4066,7 @@ zh_Hant:
       move_course: 移動課程
       reset_course_content_dialog_help: 重設課程內容
       section_enrollments: 章節註冊
+  course_settings_sub_navigation_configured_e6c41593: 課程設定子瀏覽已設定
   course_statistics: 
     unknown: 未知
   course_users: 
@@ -4437,59 +4128,6 @@ zh_Hant:
       start_at: 開始日期
       titles: 
         copy_course: 複製課程
-    course_wizard_box: 
-      buttons: 
-        publish: 發佈課程
-      details: 
-        assignments: 新增您的任務。您可以只做一個長長的清單，或將其分成群組，甚至為每個任務群組指定權重。
-        available: 由於您的課程已設定且可用，您可能不再需要這個清單。但我們會暫時保留，以備您日後想嘗試新的東西，或者您更改您的課程內容只是需要一點額外的説明。
-        calendar: 有一個很好的機會去瞭解月曆，新增您可能需要的任何非任務的事件至課程。別擔心，我們會幫您完成它。
-        claimed: 
-          not_saved: |-
-              好極了，您已獲得一門課程......現在該怎麼辦？那麼，在您將其發佈到世界上之前，可能要檢查並確保您已奠定了基礎。瀏覽左側的清單，以確保您的課程已經可以使用。
-              
-              *在本課程發佈之前，僅教師可見*
-          saved: "已完成！您的課程 %{course} 現在已正式建立。在其發佈之前，僅您自己可見，但是在您過早行動之前，您需要瀏覽左側的清單，以瞭解 Canvas 是如何工作的，並確保您真的已為授課做好準備。"
-        created: 
-          not_saved: |-
-              該課程已建立，但尚未宣告。如果在一個星期內仍未宣告，則其會被刪除。與此同時，勾選左側的清單，以確保您已經準備好了。
-              
-              如果您需要離開並在那之前返回，只需儲存*此連結*以在稍後返回。
-              
-              請**登入**或***登錄***以宣告這門課程。
-          saved: |-
-              已完成！您的課程 %{course} 現在已正式建立。在其發佈之前，僅您自己可見，但是在您過早行動之前，您需要瀏覽左側的清單，以瞭解 Canvas 是如何工作的，並確保您真的已為授課做好準備。
-              
-              如果您需要離開並在那之前返回，只需儲存*此連結*以在稍後返回。
-              
-              請**登入**或***登錄***以宣告這門課程。
-        files: "檔案標籤是共用講座幻燈片、範例文件、學習說明以及您的學生想要下載任何資料之處。使用 Canvas 可以很容易地上傳和整理您的檔案。我們會向您演示該怎麼做。"
-        home2: "當有人瀏覽課程時，這就是其會看到的頁面。您可以將其設定為演示活動流、課程模組清單、教學大綱，或您自己所寫的自訂頁面。預設是課程活動流。要自訂此，只需按一下 %{choose_home_page}。"
-        import: "如果您已經使用了其他的課程管理系統，其中可能有您想移動至 Canvas 的資料。我們可以引導您輕鬆遷移您的內容到 Canvas 的過程。"
-        navigation: 預設情況下，所有連結均為課程啟用。學生將看不到沒有內容的章節的連結。例如，如果您還沒有建立任何測驗，則學生將看不到測驗的連結。如果課程中有您不希望您的學生存取的領域，那麼您可以排序和明確禁用這些連結。
-        publish: 
-          form: |-
-              所有的均已完成？現在即可發佈您的課程！按一下以下按鈕，使之正式！ 
-              
-              發佈將允許使用者開始參加該課程。
-          not_registered: "本課程已宣告並已準備好了，但您需要完成註冊過程，然後才能發佈課程。您應該已經收到了一封來自 Canvas 的電子郵件，並隨附一個連結以完成這個過程。一定要檢查您的垃圾郵件箱。"
-        students: 您肯定會想要瞭解這些資訊中的一些。如果沒有人聽課，那麼教授課程的樂趣是什麼？
-        tas: 您可能需要指定一些助教在您的課程中提供幫助。助教能夠為您評分學生提交件、幫助緩和討論，甚至更新截止日期及任務詳細資料。
-      headings: 
-        next_steps: 接下來的步驟
-      links: 
-        assignments: 新增課程任務
-        calendar: 新增課程月曆事件
-        files: 新增課程檔案
-        home: 選擇課程首頁
-        import: 匯入內容
-        navigation: 選擇瀏覽連結
-        publish: 發佈課程
-        re_send_confirmation: 重新傳送確認電子郵件
-        students: 新增學生至課程
-        tas: 新增助教至課程
-        title: 
-          bookmark: 複製或標記此連結
     description: 
       links: 
         join_course: 加入本課程
@@ -4549,7 +4187,6 @@ zh_Hant:
     errors: 
       create_failed: 課程建立失敗
       role_not_active: "無法為非活躍的角色新增使用者：「%{role}」"
-      role_not_found: "不存在名為「%{role}」的角色。"
       unpublish: 如果存在學生意見，則課程不能是未發佈的。
     group_list: 
       headings: 
@@ -4825,19 +4462,9 @@ zh_Hant:
         stats: 課程統計資料
         student_view: 學生檢視
     show: 
-      buttons: 
-        update_layout: 更新版面配置
       change_home_page: 更改
       details: 
-        assignments: 該檢視顯示了本課程的**任務清單**，即將到來的和最近的任務顯示於頂部。
         confirm_unenroll: 是否確定要取消註冊本課程？您將無法再看到課程名冊，或直接與教師溝通，並且您將無法再在您的資料流中看到課程事件以及通知。
-        custom_page: "您可以**设计自己的课程首頁**，包括您喜欢的任何链接、影像或 Rich Media。"
-        modules: |-
-            您可以將您的課程組織為 **模組或章節**，其中每個章節包含一組相關的檔案、任務、網頁等。如果您想，您也可以透過定義在每個模組被解除鎖定之前需要完成的標準和先決條件排序模組。
-            
-            - 這個版面配置可能最適合那些不基於特定的時間表（如期限或學期）的課程。
-        recent_activity_dashboard: "**近期活動儀表板**可讓參與者看到最近的交談、宣告、討論以及關於這門課程的互動。這與使用者第一次登入時看到的儀表板頁面非常相似，但只顯示這門特定課程的內容。"
-        syllabus: "**教學大綱檢視**可讓您詳細描寫有關課程的期望描述或透過連結、影像等介紹課程，然後還顯示所有任務和課程事件的月曆檢視。"
       draft_state: 
         buttons: 
           cancel: 取消
@@ -4859,27 +4486,16 @@ zh_Hant:
         choose_home_page_title: 選擇首頁
         confirm_unenroll: 確認取消註冊
         importing: 本課程將被匯入
-        set_layout: 設定首頁版面配置
         unpublished: 本課程未發佈
       importing: 正在進行課程複製/遷移。這意味著，某些內容可能暫時不可用。
-      labels: 
-        select_content: 當人們瀏覽課程網頁時，向其顯示
       license_notice: "本課程內容根據 %{license_type} 授權提供。本課程內容可根據本授權考慮，除非另有說明。"
       links: 
-        change_layout: 更改首頁版面配置
         choose_home_page: 選擇首頁
         course_setup: 課程設定清單
-        course_stream: 參見課程流
         drop_course: 放棄本課程
         join_course: 加入本課程
         new_announcement: 新宣告
         view_course_stream: 檢視課程流
-      options: 
-        assignments: 任務清單
-        custom_page: 我將自己設計的頁面
-        modules: 課程模組/章節
-        recent_activity_dashboard: 近期活動儀表板
-        syllabus: 任務與課程教學大綱
       period_name: "最後 2 週"
       re_sending: 正在重新傳送...
       send_done: 已完成！通知可能需要幾分鐘。
@@ -4975,6 +4591,7 @@ zh_Hant:
     announcements: 宣告
     assignments: 任務
     calendar_events: 月曆事件
+    collaborations: 協作
     conferences: 會議
     confirmation: 確認
     copy_course: 複製課程
@@ -4984,7 +4601,7 @@ zh_Hant:
     error_reports: 錯誤報告
     files: 檔案
     grades: 成績
-    grading_schemes: 評分配置
+    grading_standards: 評分
     groups: 群組
     jobs: 工作
     media: 媒體
@@ -5004,7 +4621,6 @@ zh_Hant:
     stats: 統計資料
     syllabus: 課程教學大綱
     users: 使用者
-    wiki_page_revisions: 修訂
     wiki_pages: 頁面
   csv: 
     alpha: Alpha
@@ -5062,6 +4678,7 @@ zh_Hant:
       assign_blanks: 將零分配至未提交的學生
     out_of_points_possible: "超出 %{assignment.points_possible}"
     this_is_permanent: 成績曲線繪製無法取消。先前繪製的曲線成績歷史可用，但繪製曲線的操作無法復原。
+  custom_fields_fc3e55af: 自訂欄位
   d2l_display: Desire2Learn
   d2l_file_description: "D2L 匯出 .zip 格式"
   d2l_name: "D2L 轉換器"
@@ -5133,13 +4750,13 @@ zh_Hant:
       tomorrow: 明天
       yesterday: 昨天
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
+      date_at_time: "%b %-d at %k:%M"
       default: "%Y-%m-%d"
-      long: "%B %-d, %Y"
+      long: "%Y %B %-d"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
-      medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
+      medium: "%Y %b %-d"
+      medium_month: "%Y %b"
+      medium_with_weekday: "%a %Y %b %-d"
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
@@ -5207,6 +4824,8 @@ zh_Hant:
   default_conference_title: "%{course_name} 會議"
   default_question_name: 問題
   default_question_text: 問題文字
+  delete_a6efa79d: " 刪除"
+  delete_grading_scheme_6b308832: 刪除評分配置
   delete_quiz_142b8099: 刪除測驗
   delete_survey_56fddbbd: 刪除調查
   demos: 
@@ -5286,6 +4905,7 @@ zh_Hant:
       technology_education_director: 技術教育總監
       united_states_and_canada: 美國和加拿大
       vp: VP
+  description_436c48d7: 說明
   developer_key: 
     api_key: "金鑰：*%{api_key}*"
     created: 建立日期：
@@ -5342,6 +4962,7 @@ zh_Hant:
     atom_no_author: 無作者
     default_title: 無標題
     empty_message: 無訊息
+  discussion_topic_menu_configured_1b518ef2: 討論主題功能表已設定
   discussion_topics: 
     assignment_details: 
       available_from: 自…可用
@@ -5452,7 +5073,6 @@ zh_Hant:
       make_sure_all_search_terms_are_spelled_correctly: 確保所有的搜尋詞均拼寫正確。
       new_discussion: "*開始*討論"
       rss_feed: "RSS 摘要"
-      search_title_body_or_author: 搜尋標題、正文或作者
       start_one_now: 即刻開始一個
       suggestions: 建議：
       there_are_no_discussion_topics_to_show: 沒有要顯示的討論主題
@@ -5487,9 +5107,7 @@ zh_Hant:
     show: 
       add_rubric: 新增題目
       announcement_closed: 已結束本宣告以徵求意見
-      announcement_locked: "在 *%{date}* 之前，使用者不會看到本宣告。"
       announcement_locked_until: "此宣告已被鎖定，直至 %{time}"
-      announcement_not_visible: 使用者看不到本宣告。
       authors_name: 作者姓名
       collapse_replies: 收起回覆
       confirm_delete_discussion: 是否確定要刪除此討論？
@@ -5517,12 +5135,9 @@ zh_Hant:
       reply_to_message: 回覆當前郵件
       reply_to_topic: 回覆主題
       retrieved_from_feed: "從 %{feed} 抓取"
-      search_entries_placeholder: 搜尋輸入項目或作者
       show_rubric: 顯示題目
       speed_grader: "Speed Grader"
       topic: 主題
-      topic_locked: "在 *%{date}* 之前，使用者不會看到本主題。"
-      topic_not_visible: 使用者看不到此主題
       topic_podcast_feed_link: 主題播客摘要
       topic_subscribe: 訂閱
       topic_subscribe_tooltip: 您已取消訂閱，將不會收到關於新意見的通知
@@ -5619,14 +5234,17 @@ zh_Hant:
     unsubscribed: 已取消訂閱
     unsubscribed_hint: 您未訂閱這個話題。按一下以訂閱。
   display_course_catalog: 在該根帳戶中顯示可被搜尋的課程清單，啟用『將該課程加入公共課程索引』旗標。
-  draft_state_description: "此測試版功能重新設計 Canvas 的許多部分，並允許內容存在於一個新的未公佈狀態，該狀態學生看不到，並且被排除在成績計算之外。注意 – 停用此功能可能會從教師的檢視表中刪除新建立或編輯的內容。"
+  domain_3b54c511: 網域
   due_date_822625d8: 截止日期
   due_dates: 
     due_at: "截止日期：%{assignment_due_date_time}"
     multiple_due_dates: 截止日期：多個截止日期
     no_due_date: 截止日期：無截止日期
+  e_mail_only_2cc5e513: 僅電子郵件
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 轉換器"
+  edit_external_tool_472a475: 編輯外部工具
+  edit_grading_scheme_53091236: 編輯評分配置
   edit_quiz_ededddd8: 編輯測驗
   edit_rubric: 
     buttons: 
@@ -5701,6 +5319,8 @@ zh_Hant:
       font_size: 字型大小，按下以選擇
       formatting: 格式化，按下以選擇
       rte_help: "RTF 區域。按 Alt F10 以彈出工具列。按 ALT F8 以查看說明。"
+  editor_button_configured_b9419357: 編輯器按鈕已設定
+  either_the_url_or_domain_should_be_set_c29cf8c1: "應該設定 URL 或網域。"
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "在 Ember 中重寫的模組。使用本機拖放 API，允許從外部位置拖曳。"
@@ -5903,7 +5523,6 @@ zh_Hant:
         html_content: HTML/嵌入的內容
         portfolio: 移至實際電子檔案袋
         rich_content: "RTF 內容"
-        share: 複製並共用該連結以允許其他使用者存取您的私人電子檔案袋。
         view_original: 檢視原始檔案
         wizard: 開始使用精靈
       login_required: 您必須*登入*才能在此頁面上進行註解。
@@ -6041,6 +5660,8 @@ zh_Hant:
     unsaved_changes: 您有未儲存的更改。
     wrong_file_extension: "您選擇的檔案擴展名為 \"%{extension}\"，不允許提交"
   everyone_854554dd: 每個人
+  extensions_7250a0bb: 副檔名
+  external_apps_f5490181: 外部應用程式
   external_content: 
     cancel: 
       canceling: 正在取消...
@@ -6246,15 +5867,11 @@ zh_Hant:
       feature_options: 功能選項
       no_features_available: 目前無可用功能。
   features: 
-    allow_opt_out_of_inbox: 允許使用者選擇退出收件匣
     better_file_browsing: 更好的檔案瀏覽
     course_catalog: 課程目錄
     differentiated_assignments: 差異化任務
     differentiated_assignments_account_disable_warning: "關閉該功能將影響現有的課程。有關停用該功能的幫助，請聯繫您的 Canvas Success 主管。"
     differentiated_assignments_course_disable_warning: 停用任務區分，所有已發佈任務將對所有學生可見。
-    draft_state: 草稿狀態
-    draft_state_account_disable_warning: "關閉該功能將影響現有的課程。有關停用該功能的幫助，請聯繫您的 Canvas Success 主管。"
-    draft_state_course_disable_warning: 關閉該功能將發佈課程中的所有現有物件。請確保所有的草案內容已準備好發佈，並在繼續之前可提供給課程中的所有使用者。
     ember_modules: "Ember 模組"
     google_docs_domain_restriction: "Google 文件網域限制"
     high_contrast: 使用高對比樣式
@@ -6460,6 +6077,7 @@ zh_Hant:
     warnings: 
       file_uploaded_without_response: 檔案可能已上傳，但伺服器沒有回應。重新載入頁面以確認。
   fill_in_the_blank_read_surrounding_text_1a6c73c7: 填空，閱讀周圍文字
+  filter_by_name_34cbe139: 按名稱篩選
   find_flickr_image_view: 
     find_cc_on_flickr: "尋找 Flickr 上的創意共享影像"
     search: 搜尋
@@ -6496,6 +6114,7 @@ zh_Hant:
     invitation: 邀請
     question: 問題
     warning: 警告
+  global_navigation_configured_9e7bd94c: 全域瀏覽已設定
   google_docs_domain_restriction_description: "Google Docs 網域限制允許 Google Docs 提交與協作被限制於單個網域。嘗試提交任務或加入未經批准的網域上的協作的學生將收到一條錯誤訊息，通知他們將需要更新其 Google Docs 整合。"
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -7017,6 +6636,7 @@ zh_Hant:
   grading_period: 
     errors: 
       invalid_grading_period_end_date: 評分結束日期早於開始日期
+  grading_schemes_1c3c3252: 評分配置
   grading_standard: 
     unknown_grading_details: 未知詳細資料
   grading_standards: 
@@ -7033,9 +6653,6 @@ zh_Hant:
     grading_scheme_currently_set: 當前設定
     grading_scheme_not_set: 未設定
     index: 
-      buttons: 
-        add: 新增評分配置
-      heading_grading_schemes: 評分配置
       title: 評分標準
     no_grading_standards: 找不到評分標準
     status: 
@@ -7492,6 +7109,7 @@ zh_Hant:
       如果您想要 Canvas 使用者介面的高對比版本，啟用這個。
       這可能對患有視力障礙或閱讀困難者有用。
   highest_28ad71e6: 最高
+  homework_submission_configured_35c56ff0: 作業提交已設定
   html5_first_videos_description: "預設情況下，Canvas 會嘗試先使用 Flash 播放視頻。啟用該選項以嘗試先使用 HTML5，然後返回到 Flash。"
   html_editor_fb2ab713: "HTML 編輯器"
   ic_actions: 
@@ -7503,6 +7121,7 @@ zh_Hant:
     online_url_submission: "線上 URL 提交"
     quiz_submission: 測驗提交
     text_entry_submission: 文字輸入提交
+  if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您已經使用了其他的課程管理系統，其中可能有您想移動至 Canvas 的資料。我們可以引導您輕鬆遷移您的內容到 Canvas 的過程。"
   image_8ad06: 影像
   images: 
     error_checking_color: 檢查影像色彩時發生錯誤
@@ -7512,6 +7131,7 @@ zh_Hant:
     invalid_file_type: "無效的檔案類型 %{type}。允許的類型包括：%{type_list}"
     not_an_image: 選定的檔案不是影像
   immediately_c128ede6: 立即
+  import_content_b2fd6620: 匯入內容
   importers/assignment_importer: 
     errors: 
       import: 
@@ -7547,6 +7167,7 @@ zh_Hant:
       start_a_group: 啟動群組
     styleguide: 
       manage: 管理
+  installed_7b284a91: 已安裝
   instructions: 
     authorize_google_docs: "在可以協作處理文件之前，需要授權 Canvas 存取您的 Google Docs 帳戶："
   instructure: 
@@ -7818,9 +7439,13 @@ zh_Hant:
       feedback: 按一下此處告诉我们發生了什麼。
     help: 說明
     show_me_where: 顯示在何處
+  links_14b70841: 連結
   locales: 
     zh_Hant: 繁體中文
+  lock_date_cannot_be_after_course_end_a473158b: 鎖定日期不得晚於結課日期
+  lock_date_cannot_be_before_due_date_ac30f54: 鎖定日期不能在截止日期之前
   logged_out_user: "已登出的使用者 %{user_counter}"
+  lower_limit_of_range_6ddd4983: 範圍下限
   lti: 
     lti_message: 
       load_tool_new_tab_button: "在新視窗中載入 %{tool}"
@@ -7841,6 +7466,7 @@ zh_Hant:
     prompts: 
       delete_avatar: 是否確定要刪除這個使用者的個人檔案圖片？
       lock_avatar: 鎖定這張照片將會核准其，並防止使用者對其進行更新。繼續？
+  manual_entry_e4a4f99a: 手動輸入
   mathquill: 
     tabs: 
       arrows: 箭號
@@ -9831,6 +9457,7 @@ zh_Hant:
   migration_issues: 
     errors: 
       valid_workflow_state: 必須傳送一個有效的工作流程狀態
+  migration_selection_configured_c6ed9b28: 遷移選擇已設定
   module_item_types: 
     assignment: 任務
     disuccsion: 討論
@@ -9840,6 +9467,7 @@ zh_Hant:
     page: 頁面
     quiz: 測驗
     sub_header: 子標題
+  module_menu_configured_cdf62584: 模組功能表已設定
   modules: 
     add: 
       assignment: 
@@ -9989,14 +9617,20 @@ zh_Hant:
     sure_you_want_to_mute: 是否確定要靜音這項任務？當這項任務是靜音的時，學生將不會收到或看到相關的新通知：
   n_a_d6f6c42f: 不適用
   name: 學術基準匯入程式
+  name_1aed4a1b: 名稱
+  name_3806192d: 名稱：
+  name_only_5f56718e: 僅名稱
   new_facebook_message: "您有一個來自 Canvas 的新郵件"
   new_quiz_statistics_desc: 為一門課程啟用新測驗統計資料頁面。
   new_styles_description: "我們正在致力於一個至 Canvas 的 UI 改建。啟用該選項來選擇查看已更新、簡化的 Canvas 介面的外觀和感覺。這是一個正好在『進行中的工作』功能，尚不應該在生產中為實際使用者開啟。"
+  next_steps_ce0f0d0c: 接下來的步驟
+  no_due_date_44271c53: 無截止日期
   no_e16d9132: 否
   no_migration_file: 內容遷移所需的檔案。
   no_students_have_taken_the_quiz_yet_e667644b: 還沒有學生參加該測驗
   no_students_have_taken_the_survey_yet_d378cd35: 還沒有學生參加該調查
   not_a_number: 必須為正數
+  not_installed_37a21a76: 未安裝
   notification: 
     added_to_conversation_description: 您已被新增至交談
     added_to_conversation_display: 新增至交談
@@ -10266,6 +9900,7 @@ zh_Hant:
     observee_added: "现在觀察 %{user}"
     observing: 觀察
   ok_c47544a2: 確定
+  one_per_line_format_name_value_79647700: 每行一個。格式：名稱=值
   options: 
     ? "no"
     : 否
@@ -10423,12 +10058,9 @@ zh_Hant:
   overrides: 
     everyone: 每個人
     everyone_else: 其他所有人
-    lock_date_before_due_date: 鎖定日期不能在截止日期之前
     overrides: 
       everyone: 每個人
       everyone_else: 其他所有人
-    unlock_date_after_due_date: 解除鎖定日期不能在截止日期之後
-    unlock_date_after_lock_date: 解除鎖定日期不能在鎖定日期之後
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -10443,6 +10075,7 @@ zh_Hant:
         time: 時間
         url: URL
         user_agent: 使用者代理程式
+  page_views_eb64cf53: 頁面檢視
   pages: 
     cancel_button: 取消
     cannot_unpublish_front_page: 無法解除發佈標題版
@@ -10477,6 +10110,7 @@ zh_Hant:
     view_more_link: 檢視更多
   paginated_view: 
     loading_more_results: 載入更多結果
+  paste_xml_cda3a64e: "粘貼 XML"
   paypal: 
     exception: 很抱歉，發生錯誤，請稍後再試一次。
   plugins: 
@@ -10489,7 +10123,6 @@ zh_Hant:
       description: "在 Canvas 中跟蹤/安裝外部工具的應用程式中心"
       name: 應用程式中心
     app_center_settings: 
-      description: "應用程式中心將出現在一門課程或帳戶設定頁面的『應用程式』選項卡中。下面提供的 URL 應該指向一個有效的應用程式中心端點 (如 https://lti-examples.heroku.com -- 一定要忽略尾部斜線)"
       labels: 
         app_reviews_endpoint: 應用程式顯示端點
         apps_index_endpoint: 應用程式索引端點
@@ -10804,6 +10437,7 @@ zh_Hant:
       description: "您將需要 [Yo 的 API 令牌](%{yo_url})。"
       labels: 
         api_token: "API 令牌"
+  points_bb475533: 點
   polling: 
     poll_sessions: 
       errors: 
@@ -10827,6 +10461,7 @@ zh_Hant:
       completion_prerequisites: 完成先決條件
     labels: 
       requirements_must_be_completed: 以下要求需要在此頁面將被解除鎖定之前完成
+  privacy_290109ea: 隱私權
   product_name: Canvas
   profile: 
     access_token: 
@@ -11256,6 +10891,7 @@ zh_Hant:
       email_sent: "確認電子郵件已傳送至 %{email}，請務必檢查您的垃圾郵件箱。"
       link_invalid: 您所使用的連結不再有效。如果您無法登入，按一下『不知道您的密碼？』以重設密碼。
       password_changed: 密碼已更改
+  public_a749f507: 公共
   public_courses_title: 公共課程
   public_domain_112ed397: 公用網域
   publish_btn_module: 
@@ -11386,20 +11022,6 @@ zh_Hant:
       select_bank: 選擇此問題的目標題庫：
       show_details: 顯示問題詳細資料
   question_unanswered: 还没有回答
-  quick_start_bar: 
-    announcement: 
-      saving: 正在儲存...
-    assignment: 
-      assigning: 正在儲存...
-    discussion: 
-      saving: 正在儲存...
-    event: 
-      save: 儲存
-      saving: 正在儲存...
-    message: 
-      Sending: 正在傳送...
-    quick_start_bar_view: 
-      new: 新：
   quiz: 
     regrade: 
       give_everyone_full_credit: 就此問題給每個人滿分。
@@ -11408,6 +11030,21 @@ zh_Hant:
       regrade_options: 重新評分選項*(針對已經回答了此問題的學生)：*
       some_scores_reduced: 僅為正確答案獎勵積分(*部分學生的分數可能會減少*)
       update_question_without_regrading: 更新問題，而不重新評分
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: 問題
+    loading: 正在載入…
+    navigation: 
+      links: 
+        question: "問題 %{position}"
+      questions: 問題
+    session_table_headers: 
+      attempt: 嘗試
+    table_view: 
+      headers: 
+        question: "問題 %{position}"
+  quiz_menu_configured_b9aa5c0d: 測驗功能表已設定
   quiz_reports: 
     cancel_generation: 取消
     download_item_analysis: 下載項目分析報告。
@@ -12166,7 +11803,6 @@ zh_Hant:
       quiz_details: 
         allowed_attempts: 允許的嘗試
         headers: 
-          available: 可用
           due: 截止日期
           points: 點
           questions: 問題
@@ -12174,9 +11810,6 @@ zh_Hant:
         multiple_due_dates: 多個截止日期
         no_due_date: 沒有截止日期
         none: 無
-        quiz_availabile_through: "%{start_time} - %{end_time}"
-        quiz_available_after: "在 %{start_time} 之後"
-        quiz_available_until: "直到 %{end_time}"
         requires_lockdown: "需要 Respondus 鎖定瀏覽器"
         time_limit: 
           one: "%{count} 分鐘"
@@ -12555,7 +12188,6 @@ zh_Hant:
     folder: 資料夾
     folder_browsing_tree: 資料夾瀏覽樹
     folder_name: 資料夾名稱
-    kind: 類型
     labels: 
       select: 選擇此項目
     loading_more_results: 正在載入更多結果...
@@ -12636,8 +12268,10 @@ zh_Hant:
         name: 名稱
     welcome_to_canvas: "歡迎使用 Canvas！"
   remove_f47dc62a: 移除
+  remove_row_c198da5a: 移除行
   rename_45608f54: 重命名
   reply_from_name: "%{name} 透過 Canvas 通知"
+  resource_selection_configured_d45b553d: 資源選擇已設定
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
@@ -12854,7 +12488,9 @@ zh_Hant:
         are_you_sure_remove: 是否確定要從您的清單中移除此評估準則？
       remove_rubric: 從我的清單中移除此評估準則
   save_11a80ec3: 儲存
+  saving_d55dd90e: 正在儲存...
   score_out_of_points_possible_88f370fd: "%{score} 超出 %{points_possible}"
+  score_score_6f81e8c8: "分數：%{score}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -12976,7 +12612,9 @@ zh_Hant:
     enrollments_tas: 教學助理
     enrollments_teachers: 教師
     student_groups: " 群組"
+  search_entries_or_author_63fb0a86: 搜尋輸入項目或作者
   search_groups_or_people_6c15d6ad: 搜尋群組或人員
+  search_title_body_or_author_1d26711f: 搜尋標題、正文或作者
   section: 
     confirms: 
       delete_enrollment: 是否確定要永久刪除此註冊？
@@ -13070,6 +12708,7 @@ zh_Hant:
     titles: 
       add_item_to_module: 新增項目至模組
       find_links_using_service: "尋找使用 %{service} 的連結"
+  select_navigation_links_68e1e924: 選擇瀏覽連結
   selected_answer: 您選擇了此答案。
   self_enrollments: 
     already_enrolled: 
@@ -13201,6 +12840,12 @@ zh_Hant:
       links: 
         add_rubric: 新增題目
         assign_rubric: 指派題目
+    available_dates: 
+      headers: 
+        available: 可用
+      quiz_available_after: "在 %{start_time} 之後"
+      quiz_available_through: "%{start_time} - %{end_time}"
+      quiz_available_until: "直到 %{end_time}"
     canvas-user-nav: 
       navigation: 
         user_menu: 使用者功能表
@@ -13675,10 +13320,6 @@ zh_Hant:
       topic_notice: 選擇您想要關聯至此*模組*的主題，或者透過選擇『新主題』新增主題。
       wiki_page_notice: "選擇您想要關聯至此*模組*的 Wiki 頁面，或者透過選擇『新頁面』新增頁面。"
       wiki_page_select_label: 選擇要關聯的維基頁面，或選擇『新頁面』新增頁面。
-    sequence_footer: 
-      full_course_sequence: 查看全部課程序列
-      next: 下一個
-      previous: 上一個
     submission_comment: 
       assignment: 任務
       grading_alt: 評分
@@ -13823,6 +13464,7 @@ zh_Hant:
         select_file: "請選擇一個 zip 檔案以上傳"
       titles: 
         uploading: 正在上傳，請等待。
+  shared_secret_892c88f2: 共用密碼
   sis_batch: 
     errors: 
       too_many_errors: "有 %{count} 個以上的錯誤"
@@ -14232,6 +13874,8 @@ zh_Hant:
         term_start: 學期開始
         unspecified: 無論何時
       timespan: "%{start_at} *至* %{end_at}"
+  there_was_an_error_in_processing_your_request_6513a49a: 處理您的要求時發生錯誤
+  this_field_is_required_fa58c4a: 此欄位為必填項
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*此測驗未發佈*在此測驗發佈之前，只有教師可以看到。"
   time: 
     am: 上午
@@ -14244,18 +13888,17 @@ zh_Hant:
     due_date: "%{date}，%{time}"
     event: "%{date}，%{time}"
     formats: 
-      default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
-      short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      default: "%a, %Y %b %d  %H:%M:%S %z"
+      long: "%Y %B %d %H:%M"
+      short: "%b %d %H:%M"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: 不到一分鐘以前
     pm: " 下午"
     ranges: 
       different_days: "%{start_date_and_time} 至 %{end_date_and_time}"
       same_day: "%{date} 自 %{start_time} 至 %{end_time}"
       times: "%{start_time} 至 %{end_time}"
-    unknown_date: 未知日期
     with_ago: "%{time}以前"
   time_zones: 
     abu_dhabi: 阿布達比
@@ -14470,6 +14113,9 @@ zh_Hant:
   unknown_47a3b725: 未知
   unknown_question_bank: 未知題庫
   unknown_quiz: 未知測驗
+  unlock_date_cannot_be_after_due_date_8829d9ca: 解除鎖定日期不能在截止日期之後
+  unlock_date_cannot_be_after_lock_date_591f7fda: 解除鎖定日期不能在鎖定日期之後
+  unlock_date_cannot_be_before_course_start_9c7b8524: 解鎖日期不得早於開課日期
   unpublished_courses_title: 未發佈的課程
   unsupported_package: 不支援的內容封裝
   until_date_949017c4: "直到 %{date}"
@@ -14479,6 +14125,7 @@ zh_Hant:
     upload: " "
   upload_drop_zone: 
     drop_to_upload: 拖放項目，開始上傳
+  upper_limit_of_range_c454a8f2: 範圍上限
   usage_rights_modal: 
     saving: 正在儲存...
   user: 
@@ -14556,6 +14203,7 @@ zh_Hant:
       updating_user_details: 正在更新使用者詳細資料…
     notices: 
       image_reported: 此影像已報告
+  user_navigation_configured_135ee933: 使用者瀏覽已設定
   user_notes: 
     confirms: 
       delete_journal_entry: 是否確定要刪除此日誌條目？
@@ -14872,6 +14520,8 @@ zh_Hant:
       welcome_to_happiness: "歡迎使用 Canvas！"
   validate: 
     is_required: 此欄位為必填項
+  view_app_center_6c89a3fe: 檢視應用程式中心
+  view_app_configurations_52b52441: 檢視應用程式設定
   visit_864b4060: 訪問
   warnings: 
     test_install: 
@@ -15000,8 +14650,6 @@ zh_Hant:
   wiki_page: 
     atom_author: "Wiki 頁面"
     atom_entry_title: "Wiki 頁面，%{course_or_group_name}：%{page_title}"
-    cannot_hide_page: 不能隱藏標題版
-    cannot_set_hidden_front_page: 不能設定為標題版，因為其被隱藏
     cannot_set_unpublished_front_page: 不能設定為標題版，因為其未發佈
     defaults: 
       no_content: " 內容"
@@ -15010,107 +14658,26 @@ zh_Hant:
       title_characters: 標題必須至少包含一個字母或數字
       title_too_long: "標題不能超過 %{max_characters} 個字元"
     unknown_user_name: 未知
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: 返回當前版本
-      page_edited_by_with_link: "由 [%{user_name}](%{link})"
-      page_imported: 由內容匯入程式
-      titles: 
-        revisions_for_page: "修訂：%{title}"
-    notices: 
-      page_rolled_back: 網頁已成功回復到以前的版本。
-    show: 
-      buttons: 
-        roll_back_version: 回復到此版本
-      imported_at: "已匯入：*%{time_ago}*"
-      labels: 
-        by_content_importer: 由內容匯入程式
-        by_user: "由 %{user}"
-        on_date: "於 *%{date_time}*"
-      links: 
-        back_to_history: 返回修訂歷史記錄
-        go_to_latest: 轉到最新版本
-      not_most_recent_version_warning: 這不是最新版本
-      saved_by: "已儲存：*%{time_ago}*，由 %{user}"
+  wiki_page_menu_configured_de3078c9: "Wiki 頁面功能表已設定"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: 儲存更改
-        start_editing: 現在開始編輯
-      course_editing_roles: 
-        anyone: 任何人
-        only_teachers: 僅教師
-        teachers_and_students: 教師和學生
-      course_home_wiki_page_description: 您可以使用此頁面來組織或介紹您的課程，只要您喜歡。使用一旦您開始編輯，您在右側會看到的『頁面工具』部分，便可以輕鬆地連結到任務、檔案等。
-      course_wiki_page_description: "您可以使用此 Wiki 為您的課程材料建立附加頁面或描述。您可以輕鬆地從任務連結到 Wiki 頁面，或從任何 Wiki 頁面連結到其他課程材料和檔案。這使得其成為解釋很難的概念、允許群組專案，或建立您課程中可能需要的幾乎任何類型的頁面的極好的工具。"
-      default_wiki_page_description: "此頁面是預設的 Wiki 頁面，當學生按一下這門課程的『頁面』標籤時將會看到它。"
-      default_wiki_page_is_course_home_page_warning: "現在，這也被設定為預設的課程頁面，因此您的課程訪客會先看到此頁面。您可以從[課程首頁](%{link}) 進行更改。"
-      editing_content: 編輯內容。
-      editing_roles: 
-        anyone: 任何人
-        only_members: 僅成員
-        prompt: "%{options} 可以編輯此頁面"
-      group_wiki_warning: "此頁面是群組 Wiki 的一部分，而*不是*您的課程 Wiki。如果您正在尋找課程 Wiki，[按一下此處](%{link})。"
-      labels: 
-        hide_from_students: 隱藏此頁面以使學生看不到
-        last_edited: "上次編輯由 %{name} 於 %{time_ago} 以前進行"
-        notify_of_update: 通知使用者該內容已更改
-      links: 
-        page_history: 頁面歷史記錄
-      notices: 
-        page_deleted: 此頁面已被刪除。
-        page_does_not_exist: 此頁面尚不存在。
-        page_edited_while_viewing: "此頁面自您開始檢視時已被其他人更新。[按一下此處以重新載入頁面。](%{link})"
-        page_edited_while_viewing_detailed: 自您第一次載入時，其他人已編輯了此頁面，如果您現在提交，則將覆蓋他們的更改。您可能需要重新載入頁面，然後重新輸入您的更改，以確保您不會丟失其他人所做的工作。
-      welcome_message: "歡迎來到課程 Wiki"
-    edit_page: 
+    edit: 
       page_header_title: "編輯 %{page_name}"
-    errors: 
-      cannot_delete_front_page: 不能刪除標題版。
-    front_page: 標題版
+    index: 
+      titles: 
+        pages: 頁面
     notices: 
       cannot_edit: "您無權編輯頁面『%{title}』。"
       cannot_read_revisions: "您無權檢視『%{title}』的歷史修訂。"
       create_non_existent_page: "頁面『%{title}』不存在，但您可以在下面建立"
       page_deleted: "頁面『%{title}』已刪除。"
       page_does_not_exist: "頁面『%{title}』不存在。"
-      page_updated: 頁面已成功更新。
-    page_link: 
-      link_hidden_from_students_warning: 學生們將不會看到此連結
-    page_revisions: 
+    revisions: 
       page_revisions_title: "%{title} 修訂：%{context_name}"
-    pages_index: 
-      titles: 
-        pages: 頁面
-    wiki_right_side: 
-      buttons: 
-        create: 建立
-        rename: 重命名
-      delete_page_confirmation: 是否確定要刪除此頁面？此操作無法撤銷！
-      headers: 
-        all_pages: 所有頁面
-        common_pages: 公共頁面
-        page_tools: 頁面工具
-        recent_changes: 最近更改
-      links: 
-        create_page: 建立新頁面
-        delete_page: 刪除此頁面
-        edit_page: 編輯此頁面
-        more: 更多...
-        rename_page: 重命名此頁面
-        show_all: 顯示所有...
-      title: 新頁面標題
-      wiki_description_for_course: 將其視作一個開放式的空間來儲存內容。您可以用其來描述您的課程，提供有關困難話題的有用解釋，或甚至於讓學生就寫作專案進行合作。
-      wiki_description_for_group: 將其視作一個開放式的空間來儲存內容。您可以用其來描述您的課程，提供有關困難話題的有用解釋，或甚至於讓成員就寫作專案進行合作。
-      wiki_description_header: "Wiki 的作用是什麼？"
   wiki_pages_api: 
     cannot_delete_front_page: 不能刪除標題版
-    cannot_have_hidden_front_page: 不能隱藏標題版
     cannot_have_unpublished_front_page: 不能解除發佈標題版
     cannot_update_editing_roles: "您無權更新此 Wiki 頁面的編輯角色"
     cannot_update_front_page: "您無權更新 Wiki 標題版"
-    cannot_update_hide_from_students: "您無權更新此 Wiki 頁面的對學生隱藏標幟"
     cannot_update_published: "您無權更新此 Wiki 頁面的已發佈狀態"
     cannot_update_title: "您無權更新此 Wiki 頁面的標題"
     invalid_editing_roles: 所提供的編輯角色是無效的

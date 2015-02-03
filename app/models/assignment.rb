@@ -250,9 +250,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at
+    reviews_due_at = self.peer_reviews_assign_at || self.due_at
+    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && reviews_due_at
       self.send_later_enqueue_args(:do_auto_peer_review, {
-        :run_at => due_at,
+        :run_at => reviews_due_at,
         :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
       })
     end
@@ -1243,7 +1244,6 @@ class Assignment < ActiveRecord::Base
 
     submissions = self.submissions.where(:user_id => students)
                   .includes(:submission_comments,
-                            :attachments,
                             :versions,
                             :quiz_submission)
 
@@ -1258,14 +1258,15 @@ class Assignment < ActiveRecord::Base
           :submission_comments => {
             :methods => avatar_methods,
             :only => comment_fields
-          },
-          :attachments => {
-            :only => [:mime_class, :comment_id, :id, :submitter_id ]
-          },
+          }
         },
         :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
+      json['attachments'] = sub.attachments.map{|att| att.as_json(
+          :only => [:mime_class, :comment_id, :id, :submitter_id ]
+      )}
 
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
@@ -1732,6 +1733,10 @@ class Assignment < ActiveRecord::Base
 
   def expects_external_submission?
     submission_types == 'on_paper' || submission_types == 'external_tool'
+  end
+
+  def non_digital_submission?
+    ["on_paper","none","not_graded",""].include?(submission_types.strip)
   end
 
   def allow_google_docs_submission?

@@ -217,10 +217,10 @@ window.rubricAssessment = {
             $saved_custom_rating = $holder.find(".saved_custom_rating");
             
         $saved_custom_rating.find(".comment").remove();
-        $saved_custom_rating.empty().append('<option value="">' + I18n.t('options.select', '[ Select ]') + '</option>');
+        $saved_custom_rating.empty().append('<option value="">' + htmlEscape(I18n.t('options.select', '[ Select ]')) + '</option>');
         for(var jdx in comments) {
           if(comments[jdx]) {
-            $saved_custom_rating.append('<option value="' + escape(comments[jdx])+ '">' + TextHelper.truncateText(comments[jdx], {max: 50}) + '</option>');
+            $saved_custom_rating.append('<option value="' + htmlEscape(comments[jdx])+ '">' + htmlEscape(TextHelper.truncateText(comments[jdx], {max: 50})) + '</option>');
             $holder.show();
           }
         }

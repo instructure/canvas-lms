@@ -39,9 +39,9 @@ require [
       $link.hide()
       $.ajaxJSON $(this).attr("href"), "GET", {}, (data) ->
         $("#home_page").loadingImage "remove"
-        body = htmlEscape($.trim(data.wiki_page.body))
-        body = htmlEscape(I18n.t("empty_body", "No Content")) if body.length is 0
-        $("#home_page_content").html body
+        bodyHtml = htmlEscape($.trim(data.wiki_page.body))
+        bodyHtml = htmlEscape(I18n.t("empty_body", "No Content")) if bodyHtml.length is 0
+        $("#home_page_content").html bodyHtml
         $("html,body").scrollTo $("#home_page")
 
     $(".dashboard_view_link").click (event) ->

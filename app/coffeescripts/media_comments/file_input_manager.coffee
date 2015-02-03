@@ -16,8 +16,8 @@ define [
       if @$fileInput
         @$fileInput.off 'change', callback
         @$fileInput.remove()
-      fileInput = "<input id='#{id}' type='file' style='display: none;'>"
-      $(parentId).append(fileInput)
+      fileInputHtml = "<input id='#{id}' type='file' style='display: none;'>"
+      $(parentId).append(fileInputHtml)
       @$fileInput = $("##{id}")
       @$fileInput.on 'change', callback
 

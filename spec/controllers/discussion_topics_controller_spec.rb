@@ -250,6 +250,15 @@ describe DiscussionTopicsController do
 
   end
 
+  describe "GET 'new'" do
+    it "should maintain date and time when passed params" do
+      user_session(@teacher)
+      due_at = 1.day.from_now
+      get 'new', course_id: @course.id, due_at: due_at.iso8601
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:assignment][:due_at]).to eq due_at.iso8601
+    end
+  end
+
   describe "GET 'public_feed.atom'" do
     before(:once) do
       course_topic

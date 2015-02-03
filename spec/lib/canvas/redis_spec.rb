@@ -62,7 +62,7 @@ describe "Canvas::Redis" do
 
     it "should protect against max # of client errors" do
       Redis::Client.any_instance.expects(:write).raises(Redis::CommandError.new("ERR max number of clients reached")).once
-      expect(Canvas.redis.read('blah')).to eq nil
+      expect(Canvas.redis.set('blah', 'blah')).to eq nil
     end
 
     it "should pass through other command errors" do
@@ -72,7 +72,7 @@ describe "Canvas::Redis" do
       expect { Canvas.redis.evalsha('xxx') }.to raise_error(Redis::CommandError)
 
       Redis::Client.any_instance.expects(:write).raises(Redis::CommandError.new("ERR no such key")).once
-      expect { Canvas.redis.renamenx('no-such-key', 'new-key') }.to raise_error(Redis::CommandError)
+      expect { Canvas.redis.get('no-such-key') }.to raise_error(Redis::CommandError)
     end
 
     describe "redis failure" do
@@ -156,6 +156,16 @@ describe "Canvas::Redis" do
       it "should not fail raw redis commands" do
         expect(Canvas.redis.setnx('my_key', 5)).to eq nil
       end
+    end
+  end
+
+  describe "Canvas::RedisWrapper" do
+    it "should wrap redis connections" do
+      expect(Canvas.redis.class).to eq Canvas::RedisWrapper
+    end
+
+    it "should raise on unsupported commands" do
+      expect { Canvas.redis.keys }.to raise_error(Canvas::RedisWrapper::UnsupportedRedisMethod)
     end
   end
 end

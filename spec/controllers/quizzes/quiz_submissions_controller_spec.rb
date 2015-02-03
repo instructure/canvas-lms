@@ -69,6 +69,21 @@ describe Quizzes::QuizSubmissionsController do
       expect(response).to be_redirect
       expect(flash[:error]).not_to be_blank
     end
+
+    it "should build a new QuizSubmissionEvent" do
+      user_session(@student)
+      @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
+      @submission.submission_data = {}
+      @submission.quiz_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", 'id'=>128, :answers=>[{:weight=>0, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
+      @submission.attempt = 1
+      @submission.save!
+
+      post 'create', course_id: @quiz.context_id, quiz_id: @quiz.id,
+        question_128: "bye", validation_token: @submission.validation_token,
+        attempt: 1
+      events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: @submission.id)
+      expect(events.size).to be_equal(1)
+    end
   end
   
   describe "PUT 'update'" do

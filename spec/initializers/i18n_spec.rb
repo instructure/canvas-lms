@@ -14,4 +14,11 @@ describe I18n do
       end
     end
   end
+
+  describe ".i18nliner_scope" do
+    it "should be correct for model class and instances" do
+      expect(User.i18nliner_scope.scope).to eq "user."
+      expect(Group.new.i18nliner_scope.scope).to eq "group."
+    end
+  end
 end

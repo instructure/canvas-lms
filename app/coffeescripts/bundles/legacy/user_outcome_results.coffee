@@ -7,7 +7,7 @@ require [
     showAllArtifacts.click (event) ->
       event.preventDefault()
       $("tr.artifact_details").toggle()
-      if showAllArtifacts.html() is I18n.t("#buttons.show_all_artifacts", "Show All Artifacts")
-        showAllArtifacts.html I18n("#buttons.hide_all_artifacts", "Hide All Artifacts")
+      if showAllArtifacts.text() is I18n.t("#buttons.show_all_artifacts", "Show All Artifacts")
+        showAllArtifacts.text I18n("#buttons.hide_all_artifacts", "Hide All Artifacts")
       else
-        showAllArtifacts.html I18n.t("#buttons.show_all_artifacts", "Show All Artifacts")
+        showAllArtifacts.text I18n.t("#buttons.show_all_artifacts", "Show All Artifacts")

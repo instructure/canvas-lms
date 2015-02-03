@@ -59,7 +59,9 @@ class AssignmentsController < ApplicationController
         :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
         :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
-        :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
+        :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
+        :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
+        :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
       })
 
 
@@ -316,7 +318,6 @@ class AssignmentsController < ApplicationController
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
     @assignment.workflow_state ||= "unpublished"
-    @assignment.post_to_sis ||= @context.feature_enabled?(:post_to_sis) ? true : false
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
@@ -381,14 +382,29 @@ class AssignmentsController < ApplicationController
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :POST_TO_SIS => @context.feature_enabled?(:post_grades),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
-          {:id => section.id, :name => section.name }
+          {
+            :id => section.id,
+            :name => section.name,
+            :start_at => section.start_at,
+            :end_at => section.end_at,
+            :override_course_dates => section.restrict_enrollments_to_section_dates
+          }
         }),
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(
             @assignment.overrides_for(@current_user)
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments)
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+        :COURSE_DATE_RANGE => {
+          :start_at => @context.start_at,
+          :end_at => @context.conclude_at,
+          :override_term_dates => @context.restrict_enrollments_to_course_dates
+        },
+        :TERM_DATE_RANGE => {
+          :start_at => @context.enrollment_term.start_at,
+          :end_at => @context.enrollment_term.end_at
+        }
       }
 
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)

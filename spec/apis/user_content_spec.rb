@@ -254,8 +254,10 @@ describe UserContent, type: :request do
           <a href='/courses/#{@course.id}/assignments/9~123'>assignment</a>
           <a href='/courses/#{@course.id}/wiki'>wiki index</a>
           <a href='/courses/#{@course.id}/wiki/test-wiki-page'>wiki page</a>
+          <a href='/courses/#{@course.id}/wiki/test-wiki-page-2?titleize=0'>wiki page</a>
           <a href='/courses/#{@course.id}/pages'>wiki index</a>
           <a href='/courses/#{@course.id}/pages/test-wiki-page'>wiki page</a>
+          <a href='/courses/#{@course.id}/pages/test-wiki-page-2?titleize=0'>wiki page</a>
           <a href='/courses/#{@course.id}/discussion_topics'>discussion index</a>
           <a href='/courses/#{@course.id}/discussion_topics/456'>discussion topic</a>
           <a href='/courses/#{@course.id}/files'>files index</a>
@@ -278,8 +280,10 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments/9~123",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page-2",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page-2",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
           "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",
@@ -290,7 +294,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
         expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
-            %w([Assignment] Assignment [Page] Page [Page] Page [Discussion] Discussion Folder File File [Quiz] Quiz SessionlessLaunchUrl)
+            %w([Assignment] Assignment [Page] Page Page [Page] Page Page [Discussion] Discussion Folder File File [Quiz] Quiz SessionlessLaunchUrl)
         )
       end
     end

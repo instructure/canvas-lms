@@ -36,23 +36,21 @@
     color: #c5c5c5;
     position: absolute;
     margin-left: 208px;
-    margin-top: 1px;
+    margin-top: -38px;
+}
+
+.name-span3{
+  margin-left: 5px;
+}
+
+.date-span2{
+  margin-left: 5px;
 }
 
 /* Provide enough extra space on bottom of row for hints and datefields */
 .correction-row {
     margin-left: 14px;
-    height: 52px;
-}
-
-/* Prevents the name input in the grade pass back from overlapping each other */
-.correction-row .span3 {
-  width: 270px;
-}
-
-/* Prevents the date input in the grade pass back from overlapping each other */
-.correction-row .span2 {
-    width: 170px;
+    margin-bottom: 10px;
 }
 
 .title-row {
@@ -89,4 +87,13 @@ input + .hint-text {
     padding: 0 10px;
     color: #000;
     font-weight: 300;
+}
+
+.assignment_correction_input{
+  position: relative;
+}
+
+.assignment_correction_ignore{
+  top: 38px;
+  right: -83px;
 }

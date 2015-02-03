@@ -60,9 +60,7 @@ $context_module_bg_color: #f2f3f4
     h2 .name
       left: 20px
 
-  .student-view 
-    .requirement-description
-      left: 36px
+  .student-view
     .module-item-title
       right: 150px
     .ig-details
@@ -77,7 +75,7 @@ $context_module_bg_color: #f2f3f4
   .requirement-description
     position: absolute
     bottom: 5px
-    left: 55px
+    left: 36px
     font-size: 11px
 
   .completion_status .complete_icon, 
@@ -310,6 +308,8 @@ $context_module_bg_color: #f2f3f4
     width: 3.2em
 
 #context_modules.editable
+  .requirement-description
+    left: 55px
   .context_module_item
     &.after_current_position
       opacity: 1

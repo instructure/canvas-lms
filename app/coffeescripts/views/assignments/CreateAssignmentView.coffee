@@ -12,7 +12,7 @@ define [
   class CreateAssignmentView extends DialogFormView
     defaults:
       width: 500
-      height: 350
+      height: 380
 
     events: _.extend {}, @::events,
       'click .dialog_closer': 'close'

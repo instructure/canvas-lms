@@ -113,6 +113,22 @@ describe FilePreviewsController do
     expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
   end
 
+  it "should log asset accesses when previewable" do
+    Setting.set('enable_page_views', 'db')
+    attachment_model content_type: 'image/png'
+    get :show, course_id: @course.id, file_id: @attachment.id
+    access = AssetUserAccess.for_user(@user).first
+    expect(access.asset).to eq @attachment
+  end
+
+  it "should not log asset accesses when not previewable" do
+    Setting.set('enable_page_views', 'db')
+    attachment_model content_type: 'unknown/unknown'
+    get :show, course_id: @course.id, file_id: @attachment.id
+    access = AssetUserAccess.for_user(@user)
+    expect(access).to be_empty
+  end
+
   it "should work with hidden files" do
     attachment_model content_type: 'image/png'
     @attachment.update_attribute(:file_state, 'hidden')

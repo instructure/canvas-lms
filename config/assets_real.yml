@@ -16,6 +16,8 @@ compress_assets: off
 
 
 stylesheets:
+  course_wizard:
+    - public/stylesheets/compiled/pages/course_wizard/compiler-course_wizard.css
   react_files:
     - public/stylesheets/compiled/pages/react_files/compiler-react_files.css
   instructure_eportfolio:
@@ -161,6 +163,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/all_courses.css
   external_tool_full_width:
     - public/stylesheets/compiled/pages/external_tools/full_width.css
+  terms:
+    - public/stylesheets/compiled/pages/terms.css
   # Client Apps:
   canvas_quizzes:
     - public/stylesheets/compiled/client_apps/canvas_quizzes.css

@@ -85,9 +85,10 @@ define [
         messages = errors[integerField]
         control_group.toggleClass('error', messages?)
         if messages
-          helpInline = $('<span class="help-inline"></span>')
-          helpInline.html((htmlEscape(message) for {message} in messages).join('<br/>'))
-          control_group.find('.controls').append(helpInline)
+          $helpInline = $('<span class="help-inline"></span>')
+          html = (htmlEscape(message) for {message} in messages).join('<br/>')
+          $helpInline.html(html)
+          control_group.find('.controls').append($helpInline)
 
     findItem: ->
       @hideErrors()

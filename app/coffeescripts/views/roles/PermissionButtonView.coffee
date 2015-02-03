@@ -335,8 +335,8 @@ define [
     #   3 = "disabledLocked"
     # @api private
     setButtonPreview: (selected_radio) -> 
-      icons = @$el.find("label[for=button-#{@cid}-#{selected_radio}] i").clone()
-      @$el.find('a.dropdown-toggle').html icons
+      $icons = @$el.find("label[for=button-#{@cid}-#{selected_radio}] i").clone()
+      @$el.find('a.dropdown-toggle').html $icons
 
     # Method Summary
     #   Sets the button preview for an dropdown button to the enabled icons

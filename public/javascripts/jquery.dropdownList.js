@@ -88,9 +88,9 @@ define([
         $div.find(".list").css('maxHeight', options.height); 
       }
       $list.empty();
-      $.each(options.options, function(optionName, callback){
+      $.each(options.options, function(optionHtml, callback){
         var $option = $("<div class='option minimal' style='cursor: pointer; padding: 2px 5px; overflow: hidden; white-space: nowrap;'>" +
-                        "  <span tabindex='-1'>" + optionName + "</span>" +
+                        "  <span tabindex='-1'>" + optionHtml + "</span>" +
                         "</div>").appendTo($list);
 
         if($.isFunction(callback)) {

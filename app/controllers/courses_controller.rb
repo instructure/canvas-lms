@@ -143,6 +143,11 @@ require 'set'
 #           "type": "array",
 #           "items": { "$ref": "Enrollment" }
 #         },
+#         "total_students": {
+#           "description": "optional: the total number of active and invited students in the course",
+#           "example": 32,
+#           "type": "integer"
+#         },
 #         "calendar": {
 #           "description": "course calendar",
 #           "$ref": "CalendarLink"
@@ -195,6 +200,10 @@ require 'set'
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "is_public_to_auth_users": {
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "public_syllabus": {
 #           "example": true,
 #           "type": "boolean"
@@ -206,6 +215,10 @@ require 'set'
 #         "storage_quota_mb": {
 #           "example": 5,
 #           "type": "integer"
+#         },
+#         "storage_quota_used_mb": {
+#           "example": 5,
+#           "type": "float"
 #         },
 #         "hide_final_grades": {
 #           "example": false,
@@ -291,7 +304,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -329,6 +342,10 @@ class CoursesController < ApplicationController
   #     Returns an array of hashes containing the section ID (id), section name
   #     (name), start and end dates (start_at, end_at), as well as the enrollment
   #     type (enrollment_role, e.g. 'StudentEnrollment').
+  #   - "storage_quota_used_mb": The amount of storage space used by the files in this course
+  #   - "total_students": Optional information to include with each Course.
+  #     Returns an integer for the total amount of active and invited students.
+  #   - "passback_status": Include the grade passback_status
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -357,6 +374,8 @@ class CoursesController < ApplicationController
           end
         end
 
+        @visible_groups = @current_user.visible_groups
+
         @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
         [@current_enrollments, @future_enrollments].each{|list| list.sort_by!{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }}
       }
@@ -368,7 +387,7 @@ class CoursesController < ApplicationController
           conditions = states.map{ |state|
             Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
           }.compact.join(" OR ")
-          enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions)
+          enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions).shard(@current_user)
         else
           enrollments = @current_user.cached_current_enrollments(preload_courses: true)
         end
@@ -440,6 +459,9 @@ class CoursesController < ApplicationController
   #
   # @argument course[is_public] [Boolean]
   #   Set to true if course if public.
+  #
+  # @argument course[is_public_to_auth_users] [Boolean]
+  #   Set to true if course if public to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
@@ -560,7 +582,7 @@ class CoursesController < ApplicationController
             @current_user,
             session,
             [:start_at, course_end, :license,
-             :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
+             :is_public, :is_public_to_auth_users, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
              :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
@@ -939,7 +961,11 @@ class CoursesController < ApplicationController
   #     "allow_student_forum_attachments": false,
   #     "allow_student_discussion_editing": true,
   #     "grading_standard_enabled": true,
-  #     "grading_standard_id": 137
+  #     "grading_standard_id": 137,
+  #     "allow_student_organized_groups": true,
+  #     "hide_final_grades": false,
+  #     "hide_distribution_graphs": false,
+  #     "lock_all_announcements": true
   #   }
   def settings
     get_context
@@ -985,8 +1011,25 @@ class CoursesController < ApplicationController
   # Can update the following course settings:
   #
   # @argument allow_student_discussion_topics [Boolean]
+  #   Let students create discussion topics
+  #
   # @argument allow_student_forum_attachments [Boolean]
+  #   Let students attach files to discussions
+  #
   # @argument allow_student_discussion_editing [Boolean]
+  #   Let students edit or delete their own discussion posts
+  #
+  # @argument allow_student_organized_groups [Boolean]
+  #   Let students organize their own groups
+  #
+  # @argument hide_final_grades [Boolean]
+  #   Hide totals in student grades summary
+  #
+  # @argument hide_distribution_graphs [Boolean]
+  #   Hide grade distribution graphs from students
+  #
+  # @argument lock_all_announcements [Boolean]
+  #   Disable comments on announcements
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
@@ -1003,7 +1046,11 @@ class CoursesController < ApplicationController
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
       :allow_student_discussion_editing,
-      :show_total_grade_as_points
+      :show_total_grade_as_points,
+      :allow_student_organized_groups,
+      :hide_final_grades,
+      :hide_distribution_graphs,
+      :lock_all_announcements
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
@@ -1387,6 +1434,43 @@ class CoursesController < ApplicationController
       set_badge_counts_for(@context, @current_user, @current_enrollment)
 
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
+
+      # Course Wizard JS Info
+      js_env({:COURSE_WIZARD => {
+          :just_saved =>  @context_just_saved,
+          :checklist_states => {
+            :import_step => @context.attachments.active.first.nil?,
+            :assignment_step => @context.assignments.active.first.nil?,
+            :add_student_step => @context.students.first.nil?,
+            :navigation_step => @context.tab_configuration.empty?,
+            :home_page_step => true, # The current wizard just always marks this as complete.
+            :calendar_event_step => @context.calendar_events.active.first.nil?,
+            :add_ta_step => @context.tas.empty?,
+            :publish_step => @context.workflow_state === "available"
+          },
+          :urls => {
+            :content_import => context_url(@context, :context_content_migrations_url),
+            :add_assignments => context_url(@context, :context_assignments_url, :wizard => 1),
+            :add_students => course_users_path(course_id: @context),
+            :add_files => context_url(@context, :context_files_url, :wizard => 1),
+            :select_navigation => context_url(@context, :context_details_url),
+            :course_calendar => calendar_path(:wizard => 1),
+            :add_tas => course_users_path(:course_id => @context),
+            :publish_course => course_path(@context)
+          },
+          :permisssions => {
+            # Sending the permissions just so maybe later we can extract this easier.
+            :can_manage_content => can_do(@context, @current_user, :manage_content),
+            :can_manage_students => can_do(@context, @current_user, :manage_students),
+            :can_manage_assignments => can_do(@context, @current_user, :manage_assignments),
+            :can_manage_files => can_do(@context, @current_user, :manage_files),
+            :can_update => can_do(@context, @current_user, :update),
+            :can_manage_calendar => can_do(@context, @current_user, :manage_calendar),
+            :can_manage_admin_users => can_do(@context, @current_user, :manage_admin_users),
+            :can_change_course_state => can_do(@context, @current_user, :change_course_state)
+          }
+        }
+      })
 
       # make sure the wiki front page exists
       if @course_home_view == 'wiki'
@@ -2009,12 +2093,21 @@ class CoursesController < ApplicationController
                       :sis_publish_statuses => processed_grade_publishing_statuses }
   end
 
+  # @API Reset a course
+  # Deletes the current course, and creates a new equivalent course with
+  # no content, but all sections and users moved over.
+  #
+  # @returns Course
   def reset_content
     get_context
     return unless authorized_action(@context, @current_user, :reset_content)
     @new_course = @context.reset_content
     Auditors::Course.record_reset(@context, @new_course, @current_user, source: api_request? ? :api : :manual)
-    redirect_to course_settings_path(@new_course.id)
+    if api_request?
+      render :json => course_json(@new_course, @current_user, session, [], nil)
+    else
+      redirect_to course_settings_path(@new_course.id)
+    end
   end
 
   def student_view
@@ -2110,6 +2203,8 @@ class CoursesController < ApplicationController
         :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
       },
       :PERMISSIONS => permissions,
+      :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
+      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
     })
   end
 

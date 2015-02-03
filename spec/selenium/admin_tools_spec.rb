@@ -376,6 +376,13 @@ describe "admin_tools" do
       wait_for_ajaximations
       expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
     end
+
+    it "should fail gracefully with invalid ids" do
+      set_value f("#gradeChangeAssignmentSearch"), "notarealid"
+      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      wait_for_ajaximations
+      expect(f('#gradeChangeLoggingSearchResults').text).to eq 'No items found'
+    end
   end
 
   context "Course Logging" do
@@ -425,6 +432,13 @@ describe "admin_tools" do
       wait_for_ajaximations
       cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
       expect(cols.size).to eq 6
+    end
+
+    it "should fail gracefully with invalid ids" do
+      set_value f("#course_id-autocompleteField"), "notarealid"
+      f('#loggingCourse button[name=course_submit]').click
+      wait_for_ajaximations
+      expect(f('#courseLoggingSearchResults ').text).to eq 'No items found'
     end
 
     it "should find courses in any workflow state" do

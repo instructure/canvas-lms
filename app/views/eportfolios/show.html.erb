@@ -97,9 +97,10 @@
       DETAILS
     %></p>
     <p>
-    <a href="<%= eportfolio_path(@portfolio.id, :verifier => @portfolio.uuid) %>"><b style="font-size: 1.2em;">
-      <%= t('links.share', "Copy and share this link to give others access to your private ePortfolio.") %>
-    </b></a>
+    <%= t('links.share', "Copy and share this link to give others access to your private ePortfolio:") %><br />
+    <a href="<%= eportfolio_path(@portfolio.id, :verifier => @portfolio.uuid) %>" id="eportfolio_share_link">
+      <%= eportfolio_url(@portfolio.id, :verifier => @portfolio.uuid) %>
+    </a>
     </p>
   <% end %>
 

@@ -80,7 +80,7 @@ zh:
     tab_courses: 课程
     tab_developer_keys: 开发人员密钥
     tab_faculty_journal: 教师日志
-    tab_grading_standards: 计分方案
+    tab_grading_standards: 评分
     tab_jobs: 任务
     tab_outcomes: 成果
     tab_permissions: 权限
@@ -267,6 +267,7 @@ zh:
       logout_request_to_idp: "已向 IdP 发送 LogoutRequest"
       logout_response_from_idp: "来自 IdP 的 LogoutResponse"
       saml_required: "如果要测试 SAML，需要先配置 SAML。"
+  account_navigation_configured_946bf47e: 帐户导航已配置
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帐户通知结束时间早于开始时间
@@ -1238,12 +1239,19 @@ zh:
         header: 
           one: "%{count} 个错误阻止保存此 %{model}"
           other: "%{count} 个错误阻止保存此 %{model}"
+  add_app_baf540f: 添加应用程序
+  add_course_assignments_628ed6d0: 添加课程作业
+  add_course_calendar_events_146154a5: 添加课程日历事件
+  add_external_tool_6ef00052: 添加外部工具
   add_module_item: 
     add_assignment_to: "添加作业到 %{module}"
     add_file_to: "添加文件到 %{module}"
     add_page_to: "添加页面到 %{module}"
     add_quiz_to: "添加测验到 %{module}"
     add_topic_to: "添加讨论主题到 %{module}"
+  add_students_to_the_course_874be8fb: 向课程添加学生
+  add_tas_to_the_course_2aac6e02: 向课程添加助教
+  add_tool_4a5e66c8: 添加工具
   after_date_981cd41b: "在 %{date} 之后"
   after_last_attempt_c9168da2: 在上次尝试后
   ajax_errors: 
@@ -1298,6 +1306,7 @@ zh:
       criteria_required: 至少需要一个触发器
       recipients_required: 至少需要一个收件人
       threshold_should_be_numeric: 这应该是正数
+  all_4321c3a1: 全部
   all_students_have_taken_the_quiz_b558f8b4: 所有学生均已参加测验
   all_students_have_taken_the_survey_494f9f42: 所有学生均已参加调查
   allow_lor_tools: "允许用户查看和使用针对 LOR 配置的外部工具。"
@@ -1358,7 +1367,6 @@ zh:
       lock_for_comments: 锁定以发表评论
       make_sure_all_search_terms_are_spelled_correctly: 确保所有的搜索词拼写正确。
       rss_feed: "RSS 信息源"
-      search_title_body_or_author: 搜索标题、正文或作者
       suggestions: "建议:"
       there_are_no_announcements_show: 没有要显示的通告
       try_different_more_general_or_fewer_keywords: 尝试其它、更常用或更少的关键字。
@@ -1368,6 +1376,7 @@ zh:
     podcast_feed_description_course: "任何与课程 \"%{course}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_description_group: "任何与小组 \"%{group}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_name: "%{course} 通告播客动态消息"
+  anonymous_e1b8ad27: 匿名
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最后一次尝试后将显示答案
   application: 
     errors: 
@@ -1422,11 +1431,14 @@ zh:
       invalid_course_section: 无效的课程班级
       invalid_group_category: 无效的小组目录
       missing_group_category: 小组约会必须要有小组类别
+  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "应用程序是向 Canvas 添加新功能的简单方式。这些功能可添加到帐户中的各个课程或所有课程。配置完毕后，您可以通过课程模块与其链接，并为测验工具创建作业。"
   appt_calendar_event_dialog: 
     invalid_participants: "您至少要允许 1 名用户参加"
     title: "编辑 %{name}"
     update: 更新
   archive_3f794d7e: 存档
+  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否确定要删除此评分方案?
+  are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否确定要删除此工具？
   aria_labels: 
     unlock_at_date: 解锁日期
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
@@ -1456,7 +1468,6 @@ zh:
     labels: 
       due: 截止时间
     name_is_required: 需要姓名
-    points_possible_not_zero: "对于所选的评分类型，可能的分数必须大于 0"
     points_possible_number: 满分必须为数字
     select_external_tool_dialog_title: 配置外部工具
     submission_action_take_quiz: "提取 %{title}"
@@ -1506,6 +1517,7 @@ zh:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: 您无法删除一个含有已锁定作业的小组。
+  assignment_menu_configured_7a5f4eec: 作业菜单已配置
   assignment_muter: 
     mute_assignment: 屏蔽作业
     muting_assignment: 正在屏蔽作业...
@@ -1515,41 +1527,6 @@ zh:
     unmuting_assignment: 正在取消屏蔽作业...
   assignment_name_b2d87383: 作业名称
   assignments: 
-    add_assignment_form: 
-      assignment_name: 作业名称
-      labels: 
-        due: "截止时间:"
-        points: "得分:"
-        quiz_points: 测验得分
-        type: 类型
-      links: 
-        full_edit: 完全编辑
-        more_options: 更多可更多选项
-      options: 
-        assignment: 作业
-        attendance: 参与
-        discussion: 讨论
-        external_tool: 外部工具
-        not_graded: 未计分
-        quiz: 测验
-      tooltips: 
-        assignment_is_quiz: 此作业是一个测验，因此得分可能来自问题，无法手动设置。
-    add_assignment_group_form: 
-      drop_x_scores_for_each_student: "每个学生 %{scores} 分"
-      labels: 
-        assignments: 作业
-        group_name: 小组名称
-      links: 
-        add_grading_rule: 添加计分规则
-        delete_assignment: 删除
-      options: 
-        drop_highest: 去掉最高分
-        drop_lowest: 去掉最低分
-        equally_weighted: 平均
-        never_drop: 不删除
-        no_assignments: "[无作业]"
-        weighted_by_points: 按得分加权
-      percent_of_total_grade: "总计分的 %"
     assignment_count: 
       one: "%{count} 份作业"
       other: "%{count} 份作业"
@@ -1604,10 +1581,6 @@ zh:
       not_yet_graded: "*尚未计分*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} 分"
       score_with_points_possible_screenreader: "分数: %{score}，满分 %{pointsPossible} 分。"
-    assignment_locked: 
-      assignment_locked: "此作业锁定于 *%{lock_at}*"
-      assignment_unlocked_from: "此作业锁定至 *%{unlock_at}*"
-      assignment_unlocked_from_to: "此作业仅在从 *%{unlock_at}* 至 *%{lock_at}* 解锁"
     assignment_settings: 
       cancel: 取消
       save: 保存
@@ -1616,49 +1589,13 @@ zh:
     assignment_sidebar: 
       links: 
         submit: 提交作业
-    assignments_content: 
-      buttons: 
-        delete_group: 删除小组
-      labels: 
-        class_weighting_policy: 根据各项作业所占比率计算总成绩
-        delete_assignments_in_group: 删除此小组中的作业
-        move_assignments_to: 将作业从此小组移至
-      options: 
-        select_group: "[选择小组]"
-      titles: 
-        delete_assignment_group: 是否删除作业小组?
-      tooltips: 
-        target_group: 选择此作业要移入的小组
-      warnings: 
-        delete_assignment_group: "作业小组 %{group} 中有 %{assignment_count} 个作业。可以删除这些作业或将其移至另一个小组。"
-    assignments_list_content: 
-      assignments: 
-        graded: 此作业已计分
-        needs_grading_count: "此作业的 %{needs_grading_count} 个提交作业仍需评分"
-        overdue: 此作业已逾期
-      no_assignments: 没有为此课程创建作业。
-      titles: 
-        assignments: 作业
-        course_assignments: 课程作业
-        overdue_assignments: 逾期作业
-        past_assignments: 以前的作业
-        undated_assignments: 更新的作业
-        ungraded_assignments: 未计分的作业
-        upcoming_assignments: 即将到来的作业
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: 按类型对作业分组
-        just_show_assignment_list: 只显示作业列表
         manage_assignments: 管理作业
         see_current_grades: 查看我目前的计分
       titles: 
         show_only_assignments_from: 只显示下列来源的作业
         upcoming_assignments: 即将到来的作业
-    assignments_right_side: 
-      add_assignment_to_group: "*将作业添加*至 %{group}"
-      assignment_groups_wrapper: "（%{number_of_groups} 中）"
-      links: 
-        add_assignment_group: 添加作业小组
     available_date_description: 
       available_until: 可供使用的截止日期
       closed: 已关闭
@@ -1846,28 +1783,6 @@ zh:
         total: 总计
     higher_than_max: 您不能使用大于作业数的数字。
     incomplete: 未完成
-    index: 
-      assignment_locked: 此作业当前锁定。更多信息请访问作业详细信息页面。
-      assignment_locked_tooltip: 已锁定
-      keycode_descriptions: 
-        add_assignment_or_group: 将作业添加至当前小组
-        close_active_dialog: 关闭活动对话框
-        delete_assignment_or_group: 删除当前作业/小组
-        edit_assignment_or_group: 编辑当前作业/小组
-        full_preview: 完全预览/编辑作业
-        next_assignment_or_group: 下一个作业/小组
-        previous_assignment_or_group: 上一个作业/小组
-      keycodes: 
-        add_assignment_or_group: a
-        close_active_dialog: esc
-        delete_assignment_or_group: d
-        edit_assignment_or_group: e
-        full_preview: f
-        next_assignment_or_group: j
-        previous_assignment_or_group: k
-      links: 
-        wizard: 如何...?
-      page_title: 作业
     index_view: 
       add_assignment: 作业
       add_group: 小组
@@ -2025,10 +1940,6 @@ zh:
       locked: 已锁定
     status: 
       deleting_group: 正在删除小组...
-    student_index: 
-      assignments: 作业
-      labels: 
-        assignments: 作业
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -2181,40 +2092,7 @@ zh:
         settings_exclude_less_than_percent: "少于文档的 %{percentInput}"
     undated_assignments: 无日期作业
     upcoming_assignments: 即将布置的作业
-    wizard_box: 
-      descriptions: 
-        delete_icon: "%{icon}: 删除作业"
-        edit_icon: "%{icon}: 再次编辑基本可选功能"
-        move_icon: "%{icon}: 将作业移至其它小组"
-        preview_icon: "%{icon}: 预览作业并全面编辑"
-      errors: 
-        no_assignment_group: 噢。您需要先添加作业小组。单击"创建作业小组"以查看方法。
-      instructions: 
-        wizard: 
-          details: "在截止时间和获得所需得分之前，还有许多作业要分配。如果要键入作业说明、允许文件上传、更改评分类型或多项其它设置，请单击作业名称或单击 %{edit_icon} 图标，然后单击\"更多可更多选项\"。"
-          group: 
-            screenreader_step1: 作业组用于组织作业。可为每个组提供名称。如果选择根据组加权最终评分，则亦可为每个组设置比例分数。单击"添加作业组"创建组。
-            step1: 作业小组用于组织作业。可为每个小组提供名称。如果选择根据各项作业所占比率计算总成绩（*位置?*），则亦可为每个小组设置比例分数。单击"添加作业小组"创建小组。
-          overview: 此页面用于在高级别设置课程。可以添加作业、组织作业，然后加权这些小组。方法是先组织，然后再研究细节。即使这样，在这里也可以执行许多操作。
-          quizzes: 测验是特殊类型的作业。可以单击左侧栏中的"测验"链接来创建或导入测验。
-          screenreader_details: 除了到期日期和分数之外，作业中还有许多其他操作。如果要键入作业说明、允许上传文件、更改评分类型或进行多项其他设置，请单击作业名称或单击编辑图标，然后单击"更多选项"。
-          screenreader_step1: 作业始终要分配到组中，因此要添加作业，必须先知道要将其加入哪个组。选择该组，然后单击"添加作业到"或单击添加图标，开始为组分配新作业。
-          step1: "作业始终要分配到小组中，因此要添加作业，必须先知道要将其加入哪个小组。选择该小组，然后单击\"将作业添加至\"或单击 %{add_icon} 图标，开始为小组分配新作业。"
-          step2: 很好！现在输入详细信息。可以输入作业的标题、截止时间以及最高得分。如果还要执行其它操作，只有等到作业创建后。
-          step3: "完成！作业已添加到小组中！如果将鼠标放在作业上，将会看到许多可选功能。其含义如下:"
-      links: 
-        create_assignment: 创建新作业
-        create_assignment_group: 创建作业小组
-        create_or_import_quiz: 创建/导入测验
-        edit_assignment_in_detail: 编辑作业详细信息
-        screenreader_show_me_add_assignment: 转至添加作业按钮
-        screenreader_show_me_add_assignment_group: 转至添加作业组按钮
-        screenreader_show_me_weight_final_grade: 转至加权最终评分复选框
-        show_me_where: 显示我的位置
-      subtitles: 
-        edit_assignment_in_detail: （允许上传、编辑说明等）
-      titles: 
-        wizard_box: "我要:"
+  assignments_1e02582c: 作业
   assignments_api: 
     invalid_date_time: "%{attribute} 的日期时间无效"
     invalid_submission_types: 提交类型无效
@@ -2254,6 +2132,7 @@ zh:
     login: 登录
     logout: 登出
   available_from_587ce92f: 开始时间
+  back_to_app_center_95420d83: "返回 App Center"
   bb_display: "Blackboard 学习"
   bb_file_description: "Blackboard 6/7/8/9 export .zip 文件"
   bb_name: "Blackboard 转换器"
@@ -2374,6 +2253,7 @@ zh:
     update: 更新
     view_account_roster: 查看帐户清单
     view_course_roster: 查看课程清单
+  by_url_a163275e: "通过 URL"
   c_modal_form: 
     close: 关闭
   calculator: 
@@ -2889,6 +2769,8 @@ zh:
       update_assignment_points: "这份作业可能有 %{assignmentPoints} 分，您是否希望改变它以获得 %{rubricPoints} 分以匹配评分标准?"
     titles: 
       update_assignment_points: 是否改变可能得分以匹配评分标准?
+  choose_a_course_home_page_8059c7b: 选择课程主页
+  close_d634289d: 关闭
   collaboration: 
     default_title: 未命名的协作
   collaborations: 
@@ -2984,6 +2866,7 @@ zh:
         current: 当前协作
     titles: 
       delete: 删除协作？
+  coming_up_4348b0bd: 即将到来
   comm_messages: 
     from_beginning: 开始
     to_now: 立即
@@ -3122,11 +3005,13 @@ zh:
         new: 尚未开始
         started: "开始于 %{time}"
     type_disabled_error: "此类会议不再为此 Canvas 网站启用"
+  configuration_type_25a084a4: 配置类型
   confirm_dialog: 
     cancel: 取消
     submit: 提交
   confirm_dialog_component: 
     ok: 确定
+  consumer_key_6f94ba11: 用户密钥
   content_exports: 
     buttons: 
       process: 处理数据
@@ -3164,7 +3049,6 @@ zh:
       select_quizzes: 选择需要导出的考试
   content_imports: 
     errors: 
-      failed: "课程导入失败，错误如下:"
       import_failed: "在导入过程中发生错误。请通知系统管理员，并向其提供如下代码: \"%{code}\""
       no_only_and_except: 无法同时使用"仅"和"除外"可选功能。
     files: 
@@ -3174,7 +3058,6 @@ zh:
       description: "可以将压缩的文件集上传至您的课程，我们将为您全部解压缩。这是一种将文件从其它系统移到 Canvas 的简便方式。"
       page_title: 导入文件
     messages: 
-      copying: "正在复制... 可能需要几分钟"
       import_complete: "导入完成! 正在返回到课程页面..."
       importing_button: "导入中... 这可能需要一些时间"
     titles: 
@@ -3550,123 +3433,12 @@ zh:
     buttons: 
       add: 添加单元
       add_item: 添加项目
-      add_module: 创建单元
+      add_module: 单元
       add_module_first: 新增单元
       update: 更新单元
     confirm: 
       delete: 是否确定要删除此单元?
       delete_item: 是否确定要从该单元删除此项目?
-    content: 
-      add_prerequisite: "添加先修课程到 *%{module}*"
-      assignment_points_possible: "满分 %{points_possible} 分"
-      buttons: 
-        add_module: 添加单元
-        add_prerequisite: 添加先修课程
-      criterion_for_assignment: "对于 %{assignment} 用户，必须 %{select_criterion}"
-      headings: 
-        add_prerequisite: "添加先修课程到 %{name}"
-        course_modules: 课程单元
-        student_progress: 学生学习单元的进度
-        student_progress_for_module: "%{module} 的学生学习进度"
-        students_completed: 已完成单元的学生
-        students_in_progress: 正在学习单元的学生
-        students_locked: 未解锁单元的学生
-        students_unlocked: 已解锁（但未启动）单元的学生
-      help: 
-        create: |-
-            课程单元可让您将作业、页面、文件等组织为更小的班级或单元。单元可围绕主题组织，集中于具体的课题，或只是按时间顺序组织。
-            
-            您也可以定义每个单元的标准和先修课程，以此安排单元的顺序。学生在其解锁所有先修课程之前无法访问单元。这样可以防止学生在评审测验中获得一定分数（例如 75%）之前访问特定内容或文件。
-            
-            要开始将课程组织为单元，请单击右边的 "%{button}" 按钮。
-        no_modules: 没有为此课程定义单元。
-      images: 
-        alt: 
-          min_score: 最低分数
-          must_contribute: 必须参与
-          must_submit: 必须提交
-          must_view: 必须查看
-        title: 
-          min_score: "在单元被视为完成之前，学生必须在此项目上获得 %{min_score} "
-          must_contribute: 在单元被视为完成之前，学生必须参与此项目
-          must_submit: 在单元被视为完成之前，学生必须提交此作业
-          must_view: 在单元被视为完成之前，学生必须查看此项目
-      indent: 
-        ? "n"
-        : 
-          one: "缩进 1 级"
-          other: "缩进 %{count} 级"
-          zero: 不缩进
-      key: 
-        description: 
-          delete: 删除当前单元/项目
-          edit: 编辑单元/项目
-          indent: 缩进当前项目
-          new: 新单元
-          next: 下一个单元/项目
-          outdent: 减少缩进当前项目
-          previous: 上一个单元/项目
-      keycode_descriptions: 
-        next_module_item: 选择下一个单元或单元项目
-        previous_module_item: 选择上一个单元或单元项目
-        toggle_module_dragging: 选择项目开始拖动，或放下之前选定的项目
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: 向上键
-        outdent: o
-        previous: k
-        previous_module_item: 向下键
-        toggle_module_dragging: 空格键
-      labels: 
-        indent: 缩进
-        module_complete_when: 此单元完成的条件
-        modules: 
-          before_students_view: 在学生可以查看此单元之前
-        new_tab: 在新选项卡中加载
-        publish_final_grade: 此模块完成时为学生发布最终评分
-        require_sequential_progress: 学生必须按顺序浏览此单元中的要求
-        sort_by: 排序方式
-        title: 标题
-        unlock_at: 解锁时间
-        url: URL
-      links: 
-        add_prerequisite: 添加先修课程
-        add_requirement: 添加要求
-        reload_student: 重新加载学生的进度
-        sort_by_name: 姓名
-        sort_by_progress: 进度
-        student_progress: 查看进度
-        title: 
-          remove_prerequisite: 删除此先修课程
-      module: 单元
-      module_details: "单元按顺序显示，因此只有显示在 %{name} 上方的单元可以设置为先修课程。"
-      module_name: 模块名称
-      modules_keyboard_hint: "要更改课程单元和单元项目的顺序，先关闭屏幕读取器上的光标。在 JAWS 中按 Insert-z。按 Tab 选择第一个单元，按向上键和向下键选择一个单元或单元项目。按空格键选择一个单元或单元项目开始拖动，然后按向上键和向下键选择一个目标，再次按空格键在目标后放下所选项。"
-      must_complete_prerequisites: 它们必须完成
-      no_preprequisites: 未定义先修课程
-      no_requirements: 未定义要求
-      prerequisites: 
-        another_module: 其它单元
-      prerequisites_need_item: 必须添加项目，然后才可指定用户完成此单元的方式
-      requirements: 
-        must_contribute: 参与页面
-        must_score_at_least: 至少得分
-        must_submit: 提交作业
-        must_view: 查看项目
-      select_module: 
-        instructions: 选择单元
-        name: "单元 %{module}"
-      select_prerequisite: 选择先修课程的类型。学生在所有先修课程完成之前无法查看单元。
-      student_name: 学生姓名
-      table_headings: 
-        module: 单元
-        state: 状态
-      titles: 
-        student_progression: 学生学习单元的进度
     content_next: 
       add_prerequisite: "添加先修课程到 *%{module}*"
       assignment_points_possible: "满分 %{points_possible} 分"
@@ -3791,41 +3563,6 @@ zh:
       titles: 
         student_progression: 学生学习单元的进度
     context_module: 
-      admin_links: 
-        module_options_label: 管理单元
-        module_options_title: 管理单元
-      context_module: 
-        draft: (草稿)
-      images: 
-        alt: 
-          complete: 完成
-          incomplete: 未完成
-          locked: 已锁定
-        title: 
-          complete: 单元已完成
-          incomplete: 单元未完成
-          locked: 单元已锁定
-      links: 
-        add_item: 添加内容
-        hide_contents: 隐藏单元内容
-        settings: 单元设置
-        show_contents: 显示单元内容
-        text: 
-          delete_module: 删除
-          edit_module: 编辑
-        title: 
-          delete_module: 删除此单元
-          edit_module: 编辑
-          student_progress: 查看学生学习此单元的进度
-      manage: 管理单元
-      module_toolbar: 
-        aria: 
-          module_options: 
-            label: 单元可选功能
-      module_will_unlock_at: "解锁日期 *%{unlock_date}*"
-      progression_complete_count: "*%{count}* 完成"
-      progression_started_count: "*%{count}* 进行中"
-      reorder_modules: 拖动以重新排序单元
       unpublish: 取消发布
     context_module_next: 
       aria_labels: 
@@ -3863,51 +3600,6 @@ zh:
         course_modules: 课程单元
     module_complete: 完成
     module_empty: "单元 \"%{module}\" 中没有项目"
-    module_item: 
-      drag_to_reorder: 拖动可重新排序或移动项目至其它单元
-      images: 
-        alt: 
-          complete: 完成
-          incomplete: 未完成
-          max_score: 最高分数
-          min_score: 最低分数
-          must_contribute: 必须参与
-          must_submit: 必须提交
-          must_view: 必须查看
-        title: 
-          complete: 单元项目已完成
-          incomplete: 单元项目未完成
-          max_score: 在单元被视为完成之前，学生不得超过此项目的最高分数
-          min_score: 在单元被视为完成之前，学生必须达到此项目的最低分数
-          must_contribute: 在单元被视为完成之前，学生必须参与此项目
-          must_submit: 在单元被视为完成之前，学生必须提交此作业
-          must_view: 在单元被视为完成之前，学生必须查看此项目
-      links: 
-        edit_item: 编辑项目详细信息
-        edit_item_details_label: 编辑项目详细信息
-        indent: 增加缩进
-        indent_label: 增加缩进
-        outdent: 减少缩进
-        outdent_label: 减少缩进
-        remove_item: 从单元删除此项目
-        remove_item_label: 从单元删除此项目
-      max_score: 
-        fulfilled: "得分不超过 %{score}"
-        unfulfilled: "得分不得超过 %{score}"
-      min_score: 
-        fulfilled: "得分至少为 %{score}"
-        unfulfilled: "得分至少为 %{score}"
-      module: 
-        item_aria_label: "%{item_label} 单元项目"
-      must_contribute: 
-        fulfilled: 已参与页面的内容
-        unfulfilled: 必须参与页面的内容
-      must_submit: 
-        fulfilled: 已提交作业
-        unfulfilled: 必须提交作业
-      must_view: 
-        fulfilled: 已查看页面
-        unfulfilled: 必须查看页面
     module_item_next: 
       drag_to_reorder: 拖动可重新排序或移动项目至其它单元
       images: 
@@ -3954,7 +3646,6 @@ zh:
     module_locked: 已锁定
     module_started: 正在进行
     module_unlocked: 解锁
-    none_in_progress: 无进展
     optgroup: 
       assignments: 作业
       discussion_topics: 讨论
@@ -3964,7 +3655,7 @@ zh:
       quizzes: 测验
       wiki_pages: 维基页面
     points_possible_short: "%{points} 分"
-    prerequisits_footer: 
+    prerequisites_footer: 
       default_module_name: 单元
       labels: 
         prerequisites: 先修课程
@@ -3975,14 +3666,12 @@ zh:
       titles: 
         student_progress: 学生进度
         student_progression: 学生学习单元的进度
-    still_needs_completing: 仍需完成
     titles: 
       add: 添加单元
       add_item: "添加项目到 %{module}"
       add_prerequisite: "添加先修课程到 %{module}"
       edit: 编辑单元设置
       edit_item: 编辑项目详细信息
-      student_progress: 学生学习单元的进度
     url_show: 
       new_tab: 此站点需要在新的浏览器窗口中打开。
       open_url_button: "在新窗口中打开 %{title}"
@@ -4286,6 +3975,7 @@ zh:
       file: 未知文件
       topic: 未知主题
       wiki_page: 未知维基页面
+  course_home_sub_navigation_configured_5b80b8bf: 课程主页次级导航已配置
   course_list: 
     favorited_tooltip: 单击可从课程菜单中删除。
     nonfavorited_tooltip: 单击可添加到课程菜单。
@@ -4363,6 +4053,7 @@ zh:
       wiki_id: "Wiki ID"
       workflow_state: 工作流状态
   course_members_are_free_to_join_9b2603d4: 学员可自由加入
+  course_navigation_configured_a48400fe: 课程导航已配置
   course_restore: 
     restore_error: 尝试恢复课程时出现错误。课程未恢复。
   course_search: 
@@ -4412,6 +4103,7 @@ zh:
       move_course: 移动课程
       reset_course_content_dialog_help: 重置课程内容
       section_enrollments: 班级注册
+  course_settings_sub_navigation_configured_e6c41593: 课程设置次级导航已配置
   course_statistics: 
     unknown: 未知
   course_users: 
@@ -4473,59 +4165,6 @@ zh:
       start_at: 开始日期
       titles: 
         copy_course: 复制课程
-    course_wizard_box: 
-      buttons: 
-        publish: 发布课程
-      details: 
-        assignments: "添加作业。您可以只添加一个较长的作业列表，或对作业进行分组 – 还可以指定每个作业小组的权重。"
-        available: 现在，您的课程已经设置就绪，您可能不再需要这份清单。但我们会保存它，以便您在今后想尝试一些新作业或对课程内容进行更改时，能够为您提供帮助。
-        calendar: 日历功能对于了解日历以及向课程添加任何非作业事件都大有裨益。不用担心，我们会帮助您使用它。
-        claimed: 
-          not_saved: |-
-              好，您的课程已经设置完毕...接下来该干什么呢?在您发布课程之前，可能需要检查课程，确保您了解基本框架。逐步检查左侧的列表，确保您的课程可以使用。
-              
-              *本课程在发布之前只有教师可以查看*
-          saved: "完成！您已正式创建课程 %{course}。该课程在发布之前只有您本人才能查看 – 但在发布之前，您应该认真查看左侧的列表，以熟悉 Canvas 的使用方法并确保您做好了授课准备。"
-        created: 
-          not_saved: |-
-              本课程已创建，但未被领受。在一周内未被领受的课程将被删除。在此期间，请勾选左侧的列表，确保您已经做好准备。
-              
-              如果您暂时需要离开，只需保存*此链接*以便在有效满之前返回此处。
-              
-              请**登录**或***注册***以领受本课程。
-          saved: |-
-              完成！您已正式创建课程 %{course}。该课程在发布之前只有您本人才能查看 – 但在发布之前，您应该认真查看左侧的列表，以熟悉 Canvas 的使用方法并确保您做好了授课准备。
-              
-              如果您暂时需要离开，只需保存*此链接*以便在有效满之前返回此处。
-              
-              请**登录**或***注册***以领受本课程。
-        files: "\"文件\"选项卡是用来分享讲义的区域，例如文档、学习帮助等 – 学生需要下载的任何文件。在 Canvas 中，上传和组织文件是轻而易举的事情。我们会告诉您如何操作。"
-        home2: "当人们访问课程时，这是他们将看到的页面。您可以将其设置为显示活动流、课程单元列表、提纲或者您自己编写的自定义页面。默认设置为课程活动流。要自定义此页面，只需单击 %{choose_home_page}。"
-        import: "如果您曾使用其它课程管理系统，您可能需要将其中的材料转移到 Canvas 中。我们可以引导您轻松将内容迁移到 Canvas。"
-        navigation: 默认情况下会启用课程的所有相关链接。对于没有内容的部分，学生将无法看到其链接。例如，如果您尚未创建任何测验，学生将无法看到测验链接。对于您不希望学生访问的课程部分，您可以归类并明确禁用这些链接。
-        publish: 
-          form: |-
-              全部完成了吗?可以发布您的课程了！单击下面的按钮，正式发布课程！
-              
-              发布课程时会向所有课程用户发送电子邮件邀请，以便他们能够注册并开始学习该课程。
-          not_registered: "本课程已被领受并准备就绪，但需要完成注册过程后才能发布。您应该收到了来自 Canvas 的电子邮件，其中包含完成该过程的链接。确保检查您的垃圾邮件箱。"
-        students: 您肯定对学生感兴趣。试想，没有学生参与的课程有什么趣味呢?
-        tas: 您可能要指定一些助教帮助您教授课程。助教可以帮助您批改学生作业、引导讨论以及更新截止时间和作业详细信息。
-      headings: 
-        next_steps: 后续步骤
-      links: 
-        assignments: 添加课程作业
-        calendar: 添加课程日历事件
-        files: 添加课程文件
-        home: 选择课程主页
-        import: 导入内容
-        navigation: 选择导航链接
-        publish: 发布课程
-        re_send_confirmation: 重新发送确认电子邮件
-        students: 向课程添加学生
-        tas: 向课程添加助教
-        title: 
-          bookmark: 复制此链接或制作其书签
     description: 
       links: 
         join_course: 加入此课程
@@ -4585,7 +4224,6 @@ zh:
     errors: 
       create_failed: 课程创建失败
       role_not_active: "无法为未激活用户添加身份: '%{role}'"
-      role_not_found: "不存在名为 '%{role}' 的身份。"
       unpublish: 如果存在学生提交项，则无法取消发布课程。
     group_list: 
       headings: 
@@ -4861,19 +4499,9 @@ zh:
         stats: 课程统计信息
         student_view: 学生视图
     show: 
-      buttons: 
-        update_layout: 更新布局
       change_home_page: 更改
       details: 
-        assignments: 此视图显示本课程的**作业列表**，即将到来和近期的作业显示在顶部。
         confirm_unenroll: 是否确定要取消注册此课程?您将不再能够看到课程清单或与教师直接沟通，并且在您的通信流和通知中不再看到课程事件。
-        custom_page: 您可以**设计自己的课程主页**，在其中包含您喜欢的任何链接、图像或富媒体。
-        modules: |-
-            您可以将课程组织成**单元或章节**，每节包含一组相关的文件、作业和页面等。如果需要，还可以通过定义每个单元解锁之前需要完成的标准和先决条件来组织序列单元。
-            
-                        - 这种布局可能最适合没有特定时间表（例如学期）的课程。
-        recent_activity_dashboard: "**最近活动仪表板**让参加者能看到此课程最近的谈话、公告、讨论和互动。它很类似于用户在第一次登录时看到的仪表板，但只显示此特定课程的内容。"
-        syllabus: "**大纲视图**允许您编写有关课程期望的说明或通过链接、图像方式等介绍课程。还显示涵盖所有作业和课程事件的日历视图。"
       draft_state: 
         buttons: 
           cancel: 取消
@@ -4895,27 +4523,16 @@ zh:
         choose_home_page_title: 选择主页
         confirm_unenroll: 确认取消注册
         importing: 课程正在导入
-        set_layout: 设置主页布局
         unpublished: 此课程未发布
       importing: 课程复制/迁移进行中。这意味着某些内容可能暂时不可用。
-      labels: 
-        select_content: 当用户访问课程页面时，显示它们
       license_notice: "此课程的内容根据 %{license_type} 许可证提供。本课程的内容可用性取决于此许可证，除非另有说明。"
       links: 
-        change_layout: 更改主页布局
         choose_home_page: 选择主页
         course_setup: 课程设置清单
-        course_stream: 查看课程流
         drop_course: 放弃此课程
         join_course: 参与此课程
         new_announcement: 新通告
         view_course_stream: 查看课程流
-      options: 
-        assignments: 作业列表
-        custom_page: 自定义页面
-        modules: 课程单元/班级
-        recent_activity_dashboard: 最近活动仪表板
-        syllabus: 含有大纲的作业
       period_name: 最近两周
       re_sending: 正在重新发送...
       send_done: 完成！收到消息可能需要几分钟。
@@ -5011,6 +4628,7 @@ zh:
     announcements: 通告
     assignments: 作业
     calendar_events: 日历事件
+    collaborations: 协作
     conferences: 会议
     confirmation: 确认
     copy_course: 复制课程
@@ -5020,7 +4638,7 @@ zh:
     error_reports: 错误报告
     files: 文件
     grades: 评分
-    grading_schemes: 评分方案
+    grading_standards: 评分
     groups: 小组
     jobs: 任务
     media: 媒体
@@ -5040,7 +4658,6 @@ zh:
     stats: 统计
     syllabus: 大纲
     users: 用户
-    wiki_page_revisions: 修订版
     wiki_pages: 页面
   csv: 
     alpha: Alpha
@@ -5098,6 +4715,7 @@ zh:
       assign_blanks: 对未提交的学生分配零
     out_of_points_possible: "满分 %{assignment.points_possible} 分"
     this_is_permanent: 曲线评分无法撤消。将提供预先进行曲线计算的评分历史记录，但曲线计算操作不可逆。
+  custom_fields_fc3e55af: 自定义字段
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip 格式"
   d2l_name: "D2L 转换器"
@@ -5171,12 +4789,12 @@ zh:
     formats: 
       date_at_time: "%b %-d 于 %H:%M"
       default: "%Y-%m-%d"
-      long: "%B %-d，%Y"
-      long_with_weekday: "%A，%B %-d"
-      medium: "%b %e, %Y"
-      medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %e"
+      long: "%Y %B %-d"
+      long_with_weekday: "%A, %B %-d"
+      medium: "%Y %b %-d"
+      medium_month: "%Y %b"
+      medium_with_weekday: "%a %Y %b %-d"
+      short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -5243,6 +4861,8 @@ zh:
   default_conference_title: "%{course_name} 会议"
   default_question_name: 问题
   default_question_text: 问题文本
+  delete_a6efa79d: 删除
+  delete_grading_scheme_6b308832: 删除评分方案
   delete_quiz_142b8099: 删除测验
   delete_survey_56fddbbd: 删除调查
   demos: 
@@ -5322,6 +4942,7 @@ zh:
       technology_education_director: 技术培训主管
       united_states_and_canada: 美国和加拿大
       vp: VP
+  description_436c48d7: 说明
   developer_key: 
     api_key: "密钥: *%{api_key}*"
     created: "创建时间:"
@@ -5379,6 +5000,7 @@ zh:
     atom_no_author: 无作者
     default_title: 无标题
     empty_message: 无消息
+  discussion_topic_menu_configured_1b518ef2: 讨论主题菜单已配置
   discussion_topics: 
     assignment_details: 
       available_from: 开始时间
@@ -5489,7 +5111,6 @@ zh:
       make_sure_all_search_terms_are_spelled_correctly: 确保所有的搜索词拼写正确。
       new_discussion: "*开始* 讨论"
       rss_feed: "RSS 信息源"
-      search_title_body_or_author: 搜索标题、正文或作者
       start_one_now: 立即开始
       suggestions: "建议:"
       there_are_no_discussion_topics_to_show: 没有要显示的讨论主题
@@ -5524,9 +5145,7 @@ zh:
     show: 
       add_rubric: 添加评分标准说明
       announcement_closed: 此通告已关闭评论
-      announcement_locked: "此通告将对用户不可见，直至 *%{date}*"
       announcement_locked_until: "此通告锁定至 %{time}"
-      announcement_not_visible: 此通告对用户不可见
       authors_name: 作者姓名
       collapse_replies: 隐藏回复
       confirm_delete_discussion: 是否确定要删除这个讨论?
@@ -5554,12 +5173,9 @@ zh:
       reply_to_message: 回复当前消息
       reply_to_topic: 回复主题
       retrieved_from_feed: "从 %{feed} 检索"
-      search_entries_placeholder: 搜索条目或作者
       show_rubric: 显示评分标准说明
       speed_grader: 快速评分器
       topic: 主题
-      topic_locked: "此主题在 *%{date}* 之前对用户不可见"
-      topic_not_visible: 此主题对用户不可见
       topic_podcast_feed_link: 主题播客动态消息
       topic_subscribe: 订阅
       topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论的通知
@@ -5656,18 +5272,17 @@ zh:
     unsubscribed: 取消订阅
     unsubscribed_hint: 您未订阅此主题。单击可订阅。
   display_course_catalog: “在公共课程索引中包含此课程”标记启用的情况下，在此根帐户中显示一个可搜索的课程列表。
-  draft_state_description: |-
-      此测试版功能重新设计了 Canvas 的许多部分，
-      内容可以在学生不可见的的新的未发布状态下
-      存在并且不包括在评分计算中。注意: 禁用此功能
-      可能会在教师视图中删除新创建的或编辑的内容。
+  domain_3b54c511: 域
   due_date_822625d8: 截止时间
   due_dates: 
     due_at: "截止时间: %{assignment_due_date_time}"
     multiple_due_dates: "截止时间: 多个截止时间"
     no_due_date: "截止时间: 无截止时间"
+  e_mail_only_2cc5e513: 仅限电子邮件
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 转换器"
+  edit_external_tool_472a475: 退出外部工具
+  edit_grading_scheme_53091236: 编辑评分方案
   edit_quiz_ededddd8: 编辑测验
   edit_rubric: 
     buttons: 
@@ -5742,6 +5357,8 @@ zh:
       font_size: 字体大小，按下即可选择
       formatting: 格式，按下即可选择
       rte_help: "富文本区域。按 ALT F10 显示工具栏。按 ALT F8 显示帮助。"
+  editor_button_configured_b9419357: 编辑器按钮已配置
+  either_the_url_or_domain_should_be_set_c29cf8c1: "应设置 URL 或域名的一项"
   email: 
     default_from_name: "Instructure Canvas"
   ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
@@ -5944,7 +5561,6 @@ zh:
         html_content: HTML/嵌入内容
         portfolio: 进入电子学业档案
         rich_content: 富文本内容
-        share: 复制并分享此链接，以便他人可访问您的私人电子学业档案。
         view_original: 查看原始文件
         wizard: 入门向导
       login_required: 必须*登录*后才能在此页发表评论。
@@ -6085,6 +5701,8 @@ zh:
     unsaved_changes: 您有未保存的更改。
     wrong_file_extension: "您所选的扩展名为 \"%{extension}\" 的文件不允许进行提交"
   everyone_854554dd: 所有人
+  extensions_7250a0bb: 延时
+  external_apps_f5490181: 外部应用程序
   external_content: 
     cancel: 
       canceling: 正在取消...
@@ -6290,7 +5908,6 @@ zh:
       feature_options: 功能选项
       no_features_available: 当前没有可用的功能。
   features: 
-    allow_opt_out_of_inbox: 允许用户选择退出收件箱
     better_file_browsing: 更好的文件浏览功能
     course_catalog: 课程目录
     differentiated_assignments: 差异化作业
@@ -6298,13 +5915,6 @@ zh:
         关闭此功能将影响现有的课程。有关禁用此功能的帮助，请联系
         您的 Canvas Success 经理。
     differentiated_assignments_course_disable_warning: 禁用差异化作业将使所有发布的作业向全体学生显示。
-    draft_state: 草稿状态
-    draft_state_account_disable_warning: |-
-        关闭此功能将影响现有的课程。有关禁用此功能的帮助，请联系
-        您的 Canvas Success 经理。
-    draft_state_course_disable_warning: |-
-        关闭此功能将发布课程中所有现有对象。请在继续之前确保
-        所有草稿内容可以发布，并且对课程中的所有用户可用。
     ember_modules: "Ember 单元"
     google_docs_domain_restriction: "Google Docs 域限制"
     high_contrast: 使用高对比度样式
@@ -6512,6 +6122,7 @@ zh:
     warnings: 
       file_uploaded_without_response: 文件可能已上传，但服务器没有响应。请重新加载页面以确认。
   fill_in_the_blank_read_surrounding_text_1a6c73c7: 在空白处填写，阅读周围的文本
+  filter_by_name_34cbe139: 按姓名过滤
   find_flickr_image_view: 
     find_cc_on_flickr: "在 Flickr 上查找知识共享图像"
     search: 搜索
@@ -6548,6 +6159,7 @@ zh:
     invitation: 邀请
     question: 问题
     warning: 警告
+  global_navigation_configured_9e7bd94c: 全球导航已配置
   google_docs_domain_restriction_description: |-
       Google Docs 域限制允许 Google Docs 作业和协作
       仅限于单个域。尝试在未经批准的域上提交作业或
@@ -7075,6 +6687,7 @@ zh:
   grading_period: 
     errors: 
       invalid_grading_period_end_date: 评分时段结束日期早于开始日期
+  grading_schemes_1c3c3252: 计分方案
   grading_standard: 
     unknown_grading_details: 未知详细信息
   grading_standards: 
@@ -7091,9 +6704,6 @@ zh:
     grading_scheme_currently_set: 现已设置
     grading_scheme_not_set: 未设置
     index: 
-      buttons: 
-        add: 添加评分方案
-      heading_grading_schemes: 评分方案
       title: 评分标准
     no_grading_standards: 找不到评分标准
     status: 
@@ -7549,6 +7159,7 @@ zh:
       如果您更喜欢对比度较高版本的 Canvas 用户界面，请启用此项。
       这对于视力受损或阅读困难的人非常有用。
   highest_28ad71e6: 最高
+  homework_submission_configured_35c56ff0: 已配置家作提交项
   html5_first_videos_description: |-
       默认情况下，Canvas 将首先尝试使用 Flash 来播放视频。启用此项可首先尝试使用 HTML5，
       然后返回到 Flash。
@@ -7562,6 +7173,7 @@ zh:
     online_url_submission: "在线 URL 提交项"
     quiz_submission: 测验提交项
     text_entry_submission: 文本条目提交项
+  if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您曾使用其它课程管理系统，您可能需要将其中的材料转移到 Canvas 中。我们可以引导您轻松将内容迁移到 Canvas。"
   image_8ad06: 图像
   images: 
     error_checking_color: 检查图像颜色时出错
@@ -7571,6 +7183,7 @@ zh:
     invalid_file_type: "文件类型 %{type} 无效。允许的类型包括: %{type_list}"
     not_an_image: 所选文件不是图像
   immediately_c128ede6: 立即
+  import_content_b2fd6620: 导入内容
   importers/assignment_importer: 
     errors: 
       import: 
@@ -7606,6 +7219,7 @@ zh:
       start_a_group: 启动小组
     styleguide: 
       manage: 管理
+  installed_7b284a91: 已安装
   instructions: 
     authorize_google_docs: "需要授权 Canvas 访问您的 Google Docs 帐户之后才能协作处理文档:"
   instructure: 
@@ -7883,9 +7497,13 @@ zh:
       feedback: 单击此处告诉我们发生了什么
     help: 帮助
     show_me_where: 显示我的位置
+  links_14b70841: 链接
   locales: 
     zh: 简体中文
+  lock_date_cannot_be_after_course_end_a473158b: 锁定日期不能晚于课程结束日期
+  lock_date_cannot_be_before_due_date_ac30f54: 锁定时间不能早于截止时间
   logged_out_user: "注销的用户 %{user_counter}"
+  lower_limit_of_range_6ddd4983: 范围的下限
   lti: 
     lti_message: 
       load_tool_new_tab_button: "在新窗口中加载 %{tool}"
@@ -7906,6 +7524,7 @@ zh:
     prompts: 
       delete_avatar: 是否确定要删除此用户的档案头像?
       lock_avatar: 锁定此头像将会批准它，并阻止用户进行更新。是否继续?
+  manual_entry_e4a4f99a: 手动输入
   mathquill: 
     tabs: 
       arrows: 箭头
@@ -9926,6 +9545,7 @@ zh:
   migration_issues: 
     errors: 
       valid_workflow_state: 必须发送有效的工作流状态
+  migration_selection_configured_c6ed9b28: 迁移选择已配置
   module_item_types: 
     assignment: 作业
     disuccsion: 讨论
@@ -9935,6 +9555,7 @@ zh:
     page: 页面
     quiz: 测验
     sub_header: 副标题
+  module_menu_configured_cdf62584: 单元菜单已配置
   modules: 
     add: 
       assignment: 
@@ -10084,17 +9705,23 @@ zh:
     sure_you_want_to_mute: "是否确定要静音此作业?此作业静音时，学生将不会收到关于以下内容的新通知或无法看到:"
   n_a_d6f6c42f: 不适用
   name: 学术基准导入器
+  name_1aed4a1b: 名称
+  name_3806192d: 姓名：
+  name_only_5f56718e: 仅限姓名
   new_facebook_message: "您有来自 Canvas 的新消息"
   new_quiz_statistics_desc: 启用某课程的新测验统计页面。
   new_styles_description: |-
       我们正在改进 Canvas 的 UI 界面。启用此项可选择查看
       更新的简化外观并感受 Canvas 界面。这是一项“正在进行中”的功能，
       在生产中还不应该为实际用户启用此功能。
+  next_steps_ce0f0d0c: 后续步骤
+  no_due_date_44271c53: 无截止时间
   no_e16d9132: 否
   no_migration_file: 内容迁移需要文件
   no_students_have_taken_the_quiz_yet_e667644b: 学生尚未参加测验
   no_students_have_taken_the_survey_yet_d378cd35: 学生尚未参加调查
   not_a_number: 必须为正数
+  not_installed_37a21a76: 未安装
   notification: 
     added_to_conversation_description: 已将您添加到会话
     added_to_conversation_display: 添加到会话
@@ -10362,6 +9989,7 @@ zh:
     observee_added: "现在正在观察 %{user}"
     observing: 正在观察
   ok_c47544a2: 确定
+  one_per_line_format_name_value_79647700: "每行一个。格式:姓名=值"
   options: 
     ? "no"
     : 否
@@ -10519,12 +10147,9 @@ zh:
   overrides: 
     everyone: 所有人
     everyone_else: 其他所有人
-    lock_date_before_due_date: 锁定时间不能早于截止时间
     overrides: 
       everyone: 所有人
       everyone_else: 其他所有人
-    unlock_date_after_due_date: 解锁时间不能晚于截止时间
-    unlock_date_after_lock_date: 解锁日期不能晚于锁定日期
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -10539,6 +10164,7 @@ zh:
         time: 时间
         url: URL
         user_agent: 用户代理
+  page_views_eb64cf53: 页面视图
   pages: 
     cancel_button: 取消
     cannot_unpublish_front_page: 无法取消发布上一页
@@ -10573,6 +10199,7 @@ zh:
     view_more_link: 查看更多
   paginated_view: 
     loading_more_results: 正在加载其它结果
+  paste_xml_cda3a64e: "粘贴 XML"
   paypal: 
     exception: 抱歉，出现错误，请稍后重试。
   plugins: 
@@ -10585,7 +10212,6 @@ zh:
       description: "App Center 用于在 Canvas 中跟踪/安装外部工具"
       name: "App Center"
     app_center_settings: 
-      description: "App Center 将出现在课程或帐户的设置页上的“应用程序”选项卡中。下面提供的 URL 应指向有效的 App Center 端点（例如，https://lti-examples.heroku.com -- 确保略去末尾斜杠）"
       labels: 
         app_reviews_endpoint: 应用程序显示端点
         apps_index_endpoint: 应用程序索引端点
@@ -10913,6 +10539,7 @@ zh:
       description: "您将需要 [来自 Yo 的 api 令牌](%{yo_url})。"
       labels: 
         api_token: "Api 令牌"
+  points_bb475533: 得分
   polling: 
     poll_sessions: 
       errors: 
@@ -10936,6 +10563,7 @@ zh:
       completion_prerequisites: 完成先决条件
     labels: 
       requirements_must_be_completed: 需要完成以下要求，然后才能解锁此页面
+  privacy_290109ea: 隐私
   product_name: Canvas
   profile: 
     access_token: 
@@ -11380,6 +11008,7 @@ zh:
       email_sent: "确认电子邮件已发送到 %{email}，确保检查您的垃圾邮件箱"
       link_invalid: 您所使用的链接不再有效。如果您无法登录，请单击“不知道您的密码？”来重置密码。
       password_changed: 密码已更改
+  public_a749f507: 公共
   public_courses_title: 公共课程
   public_domain_112ed397: 公共域
   publish_btn_module: 
@@ -11510,20 +11139,6 @@ zh:
       select_bank: "选择此问题的目标题库:"
       show_details: 显示问题详细信息
   question_unanswered: 尚未回答
-  quick_start_bar: 
-    announcement: 
-      saving: 正在保存...
-    assignment: 
-      assigning: 正在保存...
-    discussion: 
-      saving: 正在保存...
-    event: 
-      save: 保存
-      saving: 正在保存...
-    message: 
-      Sending: 正在发送...
-    quick_start_bar_view: 
-      new: "新建:"
   quiz: 
     regrade: 
       give_everyone_full_credit: 对于此问题给所有人满分。
@@ -11532,6 +11147,21 @@ zh:
       regrade_options: "重新评分可选功能 *（针对已回答此问题的学生）：*"
       some_scores_reduced: 仅正确的回答可得分（*可能会扣除某些学生的分数*）
       update_question_without_regrading: 更新问题而不重新评分
+  quiz_log_auditing: 
+    inverted_table_view: 
+      headers: 
+        question: 问题
+    loading: 正在加载...
+    navigation: 
+      links: 
+        question: "问题 %{position}"
+      questions: 问题
+    session_table_headers: 
+      attempt: 尝试
+    table_view: 
+      headers: 
+        question: "问题 %{position}"
+  quiz_menu_configured_b9aa5c0d: 测验菜单已配置
   quiz_reports: 
     cancel_generation: 取消
     download_item_analysis: " 下载项目分析报告。"
@@ -12310,7 +11940,6 @@ zh:
       quiz_details: 
         allowed_attempts: 允许的尝试次数
         headers: 
-          available: 可用
           due: 截止时间
           points: 得分
           questions: 问题
@@ -12318,9 +11947,6 @@ zh:
         multiple_due_dates: 多个截止时间
         no_due_date: 无截止时间
         none: 无
-        quiz_availabile_through: "%{start_time} 至 %{end_time}"
-        quiz_available_after: "%{start_time} 之后"
-        quiz_available_until: "直到 %{end_time}"
         requires_lockdown: "需要 Respondus LockDown Browser"
         time_limit: 
           one: "%{count} 分钟"
@@ -12700,7 +12326,6 @@ zh:
     folder: 文件夹
     folder_browsing_tree: 文件夹浏览树
     folder_name: 文件夹名称
-    kind: 类型
     labels: 
       select: 选择此项目
     loading_more_results: 正在加载更多结果...
@@ -12781,8 +12406,10 @@ zh:
         name: 姓名
     welcome_to_canvas: "欢迎使用 Canvas！"
   remove_f47dc62a: 删除
+  remove_row_c198da5a: 移除行
   rename_45608f54: 重命名
   reply_from_name: "%{name}，借助 Canvas 通知"
+  resource_selection_configured_d45b553d: 资源选择已配置
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
@@ -12999,7 +12626,9 @@ zh:
         are_you_sure_remove: 是否确定要从您的列表中删除此评分标准?
       remove_rubric: 从我的列表中删除此评分标准
   save_11a80ec3: 保存
+  saving_d55dd90e: 正在保存...
   score_out_of_points_possible_88f370fd: "%{score}，满分 %{points_possible} 分"
+  score_score_6f81e8c8: "分数：%{score}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -13121,7 +12750,9 @@ zh:
     enrollments_tas: 助教
     enrollments_teachers: 教师
     student_groups: 学习小组
+  search_entries_or_author_63fb0a86: 搜索条目或作者
   search_groups_or_people_6c15d6ad: 搜索组或人员
+  search_title_body_or_author_1d26711f: 搜索标题、正文或作者
   section: 
     confirms: 
       delete_enrollment: 是否确定要永久删除此注册?
@@ -13215,6 +12846,7 @@ zh:
     titles: 
       add_item_to_module: 添加项目到单元
       find_links_using_service: "使用 %{service} 查找链接"
+  select_navigation_links_68e1e924: 选择导航链接
   selected_answer: 您已选择此答案。
   self_enrollments: 
     already_enrolled: 
@@ -13346,6 +12978,12 @@ zh:
       links: 
         add_rubric: 添加评分标准说明
         assign_rubric: 分配评分标准
+    available_dates: 
+      headers: 
+        available: 可用
+      quiz_available_after: "%{start_time} 之后"
+      quiz_available_through: "%{start_time} 至 %{end_time}"
+      quiz_available_until: "直到 %{end_time}"
     canvas-user-nav: 
       navigation: 
         user_menu: 用户菜单
@@ -13821,10 +13459,6 @@ zh:
       topic_notice: 选择您要与此*单元*关联的主题，或通过选择"新主题"添加一个主题。
       wiki_page_notice: 选择您要与此*单元*关联的维基页面，或通过选择"新页面"添加一个新页面。
       wiki_page_select_label: 选择您要关联的维基页面，或者通过选择“新页面”来添加新页面。
-    sequence_footer: 
-      full_course_sequence: 查看完整课程序列
-      next: 下一页
-      previous: 上一页
     submission_comment: 
       assignment: 作业
       grading_alt: 评分
@@ -13969,6 +13603,7 @@ zh:
         select_file: "请选择一个 .zip 文件进行上传"
       titles: 
         uploading: 正在上传，请稍候。
+  shared_secret_892c88f2: 共享密钥
   sis_batch: 
     errors: 
       too_many_errors: "存在另外 %{count} 个错误"
@@ -14386,6 +14021,8 @@ zh:
         term_start: 学期开始
         unspecified: 无论何时
       timespan: "%{start_at} *到* %{end_at}"
+  there_was_an_error_in_processing_your_request_6513a49a: 处理您的请求时出错
+  this_field_is_required_fa58c4a: 此字段为必填字段
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
   time: 
     am: 上午
@@ -14398,18 +14035,17 @@ zh:
     due_date: "%{date}，%{time} 之前"
     event: "%{date} %{time}"
     formats: 
-      default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
-      short: "%d %b %H:%M"
+      default: "%a, %Y %b %d  %H:%M:%S %z"
+      long: "%Y %B %d %H:%M"
+      short: "%b %d %H:%M"
       tiny: "%H:%M"
-      tiny_on_the_hour: "%l%P"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: 不到一分钟前
     pm: 下午
     ranges: 
       different_days: "%{start_date_and_time} 至 %{end_date_and_time}"
       same_day: "%{date}，从 %{start_time} 到 %{end_time}"
       times: "%{start_time} 至 %{end_time}"
-    unknown_date: 未知日期
     with_ago: "%{time} 前"
   time_zones: 
     abu_dhabi: 阿布扎比
@@ -14624,6 +14260,9 @@ zh:
   unknown_47a3b725: 未知
   unknown_question_bank: 未知题库
   unknown_quiz: 未知测验
+  unlock_date_cannot_be_after_due_date_8829d9ca: 解锁时间不能晚于截止时间
+  unlock_date_cannot_be_after_lock_date_591f7fda: 解锁日期不能晚于锁定日期
+  unlock_date_cannot_be_before_course_start_9c7b8524: 解锁日期不能早于课程开始日期
   unpublished_courses_title: 未发布的课程
   unsupported_package: 不受支持的内容包
   until_date_949017c4: "直到 %{date}"
@@ -14633,6 +14272,7 @@ zh:
     upload: 上传
   upload_drop_zone: 
     drop_to_upload: 放下项目即可上传
+  upper_limit_of_range_c454a8f2: 范围的上限
   usage_rights_modal: 
     saving: 正在保存...
   user: 
@@ -14710,6 +14350,7 @@ zh:
       updating_user_details: 正在更新用户详细信息...
     notices: 
       image_reported: 此图像已报告
+  user_navigation_configured_135ee933: 用户导航已配置
   user_notes: 
     confirms: 
       delete_journal_entry: 是否确定要删除此日志条目?
@@ -15026,6 +14667,8 @@ zh:
       welcome_to_happiness: "欢迎使用 Canvas!"
   validate: 
     is_required: 此字段为必填字段
+  view_app_center_6c89a3fe: "查看 App Center"
+  view_app_configurations_52b52441: 查看应用程序配置
   visit_864b4060: 访问
   warnings: 
     test_install: 
@@ -15154,8 +14797,6 @@ zh:
   wiki_page: 
     atom_author: 维基页面
     atom_entry_title: "维基页面 %{course_or_group_name}: %{page_title}"
-    cannot_hide_page: 无法隐藏上一页
-    cannot_set_hidden_front_page: 无法设置为上一页，因为该页处于隐藏状态
     cannot_set_unpublished_front_page: 无法设为上一页，因为它未发布
     defaults: 
       no_content: 无内容
@@ -15164,109 +14805,26 @@ zh:
       title_characters: 标题必须包含至少一个字母或数字
       title_too_long: "标题不能超过 %{max_characters} 个字符"
     unknown_user_name: 未知
-  wiki_page_revisions: 
-    index: 
-      links: 
-        back_to_current_version: 返回当前版本
-      page_edited_by_with_link: "通过 [%{user_name}](%{link})"
-      page_imported: 通过内容导入程序
-      titles: 
-        revisions_for_page: "修订: %{title}"
-    notices: 
-      page_rolled_back: 页面已成功回滚到之前版本。
-    show: 
-      buttons: 
-        roll_back_version: 回滚到此版本
-      imported_at: "导入时间: *%{time_ago}*"
-      labels: 
-        by_content_importer: 通过内容导入程序
-        by_user: "通过 %{user}"
-        on_date: "于 *%{date_time}*"
-      links: 
-        back_to_history: 返回修订历史记录
-        go_to_latest: 转到最新版本
-      not_most_recent_version_warning: 这不是最新的版本
-      saved_by: "保存时间:*%{time_ago}* 通过 %{user}"
+  wiki_page_menu_configured_de3078c9: "Wiki 页面菜单已配置"
   wiki_pages: 
-    content: 
-      buttons: 
-        save_changes: 保存更改
-        start_editing: 立即开始编辑
-      course_editing_roles: 
-        anyone: 任何人
-        only_teachers: 仅教师
-        teachers_and_students: 教师和学生
-      course_home_wiki_page_description: 您可以使用此页面组织或介绍您喜欢的课程。您可以轻松地使用"页面工具"班级链接至作业、文件等；一旦开始编辑后，您将在右侧看到。
-      course_wiki_page_description: 您可以使用此维基创建课程材料的补充页面或说明。您可以从作业轻松地链接至维基页面，或从任何维基页面链接至其它课程材料和文件。这使它成为说明困难概念的绝佳场所，允许分组项目，或创建您的课程中可能需要的几乎任何类型的页面。
-      default_wiki_page_description: 此页面是默认维基页面，学生单击此课程的"页面"选项卡时将看到它。
-      default_wiki_page_is_course_home_page_warning: |-
-          目前，此页面还设置为默认课程页面，因此您的课程的访问者
-          也将首先看到此页面。您可以从 [课程主页](%{link}) 进行更改。
-      editing_content: 编辑内容。
-      editing_roles: 
-        anyone: 任何人
-        only_members: 仅成员
-        prompt: "%{options} 可以编辑此页面"
-      group_wiki_warning: "此页面是小组维基的组成部分，*而不是*课程维基。如果您查找课程维基，[单击此处](%{link})。"
-      labels: 
-        hide_from_students: 对学生隐藏此页面
-        last_edited: "由 %{name} 在 %{time_ago} 天前上次编辑"
-        notify_of_update: 通知用户此内容已更改
-      links: 
-        page_history: 页面历史记录
-      notices: 
-        page_deleted: 此页面已删除。
-        page_does_not_exist: 此页面不存在。
-        page_edited_while_viewing: "自从您开始查看后，此页面已被其他人更新。[单击此处重新加载该页面。](%{link})"
-        page_edited_while_viewing_detailed: 自从您初次加载后，其他人已编辑此页面，如果您现在提交，将会覆盖其更改。您可能会想要重新加载该页面并重新输入您的更改以确保没有丢失其他人的工作。
-      welcome_message: 欢迎使用课程维基
-    edit_page: 
+    edit: 
       page_header_title: "编辑 %{page_name}"
-    errors: 
-      cannot_delete_front_page: 您无法删除上一页。
-    front_page: 首页
+    index: 
+      titles: 
+        pages: 页面
     notices: 
       cannot_edit: "不允许您编辑页面“%{title}”。"
       cannot_read_revisions: "不允许您审阅 “%{title}” 的历史修订版。"
       create_non_existent_page: "页面 \"%{title}\" 不存在，但您可以在下面创建"
       page_deleted: "页面\"%{title}\"已删除。"
       page_does_not_exist: "页面 \"%{title}\" 不存在。"
-      page_updated: 页面已成功更新。
-    page_link: 
-      link_hidden_from_students_warning: 学生不会看到此链接
-    page_revisions: 
+    revisions: 
       page_revisions_title: "%{title} 修订版：%{context_name}"
-    pages_index: 
-      titles: 
-        pages: 页面
-    wiki_right_side: 
-      buttons: 
-        create: 创建
-        rename: 重命名
-      delete_page_confirmation: 是否确定要删除此页面?此操作无法撤消！
-      headers: 
-        all_pages: 所有页面
-        common_pages: 常用页面
-        page_tools: 页面工具
-        recent_changes: 最近更改
-      links: 
-        create_page: 创建新页面
-        delete_page: 删除此页面
-        edit_page: 编辑此页面
-        more: 更多...
-        rename_page: 重命名此页面
-        show_all: 全部显示...
-      title: 新页面标题
-      wiki_description_for_course: 将其视为容纳内容的无限制场所。您可以使用它描述您的课程，提供难题的有用说明，或甚至允许学生一起编写项目。
-      wiki_description_for_group: 将其视为容纳内容的无限制场所。您可以使用它描述您的小组，提供难题的有用说明，或甚至允许成员一起编写项目。
-      wiki_description_header: 维基的目的是什么?
   wiki_pages_api: 
     cannot_delete_front_page: 不能删除上一页
-    cannot_have_hidden_front_page: 上一页无法隐藏
     cannot_have_unpublished_front_page: 不能取消发布上一页
     cannot_update_editing_roles: 不允许您更新此维基页面的编辑身份
     cannot_update_front_page: 不允许您更改维基上一页
-    cannot_update_hide_from_students: 不允许您更新此维基页面的从学生隐藏标记
     cannot_update_published: 不允许您更新此维基页面的已发布状态
     cannot_update_title: 不允许您更新此维基页面的标题
     invalid_editing_roles: 所提供的编辑身份无效

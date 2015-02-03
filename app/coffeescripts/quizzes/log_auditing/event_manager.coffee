@@ -40,6 +40,10 @@ define (require) ->
     #
     # EventTracker instances will be provided with a deliveryCallback that
     # enqueues events for delivery via this module.
+
+    unregisterAllTrackers: ->
+      this._trackerFactories = []
+
     start: ->
       state = this._state
       state.buffer = new EventBuffer()

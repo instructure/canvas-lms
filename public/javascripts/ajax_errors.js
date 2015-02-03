@@ -108,8 +108,8 @@ define([
       } catch(e) {}
       $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
         if ($.ajaxJSON.isUnauthenticated(request)) {
-          var message = I18n.t('errors.logged_out', "You are not currently logged in, possibly due to a long period of inactivity.")
-          message += "<br\/><a href='/login' target='_new'>" + I18n.t('links.login', 'Login') + "<\/a>";
+          var message = htmlEscape(I18n.t('errors.logged_out', "You are not currently logged in, possibly due to a long period of inactivity."))
+          message += "<br\/><a href='/login' target='_new'>" + htmlEscape(I18n.t('links.login', 'Login')) + "<\/a>";
           $.flashError({ html: message }, 30000);
         } else {
           ajaxErrorFlash(I18n.t('errors.unhandled', "Oops! The last request didn't work out."), request);
@@ -126,12 +126,12 @@ define([
                 window.frames[$obj.attr('id')].document;
         var $body = $(d).find("body");
         $body.html($("<h1 />").text(I18n.t('error_heading', 'Ajax Error: %{status_code}', {status_code: status})));
-        $body.append(text);
+        $body.append(htmlEscape(text));
         $("#instructure_ajax_error_box").hide();
         var pre = "";
         message = htmlEscape(message);
         if(debugOnly) {
-          message = message + "<br\/><span style='font-size: 0.7em;'>(Development Only)<\/span>";
+          message += "<br\/><span style='font-size: 0.7em;'>(Development Only)<\/span>";
         }
         if(debugOnly || INST.environment != "production") {
           message += "<br\/><a href='#' class='last_error_details_link'>" + htmlEscape(I18n.t('links.details', 'details...')) + "<\/a>";
@@ -161,7 +161,7 @@ define([
                   "&Platform="   + escape(navigator.platform) +
                   "&UserAgent="  + escape(navigator.userAgent) +
                   "&Params="     + escape(data.params || "unknown");
-        $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" + INST.ajaxErrorURL + txt.substring(0, 2000) + "' />");
+        $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" + htmlEscape(INST.ajaxErrorURL + txt.substring(0, 2000)) + "' />");
       }
     });
     $(".last_error_details_link").live('click', function(event) {

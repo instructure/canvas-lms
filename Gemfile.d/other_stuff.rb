@@ -21,7 +21,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4'
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.2.22'
+gem 'switchman', '1.2.25'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
 
@@ -34,7 +34,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.6'
   gem 'adobe_connect', '1.0.0'
 gem 'canvas_webex', '0.15'
-gem 'canvas-jobs', '0.9.8'
+gem 'canvas-jobs', '0.9.11'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.2.5', :require => 'diff/lcs'
 
@@ -46,8 +46,8 @@ gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
 gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.9'
-gem 'i18nema', '0.0.8', :platforms => [:mri_20, :mri_21]
-gem 'i18nema19', '0.0.8', :platform => :mri_19
+gem 'i18nema', '0.0.8', :platforms => [:ruby_20, :ruby_21, :ruby_22]
+gem 'i18nema19', '0.0.8', :platform => :ruby_19
 gem 'i18nliner', '0.0.9'
 gem 'icalendar', '1.5.4'
 gem 'ims-lti', '2.0.0.beta.18'
@@ -58,7 +58,7 @@ gem 'json', '1.8.1'
 gem 'oj', '2.5.5'
 
 # native xml parsing, diigo
-gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
+gem 'libxml-ruby', '2.7.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
   gem 'treetop', '1.4.15'
@@ -85,7 +85,7 @@ gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
 gem 'net-ldap', '0.10.1'
 gem 'ruby-duration', '3.2.0'
-gem 'ruby-saml-mod', '0.2.1'
+gem 'ruby-saml-mod', '0.2.2'
 gem 'rubycas-client', '2.3.9'
 gem 'rubyzip', '1.1.1', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace

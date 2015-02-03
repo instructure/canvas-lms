@@ -172,8 +172,8 @@ describe ContentMigration do
       rub2.data = data
       rub2.save!
       rub2.associate_with(@copy_from, @copy_from)
-      ef1 = @copy_from.external_feeds.create! feed_type: 'rss/atom', feed_purpose: 'announcements', url: 'https://feed1.example.org', verbosity: 'full'
-      ef2 = @copy_from.external_feeds.create! feed_type: 'rss/atom', feed_purpose: 'announcements', url: 'https://feed2.example.org', verbosity: 'full'
+      ef1 = @copy_from.external_feeds.create! url: 'https://feed1.example.org', verbosity: 'full'
+      ef2 = @copy_from.external_feeds.create! url: 'https://feed2.example.org', verbosity: 'full'
       default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from

@@ -98,11 +98,11 @@ define [
 
     # attaches child views to @$childContainer
     attachChildViews: ->
-      container = @$childContainer.detach()
+      $container = @$childContainer.detach()
       if @parentListView
-        container.append(@parentListView.render().el)
-      container.append(@listView.render().el)
-      @$content.append(container)
+        $container.append(@parentListView.render().el)
+      $container.append(@listView.render().el)
+      @$content.append($container)
 
     cleanup: =>
       @parentListView?.remove()

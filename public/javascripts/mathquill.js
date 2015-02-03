@@ -5,6 +5,9 @@
  *  * I18n'd toolbar tabs
  */
 
+// xsslint jqueryObject.identifier contents textareaSpan
+// xsslint jqueryObject.property jQ
+
 /**
  * Copyleft 2010-2011 Jay and Han (laughinghan@gmail.com)
  *   under the GNU Lesser General Public License
@@ -13,8 +16,9 @@
  */
 define([
   'i18n!mathquill',
-  'jquery' /* jQuery, $ */
-], function(I18n, $) {
+  'jquery', /* jQuery, $ */
+  'str/htmlEscape'
+], function(I18n, $, htmlEscape) {
 
   var undefined,
     _, //temp variable of prototypes
@@ -415,7 +419,7 @@ define([
 
     if (!editable) {
       jQ.bind('cut paste', false).bind('copy', setTextareaSelection)
-        .prepend('<span class="selectable">$'+root.latex()+'$</span>');
+        .prepend('<span class="selectable">$'+htmlEscape(root.latex())+'$</span>');
       textarea.blur(function() {
         cursor.clearSelection();
         setTimeout(detach); //detaching during blur explodes in WebKit
@@ -595,22 +599,22 @@ define([
     var panes = [];
     $.each(button_tabs, function(index, tab){
       tabs.push(
-        '<li><a href="#' + tab.name + '_tab" role="tab" tabindex="-1" aria-controls="' + tab.name + '_tab">'
-        + '  <span class="mathquill-rendered-math">' + tab.example + '</span>' + tab.name + '</a></li>'
+        '<li><a href="#' + htmlEscape(tab.name) + '_tab" role="tab" tabindex="-1" aria-controls="' + htmlEscape(tab.name) + '_tab">'
+        + '  <span class="mathquill-rendered-math">' + htmlEscape(tab.example) + '</span>' + htmlEscape(tab.name) + '</a></li>'
       );
       var buttons = [];
       $.each(tab.button_groups, function(index, group) {
         $.each(group, function(index, cmd) {
           var obj = new LatexCmds[cmd](undefined, cmd);
-           buttons.push('<li><a class="mathquill-rendered-math" href="#" title="' + (cmd.match(/^[a-z]+$/i) ? '\\' + cmd : cmd) + '">' +
-                       (html_template_overrides[cmd] ? html_template_overrides[cmd] : '<span style="line-height: 1.5em">' + obj.html_template.join('') + '</span>') +
+           buttons.push('<li><a class="mathquill-rendered-math" href="#" title="' + htmlEscape(cmd.match(/^[a-z]+$/i) ? '\\' + cmd : cmd) + '">' +
+                       $.raw(html_template_overrides[cmd] ? html_template_overrides[cmd] : '<span style="line-height: 1.5em">' + $.raw(obj.html_template.join('')) + '</span>') +
                        '</a></li>');
         });
         buttons.push('<li class="mathquill-button-spacer"></li>');
       });
-      panes.push('<div class="mathquill-tab-pane" id="' + tab.name + '_tab" role="tabpanel"><ul>' + buttons.join('') + '</ul></div>');
+      panes.push('<div class="mathquill-tab-pane" id="' + htmlEscape(tab.name) + '_tab" role="tabpanel"><ul>' + $.raw(buttons.join('')) + '</ul></div>');
     });
-    root.toolbar = $('#mathquill-view .mathquill-toolbar').html('<ul class="mathquill-tab-bar" role="tablist">' + tabs.join('') + '</ul><div class="mathquill-toolbar-panes">' + panes.join('') + '</div>');
+    root.toolbar = $('#mathquill-view .mathquill-toolbar').html('<ul class="mathquill-tab-bar" role="tablist">' + $.raw(tabs.join('')) + '</ul><div class="mathquill-toolbar-panes">' + $.raw(panes.join('')) + '</div>');
     $('#mathquill-view .mathquill-tab-bar li a').click(function(e) {
       e.preventDefault();
       $('#mathquill-view .mathquill-tab-bar li').removeClass('mathquill-tab-selected')
@@ -1152,7 +1156,7 @@ define([
   // Round/Square/Curly/Angle Brackets (aka Parens/Brackets/Braces)
   function Bracket(open, close, cmd, end, replacedFragment) {
     this.init('\\left'+cmd,
-      ['<span class="block"><span class="paren">'+open+'</span><span class="block"></span><span class="paren">'+close+'</span></span>'],
+      ['<span class="block"><span class="paren">'+htmlEscape(open)+'</span><span class="block"></span><span class="paren">'+htmlEscape(close)+'</span></span>'],
       [open, close],
       replacedFragment);
     this.end = '\\right'+end;
@@ -1617,7 +1621,7 @@ define([
   LatexCmds.f = bind(Symbol, 'f', '<var class="florin">&fnof;</var><span style="display:inline-block;width:0">&nbsp;</span>');
 
   function Variable(ch, html) {
-    Symbol.call(this, ch, '<var>'+(html || ch)+'</var>');
+    Symbol.call(this, ch, '<var>'+$.raw(html || htmlEscape(ch))+'</var>');
   }
   _ = Variable.prototype = new Symbol;
   _.text = function() {
@@ -1632,7 +1636,7 @@ define([
   };
 
   function VanillaSymbol(ch, html) {
-    Symbol.call(this, ch, '<span>'+(html || ch)+'</span>');
+    Symbol.call(this, ch, '<span>'+$.raw(html || htmlEscape(ch))+'</span>');
   }
   VanillaSymbol.prototype = Symbol.prototype;
 
@@ -1641,7 +1645,7 @@ define([
   LatexCmds.prime = CharCmds["'"] = bind(VanillaSymbol, "'", '&prime;');
 
   function NonSymbolaSymbol(ch, html) { //does not use Symbola font
-    Symbol.call(this, ch, '<span class="nonSymbola">'+(html || ch)+'</span>');
+    Symbol.call(this, ch, '<span class="nonSymbola">'+$.raw(html || htmlEscape(ch))+'</span>');
   }
   NonSymbolaSymbol.prototype = Symbol.prototype;
 
@@ -2131,7 +2135,7 @@ define([
 
 
   function NonItalicizedFunction(replacedFragment, fn) {
-    Symbol.call(this, '\\'+fn+' ', '<span>'+fn+'</span>');
+    Symbol.call(this, '\\'+fn+' ', '<span>'+htmlEscape(fn)+'</span>');
   }
   _ = NonItalicizedFunction.prototype = new Symbol;
   _.respace = function()

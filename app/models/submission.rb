@@ -37,7 +37,6 @@ class Submission < ActiveRecord::Base
   has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
-  has_many :attachments, :through => :attachment_associations
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -749,6 +748,10 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  def attachments
+    Attachment.where(:id => self.attachment_associations.map(&:attachment_id))
+  end
+
   def attachments=(attachments)
     # Accept attachments that were already approved, those that were just created
     # or those that were part of some outside context.  This is all to prevent
@@ -791,6 +794,8 @@ class Submission < ActiveRecord::Base
     state :pending_review
     state :graded
   end
+
+  scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
 
   scope :graded, -> { where("submissions.grade IS NOT NULL") }
 
@@ -1063,8 +1068,8 @@ class Submission < ActiveRecord::Base
   end
 
   def self.json_serialization_full_parameters(additional_parameters={})
-    includes = { :attachments => {}, :quiz_submission => {} }
-    methods = [ :formatted_body, :submission_history ]
+    includes = { :quiz_submission => {} }
+    methods = [ :formatted_body, :submission_history, :attachments ]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 
@@ -1199,5 +1204,82 @@ class Submission < ActiveRecord::Base
 
   def without_graded_submission?
     !self.has_submission? && !self.graded?
+  end
+
+  def self.queue_bulk_update(context, section, assignment, grader, grade_data)
+    progress = Progress.create!(:context => assignment, :tag => "submissions_update")
+    progress.process_job(self, :process_bulk_update, {}, context, section, assignment, grader, grade_data)
+    progress
+  end
+
+  def self.process_bulk_update(progress, context, section, assignment, grader, grade_data)
+    missing_ids = []
+
+    scope = assignment.students_with_visibility(context.students_visible_to(grader))
+    if section
+      scope = scope.where(:enrollments => { :course_section_id => section })
+    end
+
+    preloaded_users = scope.where(:id => grade_data.map{|id, data| id})
+
+    Delayed::Batch.serial_batch(:priority => Delayed::LOW_PRIORITY) do
+      grade_data.each do |user_id, user_data|
+
+        user = preloaded_users.detect{|u| u.global_id == Shard.global_id_for(user_id)}
+        if !user && (params = Api.sis_find_params_for_collection(scope, [user_id], context.root_account)) && params != :not_found
+          params[:limit] = 1
+          user = scope.all(params).first
+        end
+        unless user
+          missing_ids << user_id
+          next
+        end
+
+        if grade = user_data[:posted_grade]
+          submissions = assignment.grade_student(user, { :grader => grader, :grade => grade})
+          submission = submissions.first
+        else
+          submission = assignment.find_or_create_submission(user)
+        end
+
+        assessment = user_data[:rubric_assessment]
+        if assessment.is_a?(Hash) && assignment.rubric_association
+          # prepend each key with "criterion_", which is required by the current
+          # RubricAssociation#assess code.
+          assessment.keys.each do |crit_name|
+            assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
+          end
+          assignment.rubric_association.assess(
+            :assessor => grader, :user => user, :artifact => submission,
+            :assessment => assessment.merge(:assessment_type => 'grading'))
+        end
+
+        comment = user_data.slice(:text_comment, :file_ids, :media_comment_id, :media_comment_type, :group_comment)
+        if comment.present?
+          comment = {
+              :comment => comment[:text_comment],
+              :author => grader,
+              :hidden => assignment.muted?,
+          }.merge(
+              comment
+          ).with_indifferent_access
+
+          if file_ids = user_data[:file_ids]
+            attachments = Attachment.where(id: file_ids).to_a.select{ |a|
+              a.grants_right?(grader, :attach_to_submission_comment)
+            }
+            attachments.each { |a| a.ok_for_submission_comment = true }
+            comment[:attachments] = attachments if attachments.any?
+          end
+          assignment.update_submission(user, comment)
+        end
+
+      end
+    end
+    if missing_ids.any?
+      progress.message = "Couldn't find User(s) with API ids #{missing_ids.map{|id| "'#{id}'"}.join(", ")}"
+      progress.save
+      progress.fail
+    end
   end
 end

@@ -4,15 +4,16 @@ define [
   'Backbone'
   'i18n!calendar.edit'
   'jst/calendar/missingDueDateDialog'
+  'str/htmlEscape'
   'jqueryui/dialog'
   'compiled/jquery/fixDialogButtons'
-], ($, _, {View}, I18n, template) ->
+], ($, _, {View}, I18n, template, htmlEscape) ->
 
   class MissingDateDialogView extends View
     dialogTitle: """
       <span>
         <i class="icon-warning"></i>
-        #{I18n.t('titles.warning', 'Warning')}
+        #{htmlEscape I18n.t('titles.warning', 'Warning')}
       </span>
     """
 

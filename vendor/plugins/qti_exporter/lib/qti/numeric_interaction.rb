@@ -49,11 +49,11 @@ class NumericInteraction < AssessmentItemConverter
       elsif and_node = r_if.at_css('and')
         # range answer
         answer[:numerical_answer_type] = 'range_answer'
-        if upper = and_node.at_css('customOperator[class=vargte] baseValue')
-          answer[:end] = upper.text.to_f rescue 0.0
-        end
-        if lower = and_node.at_css('customOperator[class=varlte] baseValue')
+        if lower = and_node.at_css('customOperator[class=vargte] baseValue')
           answer[:start] = lower.text.to_f rescue 0.0
+        end
+        if upper = and_node.at_css('customOperator[class=varlte] baseValue')
+          answer[:end] = upper.text.to_f rescue 0.0
         end
         if upper || lower
           @question[:answers] << answer

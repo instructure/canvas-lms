@@ -523,7 +523,7 @@ describe "quizzes" do
 
       click_quiz_statistics_button
 
-      expect(f('#content .question_name')).to include_text("Question 1")
+      expect(f('#content .question-statistics .question-text')).to include_text("Which book(s) are required for this course?")
     end
 
     it "should display a link to quiz statistics for a MOOC" do

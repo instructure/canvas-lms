@@ -18,28 +18,40 @@
 
 class GradingStandardsController < ApplicationController
   before_filter :require_context
-  add_crumb(proc { t '#crumbs.grading_schemes', "Grading Schemes" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
+  add_crumb(proc { t '#crumbs.grading_standards', "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
   before_filter { |c| c.active_tab = "grading_standards" }
-  
+
   def default_data
-    render :json => GradingStandard.default_grading_standard
+    GradingStandard.default_grading_standard
   end
-  
+
   def index
     if authorized_action(@context, @current_user, :manage_grades)
+      js_env({
+        :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
+        :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?
+      })
       @standards = GradingStandard.standards_for(@context).sorted.limit(100)
       respond_to do |format|
         format.html { }
         format.json {
-          render :json => @standards.map{ |s| s.as_json(methods: [:display_name, :context_code]) }
+          editable_ids = @standards.select{ |s| s.context_type == @context.class.name &&
+                         s.context_id == @context.id }.map(&:id)
+          standards_json = @standards.map do |s|
+            standard = s.as_json(methods: [:display_name, :context_code, :assessed_assignment?])
+            standard[:can_edit_and_destroy] = editable_ids.include?(s.id)
+            standard
+          end
+          render :json => standards_json
         }
       end
     end
   end
-  
+
   def create
     if authorized_action(@context, @current_user, :manage_grades)
       @standard = @context.grading_standards.build(params[:grading_standard])
+      @standard.data = default_data unless params[:grading_standard][:data]
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save
@@ -50,7 +62,7 @@ class GradingStandardsController < ApplicationController
       end
     end
   end
-  
+
   def update
     @standard = @context.grading_standards.find(params[:id])
     if authorized_action(@context, @current_user, :manage_grades)
@@ -64,7 +76,7 @@ class GradingStandardsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     @standard = @context.grading_standards.find(params[:id])
     if authorized_action(@context, @current_user, :manage_grades)

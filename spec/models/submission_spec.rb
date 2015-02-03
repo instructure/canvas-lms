@@ -1107,6 +1107,22 @@ describe Submission do
       expect(a2.crocodoc_document).to eq a2.crocodoc_document
     end
   end
+
+  describe "cross-shard attachments" do
+    specs_require_sharding
+    it "should work" do
+      @shard1.activate do
+        @student = user(:active_user => true)
+        @attachment = Attachment.create! uploaded_data: StringIO.new('blah'), context: @student, filename: 'blah.txt'
+      end
+      course(:active_all => true)
+      @course.enroll_user(@student, "StudentEnrollment").accept!
+      @assignment = @course.assignments.create!
+
+      sub = @assignment.submit_homework(@user, attachments: [@attachment])
+      expect(sub.attachments).to eq [@attachment]
+    end
+  end
 end
 
 def submission_spec_model(opts={})

@@ -15,7 +15,6 @@
 @import "vendor/bootstrap/forms";
 @import "vendor/bootstrap/tables";
 
-
 // Components: common
 //@import "vendor/bootstrap/sprites"; //we do our own icons
 @import "vendor/bootstrap/dropdowns";
@@ -28,11 +27,6 @@
 
 // Components: Nav
 @import "vendor/bootstrap/navs";
-//these are just commented out because we dont use them yet, if you want them just uncomment.
-//@import "vendor/bootstrap/navbar";
-//@import "vendor/bootstrap/breadcrumbs";
-@import "vendor/bootstrap/pagination";
-@import "vendor/bootstrap/pager";
 
 // Components: Popovers
 //@import "vendor/bootstrap/modals"; // use jqueryUI instead
@@ -48,9 +42,6 @@
 @import "vendor/bootstrap/labels-badges";
 @import "vendor/bootstrap/progress-bars";
 @import "vendor/bootstrap/media";
-//these are just commented out because we dont use them yet, if you want them just uncomment.
-//@import "vendor/bootstrap/carousel";
-//@import "vendor/bootstrap/hero-unit";
 
 // Utility classes
 @import "vendor/bootstrap/utilities"; // Has to be last to override when necessary
@@ -68,13 +59,5 @@
 
 // Tablets to regular desktops
 @import "vendor/bootstrap/responsive-768px-979px";
-
-// RESPONSIVE NAVBAR
-// ------------------
-
-
-// From 979px and below, show a button to toggle navbar contents
-//@import "vendor/bootstrap/responsive-navbar"; //Uncomment if you want to use a responsive navbar
-
 
 @import "bootstrap_overrides";

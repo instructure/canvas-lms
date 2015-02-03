@@ -249,7 +249,7 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="feed_type" minOccurs="1">
+              <xs:element name="feed_type" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:enumeration value="rss/atom"/>

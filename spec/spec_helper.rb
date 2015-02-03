@@ -419,7 +419,7 @@ RSpec.configure do |config|
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb rescue nil
+      Canvas.redis.flushdb
     end
     Canvas.redis_used = false
   end
@@ -446,38 +446,18 @@ RSpec.configure do |config|
     @account
   end
 
-  def account_with_grading_periods
-    @account = Account.default
-    @account.set_feature_flag!(:multiple_grading_periods, 'on')
-    grading_period_group = @account.grading_period_groups.create!()
-    account_admin_user(account: @account)
-    user_session(@admin)
-    now = Time.zone.now
-    gps = 3.times.map do |n|
-      grading_period_group.
-        grading_periods.create!(weight: 50, start_date: n.month.since(now),
-                                end_date: (n+1).month.since(now),
-                                title: "Grading Period #{n+1}")
-    end
-    gps.last.destroy
-    @account
-  end
+  def grading_periods(opts = {})
+    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
+    ctx = opts[:context] || @course || course
+    count = opts[:count] || 2
 
-  def course_with_grading_periods
-    course_with_student_logged_in
-    @course.root_account.set_feature_flag!(:multiple_grading_periods, 'on')
-    grading_period_group = @course.grading_period_groups.create!()
-    account_admin_user(account: @course.account)
-    user_session(@admin)
+    gpg = ctx.grading_period_groups.create!
     now = Time.zone.now
-    gps = 3.times.map do |n|
-      grading_period_group.
-        grading_periods.create!(weight: 50, start_date: n.month.since(now),
-                                end_date: (n+1).month.since(now),
-                                title: "Grading Period #{n+1}")
-    end
-    gps.last.destroy
-    @course
+    count.times.map { |n|
+      gpg.grading_periods.create! start_date: n.months.since(now),
+        end_date: (n+1).months.since(now),
+        weight: 1
+    }
   end
 
   def course(opts={})
@@ -501,7 +481,7 @@ RSpec.configure do |config|
     @course
   end
 
-  def account_admin_user_with_role_changes(opts={})
+  def account_with_role_changes(opts={})
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
@@ -514,6 +494,10 @@ RSpec.configure do |config|
       end
     end
     RoleOverride.clear_cached_contexts
+  end
+
+  def account_admin_user_with_role_changes(opts={})
+    account_with_role_changes(opts)
     account_admin_user(opts)
   end
 
@@ -922,7 +906,11 @@ RSpec.configure do |config|
 
   def outcome_with_rubric(opts={})
     @outcome_group ||= @course.root_outcome_group
-    @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
+    @outcome = @course.created_learning_outcomes.create!(
+      :description => '<p>This is <b>awesome</b>.</p>',
+      :short_description => 'new outcome',
+      :calculation_method => 'highest'
+    )
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 

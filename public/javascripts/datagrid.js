@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// xsslint jqueryObject.method _createCell _templateCellHTML
+
 define([
   'INST' /* INST */,
   'jquery' /* $ */,

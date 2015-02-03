@@ -4,11 +4,11 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-  'compiled/views/TreeBrowserView'
+  '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
   '../utils/moveStuff'
-], (I18n, $, React, withReactDOM, preventDefault, TreeBrowserView, RootFoldersFinder, customPropTypes, moveStuff) ->
+], (I18n, $, React, withReactDOM, preventDefault, BBTreeBrowserView, RootFoldersFinder, customPropTypes, moveStuff) ->
 
   MoveDialog = React.createClass
     displayName: 'MoveDialog'
@@ -34,14 +34,22 @@ define [
         rootFoldersToShow: @props.rootFoldersToShow
       })
 
-      new TreeBrowserView({
-        onlyShowFolders: true,
-        rootModelsFinder: rootFoldersFinder
-        rootFoldersToShow: @props.rootFoldersToShow
-        onClick: @onSelectFolder
-        focusStyleClass: 'MoveDialog__folderItem--focused'
-        selectedStyleClass: 'MoveDialog__folderItem--selected'
-      }).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode()).find(':tabbable:first').focus();
+      @treeBrowserViewId = BBTreeBrowserView.create({
+          onlyShowFolders: true,
+          rootModelsFinder: rootFoldersFinder
+          rootFoldersToShow: @props.rootFoldersToShow
+          onClick: @onSelectFolder
+          focusStyleClass: 'MoveDialog__folderItem--focused'
+          selectedStyleClass: 'MoveDialog__folderItem--selected'
+        },
+        {
+          element: @refs.FolderTreeHolder.getDOMNode()
+        }).index
+
+      BBTreeBrowserView.getView(@treeBrowserViewId).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode()).find(':tabbable:first').focus()
+
+    componentWillUnmount: ->
+      BBTreeBrowserView.remove(@treeBrowserViewId)
 
     onSelectFolder: (event, folder) ->
       event.preventDefault()
@@ -49,7 +57,9 @@ define [
 
     submit: ->
       promise = moveStuff(@props.thingsToMove, @state.destinationFolder)
-      promise.then(@props.closeDialog)
+      promise.then =>
+        @props.closeDialog()
+        BBTreeBrowserView.refresh()
       $(@refs.form.getDOMNode()).disableWhileLoading(promise)
 
 

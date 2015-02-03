@@ -61,9 +61,10 @@ define([
                                      className="manage-link"
                                      aria-label={I18n.t('Manage group %{group_name}', {group_name: groupName})}
                                      onClick={this._onManage}>Manage</a> : null;
+
       var arrowDown = this.state.open || this.props.group.users.length == 0;
-var arrow = <i className={`icon-mini-arrow-${arrowDown ? 'down' : 'right'}`}
-               aria-hidden="true" />;
+      var arrow = <i className={`icon-mini-arrow-${arrowDown ? 'down' : 'right'}`}
+                     aria-hidden="true" />;
 
       var showBody = this.state.open && this.props.group.users.length > 0;
       var body = (

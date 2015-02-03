@@ -7,6 +7,10 @@ define [
   'tinymce.editor_box'
 ], (_, I18n, $, Backbone, preventDefault) ->
 
+  ###
+  xsslint safeString.property content
+  ###
+
   ##
   # Toggles an element between a rich text editor and itself
   class EditorToggle
@@ -103,7 +107,7 @@ define [
     # @api private
     createDone: ->
       $('<a/>')
-        .html(@options.doneText)
+        .text(@options.doneText)
         .attr('href', '#')
         .addClass('btn edit-html-done edit_html_done')
         .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))

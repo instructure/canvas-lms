@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,6 +28,7 @@ class ActiveRecord::Base
     'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments reminders_created_for_due_at publishing_reminder_sent previously_published before_quiz_submission_types),
     'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts cached_scribd_thumbnail),
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
+    'communication_channels' => %w(access_token_id internal_path),
     'content_exports' => %w(course_id),
     'content_tags' => %w(sequence_position context_module_association_id),
     'context_modules' => %w(downstream_modules),
@@ -37,6 +38,7 @@ class ActiveRecord::Base
     'discussion_topics' => %w(authorization_list_id),
     'enrollment_terms' => %w(sis_data sis_name ignore_term_date_restrictions),
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections role_name),
+    'external_feeds' => %w(body_match feed_type feed_purpose),
     'failed_jobs' => %w(original_id),
     'grading_periods' => %w(course_id account_id),
     'groups' => %w(sis_name type groupable_id groupable_type),

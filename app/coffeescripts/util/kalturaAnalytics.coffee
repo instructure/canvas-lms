@@ -61,7 +61,7 @@ define [
       for i in [0..count-1]
         iframe = document.createElement('iframe')
         $(iframe).addClass('hidden kaltura-analytics')
-        $(document.body).append(iframe)
+        $(document.body).append($(iframe))
 
         # there is no reliable way to know when a remote url has loaded in an
         # iframe, so just send them every 4 seconds
