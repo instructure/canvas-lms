@@ -4,11 +4,9 @@ shared_examples_for "course copy" do
   before :once do
     course_with_teacher(:course_name => "from course", :active_all => true)
     @copy_from = @course
-    set_course_draft_state(:course => @copy_from)
 
     course_with_teacher(:user => @user, :course_name => "tocourse", :course_code => "tocourse")
     @copy_to = @course
-    set_course_draft_state(:course => @copy_to)
 
     @cm = ContentMigration.new(
       :context => @copy_to,

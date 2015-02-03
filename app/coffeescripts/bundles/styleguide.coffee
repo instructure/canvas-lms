@@ -47,7 +47,7 @@ require [
   $("#content").on iconEventsMap, ".demo-icons"
 
   # Accordion
-  $(".accordion").accordion header: "h3"
+  $("#styleguide_demo_accordion1, #styleguide_demo_accordion2").accordion header: "h3"
 
   # Tabs
   $("#styleguide-tabs-demo-regular").tabs()

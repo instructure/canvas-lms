@@ -2,9 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes" do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"
@@ -14,7 +11,7 @@ describe "quizzes" do
     @course.update_attributes(:name => 'teacher course')
     @course.save!
     @course.reload
-    course_with_teacher_logged_in(:draft_state => true)
+    course_with_teacher_logged_in
     Account.default.enable_feature!(:lor_for_account)
 
     @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')

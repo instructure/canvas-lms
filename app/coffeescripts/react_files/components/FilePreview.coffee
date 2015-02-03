@@ -170,8 +170,8 @@ define [
                 },
                   i {className: 'icon-download'}
                   ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
-              button {
-                type: 'button'
+              a {
+                role: 'button'
                 className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"
                 onClick: @toggle('showInfoPanel')
               },
@@ -193,9 +193,15 @@ define [
                 src: "/#{filesEnv.contextType}/#{filesEnv.contextId}/files/#{@state.displayedItem.id}/file_preview"
                 className: 'ef-file-preview-frame'
               }
+            else # file was not found
+              div className: 'ef-file-not-found ef-file-preview-frame',
+                i className:'media-object ef-not-found-icon FilesystemObjectThumbnail mimeClass-file'
+                I18n.t "File not found"
+
             @renderArrowLink('right') if @state.otherItems?.length > 0
 
             if @state.showInfoPanel
               FilePreviewInfoPanel
                 displayedItem: @state.displayedItem
                 getStatusMessage: @getStatusMessage
+                usageRightsRequiredForContext: @props.usageRightsRequiredForContext

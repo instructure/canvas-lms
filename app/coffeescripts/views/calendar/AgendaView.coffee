@@ -89,6 +89,8 @@ define [
       $firstEventDayDate[0].focus() if $firstEventDayDate.length
 
     manageEvent: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
       eventId = $(e.target).closest('.agenda-event').data('event-id')
       event = @dataSource.eventWithId(eventId)
       new ShowEventDetailsDialog(event, @dataSource).show e

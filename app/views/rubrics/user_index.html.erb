@@ -8,43 +8,7 @@
 
 <% js_bundle :edit_rubric %>
 <% jammit_css :learning_outcomes %>
-<% content_for :stylesheets do %>
-<style>
-#rubrics .find_rubric_link {
-  display: none;
-}
-#rubrics ul {
-  list-style-type: none;
-  padding-left: 0px;
-}
-#rubrics ul li {
-  padding: 3px 5px;
-  margin-bottom: 5px;
-}
-#rubrics ul li .title {
-  font-size: 1.2em;
-  font-weight: bold;
-  float: left;
-}
-#rubrics ul li .links {
-  float: right;
-  opacity: 0.5;
-}
-#rubrics ul li .details {
-  clear: left;
-  display: block;
-  font-size: 0.7em;
-  margin-left: 20px;
-}
-#rubrics ul li:hover {
-  background-color: #eee;
-  -moz-border-radius: 5px;
-}
-#rubrics ul li:hover .links {
-  opacity: 1.0;
-}
-</style>
-<% end %>
+
 <% js_bundle :edit_rubric_user_index %>
 <h2><%= t 'headings.user_rubrics', 'User Rubrics' %></h2>
 <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>

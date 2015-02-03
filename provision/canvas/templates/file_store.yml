@@ -1,0 +1,11 @@
+development:
+  storage: local
+  path_prefix: tmp/files
+
+test:
+  storage: local
+  path_prefix: tmp/files
+
+production:
+  storage: local
+  path_prefix: tmp/files

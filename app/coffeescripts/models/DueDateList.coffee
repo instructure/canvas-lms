@@ -88,6 +88,9 @@ define [
         section.id not in @overrideSectionIDs() and
           section.id isnt Section.defaultDueDateSectionID
 
+    onlyVisibleToOverrides: =>
+      ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED and @assignment.isOnlyVisibleToOverrides()
+
     toJSON: =>
       overrides: @overrides.toJSON()
       sections: @sections.toJSON()

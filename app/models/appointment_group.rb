@@ -51,7 +51,8 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def sub_contexts
-    appointment_group_sub_contexts.map &:sub_context
+    # I wonder how rails is adding multiples of the same sub_contexts
+    appointment_group_sub_contexts.uniq.map &:sub_context
   end
 
   validates_presence_of :workflow_state
@@ -352,9 +353,10 @@ class AppointmentGroup < ActiveRecord::Base
           user
         else
           # can't have more than one group_category
-          raise "inconsistent appointment group" if sub_contexts.size > 1
-          sub_context_id = sub_contexts.first.id
-          user.groups.detect{ |g| g.group_category_id == sub_context_id }
+          group_categories = sub_contexts.find_all{|sc| sc.instance_of? GroupCategory }
+          raise %Q{inconsistent appointment group: #{self.id} #{group_categories.to_s}} if group_categories.length > 1
+          group_category_id = group_categories.first.id
+          user.groups.detect{ |g| g.group_category_id == group_category_id }
         end
       participant if participant && eligible_participant?(participant)
     end

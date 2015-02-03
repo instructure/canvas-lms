@@ -420,53 +420,52 @@ class ContentTag < ActiveRecord::Base
   # Scopes For Differentiated Assignment Filtering:
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    # keep content tags that:
-    # - arent a discussion/quiz/assignment
-    # - or are a discussion without an assignment
-    # - or have an assignment/quiz visibility
-    # - and are in the proper course(s)
-    scope = includes_assignment_and_discussion_visibilities(user_ids, course_ids).
-    includes_quiz_visibilities(user_ids, course_ids).
-    where(<<-SQL, Quizzes::Quiz.class_names)
-      content_tags.content_type NOT IN ('Assignment','DiscussionTopic', ? )
-      OR (
-        (discussion_topics.id IS NOT NULL AND discussion_topics.assignment_id IS NULL)
-        OR (assignment_student_visibilities.assignment_id IS NOT NULL)
-        OR (quiz_student_visibilities.quiz_id IS NOT NULL))
-    SQL
-    scope.where("content_tags.context_id IN (?)",course_ids).
-    uniq
-   }
-
-  # must join with ON's (rather than where's) to avoid sequence scans
-  scope :includes_assignment_and_discussion_visibilities, lambda { |user_ids, course_ids|
-    user_ids = Array.wrap(user_ids).join(',')
-    course_ids = Array.wrap(course_ids).join(',')
-    joins("LEFT JOIN discussion_topics ON discussion_topics.id = content_tags.content_id AND content_type = 'DiscussionTopic'").
-    joins(sanitize_sql_array([<<-SQL, user_ids, course_ids, user_ids, course_ids]))
-      LEFT JOIN assignment_student_visibilities
-        ON ((assignment_student_visibilities.assignment_id = content_tags.content_id
-              AND assignment_student_visibilities.user_id IN (%s)
-              AND assignment_student_visibilities.course_id IN (%s)
-              AND content_type = 'Assignment')
-        OR (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
-              AND assignment_student_visibilities.user_id IN (%s)
-              AND assignment_student_visibilities.course_id IN (%s)
-              AND content_type = 'DiscussionTopic'))
-    SQL
+    for_non_differentiable_classes(user_ids, course_ids).union(
+    for_non_differentiable_discussions(user_ids, course_ids),
+    for_differentiable_assignments(user_ids, course_ids),
+    for_differentiable_discussions(user_ids, course_ids),
+    for_differentiable_quizzes(user_ids, course_ids))
   }
 
-  # must join with ON's (rather than where's) to avoid sequence scans
-  scope :includes_quiz_visibilities, lambda { |user_ids, course_ids|
-    user_ids = Array.wrap(user_ids).join(',')
-    course_ids = Array.wrap(course_ids).join(',')
-    joins(sanitize_sql_array([<<-SQL, user_ids, course_ids]))
-      LEFT JOIN quiz_student_visibilities
-        ON (quiz_student_visibilities.quiz_id = content_tags.content_id
-          AND quiz_student_visibilities.user_id IN (%s)
-          AND quiz_student_visibilities.course_id IN (%s)
-          AND content_type IN ('Quiz','Quizzes::Quiz'))
-    SQL
+  scope :for_non_differentiable_classes, lambda {|user_ids, course_ids|
+    where("content_tags.content_type NOT IN ('Assignment','DiscussionTopic', 'Quiz','Quizzes::Quiz' ) AND content_tags.context_id IN (?)",course_ids)
+  }
+
+  scope :for_non_differentiable_discussions, lambda {|user_ids, course_ids|
+    joins("JOIN discussion_topics as dt ON dt.id = content_tags.content_id").
+    where("content_tags.context_id IN (?)
+           AND content_tags.content_type = 'DiscussionTopic'
+           AND dt.assignment_id IS NULL",course_ids)
+  }
+
+  scope :for_differentiable_assignments, lambda {|user_ids, course_ids|
+    joins("JOIN quiz_student_visibilities as qsv ON qsv.quiz_id = content_tags.content_id").
+    where(" content_tags.context_id IN (?)
+           AND qsv.course_id IN (?)
+           AND content_tags.content_type in ('Quiz', 'Quizzes::Quiz')
+           AND qsv.user_id = ANY( '{?}'::INT8[] )
+      ",course_ids,course_ids,user_ids)
+  }
+
+  scope :for_differentiable_discussions, lambda {|user_ids, course_ids|
+    joins("JOIN assignment_student_visibilities as asv ON asv.assignment_id = content_tags.content_id").
+    where("content_tags.context_id IN (?)
+           AND asv.course_id IN (?)
+           AND content_tags.content_type = 'Assignment'
+           AND asv.user_id = ANY( '{?}'::INT8[] )
+      ",course_ids,course_ids,user_ids)
+  }
+
+  scope :for_differentiable_quizzes, lambda {|user_ids, course_ids|
+    joins("JOIN discussion_topics as dt ON dt.id = content_tags.content_id AND content_tags.content_type = 'DiscussionTopic'").
+    joins("JOIN assignment_student_visibilities as asv ON asv.assignment_id = dt.assignment_id").
+    where("content_tags.context_id IN (?)
+           AND asv.course_id IN (?)
+           AND content_tags.content_type = 'DiscussionTopic'
+           AND dt.assignment_id IS NOT NULL
+           AND asv.course_id IN (?)
+           AND asv.user_id = ANY( '{?}'::INT8[] )
+    ",course_ids,course_ids,course_ids,user_ids)
   }
 
   # only intended for learning outcome links

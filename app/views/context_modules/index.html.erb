@@ -6,11 +6,8 @@
     jammit_css :modules_next
     js_bundle :modules
   %>
-<% elsif @context.feature_enabled?(:draft_state) %>
-	<% jammit_css :context_modules2 %>
-  <%= render :partial => "context_modules/content_next" %>
 <% else %>
 	<% jammit_css :context_modules2 %>
-  <%= render :partial => "context_modules/content" %>
+  <%= render :partial => "context_modules/content_next" %>
 <% end %>
 

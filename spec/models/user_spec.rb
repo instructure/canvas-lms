@@ -1642,8 +1642,7 @@ describe User do
         expect(events.first.title).to eql 'test appointment'
       end
 
-      it "should not include unpublished assignments when draft_state is enabled" do
-        @course.enable_feature!(:draft_state)
+      it "should not include unpublished assignments" do
         as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
         as.publish
         as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
@@ -1679,8 +1678,7 @@ describe User do
         expect(events.second).to eq assignment
       end
 
-      it "doesn't show unpublished assignments if draft_state is enabled" do
-        @course.enable_feature!(:draft_state)
+      it "doesn't show unpublished assignments" do
         assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
         assignment.unpublish
         assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
@@ -1738,7 +1736,6 @@ describe User do
   describe "assignments_visibile_in_course" do
     before do
       @teacher_enrollment = course_with_teacher(:active_course => true)
-      @course.enable_feature!(:draft_state)
       @course_section = @course.course_sections.create
       @student1 = User.create
       @student2 = User.create
@@ -1895,9 +1892,8 @@ describe User do
       end
     end
 
-    it "should not include unpublished assignments when draft_state is enabled" do
+    it "should not include unpublished assignments" do
       course_with_student_logged_in(:active_all => true)
-      @course.enable_feature!(:draft_state)
       assignment_quiz([], :course => @course, :user => @user)
       @assignment.unpublish
       @quiz.unlock_at = 1.hour.ago

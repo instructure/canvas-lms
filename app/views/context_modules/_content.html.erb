@@ -17,8 +17,12 @@
 
   <% if can_do(@context, @current_user, :manage_content) %>
     <div class="context-modules-main-toolbar">
-      <button class="btn btn-small module_progressions_link"><%= t('links.student_progress', 'View Progress') %></button>
-      <button class="btn btn-small btn-primary add_module_link"><%= t('#context_modules.buttons.add_module', 'Create a Module') %></button>
+      <button class="btn module_progressions_link"><%= t('links.student_progress', 'View Progress') %></button>
+      <button class="btn btn-primary add_module_link">
+        <i class="icon-plus" role="presentation"></i> 
+        <span class="screenreader-only">Add</span>
+        <%= t('#context_modules.buttons.add_module', 'Module') %>
+      </button>
     </div>
   <% end %>
 </div>

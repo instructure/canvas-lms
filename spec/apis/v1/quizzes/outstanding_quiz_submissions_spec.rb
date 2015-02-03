@@ -19,10 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
-
   describe "GET /courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions [index]" do
     def api_index(options={}, data={})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/outstanding_quiz_submissions"

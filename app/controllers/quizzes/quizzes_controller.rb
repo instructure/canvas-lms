@@ -700,6 +700,10 @@ class Quizzes::QuizzesController < ApplicationController
       submission = @quiz.quiz_submissions.where(temporary_user_code: user_code).first
     end
 
+    if submission
+      submission.ensure_question_reference_integrity!
+    end
+
     submission
   end
 

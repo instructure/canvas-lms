@@ -54,7 +54,6 @@
 // remove `.ui-widget-content .ui-state-active`, because it caused these styles to override styles we actually want (like btn) ... otherwise you get ugly blue kylemenus when activated inside another widget (e.g tabs)
 .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid $borderColorActive; color: $fcActive; background: $bgColorActive;
   @include vertical-gradient($gradientTopActive, $gradientBottomActive);
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: $fcActive; text-decoration: none; }
 .ui-widget :active { outline: none; }

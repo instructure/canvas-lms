@@ -74,6 +74,10 @@ module Canvas
         @map ||= Canvas::RequireJs::ClientAppExtension.map.to_json
       end
 
+      def bundles
+        @bundles ||= Canvas::RequireJs::ClientAppExtension.bundles.to_json
+      end
+
       def packages
         @packages ||= [
           {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax/dist/amd'},

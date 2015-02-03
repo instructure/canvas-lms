@@ -55,7 +55,7 @@
 
           <% if @user != @current_user && @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account) %>
             <%= "|" unless first %><% first = false %>
-            <% if @context && !@context.is_a?(Account) %>
+            <% if @context && !@context.is_a?(Account) && !@context.is_a?(User) %>
               <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>
             <% else %>
               <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>

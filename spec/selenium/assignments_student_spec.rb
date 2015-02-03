@@ -11,7 +11,6 @@ describe "assignments" do
     end
 
     before do
-      Account.default.enable_feature!(:draft_state)
       @due_date = Time.now.utc + 2.days
       @assignment = @course.assignments.create!(:title => 'default assignment', :name => 'default assignment', :due_at => @due_date)
     end

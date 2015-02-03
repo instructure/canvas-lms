@@ -1,0 +1,9 @@
+- name: Template passenger.conf
+  sudo: yes
+  template: src=passenger.conf dest=/etc/apache2/mods-available/passenger.conf backup=yes force=yes
+
+- name: Enable passenger
+  sudo: yes
+  command: a2enmod {{item}}
+  with_items:
+    - passenger

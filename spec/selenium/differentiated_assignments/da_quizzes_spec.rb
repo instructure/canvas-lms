@@ -20,7 +20,7 @@ describe "interaction with differentiated quizzes" do
         expect(f(".ig-empty-msg")).to include_text("No quizzes available")
       end
       it "should show quizzes with an override" do
-        create_section_override_for_assignment(@da_quiz.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz.assignment)
         get "/courses/#{@course.id}/assignments"
         expect(f("#assignment_group_upcoming")).to include_text(@da_quiz.title)
         get "/courses/#{@course.id}/quizzes"
@@ -43,7 +43,7 @@ describe "interaction with differentiated quizzes" do
         expect(driver.current_url).to match %r{/courses/\d+/quizzes}
       end
       it "should show the quiz page with an override" do
-        create_section_override_for_assignment(@da_quiz.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz.assignment)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
       end
@@ -53,7 +53,7 @@ describe "interaction with differentiated quizzes" do
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
       end
       it "should show previous submissions on inaccessible quizzes" do
-        create_section_override_for_assignment(@da_quiz, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz)
         submit_quiz(@da_quiz)
         # destroy the override and automatically generated grade providing visibility to the current student
         AssignmentOverride.find(@da_quiz.assignment_overrides.first!).destroy
@@ -66,11 +66,20 @@ describe "interaction with differentiated quizzes" do
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}/submissions/#{@da_quiz.quiz_submissions.first!.id}"
         keep_trying_until { expect(f("#flash_message_holder")).to include_text("This quiz will no longer count towards your grade.") }
       end
+      it "should not allow you the quiz to be taken if visibility has been revoked" do
+        create_section_override_for_assignment(@da_quiz)
+        submit_quiz(@da_quiz)
+        AssignmentOverride.find(@da_quiz.assignment_overrides.first!).destroy
+        @da_quiz.assignment.grade_student(@user, {:grade => nil})
+        create_section_override_for_assignment(@da_quiz, course_section: @section1)
+        get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
+        expect(f(".take_quiz_link")).to be nil
+      end
     end
 
     context "Student Grades page" do
       it "should show a quiz with an override" do
-        create_section_override_for_assignment(@da_quiz.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz.assignment)
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_quiz.title)
       end
@@ -102,7 +111,7 @@ describe "interaction with differentiated quizzes" do
         expect(f(".ig-empty-msg")).to include_text("No quizzes available")
       end
       it "should show quizzes with an override" do
-        create_section_override_for_assignment(@da_quiz.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz.assignment)
         get "/courses/#{@course.id}/assignments"
         expect(f("#assignment_group_upcoming")).to include_text(@da_quiz.title)
         get "/courses/#{@course.id}/quizzes"
@@ -125,7 +134,7 @@ describe "interaction with differentiated quizzes" do
         expect(driver.current_url).to match %r{/courses/\d+/quizzes}
       end
       it "should show the quiz page with an override" do
-        create_section_override_for_assignment(@da_quiz.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz.assignment)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
       end
@@ -135,7 +144,7 @@ describe "interaction with differentiated quizzes" do
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
       end
       it "should show previous submissions on inaccessible quizzes" do
-        create_section_override_for_assignment(@da_quiz, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz)
         user_session(@student)
         submit_quiz(@da_quiz)
         user_session(@observer)
@@ -154,7 +163,7 @@ describe "interaction with differentiated quizzes" do
 
     context "Student Grades page" do
       it "should show a quiz with an override" do
-        create_section_override_for_assignment(@da_quiz.assignment, course_section: @other_section)
+        create_section_override_for_assignment(@da_quiz.assignment)
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_quiz.title)
       end

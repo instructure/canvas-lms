@@ -17,6 +17,7 @@ class ChoiceInteraction < AssessmentItemConverter
     attach_feedback_values(answers_hash.values)
     set_question_type
     get_feedback
+    process_true_false_question
     process_either_or_question
     @question
   end
@@ -25,6 +26,26 @@ class ChoiceInteraction < AssessmentItemConverter
 
   def is_either_or
     @migration_type =~ /either\/or/i
+  end
+
+  def process_true_false_question
+    # ensure that the answers have a consistent format with our own
+    if @question[:question_type] == "true_false_question"
+      valid = false
+      if @question[:answers].count == 2
+        true_answer = @question[:answers].detect{|a| a[:text] =~ /true/i }
+        false_answer = @question[:answers].detect{|a| a != true_answer && a[:text] =~ /false/i }
+
+        if true_answer && false_answer
+          valid = true
+          true_answer[:text] = "True"
+          false_answer[:text] = "False"
+          @question[:answers] = [true_answer, false_answer]
+        end
+      end
+
+      @question[:question_type] = 'multiple_choice_question' unless valid
+    end
   end
 
   def process_either_or_question
@@ -54,7 +75,7 @@ class ChoiceInteraction < AssessmentItemConverter
         end
       end
     end
-    
+
     if correct_answers == 0
       @question[:import_error] = "The importer couldn't determine the correct answers for this question."
     end

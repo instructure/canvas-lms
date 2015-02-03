@@ -463,6 +463,23 @@ RSpec.configure do |config|
     @account
   end
 
+  def course_with_grading_periods
+    course_with_student_logged_in
+    @course.root_account.set_feature_flag!(:multiple_grading_periods, 'on')
+    grading_period_group = @course.grading_period_groups.create!()
+    account_admin_user(account: @course.account)
+    user_session(@admin)
+    now = Time.zone.now
+    gps = 3.times.map do |n|
+      grading_period_group.
+        grading_periods.create!(weight: 50, start_date: n.month.since(now),
+                                end_date: (n+1).month.since(now),
+                                title: "Grading Period #{n+1}")
+    end
+    gps.last.destroy
+    @course
+  end
+
   def course(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
@@ -475,10 +492,6 @@ RSpec.configure do |config|
         e.workflow_state = 'active'
         e.save!
         @teacher = u
-      end
-      if opts[:draft_state]
-        account.allow_feature!(:draft_state)
-        @course.enable_feature!(:draft_state)
       end
       if opts[:differentiated_assignments]
         account.allow_feature!(:differentiated_assignments)
@@ -673,16 +686,6 @@ RSpec.configure do |config|
       submission = assignment.submissions.create!(:assignment_id => assignment.id, :user_id => @student.id)
       submission.update_attributes!(score: '5') if opts[:submission_points]
     end
-  end
-
-  def set_course_draft_state(enabled=true, opts={})
-    course = opts[:course] || @course
-    account = opts[:account] || course.account
-
-    account.allow_feature!(:draft_state)
-    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
-
-    enabled
   end
 
   def add_section(section_name)

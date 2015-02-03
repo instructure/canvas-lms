@@ -1,0 +1,12 @@
+test:
+  domain: localhost
+
+development:
+  domain: {{ansible_fqdn}}
+  ssl: false
+  files_domain: "files.{{ansible_fqdn}}"
+
+production:
+  domain: {{ansible_fqdn}}
+  ssl: false
+  files_domain: "files.{{ansible_fqdn}}"

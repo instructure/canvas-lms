@@ -19,14 +19,14 @@
 <% js_bundle :edit_rubric %>
 <% jammit_css :learning_outcomes %>
 <% content_for :stylesheets do %>
-<style>
-#rubrics .find_rubric_link {
-  display: none;
-}
-#rubrics .rubric_title .links {
-  display: none;
-}
-</style>
+  <style>
+    #rubrics .find_rubric_link {
+      display: none;
+    }
+    #rubrics .rubric_title .links {
+      display: none;
+    }
+  </style>
 <% end %>
 <% js_bundle 'legacy/rubrics_show' %>
 <h2><%= @actual_rubric.title %></h2>

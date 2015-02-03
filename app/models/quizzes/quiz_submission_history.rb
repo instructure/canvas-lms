@@ -43,6 +43,14 @@ class Quizzes::QuizSubmissionHistory
     last_versions.map { |version| version.model }
   end
 
+  def model_for(attempt)
+    if attempt == @submission.attempt
+      @submission
+    else
+      version_models.detect {|qs| qs.attempt == attempt }
+    end
+  end
+
   def kept
     @kept ||= begin
       if @submission.score == @submission.kept_score

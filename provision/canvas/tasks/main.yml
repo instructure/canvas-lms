@@ -1,0 +1,84 @@
+- name: template config files
+  template: src={{item}} dest=/vagrant/config force=yes
+  with_fileglob:
+    - ../templates/*.yml
+
+- name: stop apache2
+  service: name=apache2 state=stopped
+
+- name: stop jobs
+  service: name=canvas_init state=stopped
+  ignore_errors: yes
+
+- name: wait for all vendor/bundle files to close
+  shell: lsof | grep "vendor/bundle" | wc -l
+  register: lsof_output
+  ignore_errors: true
+  until: lsof_output.stdout.find("0") != -1
+  retries: 10
+  delay: 5
+
+- name: delete vendor/bundle
+  file: path=/vagrant/vendor/bundle state=absent force=yes
+
+- name: delete Gemfile.lock
+  file: path=/vagrant/Gemfile.lock state=absent
+
+- name: bundle install
+  sudo: no
+  remote_user: vagrant
+  shell: >
+    bundle install --path=vendor/bundle --without=sqlite mysql
+  args:
+    chdir: /vagrant
+
+- name: disable npm spinner
+  shell: >
+      npm config set spin=false
+  remote_user: vagrant
+  sudo: no
+
+- name: npm install
+  shell: npm install
+  args:
+    chdir: /vagrant
+  remote_user: vagrant
+  sudo: no
+
+- name: compile assets
+  shell: RAILS_ENV=production bundle exec rake canvas:compile_assets[false]
+  args:
+    chdir: /vagrant
+  remote_user: vagrant
+  sudo: no
+
+- name: init databases
+  shell: RAILS_ENV=production CANVAS_LMS_ADMIN_EMAIL="{{canvas_admin_email}}" CANVAS_LMS_ADMIN_PASSWORD="{{canvas_admin_password}}" CANVAS_LMS_ACCOUNT_NAME="{{canvas_account_name}}" CANVAS_LMS_STATS_COLLECTION=opt_out bundle exec rake db:initial_setup && touch /home/vagrant/CanvasDBSetupDone
+  remote_user: vagrant
+  sudo: no
+  args:
+    chdir: /vagrant
+    creates: /home/vagrant/CanvasDBSetupDone
+
+- name: db migrate
+  shell: RAILS_ENV=production bundle exec rake db:migrate
+  args:
+    chdir: /vagrant
+
+- name: load notifications
+  shell: RAILS_ENV=production bundle exec rake db:load_notifications
+  args:
+    chdir: /vagrant
+
+- name: symlink canvas_init script
+  sudo: yes
+  file:
+    src=/vagrant/script/canvas_init
+    dest=/etc/init.d/canvas_init
+    state=link
+  notify:
+    - canvas_init restart
+
+- name: update-rc.d canvas_init
+  sudo: yes
+  shell: update-rc.d canvas_init defaults

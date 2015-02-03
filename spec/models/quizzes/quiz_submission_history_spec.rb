@@ -20,9 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmissionHistory do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   context "submissions with history" do
     before :once do
@@ -96,6 +93,26 @@ describe Quizzes::QuizSubmissionHistory do
         expect(models.length).to eq 2
 
         expect(attempts.kept).to eq models.first
+      end
+    end
+
+    describe "#model_for" do
+      it "should return model for the current attempt" do
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+        expect(attempts.length).to eq 2
+
+        qs = attempts.model_for(@submission.attempt)
+        expect(qs.attempt).to eq 2
+        expect(qs).to be_a(Quizzes::QuizSubmission)
+      end
+
+      it "should return model for previous attempts" do
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+        expect(attempts.length).to eq 2
+
+        qs = attempts.model_for(1)
+        expect(qs.attempt).to eq 1
+        expect(qs).to be_a(Quizzes::QuizSubmission)
       end
     end
   end

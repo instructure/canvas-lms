@@ -25,15 +25,16 @@
       {{/if}}
     </div>
     <div class="headerBar-left form-inline index_view_filter_form">
-      <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
       <input id="searchTerm"
-             placeholder="{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}"
+             placeholder="{{t "Search title, body, or author"}}"
+             aria-label="{{t "Search title, body, or author"}}"
              value="{{searchTerm}}"
              type="search">
       <span id="discussionsFilter">
         <input type="checkbox"
                id="onlyUnread"
-               {{#if onlyUnread}}checked{{/if}} /><label for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+               aria-label="{{t "filter announcements by unread"}}"
+               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
       </span>
     </div>
   </div>

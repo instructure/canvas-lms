@@ -51,7 +51,6 @@ define [
 
     toggleItemSelected: (item, event, cb) ->
       return if event and $(event.target).closest(@multiselectIgnoredElements).length
-      event?.preventDefault()
 
       return @selectRange(item) if event?.shiftKey
 
@@ -70,4 +69,3 @@ define [
 
       @setState {selectedItems: selectedItems}, ->
         cb?()
-

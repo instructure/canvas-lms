@@ -1,10 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 
 describe Quizzes::QuizRegrader::Regrader do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
-
 
   before { Timecop.freeze(Time.local(2013)) }
   after { Timecop.return }

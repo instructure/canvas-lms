@@ -7,7 +7,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     before (:each) do
       course_with_teacher_logged_in
-      set_course_draft_state
     end
 
     def wysiwyg_state_setup(text = "<p>1</p><p>2</p><p>3</p>", val = false)

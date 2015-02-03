@@ -1,0 +1,34 @@
+- name: Install postgresql
+  sudo: yes
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - postgresql
+    - libpq-dev # Required for Ansible to interact with postgres
+    - python-psycopg2 # Required for Ansible to interact with postgres
+
+- name: Copy pg_hba.conf
+  sudo: yes
+  copy: src=pg_hba.conf dest=/etc/postgresql/9.3/main/pg_hba.conf force=yes
+  notify:
+    - Restart Postgres
+
+- name: Create databases
+  sudo: yes
+  sudo_user: postgres
+  with_items:
+    - "{{canvas_database_name}}"
+    - "{{canvas_queue_database_name}}"
+  postgresql_db: name={{ item }}
+
+- name: Create database user
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: name={{ canvas_database_user }} password={{ canvas_database_password }} state=present role_attr_flags=NOSUPERUSER,CREATEDB
+
+- name: Provide database user with permissions
+  sudo: yes
+  sudo_user: postgres
+  with_items:
+    - "{{canvas_database_name}}"
+    - "{{canvas_queue_database_name}}"
+  postgresql_user: user={{ canvas_database_user }} db={{ item }} priv=ALL

@@ -19,9 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::MatchGroup do
-  before :once do
-    Account.default.enable_feature!(:draft_state)
-  end
 
   describe '#add' do
     let(:properties) do

@@ -10,7 +10,7 @@
 # passed to Delayed::Periodic.cron
 
 Rails.configuration.after_initialize do
-  if Rails.configuration.session_store == ActiveRecord::SessionStore
+  if defined?(ActiveRecord::SessionStore) && Rails.configuration.session_store == ActiveRecord::SessionStore
     expire_after = (ConfigFile.load("session_store") || {})[:expire_after]
     expire_after ||= 1.day
 
