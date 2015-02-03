@@ -76,7 +76,7 @@
   <p style="margin: 0px;"><%= t :attached_files, "Attached Files:" %></p>
   <ul style="padding-left: 20px;">
     <% asset.attachments.each do |attachment| %>
-    <li><%= attachment.display_name %> - <%= attachment.readable_size %> <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download?verifier=<%= attachment.uuid %>">[<%= t :download, "download" %>] %></a></li>
+    <li><%= attachment.display_name %> - <%= attachment.readable_size %> <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download?verifier=<%= attachment.uuid %>">[<%= t :download, "download" %>]</a></li>
     <% end %>
   </ul>
 </div>
