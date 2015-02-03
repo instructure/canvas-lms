@@ -28,7 +28,7 @@ module Canvas
       raw_conn = factory.create(servers.map { |s|
         # convert string addresses to options hash, and disable redis-cache's
         # built-in marshalling code
-        url_to_redis_options(s).merge(:marshalling => false).merge(options || {})
+        url_to_redis_options(s).merge(options || {})
       })
       ::Canvas::RedisWrapper.new(raw_conn)
     end
