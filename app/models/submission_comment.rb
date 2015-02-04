@@ -227,7 +227,6 @@ class SubmissionComment < ActiveRecord::Base
   scope :visible, -> { where(:hidden => false) }
 
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
-  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks

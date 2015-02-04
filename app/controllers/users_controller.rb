@@ -1685,12 +1685,9 @@ class UsersController < ApplicationController
     student_enrollments.each { |e| data[e.user.id] = { :enrollment => e, :ungraded => [] } }
 
     # find last interactions
-    last_comment_dates = SubmissionComment.for_context(course).
-        group(:recipient_id).
-        where("author_id = ? AND recipient_id IN (?)", teacher, ids).
-        maximum(:created_at)
-    last_comment_dates.each do |user_id, date|
-      next unless student = data[user_id]
+    last_comment_dates = SubmissionCommentInteraction.in_course_between(course, teacher.id, ids)
+    last_comment_dates.each do |(user_id, author_id), date|
+      next unless student = data[user_id.to_i]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.
