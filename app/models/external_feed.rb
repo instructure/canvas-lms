@@ -105,7 +105,7 @@ class ExternalFeed < ActiveRecord::Base
       return nil if (date && self.created_at > date rescue false)
       description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.description || item.title)
-      entry = self.external_feed_entries.create(
+      entry = self.external_feed_entries.new(
         :title => item.title,
         :message => description,
         :source_name => feed.channel.title,
@@ -115,6 +115,7 @@ class ExternalFeed < ActiveRecord::Base
         :url => item.link,
         :uuid => uuid
       )
+      return entry if entry.save
     elsif feed_type == :atom
       uuid = item.id || Digest::MD5.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
       entry = self.external_feed_entries.where(uuid: uuid).first
@@ -140,7 +141,7 @@ class ExternalFeed < ActiveRecord::Base
       author = item.authors.first || OpenObject.new
       description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.content || item.title)
-      entry = self.external_feed_entries.create(
+      entry = self.external_feed_entries.new(
         :title => item.title,
         :message => description,
         :source_name => feed.title,
@@ -153,6 +154,7 @@ class ExternalFeed < ActiveRecord::Base
         :author_email => author.email,
         :uuid => uuid
       )
+      return entry if entry.save
     end
   end
 end
