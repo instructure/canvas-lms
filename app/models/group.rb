@@ -81,6 +81,8 @@ class Group < ActiveRecord::Base
   before_save :maintain_category_attribute
   before_save :update_max_membership_from_group_category
 
+  after_create :refresh_group_discussion_topics
+
   delegate :time_zone, :to => :context
 
   include StickySisFields
@@ -97,6 +99,12 @@ class Group < ActiveRecord::Base
   validates_each :max_membership do |record, attr, value|
     next if value.nil?
     record.errors.add attr, t(:greater_than_1, "Must be greater than 1") unless value.to_i > 1
+  end
+
+  def refresh_group_discussion_topics
+    if self.group_category
+      self.group_category.discussion_topics.active.each(&:update_subtopics)
+    end
   end
 
   alias_method :participating_users_association, :participating_users

@@ -533,6 +533,18 @@ describe DiscussionTopic do
       expect(@topic.reload.child_topics).to be_empty
     end
 
+    it "should refresh when groups are added to a group_category" do
+      group_category = @course.group_categories.create!(:name => "category")
+
+      topic = @course.discussion_topics.build(:title => "topic")
+      topic.group_category = group_category
+      topic.save!
+
+      group = @course.groups.create!(:name => "group 1", :group_category => group_category)
+      expect(topic.reload.child_topics.size).to eq 1
+      expect(group.reload.discussion_topics.size).to eq 1
+    end
+
     context "in a group discussion" do
       before :once do
         group_discussion_assignment
