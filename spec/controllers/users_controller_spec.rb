@@ -1036,4 +1036,17 @@ describe UsersController do
       post "create"
     end
   end
+
+  describe "teacher_activity" do
+    it "finds submission comment interaction" do
+      course_with_student_submissions
+      sub = @course.assignments.first.submissions.
+        where(user_id: @student).first
+      sub.add_comment(comment: 'hi', author: @teacher)
+
+      get 'teacher_activity', user_id: @teacher.id, course_id: @course.id
+
+      expect(assigns[:courses][@course][0]['last_interaction']).not_to be_nil
+    end
+  end
 end
