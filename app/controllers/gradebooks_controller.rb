@@ -48,9 +48,16 @@ class GradebooksController < ApplicationController
       if @presenter.student
         add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
 
+        gp_id = nil
+        if multiple_grading_periods?
+          set_current_grading_period
+          @grading_periods = get_grading_periods
+          gp_id = @current_grading_period_id unless view_all_grading_periods?
+        end
+
         Shackles.activate(:slave) do
           #run these queries on the slave database for speed
-          @presenter.assignments
+          @presenter.assignments(gp_id)
           @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
           @presenter.submissions
           @presenter.submission_counts
@@ -177,9 +184,14 @@ class GradebooksController < ApplicationController
 
   def set_current_grading_period
     unless @current_grading_period_id = params[:grading_period_id]
+      return if view_all_grading_periods?
       return unless current = @context.grading_periods.active.current
-      @current_grading_period_id = current.first.try(:id)
+      @current_grading_period_id = current.first.try(:id).to_s
     end
+  end
+
+  def view_all_grading_periods?
+    @current_grading_period_id == "0"
   end
 
   def get_grading_periods
