@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= course_quiz_history_path(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.quiz.context) %>/<%= course_quiz_history_path(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
 <% end %>
 
 <% define_content :subject do %>
