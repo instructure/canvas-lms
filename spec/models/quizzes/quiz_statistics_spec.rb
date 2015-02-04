@@ -136,7 +136,7 @@ describe Quizzes::QuizStatistics do
   end
 
   describe 'self#large_quiz?' do
-    let :quiz_questions do
+    let :active_quiz_questions do
       Object.new.tap { |o| o.stubs(size: 50) }
     end
 
@@ -146,7 +146,7 @@ describe Quizzes::QuizStatistics do
 
     let :quiz do
       Quizzes::Quiz.new.tap do |quiz|
-        quiz.stubs(:quiz_questions).returns(quiz_questions)
+        quiz.stubs(:active_quiz_questions).returns(active_quiz_questions)
         quiz.stubs(:quiz_submissions).returns(quiz_submissions)
       end
     end
