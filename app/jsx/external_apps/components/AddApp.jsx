@@ -115,7 +115,11 @@ define([
 
       var queryParams = {};
       _.map(this.state.fields, function(v, k) {
-        queryParams[k] = v.value;
+        if(v.type == "checkbox") {
+          if(!v.value) return;
+          queryParams[k] = '1';
+        } else
+          queryParams[k] = v.value;
       });
       delete queryParams['consumer_key'];
       delete queryParams['shared_secret'];
@@ -139,6 +143,7 @@ define([
 
       newTool.set('config_url', this.configUrl());
       newTool.set('config_type', 'by_url');
+      newTool.set('name', this.state.fields.name.value);
 
       $(e.target).attr('disabled', 'disabled');
 
@@ -162,7 +167,8 @@ define([
     configOptions() {
       return _.map(this.state.fields, function(v, k) {
         return (
-          <ConfigOptionField name={k}
+          <ConfigOptionField
+            name={k}
             type={v.type}
             ref={'option_' + k}
             key={'option_' + k}

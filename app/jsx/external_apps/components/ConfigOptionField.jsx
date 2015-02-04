@@ -17,11 +17,12 @@ define([
     },
 
     checkbox() {
+      var checked = this.props.value ? "checked" : "";
       return (
         <div className="grid-row">
           <div className="col-xs-12">
             <label className="checkbox">
-              <input type="checkbox" data-rel={this.props.name} onChange={this.props.handleChange} /> {this.props.description}
+              <input type="checkbox" name={this.props.name}  data-rel={this.props.name} onChange={this.props.handleChange} checked={checked}/> {this.props.description}
             </label>
           </div>
         </div>
@@ -40,6 +41,7 @@ define([
                 defaultValue={this.props.value}
                 required={this.props.required}
                 data-rel={this.props.name}
+                name={this.props.name}
                 onChange={this.props.handleChange} />
             </label>
           </div>
