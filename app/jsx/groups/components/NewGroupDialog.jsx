@@ -20,7 +20,7 @@ define([
     getInitialState() {
       return {
         userCollection: this.props.userCollection,
-        checked: this.props.checked,
+        checked: [],
         name: '',
         joinLevel: 'parent_context_auto_join'
       };
@@ -57,13 +57,13 @@ define([
                 <tr>
                   <td><label htmlFor="group_name">{I18n.t('Group Name')}</label></td>
                   <td>
-                    <input ref="nameInput" type="text" name="name" maxLength="200" valueLink={this.linkState('name')}/>
+                    <input id="groupName" ref="nameInput" type="text" name="name" maxLength="200" valueLink={this.linkState('name')}/>
                   </td>
                 </tr>
                 <tr>
                   <td><label htmlFor="">{I18n.t('Joining')}</label></td>
                   <td>
-                    <select valueLink={this.linkState('joinLevel')}>
+                    <select id="joinLevelSelect" valueLink={this.linkState('joinLevel')}>
                       <option value="parent_context_auto_join">{I18n.t('Course members are free to join')}</option>
                       <option value="invitation_only">{I18n.t('Membership by invitation only')}</option>
                     </select>
