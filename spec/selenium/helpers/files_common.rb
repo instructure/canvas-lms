@@ -31,6 +31,18 @@ def download_from_preview
   f('.icon-download').click
 end
 
+def delete_from_cog
+  ff('.al-trigger')[0].click
+  fln("Delete").click
+  confirm_delete_on_dialog
+end
+
+def delete_from_toolbar
+  ff('.ef-item-row')[0].click
+  f('.btn-delete').click
+  confirm_delete_on_dialog
+end
+
 def should_make_folders_in_the_menu_droppable
   course_with_teacher_logged_in
   get "/files"
@@ -128,11 +140,28 @@ def unzip_into_folder_drag_and_drop
 end
 
 def confirm_delete_on_dialog
-    driver.switch_to.alert.accept
+  driver.switch_to.alert.accept
+  wait_for_ajaximations
 end
 
 def cancel_delete_on_dialog
-    driver.switch_to.alert.dismiss
+  driver.switch_to.alert.dismiss
+  wait_for_ajaximations
+end
+
+def add_folder(name = 'new folder')
+  click_new_folder_button
+  new_folder = f("input.input-block-level")
+  new_folder.send_keys(name)
+  new_folder.send_keys(:return)
+  wait_for_ajaximations
+end
+
+def click_new_folder_button
+  keep_trying_until do
+    f(".btn-add-folder").click
+    wait_for_ajaximations
+  end
 end
 
 def create_new_folder

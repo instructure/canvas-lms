@@ -11,9 +11,27 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
         get "/courses/#{@course.id}/files"
       end
 
-        it "should display new files UI" do
-          keep_trying_until { expect(f('.btn-upload')).to be_displayed }
-        end
+      it "should display new files UI" do
+        keep_trying_until { expect(f('.btn-upload')).to be_displayed }
+      end
+
+      it "should display the new folder form" do
+        click_new_folder_button
+        expect(f("form.ef-edit-name-form")).to be_displayed
+      end
+
+      it "should create a new folder" do
+        folder_name = "new test folder"
+        add_folder(folder_name)
+        expect(fln(folder_name)).to be_present
+      end
+
+      it "should delete a folder from cog menu" do
+        folder_name = "folder to be deleted"
+        add_folder(folder_name)
+        delete_from_cog
+        expect(fln(folder_name)).not_to be_present
+      end
    end
 
    context "File Downloads", :priority => "2" do
