@@ -420,6 +420,10 @@ class ApplicationController < ActionController::Base
     return @context != nil
   end
 
+  def require_context_and_read_access
+    return require_context && authorized_action(@context, @current_user, :read)
+  end
+
   helper_method :clean_return_to
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3

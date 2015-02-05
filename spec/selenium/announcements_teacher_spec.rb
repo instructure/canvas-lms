@@ -201,7 +201,7 @@ describe "announcements" do
     end
 
     it "should remove delayed_post_at when unchecking delay_posting" do
-      topic = announcement_model(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago)
+      topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
 
