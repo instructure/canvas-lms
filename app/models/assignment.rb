@@ -1165,7 +1165,7 @@ class Assignment < ActiveRecord::Base
         })
         homework.submitted_at = Time.now
 
-        homework.with_versioning(:explicit => true) do
+        homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             if student == original_student
               homework.broadcast_group_submission
