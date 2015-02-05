@@ -782,7 +782,13 @@ describe ConversationsController, type: :request do
                 "forwarded_messages" => [
                   {
                           "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [],
-                          "attachments" => [{'filename' => attachment.filename, 'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png', 'id' => attachment.id, 'size' => attachment.size,
+                          "attachments" => [{'filename' => attachment.filename,
+                                             'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
+                                             'content-type' => 'image/png',
+                                             'display_name' => 'test my file? hai!&.png',
+                                             'id' => attachment.id,
+                                             'folder_id' => attachment.folder_id,
+                                             'size' => attachment.size,
                                              'unlock_at' => nil,
                                              'locked' => false,
                                              'hidden' => false,
@@ -962,6 +968,7 @@ describe ConversationsController, type: :request do
                 "content-type" => "unknown/unknown",
                 "display_name" => "test.txt",
                 "id" => attachment.id,
+                "folder_id" => attachment.folder_id,
                 "size" => attachment.size,
                 'unlock_at' => nil,
                 'locked' => false,

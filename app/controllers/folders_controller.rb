@@ -115,14 +115,14 @@ class FoldersController < ApplicationController
     end
   end
 
-  
+
   # @API List folders
   # @subtopic Folders
   # Returns the paginated list of folders in the folder.
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns [Folder]
@@ -142,6 +142,38 @@ class FoldersController < ApplicationController
       end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
+    end
+  end
+
+  # @API List all folders
+  # @subtopic Folders
+  # Returns the paginated list of all folders for the given context. This will
+  # be returned as a flat list containing all subfolders as well.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/folders' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Folder]
+  def list_all_folders
+    if authorized_action(@context, @current_user, :read)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+
+      url = named_context_url(@context, :api_v1_context_folders_url, include_host: true)
+
+      scope = @context.active_folders
+      unless can_manage_files
+        scope = scope.not_hidden.not_locked
+      end
+      if params[:sort_by] == 'position'
+        scope = scope.by_position
+      else
+        scope = scope.by_name
+      end
+
+      folders = Api.paginate(scope, self, url)
+      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
 
@@ -177,11 +209,11 @@ class FoldersController < ApplicationController
   # For example, you could get the root folder for a course like:
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
@@ -236,16 +268,16 @@ class FoldersController < ApplicationController
       end
     end
   end
-  
+
   def download
     if authorized_action(@context, @current_user, :read)
       @folder = @context.folders.find(params[:folder_id])
       user_id = @current_user && @current_user.id
-      
-      # Destroy any previous zip downloads that might exist for this folder, 
+
+      # Destroy any previous zip downloads that might exist for this folder,
       # except the last one (cause we might be able to use it)
       folder_filename = "#{t :folder_filename, "folder"}.zip"
-      
+
       @attachments = Attachment.where(context_id: @folder,
                                       context_type: @folder.class.to_s,
                                       display_name: folder_filename,
@@ -260,7 +292,7 @@ class FoldersController < ApplicationController
         @attachment.destroy!
         @attachment = nil
       end
-      
+
       if @attachment.nil?
         @attachment = @folder.file_attachments.build(:display_name => folder_filename)
         @attachment.user_id = user_id
@@ -320,9 +352,9 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \ 
-  #        -F 'name=<new_name>' \ 
-  #        -F 'locked=true' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \
+  #        -F 'name=<new_name>' \
+  #        -F 'locked=true' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
@@ -465,11 +497,11 @@ class FoldersController < ApplicationController
   def process_folder_params(parameters, api_request)
     folder_params = (api_request ? parameters : parameters[:folder]) || {}
     folder_params.slice(:name, :parent_folder_id, :parent_folder_path, :folder_id,
-                        :source_folder_id, :lock_at, :unlock_at, :locked, 
+                        :source_folder_id, :lock_at, :unlock_at, :locked,
                         :hidden, :context, :position, :just_hide)
   end
   private :process_folder_params
-  
+
   def destroy
     @folder = Folder.find(params[:id])
     if authorized_action(@folder, @current_user, :delete)
@@ -491,7 +523,7 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \
   #        -H 'Authorization: Bearer <token>'
   def api_destroy
     @folder = Folder.find(params[:id])

@@ -793,6 +793,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/course_copy/:id', controller: :content_imports, action: :copy_course_status, as: :course_copy_status
       get  'courses/:course_id/files', controller: :files, action: :api_index, as: 'course_files'
       post 'courses/:course_id/files', action: :create_file, as: 'course_create_file'
+      get 'courses/:course_id/folders', controller: :folders, action: :list_all_folders, as: 'course_folders'
       post 'courses/:course_id/folders', controller: :folders, action: :create
       get 'courses/:course_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'courses/:course_id/folders/by_path', controller: :folders, action: :resolve_path
@@ -1045,6 +1046,7 @@ CanvasRails::Application.routes.draw do
       post 'users/:user_id/files', action: :create_file
 
       get  'users/:user_id/files', controller: :files, action: :api_index, as: 'user_files'
+      get 'users/:user_id/folders', controller: :folders, action: :list_all_folders, as: 'user_folders'
       post 'users/:user_id/folders', controller: :folders, action: :create
       get 'users/:user_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'users/:user_id/folders/by_path', controller: :folders, action: :resolve_path
@@ -1223,6 +1225,7 @@ CanvasRails::Application.routes.draw do
       end
 
       get  'groups/:group_id/files', controller: :files, action: :api_index, as: 'group_files'
+      get 'groups/:group_id/folders', controller: :folders, action: :list_all_folders, as: 'group_folders'
       post 'groups/:group_id/folders', controller: :folders, action: :create
       get 'groups/:group_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'groups/:group_id/folders/by_path', controller: :folders, action: :resolve_path

@@ -71,6 +71,7 @@ module Api::V1::Attachment
 
     hash = {
       'id' => attachment.id,
+      'folder_id' => attachment.folder_id,
       'content-type' => attachment.content_type,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,

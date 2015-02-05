@@ -153,13 +153,13 @@ describe "Folders API", type: :request do
         json = api_call(:get,  "/api/v1/courses/#{@course.id}/folders/root", @folders_path_options.merge(:action => "show", :course_id => @course.id.to_param, :id => 'root'), {})
         expect(json['id']).to eq @root.id
       end
-      
+
       it "should get a folder in a context" do
         @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
         json = api_call(:get,  "/api/v1/courses/#{@course.id}/folders/#{@f1.id}", @folders_path_options.merge(:action => "show", :course_id => @course.id.to_param, :id => @f1.id.to_param), {})
         expect(json['id']).to eq @f1.id
       end
-      
+
       it "should 404 for a folder in a different context" do
         group_model(:context => @course)
         group_root = Folder.root_folders(@group).first
@@ -660,5 +660,95 @@ describe "Folders API", type: :request do
         expect(file.display_name).not_to eq(@file.display_name)
       end
     end
+  end
+
+  describe "#list_all_folders" do
+
+    def make_folders_in_context(context)
+      @root = Folder.root_folders(context).first
+      @f1 = @root.sub_folders.create!(:name => "folder1", :context => context , :position => 1)
+      @f2 = @root.sub_folders.create!(:name => "folder2" , :context => context, :position => 2)
+      @f3 = @f2.sub_folders.create!(:name => "folder2.1", :context => context, :position => 3)
+      @f4 = @f3.sub_folders.create!(:name => "folder2.1.1", :context => context, :position => 4)
+      @f5 = @f4.sub_folders.create!(:name => "folderlocked", :context => context, :position => 5, :locked => true)
+      @f6 = @f5.sub_folders.create!(:name => "folderhidden", :context => context, :position => 6, :hidden => true)
+    end
+
+    context "course" do
+
+      before :once do
+         course_with_teacher(active_all: true)
+         student_in_course(active_all: true)
+         make_folders_in_context @course
+       end
+
+      it "should list all folders in a course including subfolders" do
+        @user = @teacher
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
+                        {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param})
+        res = json.map{|f|f['name']}
+        expect(res).to eq %w{course\ files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked}
+      end
+
+      it "should not show hidden and locked files to unauthorized users" do
+        @user = @student
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
+                        {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param})
+        res = json.map{|f|f['name']}
+        expect(res).to eq %w{course\ files folder1 folder2 folder2.1 folder2.1.1}
+      end
+
+      it "should return a 401 for unauthorized users" do
+        @user = user(active_all: true)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
+                        {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param},
+                        {}, {}, {:expected_status => 401})
+      end
+
+      it "should paginate the folder list" do
+        @user = @teacher
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
+                        {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param, :per_page => 3})
+
+        expect(json.length).to eq 3
+        links = response.headers['Link'].split(",")
+        expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/folders/ }).to be_truthy
+        expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2&per_page=3>/
+        expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
+        expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
+                        {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param, :per_page => 3, :page => 3})
+        expect(json.length).to eq 1
+        links = response.headers['Link'].split(",")
+        expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/folders/ }).to be_truthy
+        expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=3>/
+        expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
+        expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+      end
+    end
+
+    context "group" do
+      it "should list all folders in a group including subfolders" do
+        group_with_user(active_all: true)
+        make_folders_in_context @group
+        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders",
+                        {:controller => "folders", :action => "list_all_folders", :format => "json", :group_id => @group.id.to_param})
+        res = json.map{|f|f['name']}
+        expect(res).to eq %w{files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked}
+      end
+    end
+
+    context "user" do
+      it "should list all folders owned by a user including subfolders" do
+        user(active_all: true)
+        make_folders_in_context @user
+        json = api_call(:get, "/api/v1/users/#{@user.id}/folders",
+                        {:controller => "folders", :action => "list_all_folders", :format => "json", :user_id => @user.id.to_param})
+        res = json.map{|f|f['name']}
+        expect(res).to eq %w{folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked my\ files}
+      end
+    end
+
   end
 end
