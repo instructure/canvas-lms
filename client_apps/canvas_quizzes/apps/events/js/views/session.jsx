@@ -33,9 +33,9 @@ define(function(require) {
               {' '}
 
               {Config.allowMatrixView &&
-                <a href="#/answer_matrix" className="btn btn-default">
+                <Link to="answer_matrix" className="btn btn-default" query={this.props.query}>
                   {I18n.t('buttons.table_view', 'View Table')}
-                </a>
+                </Link>
               }
             </div>
           </h1>
@@ -65,7 +65,6 @@ define(function(require) {
 
     renderAttemptLink: function(attempt) {
       var className = 'ic-AttemptController__Attempt';
-      var href = "/";
       var query = { attempt: attempt };
 
       if (attempt === this.props.attempt) {
@@ -74,7 +73,7 @@ define(function(require) {
 
       return (
         <Link
-          to={href}
+          to="app"
           query={query}
           key={"attempt-"+attempt}
           className={className}
