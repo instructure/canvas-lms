@@ -18,7 +18,8 @@
 
 class MarkDonePresenter
 
-  def initialize(course, content, user)
+  def initialize(ctrl, course, content, user)
+    @ctrl = ctrl
     @course = course
     @content = content
     @item = @course.context_modules.map do |i|
@@ -44,7 +45,9 @@ class MarkDonePresenter
   end
 
   def api_url
-    "/api/v1/courses/#{@course.id}/modules/#{@item.context_module_id}/items/#{@item.id}/done"
+    @ctrl.api_v1_course_context_module_item_done_path(:course_id => @course.id,
+                                                      :module_id => @item.context_module_id,
+                                                      :id => @item.id)
   end
 end
 
