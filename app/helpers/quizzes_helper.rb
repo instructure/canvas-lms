@@ -87,6 +87,8 @@ module QuizzesHelper
       I18n.t('Highest')
     when "keep_latest"
       I18n.t('Latest')
+    when "keep_average"
+      I18n.t('Average')
     end
   end
 
@@ -547,9 +549,14 @@ module QuizzesHelper
   end
 
   def score_to_keep_message(quiz=@quiz)
-    quiz.scoring_policy == "keep_highest" ?
-      I18n.t("Will keep the highest of all your scores") :
+    case quiz.scoring_policy
+    when "keep_highest"
+      I18n.t("Will keep the highest of all your scores") 
+    when "keep_latest"
       I18n.t("Will keep the latest of all your scores")
+    when "keep_average"
+      I18n.t("Will keep the average of all your scores")
+    end
   end
 
   def quiz_edit_text(quiz=@quiz)

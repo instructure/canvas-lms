@@ -410,6 +410,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def score_to_keep
     if self.quiz && self.quiz.scoring_policy == "keep_highest"
       highest_score_so_far
+    elsif self.quiz && self.quiz.scoring_policy == "keep_average"
+      average_score_so_far
     else # keep_latest
       latest_score
     end
@@ -439,17 +441,28 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     @assignment_submission.save! if @assignment_submission
   end
 
-  def highest_score_so_far(exclude_version_id=nil)
+  def scores_for_versions(exclude_version_id)
+    versions = self.versions.reload.reject { |v| v.id == exclude_version_id } rescue []
     scores = {}
     scores[attempt] = self.score if self.score
-
-    versions = self.versions.reload.reject { |v| v.id == exclude_version_id } rescue []
 
     # only most recent version for each attempt - some have regraded a version
     versions.sort_by(&:number).reverse.each do |ver|
       scores[ver.model.attempt] ||= ver.model.score || 0.0
     end
 
+    scores
+  end
+  private :scores_for_versions
+
+  def average_score_so_far(exclude_version_id=nil)
+    scores = scores_for_versions(exclude_version_id)
+    (scores.values.sum.to_f / scores.size).round(2)
+  end
+  private :average_score_so_far
+
+  def highest_score_so_far(exclude_version_id=nil)
+    scores = scores_for_versions(exclude_version_id)
     scores.values.max
   end
 

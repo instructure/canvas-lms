@@ -201,7 +201,7 @@
                   <div class="options" id="multiple_attempts_suboptions">
                     <div>
                       <label for="keep_score_select" class="inline"><%= t(:score_to_keep, "Quiz Score to Keep") %></label>
-                      <%= select(:quiz, :scoring_policy, [[render_score_to_keep('keep_highest'), 'keep_highest'], [render_score_to_keep('keep_latest'), 'keep_latest']], {}, :id => 'keep_score_select') %>
+                      <%= select(:quiz, :scoring_policy, [[render_score_to_keep('keep_highest'), 'keep_highest'], [render_score_to_keep('keep_latest'), 'keep_latest'], [render_score_to_keep('keep_average'), 'keep_average']], {}, :id => 'keep_score_select') %>
                     </div>
                     <div style="margin-top:5px">
                       <label for="limit_attempts_option" class="checkbox inline nowrap">

@@ -446,8 +446,50 @@ describe Quizzes::QuizSubmission do
     s.with_versioning(true, &:save!)
     expect(s.kept_score).to eql(5.0)
 
+    q.update_attributes!(scoring_policy: "keep_average")
+    s.reload
+    s.with_versioning(true, &:save!)
+    expect(s.kept_score).to eql(4.0)
+
+    q.update_attributes!(:scoring_policy => "keep_highest")
     s.update_scores(:submission_version_number => 2, :fudge_points => 6.0)
     expect(s.kept_score).to eql(6.0)
+  end
+
+  it "should calculate average score to a precision of 2" do
+    q = @course.quizzes.create!(scoring_policy: "keep_average")
+    s = q.quiz_submissions.new
+    s.workflow_state = "complete"
+    s.score = 2.0
+    s.attempt = 1
+    s.with_versioning(true, &:save!)
+
+    s.score = 4.0
+    s.attempt = 2
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(2)
+
+    s.score = 5.0
+    s.attempt = 3
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(3)
+
+    s.score = 6.0
+    s.attempt = 4
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(4)
+    expect(s.kept_score).to eql(4.25)
+
+    s.score = 7.0
+    s.attempt = 5
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(5)
+
+    s.score = 8.0
+    s.attempt = 6
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(6)
+    expect(s.kept_score).to eql(5.33)
   end
 
   it "should calculate highest score based on most recent version of an attempt" do
