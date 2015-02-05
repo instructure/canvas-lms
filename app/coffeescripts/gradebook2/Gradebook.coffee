@@ -465,6 +465,7 @@ define [
     getSubmissionsChunks: =>
       @withAllStudents (allStudentsObj) =>
         allStudents = (s for k, s of allStudentsObj)
+          .sort (a, b) => @localeSort(a.sortable_name, b.sortable_name)
         loop
           students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
           unless students.length
