@@ -199,6 +199,25 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(new_teacher)).to be_truthy
     end
 
+    it "unpublished topics should not be visible to custom account admins by default" do
+      @topic.unpublish
+
+      account = @course.root_account
+      nobody_role = custom_account_role('NobodyAdmin', account: account)
+      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      expect(@topic.visible_for?(admin)).to be_falsey
+    end
+
+    it "unpublished topics should be visible to account admins with :read_course_content permission" do
+      @topic.unpublish
+
+      account = @course.root_account
+      nobody_role = custom_account_role('NobodyAdmin', account: account)
+      account_with_role_changes(account: account, role: nobody_role, role_changes: { read_course_content: true })
+      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      expect(@topic.visible_for?(admin)).to be_truthy
+    end
+
     context "differentiated assignements" do
       before do
         @course = course(:active_course => true)

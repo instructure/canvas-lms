@@ -772,7 +772,7 @@ class DiscussionTopic < ActiveRecord::Base
         self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :reply and can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
+    given { |user, session| self.context.grants_any_right?(user, session, :read_forum, :post_to_forum) && self.visible_for?(user)}
     can :read
 
     given { |user, session|
@@ -966,8 +966,9 @@ class DiscussionTopic < ActiveRecord::Base
     # user is the topic's author
     return true if user == self.user
 
-    # user is an admin in the context (teacher/ta/designer)
-    return true if context.grants_right?(user, :manage)
+    # user is an admin in the context (teacher/ta/designer) OR
+    # user is an account admin with appropriate permission
+    return true if context.grants_any_right?(user, :manage, :read_course_content)
 
     # assignment exists and isnt assigned to user (differentiated assignments)
     if for_assignment? && !self.assignment.visible_to_user?(user)
