@@ -317,6 +317,7 @@ class Quizzes::QuizzesController < ApplicationController
           @assignment = @context.assignments.build(:title => params[:quiz][:title], :due_at => params[:quiz][:lock_at], :submission_types => 'online_quiz')
           @assignment.assignment_group = @assignment_group
           @assignment.saved_by = :quiz
+          @assignment.workflow_state = 'unpublished'
           @assignment.save
           params[:quiz][:assignment_id] = @assignment.id
         end

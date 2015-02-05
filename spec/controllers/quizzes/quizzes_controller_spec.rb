@@ -910,6 +910,24 @@ describe Quizzes::QuizzesController do
       expect(overrides.length).to eq 1
       expect(overrides.first[:due_at].iso8601).to eq section_due_date
     end
+
+    it "does not dispatch assignment-created notifications for unpublished quizzes" do
+      notification = Notification.create(:name => "Assignment Created")
+      student_in_course active_all: true
+      user_session @teacher
+      ag = @course.assignment_groups.create! name: 'teh group'
+      post 'create', :course_id => @course.id,
+           :quiz => {
+              title: 'some quiz',
+              quiz_type: 'assignment',
+              assignment_group_id: ag.id
+           }
+      json = JSON.parse response.body
+      quiz = Quizzes::Quiz.find(json['quiz']['id'])
+      expect(quiz).to be_unpublished
+      expect(quiz.assignment).to be_unpublished
+      expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
+    end
   end
 
   describe "PUT 'update'" do
