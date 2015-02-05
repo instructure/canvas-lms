@@ -159,6 +159,11 @@ class UsersController < ApplicationController
         :original_host_with_port => request.host_with_port
       )
       redirect_to request_token.authorize_url
+    elsif params[:service] == "google_drive"
+      redirect_uri = oauth_success_url(:service => 'google_drive')
+      session[:oauth_gdrive_nonce] = SecureRandom.hex
+      state = JWT.encode({redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce]}, Canvas::Security::encryption_key)
+      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
@@ -210,6 +215,43 @@ class UsersController < ApplicationController
       request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
 
       oauth_request = OauthRequest.where(id: request_id).first
+    elsif params[:code] &&  params[:state] && params[:service] == 'google_drive'
+
+      begin
+
+        client = google_drive_client
+        client.authorization.code = params[:code]
+        client.authorization.fetch_access_token!
+        drive = client.discovered_api('drive', 'v2')
+        result = client.execute!(:api_method => drive.about.get)
+
+        if result.status == 200
+          user_info = result.data
+        else
+          raise "Error getting user info from Google"
+        end
+
+        json = JWT.decode(params[:state], Canvas::Security::encryption_key).first
+        render_unauthorized_action and return unless json['nonce'] && json['nonce'] == session[:oauth_gdrive_nonce]
+        session.delete(:oauth_gdrive_nonce)
+
+        if logged_in_user
+          service = UserService.where(user_id: @current_user, service: 'google_drive', service_domain: 'drive.google.com').first_or_initialize
+          service.service_user_id = user_info['permissionId']
+          service.token = client.authorization.refresh_token
+          service.secret = client.authorization.access_token
+          service.save
+        else
+          session[:oauth_gdrive_access_token] = client.authorization.access_token
+          session[:oauth_gdrive_refresh_token] = client.authorization.refresh_token
+        end
+
+        flash[:notice] = t('google_drive_added', "Google Drive account successfully added!")
+        redirect_to json['return_to_url'] and return
+      rescue => e
+        ErrorReport.log_exception(:oauth, e)
+        flash[:error] = t('google_drive_fail', "Google Drive authorization failed. Please try again")
+      end
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)

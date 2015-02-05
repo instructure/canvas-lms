@@ -82,6 +82,16 @@ Canvas::Plugin.register('google_docs', :collaborations, {
   :settings_partial => 'plugins/google_docs_settings',
   :validator => 'GoogleDocsValidator'
 })
+Canvas::Plugin.register('google_drive', :collaborations, {
+  :name => lambda{ t :name, 'Google Drive' },
+  :description => lambda{ t :description, 'Google Drive file sharing' },
+  :website => 'http://drive.google.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/google_drive_settings',
+  :validator => 'GoogleDriveValidator'
+})
 Canvas::Plugin.register('kaltura', nil, {
   :name => lambda{ t :name, 'Kaltura' },
   :description => lambda{ t :description, 'Kaltura video/audio recording and playback'},

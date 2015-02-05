@@ -9,6 +9,7 @@ CanvasRails::Application.routes.draw do
   resources :submission_comments, only: :destroy
 
   get 'inbox' => 'context#inbox'
+  get 'oauth/redirect_proxy' => 'oauth_proxy#redirect_proxy'
 
   get 'conversations/unread' => 'conversations#index', as: :conversations_unread, redirect_scope: 'unread'
   get 'conversations/starred' => 'conversations#index', as: :conversations_starred, redirect_scope: 'starred'

@@ -262,6 +262,26 @@ TEXT
           </div>
         </div>
       </li>
+
+      <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
+        <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png" %> <%= t('links.google_drive', "Google Drive") %></a>
+        <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_google_drive', "Authorize Google Drive") %>" id="unregistered_service_google_drive_dialog">
+          <div>
+            <%= image_tag "google_docs.png", :style => "float: left; padding-right: 5px;" %>
+            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.google_drive_access', "Google Drive Access") %></div>
+            <%= t(:google_drive_description, <<-TEXT)
+                Once you authorize us to see your Google Drive you'll be able to submit your assignments
+                            directly from Google Drive, and create and share documents with members of your classes.
+                TEXT
+            %>
+            <div class="clear"></div>
+          </div>
+          <div style="text-align: center; margin-top: 10px;">
+            <a class="btn" href="<%= oauth_url(:service => "google_drive", :return_to => settings_profile_url) %>"><%= t('buttons.authorize_google_drive', "Authorize Google Drive Access") %></a>
+          </div>
+        </div>
+      </li>
+
       <li id="unregistered_service_skype" class="service" style="<%= hidden if services.include?("skype") || !service_enabled?(:skype) %>">
         <a href="#" class="btn btn-small"><%= image_tag "skype_icon.png" %> <%= t('links.skype', "Skype") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.register_skype', "Register Skype") %>" id="unregistered_service_skype_dialog">

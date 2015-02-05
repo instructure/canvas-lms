@@ -84,6 +84,26 @@ describe UsersController do
 
       expect(response).to redirect_to "http://example.com/redirect"
     end
+
+    it "sets up oauth for google_drive" do
+      state = nil
+      settings_mock = mock()
+      settings_mock.stubs(:settings).returns({})
+      settings_mock.stubs(:enabled?).returns(true)
+      Canvas::Plugin.stubs(:find).returns(settings_mock)
+      SecureRandom.stubs(:hex).returns('abc123')
+      GoogleDrive::Client.expects(:auth_uri).with() {|c, s| state = s and true}.returns("http://example.com/redirect")
+
+      get :oauth, {service: "google_drive", return_to: "http://example.com"}
+
+      expect(response).to redirect_to "http://example.com/redirect"
+      json = JWT.decode(state, Canvas::Security::encryption_key).first
+      expect(session[:oauth_gdrive_nonce]).to eq 'abc123'
+      expect(json['redirect_uri']).to eq oauth_success_url(:service => 'google_drive')
+      expect(json['return_to_url']).to eq "http://example.com"
+      expect(json['nonce']).to eq session[:oauth_gdrive_nonce]
+    end
+
   end
 
   describe "GET oauth_success" do
@@ -104,7 +124,65 @@ describe UsersController do
       end
 
       get :oauth_success, state: "some.state", service: "facebook", access_token: "access_token"
+    end
 
+    it "handles google_drive oauth_success for a logged_in_user" do
+      settings_mock = mock()
+      settings_mock.stubs(:settings).returns({})
+      authorization_mock = mock('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
+      drive_mock = mock('drive_mock', about: mock(get: nil))
+      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id'}))
+      client_mock.stubs(:authorization).returns(authorization_mock)
+      GoogleDrive::Client.stubs(:create).returns(client_mock)
+
+      session[:oauth_gdrive_nonce] = 'abc123'
+      state = JWT.encode({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'}, Canvas::Security::encryption_key)
+      course_with_student_logged_in
+
+      get :oauth_success, state: state, service: "google_drive", code: "some_code"
+
+      service = UserService.where(user_id: @user, service: 'google_drive', service_domain: 'drive.google.com').first
+      expect(service.service_user_id).to eq 'permission_id'
+      expect(service.token).to eq 'refresh_token'
+      expect(service.secret).to eq 'access_token'
+      expect(session[:oauth_gdrive_nonce]).to be_nil
+    end
+
+    it "handles google_drive oauth_success for a non logged in user" do
+      settings_mock = mock()
+      settings_mock.stubs(:settings).returns({})
+      authorization_mock = mock('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
+      drive_mock = mock('drive_mock', about: mock(get: nil))
+      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id'}))
+      client_mock.stubs(:authorization).returns(authorization_mock)
+      GoogleDrive::Client.stubs(:create).returns(client_mock)
+
+      session[:oauth_gdrive_nonce] = 'abc123'
+      state = JWT.encode({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'}, Canvas::Security::encryption_key)
+
+      get :oauth_success, state: state, service: "google_drive", code: "some_code"
+
+      expect(session[:oauth_gdrive_access_token]).to eq 'access_token'
+      expect(session[:oauth_gdrive_refresh_token]).to eq 'refresh_token'
+      expect(session[:oauth_gdrive_nonce]).to be_nil
+    end
+
+    it "rejects invalid state" do
+      settings_mock = mock()
+      settings_mock.stubs(:settings).returns({})
+      authorization_mock = mock('authorization')
+      authorization_mock.stubs(:code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
+      drive_mock = mock('drive_mock', about: mock(get: nil))
+      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id'}))
+      client_mock.stubs(:authorization).returns(authorization_mock)
+      GoogleDrive::Client.stubs(:create).returns(client_mock)
+
+      state = JWT.encode({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'}, Canvas::Security::encryption_key)
+      get :oauth_success, state: state, service: "google_drive", code: "some_code"
+
+      expect(response.code).to eq "401"
+      expect(session[:oauth_gdrive_access_token]).to be_nil
+      expect(session[:oauth_gdrive_refresh_token]).to be_nil
     end
   end
 

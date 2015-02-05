@@ -1394,6 +1394,8 @@ class ApplicationController < ActionController::Base
         !!Diigo::Connection.config
       elsif feature == :google_docs
         !!GoogleDocs::Connection.config
+      elsif feature == :google_drive
+        Canvas::Plugin.find(:google_drive).try(:enabled?)
       elsif feature == :etherpad
         !!EtherpadCollaboration.config
       elsif feature == :kaltura
@@ -1812,6 +1814,24 @@ class ApplicationController < ActionController::Base
       google_docs = GoogleDocs::Connection.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
     end
     google_docs
+  end
+
+  def google_drive_connection
+    if logged_in_user
+      refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.where(service: "google_drive").first
+        service && [service.token, service.access_token]
+      end
+    else
+      refresh_token = session[:oauth_gdrive_access_token]
+      access_token = session[:oauth_gdrive_refresh_token]
+    end
+    google_drive_client(refresh_token, access_token)
+  end
+
+  def google_drive_client(refresh_token=nil, access_token=nil)
+    client_secrets = Canvas::Plugin.find(:google_drive).try(:settings)
+    GoogleDrive::Client.create(client_secrets, refresh_token, access_token)
   end
 
 
