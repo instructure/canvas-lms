@@ -156,7 +156,8 @@ define(function(require) {
       return (
         <Link
           key={"question-anchor"+id}
-          to={"/questions/"+id}
+          to="question"
+          params={{id: id}}
           className="ic-QuestionAnchors__Anchor"
           query={{ event: this.props.id, attempt: this.props.attempt }}
           children={'#'+position} />

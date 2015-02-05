@@ -27,7 +27,7 @@ define(function(require) {
             }
           </ol>
 
-          <Link className="no-hover icon-arrow-left" to="/" query={this.props.query}>
+          <Link className="no-hover icon-arrow-left" to="app" query={this.props.query}>
             {I18n.t('links.back_to_session_information', 'Back to Log')}
           </Link>
         </div>
@@ -39,7 +39,8 @@ define(function(require) {
         <li key={"question-"+question.id}>
           <Link
             className={this.props.activeQuestionId === question.id ? 'active' : undefined}
-            to={'/questions/'+question.id}
+            to='/questions/'
+            params={{id: question.id}}
             query={this.props.query}>
             {I18n.t('links.question', 'Question %{position}', {
               position: question.position

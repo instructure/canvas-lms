@@ -291,7 +291,7 @@ CanvasRails::Application.routes.draw do
           get :record_answer
           post :record_answer
         end
-        resources :events, controller: 'quizzes/quiz_submission_events', path: :log
+        resources :events, controller: 'quizzes/quiz_submission_events', path: "log#{full_path_glob}"
       end
 
       post 'extensions/:user_id' => 'quizzes/quiz_submissions#extensions', as: :extensions
