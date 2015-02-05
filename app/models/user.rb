@@ -981,6 +981,7 @@ class User < ActiveRecord::Base
         result = if self.pseudonyms.loaded? && self.shard == Shard.current
             self.pseudonyms.detect { |p| p.active? && p.sis_user_id && trusted_ids.include?(p.account_id) }
           else
+            next unless associated_shards.include?(Shard.current)
             Pseudonym.where(account_id: trusted_ids).active.
                 where("sis_user_id IS NOT NULL AND user_id=?", self).first
           end
