@@ -1029,7 +1029,7 @@ describe DiscussionTopicsController, type: :request do
 
   it "should translate user content in topics" do
     should_translate_user_content(@course) do |user_content|
-      @topic = create_topic(@course, :title => "Topic 1", :message => user_content)
+      @topic ||= create_topic(@course, :title => "Topic 1", :message => user_content)
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics",
         { :controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s })
