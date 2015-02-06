@@ -125,7 +125,7 @@ class BigBlueButtonConference < WebConference
   def end_meeting
     response = send_request(:end, {
       :meetingID => conference_key,
-      :password => settings[(type == :user ? :user_key : :admin_key)]
+      :password => settings[(type == :user ? :user_key : :admin_key)],
       })
     response[:ended] if response
   end
@@ -142,7 +142,7 @@ class BigBlueButtonConference < WebConference
 
   def delete_recording(recording_id)
     response = send_request(:deleteRecordings, {
-      :recordID => recording_id
+      :recordID => recording_id,
       })
     response[:deleted] if response
   end
@@ -150,7 +150,7 @@ class BigBlueButtonConference < WebConference
   def publish_recording(recording_id)
     response = send_request(:publishRecordings, {
       :recordID => recording_id,
-	  :publish => true
+      :publish => true,
       })
     response[:published] if response
   end
@@ -158,7 +158,7 @@ class BigBlueButtonConference < WebConference
   def unpublish_recording(recording_id)
     response = send_request(:publishRecordings, {
       :recordID => recording_id,
-	  :publish => false
+      :publish => false,
       })
     response[:unpublished] if response
   end
