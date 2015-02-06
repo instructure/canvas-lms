@@ -46,7 +46,7 @@ define [
 
     componentDidMount: ->
       $([@refs.unlock_at.getDOMNode(), @refs.lock_at.getDOMNode()]).datetime_field()
-      $(@getDOMNode()).find(':tabbable:first').focus()
+      $('.ui-dialog-titlebar-close').focus()
 
     # === Custom Functions === #
 

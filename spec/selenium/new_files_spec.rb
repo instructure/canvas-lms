@@ -112,4 +112,22 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
        keep_trying_until { expect(driver.find_elements(:css, 'ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li').count).to eq 15 }
      end
    end
+
+   context "Publish Cloud Dialog", :priority => '3' do
+    before (:each) do
+      course_with_teacher_logged_in
+      Account.default.enable_feature!(:better_file_browsing)
+      add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
+               @course, "a_file.txt")
+      get "/courses/#{@course.id}/files"
+    end
+
+    it "should set focus to the close button when opening the dialog" do
+      f('.btn-link.published-status').click
+      wait_for_ajaximations
+      shouldFocus = f('.ui-dialog-titlebar-close')
+      element = driver.execute_script('return document.activeElement')
+      expect(element).to eq(shouldFocus)
+    end
+   end
 end
