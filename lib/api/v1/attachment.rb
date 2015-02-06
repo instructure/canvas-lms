@@ -58,7 +58,9 @@ module Api::V1::Attachment
     elsif !downloadable
       ''
     else
-      file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
+      h = { :download => '1', :download_frd => '1' }
+      h.merge!(:verifier => attachment.uuid) unless respond_to?(:in_app?, true) && in_app?
+      file_download_url(attachment, h.merge(url_options))
     end
 
     thumbnail_download_url = if downloadable
