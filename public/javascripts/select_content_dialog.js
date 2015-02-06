@@ -20,6 +20,8 @@ define([
   'INST' /* INST */,
   'i18n!select_content_dialog',
   'jquery' /* $ */,
+  'old_unsupported_dont_use_react',
+  'jsx/context_modules/FileSelectBox',
   'compiled/legacy/add_assignment' /* attachAddAssignment */,
   'jquery.instructure_date_and_time' /* datetime_field */,
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -31,7 +33,7 @@ define([
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */
-], function(INST, I18n, $, attachAddAssignment) {
+], function(INST, I18n, $, React, FileSelectBox, attachAddAssignment) {
 
   $(document).ready(function() {
     $(".add_assignment_inline:not(:first)").remove();
@@ -65,6 +67,7 @@ define([
   });
 
 $(document).ready(function() {
+
   var external_services = null;
   var $dialog = $("#select_context_content_dialog");
   attachAddAssignment($("#assignments_select .module_item_select"));
@@ -335,6 +338,9 @@ $(document).ready(function() {
   $("#add_module_item_select").change(function() {
     $("#select_context_content_dialog .module_item_option").hide();
     $("#" + $(this).val() + "s_select").show().find(".module_item_select").change();
+    if ($(this).val() === 'attachment') {
+      React.renderComponent(FileSelectBox({contextString: ENV.context_asset_string}), $('#module_item_select_file')[0]);
+    }
     if($(this).val() == 'context_external_tool') {
       var $select = $("#context_external_tools_select");
       if(!$select.hasClass('loaded')) {
@@ -361,12 +367,13 @@ $(document).ready(function() {
       }
     }
   })
-  $("#select_context_content_dialog .module_item_select").change(function() {
+
+  $('#select_context_content_dialog').on('change', '.module_item_select', function () {
     if($(this).val() == "new") {
       $(this).parents(".module_item_option").find(".new").show().focus().select();
     } else {
       $(this).parents(".module_item_option").find(".new").hide();
     }
-  })
+  });
 });
 });

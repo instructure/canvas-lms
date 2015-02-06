@@ -151,17 +151,8 @@
           <%= t :file_notice, 'Select the file you want to associate with this *module*, or add a file by selecting "New File".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" aria-label="<%= t 'file_select_label', 'Select the file you want to associate, or add a file by selecting "New File".' %>" multiple>
-          <option value="new"><%= t :new_file_option, "[ New File ]" %></option>
-          <% includes = @context.grants_right?(@current_user, session, :manage_files) ? :active_file_attachments : :visible_file_attachments %>
-          <% Canvas::ICU.collate_by(@context.folders.active.limit(200).includes(includes), &:full_name).each do |folder| %>
-            <optgroup label="<%= folder.full_name %>">
-              <% Canvas::ICU.collate_by(folder.send(includes), &:display_name).each do |file| %>
-                <option value="<%= file.id %>"><%= file.display_name %></option>
-              <% end %>
-            </optgroup>
-          <% end %>
-        </select>
+          <div id="module_item_select_file">
+          </div>
         </div>
         <div class="new" style="margin-top: 5px;">
           <table>
