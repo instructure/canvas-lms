@@ -440,6 +440,32 @@ describe ApplicationController do
 
   end
 
+  describe 'external_tools_display_hashes' do
+    it 'returns empty array if context is group' do
+      @course = course_model
+      @group = @course.groups.create!(:name => "some group")
+      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+      tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
+      tool.save!
+
+      controller.stubs(:named_context_url).returns("http://example.com")
+      external_tools = controller.external_tools_display_hashes(:account_navigation, @group)
+
+      expect(external_tools).to eq([])
+    end
+  end
+
+  it 'returns array of tools if context is not group' do
+    @course = course_model
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+    tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
+    tool.save!
+
+    controller.stubs(:named_context_url).returns("http://example.com")
+    external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
+
+    expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com"}])
+  end
 end
 
 describe ApplicationController do

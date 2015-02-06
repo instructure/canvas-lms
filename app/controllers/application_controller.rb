@@ -133,9 +133,11 @@ class ApplicationController < ActionController::Base
   helper_method :js_env
 
   def external_tools_display_hashes(type, context=@context, custom_settings=[])
+    return [] if context.is_a?(Group)
+
     context = context.account if context.is_a?(User)
-    tools = ContextExternalTool.all_tools_for(context, :type => type,
-      :root_account => @domain_root_account, :current_user => @current_user)
+    tools = ContextExternalTool.all_tools_for(context, {:type => type,
+      :root_account => @domain_root_account, :current_user => @current_user})
 
     extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|

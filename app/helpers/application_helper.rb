@@ -477,7 +477,7 @@ module ApplicationHelper
   end
 
   def editor_buttons
-    tools = []
+    return [] if @context.is_a?(Group)
     contexts = []
     contexts << @context if @context && @context.respond_to?(:context_external_tools)
     contexts += @context.account_chain if @context.respond_to?(:account_chain)
