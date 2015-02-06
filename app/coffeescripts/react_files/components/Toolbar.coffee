@@ -5,15 +5,15 @@ define [
   'old_unsupported_dont_use_react-router'
   'compiled/react/shared/utils/withReactDOM'
   './UploadButton'
+  './UsageRightsDialog'
   '../utils/openMoveDialog'
-  '../utils/openUsageRightsDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
   '../modules/customPropTypes'
   './RestrictedDialogForm'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactDOM, UploadButton, openMoveDialog, openUsageRightsDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
+], (_, I18n, React, Router, withReactDOM, UploadButton, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
@@ -75,6 +75,16 @@ define [
         usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         closeDialog: -> $dialog.dialog('close')
       }), $dialog[0])
+
+    openUsageRightsDialog: (event)->
+      event.preventDefault()
+
+      contents = UsageRightsDialog(
+        closeModal: @props.modalOptions.closeModal
+        itemsToManage: @props.selectedItems
+      )
+
+      @props.modalOptions.openModal(contents, => @refs.usageRightsBtn.getDOMNode().focus())
 
     render: withReactDOM ->
       showingButtons = @props.selectedItems.length
@@ -174,15 +184,11 @@ define [
 
           if @props.userCanManageFilesForContext and @props.usageRightsRequiredForContext
             button {
+              ref: 'usageRightsBtn'
               type: 'button'
               disabled: !showingButtons
-              className: 'ui-button btn-rights'
-              onClick: (event) =>
-                openUsageRightsDialog(@props.selectedItems, {
-                  contextType: @props.contextType
-                  contextId: @props.contextId
-                  returnFocusTo: event.target
-                })
+              className: 'Toolbar__ManageUsageRights ui-button btn-rights'
+              onClick: @openUsageRightsDialog
               title: I18n.t('Manage Usage Rights')
               'aria-label': I18n.t('Manage Usage Rights')
               'data-tooltip': ''

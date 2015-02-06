@@ -7,20 +7,29 @@ define [
   '../modules/filesEnv'
   'compiled/models/File'
   'compiled/models/Folder'
+  './UsageRightsDialog'
   './RestrictedDialogForm'
   '../utils/openMoveDialog'
-  '../utils/openUsageRightsDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, File, Folder, RestrictedDialogForm, openMoveDialog, openUsageRightsDialog, downloadStuffAsAZip, deleteStuff, $) ->
+], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, File, Folder, UsageRightsDialog, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) ->
 
   ItemCog = React.createClass
     displayName: 'ItemCog'
 
     propTypes:
       model: customPropTypes.filesystemObject
+      modalOptions: React.PropTypes.object.isRequired
+
+    openUsageRightsDialog: (event) ->
+      contents = UsageRightsDialog(
+        closeModal: @props.modalOptions.closeModal
+        itemsToManage: [@props.model]
+      )
+
+      @props.modalOptions.openModal(contents, => @refs.settingsCogBtn.getDOMNode().focus())
 
     render: withReactDOM ->
       if @props.model instanceof File
@@ -96,10 +105,10 @@ define [
 
               # don't show any usage rights related stuff to people that don't have the feature flag on
               if @props.usageRightsRequiredForContext
-                li {},
+                li {className: 'ItemCog__OpenUsageRights'},
                   a {
                     href: '#'
-                    onClick: wrap(openUsageRightsDialog)
+                    onClick: preventDefault(@openUsageRightsDialog)
                     ref: 'usageRights'
                   },
                     I18n.t('Manage Usage Rights')

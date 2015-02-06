@@ -1,6 +1,7 @@
 define [
   'old_unsupported_dont_use_react'
   'old_unsupported_dont_use_react-router'
+  'old_unsupported_dont_use_react-modal'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/str/splitAssetString'
@@ -11,7 +12,7 @@ define [
   '../mixins/MultiselectableMixin'
   '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, ReactRouter, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
+], (React, ReactRouter, ReactModal, I18n, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   FilesApp = React.createClass
     displayName: 'FilesApp'
@@ -30,6 +31,8 @@ define [
         rootTillCurrentFolder: undefined
         showingSearchResults: false
         selectedItems: undefined
+        showingModal: false
+        modalContents: undefined  # This should be a React Component to render in the modal container.
       }
 
     mixins: [MultiselectableMixin, dndMixin, ReactRouter.Navigation]
@@ -57,6 +60,15 @@ define [
         'folder'
       else
         'rootFolder'
+
+    openModal: (contents, afterClose) ->
+      @setState
+        modalContents: contents
+        showingModal: true
+        afterModalClose: afterClose
+
+    closeModal: ->
+      @setState(showingModal: false, -> @state.afterModalClose())
 
     previewItem: (item) ->
       @clearSelectedItems =>
@@ -98,6 +110,9 @@ define [
           usageRightsRequiredForContext: usageRightsRequiredForContext
           getPreviewQuery: @getPreviewQuery
           getPreviewRoute: @getPreviewRoute
+          modalOptions:
+            openModal: @openModal
+            closeModal: @closeModal
         })
 
         div className: 'ef-main',
@@ -132,6 +147,9 @@ define [
               usageRightsRequiredForContext: usageRightsRequiredForContext
               externalToolsForContext: externalToolsForContext
               previewItem: @previewItem
+              modalOptions:
+                openModal: @openModal
+                closeModal: @closeModal
               dndOptions:
                 onItemDragStart: @onItemDragStart
                 onItemDragEnterOrOver: @onItemDragEnterOrOver
@@ -150,3 +168,14 @@ define [
               div {},
                 a className: 'pull-right', href: '/files',
                   I18n.t('all_my_files', 'All My Files')
+        # This is a placeholder modal instance where we can render arbitrary
+        # data into it to show.
+        if @state.showingModal
+          ReactModal {
+            isOpen: @state.showingModal,
+            onRequestClose: @closeModal,
+            closeTimeoutMS: 10,
+            className: 'ReactModal__Content--canvas',
+            overlayClassName: 'ReactModal__Overlay--canvas'
+          },
+            @state.modalContents

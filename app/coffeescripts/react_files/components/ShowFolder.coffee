@@ -153,6 +153,7 @@ define [
               externalToolsForContext: @props.externalToolsForContext
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
+              modalOptions: @props.modalOptions
 
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
 

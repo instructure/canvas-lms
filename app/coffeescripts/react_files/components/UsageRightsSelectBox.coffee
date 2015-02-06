@@ -39,14 +39,13 @@ define [
       showMessage: React.PropTypes.bool
       contextType: React.PropTypes.string
       contextId: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
-      # This is where focus should be given should no option be selected... a11y for the win.
-      afterChooseBlur: React.PropTypes.func.isRequired
 
     getInitialState: ->
       showTextBox: @props.use_justification != 'choose'
       showCreativeCommonsOptions: @props.use_justification == 'creative_commons' && @props.copyright?
       licenseOptions: []
       showMessage: @props.showMessage
+      usageRightSelectionValue: @props.use_justification if @props.use_justification
 
     componentDidMount: ->
       @getUsageRightsOptions()
@@ -72,23 +71,26 @@ define [
 
     handleChange: (event) ->
       @setState({
+        usageRightSelectionValue: event.target.value
         showTextBox: event.target.value != 'choose'
         showCreativeCommonsOptions: event.target.value == 'creative_commons'
         showMessage: (@props.showMessage && event.target.value == 'choose')
       })
 
-    handleBlur: (event) ->
-      if (@state.showCreativeCommonsOptions)
-        @refs.creativeCommons.getDOMNode().focus()
-      else if (@state.showTextBox)
-        @refs.copyright.getDOMNode().focus()
-      else
-        # a11y for the win.
-        @props.afterChooseBlur().getDOMNode().focus()
+    # This method only really applies to firefox which doesn't handle onChange
+    # events on select boxes like every other browser.
+    handleChooseKeyPress: (event) ->
+      if (event.key == "ArrowUp") || (event.key == "ArrowDown")
+        @setState({
+          usageRightSelectionValue: event.target.value
+        }, @handleChange(event))
+
 
     renderContentOptions: ->
       contentOptions.map (contentOption) ->
-        option {value: contentOption.value},
+        option {
+          value: contentOption.value
+        },
           contentOption.display
 
     renderCreativeCommonsOptions: ->
@@ -112,9 +114,9 @@ define [
               id: 'usageRightSelector'
               className: 'UsageRightsSelectBox__select',
               onChange: @handleChange,
-              onBlur: @handleBlur
+              onKeyUp : @handleChooseKeyPress
               ref: 'usageRightSelection'
-              defaultValue: @props.use_justification if @props.use_justification
+              value: @state.usageRightSelectionValue
             },
               @renderContentOptions()
         if @state.showCreativeCommonsOptions
@@ -129,7 +131,7 @@ define [
                 id: 'creativeCommonsSelection',
                 className: 'UsageRightsSelectBox__creativeCommons',
                 ref: 'creativeCommons',
-                defaultValue: @props.copyright
+                defaultValue: @props.cc_value
               },
                 @renderCreativeCommonsOptions()
         div {className: 'control-group'},

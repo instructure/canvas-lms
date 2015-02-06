@@ -114,6 +114,7 @@ define [
               externalToolsForContext: @props.externalToolsForContext
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
+              modalOptions: @props.modalOptions
           LoadingIndicator isLoading: !@state.collection.loadedAll
 
           # Prepare and render the FilePreview if needed.

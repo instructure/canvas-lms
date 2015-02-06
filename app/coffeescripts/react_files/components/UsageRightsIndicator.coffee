@@ -4,8 +4,8 @@ define [
   '../modules/customPropTypes'
   'compiled/models/Folder'
   '../modules/filesEnv'
-  '../utils/openUsageRightsDialog'
-], (I18n, React, customPropTypes, Folder, filesEnv, openUsageRightsDialog) ->
+  './UsageRightsDialog'
+], (I18n, React, customPropTypes, Folder, filesEnv, UsageRightsDialog) ->
 
   {button, span, i} = React.DOM
 
@@ -18,12 +18,17 @@ define [
       model: customPropTypes.filesystemObject.isRequired
       userCanManageFilesForContext: React.PropTypes.bool.isRequired
       usageRightsRequiredForContext: React.PropTypes.bool.isRequired
+      modalOptions: React.PropTypes.object.isRequired
 
     handleClick: (event) ->
       event.preventDefault()
 
-      openUsageRightsDialog([@props.model], {returnFocusTo: @getDOMNode()})
+      contents = UsageRightsDialog(
+        closeModal: @props.modalOptions.closeModal
+        itemsToManage: [@props.model]
+      )
 
+      @props.modalOptions.openModal(contents, => @getDOMNode().focus())
 
     render: ->
       if (@props.model instanceof Folder) || (!@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))
