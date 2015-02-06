@@ -286,8 +286,8 @@ class DiscussionTopicsController < ApplicationController
     @topics = Api.paginate(scope, self, topic_pagination_url)
 
     if states.present?
-      @topics.reject! { |t| t.locked? || t.closed_for_comment_for?(@current_user) } if states.include?('unlocked')
-      @topics.select! { |t| t.locked? || t.closed_for_comment_for?(@current_user) } if states.include?('locked')
+      @topics.reject! { |t| t.locked_for?(@current_user) } if states.include?('unlocked')
+      @topics.select! { |t| t.locked_for?(@current_user) } if states.include?('locked')
     end
     @topics.each { |topic| topic.current_user = @current_user }
 
@@ -300,7 +300,7 @@ class DiscussionTopicsController < ApplicationController
                   named_context_url(@context, :context_discussion_topics_url))
 
         locked_topics, open_topics = @topics.partition do |topic|
-          topic.locked? || topic.closed_for_comment_for?(@current_user)
+          topic.locked? || topic.locked_for?(@current_user)
         end
         hash = {USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
                 openTopics: open_topics,
@@ -483,7 +483,8 @@ class DiscussionTopicsController < ApplicationController
               :PERMISSIONS => {
                 :CAN_REPLY      => @topic.grants_right?(@current_user, session, :reply),     # Can reply
                 :CAN_ATTACH     => @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
-                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
+                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user) &&
+                                    !@topic.locked_for?(@current_user, :check_policies => true),           # Can moderate their own topics
                 :MODERATE       => user_can_moderate                                                        # Can moderate any topic
               },
               :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
@@ -704,7 +705,7 @@ class DiscussionTopicsController < ApplicationController
       f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
-    @entries.concat @context.discussion_topics.reject{|a| a.closed_for_comment_for?(@current_user, :check_policies => true) }
+    @entries.concat @context.discussion_topics.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
