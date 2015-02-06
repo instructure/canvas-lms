@@ -487,7 +487,7 @@ Implemented for: Canvas LMS}]
   end
 
   ASSET_TYPES = {
-    'quiz' => /^quiz_/,
+    'quiz' => /^quizzes:quiz_/,
     'qdb' => /^assessment_question_bank_/,
   }
 

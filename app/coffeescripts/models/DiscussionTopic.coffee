@@ -7,7 +7,8 @@ define [
   'compiled/collections/DiscussionEntriesCollection'
   'compiled/models/Assignment'
   'compiled/models/DateGroup'
-], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment, DateGroup) ->
+  'str/stripTags'
+], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment, DateGroup, stripTags) ->
 
   class DiscussionTopic extends Backbone.Model
     resourceName: 'discussion_topics'
@@ -43,7 +44,7 @@ define [
       assign_attributes.turnitin_settings or= {}
       json.assignment = @createAssignment(assign_attributes)
       json.publishable = json.can_publish
-      json.unpublishable = json.can_unpublish
+      json.unpublishable = !json.published or json.can_unpublish
 
       json
 
@@ -62,7 +63,7 @@ define [
     unpublish: ->
       @updateOneAttribute('published', false)
 
-    disabledMessage: -> I18n.t 'cannot_unpublish_with_replies', "Can't unpublish if there are replies"
+    disabledMessage: -> I18n.t 'cannot_unpublish_with_replies', "Can't unpublish if there are student replies"
 
     topicSubscribe: ->
       baseUrl = _.result this, 'url'
@@ -116,7 +117,7 @@ define [
         @entries.reset(entries)
 
     summary: ->
-      $('<div/>').html(@get('message')).text() || ''
+      stripTags @get('message')
 
     # TODO: this would belong in Backbone.model, but I dont know of others are going to need it much
     # or want to commit to this api so I am just putting it here for now

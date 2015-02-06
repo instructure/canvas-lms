@@ -15,10 +15,10 @@ define [
       return false
 
     quiz.set({
-      base: overrides.due_dates[0].base,
-      due_at: overrides.due_dates[0].due_at,
-      lock_at: overrides.due_dates[0].lock_at,
-      unlock_at: overrides.due_dates[0].unlock_at,
+      base: overrides.due_dates[0]?.base,
+      due_at: overrides.due_dates[0]?.due_at,
+      lock_at: overrides.due_dates[0]?.lock_at,
+      unlock_at: overrides.due_dates[0]?.unlock_at,
       all_dates: overrides.all_dates,
     }, { silent: true })
     quiz.initAllDates()

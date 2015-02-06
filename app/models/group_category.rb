@@ -80,8 +80,10 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  Bookmarker = BookmarkedCollection::SimpleBookmarker.new(GroupCategory, :name, :id)
+  
+  scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(:deleted_at => nil) }
-
   scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
 
   class << self
@@ -149,7 +151,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def protected?
-    self.role.present?
+    self.role.present? && self.role != 'imported'
   end
 
   # Group categories generally restrict students to only be in one group per
@@ -167,11 +169,6 @@ class GroupCategory < ActiveRecord::Base
     args = {enable_self_signup: enabled, restrict_self_signup: restricted}
     self.self_signup = GroupCategories::Params.new(args).self_signup
     self.save!
-  end
-
-  def configure_auto_leader(enabled, auto_leader_type)
-    args = {enable_auto_leader: enabled, auto_leader_type: auto_leader_type}
-    self.auto_leader = GroupCategories::Params.new(args).auto_leader
   end
 
   def self_signup?
@@ -197,6 +194,10 @@ class GroupCategory < ActiveRecord::Base
 
   def group_for(user)
     groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
+  end
+
+  def is_member?(user)
+    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).any?
   end
 
   alias_method :destroy!, :destroy
@@ -337,8 +338,8 @@ class GroupCategory < ActiveRecord::Base
       number_of_users_to_add = number_to_bring_base_equality + chunk_count + sprinkle
       ##
       # respect group limits!
-      if self.group_limit
-        slots_remaining = self.group_limit - group.users.size
+      if group.max_membership
+        slots_remaining = group.max_membership - group.users.size
         number_of_users_to_add = [slots_remaining, number_of_users_to_add].min
       end
       next if number_of_users_to_add <= 0

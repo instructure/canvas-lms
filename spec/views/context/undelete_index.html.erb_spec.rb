@@ -29,7 +29,7 @@ describe "context/undelete_index.html.erb" do
     quiz = @course.quizzes.create!
     assigns[:deleted_items] = [quiz]
     render
-    response.body.should_not =~ /quizzes:quiz/
-    response.body.should =~ /quiz_#{quiz.id}/
+    expect(response.body).not_to match /quizzes:quiz/
+    expect(response.body).to match /quiz_#{quiz.id}/
   end
 end

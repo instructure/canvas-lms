@@ -41,11 +41,11 @@ describe NotificationPolicy do
       @cc.confirm!
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
       @assignment = @course.assignments.create!(:title => "test assignment")
-      @assignment.messages_sent.should be_include("Assignment Created")
+      expect(@assignment.messages_sent).to be_include("Assignment Created")
       m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
-      m.should be_nil
+      expect(m).to be_nil
       m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
-      m.should_not be_nil
+      expect(m).not_to be_nil
     end
     
     it "should prevent message dispatches if set to 'never' on triggered policies" do
@@ -54,9 +54,9 @@ describe NotificationPolicy do
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
       @assignment = @course.assignments.create!(:title => "test assignment")
       m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
-      m.should be_nil
+      expect(m).to be_nil
       m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
-      m.should be_nil
+      expect(m).to be_nil
     end
 
     it "should prevent message dispatches if no policy setting exists" do
@@ -65,9 +65,9 @@ describe NotificationPolicy do
       NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
       @assignment = @course.assignments.create!(:title => "test assignment")
       m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
-      m.should be_nil
+      expect(m).to be_nil
       m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
-      m.should be_nil
+      expect(m).to be_nil
     end
   end
 
@@ -102,26 +102,26 @@ describe NotificationPolicy do
                       workflow_state: 'created')
     dt.save!
     msg = dt.messages_sent["Hello"].find { |m| m.to == "blarg@example.com" }
-    msg.should_not be_nil
-    msg.body.should include "mtn dew"
+    expect(msg).not_to be_nil
+    expect(msg.body).to include "mtn dew"
   end
   
   context "named scopes" do
     it "should have a named scope for users" do
       user_with_pseudonym(:active_all => 1)
       notification_policy_model(:communication_channel => @cc)
-      NotificationPolicy.for(@user).should == [@notification_policy]
+      expect(NotificationPolicy.for(@user)).to eq [@notification_policy]
     end
 
     it "should have a named scope for notifications" do
       notification_model
       notification_policy_model(:notification => @notification)
-      NotificationPolicy.for(@notification).should == [@notification_policy]
+      expect(NotificationPolicy.for(@notification)).to eq [@notification_policy]
     end
     
     it "should not slow down from other kinds of input on the *for* named scope" do
       notification_policy_model
-      NotificationPolicy.for(:anything_else).should == NotificationPolicy.all
+      expect(NotificationPolicy.for(:anything_else)).to eq NotificationPolicy.all
     end
     
     context "by" do
@@ -134,21 +134,21 @@ describe NotificationPolicy do
       end
       
       it "should have a scope to differentiate by frequency" do
-        NotificationPolicy.by(:immediately).should == [@n1]
-        NotificationPolicy.by(:daily).should == [@n2]
-        NotificationPolicy.by(:weekly).should == [@n3]
-        NotificationPolicy.by(:never).should == [@n4]
+        expect(NotificationPolicy.by(:immediately)).to eq [@n1]
+        expect(NotificationPolicy.by(:daily)).to eq [@n2]
+        expect(NotificationPolicy.by(:weekly)).to eq [@n3]
+        expect(NotificationPolicy.by(:never)).to eq [@n4]
       end
     
       it "should be able to differentiate by several frequencies at once" do
-        NotificationPolicy.by([:immediately, :daily]).should be_include(@n1)
-        NotificationPolicy.by([:immediately, :daily]).should be_include(@n2)
+        expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n1)
+        expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n2)
       end
       
       it "should be able to combine an array of frequencies with a for scope" do
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(@n2)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should be_include(@n3)
-        NotificationPolicy.for(@user).by([:daily, :weekly]).should_not be_include(@n1)
+        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n2)
+        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n3)
+        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).not_to be_include(@n1)
       end
     end
     
@@ -167,19 +167,19 @@ describe NotificationPolicy do
       n1 = notification_policy_model
 
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
-      policies.should == []
+      expect(policies).to eq []
 
       n1.update_attribute(:frequency, 'never')
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
-      policies.should == []
+      expect(policies).to eq []
 
       n1.update_attribute(:frequency, 'daily')
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
-      policies.should == [n1]
+      expect(policies).to eq [n1]
 
       n1.update_attribute(:frequency, 'weekly')
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
-      policies.should == [n1]
+      expect(policies).to eq [n1]
     end
     
   end
@@ -212,8 +212,8 @@ describe NotificationPolicy do
       params = {:category => 'multi_category', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
       NotificationPolicy.setup_for(@user, params)
       n1.reload; n2.reload
-      n1.frequency.should == Notification::FREQ_IMMEDIATELY
-      n2.frequency.should == Notification::FREQ_IMMEDIATELY
+      expect(n1.frequency).to eq Notification::FREQ_IMMEDIATELY
+      expect(n2.frequency).to eq Notification::FREQ_IMMEDIATELY
     end
 
     context "sharding" do
@@ -224,9 +224,9 @@ describe NotificationPolicy do
         NotificationPolicy.delete_all
         notification_model
         @shard1.activate do
-          @user.notification_policies.scoped.exists?.should be_false
+          expect(@user.notification_policies.scoped.exists?).to be_falsey
           NotificationPolicy.setup_for(@user, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: 'test_immediately')
-          @user.notification_policies.scoped.exists?.should be_true
+          expect(@user.notification_policies.scoped.exists?).to be_truthy
         end
       end
     end
@@ -248,8 +248,8 @@ describe NotificationPolicy do
       NotificationPolicy.delete_all
 
       policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
-      policies.length.should == 1
-      policies.first.frequency.should == @announcement.default_frequency
+      expect(policies.length).to eq 1
+      expect(policies.first.frequency).to eq @announcement.default_frequency
     end
 
     it "should not overwrite an existing setting with a default" do
@@ -259,10 +259,10 @@ describe NotificationPolicy do
                                       :notification => @announcement,
                                       :frequency => Notification::FREQ_NEVER})
 
-      @announcement.default_frequency.should_not == Notification::FREQ_NEVER # verify that it differs from the default
+      expect(@announcement.default_frequency).not_to eq Notification::FREQ_NEVER # verify that it differs from the default
       policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
-      policies.length.should == 1
-      policies.first.frequency.should == Notification::FREQ_NEVER
+      expect(policies.length).to eq 1
+      expect(policies.first.frequency).to eq Notification::FREQ_NEVER
     end
 
     it "should not set defaults on secondary communication channel" do
@@ -271,13 +271,13 @@ describe NotificationPolicy do
       primary_channel   = @user.communication_channel
       secondary_channel = communication_channel_model(:path => 'secondary@example.com')
       # start out with 0 on primary and secondary
-      primary_channel.notification_policies.count.should == 0
-      secondary_channel.notification_policies.count.should == 0
+      expect(primary_channel.notification_policies.count).to eq 0
+      expect(secondary_channel.notification_policies.count).to eq 0
       # Load data
       NotificationPolicy.setup_with_default_policies(@user, [@announcement])
       # Primary should have 1 created and secondary should be left alone.
-      primary_channel.notification_policies.count.should == 1
-      secondary_channel.notification_policies.count.should == 0
+      expect(primary_channel.notification_policies.count).to eq 1
+      expect(secondary_channel.notification_policies.count).to eq 0
     end
 
     it "should not pull defaults from non-default channels" do
@@ -288,14 +288,14 @@ describe NotificationPolicy do
       secondary_channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
       NotificationPolicy.setup_with_default_policies(@user, [@announcement])
       # Primary should have 1 created and secondary should be left alone.
-      primary_channel.reload.notification_policies.count.should == 1
-      secondary_channel.reload.notification_policies.count.should == 1
+      expect(primary_channel.reload.notification_policies.count).to eq 1
+      expect(secondary_channel.reload.notification_policies.count).to eq 1
     end
 
     it "should not error if no channel exists" do
       NotificationPolicy.delete_all
       CommunicationChannel.delete_all
-      lambda { NotificationPolicy.setup_with_default_policies(@user, [@announcement])}.should_not raise_error
+      expect { NotificationPolicy.setup_with_default_policies(@user, [@announcement])}.not_to raise_error
     end
 
     context "across shards" do
@@ -308,7 +308,7 @@ describe NotificationPolicy do
           NotificationPolicy.delete_all
           @policy = @channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
           NotificationPolicy.setup_with_default_policies(@shard_user, [@announcement])
-          @policy.reload.frequency.should == Notification::FREQ_NEVER
+          expect(@policy.reload.frequency).to eq Notification::FREQ_NEVER
         }
       end
     end

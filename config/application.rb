@@ -28,6 +28,9 @@ module CanvasRails
     config.filter_parameters.concat LoggingFilter.filtered_parameters
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
+    if CANVAS_RAILS3
+      config.action_dispatch.rescue_responses['ActionController::ParameterMissing'] = 400
+    end
 
     config.app_generators do |c|
       c.test_framework :rspec

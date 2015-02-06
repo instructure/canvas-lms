@@ -150,12 +150,8 @@ class GradingStandard < ActiveRecord::Base
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
 
-  set_policy do
-    given {|user| true }
-    can :read and can :create
-
-    given {|user| self.assignments.active.length < 2}
-    can :update and can :delete
+  def assessed_assignment?
+    self.assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
   end
 
   def update_data(params)

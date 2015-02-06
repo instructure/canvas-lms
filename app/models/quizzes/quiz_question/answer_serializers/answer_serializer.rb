@@ -29,12 +29,24 @@ module Quizzes::QuizQuestion::AnswerSerializers
     # @return [Any]
     #   The output is similar to the user-supplied answer, which may vary between
     #   serializers.
-    def deserialize(submission_data)
+    def deserialize(submission_data, full=false)
       raise NotImplementedError
     end
 
     def self.question_type
       self.name.demodulize.underscore
+    end
+
+    # Prevent the serializer from locating which question data to use for doing
+    # its work. Use this only if you have something like a hash of the question
+    # data and not actual QuizQuestion objects.
+    #
+    # @see #frozen_question_data()
+    #
+    # Also, don't use this unless you really know what you're doing.
+    def override_question_data(question_data)
+      @frozen_question_data = question_data
+      @question_key = [ 'question', question_data[:id] ].join('_')
     end
 
     protected

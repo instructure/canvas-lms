@@ -5,6 +5,7 @@ const path = require('path')
 const yaml = require('js-yaml')
 const _ = require('lodash')
 
+
 const browserSupport = _.map(yaml.safeLoad(fs.readFileSync('config/browsers.yml')).minimums, function(version, browserName) {
   return browserName.replace('Internet Explorer', 'Explorer') + ' >= ' + version
 })
@@ -14,10 +15,16 @@ const autoprefixer = require('autoprefixer')(browserSupport)
 const outputStyle = process.env.CANVAS_SASS_STYLE || 'nested'
 
 process.on('message', function(variantAndSassFile){
-  var variant = variantAndSassFile[0],
-      sassFile = variantAndSassFile[1],
-      cssFolder = path.dirname(sassFile).replace(/^app\/stylesheets/, 'public/stylesheets_compiled/' + variant),
-      cssFile = cssFolder + '/' + path.basename(sassFile).replace(/.s[ac]ss$/, '.css')
+  const variant = variantAndSassFile[0]
+  const sassFile = variantAndSassFile[1]
+  const cssFolder = path.dirname(sassFile).replace(/^app\/stylesheets/, 'public/stylesheets_compiled/' + variant)
+  const cssFile = cssFolder + '/' + path.basename(sassFile).replace(/.s[ac]ss$/, '.css')
+  var includePaths = ['app/stylesheets', 'app/stylesheets/variants/' + variant]
+
+  // pull in 'config/brand_variables.scss' if we should
+  if ((variant === 'new_styles_normal_contrast' || variant === 'k12_normal_contrast') && fs.existsSync('config/brand_variables.scss')) {
+    includePaths.unshift('config')
+  }
 
   // make sure the folder is there before we try to write the css file to it
   mkdirp.sync(cssFolder)
@@ -35,7 +42,7 @@ process.on('message', function(variantAndSassFile){
       console.log('Error compiling sass:', errorMsg)
       throw new Error(errorMsg)
     },
-    includePaths: ['app/stylesheets', 'app/stylesheets/variants/' + variant],
+    includePaths: includePaths,
     imagePath: '/images',
     outputStyle: outputStyle,
     sourceComments: (outputStyle === 'compressed' ? 'none' : 'normal'), // one of 'none', 'normal', 'map'

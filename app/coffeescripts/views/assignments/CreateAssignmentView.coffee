@@ -12,7 +12,7 @@ define [
   class CreateAssignmentView extends DialogFormView
     defaults:
       width: 500
-      height: 350
+      height: 380
 
     events: _.extend {}, @::events,
       'click .dialog_closer': 'close'
@@ -48,9 +48,8 @@ define [
 
       dataParams = {}
       _.each data, (value, key) ->
-        if value and _.contains(valid, key) and value != ""
+        if _.contains(valid, key)
           dataParams[key] = value
-
       url = if @assignmentGroup then @newAssignmentUrl() else @model.htmlEditUrl()
 
       @redirectTo("#{url}?#{$.param(dataParams)}")
@@ -79,7 +78,7 @@ define [
       super
 
       timeField = @$el.find(".datetime_field")
-      if @model.multipleDueDates()
+      if @model.multipleDueDates() || @model.isOnlyVisibleToOverrides()
         timeField.tooltip
           position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
           tooltipClass: 'center bottom vertical',

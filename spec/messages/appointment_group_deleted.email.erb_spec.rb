@@ -27,9 +27,9 @@ describe 'appointment_group_deleted.email' do
     generate_message(:appointment_group_deleted, :email, @appointment_group,
                      :user => @user, :data => {:cancel_reason => "because"})
 
-    @message.subject.should include('some title')
-    @message.body.should include('some title')
-    @message.body.should include('because')
-    @message.body.should include(@course.name)
+    expect(@message.subject).to include('some title')
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include('because')
+    expect(@message.body).to include(@course.name)
   end
 end

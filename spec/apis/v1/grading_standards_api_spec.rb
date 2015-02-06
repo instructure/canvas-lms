@@ -32,14 +32,14 @@ describe GradingStandardsApiController, type: :request do
         post_params = {"title"=>"account grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
         json = api_call(:post, @resource_path, @resource_params, post_params)
         grading_standard = GradingStandard.find(json['id'])
-        json['title'].should == 'account grading standard'
-        json['context_id'].should == @account.id
-        json['context_type'].should == 'Account'
+        expect(json['title']).to eq 'account grading standard'
+        expect(json['context_id']).to eq @account.id
+        expect(json['context_type']).to eq 'Account'
         data = json['grading_scheme']
-        data.count.should == 3
-        data[0].should == {'name'=>'A', 'value'=>0.9}
-        data[1].should == {'name'=>'B', 'value'=>0.8}
-        data[2].should == {'name'=>'C', 'value'=>0.7}
+        expect(data.count).to eq 3
+        expect(data[0]).to eq({'name'=>'A', 'value'=>0.9})
+        expect(data[1]).to eq({'name'=>'B', 'value'=>0.8})
+        expect(data[2]).to eq({'name'=>'C', 'value'=>0.7})
       end
 
       it "should create course level grading standards" do
@@ -49,32 +49,32 @@ describe GradingStandardsApiController, type: :request do
         post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
         json = api_call(:post, @resource_path, @resource_params, post_params)
         grading_standard = GradingStandard.find(json['id'])
-        json['title'].should == 'course grading standard'
-        json['context_id'].should == course.id
-        json['context_type'].should == 'Course'
+        expect(json['title']).to eq 'course grading standard'
+        expect(json['context_id']).to eq course.id
+        expect(json['context_type']).to eq 'Course'
         data = json['grading_scheme']
-        data.count.should == 3
-        data[0].should == {'name'=>'A', 'value'=>0.9}
-        data[1].should == {'name'=>'B', 'value'=>0.8}
-        data[2].should == {'name'=>'C', 'value'=>0.7}
+        expect(data.count).to eq 3
+        expect(data[0]).to eq({'name'=>'A', 'value'=>0.9})
+        expect(data[1]).to eq({'name'=>'B', 'value'=>0.8})
+        expect(data[2]).to eq({'name'=>'C', 'value'=>0.7})
       end
 
       it "should return error if no grading scheme provided" do
         post_params = {"title"=>"account grading standard"}
         json = api_call(:post, @resource_path, @resource_params, post_params, {}, {expected_status: 400})
-        json.should == {"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"blank", "message"=>"blank"}]}}
+        expect(json).to eq({"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"blank", "message"=>"blank"}]}})
       end
 
       it "should return error if grading scheme contains negative values" do
         post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"-90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"70"}]}
         json = api_call(:post, @resource_path, @resource_params, post_params, {}, {expected_status: 400})
-        json.should == {"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"grading scheme values cannot be negative", "message"=>"grading scheme values cannot be negative"}]}}
+        expect(json).to eq({"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"grading scheme values cannot be negative", "message"=>"grading scheme values cannot be negative"}]}})
       end
 
       it "should return error if grading scheme contains duplicate values" do
         post_params = {"title"=>"course grading standard", "grading_scheme_entry"=>[{"name"=>"A", "value"=>"90"}, {"name"=>"B", "value"=>"80"}, {"name"=>"C", "value"=>"90"}]}
         json = api_call(:post, @resource_path, @resource_params, post_params, {}, {expected_status: 400})
-        json.should == {"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"grading scheme cannot contain duplicate values", "message"=>"grading scheme cannot contain duplicate values"}]}}
+        expect(json).to eq({"errors"=>{"data"=>[{"attribute"=>"data", "type"=>"grading scheme cannot contain duplicate values", "message"=>"grading scheme cannot contain duplicate values"}]}})
       end
     end
   end

@@ -168,7 +168,7 @@ describe Lti::LtiOutboundAdapter do
       LtiOutbound::ToolLaunch.stubs(:new).returns(tool_launch)
       adapter.prepare_tool_launch(return_url)
 
-      adapter.launch_url.should == '/launch/url'
+      expect(adapter.launch_url).to eq '/launch/url'
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
@@ -182,7 +182,7 @@ describe Lti::LtiOutboundAdapter do
       LtiOutbound::ToolLaunch.stubs(:new).returns(tool_launch)
       adapter.prepare_tool_launch(return_url)
 
-      adapter.generate_post_payload.should == {}
+      expect(adapter.generate_post_payload).to eq({})
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
@@ -252,13 +252,13 @@ describe Lti::LtiOutboundAdapter do
       some_class = Class.new
       Lti::LtiOutboundAdapter.consumer_instance_class = some_class
 
-      Lti::LtiOutboundAdapter.consumer_instance_class.should == some_class
+      expect(Lti::LtiOutboundAdapter.consumer_instance_class).to eq some_class
 
       Lti::LtiOutboundAdapter.consumer_instance_class = nil
     end
 
     it "returns the LtiOutbound::LTIConsumerInstance if none defined" do
-      Lti::LtiOutboundAdapter.consumer_instance_class.should == LtiOutbound::LTIConsumerInstance
+      expect(Lti::LtiOutboundAdapter.consumer_instance_class).to eq LtiOutbound::LTIConsumerInstance
     end
   end
 end

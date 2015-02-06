@@ -28,36 +28,6 @@ module Quizzes
       s
     end
 
-    def self.grade_outstanding_submissions_in_course(user_id, context_id, context_type)
-      user = User.find(user_id)
-      user.quiz_submissions
-        .where('quizzes.context_id=? AND quizzes.context_type=?', context_id, context_type)
-        .includes(:quiz)
-        .select(&:needs_grading?)
-        .each do |quiz_submission|
-          Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-            finished_at: quiz_submission.end_at
-          })
-        end
-    end
-
-    def self.grade_outstanding_submissions_in_quiz(quiz_submissions)
-      quiz_submissions.each do |quiz_submission|
-        Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-          finished_at: quiz_submission.end_at
-        })
-      end
-    end
-
-    def self.find_outstanding_submissions_in_quiz(quiz_id)
-      # Find these in batches, so as to reduce the memory load
-      outstanding_qs = []
-      Quizzes::QuizSubmission.where("quiz_id=?", quiz_id).find_in_batches(batch_size: 1000) do |arr|
-        outstanding_qs += arr.select(&:needs_grading?)
-      end
-      outstanding_qs
-    end
-
     private
     # this is needed because Rails 2 expects a User object instead of an id
     def generate_build_hash(query_hash, user)

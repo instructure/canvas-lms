@@ -97,10 +97,10 @@ define [
     animateGhost: (fromElement, toElement) ->
       from          = fromElement.offset()
       to            = toElement.offset()
-      clone         = fromElement.clone()
+      $clone        = fromElement.clone()
       from.position = 'absolute'
 
-      @ghost.append(clone)
+      @ghost.append($clone)
       @ghost.appendTo(@doc).css(from).animate to, @options.animationDuration, =>
         @ghost.detach().empty()
 

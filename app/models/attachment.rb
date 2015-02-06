@@ -63,6 +63,7 @@ class Attachment < ActiveRecord::Base
   has_many :thumbnails, :foreign_key => "parent_id"
   has_one :crocodoc_document
   has_one :canvadoc
+  belongs_to :usage_rights
 
   before_save :infer_display_name
   before_save :default_values
@@ -561,6 +562,10 @@ class Attachment < ActiveRecord::Base
     Canvas::Security.hmac_sha1(uuid + "quota_exempt")[0,10]
   end
 
+  def verify_quota_exemption_key(hmac)
+    Canvas::Security.verify_hmac_sha1(hmac, uuid + "quota_exempt", truncate: 10)
+  end
+
   def self.minimum_size_for_quota
     Setting.get('attachment_minimum_size_for_quota', '512').to_i
   end
@@ -595,16 +600,18 @@ class Attachment < ActiveRecord::Base
     method = method.to_sym
     deleted_attachments = []
     if method == :rename
-      self.save unless self.id
+      self.save! unless self.id
 
       valid_name = false
-      while !valid_name
-        existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
-        self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
+      self.shard.activate do
+        while !valid_name
+          existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
+          self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
 
-        if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
-                            self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
-          valid_name = true
+          if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
+                              self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
+            valid_name = true
+          end
         end
       end
     elsif method == :overwrite
@@ -984,7 +991,6 @@ class Attachment < ActiveRecord::Base
       "audio/mpeg" => "audio",
       "audio/basic" => "audio",
       "audio/mid" => "audio",
-      "audio/mpeg" => "audio",
       "audio/3gpp" => "audio",
       "audio/x-aiff" => "audio",
       "audio/x-mpegurl" => "audio",
@@ -1180,7 +1186,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def crocodocable?
-    Canvas::Crocodoc.config &&
+    Canvas::Crocodoc.enabled? &&
       CrocodocDocument::MIME_TYPES.include?(content_type)
   end
 
@@ -1217,7 +1223,13 @@ class Attachment < ActiveRecord::Base
     return if Attachment.skip_3rd_party_submits?
 
     if opts[:wants_annotation] && crocodocable?
-      submit_to_crocodoc(attempt)
+      # get crocodoc off the canvadocs strand
+      # (maybe :wants_annotation was a dumb idea)
+      send_later_enqueue_args :submit_to_crocodoc, {
+        n_strand: 'crocodoc',
+        max_attempts: 1,
+        priority: Delayed::LOW_PRIORITY,
+      }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
       doc.upload

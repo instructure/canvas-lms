@@ -112,10 +112,11 @@ module Workflow
     end
  
     def workflow(&specification)
+      workflow_methods = Module.new
       self.workflow_spec = Specification.new(Hash.new, &specification)
       self.workflow_spec.states.values.each do |state|
         state_name = state.name
-        module_eval do
+        workflow_methods.module_eval do
           define_method "#{state_name}?" do
             state_name == current_state.name
           end
@@ -123,7 +124,7 @@ module Workflow
  
         state.events.values.each do |event|
           event_name = event.name
-          module_eval do
+          workflow_methods.module_eval do
             define_method "#{event_name}!".to_sym do |*args|
               process_event!(event_name, *args)
             end
@@ -134,6 +135,8 @@ module Workflow
           end
         end
       end
+
+      include workflow_methods
     end
   end
  

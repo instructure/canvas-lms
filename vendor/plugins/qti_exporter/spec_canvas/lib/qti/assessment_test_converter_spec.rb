@@ -7,15 +7,15 @@ describe Qti::AssessmentTestConverter do
     minutes_in_hour = 60
     minutes_in_day = 24 * minutes_in_hour
 
-    assess.parse_time_limit("D1").should == minutes_in_day
-    assess.parse_time_limit("d2").should == 2 * minutes_in_day
-    assess.parse_time_limit("H4").should == 4 * minutes_in_hour
-    assess.parse_time_limit("h1").should == minutes_in_hour
-    assess.parse_time_limit("M120").should == 120
-    assess.parse_time_limit("m14").should == 14
+    expect(assess.parse_time_limit("D1")).to eq minutes_in_day
+    expect(assess.parse_time_limit("d2")).to eq 2 * minutes_in_day
+    expect(assess.parse_time_limit("H4")).to eq 4 * minutes_in_hour
+    expect(assess.parse_time_limit("h1")).to eq minutes_in_hour
+    expect(assess.parse_time_limit("M120")).to eq 120
+    expect(assess.parse_time_limit("m14")).to eq 14
 
     #Canvas uses minutes, QTI uses seconds
-    assess.parse_time_limit("60").should == 1
-    assess.parse_time_limit("3600").should == 60
+    expect(assess.parse_time_limit("60")).to eq 1
+    expect(assess.parse_time_limit("3600")).to eq 60
   end
 end

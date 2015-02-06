@@ -6,8 +6,8 @@ shared_examples_for 'Textual Answer Serializers' do
     input = format(input) if respond_to?(:format)
 
     rc = subject.serialize(input)
-    rc.valid?.should be_false
-    rc.error.should match(/too long/i)
+    expect(rc.valid?).to be_falsey
+    expect(rc.error).to match(/too long/i)
   end
 
   it '[auto] should reject a textual answer that is not a String' do
@@ -15,8 +15,8 @@ shared_examples_for 'Textual Answer Serializers' do
       bad_input = format(bad_input) if respond_to?(:format)
 
       rc = subject.serialize(bad_input)
-      rc.valid?.should be_false
-      rc.error.should match(/must be of type string/i)
+      expect(rc.valid?).to be_falsey
+      expect(rc.error).to match(/must be of type string/i)
     end
   end
 end

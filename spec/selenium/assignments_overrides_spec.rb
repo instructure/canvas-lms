@@ -22,7 +22,7 @@ describe "assignment groups" do
       fill_assignment_overrides
       click_option('#assignment_submission_type', 'No Submission')
       update_assignment!
-      a = Assignment.find_by_title('vdd assignment')
+      a = Assignment.where(title: 'vdd assignment').first
       compare_assignment_times(a)
     end
 
@@ -30,12 +30,12 @@ describe "assignment groups" do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 
-      first_due_at_element.attribute(:value).
-        should match due_at.strftime('%b %-d')
-      first_unlock_at_element.attribute(:value).
-        should match unlock_at.strftime('%b %-d')
-      first_lock_at_element.attribute(:value).
-        should match lock_at.strftime('%b %-d')
+      expect(first_due_at_element.attribute(:value)).
+        to match due_at.strftime('%b %-d')
+      expect(first_unlock_at_element.attribute(:value)).
+        to match unlock_at.strftime('%b %-d')
+      expect(first_lock_at_element.attribute(:value)).
+        to match lock_at.strftime('%b %-d')
     end
 
     it "should edit a due date" do
@@ -47,8 +47,8 @@ describe "assignment groups" do
       first_due_at_element.send_keys(due_at.strftime('%b %-d, %y'))
       update_assignment!
 
-      assignment.reload.due_at.strftime('%b %-d, %y').
-        should == due_at.to_date.strftime('%b %-d, %y')
+      expect(assignment.reload.due_at.strftime('%b %-d, %y')).
+        to eq due_at.to_date.strftime('%b %-d, %y')
     end
 
     it "should clear a due date" do
@@ -58,7 +58,7 @@ describe "assignment groups" do
       f('.due-date-overrides [name="due_at"]').clear
       expect_new_page_load { submit_form('#edit_assignment_form') }
 
-      assign.reload.due_at.should be_nil
+      expect(assign.reload.due_at).to be_nil
     end
 
     it "should allow setting overrides" do
@@ -84,29 +84,47 @@ describe "assignment groups" do
 
       update_assignment!
       overrides = assign.reload.assignment_overrides
-      overrides.count.should == 2
+      expect(overrides.count).to eq 2
       default_override = overrides.detect{ |o| o.set_id == default_section.id }
-      default_override.due_at.strftime('%b %-d, %y').
-        should == default_section_due.to_date.strftime('%b %-d, %y')
+      expect(default_override.due_at.strftime('%b %-d, %y')).
+        to eq default_section_due.to_date.strftime('%b %-d, %y')
       other_override = overrides.detect{ |o| o.set_id == other_section.id }
-      other_override.due_at.strftime('%b %-d, %y').
-        should == other_section_due.to_date.strftime('%b %-d, %y')
+      expect(other_override.due_at.strftime('%b %-d, %y')).
+        to eq other_section_due.to_date.strftime('%b %-d, %y')
     end
 
     it "should show a vdd tooltip summary on the course assignments page" do
       assignment = create_assignment!
       get "/courses/#{@course.id}/assignments"
-      f('.assignment_list .assignment_due').should_not include_text "Multiple Due Dates"
+      expect(f('.assignment .assignment-date-due')).not_to include_text "Multiple Dates"
       add_due_date_override(assignment)
 
       get "/courses/#{@course.id}/assignments"
-      f('.assignment_list .assignment_due').should include_text "Multiple Due Dates"
-      driver.mouse.move_to f(".assignment_list .assignment_due a")
+      expect(f('.assignment .assignment-date-due')).to include_text "Multiple Dates"
+      driver.mouse.move_to f(".assignment .assignment-date-due a")
       wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')
-      tooltip.should include_text 'New Section'
-      tooltip.should include_text 'Everyone else'
+      expect(tooltip).to include_text 'New Section'
+      expect(tooltip).to include_text 'Everyone else'
+    end
+  end
+
+  context "as a student" do
+
+    let(:unlock_at) { Time.zone.now - 2.days }
+    let(:lock_at) { Time.zone.now + 4.days }
+
+    before(:once) do
+      make_full_screen
+      course_with_student_logged_in(:active_all => true)
+    end
+
+    it "should show the available date range when overrides are set" do
+      assign = create_assignment!
+      get "/courses/#{@course.id}/assignments/#{assign.id}"
+      wait_for_ajaximations
+      expect(f('.student-assignment-overview')).to include_text 'Available'
     end
   end
 end

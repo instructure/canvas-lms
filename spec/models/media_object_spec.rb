@@ -24,12 +24,12 @@ describe MediaObject do
       course
       mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :old_media_id => '1_01234567', :context => @course)
 
-      MediaObject.by_media_id('0_abcdefgh').first.should == mo
-      MediaObject.by_media_id('1_01234567').first.should == mo
+      expect(MediaObject.by_media_id('0_abcdefgh').first).to eq mo
+      expect(MediaObject.by_media_id('1_01234567').first).to eq mo
     end
 
     it "should raise an error if someone tries to use find_by_media_id" do
-      lambda { MediaObject.find_by_media_id('fjdksl') }.should raise_error
+      expect { MediaObject.find_by_media_id('fjdksl') }.to raise_error
     end
   end
 
@@ -46,8 +46,8 @@ describe MediaObject do
         ],
       }
       MediaObject.build_media_objects(data, Account.default.id)
-      @a1.reload.file_state.should == 'deleted'
-      @a2.reload.file_state.should == 'available'
+      expect(@a1.reload.file_state).to eq 'deleted'
+      expect(@a2.reload.file_state).to eq 'available'
     end
 
     it "should build media objects from attachment_id" do
@@ -66,12 +66,12 @@ describe MediaObject do
       MediaObject.create!(:context => user, :media_id => "test2")
       MediaObject.create!(:context => user, :media_id => "test3")
       MediaObject.build_media_objects(data, Account.default.id)
-      media_object = MediaObject.find_by_attachment_id(@a1.id)
-      media_object.should_not be_nil
-      media_object = MediaObject.find_by_attachment_id(@a2.id)
-      media_object.should_not be_nil
-      media_object = MediaObject.find_by_attachment_id(@a3.id)
-      media_object.should_not be_nil
+      media_object = MediaObject.where(attachment_id: @a1).first
+      expect(media_object).not_to be_nil
+      media_object = MediaObject.where(attachment_id: @a2).first
+      expect(media_object).not_to be_nil
+      media_object = MediaObject.where(attachment_id: @a3).first
+      expect(media_object).not_to be_nil
     end
   end
 
@@ -98,7 +98,7 @@ describe MediaObject do
         run_jobs
       }.to change { Delayed::Job.jobs_count(:future) }.by(1)
       obj = MediaObject.by_media_id("test").first
-      obj.context.should == @user
+      expect(obj.context).to eq @user
     end
   end
 
@@ -111,8 +111,8 @@ describe MediaObject do
         mo.user = nil
         mo.save!
 
-        mo.grants_right?(@teacher, :add_captions).should == true
-        mo.grants_right?(@teacher, :delete_captions).should == true
+        expect(mo.grants_right?(@teacher, :add_captions)).to eq true
+        expect(mo.grants_right?(@teacher, :delete_captions)).to eq true
       end
 
       it "should not allow course non-admin users to add_captions to userless objects" do
@@ -122,8 +122,8 @@ describe MediaObject do
         mo.user = nil
         mo.save!
 
-        mo.grants_right?(@student, :add_captions).should == false
-        mo.grants_right?(@student, :delete_captions).should == false
+        expect(mo.grants_right?(@student, :add_captions)).to eq false
+        expect(mo.grants_right?(@student, :delete_captions)).to eq false
       end
 
       it "should allow course non-admin users to add_captions to objects belonging to them" do
@@ -133,8 +133,8 @@ describe MediaObject do
         mo.user = @student
         mo.save!
 
-        mo.grants_right?(@student, :add_captions).should == true
-        mo.grants_right?(@student, :delete_captions).should == true
+        expect(mo.grants_right?(@student, :add_captions)).to eq true
+        expect(mo.grants_right?(@student, :delete_captions)).to eq true
       end
 
       it "should not allow course non-admin users to add_captions to objects not belonging to them" do
@@ -145,8 +145,8 @@ describe MediaObject do
         mo.user = @user
         mo.save!
 
-        mo.grants_right?(@student, :add_captions).should == false
-        mo.grants_right?(@student, :delete_captions).should == false
+        expect(mo.grants_right?(@student, :add_captions)).to eq false
+        expect(mo.grants_right?(@student, :delete_captions)).to eq false
       end
     end
   end
@@ -161,7 +161,7 @@ describe MediaObject do
 
       kaltura_media_file_handler.expects(:add_media_files).with(attachments, wait_for_completion).returns(:retval)
 
-      MediaObject.add_media_files(attachments, wait_for_completion).should == :retval
+      expect(MediaObject.add_media_files(attachments, wait_for_completion)).to eq :retval
     end
   end
 end

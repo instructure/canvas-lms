@@ -22,6 +22,12 @@
 
 </div>
 
+{{#if needsUnassignedWarning}}
+  <div id="unassigned_warning" class="alert">
+    No students are currently assigned. Add a due date to assign a set of students.
+  </div>
+{{/if}}
+
 <ul class="due-date-overrides"></ul>
 
 <div class="due-date-override-footer">

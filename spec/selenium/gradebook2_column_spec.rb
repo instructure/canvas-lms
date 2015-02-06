@@ -3,27 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "assignment column headers" do
   include_examples "in-process server selenium tests"
 
-  ASSIGNMENT_1_POINTS = "10"
-  ASSIGNMENT_2_POINTS = "5"
-  ASSIGNMENT_3_POINTS = "50"
-  ATTENDANCE_POINTS = "15"
-
-  STUDENT_NAME_1 = "student 1"
-  STUDENT_NAME_2 = "student 2"
-  STUDENT_NAME_3 = "student 3"
-  STUDENT_SORTABLE_NAME_1 = "1, student"
-  STUDENT_SORTABLE_NAME_2 = "2, student"
-  STUDENT_SORTABLE_NAME_3 = "3, student"
-  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
-  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
-  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  DEFAULT_PASSWORD = "qwerty"
-
   before (:each) do
-    data_setup
+    gradebook_data_setup
     @assignment = @course.assignments.first
     @header_selector = %([id$="assignment_#{@assignment.id}"])
     get "/courses/#{@course.id}/gradebook2"
@@ -38,13 +19,13 @@ describe "assignment column headers" do
     meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
     grade_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     #filter validation
-    validate_cell_text(meta_cells[0], STUDENT_NAME_3 + "\n" + @course.name)
-    validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_3_TOTAL_IGNORING_UNGRADED)
+    validate_cell_text(meta_cells[0], @student_name_3 + "\n" + @course.name)
+    validate_cell_text(grade_cells[0], @assignment_2_points)
+    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), @student_3_total_ignoring_ungraded)
   end
 
   it "should minimize a column and remember it" do
-    pending("dragging and dropping these does not work well in selenium")
+    skip("dragging and dropping these does not work well in selenium")
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     first_dragger, second_dragger = ff('#gradebook_grid .slick-resizable-handle')
@@ -52,7 +33,7 @@ describe "assignment column headers" do
   end
 
   it "should have a tooltip with the assignment name" do
-    f(@header_selector)["title"].should == @assignment.title
+    expect(f(@header_selector)["title"]).to eq @assignment.title
   end
 
   it "should handle a ton of assignments without wrapping the slick-header" do
@@ -62,7 +43,7 @@ describe "assignment column headers" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     # being 38px high means it did not wrap
-    driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should == 38
+    expect(driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()')).to eq 38
   end
 
   it "should validate arrange columns by due date option" do
@@ -72,8 +53,8 @@ describe "assignment column headers" do
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], expected_text)
     open_gradebook_settings()
-    arrange_settings.first.find_element(:xpath, '..').should_not be_displayed
-    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+    expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
+    expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
 
     # Setting should stick after reload
     get "/courses/#{@course.id}/gradebook2"
@@ -83,25 +64,25 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], expected_text)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[2], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_1_points)
+    validate_cell_text(first_row_cells[2], @assignment_2_points)
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
-    arrange_settings.first.find_element(:xpath, '..').should_not be_displayed
-    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+    expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
+    expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
   end
 
   it "should default to arrange columns by assignment group" do
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_1_points)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
     validate_cell_text(first_row_cells[2], "-")
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
-    arrange_settings.first.find_element(:xpath, '..').should be_displayed
-    arrange_settings.last.find_element(:xpath, '..').should_not be_displayed
+    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
+    expect(arrange_settings.last.find_element(:xpath, '..')).not_to be_displayed
   end
 
   it "should validate arrange columns by assignment group option" do
@@ -110,46 +91,46 @@ describe "assignment column headers" do
     open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
     open_gradebook_settings(arrange_settings.last.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_1_points)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
     validate_cell_text(first_row_cells[2], "-")
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
-    arrange_settings.first.find_element(:xpath, '..').should be_displayed
-    arrange_settings.last.find_element(:xpath, '..').should_not be_displayed
+    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
+    expect(arrange_settings.last.find_element(:xpath, '..')).not_to be_displayed
 
     # Setting should stick (not be messed up) after reload
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_1_points)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
     validate_cell_text(first_row_cells[2], "-")
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
-    arrange_settings.first.find_element(:xpath, '..').should be_displayed
-    arrange_settings.last.find_element(:xpath, '..').should_not be_displayed
+    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
+    expect(arrange_settings.last.find_element(:xpath, '..')).not_to be_displayed
   end
 
   it "should allow custom column ordering" do
-    pending("drag and drop doesn't seem to work")
+    skip("drag and drop doesn't seem to work")
     columns = ff('.assignment-points-possible')
-    columns.should_not be_empty
+    expect(columns).not_to be_empty
     driver.action.drag_and_drop_by(columns[1], -300, 0).perform
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[0], @assignment_2_points)
+    validate_cell_text(first_row_cells[1], @assignment_1_points)
     validate_cell_text(first_row_cells[2], "-")
 
     # with a custom order, both sort options should be displayed
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
-    arrange_settings.first.find_element(:xpath, '..').should be_displayed
-    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
+    expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
   end
 
   it "should load custom column ordering" do
@@ -167,14 +148,14 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
-    validate_cell_text(first_row_cells[2], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
+    validate_cell_text(first_row_cells[2], @assignment_1_points)
 
     # both predefined short orders should be displayed since neither one is selected.
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
-    arrange_settings.first.find_element(:xpath, '..').should be_displayed
-    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
+    expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
   end
 
   it "should put new assignments at the end when columns have custom order" do
@@ -200,8 +181,8 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
-    validate_cell_text(first_row_cells[2], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
+    validate_cell_text(first_row_cells[2], @assignment_1_points)
     validate_cell_text(first_row_cells[3], '150')
   end
 
@@ -220,21 +201,21 @@ describe "assignment column headers" do
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[1], @assignment_2_points)
   end
 
   it "should validate show attendance columns option" do
     attendance_setting = f('#show_attendance').find_element(:xpath, '..')
     open_gradebook_settings(attendance_setting)
     headers = ff('.slick-header')
-    headers[1].should include_text(@attendance_assignment.title)
+    expect(headers[1]).to include_text(@attendance_assignment.title)
     open_gradebook_settings(attendance_setting)
   end
 
   it "show letter grade in total column" do
-    f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points').should include_text("A")
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points')).to include_text("A")
     edit_grade('#gradebook_grid .slick-row:nth-child(2) .l2', '50')
     wait_for_ajax_requests
-    f('#gradebook_grid .container_1 .slick-row:nth-child(2) .total-cell .letter-grade-points').should include_text("A")
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .total-cell .letter-grade-points')).to include_text("A")
   end
 end

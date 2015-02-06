@@ -105,11 +105,26 @@
 #           "type": "integer"
 #         },
 #         "id": {
+#           "description": "The id of rubric criteria.",
 #           "example": "crit1",
+#           "type": "string"
+#         },
+#         "outcome_id": {
+#           "description": "(Optional) The id of the learning outcome this criteria uses, if any.",
+#           "example": "1234",
+#           "type": "string"
+#         },
+#         "vendor_guid": {
+#           "description": "(Optional) The 3rd party vendor's GUID for the outcome this criteria references, if any.",
+#           "example": "abdsfjasdfne3jsdfn2",
 #           "type": "string"
 #         },
 #         "description": {
 #           "example": "Criterion 1",
+#           "type": "string"
+#         },
+#         "long_description": {
+#           "example": "Criterion 1 more details",
 #           "type": "string"
 #         },
 #         "ratings": {
@@ -255,6 +270,11 @@
 #           "description": "the unlock date (assignment is unlocked after this date) returns null if not present NOTE: If this assignment has assignment overrides, this field will be the unlock date as it applies to the user requesting information from the API.",
 #           "example": "2012-07-01T23:59:00-06:00",
 #           "type": "datetime"
+#         },
+#         "has_overrides": {
+#           "description": "whether this assignment has overrides",
+#           "example": true,
+#           "type": "boolean"
 #         },
 #         "all_dates": {
 #           "description": "(Optional) all dates associated with the assignment, if applicable",
@@ -499,7 +519,7 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the list of assignments for the current context.
-  # @argument include[] [String, "submission"|"assignment_visibility"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on.
   # @argument search_term [String]
@@ -521,20 +541,20 @@ class AssignmentsApiController < ApplicationController
       fake = @context.assignments.scoped.new
       fake.workflow_state = 'unpublished'
 
-      if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
+      unless fake.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
         scope = scope.published
       end
 
-      if @context.feature_enabled?(:differentiated_assignments)
-        scope = AssignmentStudentVisibility.filter_for_differentiated_assignments(scope, @current_user, @context) do |scope, user_ids|
-          scope.visible_to_student_in_course_with_da(user_ids, @context.id)
-        end
+      if da_enabled = @context.feature_enabled?(:differentiated_assignments)
+        scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
       end
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
 
-      if Array(params[:include]).include?('submission')
+      include_params = Array(params[:include])
+
+      if include_params.include?('submission')
         submissions = Hash[
           @context.submissions.
             where(:assignment_id => assignments).
@@ -545,25 +565,35 @@ class AssignmentsApiController < ApplicationController
         submissions = {}
       end
 
+      include_all_dates = include_params.include?('all_dates')
+
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
-      if override_dates
-        Assignment.send(:preload_associations, assignments, :assignment_overrides)
+      if override_dates || include_all_dates
+        ActiveRecord::Associations::Preloader.new(assignments, :assignment_overrides).run
         assignments.select{ |a| a.assignment_overrides.size == 0 }.
           each { |a| a.has_no_overrides = true }
       end
 
-      include_visibility = Array(params[:include]).include?('assignment_visibility')
+      include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+
+      if include_visibility && da_enabled
+        assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
+      end
 
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
       hashes = assignments.map do |assignment|
+        visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
         assignment_json(assignment, @current_user, session,
                         submission: submission, override_dates: override_dates,
                         include_visibility: include_visibility,
-                        needs_grading_count_by_section: needs_grading_count_by_section)
+                        assignment_visibilities: visibility_array,
+                        needs_grading_count_by_section: needs_grading_count_by_section,
+                        include_all_dates: include_all_dates
+                        )
       end
 
       render :json => hashes
@@ -579,6 +609,8 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
+  # @argument all_dates [Boolean]
+  #   All dates associated with the assignment, if applicable
   # @returns Assignment
   def show
     @assignment = @context.active_assignments.find(params[:id],
@@ -590,7 +622,8 @@ class AssignmentsApiController < ApplicationController
         submission = @assignment.submissions.for_user(@current_user).first
       end
 
-      include_visibility = Array(params[:include]).include?('assignment_visibility')
+      include_visibility = Array(params[:include]).include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      include_all_dates = value_to_boolean(params[:all_dates] || false)
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -603,7 +636,8 @@ class AssignmentsApiController < ApplicationController
                   submission: submission,
                   override_dates: override_dates,
                   include_visibility: include_visibility,
-                  needs_grading_count_by_section: needs_grading_count_by_section)
+                  needs_grading_count_by_section: needs_grading_count_by_section,
+                  include_all_dates: include_all_dates)
     end
   end
 
@@ -746,7 +780,7 @@ class AssignmentsApiController < ApplicationController
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
-    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
+    @assignment.workflow_state = 'unpublished'
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response
     end

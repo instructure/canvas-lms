@@ -113,7 +113,7 @@ describe DueDateCacher do
   describe "#submissions" do
     it "should not create submissions for enrollments that are not overridden" do
       cacher = DueDateCacher.new([@assignment])
-      cacher.submissions.size.should eql(0)
+      expect(cacher.submissions.size).to eql(0)
     end
 
     it "should create submissions for enrollments that are overridden" do
@@ -124,9 +124,9 @@ describe DueDateCacher do
       @override.save!
 
       cacher = DueDateCacher.new([@assignment])
-      cacher.submissions.size.should eql(1)
-      cacher.submissions.first.assignment.should == @assignment
-      cacher.submissions.first.user.should == @student
+      expect(cacher.submissions.size).to eql(1)
+      expect(cacher.submissions.first.assignment).to eq @assignment
+      expect(cacher.submissions.first.user).to eq @student
     end
   end
 
@@ -143,7 +143,7 @@ describe DueDateCacher do
         @assignment.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission.reload.cached_due_date).to eq @assignment.due_at
       end
 
       it "should set the cached_due_date to nil if the assignment has no due_at" do
@@ -151,7 +151,7 @@ describe DueDateCacher do
         @assignment.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should be_nil
+        expect(@submission.reload.cached_due_date).to be_nil
       end
     end
 
@@ -167,7 +167,7 @@ describe DueDateCacher do
         @override.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should == @override.due_at
+        expect(@submission.reload.cached_due_date).to eq @override.due_at
       end
 
       it "should prefer override's due_at over assignment's nil" do
@@ -178,7 +178,7 @@ describe DueDateCacher do
         @assignment.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should == @override.due_at
+        expect(@submission.reload.cached_due_date).to eq @override.due_at
       end
 
       it "should prefer override's nil over assignment's due_at" do
@@ -186,7 +186,7 @@ describe DueDateCacher do
         @override.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should == @override.due_at
+        expect(@submission.reload.cached_due_date).to eq @override.due_at
       end
 
       it "should not apply override if it doesn't override due_at" do
@@ -194,7 +194,7 @@ describe DueDateCacher do
         @override.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission.reload.cached_due_date).to eq @assignment.due_at
       end
     end
 
@@ -217,11 +217,11 @@ describe DueDateCacher do
       end
 
       it "should apply to students in the adhoc set" do
-        @submission2.reload.cached_due_date.should == @override.due_at
+        expect(@submission2.reload.cached_due_date).to eq @override.due_at
       end
 
       it "should not apply to students not in the adhoc set" do
-        @submission1.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at
       end
     end
 
@@ -246,11 +246,11 @@ describe DueDateCacher do
       end
 
       it "should apply to students in that section" do
-        @submission2.reload.cached_due_date.should == @override.due_at
+        expect(@submission2.reload.cached_due_date).to eq @override.due_at
       end
 
       it "should not apply to students in other sections" do
-        @submission1.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at
       end
 
       it "should not apply to non-active enrollments in that section" do
@@ -258,7 +258,7 @@ describe DueDateCacher do
           :enrollment_state => 'deleted',
           :section => @course_section,
           :allow_multiple_enrollments => true)
-        @submission1.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at
       end
     end
 
@@ -290,16 +290,16 @@ describe DueDateCacher do
       end
 
       it "should apply to students in that group" do
-        @submission2.reload.cached_due_date.should == @override.due_at
+        expect(@submission2.reload.cached_due_date).to eq @override.due_at
       end
 
       it "should not apply to students not in the group" do
-        @submission1.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at
       end
 
       it "should not apply to non-active memberships in that group" do
         @group.add_user(@student1, 'deleted')
-        @submission1.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission1.reload.cached_due_date).to eq @assignment.due_at
       end
     end
 
@@ -324,7 +324,7 @@ describe DueDateCacher do
         @override1.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should == @override1.due_at
+        expect(@submission.reload.cached_due_date).to eq @override1.due_at
       end
 
       it "should prefer second override's due_at if latest" do
@@ -332,7 +332,7 @@ describe DueDateCacher do
         @override2.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should == @override2.due_at
+        expect(@submission.reload.cached_due_date).to eq @override2.due_at
       end
 
       it "should be nil if first override's nil" do
@@ -340,7 +340,7 @@ describe DueDateCacher do
         @override1.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should be_nil
+        expect(@submission.reload.cached_due_date).to be_nil
       end
 
       it "should be nil if second override's nil" do
@@ -348,7 +348,7 @@ describe DueDateCacher do
         @override2.save!
 
         @cacher.recompute
-        @submission.reload.cached_due_date.should be_nil
+        expect(@submission.reload.cached_due_date).to be_nil
       end
     end
 
@@ -384,7 +384,7 @@ describe DueDateCacher do
         @override1.save!
 
         @cacher.recompute
-        @submission1.reload.cached_due_date.should == @override1.due_at
+        expect(@submission1.reload.cached_due_date).to eq @override1.due_at
       end
 
       it "should use second override where the first doesn't apply" do
@@ -392,7 +392,7 @@ describe DueDateCacher do
         @override2.save!
 
         @cacher.recompute
-        @submission2.reload.cached_due_date.should == @override2.due_at
+        expect(@submission2.reload.cached_due_date).to eq @override2.due_at
       end
 
       it "should use the best override where both apply" do
@@ -400,7 +400,7 @@ describe DueDateCacher do
         @override1.save!
 
         @cacher.recompute
-        @submission2.reload.cached_due_date.should == @override2.due_at
+        expect(@submission2.reload.cached_due_date).to eq @override2.due_at
       end
     end
 
@@ -422,11 +422,11 @@ describe DueDateCacher do
       end
 
       it "should apply to submission on the overridden assignment" do
-        @submission1.reload.cached_due_date.should == @override.due_at
+        expect(@submission1.reload.cached_due_date).to eq @override.due_at
       end
 
       it "should not apply to apply to submission on the other assignment" do
-        @submission2.reload.cached_due_date.should == @assignment.due_at
+        expect(@submission2.reload.cached_due_date).to eq @assignment.due_at
       end
     end
   end

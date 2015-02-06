@@ -34,7 +34,7 @@ describe "/calendars/show" do
     assigns[:assignment_groups_for] = {}
     assigns[:body_classes] = []
     render 'calendars/show'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

@@ -143,6 +143,9 @@
         <label for="assignment_external_tool_tag_attributes_url">
           {{#t "label.external_tool_url"}}External Tool URL{{/t}}
         </label>
+        <button class="screenreader-only" id="assignment_external_tool_tag_attributes_url_screenreader_button">
+          Open External Tool Url Options
+        </button>
         <div class="nested">
           <input id="assignment_external_tool_tag_attributes_url"
             name="external_tool_tag_attributes[url]"
@@ -150,6 +153,14 @@
             value="{{externalToolUrl}}"
             {{disabledIfIncludes frozenAttributes "submission_types"}}/>
         </div>
+          <input id="assignment_external_tool_tag_attributes_content_type"
+                 name="external_tool_tag_attributes[content_type]"
+                 type="text"
+                 style="display: none"/>
+        <input id="assignment_external_tool_tag_attributes_content_id"
+               name="external_tool_tag_attributes[content_id]"
+               type="text"
+               style="display: none"/>
         <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
           {{checkbox "externalToolNewTab"
             id="assignment_external_tool_tag_attributes_new_tab"

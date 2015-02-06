@@ -114,7 +114,7 @@ module ApplicationHelper
   end
 
   def url_helper_context_from_object(context)
-    (context ? context.class.base_ar_class : context.class).name.underscore
+    (context ? context.class.base_class : context.class).name.underscore
   end
 
   def message_user_path(user, context = nil)
@@ -297,11 +297,14 @@ module ApplicationHelper
           end
         end
         return '' if tabs.empty?
+
+        inactive_element = "<span id='inactive_nav_link' class='screenreader-only'>#{I18n.t('* No content has been added')}</span>"
+
         html << '<nav role="navigation" aria-label="context"><ul id="section-tabs">'
         tabs.each do |tab|
           path = nil
           if tab[:args]
-            path = send(tab[:href], *tab[:args])
+            path = tab[:args].instance_of?(Array) ? send(tab[:href], *tab[:args]) : send(tab[:href], tab[:args])
           elsif tab[:no_args]
             path = send(tab[:href])
           else
@@ -311,10 +314,14 @@ module ApplicationHelper
           class_name = tab[:css_class].downcase.replace_whitespace("-")
           class_name += ' active' if @active_tab == tab[:css_class]
 
+          if hide
+            tab[:label] += inactive_element
+          end
+
           if tab[:screenreader]
-            link = link_to(tab[:label], path, :class => class_name, "aria-label" => tab[:screenreader])
+            link = "<a href='#{path}' class='#{class_name}' aria-label='#{tab[:screenreader]}'>#{tab[:label]}</a>"
           else
-            link = link_to(tab[:label], path, :class => class_name)
+            link = "<a href='#{path}' class='#{class_name}'>#{tab[:label]}</a>"
           end
 
           html << "<li class='section #{"section-tab-hidden" if hide }'>" + link + "</li>" if tab[:href]
@@ -373,7 +380,7 @@ module ApplicationHelper
 
   def active_external_tool_by_id(tool_id)
     # don't use for groups. they don't have account_chain_ids
-    tool = @context.context_external_tools.active.find_by_tool_id(tool_id)
+    tool = @context.context_external_tools.active.where(tool_id: tool_id).first
     return tool if tool
 
     # account_chain_ids is in the order we need to search for tools
@@ -460,6 +467,7 @@ module ApplicationHelper
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
+      :pandaPubSettings        => CanvasPandaPub::Client.config.try(:slice, 'push_url', 'application_id'),
     }.each do |key,value|
       # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
       global_inst_object[key] = value if value
@@ -567,12 +575,6 @@ module ApplicationHelper
     concat(t(*args))
   end
 
-  def jt(key, default, js_options='{}')
-    full_key = key =~ /\A#/ ? key.sub(/\A#/, '') : i18n_scope + '.' + key
-    translated_default = I18n.backend.send(:lookup, I18n.locale, full_key) || default # string or hash
-    raw "I18n.scoped(#{i18n_scope.to_json}).t(#{key.to_json}, #{translated_default.to_json}, #{js_options})"
-  end
-
   def join_title(*parts)
     parts.join(t('#title_separator', ': '))
   end
@@ -588,10 +590,11 @@ module ApplicationHelper
   def map_courses_for_menu(courses)
     mapped = courses.map do |course|
       term = course.enrollment_term.name if !course.enrollment_term.default_term?
+      role = Role.get_role_by_id(course.primary_enrollment_role_id) || Enrollment.get_built_in_role_for_type(course.primary_enrollment_type)
       subtitle = (course.primary_enrollment_state == 'invited' ?
                   before_label('#shared.menu_enrollment.labels.invited_as', 'Invited as') :
                   before_label('#shared.menu_enrollment.labels.enrolled_as', "Enrolled as")
-                 ) + " " + Enrollment.readable_type(course.primary_enrollment)
+                 ) + " " + role.label
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
@@ -750,7 +753,7 @@ module ApplicationHelper
     context = opts[:context]
     tag_type = opts.fetch(:tag_type, :time)
     if datetime.present?
-      attributes[:title] ||= context_sensitive_datetime_title(datetime, context, just_text: true)
+      attributes['data-html-tooltip-title'] ||= context_sensitive_datetime_title(datetime, context, just_text: true)
       attributes['data-tooltip'] ||= 'top'
     end
 
@@ -761,18 +764,19 @@ module ApplicationHelper
 
   def context_sensitive_datetime_title(datetime, context, options={})
     just_text = options.fetch(:just_text, false)
-    return "" unless datetime.present?
+    default_text = options.fetch(:default_text, "")
+    return default_text unless datetime.present?
     local_time = datetime_string(datetime)
     text = local_time
     if context.present?
       course_time = datetime_string(datetime, :event, nil, false, context.time_zone)
       if course_time != local_time
-        text = "#{I18n.t('#helpers.local', "Local")}: #{local_time}<br>#{I18n.t('#helpers.course', "Course")}: #{course_time}".html_safe
+        text = "#{h I18n.t('#helpers.local', "Local")}: #{h local_time}<br>#{h I18n.t('#helpers.course', "Course")}: #{h course_time}".html_safe
       end
     end
 
     return text if just_text
-    "data-tooltip title=\"#{text}\"".html_safe
+    "data-tooltip data-html-tooltip-title=\"#{text}\"".html_safe
   end
 
   # render a link with a tooltip containing a summary of due dates
@@ -828,12 +832,12 @@ module ApplicationHelper
   end
 
   def dashboard_url(opts={})
-    return super(opts) if opts[:login_success]
+    return super(opts) if opts[:login_success] || opts[:become_user_id]
     custom_dashboard_url || super(opts)
   end
 
   def dashboard_path(opts={})
-    return super(opts) if opts[:login_success]
+    return super(opts) if opts[:login_success] || opts[:become_user_id]
     custom_dashboard_url || super(opts)
   end
 

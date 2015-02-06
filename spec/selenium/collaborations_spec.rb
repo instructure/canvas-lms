@@ -23,12 +23,12 @@ describe "collaborations" do
     f(".collaboration_#{collaboration.id} .delete_collaboration_link").click
 
     if type == 'google_docs'
-      keep_trying_until { f('#delete_collaboration_dialog .delete_button').should be_displayed }
+      keep_trying_until { expect(f('#delete_collaboration_dialog .delete_button')).to be_displayed }
       f('#delete_collaboration_dialog .delete_button').click
     else
       #driver.switch_to.alert.accept
     end
-    keep_trying_until { f(".collaboration_#{collaboration.id} .delete_collaboration_link").should be_nil }
+    keep_trying_until { expect(f(".collaboration_#{collaboration.id} .delete_collaboration_link")).to be_nil }
   end
 
   # Public: Given an array of collaborations, verify their presence.
@@ -48,7 +48,7 @@ describe "collaborations" do
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end
       keep_trying_until {
-        form_visible?.should == form_visible
+        expect(form_visible?).to eq form_visible
       }
     end
   end
@@ -115,8 +115,8 @@ describe "collaborations" do
             submit_form('.edit_collaboration')
           end
 
-          f('.collaboration .title').text.should == new_title
-          Collaboration.order("id DESC").last.title.should == new_title
+          expect(f('.collaboration .title').text).to eq new_title
+          expect(Collaboration.order("id DESC").last.title).to eq new_title
         end
 
         it 'should be delete-able' do
@@ -132,8 +132,8 @@ describe "collaborations" do
           end
           wait_for_ajaximations
 
-          f('#no_collaborations_message').should be_displayed
-          Collaboration.order("id DESC").last.should be_deleted
+          expect(f('#no_collaborations_message')).to be_displayed
+          expect(Collaboration.order("id DESC").last).to be_deleted
         end
 
         it 'should display available collaborators' do
@@ -147,7 +147,7 @@ describe "collaborations" do
           wait_for_ajaximations
 
           keep_trying_until {
-            ffj('.available-users:visible li').length.should == 1
+            expect(ffj('.available-users:visible li').length).to eq 1
           }
         end
 
@@ -162,7 +162,7 @@ describe "collaborations" do
           wait_for_ajaximations
           fj('.available-users:visible a').click
           keep_trying_until {
-            ffj('.members-list li').length.should == 1
+            expect(ffj('.members-list li').length).to eq 1
           }
         end
 
@@ -178,7 +178,7 @@ describe "collaborations" do
 
           fj('.available-users:visible a').click
           fj('.members-list a').click
-          ffj('.members-list li').length.should == 0
+          expect(ffj('.members-list li').length).to eq 0
         end
       end
     end

@@ -3,7 +3,7 @@ module Canvas::Migration
     class QtiWorker < Struct.new(:migration_id)
 
       def perform
-        cm = ContentMigration.find_by_id migration_id
+        cm = ContentMigration.where(id: migration_id).first
         begin
           cm.reset_job_progress
           cm.job_progress.start

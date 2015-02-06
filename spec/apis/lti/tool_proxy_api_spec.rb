@@ -17,53 +17,97 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
 
 module Lti
-  describe ToolProxyController, type: :request  do
+  describe ToolProxyController, type: :request do
+    let (:account) { Account.create }
 
-    let(:account) { Account.new }
-    let (:product_family) {ProductFamily.create(vendor_code: '123', product_code:'abc', vendor_name:'acme', root_account:account)}
-    let(:tool_proxy) do
-      ToolProxy.create!(
-        context: account,
-        guid: SecureRandom.uuid,
-        shared_secret: 'abc',
-        product_family: product_family,
-        root_account: account,
-        product_version: '1',
-        workflow_state: 'disabled',
-        raw_data: {'proxy' => 'value'},
-        lti_version: '1'
-      )
-    end
+    describe "#destroy" do
 
-    before(:each) do
-      OAuth::Signature.stubs(:build).returns(mock(verify:true))
-      OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
-    end
+      context 'course' do
+        it 'marks a tool proxy as deleted from a course' do
+          course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+          tp = create_tool_proxy(context: @course)
+          api_call(:delete, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+                   {controller: 'lti/tool_proxy', action: 'destroy', format: 'json', course_id: @course.id.to_s, tool_proxy_id: tp.id})
+          expect(tp.reload.workflow_state).to eq 'deleted'
+        end
 
-    describe "Get #show" do
-      it 'the tool proxy raw data' do
-        get "api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
-        JSON.parse(body).should == tool_proxy.raw_data
-      end
-    end
+        it "doesn't allow a student to delete tool proxies" do
+          course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+          tp = create_tool_proxy(context: @course)
+          raw_api_call(:delete, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+                   {controller: 'lti/tool_proxy', action: 'destroy', format: 'json', course_id: @course.id.to_s, tool_proxy_id: tp.id})
+          assert_status(401)
+          expect(tp.reload.workflow_state).to eq 'active'
+        end
 
-    describe "POST #create" do
-      it 'returns a tool_proxy id object' do
-        course_with_teacher_logged_in(:active_all => true)
-        tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-        json = JSON.parse(tool_proxy_fixture)
-        json[:format] = 'json'
-        json[:account_id] = @course.account.id
-        headers = { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-        response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
-        response.should == 201
-        JSON.parse(body).keys.should =~ ["@context", "@type", "@id", "tool_proxy_guid"]
       end
 
+      context 'account' do
+        it 'marks a tool proxy as deleted from a account' do
+          account_admin_user(account: account)
+          tp = create_tool_proxy(context: account)
+          api_call(:delete, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+                   {controller: 'lti/tool_proxy', action: 'destroy', format: 'json', account_id: account.id.to_s, tool_proxy_id: tp.id})
+          expect(tp.reload.workflow_state).to eq 'deleted'
+        end
+
+        it "doesn't allow a non-admin to delete tool proxies" do
+          user_with_pseudonym(account: account )
+          tp = create_tool_proxy(context: account)
+          raw_api_call(:delete, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+                       {controller: 'lti/tool_proxy', action: 'destroy', format: 'json', account_id: account.id.to_s, tool_proxy_id: tp.id})
+          assert_status(401)
+          expect(tp.reload.workflow_state).to eq 'active'
+        end
+
+      end
+
     end
 
+    describe '#update' do
+      context 'course' do
+        it 'updates a tools workflow state' do
+          course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+          tp = create_tool_proxy(context: @course)
+          api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+                   {controller: 'lti/tool_proxy', action: 'update', format: 'json', course_id: @course.id.to_s, tool_proxy_id: tp.id, workflow_state: 'disabled'})
+          expect(tp.reload.workflow_state).to eq 'disabled'
+        end
+
+        it "doesn't allow a student to update" do
+          course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+          tp = create_tool_proxy(context: @course)
+          raw_api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+                       {controller: 'lti/tool_proxy', action: 'update', format: 'json', course_id: @course.id.to_s, tool_proxy_id: tp.id, workflow_state: 'disabled'})
+          assert_status(401)
+          expect(tp.reload.workflow_state).to eq 'active'
+        end
+
+      end
+
+      context 'account' do
+        it 'updates a tools workflow state' do
+          account_admin_user(account: account)
+          tp = create_tool_proxy(context: account)
+          api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+                   {controller: 'lti/tool_proxy', action: 'update', format: 'json', account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: 'disabled'})
+          expect(tp.reload.workflow_state).to eq 'disabled'
+        end
+
+        it "doesn't allow a non-admin to update workflow_state" do
+          user_with_pseudonym(account: account )
+          tp = create_tool_proxy(context: account)
+          raw_api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+                       {controller: 'lti/tool_proxy', action: 'update', format: 'json', account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: 'disabled'})
+          assert_status(401)
+          expect(tp.reload.workflow_state).to eq 'active'
+        end
+
+      end
+    end
 
   end
 end

@@ -1,13 +1,13 @@
 module Quizzes
   class SubmissionGrader
-
+    class AlreadyGradedError < RuntimeError; end
     def initialize(submission)
       @submission = submission
     end
 
     def grade_submission(opts={})
       if @submission.submission_data.is_a?(Array)
-        raise "Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class.to_s}"
+        raise(AlreadyGradedError,"Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class.to_s}")
       end
       @submission.manually_scored = false
       tally = 0

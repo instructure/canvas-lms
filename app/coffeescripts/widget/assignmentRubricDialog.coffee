@@ -1,9 +1,10 @@
 define [
   'i18n!rubrics'
   'jquery'
+  'str/htmlEscape'
   'jqueryui/dialog'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $) ->
+], (I18n, $, htmlEscape) ->
 
   assignmentRubricDialog =
 
@@ -23,7 +24,7 @@ define [
     initDialog: ->
       @dialogInited = true
 
-      @$dialog = $("<div><h4>#{I18n.t 'loading', 'Loading...'}</h4></div>").dialog
+      @$dialog = $("<div><h4>#{htmlEscape I18n.t 'loading', 'Loading...'}</h4></div>").dialog
         title: I18n.t("titles.assignment_rubric_details", "Assignment Rubric Details")
         width: 600
         modal: false

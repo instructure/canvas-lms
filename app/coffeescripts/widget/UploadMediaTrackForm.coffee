@@ -49,7 +49,7 @@ define [
         $.ajaxJSON "/media_objects/#{@mediaCommentId}/media_tracks", 'POST', params, =>
           submitDfd.resolve()
           @$dialog.dialog('close')
-          $.flashMessage I18n.t 'track_uploaded_successfully', "Track uploaded successfuly, refresh to see it."
+          $.flashMessage I18n.t 'track_uploaded_successfully', "Track uploaded successfully; please refresh your browser."
 
     getFileContent: ->
       dfd = new $.Deferred

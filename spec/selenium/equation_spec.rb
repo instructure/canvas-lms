@@ -15,7 +15,7 @@ describe "equation editor" do
       f('.mce_instructure_equation').click
       wait_for_ajaximations
       equation_editor = fj(".mathquill-editor:visible")
-      equation_editor.should_not be_nil
+      expect(equation_editor).not_to be_nil
       equation_editor
     end
 
@@ -27,12 +27,12 @@ describe "equation editor" do
       f('.description')
     end
 
-    description.text.should == 'foobar'
+    expect(description.text).to eq 'foobar'
 
   end
 
   it "should support multiple equation editors on the same page" do
-    pending("193")
+    skip("193")
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes"
@@ -49,7 +49,7 @@ describe "equation editor" do
       click_new_question_button
 
       questions = ffj(".question_holder:visible")
-      questions.length.should == time + 1
+      expect(questions.length).to eq time + 1
       question = questions[time]
 
       wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
@@ -58,18 +58,18 @@ describe "equation editor" do
         question.find_element(:css, '.mce_instructure_equation').click
         wait_for_ajaximations
         equation_editor = fj(".mathquill-editor:visible")
-        equation_editor.should_not be_nil
+        expect(equation_editor).not_to be_nil
         equation_editor
       end
       f('.ui-dialog-buttonset .btn-primary').click
       question.find_element(:css, '.toggle_question_content_views_link').click
-      question.find_element(:css, 'textarea.question_content').attribute(:value).should include('<img class="equation_image" title="" src="/equation_images/" alt="" />')
+      expect(question.find_element(:css, 'textarea.question_content').attribute(:value)).to include('<img class="equation_image" title="" src="/equation_images/" alt="" />')
       save_question_and_wait
 
-      question.find_elements(:css, 'img.equation_image').size.should == 1
+      expect(question.find_elements(:css, 'img.equation_image').size).to eq 1
 
       click_settings_tab
-      f(".points_possible").text.should == (time + 1).to_s
+      expect(f(".points_possible").text).to eq (time + 1).to_s
     end
   end
 end

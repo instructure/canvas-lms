@@ -41,19 +41,19 @@ describe 'Canvas::RequestThrottle' do
     end
 
     it "should use access token" do
-      throttler.client_identifier(req request_header_token).should == "token:#{AccessToken.hashed_token(token2.full_token)}"
+      expect(throttler.client_identifier(req request_header_token)).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
     end
 
     it "should use user id" do
-      throttler.client_identifier(req request_user_2).should == "user:2"
+      expect(throttler.client_identifier(req request_user_2)).to eq "user:2"
     end
 
     it "should use session id" do
-      throttler.client_identifier(req request_logged_out).should == 'session:sess1'
+      expect(throttler.client_identifier(req request_logged_out)).to eq 'session:sess1'
     end
 
     it "should fall back to nil" do
-      throttler.client_identifier(req request_no_session).should == nil
+      expect(throttler.client_identifier(req request_no_session)).to eq nil
     end
   end
 
@@ -66,37 +66,37 @@ describe 'Canvas::RequestThrottle' do
     it "should pass on other requests" do
       throttler.stubs(:whitelisted?).returns(false)
       throttler.stubs(:blacklisted?).returns(false)
-      throttler.call(request_user_1).should == response
+      expect(throttler.call(request_user_1)).to eq response
     end
 
     it "should blacklist based on ip" do
       set_blacklist('ip:1.2.3.4')
-      throttler.call(request_user_1).should == rate_limit_exceeded
-      throttler.call(request_user_2).should == response
+      expect(throttler.call(request_user_1)).to eq rate_limit_exceeded
+      expect(throttler.call(request_user_2)).to eq response
       set_blacklist('ip:1.2.3.4,ip:4.3.2.1')
-      throttler.call(request_user_2).should == rate_limit_exceeded
+      expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
     end
 
     it "should blacklist based on user id" do
       set_blacklist('user:2')
-      throttler.call(request_user_1).should == response
-      throttler.call(request_user_2).should == rate_limit_exceeded
+      expect(throttler.call(request_user_1)).to eq response
+      expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
     end
 
     it "should blacklist based on access token" do
       set_blacklist("token:#{AccessToken.hashed_token(token2.full_token)}")
-      throttler.call(request_query_token).should == response
-      throttler.call(request_header_token).should == rate_limit_exceeded
+      expect(throttler.call(request_query_token)).to eq response
+      expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
       set_blacklist("token:#{AccessToken.hashed_token(token1.full_token)},token:#{AccessToken.hashed_token(token2.full_token)}")
-      throttler.call(request_query_token).should == rate_limit_exceeded
-      throttler.call(request_header_token).should == rate_limit_exceeded
+      expect(throttler.call(request_query_token)).to eq rate_limit_exceeded
+      expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
     end
   end
 
   describe ".list_from_setting" do
     it "should split the string and create a set" do
       Setting.set('list_test', 'a:x,b:y ,  z ')
-      Canvas::RequestThrottle.list_from_setting('list_test').should == Set.new(%w[z b:y a:x])
+      expect(Canvas::RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
     end
   end
 
@@ -111,14 +111,14 @@ describe 'Canvas::RequestThrottle' do
         Canvas.stubs(:redis_enabled?).returns(false)
         Redis::Scripting::Module.any_instance.expects(:run).never
       end
-      throttler.call(request_user_1).should == response
+      expect(throttler.call(request_user_1)).to eq response
     end
 
     it "should skip if no client_identifier found" do
       if Canvas.redis_enabled?
         Redis::Scripting::Module.any_instance.expects(:run).never
       end
-      throttler.call(request_no_session).should == response
+      expect(throttler.call(request_no_session)).to eq response
     end
 
     def throttled_request
@@ -131,13 +131,13 @@ describe 'Canvas::RequestThrottle' do
 
     it "should throttle if bucket is full" do
       throttled_request
-      throttler.call(request_user_1).should == rate_limit_exceeded
+      expect(throttler.call(request_user_1)).to eq rate_limit_exceeded
     end
 
     it "should not throttle if disabled" do
       Setting.set("request_throttle.enabled", "false")
       throttled_request
-      throttler.call(request_user_1).should == response
+      expect(throttler.call(request_user_1)).to eq response
     end
 
     it "should not throttle, but update, if bucket is not full" do
@@ -146,15 +146,15 @@ describe 'Canvas::RequestThrottle' do
       bucket.expects(:reserve_capacity).yields
       bucket.expects(:full?).returns(false)
 
-      throttler.call(request_user_1).should == response
+      expect(throttler.call(request_user_1)).to eq response
     end
 
     if Canvas.redis_enabled?
       it "should increment the bucket" do
-        throttler.call(request_user_1).should == response
+        expect(throttler.call(request_user_1)).to eq response
         bucket = Canvas::RequestThrottle::LeakyBucket.new("user:1")
         count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
-        last_touched.to_f.should be > 0.0
+        expect(last_touched.to_f).to be > 0.0
       end
     end
   end
@@ -174,9 +174,9 @@ describe 'Canvas::RequestThrottle' do
         it "should compare to the hwm setting" do
           bucket = Canvas::RequestThrottle::LeakyBucket.new("test", 5.0)
           Setting.set('request_throttle.hwm', '6.0')
-          bucket.full?.should == false
+          expect(bucket.full?).to eq false
           Setting.set('request_throttle.hwm', '4.0')
-          bucket.full?.should == true
+          expect(bucket.full?).to eq true
         end
       end
 
@@ -184,8 +184,8 @@ describe 'Canvas::RequestThrottle' do
         it "should use defaults if no redis data" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0)
-            @bucket.count.should == 0
-            @bucket.last_touched.should == Time.now.to_f
+            expect(@bucket.count).to eq 0
+            expect(@bucket.last_touched).to eq Time.now.to_f
           end
         end
 
@@ -193,28 +193,28 @@ describe 'Canvas::RequestThrottle' do
           ts = Time.parse('2012-01-29 12:00:00 UTC')
           @bucket.redis.hmset(@bucket.cache_key, 'count', '15', 'last_touched', ts.to_f)
           @bucket.increment(0, 0, ts)
-          @bucket.count.should == 15
-          @bucket.last_touched.should be_close(ts.to_f, 0.1)
+          expect(@bucket.count).to eq 15
+          expect(@bucket.last_touched).to be_within(0.1).of(ts.to_f)
         end
 
         it "should update redis via the lua script" do
           @bucket.redis.hmset(@bucket.cache_key, 'count', @bucket.count, 'last_touched', @bucket.last_touched)
           @cost = 20.5
           @bucket.increment(@cost, 0, @current_time)
-          @bucket.count.should be_close(@expected + @cost, 0.1)
-          @bucket.last_touched.should be_close(@current_time, 0.1)
-          @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(@expected + @cost, 0.1)
-          @bucket.redis.hget(@bucket.cache_key, 'last_touched').to_f.should be_close(@current_time, 0.1)
+          expect(@bucket.count).to be_within(0.1).of(@expected + @cost)
+          expect(@bucket.last_touched).to be_within(0.1).of(@current_time)
+          expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(@expected + @cost)
+          expect(@bucket.redis.hget(@bucket.cache_key, 'last_touched').to_f).to be_within(0.1).of(@current_time)
         end
 
         it "should leak when incrementing" do
           @bucket.redis.hmset(@bucket.cache_key, 'count', @bucket.count, 'last_touched', @bucket.last_touched)
           @bucket.increment(0, 0, Time.at(@current_time))
-          @bucket.count.should be_close(@expected, 0.1)
-          @bucket.last_touched.should be_close(@current_time, 0.1)
+          expect(@bucket.count).to be_within(0.1).of(@expected)
+          expect(@bucket.last_touched).to be_within(0.1).of(@current_time)
           @bucket.increment(0, 0, Time.at(75))
-          @bucket.count.should == 0.0
-          @bucket.last_touched.should be_close(75, 0.1)
+          expect(@bucket.count).to eq 0.0
+          expect(@bucket.last_touched).to be_within(0.1).of(75)
         end
       end
 
@@ -223,10 +223,10 @@ describe 'Canvas::RequestThrottle' do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
             @bucket.reserve_capacity(20) do
-              @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(20, 0.1)
+              expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(20)
               5
             end
-            @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(5, 0.1)
+            expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(5)
           end
         end
 
@@ -236,7 +236,7 @@ describe 'Canvas::RequestThrottle' do
             expect { @bucket.reserve_capacity(20) do
               raise "oh noes"
             end }.to raise_error(RuntimeError)
-            @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(0, 0.1)
+            expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
           end
         end
 
@@ -248,8 +248,8 @@ describe 'Canvas::RequestThrottle' do
               5
             end
           end
-          @bucket.count.should == 0
-          @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should == 0
+          expect(@bucket.count).to eq 0
+          expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to eq 0
         end
       end
     end

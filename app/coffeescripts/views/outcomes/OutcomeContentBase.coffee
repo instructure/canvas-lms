@@ -21,11 +21,12 @@ define [
   'jquery'
   'underscore'
   'compiled/views/ValidatedFormView'
+  'compiled/views/editor/KeyboardShortcuts'
   'tinymce.editor_box'
   'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
   'compiled/tinymce',
-], (I18n, $, _, ValidatedFormView) ->
+], (I18n, $, _, ValidatedFormView, RCEKeyboardShortcuts) ->
 
   # Superclass for OutcomeView and OutcomeGroupView.
   # This view is used to show, add, edit, and delete outcomes and groups.
@@ -120,6 +121,7 @@ define [
       @$('form').toJSON()
 
     remove: ->
+      @_cleanUpTiny() if @tinymceExists()
       @$el.hideErrors()
       @model.destroy() if @state is 'add' and @model.isNew()
       super arguments...
@@ -163,10 +165,23 @@ define [
     resetModel: ->
       @model.set @_modelAttributes
 
+    setupTinyMCEViewSwitcher: =>
+      $('.rte_switch_views_link').click (e) =>
+        e.preventDefault()
+        @$('textarea').editorBox 'toggle'
+        # hide the clicked link, and show the other toggle link.
+        $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
+
+    addTinyMCEKeyboardShortcuts: =>
+      keyboardShortcutsView = new RCEKeyboardShortcuts()
+      keyboardShortcutsView.render().$el.insertBefore($('.rte_switch_views_link:first'))
+
     # Called from subclasses in render.
     readyForm: ->
       setTimeout =>
-        @$('textarea').editorBox() # tinymce
+        @$('textarea').editorBox() # tinymce initializer
+        @setupTinyMCEViewSwitcher()
+        @addTinyMCEKeyboardShortcuts()
         @$('input:first').focus()
 
     readOnly: ->
@@ -174,3 +189,6 @@ define [
 
     updateTitle: (e) =>
       @model.set 'title', e.currentTarget.value
+
+    tinymceExists: =>
+      return @$el.find('[name="description"]').length > 0 and @$el.find('[name="description"]').editorBox('exists?')

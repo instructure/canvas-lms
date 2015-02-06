@@ -18,18 +18,18 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.context_external_tools.count.should == 1
+      expect(@copy_to.context_external_tools.count).to eq 1
       tool_to = @copy_to.context_external_tools.first
 
-      @copy_to.tab_configuration.should == [
+      expect(@copy_to.tab_configuration).to eq [
           {"id" =>0 }, {"id" => "context_external_tool_#{tool_to.id}"}, {"id" => 14}
       ]
 
-      tool_to.name.should == @tool_from.name
-      tool_to.custom_fields.should == @tool_from.custom_fields
-      tool_to.has_placement?(:course_navigation).should == true
-      tool_to.consumer_key.should == @tool_from.consumer_key
-      tool_to.shared_secret.should == @tool_from.shared_secret
+      expect(tool_to.name).to eq @tool_from.name
+      expect(tool_to.custom_fields).to eq @tool_from.custom_fields
+      expect(tool_to.has_placement?(:course_navigation)).to eq true
+      expect(tool_to.consumer_key).to eq @tool_from.consumer_key
+      expect(tool_to.shared_secret).to eq @tool_from.shared_secret
     end
 
     it "should not duplicate external tools used in modules" do
@@ -42,12 +42,12 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.context_external_tools.count.should == 1
+      expect(@copy_to.context_external_tools.count).to eq 1
 
       tool_to = @copy_to.context_external_tools.first
-      tool_to.name.should == @tool_from.name
-      tool_to.consumer_key.should == @tool_from.consumer_key
-      tool_to.has_placement?(:course_navigation).should == true
+      expect(tool_to.name).to eq @tool_from.name
+      expect(tool_to.consumer_key).to eq @tool_from.consumer_key
+      expect(tool_to.has_placement?(:course_navigation)).to eq true
     end
 
     it "should copy external tool assignments" do
@@ -59,12 +59,12 @@ describe ContentMigration do
       run_course_copy
 
       asmnt_2 = @copy_to.assignments.first
-      asmnt_2.submission_types.should == "external_tool"
-      asmnt_2.external_tool_tag.should_not be_nil
+      expect(asmnt_2.submission_types).to eq "external_tool"
+      expect(asmnt_2.external_tool_tag).not_to be_nil
       tag_to = asmnt_2.external_tool_tag
-      tag_to.content_type.should == tag_from.content_type
-      tag_to.url.should == tag_from.url
-      tag_to.new_tab.should == tag_from.new_tab
+      expect(tag_to.content_type).to eq tag_from.content_type
+      expect(tag_to.url).to eq tag_from.url
+      expect(tag_to.new_tab).to eq tag_from.new_tab
     end
 
     it "should copy vendor extensions" do
@@ -73,8 +73,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
-      tool.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
+      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
+      expect(tool.settings[:vendor_extensions]).to eq [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
     end
 
     it "should copy canvas extensions" do
@@ -87,17 +87,17 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
-      tool.course_navigation.should_not be_nil
-      tool.course_navigation.should == @tool_from.course_navigation
-      tool.editor_button.should_not be_nil
-      tool.editor_button.should == @tool_from.editor_button
-      tool.resource_selection.should_not be_nil
-      tool.resource_selection.should == @tool_from.resource_selection
-      tool.account_navigation.should_not be_nil
-      tool.account_navigation.should == @tool_from.account_navigation
-      tool.user_navigation.should_not be_nil
-      tool.user_navigation.should == @tool_from.user_navigation
+      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
+      expect(tool.course_navigation).not_to be_nil
+      expect(tool.course_navigation).to eq @tool_from.course_navigation
+      expect(tool.editor_button).not_to be_nil
+      expect(tool.editor_button).to eq @tool_from.editor_button
+      expect(tool.resource_selection).not_to be_nil
+      expect(tool.resource_selection).to eq @tool_from.resource_selection
+      expect(tool.account_navigation).not_to be_nil
+      expect(tool.account_navigation).to eq @tool_from.account_navigation
+      expect(tool.user_navigation).not_to be_nil
+      expect(tool.user_navigation).to eq @tool_from.user_navigation
     end
 
     it "should keep reference to ContextExternalTool by id for courses" do
@@ -106,10 +106,10 @@ describe ContentMigration do
                     :url => "https://www.example.com/launch"
       run_course_copy
 
-      tool_copy = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+      tool_copy = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
       tag = @copy_to.context_modules.first.content_tags.first
-      tag.content_type.should == 'ContextExternalTool'
-      tag.content_id.should == tool_copy.id
+      expect(tag.content_type).to eq 'ContextExternalTool'
+      expect(tag.content_id).to eq tool_copy.id
     end
 
     it "should keep reference to ContextExternalTool by id for accounts" do
@@ -122,8 +122,8 @@ describe ContentMigration do
       run_course_copy
 
       tag = @copy_to.context_modules.first.content_tags.first
-      tag.content_type.should == 'ContextExternalTool'
-      tag.content_id.should == @tool_from.id
+      expect(tag.content_type).to eq 'ContextExternalTool'
+      expect(tag.content_id).to eq @tool_from.id
     end
 
     it "should keep tab configuration for account-level external tools" do
@@ -138,9 +138,19 @@ describe ContentMigration do
 
       run_course_copy
 
-      @copy_to.tab_configuration.should == [
+      expect(@copy_to.tab_configuration).to eq [
           {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
       ]
+    end
+
+    it "should not double-escape retrieval urls" do
+      url = "http://www.example.com?url=http%3A%2F%2Fwww.anotherurl.com"
+
+      @copy_from.syllabus_body = "<p><iframe src=\"/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape(url)}\" width=\"320\" height=\"240\" style=\"width: 553px; height: 335px;\"></iframe></p>"
+
+      run_course_copy
+
+      expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/courses/#{@copy_from.id}/", "/courses/#{@copy_to.id}/")
     end
   end
 end

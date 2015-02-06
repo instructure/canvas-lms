@@ -51,6 +51,8 @@ describe DataFixup::FixAuditLogUuidIndexes do
     # Truncate the mapping and last batch tables.
     @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::MAPPING_TABLE}")
     @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::LAST_BATCH_TABLE}")
+
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.stubs(:end_time).returns(Time.now + 1.month)
   end
 
   def check_event_stream(event_id, stream_table, expected_total)
@@ -58,12 +60,12 @@ describe DataFixup::FixAuditLogUuidIndexes do
     # Along with the right count of corrupted events.
     corrupted_total = 0
     rows = @database.execute("SELECT id, event_type FROM #{stream_table}")
-    rows.count.should == expected_total
+    expect(rows.count).to eq expected_total
     rows.fetch do |row|
       row = row.to_hash
       corrupted_total += 1 if row['event_type'] == 'corrupted'
     end
-    corrupted_total.should == expected_total - 1
+    expect(corrupted_total).to eq expected_total - 1
 
     # Check each Index table and make sure there is only one
     # with the specified event_id remaining.  Others should
@@ -72,12 +74,12 @@ describe DataFixup::FixAuditLogUuidIndexes do
     @stream_tables[stream_table].each do |index_table|
       count = 0
       rows = @database.execute("SELECT id FROM #{index_table}")
-      rows.count.should == expected_total
+      expect(rows.count).to eq expected_total
       rows.fetch do |row|
         row = row.to_hash
         count += 1 if row['id'] == event_id
       end
-      count.should == 1
+      expect(count).to eq 1
     end
   end
 
@@ -170,8 +172,8 @@ describe DataFixup::FixAuditLogUuidIndexes do
     migration.fix_index(index)
 
     last_batch = migration.get_last_batch(index)
-    last_batch.size.should == 3
-    last_batch.should_not == ['', '', 0]
+    expect(last_batch.size).to eq 3
+    expect(last_batch).not_to eq ['', '', 0]
 
     migration.expects(:update_index_batch).never
     migration.fix_index(index)
@@ -181,7 +183,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
     check = corrupt_course_changes
 
     check[:courses].each do |course|
-      Auditors::Course.for_course(course).paginate(per_page: 5).size.should eq 1
+      expect(Auditors::Course.for_course(course).paginate(per_page: 5).size).to eq 1
     end
 
     check_event_stream(check[:event_id], 'courses', check[:count])
@@ -197,7 +199,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
     end
     CanvasUUID.unstub(:generate)
 
-    Auditors::Course.for_course(@course).paginate(per_page: 5).size.should eq 2
+    expect(Auditors::Course.for_course(@course).paginate(per_page: 5).size).to eq 2
   end
 
   it "fixes index rows as they are queried for events that have multiple indexes" do
@@ -222,11 +224,11 @@ describe DataFixup::FixAuditLogUuidIndexes do
     CanvasUUID.unstub(:generate)
 
     users.each do |user|
-      Auditors::Authentication.for_user(user).paginate(per_page: 5).size.should eq 2
+      expect(Auditors::Authentication.for_user(user).paginate(per_page: 5).size).to eq 2
     end
 
     pseudonyms.each do |pseudonym|
-      Auditors::Authentication.for_pseudonym(pseudonym).paginate(per_page: 5).size.should eq 2
+      expect(Auditors::Authentication.for_pseudonym(pseudonym).paginate(per_page: 5).size).to eq 2
     end
   end
 
@@ -241,8 +243,25 @@ describe DataFixup::FixAuditLogUuidIndexes do
     Auditors::Authentication::Stream.insert(record)
 
     events = Auditors::Authentication.for_user(@user).paginate(per_page: 5)
-    events.size.should eq 1
+    expect(events.size).to eq 1
 
-    events.first.attributes['created_at'].to_i.should eq first_event_at
+    expect(events.first.attributes['created_at'].to_i).to eq first_event_at
+  end
+
+  it "should skip records after the bug fix was released" do
+    # Create bad data
+    stream_checks = {}
+    stream_checks['grade_changes'] = corrupt_grade_changes
+    stream_checks['courses'] = corrupt_course_changes
+    stream_checks['authentications'] = corrupt_authentications
+
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.stubs(:end_time).returns(Time.now - 1.month)
+
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:create_tombstone).never
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:create_index_entry).never
+    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:delete_index_entry).never
+
+    # Run Fix
+    DataFixup::FixAuditLogUuidIndexes::Migration.run
   end
 end

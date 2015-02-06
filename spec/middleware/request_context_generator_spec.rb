@@ -10,7 +10,7 @@ describe "RequestContextGenerator" do
       RequestContextGenerator.add_meta_header("a3", "")
       [ 200, {}, [] ]
     }).call(env)
-    headers['X-Canvas-Meta'].should == "a1=test1;a2=test2;"
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;a2=test2;"
   end
 
   it "should add page view data to X-Canvas-Meta" do
@@ -19,6 +19,6 @@ describe "RequestContextGenerator" do
       RequestContextGenerator.store_page_view_meta(page_view_model)
       [ 200, {}, [] ]
     }).call(env)
-    headers['X-Canvas-Meta'].should == "a1=test1;x=5;p=f;"
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5;p=f;"
   end
 end

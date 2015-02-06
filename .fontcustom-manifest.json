@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "bc7417f957ee16e48bc6ceadfda4de71eefb6620c4651d1e0bc43b44fb07c551",
-    "current": "bc7417f957ee16e48bc6ceadfda4de71eefb6620c4651d1e0bc43b44fb07c551"
+    "previous": "ffa3a504ea4959c4faac9c1c6b15959b7a8e3b147dafd0fb6dc142dc9080c221",
+    "current": "ffa3a504ea4959c4faac9c1c6b15959b7a8e3b147dafd0fb6dc142dc9080c221"
   },
   "fonts": [
     "public/font/canvas/canvas-icons.ttf",
@@ -71,7 +71,7 @@
       "source": "public/font/icons/bookmark.svg"
     },
     "calendar-day": {
-      "codepoint": 61880,
+      "codepoint": 62027,
       "source": "public/font/icons/calendar-day.svg"
     },
     "calendar-days": {
@@ -101,6 +101,10 @@
     "clock": {
       "codepoint": 61887,
       "source": "public/font/icons/clock.svg"
+    },
+    "cloud-lock": {
+      "codepoint": 62024,
+      "source": "public/font/icons/cloud-lock.svg"
     },
     "collapse": {
       "codepoint": 61698,
@@ -206,6 +210,10 @@
       "codepoint": 61905,
       "source": "public/font/icons/export-content.svg"
     },
+    "eye": {
+      "codepoint": 62025,
+      "source": "public/font/icons/eye.svg"
+    },
     "facebook": {
       "codepoint": 61836,
       "source": "public/font/icons/facebook.svg"
@@ -213,6 +221,26 @@
     "facebook-boxed": {
       "codepoint": 61906,
       "source": "public/font/icons/facebook-boxed.svg"
+    },
+    "files-copyright": {
+      "codepoint": 62034,
+      "source": "public/font/icons/files-copyright.svg"
+    },
+    "files-creative-commons": {
+      "codepoint": 62035,
+      "source": "public/font/icons/files-creative-commons.svg"
+    },
+    "files-fair-use": {
+      "codepoint": 62036,
+      "source": "public/font/icons/files-fair-use.svg"
+    },
+    "files-obtained-permission": {
+      "codepoint": 62040,
+      "source": "public/font/icons/files-obtained-permission.svg"
+    },
+    "files-public-domain": {
+      "codepoint": 62038,
+      "source": "public/font/icons/files-public-domain.svg"
     },
     "filmstrip": {
       "codepoint": 61907,
@@ -237,6 +265,14 @@
     "gradebook": {
       "codepoint": 61910,
       "source": "public/font/icons/gradebook.svg"
+    },
+    "gradebook-export": {
+      "codepoint": 62041,
+      "source": "public/font/icons/gradebook-export.svg"
+    },
+    "gradebook-import": {
+      "codepoint": 62042,
+      "source": "public/font/icons/gradebook-import.svg"
     },
     "group": {
       "codepoint": 61911,
@@ -688,8 +724,12 @@
     "config": "config/fontcustom.yml",
     "css_selector": ".icon-{{glyph}}",
     "debug": false,
+    "font_ascent": 448,
+    "font_descent": 64,
+    "font_design_size": 16,
+    "font_em": 512,
     "font_name": "canvas-icons",
-    "force": false,
+    "force": true,
     "input": {
       "templates": "public/font/icons",
       "vectors": "public/font/icons"

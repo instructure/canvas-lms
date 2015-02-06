@@ -1,5 +1,5 @@
 /*
-@styleguide Buttons: Button Set
+@styleguide Button Set
 
 We use jQuery UI button set
 
@@ -21,23 +21,6 @@ We use jQuery UI button set
 ```
 
 */
-
-.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { @extend .ui-helper-hidden-accessible; }
-
-// DONT USE .ui-button, USE .btn INSTEAD!
-// it remains only because our jqueryUI widgets
-// (like 'dialog', and 'buttonset') generate .ui-buttons
-// in their markup.
-
-// make .ui-button mimic .btn styles
-.ui-button {
-  position: relative;
-  @extend .btn;
-  &.ui-state-hover { @extend .btn:hover }
-  &.ui-state-focus { @extend .btn:focus }
-  &.ui-state-active { @extend .btn:active }
-  &.ui-state-disabled { @extend .btn:active }
-}
 
 .ui-buttonset {
   margin-right: 7px;

@@ -14,6 +14,7 @@ define [
   'compiled/views/assignments/AssignmentGroupSelector'
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/jquery/toggleAccessibly'
+  'compiled/views/editor/KeyboardShortcuts'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jqueryui/dialog'
@@ -21,7 +22,7 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
 userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
-AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
+AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts) ->
 
   class EditView extends ValidatedFormView
 
@@ -46,7 +47,12 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     GROUP_CATEGORY_SELECTOR = '#group_category_selector'
     PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
     EXTERNAL_TOOLS_URL = '#assignment_external_tool_tag_attributes_url'
+    EXTERNAL_TOOLS_CONTENT_TYPE = '#assignment_external_tool_tag_attributes_content_type'
+    EXTERNAL_TOOLS_CONTENT_ID = '#assignment_external_tool_tag_attributes_content_id'
     EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
+    ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
+    ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
+
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -68,6 +74,10 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       els["#{PEER_REVIEWS_FIELDS}"] = '$peerReviewsFields'
       els["#{EXTERNAL_TOOLS_URL}"] = '$externalToolsUrl'
       els["#{EXTERNAL_TOOLS_NEW_TAB}"] = '$externalToolsNewTab'
+      els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
+      els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
+      els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
+      els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
       els
     )
 
@@ -80,6 +90,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
       events["click #{EXTERNAL_TOOLS_URL}"] = 'showExternalToolsDialog'
+      events["click #{EXTERNAL_TOOLS_URL}_screenreader_button"] = 'showExternalToolsDialogForScreenreader'
+      events["change #assignment_points_possible"] = 'handlePointsChange'
       events
     )
 
@@ -105,6 +117,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
        "points_possible","allowed_extensions","peer_reviews","peer_review_count",
        "automatic_peer_reviews","group_category_id","grade_group_students_individually",
        "turnitin_enabled"]
+
+    handlePointsChange:(ev) =>
+      ev.preventDefault()
+      if @assignment.hasSubmittedSubmissions()
+        @$pointsChangeWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@assignment.pointsPossible()}")
 
     setDefaultsIfNew: =>
       if @assignment.isNew()
@@ -139,8 +156,14 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         select_button_text: I18n.t('buttons.select_url', 'Select'),
         no_name_input: true,
         submit: (data) =>
+          @$externalToolsContentType.val(data['item[type]'])
+          @$externalToolsContentId.val(data['item[id]'])
           @$externalToolsUrl.val(data['item[url]'])
           @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
+
+    showExternalToolsDialogForScreenreader: (ev) =>
+      ev.preventDefault()
+      @showExternalToolsDialog()
 
     toggleRestrictFileUploads: =>
       @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')
@@ -166,6 +189,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     afterRender: =>
       @_attachEditorToDescription()
       $ @_initializeWikiSidebar
+      @addTinyMCEKeyboardShortcuts()
       this
 
     toJSON: =>
@@ -191,6 +215,10 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         wikiSidebar.init()
         $.scrollSidebar()
       wikiSidebar.attachToEditor(@$description).show()
+
+    addTinyMCEKeyboardShortcuts: =>
+      keyboardShortcutsView = new RCEKeyboardShortcuts()
+      keyboardShortcutsView.render().$el.insertBefore($(".rte_switch_views_link:first"))
 
     # -- Data for Submitting --
     getFormData: =>
@@ -224,7 +252,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         missingDateDialog = new MissingDateDialog
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
-          success: =>
+          da_enabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
+          success: (dateDialog) =>
+            dateDialog.dialog('close').remove()
             ValidatedFormView::submit.call(this)
         missingDateDialog.cancel = (e) ->
           missingDateDialog.$dialog.dialog('close').remove()
@@ -321,8 +351,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     _validatePointsRequired: (data, errors) =>
       return errors unless _.include ['percent','letter_grade','gpa_scale'], data.grading_type
 
-      if data.points_possible == "0" or isNaN(parseFloat(data.points_possible))
+      if parseInt(data.points_possible,10) < 0 or isNaN(parseFloat(data.points_possible))
         errors["points_possible"] = [
-          message: I18n.t('points_possible_not_zero', "Points possible must be more than 0 for selected grading type")
+          message: I18n.t("Points possible must be 0 or more for selected grading type")
         ]
       errors

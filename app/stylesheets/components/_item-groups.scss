@@ -181,6 +181,7 @@ is for items that are not draggable.
 .ig-header {
   padding-top: 5px;
   padding-bottom: 5px;
+  min-height: 30px;
 
   .ig-header-title {
     text-decoration: none;
@@ -189,7 +190,9 @@ is for items that are not draggable.
     line-height: 20px;
     margin: auto;
     display: inline-block;
-    &:focus { @include button-focus; }
+    &:focus { 
+      @if $use_high_contrast { @include button-focus; }
+    }
 
     .icon-mini-arrow-down {
       vertical-align: middle;
@@ -233,7 +236,6 @@ is for items that are not draggable.
   }
 
   .ellipses {
-    color: #7c7c7c;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -301,12 +303,17 @@ is for items that are not draggable.
 
   .publish-icon {
     margin-right: 22px;
+    
 
     i[class*=icon-]:before,
     i[class^=icon-]:before {
       font-size: 18px;
     }
   }
+}
+
+.ig-list .icon-drag-handle {
+  color: $canvas-secondary;
 }
 
 .ig-details [class^=span] {

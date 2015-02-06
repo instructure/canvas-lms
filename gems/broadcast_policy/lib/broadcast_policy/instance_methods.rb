@@ -48,12 +48,9 @@ module BroadcastPolicy
     def generate_prior_version
       obj = self.class.new
       self.attributes.each do |attr, value|
-        obj.__send__("#{attr}=", value) rescue nil
+        value = changed_attributes[attr] if changed_attributes.key?(attr)
+        obj.write_attribute(attr, value)
       end
-      self.changes.each do |attr, values|
-        obj.__send__("#{attr}=", values[0]) rescue nil
-      end
-      obj.workflow_state = self.workflow_state_was if obj.respond_to?("workflow_state=") && self.respond_to?("workflow_state_was")
       obj
     end
 

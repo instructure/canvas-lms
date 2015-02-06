@@ -18,7 +18,7 @@
 
 # @API Communication Channels
 #
-# API for accessing users' email addresses, SMS phone numbers, Twitter,
+# API for accessing users' email addresses, SMS phone numbers, Twitter, Yo,
 # and Facebook communication channels.
 #
 # In this API, the `:user_id` parameter can always be replaced with `self` if
@@ -40,7 +40,7 @@
 #           "type": "string"
 #         },
 #         "type": {
-#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'facebook' or 'twitter'. This field determines the type of value seen in 'address'.",
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'facebook', 'twitter' or 'yo'. This field determines the type of value seen in 'address'.",
 #           "example": "email",
 #           "type": "string",
 #           "allowableValues": {
@@ -49,7 +49,8 @@
 #               "sms",
 #               "chat",
 #               "facebook",
-#               "twitter"
+#               "twitter",
+#               "yo"
 #             ]
 #           }
 #         },
@@ -110,7 +111,7 @@ class CommunicationChannelsController < ApplicationController
   # Creates a new communication channel for the specified user.
   #
   # @argument communication_channel[address] [Required, String]
-  #   An email address or SMS number.
+  #   An email address or SMS number. Not required for "push" type channels.
   #
   # @argument communication_channel[type] [Required, String, "email"|"sms"|"push"]
   #   The type of communication channel.
@@ -120,6 +121,11 @@ class CommunicationChannelsController < ApplicationController
   #   Simple Notification Services, and the developer key used to create
   #   the access token from this request must have an SNS ARN configured on
   #   it.
+  #
+  # @argument communication_channel[token] [String]
+  #   A registration id, device token, or equivalent token given to an app when
+  #   registering with a push notification provider. Only valid for "push" type channels.
+  #
   #
   # @argument skip_confirmation [Boolean]
   #   Only valid for site admins and account admins making requests; If true, the channel is
@@ -139,10 +145,25 @@ class CommunicationChannelsController < ApplicationController
 
     return render_unauthorized_action unless has_api_permissions?
 
-    params.delete(:build_pseudonym) if api_request?
+    params[:build_pseudonym] = 0 if api_request?
 
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
         (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
+
+    if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
+      if !@access_token
+        return render :json => { errors: { type: 'Push is only supported when using an access token'}}, status: :bad_request
+      end
+      if !@access_token.developer_key.try(:sns_arn)
+        return render :json => { errors: { type: 'SNS is not configured for this developer key'}}, status: :bad_request
+      end
+      endpoint = @current_user.notification_endpoints.where(token: params[:communication_channel][:token]).first
+      endpoint ||= @access_token.notification_endpoints.create!(token: params[:communication_channel][:token])
+
+      skip_confirmation = true
+      params[:build_pseudonym] = nil
+      params[:communication_channel][:address] = "push"
+    end
 
     # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
     # that the unique_id is valid. The pseudonym will be created on approval of the
@@ -155,17 +176,6 @@ class CommunicationChannelsController < ApplicationController
       unless @pseudonym.valid?
         return render :json => @pseudonym.errors.as_json, :status => :bad_request
       end
-    end
-
-    if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
-      if !@access_token
-        return render :json => { errors: { type: 'Push is only supported when using an access token'}}, status: :bad_request
-      end
-      if !@access_token.developer_key.try(:sns_arn)
-        return render :json => { errors: { type: 'SNS is not configured for this developer key'}}, status: :bad_request
-      end
-      skip_confirmation = true
-      @cc = @user.communication_channels.create_push(@access_token, params[:communication_channel][:address])
     end
 
     # Find or create the communication channel.
@@ -244,6 +254,8 @@ class CommunicationChannelsController < ApplicationController
       # load merge opportunities
       merge_users = cc.merge_candidates
       merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
+      user_observers = UserObserver.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
+      merge_users = merge_users.reject { |u| user_observers.any?{|uo| uo.user == u || uo.observer == u} }
       # remove users that don't have a pseudonym for this account, or one can't be created
       merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
       @merge_opportunities = []

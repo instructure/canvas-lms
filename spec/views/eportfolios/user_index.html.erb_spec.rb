@@ -25,7 +25,7 @@ describe "/eportfolios/index" do
     view_portfolio
     assigns[:portfolios] = [@portfolio]
     render "eportfolios/user_index"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

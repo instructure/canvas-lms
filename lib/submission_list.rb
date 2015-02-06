@@ -311,7 +311,6 @@ class SubmissionList
         matches = hash_list.select { |a| a[:id] == qs.submission_id}
         matches.each do |h|
           h[:score_before_regrade] = qs.score_before_regrade
-          h[:grader_id] = 'regraded'
         end
       end
 
@@ -321,13 +320,13 @@ class SubmissionList
     # Still a list of unsorted, unfiltered hashes, but the meta data is inserted at this point
     def full_hash_list
       @full_hash_list ||= self.raw_hash_list.map do |h|
-        h[:grader] = if h[:grader_id] && self.grader_map[h[:grader_id]]
-          self.grader_map[h[:grader_id]].name
-        elsif h[:grader_id] == 'regraded'
-          I18n.t('gradebooks.history.regraded', "Regraded")
-        else
-          I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
-        end
+        h[:grader] = if h.has_key? :score_before_regrade
+                       I18n.t('gradebooks.history.regraded', "Regraded")
+                     elsif h[:grader_id] && grader_map[h[:grader_id]]
+                       grader_map[h[:grader_id]].name
+                     else
+                       I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
+                     end
         h[:safe_grader_id] = h[:grader_id] ? h[:grader_id] : 0
         h[:assignment_name] = self.assignment_map[h[:assignment_id]].title
         h[:student_user_id] = h[:user_id]

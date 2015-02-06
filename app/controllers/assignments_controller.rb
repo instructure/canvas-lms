@@ -32,10 +32,12 @@ class AssignmentsController < ApplicationController
   before_filter :normalize_title_param, :only => [:new, :edit]
 
   def index
-    return old_index if @context == @current_user || !@context.feature_enabled?(:draft_state)
+    return redirect_to(dashboard_url) if @context == @current_user
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+      log_asset_access("assignments:#{@context.asset_string}", 'assignments', 'other')
+
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
       # It'd be nice to do this as an after_create, but it's not that simple
@@ -54,9 +56,12 @@ class AssignmentsController < ApplicationController
           :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
         :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
-        :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
+        :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
+        :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
+        :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
       })
 
 
@@ -65,39 +70,6 @@ class AssignmentsController < ApplicationController
           @padless = true
           render :action => :new_index
         end
-      end
-    end
-  end
-
-  def old_index
-    return redirect_to(dashboard_url) if @context == @current_user
-    if authorized_action(@context, @current_user, :read)
-      get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
-      get_sorted_assignments
-      add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
-      @context = (@just_viewing_one_course ? @context : @current_user)
-      return if @just_viewing_one_course && !tab_enabled?(@context.class::TAB_ASSIGNMENTS)
-
-      respond_to do |format|
-        if @contexts.empty?
-          if @context
-            format.html { redirect_to @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
-          else
-            format.html { redirect_to root_url }
-          end
-        elsif @just_viewing_one_course && @context.assignments.scoped.new.grants_right?(@current_user, session, :update)
-          format.html {
-            render :action => :index
-          }
-        else
-          @current_user_submissions ||= @current_user && @current_user.submissions.
-              select([:id, :assignment_id, :score, :workflow_state]).
-              where(:assignment_id => @upcoming_assignments)
-          js_env(:submissions_hash => @submissions_hash)
-          format.html { render :action => :student_index }
-        end
-        # TODO: eager load the rubric associations
-        format.json { render :json => @assignments.map{ |a| a.as_json(include: [:rubric_association, :rubric]) } }
       end
     end
   end
@@ -113,7 +85,9 @@ class AssignmentsController < ApplicationController
     end
     if authorized_action(@assignment, @current_user, :read)
 
-      if @context.feature_enabled?(:differentiated_assignments) && @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
+      if (da_on = @context.feature_enabled?(:differentiated_assignments)) &&
+           @current_user && @assignment &&
+           !@assignment.visible_to_user?(@current_user, differentiated_assignments: da_on)
         respond_to do |format|
           flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
@@ -132,7 +106,6 @@ class AssignmentsController < ApplicationController
 
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
-        :DRAFT_STATE => @context.feature_enabled?(:draft_state),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
@@ -312,7 +285,7 @@ class AssignmentsController < ApplicationController
         # the requesting user may not have :read if the course syllabus is public, in which
         # case, we pass nil as the user so verifiers are added to links in the syllabus body
         # (ability for the user to read the syllabus was checked above as :read_syllabus)
-        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil, {}, true)
       end
 
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
@@ -344,8 +317,7 @@ class AssignmentsController < ApplicationController
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
-    @assignment.workflow_state ||= @context.feature_enabled?(:draft_state) ? "unpublished" : "published"
-    @assignment.post_to_sis ||= @context.feature_enabled?(:post_to_sis) ? true : false
+    @assignment.workflow_state ||= "unpublished"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
@@ -367,7 +339,7 @@ class AssignmentsController < ApplicationController
 
   def new
     @assignment ||= @context.assignments.scoped.new
-    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
+    @assignment.workflow_state = 'unpublished'
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'
@@ -410,14 +382,29 @@ class AssignmentsController < ApplicationController
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :POST_TO_SIS => @context.feature_enabled?(:post_grades),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
-          {:id => section.id, :name => section.name }
+          {
+            :id => section.id,
+            :name => section.name,
+            :start_at => section.start_at,
+            :end_at => section.end_at,
+            :override_course_dates => section.restrict_enrollments_to_section_dates
+          }
         }),
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(
             @assignment.overrides_for(@current_user)
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments)
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+        :COURSE_DATE_RANGE => {
+          :start_at => @context.start_at,
+          :end_at => @context.conclude_at,
+          :override_term_dates => @context.restrict_enrollments_to_course_dates
+        },
+        :TERM_DATE_RANGE => {
+          :start_at => @context.enrollment_term.start_at,
+          :end_at => @context.enrollment_term.end_at
+        }
       }
 
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
@@ -504,15 +491,13 @@ class AssignmentsController < ApplicationController
 
   def get_assignment_group(assignment_params)
     return unless assignment_params
-    if (group_id = assignment_params.delete(:assignment_group_id)).present?
-      group = @context.assignment_groups.find(group_id)
+    if (group_id = assignment_params[:assignment_group_id]).present?
+      @context.assignment_groups.find(group_id)
     end
   end
 
   def normalize_title_param
-    if title = params.delete(:name)
-      params[:title] = title
-    end
+    params[:title] ||= params[:name]
   end
 
   def index_edit_params

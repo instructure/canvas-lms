@@ -246,9 +246,13 @@ class FoldersController < ApplicationController
       # except the last one (cause we might be able to use it)
       folder_filename = "#{t :folder_filename, "folder"}.zip"
       
-      @attachments = Attachment.find_all_by_context_id_and_context_type_and_display_name_and_user_id(@folder.id, @folder.class.to_s, folder_filename, user_id).
-                                select{|a| ['to_be_zipped', 'zipping', 'zipped', 'unattached'].include?(a.workflow_state) && !a.deleted? }.
-                                sort_by{|a| a.created_at }
+      @attachments = Attachment.where(context_id: @folder,
+                                      context_type: @folder.class.to_s,
+                                      display_name: folder_filename,
+                                      user_id: user_id,
+                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached']).
+          where("file_state<>'deleted'").
+          order(:created_at).to_a
       @attachment = @attachments.pop
       @attachments.each{|a| a.destroy! }
       last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.by_position.map(&:updated_at)).compact.max

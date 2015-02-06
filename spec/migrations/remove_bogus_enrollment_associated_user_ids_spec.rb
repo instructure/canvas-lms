@@ -32,7 +32,7 @@ describe 'DataFixup::RemoveBogusEnrollmentAssociatedUserIds' do
     # ... and erroneously set associated_user_id
     bad_enrollment.update_attribute(:associated_user_id, @student1.id)
     bad_enrollment.reload
-    bad_enrollment.associated_user_id.should == @student1.id
+    expect(bad_enrollment.associated_user_id).to eq @student1.id
 
     # run the fix 
     DataFixup::RemoveBogusEnrollmentAssociatedUserIds.run
@@ -40,7 +40,7 @@ describe 'DataFixup::RemoveBogusEnrollmentAssociatedUserIds' do
     bad_enrollment.reload
 
     # verify the results
-    observer_enrollment.associated_user_id.should == @student1.id
-    bad_enrollment.associated_user_id.should be_nil
+    expect(observer_enrollment.associated_user_id).to eq @student1.id
+    expect(bad_enrollment.associated_user_id).to be_nil
   end
 end

@@ -28,7 +28,7 @@ describe "Importing assignments" do
 
         data[:assignments_to_import] = {}
         expect {
-          Importers::AssignmentImporter.import_from_migration(data, context).should be_nil
+          expect(Importers::AssignmentImporter.import_from_migration(data, context)).to be_nil
         }.to change(Assignment, :count).by(0)
 
         data[:assignments_to_import][data[:migration_id]] = true
@@ -36,13 +36,13 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(data, context)
           Importers::AssignmentImporter.import_from_migration(data, context)
         }.to change(Assignment, :count).by(1)
-        a = Assignment.find_by_migration_id(data[:migration_id])
+        a = Assignment.where(migration_id: data[:migration_id]).first
         
-        a.title.should == data[:title]
-        a.description.should include(data[:instructions]) if data[:instructions]
-        a.description.should include(data[:description]) if data[:description]
+        expect(a.title).to eq data[:title]
+        expect(a.description).to include(data[:instructions]) if data[:instructions]
+        expect(a.description).to include(data[:description]) if data[:description]
         a.due_at = Time.at(data[:due_date].to_i / 1000)
-        a.points_possible.should == data[:grading][:points_possible].to_f
+        expect(a.points_possible).to eq data[:grading][:points_possible].to_f
       end
     end
   end
@@ -59,8 +59,34 @@ describe "Importing assignments" do
     rubric.save!
 
     Importers::AssignmentImporter.import_from_migration(assignment_hash, context)
-    a = Assignment.find_by_migration_id(assignment_hash[:migration_id])
-    a.points_possible.should == rubric.points_possible
+    a = Assignment.where(migration_id: assignment_hash[:migration_id]).first
+    expect(a.points_possible).to eq rubric.points_possible
+  end
+
+  it "should infer the default name when importing a nameless assignment" do
+    course_model
+    nameless_assignment_hash = {
+        "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+        "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+        "grading_standard_migration_id" => nil,
+        "rubric_migration_id" => nil,
+        "rubric_id" => nil,
+        "quiz_migration_id" => nil,
+        "workflow_state" => "published",
+        "title" => "",
+        "grading_type" => "points",
+        "submission_types" => "none",
+        "peer_reviews" => false,
+        "automatic_peer_reviews" => false,
+        "muted" => false,
+        "due_at" => 1401947999000,
+        "peer_reviews_due_at" => 1401947999000,
+        "position" => 6,
+        "peer_review_count" => 0
+    }
+    Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course)
+    assignment = @course.assignments.where(migration_id: 'ib4834d160d180e2e91572e8b9e3b1bc6').first
+    expect(assignment.title).to eq 'untitled assignment'
   end
   
 end

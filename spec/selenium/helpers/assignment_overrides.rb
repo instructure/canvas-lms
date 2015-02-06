@@ -34,11 +34,11 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def compare_assignment_times(a)
-    a.due_at.strftime('%b %-d, %y').should == due_at.to_date.
+    expect(a.due_at.strftime('%b %-d, %y')).to eq due_at.to_date.
       strftime('%b %-d, %y')
-    a.unlock_at.strftime('%b %-d, %y').should == unlock_at.to_date.
+    expect(a.unlock_at.strftime('%b %-d, %y')).to eq unlock_at.to_date.
       strftime('%b %-d, %y')
-    a.lock_at.strftime('%b %-d, %y').should == lock_at.to_date.
+    expect(a.lock_at.strftime('%b %-d, %y')).to eq lock_at.to_date.
       strftime('%b %-d, %y')
   end
 

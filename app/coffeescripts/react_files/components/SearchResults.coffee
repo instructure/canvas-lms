@@ -11,8 +11,10 @@ define [
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
-
+  './FilePreview'
+  './NoResults'
+  '../utils/locationOrigin'
+], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreview, NoResults) ->
 
   SearchResults = React.createClass
     displayName: 'SearchResults'
@@ -24,7 +26,32 @@ define [
     getInitialState: ->
       return {
         collection: new FilesCollection
+        errors: null
       }
+
+    onFetchError: (jqXHR, textStatus, errorThrown) ->
+      message = I18n.t('An unknown server error occurred.  Please try again.')
+
+      try
+        responseText = JSON.parse(textStatus.responseText)
+      catch e
+        responseText =
+          errors: [{message}]
+
+      @setState errors: if _.isArray(responseText.errors)
+                          responseText.errors
+                        else if responseText.errors?.base?
+                          [{message: "#{responseText.errors.base}, #{responseText.status}"}]
+                        else
+                          [{message}]
+
+    displayErrors: (errors) ->
+      div {},
+        p {},
+          I18n.t({one: 'Your search encountered the following error:', other: 'Your search encountered the following errors:'}, {count: errors.length})
+        ul {},
+          errors.map (error) ->
+            li {}, error.message if error?.message?
 
     updateResults: (props) ->
       oldUrl = @state.collection.url
@@ -36,9 +63,12 @@ define [
 
       # Refactor this when given time. Maybe even use setState instead of forceUpdate
       unless @state.collection.loadedAll and _.isEqual(@props.query.search_term, props.query.search_term)
-        forceUpdate = => @forceUpdate() if @isMounted()
-        @state.collection.fetch({data: props.query}).then(forceUpdate)
-        # TODO: use scroll position to only fetch the pages we need
+        forceUpdate = =>
+          @setState({errors: null})
+          @forceUpdate() if @isMounted()
+          $.screenReaderFlashMessageExclusive I18n.t('results_count', "Showing %{num_results} search results", {num_results: @state.collection.length})
+        @state.collection.fetch({data: props.query, error: @onFetchError}).then(forceUpdate)
+          # TODO: use scroll position to only fetch the pages we need
           .then getAllPages.bind(null, @state.collection, forceUpdate)
 
     componentWillReceiveProps: (newProps) ->
@@ -50,29 +80,47 @@ define [
     componentDidMount: ->
       # this setTimeout is to handle a race condition with the setTimeout in the componentWillUnmount method of ShowFolder
       setTimeout =>
-        @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null, showingSearchResults: true})
+        @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null, showingSearchResults: true, searchResultCollection: @state.collection})
 
     render: withReactDOM ->
-      div {
-        className:'ef-directory'
-        role: 'grid'
-        'aria-label': I18n.t('search_results', 'Search results')
-      },
-        ColumnHeaders {
-          to: 'search'
-          subject: @state.collection
-          query: @props.query
-          toggleAllSelected: @props.toggleAllSelected
-          areAllItemsSelected: @props.areAllItemsSelected
-        }
-        @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
-          FolderChild key:child.cid, model: child, userCanManageFilesForContext: @props.userCanManageFilesForContext
-        LoadingIndicator isLoading: !@state.collection.loadedAll
-        if @state.collection.loadedAll and (@state.collection.length is 0)
-          div ref: 'noResultsFound',
-            p {}, I18n.t('errors.no_match.your_search', 'Your search - "%{search_term}" - did not match any files.', {search_term: @props.query.search_term})
-            p {}, I18n.t('errors.no_match.suggestions', 'Suggestions:')
-            ul {},
-              li {}, I18n.t('errors.no_match.spelled', 'Make sure all words are spelled correctly.')
-              li {}, I18n.t('errors.no_match.keywords', 'Try different keywords.')
-              li {}, I18n.t('errors.no_match.three_chars', 'Enter at least 3 letters in the search box.')
+      if @state.errors
+        @displayErrors(@state.errors)
+      else if @state.collection.loadedAll and (@state.collection.length is 0)
+        NoResults {search_term: @props.query.search_term}
+      else
+        div role: 'grid',
+          div {
+            ref: 'accessibilityMessage'
+            className: 'SearchResults__accessbilityMessage col-xs'
+            tabIndex: 0
+          },
+            I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")
+          ColumnHeaders {
+            to: 'search'
+            query: @props.query
+            params: @props.params
+            toggleAllSelected: @props.toggleAllSelected
+            areAllItemsSelected: @props.areAllItemsSelected
+            usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+          }
+          @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
+            FolderChild
+              key: child.cid
+              model: child
+              isSelected: child in @props.selectedItems
+              toggleSelected: @props.toggleItemSelected.bind(null, child)
+              userCanManageFilesForContext: @props.userCanManageFilesForContext
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+              externalToolsForContext: @props.externalToolsForContext
+              previewItem: @props.previewItem.bind(null, child)
+              dndOptions: @props.dndOptions
+          LoadingIndicator isLoading: !@state.collection.loadedAll
+
+          # Prepare and render the FilePreview if needed.
+          # As long as ?preview is present in the url.
+          if @props.query.preview? and @state.collection.length
+            FilePreview
+              params: @props.params
+              query: @props.query
+              collection: @state.collection
+              usageRightsRequiredForContext: @props.usageRightsRequiredForContext

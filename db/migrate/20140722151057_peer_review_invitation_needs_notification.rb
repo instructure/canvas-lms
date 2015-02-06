@@ -12,6 +12,6 @@ class PeerReviewInvitationNeedsNotification < ActiveRecord::Migration
 
   def self.down
     return unless Shard.current == Shard.default
-    Notification.find_by_name('Peer Review Invitation').destroy
+    Notification.where(name: 'Peer Review Invitation').delete_all
   end
 end

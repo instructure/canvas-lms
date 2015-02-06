@@ -6,12 +6,9 @@
   margin: 0 -1em -1em;
   > .collectionViewItems {
     padding: 10px 0 0 1em;
-    border-bottom: 0px;
   }
   > .tab-panel {
     position: relative;
-    // moved from tab ul, because IE9 is dumb
-    border-top: 1px solid #aaaaaa;
   }
 }
 

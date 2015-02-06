@@ -6,6 +6,7 @@ module BroadcastPolicies
     let(:course) do
       mock("Course").tap do |c|
         c.stubs(:available?).returns(true)
+        c.stubs(:feature_enabled?).with(:differentiated_assignments).returns(false)
       end
     end
     let(:assignment) do
@@ -41,6 +42,7 @@ module BroadcastPolicies
         qs.stubs(:quiz).returns(quiz)
         qs.stubs(:submission).returns(submission)
         qs.stubs(:user).returns(user)
+        qs.stubs(:context).returns(course)
       end
     end
     let(:policy) { QuizSubmissionPolicy.new(quiz_submission) }
@@ -53,12 +55,12 @@ module BroadcastPolicies
       end
 
       it 'is true when the dependent inputs are true' do
-        policy.should_dispatch_submission_graded?.should be_true
+        expect(policy.should_dispatch_submission_graded?).to be_truthy
       end
 
       def wont_send_when
         yield
-        policy.should_dispatch_submission_graded?.should be_false
+        expect(policy.should_dispatch_submission_graded?).to be_falsey
       end
 
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
@@ -79,11 +81,11 @@ module BroadcastPolicies
       before { quiz_submission.stubs(:pending_review?).returns false }
       def wont_send_when
         yield
-        policy.should_dispatch_submission_needs_grading?.should be_false
+        expect(policy.should_dispatch_submission_needs_grading?).to be_falsey
       end
       it "is true when quiz is pending review" do
         quiz_submission.stubs(:pending_review?).returns true
-        policy.should_dispatch_submission_needs_grading?.should == true
+        expect(policy.should_dispatch_submission_needs_grading?).to eq true
       end
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
       specify { wont_send_when { quiz.stubs(:survey?).returns true} }
@@ -92,13 +94,14 @@ module BroadcastPolicies
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
       specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
       specify { wont_send_when { submission.stubs(:pending_review?).returns false }}
+      specify { wont_send_when { QuizSubmissionPolicy.any_instance.stubs(:user_has_visibility?).returns(false) }}
     end
 
 
     describe '#should_dispatch_submission_grade_changed?' do
       def wont_send_when
         yield
-        policy.should_dispatch_submission_grade_changed?.should be_false
+        expect(policy.should_dispatch_submission_grade_changed?).to be_falsey
       end
 
       before do
@@ -107,7 +110,7 @@ module BroadcastPolicies
       end
 
       it 'is true when the necessary inputs are true' do
-        policy.should_dispatch_submission_grade_changed?.should be_true
+        expect(policy.should_dispatch_submission_grade_changed?).to be_truthy
       end
 
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
@@ -115,6 +118,7 @@ module BroadcastPolicies
       specify { wont_send_when { course.stubs(:available?).returns false} }
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
       specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
+      specify { wont_send_when { QuizSubmissionPolicy.any_instance.stubs(:user_has_visibility?).returns(false) }}
 
       specify do
         wont_send_when do
@@ -126,8 +130,8 @@ module BroadcastPolicies
 
     describe '#when there is no quiz submission' do
       let(:policy) { QuizSubmissionPolicy.new(nil) }
-      specify { policy.should_dispatch_submission_graded?.should be_false }
-      specify { policy.should_dispatch_submission_grade_changed?.should be_false }
+      specify { expect(policy.should_dispatch_submission_graded?).to be_falsey }
+      specify { expect(policy.should_dispatch_submission_grade_changed?).to be_falsey }
     end
 
   end

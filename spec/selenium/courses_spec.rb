@@ -22,13 +22,13 @@ describe "courses" do
     context 'draft state' do
 
       before(:each) do
-        course_with_teacher_logged_in({draft_state: true})
+        course_with_teacher_logged_in
       end
 
       def validate_action_button(postion, validation_text)
         action_button = ff('#course_status_actions button').send(postion)
-        action_button.should have_class('disabled')
-        action_button.text.should == validation_text
+        expect(action_button).to have_class('disabled')
+        expect(action_button.text).to eq validation_text
       end
 
       it "should allow publishing of the course through the course status actions" do
@@ -36,37 +36,37 @@ describe "courses" do
         @course.save!
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        f('.publish_course_in_wizard_link').should be_displayed
-        course_status_buttons.first.should have_class('disabled')
-        course_status_buttons.first.text.should == 'Unpublished'
-        course_status_buttons.last.should_not have_class('disabled')
-        course_status_buttons.last.text.should == 'Publish'
+        expect(f('.publish_course_in_wizard_link')).to be_displayed
+        expect(course_status_buttons.first).to have_class('disabled')
+        expect(course_status_buttons.first.text).to eq 'Unpublished'
+        expect(course_status_buttons.last).not_to have_class('disabled')
+        expect(course_status_buttons.last.text).to eq 'Publish'
         expect_new_page_load { course_status_buttons.last.click }
-        f('.publish_course_in_wizard_link').should be_nil
+        expect(f('.publish_course_in_wizard_link')).to be_nil
         validate_action_button(:last, 'Published')
       end
 
       it "should allow unpublishing of a course through the course status actions" do
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        f('.publish_course_in_wizard_link').should be_nil
-        course_status_buttons.first.should_not have_class('disabled')
-        course_status_buttons.first.text.should == 'Unpublish'
-        course_status_buttons.last.should have_class('disabled')
-        course_status_buttons.last.text.should == 'Published'
+        expect(f('.publish_course_in_wizard_link')).to be_nil
+        expect(course_status_buttons.first).not_to have_class('disabled')
+        expect(course_status_buttons.first.text).to eq 'Unpublish'
+        expect(course_status_buttons.last).to have_class('disabled')
+        expect(course_status_buttons.last.text).to eq 'Published'
         expect_new_page_load { course_status_buttons.first.click }
-        f('.publish_course_in_wizard_link').should be_displayed
+        expect(f('.publish_course_in_wizard_link')).to be_displayed
         validate_action_button(:first, 'Unpublished')
       end
 
       it "should not show course status if graded submissions exist" do
-        course_with_student_submissions({submission_points: true, draft_state: true})
+        course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
-        f('#course_status').should be_nil
+        expect(f('#course_status')).to be_nil
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
-        course_with_student_submissions({draft_state: true})
+        course_with_student_submissions
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
         expect_new_page_load { course_status_buttons.first.click }
@@ -77,28 +77,34 @@ describe "courses" do
     end
 
     it "should properly hide the wizard and remember its hidden state" do
+      # For now we are not allowing the wizard to popup automatically
+      # so this spec doesn't apply, it may in the future though.
+      pending
       course_with_teacher_logged_in
 
       create_new_course
 
-      wizard_box = f("#wizard_box")
-      keep_trying_until { wizard_box.should be_displayed }
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      wizard_box = f(".ic-wizard-box")
+      keep_trying_until { expect(wizard_box).to be_displayed }
+      f(".ic-wizard-box__close a").click
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
-      wizard_box = f("#wizard_box")
-      wizard_box.should_not be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
 
       # un-remember the setting
       driver.execute_script "localStorage.clear()"
     end
 
     it "should open and close wizard after initial close" do
+      # For now we are not allowing the wizard to popup automatically
+      # so this spec doesn't apply, it may in the future though.
+      pending
       def find_wizard_box
         wizard_box = keep_trying_until do
-          wizard_box = f("#wizard_box")
-          wizard_box.should be_displayed
+          wizard_box = f(".ic-wizard-box")
+          expect(wizard_box).to be_displayed
           wizard_box
         end
         wizard_box
@@ -109,55 +115,73 @@ describe "courses" do
 
       wait_for_ajaximations
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      f(".ic-wizard-box__close a").click
       wait_for_ajaximations
-      wizard_box.should_not be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
       checklist_button = f('.wizard_popup_link')
-      checklist_button.should be_displayed
+      expect(checklist_button).to be_displayed
       checklist_button.click
       wait_for_ajaximations
-      checklist_button.should_not be_displayed
       wizard_box = find_wizard_box
-      wizard_box.find_element(:css, ".close_wizard_link").click
+      f(".ic-wizard-box__close a").click
       wait_for_ajaximations
-      wizard_box.should_not be_displayed
-      checklist_button.should be_displayed
+      wizard_box = f(".ic-wizard-box")
+      expect(wizard_box).to eq nil
+      expect(checklist_button).to be_displayed
+    end
+
+    it "should open up the choose home page dialog from the wizard" do
+      course_with_teacher_logged_in
+      create_new_course
+
+      # Because of the specs about automatically opening are currently
+      # pending, we need to cause the wizard to open by way of click. When
+      # those specs are no longer pendings, the click line should be removed.
+      f(".wizard_popup_link").click()
+      wizard_box = f(".ic-wizard-box")
+      keep_trying_until { expect(wizard_box).to be_displayed }
+
+
+      f("#wizard_home_page").click
+      f(".ic-wizard-box__message-button a").click
+      wait_for_ajaximations
+      modal = f("#edit_course_home_content_form")
+      expect(modal).to be_displayed
     end
 
     it "should correctly update the course quota" do
       course_with_admin_logged_in
 
       # first try setting the quota explicitly
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       f("#ui-id-1").click
       form = f("#course_form")
-      f("#course_form .edit_course_link").should be_displayed
-      form.find_element(:css, ".edit_course_link").click
-      wait_for_ajaximations
+      expect(form).to be_displayed
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       replace_content(quota_input, "10")
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
-      form = f("#course_form")
-      form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
 
       # then try just saving it (without resetting it)
-      get "/courses/#{@course.id}/details"
+      get "/courses/#{@course.id}/settings"
       form = f("#course_form")
-      form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
-      form.find_element(:css, ".edit_course_link").click
-      wait_for_ajaximations
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form = f("#course_form")
-      form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
 
       # then make sure it's right after a reload
-      get "/courses/#{@course.id}/details"
-      form = f("#course_form")
-      form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
+      get "/courses/#{@course.id}/settings"
+      value = f("#course_form input#course_storage_quota_mb")['value']
+      expect(value).to eq "10"
       @course.reload
-      @course.storage_quota.should == 10.megabytes
+      expect(@course.storage_quota).to eq 10.megabytes
     end
 
     it "should redirect to the gradebook when switching courses when viewing a students grades" do
@@ -176,10 +200,10 @@ describe "courses" do
 
       select = f('#course_url')
       options = select.find_elements(:css, 'option')
-      options.length.should == 2
+      expect(options.length).to eq 2
       wait_for_ajaximations
       expect_new_page_load{ click_option('#course_url', course2.name) }
-      f('#section-tabs-header').text.should match course2.name
+      expect(f('#section-tabs-header').text).to match course2.name
     end
 
     it "should load the users page using ajax" do
@@ -195,8 +219,8 @@ describe "courses" do
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      flash_message_present?(:error).should be_false
-      ff('.roster .rosterUser').length.should == 50
+      expect(flash_message_present?(:error)).to be_falsey
+      expect(ff('.roster .rosterUser').length).to eq 50
     end
 
     it "should only show users that a user has permissions to view" do
@@ -210,12 +234,12 @@ describe "courses" do
       enrollment = @course.enroll_ta(@user)
       enrollment.accept!
       enrollment.update_attributes(:limit_privileges_to_course_section => true,
-                                   :course_section => CourseSection.find_by_name('Two'))
+                                   :course_section => CourseSection.where(name: 'Two').first)
 
       # Test that only users in the approved section are displayed.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      ff('.roster .rosterUser').length.should == 2
+      expect(ff('.roster .rosterUser').length).to eq 2
     end
 
     it "should display users section name" do
@@ -235,7 +259,7 @@ describe "courses" do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       sections = ff('.roster .section')
-      sections.map(&:text).sort.should == ["One", "One", "Two", "Unnamed Course", "Unnamed Course"]
+      expect(sections.map(&:text).sort).to eq ["One", "One", "Two", "Unnamed Course", "Unnamed Course"]
     end
 
     it "should display users section name properly when separated by custom roles" do
@@ -251,8 +275,8 @@ describe "courses" do
       role2.base_role_type = "StudentEnrollment"
       role2.save!
 
-      @course.enroll_user(user1, "StudentEnrollment", :section => section1, :role_name => role1.name).accept!
-      @course.enroll_user(user1, "StudentEnrollment", :section => section2, :role_name => role2.name, :allow_multiple_enrollments => true).accept!
+      @course.enroll_user(user1, "StudentEnrollment", :section => section1, :role => role1).accept!
+      @course.enroll_user(user1, "StudentEnrollment", :section => section2, :role => role2, :allow_multiple_enrollments => true).accept!
       roles_to_sections = {'CustomStudent1' => 'One', 'CustomStudent2' => 'Two'}
 
       get "/courses/#{@course.id}/users"
@@ -263,8 +287,8 @@ describe "courses" do
       role_wrappers.each do |rw|
         role_name = ff('.h3', rw).first.text
         sections = ff('.section', rw)
-        sections.count.should == 1
-        roles_to_sections[role_name].should == sections.first.text
+        expect(sections.count).to eq 1
+        expect(roles_to_sections[role_name]).to eq sections.first.text
       end
     end
 
@@ -286,31 +310,29 @@ describe "courses" do
         num_tools = 3
         num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
         get "/courses/#{@course.id}"
-        ff(".course-home-sub-navigation-lti").size.should == num_tools
+        expect(ff(".course-home-sub-navigation-lti").size).to eq num_tools
       end
 
       it "should display course_home_sub_navigation lti apps (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         num_tools = 2
         num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
         get "/courses/#{@course.id}"
-        ff(".course-home-sub-navigation-lti").size.should == num_tools
+        expect(ff(".course-home-sub-navigation-lti").size).to eq num_tools
       end
 
       it "should include launch type parameter (draft state off)" do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        f('.course-home-sub-navigation-lti').attribute("href").should match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
       end
 
       it "should include launch type parameter (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
-        @course.account.enable_feature!(:draft_state)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        f('.course-home-sub-navigation-lti').attribute("href").should match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
       end
 
       it "should only display active tools" do
@@ -319,7 +341,7 @@ describe "courses" do
         tool.workflow_state = 'deleted'
         tool.save!
         get "/courses/#{@course.id}"
-        ff(".course-home-sub-navigation-lti").size.should == 0
+        expect(ff(".course-home-sub-navigation-lti").size).to eq 0
       end
 
       it "should not display admin tools to students" do
@@ -328,11 +350,11 @@ describe "courses" do
         tool.course_home_sub_navigation['visibility'] = 'admins'
         tool.save!
         get "/courses/#{@course.id}"
-        ff(".course-home-sub-navigation-lti").size.should == 1
+        expect(ff(".course-home-sub-navigation-lti").size).to eq 1
 
         course_with_student_logged_in(course: @course, active_all: true)
         get "/courses/#{@course.id}"
-        ff(".course-home-sub-navigation-lti").size.should == 0
+        expect(ff(".course-home-sub-navigation-lti").size).to eq 0
       end
     end
 
@@ -376,13 +398,14 @@ describe "courses" do
     it "should display user groups on courses page" do
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@student)
+      enroll_student(@student, true)
 
       login_as(@student.name)
       get '/courses'
 
       content = f('#content')
-      content.should include_text('My Groups')
-      content.should include_text('group1')
+      expect(content).to include_text('My Groups')
+      expect(content).to include_text('group1')
     end
   end
 end

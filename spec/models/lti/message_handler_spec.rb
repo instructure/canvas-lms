@@ -34,19 +34,19 @@ module Lti
       it 'requires the message type' do
         subject.message_type = nil
         subject.save
-        subject.errors.first.should == [:message_type, "can't be blank"]
+        expect(subject.errors.first).to eq [:message_type, "can't be blank"]
       end
 
       it 'requires the launch path' do
         subject.launch_path = nil
         subject.save
-        subject.errors.first.should == [:launch_path, "can't be blank"]
+        expect(subject.errors.first).to eq [:launch_path, "can't be blank"]
       end
 
       it 'requires a resource_handler' do
         subject.resource_handler = nil
         subject.save
-        subject.errors.first.should == [:resource_handler, "can't be blank"]
+        expect(subject.errors.first).to eq [:resource_handler, "can't be blank"]
       end
     end
 
@@ -58,7 +58,7 @@ module Lti
         mh3 = create_message_handler(create_resource_handler, message_type: 'content_item')
 
         message_handlers = described_class.by_message_types('basic-lti-launch-request')
-        message_handlers.count.should == 2
+        expect(message_handlers.count).to eq 2
       end
 
       it 'returns all message_handlers for mutlipe message types' do
@@ -68,12 +68,12 @@ module Lti
         mh3 = create_message_handler(rh, message_type: 'content_item')
 
         message_handlers = described_class.by_message_types('basic-lti-launch-request', 'other_type')
-        message_handlers.count.should == 2
+        expect(message_handlers.count).to eq 2
       end
 
     end
 
-    describe 'scope #for_tool_proxies' do
+    describe 'scope #for_context' do
 
 
       it 'returns all message_handlers for a tool proxy' do
@@ -83,7 +83,7 @@ module Lti
           rh = create_resource_handler(tp, resource_type_code: code)
           create_message_handler(rh)
         end
-        Set.new(described_class.for_context(account)).should == Set.new(message_handlers)
+        expect(Set.new(described_class.for_context(account))).to eq Set.new(message_handlers)
       end
 
       it 'returns all message_handlers for multiple tool_proxy' do
@@ -93,7 +93,103 @@ module Lti
           rh = create_resource_handler(tp)
           create_message_handler(rh)
         end
-        Set.new(described_class.for_context(account)).should == Set.new(message_handlers)
+        expect(Set.new(described_class.for_context(account))).to eq Set.new(message_handlers)
+      end
+
+    end
+
+    describe 'scope #has_placements' do
+
+      before :once do
+        tp = create_tool_proxy
+        rh1 = create_resource_handler(tp, resource_type_code: 1)
+        rh2 = create_resource_handler(tp, resource_type_code: 2)
+        rh3 = create_resource_handler(tp, resource_type_code: 3)
+        @mh1 = create_message_handler(rh1)
+        @mh2 = create_message_handler(rh2)
+        @mh3 = create_message_handler(rh3)
+        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
+        rh2.placements.create(placement: ResourcePlacement::RESOURCE_SELECTION)
+        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        rh3.placements.create(placement: ResourcePlacement::RESOURCE_SELECTION)
+      end
+
+
+
+      it 'filters on one placement type' do
+        handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION)
+        expect(handlers.count).to eq 2
+        expect(handlers).to include(@mh1)
+        expect(handlers).to include(@mh2)
+      end
+
+      it 'filters on multiple placement types' do
+        handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION, ResourcePlacement::RESOURCE_SELECTION)
+        expect(handlers.count).to eq 3
+        expect(handlers).to include(@mh1)
+        expect(handlers).to include(@mh2)
+        expect(handlers).to include(@mh3)
+      end
+
+
+    end
+
+    describe '#lti_apps_tabs' do
+
+      before :once do
+        @tp = create_tool_proxy
+        rh1 = create_resource_handler(@tp, resource_type_code: 1)
+        rh2 = create_resource_handler(@tp, resource_type_code: 2)
+        rh3 = create_resource_handler(@tp, resource_type_code: 3)
+        @mh1 = create_message_handler(rh1)
+        @mh2 = create_message_handler(rh2)
+        @mh3 = create_message_handler(rh3)
+        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
+        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        rh3.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
+      end
+
+      it 'converts a message handler into json tab' do
+        @tp.bindings.create(context: account)
+
+        tabs = described_class.lti_apps_tabs(account, [ResourcePlacement::ACCOUNT_NAVIGATION], {})
+        expect(tabs.count).to eq 2
+        tab = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh1.id}" }
+        expect(tab).to eq( {
+          id: "lti/message_handler_#{@mh1.id}",
+          label: "resource name",
+          css_class: "lti/message_handler_#{@mh1.id}",
+          href: :account_basic_lti_launch_request_path,
+          visibility: nil,
+          external: true,
+          hidden: false,
+          args: {:message_handler_id=>@mh1.id, :resource_link_fragment=>"nav", "account_id"=>account.id}
+        })
+      end
+
+      it 'returns message handlers tabs for account with account_navigation placement' do
+        @tp.bindings.create(context: account)
+
+        tabs = described_class.lti_apps_tabs(account, [ResourcePlacement::ACCOUNT_NAVIGATION], {})
+        expect(tabs.count).to eq 2
+        tab1 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh1.id}" }
+        tab2 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh2.id}" }
+        expect(tab1).to_not be_nil
+        expect(tab2).to_not be_nil
+      end
+
+      it 'returns message handlers tabs for course with course_navigation placement' do
+        course_with_teacher(account: account)
+        @tp.bindings.create(context: @course)
+
+        tabs = described_class.lti_apps_tabs(@course, [ResourcePlacement::COURSE_NAVIGATION], {})
+        expect(tabs.count).to eq 2
+        tab1 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh1.id}" }
+        tab2 = tabs.find{|t| t[:id] == "lti/message_handler_#{@mh3.id}" }
+        expect(tab1).to_not be_nil
+        expect(tab2).to_not be_nil
       end
 
     end
@@ -120,7 +216,7 @@ module Lti
 
     def create_message_handler(resource_handler = create_resource_handler, opts = {})
       default_ops = {message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler}
-      MessageHandler.create(default_ops.merge(opts))
+      MessageHandler.create!(default_ops.merge(opts))
     end
 
   end

@@ -27,6 +27,7 @@ define([
   'jst/_vddTooltip',
   'compiled/models/Publishable',
   'compiled/views/PublishButtonView',
+  'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
@@ -40,7 +41,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView) {
+], function(PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -105,35 +106,8 @@ define([
         );
       },
 
-      refreshProgressions: function(show_links) {
-        if (ENV.NO_MODULE_PROGRESSIONS) return;
-
-        $("#context_modules .context_module:visible").each(function() {
-          var $module = $(this);
-          var id = $module.find(".header").getTemplateData({textValues: ['id']});
-          var data = {progression_complete_count: 0, progression_started_count: 0};
-          $("#progression_list .progression_" + id).each(function() {
-            var state = $(this).getTemplateData({textValues: ['workflow_state']}).workflow_state;
-            if(state == 'completed') {
-              data.progression_complete_count++;
-            } else if(state == 'unlocked' || state == 'started') {
-              data.progression_started_count++;
-            }
-          });
-          $module.find(".progression_details_link").showIf(data.progression_complete_count || data.progression_started_count);
-          $module.find(".footer").fillTemplateData({data: data})
-            .find(".progression_details_link").showIf(data.progression_complete_count || data.progression_started_count).end()
-            .find(".progression_complete").showIf(data.progression_complete_count > 0).end()
-            .find(".progression_started").showIf(data.progression_started_count > 0);
-        });
-
-        $(".context_module .progression_complete").showIf($(".context_module .prerequisites_footer:visible,.context_module_item .criterion img.not_blank").length > 0);
-        if(show_links) {
-          $(".loading_module_progressions_link").remove();
-          $(".module_progressions_link").showIf($(".editable_context_module").length > 0 || $(".context_module .progression_complete:visible").length > 0 || $(".context_module_item.completed_item").length > 0);
-        }
-      },
       updateProgressions: function(user_id, callback) {
+        if (!ENV.IS_STUDENT) return;
         var url = $(".progression_list_url").attr('href');
         if(user_id) {
           url = url + "?user_id=" + user_id;
@@ -163,7 +137,6 @@ define([
                 modules.updateProgressionState($(this));
               });
             }
-            modules.refreshProgressions(!user_id);
             if(callback) { callback(); }
           }
           var progressionCnt = 0;
@@ -262,10 +235,10 @@ define([
         $("#context_modules .context_module").each(function() {
           var id = $(this).attr('id').substring('context_module_'.length);
           var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
-          moduleSelectOptions.push('<option value="' + id + '">' + name + '</option>');
+          moduleSelectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
         $('#move_module_item_module_select').empty();
-        $('#move_module_item_module_select').append(moduleSelectOptions.join(''));
+        $('#move_module_item_module_select').append($.raw(moduleSelectOptions.join('')));
 
         // Trigger the change to make sure the list is initally populated.
         $('#move_module_item_module_select').trigger('change');
@@ -301,12 +274,12 @@ define([
           }
           var id = $(this).attr('id').substring('context_module_'.length);
           var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
-          selectOptions.push('<option value="' + id + '">' + name + '</option>');
+          selectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
 
         var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
         $('#move_context_module_select').empty();
-        $('#move_context_module_select').append(selectOptions.join(''));
+        $('#move_context_module_select').append($.raw(selectOptions.join('')));
         //$form.fillFormData(data, {object_name: 'context_module'});
         $form.dialog({
           autoOpen: false,
@@ -329,37 +302,37 @@ define([
       },
       submitMoveModuleItem: function () {
         var beforeOrAfterVal = $('[name="item_move_location"]:checked').val();
-        var currentItem = $('#move_module_item_form').data('current_item');
+        var $currentItem = $('#move_module_item_form').data('current_item');
         var relativeToId = $('#move_module_item_select').val();
         var selectedModuleId = $('#move_module_item_module_select').val();
 
 
         if (beforeOrAfterVal === 'before') {
-          $('#context_module_item_' + relativeToId).before(currentItem);
+          $('#context_module_item_' + relativeToId).before($currentItem);
         }
         if (beforeOrAfterVal === 'after') {
-          $('#context_module_item_' + relativeToId).after(currentItem);
+          $('#context_module_item_' + relativeToId).after($currentItem);
         }
         if ($('#move_module_item_select').children().length === 0) {
           // In this case, we are moving it into a currently empty module.
-          $('#context_module_content_' + selectedModuleId + ' .context_module_items').append(currentItem);
+          $('#context_module_content_' + selectedModuleId + ' .context_module_items').append($currentItem);
         }
 
         modules.hideMoveModuleItem();
-        modules.updateModuleItemPositions(null, {item: currentItem});
+        modules.updateModuleItemPositions(null, {item: $currentItem});
 
 
       },
       submitMoveModule: function () {
         var beforeOrAfterVal = $('[name="move_location"]:checked').val();
-        var currentModule = $('#move_context_module_form').data('current_module');
+        var $currentModule = $('#move_context_module_form').data('current_module');
         var relativeToId = $('#move_context_module_select').val();
 
         if (beforeOrAfterVal === 'before') {
-          $('#context_module_' + relativeToId).before(currentModule);
+          $('#context_module_' + relativeToId).before($currentModule);
         }
         if (beforeOrAfterVal === 'after') {
-          $('#context_module_' + relativeToId).after(currentModule);
+          $('#context_module_' + relativeToId).after($currentModule);
         }
         modules.hideMoveModule();
         modules.updateModulePositions();
@@ -428,6 +401,9 @@ define([
           width: 600,
           close: function() {
             modules.hideEditModule(true);
+          },
+          open: function(){
+            $(this).find('input[type=text],textarea,select').first().focus();
           }
         }).fixDialogButtons().dialog('option', {title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
         $module.removeClass('dont_remove');
@@ -448,11 +424,11 @@ define([
         data.graded = data.graded ? '1' : '0';
         var $item, $olditem = (data.id != 'new') ? $("#context_module_item_" + data.id) : [];
         if($olditem.length) {
-          var admin = $olditem.find('.ig-admin');
-          if (admin.length) { admin.detach(); }
+          var $admin = $olditem.find('.ig-admin');
+          if ($admin.length) { $admin.detach(); }
           $item = $olditem.clone(true);
-          if (admin.length) {
-            $item.find('.ig-row').append(admin)
+          if ($admin.length) {
+            $item.find('.ig-row').append($admin)
           };
         } else {
           $item = $("#context_module_item_blank").clone(true).removeAttr('id');
@@ -625,7 +601,8 @@ define([
 
     // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
-      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at);
+      data.context_module.displayed_unlock_at = $.datetimeString(data.context_module.unlock_at);
+      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at, { localized: false });
       var $module = $("#context_module_" + data.context_module.id);
       $module.attr('aria-label', data.context_module.name);
       $module.find(".header").fillTemplateData({
@@ -692,6 +669,8 @@ define([
           data["context_module[completion_requirements][" + id + "][type]"] = $(this).find(".type").val();
           data["context_module[completion_requirements][" + id + "][min_score]"] = $(this).find(".min_score").val();
         });
+        var date = $.datetime.parse(data['context_module[unlock_at]']);
+        data['context_module[unlock_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
         return data;
       },
       beforeSubmit: function(data) {
@@ -723,7 +702,7 @@ define([
         $("#no_context_modules_message").slideUp();
         var $publishIcon = $module.find('.publish-icon');
         // new module, setup publish icon and other stuff
-        if (ENV.ENABLE_DRAFT && !$publishIcon.data('id')) {
+        if (!$publishIcon.data('id')) {
           var fixLink = function(locator, attribute) {
               el = $module.find(locator);
               el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id));
@@ -801,16 +780,16 @@ define([
         } else if (data.type == 'wiki_page') {
           displayType = I18n.t('optgroup.wiki_pages', "Wiki Pages");
         }
-        var group = $optgroups[displayType]
-        if (!group) {
-          group = $optgroups[displayType] = $(document.createElement('optgroup'))
-          group.attr('label', displayType)
-          $select.append(group)
+        var $group = $optgroups[displayType]
+        if (!$group) {
+          $group = $optgroups[displayType] = $(document.createElement('optgroup'))
+          $group.attr('label', displayType)
+          $select.append($group)
         }
         var titleDesc = data.title;
         var $option = $(document.createElement('option'));
         $option.val(data.id).text(titleDesc);
-        group.append($option);
+        $group.append($option);
       });
       $pre.find(".option").empty().append($option);
       $option.slideDown();
@@ -896,7 +875,11 @@ define([
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
       $("#edit_item_form").dialog({
-        title: I18n.t('titles.edit_item', "Edit Item Details")
+        title: I18n.t('titles.edit_item', "Edit Item Details"),
+        open: function(){
+          $(this).find('input[type=text],textarea,select').first().focus();
+        },
+        minWidth: 320
       }).fixDialogButtons();
     });
     $("#edit_item_form .cancel_button").click(function(event) {
@@ -950,9 +933,9 @@ define([
         }
         var id = $(item).attr('id').substring('context_module_item_'.length);
         var name = $(item).children().find('span.title').text();
-        selectItemOptions.push('<option value="' + id + '">' + name + '</option>');
+        selectItemOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
       });
-      $('#move_module_item_select').append(selectItemOptions.join(''));
+      $('#move_module_item_select').append($.raw(selectItemOptions.join('')));
 
       // The case where the module has no items.
       if ($('#move_module_item_select').children().length === 0) {
@@ -1049,7 +1032,7 @@ define([
               data.content_tag.type = item_data['item[type]'];
               $item = modules.addItemToModule($module, data.content_tag);
               $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
-              if (ENV.ENABLE_DRAFT) { initNewItemPublishButton($item, data.content_tag); }
+              initNewItemPublishButton($item, data.content_tag);
               modules.updateAssignmentData();
             })
           );
@@ -1286,12 +1269,16 @@ define([
   };
 
   $(document).ready(function() {
-    if (ENV.ENABLE_DRAFT) {
-      $('.publish-icon:visible').each(function(index, el) {
-        var view = initPublishButton($(el));
-        overrideModel(view.model, view);
-      });
+
+    if (ENV.IS_STUDENT) {
+      $('.context_module').addClass('student-view');
+      $('.context_module_item .ig-row').addClass('student-view');
     }
+
+    $('.publish-icon:visible').each(function(index, el) {
+      var view = initPublishButton($(el));
+      overrideModel(view.model, view);
+    });
 
     $('.external_url_link').click(function() {
       window.location = $(this).attr('data-item-href');
@@ -1388,7 +1375,6 @@ define([
     }
 
     modules.updateProgressions();
-    modules.refreshProgressions();
     modules.updateAssignmentData();
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
@@ -1484,133 +1470,6 @@ define([
           $("#student_progression_dialog").find(".student.selected_side_tab:first").click();
         });
       }
-    });
-    $("#student_progression_dialog").delegate('.student', 'click', function(event) {
-      $("#student_progression_dialog").find(".selected_side_tab").removeClass('selected_side_tab');
-      $(this).addClass('selected_side_tab');
-      event.preventDefault();
-      var id = $(this).getTemplateData({textValues: ['id']}).id;
-      var $studentWithProgressions = $("#progression_list .student_" + id + ":first");
-      $("#context_modules .context_module:visible").each(function() {
-        var $module = $(this);
-        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
-        var $row = $("#student_progression_dialog .module_" + moduleData.id);
-
-        moduleData.progress = $studentWithProgressions.find(".progression_" + moduleData.id + ":first").getTemplateData({textValues: ['workflow_state']}).workflow_state;
-        moduleData.progress = moduleData.progress || "no information";
-        var type = "nothing";
-        if(moduleData.progress == "unlocked") {
-          type = "in_progress";
-          moduleData.progress = "in progress";
-        } else if(moduleData.progress == "started") {
-          type = "in_progress";
-          moduleData.progress = "in progress";
-        } else if(moduleData.progress == "completed") {
-          type = "completed";
-        } else if(moduleData.progress == "locked") {
-          type = "locked";
-        }
-        $row.find(".still_need_completing").empty();
-        if(moduleData.progress == "in progress") {
-          var $requirements = $("#context_module_" + moduleData.id + " .context_module_item.progression_requirement");
-          var progression = $studentWithProgressions.find(".progression_" + moduleData.id).data('progression');
-          var unfulfilled = [];
-          $requirements.each(function() {
-            var $req = $(this);
-            var req = {id: $req.attr('id').substring(20)};
-            if($req.hasClass('must_view_requirement')) {
-              req.type = 'must_view';
-            } else if($req.hasClass('min_score_requirement')) {
-              req.type = 'min_score';
-            } else if($req.hasClass('max_score_requirement')) {
-              req.type = 'max_score';
-            } else if($req.hasClass('must_contribute_requirement')) {
-              req.type = 'must_contribute';
-            } else if($req.hasClass('must_submit_requirement')) {
-              req.type = 'must_submit';
-            }
-            var met = false;
-            if(progression && progression.requirements_met) {
-              for(var jdx = 0; jdx < progression.requirements_met.length; jdx++) {
-                var compare = progression.requirements_met[jdx];
-                if(compare.id == req.id && compare.type == req.type) {
-                  met = true;
-                }
-              }
-            }
-            if(!met) {
-              unfulfilled.push($req.find(".title:first").text());
-            }
-          });
-          $row.find(".still_need_completing")
-            .append("<b>"+I18n.t('still_needs_completing', 'Still Needs to Complete')+"</b><br/>")
-            .append(unfulfilled.join("<br/>"));
-        }
-        $row.removeClass('locked').removeClass('in_progress').removeClass('completed')
-          .addClass(type);
-        moduleData.progressString = moduleData.progress;
-        $row.fillTemplateData({data: moduleData});
-      });
-    });
-    $(".module_progressions_link").click(function(event) {
-      event.preventDefault();
-      var $dialog = $("#student_progression_dialog");
-      var $student_list = $dialog.find(".student_list");
-      $student_list.find(".student:not(.blank)").remove();
-      $dialog.find(".side_tabs_content tbody .module:not(.blank)").remove();
-      var $visible_modules = $("#context_modules .context_module:visible");
-      var module_ids = [];
-      $visible_modules.each(function() {
-        var $mod = $(this);
-        var id = $mod.attr('id').substring(15);
-        module_ids.push(id);
-      });
-      $("#progression_list .student").each(function() {
-        var $student = $dialog.find(".student.blank:first").clone(true).removeClass('blank');
-        var $studentWithProgressions = $(this);
-        var data = $studentWithProgressions.getTemplateData({textValues: ['name', 'id', 'current_module']});
-        data.current_module = data.current_module || I18n.t('none_in_progress', "none in progress");
-        $student.find("a").attr('href', '#' + data.id);
-        $student.fillTemplateData({data: data});
-        $student_list.append($student.show())
-      });
-      $visible_modules.each(function() {
-        var $module = $(this);
-        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
-        var $template = $dialog.find(".module.blank:first").clone(true).removeClass('blank');
-
-        $template.addClass('module_' + moduleData.id);
-        $template.fillTemplateData({data: moduleData});
-        $dialog.find(".side_tabs_content tbody").append($template.show());
-      });
-
-      $("#student_progression_dialog").dialog({
-        width: 800,
-        open: function() {
-          $(this).find(".student:not(.blank):first .name").click();
-        }
-      });
-    });
-    $(".context_module .progression_details_link").click(function(event) {
-      event.preventDefault();
-      var data = $(this).parents(".context_module").find(".header").getTemplateData({textValues: ['id', 'name']});
-      data.module_name = data.name;
-      var $dialog = $("#module_progression_dialog");
-      $dialog.fillTemplateData({data: data});
-      $dialog.find("ul").empty();
-      $dialog.find(".progression_list").hide();
-      $("#progression_list .student").each(function() { //.progressions .progression_" + data.id).each(function() {
-        var $progression = $(this).find(".progressions .progression_" + data.id);
-        var progressionData = $progression.getTemplateData({textValues: ['context_module_id', 'workflow_state']});
-        progressionData.workflow_state = progressionData.workflow_state || "locked";
-        progressionData.name = $(this).getTemplateData({textValues: ['name']}).name;
-        $dialog.find("." + progressionData.workflow_state + "_list").show()
-          .find("ul").show().append($("<li />").text(progressionData.name));
-      });
-      $("#module_progression_dialog").dialog({
-        title: I18n.t('titles.student_progress', "Student Progress for Module"),
-        width: 500
-      });
     });
     $(document).fragmentChange(function(event, hash) {
       if (hash == '#student_progressions') {

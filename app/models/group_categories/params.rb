@@ -18,8 +18,8 @@ module GroupCategories
     end
 
     def auto_leader
-      return _auto_leader if _auto_leader
-      return nil if !enable_auto_leader
+      return nil if !enable_auto_leader.nil? && !enable_auto_leader
+      return _auto_leader unless enable_auto_leader
       return auto_leader_type if ['first', 'random'].include?(auto_leader_type)
       raise(ArgumentError, "Invalid AutoLeader Type #{auto_leader_type}")
     end
@@ -84,6 +84,7 @@ module GroupCategories
     end
 
     def enable_auto_leader
+      return nil if raw_params[:enable_auto_leader].nil?
       value_to_boolean raw_params[:enable_auto_leader]
     end
 

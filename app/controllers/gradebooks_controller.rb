@@ -126,7 +126,7 @@ class GradebooksController < ApplicationController
     elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
       @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @submissions = @context.submissions.find_all_by_user_id(@enrollment.user_id)
+      @submissions = @context.submissions.where(user_id: @enrollment.user_id).to_a
       @user = @enrollment.user
       render :action => "student_attendance"
       # render student_attendance, optional params[:assignment_id] to highlight and scroll to that particular assignment
@@ -183,19 +183,20 @@ class GradebooksController < ApplicationController
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => Setting.get('gradebook2.submissions_chunk_size', '35').to_i,
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
-      :sections_url => api_v1_course_sections_url(@context),
+      :sections_url => api_v1_course_sections_url(@context, :include => 'passback_status'),
+      :course_url => api_v1_course_url(@context, :include => 'passback_status'),
       :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
       :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
       :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
       :outcome_links_url => api_v1_course_outcome_group_links_url(@context),
       :outcome_rollups_url => api_v1_course_outcome_rollups_url(@context, :per_page => 100),
-      :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
+      :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", :include =>[:visibility]),
       :context_url => named_context_url(@context, :context_url),
       :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
       :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
       :context_id => @context.id,
       :context_code => @context.asset_string,
-      :context_integration_id => @context.integration_id,
+      :context_sis_id => @context.sis_source_id,
       :group_weighting_scheme => @context.group_weighting_scheme,
       :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
       :course_is_concluded => @context.completed?,
@@ -205,7 +206,6 @@ class GradebooksController < ApplicationController
       :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
       :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
-      :draft_state_enabled => @context.feature_enabled?(:draft_state),
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
@@ -216,7 +216,9 @@ class GradebooksController < ApplicationController
       :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
       :sis_app_url => Setting.get('sis_app_url', nil),
-      :sis_app_token => Setting.get('sis_app_token', nil)
+      :sis_app_token => Setting.get('sis_app_token', nil),
+      :post_grades_feature_enabled => @context.feature_enabled?(:post_grades),
+      :list_students_by_sortable_name_enabled => @context.feature_enabled?(:gradebook_list_students_by_sortable_name)
     }
   end
 
@@ -342,7 +344,7 @@ class GradebooksController < ApplicationController
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    if @context.feature_enabled?(:draft_state) && @assignment.unpublished?
+    if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
                          'Speedgrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
@@ -473,8 +475,7 @@ class GradebooksController < ApplicationController
 
 
   def assignment_groups_json(opts={})
-    assignment_scope = AssignmentGroup.assignment_scope_for_draft_state(@context)
-    @context.assignment_groups.active.includes(assignment_scope).map { |g|
+    @context.assignment_groups.active.includes(:published_assignments).map { |g|
       assignment_group_json(g, @current_user, session, ['assignments'], {
         stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?
       })

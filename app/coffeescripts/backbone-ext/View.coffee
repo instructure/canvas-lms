@@ -250,6 +250,10 @@ define [
     #
     # @api private
 
+    ###
+    xsslint safeString.method format
+    ###
+
     createBindings: (index, el) =>
       @$('[data-bind]').each (index, el) =>
         $el = $ el

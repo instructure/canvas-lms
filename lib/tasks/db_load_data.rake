@@ -115,8 +115,14 @@ namespace :db do
     end
     puts "\nNotifications Loaded"
   end
-  
-  desc "Create an administrator account"
+
+  desc "Create default accounts"
+  task :create_default_accounts => :environment do
+    Account.default(true)
+    Account.site_admin(true)
+  end
+
+  desc "Create an administrator user"
   task :configure_admin => :load_environment do
 
     def create_admin(email, password)
@@ -139,8 +145,8 @@ namespace :db do
           raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
           raise "unknown error saving password"
         end
-        Account.site_admin.account_users.where(user_id: user, membership_type: 'AccountAdmin').first_or_create!
-        Account.default.account_users.where(user_id: user, membership_type: 'AccountAdmin').first_or_create!
+        Account.site_admin.account_users.where(user_id: user, role_id: Role.get_built_in_role('AccountAdmin')).first_or_create!
+        Account.default.account_users.where(user_id: user, role_id: Role.get_built_in_role('AccountAdmin')).first_or_create!
         user
       rescue => e
         STDERR.puts "Problem creating administrative account, please try again: #{e}"
@@ -237,7 +243,7 @@ namespace :db do
   end
   
   desc "Create all the initial data, including notifications and admin account"
-  task :load_initial_data => [:configure_admin, :configure_account_name, :configure_statistics_collection, :generate_data] do
+  task :load_initial_data => [:create_default_accounts, :configure_admin, :configure_account_name, :configure_statistics_collection, :generate_data] do
    
     puts "\nInitial data loaded"
     

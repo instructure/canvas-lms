@@ -35,6 +35,7 @@ module HasContentTags
     @associated_content_tags_need_updating = true if self.respond_to?(:display_name_changed?) && self.display_name_changed?
     @associated_content_tags_need_updating = true if self.respond_to?(:points_possible_changed?) && self.points_possible_changed?
     @associated_content_tags_need_updating = true if self.respond_to?(:workflow_state_changed?) && self.workflow_state_changed? || self.workflow_state == 'deleted'
+    @associated_content_tags_need_updating = true if self.is_a?(Attachment) && self.locked_changed?
   end
   
   def self.included(klass)

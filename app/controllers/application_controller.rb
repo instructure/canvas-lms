@@ -47,7 +47,6 @@ class ApplicationController < ActionController::Base
   before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :set_page_view
-  before_filter :refresh_cas_ticket
   before_filter :require_reacceptance_of_terms
   before_filter :clear_policy_cache
   after_filter :log_page_view
@@ -104,7 +103,7 @@ class ApplicationController < ActionController::Base
       @js_env = {
         :current_user_id => @current_user.try(:id),
         :current_user => user_display_json(@current_user, :profile),
-        :current_user_roles => @current_user.try(:roles),
+        :current_user_roles => @current_user.try(:roles, @domain_root_account),
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
         :SETTINGS => {
@@ -132,15 +131,21 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
-  def external_tools_display_hashes(type)
-    tools = ContextExternalTool.all_tools_for(@context, :type => type,
+  def external_tools_display_hashes(type, context=@context, custom_settings=[])
+    context = context.account if context.is_a?(User)
+    tools = ContextExternalTool.all_tools_for(context, :type => type,
       :root_account => @domain_root_account, :current_user => @current_user)
+
+    extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
-      {
+      hash = {
           :title => tool.label_for(type),
-          :icon_url => tool.extension_setting(type, :icon_url),
-          :base_url => course_external_tool_path(@context, tool, :launch_type => type)
+          :base_url => named_context_url(context, :context_external_tool_path, tool, :launch_type => type)
       }
+      extension_settings.each do |setting|
+        hash[setting] = tool.extension_setting(type, setting)
+      end
+      hash
     end
   end
 
@@ -153,6 +158,11 @@ class ApplicationController < ActionController::Base
     @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles)
   end
   helper_method 'use_new_styles?'
+
+  def multiple_grading_periods?
+    @domain_root_account && @domain_root_account.feature_enabled?(:multiple_grading_periods)
+  end
+  helper_method 'multiple_grading_periods?'
 
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
@@ -266,7 +276,7 @@ class ApplicationController < ActionController::Base
     if context.is_a?(UserProfile)
       name = name.to_s.sub(/context/, "profile")
     else
-      klass = context.class.base_ar_class
+      klass = context.class.base_class
       name = name.to_s.sub(/context/, klass.name.underscore)
       opts.unshift(context)
     end
@@ -516,7 +526,7 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      courses = @context.enrollments.current.shard(@context).select { |e| e.state_based_on_date == :active }.map(&:course).uniq
       groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
           g.context.concluded?} : []
       if only_contexts.present?
@@ -589,7 +599,7 @@ class ApplicationController < ActionController::Base
       fake.workflow_state = 'unpublished'
 
       assignment_scope = :active_assignments
-      if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
+      if !fake.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
         assignment_scope = :published_assignments
       end
@@ -792,12 +802,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def refresh_cas_ticket
-    if session[:cas_session] && @current_pseudonym
-      @current_pseudonym.claim_cas_ticket(session[:cas_session])
-    end
-  end
-
   def require_reacceptance_of_terms
     if session[:require_terms] && !api_request? && request.get?
       render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
@@ -809,10 +813,10 @@ class ApplicationController < ActionController::Base
     AdheresToPolicy::Cache.clear
   end
 
-  def generate_page_view
-    attributes = { :user => @current_user, :developer_key => @developer_key, :real_user => @real_current_user }
+  def generate_page_view(user=@current_user)
+    attributes = { :user => user, :developer_key => @developer_key, :real_user => @real_current_user }
     @page_view = PageView.generate(request, attributes)
-    @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.get?)
+    @page_view.user_request = true if params[:user_request] || (user && !request.xhr? && request.get?)
     @page_before_render = Time.now.utc
   end
 
@@ -839,9 +843,12 @@ class ApplicationController < ActionController::Base
   # and reports from these accesses.  This is currently being used
   # to generate access reports per student per course.
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
-    return unless @current_user && @context && asset
+    user = @current_user
+    user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
+    return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
     @accessed_asset = {
+      :user => user,
       :code => asset.is_a?(String) ? asset : asset.asset_string,
       :group_code => asset_group.is_a?(String) ? asset_group : (asset_group.asset_string rescue 'unknown'),
       :category => asset_category,
@@ -853,7 +860,8 @@ class ApplicationController < ActionController::Base
   def log_page_view
     return true if !page_views_enabled?
 
-    if @current_user && @log_page_views != false
+    user = @current_user || (@accessed_asset && @accessed_asset[:user])
+    if user && @log_page_views != false
       updated_fields = params.slice(:interaction_seconds)
       if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
         @page_view = PageView.find_for_update(params[:page_view_id])
@@ -867,14 +875,15 @@ class ApplicationController < ActionController::Base
       # or it's not an update to an already-existing page_view.  We check to make sure
       # it's not an update because if the page_view already existed, we don't want to
       # double-count it as multiple views when it's really just a single view.
-      if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.where(user_id: @current_user.id, asset_code: @accessed_asset[:code]).first_or_initialize
+
+      if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
+        @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
         @accessed_asset[:level] ||= 'view'
         access_context = @context.is_a?(UserProfile) ? @context.user : @context
         @access.log access_context, @accessed_asset
 
         if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
-          generate_page_view
+          generate_page_view(user)
         end
 
         if @page_view
@@ -1046,6 +1055,8 @@ class ApplicationController < ActionController::Base
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{message: 'Invalid access token.'}] }
+    when ActionController::ParameterMissing
+      data = { errors: [{message: "#{exception.param} is missing"}] }
     else
       if status_code.is_a?(Symbol)
         status_code_string = status_code.to_s
@@ -1115,7 +1126,7 @@ class ApplicationController < ActionController::Base
   end
 
   def form_authenticity_token
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies)
+    masked_authenticity_token
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
@@ -1136,18 +1147,13 @@ class ApplicationController < ActionController::Base
     @wiki.check_has_front_page
 
     @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    @page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.feature_enabled?(:draft_state)
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       @page_name += ".#{params[:format]}"
       params[:format] = 'html'
     end
     return if @page || !@page_name
 
-    if params[:action] != 'create'
-      @page = @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s).first ||
-              @wiki.wiki_pages.not_deleted.where(url: @page_name.to_s.to_url).first ||
-              @wiki.wiki_pages.not_deleted.where(id: @page_name.to_i).first
-    end
+    @page = @wiki.find_page(@page_name) if params[:action] != 'create'
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
@@ -1158,17 +1164,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def context_wiki_page_url
-    page_name = @page.url
-    named_context_url(@context, :context_wiki_page_url, page_name)
-  end
-
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type=nil)
     url_params = { :module_item_id => tag.id }
     if tag.content_type == 'Assignment'
       redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
-      redirect_to named_context_url(context, :context_wiki_page_url, tag.content.url, url_params)
+      redirect_to polymorphic_url([context, tag.content], url_params)
     elsif tag.content_type == 'Attachment'
       redirect_to named_context_url(context, :context_file_url, tag.content_id, url_params)
     elsif tag.content_type_quiz?
@@ -1177,9 +1178,13 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
     elsif tag.content_type == 'Rubric'
       redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
+    elsif tag.content_type == 'Lti::MessageHandler'
+      url_params[:resource_link_fragment] = "ContentTag:#{tag.id}"
+      redirect_to named_context_url(context, :context_basic_lti_launch_request_url, tag.content_id, url_params)
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module
+      log_asset_access(@tag, "external_urls", "external_urls")
       tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
@@ -1199,18 +1204,18 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
-        return unless require_user
+        log_asset_access(@tool, "external_tools", "external_tools")
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
         @lti_launch = Lti::Launch.new
 
         success_url = case tag_type
         when :assignments
-          named_context_url(@context, :context_assignments_url)
+          named_context_url(@context, :context_assignments_url, include_host: true)
         when :modules
-          named_context_url(@context, :context_context_modules_url)
+          named_context_url(@context, :context_context_modules_url, include_host: true)
         else
-          named_context_url(@context, :context_url)
+          named_context_url(@context, :context_url, include_host: true)
         end
         if tag.new_tab
           @lti_launch.launch_type = 'window'
@@ -1222,11 +1227,21 @@ class ApplicationController < ActionController::Base
                  :redirect_return_cancel_url => success_url)
         end
 
+        substitutions = common_variable_substitutions
+        if tag.tag_type == 'context_module'
+          substitutions.merge!(
+              {
+                  '$Canvas.module.id' => tag.context_module_id,
+                  '$Canvas.moduleItem.id' => tag.id,
+              }
+          )
+        end
+
         opts = {
             launch_url: @resource_url,
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
-            custom_substitutions: common_variable_substitutions
+            custom_substitutions: substitutions
         }
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
 
@@ -1235,6 +1250,7 @@ class ApplicationController < ActionController::Base
         end
 
         if @assignment
+          return unless require_user
           add_crumb(@resource_title)
           @prepend_template = 'assignments/description'
           @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
@@ -1341,7 +1357,7 @@ class ApplicationController < ActionController::Base
         opts[:inline] = 1
       end
 
-      if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
+      if @context && Attachment.relative_context?(@context.class.base_class) && @context == attachment.context
         # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
         # it, so we're setting :download=>1 *because* we want to display inline.
         opts[:download] = 1 unless download
@@ -1369,12 +1385,16 @@ class ApplicationController < ActionController::Base
     @features_enabled[feature] ||= begin
       if [:question_banks].include?(feature)
         true
+      elsif feature == :yo
+        Canvas::Plugin.find(:yo).try(:enabled?)
       elsif feature == :twitter
         !!Twitter::Connection.config
       elsif feature == :facebook
         !!Facebook::Connection.config
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
+      elsif feature == :diigo
+        !!Diigo::Connection.config
       elsif feature == :google_docs
         !!GoogleDocs::Connection.config
       elsif feature == :etherpad
@@ -1528,6 +1548,7 @@ class ApplicationController < ActionController::Base
   end
 
   def destroy_session
+    logger.info "Destroying session: #{session[:session_id]}"
     @pseudonym_session.destroy rescue true
     reset_session
   end
@@ -1657,7 +1678,7 @@ class ApplicationController < ActionController::Base
         flash.delete(:info)
         notices << {:type => 'info', :content => info, :icon => 'info'}
       end
-      if notice = (flash[:html_notice] ? flash[:html_notice].html_safe : flash[:notice])
+      if notice = (flash[:html_notice] ? {html: flash[:html_notice]} : flash[:notice])
         if flash[:html_notice]
           flash.delete(:html_notice)
         else
@@ -1757,7 +1778,7 @@ class ApplicationController < ActionController::Base
     hash = {}
 
     hash[:DEFAULT_EDITING_ROLES] = @context.default_wiki_editing_roles if @context.respond_to?(:default_wiki_editing_roles)
-    hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :pages])
+    hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :wiki_pages])
     if opts[:course_home]
       hash[:COURSE_HOME] = true
       hash[:COURSE_TITLE] = @context.name
@@ -1766,9 +1787,9 @@ class ApplicationController < ActionController::Base
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
       hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
-      hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
-      hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
-      hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])
+      hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
+      hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
+      hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
 
       if @context.is_a?(Course) && @context.grants_right?(@current_user, :read)
         hash[:COURSE_ID] = @context.id
@@ -1804,5 +1825,9 @@ class ApplicationController < ActionController::Base
     else
       return Twitter::Connection.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])
     end
+  end
+
+  def self.region
+    nil
   end
 end

@@ -93,7 +93,7 @@ describe "grades" do
 
       it "should validate courses display" do
         course_details = f('.course_details')
-        4.times { |i| course_details.should include_text(@course_names[i].name) }
+        4.times { |i| expect(course_details).to include_text(@course_names[i].name) }
       end
     end
 
@@ -103,10 +103,10 @@ describe "grades" do
       @outcome_group.add_outcome(@outcome)
       Account.default.set_feature_flag!('student_outcome_gradebook', 'on')
       get "/courses/#{@course.id}/grades/#{@student_1.id}"
-      f('#navpills').should_not be_nil
+      expect(f('#navpills')).not_to be_nil
       f('a[href="#outcomes"]').click
       wait_for_ajaximations
-      ff('#outcomes li.outcome').count.should == @course.learning_outcome_links.count
+      expect(ff('#outcomes li.outcome').count).to eq @course.learning_outcome_links.count
     end
 
     context 'student view' do
@@ -118,7 +118,7 @@ describe "grades" do
         enter_student_view
         get "/courses/#{@course.id}/grades"
 
-        f("#submission_#{@first_assignment.id} .grade").should include_text "8"
+        expect(f("#submission_#{@first_assignment.id} .grade")).to include_text "8"
       end
     end
   end
@@ -134,7 +134,7 @@ describe "grades" do
       Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)
 
       #check initial total
-      f('#submission_final-grade .assignment_score .grade').text.should == '33.3%'
+      expect(f('#submission_final-grade .assignment_score .grade').text).to eq '33.3%'
 
       edit_grade = lambda do |field, score|
         field.click
@@ -145,7 +145,7 @@ describe "grades" do
       assert_grade = lambda do |grade|
         keep_trying_until do
           wait_for_ajaximations
-          fj('#submission_final-grade .grade').text.should == grade.to_s
+          expect(fj('#submission_final-grade .grade').text).to eq grade.to_s
         end
       end
 
@@ -170,11 +170,11 @@ describe "grades" do
       #click rubric
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
       wait_for_ajaximations
-      fj('.rubric_assessments:visible .rubric_title').should include_text(@rubric.title)
-      fj('.rubric_assessments:visible .rubric_total').should include_text('2')
+      expect(fj('.rubric_assessments:visible .rubric_title')).to include_text(@rubric.title)
+      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('2')
 
       #check rubric comment
-      fj('.assessment-comments:visible div').text.should == 'cool, yo'
+      expect(fj('.assessment-comments:visible div').text).to eq 'cool, yo'
     end
 
     it "should not display rubric on muted assignment" do
@@ -184,7 +184,7 @@ describe "grades" do
       @first_assignment.save!
       get "/courses/#{@course.id}/grades"
 
-      f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").should_not be_displayed
+      expect(f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link")).not_to be_displayed
     end
 
     it "should not display letter grade score on muted assignment" do
@@ -203,7 +203,7 @@ describe "grades" do
       @another_assignment.grade_student(@student_1, :grade => 81)
       @another_submission.save!
       get "/courses/#{@course.id}/grades"
-      f('.score_value').text.should == ''
+      expect(f('.score_value').text).to eq ''
     end
 
     it "should display assignment statistics" do
@@ -217,9 +217,9 @@ describe "grades" do
 
       score_row = f('#grades_summary tr.grade_details')
 
-      score_row.should include_text('Mean:')
-      score_row.should include_text('High: 4')
-      score_row.should include_text('Low: 3')
+      expect(score_row).to include_text('Mean:')
+      expect(score_row).to include_text('High: 4')
+      expect(score_row).to include_text('Low: 3')
     end
 
     it "should display teacher comments" do
@@ -228,12 +228,12 @@ describe "grades" do
       #check comment
       f('.toggle_comments_link').click
       comment_row = f('#grades_summary tr.comments_thread')
-      comment_row.should include_text('submission comment')
+      expect(comment_row).to include_text('submission comment')
     end
 
     it "should not show assignment statistics on assignments with less than 5 submissions" do
       get "/courses/#{@course.id}/grades"
-      f("#grade_info_#{@first_assignment.id} .tooltip").should be_nil
+      expect(f("#grade_info_#{@first_assignment.id} .tooltip")).to be_nil
     end
 
     it "should not show assignment statistics on assignments when it is diabled on the course" do
@@ -247,7 +247,7 @@ describe "grades" do
       @course.update_attributes(:hide_distribution_graphs => true)
 
       get "/courses/#{@course.id}/grades"
-      f("#grade_info_#{@first_assignment.id} .tooltip").should be_nil
+      expect(f("#grade_info_#{@first_assignment.id} .tooltip")).to be_nil
     end
 
     it "should show rubric even if there are no comments" do
@@ -271,11 +271,11 @@ describe "grades" do
 
       #click rubric
       f("#submission_#{@third_assignment.id} .toggle_rubric_assessments_link").click
-      fj('.rubric_assessments:visible .rubric_title').should include_text(@rubric.title)
-      fj('.rubric_assessments:visible .rubric_total').should include_text('2')
+      expect(fj('.rubric_assessments:visible .rubric_title')).to include_text(@rubric.title)
+      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('2')
 
       #check rubric comment
-      fj('.assessment-comments:visible div').text.should == 'not bad, not bad'
+      expect(fj('.assessment-comments:visible div').text).to eq 'not bad, not bad'
     end
   end
 
@@ -292,23 +292,23 @@ describe "grades" do
       user_session(@obs)
       get "/courses/#{@course.id}/grades"
 
-      f("#observer_user_url").should be_displayed
-      f("#observer_user_url option[selected]").should include_text "Student 1"
-      f("#submission_#{@submission.assignment_id} .grade").should include_text "3"
+      expect(f("#observer_user_url")).to be_displayed
+      expect(f("#observer_user_url option[selected]")).to include_text "Student 1"
+      expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
 
       click_option("#observer_user_url", "Student 2")
       wait_for_ajaximations
 
-      f("#observer_user_url").should be_displayed
-      f("#observer_user_url option[selected]").should include_text "Student 2"
-      f("#submission_#{@submission.assignment_id} .grade").should include_text "4"
+      expect(f("#observer_user_url")).to be_displayed
+      expect(f("#observer_user_url option[selected]")).to include_text "Student 2"
+      expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
 
       click_option("#observer_user_url", "Student 1")
       wait_for_ajaximations
 
-      f("#observer_user_url").should be_displayed
-      f("#observer_user_url option[selected]").should include_text "Student 1"
-      f("#submission_#{@submission.assignment_id} .grade").should include_text "3"
+      expect(f("#observer_user_url")).to be_displayed
+      expect(f("#observer_user_url option[selected]")).to include_text "Student 1"
+      expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
     end
   end
 end

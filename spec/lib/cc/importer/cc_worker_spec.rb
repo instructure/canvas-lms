@@ -25,8 +25,8 @@ describe Canvas::Migration::Worker::CCWorker do
     cm.reset_job_progress
     CC::Importer::Canvas::Converter.any_instance.expects(:export).returns({})
     worker = Canvas::Migration::Worker::CCWorker.new(cm.id)
-    worker.perform().should == true
-    cm.reload.migration_settings[:worker_class].should == 'CC::Importer::Canvas::Converter'
+    expect(worker.perform()).to eq true
+    expect(cm.reload.migration_settings[:worker_class]).to eq 'CC::Importer::Canvas::Converter'
   end
 
   it "should honor skip_job_progress" do
@@ -34,7 +34,7 @@ describe Canvas::Migration::Worker::CCWorker do
                                                            :no_archive_file => true, :skip_job_progress => true }, :context => course)
     CC::Importer::Canvas::Converter.any_instance.expects(:export).returns({})
     worker = Canvas::Migration::Worker::CCWorker.new(cm.id)
-    worker.perform().should == true
-    cm.skip_job_progress.should be_true
+    expect(worker.perform()).to eq true
+    expect(cm.skip_job_progress).to be_truthy
   end
 end

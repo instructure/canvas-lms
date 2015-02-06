@@ -1,12 +1,16 @@
 <div>
   <div class="message-header">
-    <b class="subject" tabindex="-1" {{#if subject}}title="{{subject}}"{{/if}}>
-      {{#if subject}}
-        {{subject}}
+    <h2 class="subject" tabindex="-1" {{#if subject}}title="{{subject}}"{{/if}}>
+    {{#if subject}}
+      {{#if subject_url}}
+        <a href={{subject_url}}>{{subject}}</a>
       {{else}}
+        {{subject}}
+      {{/if}}
+    {{else}}
         ({{#t "no_subject"}}No subject{{/t}})
       {{/if}}
-    </b>
+    </h2>
 
     <ul class="message-detail-actions pull-right unstyled">
       <li>
@@ -17,6 +21,7 @@
           <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
         </a>
       </li>
+      {{#unless for_submission}}
       <li>
         <div class="inline-block" role="application">
           <a href="#"
@@ -48,6 +53,7 @@
           </ul>
         </div>
       </li>
+      {{/unless}}
     </ul>
   </div>
 

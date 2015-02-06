@@ -38,6 +38,25 @@ module Lti
         StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
     }
 
+    LIS_V2_ROLE_MAP = {
+      'user' => 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User',
+      'siteadmin' => 'http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin',
+
+      'teacher' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor',
+      'student' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student',
+      'admin' => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator',
+      AccountUser => 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator',
+
+      StudentEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner',
+      TeacherEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor',
+      TaEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant',
+      DesignerEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper',
+      ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer',
+      StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
+    }
+
+    LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
+
     def initialize(context, root_account, user)
       @context = context
       @root_account = root_account
@@ -60,22 +79,36 @@ module Lti
       enrollments.map { |enrollment| Lti::LtiUserCreator::ENROLLMENT_MAP[enrollment.class] }.uniq
     end
 
-    def all_roles
+    def all_roles(version = 'lis1')
+      case version
+        when 'lis2'
+          role_map = LIS_V2_ROLE_MAP
+          role_none = LIS_V2_ROLE_NONE
+        else
+          role_map = LIS_ROLE_MAP
+          role_none = LtiOutbound::LTIRoles::System::NONE
+      end
+
       if @user
-        context_roles = course_enrollments.map { |enrollment| LIS_ROLE_MAP[enrollment.class] }
-        institution_roles = @user.roles.map { |role| LIS_ROLE_MAP[role] }
+        context_roles = course_enrollments.map { |enrollment| role_map[enrollment.class] }
+        institution_roles = @user.roles(@root_account).map { |role| role_map[role] }
         if Account.site_admin.account_users_for(@user).present?
-          institution_roles << LIS_ROLE_MAP['siteadmin']
+          institution_roles << role_map['siteadmin']
         end
         (context_roles + institution_roles).uniq.sort.join(',')
       else
-        [LtiOutbound::LTIRoles::System::NONE]
+        [role_none]
       end
     end
 
     def course_enrollments
-      return [] unless @context.is_a?(Course)
+      return [] unless @context.is_a?(Course) && @user
       @current_course_enrollments ||= @context.current_enrollments.where(user_id: @user.id)
+    end
+
+    def course_sections
+      return [] unless @context.is_a?(Course) && @user
+      @current_course_sections ||= @context.course_sections.where(id: course_enrollments.map(&:course_section_id)).select("id, sis_source_id")
     end
 
     def account_enrollments
@@ -95,7 +128,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @context.is_a?(Course) ? @user.concluded_enrollments.where(course_id: @context.id).shard(@context.shard) : []
+          @context.is_a?(Course) && @user ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
     end
 
     def concluded_lis_roles
@@ -103,13 +136,39 @@ module Lti
     end
 
     def current_canvas_roles
-      (course_enrollments.map(&:role) + account_enrollments.map(&:readable_type)).uniq.join(',')
+      (course_enrollments.map(&:role).map(&:name) + account_enrollments.map(&:readable_type)).uniq.join(',')
     end
 
     def enrollment_state
-      enrollments = @context.enrollments.where(user_id: @user.id)
+      enrollments = @user ? @context.enrollments.where(user_id: @user.id) : []
       return '' if enrollments.size == 0
       enrollments.any? { |membership| membership.state_based_on_date == :active } ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
     end
+
+    def previous_lti_context_ids
+      previous_course_ids_and_context_ids.map(&:lti_context_id).compact.join(',')
+    end
+
+    def previous_course_ids
+      previous_course_ids_and_context_ids.map(&:id).sort.join(',')
+    end
+
+    def section_ids
+      course_enrollments.map(&:course_section_id).uniq.sort.join(',')
+    end
+
+    def section_sis_ids
+      course_sections.map(&:sis_source_id).compact.uniq.sort.join(',')
+    end
+
+    private
+
+    def previous_course_ids_and_context_ids
+      return [] unless @context.is_a?(Course)
+      @previous_ids ||= Course.where(ContentMigration.where(context_id: @context.id, workflow_state: :imported)
+                                     .where("content_migrations.source_course_id = courses.id").exists)
+                                     .select("id, lti_context_id")
+    end
+
   end
 end

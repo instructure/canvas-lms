@@ -72,7 +72,7 @@ define([
       }
       $link.after($ul);
       var header = I18n.t("headers.completion_prerequisites", "Completion Prerequisites");
-      var sentence = I18n.beforeLabel("requirements_must_be_completed", "The following requirements need to be completed before this page will be unlocked");
+      var sentence = I18n.beforeLabel(I18n.t("labels.requirements_must_be_completed", "The following requirements need to be completed before this page will be unlocked"));
       $link.after("<br/><h3 style='margin-top: 15px;'>" + htmlEscape(header) + "</h3>" + htmlEscape(sentence));
       $link.prev("a").hide();
     }, function(data) {});

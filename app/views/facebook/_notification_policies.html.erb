@@ -14,7 +14,7 @@
     </thead>
     <% @notification_categories.each do |category| %>
       <tr style="text-align: center;">
-        <% policy = @policies.find_by_notification_id(category.id) %>
+        <% policy = @policies.where(notification_id: category).first %>
         <td style="padding-right: 50px;"><%= category.category %> <%= t :alerts, "Alerts" %></td>
         <td style="text-align: center;">
           <% if policy && policy.frequency == 'immediately' %>
@@ -60,7 +60,7 @@
     </thead>
     <% @notification_categories.each do |category| %>
       <tr>
-        <% policy = @policies.find_by_notification_id(category.id) %>
+        <% policy = @policies.where(notification_id: category).first %>
         <td style="padding-right: 50px;"><%= t 'labels.alerts_for_category', '%{category_name} Alerts', :category_name => category.category %></td>
         <td style="white-space: nowrap; padding: 1px 10px;">
           <input type="radio" <%= 'checked' if policy && policy.frequency == 'immediately' %> name="types[<%= category.category %>]" value="immediately" id="notification_type_<%= category.id %>_immediately"/>

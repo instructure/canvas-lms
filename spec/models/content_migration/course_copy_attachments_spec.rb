@@ -14,9 +14,9 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_attachment = @copy_to.attachments.find_by_migration_id(mig_id(old_attachment))
-      new_attachment.should_not be_nil
-      new_attachment.full_path.should == "course files/folder_1/folder_2/folder_3/merge.test"
+      new_attachment = @copy_to.attachments.where(migration_id: mig_id(old_attachment)).first
+      expect(new_attachment).not_to be_nil
+      expect(new_attachment.full_path).to eq "course files/folder_1/folder_2/folder_3/merge.test"
       folder.reload
     end
 
@@ -29,11 +29,11 @@ describe ContentMigration do
       run_course_copy
 
       to_root = Folder.root_folders(@copy_to).first
-      new_attachment = @copy_to.attachments.find_by_migration_id(mig_id(att))
-      new_attachment.should_not be_nil
-      new_attachment.full_path.should == "course files/dummy.txt"
-      new_attachment.folder.should == to_root
-      @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
+      new_attachment = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(new_attachment).not_to be_nil
+      expect(new_attachment.full_path).to eq "course files/dummy.txt"
+      expect(new_attachment.folder).to eq to_root
+      expect(@copy_to.syllabus_body).to eq %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 
     it "should copy files into the correct folders when the folders share the same name" do
@@ -48,8 +48,8 @@ describe ContentMigration do
       run_course_copy
 
       atts.each do |att|
-        new_att = @copy_to.attachments.find_by_migration_id(mig_id(att))
-        new_att.full_path.should == att.full_path
+        new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+        expect(new_att.full_path).to eq att.full_path
       end
     end
 
@@ -58,7 +58,7 @@ describe ContentMigration do
       Attachment.where(:id => att).update_all(:filename => nil)
 
       att.reload
-      att.should_not be_valid
+      expect(att).not_to be_valid
 
       run_course_copy(["Couldn't copy file \"dummy.txt\""])
     end
@@ -81,21 +81,21 @@ describe ContentMigration do
       @cm.save!
       run_course_copy
 
-      @copy_to.attachments.count.should == 2
-      att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
-      att_2.should_not be_nil
-      att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
-      att2_2.should_not be_nil
+      expect(@copy_to.attachments.count).to eq 2
+      att_2 = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(att_2).not_to be_nil
+      att2_2 = @copy_to.attachments.where(migration_id: mig_id(att2)).first
+      expect(att2_2).not_to be_nil
 
-      @copy_to.assignments.first.description.should == asmnt_des % [@copy_to.id, att_2.id]
-      @copy_to.wiki.wiki_pages.first.body.should == wiki_body % [@copy_to.id, att2_2.id]
+      expect(@copy_to.assignments.first.description).to eq asmnt_des % [@copy_to.id, att_2.id]
+      expect(@copy_to.wiki.wiki_pages.first.body).to eq wiki_body % [@copy_to.id, att2_2.id]
     end
 
     it "should preserve links to re-uploaded attachments" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att.destroy
       new_att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      @copy_from.attachments.find(att.id).should == new_att
+      expect(@copy_from.attachments.find(att.id)).to eq new_att
 
       page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
 
@@ -104,10 +104,41 @@ describe ContentMigration do
 
       run_course_copy
 
-      att2 = @copy_to.attachments.find_by_filename('first.png')
-      page2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
-      page2.body.should include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
+      att2 = @copy_to.attachments.where(filename: 'first.png').first
+      page2 = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
+      expect(page2.body).to include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
     end
 
+    it "should reference existing usage rights on course copy" do
+      usage_rights = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2014 Incom Corp Ltd.'
+      att1 = Attachment.create(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att1.usage_rights = usage_rights
+      att1.save!
+      run_course_copy
+      expect(@copy_to.attachments.where(migration_id: mig_id(att1)).first.usage_rights).to eq(usage_rights)
+    end
+
+    it "should preserve usage rights on export/import" do
+      att1 = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => '2.txt', :uploaded_data => StringIO.new('2'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att3 = Attachment.create!(:filename => '3.txt', :uploaded_data => StringIO.new('3'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+
+      ur1 = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2014 Incom Corp Ltd.'
+      ur2 = @copy_from.usage_rights.create! use_justification: 'creative_commons', license: 'cc_by_nd', legal_copyright: '(C) 2014 Koensayr Manufacturing Inc.'
+      Attachment.where(id: [att1.id, att2.id]).update_all(usage_rights_id: ur1.id)
+      Attachment.where(id: [att3.id]).update_all(usage_rights_id: ur2.id)
+
+      run_export_and_import
+
+      att1_rights = @copy_to.attachments.where(migration_id: mig_id(att1)).first.usage_rights
+      att2_rights = @copy_to.attachments.where(migration_id: mig_id(att2)).first.usage_rights
+      att3_rights = @copy_to.attachments.where(migration_id: mig_id(att3)).first.usage_rights
+      expect(att1_rights).not_to eq(ur1) # check it was actually copied
+      expect(att1_rights).to eq(att2_rights) # check de-duplication
+
+      attrs = %w(use_justification legal_copyright license)
+      expect(att1_rights.attributes.slice(*attrs)).to eq({"use_justification" => 'used_by_permission', "legal_copyright" => '(C) 2014 Incom Corp Ltd.', "license" => 'private'})
+      expect(att3_rights.attributes.slice(*attrs)).to eq({"use_justification" => 'creative_commons', "legal_copyright" => '(C) 2014 Koensayr Manufacturing Inc.', "license" => 'cc_by_nd'})
+    end
   end
 end

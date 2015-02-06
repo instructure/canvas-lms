@@ -34,11 +34,12 @@
         {{/unless}}
 
         {{!-- Group selection --}}
-        <label for="group_category_id">
+        <label id="assignment_group_category_id_label" for="group_category_id">
           {{#t "group_set"}}Group Set{{/t}}
         </label>
         <select id="assignment_group_category_id"
           name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
+          aria-labelledby="assignment_group_category_id_label"
           {{disabledIf groupCategoryIdDisabled}}>
           {{#each groupCategories}}
             <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>

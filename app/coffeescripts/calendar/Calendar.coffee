@@ -21,13 +21,14 @@ define [
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/CalendarDefaults'
   'compiled/util/deparam'
+  'str/htmlEscape'
 
   'vendor/fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam) ->
+], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam, htmlEscape) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -55,7 +56,7 @@ define [
       data = @dataFromDocumentHash()
       if not data.view_start and @options?.viewStart
         data.view_start = @options.viewStart
-        @updateFragment data
+        @updateFragment data, replaceState: true
       if data.view_start
         date = $.fullCalendar.parseISO8601(data.view_start)
       else
@@ -155,7 +156,7 @@ define [
         dayClick: @dayClick
         addEventClick: @addEventClick
         titleFormat:
-          week: "MMM d[ yyyy]{ '&ndash;'[ MMM] d, yyyy}"
+          week: "MMM d[ yyyy]{ '–'[ MMM] d, yyyy}"
         viewDisplay: @viewDisplay
         windowResize: @windowResize
         drop: @drop
@@ -269,13 +270,13 @@ define [
         else
           @calendar.fullCalendar('formatDates', event.startDate(), event.endDate(), 'h:mmtt{ – h:mmtt}')
       screenReaderTitleHint = if event.eventType.match(/assignment/)
-          I18n.t('event_assignment_title', 'Assignment Title: ')
+          I18n.t('event_assignment_title', 'Assignment Title:')
         else
-          I18n.t('event_event_title', 'Event Title: ')
+          I18n.t('event_event_title', 'Event Title:')
 
-      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
-      $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
-      $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}"))
+      $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{htmlEscape I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}</span>"))
+      $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{htmlEscape screenReaderTitleHint} </span>"))
       $element.find('.fc-event-title').toggleClass('calendar__event--completed', event.isCompleted())
       element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
       true
@@ -373,6 +374,9 @@ define [
       (new EditEventDetailsDialog(event)).show()
 
     updateFragment: (opts) ->
+      replaceState = !!opts.replaceState
+      opts = _.omit(opts, 'replaceState')
+
       data = @dataFromDocumentHash()
       changed = false
       for k, v of opts
@@ -381,7 +385,13 @@ define [
           data[k] = v
         else
           delete data[k]
-      location.href = "#" + $.param(data) if changed
+
+      if changed
+        fragment = "#" + $.param(data)
+        if replaceState || location.hash == ""
+          history.replaceState(null, "", fragment)
+        else
+          location.href = fragment
 
     viewDisplay: (view) =>
       @setDateTitle(view.title)
@@ -398,20 +408,20 @@ define [
     drawNowLine: =>
       return unless @currentView == 'week'
 
-      if !@nowLine
-        @nowLine = $('<div />', {'class': 'calendar-nowline'})
-      $('.fc-agenda-slots').parent().append(@nowLine)
+      if !@$nowLine
+        @$nowLine = $('<div />', {'class': 'calendar-nowline'})
+      $('.fc-agenda-slots').parent().append(@$nowLine)
 
       now = $.fudgeDateForProfileTimezone(new Date)
       midnight = new Date(now.getTime())
       midnight.setHours(0, 0, 0)
       seconds = (now.getTime() - midnight.getTime())/1000
 
-      @nowLine.toggle(@isSameWeek(@getCurrentDate(), now))
+      @$nowLine.toggle(@isSameWeek(@getCurrentDate(), now))
 
-      @nowLine.css('width', $('.fc-agenda-slots .fc-widget-content:first').css('width'))
+      @$nowLine.css('width', $('.fc-agenda-slots .fc-widget-content:first').css('width'))
       secondHeight = $('.fc-agenda-slots').css('height').replace('px', '')/24/3600
-      @nowLine.css('top', seconds*secondHeight + 'px')
+      @$nowLine.css('top', seconds*secondHeight + 'px')
 
     setDateTitle: (title) =>
       @header.setHeaderText(title)
@@ -559,7 +569,11 @@ define [
       @setCurrentDate(start)
 
     setCurrentDate: (d) ->
-      @updateFragment view_start: d.toISOString()
+      d.setHours(0, 0, 0, 0)
+      @updateFragment
+        view_start: d.toISOString()
+        replaceState: true
+
       $.publish('Calendar/currentDate', d)
 
     getCurrentDate: () ->
@@ -570,7 +584,10 @@ define [
         $.fudgeDateForProfileTimezone(new Date)
 
     setCurrentView: (view) ->
-      @updateFragment view_name: view
+      @updateFragment
+        view_name: view
+        replaceState: !_.has(@dataFromDocumentHash(), 'view_name') # use replaceState if view_name wasn't set before
+
       @currentView = view
       userSettings.set('calendar_view', view)
 
@@ -625,7 +642,7 @@ define [
       @agenda.fetch(@visibleContextList, start)
 
     renderDateRange: (start, end) =>
-      @setDateTitle(I18n.l('#date.formats.medium', start)+' &ndash; '+I18n.l('#date.formats.medium', end))
+      @setDateTitle(I18n.l('#date.formats.medium', start)+' – '+I18n.l('#date.formats.medium', end))
       # for "load more" with voiceover, we want the alert to happen later so
       # the focus change doesn't interrupt it.
       window.setTimeout =>
@@ -654,15 +671,16 @@ define [
 
     colorizeContexts: =>
       colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.SETTINGS.use_high_contrast})
-      html = for contextCode, index in @contextCodes
+      html = (for contextCode, index in @contextCodes
         color = colors[index]
         ".group_#{contextCode}{
            color: #{color};
            border-color: #{color};
            background-color: #{color};
         }"
+      ).join('')
 
-      $styleContainer.html "<style>#{html.join('')}</style>"
+      $styleContainer.html "<style>#{html}</style>"
 
     dataFromDocumentHash: () =>
       data = {}

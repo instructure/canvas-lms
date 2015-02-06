@@ -42,7 +42,7 @@ describe SisBatch do
         SisBatch.create_with_attachment(@account, 'instructure_csv', tmp, @user || user)
       end
       # SisBatches shouldn't need any background processing
-      Delayed::Job.count.should == old_job_count
+      expect(Delayed::Job.count).to eq old_job_count
       yield batch if block_given?
       batch
     end
@@ -57,22 +57,22 @@ describe SisBatch do
   end
 
   it "should not add attachments to the list" do
-    create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
-    create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
-    create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
+    create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}
+    create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}
+    create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}
   end
 
   it "should keep the batch in initializing state during create_with_attachment" do
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user) do |batch|
-      batch.attachment.should_not be_new_record
-      batch.workflow_state.should == 'initializing'
+      expect(batch.attachment).not_to be_new_record
+      expect(batch.workflow_state).to eq 'initializing'
       batch.options = { :override_sis_stickiness => true }
     end
 
-    batch.workflow_state.should == 'created'
-    batch.should_not be_new_record
-    batch.changed?.should be_false
-    batch.options[:override_sis_stickiness].should == true
+    expect(batch.workflow_state).to eq 'created'
+    expect(batch).not_to be_new_record
+    expect(batch.changed?).to be_falsey
+    expect(batch.options[:override_sis_stickiness]).to eq true
   end
 
   describe ".process_all_for_account" do
@@ -88,7 +88,7 @@ describe SisBatch do
       b2.any_instantiation.expects(:process_without_send_later).never
       b5.any_instantiation.expects(:process_without_send_later).never
       SisBatch.process_all_for_account(@a1)
-      [b1, b2, b4].each { |batch| [:imported, :imported_with_messages].should be_include(batch.reload.state) }
+      [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to be_include(batch.reload.state) }
     end
   end
 
@@ -100,8 +100,8 @@ describe SisBatch do
     end
 
     job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
-    job.should be_present
-    job.run_at.to_i.should <= Time.now.to_i
+    expect(job).to be_present
+    expect(job.run_at.to_i).to be <= Time.now.to_i
 
     job.destroy
 
@@ -113,9 +113,9 @@ describe SisBatch do
     end
 
     job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
-    job.should be_present
-    job.run_at.to_i.should >= 100.seconds.from_now.to_i
-    job.run_at.to_i.should <= 150.minutes.from_now.to_i
+    expect(job).to be_present
+    expect(job.run_at.to_i).to be >= 100.seconds.from_now.to_i
+    expect(job.run_at.to_i).to be <= 150.minutes.from_now.to_i
   end
 
   it "should fail itself if the jobs dies" do
@@ -129,7 +129,7 @@ describe SisBatch do
 
     job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
     job.reschedule
-    batch.reload.should be_failed
+    expect(batch.reload).to be_failed
   end
 
   describe "batch mode" do
@@ -153,7 +153,7 @@ describe SisBatch do
         "course_id,short_name,long_name,account_id,term_id,status\n" +
         "another_course,not-delete,not deleted not changed,,term1,active"
       ])
-      @c4 = @account.courses.find_by_course_code('not-delete')
+      @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in
       @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id)
@@ -184,27 +184,27 @@ s2,test_1,section2,active},
         ],
         :batch_mode => true)
 
-      @c1.reload.should be_available
-      @c2.reload.should be_available
-      @c3.reload.should be_available
-      @c4.reload.should be_claimed
-      @cnew = @account.reload.courses.find_by_course_code('TC 101')
-      @cnew.should_not be_nil
-      @cnew.sis_batch_id.should == @batch.id
-      @cnew.should be_claimed
+      expect(@c1.reload).to be_available
+      expect(@c2.reload).to be_available
+      expect(@c3.reload).to be_available
+      expect(@c4.reload).to be_claimed
+      @cnew = @account.reload.courses.where(course_code: 'TC 101').first
+      expect(@cnew).not_to be_nil
+      expect(@cnew.sis_batch_id).to eq @batch.id
+      expect(@cnew).to be_claimed
 
-      @s1.reload.should be_active
-      @s2.reload.should be_active
-      @s3.reload.should be_active
-      @s4.reload.should be_active
-      @s5 = @cnew.course_sections.find_by_sis_source_id('s2')
-      @s5.should_not be_nil
+      expect(@s1.reload).to be_active
+      expect(@s2.reload).to be_active
+      expect(@s3.reload).to be_active
+      expect(@s4.reload).to be_active
+      @s5 = @cnew.course_sections.where(sis_source_id: 's2').first
+      expect(@s5).not_to be_nil
 
-      @e1.reload.should be_active
-      @e2.reload.should be_active
-      @e3.reload.should be_active
-      @e4.reload.should be_active
-      @e5.reload.should be_active
+      expect(@e1.reload).to be_active
+      expect(@e2.reload).to be_active
+      expect(@e3.reload).to be_active
+      expect(@e4.reload).to be_active
+      expect(@e5.reload).to be_active
     end
 
     def test_remove_specific_term
@@ -227,7 +227,7 @@ s2,test_1,section2,active},
 %{course_id,short_name,long_name,account_id,term_id,status
 another_course,not-delete,not deleted not changed,,term1,active}
       ])
-      @c4 = @account.courses.find_by_course_code('not-delete')
+      @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in
       @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id)
@@ -259,30 +259,30 @@ s2,test_1,section2,active},
         :batch_mode => true,
         :batch_mode_term => @term1)
 
-      @batch.data[:stack_trace].should be_nil
+      expect(@batch.data[:stack_trace]).to be_nil
 
-      @c1.reload.should be_deleted
-      @c1.stuck_sis_fields.should_not be_include(:workflow_state)
-      @c2.reload.should be_available
-      @c3.reload.should be_available
-      @c4.reload.should be_claimed
-      @cnew = @account.reload.courses.find_by_course_code('TC 101')
-      @cnew.should_not be_nil
-      @cnew.sis_batch_id.should == @batch.id
-      @cnew.should be_claimed
+      expect(@c1.reload).to be_deleted
+      expect(@c1.stuck_sis_fields).not_to be_include(:workflow_state)
+      expect(@c2.reload).to be_available
+      expect(@c3.reload).to be_available
+      expect(@c4.reload).to be_claimed
+      @cnew = @account.reload.courses.where(course_code: 'TC 101').first
+      expect(@cnew).not_to be_nil
+      expect(@cnew.sis_batch_id).to eq @batch.id
+      expect(@cnew).to be_claimed
 
-      @s1.reload.should be_deleted
-      @s2.reload.should be_active
-      @s3.reload.should be_active
-      @s4.reload.should be_deleted
-      @s5 = @cnew.course_sections.find_by_sis_source_id('s2')
-      @s5.should_not be_nil
+      expect(@s1.reload).to be_deleted
+      expect(@s2.reload).to be_active
+      expect(@s3.reload).to be_active
+      expect(@s4.reload).to be_deleted
+      @s5 = @cnew.course_sections.where(sis_source_id: 's2').first
+      expect(@s5).not_to be_nil
 
-      @e1.reload.should be_deleted
-      @e2.reload.should be_active
-      @e3.reload.should be_active
-      @e4.reload.should be_deleted
-      @e5.reload.should be_active
+      expect(@e1.reload).to be_deleted
+      expect(@e2.reload).to be_active
+      expect(@e3.reload).to be_active
+      expect(@e4.reload).to be_deleted
+      expect(@e5.reload).to be_active
 
     end
 
@@ -312,7 +312,7 @@ s2,test_1,section2,active},
         %{course_id,short_name,long_name,account_id,term_id,status
           test_1,TC 101,Test Course 101,,,active}],
         :batch_mode => false)
-      @c1.reload.should be_available
+      expect(@c1.reload).to be_available
     end
 
     it "should only do batch mode removals for supplied data types" do
@@ -332,15 +332,15 @@ s2,test_1,section2,active},
           section_1,user_1,student,active}
           ])
 
-      @user = Pseudonym.find_by_sis_user_id('user_1').user
-      @section = CourseSection.find_by_sis_source_id('section_1')
+      @user = Pseudonym.where(sis_user_id: 'user_1').first.user
+      @section = CourseSection.where(sis_source_id: 'section_1').first
       @course = @section.course
-      @enrollment1 = @course.student_enrollments.find_by_user_id(@user.id)
+      @enrollment1 = @course.student_enrollments.where(user_id: @user).first
 
-      @user.should be_registered
-      @section.should be_active
-      @course.should be_claimed
-      @enrollment1.should be_active
+      expect(@user).to be_registered
+      expect(@section).to be_active
+      expect(@course).to be_claimed
+      expect(@enrollment1).to be_active
 
       # only supply enrollments; course and section are left alone
       process_csv_data(
@@ -348,29 +348,29 @@ s2,test_1,section2,active},
           section_1,user_1,teacher,active}],
           :batch_mode => true, :batch_mode_term => @term)
 
-      @user.reload.should be_registered
-      @section.reload.should be_active
-      @course.reload.should be_claimed
-      @enrollment1.reload.should be_deleted
-      @enrollment2 = @course.teacher_enrollments.find_by_user_id(@user.id)
-      @enrollment2.should be_active
+      expect(@user.reload).to be_registered
+      expect(@section.reload).to be_active
+      expect(@course.reload).to be_claimed
+      expect(@enrollment1.reload).to be_deleted
+      @enrollment2 = @course.teacher_enrollments.where(user_id: @user).first
+      expect(@enrollment2).to be_active
 
       # only supply sections; course left alone
       process_csv_data(
           [%{section_id,course_id,name}],
           :batch_mode => true, :batch_mode_term => @term)
-      @user.reload.should be_registered
-      @section.reload.should be_deleted
+      expect(@user.reload).to be_registered
+      expect(@section.reload).to be_deleted
       @section.enrollments.not_fake.each do |e|
-        e.should be_deleted
+        expect(e).to be_deleted
       end
-      @course.reload.should be_claimed
+      expect(@course.reload).to be_claimed
 
       # only supply courses
       process_csv_data(
           [%{course_id,short_name,long_name,term_id}],
           :batch_mode => true, :batch_mode_term => @term)
-      @course.reload.should be_deleted
+      expect(@course.reload).to be_deleted
     end
 
     it "should treat crosslisted sections as belonging to their original course" do
@@ -399,8 +399,8 @@ s2,test_1,section2,active},
       process_csv_data(
           ['section_id,course_id,name,status}'],
           :batch_mode => true, :batch_mode_term => @term1)
-      @section1.reload.should be_deleted
-      @section2.reload.should_not be_deleted
+      expect(@section1.reload).to be_deleted
+      expect(@section2.reload).not_to be_deleted
     end
   end
 
@@ -411,17 +411,17 @@ s2,test_1,section2,active},
     batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 3
     batch.save!
     batch.reload
-    batch.processing_warnings.size.should == 3
-    batch.processing_warnings.last.should == ['testfile.csv', 'test warning']
-    batch.processing_errors.size.should == 3
-    batch.processing_errors.last.should == ['testfile.csv', 'test error']
+    expect(batch.processing_warnings.size).to eq 3
+    expect(batch.processing_warnings.last).to eq ['testfile.csv', 'test warning']
+    expect(batch.processing_errors.size).to eq 3
+    expect(batch.processing_errors.last).to eq ['testfile.csv', 'test error']
     batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 5
     batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 5
     batch.save!
     batch.reload
-    batch.processing_warnings.size.should == 3
-    batch.processing_warnings.last.should == ['', 'There were 3 more warnings']
-    batch.processing_errors.size.should == 3
-    batch.processing_errors.last.should == ['', 'There were 3 more errors']
+    expect(batch.processing_warnings.size).to eq 3
+    expect(batch.processing_warnings.last).to eq ['', 'There were 3 more warnings']
+    expect(batch.processing_errors.size).to eq 3
+    expect(batch.processing_errors.last).to eq ['', 'There were 3 more errors']
   end
 end

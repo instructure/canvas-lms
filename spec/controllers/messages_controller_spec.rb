@@ -26,7 +26,7 @@ describe MessagesController do
 
       it "should be able to access the page" do
         post 'create', :user_id => @user.to_param
-        response.code.should == '200'
+        expect(response.code).to eq '200'
       end
 
       it "should be able to send messages" do
@@ -49,7 +49,7 @@ describe MessagesController do
 
       it "should receive a redirect" do
         post 'create', :user_id => @user.to_param
-        response.code.should == '302'
+        expect(response.code).to eq '302'
       end
     end
   end

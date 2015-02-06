@@ -30,39 +30,39 @@ describe DelayedMessage do
 
     it "should have scope for :daily" do
       delayed_message_model(:frequency => 'daily')
-      DelayedMessage.for(:daily).should == [@delayed_message]
+      expect(DelayedMessage.for(:daily)).to eq [@delayed_message]
     end
 
     it "should scope for :weekly" do
       delayed_message_model(:frequency => 'weekly')
-      DelayedMessage.for(:weekly).should == [@delayed_message]
+      expect(DelayedMessage.for(:weekly)).to eq [@delayed_message]
     end
 
     it "should scope for notification" do
       notification_model
       delayed_message_model
-      DelayedMessage.for(@notification).should == [@delayed_message]
+      expect(DelayedMessage.for(@notification)).to eq [@delayed_message]
     end
 
     it "should scope for notification_policy" do
       notification_policy_model
       delayed_message_model(:notification_policy_id => @notification_policy.id)
-      @notification_policy.should be_is_a(NotificationPolicy)
-      DelayedMessage.for(@notification_policy).should == [@delayed_message]
+      expect(@notification_policy).to be_is_a(NotificationPolicy)
+      expect(DelayedMessage.for(@notification_policy)).to eq [@delayed_message]
     end
 
     it "should scope for communication_channel" do
       communication_channel_model
       delayed_message_model(:communication_channel_id => @communication_channel.id)
-      @communication_channel.should be_is_a(CommunicationChannel)
-      DelayedMessage.for(@communication_channel).should == [@delayed_message]
+      expect(@communication_channel).to be_is_a(CommunicationChannel)
+      expect(DelayedMessage.for(@communication_channel)).to eq [@delayed_message]
     end
 
     it "should scope for context" do
       delayed_message_model
       @delayed_message.context = assignment_model
       @delayed_message.save!
-      DelayedMessage.for(@assignment).should == [@delayed_message]
+      expect(DelayedMessage.for(@assignment)).to eq [@delayed_message]
     end
 
     it "should have a scope to filter by the state" do
@@ -70,12 +70,12 @@ describe DelayedMessage do
       delayed_message_model(:workflow_state => 'pending')
       delayed_message_model(:workflow_state => 'cancelled')
       delayed_message_model(:workflow_state => 'sent')
-      DelayedMessage.in_state(:pending).all? { |d| d.state == :pending }.should be_true
-      DelayedMessage.in_state(:pending).size.should eql(1)
-      DelayedMessage.in_state(:cancelled).all? { |d| d.state == :cancelled }.should be_true
-      DelayedMessage.in_state(:cancelled).size.should eql(1)
-      DelayedMessage.in_state(:sent).all? { |d| d.state == :sent }.should be_true
-      DelayedMessage.in_state(:sent).size.should eql(1)
+      expect(DelayedMessage.in_state(:pending).all? { |d| d.state == :pending }).to be_truthy
+      expect(DelayedMessage.in_state(:pending).size).to eql(1)
+      expect(DelayedMessage.in_state(:cancelled).all? { |d| d.state == :cancelled }).to be_truthy
+      expect(DelayedMessage.in_state(:cancelled).size).to eql(1)
+      expect(DelayedMessage.in_state(:sent).all? { |d| d.state == :sent }).to be_truthy
+      expect(DelayedMessage.in_state(:sent).size).to eql(1)
     end
   end
 
@@ -85,17 +85,17 @@ describe DelayedMessage do
     end
 
     it "should start the workflow with pending" do
-      @delayed_message.state.should eql(:pending)
+      expect(@delayed_message.state).to eql(:pending)
     end
 
     it "should should be able to go to cancelled from pending" do
       @delayed_message.cancel
-      @delayed_message.state.should eql(:cancelled)
+      expect(@delayed_message.state).to eql(:cancelled)
     end
 
     it "should be able to be sent from pending" do
       @delayed_message.begin_send
-      @delayed_message.state.should eql(:sent)
+      expect(@delayed_message.state).to eql(:sent)
     end
   end
 
@@ -103,15 +103,15 @@ describe DelayedMessage do
     Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
-    user.pseudonym.account.should == account
+    expect(user.pseudonym.account).to eq account
     HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
     HostUrl.stubs(:default_host).returns("test.host")
     user.communication_channel.confirm!
     dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
     DelayedMessage.summarize([dm])
     message = Message.last
-    message.body.to_s.should_not match(%r{http://test.host/})
-    message.body.to_s.should match(%r{http://dm.dummy.test.host/})
+    expect(message.body.to_s).not_to match(%r{http://test.host/})
+    expect(message.body.to_s).to match(%r{http://dm.dummy.test.host/})
   end
 
   it 'should return nil if the delayed messages are using a retired communication channel' do
@@ -120,7 +120,7 @@ describe DelayedMessage do
     user = user_with_pseudonym(:account => account)
     user.communication_channel.retire!
     dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
-    DelayedMessage.summarize([dm]).should be_nil
+    expect(DelayedMessage.summarize([dm])).to be_nil
   end
 
   context "sharding" do
@@ -132,7 +132,7 @@ describe DelayedMessage do
       @shard1.activate do
         account = Account.create!(:name => 'new acct')
         user = user_with_pseudonym(:account => account)
-        user.pseudonym.account.should == account
+        expect(user.pseudonym.account).to eq account
         HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
         HostUrl.stubs(:default_host).returns("test.host")
         @cc = user.communication_channel
@@ -141,8 +141,8 @@ describe DelayedMessage do
       end
       @shard2.activate do
         DelayedMessage.summarize([@dm])
-        @cc.messages.last.should_not be_nil
-        @cc.messages.last.shard.should == @shard1
+        expect(@cc.messages.last).not_to be_nil
+        expect(@cc.messages.last.shard).to eq @shard1
       end
     end
   end
@@ -176,21 +176,21 @@ describe DelayedMessage do
     it "should do nothing if the CC isn't set yet" do
       @dm.communication_channel = nil
       @dm.send(:set_send_at)
-      @dm.send_at.should be_nil
+      expect(@dm.send_at).to be_nil
     end
 
     it "should do nothing if send_at is already set" do
       send_at = @true_now - 5.days
       @dm.send_at = send_at
       @dm.send(:set_send_at)
-      @dm.send_at.should == send_at
+      expect(@dm.send_at).to eq send_at
     end
 
     it "should set to 6pm in the user's time zone for non-weekly messages" do
       Timecop.freeze(@central.now.change(:hour => 12)) do
         @dm.frequency = 'daily'
         @dm.send(:set_send_at)
-        @dm.send_at.should == @central.now.change(:hour => 18)
+        expect(@dm.send_at).to eq @central.now.change(:hour => 18)
       end
     end
 
@@ -201,7 +201,7 @@ describe DelayedMessage do
       Timecop.freeze(@mountain.now.change(:hour => 12)) do
         @dm.frequency = 'daily'
         @dm.send(:set_send_at)
-        @dm.send_at.should == @mountain.now.change(:hour => 18)
+        expect(@dm.send_at).to eq @mountain.now.change(:hour => 18)
       end
     end
 
@@ -209,7 +209,7 @@ describe DelayedMessage do
       Timecop.freeze(@central.now.change(:hour => 20)) do
         @dm.frequency = 'daily'
         @dm.send(:set_send_at)
-        @dm.send_at.should == @central.now.tomorrow.change(:hour => 18)
+        expect(@dm.send_at).to eq @central.now.tomorrow.change(:hour => 18)
       end
     end
 
@@ -221,13 +221,13 @@ describe DelayedMessage do
       Timecop.freeze(monday) do
         @dm.frequency = 'weekly'
         @dm.send(:set_send_at)
-        @dm.send_at.in_time_zone(@eastern).midnight.should == saturday
+        expect(@dm.send_at.in_time_zone(@eastern).midnight).to eq saturday
       end
 
       Timecop.freeze(sunday) do
         @dm.send_at = nil
         @dm.send(:set_send_at)
-        @dm.send_at.in_time_zone(@eastern).midnight.should == saturday + 1.week
+        expect(@dm.send_at.in_time_zone(@eastern).midnight).to eq saturday + 1.week
       end
     end
 
@@ -243,7 +243,7 @@ describe DelayedMessage do
       Timecop.freeze(@dm.send_at + 30.minutes) do
         @dm.send_at = nil
         @dm.send(:set_send_at)
-        @dm.send_at.in_time_zone(@eastern).midnight.should == saturday + 1.week
+        expect(@dm.send_at.in_time_zone(@eastern).midnight).to eq saturday + 1.week
       end
     end
 
@@ -262,7 +262,7 @@ describe DelayedMessage do
       Timecop.freeze(monday + 1.week) do
         @dm.send_at = nil
         @dm.send(:set_send_at)
-        @dm.send_at.in_time_zone(@eastern).should == first + 1.week
+        expect(@dm.send_at.in_time_zone(@eastern)).to eq first + 1.week
       end
     end
 
@@ -284,7 +284,7 @@ describe DelayedMessage do
           expected_windows << i
         end
 
-        actual_windows.sort.should == expected_windows
+        expect(actual_windows.sort).to eq expected_windows
       end
     end
 
@@ -309,8 +309,8 @@ describe DelayedMessage do
           expected_diffs << i.minutes
         end
 
-        actual_diffs.sort.should == expected_diffs
-        windows.uniq.size.should == 1
+        expect(actual_diffs.sort).to eq expected_diffs
+        expect(windows.uniq.size).to eq 1
       end
     end
   end
@@ -321,11 +321,11 @@ describe DelayedMessage do
       submission = quiz_model.quiz_submissions.create!
       message.context = submission
       message.save
-      message.context_type.should == 'Quizzes::QuizSubmission'
+      expect(message.context_type).to eq 'Quizzes::QuizSubmission'
 
       DelayedMessage.where(id: message).update_all(context_type: 'QuizSubmission')
 
-      DelayedMessage.find(message.id).context_type.should == 'Quizzes::QuizSubmission'
+      expect(DelayedMessage.find(message.id).context_type).to eq 'Quizzes::QuizSubmission'
     end
   end
 end

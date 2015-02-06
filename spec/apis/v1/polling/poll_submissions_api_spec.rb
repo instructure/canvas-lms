@@ -62,8 +62,8 @@ describe Polling::PollSubmissionsController, type: :request do
     it "retrieves the poll submission specified" do
       json = get_show
       poll_submission_json = json['poll_submissions'].first
-      poll_submission_json['id'].should == @submission.id.to_s
-      poll_submission_json['poll_choice_id'].should == @selected.id.to_s
+      expect(poll_submission_json['id']).to eq @submission.id.to_s
+      expect(poll_submission_json['poll_choice_id']).to eq @selected.id.to_s
     end
   end
 
@@ -89,18 +89,18 @@ describe Polling::PollSubmissionsController, type: :request do
         post_create(poll_choice_id: @selected.id)
 
         @session.reload
-        @session.poll_submissions.size.should == 1
+        expect(@session.poll_submissions.size).to eq 1
         submission = @session.poll_submissions.first
-        submission.user.should == @student
-        submission.poll_choice.should == @selected
+        expect(submission.user).to eq @student
+        expect(submission.poll_choice).to eq @selected
       end
 
       it "is invalid if the poll choice does not exist" do
         student_in_course(active_all: true, course: @course)
         post_create({filler: true}, true)
 
-        response.code.should == "404"
-        response.body.should =~ /The specified resource does not exist/
+        expect(response.code).to eq "404"
+        expect(response.body).to match /The specified resource does not exist/
       end
 
       it "doesn't submit if the student isn't enrolled in the specified section" do
@@ -112,9 +112,9 @@ describe Polling::PollSubmissionsController, type: :request do
 
         post_create({poll_choice_id: @selected.id}, true)
 
-        response.code.should == '401'
+        expect(response.code).to eq '401'
         @session.reload
-        @session.poll_submissions.size.should be_zero
+        expect(@session.poll_submissions.size).to be_zero
       end
 
       it "allows submission if the student is enrolled in the specified section" do
@@ -125,10 +125,10 @@ describe Polling::PollSubmissionsController, type: :request do
         post_create(poll_choice_id: @selected.id)
 
         @session.reload
-        @session.poll_submissions.size.should == 1
+        expect(@session.poll_submissions.size).to eq 1
         submission = @session.poll_submissions.first
-        submission.user.should == @student
-        submission.poll_choice.should == @selected
+        expect(submission.user).to eq @student
+        expect(submission.poll_choice).to eq @selected
       end
     end
   end

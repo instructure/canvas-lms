@@ -64,7 +64,7 @@ module Api
 
       def attachment
         return @_attachment unless @_attachment.nil?
-        @_attachment = Attachment.find_by_id(attachment_id)
+        @_attachment = Attachment.where(id: attachment_id).first
       end
 
       def attachment_id

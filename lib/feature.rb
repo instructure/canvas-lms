@@ -24,6 +24,7 @@ class Feature
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
+      val = (Feature.production_environment? ? 'hidden' : 'allowed') if key == :state && val == 'hidden_in_prod'
       next if key == :state && !%w(hidden off allowed on).include?(val)
       instance_variable_set "@#{key}", val
     end
@@ -62,7 +63,10 @@ class Feature
     display_name: lambda { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
     description: lambda { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-    state: 'allowed',     # or 'off' or 'on' or 'hidden'
+    state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
+                          # - 'hidden' means the feature must be set by a site admin before it will be visible
+                          #   (in that context and below) to other users
+                          # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere
     root_opt_in: false,   # if true, 'allowed' features in source or site admin
                           # will be inherited in "off" state by root accounts
     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
@@ -131,8 +135,8 @@ By default, Canvas will try to use Flash first to play videos. Turn this on to t
 then fall back to Flash.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: true
+      state: 'on',
+      beta: false
     },
     'high_contrast' =>
     {
@@ -196,16 +200,6 @@ END
       root_opt_in: true,
       beta: true
     },
-    'quiz_moderate' =>
-    {
-      display_name: -> { I18n.t('features.new_quiz_moderate', 'New Quiz Moderate Page') },
-      description: -> { I18n.t('new_quiz_moderate_desc', <<-END) },
-When Draft State and Quiz Statistics is allowed/on, this enables the new quiz moderate page for an account.
-END
-      applies_to: 'Course',
-      state: 'hidden',
-      beta: true
-    },
     'student_groups_next' =>
     {
       display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },
@@ -214,9 +208,7 @@ This enables the new student group page for an account. The new page was build t
 experience.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
-      root_opt_in: true,
-      beta: true
+      state: 'on'
     },
     'better_file_browsing' =>
     {
@@ -228,7 +220,7 @@ goes to the personal files page for a user ('/files') then you need to turn it o
 END
 
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'allowed',
       beta: true
     },
     'modules_next' =>
@@ -243,7 +235,7 @@ END
     },
     'allow_opt_out_of_inbox' =>
     {
-      display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow users to opt out of the inbox") },
+      display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow Users to Opt-out of the Inbox") },
       description:  -> { I18n.t('allow_opt_out_of_inbox', <<-END) },
 Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences.
 END
@@ -271,15 +263,43 @@ END
       state: 'hidden',
       beta: true
     },
-    'quiz_stats' =>
+    'multiple_grading_periods' =>
     {
-      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
-      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
-Enable the new quiz statistics page for an account.
+      display_name: -> { I18n.t('features.multiple_grading_periods', 'Multiple Grading Periods') },
+      description: -> { I18n.t('enable_multiple_grading_periods', <<-END) },
+Enable multiple grading periods management in the account admin, and use in the Gradebook.
+END
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true
+    },
+    'course_catalog' =>
+    {
+      display_name: -> { I18n.t('features.course_catalog', "Course Catalog") },
+      description:  -> { I18n.t('display_course_catalog', <<-END) },
+Show a searchable list of courses in this root account with the "Include this course in the public course index" flag enabled.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
+      root_opt_in: true
+    },
+    'gradebook_list_students_by_sortable_name' =>
+    {
+      display_name: -> { I18n.t('features.gradebook_list_students_by_sortable_name', "Gradebook - List Students by Sortable Name") },
+      description: -> { I18n.t('enable_gradebook_list_students_by_sortable_name', <<-END) },
+List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings.
 END
       applies_to: 'Course',
-      state: 'allowed',
-      development: true
+      state: 'allowed'
+    },
+    'usage_rights_required' =>
+    {
+      display_name: -> { I18n.t('Require Usage Rights for Uploaded Files') },
+      description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published') },
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true
     }
   )
 

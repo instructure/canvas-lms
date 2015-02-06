@@ -1,12 +1,12 @@
 define [
+  'i18n!groups'
   'jquery'
   'underscore'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/views/groups/manage/Scrollable'
-  'compiled/views/Filterable'
   'jst/groups/manage/groupUsers'
-], ($, _, GroupUsersView, AssignToGroupMenu, Scrollable, Filterable, template) ->
+], (I18n, $, _, GroupUsersView, AssignToGroupMenu, Scrollable, template) ->
 
   class UnassignedUsersView extends GroupUsersView
 
@@ -24,8 +24,9 @@ define [
       GroupUsersView::els,
       '.no-results-wrapper': '$noResultsWrapper'
       '.no-results': '$noResults'
+      '.invalid-filter': '$invalidFilter'
 
-    @mixin Filterable, Scrollable
+    @mixin Scrollable
 
     dropOptions:
       accept: '.group-user'
@@ -37,13 +38,11 @@ define [
       @collection.on 'reset', @render
       @collection.on 'remove', @render
       @collection.on 'moved', @highlightUser
-      @collection.on 'filterOut', _(=> @checkScroll()).debounce(50)
 
       @collection.once 'fetch', => @$noResultsWrapper.hide()
       @collection.on 'fetched:last', => @$noResultsWrapper.show()
 
     afterRender: ->
-      @$filter = @$externalFilter
       super
       @collection.load('first')
       @$el.parent().droppable(_.extend({}, @dropOptions))
@@ -76,6 +75,15 @@ define [
 
     hideAssignToGroup: ->
       @assignToGroupMenu?.hide()
+
+    setFilter: (search_term, options) ->
+      searchDefer = @collection.search(search_term, options)
+      searchDefer.always(=>
+        if search_term.length < 3
+          shouldShow = search_term.length > 0
+          @$invalidFilter.toggleClass("hidden", !shouldShow)
+          @$noResultsWrapper.toggle(shouldShow)
+      ) if searchDefer
 
     canAssignToGroup: ->
       @options.canAssignToGroup and @groupsCollection.length

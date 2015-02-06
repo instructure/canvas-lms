@@ -148,7 +148,7 @@
 #           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping'], ...]",
 #           "type": "array",
 #           "items": {
-#             "$ref": "Array"
+#             "type": "string"
 #           }
 #         },
 #         "processing_errors": {
@@ -156,7 +156,7 @@
 #           "example": "[['students.csv','Error while importing CSV. Please contact support.'], ...]",
 #           "type": "array",
 #           "items": {
-#             "$ref": "Array"
+#             "type": "string"
 #           }
 #         },
 #         "batch_mode": {
@@ -200,14 +200,21 @@ class SisImportsApiController < ApplicationController
   #
   # Returns the list of SIS imports for an account
   #
-  #   Examples:
-  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \
-  #         -H "Authorization: Bearer <token>"
+  # @argument created_since [Optional, DateTime]
+  #   If set, only shows imports created after the specified date (use ISO8601 format)
+  #
+  # Example:
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns [SisImport]
   def index
     if authorized_action(@account, @current_user, :manage_sis)
-      @batches = Api.paginate(@account.sis_batches.order('created_at DESC'), self, url_for({action: :index, controller: :sis_imports_api}))
+      scope = @account.sis_batches.order('created_at DESC')
+      if created_since = CanvasTime.try_parse(params[:created_since])
+        scope = scope.where("created_at > ?", created_since)
+      end
+      @batches = Api.paginate(scope, self, url_for({action: :index, controller: :sis_imports_api}))
       render :json => ({ sis_imports: @batches})
     end
   end

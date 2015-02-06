@@ -30,24 +30,24 @@ describe "Importing Rubrics" do
         migration.stubs(:add_imported_item)
 
         data[:rubrics_to_import] = {}
-        Importers::RubricImporter.import_from_migration(data, migration).should be_nil
-        context.rubrics.count.should == 0
+        expect(Importers::RubricImporter.import_from_migration(data, migration)).to be_nil
+        expect(context.rubrics.count).to eq 0
 
         data[:rubrics_to_import][data[:migration_id]] = true
         Importers::RubricImporter.import_from_migration(data, migration)
         Importers::RubricImporter.import_from_migration(data, migration)
-        context.rubrics.count.should == 1
-        r = Rubric.find_by_migration_id(data[:migration_id])
+        expect(context.rubrics.count).to eq 1
+        r = Rubric.where(migration_id: data[:migration_id]).first
         
-        r.title.should == data[:title]
-        r.description.should include(data[:description]) if data[:description]
-        r.points_possible.should == data[:points_possible].to_f
+        expect(r.title).to eq data[:title]
+        expect(r.description).to include(data[:description]) if data[:description]
+        expect(r.points_possible).to eq data[:points_possible].to_f
 
         crit_ids = r.data.map{|rub|rub[:ratings].first[:criterion_id]}
 
         data[:data].each do |crit|
           id = crit[:migration_id] || crit[:id]
-          crit_ids.member?(id).should be_true
+          expect(crit_ids.member?(id)).to be_truthy
         end
       end
     end

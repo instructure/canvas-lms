@@ -6,7 +6,8 @@ define [
   'vendor/mediaelement-and-player'
   'jquery'
   'compiled/util/kalturaAnalytics'
-], (I18n, _, pubsub, mejs, $, kalturaAnalytics) ->
+  'str/htmlEscape'
+], (I18n, _, pubsub, mejs, $, kalturaAnalytics, htmlEscape) ->
 
   VIDEO_WIDTH = 550
   VIDEO_HEIGHT = 448
@@ -47,11 +48,11 @@ define [
       # this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
       # see: CNVS-12998
       sources = for source in data.media_sources when source.content_type isnt 'audio/mp3'
-        "<source type='#{source.content_type}' src='#{source.url}' title='#{source.width}x#{source.height} #{Math.floor(source.bitrate / 1024)} kbps' />"
+        "<source type='#{htmlEscape source.content_type}' src='#{htmlEscape source.url}' title='#{htmlEscape source.width}x#{htmlEscape source.height} #{htmlEscape(Math.floor(source.bitrate / 1024))} kbps' />"
 
       tracks = _.map data.media_tracks, (track) ->
         languageName = mejs.language.codes[track.locale] || track.locale
-        "<track kind='#{track.kind}' label='#{languageName}' src='#{track.url}' srclang='#{track.locale}' />"
+        "<track kind='#{htmlEscape track.kind}' label='#{htmlEscape languageName}' src='#{htmlEscape track.url}' srclang='#{htmlEscape track.locale}' />"
 
       types = _.map data.media_sources, (source) -> source.content_type
       dfd.resolve {sources, tracks, types, can_add_captions: data.can_add_captions}
@@ -62,7 +63,8 @@ define [
     st_tags = sourcesAndTracks.sources.concat(sourcesAndTracks.tracks).join('')
 
     getElement = (tagType) ->
-      $("<#{tagType} #{if mediaType is 'video' then "width='#{width}' height='#{height}'" else ''} controls>#{st_tags}</#{tagType}>")
+      html = "<#{tagType} #{if mediaType is 'video' then "width='#{width}' height='#{height}'" else ''} controls>#{st_tags}</#{tagType}>"
+      $(html)
 
     willPlayAudioInFlash = ->
       opts = $.extend({mode: 'auto'}, mejs.MediaElementDefaults, mejs.MepDefaults,mediaPlayerOptions)

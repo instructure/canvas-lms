@@ -1,7 +1,8 @@
 define [
   'i18n!editor_accessibility'
   'jquery'
-], (I18n, $) ->
+  'str/htmlEscape'
+], (I18n, $, htmlEscape) ->
   ##
   # Used to insert accessibility titles into core TinyMCE components
   class EditorAccessiblity
@@ -32,7 +33,7 @@ define [
 
       @$el.find("##{@id_prepend}_instructure_record").attr('aria-disabled', 'true')
       @$el.find("##{@id_prepend}_instructure_record").removeAttr('role')
-      @$el.find("##{@id_prepend}_instructure_record_voice").append('<br/>').append(I18n.t('accessibles.record', 'This feature is inaccessible for screen readers.'))
+      @$el.find("##{@id_prepend}_instructure_record_voice").append('<br/>').append(htmlEscape(I18n.t('accessibles.record', 'This feature is inaccessible for screen readers.')))
       @$el.find("##{@id_prepend}_instructure_record img").attr('alt',
         @$el.find("##{@id_prepend}_instructure_record img").attr('alt') + ", " + I18n.t('accessibles.record', 'This feature is inaccessible for screen readers.'));
 

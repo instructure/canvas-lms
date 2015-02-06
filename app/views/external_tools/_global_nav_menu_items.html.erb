@@ -6,7 +6,11 @@
     <% tools.each do |tool| %>
       <li id="<%= tool.asset_string %>_menu_item" class="menu-item">
         <a class='menu-item-no-drop' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
-          <% if k12? %><div class="menu-item__text"><% end %>
+          <% if k12? %>
+            <%# Hardcoding Commons logo in to help K-12 sales demos, until a way to give the nav items logos is built out %>
+            <%= render(:partial => 'shared/svg/svg_commons_logo') %>
+            <div class="menu-item__text">
+          <% end %>
           <%= tool.label_for(:global_navigation) %>
           <% if k12? %></div><% end %>
         </a>

@@ -23,8 +23,8 @@ describe BookmarkService do
     bookmark_service_model
   end
   
-  it "should include DeliciousDiigo" do
-    BookmarkService.included_modules.should be_include(DeliciousDiigo)
+  it "should include Delicious" do
+    expect(BookmarkService.included_modules).to be_include(Delicious)
   end
 
   context "post_bookmark" do
@@ -35,9 +35,9 @@ describe BookmarkService do
     end
     
     it "should be able to post a bookmark for diigo" do
-      @bookmark_service.service.should eql('diigo')
+      expect(@bookmark_service.service).to eql('diigo')
       
-      @bookmark_service.expects(:diigo_post_bookmark).with(
+      Diigo::Connection.expects(:diigo_post_bookmark).with(
         @bookmark_service, 
         'google.com', 
         'some title', 
@@ -56,7 +56,7 @@ describe BookmarkService do
     it "should be able to post a bookmark for delicious" do
       bookmark_service_model(:service => 'delicious')
 
-      @bookmark_service.service.should eql('delicious')
+      expect(@bookmark_service.service).to eql('delicious')
       
       @bookmark_service.expects(:delicious_post_bookmark).with(
         @bookmark_service, 
@@ -79,12 +79,12 @@ describe BookmarkService do
         raise ArgumentError
       end
       
-      lambda{@bookmark_service.post_bookmark(
+      expect{@bookmark_service.post_bookmark(
         :title => 'some title', 
         :url => 'google.com', 
         :comments => 'some comments', 
         :tags => %w(some tags)
-      )}.should_not raise_error
+      )}.not_to raise_error
     end
   end
 end

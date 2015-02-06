@@ -10,7 +10,8 @@
       'default_storage_quota_mb' => @context.default_storage_quota_mb,
       'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
       'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb,
-      'site_admin' => @account.site_admin?
+      'site_admin' => @account.site_admin?,
+      'root_account' => @account.root_account?
     }
   end
 %>
@@ -146,6 +147,17 @@ TEXT
                   <% end %>
 
                   <tr>
+                    <td><%= settings.blabel :trusted_referers, :en => "Trusted HTTP Referers" %></td>
+                    <td>
+                      <%= settings.text_field :trusted_referers,
+                                              :value => @account.settings[:trusted_referers],
+                                              :class => 'same-width-as-select',
+                                              :placeholder => "https://example.edu" %>
+                      <p style="font-size: 0.9em;"><%= t("This is a comma separated list of URL's to trust.  Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas.") %></p>
+                    </td>
+                  </tr>
+
+                  <tr>
                     <td colspan="2"><%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
                     <%= settings.label :prevent_course_renaming_by_teachers, :en => "Don't let teachers rename their courses" %>
                     </td>
@@ -160,6 +172,13 @@ TEXT
                       <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
                     </td>
                   </tr>
+                  <% if @account.grants_right?(@current_user, :manage_site_settings) %>
+                    <tr>
+                      <td colspan="2"><%= settings.check_box :include_students_in_global_survey, checked: @account.include_students_in_global_survey?%>
+                        <%= settings.label :include_students_in_global_survey, en: "Include students in global surveys" %>
+                      </td>
+                    </tr>
+                  <% end %>
                   <tr>
                     <td colspan="2"><%= settings.check_box :restrict_quiz_questions, :checked => @account.settings[:restrict_quiz_questions] %>
                       <%= settings.label :restrict_quiz_questions, :en => "Restrict students from viewing quiz questions after course end date" %>
@@ -366,6 +385,24 @@ TEXT
           <% end %>
         </fieldset>
 
+        <% if !@account.site_admin? &&
+                @account.root_account? &&
+                (@account.feature_enabled?(:post_grades) || @account.feature_allowed?(:post_grades)) &&
+                @account.grants_right?(@current_user, :manage_site_settings) %>
+            <fieldset id="add_sis_app_token">
+              <legend><%= t("SIS Agent Token Authentication") %></legend>
+              <p style="font-size: 0.9em;"><%= t("This will allow you to authenticate Canvas for posting grades to SIS") %></p>
+              <%= f.fields_for :settings do |settings| %>
+                  <table class="formtable">
+                    <tr>
+                      <td><%= settings.blabel :sis_app_token, :en => "SIS Agent Token" %></td>
+                      <td><%= settings.text_field :sis_app_token, :value => @account.settings[:sis_app_token] %></td>
+                    </tr>
+                  </table>
+              <% end %>
+            </fieldset>
+        <% end %>
+
         <% if @account.root_account? && !@account.site_admin? && Setting.get("show_feedback_link", "false") == "true"  %>
           <fieldset>
             <legend><%= t(:custom_links_to_include_in_the_help_dialog_popup, "Custom Links to include in the help dialog popup") %></legend>
@@ -531,6 +568,8 @@ acknowledge that you have read and agreed to the
           </fieldset>
         <% end %>
 
+        <%= render partial: 'external_integration_keys', locals: { f: f } %>
+
         <div class="button-container">
           <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
@@ -657,7 +696,7 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <% available_roles = @context.available_account_roles(@current_user) %>
+      <% available_roles = @context.available_account_roles(false, @current_user) %>
       <% unless available_roles.empty? %>
         <%= render :partial => 'account_user', :object => nil %>
       <% end %>
@@ -669,10 +708,10 @@ acknowledge that you have read and agreed to the
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
           <div>
-            <%= label_tag :membership_type, :en => "Add More" %>
-            <select name="membership_type" id="admin_membership_type">
-            <% available_roles.each do |type| %>
-              <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
+            <%= label_tag :role_id, :en => "Add More" %>
+            <select name="role_id" id="admin_role_id">
+            <% available_roles.each do |role| %>
+              <option value="<%= role.id %>"><%= AccountUser.readable_type(role.name) %></option>
             <% end %>
             </select>
           </div>
@@ -741,15 +780,14 @@ acknowledge that you have read and agreed to the
                 <%= t :announcement_sent_to_roles, "Send only to the following types of users:" %>
                 <ul>
                   <% announcement.account_notification_roles.each do |r| %>
-                    <% @enrollment_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
-                      <li><%= rt[:plural_label][] %></li>
+                    <% @course_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
+                      <li><%= rt[:label] %></li>
                     <% end %>
                     <% # NilEnrollment is a special case %>
-                    <% if r.role_type == "NilEnrollment" %>
+                    <% if r.role_id.nil? %>
                       <li><%= t :no_enrollment_roles, "Unenrolled users" %></li>
                     <% end %>
-                    <% @role_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
-                      <% # no plural_label :( %>
+                    <% @account_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
                       <li><%= rt[:label]  %></li>
                     <% end %>
                   <% end %>
@@ -810,41 +848,37 @@ acknowledge that you have read and agreed to the
             </tr>
             <tr id="restrict_to_roles">
               <td id="restrict_to_enrollment_roles">
-                <% unless @enrollment_types.nil? %>
-                  <%= t :course_roles, "Course roles:" %>
-                  <ul>
-                    <% @enrollment_types.each do |r| %>
-                      <li id="account_notification_role_<%= r[:name]%>">
-                        <label>
-                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
-                          <%= r[:plural_label][] %>
-                        </label>
-                      </li>
-                    <% end %>
-                    <% # NilEnrollment is a special case, because it's not actually a role, just a status reflecting that the user is not part of any course %>
-                    <li id="account_notification_role_NilEnrollment">
+                <%= t :course_roles, "Course roles:" %>
+                <ul>
+                  <% @course_roles.each do |r| %>
+                    <li id="account_notification_role_<%= r[:id]%>">
                       <label>
-                        <%= check_box_tag "account_notification_roles[]", "NilEnrollment", false, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx" } %>
-                        <%= t :no_enrollment_roles, "Unenrolled users" %>
+                        <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
+                        <%= r[:label] %>
                       </label>
                     </li>
-                  </ul>
-                <% end %>
+                  <% end %>
+                  <% # NilEnrollment is a special case, because it's not actually a role, just a status reflecting that the user is not part of any course %>
+                  <li id="account_notification_role_NilEnrollment">
+                    <label>
+                      <%= check_box_tag "account_notification_roles[]", "NilEnrollment", false, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx" } %>
+                      <%= t :no_enrollment_roles, "Unenrolled users" %>
+                    </label>
+                  </li>
+                </ul>
               </td>
               <td id="restrict_to_membership_roles">
-                <% unless @role_types.nil? %>
-                  <%= t :account_roles, "Account roles:" %>
-                  <ul>
-                    <% @role_types.each do |r| %>
-                      <li id="account_notification_role_<%= r[:name]%>">
-                        <label>
-                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
-                          <%= r[:label] %>
-                        </label>
-                      </li>
-                    <% end %>
-                  </ul>
-                <% end %>
+                <%= t :account_roles, "Account roles:" %>
+                <ul>
+                  <% @account_roles.each do |r| %>
+                    <li id="account_notification_role_<%= r[:id]%>">
+                      <label>
+                        <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
+                        <%= r[:label] %>
+                      </label>
+                    </li>
+                  <% end %>
+                </ul>
               </td>
             </tr>
             <tr>

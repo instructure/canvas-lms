@@ -44,7 +44,7 @@ describe "Migration package importers" do
     supported.each_pair do |key, val|
       it "should find converter for #{key}" do 
         settings = get_settings(val.first)
-        Canvas::Migration::Worker::get_converter(settings).should == val.last
+        expect(Canvas::Migration::Worker::get_converter(settings)).to eq val.last
       end
     end
     
@@ -52,7 +52,7 @@ describe "Migration package importers" do
       it "should correctly identify package type for #{key}" do 
         settings = get_settings(val.first)
         archive = Canvas::Migration::Archive.new(settings)
-        Canvas::Migration::PackageIdentifier.new(archive).identify_package.should == val.last
+        expect(Canvas::Migration::PackageIdentifier.new(archive).identify_package).to eq val.last
       end
     end
   end
@@ -64,8 +64,8 @@ describe "Migration package importers" do
 
       mig = Canvas::Migration::Migrator.new({:archive_file => file, :content_migration => cm}, "test")
       mig.unzip_archive
-      File.should be_exist(File.join(mig.unzipped_file_path, 'messaging/why oh why.txt'))
-      File.should be_exist(File.join(mig.unzipped_file_path, 'res00175/SR_Epilogue_Frequently_Asked_Questions.html'))
+      expect(File).to be_exist(File.join(mig.unzipped_file_path, 'messaging/why oh why.txt'))
+      expect(File).to be_exist(File.join(mig.unzipped_file_path, 'res00175/SR_Epilogue_Frequently_Asked_Questions.html'))
     end
   end
   

@@ -32,7 +32,7 @@ describe "/users/show" do
     assigns[:page_views] = PageView.paginate(:page => 1, :per_page => 20)
 
     render "users/show"
-    response.should_not be_nil
-    content_for(:right_side).should include "Message #{@user.name}" # regardless of permissions
+    expect(response).not_to be_nil
+    expect(content_for(:right_side)).to include "Message #{@user.name}" # regardless of permissions
   end
 end

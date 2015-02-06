@@ -23,23 +23,23 @@ describe Api::V1::ExternalTools do
 
     it "generates json" do
       json = controller.external_tool_json(tool, @course, @student, nil)
-      json['id'].should == tool.id
-      json['name'].should == tool.name
-      json['description'].should == tool.description
-      json['url'].should == tool.url
-      json['domain'].should == tool.domain
-      json['consumer_key'].should == tool.consumer_key
-      json['created_at'].should == tool.created_at
-      json['updated_at'].should == tool.updated_at
-      json['privacy_level'].should == tool.privacy_level
-      json['custom_fields'].should == tool.custom_fields
+      expect(json['id']).to eq tool.id
+      expect(json['name']).to eq tool.name
+      expect(json['description']).to eq tool.description
+      expect(json['url']).to eq tool.url
+      expect(json['domain']).to eq tool.domain
+      expect(json['consumer_key']).to eq tool.consumer_key
+      expect(json['created_at']).to eq tool.created_at
+      expect(json['updated_at']).to eq tool.updated_at
+      expect(json['privacy_level']).to eq tool.privacy_level
+      expect(json['custom_fields']).to eq tool.custom_fields
     end
 
     it "gets default extension settings" do
       json = controller.external_tool_json(tool, @course, @student, nil)
-      json['selection_width'].should == tool.settings[:selection_width]
-      json['selection_height'].should == tool.settings[:selection_height]
-      json['icon_url'].should == tool.settings[:icon_url]
+      expect(json['selection_width']).to eq tool.settings[:selection_width]
+      expect(json['selection_height']).to eq tool.settings[:selection_height]
+      expect(json['icon_url']).to eq tool.settings[:icon_url]
     end
 
     it "gets extension labels" do

@@ -19,6 +19,14 @@ describe "scheduler" do
       make_full_screen
     end
 
+    it "should bring up 'edit appointment group' modal when clicking 'create an appointment group' scheduler button" do
+      get "/calendar2"
+      click_scheduler_link
+      wait_for_ajaximations
+      f('#right-side .create_link').click
+      expect(f('#edit_event')).not_to be_nil
+    end
+
     it "should split time slots" do
       start_time_text = '02'
       end_time_text = '06'
@@ -38,7 +46,7 @@ describe "scheduler" do
       start_fields = ff('.time-block-list .start_time')
       times = %W(2:00 2:30 3:00 3:30 4:00 4:30 5:00 5:30)
       start_fields.each_with_index do |start_field, i|
-        start_field.attribute(:value).strip.should == times[i] + "pm" unless i == 8
+        expect(start_field.attribute(:value).strip).to eq times[i] + "pm" unless i == 8
       end
       f('.ag_contexts_selector').click
       f("#option_course_#{@course.id}").click
@@ -50,8 +58,8 @@ describe "scheduler" do
       start_time_correct = true if last_group.end_at.strftime("%I") == end_time_text || local_end_time
       end_time_correct = true if last_group.start_at.strftime("%I") == start_time_text || local_start_time
 
-      start_time_correct.should == true
-      end_time_correct.should == true
+      expect(start_time_correct).to eq true
+      expect(end_time_correct).to eq true
     end
 
     it "should allow checkboxes in the options section to be edited" do
@@ -64,9 +72,9 @@ describe "scheduler" do
       }
       # assert options are checked
       open_edit_dialog
-      f('[type=checkbox][name="per_slot_option"]').selected?.should be_true
-      f('[type=checkbox][name="participant_visibility"]').selected?.should be_true
-      f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?.should be_true
+      expect(f('[type=checkbox][name="per_slot_option"]').selected?).to be_truthy
+      expect(f('[type=checkbox][name="participant_visibility"]').selected?).to be_truthy
+      expect(f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?).to be_truthy
 
       # uncheck the options
       f('[type=checkbox][name="per_slot_option"]').click
@@ -76,9 +84,9 @@ describe "scheduler" do
       wait_for_ajaximations
       # assert options are not checked
       open_edit_dialog
-      f('[type=checkbox][name="per_slot_option"]').selected?.should be_false
-      f('[type=checkbox][name="participant_visibility"]').selected?.should be_false
-      f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?.should be_false
+      expect(f('[type=checkbox][name="per_slot_option"]').selected?).to be_falsey
+      expect(f('[type=checkbox][name="participant_visibility"]').selected?).to be_falsey
+      expect(f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?).to be_falsey
     end
 
     it "should send messages to appropriate participants" do
@@ -109,25 +117,25 @@ describe "scheduler" do
         %w(all registered unregistered).each do |registration_status|
           click_al_option('.message_link', i)
           form = f('#message_participants_form')
-          form.should be_displayed
+          expect(form).to be_displayed
           wait_for_ajaximations
 
           set_value(form.find_element(:css, '.message_groups'), registration_status)
           wait_for_ajaximations
 
-          form.find_elements(:css, '.participant_list li').should_not be_empty
+          expect(form.find_elements(:css, '.participant_list li')).not_to be_empty
           set_value(form.find_element(:css, '#body'), 'hello')
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
           wait_for_ajaximations
           # using fj to avoid selenium caching
-          keep_trying_until { fj('#message_participants_form').should be_nil }
+          keep_trying_until { expect(fj('#message_participants_form')).to be_nil }
         end
       end
-      student1.conversations.first.messages.size.should == 6 # registered/all * 3
-      student2.conversations.first.messages.size.should == 6 # unregistered/all * 2 + registered/all (ug1)
-      student3.conversations.first.messages.size.should == 6 # unregistered/all * 3
-      student4.conversations.first.messages.size.should == 4 # unregistered/all * 2 (not in any group)
-      student5.conversations.first.messages.size.should == 2 # unregistered/all * 1 (doesn't meet any sub_context criteria)
+      expect(student1.conversations.first.messages.size).to eq 6 # registered/all * 3
+      expect(student2.conversations.first.messages.size).to eq 6 # unregistered/all * 2 + registered/all (ug1)
+      expect(student3.conversations.first.messages.size).to eq 6 # unregistered/all * 3
+      expect(student4.conversations.first.messages.size).to eq 4 # unregistered/all * 2 (not in any group)
+      expect(student5.conversations.first.messages.size).to eq 2 # unregistered/all * 1 (doesn't meet any sub_context criteria)
     end
 
     it "should validate the appointment group shows up on the calendar" do
@@ -135,7 +143,7 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       click_appointment_link
-      element_exists('.fc-event-bg').should be_true
+      expect(element_exists('.fc-event-bg')).to be_truthy
     end
 
     it "should not allow limiting the max appointments per participant to less than 1" do
@@ -146,7 +154,7 @@ describe "scheduler" do
       # invalid max_appointments
       max_appointments_input = f('[name="max_appointments_per_participant"]')
       replace_content(max_appointments_input, '0')
-      get_value('[name="max_appointments_per_participant"]').to_i.should > 0
+      expect(get_value('[name="max_appointments_per_participant"]').to_i).to be > 0
     end
 
     it "should allow removing individual appointment users" do
@@ -174,18 +182,18 @@ describe "scheduler" do
 
       wait_for_ajaximations
 
-      keep_trying_until { ffj('#attendees li').size.should == 2 }
+      keep_trying_until { expect(ffj('#attendees li').size).to eq 2 }
 
       # delete the first appointment
       driver.execute_script("$('.cancel_appointment_link:eq(1)').trigger('click')")
       wait_for_ajaximations
       driver.execute_script("$('.ui-dialog-buttonset .btn-primary').trigger('click')")
       wait_for_ajaximations
-      ff('#attendees li').size.should == 1
+      expect(ff('#attendees li').size).to eq 1
 
       fj('.fc-event:visible').click
 
-      keep_trying_until { ff('#attendees li').size.should == 1 }
+      keep_trying_until { expect(ff('#attendees li').size).to eq 1 }
       f('.scheduler_done_button').click
     end
 
@@ -195,7 +203,7 @@ describe "scheduler" do
       gc = @course.group_categories.create!(:name => "Blah Groups")
       title = create_appointment_group :sub_context_codes => [gc.asset_string],
                                        :title => "group ag"
-      ag = AppointmentGroup.find_by_title(title)
+      ag = AppointmentGroup.where(title: title).first
       2.times do |i|
         student_in_course(:course => @course, :active_all => true)
         group = Group.create! :group_category => gc,
@@ -213,17 +221,17 @@ describe "scheduler" do
       wait_for_ajaximations
       fj('.fc-event:visible').click
       wait_for_ajaximations
-      ffj('#attendees li').size.should == 2
+      expect(ffj('#attendees li').size).to eq 2
 
       # delete the first appointment
       driver.execute_script("$('.cancel_appointment_link:eq(1)').trigger('click')")
       wait_for_ajaximations
       driver.execute_script("$('.ui-dialog-buttonset .btn-primary').trigger('click')")
       wait_for_ajaximations
-      ff('#attendees li').size.should == 1
+      expect(ff('#attendees li').size).to eq 1
 
       fj('.fc-event:visible').click
-      ff('#attendees li').size.should == 1
+      expect(ff('#attendees li').size).to eq 1
       f('.scheduler_done_button').click
     end
 
@@ -235,27 +243,27 @@ describe "scheduler" do
       fill_out_appointment_group_form('multiple contexts')
       f('.ag_contexts_selector').click
       ff('.ag_sections_toggle').last.click
-      course_box = f("[value=#{@course.asset_string}]")
-      course_box.click
+      f("[value=#{course1.asset_string}]").click
 
       # sections should get checked by their parent
       section_box = f("[value=#{@course.course_sections.first.asset_string}]")
-      section_box[:checked].should be_true
+      expect(section_box[:checked]).to be_truthy
 
       # unchecking all sections should uncheck their parent
+      course_box = f("[value=#{@course.asset_string}]")
       section_box.click
-      course_box[:checked].should be_false
+      expect(course_box[:checked]).to be_falsey
 
       # checking all sections should check parent
       section_box.click
-      course_box[:checked].should be_true
+      expect(course_box[:checked]).to be_truthy
 
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       ag = AppointmentGroup.first
-      ag.contexts.should include course1
-      ag.contexts.should include @course
-      ag.sub_contexts.should == []
+      expect(ag.contexts).to include course1
+      expect(ag.contexts).to include @course
+      expect(ag.sub_contexts).to eq []
     end
 
     it "should allow me to override the participant limit on a slot-by-slot basis" do
@@ -272,8 +280,8 @@ describe "scheduler" do
       wait_for_ajaximations
 
       ag = AppointmentGroup.first
-      ag.appointments.first.participants_per_appointment.should == 5
-      ag.participants_per_appointment.should == 2
+      expect(ag.appointments.first.participants_per_appointment).to eq 5
+      expect(ag.participants_per_appointment).to eq 2
 
       open_edit_event_dialog
       f('[type=checkbox][name=max_participants_option]').click
@@ -281,7 +289,7 @@ describe "scheduler" do
       wait_for_ajaximations
 
       ag.reload
-      ag.appointments.first.participants_per_appointment.should be_nil
+      expect(ag.appointments.first.participants_per_appointment).to be_nil
     end
   end
 end

@@ -1,6 +1,6 @@
 define [], ->
   strings: (x, y) ->
-    x.localeCompare(y, window.I18n.locale, { sensitivity: 'accent', ignorePunctuation: true, numeric: true})
+    x.localeCompare(y, window.I18n.locale || 'en-US', { sensitivity: 'accent', ignorePunctuation: true, numeric: true})
 
   by: (f) ->
     return (x, y) =>

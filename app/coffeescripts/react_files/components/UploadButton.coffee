@@ -9,6 +9,8 @@ define [
   '../modules/FileOptionsCollection'
 ], (I18n, React, withReactDOM, _, FileRenameForm, customPropTypes, ZipFileOptionsForm, FileOptionsCollection) ->
 
+  resolvedUserAction = false
+
   UploadButton = React.createClass
     displayName: 'UploadButton'
 
@@ -28,6 +30,7 @@ define [
       this.refs.addFileInput.getDOMNode().click()
 
     handleFilesInputChange: (e) ->
+      resolvedUserAction = false
       files = this.refs.addFileInput.getDOMNode().files
       FileOptionsCollection.setFolder(@props.currentFolder)
       FileOptionsCollection.setOptionsFromFiles(files)
@@ -35,18 +38,51 @@ define [
 
     onNameConflictResolved: (fileNameOptions) ->
       FileOptionsCollection.onNameConflictResolved(fileNameOptions)
+      resolvedUserAction = true
       @setState(FileOptionsCollection.getState())
 
     onZipOptionsResolved: (fileNameOptions) ->
       FileOptionsCollection.onZipOptionsResolved(fileNameOptions)
+      resolvedUserAction = true
       @setState(FileOptionsCollection.getState())
 
     onClose: ->
       @refs.form.getDOMNode().reset()
+      if !resolvedUserAction
+        # user dismissed zip or name conflict modal without resolving things
+        # reset state to dump previously selected files
+        FileOptionsCollection.resetState()
+        @setState(FileOptionsCollection.getState())
+      resolvedUserAction = false
 
     componentDidUpdate: (prevState) ->
-      if @state.nameCollisions.length == 0 && @state.resolvedNames.length > 0 && FileOptionsCollection.hasNewOptions()
+      
+      if @state.zipOptions.length == 0 && @state.nameCollisions.length == 0 && @state.resolvedNames.length > 0 && FileOptionsCollection.hasNewOptions()
         @queueUploads()
+      else
+        resolvedUserAction = false
+
+    componentWillMount: ->
+      FileOptionsCollection.onChange = @setStateFromOptions
+
+    componentWillUnMount: ->
+      FileOptionsCollection.onChange = null
+
+    setStateFromOptions: ->
+      @setState(FileOptionsCollection.getState())
+
+    buildPotentialModal: ->
+      if @state.zipOptions.length
+        ZipFileOptionsForm
+          fileOptions: @state.zipOptions[0]
+          onZipOptionsResolved: @onZipOptionsResolved
+          onClose: @onClose
+      else if @state.nameCollisions.length
+        FileRenameForm
+          fileOptions: @state.nameCollisions[0]
+          onNameConflictResolved: @onNameConflictResolved
+          onClose: @onClose
+
 
     render: withReactDOM ->
       span {},
@@ -59,17 +95,11 @@ define [
             onChange: @handleFilesInputChange
             multiple: true
         button
+          type: 'button'
           className:'btn btn-primary btn-upload'
           'aria-label': I18n.t('upload', 'Upload')
           onClick: @handleAddFilesClick,
             i className: 'icon-upload'
             span className: ('hidden-phone' if @props.showingButtons),
               I18n.t('upload', 'Upload')
-        FileRenameForm
-          fileOptions: @state.nameCollisions[0]
-          onNameConflictResolved: @onNameConflictResolved
-          onClose: @onClose
-        ZipFileOptionsForm
-          fileOptions: @state.zipOptions[0]
-          onZipOptionsResolved: @onZipOptionsResolved
-          onClose: @onClose
+        @buildPotentialModal()

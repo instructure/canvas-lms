@@ -63,6 +63,11 @@
 #           "example": "AdobeConnect",
 #           "type": "string"
 #         },
+#         "conference_key": {
+#           "description": "The 3rd party's ID for the conference",
+#           "example": "abcdjoelisgreatxyz",
+#           "type": "string"
+#         },
 #         "description": {
 #           "description": "The description for the conference",
 #           "example": "Conference Description",
@@ -331,7 +336,7 @@ class ConferencesController < ApplicationController
       params[:user].each do |id, val|
         ids << id.to_i if val == '1'
       end
-      members += @context.users.find_all_by_id(ids).to_a
+      members += @context.users.where(id: ids)
     else
       members += @context.users.to_a
     end

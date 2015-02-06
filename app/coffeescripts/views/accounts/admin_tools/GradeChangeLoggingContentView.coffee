@@ -111,9 +111,9 @@ define [
       @collection.on 'setParams', @fetch
 
     fetch: =>
-      @collection.fetch().fail @onFail
+      @collection.fetch(error: @onFail)
 
-    onFail: (xhr) =>
+    onFail: (collection, xhr) =>
       # Received a 404, empty the collection and don't let the paginated
       # view try to fetch more.
 

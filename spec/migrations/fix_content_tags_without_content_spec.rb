@@ -10,7 +10,7 @@ describe 'FixContentTagsWithoutContents' do
       tag.save(:validate => false)
       FixContentTagsWithoutContent.new.up
 
-      ContentTag.find_by_id(tag.id).should be_nil
+      expect(ContentTag.find_by_id(tag.id)).to be_nil
     end
   end
 end

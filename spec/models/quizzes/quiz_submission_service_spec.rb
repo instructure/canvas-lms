@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 shared_examples_for 'Takeable Quiz Services' do
+
   it 'should deny access to locked quizzes' do
     quiz.stubs(:locked?).returns true
 

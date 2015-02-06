@@ -33,19 +33,19 @@ shared_examples_for "All answer parsers" do
   end
 
   it "seeds the question with the answers" do
-    @answer_data.answers.should have(raw_answers.size).items
+    expect(@answer_data.answers.size).to eq raw_answers.size
   end
 
   it "formats the answers" do
-    @answer_data.should be_kind_of(Quizzes::QuizQuestion::AnswerGroup)
+    expect(@answer_data).to be_kind_of(Quizzes::QuizQuestion::AnswerGroup)
     raw_answers.each do |raw|
-      @answer_data.answers.should have_answer raw[:answer_text]
+      expect(@answer_data.answers).to have_answer raw[:answer_text]
     end
   end
 
   it "provides IDs for the answers" do
     ids = @answer_data.answers.map { |a| a[:id] }
-    ids.each { |id| id.should be_kind_of(Fixnum) }
+    ids.each { |id| expect(id).to be_kind_of(Fixnum) }
   end
 end
 

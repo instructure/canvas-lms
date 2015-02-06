@@ -28,7 +28,7 @@ module Lti
 
       substitutions = {
           '$Canvas.api.domain' => -> { HostUrl.context_host(@domain_root_account, request.host) },
-          '$Canvas.xapi.url' => -> { lti_xapi_url(@tool) },
+          '$Canvas.api.baseUrl' => -> { "#{request.scheme}://#{HostUrl.context_host(@domain_root_account, request.host)}"},
           '$Canvas.account.id' => account.id,
           '$Canvas.account.name' => account.name,
           '$Canvas.account.sisSourceId' => account.sis_source_id,
@@ -47,17 +47,22 @@ module Lti
         substitutions.merge!(
           {
             '$Canvas.course.id' => @context.id,
+            '$CourseSection.sourcedId' => @context.sis_source_id,
             '$Canvas.course.sisSourceId' => @context.sis_source_id,
             '$Canvas.enrollment.enrollmentState' => -> { lti_helper.enrollment_state },
             '$Canvas.membership.roles' => -> { lti_helper.current_canvas_roles },
             #This is a list of IMS LIS roles should have a different key
             '$Canvas.membership.concludedRoles' => -> { lti_helper.concluded_lis_roles },
+            '$Canvas.course.previousContextIds' => -> { lti_helper.previous_lti_context_ids },
+            '$Canvas.course.previousCourseIds' => -> { lti_helper.previous_course_ids }
           }
         )
       end
 
       if @current_user
-        pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account)
+        sis_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account)
+        logged_in_pseudonym = @current_pseudonym
+
         substitutions.merge!(
             {
                 '$Person.name.full' => @current_user.name,
@@ -66,15 +71,47 @@ module Lti
                 '$Person.email.primary' => @current_user.email,
                 '$Person.address.timezone' => Time.zone.tzinfo.name,
                 '$User.image' => -> { @current_user.avatar_url },
+                '$User.id' => @current_user.id,
                 '$Canvas.user.id' => @current_user.id,
-                '$Canvas.user.sisSourceId' => pseudonym ? pseudonym.sis_user_id : nil,
-                '$Canvas.user.loginId' => pseudonym ? pseudonym.unique_id : nil,
                 '$Canvas.user.prefersHighContrast' => -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
+                '$Membership.role' => -> { lti_helper.lis2_roles },
+                '$Canvas.xuser.allRoles' => -> { lti_helper.all_roles}
             }
         )
-        if pseudonym
-          substitutions.merge!({'$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, pseudonym)) }})
+        if sis_pseudonym
+          # Substitutions for the primary pseudonym for the user for the account
+          # This should hold all the SIS information for the user
+          # This may not be the pseudonym the user is actually logged in with
+          substitutions.merge!(
+              {
+                  '$User.username' => sis_pseudonym.unique_id,
+                  '$Canvas.user.loginId' => sis_pseudonym.unique_id,
+                  '$Canvas.user.sisSourceId' => sis_pseudonym.sis_user_id,
+                  '$Person.sourcedId' => sis_pseudonym.sis_user_id,
+              }
+          )
         end
+        if logged_in_pseudonym
+          # This is the pseudonym the user is actually logged in as
+          # it may not hold all the sis info needed in other launch substitutions
+          substitutions.merge!(
+              {
+                  '$Canvas.logoutService.url' => -> { lti_logout_service_url(Lti::LogoutService.create_token(@tool, logged_in_pseudonym)) },
+              }
+          )
+        end
+
+        substitutions.merge!( '$Canvas.masqueradingUser.id' => logged_in_user.id ) if logged_in_user != @current_user
+      end
+
+      if @current_user && @context.is_a?(Course)
+        substitutions.merge!(
+              {
+                 '$Canvas.xapi.url' => -> { lti_xapi_url(Lti::XapiService.create_token(@tool, @current_user, @context)) },
+                 '$Canvas.course.sectionIds' => -> { lti_helper.section_ids },
+                 '$Canvas.course.sectionSisSourceIds' => -> { lti_helper.section_sis_ids }
+              }
+        )
       end
 
       substitutions

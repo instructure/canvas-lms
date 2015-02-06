@@ -46,7 +46,7 @@ describe Api::V1::GradeChangeEvent do
   end
 
   before do
-    pending("needs auditors cassandra keyspace configured") unless Auditors::GradeChange::Stream.available?
+    skip("needs auditors cassandra keyspace configured") unless Auditors::GradeChange::Stream.available?
 
     @request_id = CanvasUUID.generate
     RequestContextGenerator.stubs( :request_id => @request_id )
@@ -86,58 +86,58 @@ describe Api::V1::GradeChangeEvent do
   it "should be formatted as a grade change event hash" do
     event = grade_change_event_json(@event, @student, @session)
 
-    event[:id].should == @event.id
-    event[:created_at].should == @event.created_at.in_time_zone
-    event[:event_type].should == @event.event_type
-    event[:grade_before].should == @previous_grade
-    event[:grade_after].should == @submission.grade
-    event[:version_number].should == @submission.version_number
-    event[:links][:assignment].should == Shard.relative_id_for(@assignment, Shard.current, Shard.current)
-    event[:links][:course].should == Shard.relative_id_for(@course, Shard.current, Shard.current)
-    event[:links][:student].should == Shard.relative_id_for(@student, Shard.current, Shard.current)
-    event[:links][:grader].should == Shard.relative_id_for(@teacher, Shard.current, Shard.current)
-    event[:links][:page_view].should == @page_view.id
+    expect(event[:id]).to eq @event.id
+    expect(event[:created_at]).to eq @event.created_at.in_time_zone
+    expect(event[:event_type]).to eq @event.event_type
+    expect(event[:grade_before]).to eq @previous_grade
+    expect(event[:grade_after]).to eq @submission.grade
+    expect(event[:version_number]).to eq @submission.version_number
+    expect(event[:links][:assignment]).to eq Shard.relative_id_for(@assignment, Shard.current, Shard.current)
+    expect(event[:links][:course]).to eq Shard.relative_id_for(@course, Shard.current, Shard.current)
+    expect(event[:links][:student]).to eq Shard.relative_id_for(@student, Shard.current, Shard.current)
+    expect(event[:links][:grader]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current)
+    expect(event[:links][:page_view]).to eq @page_view.id
   end
 
   it "should be formatted as an array of grade change event hashes" do
-    grade_change_events_json(@events, @student, @session).size.should eql(@events.size)
+    expect(grade_change_events_json(@events, @student, @session).size).to eql(@events.size)
   end
 
   it "should be formatted as an array of compound grade change event hashes" do
     json_hash = grade_change_events_compound_json(@events, @user, @session)
 
-    json_hash.keys.sort.should == [:events, :linked, :links]
+    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
 
-    json_hash[:links].should == {
+    expect(json_hash[:links]).to eq({
       "events.assignment" => "#{url_root}/api/v1/courses/{events.course}/assignments/{events.assignment}",
       "events.course" => "#{url_root}/api/v1/courses/{events.course}",
       "events.student" => { href: nil, type: 'user' },
       "events.grader" => { href: nil, type: 'user' },
       "events.page_view" => nil
-    }
+    })
 
-    json_hash[:events].should == grade_change_events_json(@events, @user, @session)
+    expect(json_hash[:events]).to eq grade_change_events_json(@events, @user, @session)
 
-    json_hash[:linked].keys.sort.should == [:assignments, :courses, :page_views, :users]
+    expect(json_hash[:linked].keys.sort).to eq [:assignments, :courses, :page_views, :users]
     linked = json_hash[:linked]
-    linked[:assignments].size.should eql(1)
-    linked[:courses].size.should eql(1)
-    linked[:users].size.should eql(2)
-    linked[:page_views].size.should eql(1)
+    expect(linked[:assignments].size).to eql(1)
+    expect(linked[:courses].size).to eql(1)
+    expect(linked[:users].size).to eql(2)
+    expect(linked[:page_views].size).to eql(1)
   end
 
   it "should handle an empty result set" do
     json_hash = grade_change_events_compound_json([], @user, @session)
 
-    json_hash.keys.sort.should == [:events, :linked, :links]
+    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
 
-    json_hash[:events].should == grade_change_events_json([], @user, @session)
+    expect(json_hash[:events]).to eq grade_change_events_json([], @user, @session)
 
-    json_hash[:linked].keys.sort.should == [:assignments, :courses, :page_views, :users]
+    expect(json_hash[:linked].keys.sort).to eq [:assignments, :courses, :page_views, :users]
     linked = json_hash[:linked]
-    linked[:assignments].size.should be_zero
-    linked[:courses].size.should be_zero
-    linked[:users].size.should be_zero
-    linked[:page_views].size.should be_zero
+    expect(linked[:assignments].size).to be_zero
+    expect(linked[:courses].size).to be_zero
+    expect(linked[:users].size).to be_zero
+    expect(linked[:page_views].size).to be_zero
   end
 end

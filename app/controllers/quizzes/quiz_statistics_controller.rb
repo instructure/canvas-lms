@@ -17,7 +17,6 @@
 #
 
 # @API Quiz Statistics
-# @beta
 #
 # API for accessing quiz submission statistics. The statistics provided by this
 # interface are an aggregate of what is known as Student and Item Analysis for a
@@ -108,24 +107,14 @@
 #       "description": "Statistics for submissions made to a specific quiz question.",
 #       "properties": {
 #         "responses": {
-#           "description": "Number of students who have answered this question.",
+#           "description": "Number of students who have provided an answer to this question. Blank or empty responses are not counted.",
 #           "example": 3,
 #           "type": "integer",
 #           "format": "int64"
 #         },
-#         "response_values": {
-#           "description": "The unique set of answers (or their IDs) that were supplied (or chosen) by students.",
-#           "example": [ "2040", "3866", "3866" ],
-#           "type": "integer[]"
-#         },
 #         "answers": {
 #           "$ref": "QuizStatisticsAnswerStatistics",
 #           "description": "Statistics related to each individual pre-defined answer."
-#         },
-#         "user_ids": {
-#           "description": "IDs of the students who have answered this question.",
-#           "example": [ 4, 6, 2 ],
-#           "type": "integer[]"
 #         }
 #       }
 #     }
@@ -157,11 +146,6 @@
 #           "example": 2,
 #           "type": "integer",
 #           "format": "int64"
-#         },
-#         "user_ids": {
-#           "description": "IDs of the students who have chosen this answer.",
-#           "example": [ 6, 2 ],
-#           "type": "integer[]"
 #         }
 #       }
 #     }
@@ -245,18 +229,6 @@
 #           "description": "The average time spent by students while taking the quiz.",
 #           "example": 42.333333333,
 #           "type": "number"
-#         },
-#         "user_ids": {
-#           "description": "IDs of the students that have taken the quiz.",
-#           "example": [ 4, 6, 2 ],
-#           "type": "integer[]"
-#         },
-#         "logged_out_users": {
-#           "description": "Guests (anonymous users who have not signed in) who have taken this quiz. Each entry in this array is an array of two elements: a temporary user code (a string) and a string identifying the guest's number. NOTE: This only applies to quizzes of the type Ungraded Survey where anonymous submissions are permitted.",
-#           "example": [
-#             [ "tmp_3cff672c9168698019fb2c9c89e91adf", "Logged Out User 1" ]
-#           ],
-#           "type": "integer[]"
 #         }
 #       }
 #     }

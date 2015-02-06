@@ -50,11 +50,11 @@ module Api::V1
     def versions_json(course, versions, api_context, opts={})
       # preload for efficiency
       unless opts[:submission]
-        ::Version.send(:preload_associations, versions, :versionable)
+        ActiveRecord::Associations::Preloader.new(versions, :versionable).run
         submissions = versions.map(&:versionable)
-        ::Submission.send(:preload_associations, submissions, :assignment) unless opts[:assignment]
-        ::Submission.send(:preload_associations, submissions, :user) unless opts[:student]
-        ::Submission.send(:preload_associations, submissions, :grader)
+        ActiveRecord::Associations::Preloader.new(submissions, :assignment).run unless opts[:assignment]
+        ActiveRecord::Associations::Preloader.new(submissions, :user).run unless opts[:student]
+        ActiveRecord::Associations::Preloader.new(submissions, :grader).run
       end
 
       versions.map do |version|
@@ -119,7 +119,7 @@ module Api::V1
       end
 
       if assignment_id = options[:assignment_id]
-        collection = collection.scoped_by_assignment_id(assignment_id)
+        collection = collection.where(assignment_id: assignment_id)
       end
 
       if grader_id = options[:grader_id]
@@ -127,7 +127,7 @@ module Api::V1
           # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
           collection = collection.where("submissions.grader_id<=0")
         else
-          collection = collection.scoped_by_grader_id(grader_id)
+          collection = collection.where(grader_id: grader_id)
         end
       end
 

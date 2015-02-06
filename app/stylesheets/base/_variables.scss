@@ -13,8 +13,19 @@
 // accessibility ($use_high_contrast) and k12 ($is-k12). 
 // You can also use the sass function that helps ensure color contrast ratio. 
 // Look in /sass-functions/ for more information on how that is used
-
 @import "variant_variables";
+
+
+/// Custom Branding
+//=======================
+// Pulls in variables in 'config/brand_variables.scss', if it exists.
+// See docs in config/brand_variables.scss.example.
+// In the future, this will be how we'll pull in the variables that
+// a school sets in their "Theme Editor" interface.
+// Only variables here with a "!default" at the end are able to be overrideable by the school.
+// see: http://sass-lang.com/documentation/file.SASS_REFERENCE.html#variable_defaults_
+@import "brand_variables";
+
 
 /// Canvas LMS Color Sheet
 //=======================
@@ -29,63 +40,31 @@
 // all the canvas pages in. All of the app variables that denote a
 // color should use or be based off of one of these variables
 
-@if $use_new_styles {
-  $canvas-primary:                  #0099e0; // light blue
-  @if $use_high_contrast { $canvas-primary: #0078c4; } 
 
-  $canvas-secondary:                #5b6c79; // dark blue
-  @if $use_high_contrast { $canvas-secondary: #58646d; }
+$canvas-primary:                  #0099e0 !default; // light blue
+@if $use_high_contrast { $canvas-primary: #0073ac; } 
 
-  $canvas-success:                  #00ad18; // green
-  @if $use_high_contrast { $canvas-success: #008a14; }
+$canvas-secondary:                #5b6c79 !default; // dark blue
+@if $use_high_contrast { $canvas-secondary: #343c44; }
 
-  $canvas-neutral:                  #f4f6f7; // lt gray;
-  @if $use_high_contrast { $canvas-neutral: blue; }
+$canvas-success:                  #00ad18; // green
+@if $use_high_contrast { $canvas-success: #008a14; }
 
-  $canvas-action:                   #ba3fa5; // magenta
-  @if $use_high_contrast { $canvas-action: #a23891; }
+$canvas-neutral:                  hsl(0,0,90%);
 
-  $canvas-danger:                   #ad393a; // red
-  @if $use_high_contrast { $canvas-danger: #a03536; }
+$canvas-action:                   #ba3fa5; // magenta
+@if $use_high_contrast { $canvas-action: #a23891; }
 
-  $canvas-alert:                    #c38406; // gold
-  @if $use_high_contrast { $canvas-alert: #9e6b05; }
+$canvas-danger:                   #ad393a; // red
+@if $use_high_contrast { $canvas-danger: #a03536; }
 
-  $canvas-light:                    #ffffff; // white
+$canvas-alert:                    #c48506; // gold
+@if $use_high_contrast { $canvas-alert: #9e6b05; }
 
-  $canvas-dark:                     #5d6d78; // gray/blue
-  @if $use_high_contrast { $canvas-dark: #405360; }
-}
-@else {
-  $canvas-primary:                  #0aafff; // lt blue
-  @if $use_high_contrast { $canvas-primary: #0073ac; } 
+$canvas-light:                    #ffffff; // white
 
-  $canvas-secondary:                #08c; // dark blue
-  @if $use_high_contrast { $canvas-secondary: #0074af; }
+$canvas-dark:                     #333333;
 
-  $canvas-success:                  #33802a; 
-  // this passes by itself with a 4.93 ratio
-  // in case you're wondering where $use_high_contrast is
-
-  $canvas-neutral:                  hsl(0,0,90%);
-  @if $use_high_contrast { $canvas-neutral: #6d6d6d; }
-
-  $canvas-action:                   #ba3fa5;
-  @if $use_high_contrast { $canvas-action: #a23891; }
-
-  $canvas-danger:                   #ad393a;
-  // this passes by itself with a 4.93 ratio
-  // in case you're wondering where $use_high_contrast is
-
-  $canvas-alert:                    #c38406;
-  @if $use_high_contrast { $canvas-alert: #845a04; }
-
-  $canvas-light:                    #ffffff;
-
-  $canvas-dark:                     #333333;
-  // this passes by itself with a 4.93 ratio
-  // in case you're wondering where $use_high_contrast is
-}
 
 
 // Bootstrap Color Variable Overwrites
@@ -125,8 +104,13 @@ $eportfolio-name--disabled: #777;
 
 // in these variables, "content" refers specifically to the #content div,
 // which is the main white page in between the left and right columns
+$base-body-background-color: lighten($canvas-neutral, 4);
 $base-content-background-color: $canvas-light;
 $base-content-padding: 15px;
+$ic-base-header-background: $canvas-secondary;
+@if $use_high_contrast {$ic-base-header-background: #333;}
+      
+    
 
 $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
@@ -134,6 +118,11 @@ $base-font-color--subdued: #696969;
 $base-border-color: $canvas-neutral;
 $base-list-item-background--hover: #eef7ff;
 $base-list-item-background--selected: #d9edf9;
+// To be used for any disabled icon states
+$ic-base-color-icon-disabled: darken($canvas-neutral, 40);
+@if $use_high_contrast {$ic-base-color-icon-disabled: darken($canvas-neutral, 60);}
+$ic-base-dim-helper-text: darken($canvas-neutral, 33);
+@if $use_high_contrast {$ic-base-dim-helper-text: darken($canvas-neutral, 50);}
 
 $announcements_disscussion-summary-color: $canvas-dark;
 
@@ -153,7 +142,13 @@ $course-sidenav_list-item--inactive-font-color: #ccc;
 $course-sidenav_list-item--hover-bg-color: #0099e0;
 @if $use_high_contrast {$course-sidenav_list-item--hover-bg-color: #333;}
 
+// Ulility Variables
+//=======================
+// Variables we can reuse to make Canvas behave more consistently, in terms of how far things are
+// spaced and what transitions feel like, etc.
 
+$can-sp: 12px; // use this variable -- or multiples of it -- to space things out and add padding, etc.
+$can-transition: cubic-bezier(0,1,0.5,1); // this is a pleasing transition that can be used when you need a transition timing function
 
 // Legacy Variables
 //=======================
@@ -199,13 +194,15 @@ $ui-state-default-gradient-bottom: #c4c4c4;
 
 
 // this is the blue color that we use all over the place when not in a gradiants
-$highlight-color: #06a9ee;
+$highlight-color: #06a9ee !default;
 // light blue hover color
-$hover-color: #E5F3FF;
+$hover-color: #E5F3FF !default;
 // this is the grey color for when things are disabled, or meant to contrast with $highlight-color
 $diminutive-color: #acacac;
 
 $masquerade-link-color: #ffa500;
+$ic-sp: 12px;
+$ic-border-radius: $ic-sp/2;
 
 // canvas stuff
 $lightBackground:               rgb(248, 250, 251);
@@ -222,7 +219,6 @@ $activeBG:                      #d6ecfc;
 @if $use_high_contrast { $dimmedOpacity: 0.9; }
 @else { $dimmedOpacity: 0.6; }
 
-$masquerade-link-color: #ffa500;
 
 // Canvas K-12 brand color and global spacing variables
 @if $is-k12 {
@@ -250,4 +246,57 @@ $wellBackground: #e8ecef;
 
 // override bootstrap orange color for k-12
 @if $is-k12 { $orange: #f55e22; }
+
+
+// 
+// New-component variables that will eventually phase out the legacy stuff above
+//==================================================================================
+//
+
+/// Global light background colors
+//================================
+
+// $can-bg-light-neutral
+$can-bg-light-neutral: lighten($canvas-neutral, 6%);
+
+// $can-bg-light-primary
+$can-bg-light-primary: lighten($canvas-primary, 52%); 
+@if $use_high_contrast { $can-bg-light-primary: lighten($canvas-primary, 64%); }
+
+// $can-bg-light-success
+$can-bg-light-success: lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
+
+// $can-bg-light-alert
+$can-bg-light-alert: lighten($canvas-alert, 50%); 
+@if $use_high_contrast { $can-bg-light-alert: lighten($canvas-alert, 66%); }
+
+// $can-bg-light-danger
+$can-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color exists for legacy $canvas-danger
+
+
+/// Global border colors
+//======================
+
+// If it's a light border, it should be this color. 
+@if $use_new_styles { $can-border-light: lighten($canvas-secondary, 42%); }
+@else { $can-border-light: $menu-border-color; }
+
+// If it's a dark border, it should be this color.
+@if $use_new_styles { $can-border-dark: lighten($canvas-secondary, 25%); }
+@else { $can-border-dark: lighten(#4b5662, 20%); }
+
+/// Link-color-related variables
+//==============================
+
+$ic-icon-link-color-hover: lighten($canvas-dark, 15%);
+@if $use_high_contrast { $ic-icon-link-color-hover: $canvas-dark; }
+
+$ic-icon-link-color: lighten($canvas-dark, 30%);
+@if $use_high_contrast { $ic-icon-link-color: lighten($canvas-dark, 12%); }
+
+
+
+
+
+
 

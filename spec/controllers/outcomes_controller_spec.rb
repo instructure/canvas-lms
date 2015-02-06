@@ -24,11 +24,11 @@ describe OutcomesController do
     @outcome = context.created_learning_outcomes.create!(:title => 'outcome')
     @outcome_group.add_outcome(@outcome)
   end
-  
+
   def course_outcome
     context_outcome(@course)
   end
-  
+
   def account_outcome
     context_outcome(@account)
   end
@@ -50,14 +50,14 @@ describe OutcomesController do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>15,'hidden'=>true}])
       get 'index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
     end
     
     it "should assign variables" do
       user_session(@student)
       get 'index', :course_id => @course.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should work in accounts" do
@@ -71,7 +71,7 @@ describe OutcomesController do
       account_outcome
       Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
       get 'index', :account_id => @account.id
-      assigns[:js_env][:COMMON_CORE_GROUP_ID].should == @outcome_group.id
+      expect(assigns[:js_env][:COMMON_CORE_GROUP_ID]).to eq @outcome_group.id
     end
   end
 
@@ -93,14 +93,14 @@ describe OutcomesController do
       user_session(@teacher)
       course_outcome
       get 'show', :course_id => @course.id, :id => @outcome.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
       get 'show', :account_id => @account.id, :id => @outcome.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should include tags from courses when viewed in the account" do
@@ -113,7 +113,7 @@ describe OutcomesController do
       user_session(@admin)
       get 'show', :account_id => @account.id, :id => @outcome.id
 
-      assigns[:alignments].any?{ |a| a.id == alignment.id }.should be_true
+      expect(assigns[:alignments].any?{ |a| a.id == alignment.id }).to be_truthy
     end
 
     it "should not allow access to individual outcomes for large_roster courses" do
@@ -123,11 +123,11 @@ describe OutcomesController do
       @course.save!
 
       get 'show', :course_id => @course.id, :id => @outcome.id
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
 
-  describe "GET 'detail'" do
+  describe "GET 'details'" do
     it "should require authorization" do
       course_outcome
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
@@ -138,7 +138,7 @@ describe OutcomesController do
       user_session(@student)
       course_outcome
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
-      response.should be_success
+      expect(response).to be_success
     end
     
     it "should work in accounts" do
@@ -154,9 +154,9 @@ describe OutcomesController do
 
       user_session(@admin)
       get 'list', :account_id => @account.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_empty
+      expect(data).not_to be_empty
     end
 
     it "should list account outcomes for a subaccount context" do
@@ -165,9 +165,9 @@ describe OutcomesController do
 
       user_session(@admin)
       get 'list', :account_id => sub_account_1.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_empty
+      expect(data).not_to be_empty
     end
 
     it "should list account outcomes for a course context" do
@@ -175,9 +175,125 @@ describe OutcomesController do
 
       user_session(@teacher)
       get 'list', :course_id => @course.id
-      response.should be_success
+      expect(response).to be_success
       data = json_parse
-      data.should_not be_empty
+      expect(data).not_to be_empty
+    end
+  end
+
+  describe "POST 'create'" do
+    before :once do
+      OUTCOME_PARAMS = {
+        :description => "A long description",
+        :short_description => "A short description"
+      }
+    end
+
+    it "should require authorization" do
+      course_outcome
+      post 'create', :course_id => @course.id
+      assert_unauthorized
+    end
+
+    it "should not let a student create a outcome" do
+      user_session(@student)
+      post 'create', :course_id => @course.id,
+                     :learning_outcome => { :short_description => TEST_STRING }
+      assert_unauthorized
+    end
+
+    it "should allow creating a new outcome with the root group" do
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :learning_outcome => OUTCOME_PARAMS
+      expect(response).to be_redirect
+      expect(assigns[:outcome]).not_to be_nil
+      expect(assigns[:outcome][:description]).to eql("A long description")
+      expect(assigns[:outcome][:short_description]).to eql("A short description")
+      expect(@course.learning_outcome_links.map { |n| n.content }.include?(assigns[:outcome])).to be_truthy
+
+      @course.learning_outcome_groups.each do |group|
+        if group.child_outcome_links.map { |n| n.content }.include?(assigns[:outcome])
+          expect(group).to eql(@course.root_outcome_group)
+        end
+      end
+    end
+
+    it "should allow creating a new outcome with a specific group" do
+      # create a new group that is a child of the root group that we can
+      # set our new outcome to belong to
+      user_session(@teacher)
+      outcome_group = @course.root_outcome_group.child_outcome_groups.build(
+                                  :title => "Child outcome group", :context => @course)
+      expect(outcome_group.save).to be_truthy
+      expect(outcome_group.id).not_to be_nil
+      expect(outcome_group).not_to be_nil
+
+      post 'create', :course_id => @course.id, :learning_outcome_group_id => outcome_group.id,
+                     :learning_outcome => OUTCOME_PARAMS
+      expect(response).to be_redirect
+      expect(assigns[:outcome]).not_to be_nil
+      expect(assigns[:outcome][:description]).to eql("A long description")
+      expect(assigns[:outcome][:short_description]).to eql("A short description")
+      expect(@course.learning_outcome_links.map { |n| n.content }.include?(assigns[:outcome])).to be_truthy
+
+      @course.learning_outcome_groups.each do |group|
+        if group.child_outcome_links.map { |n| n.content }.include?(assigns[:outcome])
+          expect(group).to eql(outcome_group)
+        end
+      end
+    end
+  end
+
+  describe "PUT 'update'" do
+    TEST_STRING = "Some test String"
+
+    before :each do
+      course_outcome
+    end
+
+    it "should require authorization" do
+      put 'update', :course_id => @course.id, :id => @outcome.id,
+                    :learning_outcome => { :short_description => TEST_STRING }
+      assert_unauthorized
+    end
+
+    it "should not let a student update the outcome" do
+      user_session(@student)
+      put 'update', :course_id => @course.id, :id => @outcome.id,
+                    :learning_outcome => { :short_description => TEST_STRING }
+      assert_unauthorized
+    end
+
+    it "should allow updating the outcome" do
+      user_session(@teacher)
+      put 'update', :course_id => @course.id, :id => @outcome.id,
+                    :learning_outcome => { :short_description => TEST_STRING }
+      @outcome.reload
+      expect(@outcome[:short_description]).to eql TEST_STRING
+    end
+  end
+
+  describe "DELETE 'destroy'" do
+    before :each do
+      course_outcome
+    end
+
+    it "should require authorization" do
+      delete 'destroy', :course_id => @course.id, :id => @outcome.id
+      assert_unauthorized
+    end
+
+    it "should not let a student delete the outcome" do
+      user_session(@student)
+      delete 'destroy', :course_id => @course.id, :id => @outcome.id
+      assert_unauthorized
+    end
+
+    it "should delete the outcome from the database" do
+      user_session(@teacher)
+      delete 'destroy', :course_id => @course.id, :id => @outcome.id
+      @outcome.reload
+      expect(@outcome).to be_deleted
     end
   end
 end

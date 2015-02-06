@@ -68,11 +68,15 @@ module Api::V1::Submission
     end
 
     if includes.include?("html_url")
-      hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, user.id)
+      hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
     end
 
     if includes.include?("user")
       hash['user'] = user_json(submission.user, user, session, ['avatar_url'], submission.context, nil)
+    end
+
+    if includes.include?("visibility")
+      hash['assignment_visible'] = submission.assignment_visible_to_user?(submission.user)
     end
 
     hash
@@ -114,7 +118,7 @@ module Api::V1::Submission
       hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
     end
 
-    if attempt.turnitin_data && attempt.grants_right?(@current_user, :view_turnitin_report)
+    if attempt.turnitin_data.present? && attempt.grants_right?(@current_user, :view_turnitin_report)
       turnitin_hash = attempt.turnitin_data.dup
       turnitin_hash.delete(:last_processed_attempt)
       hash['turnitin_data'] = turnitin_hash
@@ -203,4 +207,3 @@ module Api::V1::Submission
     attachment
   end
 end
-

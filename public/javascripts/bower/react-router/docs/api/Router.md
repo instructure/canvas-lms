@@ -1,66 +1,43 @@
 API: `Router`
 =============
 
-The main export, `Router`, contains several methods that may be used to
-navigate around the application.
+The main export of this library.
 
 ```js
 // cjs modules
 var Router = require('react-router')
 
 // or global build
-window.ReactRouter
+var Router = window.ReactRouter
+
+// contains these exports
+
+// components
+Router.DefaultRoute
+Router.Link
+Router.NotFoundRoute
+Router.Redirect
+Router.Route
+Router.Routes
+
+// mixins
+Router.ActiveState
+Router.CurrentPath
+Router.Navigation
+
+// methods
+Router.renderRoutesToString
+Router.renderRoutesToStaticMarkup
 ```
 
 Methods
 -------
 
-### `transitionTo(routeNameOrPath, [params[, query]])`
+### `renderRoutesToString(routes, path, callback)`
 
-Programatically transition to a new route.
+We will document this more when the data loading story finalizes.
 
-#### Examples
+### `renderRoutesToStaticMarkup(routes, path, callback)`
 
-```js
-Router.transitionTo('user', {id: 10}, {showAge: true});
-Router.transitionTo('about');
-Router.transitionTo('/users/10?showAge=true');
-```
-
-### `replaceWith(routeNameOrPath, [params[, query]])`
-
-Programatically replace current route with a new route. Does not add an
-entry into the browser history.
-
-#### Examples
-
-```js
-Router.replaceWith('user', {id: 10}, {showAge: true});
-Router.replaceWith('about');
-Router.replaceWith('/users/10?showAge=true');
-```
-
-### `goBack()`
-
-Programatically go back to the last route and remove the most recent
-entry from the browser history.
-
-#### Example
-
-```js
-Router.goBack();
-```
-
-### `makeHref(routeName, params, query)`
-
-Creates an `href` to a route. Use this along with `ActiveState` when you
-need to build components similar to `Link`.
-
-#### Example
-
-```js
-// given a route like this:
-<Route name="user" path="users/:userId"/>
-Router.makeHref('user', {userId: 123}); // "users/123"
-```
+We will document this more when the data loading story finalizes.
 

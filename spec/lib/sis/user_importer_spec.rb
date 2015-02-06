@@ -48,6 +48,6 @@ describe SIS::UserImporter do
     SIS::UserImporter.new(account_model, {}).process(2, []) do |importer|
       importer.add_user(12345, 'user1', 'active', 'User', 'One', 'user1@example.com')
     end
-    Pseudonym.last.sis_user_id.should == '12345'
+    expect(Pseudonym.last.sis_user_id).to eq '12345'
   end
 end

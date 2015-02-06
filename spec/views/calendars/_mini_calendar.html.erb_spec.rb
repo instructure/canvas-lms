@@ -23,7 +23,7 @@ describe "/calendars/_mini_calendar" do
   it "should render" do
     today = Time.zone.today
     render :partial => 'calendars/mini_calendar', :locals => {:current => today, :first_day => today - 3, :last_day => today + 30}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

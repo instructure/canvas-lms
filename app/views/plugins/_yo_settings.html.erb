@@ -1,0 +1,16 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2"><%= mt(:description, <<-TEXT, :yo_url => 'http://dev.justyo.co')
+You will need an [api token from Yo](%{yo_url}).
+TEXT
+      %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :api_token, :en => "Api token" %></td>
+      <td>
+        <%= f.text_field :api_token %>
+      </td>
+    </tr>
+  </table>
+<% end %>

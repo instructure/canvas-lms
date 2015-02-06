@@ -12,6 +12,6 @@ class AddConversationCreatedNotification < ActiveRecord::Migration
 
   def self.down
     return unless Shard.current == Shard.default
-    Notification.find_by_name('Conversation Created').destroy
+    Notification.where(name: 'Conversation Created').delete_all
   end
 end

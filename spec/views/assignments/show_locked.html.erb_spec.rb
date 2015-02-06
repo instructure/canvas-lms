@@ -25,7 +25,7 @@ describe "/assignments/show_locked" do
     view_context(@course, @user)
     assigns[:assignment] = @course.assignments.create!(:title => "some assignment")
     render 'assignments/show_locked'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

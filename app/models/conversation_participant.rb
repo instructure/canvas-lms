@@ -61,9 +61,13 @@ class ConversationParticipant < ActiveRecord::Base
     # we're also counting on conversations being in the join
 
     own_root_account_ids = Shard.birth.activate do
-      user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
+      accts = user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }
+      # we really shouldn't need the global id here, but we've got a lot of participants with
+      # global id's in their root_account_ids for some reason
+      accts.map(&:id) + accts.map(&:global_id)
     end
-    id_string = "[" + own_root_account_ids.sort.join("][") + "]"
+    own_root_account_ids.sort!.uniq!
+    id_string = "[" + own_root_account_ids.join("][") + "]"
     root_account_id_matcher = "'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'"
     where("conversation_participants.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string)
   }

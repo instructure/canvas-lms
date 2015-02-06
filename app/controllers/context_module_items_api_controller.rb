@@ -223,7 +223,7 @@ class ContextModuleItemsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@student || @current_user).find(params[:module_id])
-      ContextModule.send(:preload_associations, mod, {:content_tags => :content})
+      ActiveRecord::Associations::Preloader.new(mod, content_tags: :content).run
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@student || @current_user)
       scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
@@ -355,10 +355,8 @@ class ContextModuleItemsApiController < ApplicationController
       item_params[:url] = params[:module_item][:external_url]
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
-        if @context.feature_enabled?(:draft_state)
-          @tag.workflow_state = 'unpublished'
-          @tag.save
-        end
+        @tag.workflow_state = 'unpublished'
+        @tag.save
         @module.touch
         render :json => module_item_json(@tag, @current_user, session, @module, nil)
       elsif @tag
@@ -569,10 +567,37 @@ class ContextModuleItemsApiController < ApplicationController
         end
         result[:items] << hash
       end
-      modules = @context.context_modules.find_all_by_id(module_ids.to_a)
+      modules = @context.context_modules.where(id: module_ids.to_a)
       result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
 
       render :json => result
+    end
+  end
+
+  # @API Mark module item read
+  #
+  # Fulfills "must view" requirement for a module item. It is generally not necessary to do this explicitly,
+  # but it is provided for applications that need to access external content directly (bypassing the html_url
+  # redirect that normally allows Canvas to fulfill "must view" requirements).
+  #
+  # This endpoint cannot be used to complete requirements on locked or unpublished module items.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id>/mark_read \
+  #       -X POST \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  def mark_item_read
+    if authorized_action(@context, @current_user, :read)
+      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
+      item = mod.content_tags_visible_to(@current_user).find(params[:id])
+
+      content = (item.content && item.content.respond_to?(:locked_for?)) ? item.content : item
+      return render :json => { :message => t('The module item is locked.') }, :status => :forbidden if content.locked_for?(@current_user)
+
+      item.context_module_action(@current_user, :read)
+      render :json => { :message => t('OK') }
     end
   end
 

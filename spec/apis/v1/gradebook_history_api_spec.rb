@@ -35,7 +35,7 @@ describe GradebookHistoryApiController, type: :request do
             :course_id => @course.id.to_s
           })
 
-      json.first.keys.sort.should == ['date', 'graders']
+      expect(json.first.keys.sort).to eq ['date', 'graders']
     end
   end
 
@@ -63,7 +63,7 @@ describe GradebookHistoryApiController, type: :request do
               :date=>date
             })
 
-      json.first["name"].should == "Grader"
+      expect(json.first["name"]).to eq "Grader"
     end
 
   end
@@ -96,7 +96,7 @@ describe GradebookHistoryApiController, type: :request do
               :assignment_id => @assignment.id.to_s
             })
 
-      json.first['submission_id'].should == @submission.id
+      expect(json.first['submission_id']).to eq @submission.id
     end
 
     it 'can find autograded data' do
@@ -114,7 +114,7 @@ describe GradebookHistoryApiController, type: :request do
               :assignment_id => @assignment.id.to_s
             })
 
-      json.first['submission_id'].should == @submission.id
+      expect(json.first['submission_id']).to eq @submission.id
     end
   end
 
@@ -152,7 +152,7 @@ describe GradebookHistoryApiController, type: :request do
         :course_id => @course.id.to_s
       }).first
 
-      json.keys.sort.should == ["assignment_id", "assignment_name", "attempt", "body", "current_grade", "current_graded_at", "current_grader", "grade", "grade_matches_current_submission", "graded_at", "grader", "grader_id", "id", "late", "preview_url", "score", "submission_type", "submitted_at", "url", "user_id", "user_name", "workflow_state"]
+      expect(json.keys.sort).to eq ["assignment_id", "assignment_name", "attempt", "body", "current_grade", "current_graded_at", "current_grader", "grade", "grade_matches_current_submission", "graded_at", "grader", "grader_id", "id", "late", "preview_url", "score", "submission_type", "submitted_at", "url", "user_id", "user_name", "workflow_state"]
     end
 
     it 'should return all applicable versions' do
@@ -161,12 +161,12 @@ describe GradebookHistoryApiController, type: :request do
       @submission3.update_attributes!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
       @submission4.update_attributes!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
 
-      api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json", {
+      expect(api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json", {
         :controller => 'gradebook_history_api',
         :action => 'feed',
         :format => 'json',
         :course_id => @course.id.to_s
-      }).size.should == 8
+      }).size).to eq 8
     end
 
     it 'should paginate the versions' do
@@ -175,18 +175,18 @@ describe GradebookHistoryApiController, type: :request do
       @submission3.update_attributes!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
       @submission4.update_attributes!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
 
-      api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json?per_page=5", {
+      expect(api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json?per_page=5", {
         :controller => 'gradebook_history_api',
         :action => 'feed',
         :format => 'json',
         :course_id => @course.id.to_s,
         :per_page => '5'
-      }).size.should == 5
+      }).size).to eq 5
 
       links = Api.parse_pagination_links(response.headers['Link'])
       next_link = links.index_by{ |link| link[:rel] }["next"]
 
-      api_call_as_user(@teacher, :get, next_link[:uri].to_s, {
+      expect(api_call_as_user(@teacher, :get, next_link[:uri].to_s, {
         :controller => 'gradebook_history_api',
         :action => 'feed',
         :format => 'json',
@@ -195,7 +195,7 @@ describe GradebookHistoryApiController, type: :request do
         :context_type => 'Course',
         :page => '2',
         :per_page => '5'
-      }).size.should == 3
+      }).size).to eq 3
     end
 
     it 'should order the most recent versions first' do
@@ -208,9 +208,9 @@ describe GradebookHistoryApiController, type: :request do
         :course_id => @course.id.to_s
       }).first
 
-      json["id"].should == @submission3.id
-      json["grade"].should == @submission3.grade
-      json["grader_id"].should == @other_grader.id
+      expect(json["id"]).to eq @submission3.id
+      expect(json["grade"]).to eq @submission3.grade
+      expect(json["grader_id"]).to eq @other_grader.id
     end
 
     it 'should optionally restrict by assignment_id' do
@@ -224,8 +224,8 @@ describe GradebookHistoryApiController, type: :request do
         :assignment_id => @assignment2.id.to_s
       })
 
-      json.size.should == 2
-      json.each{ |entry| entry["assignment_id"].should == @assignment2.id }
+      expect(json.size).to eq 2
+      json.each{ |entry| expect(entry["assignment_id"]).to eq @assignment2.id }
     end
 
     it 'should optionally restrict by user_id' do
@@ -239,8 +239,8 @@ describe GradebookHistoryApiController, type: :request do
         :user_id => @student1.id.to_s
       })
 
-      json.size.should == 3
-      json.each{ |entry| entry["user_id"].should == @student1.id }
+      expect(json.size).to eq 3
+      json.each{ |entry| expect(entry["user_id"]).to eq @student1.id }
     end
 
     it 'should optionally reverse ordering to oldest version first' do
@@ -254,9 +254,9 @@ describe GradebookHistoryApiController, type: :request do
         :ascending => '1'
       }).first
 
-      json["id"].should == @submission1.id
-      json["grade"].should be_nil
-      json["grader_id"].should be_nil
+      expect(json["id"]).to eq @submission1.id
+      expect(json["grade"]).to be_nil
+      expect(json["grader_id"]).to be_nil
     end
   end
 end

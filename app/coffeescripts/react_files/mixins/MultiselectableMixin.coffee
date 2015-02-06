@@ -45,17 +45,17 @@ define [
       range.reverse() if newPos > lastPos
       @setState selectedItems: range
 
-    clearSelectedItems: ->
-      @setState selectedItems: []
+    clearSelectedItems: (cb) ->
+      @setState selectedItems: [], ->
+        cb?()
 
-    toggleItemSelected: (item, event={}) ->
-      return if $(event.target).closest(@multiselectIgnoredElements).length
-      event.preventDefault()
+    toggleItemSelected: (item, event, cb) ->
+      return if event and $(event.target).closest(@multiselectIgnoredElements).length
 
-      return @selectRange(item) if event.shiftKey
+      return @selectRange(item) if event?.shiftKey
 
       itemIsSelected = item in @state.selectedItems
-      leaveOthersAlone = (event.metaKey or event.ctrlKey) or event.target.type is 'checkbox'
+      leaveOthersAlone = (event?.metaKey or event?.ctrlKey) or event?.target.type is 'checkbox'
 
       if leaveOthersAlone and itemIsSelected
         selectedItems = _.without(@state.selectedItems, item)
@@ -67,5 +67,5 @@ define [
       else
         selectedItems = [item]
 
-      @setState selectedItems: selectedItems
-
+      @setState {selectedItems: selectedItems}, ->
+        cb?()

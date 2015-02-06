@@ -8,10 +8,10 @@ define [
 
   routes = [
     # TODO: do I need this next line? why?
-    Route path:filesEnv.baseUrl.replace(/\/files$/, ''), handler: FilesApp,
-      Route path: "#{filesEnv.baseUrl}/search", name: 'search', handler: SearchResults
-      Route path: "#{filesEnv.baseUrl}/folder/*", name: 'folder', handler: ShowFolder
-      Route path: "#{filesEnv.baseUrl}", name: 'rootFolder', handler: ShowFolder
+    Route path:filesEnv.baseUrl.replace(/\/files$/, ''), addHandlerKey: true, handler: FilesApp,
+      Route path: "#{filesEnv.baseUrl}/search", name: 'search', addHandlerKey: true, handler: SearchResults
+      Route path: "#{filesEnv.baseUrl}/folder/*", name: 'folder', addHandlerKey: true, handler: ShowFolder
+      Route path: "#{filesEnv.baseUrl}", name: 'rootFolder', addHandlerKey: true, handler: ShowFolder
     Redirect from: "#{filesEnv.baseUrl}/folder", to: filesEnv.baseUrl
   ]
   if filesEnv.showingAllContexts

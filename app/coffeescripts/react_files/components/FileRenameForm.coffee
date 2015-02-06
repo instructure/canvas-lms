@@ -29,11 +29,24 @@ define [
     handleBackClick: ->
       @setState isEditing: false
 
+    # pass back expandZip to preserve options that was possibly already made
+    # in a previous modal
     handleReplaceClick: ->
-      @props.onNameConflictResolved({file: @state.fileOptions.file, dup: 'overwrite'})
+      @props.onNameConflictResolved({
+        file: @state.fileOptions.file
+        dup: 'overwrite'
+        expandZip: @state.fileOptions.expandZip
+      })
 
+    # pass back expandZip to preserve options that was possibly already made
+    # in a previous modal
     handleChangeClick: ->
-      @props.onNameConflictResolved({file: @state.fileOptions.file, dup: 'rename', name: @refs.newName.getDOMNode().value})
+      @props.onNameConflictResolved({
+        file: @state.fileOptions.file
+        dup: 'rename'
+        name: @refs.newName.getDOMNode().value
+        expandZip: @state.fileOptions.expandZip
+      })
 
     handleFormSubmit: (e) ->
       e.preventDefault()

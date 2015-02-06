@@ -65,7 +65,7 @@ shared_examples_for "quiz question selenium tests" do
   end
 
   def it_should_show_cant_go_back_warning
-    f('body').should include_text \
+    expect(f('body')).to include_text \
       "Once you have submitted an answer, you will not be able to change it later"
   end
 
@@ -90,10 +90,10 @@ shared_examples_for "quiz question selenium tests" do
 
   def it_should_be_on_question(which_question)
     body = f('body')
-    body.should include_text which_question
+    expect(body).to include_text which_question
     questions = ['first question', 'second question', 'third question'] - [which_question]
     questions.each do |question|
-      body.should_not include_text question
+      expect(body).not_to include_text question
     end
   end
 
@@ -126,11 +126,11 @@ shared_examples_for "quiz question selenium tests" do
   end
 
   def it_should_not_show_previous_button
-    fj("button:contains('Previous')").should be_nil
+    expect(fj("button:contains('Previous')")).to be_nil
   end
 
   def it_should_not_show_next_button
-    fj("button:contains('Next')").should be_nil
+    expect(fj("button:contains('Next')")).to be_nil
   end
 
   def submit_the_quiz
@@ -141,7 +141,7 @@ shared_examples_for "quiz question selenium tests" do
     submit_the_quiz
 
     if alert_message
-      driver.switch_to.alert.text.should include alert_message
+      expect(driver.switch_to.alert.text).to include alert_message
     end
 
     driver.switch_to.alert.accept
@@ -151,14 +151,14 @@ shared_examples_for "quiz question selenium tests" do
   def click_next_button_and_accept_warning
     expect_new_page_load {
       fj("button:contains('Next')").click
-      driver.switch_to.alert.text.should include "leave it blank?"
+      expect(driver.switch_to.alert.text).to include "leave it blank?"
       driver.switch_to.alert.accept      
     }
   end
 
   def submit_finished_quiz
     submit_the_quiz
-    alert_present?.should be_false
+    expect(alert_present?).to be_falsey
   end
 
   def answer_the_question_correctly
@@ -172,7 +172,7 @@ shared_examples_for "quiz question selenium tests" do
   end
 
   def it_should_show_two_correct_answers
-    f('body').should include_text "Score for this quiz: 2"
+    expect(f('body')).to include_text "Score for this quiz: 2"
   end
 
   def back_and_forth_flow

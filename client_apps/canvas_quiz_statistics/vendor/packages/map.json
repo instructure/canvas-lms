@@ -1,7 +1,0 @@
-{
-  "lodash": "underscore",
-  "d3": "vendor/d3.v3",
-  "tooltip": "compiled/behaviors/tooltip",
-  "backbone": "vendor/backbone",
-  "jquery/instructure_date_and_time": "jquery.instructure_date_and_time"
-}

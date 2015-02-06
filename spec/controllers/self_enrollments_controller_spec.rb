@@ -28,14 +28,14 @@ describe SelfEnrollmentsController do
 
     it "should render if the course is open for enrollment" do
       get 'new', :self_enrollment_code => @course.self_enrollment_code
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should do the delegated auth dance" do
       account = account_with_cas({:account => Account.default})
       
       get 'new', :self_enrollment_code => @course.self_enrollment_code
-      response.should redirect_to login_url
+      expect(response).to redirect_to login_url
     end
 
     it "should not render for an incorrect code" do
@@ -49,7 +49,7 @@ describe SelfEnrollmentsController do
       @course.update_attribute(:self_enrollment, false)
 
       get 'new', :self_enrollment_code => code
-      response.should be_success
+      expect(response).to be_success
     end
   end
 end

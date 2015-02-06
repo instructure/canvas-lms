@@ -70,7 +70,7 @@ class GradeSummaryPresenter
 
   def selectable_courses
     courses_with_grades.to_a.select do |course|
-      student_enrollment = course.all_student_enrollments.find_by_user_id(student)
+      student_enrollment = course.all_student_enrollments.where(user_id: student).first
       student_enrollment.grants_right?(@current_user, :read_grades)
     end
   end
@@ -80,11 +80,11 @@ class GradeSummaryPresenter
       if @id_param # always use id if given
         validate_id
         user_id = Shard.relative_id_for(@id_param, @context.shard, @context.shard)
-        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(user_id) }
+        @context.shard.activate { @context.all_student_enrollments.where(user_id: user_id).first }
       elsif observed_students.present? # otherwise try to find an observed student
         observed_student
       else # or just fall back to @current_user
-        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(@current_user) }
+        @context.shard.activate { @context.all_student_enrollments.where(user_id: @current_user).first }
       end
     end
   end
@@ -124,10 +124,6 @@ class GradeSummaryPresenter
     end
   end
 
-  def relevant_assignments_scope
-    AssignmentGroup.assignment_scope_for_draft_state(@context)
-  end
-
   def submissions
     @submissions ||= begin
       ss = @context.submissions
@@ -135,7 +131,7 @@ class GradeSummaryPresenter
                 {:rubric_assessments => [:rubric, :rubric_association]},
                 :content_participations)
       .where("assignments.workflow_state != 'deleted'")
-      .find_all_by_user_id(student)
+      .where(user_id: student).to_a
 
       if @context.feature_enabled?(:differentiated_assignments)
         visible_assignment_ids = AssignmentStudentVisibility.visible_assignment_ids_for_user(student_id, @context.id)
@@ -171,26 +167,20 @@ class GradeSummaryPresenter
 
   def assignment_stats
     @stats ||= begin
-      chain = @context.assignments.active
-        .except(:order)
-        .joins(:submissions)
+      chain = @context.assignments.active.except(:order)
+      # note: because a score is needed for max/min/ave we are not filtering
+      # by assignment_student_visibilities, if a stat is added that doesn't
+      # require score then add a filter when the DA feature is on
+      chain.joins(:submissions)
         .where("submissions.user_id in (?)", real_and_active_student_ids)
-      if @context.feature_enabled?(:differentiated_assignments)
-        # if DA is on, further restrict the assignments to those visible to each student
-        chain = chain.joins(:assignment_student_visibilities).where("""
-                  submissions.assignment_id = assignments.id
-                  AND submissions.assignment_id = assignment_student_visibilities.assignment_id
-                  AND submissions.user_id = assignment_student_visibilities.user_id
-                """)
-      end
-      chain.group("assignments.id")
+        .group("assignments.id")
         .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
         .index_by(&:id)
     end
   end
 
   def real_and_active_student_ids
-    @context.all_real_student_enrollments.where("workflow_state not in (?)", ['rejected','inactive']).pluck(:user_id).uniq
+    @context.all_real_student_enrollments.active_or_pending.pluck(:user_id).uniq
   end
 
   def assignment_presenters

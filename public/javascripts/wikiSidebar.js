@@ -20,6 +20,7 @@ define([
   'i18n!wiki.sidebar',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'compiled/util/UsageRights' /* Usage Rights for File Uploading */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData */,
@@ -32,7 +33,7 @@ define([
   'vendor/jquery.pageless' /* pageless */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, UsageRights) {
 
   var $editor_tabs,
       $tree1,
@@ -66,7 +67,7 @@ define([
     itemSelected: function(item) {
       switch(item.item_type) {
         case 'image':
-          wikiSidebar.editor.editorBox('insert_code', '<img alt="' + item.title + '" src="' + item.link_url + '"/>');
+          wikiSidebar.editor.editorBox('insert_code', '<img alt="' + htmlEscape(item.title) + '" src="' + htmlEscape(item.link_url) + '"/>');
           break;
         default: // we'll rely on enhance-user-content to create youtube thumbnails, etc.
           wikiSidebar.editor.editorBox('create_link', {title: (item.title || I18n.t("no_title", "No title")), url: item.link_url});
@@ -87,7 +88,7 @@ define([
     imageSelected: function($img) {
       var src = $img.data('url') || $img.attr('src'),
           alt = $img.attr('alt');
-      wikiSidebar.editor.editorBox('insert_code', '<img alt="'+alt+'" src="'+src+'"/>');
+      wikiSidebar.editor.editorBox('insert_code', '<img alt="'+htmlEscape(alt)+'" src="'+htmlEscape(src)+'"/>');
     },
     fileAdded: function(attachment, newUploadOrCallbackOrParent, fileCallback) {
       var children, newUpload, imageCallback, $file;
@@ -104,12 +105,12 @@ define([
       }
       if(children.length || fileCallback) {
         var file = attachment;
-        var displayName = "<span class='screenreader-only'>" + htmlEscape(file.display_name) + " " + I18n.t('aria_tree.file', 'file') + "</span>" + htmlEscape(file.display_name);
+        var displayName = "<span class='screenreader-only'>" + htmlEscape(file.display_name) + " " + htmlEscape(I18n.t('aria_tree.file', 'file')) + "</span>" + htmlEscape(file.display_name);
 
         $file = $tree1.find(".file_blank").clone(true);
         $file
           .attr('class', 'file')
-          .attr('title', file.display_name)
+          .attr('title', htmlEscape(file.display_name))
           .attr('data-tooltip', '')
           .attr('aria-level', children.data('level'))
           .attr('id', this.generateTreeItemID('file'))
@@ -184,7 +185,7 @@ define([
           var folder = data.sub_folders[idx].folder;
           var $folder = $tree1.find(".folder_blank").clone(true);
           $folder.attr('class', 'folder').data('id', folder.id).addClass('folder_' + folder.id);
-          $folder.find('.name').html(" <span class='screenreader-only'>" + htmlEscape(folder.name) + " " + I18n.t('aria_tree.folder', 'folder') + "</span>" + htmlEscape(folder.name) );
+          $folder.find('.name').html(" <span class='screenreader-only'>" + htmlEscape(folder.name) + " " + htmlEscape(I18n.t('aria_tree.folder', 'folder')) + "</span>" + htmlEscape(folder.name) );
           $folder.attr('aria-level', children.data('level'))
                  .attr('id', wikiSidebar.generateTreeItemID('folder'));
           children.append($folder);
@@ -213,7 +214,7 @@ define([
         }
         var $option = $("<option />");
         $option.val(folder.id);
-        $option.html(name);
+        $option.html($.raw(name));
         $sidebar_upload_file_form.find('#attachment_folder_id').append($option.clone());
         $sidebar_upload_image_form.find('#image_folder_id').append($option.clone());
         $wiki_sidebar_select_folder_dialog.find('.folder_id').append($option.clone());
@@ -231,9 +232,9 @@ define([
           var root_folder_id;
           for(var idx in data.folders) {
             var folder = data.folders[idx].folder;
-            if(!folders[folder.id]) {
-              folders[folder.id] = folder;
-            }
+            // merge placeholder (if any) with actual content
+            folders[folder.id] = $.extend(folder, folders[folder.id]);
+
             if(!folder.parent_folder_id) {
               root_folder_id = folder.id;
               continue;
@@ -252,6 +253,8 @@ define([
     },
     init: function() {
       wikiSidebar.inited = true;
+
+      UsageRights.render('#usage-rights');
 
       $editor_tabs.find("#pages_accordion a.add").click(function(event){
         event.preventDefault();
@@ -625,6 +628,7 @@ define([
           $sidebar_upload_file_form.slideUp(function() {
             $sidebar_upload_file_form.find(".uploading").hide();
           });
+          UsageRights.setFileUsageRights(data.attachment);
           wikiSidebar.fileAdded(data.attachment, true, function(node) {
             wikiSidebar.fileSelected(node);
           });

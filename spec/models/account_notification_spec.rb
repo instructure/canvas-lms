@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -26,20 +26,21 @@ describe AccountNotification do
   end
 
   it "should find notifications" do
-    AccountNotification.for_user_and_account(@user, @account).should == [@announcement]
+    expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
   end
 
   it "should find site admin announcements" do
     @announcement.destroy
     account_notification(:account => Account.site_admin)
-    AccountNotification.for_user_and_account(@user, Account.default).should == [@announcement]
+    expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq [@announcement]
   end
 
   it "should find announcements only if user has a role in the list of roles to which the announcement is restricted" do
     @announcement.destroy
-    account_notification(:roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    role_ids = ["TeacherEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name).id}
+    account_notification(:role_ids => role_ids, :message => "Announcement 1")
     @a1 = @announcement
-    account_notification(:account => @account, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
     @a2 = @announcement
     account_notification(:account => @account, :message => "Announcement 3") # no roles, should go to all
     @a3 = @announcement
@@ -52,36 +53,36 @@ describe AccountNotification do
     course_with_student(:course => @course)
     @student = @user
 
-    AccountNotification.for_user_and_account(@teacher, @account).map(&:id).sort.should == [@a1.id, @a3.id]
-    AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort.should == [@a1.id, @a2.id, @a3.id]
-    AccountNotification.for_user_and_account(@student, @account).map(&:id).sort.should == [@a3.id]
-    AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort.should == [@a2.id, @a3.id]
+    expect(AccountNotification.for_user_and_account(@teacher, @account).map(&:id).sort).to eq [@a1.id, @a3.id]
+    expect(AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort).to eq [@a1.id, @a2.id, @a3.id]
+    expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
+    expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
 
-    account_notification(:account => Account.site_admin, :roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    account_notification(:account => Account.site_admin, :role_ids => role_ids, :message => "Announcement 1")
     @a4 = @announcement
-    account_notification(:account => Account.site_admin, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    account_notification(:account => Account.site_admin, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
     @a5 = @announcement
     account_notification(:account => Account.site_admin, :message => "Announcement 3") # no roles, should go to all
     @a6 = @announcement
 
-    AccountNotification.for_user_and_account(@teacher, Account.site_admin).map(&:id).sort.should == [@a4.id, @a6.id]
-    AccountNotification.for_user_and_account(@admin, Account.site_admin).map(&:id).sort.should == [@a4.id, @a5.id, @a6.id]
-    AccountNotification.for_user_and_account(@student, Account.site_admin).map(&:id).sort.should == [@a6.id]
-    AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort.should == [@a5.id, @a6.id]
+    expect(AccountNotification.for_user_and_account(@teacher, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a6.id]
+    expect(AccountNotification.for_user_and_account(@admin, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a5.id, @a6.id]
+    expect(AccountNotification.for_user_and_account(@student, Account.site_admin).map(&:id).sort).to eq [@a6.id]
+    expect(AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort).to eq [@a5.id, @a6.id]
   end
 
   it "should allow closing an announcement" do
     @user.close_announcement(@announcement)
-    @user.preferences[:closed_notifications].should == [@announcement.id]
-    AccountNotification.for_user_and_account(@user, Account.default).should == []
+    expect(@user.preferences[:closed_notifications]).to eq [@announcement.id]
+    expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
   end
 
   it "should remove non-applicable announcements from user preferences" do
     @user.close_announcement(@announcement)
-    @user.preferences[:closed_notifications].should == [@announcement.id]
+    expect(@user.preferences[:closed_notifications]).to eq [@announcement.id]
     @announcement.destroy
-    AccountNotification.for_user_and_account(@user, Account.default).should == []
-    @user.preferences[:closed_notifications].should == []
+    expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
+    expect(@user.preferences[:closed_notifications]).to eq []
   end
 
   describe "survey notifications" do
@@ -92,30 +93,56 @@ describe AccountNotification do
       @a2 = account_model
       @a2.enable_service(flag)
       @a2.save!
-      AccountNotification.for_account(@a1).should == []
-      AccountNotification.for_account(@a2).should == [@announcement]
+      expect(AccountNotification.for_account(@a1)).to eq []
+      expect(AccountNotification.for_account(@a2)).to eq [@announcement]
     end
 
     describe "display_for_user?" do
       it "should select each mod value once throughout the cycle" do
-        AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-04-02')).should == false
-        AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-04-02')).should == false
-        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02')).should == true
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-04-02'))).to eq false
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-04-02'))).to eq false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02'))).to eq true
 
-        AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-05-05')).should == true
-        AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-05-05')).should == false
-        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-05-05')).should == false
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-05-05'))).to eq true
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-05-05'))).to eq false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-05-05'))).to eq false
 
-        AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-06-04')).should == false
-        AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-06-04')).should == true
-        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-06-04')).should == false
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-06-04'))).to eq false
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-06-04'))).to eq true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-06-04'))).to eq false
       end
 
       it "should shift the mod values each new cycle" do
-        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02')).should == true
-        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-07-02')).should == false
-        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-09-02')).should == true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02'))).to eq true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-07-02'))).to eq false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-09-02'))).to eq true
       end
+    end
+
+    it "should exclude students on surveys if the account restricts a student" do
+      flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
+      @survey = account_notification(:required_account_service => flag, :account => Account.site_admin)
+      @a1 = account_model
+      @a1.enable_service(flag)
+      @a1.settings[:include_students_in_global_survey] = false
+      @a1.save!
+
+      @unenrolled = @user
+      course_with_teacher(account: @a1)
+      @student_teacher = @user
+      course_with_student(course: @course, user: @student_teacher)
+      course_with_teacher(course: @course, :account => @a1)
+      @teacher = @user
+      account_admin_user(:account => @a1)
+      @admin = @user
+      course_with_student(:course => @course)
+      @student = @user
+
+      expect(AccountNotification.for_user_and_account(@teacher, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@admin, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@student, @a1).map(&:id).sort).to eq []
+      expect(AccountNotification.for_user_and_account(@student_teacher, @a1).map(&:id).sort).to eq [@survey.id]
+      expect(AccountNotification.for_user_and_account(@unenrolled, @a1).map(&:id).sort).to eq [@survey.id]
     end
   end
 
@@ -128,11 +155,11 @@ describe AccountNotification do
       @shard1.activate do
         @account = Account.create!
         user
-        AccountNotification.for_user_and_account(@user, @account).should == [@announcement]
+        expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
       end
 
       @shard2.activate do
-        AccountNotification.for_user_and_account(@user, @account).should == [@announcement]
+        expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
       end
     end
 
@@ -140,9 +167,9 @@ describe AccountNotification do
       @shard1.activate do
         @user.close_announcement(@announcement)
       end
-      @user.preferences[:closed_notifications].should == [@announcement.id]
+      expect(@user.preferences[:closed_notifications]).to eq [@announcement.id]
       @shard1.activate do
-        AccountNotification.for_user_and_account(@user, Account.default).should == []
+        expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
       end
     end
   end

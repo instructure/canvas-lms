@@ -16,7 +16,7 @@ define [
     moveTo: (newFolder) ->
       # only update the new parent_folder_id property
       @save({}, {attrs: {parent_folder_id: newFolder.id} }).then =>
-        @collection?.remove(this)
+        @collection.remove(this)
 
         # add it to newFolder's children
         myType = if @saveFrd then 'file' else 'folder' #TODO find a better way to infer type

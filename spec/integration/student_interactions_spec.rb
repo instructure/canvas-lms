@@ -44,37 +44,37 @@ describe "student interactions links" do
 
   it "should show the student link on the student's page" do
     get "/courses/#{@course.id}/users/#{@student.id}"
-    response.should be_success
-    response.body.should match(/Interactions with You/)
+    expect(response).to be_success
+    expect(response.body).to match(/Interactions with You/)
   end
 
   it "should show the teacher link on the teacher's page" do
     get "/courses/#{@course.id}/users/#{@teacher.id}"
-    response.should be_success
-    response.body.should match(/Student Interactions Report/)
+    expect(response).to be_success
+    expect(response.body).to match(/Student Interactions Report/)
   end
 
   it "should show mail link for teachers" do
     get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-    response.should be_success
+    expect(response).to be_success
     html = Nokogiri::HTML(response.body)
-    html.css('.message_student_link').should_not be_nil
+    expect(html.css('.message_student_link')).not_to be_nil
   end
 
   it "should recalculate grades on the first page load" do
     Enrollment.expects(:recompute_final_score).twice # once for the course, once for the student ('s course)
     enable_cache do
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-      response.should be_success
+      expect(response).to be_success
 
       get "/users/#{@teacher.id}/teacher_activity/student/#{@student.id}"
-      response.should be_success
+      expect(response).to be_success
 
       get "/users/#{@teacher.id}/teacher_activity/student/#{@student.id}"
-      response.should be_success
+      expect(response).to be_success
 
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
@@ -83,9 +83,9 @@ describe "student interactions links" do
     Account.site_admin.account_users.create!(user: @user)
     user_session(@user)
     get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-    response.should be_success
+    expect(response).to be_success
     html = Nokogiri::HTML(response.body)
-    html.css('.message_student_link').should be_empty
+    expect(html.css('.message_student_link')).to be_empty
   end
 end
 

@@ -52,15 +52,15 @@ describe 'Submissions Comment API', type: :request do
        format: "json", course_id: @course.to_param,
        assignment_id: @assignment.to_param, user_id: @student.to_param},
       name: "whatever"
-      response.should_not be_success
+      expect(response).not_to be_success
     end
 
     it "creates an attachment with the right the user_id" do
       preflight(name: "blah blah blah")
-      response.should be_success
+      expect(response).to be_success
       a = @assignment.attachments.first
-      a.should_not be_nil
-      a.user_id.should == @user.id
+      expect(a).not_to be_nil
+      expect(a.user_id).to eq @user.id
     end
   end
 

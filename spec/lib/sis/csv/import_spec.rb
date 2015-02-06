@@ -27,7 +27,7 @@ describe SIS::CSV::Import do
       "course_id,randomness,smelly",
       "test_1,TC 101,Test Course 101,,,active"
     )
-    importer.errors.first.last.should == "Couldn't find Canvas CSV import headers"
+    expect(importer.errors.first.last).to eq "Couldn't find Canvas CSV import headers"
   end
 
   it "should error files with invalid UTF-8" do
@@ -35,14 +35,14 @@ describe SIS::CSV::Import do
       "xlist_course_id,section_id,status",
       force_string_encoding("ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active")
     )
-    importer.errors.first.last.should == "Invalid UTF-8"
+    expect(importer.errors.first.last).to eq "Invalid UTF-8"
   end
 
   it "should error files with invalid CSV headers " do
     importer = process_csv_data(
       "xlist_course_id,\"section_id,status"
     )
-    importer.errors.first.last.should == "Malformed CSV"
+    expect(importer.errors.first.last).to eq "Malformed CSV"
   end
 
   it "should error files with invalid CSV" do
@@ -50,7 +50,7 @@ describe SIS::CSV::Import do
       "xlist_course_id,section_id,status",
       "ABC2119_ccutrer_2012201_xlist,\"26076.20122"
     )
-    importer.errors.first.last.should == "Malformed CSV"
+    expect(importer.errors.first.last).to eq "Malformed CSV"
   end
 
   it "should error files with invalid CSV way down" do
@@ -59,7 +59,7 @@ describe SIS::CSV::Import do
     lines.concat(["ABC2119_ccutrer_2012201_xlist,26076.20122"]*100)
     lines << "ABC2119_ccutrer_2012201_xlist,\"26076.20122"
     importer = process_csv_data(*lines)
-    importer.errors.first.last.should == "Malformed CSV"
+    expect(importer.errors.first.last).to eq "Malformed CSV"
   end
 
   it "should work for a mass import" do
@@ -168,19 +168,19 @@ describe SIS::CSV::Import do
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Hum101,Humanities,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Humanities"
-      c.short_name.should == "Hum101"
+      expect(c.name).to eq "Humanities"
+      expect(c.short_name).to eq "Hum101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Math101,Mathematics,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Mathematics"
-      c.short_name.should == "Math101"
+      expect(c.name).to eq "Mathematics"
+      expect(c.short_name).to eq "Math101"
       c.name = "Physics"
       c.short_name = "Phys101"
       c.save!
@@ -189,29 +189,29 @@ describe SIS::CSV::Import do
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Physics"
-      c.short_name.should == "Phys101"
+      expect(c.name).to eq "Physics"
+      expect(c.short_name).to eq "Phys101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active",
       {:override_sis_stickiness => true}
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Theater"
-      c.short_name.should == "Thea101"
+      expect(c.name).to eq "Theater"
+      expect(c.short_name).to eq "Thea101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Fren101,French,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Theater"
-      c.short_name.should == "Thea101"
+      expect(c.name).to eq "Theater"
+      expect(c.short_name).to eq "Thea101"
     end
   end
 
@@ -229,19 +229,19 @@ describe SIS::CSV::Import do
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Hum101,Humanities,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Humanities"
-      c.short_name.should == "Hum101"
+      expect(c.name).to eq "Humanities"
+      expect(c.short_name).to eq "Hum101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Math101,Mathematics,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Mathematics"
-      c.short_name.should == "Math101"
+      expect(c.name).to eq "Mathematics"
+      expect(c.short_name).to eq "Math101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
@@ -252,10 +252,10 @@ describe SIS::CSV::Import do
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Physics"
-      c.short_name.should == "Phys101"
+      expect(c.name).to eq "Physics"
+      expect(c.short_name).to eq "Phys101"
     end
   end
 
@@ -273,19 +273,19 @@ describe SIS::CSV::Import do
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Hum101,Humanities,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Humanities"
-      c.short_name.should == "Hum101"
+      expect(c.name).to eq "Humanities"
+      expect(c.short_name).to eq "Hum101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Math101,Mathematics,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Mathematics"
-      c.short_name.should == "Math101"
+      expect(c.name).to eq "Mathematics"
+      expect(c.short_name).to eq "Math101"
       c.name = "Physics"
       c.short_name = "Phys101"
       c.save!
@@ -294,10 +294,10 @@ describe SIS::CSV::Import do
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Fren101,French,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Physics"
-      c.short_name.should == "Phys101"
+      expect(c.name).to eq "Physics"
+      expect(c.short_name).to eq "Phys101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
@@ -305,19 +305,19 @@ describe SIS::CSV::Import do
       { :override_sis_stickiness => true,
         :clear_sis_stickiness => true }
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "Theater"
-      c.short_name.should == "Thea101"
+      expect(c.name).to eq "Theater"
+      expect(c.short_name).to eq "Thea101"
     end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Fren101,French,A001,T001,active"
     )
-    AbstractCourse.count.should == before_count + 1
+    expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
-      c.name.should == "French"
-      c.short_name.should == "Fren101"
+      expect(c.name).to eq "French"
+      expect(c.short_name).to eq "Fren101"
     end
   end
 

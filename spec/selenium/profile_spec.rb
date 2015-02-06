@@ -7,7 +7,7 @@ describe "profile" do
   def click_edit
     f('.edit_settings_link').click
     edit_form = f('#update_profile_form')
-    keep_trying_until { edit_form.should be_displayed }
+    keep_trying_until { expect(edit_form).to be_displayed }
     edit_form
   end
 
@@ -17,7 +17,7 @@ describe "profile" do
     skype_dialog.find_element(:id, 'user_service_user_name').send_keys("jakesorce")
     submit_dialog(skype_dialog, '.btn')
     wait_for_ajaximations
-    f('#registered_services').should include_text("Skype")
+    expect(f('#registered_services')).to include_text("Skype")
   end
 
   def generate_access_token(purpose = 'testing', close_dialog = false)
@@ -27,7 +27,7 @@ describe "profile" do
     submit_form(access_token_form)
     wait_for_ajax_requests
     details_dialog = f('#token_details_dialog')
-    details_dialog.should be_displayed
+    expect(details_dialog).to be_displayed
     if close_dialog
       close_visible_dialog
     end
@@ -48,8 +48,8 @@ describe "profile" do
     wait_for_ajaximations
     # check to see if error box popped up
     errorboxes = ff('.error_text')
-    errorboxes.length.should > 1
-    errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }.should be_true
+    expect(errorboxes.length).to be > 1
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }).to be_truthy
   end
 
   it "should change the password" do
@@ -88,7 +88,7 @@ describe "profile" do
 
       f('#communication_channels a[href="#register_sms_number"]').click
       replace_content(f('#register_sms_number #communication_channel_sms_email'), 'test@example.com')
-      f('#register_sms_number button[type="submit"]').should be_displayed
+      expect(f('#register_sms_number button[type="submit"]')).to be_displayed
       f('#communication_channels a[href="#register_email_address"]').click
       form = f("#register_email_address")
       test_email = 'nobody+1234@example.com'
@@ -96,11 +96,11 @@ describe "profile" do
       submit_form(form)
 
       confirmation_dialog = f("#confirm_email_channel")
-      keep_trying_until { confirmation_dialog.should be_displayed }
-      driver.execute_script("return INST.errorCount;").should == 0
+      keep_trying_until { expect(confirmation_dialog).to be_displayed }
+      expect(driver.execute_script("return INST.errorCount;")).to eq 0
       submit_dialog(confirmation_dialog, '.cancel_button')
-      confirmation_dialog.should_not be_displayed
-      f('.email_channels').should include_text(test_email)
+      expect(confirmation_dialog).not_to be_displayed
+      expect(f('.email_channels')).to include_text(test_email)
     end
 
     it "should change default email address" do
@@ -113,7 +113,7 @@ describe "profile" do
       link = f("#channel_#{channel.id} td:first-child a")
       link.click
       wait_for_ajaximations
-      row.should have_class("default")
+      expect(row).to have_class("default")
     end
 
     it "should edit full name" do
@@ -123,7 +123,7 @@ describe "profile" do
       edit_form.find_element(:id, 'user_name').send_keys(new_user_name)
       submit_form(edit_form)
       wait_for_ajaximations
-      keep_trying_until { f('.full_name').text.should == new_user_name }
+      keep_trying_until { expect(f('.full_name').text).to eq new_user_name }
     end
 
     it "should edit display name and validate" do
@@ -134,7 +134,7 @@ describe "profile" do
       submit_form(edit_form)
       wait_for_ajaximations
       refresh_page
-      keep_trying_until { f('#topbar li.user_name').text.should == new_display_name }
+      keep_trying_until { expect(f('#topbar li.user_name').text).to eq new_display_name }
     end
 
     it "should change the language" do
@@ -142,7 +142,7 @@ describe "profile" do
       edit_form = click_edit
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      get_value('#user_locale').should == 'es'
+      expect(get_value('#user_locale')).to eq 'es'
     end
 
     it "should change the language even if you can't update your name" do
@@ -152,10 +152,10 @@ describe "profile" do
 
       get "/profile/settings"
       edit_form = click_edit
-      edit_form.find_elements(:id, 'user_short_name').first.should be_nil
+      expect(edit_form.find_elements(:id, 'user_short_name').first).to be_nil
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      get_value('#user_locale').should == 'es'
+      expect(get_value('#user_locale')).to eq 'es'
     end
 
     it "should add another contact method - sms" do
@@ -168,7 +168,7 @@ describe "profile" do
       submit_form(register_form)
       wait_for_ajaximations
       close_visible_dialog
-      keep_trying_until { f('.other_channels .path').should include_text(test_cell_number) }
+      keep_trying_until { expect(f('.other_channels .path')).to include_text(test_cell_number) }
     end
 
     it "should register a service" do
@@ -182,10 +182,10 @@ describe "profile" do
       #had to use add class because tests were failing inconsistently in aws
       driver.execute_script("$('.service').addClass('service-hover')")
       f('.delete_service_link').click
-      driver.switch_to.alert.should_not be_nil
+      expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      f('#unregistered_services').should include_text("Skype")
+      expect(f('#unregistered_services')).to include_text("Skype")
     end
 
     it "should toggle service visibility" do
@@ -195,11 +195,11 @@ describe "profile" do
 
       f('#show_user_services').click
       wait_for_ajaximations
-      @user.reload.show_user_services.should_not == initial_state
+      expect(@user.reload.show_user_services).not_to eq initial_state
 
       f('#show_user_services').click
       wait_for_ajaximations
-      @user.reload.show_user_services.should == initial_state
+      expect(@user.reload.show_user_services).to eq initial_state
     end
 
     it "should generate a new access token" do
@@ -212,7 +212,7 @@ describe "profile" do
       f('.add_access_token_link').click
       access_token_form = f('#access_token_form')
       access_token_form.find_element(:xpath, '../..').find_element(:css, '.ui-dialog-buttonpane .cancel_button').click
-      access_token_form.should_not be_displayed
+      expect(access_token_form).not_to be_displayed
     end
 
     it "should view the details of an access token" do
@@ -220,7 +220,7 @@ describe "profile" do
       generate_access_token('testing', true)
       #had to use :visible because it was failing saying element wasn't visible
       fj('#access_tokens .show_token_link:visible').click
-      f('#token_details_dialog').should be_displayed
+      expect(f('#token_details_dialog')).to be_displayed
     end
 
     it "should delete an access token" do
@@ -228,10 +228,10 @@ describe "profile" do
       generate_access_token('testing', true)
       #had to use :visible because it was failing saying element wasn't visible
       fj("#access_tokens .delete_key_link:visible").click
-      driver.switch_to.alert.should_not be_nil
+      expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      f('#access_tokens').should_not be_displayed
+      expect(f('#access_tokens')).not_to be_displayed
     end
   end
 
@@ -246,7 +246,7 @@ describe "profile" do
       links.each do |l|
         url = l.attribute('href')
         query = URI.parse(url).query
-        CGI.unescape(query).should match /profile\/settings/
+        expect(CGI.unescape(query)).to match /profile\/settings/
       end
     end
   end
@@ -257,7 +257,7 @@ describe "profile" do
     end
 
     it "should successfully upload profile pictures" do
-      pending("intermittently fails")
+      skip("intermittently fails")
       course_with_teacher_logged_in
       a = Account.default
       a.enable_service('avatars')
@@ -267,7 +267,7 @@ describe "profile" do
       get "/profile/settings"
       keep_trying_until { f(".profile_pic_link") }.click
       dialog = f("#profile_pic_dialog")
-      dialog.should be_displayed
+      expect(dialog).to be_displayed
       dialog.find_element(:css, ".add_pic_link").click
       filename, fullpath, data = get_file("graded.png")
       dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
@@ -277,7 +277,7 @@ describe "profile" do
       submit_form('#add_pic_form')
 
       new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-      new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+      expect(new_image.attribute('src')).not_to match %r{/images/thumbnails/}
 
       FilesController._process_action_callbacks.pop
 
@@ -286,16 +286,16 @@ describe "profile" do
         spans.last.attribute('class') =~ /selected/
         uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
         image_src = uploaded_image.attribute('src')
-        image_src.should =~ %r{/images/thumbnails/}
-        new_image.attribute('alt').should =~ /graded/
+        expect(image_src).to match %r{/images/thumbnails/}
+        expect(new_image.attribute('alt')).to match /graded/
       end
       dialog.find_element(:css, '.select_button').click
       wait_for_ajaximations
       keep_trying_until do
         profile_pic = fj('.profile_pic_link img')
-        profile_pic.should have_attribue('src', image_src)
+        expect(profile_pic).to have_attribue('src', image_src)
       end
-      Attachment.last.folder.should == @user.profile_pics_folder
+      expect(Attachment.last.folder).to eq @user.profile_pics_folder
     end
 
     it "should allow users to choose an avatar from their profile page" do
@@ -312,7 +312,7 @@ describe "profile" do
       f('.profile-link').click
       wait_for_ajaximations
 
-      ff('.avatar-content').length.should == 1
+      expect(ff('.avatar-content').length).to eq 1
     end
   end
 
@@ -322,7 +322,7 @@ describe "profile" do
     end
 
     it "should successfully upload profile pictures" do
-      pending("intermittently fails")
+      skip("intermittently fails")
       course_with_teacher_logged_in
       a = Account.default
       a.enable_service('avatars')
@@ -332,7 +332,7 @@ describe "profile" do
       get "/profile/settings"
       keep_trying_until { f(".profile_pic_link") }.click
       dialog = f("#profile_pic_dialog")
-      dialog.should be_displayed
+      expect(dialog).to be_displayed
       dialog.find_element(:css, ".add_pic_link").click
       filename, fullpath, data = get_file("graded.png")
       dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
@@ -342,7 +342,7 @@ describe "profile" do
       submit_form('#add_pic_form')
 
       new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-      new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+      expect(new_image.attribute('src')).not_to match %r{/images/thumbnails/}
 
       FilesController._process_action_callbacks.pop
 
@@ -351,16 +351,16 @@ describe "profile" do
         spans.last.attribute('class') =~ /selected/
         uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
         image_src = uploaded_image.attribute('src')
-        image_src.should =~ %r{/images/thumbnails/}
-        new_image.attribute('alt').should =~ /graded/
+        expect(image_src).to match %r{/images/thumbnails/}
+        expect(new_image.attribute('alt')).to match /graded/
       end
       dialog.find_element(:css, '.select_button').click
       wait_for_ajaximations
       keep_trying_until do
         profile_pic = fj('.profile_pic_link img')
-        profile_pic.should have_attribue('src', image_src)
+        expect(profile_pic).to have_attribue('src', image_src)
       end
-      Attachment.last.folder.should == @user.profile_pics_folder
+      expect(Attachment.last.folder).to eq @user.profile_pics_folder
     end
   end
 end

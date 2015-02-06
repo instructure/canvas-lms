@@ -23,15 +23,16 @@ module Api::V1::Role
   def role_json(account, role, current_user, session, opts={})
     json = {
       :account => account_json(account, current_user, session, []),
+      :id => role.id,
       :role => role.name,
       :label => role.label,
-      :base_role_type => role.base_role_type,
+      :base_role_type => (role.built_in? && role.account_role?) ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
       :workflow_state => role.workflow_state,
       :permissions => {}
     }
 
     RoleOverride.manageable_permissions(account).keys.each do |permission|
-      perm = RoleOverride.permission_for(account, account, permission, role.base_role_type, role.name)
+      perm = RoleOverride.permission_for(account, permission, role, account)
       json[:permissions][permission] = permission_json(perm, current_user, session) if perm[:account_allows]
     end
 

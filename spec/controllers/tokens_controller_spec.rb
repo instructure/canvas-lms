@@ -22,19 +22,19 @@ describe TokensController do
   describe "developer keys" do
     it "should require being logged in to create an access token" do
       post 'create', :access_token => {:purpose => "test"}
-      response.should be_redirect
-      assigns[:token].should be_nil
+      expect(response).to be_redirect
+      expect(assigns[:token]).to be_nil
     end
     
     it "should allow creating an access token" do
       user(:active_user => true)
       user_session(@user)
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011"}
-      response.should be_success
-      assigns[:token].should_not be_nil
-      assigns[:token].developer_key.should == DeveloperKey.default
-      assigns[:token].purpose.should == "test"
-      assigns[:token].expires_at.to_date.should == Time.parse("jun 1 2011").to_date
+      expect(response).to be_success
+      expect(assigns[:token]).not_to be_nil
+      expect(assigns[:token].developer_key).to eq DeveloperKey.default
+      expect(assigns[:token].purpose).to eq "test"
+      expect(assigns[:token].expires_at.to_date).to eq Time.parse("jun 1 2011").to_date
     end
 
     it "should not allow creating an access token while masquerading" do
@@ -51,36 +51,36 @@ describe TokensController do
       user(:active_user => true)
       user_session(@user)
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011", :token => "mytoken"}
-      response.should be_success
-      response.body.should_not match(/mytoken/)
-      assigns[:token].should_not be_nil
-      assigns[:token].full_token.should_not match(/mytoken/)
-      response.body.should match(/#{assigns[:token].full_token}/)
-      assigns[:token].developer_key.should == DeveloperKey.default
-      assigns[:token].purpose.should == "test"
-      assigns[:token].expires_at.to_date.should == Time.parse("jun 1 2011").to_date
+      expect(response).to be_success
+      expect(response.body).not_to match(/mytoken/)
+      expect(assigns[:token]).not_to be_nil
+      expect(assigns[:token].full_token).not_to match(/mytoken/)
+      expect(response.body).to match(/#{assigns[:token].full_token}/)
+      expect(assigns[:token].developer_key).to eq DeveloperKey.default
+      expect(assigns[:token].purpose).to eq "test"
+      expect(assigns[:token].expires_at.to_date).to eq Time.parse("jun 1 2011").to_date
     end
     
     it "should require being logged in to delete an access token" do
       delete 'destroy', :id => 5
-      response.should be_redirect
+      expect(response).to be_redirect
     end
     
     it "should allow deleting an access token" do
       user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.create!
-      token.user_id.should == @user.id
+      expect(token.user_id).to eq @user.id
       delete 'destroy', :id => token.id
-      response.should be_success
-      assigns[:token].should be_frozen
+      expect(response).to be_success
+      expect(assigns[:token]).to be_frozen
     end
 
     it "should not allow deleting an access token while masquerading" do
       user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.create!
-      token.user_id.should == @user.id
+      expect(token.user_id).to eq @user.id
       Account.site_admin.account_users.create!(user: @user)
       session[:become_user_id] = user_with_pseudonym.id
 
@@ -93,14 +93,14 @@ describe TokensController do
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!
-      token.user_id.should == user2.id
+      expect(token.user_id).to eq user2.id
       delete 'destroy', :id => token.id
       assert_status(404)
     end
     
     it "should require being logged in to retrieve an access token" do
       get 'show', :id => 5
-      response.should be_redirect
+      expect(response).to be_redirect
     end
     
     it "should allow retrieving an access token, but not give the full token string" do
@@ -109,24 +109,24 @@ describe TokensController do
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
       token.save!
-      token.user_id.should == @user.id
-      token.protected_token?.should == false
+      expect(token.user_id).to eq @user.id
+      expect(token.protected_token?).to eq false
       get 'show', :id => token.id
-      response.should be_success
-      assigns[:token].should == token
-      response.body.should match(/#{assigns[:token].token_hint}/)
+      expect(response).to be_success
+      expect(assigns[:token]).to eq token
+      expect(response.body).to match(/#{assigns[:token].token_hint}/)
     end
     
     it "should not include token for protected tokens" do
       user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.create!
-      token.user_id.should == @user.id
-      token.protected_token?.should == true
+      expect(token.user_id).to eq @user.id
+      expect(token.protected_token?).to eq true
       get 'show', :id => token.id
-      response.should be_success
-      assigns[:token].should == token
-      response.body.should_not match(/#{assigns[:token].token_hint}/)
+      expect(response).to be_success
+      expect(assigns[:token]).to eq token
+      expect(response.body).not_to match(/#{assigns[:token].token_hint}/)
     end
     
     it "should not allow retrieving someone else's access token" do
@@ -134,7 +134,7 @@ describe TokensController do
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!
-      token.user_id.should == user2.id
+      expect(token.user_id).to eq user2.id
       get 'show', :id => token.id
       assert_status(404)
     end
@@ -145,13 +145,13 @@ describe TokensController do
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
       token.save!
-      token.user_id.should == @user.id
-      token.protected_token?.should == false
+      expect(token.user_id).to eq @user.id
+      expect(token.protected_token?).to eq false
       put 'update', :id => token.id, :access_token => {:purpose => 'new purpose'}
-      response.should be_success
-      assigns[:token].should == token
-      assigns[:token].purpose.should == "new purpose"
-      response.body.should match(/#{assigns[:token].token_hint}/)
+      expect(response).to be_success
+      expect(assigns[:token]).to eq token
+      expect(assigns[:token].purpose).to eq "new purpose"
+      expect(response.body).to match(/#{assigns[:token].token_hint}/)
     end
 
     it "should allow regenerating an unprotected token" do
@@ -160,13 +160,13 @@ describe TokensController do
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
       token.save!
-      token.user_id.should == @user.id
-      token.protected_token?.should == false
+      expect(token.user_id).to eq @user.id
+      expect(token.protected_token?).to eq false
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}
-      response.should be_success
-      assigns[:token].should == token
-      assigns[:token].crypted_token.should_not == token.crypted_token
-      response.body.should match(/#{assigns[:token].full_token}/)
+      expect(response).to be_success
+      expect(assigns[:token]).to eq token
+      expect(assigns[:token].crypted_token).not_to eq token.crypted_token
+      expect(response.body).to match(/#{assigns[:token].full_token}/)
     end
 
     it "should not allow regenerating a token while masquerading" do
@@ -175,8 +175,8 @@ describe TokensController do
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
       token.save!
-      token.user_id.should == @user.id
-      token.protected_token?.should == false
+      expect(token.user_id).to eq @user.id
+      expect(token.protected_token?).to eq false
       Account.site_admin.account_users.create!(user: @user)
       session[:become_user_id] = user_with_pseudonym.id
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}
@@ -188,13 +188,13 @@ describe TokensController do
       user_session(@user)
       token = @user.access_tokens.new
       token.save!
-      token.user_id.should == @user.id
-      token.protected_token?.should == true
+      expect(token.user_id).to eq @user.id
+      expect(token.protected_token?).to eq true
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}
-      response.should be_success
-      assigns[:token].should == token
-      assigns[:token].crypted_token.should == token.crypted_token
-      response.body.should_not match(/#{assigns[:token].token_hint}/)
+      expect(response).to be_success
+      expect(assigns[:token]).to eq token
+      expect(assigns[:token].crypted_token).to eq token.crypted_token
+      expect(response.body).not_to match(/#{assigns[:token].token_hint}/)
     end
     
     it "should not allow updating someone else's token" do
@@ -202,7 +202,7 @@ describe TokensController do
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!
-      token.user_id.should == user2.id
+      expect(token.user_id).to eq user2.id
       put 'update', :id => token.id
       assert_status(404)
     end

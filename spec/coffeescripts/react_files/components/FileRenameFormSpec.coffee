@@ -58,3 +58,29 @@ define [
     Simulate.click(@form.refs.renameBtn.getDOMNode())
     ok(@form.state.isEditing)
     Simulate.click(@form.refs.commitChangeBtn.getDOMNode())
+
+  test 'onNameConflicResolved preserves expandZip option when renaming', ->
+    expect(2)
+    @form.setProps(
+      fileOptions:
+        file:
+          name: 'file_name.md'
+        expandZip: 'true'
+      onNameConflictResolved: (options) ->
+        equal(options.expandZip, 'true')
+    )
+    Simulate.click(@form.refs.renameBtn.getDOMNode())
+    ok(@form.state.isEditing)
+    Simulate.click(@form.refs.commitChangeBtn.getDOMNode())
+
+  test 'onNameConflicResolved preserves expandZip option when replacing', ->
+    expect(1)
+    @form.setProps(
+      fileOptions:
+        file:
+          name: 'file_name.md'
+        expandZip: 'true'
+      onNameConflictResolved: (options) ->
+        equal(options.expandZip, 'true')
+    )
+    Simulate.click(@form.refs.replaceBtn.getDOMNode())

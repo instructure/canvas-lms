@@ -29,35 +29,35 @@ describe "/profile/_ways_to_contact" do
     assigns[:user] = @user
     
     render :partial => "profile/ways_to_contact"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should not show a student the confirm link" do
     course_with_student
     view_context
     @user.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
-    @user.communication_channels.first.state.should == :unconfirmed
+    expect(@user.communication_channels.first.state).to eq :unconfirmed
     assigns[:email_channels] = @user.communication_channels.to_a
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
     assigns[:user] = @user
 
     render :partial => "profile/ways_to_contact"
-    response.body.should_not match /confirm_channel_link/
+    expect(response.body).not_to match /confirm_channel_link/
   end
 
   it "should show an admin the confirm link" do
     account_admin_user
     view_context
     @user.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
-    @user.communication_channels.first.state.should == :unconfirmed
+    expect(@user.communication_channels.first.state).to eq :unconfirmed
     assigns[:email_channels] = @user.communication_channels.to_a
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
     assigns[:user] = @user
 
     render :partial => "profile/ways_to_contact"
-    response.body.should match /confirm_channel_link/
+    expect(response.body).to match /confirm_channel_link/
   end
 
   it "should not show confirm link for confirmed channels" do
@@ -65,14 +65,14 @@ describe "/profile/_ways_to_contact" do
     view_context
     @user.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
     @user.communication_channels.first.confirm
-    @user.communication_channels.first.state.should == :active
+    expect(@user.communication_channels.first.state).to eq :active
     assigns[:email_channels] = @user.communication_channels.to_a
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
     assigns[:user] = @user
 
     render :partial => "profile/ways_to_contact"
-    response.body.should_not match /confirm_channel_link/
+    expect(response.body).not_to match /confirm_channel_link/
   end
 
   it "should show an admin masquerading as a user the confirm link" do
@@ -80,14 +80,14 @@ describe "/profile/_ways_to_contact" do
     account_admin_user
     view_context(@course, @student, @admin)
     @student.communication_channels.create!(:path_type => 'email', :path => 'someone@somewhere.com')
-    @student.communication_channels.first.state.should == :unconfirmed
+    expect(@student.communication_channels.first.state).to eq :unconfirmed
     assigns[:email_channels] = @student.communication_channels.to_a
     assigns[:other_channels] = []
     assigns[:sms_channels] = []
     assigns[:user] = @student
 
     render :partial => "profile/ways_to_contact"
-    response.body.should match /confirm_channel_link/
+    expect(response.body).to match /confirm_channel_link/
   end
 
   it 'should not show the "I want to log in" for non-default accounts' do
@@ -100,7 +100,7 @@ describe "/profile/_ways_to_contact" do
     assigns[:domain_root_account] = Account.create!
 
     render :partial => "profile/ways_to_contact"
-    response.body.should_not match /I want to log in to Canvas using this email address/
+    expect(response.body).not_to match /I want to log in to Canvas using this email address/
   end
 end
 

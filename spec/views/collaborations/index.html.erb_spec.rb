@@ -28,15 +28,15 @@ describe "/collaborations/index" do
 
   it "should render" do
     render 'collaborations/index'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should provide labels for accessibility devices i.e. screen readers" do
     render :partial => "collaborations/forms"
-    response.should_not be_nil
-    response.should have_tag("label[for=collaboration_title]", :text => "Document name:")
-    response.should have_tag("label[for=collaboration_description]", :text => "Description")
-    response.should have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate using:")
+    expect(response).not_to be_nil
+    expect(response).to have_tag("label[for=collaboration_title]", :text => "Document name:")
+    expect(response).to have_tag("label[for=collaboration_description]", :text => "Description")
+    expect(response).to have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate using:")
   end
 end
 

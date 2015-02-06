@@ -26,13 +26,13 @@ describe DeveloperKeysController do
   describe "GET 'index'" do
     it 'should require authorization' do
       get 'index'
-      response.should be_redirect
+      expect(response).to be_redirect
     end
     
     it 'should return the list of developer keys' do
       user_session(@admin)
       get 'index'
-      response.should be_success
+      expect(response).to be_success
     end
   end
   

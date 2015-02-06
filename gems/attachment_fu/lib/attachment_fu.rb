@@ -393,10 +393,12 @@ module AttachmentFu # :nodoc:
     end
 
     def find_existing_attachment_for_md5
-      if self.md5.present? && ns = self.infer_namespace
-        scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
-        scope = scope.where("id<>?", self) unless new_record?
-        scope.first
+      self.shard.activate do
+        if self.md5.present? && ns = self.infer_namespace
+          scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
+          scope = scope.where("id<>?", self) unless new_record?
+          scope.first
+        end
       end
     end
 
@@ -503,9 +505,9 @@ module AttachmentFu # :nodoc:
 
       # Initializes a new thumbnail with the given suffix.
       def find_or_initialize_thumbnail(file_name_suffix)
-        respond_to?(:parent_id) ?
-          thumbnail_class.find_or_initialize_by_thumbnail_and_parent_id(file_name_suffix.to_s, id) :
-          thumbnail_class.find_or_initialize_by_thumbnail(file_name_suffix.to_s)
+        scope = thumbnail_class.where(thumbnail: file_name_suffix.to_s)
+        scope = scope.where(parent_id: id) if respond_to?(:parent_id)
+        scope.first_or_initialize
       end
 
       # Stub for a #process_attachment method in a processor

@@ -36,15 +36,15 @@ describe EportfoliosController do
     before(:once){ eportfolio }
     it "should require authorization" do
       get 'user_index'
-      response.should be_redirect
+      expect(response).to be_redirect
     end
     
     it "should assign variables" do
       user_session(@user)
       get 'user_index'
-      assigns[:portfolios].should_not be_nil
-      assigns[:portfolios].should_not be_empty
-      assigns[:portfolios][0].should eql(@portfolio)
+      expect(assigns[:portfolios]).not_to be_nil
+      expect(assigns[:portfolios]).not_to be_empty
+      expect(assigns[:portfolios][0]).to eql(@portfolio)
     end
 
     it "should redirect if eportfolios are disabled" do
@@ -53,7 +53,7 @@ describe EportfoliosController do
       a.save
       course_with_student_logged_in(:active_all => true, :user => @user)
       get 'user_index'
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
   
@@ -66,9 +66,9 @@ describe EportfoliosController do
     it "should create portfolio" do
       user_session(@user)
       post 'create', :eportfolio => {:name => "some portfolio"}
-      response.should be_redirect
-      assigns[:portfolio].should_not be_nil
-      assigns[:portfolio].name.should eql("some portfolio")
+      expect(response).to be_redirect
+      expect(assigns[:portfolio]).not_to be_nil
+      expect(assigns[:portfolio].name).to eql("some portfolio")
     end
   end
   
@@ -91,23 +91,23 @@ describe EportfoliosController do
     it "should show portfolio" do
       user_session(@user)
       get 'show', :id => @portfolio.id
-      response.should be_success
-      assigns[:portfolio].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:portfolio]).not_to be_nil
     end
 
     it "should create a category if one doesn't exist" do
       user_session(@user)
       get 'show', :id => @portfolio.id
-      response.should be_success
-      assigns[:category].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:category]).not_to be_nil
     end
 
     it "should create an entry in the first category if one doesn't exist" do
       @portfolio.eportfolio_categories.create!(:name => "Home")
       user_session(@user)
       get 'show', :id => @portfolio.id
-      response.should be_success
-      assigns[:page].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:page]).not_to be_nil
     end
 
     describe "assigns[:owner_url]" do
@@ -118,7 +118,7 @@ describe EportfoliosController do
 
       it "should not get set when not logged in" do
         get 'show', :id => @portfolio.id
-        assigns[:owner_url].should be_nil
+        expect(assigns[:owner_url]).to be_nil
       end
 
       context "with profiles enabled" do
@@ -129,13 +129,13 @@ describe EportfoliosController do
         it "should be the profile url" do
           user_session(@user)
           get 'show', :id => @portfolio.id
-          assigns[:owner_url].should == user_profile_url(@portfolio.user)
+          expect(assigns[:owner_url]).to eq user_profile_url(@portfolio.user)
         end
 
         it "should not get set when portfolio owner is not visible to user" do
           user_session user(active_all: true)
           get 'show', :id => @portfolio.id
-          assigns[:owner_url].should be_nil
+          expect(assigns[:owner_url]).to be_nil
         end
       end
 
@@ -147,14 +147,14 @@ describe EportfoliosController do
         it "should be the settings url for the owner" do
           user_session(@user)
           get 'show', :id => @portfolio.id
-          assigns[:owner_url].should == profile_url
+          expect(assigns[:owner_url]).to eq profile_url
         end
 
         it "should be the user url for an admin" do
           user_with_pseudonym(user: @portfolio.user)
           user_session(account_admin_user)
           get 'show', :id => @portfolio.id
-          assigns[:owner_url].should == user_url(@portfolio.user)
+          expect(assigns[:owner_url]).to eq user_url(@portfolio.user)
         end
 
         it "should not get set otherwise" do
@@ -162,7 +162,7 @@ describe EportfoliosController do
           student_in_course(course: @course, user: @portfolio.user)
           user_session(@teacher)
           get 'show', :id => @portfolio.id
-          assigns[:owner_url].should be_nil
+          expect(assigns[:owner_url]).to be_nil
         end
       end
     end
@@ -178,9 +178,9 @@ describe EportfoliosController do
     it "should update portfolio" do
       user_session(@user)
       put 'update', :id => @portfolio.id, :eportfolio => {:name => "new title"}
-      response.should be_redirect
-      assigns[:portfolio].should_not be_nil
-      assigns[:portfolio].name.should eql("new title")
+      expect(response).to be_redirect
+      expect(assigns[:portfolio]).not_to be_nil
+      expect(assigns[:portfolio].name).to eql("new title")
     end
   end
   
@@ -194,12 +194,12 @@ describe EportfoliosController do
     it "should delete portfolio" do
       user_session(@user)
       delete 'destroy', :id => @portfolio.id
-      assigns[:portfolio].should_not be_nil
-      assigns[:portfolio].should_not be_frozen
-      assigns[:portfolio].should be_deleted
+      expect(assigns[:portfolio]).not_to be_nil
+      expect(assigns[:portfolio]).not_to be_frozen
+      expect(assigns[:portfolio]).to be_deleted
       @user.reload
-      @user.eportfolios.should be_include(@portfolio)
-      @user.eportfolios.active.should_not be_include(@portfolio)
+      expect(@user.eportfolios).to be_include(@portfolio)
+      expect(@user.eportfolios.active).not_to be_include(@portfolio)
     end
   end
   
@@ -215,17 +215,17 @@ describe EportfoliosController do
       c1 = eportfolio_category
       c2 = eportfolio_category
       c3 = eportfolio_category
-      c1.position.should eql(1)
-      c2.position.should eql(2)
-      c3.position.should eql(3)
+      expect(c1.position).to eql(1)
+      expect(c2.position).to eql(2)
+      expect(c3.position).to eql(3)
       post 'reorder_categories', :eportfolio_id => @portfolio.id, :order => "#{c2.id},#{c3.id},#{c1.id}"
-      response.should be_success
+      expect(response).to be_success
       c1.reload
       c2.reload
       c3.reload
-      c1.position.should eql(3)
-      c2.position.should eql(1)
-      c3.position.should eql(2)
+      expect(c1.position).to eql(3)
+      expect(c2.position).to eql(1)
+      expect(c3.position).to eql(2)
     end
   end
   
@@ -242,16 +242,16 @@ describe EportfoliosController do
       e1 = category_entry
       e2 = category_entry
       e3 = category_entry
-      e1.position.should eql(1)
-      e2.position.should eql(2)
-      e3.position.should eql(3)
+      expect(e1.position).to eql(1)
+      expect(e2.position).to eql(2)
+      expect(e3.position).to eql(3)
       post 'reorder_entries', :eportfolio_id => @portfolio.id, :eportfolio_category_id => @category.id, :order => "#{e2.id},#{e3.id},#{e1.id}"
       e1.reload
       e2.reload
       e3.reload
-      e1.position.should eql(3)
-      e2.position.should eql(1)
-      e3.position.should eql(2)
+      expect(e1.position).to eql(3)
+      expect(e2.position).to eql(1)
+      expect(e3.position).to eql(2)
     end
   end
 
@@ -267,17 +267,17 @@ describe EportfoliosController do
     it "should include absolute path for rel='self' link" do
       get 'public_feed', :eportfolio_id => @portfolio.id, :format => 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
+      expect(feed).not_to be_nil
+      expect(feed.links.first.rel).to match(/self/)
+      expect(feed.links.first.href).to match(/http:\/\//)
     end
 
     it "should include an author for each entry" do
       get 'public_feed', :eportfolio_id => @portfolio.id, :format => 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
+      expect(feed).not_to be_nil
+      expect(feed.entries).not_to be_empty
+      expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
     end
   end
 
@@ -292,31 +292,31 @@ describe EportfoliosController do
     end
 
     it "should hard delete old zips if there are no assiciated attachments" do
-      @portfolio.attachments.count.should == 1
-      @old_zipfile.related_attachments.exists?.should be_false
+      expect(@portfolio.attachments.count).to eq 1
+      expect(@old_zipfile.related_attachments.exists?).to be_falsey
 
       user_session(@user)
       get 'export', :eportfolio_id => @portfolio.id
 
       @portfolio.reload
-      @portfolio.attachments.count.should == 1
-      @portfolio.attachments.first.id.should_not == @old_zipfile.id
+      expect(@portfolio.attachments.count).to eq 1
+      expect(@portfolio.attachments.first.id).not_to eq @old_zipfile.id
     end
 
     it "should soft delete old zips if there are assiciated attachments" do
-      @portfolio.attachments.count.should == 1
+      expect(@portfolio.attachments.count).to eq 1
       cloned_att = @old_zipfile.clone_for(@user)
       cloned_att.workflow_state = 'to_be_zipped'
       cloned_att.file_state = '0'
       cloned_att.save!
-      @old_zipfile.reload.related_attachments.exists?.should be_true
+      expect(@old_zipfile.reload.related_attachments.exists?).to be_truthy
 
       user_session(@user)
       get 'export', :eportfolio_id => @portfolio.id
 
       @portfolio.reload
-      @portfolio.attachments.count.should == 2
-      @portfolio.attachments.map(&:file_state).should include "deleted"
+      expect(@portfolio.attachments.count).to eq 2
+      expect(@portfolio.attachments.map(&:file_state)).to include "deleted"
     end
   end
 end

@@ -34,18 +34,18 @@ describe MigrationIssuesController, type: :request do
 
     it "should return the list" do
       json = api_call(:get, @issue_url, @params)
-      json.length.should == 1
-      json.first['id'].should == @issue.id
+      expect(json.length).to eq 1
+      expect(json.first['id']).to eq @issue.id
     end
 
     it "should paginate" do
       issue = @migration.add_warning("hey")
       json = api_call(:get, @issue_url + "?per_page=1", @params.merge({:per_page=>'1'}))
-      json.length.should == 1
-      json.first['id'].should == @issue.id
+      expect(json.length).to eq 1
+      expect(json.first['id']).to eq @issue.id
       json = api_call(:get, @issue_url + "?per_page=1&page=2", @params.merge({:per_page => '1', :page => '2'}))
-      json.length.should == 1
-      json.first['id'].should == issue.id
+      expect(json.length).to eq 1
+      expect(json.first['id']).to eq issue.id
     end
 
     it "should 401" do
@@ -63,23 +63,23 @@ describe MigrationIssuesController, type: :request do
     it "should return migration" do
       json = api_call(:get, @issue_url, @params)
 
-      json['id'].should == @issue.id
-      json['description'].should == "fail"
-      json["workflow_state"].should == "active"
-      json['fix_issue_html_url'].should == "https://example.com"
-      json['issue_type'].should == "warning"
-      json['error_message'].should be_nil
-      json['error_report_html_url'].should be_nil
-      json["content_migration_url"].should == "http://www.example.com/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}"
-      json['created_at'].should_not be_nil
-      json['updated_at'].should_not be_nil
+      expect(json['id']).to eq @issue.id
+      expect(json['description']).to eq "fail"
+      expect(json["workflow_state"]).to eq "active"
+      expect(json['fix_issue_html_url']).to eq "https://example.com"
+      expect(json['issue_type']).to eq "warning"
+      expect(json['error_message']).to be_nil
+      expect(json['error_report_html_url']).to be_nil
+      expect(json["content_migration_url"]).to eq "http://www.example.com/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}"
+      expect(json['created_at']).not_to be_nil
+      expect(json['updated_at']).not_to be_nil
     end
 
     it "should return error messages to site admins" do
       Account.site_admin.account_users.create!(user: @user)
       json = api_call(:get, @issue_url, @params)
-      json['error_message'].should == 'secret error'
-      json['error_report_html_url'].should == "http://www.example.com/error_reports/0"
+      expect(json['error_message']).to eq 'secret error'
+      expect(json['error_report_html_url']).to eq "http://www.example.com/error_reports/0"
     end
 
     it "should 404" do
@@ -101,16 +101,16 @@ describe MigrationIssuesController, type: :request do
 
     it "should update state" do
       json = api_call(:put, @issue_url, @params, @body_params)
-      json['workflow_state'].should == 'resolved'
+      expect(json['workflow_state']).to eq 'resolved'
       @issue.reload
-      @issue.workflow_state.should == 'resolved'
+      expect(@issue.workflow_state).to eq 'resolved'
     end
 
     it "should reject invalid state" do
       api_call(:put, @issue_url, @params, {:workflow_state => 'deleted'}, {}, :expected_status => 403)
 
       @issue.reload
-      @issue.workflow_state.should == 'active'
+      expect(@issue.workflow_state).to eq 'active'
     end
 
     it "should 404" do
@@ -121,7 +121,7 @@ describe MigrationIssuesController, type: :request do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:put, @issue_url, @params, @body_params, {}, :expected_status => 401)
       @issue.reload
-      @issue.workflow_state.should == 'active'
+      expect(@issue.workflow_state).to eq 'active'
     end
   end
 

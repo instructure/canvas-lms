@@ -17,19 +17,19 @@ describe "content exports" do
       @export.export_without_send_later
       new_download_link = keep_trying_until { f("#export_files a") }
       url = new_download_link.attribute 'href'
-      url.should match(%r{/files/\d+/download\?verifier=})
+      expect(url).to match(%r{/files/\d+/download\?verifier=})
     end
 
     it "should allow course export downloads" do
       run_export
-      @export.export_type.should == 'common_cartridge'
+      expect(@export.export_type).to eq 'common_cartridge'
     end
 
     it "should allow qti export downloads" do
       run_export do
         f("input[value=qti]").click
       end
-      @export.export_type.should == 'qti'
+      expect(@export.export_type).to eq 'qti'
     end
 
     it "should selectively create qti export" do
@@ -41,14 +41,14 @@ describe "content exports" do
         f(%{.quiz_item[name="copy[quizzes][#{CC::CCHelper.create_key(q2)}]"]}).click
       end
 
-      @export.export_type.should == 'qti'
+      expect(@export.export_type).to eq 'qti'
 
       file_handle = @export.attachment.open :need_local_file => true
       zip_file = Zip::File.open(file_handle.path)
       manifest_doc = Nokogiri::XML.parse(zip_file.read("imsmanifest.xml"))
 
-      manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q1)}]").should_not be_nil
-      manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q2)}]").should be_nil
+      expect(manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q1)}]")).not_to be_nil
+      expect(manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q2)}]")).to be_nil
     end
   end
 end

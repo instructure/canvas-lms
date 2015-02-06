@@ -31,7 +31,7 @@ describe "Api::V1::Outcome" do
       outcome = LearningOutcome.new(display_name: "MyFavoriteOutcome")
       subj = Subject.new
       result = subj.outcome_json(outcome, nil, nil)
-      result['display_name'].should == "MyFavoriteOutcome"
+      expect(result['display_name']).to eq "MyFavoriteOutcome"
     end
   end
 end

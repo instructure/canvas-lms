@@ -27,7 +27,7 @@ module BasicLTI
         md = sourceid.match(SOURCE_ID_REGEX)
         return false unless md
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
-        return false unless Canvas::Security.hmac_sha1(new_encoding, tool.shard.settings[:encryption_key]) == md[5]
+        return false unless Canvas::Security.verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
         return false unless tool.id == md[1].to_i
         course = Course.find(md[2])
         assignment = course.assignments.active.find(md[3])

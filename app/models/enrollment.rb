@@ -18,6 +18,14 @@
 
 class Enrollment < ActiveRecord::Base
 
+  SIS_TYPES = {
+      'TeacherEnrollment' => 'teacher',
+      'TaEnrollment' => 'ta',
+      'DesignerEnrollment' => 'designer',
+      'StudentEnrollment' => 'student',
+      'ObserverEnrollment' => 'observer'
+  }
+
   include Workflow
 
   belongs_to :course, :touch => true, :inverse_of => :enrollments
@@ -25,86 +33,141 @@ class Enrollment < ActiveRecord::Base
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :user
   belongs_to :associated_user, :class_name => 'User'
+
+  belongs_to :role
+  include Role::AssociationHelper
+
   has_many :role_overrides, :as => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
+  has_many :grading_period_grades
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :user_id, :course_id, :type, :uuid, :workflow_state, :created_at, :updated_at, :associated_user_id, :sis_source_id, :sis_batch_id, :start_at, :end_at,
     :course_section_id, :root_account_id, :computed_final_score, :completed_at, :self_enrolled, :computed_current_score, :grade_publishing_status, :last_publish_attempt_at,
-    :grade_publishing_message, :limit_privileges_to_course_section, :role_name, :last_activity_at
+    :grade_publishing_message, :limit_privileges_to_course_section, :role_id, :last_activity_at
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :root_account, :user, :role_overrides, :pseudonyms]
 
-  validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state
+  validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],
                          :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
                          :message => "only ObserverEnrollments may have an associated_user_id"
 
+  validate :valid_role?
+
   before_save :assign_uuid
   before_validation :assert_section
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
+  before_validation :ensure_role_id
   before_validation :infer_privileges
   after_create :create_linked_enrollments
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
   after_save :update_cached_due_dates
+  after_save :touch_graders_if_needed
 
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
-  def self.active_student_conditions(prefix = 'enrollments')
-    "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
+  scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
+  scope :current_and_invited, -> { joins(:course).where(QueryBuilder.new(:current_and_invited).conditions).readonly(false) }
+  scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
+  scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
+  scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
+
+  def ensure_role_id
+    self.role_id ||= self.role.id
   end
 
-  def self.active_student_subselect(conditions)
-    "EXISTS (SELECT 1 FROM enrollments WHERE #{conditions} AND #{active_student_conditions} LIMIT 1)"
+  def valid_role?
+    return true if role.built_in?
+
+    unless self.role.base_role_type == self.type
+      self.errors.add(:role_id, "is not valid for the enrollment type")
+    end
+
+    unless self.course.account.valid_role?(role)
+      self.errors.add(:role_id, "is not an available role for this course's account")
+    end
   end
 
-  def self.needs_grading_trigger_sql
-    no_other_enrollments_sql = "NOT " + active_student_subselect("user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id")
-    default_sql = <<-SQL
-      UPDATE assignments SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
-      WHERE context_id = NEW.course_id
-      AND context_type = 'Course'
-      AND EXISTS (
-        SELECT 1
-        FROM submissions
-        WHERE user_id = NEW.user_id
-        AND assignment_id = assignments.id
-        AND (#{Submission.needs_grading_conditions})
-                LIMIT 1
-      )
-      AND #{no_other_enrollments_sql};
-      SQL
+  def self.get_built_in_role_for_type(enrollment_type)
+    role = Role.get_built_in_role("StudentEnrollment") if enrollment_type == "StudentViewEnrollment"
+    role ||= Role.get_built_in_role(enrollment_type)
+    role
+  end
 
-    # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables
-    # also, every database uses a different construct for a current UTC timestamp
-    { :default    => default_sql.gsub("{{now}}", "now()"),
-      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
-      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
-      :mysql => <<-MYSQL }
-        IF #{no_other_enrollments_sql} THEN
-          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, assignments.updated_at = utc_timestamp()
-          WHERE context_id = NEW.course_id
+  def default_role
+    Enrollment.get_built_in_role_for_type(self.type)
+  end
+
+  # see #active_student?
+  def self.active_student_conditions
+    "(enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active')"
+  end
+
+  # see .active_student_conditions
+  def active_student?(was = false)
+    suffix = was ? "_was" : ""
+
+    %w[StudentEnrollment StudentViewEnrollment].include?(send("type#{suffix}")) &&
+      send("workflow_state#{suffix}") == "active"
+  end
+
+  def active_student_changed?
+    active_student? != active_student?(:was)
+  end
+
+  def adjust_needs_grading_count(mode = :increment)
+    amount = mode == :increment ? 1 : -1
+
+    other_enrollments_conditions = sanitize_sql([
+      "#{Enrollment.active_student_conditions} AND (user_id = :user_id AND course_id = :course_id AND id <> :id",
+      {user_id: user_id, course_id: course_id, id: id}
+    ])
+
+    if ['MySQL', 'Mysql2'].include?(connection.adapter_name)
+      # IN (...) subselects perform poorly in mysql, plus we want to avoid
+      #locking rows in other tables
+      unless Enrollment.where(other_enrollments_conditions).pluck(:id).first
+        connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, user_id: user_id, course_id: course_id}])
+          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + :amount, assignments.updated_at = :now
+          WHERE context_id = :course_id
             AND context_type = 'Course'
             AND assignments.id = submissions.assignment_id
-            AND submissions.user_id = NEW.user_id
+            AND submissions.user_id = :user_id
             AND (#{Submission.needs_grading_conditions});
-        END IF;
-      MYSQL
+         SQL
+      end
+    else
+      connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, user_id: user_id, course_id: course_id}])
+        UPDATE assignments SET needs_grading_count = needs_grading_count + :amount, updated_at = :now
+        WHERE context_id = :course_id
+        AND context_type = 'Course'
+        AND EXISTS (
+          SELECT 1
+          FROM submissions
+          WHERE user_id = :user_id
+          AND assignment_id = assignments.id
+          AND (#{Submission.needs_grading_conditions})
+          LIMIT 1
+        )
+        AND NOT EXISTS (SELECT 1 FROM enrollments WHERE #{other_enrollments_conditions}))
+      SQL
+    end
   end
 
-  trigger.after(:insert).where(active_student_conditions('NEW')) do
-    Hash[needs_grading_trigger_sql.map{|key, value| [key, value % 1]}]
-  end
-
-  trigger.after(:update).where("#{active_student_conditions('NEW')} <> #{active_student_conditions('OLD')}") do
-    Hash[needs_grading_trigger_sql.map{|key, value| [key, value % "CASE WHEN NEW.workflow_state = 'active' THEN 1 ELSE -1 END"]}]
+  after_create :update_needs_grading_count, if: :active_student?
+  after_update :update_needs_grading_count, if: :active_student_changed?
+  def update_needs_grading_count
+    connection.after_transaction_commit do
+      adjust_needs_grading_count(active_student? ? :increment : :decrement)
+    end
   end
 
   include StickySisFields
@@ -203,13 +266,6 @@ class Enrollment < ActiveRecord::Base
     readable_types[type] || readable_types['StudentEnrollment']
   end
 
-  SIS_TYPES = {
-      'TeacherEnrollment' => 'teacher',
-      'TaEnrollment' => 'ta',
-      'DesignerEnrollment' => 'designer',
-      'StudentEnrollment' => 'student',
-      'ObserverEnrollment' => 'observer'
-  }
   def self.sis_type(type)
     SIS_TYPES[type] || SIS_TYPES['StudentEnrollment']
   end
@@ -219,7 +275,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def sis_role
-    self.role_name || Enrollment.sis_type(self.type)
+    (!self.role.built_in? && self.role.name) || Enrollment.sis_type(self.type)
   end
 
   def self.valid_types
@@ -328,9 +384,10 @@ class Enrollment < ActiveRecord::Base
 
   def create_linked_enrollment_for(observer)
     # we don't want to create a new observer enrollment if one exists
-    return true if linked_enrollment_for(observer)
+    enrollment = linked_enrollment_for(observer)
+    return true if enrollment && !enrollment.deleted?
     return false unless observer.can_be_enrolled_in_course?(course)
-    enrollment = observer.observer_enrollments.build
+    enrollment ||= observer.observer_enrollments.build
     enrollment.associated_user_id = user_id
     enrollment.update_from(self)
   end
@@ -339,7 +396,7 @@ class Enrollment < ActiveRecord::Base
     observer.observer_enrollments.where(
       :associated_user_id => user_id,
       :course_id => course_id,
-      :course_section_id => course_section_id_was).first
+      :course_section_id => course_section_id_was || course_section_id).first
   end
 
   def active_linked_enrollment_for(observer)
@@ -371,10 +428,10 @@ class Enrollment < ActiveRecord::Base
     if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
       if Enrollment.cross_shard_invitations?
         Shard.birth.activate do
-          self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'all_invited_enrollments'].cache_key)}
+          self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'all_invited_enrollments2'].cache_key)}
         end
       else
-        self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+        self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)}
       end
     end
   end
@@ -568,8 +625,8 @@ class Enrollment < ActiveRecord::Base
     return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
       :completed
-    # Allow admins and student view students to use the course before the term starts
-    elsif self.admin? || self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
+    # Allow student view students to use the course before the term starts
+    elsif self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
       state
     else
       :inactive
@@ -631,7 +688,7 @@ class Enrollment < ActiveRecord::Base
   def has_permission_to?(action)
     @permission_lookup ||= {}
     unless @permission_lookup.has_key? action
-      @permission_lookup[action] = RoleOverride.enabled_for?(course, course, action, base_role_name, self.role_name)
+      @permission_lookup[action] = RoleOverride.enabled_for?(course, action, self.role)
     end
     @permission_lookup[action].include?(:self)
   end
@@ -893,14 +950,14 @@ class Enrollment < ActiveRecord::Base
   def self.cached_temporary_invitations(email)
     if Enrollment.cross_shard_invitations?
       Shard.birth.activate do
-        invitations = Rails.cache.fetch([email, 'all_invited_enrollments'].cache_key) do
+        invitations = Rails.cache.fetch([email, 'all_invited_enrollments2'].cache_key) do
           Shard.with_each_shard(CommunicationChannel.associated_shards(email)) do
             Enrollment.invited.for_email(email).to_a
           end
         end
       end
     else
-      Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
+      Rails.cache.fetch([email, 'invited_enrollments2'].cache_key) do
         Enrollment.invited.for_email(email).to_a
       end
     end
@@ -920,7 +977,7 @@ class Enrollment < ActiveRecord::Base
   def self.top_enrollment_by(key, rank_order = :default)
     raise "top_enrollment_by_user must be scoped" unless scoped.where_values.present?
     key = key.to_s
-    distinct_on(key, :order => "#{key}, #{type_rank_sql(rank_order)}")
+    order("#{key}, #{type_rank_sql(rank_order)}").distinct_on(key)
   end
 
   def assign_uuid
@@ -996,10 +1053,6 @@ class Enrollment < ActiveRecord::Base
     false
   end
 
-  def role
-    self.role_name || self.type
-  end
-
   # DO NOT TRUST
   # This is only a convenience method to assist in identifying which enrollment
   # goes to which user when users have accidentally been merged together
@@ -1017,5 +1070,13 @@ class Enrollment < ActiveRecord::Base
 
   def total_activity_time
     self.read_attribute(:total_activity_time).to_i
+  end
+
+  def touch_graders_if_needed
+    if !active_student? && active_student?(:was) && self.course.submissions.where(:user_id => self.user_id).exists?
+      connection.after_transaction_commit do
+        User.where(id: self.course.admins).touch_all
+      end
+    end
   end
 end

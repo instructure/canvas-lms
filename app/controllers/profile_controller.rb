@@ -188,10 +188,8 @@ class ProfileController < ApplicationController
   # @returns Profile
   def settings
     if api_request?
-      # allow querying this basic profile data for the current user, or any
-      # user the current user has view_statistics access to
       @user = api_find(User, params[:user_id])
-      return unless @user == @current_user || authorized_action(@user, @current_user, :view_statistics)
+      return unless authorized_action(@user, @current_user, :read_profile)
     else
       @user = @current_user
       @user.dismiss_bouncing_channel_message!

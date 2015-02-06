@@ -67,6 +67,9 @@ module Importers
     def self.import_content(course, data, params, migration)
       params ||= {:copy=>{}}
       logger.debug "starting import"
+
+      Importers::ContentImporterHelper.add_assessment_id_prepend(course, data, migration)
+
       course.full_migration_hash = data
       course.external_url_hash = {}
       course.migration_results = []
@@ -134,7 +137,7 @@ module Importers
 
       # be very explicit about draft state courses, but be liberal toward legacy courses
       course.wiki.check_has_front_page
-      if course.feature_enabled?(:draft_state) && course.wiki.has_no_front_page
+      if course.wiki.has_no_front_page
         if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
           mig_id = CC::CCHelper.create_key(source.wiki.front_page)
           if new_front_page = course.wiki.wiki_pages.where(migration_id: mig_id).first
@@ -143,7 +146,7 @@ module Importers
         end
       end
       front_page = course.wiki.front_page
-      course.wiki.unset_front_page! if front_page.nil? || (course.feature_enabled?(:draft_state) && front_page.new_record?)
+      course.wiki.unset_front_page! if front_page.nil? || front_page.new_record?
 
       syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
       if syllabus_should_be_added
@@ -163,23 +166,23 @@ module Importers
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
-            event.save_without_broadcasting!
+            event.save_without_broadcasting
           end
 
           migration.imported_migration_items_by_class(Announcement).each do |event|
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
-            event.save_without_broadcasting!
+            event.save_without_broadcasting
           end
 
           migration.imported_migration_items_by_class(DiscussionTopic).each do |event|
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
-            event.save_without_broadcasting!
+            event.save_without_broadcasting
           end
 
           migration.imported_migration_items_by_class(CalendarEvent).each do |event|
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
-            event.save_without_broadcasting!
+            event.save_without_broadcasting
           end
 
           migration.imported_migration_items_by_class(Quizzes::Quiz).each do |event|
@@ -189,14 +192,14 @@ module Importers
             event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
             event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
             event.saved_by = :migration
-            event.save!
+            event.save
           end
 
           migration.imported_migration_items_by_class(ContextModule).each do |event|
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
-            event.save!
+            event.save
           end
 
           course.set_course_dates_if_blank(shift_options)
@@ -288,20 +291,11 @@ module Importers
       result[:new_start_date] = Date.parse(options[:new_start_date]) rescue course.real_start_date
       result[:new_end_date] = Date.parse(options[:new_end_date]) rescue course.real_end_date
       result[:day_substitutions] = options[:day_substitutions]
-      result[:time_zone] = options[:time_zone]
+      result[:time_zone] = Time.find_zone(options[:time_zone])
       result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
-
-      result[:default_start_at] = DateTime.parse(options[:new_start_date]) rescue course.real_start_date
-      result[:default_conclude_at] = DateTime.parse(options[:new_end_date]) rescue course.real_end_date
-      Time.use_zone(result[:time_zone] || Time.zone) do
-        # convert times
-        [:default_start_at, :default_conclude_at].each do |k|
-          old_time = result[k]
-          new_time = Time.utc(old_time.year, old_time.month, old_time.day, (old_time.hour rescue 0), (old_time.min rescue 0)).in_time_zone
-          new_time -= new_time.utc_offset
-          result[k] = new_time
-        end
-      end
+      time_zone = result[:time_zone] || Time.zone
+      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue course.real_start_date
+      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue course.real_end_date
       result
     end
 

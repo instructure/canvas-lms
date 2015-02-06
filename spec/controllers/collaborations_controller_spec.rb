@@ -36,8 +36,8 @@ describe CollaborationsController do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>16,'hidden'=>true}])
       get 'index', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "should assign variables" do
@@ -49,8 +49,8 @@ describe CollaborationsController do
 
       get 'index', :course_id => @course.id
 
-      response.should be_success
-      assigns(:google_docs_authorized).should == true
+      expect(response).to be_success
+      expect(assigns(:google_docs_authorized)).to eq true
     end
 
     it "should handle users without google authorized" do
@@ -61,8 +61,8 @@ describe CollaborationsController do
 
       get 'index', :course_id => @course.id
 
-      response.should be_success
-      assigns(:google_docs_authorized).should == false
+      expect(response).to be_success
+      expect(assigns(:google_docs_authorized)).to eq false
     end
 
     it "should assign variables when verify raises" do
@@ -74,13 +74,13 @@ describe CollaborationsController do
 
       get 'index', :course_id => @course.id
 
-      response.should be_success
-      assigns(:google_docs_authorized).should == false
+      expect(response).to be_success
+      expect(assigns(:google_docs_authorized)).to eq false
     end
 
     it "should not allow the student view student to access collaborations" do
       course_with_teacher_logged_in(:active_user => true)
-      @course.should_not be_available
+      expect(@course).not_to be_available
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
 
@@ -99,7 +99,7 @@ describe CollaborationsController do
       mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
 
       get 'index', :group_id => group.id
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
@@ -118,22 +118,22 @@ describe CollaborationsController do
     end
 
     it 'loads the correct collaboration' do
-      assigns(:collaboration).should == collaboration
+      expect(assigns(:collaboration)).to eq collaboration
     end
 
     it 'logs an asset access record for the discussion topic' do
       accessed_asset = assigns[:accessed_asset]
-      accessed_asset[:code].should == collaboration.asset_string
-      accessed_asset[:category].should == 'collaborations'
-      accessed_asset[:level].should == 'participate'
+      expect(accessed_asset[:code]).to eq collaboration.asset_string
+      expect(accessed_asset[:category]).to eq 'collaborations'
+      expect(accessed_asset[:level]).to eq 'participate'
     end
 
     it 'registers a page view' do
       page_view = assigns[:page_view]
-      page_view.should_not be_nil
-      page_view.http_method.should == 'get'
-      page_view.url.should =~ %r{^http://test\.host/courses/\d+/collaborations}
-      page_view.participated.should be_true
+      expect(page_view).not_to be_nil
+      expect(page_view.http_method).to eq 'get'
+      expect(page_view.url).to match %r{^http://test\.host/courses/\d+/collaborations}
+      expect(page_view.participated).to be_truthy
     end
 
   end
@@ -155,11 +155,11 @@ describe CollaborationsController do
     it "should create collaboration" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :collaboration => {:collaboration_type => 'EtherPad', :title => "My Collab"}
-      response.should be_redirect
-      assigns[:collaboration].should_not be_nil
-      assigns[:collaboration].class.should eql(EtherpadCollaboration)
-      assigns[:collaboration].collaboration_type.should eql('EtherPad')
-      Collaboration.find(assigns[:collaboration].id).should be_is_a(EtherpadCollaboration)
+      expect(response).to be_redirect
+      expect(assigns[:collaboration]).not_to be_nil
+      expect(assigns[:collaboration].class).to eql(EtherpadCollaboration)
+      expect(assigns[:collaboration].collaboration_type).to eql('EtherPad')
+      expect(Collaboration.find(assigns[:collaboration].id)).to be_is_a(EtherpadCollaboration)
     end
   end
 end

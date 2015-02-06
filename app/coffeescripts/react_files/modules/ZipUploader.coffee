@@ -32,7 +32,7 @@ define [
       @_actualUpload()
 
     onUploadPosted: (uploadResults) =>
-      if (event.target.status >= 400)
+      if (uploadResults.target && uploadResults.target.status >= 400)
         @deferred.reject()
         return
 
@@ -41,7 +41,7 @@ define [
         $.getJSON(url).then (results) =>
           @getContentMigration()
       else
-        results = $.parseJSON(event.target.response)
+        results = $.parseJSON(uploadResults.target.response)
         @getContentMigration()
 
     # get the content migration when ready and use progress api to pull migration progress

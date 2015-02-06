@@ -87,14 +87,14 @@ module LocaleSelection
   # there are other translations for that locale)
   def available_locales
     I18n.available_locales.inject({}) do |hash, locale|
-      name = I18n.send(:t, "locales", :locale => locale)[locale]
+      name = I18n.send(:t, :locales, :locale => locale)[locale]
       hash[locale.to_s] = name if name
       hash
     end
   end
 
   def crowdsourced_locales
-    @crowdsourced_locales ||= I18n.available_locales.select{|locale| I18n.send(:t, "crowdsourced", :locale => locale) == true}
+    @crowdsourced_locales ||= I18n.available_locales.select{ |locale| I18n.send(:t, :crowdsourced, :locale => locale) == true }
   end
 end
 

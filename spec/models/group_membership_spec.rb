@@ -28,24 +28,24 @@ describe GroupMembership do
 
     # start with one active membership
     gm1 = group1.group_memberships.create!(:user => @user, :workflow_state => "accepted")
-    gm1.reload.should be_accepted
+    expect(gm1.reload).to be_accepted
 
     # adding another should mark the first as deleted
     gm2 = group2.group_memberships.create!(:user => @user, :workflow_state => "accepted")
-    gm2.reload.should be_accepted
-    gm1.reload.should be_deleted
+    expect(gm2.reload).to be_accepted
+    expect(gm1.reload).to be_deleted
 
     # restoring the first should mark the second as deleted
     gm1.workflow_state = "accepted"
     gm1.save!
-    gm1.reload.should be_accepted
-    gm2.reload.should be_deleted
+    expect(gm1.reload).to be_accepted
+    expect(gm2.reload).to be_deleted
 
     # should work even if we start with bad data (two accepted memberships)
     GroupMembership.where(:id => gm2).update_all(:workflow_state => "accepted")
     gm1.save!
-    gm1.reload.should be_accepted
-    gm2.reload.should be_deleted
+    expect(gm1.reload).to be_accepted
+    expect(gm2.reload).to be_deleted
   end
 
   it "should not be valid if the group is full" do
@@ -59,8 +59,8 @@ describe GroupMembership do
     group.group_memberships.create!(:user => user_model, :workflow_state => 'accepted')
     # expect
     membership = group.group_memberships.build(:user => user_model, :workflow_state => 'accepted')
-    membership.should_not be_valid
-    membership.errors[:group_id].should == ["The group is full."]
+    expect(membership).not_to be_valid
+    expect(membership.errors[:group_id]).to eq ["The group is full."]
   end
 
   context "section homogeneity" do
@@ -77,15 +77,15 @@ describe GroupMembership do
       membership.stubs(:group).returns(mock(:name => 'test group'))
       membership.stubs(:restricted_self_signup?).returns(true)
       membership.stubs(:has_common_section_with_me?).returns(false)
-      membership.save.should_not be_true
-      membership.errors.size.should == 1
-      membership.errors[:user_id].to_s.should match(/test user does not share a section/)
+      expect(membership.save).not_to be_truthy
+      expect(membership.errors.size).to eq 1
+      expect(membership.errors[:user_id].to_s).to match(/test user does not share a section/)
     end
 
     it "should pass validation on update" do
-      lambda {
+      expect {
         group_membership.save!
-      }.should_not raise_error
+      }.not_to raise_error
     end
   end
 
@@ -99,7 +99,7 @@ describe GroupMembership do
     @teacher.communication_channels.create(:path => "test_channel_email_#{@teacher.id}", :path_type => "email").confirm
 
     group_membership = group.group_memberships.create(:user => student)
-    group_membership.messages_sent.should be_include("New Student Organized Group")
+    expect(group_membership.messages_sent).to be_include("New Student Organized Group")
   end
 
   it "should not dispatch a message if the membership has been created with SIS" do
@@ -113,7 +113,7 @@ describe GroupMembership do
     batch = @course.root_account.sis_batches.create!
     membership.sis_batch_id = batch.id
     membership.save!
-    membership.messages_sent.should be_empty
+    expect(membership.messages_sent).to be_empty
   end
 
   it "should be invalid if group wants a common section, but doesn't have one with the user" do
@@ -128,8 +128,8 @@ describe GroupMembership do
     group = group_category.groups.create(:context => @course)
     group.add_user(user1)
     membership = group.group_memberships.build(:user => user2)
-    membership.should_not be_valid
-    membership.errors[:user_id].should_not be_nil
+    expect(membership).not_to be_valid
+    expect(membership.errors[:user_id]).not_to be_nil
   end
 
   context 'active_given_enrollments?' do
@@ -141,38 +141,38 @@ describe GroupMembership do
 
     it 'should be false if the membership is pending (requested)' do
       @membership.workflow_state = 'requested'
-      @membership.active_given_enrollments?([@enrollment]).should be_false
+      expect(@membership.active_given_enrollments?([@enrollment])).to be_falsey
     end
 
     it 'should be false if the membership is terminated (deleted)' do
       @membership.workflow_state = 'deleted'
-      @membership.active_given_enrollments?([@enrollment]).should be_false
+      expect(@membership.active_given_enrollments?([@enrollment])).to be_falsey
     end
 
     it 'should be false given a course group without an enrollment in the list' do
-      @membership.active_given_enrollments?([]).should be_false
+      expect(@membership.active_given_enrollments?([])).to be_falsey
     end
 
     it 'should be true for other course groups' do
-      @membership.active_given_enrollments?([@enrollment]).should be_true
+      expect(@membership.active_given_enrollments?([@enrollment])).to be_truthy
     end
 
     it 'should be true for account groups regardless of enrollments' do
       @account_group = Account.default.groups.create!
       @membership = @account_group.add_user(@student)
-      @membership.active_given_enrollments?([]).should be_true
+      expect(@membership.active_given_enrollments?([])).to be_truthy
     end
 
     it 'should not be deleted when the enrollment is destroyed' do
       @enrollment.destroy
       @membership.reload
-      @membership.workflow_state.should == 'deleted'
+      expect(@membership.workflow_state).to eq 'deleted'
     end
 
     it 'should soft delete when membership destroyed' do
       @membership.destroy
       @membership.reload
-      @membership.workflow_state.should == 'deleted'
+      expect(@membership.workflow_state).to eq 'deleted'
     end
   end
 
@@ -180,7 +180,7 @@ describe GroupMembership do
     user_model
     group_model
     group_membership_model(:workflow_state => "invited")
-    @group_membership.workflow_state.should == "accepted"
+    expect(@group_membership.workflow_state).to eq "accepted"
   end
 
   it "should not auto_join for communities" do
@@ -188,7 +188,7 @@ describe GroupMembership do
     @communities = GroupCategory.communities_for(Account.default)
     group_model(:name => "Algebra Teachers", :group_category => @communities, :join_level => "parent_context_request")
     group_membership_model(:user => @user, :workflow_state => "requested")
-    @group_membership.workflow_state.should == "requested"
+    expect(@group_membership.workflow_state).to eq "requested"
   end
 
   context 'permissions' do
@@ -200,33 +200,33 @@ describe GroupMembership do
       student_in_course(:active_all => true)
       student_organized = GroupCategory.student_organized_for(@course)
       student_group = student_organized.groups.create!(:context => @course, :join_level => "parent_context_auto_join")
-      GroupMembership.new(:user => @student, :group => student_group).grants_right?(@student, :create).should be_true
+      expect(GroupMembership.new(:user => @student, :group => student_group).grants_right?(@student, :create)).to be_truthy
 
       course_groups = group_category
       course_groups.configure_self_signup(true, false)
       course_groups.save!
       course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
-      GroupMembership.new(:user => @student, :group => course_group).grants_right?(@student, :create).should be_true
+      expect(GroupMembership.new(:user => @student, :group => course_group).grants_right?(@student, :create)).to be_truthy
     end
 
     it "should allow someone to be added to a non-community group" do
       student_in_course(:active_all => true)
       course_groups = group_category
       course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
-      GroupMembership.new(:user => @student, :group => course_group).grants_right?(@teacher, :create).should be_true
+      expect(GroupMembership.new(:user => @student, :group => course_group).grants_right?(@teacher, :create)).to be_truthy
 
       @account = @course.root_account
       account_admin_user(:active_all => true, :account => @account)
       account_groups = group_category(context: @account)
       account_group = account_groups.groups.create!(:context => @account)
-      GroupMembership.new(:user => @student, :group => account_group).grants_right?(@admin, :create).should be_true
+      expect(GroupMembership.new(:user => @student, :group => account_group).grants_right?(@admin, :create)).to be_truthy
     end
 
     it "should allow someone to join an open community group" do
       @account = @course.root_account
       community_groups = GroupCategory.communities_for(@account)
       community_group = community_groups.groups.create!(:context => @account, :join_level => "parent_context_auto_join")
-      GroupMembership.new(:user => @teacher, :group => community_group).grants_right?(@teacher, :create).should be_true
+      expect(GroupMembership.new(:user => @teacher, :group => community_group).grants_right?(@teacher, :create)).to be_truthy
 
     end
 
@@ -235,7 +235,7 @@ describe GroupMembership do
       account_admin_user(:active_all => true, :account => @account)
       community_groups = GroupCategory.communities_for(@account)
       community_group = community_groups.groups.create!(:context => @account, :join_level => "parent_context_auto_join")
-      GroupMembership.new(:user => @teacher, :group => community_group).grants_right?(@admin, :create).should be_false
+      expect(GroupMembership.new(:user => @teacher, :group => community_group).grants_right?(@admin, :create)).to be_falsey
     end
 
     it "should allow a moderator to kick someone from a community" do
@@ -245,7 +245,7 @@ describe GroupMembership do
       community_group = community_groups.groups.create!(:context => @account, :join_level => "parent_context_auto_join")
       community_group.add_user(@admin, 'accepted', true)
       community_group.add_user(@teacher, 'accepted', false)
-      GroupMembership.where(:group_id => community_group.id, :user_id => @teacher.id).first.grants_right?(@admin, :delete).should be_true
+      expect(GroupMembership.where(:group_id => community_group.id, :user_id => @teacher.id).first.grants_right?(@admin, :delete)).to be_truthy
     end
   end
 
@@ -258,7 +258,7 @@ describe GroupMembership do
     @category.save!
     leader = user_model
     @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
-    @group.reload.leader.should == leader
+    expect(@group.reload.leader).to eq leader
   end
 
   describe "updating cached due dates" do

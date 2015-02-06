@@ -30,7 +30,7 @@ describe "/shared/errors/500_message" do
     end
     ActionController::TestResponse.any_instance.stubs(:status).returns(500)
     render "shared/errors/500_message"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

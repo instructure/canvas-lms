@@ -1,5 +1,8 @@
 table.course-list-table
 {
+   &.table-layout-fixed {
+      table-layout: fixed;
+   }
    td.course-list-star-column {
       width: 3%;
       padding-left: 15px;

@@ -7,8 +7,10 @@ define [
   'str/htmlEscape'
   'jst/discussions/_reply_attachment'
   'compiled/fn/preventDefault'
+  'compiled/views/editor/KeyboardShortcuts'
+  'str/stripTags'
   'tinymce.editor_box'
-], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault) ->
+], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts, stripTags) ->
 
   class Reply
 
@@ -33,6 +35,12 @@ define [
         $(e.currentTarget).siblings('a').andSelf().toggle()
       @form.delegate '.alert .close', 'click', preventDefault @hideNotification
       @editing = false
+
+      _.defer(@attachKeyboardShortcuts)
+
+
+    attachKeyboardShortcuts: =>
+      $('.toggle-wrapper').first().before((new KeyboardShortcuts()).render().$el)
 
     ##
     # Shows or hides the TinyMCE editor for a reply
@@ -80,7 +88,7 @@ define [
     submit: =>
       @hide()
       @textArea._setContentCode ''
-      @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t 'saving_reply', 'Saving reply...'}</div>"
+      @view.model.set 'notification', "<div class='alert alert-info'>#{htmlEscape I18n.t 'saving_reply', 'Saving reply...'}</div>"
       entry = new Entry @getModelAttributes()
       entry.save null,
         success: @onPostReplySuccess
@@ -105,7 +113,7 @@ define [
       now = new Date().getTime()
       # TODO: remove this summary, server should send it in create response and no further
       # work is required
-      summary: $('<div/>').html(@content).text()
+      summary: stripTags(@content)
       message: @content
       parent_id: if @options.topLevel then null else @view.model.get 'id'
       user_id: ENV.current_user_id

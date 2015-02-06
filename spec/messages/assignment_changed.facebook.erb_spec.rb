@@ -23,8 +23,8 @@ describe 'assignment_changed.facebook' do
   it "should render" do
     assignment_model(:title => "Quiz 1 & stuff")
     generate_message(:assignment_changed, :facebook, @assignment)
-    @message.body.should match(/Quiz 1 &amp; stuff/)
-    @message.body.should match(Regexp.new(@course.name))
-    @message.body.should match(/<a href=/)
+    expect(@message.body).to match(/Quiz 1 &amp; stuff/)
+    expect(@message.body).to match(Regexp.new(@course.name))
+    expect(@message.body).to match(/<a href=/)
   end
 end

@@ -44,7 +44,7 @@ define [
           @close()
 
       destroyDfd.fail =>
-        $.flashError htmlEscape(I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', title: page_title))
+        $.flashError I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', title: page_title)
         dfd.reject()
 
       @$el.disableWhileLoading dfd

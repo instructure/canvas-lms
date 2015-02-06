@@ -16,15 +16,15 @@ describe "dashboard" do
                                :end_at => 10.minutes.from_now
                            })
       get "/"
-      f('.events_list .event a').should include_text(@event.title)
+      expect(f('.events_list .event a')).to include_text(@event.title)
     end
 
     it "should put locked graded discussions / quizzes in the coming up list only" do
-      def check_list_text(list_element, text, should_have_text = true)
+      check_list_text = ->(list_element, text, should_have_text = true) do
         if should_have_text
-          list_element.should include_text(text)
+          expect(list_element).to include_text(text)
         else
-          list_element.should_not include_text(text)
+          expect(list_element).to_not include_text(text)
         end
       end
 
@@ -38,19 +38,19 @@ describe "dashboard" do
       get "/"
 
       # No "To Do" list shown
-      f('.right-side-list.to-do-list').should be_nil
+      expect(f('.right-side-list.to-do-list')).to be_nil
       coming_up_list = f('.right-side-list.events')
 
-      2.times { |i| check_list_text(coming_up_list, names[i]) }
+      2.times { |i| check_list_text.call(coming_up_list, names[i]) }
     end
 
     it "should display assignment in to do list" do
       due_date = Time.now.utc + 2.days
       @assignment = assignment_model({:due_at => due_date, :course => @course})
       get "/"
-      f('.events_list .event a').should include_text(@assignment.title)
+      expect(f('.events_list .event a')).to include_text(@assignment.title)
       # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
-      driver.execute_script("return $('.event a .tooltip_text').text()").should match(@course.short_name)
+      expect(driver.execute_script("return $('.event a .tooltip_text').text()")).to match(@course.short_name)
     end
 
     it "should display quiz submissions with essay questions as submitted in coming up list" do
@@ -70,9 +70,9 @@ describe "dashboard" do
       @assignment.save!
 
       get "/"
-      keep_trying_until { ffj(".events_list .event .tooltip_wrap").size.should > 0 }
+      keep_trying_until { expect(ffj(".events_list .event .tooltip_wrap").size).to be > 0 }
       driver.execute_script("$('.events_list .event .tooltip_wrap, .events_list .event .tooltip_text').css('visibility', 'visible')")
-      f('.events_list .event .tooltip_wrap').should include_text 'submitted'
+      expect(f('.events_list .event .tooltip_wrap')).to include_text 'submitted'
     end
   end
 end

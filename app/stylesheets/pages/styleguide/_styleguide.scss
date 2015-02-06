@@ -1,152 +1,13 @@
-// Hide/show new styles vs old styles
-@if $use_new_styles { 
-  .style-guide-nav .canvasSidebar--menu__item {
-    a[href*=_-_legacy] {display: none;}
-    a[href*=_-_new] {display: block;}
-  }  
 
-  [id*=_-_legacy].styleguide-section__component-doc { display: none;}
-  [id*=_-_new].styleguide-section__component-doc { display: block;}
-}
-@else {
-  #style-guide-nav li {
-    a[href*=_-_legacy] {display: block;}
-    a[href*=_-_new] {display: none;}
-  }
-
-  .styleguide-section__component > [id*=_-_legacy] { display: block;}
-  .styleguide-section__component > [id*=_-_new] { display: none;}
-}
-@if $use_new_styles { 
-// Styleguide Typography
-//===============
-.styleguide-subheader {
-  font-weight: normal;
-  font-size: 14px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 8px 0;
-  border-bottom: 1px solid #ccc;
-  line-height: normal;
+#style-guide-nav li {
+  a[href*=_-_legacy] {display: block;}
+  a[href*=_-_new] {display: none;}
 }
 
-// Styleguide Layout
-//===============
-// We're using flex to put these elements in the order that we
-// want them to appear in
-.styleguide-section__component {  
-  margin: 0 0 50px 0;
-}
-.styleguide-section__component-code {
-  @extend %flex;
-  flex-flow: row wrap;  
-  /* Then we define how is distributed the remaining space */
-  justify-content: space-around;
-  // Ordering
-  .code-rendered                        { @extend %flex-order-1;}
-  .highlight                            { @extend %flex-order-2;}
-  .styleguide-section__component-notes  { @extend %flex-order-3;}
-  // Sizing
-  .code-rendered                        { width: 100%;}
-  .highlight                            { @extend %flex-2;}
-  .styleguide-section__component-notes  { @extend %flex-1;}
-}
-.styleguide-section__component-code-content { @extend %flex-1; }
-// end layout
+.styleguide-section__component > [id*=_-_legacy] { display: block;}
+.styleguide-section__component > [id*=_-_new] { display: none;}
 
-/// Styleguide element styles
-//===============
-/// Note: some of these may become obsolete as we 
-/// continue to put in more styles to our typography
-.code-rendered {
-  margin-bottom: 20px;  
-  padding-bottom: 20px;
-  border-bottom: 1px solid $canvas-neutral;
-}
-.highlight {  
-  height: 100%;
-  pre {
-    padding: 10px;
-    background: lighten($canvas-primary, 60%);
-    box-shadow: 0 0 8px lighten($canvas-dark, 10%);    
-    border-radius: 0;
-    color: $canvas-dark;
-  }  
-}
-.styleguide-section__component-notes {
-  padding: 0 0 0 25px;
-  .codeBlock__note-title {
-    font-size: 18px;
-    font-weight: 500;    
-    line-height: 29px;
-    padding: 0;
-    margin: 0;
-  }
-  .codeBlock__note-description {
-    line-height: 22px;
-    font-size: 14px;
-  }
-}
-.styleguide-section__grid-demo-element {
-  padding: 8px 16px;
-  background: lighten($linkColor, 15%);
-  color: white;
-  text-align: center;
-  text-transform: uppercase;
-  height: 16px;
-}
-
-/// Temporary styles for new nav till real styles
-/// are in there. These only show up on new_styles styleguide
-.style-guide-nav-container {
-  background: $canvas-secondary;
-}
-.style-guide-nav {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  .canvasSidebar--menu__item {
-    &.canvasSidebar--menu__item-title {
-      font-weight: 500; 
-      text-transform: uppercase;
-      font-size: 14px;
-      padding: 10px 20px;
-    }
-    & {
-      color: white;
-      padding: 0;
-      margin: 0;
-      width: 100%;
-      a {
-        display: block;
-        width: 100%;
-        color: #fff;
-        padding: 10px 20px;
-        font-weight: 300;
-        min-width: 180px;
-        transition: background 0.5s ease-in-out;
-        &:hover {
-          text-decoration: none;
-          background: lighten($canvas-secondary, 5%); 
-          transition: background 0.5s ease-in-out;
-        }
-      }        
-    }
-    &.canvasSidebar--menu__item--is-on {
-      a {
-        background: lighten($canvas-secondary, 5%); 
-        font-weight: 500; 
-        &:hover {
-          text-decoration: none;
-        }
-      }          
-    }
-  }
-}
-/// end nav
-} 
-@else {
-  #main {
+#main {
   position: absolute;
   top: 70px;
   left: 0;
@@ -190,35 +51,36 @@
   border-left: solid 4px #0088cc;
   padding-left: 8px;
 }
-}// end @else legacy styles
+
+.styleguide-section__grid-demo-element {
+  padding: 8px 16px;
+  background: lighten($linkColor, 15%);
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  height: 16px;
+}
 
 /////
 ////// Styles for Colors
 /////
-.Colorguide-title {
-  width: 101%;
-  font-size: 15px;
-  padding: 0;
-  text-align: left;    
-}
+
 .Colorguide-container {
-  @extend %flex;
-  flex-flow: row wrap;    
-  justify-content: space-around;
+  display: flex;
+  justify-content: space-around;  
 }
+.Colorguide-container--primary-theme,
 .Colorguide-container--hc-theme {
-  margin-bottom: 30px;
+  width: 50%;
+  margin: 0 5px;
 }
-.Colorguide-color {  
-  height: 100px;
+.Colorguide-color {    
   padding: 25px;
-  @if $use_new_styles {
-    width: 300px;
+  .Colorguide-container--hc-theme & {
+    padding: 35px;
   }
-  @else {
-    float: left;
-    width: 150px;
-  }
+  margin: 5px 0;
+
   color: $base-font-color-light;
   margin-bottom: 5px;
   
@@ -243,27 +105,29 @@
 .Colorguide-color--alert      {@include colorguide($canvas-alert);}
 .Colorguide-color--light      {@include colorguide($canvas-light);}
 .Colorguide-color--dark       {@include colorguide($canvas-dark);}
-@if $use_new_styles {
-  .Colorguide-container--hc-theme {
-    .Colorguide-color--primary    {@include colorguide(#0078c4);}
-    .Colorguide-color--secondary  {@include colorguide(#58646d);}
-    .Colorguide-color--success    {@include colorguide(#008a14);}
-    .Colorguide-color--neutral    {@include colorguide(#ffffff);}
-    .Colorguide-color--action     {@include colorguide(#a23891);}
-    .Colorguide-color--danger     {@include colorguide(#a03536);}
-    .Colorguide-color--alert      {@include colorguide(#9e6b05);}
-    .Colorguide-color--dark       {@include colorguide(#405360);}  
-  }
-} 
-@else {
+
 .Colorguide-container--hc-theme {
   .Colorguide-color--primary    {@include colorguide(#0073ac);}
-  .Colorguide-color--secondary  {@include colorguide(#0074af);}
-  .Colorguide-color--success    {@include colorguide(#33802a);}
-  .Colorguide-color--neutral    {@include colorguide(#6d6d6d); color: $canvas-light;}
+  .Colorguide-color--secondary  {@include colorguide(#343c44);}
+  .Colorguide-color--success    {@include colorguide(#008a14);}
+  .Colorguide-color--neutral    {@include colorguide(hsl(0,0,90%)); color: $canvas-light;}
   .Colorguide-color--action     {@include colorguide(#a23891);}
-  .Colorguide-color--danger     {@include colorguide(#ad393a);}
-  .Colorguide-color--alert      {@include colorguide(#845a04);}
+  .Colorguide-color--danger     {@include colorguide(#a03536);}
+  .Colorguide-color--alert      {@include colorguide(#9e6b05);}
+  .Colorguide-color--light      {@include colorguide(#ffffff);}
   .Colorguide-color--dark       {@include colorguide(#333333);}  
-}  
+}
+
+.styleguide-section__grid-demo-element {
+  padding: 8px 16px;
+  background: lighten($linkColor, 15%);
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  height: 16px;
+}
+
+.styleguide-section__accordion-demo-element {
+  padding: $ic-sp*2;
+  color: darken($canvas-neutral, 15%);
 }

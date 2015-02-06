@@ -39,6 +39,21 @@
 #       }
 #     }
 #
+# @model QuizAssignmentOverrideSetContainer
+#     {
+#       "id": "QuizAssignmentOverrideSetContainer",
+#       "description": "Container for set of assignment-overridden dates for a quiz.",
+#       "properties": {
+#         "quiz_assignment_overrides": {
+#           "description": "The QuizAssignmentOverrideSet",
+#           "type": "array",
+#           "items": {
+#             "$ref": "QuizAssignmentOverrideSet"
+#           }
+#         }
+#       }
+#     }
+#
 # @model QuizAssignmentOverride
 #     {
 #       "id": "QuizAssignmentOverride",
@@ -105,7 +120,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
   #        }]
   #     }
   #
-  # @returns [QuizAssignmentOverrideSet]
+  # @returns QuizAssignmentOverrideSetContainer
   def index
     can_manage = is_authorized_action?(@course, @current_user, :manage_assignments)
 
@@ -115,6 +130,10 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
     scope = @course.quizzes.active.includes([ :assignment ])
     scope = scope.where(id: quiz_ids) if quiz_ids.present?
     scope = scope.available unless can_manage
+
+    if @course.feature_enabled?(:differentiated_assignments)
+      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @course)
+    end
 
     quizzes = Api.paginate(scope, self, api_route)
 

@@ -81,7 +81,7 @@
   </div>
 
   <div class="v-gutter">
-    <h2 class="h1 border border-b"><%= t :bio, "Bio" %></h2>
+    <h2 class="h1 border border-b"><label for="profile_bio" style="font-size: 22px"><%= t :bio, "Bio" %></label></h2>
     <% if @user_data[:bio] %>
       <div class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
     <% else %>
@@ -129,9 +129,9 @@
         <div class="show-if-editing">
           <table id="edit_links_table">
             <thead>
-              <th><%= t :links_title, 'Title' %></th>
+              <th scope="col"><%= t :links_title, 'Title' %></th>
               <th></th>
-              <th><%= t :links_url, 'URL' %></th>
+              <th scope="col"><%= t :links_url, 'URL' %></th>
             </thead>
             <tbody id="profile_link_fields"></tbody>
           </table>

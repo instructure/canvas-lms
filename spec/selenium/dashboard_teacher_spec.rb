@@ -18,7 +18,7 @@ describe "dashboard" do
       c1.reload
 
       get "/courses"
-      fj("#past_enrollments_table a[href='/courses/#{@course.id}']").should include_text(c1.name)
+      expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
     end
 
     it "should display assignment to grade in to do list for a teacher" do
@@ -32,7 +32,7 @@ describe "dashboard" do
         get "/"
 
         #verify assignment is in to do list
-        f('.to-do-list > li').should include_text('Grade ' + assignment.title)
+        expect(f('.to-do-list > li')).to include_text('Grade ' + assignment.title)
       end
     end
 
@@ -52,8 +52,8 @@ describe "dashboard" do
       get "/"
 
       todo_list = f('.to-do-list')
-      todo_list.should_not be_nil
-      todo_list.should include_text(quiz_title)
+      expect(todo_list).not_to be_nil
+      expect(todo_list).to include_text(quiz_title)
     end
 
     context "course menu customization" do
@@ -66,8 +66,8 @@ describe "dashboard" do
         driver.execute_script %{$('#courses_menu_item').addClass('hover');}
         wait_for_ajaximations
 
-        fj('#courses_menu_item').should include_text('My Courses')
-        fj('#courses_menu_item').should include_text('View All or Customize')
+        expect(fj('#courses_menu_item')).to include_text('My Courses')
+        expect(fj('#courses_menu_item')).to include_text('View All or Customize')
       end
     end
   end

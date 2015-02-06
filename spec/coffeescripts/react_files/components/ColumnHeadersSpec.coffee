@@ -1,45 +1,15 @@
 define [
   'react'
-  'jquery'
   'compiled/react_files/components/ColumnHeaders'
-  'compiled/models/Folder'
-  'react-router'
-], (React, $, ColumnHeaders, Folder, ReactRouter) ->
-  Simulate = React.addons.TestUtils.Simulate
+], (React, ColumnHeaders) ->
 
-  module 'ColumnHeaders#queryParamsFor',
-    setup: ->
-    teardown: ->
+  module 'ColumnHeaders'
 
-  test 'returns object with sort property set from the passed in variable', ->
-    sinon.stub(ReactRouter, 'Link').returns("some link")
-    @columnHeaders = React.renderComponent(ColumnHeaders(query:{}, areAllItemsSelected: -> true), $('<div>').appendTo('body')[0])
-    propertyString = 'some property string'
-    queryParams = @columnHeaders.queryParamsFor(propertyString)
+  test '`queryParamsFor` returns correct values', ->
+    SORT_UPDATED_AT_DESC = {sort: 'updated_at', order: 'desc'}
+    queryParamsFor = ColumnHeaders.type.prototype.queryParamsFor
 
-    equal queryParams.sort, propertyString, 'sort property is equal to the passed in property'
-
-    ReactRouter.Link.restore()
-    React.unmountComponentAtNode(@columnHeaders.getDOMNode().parentNode)
-
-  test 'toggle order to ascending when property passed in is name and query.order is desc', ->
-    sinon.stub(ReactRouter, 'Link').returns("some link")
-    @columnHeaders = React.renderComponent(ColumnHeaders(query:{order: 'desc'}, areAllItemsSelected: -> true), $('<div>').appendTo('body')[0])
-    propertyString = 'name'
-    queryParams = @columnHeaders.queryParamsFor(propertyString)
-
-    equal queryParams.order, 'asc', 'sets order to asc'
-
-    ReactRouter.Link.restore()
-    React.unmountComponentAtNode(@columnHeaders.getDOMNode().parentNode)
-
-  test 'toggle order to descending when property passed in is not name or query.order is not desc', ->
-    sinon.stub(ReactRouter, 'Link').returns("some link")
-    @columnHeaders = React.renderComponent(ColumnHeaders(query:{order: 'asc'}, areAllItemsSelected: -> true), $('<div>').appendTo('body')[0])
-    propertyString = 'foo'
-    queryParams = @columnHeaders.queryParamsFor(propertyString)
-
-    equal queryParams.order, 'desc', 'sets order to desc'
-
-    ReactRouter.Link.restore()
-    React.unmountComponentAtNode(@columnHeaders.getDOMNode().parentNode)
+    deepEqual queryParamsFor({}, 'updated_at'), SORT_UPDATED_AT_DESC, 'was not sorted by anything'
+    deepEqual queryParamsFor({sort: 'created_at', order: 'desc'}, 'updated_at'), SORT_UPDATED_AT_DESC, 'was sorted by other column'
+    deepEqual queryParamsFor({sort: 'updated_at', order: 'asc' }, 'updated_at'), SORT_UPDATED_AT_DESC, 'was sorted by this column ascending'
+    deepEqual queryParamsFor({sort: 'updated_at', order: 'desc'}, 'updated_at'), {sort: 'updated_at', order: 'asc'}

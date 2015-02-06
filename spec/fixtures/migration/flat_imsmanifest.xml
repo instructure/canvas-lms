@@ -49,6 +49,14 @@
   <resources>
 
     <resource identifier="Resource1" type="assignment_xmlv1p0">
+      <lom:lom>
+         <lom:educational>
+              <lom:intendedEndUserRole>
+               <lom:source>IMSGLC_CC_Rolesv1p2</lom:source>
+               <lom:value>Instructor</lom:value>
+            </lom:intendedEndUserRole>
+         </lom:educational>
+      </lom:lom>
       <assignment xmlns="http://www.imsglobal.org/xsd/imscc_extensions/assignment"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://www.imsglobal.org/xsd/imscc_extensions/assignment http://www.imsglobal.org/profile/cc/cc_extensions/cc_extresource_assignmentv1p0_v1p0.xsd http://www.imsglobal.org/xsd/imscc_extensions/assignment "
@@ -61,6 +69,14 @@
     </resource>
 
     <resource identifier="Resource2" type="imsdt_xmlv1p3">
+      <lom:lom>
+         <lom:educational>
+              <lom:intendedEndUserRole>
+               <lom:source>IMSGLC_CC_Rolesv1p2</lom:source>
+               <lom:value>Instructor</lom:value>
+            </lom:intendedEndUserRole>
+         </lom:educational>
+      </lom:lom>
       <topic xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imsdt_v1p3.xsd">
         <title>Assignment Discussions</title>
         <text texttype="text/html">Discuss your results from the first
@@ -70,6 +86,14 @@
     </resource>
 
     <resource identifier="Resource3" type="imswl_xmlv1p3">
+      <lom:lom>
+         <lom:educational>
+              <lom:intendedEndUserRole>
+               <lom:source>IMSGLC_CC_Rolesv1p2</lom:source>
+               <lom:value>Instructor</lom:value>
+            </lom:intendedEndUserRole>
+         </lom:educational>
+      </lom:lom>
       <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
         <title>Open2.net: Science and Nature</title>
         <url href="http://www.open2.net/sciencetechnologynature/"/>
@@ -77,6 +101,14 @@
     </resource>
 
     <resource identifier="Resource4" type="imsbasiclti_xmlv1p3">
+      <lom:lom>
+         <lom:educational>
+              <lom:intendedEndUserRole>
+               <lom:source>IMSGLC_CC_Rolesv1p2</lom:source>
+               <lom:value>Instructor</lom:value>
+            </lom:intendedEndUserRole>
+         </lom:educational>
+      </lom:lom>
       <cartridge_basiclti_link
               xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
               xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
@@ -88,6 +120,20 @@
         <blti:launch_url>http://www.imsglobal.org/developers/BLTI/tool.php</blti:launch_url>
         <blti:secure_launch_url>http://www.imsglobal.org/developers/BLTI/tool.php</blti:secure_launch_url>
       </cartridge_basiclti_link>
+    </resource>
+
+    <resource identifier="Resource5" type="webcontent">
+      <metadata>
+        <lom:lom>
+          <lom:educational>
+            <lom:intendedEndUserRole>
+              <lom:source>IMSGLC_CC_Rolesv1p1</lom:source>
+              <lom:value>Instructor</lom:value>
+            </lom:intendedEndUserRole>
+          </lom:educational>
+        </lom:lom>
+      </metadata>
+      <file href="imsmanifest.xml"/>
     </resource>
 
   </resources>

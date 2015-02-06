@@ -212,7 +212,7 @@ class AssignmentGroup < ActiveRecord::Base
       scope = user.assignments_visibile_in_course(context).
               where(:assignment_group_id => assignment_groups).published
     end
-    includes.any? ? scope.includes(includes) : scope
+    includes.any? ? scope.preload(includes) : scope
   end
 
   def move_assignments_to(move_to_id)
@@ -224,13 +224,5 @@ class AssignmentGroup < ActiveRecord::Base
     Assignment.where(id: order).first.update_order(order) unless order.empty?
     new_group.touch
     self.reload
-  end
-
-  def self.assignment_scope_for_draft_state(context)
-    if context.feature_enabled?(:draft_state)
-      :published_assignments
-    else
-      :active_assignments
-    end
   end
 end

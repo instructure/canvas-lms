@@ -5,34 +5,34 @@ describe "Converting Angel CC QTI" do
     manifest_node=get_manifest_node('multiple_choice')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>angel_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelExpected::MULTIPLE_CHOICE
+    expect(hash).to eq AngelExpected::MULTIPLE_CHOICE
   end
 
   it "should convert true false" do
     manifest_node=get_manifest_node('true_false')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>angel_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelExpected::TRUE_FALSE
+    expect(hash).to eq AngelExpected::TRUE_FALSE
   end
 
   it "should convert multiple response" do
     manifest_node=get_manifest_node('multiple_answer')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>angel_question_dir)
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelExpected::MULTIPLE_ANSWER
+    expect(hash).to eq AngelExpected::MULTIPLE_ANSWER
   end
 
   it "should convert essay" do
     manifest_node=get_manifest_node('essay')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>angel_question_dir)
-    hash.should == AngelExpected::ESSAY
+    expect(hash).to eq AngelExpected::ESSAY
   end
 
   it "should convert the assessment into a quiz" do
     manifest_node=get_manifest_node('assessment', :quiz_type => 'Test')
     a = Qti::AssessmentTestConverter.new(manifest_node, angel_question_dir)
     a.create_instructure_quiz
-    a.quiz.should == AngelExpected::ASSESSMENT
+    expect(a.quiz).to eq AngelExpected::ASSESSMENT
   end
 
 

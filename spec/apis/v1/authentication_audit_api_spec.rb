@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 describe "AuthenticationAudit API", type: :request do
@@ -42,6 +43,8 @@ describe "AuthenticationAudit API", type: :request do
 
       @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
       @account = Account.default
+      @custom_role = custom_account_role('CustomAdmin', :account => @account)
+      @custom_sa_role = custom_account_role('CustomAdmin', :account => Account.site_admin)
       user_with_pseudonym(active_all: true)
 
       @page_view = PageView.new
@@ -85,16 +88,16 @@ describe "AuthenticationAudit API", type: :request do
     def expect_event_for_context(context, event, options={})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      json['events'].map{ |e| [e['id'], e['event_type']] }
-                    .should include([event.id, event.event_type])
+      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
+                    .to include([event.id, event.event_type])
       json
     end
 
     def forbid_event_for_context(context, event, options={})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      json['events'].map{ |e| [e['id'], e['event_type']] }
-                    .should_not include([event.id, event.event_type])
+      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
+                    .not_to include([event.id, event.event_type])
       json
     end
 
@@ -104,7 +107,7 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "should have correct root keys" do
-        @json.keys.sort.should == %w{events linked links}
+        expect(@json.keys.sort).to eq %w{events linked links}
       end
 
       it "should have a formatted links key" do
@@ -114,15 +117,15 @@ describe "AuthenticationAudit API", type: :request do
           "events.user" => nil,
           "events.page_view" => nil
         }
-        @json['links'].should == links
+        expect(@json['links']).to eq links
       end
 
       it "should have a formatted linked key" do
-        @json['linked'].keys.sort.should == %w{accounts logins page_views users}
-        @json['linked']['accounts'].is_a?(Array).should be_true
-        @json['linked']['logins'].is_a?(Array).should be_true
-        @json['linked']['page_views'].is_a?(Array).should be_true
-        @json['linked']['users'].is_a?(Array).should be_true
+        expect(@json['linked'].keys.sort).to eq %w{accounts logins page_views users}
+        expect(@json['linked']['accounts'].is_a?(Array)).to be_truthy
+        expect(@json['linked']['logins'].is_a?(Array)).to be_truthy
+        expect(@json['linked']['page_views'].is_a?(Array)).to be_truthy
+        expect(@json['linked']['users'].is_a?(Array)).to be_truthy
       end
 
       describe "events collection" do
@@ -131,7 +134,7 @@ describe "AuthenticationAudit API", type: :request do
         end
 
         it "should be formatted as an array of AuthenticationEvent objects" do
-          @json.should == [{
+          expect(@json).to eq [{
             "id" => @event.id,
             "created_at" => @event.created_at.in_time_zone.iso8601,
             "event_type" => @event.event_type,
@@ -151,7 +154,7 @@ describe "AuthenticationAudit API", type: :request do
         end
 
         it "should be formatted as an array of Pseudonym objects" do
-          @json.should == [{
+          expect(@json).to eq [{
             "id" => @pseudonym.id,
             "account_id" => @account.id,
             "user_id" => @user.id,
@@ -167,7 +170,7 @@ describe "AuthenticationAudit API", type: :request do
         end
 
         it "should be formatted as an array of Account objects" do
-          @json.should == [{
+          expect(@json).to eq [{
             "id" => @account.id,
             "name" => @account.name,
             "parent_account_id" => nil,
@@ -187,7 +190,7 @@ describe "AuthenticationAudit API", type: :request do
         end
 
         it "should be formatted as an array of User objects" do
-          @json.should == [{
+          expect(@json).to eq [{
             "id" => @user.id,
             "name" => @user.name,
             "sortable_name" => @user.sortable_name,
@@ -203,7 +206,7 @@ describe "AuthenticationAudit API", type: :request do
         end
 
         it "should be formatted as an array of page_view objects" do
-          @json.size.should eql(1)
+          expect(@json.size).to eql(1)
         end
       end
     end
@@ -354,7 +357,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_role,
             :role_changes => {:view_statistics => true})
         end
 
@@ -375,7 +378,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_role,
             :role_changes => {:manage_user_logins => true})
         end
 
@@ -396,7 +399,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => Account.site_admin, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_sa_role,
             :role_changes => {:view_statistics => true})
         end
 
@@ -417,7 +420,7 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => Account.site_admin, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => @custom_sa_role,
             :role_changes => {:manage_user_logins => true})
         end
 
@@ -438,9 +441,10 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @account = account_model
           user_with_pseudonym(user: @user, account: @account, active_all: true)
+          custom_role = custom_account_role('CustomAdmin', :account => @account)
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
-            :membership_type => 'CustomAdmin',
+            :role => custom_role,
             :role_changes => {:manage_user_logins => true})
         end
 
@@ -454,7 +458,7 @@ describe "AuthenticationAudit API", type: :request do
           before do
             @user, _ = @user, account_admin_user_with_role_changes(
               :account => Account.site_admin, :user => @viewing_user,
-              :membership_type => 'CustomAdmin',
+              :role => @custom_sa_role,
               :role_changes => {:manage_user_logins => true})
           end
 
@@ -495,9 +499,10 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, @viewing_user = @user, @shard2.activate{ user_model }
           @user, _ = @user, @shard2.activate do
+            custom_role = custom_account_role("CustomAdmin", :account => @account)
             account_admin_user_with_role_changes(
               :account => @account, :user => @viewing_user,
-              :membership_type => 'CustomAdmin',
+              :role => custom_role,
               :role_changes => {:manage_user_logins => true})
           end
         end
@@ -521,11 +526,11 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "should only return one page of results" do
-        @json['events'].size.should == 2
+        expect(@json['events'].size).to eq 2
       end
 
       it "should have pagination headers" do
-        response.headers['Link'].should match(/rel="next"/)
+        expect(response.headers['Link']).to match(/rel="next"/)
       end
     end
   end

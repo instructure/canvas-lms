@@ -38,7 +38,7 @@ class Assignment < ActiveRecord::Base
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id,
+    :external_tool_tag_attributes, :freeze_on_copy,
     :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data
 
   EXPORTABLE_ATTRIBUTES = [
@@ -82,15 +82,22 @@ class Assignment < ActiveRecord::Base
   validate :positive_points_possible?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
-    # only accept the url and new_tab params, the other accessible
+    # only accept the url, content_type, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
-    attrs.slice!(:url, :new_tab)
+    content = case attrs['content_type']
+                when 'Lti::MessageHandler'
+                  Lti::MessageHandler.find(attrs['content_id'].to_i)
+                when 'ContextExternalTool'
+                  ContextExternalTool.find(attrs['content_id'].to_i)
+              end
+    attrs[:content] = content if content
+    attrs.slice!(:url, :new_tab, :content)
     false
   }
   before_validation do |assignment|
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
-      assignment.external_tool_tag.content_type = "ContextExternalTool"
+      assignment.external_tool_tag.content_type ||= "ContextExternalTool"
     else
       assignment.association(:external_tool_tag).reset
     end
@@ -243,9 +250,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at
+    reviews_due_at = self.peer_reviews_assign_at || self.due_at
+    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && reviews_due_at
       self.send_later_enqueue_args(:do_auto_peer_review, {
-        :run_at => due_at,
+        :run_at => reviews_due_at,
         :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
       })
     end
@@ -295,9 +303,8 @@ class Assignment < ActiveRecord::Base
     turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
     res = turnitin.createOrUpdateAssignment(self, self.turnitin_settings)
 
-    unless read_attribute(:turnitin_settings)
-      self.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
-    end
+    # make sure the defaults get serialized
+    self.turnitin_settings = turnitin_settings
 
     if res[:assignment_id]
       self.turnitin_settings[:created] = true
@@ -311,7 +318,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings
-    read_attribute(:turnitin_settings) || Turnitin::Client.default_assignment_turnitin_settings
+    super.empty? ? Turnitin::Client.default_assignment_turnitin_settings : super
   end
 
   def turnitin_settings=(settings)
@@ -420,9 +427,7 @@ class Assignment < ActiveRecord::Base
       quiz.assignment_group_id = self.assignment_group_id
       quiz.workflow_state = 'created' if quiz.deleted?
       quiz.saved_by = :assignment
-      if self.context.feature_enabled?(:draft_state)
-        quiz.workflow_state = published? ? 'available' : 'unpublished'
-      end
+      quiz.workflow_state = published? ? 'available' : 'unpublished'
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
       topic = self.discussion_topic || self.context.discussion_topics.build(:user => @updating_user)
@@ -432,9 +437,7 @@ class Assignment < ActiveRecord::Base
       topic.saved_by = :assignment
       topic.updated_at = Time.now
       topic.workflow_state = 'active' if topic.deleted?
-      if self.context.feature_enabled?(:draft_state)
-        topic.workflow_state = published? ? 'active' : 'unpublished'
-      end
+      topic.workflow_state = published? ? 'active' : 'unpublished'
       topic.save
       self.discussion_topic = topic
     end
@@ -560,11 +563,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    if !self.context.feature_enabled?(:draft_state) || self.has_student_submissions?
-      self.workflow_state = "published"
-    elsif self.context.feature_enabled?(:draft_state)
-      self.workflow_state = "unpublished"
-    end
+    self.workflow_state = self.has_student_submissions? ? "published" : "unpublished"
     self.save
     self.discussion_topic.restore(:assignment) if from != :discussion_topic && self.discussion_topic
     self.quiz.restore(:assignment) if from != :quiz && self.quiz
@@ -585,37 +584,9 @@ class Assignment < ActiveRecord::Base
     overridden_users
   end
 
-  def students_with_visibility
-    if self.differentiated_assignments_applies?
-      context.all_students.able_to_see_assignment_in_course_with_da(self.id, context.id)
-    else
-      context.all_students
-    end
-  end
-
-  def visible_to_user?(user)
-    return true if context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
-    visible_to_observer?(user) || students_with_visibility.pluck(:id).include?(user.id)
-  end
-
-  def visible_to_observer?(user)
-    return true if !differentiated_assignments_applies?
-    return false unless context.user_has_been_observer?(user)
-
-    visible_student_ids = students_with_visibility.pluck(:id)
-
-    observed_students_ids = ObserverEnrollment.observed_student_ids(context, user)
-
-    # observers can be students as well, so their own assignments must be included
-    if user.student_enrollments.where(course_id: self.context_id).any?
-      observed_students_ids << user.id
-    end
-
-    # if the observer doesn't have students, show them published assignments
-    has_visible_students = (observed_students_ids & visible_student_ids).any?
-    return has_visible_students if observed_students_ids.any?
-
-    self.published?
+  def students_with_visibility(scope=context.all_students)
+    return scope unless self.differentiated_assignments_applies?
+    scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
   end
 
   attr_accessor :saved_by
@@ -646,7 +617,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def score_to_grade_percent(score=0.0)
-    if self.points_possible > 0
+    if points_possible && points_possible > 0
       result = score.to_f / self.points_possible
       result = (result * 1000.0).round / 10.0
     else
@@ -866,7 +837,8 @@ class Assignment < ActiveRecord::Base
     given { |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
       context.grants_right?(user, session, :participate_as_student) &&
-      !locked_for?(user)
+      !locked_for?(user) &&
+      visible_to_user?(user)
     }
     can :submit and can :attach_submission_comment_files
 
@@ -1105,10 +1077,11 @@ class Assignment < ActiveRecord::Base
     end
 
     if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment']))
+      uuid = CanvasSlug.generate_securish_uuid
       res = find_or_create_submissions(students) do |s|
         s.group = group
         s.save! if s.changed?
-        opts[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
+        opts[:group_comment_id] = uuid if group
         s.add_comment(opts)
         # this is lame, SubmissionComment updates the submission directly in the db
         # in an after_save, and of course Rails doesn't preload the reverse association
@@ -1126,10 +1099,10 @@ class Assignment < ActiveRecord::Base
     res
   end
 
-  SUBMIT_HOMEWORK_ATTRS = %w[body url attachments submission_type
+  SUBMIT_HOMEWORK_ATTRS = %w[body url submission_type
                              media_comment_id media_comment_type]
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
-                                    %w[comment group_comment]).to_set
+                                    %w[comment group_comment attachments]).to_set
 
   def submit_homework(original_student, opts={})
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
@@ -1271,7 +1244,6 @@ class Assignment < ActiveRecord::Base
 
     submissions = self.submissions.where(:user_id => students)
                   .includes(:submission_comments,
-                            :attachments,
                             :versions,
                             :quiz_submission)
 
@@ -1286,14 +1258,15 @@ class Assignment < ActiveRecord::Base
           :submission_comments => {
             :methods => avatar_methods,
             :only => comment_fields
-          },
-          :attachments => {
-            :only => [:mime_class, :comment_id, :id, :submitter_id ]
-          },
+          }
         },
         :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
+      json['attachments'] = sub.attachments.map{|att| att.as_json(
+          :only => [:mime_class, :comment_id, :id, :submitter_id ]
+      )}
 
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
@@ -1312,6 +1285,7 @@ class Assignment < ActiveRecord::Base
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
                                                json[:attachment][:crocodoc_url] = a.crocodoc_url(user)
+                                               json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                                              }
                                            end
                                          end
@@ -1393,7 +1367,7 @@ class Assignment < ActiveRecord::Base
                                  else
                                    []
                                  end
-      groups_and_ungrouped(user).map { |group_name, group_students|
+      reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)
         representative   = (visible_group_students & users_with_turnitin_data).first
         representative ||= (visible_group_students & users_with_submissions).first
@@ -1406,10 +1380,15 @@ class Assignment < ActiveRecord::Base
         representative.sortable_name = group_name
         representative.short_name = group_name
 
-        yield representative, others if block_given?
-
-        representative
+        [representative, others]
       }.compact
+
+      sorted_reps_with_others = Canvas::ICU.collate_by(reps_and_others) { |rep, _|
+      rep.sortable_name }
+      if block_given?
+        sorted_reps_with_others.each { |r,o| yield r, o }
+      end
+      sorted_reps_with_others.map &:first
     else
       visible_students_for_speed_grader(user)
     end
@@ -1432,10 +1411,7 @@ class Assignment < ActiveRecord::Base
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[user.global_id] ||= (
       student_scope = user ? context.students_visible_to(user) : context.participating_students
-      if self.differentiated_assignments_applies?
-        student_scope = student_scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
-      end
-      student_scope
+      students_with_visibility(student_scope)
     ).order_by_sortable_name.uniq.to_a
   end
 
@@ -1502,12 +1478,7 @@ class Assignment < ActiveRecord::Base
     return [] unless self.peer_review_count && self.peer_review_count > 0
 
     submissions = self.submissions.having_submission.include_assessment_requests
-
-    student_ids = if self.differentiated_assignments_applies?
-                    context.students.able_to_see_assignment_in_course_with_da(self.id, self.context.id).pluck(:id)
-                  else
-                    context.student_ids
-                  end
+    student_ids = students_with_visibility(context.students).pluck(:id)
 
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
     submission_ids = Set.new(submissions) { |s| s.id }
@@ -1615,26 +1586,26 @@ class Assignment < ActiveRecord::Base
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
+  scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
     joins(:assignment_student_visibilities).
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
   }
 
   # course_ids should be courses that restrict visibility based on overrides
   # ie: courses with differentiated assignments on or in which the user is not a teacher
-  scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids|
-    if course_ids.nil? || course_ids.empty?
+  scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids_that_have_da_enabled|
+    if course_ids_that_have_da_enabled.nil? || course_ids_that_have_da_enabled.empty?
       active
     else
-      joins(:assignment_student_visibilities).
-      where("""
-        (assignments.context_id NOT IN (?)
-        AND assignments.workflow_state<>'deleted')
-        OR (
-          assignment_student_visibilities.user_id IN (?)
-          AND assignment_student_visibilities.course_id IN (?)
-        )
-      """, course_ids, user_ids, course_ids)
+      user_ids = Array.wrap(user_ids).join(',')
+      course_ids = Array.wrap(course_ids_that_have_da_enabled).join(',')
+      scope = joins(sanitize_sql([<<-SQL, course_ids, user_ids]))
+        LEFT OUTER JOIN assignment_student_visibilities ON (
+         assignment_student_visibilities.assignment_id = assignments.id
+         AND assignment_student_visibilities.course_id IN (%s)
+         AND assignment_student_visibilities.user_id IN (%s))
+      SQL
+      scope.where("(assignments.context_id NOT IN (?) AND assignments.workflow_state<>'deleted') OR (assignment_student_visibilities.assignment_id IS NOT NULL)", course_ids_that_have_da_enabled)
     end
   }
 
@@ -1762,6 +1733,10 @@ class Assignment < ActiveRecord::Base
 
   def expects_external_submission?
     submission_types == 'on_paper' || submission_types == 'external_tool'
+  end
+
+  def non_digital_submission?
+    ["on_paper","none","not_graded",""].include?(submission_types.strip)
   end
 
   def allow_google_docs_submission?
@@ -1896,7 +1871,20 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.submissions.having_submission.where("user_id IS NOT NULL").exists?
+    if attribute_present? :student_submission_count
+      student_submission_count.to_i > 0
+    else
+      submissions.having_submission.where("user_id IS NOT NULL").exists?
+    end
+  end
+
+  def self.with_student_submission_count
+    joins("LEFT OUTER JOIN submissions s ON
+           s.assignment_id = assignments.id AND
+           s.submission_type IS NOT NULL AND
+           s.user_id IS NOT NULL")
+    .group("assignments.id")
+    .select("assignments.*, count(s.id) AS student_submission_count")
   end
 
   def can_unpublish?

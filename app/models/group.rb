@@ -62,6 +62,7 @@ class Group < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
+  has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
   belongs_to :avatar_attachment, :class_name => "Attachment"
   belongs_to :leader, :class_name => "User"
 
@@ -78,7 +79,7 @@ class Group < ActiveRecord::Base
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
-  after_save :update_max_membership_from_group_category
+  before_save :update_max_membership_from_group_category
 
   delegate :time_zone, :to => :context
 
@@ -104,6 +105,11 @@ class Group < ActiveRecord::Base
     user_ids ?
       participating_users_association.where(:id =>user_ids) :
       participating_users_association
+  end
+
+  def all_real_students
+    return self.context.all_real_students.where("users.id IN (?)", self.users.pluck(:id)) if self.context.respond_to? "all_real_students"
+    self.users
   end
 
   def wiki_with_create
@@ -143,9 +149,8 @@ class Group < ActiveRecord::Base
   end
 
   def update_max_membership_from_group_category
-    if group_category && group_category.group_limit && (!max_membership || max_membership == 0)
+    if (!max_membership || max_membership == 0) && group_category && group_category.group_limit
       self.max_membership = group_category.group_limit
-      self.save
     end
   end
 
@@ -284,6 +289,18 @@ class Group < ActiveRecord::Base
     # permissions for this user in the group are probably different now
     clear_permissions_cache(user)
     return member
+  end
+
+  def set_users(users)
+    user_ids = users.map(&:id)
+    memberships = []
+    transaction do
+      self.group_memberships.where("user_id NOT IN (?)", user_ids).destroy_all
+      users.each do |user|
+        memberships << invite_user(user)
+      end
+    end
+    memberships
   end
 
   def bulk_add_users_to_group(users, options = {})
@@ -435,7 +452,10 @@ class Group < ActiveRecord::Base
     given { |user| self.group_category.try(:communities?) }
     can :create
 
-    given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
+    given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
+    can :participate_as_student
+
+    given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
     can :create
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
@@ -453,6 +473,8 @@ class Group < ActiveRecord::Base
     can :post_to_forum and
     can :read and
     can :read_roster and
+    can :send_messages and
+    can :send_messages_all and
     can :update and
     can :view_unpublished_items
 
@@ -537,7 +559,7 @@ class Group < ActiveRecord::Base
     available_tabs = [
       { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
       { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :css_class => 'announcements', :href => :group_announcements_path },
-      { :id => TAB_PAGES,         :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_pages_path },
+      { :id => TAB_PAGES,         :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_path },
       { :id => TAB_PEOPLE,        :label => t("#group.tabs.people", "People"), :css_class => 'people', :href => :group_users_path },
       { :id => TAB_DISCUSSIONS,   :label => t("#group.tabs.discussions", "Discussions"), :css_class => 'discussions', :href => :group_discussion_topics_path },
       { :id => TAB_FILES,         :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path },
@@ -629,5 +651,10 @@ class Group < ActiveRecord::Base
 
   def account_chain
     @account_chain ||= Account.account_chain(account_id)
+    @account_chain.dup
+  end
+
+  def sortable_name
+    name
   end
 end

@@ -427,7 +427,7 @@ class WebConference < ActiveRecord::Base
     plugins.map{ |plugin|
       next unless plugin.enabled? &&
           (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
-          klass < self.base_ar_class
+          klass < self.base_class
       plugin.settings.merge(
         :conference_type => plugin.id.classify,
         :class_name => (plugin.base || "#{plugin.id.classify}Conference"),

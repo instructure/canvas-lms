@@ -174,7 +174,7 @@ require [
   # Add module sequence footer
   if ENV.DISCUSSION.SEQUENCE?
     $('#module_sequence_footer').moduleSequenceFooter(
-      assetType: 'Discussion'
+      assetType: ENV.DISCUSSION.SEQUENCE.ASSET_TYPE
       assetID: ENV.DISCUSSION.SEQUENCE.ASSET_ID
       courseID: ENV.DISCUSSION.SEQUENCE.COURSE_ID
       )
@@ -188,5 +188,3 @@ require [
     topicView.on 'addReply', once
   else
     initEntries()
-
-

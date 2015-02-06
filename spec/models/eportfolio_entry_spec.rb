@@ -33,17 +33,17 @@ describe EportfolioEntry do
     it "should validate the length of attributes" do
       @eportfolio_entry.name = @long_string
       @eportfolio_entry.slug = @long_string
-      (lambda { @eportfolio_entry.save! }).should raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
+      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
     end
 
     it "should validate the length of slug" do
       @eportfolio_entry.slug = @long_string
-      (lambda { @eportfolio_entry.save! }).should raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
+      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
     end
 
     it "should validate the length of name" do
       @eportfolio_entry.name = @long_string
-      (lambda { @eportfolio_entry.save! }).should raise_error("Validation failed: Name is too long (maximum is 255 characters)")
+      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
   end
 
@@ -56,32 +56,32 @@ describe EportfolioEntry do
       eportfolio_model
       attachment_model(:context => @user)
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'attachment', :attachment_id => @attachment.id}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0][:section_type].should eql('attachment')
-      @eportfolio_entry.content[0][:attachment_id].should eql(@attachment.id)
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0][:section_type]).to eql('attachment')
+      expect(@eportfolio_entry.content[0][:attachment_id]).to eql(@attachment.id)
     end
 
     it "should not accept invalid attachments" do
       attachment_model(:context => User.create)
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'attachment', :attachment_id => @attachment.id}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0].should eql("No Content Added Yet")
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'attachment'}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0].should eql("No Content Added Yet")
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "should accept valid submissions" do
       submission_model(:user => @user)
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'submission', :submission_id => @submission.id}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0][:section_type].should eql('submission')
-      @eportfolio_entry.content[0][:submission_id].should eql(@submission.id)
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0][:section_type]).to eql('submission')
+      expect(@eportfolio_entry.content[0][:submission_id]).to eql(@submission.id)
     end
 
     it "should not accept invalid submissions" do
@@ -90,50 +90,50 @@ describe EportfolioEntry do
       eportfolio_model
       submission_model(:user => @user)
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'submission', :submission_id => @bad_submission.id}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0].should eql("No Content Added Yet")
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'submission'}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0].should eql("No Content Added Yet")
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "should accept valid html content" do
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'html', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>"}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0][:section_type].should eql('html')
-      @eportfolio_entry.content[0][:content].should match(/\#bob/)
-      @eportfolio_entry.content[0][:content].should match(/link/)
-      @eportfolio_entry.content[0][:content].should_not match(/alert/)
-      @eportfolio_entry.content[0][:content].should_not match(/javascript/)
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0][:section_type]).to eql('html')
+      expect(@eportfolio_entry.content[0][:content]).to match(/\#bob/)
+      expect(@eportfolio_entry.content[0][:content]).to match(/link/)
+      expect(@eportfolio_entry.content[0][:content]).not_to match(/alert/)
+      expect(@eportfolio_entry.content[0][:content]).not_to match(/javascript/)
     end
 
     it "should not accept invalid html content" do
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'html'}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0].should eql("No Content Added Yet")
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "should accept valid rich content" do
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>"}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0][:section_type].should eql('rich_text')
-      @eportfolio_entry.content[0][:content].should match(/\#bob/)
-      @eportfolio_entry.content[0][:content].should match(/link/)
-      @eportfolio_entry.content[0][:content].should_not match(/alert/)
-      @eportfolio_entry.content[0][:content].should_not match(/javascript/)
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0][:section_type]).to eql('rich_text')
+      expect(@eportfolio_entry.content[0][:content]).to match(/\#bob/)
+      expect(@eportfolio_entry.content[0][:content]).to match(/link/)
+      expect(@eportfolio_entry.content[0][:content]).not_to match(/alert/)
+      expect(@eportfolio_entry.content[0][:content]).not_to match(/javascript/)
     end
 
     it "should not accept invalid rich content" do
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "<blink/>"}})
-      @eportfolio_entry.content.should_not be_nil
-      @eportfolio_entry.content.length.should eql(1)
-      @eportfolio_entry.content[0].should eql("No Content Added Yet")
+      expect(@eportfolio_entry.content).not_to be_nil
+      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
   end
 end

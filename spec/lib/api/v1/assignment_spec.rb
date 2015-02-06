@@ -26,17 +26,17 @@ describe "Api::V1::Assignment" do
 
     it "returns json" do
       json = api.assignment_json(@assignment, @user, @session, {override_dates: false})
-      json.should be_a(Hash)
-      json["needs_grading_count"].should eq(0)
-      json["needs_grading_count_by_section"].should be_nil
+      expect(json).to be_a(Hash)
+      expect(json["needs_grading_count"]).to eq(0)
+      expect(json["needs_grading_count_by_section"]).to be_nil
     end
 
     it "includes section-based counts when grading flag is passed" do
       json = api.assignment_json(@assignment, @user, @session,
                {override_dates: false, needs_grading_count_by_section: true})
-      json.should be_a(Hash)
-      json["needs_grading_count"].should eq(0)
-      json["needs_grading_count_by_section"].should == []
+      expect(json).to be_a(Hash)
+      expect(json["needs_grading_count"]).to eq(0)
+      expect(json["needs_grading_count_by_section"]).to eq []
     end
   end
 

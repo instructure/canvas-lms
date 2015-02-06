@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
+// xsslint jqueryObject.property sortable placeholder
+// xsslint safeString.property question_text
 define([
   'jst/quiz/regrade',
   'i18n!quizzes',
@@ -32,7 +36,9 @@ define([
   'compiled/views/calendar/MissingDateDialogView',
   'compiled/editor/MultipleChoiceToggle',
   'compiled/str/TextHelper',
-  'compiled/views/quizzes/editor/KeyboardShortcuts',
+  'compiled/views/editor/KeyboardShortcuts',
+  'INST', // safari sniffing for VO workarounds
+  'quiz_formula_solution',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -54,7 +60,7 @@ define([
             wikiSidebar, DueDateListView, DueDateOverrideView, Quiz,
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper,
-            RCEKeyboardShortcuts){
+            RCEKeyboardShortcuts, INST, QuizFormulaSolution){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -219,24 +225,24 @@ define([
         id: answer.id,
         match_id: answer.match_id
       };
-      templateData.comments_header = I18n.beforeLabel('comments_on_answer', "Comments, if the user chooses this answer");
-      templateData.short_answer_header = I18n.beforeLabel('possible_answer', "Possible Answer");
+      templateData.comments_header = I18n.beforeLabel(I18n.t('labels.comments_on_answer', "Comments, if the user chooses this answer"));
+      templateData.short_answer_header = I18n.beforeLabel(I18n.t('labels.possible_answer', "Possible Answer"));
 
       $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_answer', 'Click to enter comments for the student if they choose this answer'));
 
       if (question_type == "essay_question" || question_type == "file_upload_question") {
-        templateData.comments_header = I18n.beforeLabel('comments_on_question', "Comments for this question");
+        templateData.comments_header = I18n.beforeLabel(I18n.t('labels.comments_on_question', "Comments for this question"));
       } else if (question_type == "matching_question") {
         templateData.answer_match_left_html = answer.answer_match_left_html;
-        templateData.comments_header = I18n.beforeLabel('comments_on_wrong_match', "Comments if the user gets this match wrong");
+        templateData.comments_header = I18n.beforeLabel(I18n.t('labels.comments_on_wrong_match', "Comments if the user gets this match wrong"));
         $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_wrong_match', 'Click to enter comments for the student if they miss this match'));
       } else if (question_type == "missing_word_question") {
-        templateData.short_answer_header = I18n.beforeLabel('answer_text', "Answer text");
+        templateData.short_answer_header = I18n.beforeLabel(I18n.t('labels.answer_text', "Answer text"));
       } else if (question_type == "multiple_choice_question") {
         templateData.answer_html = answer.answer_html;
       } else if (question_type == "multiple_answers_question") {
         templateData.answer_html = answer.answer_html;
-        templateData.short_answer_header = I18n.beforeLabel('answer_text', "Answer text");
+        templateData.short_answer_header = I18n.beforeLabel(I18n.t('labels.answer_text', "Answer text"));
       } else if (question_type == "fill_in_multiple_blanks_question") {
         templateData.blank_id = answer.blank_id;
       } else if (question_type == "multiple_dropdowns_question") {
@@ -492,14 +498,14 @@ define([
               $tr.append($td);
             }
             var $td = $("<td class='final_answer'/>");
-            var answer = data.answer;
+            var answerHtml = data.answer;
             if (question.answerDecimalPoints || question.answer_tolerance) {
               var tolerance = parseFloatOrPercentage(question.answer_tolerance);
               tolerance = tolerance || Math.pow(0.1, question.answerDecimalPoints);
-              answer = answer + " <span style='font-size: 0.8em;'>+/-</span> " + tolerance;
+              answerHtml = answerHtml + " <span style='font-size: 0.8em;'>+/-</span> " + htmlEscape(tolerance);
               $question.find(".answer_tolerance").text(tolerance);
             }
-            $td.html(answer);
+            $td.html(answerHtml);
             $tr.append($td);
             $question.find(".equation_combinations tbody").append($tr);
           });
@@ -530,9 +536,9 @@ define([
       $question.find(".blank_id_select").empty();
       if (question.question_type == 'missing_word_question') {
         var $text = $question.find(".question_text");
-        $text.html("<span class='text_before_answers'>" + question.question_text + "</span> ");
+        $text.html("<span class='text_before_answers'>" + $.raw(question.question_text) + "</span> ");
         $text.append($select);
-        $text.append(" <span class='text_after_answers'>" + question.text_after_answers + "</span>");
+        $text.append(" <span class='text_after_answers'>" + $.raw(question.text_after_answers) + "</span>");
       } else if (question.question_type == 'multiple_dropdowns_question' || question.question_type == 'fill_in_multiple_blanks_question') {
         var variables = {}
         $.each(question.answers, function(i, data) {
@@ -568,15 +574,15 @@ define([
             split = split.split("\n");
           }
         }
-        var code = "";
+        var codeHtml = "";
         for(var cdx in split) {
           if(split[cdx]) {
-            code = code + "<li>" + htmlEscape(split[cdx]) + "</li>";
+            codeHtml = codeHtml + "<li>" + htmlEscape(split[cdx]) + "</li>";
           }
         }
 
-        if (code) {
-          $text.append(I18n.beforeLabel('other_incorrect_matches', "Other Incorrect Match Options") + "<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
+        if (codeHtml) {
+          $text.append(htmlEscape(I18n.beforeLabel(I18n.t('labels.other_incorrect_matches', "Other Incorrect Match Options"))) + "<ul class='matching_answer_incorrect_matches_list'>" + codeHtml + "</ul>");
         }
       }
       $question.find(".blank_id_select").change();
@@ -727,7 +733,7 @@ define([
         $formQuestion.removeClass('selectable');
         $formQuestion.find(".answers_header").hide().end()
           .find(".question_comment").css('display', 'none');
-        $formQuestion.find(".question_header").text(I18n.beforeLabel('message_text', "Message Text"));
+        $formQuestion.find(".question_header").text(I18n.beforeLabel(I18n.t('labels.message_text', "Message Text")));
         $form.find(":input[name='question_points']").val(0);
         result.answer_type = "none";
         result.textValues = [];
@@ -1081,7 +1087,7 @@ define([
     // Keep the pickers visible, but enable or disable them
     enableDatePickers: function(isEnabled) {
       correctAnswerVisibility.$options
-        .find('input, button')
+        .find('input.date_field, button.date_field')
         .prop('disabled', !isEnabled);
     }
   };
@@ -1601,6 +1607,7 @@ define([
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
             labelFn: function( section ) { return section.get('name')},
+            da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED,
             success: function(){
               missingDateView.$dialog.dialog('close').remove();
               missingDateView.remove();
@@ -1849,12 +1856,12 @@ define([
             $td.attr('aria-labelledby', 'possible_solution_' + question.answers[idx].variables[jdx].name);
             $tr.append($td);
           }
-          var text = question.answers[idx].answer_text;
+          var html = question.answers[idx].answer_text;
           if (question.answer_tolerance) {
-            text = text + " <span style='font-size: 0.8em;'>+/-</span> " + question.answer_tolerance;
+            html = html + " <span style='font-size: 0.8em;'>+/-</span> " + htmlEscape(question.answer_tolerance);
           }
           var $td = $("<td class='final_answer'/>");
-          $td.html(text);
+          $td.html(html);
           $td.attr('aria-labelledby', 'possible_solution_final');
           $tr.append($td);
           $form.find(".combinations tbody").append($tr);
@@ -1876,7 +1883,7 @@ define([
         });
       }
       if ($question.hasClass('essay_question') || $question.hasClass('file_upload')) {
-        $formQuestion.find(".comments_header").text(I18n.beforeLabel('comments_on_question', "Comments for this question"));
+        $formQuestion.find(".comments_header").text(I18n.beforeLabel(I18n.t('labels.comments_on_question', "Comments for this question")));
       }
 
       limitTextInputFor($form, question.question_type);
@@ -1933,9 +1940,42 @@ define([
     });
 
     $(document).delegate("a.comment_focus", 'focus click', function(event) {
+      var $commentEditor;
+      var $focusProxy = $(this);
+      var focusEditor = function() {
+        $commentEditor.focus().select();
+      };
+
       event.preventDefault();
-      $(this).parents(".question_comment,.answer_comments").removeClass('empty')
-        .find("textarea.comments").focus().select();
+
+      $commentEditor = $focusProxy
+        .closest('.question_comment, .answer_comments')
+          .removeClass('empty')
+          .find('textarea.comments');
+
+      // Hack to fix focusing the editor on Safari using keyboard arrows under
+      // VoiceOver (tab worked just fine, just not VO+arrow cursor navigation)
+      // by waiting a while before we focus the comment editor.
+      //
+      // Read below for a "guess" on why this is happening.
+      //
+      // It seems VO/Safari ignores manual focus calls past a certain threshold,
+      // so the fact that we're focusing the a.comment_focus then moving focus
+      // to the textarea does not work with arrows. This is the closest thing I
+      // found to the issue: http://bit.ly/1rkdSUh
+      //
+      // @since CNVS-15099
+      if (INST.browser.safari && event.type === 'focusin') {
+        setTimeout(function() {
+          // don't focus the editor if the user has tabbed/moved away from the
+          // proxy anchor
+          if ($focusProxy.is(':focus')) {
+            focusEditor();
+          }
+        }, 500 /* the magic started working at 350ms but it wasn't reliable */);
+      } else {
+        focusEditor();
+      }
     });
 
     $(document).delegate("textarea.comments", 'focus', function() {
@@ -2132,6 +2172,7 @@ define([
 
       var $ans = $(this).parents(".answer");
       var $ansHeader = $ans.closest('.question').find('.answers_header');
+      $(".errorBox").not("#error_box_template").remove();
       $ans.remove();
       $ansHeader.focus();
     });
@@ -2169,7 +2210,7 @@ define([
       var $form = $question.parents(".question_holder").children("form");
       $form.attr('action', $("#quiz_urls .add_question_url,#bank_urls .add_question_url").attr('href'))
         .attr('method', 'POST')
-        .find(".submit_button").html(I18n.t('buttons.create_question', "Create Question"));
+        .find(".submit_button").text(I18n.t('buttons.create_question', "Create Question"));
       $form.find("option.missing_word").remove();
       $question.find(".question_type").change();
       $("html,body").scrollTo({top: $question.offset().top - 10, left: 0});
@@ -2525,7 +2566,7 @@ define([
         }];
         answer_type = "short_answer";
         question_type = "short_answer_question";
-        answer_selection_type = "any_answer";
+        answer_selection_type = "blanks";
       } else if ($question.hasClass('essay_question')) {
         var answers = [{
           comments: I18n.t('default_response_to_essay', "Response to show student after they submit an answer")
@@ -2580,7 +2621,7 @@ define([
         }];
         answer_type = "short_answer";
         question_type = "fill_in_multiple_blanks_question";
-        answer_selection_type = "any_answer";
+        answer_selection_type = "blanks";
       }
       for(var i = 0; i < answers.length; i++) {
         var answer = answers[i];
@@ -2591,6 +2632,9 @@ define([
         $answer = makeFormAnswer(answer);
         if (answer_selection_type == "any_answer") {
           $answer.addClass('correct_answer');
+        } else if (answer_selection_type == "blanks") {
+          $answer.addClass("correct_answer");
+          $answer.addClass("fill_in_blank_answer");
         } else if (answer_selection_type == "matching") {
           $answer.removeClass('correct_answer');
         }
@@ -2611,6 +2655,7 @@ define([
       event.stopPropagation();
       var $displayQuestion = $(this).prev();
       var $form = $(this);
+      $(".errorBox").not("#error_box_template").remove();
       var $answers = $form.find(".answer");
       var $question = $(this).find(".question");
       var answers = [];
@@ -2634,6 +2679,29 @@ define([
           error_text = I18n.t('errors.no_answer', "Please add at least one answer");
         } else if ($answers.filter(".correct_answer").length === 0 && (questionData.question_type == "multiple_choice_question" || questionData.question_type == "true_false_question" || questionData.question_tyep == "missing_word_question")) {
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
+        }
+      } else if (questionData.question_type == "fill_in_multiple_blanks_question" || questionData.question_type == "short_answer_question") {
+        function checkForNotBlanks(elements) {
+          return elements.filter(function(i,element) {
+            return !!element.value;
+          }).length;
+        }
+        if (questionData.question_type == "fill_in_multiple_blanks_question") {
+          var $variables = $form.find(".blank_id_select > option");
+          $variables.each(function(i, answer_blank) {
+            var blankCount = 0;
+            $answers.filter(".answer_idx_" + i).each(function(i, element) {
+              var $validInputs = $(element).find( $("input[name='answer_text']")).not(".disabled_answer");
+              if (checkForNotBlanks($validInputs) > 0) {blankCount += 1;}
+            });
+            if (blankCount == 0) {error_text = I18n.t("Please add at least one non-blank answer for each variable.");}
+          });
+        } else {
+          var $validAnswers = $answers.filter("div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer");
+          var $validInputs = $validAnswers.find( $("input[name='answer_text']")).not(".disabled_answer");
+          if (checkForNotBlanks($validInputs) == 0) {
+            error_text = I18n.t("Please add at least one non-blank answer.");
+          }
         }
       }
 
@@ -3014,17 +3082,17 @@ define([
 
         if (this.intoGroups.length > 0) {
           options = $.map(this.intoGroups, function(g) {
-            return '<option value="' + g.id + '">' + g.name + '</option>';
+            return '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>';
           });
           options.unshift('<option value="top">' +
-            I18n.t('top_level', '-- Top level --') +
+            htmlEscape(I18n.t('top_level', '-- Top level --')) +
           '</option>');
 
           moveWrapper.show();
         } else {
           moveWrapper.hide();
         }
-        moveSelect.html(options.join(''));
+        moveSelect.html($.raw(options.join('')));
 
         // trigger building 'place' menu
         moveSelect.change(this.buildPlaceMenu.bind(this));
@@ -3040,14 +3108,14 @@ define([
 
         // build options
         var options = $.map(filtered, function(item) {
-          return '<option value="' + item.type + '_' + item.id + '">' +
-            I18n.t('before_quiz_item', "before %{name}", {name: item.name}) +
+          return '<option value="' + htmlEscape(item.type) + '_' + item.id + '">' +
+            htmlEscape(I18n.t('before_quiz_item', "before %{name}", {name: item.name})) +
           '</option>';
         });
         options.push('<option value="last">' +
-          I18n.t('at_the_bottom', "-- at the bottom --") +
+          htmlEscape(I18n.t('at_the_bottom', "-- at the bottom --")) +
         '</option>');
-        this.$form.find('#move_select_question').html(options.join(''));
+        this.$form.find('#move_select_question').html($.raw(options.join('')));
       },
 
       itemsInGroup: function(group) {
@@ -3105,6 +3173,7 @@ define([
       reorderDom: function(group) {
         var option = this.$form.find("#move_select_question option:selected");
         var place = option.attr('value');
+        var bottom = this.selected.sortable.nextAll('.group_bottom').first();
 
         // move to bottom of the group
         if (place == 'last') {
@@ -3132,20 +3201,21 @@ define([
           beforeItem.before(this.selected.sortable);
         }
 
-        this.reorderDomGroupContent();
+        this.reorderDomGroupContent(bottom);
         this.setQuestionGroupClass(group);
       },
-      reorderDomGroupContent: function() {
+      reorderDomGroupContent: function($bottom) {
         if (this.selected.type != 'group') { return; }
 
-        var items = this.itemsInGroup(this.selected.id);
-        var bottom = items[0].sortable.nextAll('.group_bottom').first();
         var prev = this.selected.sortable;
-        $.each(items, function(i, item) {
-          prev.after(item.sortable);
-          prev = item.sortable;
-        });
-        prev.after(bottom);
+        var items = this.itemsInGroup(this.selected.id);
+        if (items.length) {
+          $.each(items, function(i, item) {
+            prev.after(item.sortable);
+            prev = item.sortable;
+          });
+        }
+        prev.after($bottom);
       },
       setQuestionGroupClass: function(group) {
         if (this.selected.type != 'question') { return; }
@@ -3235,7 +3305,7 @@ define([
           } else {
             ui.placeholder.removeClass('group');
           }
-          ui.placeholder.append("<div class='question_placeholder' style='height: " + (ui.helper.height() - 10) + "px;'>&nbsp;</div>");
+          ui.placeholder.append("<div class='question_placeholder' style='height: " + $.raw(ui.helper.height() - 10) + "px;'>&nbsp;</div>");
         }
       },
       change: function(event, ui) {
@@ -3443,8 +3513,8 @@ define([
     $("#calc_helper_methods").change(function() {
       var method = $(this).val();
       $("#calc_helper_method_description").text(calcCmd.functionDescription(method));
-      var code = "<pre>" + calcCmd.functionExamples(method).join("</pre><pre>") + "</pre>";
-      $("#calc_helper_method_examples").html(code);
+      var html = "<pre>" + $.raw($.map(calcCmd.functionExamples(method), htmlEscape).join("</pre><pre>")) + "</pre>";
+      $("#calc_helper_method_examples").html(html);
     });
 
     $("#equations_dialog_tabs").tabs();
@@ -3499,7 +3569,7 @@ define([
       }
       // if there are not any options besides the default "<option class="shown_when_no_other_options_available" value='0'>[ Enter Answer Variables Above ]</option>" one
       if (!$select.find("option:not(.shown_when_no_other_options_available)").length) {
-        $select.append("<option class='shown_when_no_other_options_available' value='0'>" + I18n.t('enter_answer_variable_above', "[ Enter Answer Variables Above ]") + "</option>");
+        $select.append("<option class='shown_when_no_other_options_available' value='0'>" + htmlEscape(I18n.t('enter_answer_variable_above', "[ Enter Answer Variables Above ]")) + "</option>");
       }
       $select.find("option.to_be_removed").remove();
       $select.change();
@@ -3640,13 +3710,13 @@ define([
           });
           $question.find(".supercalc").superCalc('recalculate', true);
           var result = $status.attr('data-res');
+          var solution = new QuizFormulaSolution(result);
           var combination = [];
           $variable_values.each(function() {
             combination.push($(this).attr('data-value'));
           });
-          var val = parseFloat(result.substring(1), 10);
           if (!existingCombinations[combination] || true) {
-            if (result.match(/^=/) && result != "= NaN" && result != "= Infinity" && val) {
+            if (solution.isValid()) {
               var $result = $("<tr/>");
               $variable_values.each(function() {
                 var $td = $("<td/>");
@@ -3655,12 +3725,12 @@ define([
               });
               var $td = $("<td/>");
               $td.addClass('final_answer');
-              var text = $.trim(result.substring(1));
+              var html = htmlEscape(solution.rawText());
               var tolerance = answer_tolerance;
               if (tolerance) {
-                text += " <span style='font-size: 0.8em;'>+/-</span> " + tolerance;
+                html += " <span style='font-size: 0.8em;'>+/-</span> " + htmlEscape(tolerance);
               }
-              $td.html(text);
+              $td.html(html);
               $result.append($td);
               succeeded++;
               failedCount = 0;
@@ -3739,7 +3809,7 @@ define([
       val = Math.round(val * data.rounder) / (data.rounder);
       $variable.attr('data-value', val);
       if (!options || options.template) {
-        $variable.find(".value").html(val);
+        $variable.find(".value").text(val);
       }
       if (!options || options.recompute) {
         $question.find(".supercalc").superCalc('recalculate');
@@ -3779,7 +3849,8 @@ define([
             if (!matchHash[variable]) {
               var $variable = $question.find('.variables tr.variable[data-name="' + variable + '"]');
               if ($variable.length === 0) {
-                var label_id = "label_for_var_" + variable;
+                var label_id = htmlEscape("label_for_var_" + variable);
+                // xsslint safeString.identifier label_id
 
                 $variable = $("<tr class='variable'>"
                               + "<th id='" + label_id + "' class='name'></th>"
@@ -3827,8 +3898,8 @@ define([
       if (isShowingResults()) {
         $('.show_quiz_results_options').show();
         // CA options:
-        // 
-        // What we'd like to do is show/hide the date-pickers based on the 
+        //
+        // What we'd like to do is show/hide the date-pickers based on the
         // "Let Students See The Correct Answers" option, and disable them
         // if we're showing results just once ("Only Once After Each Attempt"):
         correctAnswerVisibility.showDatePickers(correctAnswerVisibility.isOn());
@@ -3837,8 +3908,17 @@ define([
         correctAnswerVisibility.disable();
         $('#quiz_one_time_results').prop('checked', false)
         $('#hide_results_only_after_last').prop('checked', false);
+        $('#quiz_show_correct_answers_last_attempt').prop('checked', false);
         $('.show_quiz_results_options').hide();
       }
+
+      // Only allow students to see answers on last attempt if the quiz has more than one attempt
+      showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val()) > 0;
+      $('#quiz_show_correct_answers_last_attempt_container').toggle(showCorrectAnswersLastAttempt);
+      if(!showCorrectAnswersLastAttempt) {
+        $('#quiz_show_correct_answers_last_attempt').prop('checked', false);
+      }
+
     }).triggerHandler('change');
   });
 });

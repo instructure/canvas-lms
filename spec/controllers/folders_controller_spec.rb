@@ -47,13 +47,13 @@ describe FoldersController do
       
       get 'show', :course_id => @course.id, :id => @folder.id, :format => 'json'
       json = json_parse
-      json['files'].count.should eql(1)
+      expect(json['files'].count).to eql(1)
       
       file.hidden = true
       file.save!
       get 'show', :course_id => @course.id, :id => @folder.id, :format => 'json'
       json = json_parse
-      json['files'].count.should eql(0)
+      expect(json['files'].count).to eql(0)
     end
   end
   
@@ -67,10 +67,10 @@ describe FoldersController do
     it "should update folder" do
       user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @folder.id, :folder => {:name => "new name"}
-      response.should be_redirect
-      assigns[:folder].should_not be_nil
-      assigns[:folder].should eql(@folder)
-      assigns[:folder].name.should eql("new name")
+      expect(response).to be_redirect
+      expect(assigns[:folder]).not_to be_nil
+      expect(assigns[:folder]).to eql(@folder)
+      expect(assigns[:folder].name).to eql("new name")
     end
   end
   
@@ -83,18 +83,18 @@ describe FoldersController do
     it "should create folder" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :folder => {:name => "new name"}
-      response.should be_redirect
-      assigns[:folder].should_not be_nil
-      assigns[:folder].name.should eql("new name")
+      expect(response).to be_redirect
+      expect(assigns[:folder]).not_to be_nil
+      expect(assigns[:folder].name).to eql("new name")
     end
     
     it "should force new folders to be sub_folders" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :folder => {:name => "new name"}
-      response.should be_redirect
-      assigns[:folder].should_not be_nil
-      assigns[:folder].name.should eql("new name")
-      assigns[:folder].parent_folder_id.should_not be_nil
+      expect(response).to be_redirect
+      expect(assigns[:folder]).not_to be_nil
+      expect(assigns[:folder].name).to eql("new name")
+      expect(assigns[:folder].parent_folder_id).not_to be_nil
       # assigns[:folder].parent_folder.name.should eql("unfiled")
     end
     
@@ -102,7 +102,7 @@ describe FoldersController do
       user_session(@teacher)
       course_folder
       post 'create', :course_id => @course.id, :folder => {:name => "new folder", :parent_folder_id => @folder.id}
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
   
@@ -117,12 +117,12 @@ describe FoldersController do
       user_session(@teacher)
       yield if block_given?
       delete 'destroy', :course_id => @course.id, :id => @folder.id
-      response.should be_redirect
-      assigns[:folder].should_not be_frozen
-      assigns[:folder].should be_deleted
+      expect(response).to be_redirect
+      expect(assigns[:folder]).not_to be_frozen
+      expect(assigns[:folder]).to be_deleted
       @course.reload
-      @course.folders.should be_include(@folder)
-      @course.folders.active.should_not be_include(@folder)
+      expect(@course.folders).to be_include(@folder)
+      expect(@course.folders.active).not_to be_include(@folder)
     end
     
     it "should delete folder" do

@@ -3,10 +3,12 @@ define [
   'jquery'
   'underscore'
   'compiled/fn/preventDefault'
+  'str/htmlEscape'
   'jquery.toJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], (Backbone, $, _, preventDefault) ->
+  'jquery.instructure_misc_helpers'
+], (Backbone, $, _, preventDefault, htmlEscape) ->
 
   ValidatedMixin =
 
@@ -63,8 +65,8 @@ define [
       for fieldName, field of errors
         $input = @findField fieldName
         # check for a translations option first, fall back to just displaying otherwise
-        html = (@translations?[message] or message for {message} in field).join('</p><p>')
-        $input.errorBox "<div>#{html}</div>"
+        html = (htmlEscape(@translations?[message] or message) for {message} in field).join('</p><p>')
+        $input.errorBox $.raw("<div>#{html}</div>")
         field.$input = $input
         field.$errorBox = $input.data 'associated_error_box'
 

@@ -6,40 +6,40 @@ describe "Converting Angel QTI" do
     qti_data = file_as_string(angel_question_dir, 'p_multiple_choice.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'multiple_choice_question', :custom_type=>'angel')
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelPropExpected::MULTIPLE_CHOICE
+    expect(hash).to eq AngelPropExpected::MULTIPLE_CHOICE
   end
 
   it "should convert multiple answer" do
     qti_data = file_as_string(angel_question_dir, 'p_multiple_answers.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'multiple_answers_question', :custom_type=>'angel')
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelPropExpected::MULTIPLE_ANSWER
+    expect(hash).to eq AngelPropExpected::MULTIPLE_ANSWER
   end
 
   it "should convert true false" do
     qti_data = file_as_string(angel_question_dir, 'p_true_false.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'true_false_question', :custom_type=>'angel')
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelPropExpected::TRUE_FALSE
+    expect(hash).to eq AngelPropExpected::TRUE_FALSE
   end
 
   it "should convert essay" do
     qti_data = file_as_string(angel_question_dir, 'p_essay.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'essay_question', :custom_type=>'angel')
-    hash.should == AngelPropExpected::ESSAY
+    expect(hash).to eq AngelPropExpected::ESSAY
   end
 
   it "should convert short answer" do
     qti_data = file_as_string(angel_question_dir, 'p_short_answer.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'short_answer_question', :custom_type=>'angel')
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelPropExpected::SHORT_ANSWER
+    expect(hash).to eq AngelPropExpected::SHORT_ANSWER
   end
 
   it "should convert short answer with no correct answers into essay" do
     qti_data = file_as_string(angel_question_dir, 'p_short_answer_as_essay.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'short_answer_question', :custom_type=>'angel')
-    hash.should == AngelPropExpected::SHORT_ANSWER_AS_ESSAY
+    expect(hash).to eq AngelPropExpected::SHORT_ANSWER_AS_ESSAY
   end
 
   it "should convert matching questions" do
@@ -50,12 +50,12 @@ describe "Converting Angel QTI" do
     matches = []
     hash[:matches].each {|m| matches << m[:match_id]}
     hash[:answers].each do |a|
-      matches.include?(a[:match_id]).should be_true
+      expect(matches.include?(a[:match_id])).to be_truthy
     end
     # compare everything else without the ids
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
-    hash.should == AngelPropExpected::MATCHING
+    expect(hash).to eq AngelPropExpected::MATCHING
   end
   
   it "should convert ordering questions into matching questions" do
@@ -64,32 +64,32 @@ describe "Converting Angel QTI" do
     matches = []
     hash[:matches].each {|m| matches << m[:match_id]}
     hash[:answers].each do |a|
-      matches.include?(a[:match_id]).should be_true
+      expect(matches.include?(a[:match_id])).to be_truthy
     end
     # compare everything without the ids
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
-    hash.should == AngelPropExpected::ORDER
+    expect(hash).to eq AngelPropExpected::ORDER
   end
 
   it "should convert file response questions" do
     qti_data = file_as_string(angel_question_dir, 'p_offline.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'file_upload_question', :custom_type=>'angel')
-    hash.should == AngelPropExpected::FILE_RESPONSE
+    expect(hash).to eq AngelPropExpected::FILE_RESPONSE
   end
 
   it "should convert fill in the blank questions" do
     qti_data = file_as_string(angel_question_dir, 'p_fib.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'fill_in_multiple_blanks_question', :custom_type=>'angel')
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelPropExpected::FIB
+    expect(hash).to eq AngelPropExpected::FIB
   end
 
   it "should convert likert scale" do
     qti_data = file_as_string(angel_question_dir, 'p_likert_scale.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'stupid_likert_scale_question', :custom_type=>'angel')
     hash[:answers].each { |a| a.delete(:id) }
-    hash.should == AngelPropExpected::LIKERT
+    expect(hash).to eq AngelPropExpected::LIKERT
   end
 
 end

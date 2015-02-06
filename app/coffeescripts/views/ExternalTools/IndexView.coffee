@@ -113,7 +113,7 @@ define [
       @addAppView.remove() if @addAppView
       @editView.remove() if @editView
       @showExternalToolsView()
-      $.flashMessage(htmlEscape(I18n.t('app_saved_message', "%{app} saved successfully!", { app: model.get('name') })))
+      $.flashMessage(I18n.t('app_saved_message', "%{app} saved successfully!", { app: model.get('name') }))
 
     filterApps: (event) =>
       @appCenterView.filterText = @$appCenterFilter.val()
@@ -123,7 +123,7 @@ define [
       view = @$(event.currentTarget).closest('.external_tool_item').data('view')
       tool = view.model
       msg = I18n.t 'remove_tool', "Are you sure you want to remove this tool?"
-      dialog = $("<div>#{msg}</div>").dialog
+      dialog = $("<div>#{htmlEscape msg}</div>").dialog
         modal: true,
         resizable: false
         title: I18n.t('delete', 'Delete') + ' ' + tool.get('name') + '?'

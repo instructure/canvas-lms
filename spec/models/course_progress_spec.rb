@@ -36,14 +36,14 @@ describe CourseProgress do
   it "should return nil for non module_based courses" do
     user = student_in_course(:active_all => true)
     progress = CourseProgress.new(@course, user).to_json
-    progress.should == progress_error
+    expect(progress).to eq progress_error
   end
 
   it "should return nil for non student users" do
     user = user_model
     @course.stubs(:module_based?).returns(true)
     progress = CourseProgress.new(@course, user).to_json
-    progress.should == progress_error
+    expect(progress).to eq progress_error
   end
 
   context "module based and for student" do
@@ -83,12 +83,12 @@ describe CourseProgress do
 
     it "should return correct progress for newly enrolled student" do
       progress = CourseProgress.new(@course, @user).to_json
-      progress.should == {
+      expect(progress).to eq({
           requirement_count: 5,
           requirement_completed_count: 0,
           next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))",
           completed_at: nil
-      }
+      })
     end
 
     it "should return correct progress for student who has completed some requirements" do
@@ -96,12 +96,12 @@ describe CourseProgress do
       @module.update_for(@user, :submitted, @tag)
       @module.update_for(@user, :submitted, @tag2)
       progress = CourseProgress.new(@course, @user).to_json
-      progress.should == {
+      expect(progress).to eq({
           requirement_count: 5,
           requirement_completed_count: 2,
           next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag3.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))",
           completed_at: nil
-      }
+      })
     end
 
     it "should return correct progress for student who has completed all requirements" do
@@ -112,24 +112,24 @@ describe CourseProgress do
       @module2.update_for(@user, :submitted, @tag4)
       @module3.update_for(@user, :submitted, @tag5)
       progress = CourseProgress.new(@course, @user).to_json
-      progress.should == {
+      expect(progress).to eq({
           requirement_count: 5,
           requirement_completed_count: 5,
           next_requirement_url: nil,
           completed_at: @module3.context_module_progressions.first.completed_at.iso8601
-      }
+      })
     end
 
     it "treats a nil requirements_met as an incomplete requirement" do
       # create a progression with requirements_met uninitialized (nil)
       ContextModuleProgression.create!(user: @user, context_module: @module)
       progress = CourseProgress.new(@course, @user).to_json
-      progress.should == {
+      expect(progress).to eq({
           requirement_count: 5,
           requirement_completed_count: 0,
           next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))",
           completed_at: nil
-      }
+      })
     end
 
     it "does not count obsolete requirements" do
@@ -144,22 +144,22 @@ describe CourseProgress do
       progress = CourseProgress.new(@course, @user).to_json
 
       # assert that assignment 2 is no longer a requirement (5 -> 4)
-      progress[:requirement_count].should == 4
+      expect(progress[:requirement_count]).to eq 4
 
       # assert that assignment 2 doesn't count toward the total (2 -> 1)
-      progress[:requirement_completed_count].should == 1
+      expect(progress[:requirement_completed_count]).to eq 1
     end
 
     it "does not query destroyed ContentTags" do
       @tag.destroy
       progress = CourseProgress.new(@course, @user)
-      progress.current_content_tag.id.should_not == @tag.id
+      expect(progress.current_content_tag.id).not_to eq @tag.id
     end
 
     it "does not query unpublished ContentTags" do
       @tag.unpublish
       progress = CourseProgress.new(@course, @user)
-      progress.current_content_tag.id.should_not == @tag.id
+      expect(progress.current_content_tag.id).not_to eq @tag.id
     end
 
     it "accounts for module items that have moved between modules" do
@@ -174,14 +174,14 @@ describe CourseProgress do
 
       # check progress
       progress = CourseProgress.new(@course, @user)
-      progress.requirement_completed_count.should == 1
+      expect(progress.requirement_completed_count).to eq 1
 
       # complete the requirement again
       @module2.update_for(@user, :submitted, @tag)
 
       # check progress again
       progress = CourseProgress.new(@course, @user)
-      progress.requirement_completed_count.should == 1
+      expect(progress.requirement_completed_count).to eq 1
     end
   end
 end

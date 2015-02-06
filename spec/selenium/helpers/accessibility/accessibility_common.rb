@@ -1,9 +1,9 @@
   def val_page_title_present
-    driver.title.should_not be_nil
+    expect(driver.title).not_to be_nil
   end
 
   def val_page_title_not_empty
-    driver.title.should_not == ''
+    expect(driver.title).not_to eq ''
   end
 
   def val_image_alt_tags_present
@@ -34,7 +34,7 @@
       links.each do |link|
         links_text << link.attribute('href') if link.attribute('href') != ''
       end
-      links_text.uniq.length.should == links_text.length
+      expect(links_text.uniq.length).to eq links_text.length
     end
   end
 
@@ -64,7 +64,7 @@
 
   def val_h1_populated
     headers = find_all_elements('h1')
-    headers.should_not be_empty
+    expect(headers).not_to be_empty
     val_all_elements_attribute_not_empty(headers, 'text')
   end
 
@@ -75,18 +75,18 @@
   def val_all_tables_have_heading
     tables = find_all_elements('table')
     if tables.length > 0
-      tables.each { |t| t.find_elements(:tag_name, 'th').count.should > 0 }
+      tables.each { |t| expect(t.find_elements(:tag_name, 'th').count).to be > 0 }
     end
   end
 
   def val_all_elements_attribute_presence(elements, attrib)
-    elements.each { |element| element.attribute("#{attrib}").should_not be_nil }
+    elements.each { |element| expect(element.attribute("#{attrib}")).not_to be_nil }
   end
 
   def val_all_elements_attribute_not_empty(elements, attrib)
-    elements.each { |element| element.attribute("#{attrib}").should_not == '' }
+    elements.each { |element| expect(element.attribute("#{attrib}")).not_to eq '' }
   end
 
   def val_text_max_length(elements, max_length)
-    elements.each { |element| element.text.length.should < max_length.to_i }
+    elements.each { |element| expect(element.text.length).to be < max_length.to_i }
   end

@@ -43,4 +43,16 @@ class ObserverEnrollment < Enrollment
       context.observer_enrollments.where("user_id=? AND associated_user_id IS NOT NULL", current_user).pluck(:associated_user_id)
     end
   end
+
+  def self.observed_student_ids_by_observer_id(course, observers)
+    # select_all allows plucking multiplecolumns without instantiating AR objects
+    obs_hash = connection.select_all( ObserverEnrollment.where(course_id: course, user_id: observers).select([:user_id, :associated_user_id])).group_by{|record| record["user_id"]}
+    obs_hash.keys.each{ |key|
+      obs_hash[key.to_i] = obs_hash.delete(key).map{|v|
+        v["associated_user_id"].try(:to_i)
+      }.compact
+    }
+    # should look something like this: {10 => [11,12,13], 20 => [11,24,32]}
+    obs_hash
+  end
 end

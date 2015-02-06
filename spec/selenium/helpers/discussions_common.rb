@@ -24,7 +24,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     replace_content(f('input[name=title]'), discussion_name)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }
-    f('#discussion_topic .discussion-title').text.should == discussion_name
+    expect(f('#discussion_topic .discussion-title').text).to eq discussion_name
   end
 
   def edit_entry(entry, text)
@@ -44,7 +44,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     confirm_dialog.accept
     wait_for_ajax_requests
     entry.reload
-    entry.workflow_state.should == 'deleted'
+    expect(entry.workflow_state).to eq 'deleted'
   end
 
   def add_reply(message = 'message!', attachment = nil)
@@ -74,18 +74,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def validate_entry_text(discussion_entry, text)
     keep_trying_until do
-      f("#entry-#{discussion_entry.id}").should include_text(text)
+      expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
     end
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)
     li_selector = "#entry-#{discussion_entry.id}"
-    fj(li_selector).should be_displayed
-    fj("#{li_selector} .al-trigger").should be_displayed
+    expect(fj(li_selector)).to be_displayed
+    expect(fj("#{li_selector} .al-trigger")).to be_displayed
     fj("#{li_selector} .al-trigger").click
     wait_for_ajaximations
     menu_item = fj(menu_item_selector)
-    menu_item.should be_displayed
+    expect(menu_item).to be_displayed
     menu_item.click
   end
 

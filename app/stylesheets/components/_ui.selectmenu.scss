@@ -32,13 +32,7 @@
 
 .ui-selectmenu-menu {
   .ui-state-focus, .ui-state-hover {
-    @include vertical-gradient($gradientTopActive, $gradientBottomActive);
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  }
-  // the wierd specificity here is for the section menu in speedGrader
-  .ui-state-hover > .ui-selectmenu-item > a,
-  .ui-state-hover > a,
-  a.ui-state-focus {
-    color: white;
+    background: lighten($canvas-neutral, 5%);
+    border-color: transparent;
   }
 }

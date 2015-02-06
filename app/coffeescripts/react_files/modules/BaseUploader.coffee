@@ -43,18 +43,22 @@ define [
     # kickoff / preflight upload process
     upload: ->
       @deferred = $.Deferred()
-      params = @createPreFlightParams()
-      preflightUrl = @getPreflightUrl()
-      $.ajaxJSON preflightUrl, 'POST', params, @onPreflightComplete
-      @deferred
+      @deferred.fail (failReason) =>
+        @error = failReason
+        $.screenReaderFlashError(@error.message) if @error?.message
+
+      $.ajaxJSON(@getPreflightUrl(), 'POST', @createPreFlightParams(), @onPreflightComplete, @deferred.reject)
+      @deferred.promise()
 
     #actual upload based on kickoff / preflight
     _actualUpload: () ->
-      xhr = new XMLHttpRequest
-      xhr.upload.addEventListener('progress', @trackProgress, false)
-      xhr.onload = @onUploadPosted
-      xhr.open 'POST', @uploadData.upload_url, true
-      xhr.send @createFormData()
+      @_xhr = new XMLHttpRequest
+      @_xhr.upload.addEventListener('progress', @trackProgress, false)
+      @_xhr.onload = @onUploadPosted
+      @_xhr.onerror = @deferred.reject
+      @_xhr.onabort = @deferred.reject
+      @_xhr.open 'POST', @uploadData.upload_url, true
+      @_xhr.send @createFormData()
 
     # when using s3 uploads you now need to manually hit the success_url
     # when using local uploads you have already been auto-redirected (even
@@ -75,3 +79,7 @@ define [
 
     getFileName: ->
       @options.name || @file.name
+
+    abort: ->
+      @_xhr.abort()
+      @deferred.reject('user_aborted_upload')

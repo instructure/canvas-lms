@@ -13,7 +13,8 @@ define [
   'compiled/grade_calculator'
   'compiled/gradebook2/OutcomeGradebookGrid'
   '../../shared/components/ic_submission_download_dialog_component'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog ) ->
+  'str/htmlEscape'
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape) ->
 
   {get, set, setProperties} = Ember
 
@@ -62,7 +63,7 @@ define [
       if Ember.$('#flash_message_holder li').size() > 0
         close = Ember.$('#flash_message_holder li a').text().trim()
         message = Ember.$('#flash_message_holder li').text().replace(close,'').trim()
-        node = Ember.$("<span role='alert'>#{message}</span>")
+        node = Ember.$("<span role='alert'>#{htmlEscape(message)}</span>")
         Ember.$(node).appendTo(Ember.$('#flash_screenreader_holder'))
     ).on('init')
 
@@ -86,9 +87,6 @@ define [
       ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
     ).property()
 
-    isDraftState: ->
-      ENV.GRADEBOOK_OPTIONS.draft_state_enabled
-
     publishToSisEnabled: (->
       ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
     ).property()
@@ -111,7 +109,8 @@ define [
 
     showDownloadSubmissionsButton: (->
       @get('selectedAssignment.has_submitted_submissions') and
-      _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url']) != []
+      _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url', 'online_quiz']) != [] and
+      !@get('selectedAssignment.hide_download_submissions_button')
     ).property('selectedAssignment')
 
     hideStudentNames: false
@@ -183,20 +182,32 @@ define [
       @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
 
     updateSubmissionsFromExternal: (submissions) ->
-      students = @get('students')
       subs_proxy = @get('submissions')
       selected = @get('selectedSubmission')
+      studentsById = @groupById @get('students')
+      assignmentsById = @groupById @get('assignments')
       submissions.forEach (submission) =>
+        student = studentsById[submission.user_id]
         submissionsForStudent = subs_proxy.findBy('user_id', submission.user_id)
         oldSubmission = submissionsForStudent.submissions.findBy('assignment_id', submission.assignment_id)
 
+        #check for DA visibility
+        if submission.assignment_visible?
+          set(submission, 'hidden', !submission.assignment_visible)
+          @updateAssignmentVisibilities(assignmentsById[submission.assignment_id], submission.user_id)
+
         submissionsForStudent.submissions.removeObject oldSubmission
         submissionsForStudent.submissions.addObject submission
-        student = students.findBy('id', submission.user_id)
         @updateSubmission submission, student
         @calculateStudentGrade student
         if selected and selected.assignment_id == submission.assignment_id and selected.user_id == submission.user_id
           set(this, 'selectedSubmission', submission)
+
+    updateAssignmentVisibilities: (assignment, userId) ->
+      visibilities = get(assignment, 'assignment_visibility')
+      filteredVisibilities = visibilities.filter (id) ->
+        id != userId
+      set(assignment, 'assignment_visibility', filteredVisibilities)
 
     calculate: (submissionsArray) ->
       GradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
@@ -384,13 +395,35 @@ define [
       students.filter (s) -> s.sections.contains(currentSection.id)
     ).property('students.@each', 'selectedSection')
 
+    groupById: (array) ->
+      array.reduce( (obj, item) ->
+        obj[get(item, 'id')] = item
+        obj
+      ,{})
+
     submissionsLoaded: (->
+      assignments = @get("assignments")
+      assignmentsByID = @groupById assignments
+      studentsByID = @groupById @get("students")
       submissions = @get('submissions')
       submissions.forEach ((submission) ->
-        student = @get('students').findBy('id', submission.user_id)
+        student = studentsByID[submission.user_id]
         if student?
           submission.submissions.forEach ((s) ->
+            assignment = assignmentsByID[s.assignment_id]
+            if !@differentiatedAssignmentVisibleToStudent(assignment, s.user_id)
+              set s, 'hidden', true
             @updateSubmission(s, student)
+          ), this
+          # fill in hidden ones
+          assignments.forEach ((a) ->
+            if !@differentiatedAssignmentVisibleToStudent(a, student.id)
+              sub = {
+                user_id: student.id
+                assignment_id: a.id
+                hidden: true
+              }
+              @updateSubmission(sub, student)
           ), this
           setProperties student,
             'isLoading': false
@@ -423,7 +456,15 @@ define [
 
     differentiatedAssignmentVisibleToStudent: (assignment, student_id) ->
       return true unless assignment.only_visible_to_overrides
-      _.include(assignment.assignment_visibility, +student_id)
+      _.include(assignment.assignment_visibility, student_id)
+
+    studentsThatCanSeeAssignment: (assignment) ->
+      students = @studentsHash()
+      return students unless assignment?.only_visible_to_overrides
+      assignment.assignment_visibility.reduce( (result, id) ->
+        result[id] = students[id]
+        result
+      ,{})
 
     checkForNoPointsWarning: (ag) ->
       pointsPossible = _.inject ag.assignments
@@ -464,7 +505,7 @@ define [
         return if assignmentsProxy.findBy('id', as.id)
         @processAssignment(as, assignmentGroups)
 
-        shouldRemoveAssignment = (@isDraftState() and as.published is false) or
+        shouldRemoveAssignment = (as.published is false) or
           as.submission_types.contains 'not_graded' or
           as.submission_types.contains 'attendance' and !@get('showAttendance')
         if shouldRemoveAssignment
@@ -546,16 +587,12 @@ define [
         sub or {
           user_id: student.id
           assignment_id: assignment.id
+          hidden: !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
         }
     ).property('selectedStudent', 'selectedAssignment')
 
     selectedSubmissionHidden: (->
-      assignment = @get('selectedAssignment')
-      student = @get('selectedStudent')
-      if assignment?.only_visible_to_overrides
-        !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
-      else
-        false
+      @get('selectedSubmission.hidden') || false
     ).property('selectedStudent', 'selectedAssignment')
 
     selectedOutcomeResult: ( ->
@@ -649,6 +686,8 @@ define [
     displayName: (->
       if @get('hideStudentNames')
         "hiddenName"
+      else if ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled
+        "sortable_name"
       else
         "name"
     ).property('hideStudentNames')

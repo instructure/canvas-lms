@@ -16,8 +16,10 @@ compress_assets: off
 
 
 stylesheets:
-  ember_files:
-    - public/stylesheets/compiled/pages/ember_files.css
+  course_wizard:
+    - public/stylesheets/compiled/pages/course_wizard/compiler-course_wizard.css
+  react_files:
+    - public/stylesheets/compiled/pages/react_files/compiler-react_files.css
   instructure_eportfolio:
     - public/stylesheets/compiled/pages/instructure_eportfolio.css
   course_show:
@@ -157,10 +159,14 @@ stylesheets:
     - public/stylesheets/compiled/pages/locale.css
   mobile_auth:
     - public/stylesheets/compiled/pages/mobile_auth.css
+  all_courses:
+    - public/stylesheets/compiled/pages/all_courses.css
   external_tool_full_width:
     - public/stylesheets/compiled/pages/external_tools/full_width.css
+  terms:
+    - public/stylesheets/compiled/pages/terms.css
   # Client Apps:
-  canvas_quiz_statistics:
-    - public/stylesheets/compiled/client_apps/canvas_quiz_statistics.css
+  canvas_quizzes:
+    - public/stylesheets/compiled/client_apps/canvas_quizzes.css
 
   <%= plugin_assets.anchors_yml %>

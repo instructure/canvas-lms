@@ -45,3 +45,8 @@ define [
     ok _.isEqual([3, 3, 4], _.pluck(outcomeSort, 'outcome_1')), 'sorts by result value'
     ok _.map(outcomeSort, (r) -> r.student.sortable_name)[0] == 'Campbell, Pete', 'result sort falls back to sortable name'
     ok _.isEqual(_.map(userSort, (r) -> r.student.sortable_name), ['Campbell, Pete', 'Draper, Don', 'Olson, Peggy']), 'sorts by student name'
+
+  test 'Grid.Util.toColumns for xss', ->
+    outcome = { id: 1, title: '<script>' }
+    columns = Grid.Util.toColumns([outcome])
+    ok _.isEqual(columns[1].name, '&lt;script&gt;')

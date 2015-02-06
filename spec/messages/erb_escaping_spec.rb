@@ -30,7 +30,7 @@ describe 'erb_escaping' do
   
       assignment_model(:title => "Quiz 1 & stuff")
       generate_message(:erb_escaping, :facebook, @assignment)
-      @message.body.should eql "<b>&lt;escaped&gt;</b><i>not escaped</i>\n\nescaped: Quiz 1 &amp; stuff"
+      expect(@message.body).to eql "<b>&lt;escaped&gt;</b><i>not escaped</i>\n\nescaped: Quiz 1 &amp; stuff"
     end
   end
 
@@ -44,7 +44,7 @@ describe 'erb_escaping' do
   
       assignment_model(:title => "Quiz 1 & stuff")
       generate_message(:erb_escaping, :twitter, @assignment)
-      @message.body.should eql "<b><not escaped></b><i>not escaped</i>\n\nstill not escaped: Quiz 1 & stuff"
+      expect(@message.body).to eql "<b><not escaped></b><i>not escaped</i>\n\nstill not escaped: Quiz 1 & stuff"
     end
   end
 end

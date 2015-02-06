@@ -24,31 +24,31 @@ describe UserService do
   end
   
   it "should have a useful workflow" do
-    @user_service.state.should eql(:active)
+    expect(@user_service.state).to eql(:active)
     @user_service.failed_request
-    @user_service.state.should eql(:failed)
+    expect(@user_service.state).to eql(:failed)
   end
   
   it "should have a named scope for type" do
     @user_service.type = 'BookmarkService'
     @user_service.save!
-    UserService.of_type('BookmarkService').first.id.should eql(@user_service.id)
+    expect(UserService.of_type('BookmarkService').first.id).to eql(@user_service.id)
   end
   
   it "should have a named scope for service" do
-    UserService.for_service(@user_service).should == [@user_service]
-    UserService.for_service(@user_service.service).should == [@user_service]
+    expect(UserService.for_service(@user_service)).to eq [@user_service]
+    expect(UserService.for_service(@user_service.service)).to eq [@user_service]
   end
   
   it "should have a service_name" do
-    @user_service.service_name.should eql('Value For Service')
+    expect(@user_service.service_name).to eql('Value For Service')
   end
   
   it "should be able to crypt a password" do
-    @user_service.crypted_password.should be_nil
+    expect(@user_service.crypted_password).to be_nil
     @user_service.password = 'password'
-    @user_service.crypted_password.should_not be_nil
-    @user_service.decrypted_password.should eql('password')
+    expect(@user_service.crypted_password).not_to be_nil
+    expect(@user_service.decrypted_password).to eql('password')
   end
   
   context "registration" do
@@ -62,13 +62,13 @@ describe UserService do
         :service_user_url => 'some url',
         :password => 'password'
       )
-      @registration.token.should eql('some token')
-      @registration.secret.should eql('some secret')
-      @registration.service_user_id.should eql(@user.id)
-      @registration.service_user_name.should eql(@user.name)
-      @registration.service_user_url.should eql('some url')
-      @registration.decrypted_password.should eql('password')
-      @registration.type.should eql('DocumentService')
+      expect(@registration.token).to eql('some token')
+      expect(@registration.secret).to eql('some secret')
+      expect(@registration.service_user_id).to eql(@user.id)
+      expect(@registration.service_user_name).to eql(@user.name)
+      expect(@registration.service_user_url).to eql('some url')
+      expect(@registration.decrypted_password).to eql('password')
+      expect(@registration.type).to eql('DocumentService')
     end
 
     it "should be able to register a delicious service" do
@@ -79,11 +79,11 @@ describe UserService do
 
       us = UserService.register_from_params(user_model, params)
 
-      us.service_domain.should eql('delicious.com')
-      us.protocol.should eql('http-auth')
-      us.service_user_id.should eql('some username')
-      us.service_user_name.should eql('some username')
-      us.decrypted_password.should eql('password')
+      expect(us.service_domain).to eql('delicious.com')
+      expect(us.protocol).to eql('http-auth')
+      expect(us.service_user_id).to eql('some username')
+      expect(us.service_user_name).to eql('some username')
+      expect(us.decrypted_password).to eql('password')
     end
   
     it "should be able to register a diigo service" do
@@ -94,11 +94,11 @@ describe UserService do
 
       us = UserService.register_from_params(user_model, params)
 
-      us.service_domain.should eql('diigo.com')
-      us.protocol.should eql('http-auth')
-      us.service_user_id.should eql('some username')
-      us.service_user_name.should eql('some username')
-      us.decrypted_password.should eql('password')
+      expect(us.service_domain).to eql('diigo.com')
+      expect(us.protocol).to eql('http-auth')
+      expect(us.service_user_id).to eql('some username')
+      expect(us.service_user_name).to eql('some username')
+      expect(us.decrypted_password).to eql('password')
     end
   
     it "should not be able to register an unknown service type" do
@@ -107,25 +107,25 @@ describe UserService do
       params[:user_name] = 'some username'
       params[:password] = 'password'
 
-      lambda{UserService.register_from_params(user_model, params)}.should raise_error("Unknown Service Type")
+      expect{UserService.register_from_params(user_model, params)}.to raise_error("Unknown Service Type")
     end
   end
   
   context "service type disambiguation" do
     it "should know that google_docs means 'DocumentService" do
-      UserService.service_type('google_docs').should eql('DocumentService')
+      expect(UserService.service_type('google_docs')).to eql('DocumentService')
     end
     
     it "should know that diigo means BookmarkService" do
-      UserService.service_type('diigo').should eql('BookmarkService')
+      expect(UserService.service_type('diigo')).to eql('BookmarkService')
     end
     
     it "should know that delicious means BookmarkService" do
-      UserService.service_type('delicious').should eql('BookmarkService')
+      expect(UserService.service_type('delicious')).to eql('BookmarkService')
     end
     
     it "should use other things as a generic UserService" do
-      UserService.service_type('anything else').should eql('UserService')
+      expect(UserService.service_type('anything else')).to eql('UserService')
     end
   end
 
@@ -133,9 +133,9 @@ describe UserService do
     it "should decrypt the password to the original value" do
       s = UserService.new
       s.password = "asdf"
-      s.decrypted_password.should eql("asdf")
+      expect(s.decrypted_password).to eql("asdf")
       s.password = "2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3"
-      s.decrypted_password.should eql("2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3")
+      expect(s.decrypted_password).to eql("2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3")
     end
   end
 end

@@ -15,13 +15,13 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
     it "should add an image to the page and validate a student can see it" do
       login_as(@teacher.name)
-      get "/courses/#{@course.id}/wiki"
       add_image_to_rce
 
+      @course.wiki.wiki_pages.first.publish!
+
       login_as(@student.name)
-      get "/courses/#{@course.id}/wiki"
-      fj("img[src='/courses/#{@course.id}/files/#{@course.attachments.last.id}/preview']").should be_displayed
-      #check_image would be good to do here but the src on the image in the wiki body is messed up
+      get "/courses/#{@course.id}/pages/front-page"
+      expect(fj("#wiki_page_show img")['src']).to include("/courses/#{@course.id}/files/#{@course.attachments.last.id}/preview")
     end
   end
 end

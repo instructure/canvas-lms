@@ -51,57 +51,57 @@ module Lti
     describe '#account' do
       it 'returns the context when it is an account' do
         helper = SubstitutionsHelper.new(account, root_account, user)
-        helper.account.should == account
+        expect(helper.account).to eq account
       end
 
       it 'returns the account when it is a course' do
         helper = SubstitutionsHelper.new(course, root_account, user)
-        helper.account.should == account
+        expect(helper.account).to eq account
       end
 
       it 'returns the root_account by default' do
         helper = SubstitutionsHelper.new(nil, root_account, user)
-        helper.account.should == root_account
+        expect(helper.account).to eq root_account
       end
     end
 
     describe '#enrollments_to_lis_roles' do
       it 'converts students' do
-        subject.enrollments_to_lis_roles([StudentEnrollment.new]).first.should == 'Learner'
+        expect(subject.enrollments_to_lis_roles([StudentEnrollment.new]).first).to eq 'Learner'
       end
 
       it 'converts teachers' do
-        subject.enrollments_to_lis_roles([TeacherEnrollment.new]).first.should == 'Instructor'
+        expect(subject.enrollments_to_lis_roles([TeacherEnrollment.new]).first).to eq 'Instructor'
       end
 
       it 'converts teacher assistants' do
-        subject.enrollments_to_lis_roles([TaEnrollment.new]).first.should == 'urn:lti:role:ims/lis/TeachingAssistant'
+        expect(subject.enrollments_to_lis_roles([TaEnrollment.new]).first).to eq 'urn:lti:role:ims/lis/TeachingAssistant'
       end
 
       it 'converts designers' do
-        subject.enrollments_to_lis_roles([DesignerEnrollment.new]).first.should == 'ContentDeveloper'
+        expect(subject.enrollments_to_lis_roles([DesignerEnrollment.new]).first).to eq 'ContentDeveloper'
       end
 
       it 'converts observers' do
-        subject.enrollments_to_lis_roles([ObserverEnrollment.new]).first.should == 'urn:lti:instrole:ims/lis/Observer'
+        expect(subject.enrollments_to_lis_roles([ObserverEnrollment.new]).first).to eq 'urn:lti:instrole:ims/lis/Observer'
       end
 
       it 'converts admins' do
-        subject.enrollments_to_lis_roles([AccountUser.new]).first.should == 'urn:lti:instrole:ims/lis/Administrator'
+        expect(subject.enrollments_to_lis_roles([AccountUser.new]).first).to eq 'urn:lti:instrole:ims/lis/Administrator'
       end
 
       it 'converts fake students' do
-        subject.enrollments_to_lis_roles([StudentViewEnrollment.new]).first.should == 'Learner'
+        expect(subject.enrollments_to_lis_roles([StudentViewEnrollment.new]).first).to eq 'Learner'
       end
 
       it 'converts multiple roles' do
         lis_roles = subject.enrollments_to_lis_roles([StudentEnrollment.new, TeacherEnrollment.new])
-        lis_roles.should include 'Learner'
-        lis_roles.should include 'Instructor'
+        expect(lis_roles).to include 'Learner'
+        expect(lis_roles).to include 'Instructor'
       end
 
       it 'sends at most one of each role' do
-        subject.enrollments_to_lis_roles([StudentEnrollment.new, StudentViewEnrollment.new]).should == ['Learner']
+        expect(subject.enrollments_to_lis_roles([StudentEnrollment.new, StudentViewEnrollment.new])).to eq ['Learner']
       end
     end
 
@@ -111,27 +111,52 @@ module Lti
         subject.stubs(:course_enrollments).returns([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
         user.stubs(:roles).returns(['user', 'student', 'teacher', 'admin'])
         roles = subject.all_roles
-        roles.should include LtiOutbound::LTIRoles::System::USER
-        roles.should include LtiOutbound::LTIRoles::Institution::STUDENT
-        roles.should include LtiOutbound::LTIRoles::Institution::INSTRUCTOR
-        roles.should include LtiOutbound::LTIRoles::Institution::ADMIN
-        roles.should include LtiOutbound::LTIRoles::Context::LEARNER
-        roles.should include LtiOutbound::LTIRoles::Context::INSTRUCTOR
-        roles.should include LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER
-        roles.should include LtiOutbound::LTIRoles::Context::OBSERVER
-        roles.should include LtiOutbound::LTIRoles::Context::TEACHING_ASSISTANT
+        expect(roles).to include LtiOutbound::LTIRoles::System::USER
+        expect(roles).to include LtiOutbound::LTIRoles::Institution::STUDENT
+        expect(roles).to include LtiOutbound::LTIRoles::Institution::INSTRUCTOR
+        expect(roles).to include LtiOutbound::LTIRoles::Institution::ADMIN
+        expect(roles).to include LtiOutbound::LTIRoles::Context::LEARNER
+        expect(roles).to include LtiOutbound::LTIRoles::Context::INSTRUCTOR
+        expect(roles).to include LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER
+        expect(roles).to include LtiOutbound::LTIRoles::Context::OBSERVER
+        expect(roles).to include LtiOutbound::LTIRoles::Context::TEACHING_ASSISTANT
       end
 
       it "returns none if no user" do
         helper = SubstitutionsHelper.new(course, root_account, nil)
-        helper.all_roles.should == [LtiOutbound::LTIRoles::System::NONE]
+        expect(helper.all_roles).to eq [LtiOutbound::LTIRoles::System::NONE]
+      end
+
+      it 'converts multiple roles for lis 2' do
+        subject.stubs(:course_enrollments).returns([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
+        user.stubs(:roles).returns(['user', 'student', 'teacher', 'admin'])
+        roles = subject.all_roles('lis2')
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Learner'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/person#Observer'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#TeachingAssistant'
+      end
+
+      it "returns none if no user for lis 2" do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.all_roles('lis2')).to eq ['http://purl.imsglobal.org/vocab/lis/v2/person#None']
       end
     end
 
     describe '#course_enrollments' do
       it 'returns an empty array if the context is not a course' do
         helper = SubstitutionsHelper.new(account, root_account, user)
-        helper.course_enrollments.should == []
+        expect(helper.course_enrollments).to eq []
+      end
+
+      it 'returns an empty array if the user is nil' do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.course_enrollments).to eq []
       end
 
       it 'returns the active enrollments in a course for a user' do
@@ -142,14 +167,14 @@ module Lti
         inactive_enrollment = course_with_observer(user: user, course: course)
         inactive_enrollment.update_attribute(:workflow_state, 'inactive')
 
-        subject.course_enrollments.should include student_enrollment
-        subject.course_enrollments.should include teacher_enrollment
-        subject.course_enrollments.should_not include inactive_enrollment
+        expect(subject.course_enrollments).to include student_enrollment
+        expect(subject.course_enrollments).to include teacher_enrollment
+        expect(subject.course_enrollments).not_to include inactive_enrollment
       end
 
       it 'returns an empty array if there is no user' do
         helper = SubstitutionsHelper.new(account, root_account, nil)
-        helper.course_enrollments.should == []
+        expect(helper.course_enrollments).to eq []
       end
     end
 
@@ -159,25 +184,25 @@ module Lti
         set_up_persistance!
         enrollment = account.account_users.create!(:user => user)
 
-        subject.account_enrollments.should == [enrollment]
+        expect(subject.account_enrollments).to eq [enrollment]
       end
 
       it 'returns enrollments in an account chain for a user' do
         set_up_persistance!
         enrollment = root_account.account_users.create!(:user => user)
 
-        subject.account_enrollments.should == [enrollment]
+        expect(subject.account_enrollments).to eq [enrollment]
       end
 
       it 'returns an empty array if there is no user' do
         helper = SubstitutionsHelper.new(account, root_account, nil)
-        helper.account_enrollments.should == []
+        expect(helper.account_enrollments).to eq []
       end
     end
 
     describe '#current_lis_roles' do
       it 'returns none if the user has no roles' do
-        subject.current_lis_roles.should == 'urn:lti:sysrole:ims/lis/None'
+        expect(subject.current_lis_roles).to eq 'urn:lti:sysrole:ims/lis/None'
       end
 
       it 'returns none if the user has no roles' do
@@ -186,15 +211,20 @@ module Lti
         account.account_users.create!(:user => user)
         lis_roles = subject.current_lis_roles
 
-        lis_roles.should include 'Learner'
-        lis_roles.should include 'urn:lti:instrole:ims/lis/Administrator'
+        expect(lis_roles).to include 'Learner'
+        expect(lis_roles).to include 'urn:lti:instrole:ims/lis/Administrator'
       end
     end
 
     describe '#concluded_course_enrollments' do
       it 'returns an empty array if the context is not a course' do
         helper = SubstitutionsHelper.new(account, root_account, user)
-        helper.concluded_course_enrollments.should == []
+        expect(helper.concluded_course_enrollments).to eq []
+      end
+
+      it 'returns an empty array if the user is not set' do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.concluded_course_enrollments).to eq []
       end
 
       it 'returns the active enrollments in a course for a user' do
@@ -206,21 +236,21 @@ module Lti
         observer_enrollment = course_with_observer(user: user, course: course)
         observer_enrollment.conclude
 
-        subject.concluded_course_enrollments.should include student_enrollment
-        subject.concluded_course_enrollments.should_not include teacher_enrollment
-        subject.concluded_course_enrollments.should include observer_enrollment
+        expect(subject.concluded_course_enrollments).to include student_enrollment
+        expect(subject.concluded_course_enrollments).not_to include teacher_enrollment
+        expect(subject.concluded_course_enrollments).to include observer_enrollment
       end
     end
 
     describe '#concluded_lis_roles' do
       it 'returns none if the user has no roles' do
-        subject.concluded_lis_roles.should == 'urn:lti:sysrole:ims/lis/None'
+        expect(subject.concluded_lis_roles).to eq 'urn:lti:sysrole:ims/lis/None'
       end
 
       it 'returns none if the user has no roles' do
         set_up_persistance!
         student_in_course(user: user, course: course, active_enrollment: true).conclude
-        subject.concluded_lis_roles.should == 'Learner'
+        expect(subject.concluded_lis_roles).to eq 'Learner'
       end
     end
 
@@ -235,9 +265,9 @@ module Lti
 
         roles = subject.current_canvas_roles
 
-        roles.should include 'TeacherEnrollment'
-        roles.should include 'DesignerEnrollment'
-        roles.should include 'Account Admin'
+        expect(roles).to include 'TeacherEnrollment'
+        expect(roles).to include 'DesignerEnrollment'
+        expect(roles).to include 'Account Admin'
       end
     end
 
@@ -251,7 +281,7 @@ module Lti
 
         teacher_in_course(user: user, course: course, active_enrollment: true)
 
-        subject.enrollment_state.should == 'active'
+        expect(subject.enrollment_state).to eq 'active'
       end
 
       it 'is inactive if there are no active enrollments' do
@@ -261,7 +291,7 @@ module Lti
         enrollment.end_at = 2.days.ago
         enrollment.save!
 
-        subject.enrollment_state.should == 'inactive'
+        expect(subject.enrollment_state).to eq 'inactive'
       end
 
       it 'is inactive if the course is concluded' do
@@ -269,13 +299,78 @@ module Lti
         enrollment = student_in_course(user: user, course: course, active_enrollment: true)
         course.complete
 
-        subject.enrollment_state.should == 'inactive'
+        expect(subject.enrollment_state).to eq 'inactive'
       end
 
       it 'is blank if there are no enrollments' do
         set_up_persistance!
-        subject.enrollment_state.should == ''
+        expect(subject.enrollment_state).to eq ''
       end
     end
+
+    describe '#previous_course_ids_and_context_ids' do
+      before do
+        course.save!
+        @c1 = Course.create!
+        @c1.root_account = root_account
+        @c1.account = account
+        @c1.lti_context_id = 'abc'
+        @c1.save
+
+        course.content_migrations.create!.tap do |cm|
+          cm.context = course
+          cm.workflow_state = 'imported'
+          cm.source_course = @c1
+          cm.save!
+        end
+
+        @c2 = Course.create!
+        @c2.root_account = root_account
+        @c2.account = account
+        @c2.save!
+
+        course.content_migrations.create!.tap do |cm|
+          cm.context = course
+          cm.workflow_state = 'imported'
+          cm.source_course = @c2
+          cm.save!
+        end
+      end
+
+      it "should return previous canvas course ids" do
+        expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(',')
+      end
+
+      it "should return previous lti context_ids" do
+        expect(subject.previous_lti_context_ids).to eq 'abc'
+      end
+    end
+
+    describe "section substitutions" do
+      before do
+        course.save!
+        @sec1 = course.course_sections.create(:name => 'sec1')
+        @sec1.sis_source_id = 'def'
+        @sec1.save!
+        @sec2 = course.course_sections.create!(:name => 'sec2')
+        @sec2.sis_source_id = 'abc'
+        @sec2.save!
+        # course.reload
+
+        user.save!
+        multiple_student_enrollment(user, @sec1, course: course)
+        multiple_student_enrollment(user, @sec2, course: course)
+      end
+
+      it "should return all canvas section ids" do
+        expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
+      end
+
+      it "should return all canvas section sis ids" do
+        expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(',')
+      end
+    end
+
+
   end
 end

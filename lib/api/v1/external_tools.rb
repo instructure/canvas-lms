@@ -40,7 +40,7 @@ module Api::V1::ExternalTools
     json['not_selectable'] = tool.not_selectable
     extension_types.each do |type|
       if json[type]
-        json[type]['label'] = tool.label_for(type, user.locale)
+        json[type]['label'] = tool.label_for(type, I18n.locale)
         json[type].delete 'labels'
         json.delete 'labels'
 

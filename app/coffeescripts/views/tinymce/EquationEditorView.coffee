@@ -5,10 +5,11 @@ define [
   'Backbone'
   'compiled/views/tinymce/EquationToolbarView'
   'jst/tinymce/EquationEditorView'
+  'str/htmlEscape'
 
   'jqueryui/dialog'
   'mathquill'
-], (I18n, $, _, Backbone, EquationToolbarView, template) ->
+], (I18n, $, _, Backbone, EquationToolbarView, template, htmlEscape) ->
 
   # like $.text() / Sizzle.getText(elems), except it also gets alt attributes from images
   getEquationText = (elems) ->
@@ -46,7 +47,7 @@ define [
       @prevSelection = @editor.selection.getBookmark()
 
       unless @toolbar = @$el.data('toolbar')
-        nodes = $('<span>').html @editor.selection.getContent()
+        nodes = $('<span>').text @editor.selection.getContent()
         equation = getEquationText(nodes).replace(/^\s+|\s+$/g, '')
         @addToolbar(equation)
 
@@ -73,7 +74,7 @@ define [
       @restoreCaret()
 
     initialRender: =>
-      nodes = $('<span>').html @editor.selection.getContent()
+      nodes = $('<span>').text @editor.selection.getContent()
       equation = getEquationText(nodes).replace(/^\s+|\s+$/g, '')
 
       @$mathjaxMessage.empty()
@@ -83,7 +84,7 @@ define [
     addToolbar: (equation) ->
       @$el.append(@template)
 
-      $('#mathjax-preview').html("<script type='math/tex; mode=display'>#{equation}</script>")
+      $('#mathjax-preview').html("<script type='math/tex; mode=display'>#{htmlEscape equation}</script>")
       @toolbar = new EquationToolbarView
         el: @$el
       @toolbar.render()
@@ -138,7 +139,7 @@ define [
           .mathquill('editor')
           .mathquill('write', equation)
         if @$mathquillContainer.mathquill('latex').replace(/\s+/, '') != equation.replace(/\s+/, '')
-          @$mathjaxMessage.html(I18n.t('cannot_render_equation', "This equation cannot be rendered in Basic View."))
+          @$mathjaxMessage.text(I18n.t('cannot_render_equation', "This equation cannot be rendered in Basic View."))
           return false
       else if view == 'mathjax'
         @$mathjaxEditor.val(equation)

@@ -29,24 +29,24 @@ describe LocaleSelection do
 
   context 'accept-language' do
     it "should ignore malformed accept-language headers" do
-      ls.infer_browser_locale("en not valid", ['en']).should be_nil
+      expect(ls.infer_browser_locale("en not valid", ['en'])).to be_nil
     end
 
     it "should match valid locale ranges" do
-      ls.infer_browser_locale("en", ['en']).should eql('en')
+      expect(ls.infer_browser_locale("en", ['en'])).to eql('en')
     end
 
     it "should not match invalid locale ranges" do
-      ls.infer_browser_locale("it", ['en']).should be_nil
+      expect(ls.infer_browser_locale("it", ['en'])).to be_nil
     end
 
     it "should do case-insensitive matching" do
-      ls.infer_browser_locale("en-us", ['en-US']).should eql('en-US')
+      expect(ls.infer_browser_locale("en-us", ['en-US'])).to eql('en-US')
     end
 
     # see rfc2616 ... en means any en(-.*)? is acceptable
     it "should do range prefix-matching" do
-      ls.infer_browser_locale("en", ['en-US']).should eql('en-US')
+      expect(ls.infer_browser_locale("en", ['en-US'])).to eql('en-US')
     end
 
     # while tag prefix-matching might be desirable (sometimes), it should not
@@ -57,33 +57,33 @@ describe LocaleSelection do
     #   available. A user agent might suggest in such a case to add "en" to
     #   get the best matching behavior.
     it "should not do tag prefix-matching" do
-      ls.infer_browser_locale("en-US", ['en']).should be_nil
+      expect(ls.infer_browser_locale("en-US", ['en'])).to be_nil
     end
 
     it "should assign quality values based on the best match" do
-      ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", ['en-US', 'es']).should eql('en-US')
+      expect(ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", ['en-US', 'es'])).to eql('en-US')
 
       # no tag prefix-matching
-      ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", ['en', 'es']).should eql('es')
+      expect(ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", ['en', 'es'])).to eql('es')
 
       # order doesn't matter
-      ls.infer_browser_locale("es;q=0.9, en", ['en', 'es']).should eql('en')
+      expect(ls.infer_browser_locale("es;q=0.9, en", ['en', 'es'])).to eql('en')
 
       # although the en range matches the en-US tag, the en-US range is
       # a better (read: longer) match. so the es tag ends up with a higher
       # quality value than en-US tag
-      ls.infer_browser_locale("en, es;q=0.9, en-US;q=0.8", ['en-US', 'es']).should eql('es')
+      expect(ls.infer_browser_locale("en, es;q=0.9, en-US;q=0.8", ['en-US', 'es'])).to eql('es')
     end
 
     it "should understand wildcards" do
-      ls.infer_browser_locale("*, pt;q=0.8", ['ru', 'pt']).should eql('ru')
-      ls.infer_browser_locale("*, pt;q=0.8, ru;q=0.7", ['ru', 'pt']).should eql('pt')
+      expect(ls.infer_browser_locale("*, pt;q=0.8", ['ru', 'pt'])).to eql('ru')
+      expect(ls.infer_browser_locale("*, pt;q=0.8, ru;q=0.7", ['ru', 'pt'])).to eql('pt')
       # the pt range is explicitly rejected, so we don't get a locale
-      ls.infer_browser_locale("pt-BR, *;q=0.9, pt;q=0", ['pt']).should be_nil
+      expect(ls.infer_browser_locale("pt-BR, *;q=0.9, pt;q=0", ['pt'])).to be_nil
       # no pt variants supported, so we get the first alternative
-      ls.infer_browser_locale("pt-BR, pt;q=0.9, *;q=0.8", ['es', 'fr']).should eql('es')
+      expect(ls.infer_browser_locale("pt-BR, pt;q=0.9, *;q=0.8", ['es', 'fr'])).to eql('es')
       # equal matches sort by position before alphabetical
-      ls.infer_browser_locale("en, *", ['ar', 'en']).should eql('en')
+      expect(ls.infer_browser_locale("en, *", ['ar', 'en'])).to eql('en')
     end
   end
 
@@ -99,36 +99,36 @@ describe LocaleSelection do
     end
 
     it "should use the default locale if there is no other context" do
-      ls.infer_locale.should eql('en')
-      ls.infer_locale(:root_account => @root_account).should eql('en')
-      ls.infer_locale(:root_account => @root_account, :user => @user).should eql('en')
-      ls.infer_locale(:root_account => @root_account, :user => @user, :context => @course).should eql('en')
+      expect(ls.infer_locale).to eql('en')
+      expect(ls.infer_locale(:root_account => @root_account)).to eql('en')
+      expect(ls.infer_locale(:root_account => @root_account, :user => @user)).to eql('en')
+      expect(ls.infer_locale(:root_account => @root_account, :user => @user, :context => @course)).to eql('en')
     end
 
     it "should infer the locale from the accept_language" do
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account).should eql('it')
-      @user.browser_locale.should be_nil
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user).should eql('it')
-      @user.browser_locale.should eql('it')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('it')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('it')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account)).to eql('it')
+      expect(@user.browser_locale).to be_nil
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('it')
+      expect(@user.browser_locale).to eql('it')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('it')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('it')
     end
 
     it "should infer the locale from the root account" do
       @root_account.update_attribute(:default_locale, 'es')
 
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user).should eql('es')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('es')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('es')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('es')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('es')
     end
 
     it "should infer the locale from the account" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
 
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user).should eql('es')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('fr')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('fr')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('fr')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('fr')
     end
 
     it "should infer the locale from the user" do
@@ -136,9 +136,9 @@ describe LocaleSelection do
       @account.update_attribute(:default_locale, 'fr')
       @user.update_attribute(:locale, 'de')
 
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user).should eql('de')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('de')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('de')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('de')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('de')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('de')
     end
 
     it "should ignore bogus locales" do
@@ -146,9 +146,9 @@ describe LocaleSelection do
       @account.update_attribute(:default_locale, 'fr')
       @user.stubs(:locale).returns('bogus')
 
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user).should eql('es')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('fr')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('fr')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('fr')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('fr')
     end
 
     it "should infer the locale from the course" do
@@ -157,9 +157,9 @@ describe LocaleSelection do
       @user.update_attribute(:locale, 'de')
       @course.update_attribute(:locale, 'pt')
 
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user).should eql('de')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('de')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('pt')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('de')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('de')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('pt')
     end
 
     it "should infer the locale of a group from the group's context" do
@@ -171,8 +171,8 @@ describe LocaleSelection do
       account_gc = @account.group_categories.create!(:name => "Other Groups")
       account_gr = Group.create!(:name => "Group 1", :group_category => account_gc, :context => @account)
 
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => account_gr).should eql('fr')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => course_gr).should eql('es')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => account_gr)).to eql('fr')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => course_gr)).to eql('es')
     end
 
     it "should infer the locale from the session" do
@@ -180,8 +180,8 @@ describe LocaleSelection do
       @account.update_attribute(:default_locale, 'fr')
       @user.update_attribute(:locale, 'de')
 
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :session_locale => 'zh').should eql('zh')
-      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :user => @user, :session_locale => 'zh').should eql('de')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :session_locale => 'zh')).to eql('zh')
+      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :user => @user, :session_locale => 'zh')).to eql('de')
     end
   end
 end

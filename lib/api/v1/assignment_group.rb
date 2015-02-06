@@ -51,7 +51,10 @@ module Api::V1::AssignmentGroup
           include_module_ids: includes.include?('module_ids'),
           override_dates: opts[:override_assignment_dates],
           preloaded_user_content_attachments: user_content_attachments,
-          include_visibility: includes.include?('assignment_visibility'))
+          include_visibility: includes.include?('assignment_visibility'),
+          assignment_visibilities: opts[:assignment_visibilities].try(:[], a.id),
+          differentiated_assignments_enabled: opts[:differentiated_assignments_enabled]
+          )
       }
     end
 

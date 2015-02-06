@@ -73,20 +73,20 @@ define [
   test 'returns the correct object to publish an item', ->
     @restrictedDialogForm.refs.publishInput.getDOMNode().checked = true
     Simulate.change(@restrictedDialogForm.refs.publishInput .getDOMNode())
-    
-    expectedObject = 
+
+    expectedObject =
       'hidden': false
       'unlock_at': ''
       'lock_at': ''
       'locked' : false
-    
+
     deepEqual @restrictedDialogForm.extractFormValues(), expectedObject, "returns the correct object"
 
   test 'returns the correct object to unpublish an item', ->
     @restrictedDialogForm.refs.unpublishInput.getDOMNode().checked = true
     Simulate.change(@restrictedDialogForm.refs.unpublishInput .getDOMNode())
-    
-    expectedObject = 
+
+    expectedObject =
       'hidden': false
       'unlock_at': ''
       'lock_at': ''
@@ -97,8 +97,8 @@ define [
   test 'returns the correct object to hide an item', ->
     @restrictedDialogForm.refs.permissionsInput.getDOMNode().checked = true
     Simulate.change(@restrictedDialogForm.refs.permissionsInput.getDOMNode())
-    
-    expectedObject = 
+
+    expectedObject =
       'hidden': true
       'unlock_at': ''
       'lock_at': ''
@@ -111,10 +111,10 @@ define [
     Simulate.change(@restrictedDialogForm.refs.dateRange.getDOMNode())
     @restrictedDialogForm.refs.dateRange.getDOMNode().checked = true
 
-    @restrictedDialogForm.refs.unlock_at.getDOMNode().value = "something else"
-    @restrictedDialogForm.refs.lock_at.getDOMNode().value = "something"
+    $(@restrictedDialogForm.refs.unlock_at.getDOMNode()).data('unfudged-date', 'something else')
+    $(@restrictedDialogForm.refs.lock_at.getDOMNode()).data('unfudged-date', 'something')
 
-    expectedObject = 
+    expectedObject =
       'hidden': false
       'unlock_at': 'something else'
       'lock_at': 'something'
@@ -147,14 +147,14 @@ define [
     Simulate.change(refs.permissionsInput.getDOMNode())
     @restrictedDialogForm.setState selectedOption: 'date_range'
 
-    refs.unlock_at.getDOMNode().value = '123'
-    refs.lock_at.getDOMNode().value = '123'
+    $(refs.unlock_at.getDOMNode()).data('unfudged-date', '123')
+    $(refs.lock_at.getDOMNode()).data('unfudged-date', '123')
 
-    sinon.spy(@restrictedDialogForm.props.models[0], 'save')
+    stubbedSave = sinon.spy(@restrictedDialogForm.props.models[0], 'save')
     Simulate.submit(refs.dialogForm.getDOMNode())
 
     ok @restrictedDialogForm.props.models[0].save.calledWithMatch({}, {attrs: {hidden: false, lock_at: '123', unlock_at: '123', locked: false}}), 'Called save with single hidden true attribute'
-    @restrictedDialogForm.props.models[0].save.restore()
+    stubbedSave.restore()
 
   module 'RestrictedDialogForm Multiple Items',
     setup: ->

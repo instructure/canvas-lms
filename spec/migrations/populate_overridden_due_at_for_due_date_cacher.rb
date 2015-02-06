@@ -48,14 +48,14 @@ describe DataFixup::PopulateOverriddenDueAtForDueDateCacher do
     DataFixup::PopulateOverriddenDueAtForDueDateCacher.run
 
     @assignment1.reload
-    @assignment1.submissions.size.should eql(0)
+    expect(@assignment1.submissions.size).to eql(0)
 
     @assignment.reload
-    @assignment.submissions.size.should eql(1)
+    expect(@assignment.submissions.size).to eql(1)
     @submission = @assignment.submissions.first
 
-    @submission.user.should == @user
-    @submission.assignment.should == @assignment
-    @submission.cached_due_date.should == @due_at
+    expect(@submission.user).to eq @user
+    expect(@submission.assignment).to eq @assignment
+    expect(@submission.cached_due_date).to eq @due_at
   end
 end

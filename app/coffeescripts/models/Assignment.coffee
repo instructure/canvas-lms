@@ -30,7 +30,7 @@ define [
       if (all_dates = @get('all_dates'))?
         @set 'all_dates', new DateGroupCollection(all_dates)
       if (@postToSISEnabled())
-        unless @get('post_to_sis') == true || @get('post_to_sis') == false
+        if !@get('id') && @get('post_to_sis') != false
           @set 'post_to_sis', true
 
     isQuiz: => @_hasOnlyType 'online_quiz'
@@ -67,9 +67,6 @@ define [
     name: (newName) =>
       return @get 'name' unless arguments.length > 0
       @set 'name', newName
-
-    postToSIS:  =>
-      return @get 'post_to_sis' unless arguments.length > 0
 
     pointsPossible: (points) =>
       return @get('points_possible') || 0 unless arguments.length > 0
@@ -116,6 +113,9 @@ define [
       submissionTypes = @_submissionTypes()
       @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
 
+    hasSubmittedSubmissions: =>
+      @get('has_submitted_submissions')
+
     withoutGradedSubmission: =>
       sub = @get('submission')
       !sub? || sub.withoutGradedSubmission()
@@ -136,6 +136,10 @@ define [
       _.any @_submissionTypes(), (thing) ->
         thing in ['online', 'online_text_entry',
           'media_recording', 'online_url', 'online_upload']
+
+    postToSIS: (postToSisBoolean) =>
+      return @get 'post_to_sis' unless arguments.length > 0
+      @set 'post_to_sis', postToSisBoolean
 
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0

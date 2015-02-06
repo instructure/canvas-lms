@@ -44,31 +44,31 @@ describe CanvasConnect::MeetingArchive do
   subject { CanvasConnect::MeetingArchive.retrieve(38230, MockClient.new).first }
 
   it "returns the correct number" do
-    CanvasConnect::MeetingArchive.retrieve(38230, MockClient.new).count.should == 2
+    expect(CanvasConnect::MeetingArchive.retrieve(38230, MockClient.new).count).to eq 2
   end
 
   it "returns the name" do
-    subject.name.should == 'Test Recording'
+    expect(subject.name).to eq 'Test Recording'
   end
 
   it "returns the url_path" do
-    subject.url_path.should == '/p3u8rj0rvuj/'
+    expect(subject.url_path).to eq '/p3u8rj0rvuj/'
   end
 
   it "returns the date_begin" do
-    subject.date_begin.should == '2013-09-05T12:13:03.387-06:00'
+    expect(subject.date_begin).to eq '2013-09-05T12:13:03.387-06:00'
   end
 
   it "returns the date end" do
-    subject.date_end.should == '2013-09-05T12:13:28.970-06:00'
+    expect(subject.date_end).to eq '2013-09-05T12:13:28.970-06:00'
   end
 
   it "returns the date created" do
-    subject.date_created.should == '2013-09-05T12:13:03.387-06:00'
+    expect(subject.date_created).to eq '2013-09-05T12:13:03.387-06:00'
   end
 
   it "returns the date modified" do
-    subject.date_modified.should == '2013-09-05T12:13:29.727-06:00'
+    expect(subject.date_modified).to eq '2013-09-05T12:13:29.727-06:00'
   end
 
 end

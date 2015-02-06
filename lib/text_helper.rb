@@ -26,29 +26,15 @@ module TextHelper
     style = args.last.is_a?(Symbol) ? args.pop : :normal
     end_date = args.pop
     end_date = end_date.in_time_zone.to_date rescue end_date.to_date if end_date
+    start_date_display = Utils::DatePresenter.new(start_date).as_string(style)
     if end_date.nil? || start_date == end_date
-      date_component(start_date, style)
+      start_date_display
     else
       I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}",
-        :start_date_and_time => date_component(start_date, style),
-        :end_date_and_time => date_component(end_date, style)
+        :start_date_and_time => start_date_display,
+        :end_date_and_time => Utils::DatePresenter.new(end_date).as_string(style)
       )
     end
-  end
-
-def self.date_component(start_date, style=:normal)
-    today = Time.zone.today
-    if style != :long
-      if style != :no_words
-        string = nil
-        return string if start_date == today && (string = I18n.t('date.days.today', 'Today')) && string.strip.present?
-        return string if start_date == today + 1 && (string = I18n.t('date.days.tomorrow', 'Tomorrow')) && string.strip.present?
-        return string if start_date == today - 1 && (string = I18n.t('date.days.yesterday', 'Yesterday')) && string.strip.present?
-        return string if start_date < today + 1.week && start_date >= today && (string = I18n.l(start_date, :format => :weekday) rescue nil) && string.strip.present?
-      end
-      return I18n.l(start_date, :format => :short) if start_date.year == today.year || style == :short
-    end
-    return I18n.l(start_date, :format => :medium)
   end
 
   def date_string(*args)
@@ -56,15 +42,8 @@ def self.date_component(start_date, style=:normal)
   end
 
   def time_string(start_time, end_time=nil, zone=nil)
-    zone ||= ::Time.zone
-    start_time = start_time.in_time_zone(zone) rescue start_time
-    end_time = end_time.in_time_zone(zone) rescue end_time
-    return nil unless start_time
-    result = I18n.l(start_time, :format => start_time.min == 0 ? :tiny_on_the_hour : :tiny)
-    if end_time && end_time != start_time
-      result = I18n.t('time.ranges.times', "%{start_time} to %{end_time}", :start_time => result, :end_time => time_string(end_time, nil, zone))
-    end
-    result
+    presenter = Utils::TimePresenter.new(start_time, zone)
+    presenter.as_string(display_as_range: end_time)
   end
 
   def datetime_span(*args)
@@ -78,41 +57,8 @@ def self.date_component(start_date, style=:normal)
 
   def datetime_string(start_datetime, datetime_type=:event, end_datetime=nil, shorten_midnight=false, zone=nil)
     zone ||= ::Time.zone
-    start_datetime = start_datetime.in_time_zone(zone) rescue start_datetime
-    return nil unless start_datetime
-    end_datetime = end_datetime.in_time_zone(zone) rescue end_datetime
-    if !datetime_type.is_a?(Symbol)
-      datetime_type = :event
-      end_datetime = nil
-    end
-    end_datetime = nil if datetime_type == :due_date
-
-    def datetime_component(date_string, time, type, zone)
-      if type == :due_date
-        I18n.t('time.due_date', "%{date} by %{time}", :date => date_string, :time => time_string(time, nil, zone))
-      else
-        I18n.t('time.event', "%{date} at %{time}", :date => date_string, :time => time_string(time, nil, zone))
-      end
-    end
-
-    start_date_string = date_string(start_datetime, datetime_type == :verbose ? :long : :no_words)
-    start_string = datetime_component(start_date_string, start_datetime, datetime_type, zone)
-
-    if !end_datetime || end_datetime == start_datetime
-      if shorten_midnight && ((datetime_type == :due_date  && start_datetime.hour == 23 && start_datetime.min == 59) || (datetime_type == :event && start_datetime.hour == 0 && start_datetime.min == 0))
-        start_date_string
-      else
-        start_string
-      end
-    else
-      if start_datetime.to_date == end_datetime.to_date
-        I18n.t('time.ranges.same_day', "%{date} from %{start_time} to %{end_time}", :date => start_date_string, :start_time => time_string(start_datetime, nil, zone), :end_time => time_string(end_datetime, nil, zone))
-      else
-        end_date_string = date_string(end_datetime, datetime_type == :verbose ? :long : :no_words)
-        end_string = datetime_component(end_date_string, end_datetime, datetime_type, zone)
-        I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}", :start_date_and_time => start_string, :end_date_and_time => end_string)
-      end
-    end
+    presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone)
+    presenter.as_string(shorten_midnight: shorten_midnight)
   end
 
   def unlocalized_datetime_string(start_datetime, datetime_type=:event)

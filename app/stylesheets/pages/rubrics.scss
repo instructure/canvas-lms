@@ -1,0 +1,30 @@
+@import "base/environment";
+
+
+#rubrics ul {
+  list-style-type: none;
+  padding-left: 0px;
+  margin-left: 0;
+}
+#rubrics ul li {
+  padding: 3px 0;
+  margin-bottom: 5px;
+}
+#rubrics ul li .title {
+  font-size: 1.2em;
+  font-weight: bold;
+  float: left;
+  color: $canvas-primary;
+}
+#rubrics ul li .links {
+  float: right;
+  opacity: 0.5;
+  color: $canvas-primary;
+}
+#rubrics ul li .details {
+  clear: left;
+  display: block;
+  font-size: 0.7em;
+  margin-left: 20px;
+}
+

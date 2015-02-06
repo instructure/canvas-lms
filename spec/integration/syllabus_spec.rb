@@ -26,10 +26,10 @@ describe "syllabus" do
 
     get "/courses/#{@course.id}/assignments/syllabus"
 
-    response.should be_success
+    expect(response).to be_success
     page = Nokogiri::HTML(response.body)
-    page.css('#identity a[href="/login"]').should_not be_nil
-    page.at_css('#syllabusContainer').should_not be_nil
+    expect(page.css('#identity a[href="/login"]')).not_to be_nil
+    expect(page.at_css('#syllabusContainer')).not_to be_nil
   end
 
   it "should allow access to public courses" do
@@ -38,6 +38,22 @@ describe "syllabus" do
 
   it "should allow access to a public syllabus" do
     anonymous_syllabus_access_allowed :public_syllabus
+  end
+
+  it "should allow viewing files in a public syllabus" do
+    course(:active_all => true)
+    attachment_model
+    @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
+    @course.public_syllabus = true
+    @course.save!
+
+    get "/courses/#{@course.id}/assignments/syllabus"
+
+    expect(response).to be_success
+    page = Nokogiri::HTML(response.body)
+    expect(page.css('#identity a[href="/login"]')).not_to be_nil
+    link = page.at_css('#course_syllabus a')
+    expect(link.attributes['href'].value).to include("verifier=#{@attachment.uuid}")
   end
 
   it "should display syllabus description on syllabus course home pages" do
@@ -49,8 +65,8 @@ describe "syllabus" do
 
     get "/courses/#{@course.id}"
 
-    response.should be_success
+    expect(response).to be_success
     page = Nokogiri::HTML(response.body)
-    page.at_css('#course_syllabus').text.should include(syllabus_body)
+    expect(page.at_css('#course_syllabus').text).to include(syllabus_body)
   end
 end

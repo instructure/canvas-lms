@@ -1,7 +1,7 @@
 <% invitation = dashboard_invitation %>
 <div class="global-message image-block">
   <div class="image-block-image">
-    <i class="invitation-icon"></i>
+    <i class="icon-invitation is-invitation-icon"></i>
     <span class="hidden-inline-text">
       <%= accessible_message_icon_text("invitation") %>
     </span>
@@ -9,7 +9,7 @@
   <div class="image-block-content">
     <div class="message">
       <p><%=
-        mt(:invitation_text, "You have been invited to join **[%{course}](%{link_to_course})** as %{enrollment_type_with_indefinite_article}", {
+        mt(:invitation_text, "You have been invited to join [%{course}](%{link_to_course}) as %{enrollment_type_with_indefinite_article}", {
           :course => invitation.long_name,
           :link_to_course => course_path(invitation.course_id, :invitation => invitation.uuid),
           :enrollment_type_with_indefinite_article => Enrollment.type_with_indefinite_article(invitation.type).downcase

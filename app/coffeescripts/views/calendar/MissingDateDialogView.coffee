@@ -4,15 +4,16 @@ define [
   'Backbone'
   'i18n!calendar.edit'
   'jst/calendar/missingDueDateDialog'
+  'str/htmlEscape'
   'jqueryui/dialog'
   'compiled/jquery/fixDialogButtons'
-], ($, _, {View}, I18n, template) ->
+], ($, _, {View}, I18n, template, htmlEscape) ->
 
   class MissingDateDialogView extends View
     dialogTitle: """
       <span>
         <i class="icon-warning"></i>
-        #{I18n.t('titles.warning', 'Warning')}
+        #{htmlEscape I18n.t('titles.warning', 'Warning')}
       </span>
     """
 
@@ -21,6 +22,7 @@ define [
       @validationFn = options.validationFn
       @labelFn      = options.labelFn or @defaultLabelFn
       @success      = options.success
+      @da_enabled   = options.da_enabled
 
     defaultLabelFn: (input) ->
       $("label[for=#{$(input).attr('id')}]").text()
@@ -52,7 +54,7 @@ define [
         count: @invalidSectionNames.length
       })
 
-      tpl = template(description: description, sections: @invalidSectionNames)
+      tpl = template(description: description,da_enabled: @da_enabled, sections: @invalidSectionNames)
       @$dialog = $(tpl).dialog
         dialogClass: 'dialog-warning'
         draggable  : false
@@ -65,9 +67,9 @@ define [
 
     onAction: (e) =>
       if $(e.currentTarget).hasClass('btn-primary')
-        @cancel(@invalidFields, @sectionNames)
-      else
         @success(@$dialog)
+      else
+        @cancel(@invalidFields, @sectionNames)
 
     cancel: (e) =>
       @$dialog.dialog('close').remove()

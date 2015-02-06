@@ -1,56 +1,139 @@
+#outstanding_quiz_submissions_found
+  margin-bottom: 0px
+
+.outstanding_link
+  float: right
+
 #students
-  border-collapse: collapse
-  thead
-    td,th
-      border-bottom: 1px dotted #aaa
-      padding: 3px 8px
-      font-weight: bold
-      text-align: center
+  border: 1px solid #e6e6e7
+
+  th
+    background-color: #F4F5F6
+    font-weight: bold
+    text-align: left
+
+  tbody
+    font-weight: 300
+
+  .check
+    width: 12px
+    line-height: 1em
+    vertical-align: top
+
+  .icon-refreshing
+    &.inactive
+      display:none
+
+    position: relative
+    left: -2px
+    top: -2px
+
+  th
+    text-align: center
+
+  td
+    text-align: center
+
+  th.name, td.name
+    text-align: left
+
+  th.unlocked_col, td.unlocked_col
+    padding: 8px 2px
+
+  th.edit, td.edit
+    width: 50px
+    padding: 8px 2px
+
+  th a.icon-refresh:before
+    font-size: 100%
+
+  th a.icon-refresh, td a.icon-edit
+    color: #444
+
   .student
-    border-bottom: 1px dotted #ddd
-    td,th
-      padding: 3px 5px
-      vertical-align: top
-    .number
-      text-align: center
-    .time_holder
-      color: #888
-      font-size: 0.8em
-      text-align: left
-      vertical-align: middle
+    .extend_time_link
+      display: none
+
+  .student
+    &.extendable
       .extend_time_link
-        display: none
-    .extra_time_allowed
-      color: #888
-      font-size: 0.8em
-      padding-left: 15px
-    .score_holder
-      text-align: center
-    .links
-      text-align: right
-    &.in_progress
-      .time_holder
-        color: #222
-        font-size: 1.1em
-        text-align: right
-        padding-right: 10px
-      &.extendable
-        .extend_time_link
-          display: inline
-          padding-left: 5px
-    &.manually_unlocked
-      .unlocked
         display: inline
-    &:hover
-      background-color: #eee
-#moderate_student_dialog
-  table
-    td
-      padding-bottom: 10px
-      padding-right: 5px
-#extend_time_dialog
-  table
-    margin: 10px 20px 15px
-    th
-      font-weight: bold
-      padding-right: 5px
+        padding-left: 5px
+
+  .extra_time
+    font-size: 85%
+    color: #555
+
+.student_extension_dialog
+  h2
+    margin: 0 0 1.5em 0
+    font-size: 140%
+    line-height: 1em
+
+  .field
+    float: left
+    margin-bottom: 13px
+    label
+      float: left
+      width: 260px
+      font-size: 115%
+      .note
+        display: block
+        font-style: normal
+        font-size: 80%
+        font-weight: 300
+        color: #888
+
+    .input
+      float: right
+      width: 160px
+      margin-top: 6px
+      input[type="text"]
+        float: left
+        width: 50px
+      .units
+        line-height: 30px
+        margin-left: 8px
+        font-size: 90%
+
+  .manually_unlock, .one_time_results
+    input
+      float: left
+      margin-right: 10px
+    label
+      width: 400px
+
+  .invalid
+    border: 1px solid #b94a48
+  dl
+    margin-bottom: 1.7em
+  dt
+    width: 75px
+    float: left
+    font-weight: bold
+    text-align: right
+
+  dd
+    width: 330px
+    float: left
+  p
+    margin-bottom: 1.5em
+  p.note
+    margin: 4px 0 0 0
+    font-size: 80%
+    font-weight: 300
+    color: #888
+  .relative_time
+    input
+      width: 50px
+      margin: 0 5px
+
+    select
+      width: 120px
+      margin: 0 5px
+
+#autosubmit_form
+  .child_container
+    max-height: 200px
+    overflow: auto
+    min-height: 50px

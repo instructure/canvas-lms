@@ -6,18 +6,17 @@ describe "Navigating to wiki pages" do
   describe "Navigation" do
     before do
       account_model
-      @account.enable_feature!(:draft_state)
       course_with_teacher_logged_in :account => @account
     end
 
     it "navigates to the wiki pages edit page from the show page" do
       wikiPage = @course.wiki.wiki_pages.create!(:title => "Foo")
-      edit_url = course_edit_named_page_url(@course, wikiPage)
-      get course_named_page_path(@course, wikiPage)
+      edit_url = edit_course_wiki_page_url(@course, wikiPage)
+      get course_wiki_page_path(@course, wikiPage)
 
       f(".edit-wiki").click
 
-      keep_trying_until { driver.current_url.should == edit_url }
+      keep_trying_until { expect(driver.current_url).to eq edit_url }
     end
   end
 
@@ -35,20 +34,21 @@ describe "Navigating to wiki pages" do
       title = "foo"
       wikiPage = @course.wiki.wiki_pages.create!(:title => title, :body => "bar")
 
-      get "/courses/#{@course.id}/wiki/#{title}"
-      f('#wiki_body').should_not be_nil
+      get "/courses/#{@course.id}/pages/#{title}"
+      expect(f('#wiki_page_show')).not_to be_nil
     end
   end
 
   context "menu tools" do
     before do
-      course_with_teacher_logged_in(:draft_state => true)
+      course_with_teacher_logged_in
       Account.default.enable_feature!(:lor_for_account)
 
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.wiki_page_menu = {:url => "http://www.example.com", :text => "Export Wiki Page"}
       @tool.save!
 
+      @course.wiki.set_front_page_url!('front-page')
       @wiki_page = @course.wiki.front_page
       @wiki_page.workflow_state = 'active'; @wiki_page.save!
     end
@@ -60,9 +60,9 @@ describe "Navigating to wiki pages" do
       gear = f(".collectionViewItems tr .al-trigger")
       gear.click
       link = f(".collectionViewItems tr li a.menu_tool_link")
-      link.should be_displayed
-      link.text.should match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
-      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
+      expect(link).to be_displayed
+      expect(link.text).to match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
+      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
     end
 
     it "should show tool launch links in the gear for items on the show page" do
@@ -72,9 +72,9 @@ describe "Navigating to wiki pages" do
       gear = f("#wiki_page_show .al-trigger")
       gear.click
       link = f("#wiki_page_show .al-options li a.menu_tool_link")
-      link.should be_displayed
-      link.text.should match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
-      link['href'].should == course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
+      expect(link).to be_displayed
+      expect(link.text).to match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
+      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
     end
   end
 end

@@ -1,4 +1,4 @@
-<div class="form-dialog-content pad-box form-horizontal">
+<div class="form-dialog-content pad-box form-horizontal group-category-create">
   <fieldset class="pad-box{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
     <label class="control-label" for="new_category_name">
       {{#t "group_set_name"}}Group Set Name{{/t}}
@@ -65,34 +65,7 @@
       </label>
     </div>
   </fieldset>
-
-  <fieldset class="pad-box auto-group-leader-controls">
-    <span class="control-label">{{#t "leadership"}}Leadership{{/t}}</span>
-    <div class="controls">
-      <label class="checkbox" for="enable_auto_leader">
-        {{checkbox "enable_auto_leader" class="auto-group-leader-toggle"}}
-        {{#t "auto_group_leader"}}Automatically assign a student group leader{{/t}}
-      </label>
-    </div>
-    <div class="controls" style="margin-left: 200px;">
-      <label class="radio">
-        <input type="radio" name="auto_leader_type" value="FIRST" checked>
-        {{#t "auto_first_group_leader"}}
-          Set first student to join as group leader
-        {{/t}}
-      </label>
-    </div>
-    <div class="controls" style="margin-left: 200px;">
-      <label class="radio">
-        <input type="radio" name="auto_leader_type" value="RANDOM">
-        {{#t "auto_random_group_leader"}}
-          Set a random student as group leader
-        {{/t}}
-      </label>
-    </div>
-  </fieldset>
-
-
+  {{> [groups/manage/autoLeadershipControls]}}
 
   {{/if}}
 </div>

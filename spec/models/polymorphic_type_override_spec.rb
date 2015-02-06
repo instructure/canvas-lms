@@ -29,18 +29,18 @@ describe PolymorphicTypeOverride do
       end
 
       fizz_buzz = ContentTag.create! content: quiz_model, context: quiz_model
-      fizz_buzz.content_type.should == 'Quizzes::Quiz'
-      fizz_buzz.context_type.should == 'Quizzes::Quiz'
+      expect(fizz_buzz.content_type).to eq 'Quizzes::Quiz'
+      expect(fizz_buzz.context_type).to eq 'Quizzes::Quiz'
 
       ContentTag.update_all("content_type='OldClassInDatabase', context_type='AnotherOldClassInDatabase'", "id=#{fizz_buzz.id}")
 
       updated_fizz_buzz = ContentTag.find(fizz_buzz.id)
 
-      updated_fizz_buzz.content_type.should == 'Quizzes::Quiz'
-      updated_fizz_buzz.content_id.should_not == 'Quizzes::Quiz'
+      expect(updated_fizz_buzz.content_type).to eq 'Quizzes::Quiz'
+      expect(updated_fizz_buzz.content_id).not_to eq 'Quizzes::Quiz'
 
-      updated_fizz_buzz.context_type.should == 'Quizzes::Quiz'
-      updated_fizz_buzz.context_id.should_not == 'Quizzes::Quiz'
+      expect(updated_fizz_buzz.context_type).to eq 'Quizzes::Quiz'
+      expect(updated_fizz_buzz.context_id).not_to eq 'Quizzes::Quiz'
     end
 
     it 'overrides a single old polymorphic type with a new one' do
@@ -50,13 +50,13 @@ describe PolymorphicTypeOverride do
       end
 
       fizz_buzz = ContentTag.create! content: quiz_model, context: course_model
-      fizz_buzz.content_type.should == 'Quizzes::Quiz'
+      expect(fizz_buzz.content_type).to eq 'Quizzes::Quiz'
 
       ContentTag.update_all("content_type='OldClassInDatabase'", "id=#{fizz_buzz.id}")
 
       updated_fizz_buzz = ContentTag.find(fizz_buzz.id)
-      updated_fizz_buzz.content_type.should == 'Quizzes::Quiz'
-      updated_fizz_buzz.content_id.should_not == 'Quizzes::Quiz'
+      expect(updated_fizz_buzz.content_type).to eq 'Quizzes::Quiz'
+      expect(updated_fizz_buzz.content_id).not_to eq 'Quizzes::Quiz'
     end
 
 

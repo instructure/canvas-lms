@@ -25,8 +25,6 @@ module Importers
       item.migration_id = hash[:migration_id]
       item.url = hash[:url]
       item.title = hash[:title]
-      item.feed_type = hash[:feed_type]
-      item.feed_purpose = hash[:purpose]
       item.verbosity = hash[:verbosity]
       item.header_match = hash[:header_match] unless hash[:header_match].blank?
 

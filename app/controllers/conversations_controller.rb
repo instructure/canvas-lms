@@ -73,15 +73,24 @@
 #         },
 #         "properties": {
 #           "description": "Additional conversation flags (last_author, attachments, media_objects). Each listed property means the flag is set to true (i.e. the current user is the most recent author, there are attachments, or there are media objects)",
-#           "type": "[string]"
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
 #         },
 #         "audience": {
 #           "description": "Array of user ids who are involved in the conversation, ordered by participation level, then alphabetical. Excludes current user, unless this is a monologue.",
-#           "type": "[integer]"
+#           "type": "array",
+#           "items": {
+#             "type": "integer"
+#           }
 #         },
 #         "audience_contexts": {
 #           "description": "Most relevant shared contexts (courses and groups) between current user and other participants. If there is only one participant, it will also include that user's enrollment(s)/ membership type(s) in each course/group.",
-#           "type": "[string]"
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
 #         },
 #         "avatar_url": {
 #           "description": "URL to appropriate icon for this conversation (custom, individual or group avatar, depending on audience).",
@@ -90,7 +99,10 @@
 #         },
 #         "participants": {
 #           "description": "Array of users (id, name) participating in the conversation. Includes current user.",
-#           "type": "[string]"
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
 #         },
 #         "visible": {
 #           "description": "indicates whether the conversation is visible under the current scope and filter. This attribute is always true in the index API response, and is primarily useful in create/update responses so that you can know if the record should be displayed in the UI. The default scope is assumed, unless a scope or filter is passed to the create/update API call.",
@@ -329,6 +341,13 @@ class ConversationsController < ApplicationController
       context_id = context.id
     end
 
+    params[:recipients].each do |recipient|
+      if recipient =~ /\Acourse_\d+\Z/ &&
+         !Context.find_by_asset_string(recipient).try(:grants_right?, @current_user, session, :send_messages_all)
+        return render_error('recipients', 'restricted by role')
+      end
+    end
+
     group_conversation     = value_to_boolean(params[:group_conversation])
     batch_private_messages = !group_conversation && @recipients.size > 1
     batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
@@ -502,7 +521,7 @@ class ConversationsController < ApplicationController
     messages = nil
     Shackles.activate(:slave) do
       messages = @conversation.messages
-      ConversationMessage.send(:preload_associations, messages, :asset)
+      ActiveRecord::Associations::Preloader.new(messages, :asset).run
     end
 
     render :json => conversation_json(@conversation,
@@ -787,7 +806,7 @@ class ConversationsController < ApplicationController
   #   }
   def remove_messages
     if params[:remove]
-      @conversation.remove_messages(*@conversation.messages.find_all_by_id(*params[:remove]))
+      @conversation.remove_messages(*@conversation.messages.where(id: params[:remove]).to_a)
       if @conversation.conversation_message_participants.where('workflow_state <> ?', 'deleted').length == 0
         @conversation.update_attribute(:last_message_at, nil)
       end
@@ -1047,8 +1066,8 @@ class ConversationsController < ApplicationController
     case context
     when nil then false
     when Account then valid_account_context?(context)
-    # might want to add some validation for Course and Group.
-    else true
+    when Course, Group then context.membership_for_user(@current_user) || context.grants_right?(@current_user, session, :send_messages)
+    else false
     end
   end
 

@@ -13,15 +13,15 @@ describe "assignments turn it in" do
 
   def change_turnitin_settings
     keep_trying_until {
-      f('#assignment_submission_type').should be_displayed
+      expect(f('#assignment_submission_type')).to be_displayed
     }
     click_option('#assignment_submission_type', 'Online')
     f('#assignment_text_entry').click
-    f('#advanced_turnitin_settings_link').should_not be_displayed
+    expect(f('#advanced_turnitin_settings_link')).not_to be_displayed
     f('#assignment_turnitin_enabled').click
-    f('#advanced_turnitin_settings_link').should be_displayed
+    expect(f('#advanced_turnitin_settings_link')).to be_displayed
     f('#advanced_turnitin_settings_link').click
-    f('#assignment_turnitin_settings').should be_displayed
+    expect(f('#assignment_turnitin_settings')).to be_displayed
 
     click_option('#settings_originality_report_visibility', 'After the Due Date')
     f('#s_paper_check').click # 1 -> 0
@@ -37,7 +37,7 @@ describe "assignments turn it in" do
     wait_for_ajaximations
 
     # dialog is closed and removed from the page
-    f('#assignment_turnitin_settings').should be_nil
+    expect(f('#assignment_turnitin_settings')).to be_nil
   end
 
   def expected_settings
@@ -63,7 +63,7 @@ describe "assignments turn it in" do
     }.to_not change { Assignment.count } # although we "saved" the dialog, we haven't actually posted anything yet
 
     expect_new_page_load { submit_form('#edit_assignment_form') }
-    Assignment.last.turnitin_settings.should == expected_settings
+    expect(Assignment.last.turnitin_settings).to eq expected_settings
   end
 
   it "should edit turnitin settings" do
@@ -79,6 +79,6 @@ describe "assignments turn it in" do
     expect_new_page_load { submit_form('#edit_assignment_form') }
 
     assignment.reload
-    assignment.turnitin_settings.should == expected_settings
+    expect(assignment.turnitin_settings).to eq expected_settings
   end
 end

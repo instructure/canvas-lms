@@ -7,6 +7,24 @@
     > li {
       display: inline-block;
       white-space: nowrap;
+
+      // We need to give the <span class="ellipsis"> a display other than inline so
+      // it can do the ellipsis thing. But if we use block or inline-block we get
+      // white space issues, hence the float.
+      > a .ellipsis {
+        float: right;
+        // firefox has a bug so it can't do it like the rest of the browsers:
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=488725
+        // so we have to do it differently, but doing it this way doesn't work in safari.
+        .ff & {
+          float: none;
+          display: inline-block;
+          position: relative;
+          top: 5px;
+          margin-top: -5px;
+        }
+      }
+
       + li {
         &:before {
           @extend i[class*=icon-]:before;
@@ -21,16 +39,7 @@
       }
     }
   }
-  // This is kinda hacky, but the label for the crumbs is in a
-  // <span class="ellipsis"> so we have to give it a display other than inline
-  // for it to actually do ellipsis. but when we do that, it is positioned weird;
-  // hence the position, top and margin-top, to get it back to where it should be.
-  .ellipsis {
-    display: inline-block;
-    position: relative;
-    top: 6px;
-    margin-top: -6px;
-  }
+
   .icon-home:before {
     font-size: 10px;
     color: $base-font-color--subdued;

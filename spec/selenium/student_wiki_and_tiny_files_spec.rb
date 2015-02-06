@@ -3,31 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 describe "Wiki pages and Tiny WYSIWYG editor Files" do
   include_examples "in-process server selenium tests"
 
-  def add_file_to_rce
-    wiki_page_tools_file_tree_setup
-    wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-    fj('.wiki_switch_views_link:visible').click
-    wiki_page_body = clear_wiki_rce
-    fj('.wiki_switch_views_link:visible').click
-    f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-    root_folders = @tree1.find_elements(:css, 'li.folder')
-    root_folders.first.find_element(:css, '.sign.plus').click
-    wait_for_ajaximations
-    root_folders.first.find_elements(:css, '.file.text').length.should == 1
-    root_folders.first.find_elements(:css, '.file.text span').first.click
-
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce').should include_text('txt')
-    end
-    fj('.wiki_switch_views_link:visible').click
-    find_css_in_string(wiki_page_body[:value], '.instructure_file_link').should_not be_empty
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-    wait_for_ajax_requests
-  end
-
-
   context "wiki and tiny files as a student" do
     before (:each) do
       course(:active_all => true, :name => 'wiki course')
@@ -41,9 +16,10 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       login_as(@teacher.name)
 
       add_file_to_rce
+      @course.wiki.wiki_pages.first.publish!
       login_as(@student.name)
-      get "/courses/#{@course.id}/wiki"
-      fj('a[title="text_file.txt"]').should be_displayed
+      get "/courses/#{@course.id}/pages/front-page"
+      expect(fj('a[title="text_file.txt"]')).to be_displayed
       #check_file would be good to do here but the src on the file in the wiki body is messed up
     end
   end
@@ -64,7 +40,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      ff('li.folder').count.should == 0
+      expect(ff('li.folder').count).to eq 0
     end
 
     it "should not show root folder in the sidebar if it is hidden" do
@@ -73,7 +49,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      ff('li.folder').count.should == 0
+      expect(ff('li.folder').count).to eq 0
     end
 
     it "should not show root folder in the sidebar if the files navigation tab is hidden" do
@@ -82,7 +58,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      ff('li.folder').count.should == 0
+      expect(ff('li.folder').count).to eq 0
     end
 
     it "should not show sub-folder in the sidebar if it is locked" do
@@ -90,11 +66,11 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      f('li.folder').should_not be_nil
+      expect(f('li.folder')).not_to be_nil
       f('li.folder span').click
       wait_for_ajaximations
-      ff('li.folder li.folder').count.should == 1
-      f('li.folder li.folder .name').text.should include_text("visible subfolder")
+      expect(ff('li.folder li.folder').count).to eq 1
+      expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
     end
 
     it "should not show sub-folder in the sidebar if it is hidden" do
@@ -102,11 +78,11 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      f('li.folder').should_not be_nil
+      expect(f('li.folder')).not_to be_nil
       f('li.folder span').click
       wait_for_ajaximations
-      ff('li.folder li.folder').count.should == 1
-      f('li.folder li.folder .name').text.should include_text("visible subfolder")
+      expect(ff('li.folder li.folder').count).to eq 1
+      expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
     end
 
     it "should not show file in the sidebar if it is hidden" do
@@ -120,8 +96,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       f('li.folder span').click
       wait_for_ajaximations
-      ff('li.folder li.file').count.should == 1
-      f('li.folder li.file .name').text.should include_text("foo.txt")
+      expect(ff('li.folder li.file').count).to eq 1
+      expect(f('li.folder li.file .name').text).to include_text("foo.txt")
     end
 
     it "should not show file in the sidebar if it is locked" do
@@ -136,9 +112,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       keep_trying_until do
         f('li.folder span').click
         wait_for_ajaximations
-        ff('li.folder li.file').count.should == 1
+        expect(ff('li.folder li.file').count).to eq 1
       end
-      f('li.folder li.file .name').text.should include_text("foo.txt")
+      expect(f('li.folder li.file .name').text).to include_text("foo.txt")
     end
   end
 
@@ -167,8 +143,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
-      ff('.image_list img.img').count.should == 1
-      f('.image_list img.img')['alt'].should == "foo.png"
+      expect(ff('.image_list img.img').count).to eq 1
+      expect(f('.image_list img.img')['alt']).to eq "foo.png"
     end
 
     it "should not show image files if their containing folder is hidden" do
@@ -178,8 +154,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
-      ff('.image_list img.img').count.should == 1
-      f('.image_list img.img')['alt'].should == "foo.png"
+      expect(ff('.image_list img.img').count).to eq 1
+      expect(f('.image_list img.img')['alt']).to eq "foo.png"
     end
 
     it "should not show any image files if the files navigation tab is hidden" do
@@ -190,7 +166,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
-      ff('.image_list img.img').count.should == 0
+      expect(ff('.image_list img.img').count).to eq 0
     end
 
     it "should not show image files if they are hidden" do
@@ -200,8 +176,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
-      ff('.image_list img.img').count.should == 1
-      f('.image_list img.img')['alt'].should == "foo.png"
+      expect(ff('.image_list img.img').count).to eq 1
+      expect(f('.image_list img.img')['alt']).to eq "foo.png"
     end
 
     it "should not show image files if they are locked" do
@@ -211,8 +187,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
-      ff('.image_list img.img').count.should == 1
-      f('.image_list img.img')['alt'].should == "foo.png"
+      expect(ff('.image_list img.img').count).to eq 1
+      expect(f('.image_list img.img')['alt']).to eq "foo.png"
     end
   end
 end

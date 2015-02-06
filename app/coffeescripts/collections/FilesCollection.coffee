@@ -39,7 +39,7 @@ define [
       if response and @parentFolder
         previewUrl = @parentFolder.previewUrl()
         _.each response, (file) ->
-          file.preview_url = if previewUrl
+          file.rce_preview_url = if previewUrl
             previewUrl.replace('{{id}}', file.id.toString())
           else
             file.url

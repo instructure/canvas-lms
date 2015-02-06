@@ -33,9 +33,9 @@ describe UserObserver do
     student.observers << observer
 
     enrollments = observer.observer_enrollments.sort_by(&:course_id)
-    enrollments.size.should eql 2
-    enrollments.map(&:course_id).should eql [c1.id, c2.id]
-    enrollments.map(&:workflow_state).should eql ["invited", "active"]
+    expect(enrollments.size).to eql 2
+    expect(enrollments.map(&:course_id)).to eql [c1.id, c2.id]
+    expect(enrollments.map(&:workflow_state)).to eql ["invited", "active"]
   end
 
   it "should not enroll the observer in institutions where they lack a login" do
@@ -53,7 +53,33 @@ describe UserObserver do
     student.observers << observer
 
     enrollments = observer.observer_enrollments
-    enrollments.size.should eql 1
-    enrollments.map(&:course_id).should eql [c2.id]
+    expect(enrollments.size).to eql 1
+    expect(enrollments.map(&:course_id)).to eql [c2.id]
+  end
+
+  describe 'when adding a custom (second) student enrollment' do
+    before(:once) do
+      @custom_student_role = custom_student_role('CustomStudent', account: Account.default)
+      @course = course active_all: true
+      @student_enrollment = student_in_course(course: @course, user: student, active_all: true)
+      @observer = user_with_pseudonym
+      student.observers << @observer
+      @observer_enrollment = @observer.enrollments.where(type: 'ObserverEnrollment', course_id: @course, associated_user_id: student).first
+      expect(@observer_enrollment).not_to be_nil
+    end
+
+    it "should not attempt to add a duplicate observer enrollment" do
+      expect {
+        @course.enroll_student student, role: @custom_student_role
+      }.not_to raise_error
+    end
+
+    it "should recycle an existing deleted observer enrollment" do
+      @observer_enrollment.destroy
+      expect {
+        @course.enroll_student student, role: @custom_student_role
+      }.not_to raise_error
+      expect(@observer_enrollment.reload).to be_invited
+    end
   end
 end

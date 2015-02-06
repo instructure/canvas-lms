@@ -2962,7 +2962,7 @@ tinymce.html.Styles = function(settings, schema) {
 		selfClosingElementsMap = createLookupTable('self_closing_elements', 'colgroup dd dt li option p td tfoot th thead tr');
 		shortEndedElementsMap = createLookupTable('short_ended_elements', 'area base basefont br col frame hr img input isindex link meta param embed source wbr');
 		boolAttrMap = createLookupTable('boolean_attributes', 'checked compact declare defer disabled ismap multiple nohref noresize noshade nowrap readonly selected autoplay loop controls');
-		nonEmptyElementsMap = createLookupTable('non_empty_elements', 'td th iframe video audio object', shortEndedElementsMap);
+		nonEmptyElementsMap = createLookupTable('non_empty_elements', 'a td th iframe video audio object', shortEndedElementsMap);
 		textBlockElementsMap = createLookupTable('text_block_elements', 'h1 h2 h3 h4 h5 h6 p div address pre form ' + 
 						'blockquote center dir fieldset header footer article section hgroup aside nav figure');
 		blockElementsMap = createLookupTable('block_elements', 'hr table tbody thead tfoot ' + 
@@ -3229,7 +3229,7 @@ tinymce.html.Styles = function(settings, schema) {
 			elements.img.attributesDefault = [{name: 'alt', value: ''}];
 
 			// Remove these if they are empty by default
-			each(split('ol,ul,sub,sup,blockquote,span,font,a,table,tbody,tr,strong,em,b,i'), function(name) {
+			each(split('ol,ul,sub,sup,blockquote,span,font,table,tbody,tr,strong,em,b,i'), function(name) {
 				if (elements[name]) {
 					elements[name].removeEmpty = true;
 				}

@@ -169,6 +169,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       @saml_settings.idp_cert_fingerprint = self.certificate_fingerprint
       @saml_settings.name_identifier_format = self.identifier_format
       @saml_settings.requested_authn_context = self.requested_authn_context
+      @saml_settings.logger = logger
     end
 
     @saml_settings
@@ -185,7 +186,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
 
     if account.saml_authentication?
-      settings.issuer = account.account_authorization_config.entity_id 
+      settings.issuer = account.account_authorization_config.entity_id
     else
       settings.issuer = saml_default_entity_id_for_account(account)
     end

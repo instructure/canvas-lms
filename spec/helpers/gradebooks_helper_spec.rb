@@ -34,7 +34,7 @@ describe GradebooksHelper do
     context 'when the supplied submission is nil' do
       it 'must return a dash' do
         score = helper.student_score_display_for(nil)
-        score.should == '-'
+        expect(score).to eq '-'
       end
     end
 
@@ -55,11 +55,11 @@ describe GradebooksHelper do
           end
 
           it 'must give us a check icon' do
-            score_icon['class'].should include 'icon-check'
+            expect(score_icon['class']).to include 'icon-check'
           end
 
           it 'must indicate the assignment is complete via alt text' do
-            score_screenreader_text.should include 'Complete'
+            expect(score_screenreader_text).to include 'Complete'
           end
         end
 
@@ -70,11 +70,11 @@ describe GradebooksHelper do
           end
 
           it 'must give us a check icon' do
-            score_icon['class'].should include 'icon-x'
+            expect(score_icon['class']).to include 'icon-x'
           end
 
           it 'must indicate the assignment is complete via alt text' do
-            score_screenreader_text.should include 'Incomplete'
+            expect(score_screenreader_text).to include 'Incomplete'
           end
         end
       end
@@ -83,7 +83,7 @@ describe GradebooksHelper do
         it 'must output the percentage' do
           assignment.grading_type = 'percent'
           submission.grade = '42.5%'
-          score_display.should == '42.5%'
+          expect(score_display).to eq '42.5%'
         end
       end
 
@@ -91,7 +91,7 @@ describe GradebooksHelper do
         it 'must output the grade rounded to two decimal points' do
           submission.grade = '42.3542'
           submission.score = 42.3542
-          score_display.should == 42.35
+          expect(score_display).to eq 42.35
         end
       end
     end
@@ -105,14 +105,14 @@ describe GradebooksHelper do
       context 'and the submission is an online submission type' do
         it 'must output an appropriate icon' do
           submission.submission_type = 'online_quiz'
-          score_icon['class'].should include 'submission_icon'
+          expect(score_icon['class']).to include 'submission_icon'
         end
       end
 
       context 'and the submission is some unknown type' do
         it 'must output a dash' do
           submission.submission_type = 'bogus_type'
-          score_display.should == '-'
+          expect(score_display).to eq '-'
         end
       end
     end

@@ -31,40 +31,46 @@ class ExternalFeedAggregator
   
   def process
     Shackles.activate(:slave) do
-      ExternalFeed.to_be_polled.find_each do |feed|
-        next if !feed.context || feed.context.root_account.deleted?
-        Shackles.activate(:master) do
-          process_feed(feed)
+      start = Time.now.utc
+      begin
+        feeds = ExternalFeed.to_be_polled(start).limit(1000).preload(context: :root_account).to_a
+        feeds.each do |feed|
+          Shackles.activate(:master) do
+            if !feed.context || feed.context.root_account.deleted?
+              feed.update_attribute(:refresh_at, Time.now.utc + NO_ENTRIES_WAIT_SECONDS)
+              next
+            end
+
+            process_feed(feed)
+          end
         end
-      end
+      end while (!feeds.empty?)
     end
   end
   
   def parse_entries(feed, body)
-    if feed.feed_type == 'rss/atom'
+    begin
+      require 'rss/1.0'
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(body, false)
+      raise "Invalid rss feed" unless rss
+      feed.title = rss.channel.title
+      feed.save
+      @logger.info("#{rss.items.length} rss items found")
+      entries = feed.add_rss_entries(rss)
+      @logger.info("#{entries.length} new entries added")
+      return true
+    rescue
       begin
-        require 'rss/1.0'
-        require 'rss/2.0'
-        rss = RSS::Parser.parse(body, false)
-        raise "Invalid rss feed" unless rss
-        feed.title = rss.channel.title
+        require 'atom'
+        atom = Atom::Feed.load_feed(body)
+        feed.title = atom.title
         feed.save
-        @logger.info("#{rss.items.length} rss items found")
-        entries = feed.add_rss_entries(rss)
+        @logger.info("#{atom.entries.length} atom entries found")
+        entries = feed.add_atom_entries(atom)
         @logger.info("#{entries.length} new entries added")
         return true
-      rescue 
-        begin
-          require 'atom'
-          atom = Atom::Feed.load_feed(body)
-          feed.title = atom.title
-          feed.save
-          @logger.info("#{atom.entries.length} atom entries found")
-          entries = feed.add_atom_entries(atom)
-          @logger.info("#{entries.length} new entries added")
-          return true
-        rescue
-        end
+      rescue
       end
     end
     false

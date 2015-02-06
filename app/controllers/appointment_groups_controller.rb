@@ -257,7 +257,7 @@ class AppointmentGroupsController < ApplicationController
       api_v1_appointment_groups_url(:scope => params[:scope])
     )
     if params[:include]
-      AppointmentGroup.send(:preload_associations, groups,
+      ActiveRecord::Associations::Preloader.new(groups,
                             [{:appointments =>
                                [:parent_event,
                                 {:context =>
@@ -270,7 +270,7 @@ class AppointmentGroupsController < ApplicationController
                                      [:parent_event,
                                       :context]}]}]},
                              {:appointment_group_contexts => :context},
-                             :appointment_group_sub_contexts])
+                             :appointment_group_sub_contexts]).run
     end
     render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) } 
   end

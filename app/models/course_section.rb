@@ -49,6 +49,8 @@ class CourseSection < ActiveRecord::Base
   validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
 
+  has_many :sis_post_grades_statuses
+
   before_save :set_update_account_associations_if_changed
   before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
@@ -107,6 +109,10 @@ class CourseSection < ActiveRecord::Base
     }
     can :read
 
+    given { |user, session| self.course.grants_right?(user, session, :manage_grades) }
+    can :manage_grades
+
+
     given { |user, session| self.course.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
   end
@@ -129,8 +135,12 @@ class CourseSection < ActiveRecord::Base
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
-    existing_section = CourseSection.where(root_account_id: self.root_account_id, sis_source_id: self.sis_source_id).first
-    return true if !existing_section || existing_section.id == self.id
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
+    scope = root_account.course_sections.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
+
+    return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
@@ -240,9 +250,8 @@ class CourseSection < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.enrollments.not_fake.each do |e|
-      e.destroy
-    end
+    self.enrollments.not_fake.each(&:destroy)
+    self.assignment_overrides.each(&:destroy)
     save!
   end
 

@@ -259,3 +259,10 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     result = GradeCalculator.calculate @submissions, [@group]
     dropped2 = _(result.group_sums[0].current.submissions).find (s) -> s.drop
     equal firstDroppedAssignment, dropped2.submission.assignment_id
+
+  test "with Differentiated Assignments filtering", ->
+    @submissions.slice(1).forEach (s) ->
+      s["hidden"] = true
+
+    result = GradeCalculator.create_group_sum @group, @submissions, true
+    equal result.submissions.length, 1

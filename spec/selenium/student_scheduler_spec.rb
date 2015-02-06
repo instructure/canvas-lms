@@ -35,7 +35,7 @@ describe "scheduler" do
       click_appointment_link
 
       reserve_appointment_manual(0)
-      f('.fc-event').should include_text "Reserved"
+      expect(f('.fc-event')).to include_text "Reserved"
     end
 
     it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
@@ -51,7 +51,7 @@ describe "scheduler" do
       click_appointment_link
 
       reserve_appointment_manual(0)
-      f('.fc-event').should include_text "Reserved"
+      expect(f('.fc-event')).to include_text "Reserved"
 
       # try to reserve the second appointment
       reserve_appointment_manual(1)
@@ -59,8 +59,8 @@ describe "scheduler" do
       wait_for_ajax_requests
 
       event1, event2 = ff('.fc-event')
-      event1.should include_text "Available"
-      event2.should include_text "Reserved"
+      expect(event1).to include_text "Available"
+      expect(event2).to include_text "Reserved"
     end
 
     it "should not let me book too many appointments" do
@@ -79,12 +79,12 @@ describe "scheduler" do
       reserve_appointment_manual(0)
       reserve_appointment_manual(1)
       e1, e2, *rest = ff('.fc-event')
-      e1.should include_text "Reserved"
-      e2.should include_text "Reserved"
+      expect(e1).to include_text "Reserved"
+      expect(e2).to include_text "Reserved"
 
       reserve_appointment_manual(2)
       fj('.ui-button:contains("OK")').click # "can't reserve" dialog
-      f('.fc-event:nth-child(3)').should include_text "Available"
+      expect(f('.fc-event:nth-child(3)')).to include_text "Available"
     end
 
     it "should not allow me to cancel reservations from the attendees list" do
@@ -98,7 +98,7 @@ describe "scheduler" do
       click_appointment_link
 
       fj('.fc-event:visible').click
-      ff('#reservations').size.should be_zero
+      expect(ff('#reservations').size).to be_zero
     end
   end
 end

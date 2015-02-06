@@ -63,10 +63,10 @@ describe "sub account outcomes" do
           f('.find_outcome').click
           wait_for_ajaximations
           groups = ff('.outcome-group')
-          groups.size.should == 2
+          expect(groups.size).to eq 2
           groups.each do |g|
             g.click
-            f('.ui-dialog-buttonpane .btn-primary').should_not be_displayed
+            expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
           end
         end
       end

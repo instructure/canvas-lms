@@ -23,6 +23,7 @@ define([
   'compiled/views/GoogleDocsTreeView',
   'jst/assignments/homework_submission_tool',
   'compiled/external_tools/HomeworkSubmissionLtiContainer',
+  'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */,
   'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
@@ -35,7 +36,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool, HomeworkSubmissionLtiContainer) {
+], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool, HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts) {
 
   window.submissionAttachmentIndex = -1;
 
@@ -44,6 +45,10 @@ define([
         submissionForm = $('.submit_assignment_form');
 
     var homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer('#submit_from_external_tool_form');
+
+    // Add the Keyboard shortcuts info button
+    var keyboardShortcutsView = new RCEKeyboardShortcuts();
+    keyboardShortcutsView.render().$el.insertBefore($(".switch_text_entry_submission_views:first"));
 
     // grow and shrink the comments box on focus/blur if the user
     // hasn't entered any content.
@@ -97,11 +102,13 @@ define([
         if(ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
           var subButton = $(this).find('button[type=submit]');
           var badExt = false;
-          $.each(uploadedAttachmentIds, function(index, id) {
-            var ext = $("#uploaded_files .file_" + id + " .name").text().split('.').pop().toLowerCase();
-            if ($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
-              badExt = true;
-              $.flashError(I18n.t('#errors.wrong_file_extension', 'The file you selected with extension "%{extension}", is not authorized for submission', {extension: ext}));
+          $.each(uploadedAttachmentIds.split(","), function(index, id) {
+            if (id.length > 0) {
+              var ext = $("#uploaded_files .file_" + id + " .name").text().split('.').pop().toLowerCase();
+              if ($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
+                badExt = true;
+                $.flashError(I18n.t('#errors.wrong_file_extension', 'The file you selected with extension "%{extension}", is not authorized for submission', {extension: ext}));
+              }
             }
           });
           if(badExt) {
@@ -130,7 +137,7 @@ define([
           url: $(this).attr('action'),
           success: function(data) {
             submitting = true;
-            window.location = window.location.href.replace(window.location.hash, "");
+            window.location = window.location.href.replace(/\#$/g, "").replace(window.location.hash, "");
           },
           error: function(data) {
             submissionForm.find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));

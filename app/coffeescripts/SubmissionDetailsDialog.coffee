@@ -56,7 +56,7 @@ define [
               @dialog.dialog('close')
             , 500
 
-      deferred = $.ajaxJSON @url+'?include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment', 'GET', {}, @update
+      deferred = $.ajaxJSON @url+'&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment', 'GET', {}, @update
       @dialog.find('.submission_details_comments').disableWhileLoading deferred
 
     open: =>
@@ -68,7 +68,6 @@ define [
 
     update: (newData) =>
       $.extend @submission, newData
-      @submission.submission_history[0] = @submission
       @submission.moreThanOneSubmission = @submission.submission_history.length > 1
       @submission.loading = false
       for submission in @submission.submission_history

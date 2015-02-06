@@ -49,22 +49,22 @@ module Assignments
         @assignment.reload
 
         # check the teacher sees both, the TA sees one
-        NeedsGradingCountQuery.new(@assignment, @teacher).count.should eql(2)
-        NeedsGradingCountQuery.new(@assignment, @ta).count.should eql(1)
+        expect(NeedsGradingCountQuery.new(@assignment, @teacher).count).to eql(2)
+        expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to eql(1)
 
         # grade an assignment
         @assignment.grade_student(@user1, :grade => "1")
         @assignment.reload
 
         # check that the numbers changed
-        NeedsGradingCountQuery.new(@assignment, @teacher).count.should eql(1)
-        NeedsGradingCountQuery.new(@assignment, @ta).count.should eql(0)
+        expect(NeedsGradingCountQuery.new(@assignment, @teacher).count).to eql(1)
+        expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to eql(0)
 
         # test limited enrollment in multiple sections
         @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
                             :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
         @assignment.reload
-        NeedsGradingCountQuery.new(@assignment, @ta).count.should eql(1)
+        expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to eql(1)
       end
 
       it 'breaks them out by section if the by_section flag is passed' do
@@ -79,17 +79,16 @@ module Assignments
         @assignment.submit_homework @user2, :submission_type => "online_text_entry", :body => "haldo"
         @assignment.reload
 
-        NeedsGradingCountQuery.new(@assignment, @teacher).count.should eql(2)
+        expect(NeedsGradingCountQuery.new(@assignment, @teacher).count).to eql(2)
         sections_grading_counts = NeedsGradingCountQuery.new(@assignment, @teacher).count_by_section
-        sections_grading_counts.should be_a(Array)
+        expect(sections_grading_counts).to be_a(Array)
         @course.course_sections.each do |section|
-          sections_grading_counts.should include({
+          expect(sections_grading_counts).to include({
             section_id: section.id,
             needs_grading_count: 1
           })
         end
       end
     end
-
   end
 end

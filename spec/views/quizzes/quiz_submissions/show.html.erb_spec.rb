@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quiz_submissions/show" do
+
   it "should render" do
     course_with_student
     view_context
@@ -35,7 +36,7 @@ describe "/quiz_submissions/show" do
     assigns[:submission] = @submission
     
     render "quizzes/quiz_submissions/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

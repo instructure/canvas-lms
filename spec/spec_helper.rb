@@ -22,7 +22,7 @@ rescue LoadError
 end
 
 RSpec.configure do |c|
-  c.treat_symbols_as_metadata_keys_with_true_values = true
+  c.raise_errors_for_deprecations!
   c.color = true
 
   c.around(:each) do |example|
@@ -129,11 +129,11 @@ module RSpec::Rails
         end
       end
 
-      def failure_message_for_should
+      def failure_message
         @msg
       end
 
-      def failure_message_for_should_not
+      def failure_message_when_negated
         @msg
       end
     end
@@ -165,7 +165,7 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 
 def pend_with_bullet
   if defined?(Bullet) && Bullet.enable?
-    pending ('PENDING: Bullet')
+    skip ('PENDING: Bullet')
   end
 end
 
@@ -276,27 +276,6 @@ Mocha::Mock.class_eval do
   alias_method_chain :respond_to?, :marshalling
 end
 
-[ActiveSupport::Cache::MemoryStore, ActiveSupport::Cache::NullStore].each do |store|
-  store.class_eval do
-    def write_with_serialization_check(name, value, options = nil)
-      Marshal.dump(value)
-      write_without_serialization_check(name, value, options)
-    end
-
-    alias_method_chain :write, :serialization_check
-  end
-end
-
-ActiveSupport::Cache::NullStore.class_eval do
-  def fetch_with_serialization_check(name, options = {}, &block)
-    result = fetch_without_serialization_check(name, options, &block)
-    Marshal.dump(result) if result
-    result
-  end
-
-  alias_method_chain :fetch, :serialization_check
-end
-
 RSpec::Matchers.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
@@ -366,6 +345,7 @@ RSpec.configure do |config|
   Onceler.configure do |c|
     c.before :record do
       Account.clear_special_account_cache!(true)
+      Role.ensure_built_in_roles!
       AdheresToPolicy::Cache.clear
       Folder.reset_path_lookups!
     end
@@ -391,10 +371,8 @@ RSpec.configure do |config|
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!(true)
+    Role.ensure_built_in_roles!
     AdheresToPolicy::Cache.clear
-
-    # allow tests to still run in non-draft state even though it's hard-coded on
-    Feature.definitions["draft_state"].send(:instance_variable_set, '@state', 'allowed')
   end
 
   def delete_fixtures!
@@ -418,6 +396,7 @@ RSpec.configure do |config|
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
     Folder.reset_path_lookups!
+    Role.ensure_built_in_roles!
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
@@ -440,7 +419,7 @@ RSpec.configure do |config|
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb rescue nil
+      Canvas.redis.flushdb
     end
     Canvas.redis_used = false
   end
@@ -467,6 +446,20 @@ RSpec.configure do |config|
     @account
   end
 
+  def grading_periods(opts = {})
+    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
+    ctx = opts[:context] || @course || course
+    count = opts[:count] || 2
+
+    gpg = ctx.grading_period_groups.create!
+    now = Time.zone.now
+    count.times.map { |n|
+      gpg.grading_periods.create! start_date: n.months.since(now),
+        end_date: (n+1).months.since(now),
+        weight: 1
+    }
+  end
+
   def course(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
@@ -480,10 +473,6 @@ RSpec.configure do |config|
         e.save!
         @teacher = u
       end
-      if opts[:draft_state]
-        account.allow_feature!(:draft_state)
-        @course.enable_feature!(:draft_state)
-      end
       if opts[:differentiated_assignments]
         account.allow_feature!(:differentiated_assignments)
         @course.enable_feature!(:differentiated_assignments)
@@ -492,14 +481,23 @@ RSpec.configure do |config|
     @course
   end
 
-  def account_admin_user_with_role_changes(opts={})
+  def account_with_role_changes(opts={})
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
-        account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+        role = opts[:role] || admin_role
+        if ro = account.role_overrides.where(:permission => permission.to_s, :role_id => role.id).first
+          ro.update_attribute(:enabled, enabled)
+        else
+          account.role_overrides.create(:permission => permission.to_s, :enabled => enabled, :role => role)
+        end
       end
     end
     RoleOverride.clear_cached_contexts
+  end
+
+  def account_admin_user_with_role_changes(opts={})
+    account_with_role_changes(opts)
     account_admin_user(opts)
   end
 
@@ -507,7 +505,8 @@ RSpec.configure do |config|
     account = opts[:account] || Account.default
     @user = opts[:user] || account.shard.activate { user(opts) }
     @admin = @user
-    account.account_users.create!(:user => @user, :membership_type => opts[:membership_type])
+
+    account.account_users.create!(:user => @user, :role => opts[:role])
     @user
   end
 
@@ -673,23 +672,14 @@ RSpec.configure do |config|
     end
   end
 
-  def set_course_draft_state(enabled=true, opts={})
-    course = opts[:course] || @course
-    account = opts[:account] || course.account
-
-    account.allow_feature!(:draft_state)
-    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
-
-    enabled
-  end
-
   def add_section(section_name)
     @course_section = @course.course_sections.create!(:name => section_name)
     @course.reload
   end
 
-  def multiple_student_enrollment(user, section)
-    @enrollment = @course.enroll_student(user,
+  def multiple_student_enrollment(user, section, opts={})
+    course = opts[:course] || @course || course(opts)
+    @enrollment = course.enroll_student(user,
                                          :enrollment_state => "active",
                                          :section => section,
                                          :allow_multiple_enrollments => true)
@@ -699,20 +689,21 @@ RSpec.configure do |config|
     course = opts[:course] || @course || course(opts)
     @fake_student = course.student_view_student
     post "/users/#{@fake_student.id}/masquerade"
-    session[:become_user_id].should == @fake_student.id.to_s
+    expect(session[:become_user_id]).to eq @fake_student.id.to_s
   end
 
   def account_notification(opts={})
     req_service = opts[:required_account_service] || nil
-    roles = opts[:roles] || []
+    role_ids = opts[:role_ids] || []
     message = opts[:message] || "hi there"
     subj = opts[:subject] || "this is a subject"
     @account = opts[:account] || Account.default
     @announcement = @account.announcements.build(subject: subj, message: message, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
     @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
-    @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.account_notification_roles.build(role_ids.map { |r_id| {account_notification_id: @announcement.id, role: Role.get_role_by_id(r_id)} }) unless role_ids.empty?
     @announcement.save!
+    @announcement
   end
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
@@ -741,8 +732,7 @@ RSpec.configure do |config|
 
   def custom_role(base, name, opts={})
     account = opts[:account] || @account
-    role = account.roles.find_by_name(name)
-    role ||= account.roles.create :name => name
+    role = account.roles.where(name: name).first_or_initialize
     role.base_role_type = base
     role.save!
     role
@@ -769,7 +759,31 @@ RSpec.configure do |config|
   end
 
   def custom_account_role(name, opts={})
-    custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
+    custom_role(Role::DEFAULT_ACCOUNT_TYPE, name, opts)
+  end
+
+  def student_role
+    Role.get_built_in_role("StudentEnrollment")
+  end
+
+  def teacher_role
+    Role.get_built_in_role("TeacherEnrollment")
+  end
+
+  def ta_role
+    Role.get_built_in_role("TaEnrollment")
+  end
+
+  def designer_role
+    Role.get_built_in_role("DesignerEnrollment")
+  end
+
+  def observer_role
+    Role.get_built_in_role("ObserverEnrollment")
+  end
+
+  def admin_role
+    Role.get_built_in_role("AccountAdmin")
   end
 
   def user_session(user, pseudonym=nil)
@@ -795,7 +809,7 @@ RSpec.configure do |config|
                       "pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password
     assert_response :success
-    request.fullpath.should eql("/?login_success=1")
+    expect(request.fullpath).to eq "/?login_success=1"
   end
 
   def assignment_quiz(questions, opts={})
@@ -806,7 +820,7 @@ RSpec.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
@@ -831,7 +845,7 @@ RSpec.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @quiz.anonymous_submissions = true
     @quiz.quiz_type = "graded_survey"
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
@@ -892,7 +906,11 @@ RSpec.configure do |config|
 
   def outcome_with_rubric(opts={})
     @outcome_group ||= @course.root_outcome_group
-    @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
+    @outcome = @course.created_learning_outcomes.create!(
+      :description => '<p>This is <b>awesome</b>.</p>',
+      :short_description => 'new outcome',
+      :calculation_method => 'highest'
+    )
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
@@ -983,13 +1001,12 @@ RSpec.configure do |config|
   end
 
   def assert_status(status=500)
-    response.status.to_i.should eql(status)
+    expect(response.status.to_i).to eq status
   end
 
   def assert_unauthorized
     assert_status(401) #unauthorized
-    #    response.headers['Status'].should eql('401 Unauthorized')
-    response.should render_template("shared/unauthorized")
+    expect(response).to render_template("shared/unauthorized")
   end
 
   def assert_page_not_found(&block)
@@ -998,8 +1015,8 @@ RSpec.configure do |config|
   end
 
   def assert_require_login
-    response.should be_redirect
-    flash[:warning].should eql("You must be logged in to access this page")
+    expect(response).to be_redirect
+    expect(flash[:warning]).to eq "You must be logged in to access this page"
   end
 
   def fixture_file_upload(path, mime_type=nil, binary=false)
@@ -1050,8 +1067,8 @@ RSpec.configure do |config|
 
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
-    importer.errors.should == []
-    importer.warnings.should == []
+    expect(importer.errors).to eq []
+    expect(importer.warnings).to eq []
   end
 
   def enable_cache(new_cache=:memory_store)
@@ -1200,11 +1217,11 @@ RSpec.configure do |config|
       AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
     else
       if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
-        pending "Please put valid S3 credentials in config/amazon_s3.yml"
+        skip "Please put valid S3 credentials in config/amazon_s3.yml"
       end
     end
-    Attachment.s3_storage?.should eql(true)
-    Attachment.local_storage?.should eql(false)
+    expect(Attachment.s3_storage?).to be true
+    expect(Attachment.local_storage?).to be false
   end
 
   def local_storage!
@@ -1216,9 +1233,8 @@ RSpec.configure do |config|
       model.stubs(:local_storage?).returns(true)
     end
 
-    Attachment.local_storage?.should eql(true)
-    Attachment.s3_storage?.should eql(false)
-    Attachment.local_storage?.should eql(true)
+    expect(Attachment.local_storage?).to be true
+    expect(Attachment.s3_storage?).to be false
   end
 
   def run_job(job)
@@ -1228,7 +1244,7 @@ RSpec.configure do |config|
   def run_jobs
     while job = Delayed::Job.get_and_lock_next_available(
         'spec run_jobs',
-        Delayed::Worker.queue,
+        Delayed::Settings.queue,
         0,
         Delayed::MAX_PRIORITY)
       run_job(job)
@@ -1247,7 +1263,7 @@ RSpec.configure do |config|
     track_jobs do
       yield
     end
-    created_jobs.count { |j| j.tag == tag }.should == count
+    expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 
   # send a multipart post request in an integration spec post_params is
@@ -1287,16 +1303,16 @@ RSpec.configure do |config|
 
   def verify_post_matches(post_lines, expected_post_lines)
     # first lines should match
-    post_lines[0].should == expected_post_lines[0]
+    expect(post_lines[0]).to eq expected_post_lines[0]
 
     # now extract the headers
     post_headers = post_lines[1..post_lines.index("")]
     expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
     expected_post_headers << "User-Agent: Ruby"
-    post_headers.sort.should == expected_post_headers.sort
+    expect(post_headers.sort).to eq expected_post_headers.sort
 
     # now check payload
-    post_lines[post_lines.index(""), -1].should ==
+    expect(post_lines[post_lines.index(""), -1]).to eq
         expected_post_lines[expected_post_lines.index(""), -1]
   end
 
@@ -1312,9 +1328,9 @@ RSpec.configure do |config|
       end
     else
       if actual.is_a?(Fixnum) || actual.is_a?(Float)
-        actual.should == expected
+        expect(actual).to eq expected
       else
-        actual.to_json.should == expected.to_json
+        expect(actual.to_json).to eq expected.to_json
       end
     end
   end
@@ -1475,7 +1491,7 @@ RSpec.configure do |config|
     if user = options[:enroll_user]
       section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})
       type = options[:enrollment_type] || "TeacherEnrollment"
-      create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active'}})
+      create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}})
     end
     course_data
   end
@@ -1505,13 +1521,13 @@ RSpec.configure do |config|
 
     section_id = options[:section_id] || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
-    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active'}}, options[:return_type])
+    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}}, options[:return_type])
   end
 
   def create_assignments(course_ids, count_per_course = 1, fields = {})
     course_ids = Array(course_ids)
     course_ids *= count_per_course
-    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", workflow_state: 'published'}.merge(fields)})
+    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", grading_type: "points", submission_types: "none", workflow_state: 'published'}.merge(fields)})
   end
 end
 

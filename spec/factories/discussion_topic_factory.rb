@@ -32,14 +32,14 @@ def group_assignment_discussion(opts = {})
   course = opts[:course] || course_model(:reusable => true)
   assignment_model(:course => course, :submission_types => 'discussion_topic', :title => 'Group Assignment Discussion')
 
-  @root_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+  @root_topic = DiscussionTopic.where(assignment_id: @assignment).first
   @group_category = course.group_categories.create(:name => 'Project Group')
   group_model(:name => 'Project Group 1', :group_category => @group_category, :context => course)
   @root_topic.group_category = @group_category
   @root_topic.save!
 
   @root_topic.refresh_subtopics
-  @topic = @group.discussion_topics.find_by_root_topic_id(@root_topic.id)
+  @topic = @group.discussion_topics.where(root_topic_id: @root_topic).first
 end
 
 def topic_with_nested_replies(opts = {})

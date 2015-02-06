@@ -26,10 +26,10 @@ shared_examples_for "course copy" do
     @cm.reload
     if @cm.migration_settings[:last_error]
       er = ErrorReport.last
-      "#{er.message} - #{er.backtrace}".should == ""
+      expect("#{er.message} - #{er.backtrace}").to eq ""
     end
-    @cm.warnings.should == warnings
-    @cm.workflow_state.should == 'imported'
+    expect(@cm.warnings).to eq warnings
+    expect(@cm.workflow_state).to eq 'imported'
     @copy_to.reload
   end
 
@@ -40,8 +40,8 @@ shared_examples_for "course copy" do
     yield(export) if block_given?
     export.save
     export.export_course
-    export.workflow_state.should == 'exported'
-    export.attachment_id.should_not be_nil
+    expect(export.workflow_state).to eq 'exported'
+    expect(export.attachment_id).not_to be_nil
     export
   end
 
@@ -52,7 +52,7 @@ shared_examples_for "course copy" do
     @cm.attachment_id = export_attachment_id
     @cm.skip_job_progress = true
     worker.perform(@cm)
-    @cm.workflow_state.should == 'imported'
+    expect(@cm.workflow_state).to eq 'imported'
     @copy_to.reload
   end
 

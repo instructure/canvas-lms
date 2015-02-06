@@ -58,7 +58,7 @@
 #         "sis_course_id": {
 #           "description": "The unique SIS identifier for the course in which the section belongs. This field is only included if the user has permission to view SIS information.",
 #           "example": 7,
-#           "type": "integer"
+#           "type": "string"
 #         },
 #         "start_at": {
 #           "description": "the start date for the section, if applicable",
@@ -71,6 +71,11 @@
 #         },
 #         "nonxlist_course_id": {
 #           "description": "The unique identifier of the original course of a cross-listed section",
+#           "type": "integer"
+#         },
+#         "total_students": {
+#           "description": "optional: the total number of active and invited students in the section",
+#           "example": 13,
 #           "type": "integer"
 #         }
 #       }
@@ -85,10 +90,15 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [String, "students"|"avatar_url"]
+  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"]
   #   - "students": Associations to include with the group. Note: this is only
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
+  #   - "enrollments": If 'students' is also included, return the section
+  #      enrollment for each student
+  #   - "total_students": Returns the total amount of active and invited students
+  #      for the course section
+  #   - "passback_status": Include the grade passback status.
   #
   # @returns [Section]
   def index
@@ -118,6 +128,9 @@ class SectionsController < ApplicationController
   #
   # @argument course_section[end_at] [DateTime]
   #   Section end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #
+  # @argument course_section[restrict_enrollments_to_section_dates] [Boolean]
+  #   Set to true to restrict user enrollments to the start and end dates of the section.
   #
   # @returns Section
   def create

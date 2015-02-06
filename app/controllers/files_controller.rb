@@ -166,9 +166,6 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
-    # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
-    return ember_app if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
-
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
@@ -205,6 +202,8 @@ class FilesController < ApplicationController
         end
       end
     else
+      # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
+      return react_files if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
       full_index
     end
   end
@@ -224,6 +223,7 @@ class FilesController < ApplicationController
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content
+  #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
   # @argument sort [String, "name"|"size"|"created_at"|"updated_at"|"content_type"|"user"]
   #   Sort results by this field. Defaults to 'name'. Note that `sort=user` implies `include[]=user`.
@@ -270,6 +270,7 @@ class FilesController < ApplicationController
         end
       end
       scope = scope.includes(:user) if params[:include].include? 'user' && params[:sort] != 'user'
+      scope = scope.includes(:usage_rights) if params[:include].include? 'usage_rights'
       scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
 
       order_clause = case params[:sort]
@@ -318,32 +319,42 @@ class FilesController < ApplicationController
     end
   end
 
-  def ember_app
-    raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
-    @body_classes << 'full-width padless-content'
-    js_bundle :react_files
-    jammit_css :ember_files
+  def react_files
+    raise ActiveRecord::RecordNotFound unless (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
+    if tab_enabled?(@context.class::TAB_FILES)
+      @contexts = [@context]
+      get_all_pertinent_contexts(include_groups: true) if @context == @current_user
+      files_contexts = @contexts.map do |context|
 
-    @contexts = [@context]
-    get_all_pertinent_contexts(include_groups: true) if @context == @current_user
-    files_contexts = @contexts.map { |context|
-      # TODO: it would be a LOT better if we didn't have to go fetch all these root folders just so
-      # we can go fetch them again in ajax API requests. if we can figure out :read_contents permissions
-      # I can get by without the root_folder_id prop as well.
-      root_folder = Folder.root_folders(context).first
-      {
-        asset_string: context.asset_string,
-        name: context == @current_user ? t('my_files', 'My Files') : context.name,
-        root_folder_id: root_folder.id,
-        permissions: {
-          # TODO: make sure these permision checks are sufficient and fast
-          manage_files: context.grants_right?(@current_user, session, :manage_files),
-          read_contents: root_folder.grants_right?(@current_user, session, :read_contents)
+        tool_context = if context.is_a?(Course)
+          context
+        elsif context.is_a?(User)
+          @domain_root_account
+        elsif context.is_a?(Group)
+          context.context
+        end
+        file_menu_tools = (tool_context ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
+        {
+          asset_string: context.asset_string,
+          name: context == @current_user ? t('my_files', 'My Files') : context.name,
+          usage_rights_required: context.feature_enabled?(:usage_rights_required),
+          permissions: {
+            manage_files: context.grants_right?(@current_user, session, :manage_files),
+          },
+          file_menu_tools: file_menu_tools
         }
-      }
-    }
-    js_env :FILES_CONTEXTS => files_contexts
-    render :text => "".html_safe, :layout => true
+      end
+
+      @page_title = t('files_page_title', 'Files')
+      @body_classes << 'full-width padless-content'
+      js_bundle :react_files
+      jammit_css :react_files
+      js_env({
+        :FILES_CONTEXTS => files_contexts
+      })
+
+      render :text => "".html_safe, :layout => true
+    end
   end
 
 
@@ -439,6 +450,7 @@ class FilesController < ApplicationController
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content
+  #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
   # @example_request
   #
@@ -465,16 +477,22 @@ class FilesController < ApplicationController
     # attachment.
     # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
+      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
       @attachment = @context.attachments.find(params[:id])
     else
       @attachment = Attachment.find(params[:id])
       @skip_crumb = true unless @context
     end
+
     params[:download] ||= params[:preview]
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
-      return render_unauthorized_action unless @attachment.user_id == @current_user.id
-      flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
+      unless @attachment.user_id == @current_user.id
+        @not_found_message = t('could_not_find_file', "This file has been deleted")
+        render status: 404, template: "shared/errors/404_message"
+        return
+      end
+      flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", display_name: @attachment.display_name
       if params[:preview] && @attachment.mime_class == 'image'
         redirect_to '/images/blank.png'
       elsif request.format == :json
@@ -570,7 +588,10 @@ class FilesController < ApplicationController
 
     @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
 
-    raise ActiveRecord::RecordNotFound if !@attachment
+    unless @attachment
+      return render :template => 'shared/errors/file_not_found', :status => :bad_request
+    end
+
     params[:id] = @attachment.id
 
     params[:download] = '1'
@@ -681,9 +702,8 @@ class FilesController < ApplicationController
   def create_pending
     @context = Context.find_by_asset_string(params[:attachment][:context_code])
     @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
-    @attachment = @context.attachments.build
     @check_quota = true
-    permission_object = @attachment
+    permission_object = nil
     permission = :create
     intent = params[:attachment][:intent]
 
@@ -722,7 +742,8 @@ class FilesController < ApplicationController
       @check_quota = false
     end
 
-    @attachment.context = @context
+    @attachment = @context.attachments.build
+    permission_object ||= @attachment
     @attachment.user = @current_user
     if authorized_action(permission_object, @current_user, permission)
       if @context.respond_to?(:is_a_context?) && @check_quota
@@ -740,6 +761,7 @@ class FilesController < ApplicationController
         @attachment.folder_id = @folder.id
       end
       @attachment.content_type = Attachment.mimetype(@attachment.filename)
+      @attachment.locked = true if @attachment.usage_rights_id.nil? && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:usage_rights_required)
       @attachment.save!
 
       res = @attachment.ajax_upload_params(@current_pseudonym,
@@ -920,6 +942,7 @@ class FilesController < ApplicationController
         end
         @attachment.folder = @folder
         @folder_id_changed = @attachment.folder_id_changed?
+        @attachment.locked = true if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:usage_rights_required)
         if @attachment.save
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = t 'notices.updated', "File was successfully updated."
@@ -978,6 +1001,9 @@ class FilesController < ApplicationController
       end
 
       @attachment.attributes = process_attachment_params(params)
+      if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:usage_rights_required)
+        return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request
+      end
       if @attachment.save
         render :json => attachment_json(@attachment, @current_user)
       else
@@ -1055,7 +1081,7 @@ class FilesController < ApplicationController
         methods: [:uuid,:readable_size,:mime_class,:currently_locked,:thumbnail_url],
         permissions: {user: @current_user, session: session},
         include_root: false
-      ),
+      ).merge(doc_preview_json(attachment, @current_user)),
       :deleted_attachment_ids => deleted_attachments.map(&:id)
     }
     if folder.name == 'profile pictures'

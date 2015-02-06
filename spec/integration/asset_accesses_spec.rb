@@ -52,17 +52,17 @@ describe "user asset accesses" do
 
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
-    response.should be_success
+    expect(response).to be_success
 
     user_session(@teacher)
     get "/courses/#{@course.id}/users/#{@student.id}/usage"
-    response.should be_success
+    expect(response).to be_success
     html = Nokogiri::HTML(response.body)
-    html.css('#usage_report .access.assignment').length.should == 1
-    html.css('#usage_report .access.assignment .readable_name').text.strip.should == 'Assignment 1'
-    html.css('#usage_report .access.assignment .view_score').text.strip.should == '1'
-    html.css('#usage_report .access.assignment .last_viewed').text.strip.should == datetime_string(now)
-    AssetUserAccess.where(:user_id => @student).first.last_access.to_i.should == now.to_i
+    expect(html.css('#usage_report .access.assignment').length).to eq 1
+    expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'
+    expect(html.css('#usage_report .access.assignment .view_score').text.strip).to eq '1'
+    expect(html.css('#usage_report .access.assignment .last_viewed').text.strip).to eq datetime_string(now)
+    expect(AssetUserAccess.where(:user_id => @student).first.last_access.to_i).to eq now.to_i
 
     now2 = now + 1.hour
     Time.stubs(:now).returns(now2)
@@ -72,16 +72,16 @@ describe "user asset accesses" do
 
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
-    response.should be_success
+    expect(response).to be_success
 
     user_session(@teacher)
     get "/courses/#{@course.id}/users/#{@student.id}/usage"
-    response.should be_success
+    expect(response).to be_success
     html = Nokogiri::HTML(response.body)
-    html.css('#usage_report .access.assignment').length.should == 1
-    html.css('#usage_report .access.assignment .readable_name').text.strip.should == 'Assignment 1'
-    html.css('#usage_report .access.assignment .view_score').text.strip.should == '2'
-    html.css('#usage_report .access.assignment .last_viewed').text.strip.should == datetime_string(now2)
-    AssetUserAccess.where(:user_id => @student).first.last_access.to_i.should == now2.to_i
+    expect(html.css('#usage_report .access.assignment').length).to eq 1
+    expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'
+    expect(html.css('#usage_report .access.assignment .view_score').text.strip).to eq '2'
+    expect(html.css('#usage_report .access.assignment .last_viewed').text.strip).to eq datetime_string(now2)
+    expect(AssetUserAccess.where(:user_id => @student).first.last_access.to_i).to eq now2.to_i
   end
 end

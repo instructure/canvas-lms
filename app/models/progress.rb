@@ -22,13 +22,15 @@ class Progress < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['ContentMigration', 'Course', 'User',
-    'Quizzes::QuizStatistics', 'Account', 'GroupCategory', 'ContentExport']
+    'Quizzes::QuizStatistics', 'Account', 'GroupCategory', 'ContentExport', 'Assignment']
   belongs_to :user
   attr_accessible :context, :tag, :completion, :message
 
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :tag
+
+  serialize :results
 
   include Workflow
   workflow do
@@ -42,6 +44,18 @@ class Progress < ActiveRecord::Base
     end
     state :completed
     state :failed
+  end
+
+  def reset!
+    self.results = nil
+    self.workflow_state = 'queued'
+    self.completion = 0
+    self.save!
+  end
+
+  def set_results(results)
+    self.results = results
+    self.save
   end
 
   def update_completion!(value)
@@ -83,6 +97,9 @@ class Progress < ActiveRecord::Base
     end
 
     def on_permanent_failure(error)
+      error_report = ErrorReport.log_exception("Progress::Work", error)
+      @progress.message = "Unexpected error, ID: #{error_report.id rescue "unknown"}"
+      @progress.save
       @progress.fail
     end
   end

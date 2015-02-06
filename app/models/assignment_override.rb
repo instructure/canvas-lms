@@ -219,6 +219,17 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  def applies_to_students_with_visibility
+    return applies_to_students unless self.assignment.try(:differentiated_assignments_applies?) || self.quiz.try(:differentiated_assignments_applies?)
+    if self.quiz
+      applies_to_students.able_to_see_quiz_in_course_with_da(self.quiz_id, context.id)
+    elsif self.assignment
+      applies_to_students.able_to_see_assignment_in_course_with_da(self.assignment_id, context.id)
+    else
+      applies_to_students
+    end
+  end
+
   def applies_to_admins
     case set_type
     when 'CourseSection'
@@ -242,7 +253,7 @@ class AssignmentOverride < ActiveRecord::Base
   has_a_broadcast_policy
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
-    p.to { applies_to_students }
+    p.to { applies_to_students_with_visibility }
     p.whenever { |record| record.notify_change? }
     p.filter_asset_by_recipient { |record, user|
       # note that our asset for this message is an Assignment, not an AssignmentOverride

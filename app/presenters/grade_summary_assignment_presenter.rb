@@ -95,7 +95,7 @@ class GradeSummaryAssignmentPresenter
 
   def turnitin
     t = if is_text_entry?
-      submission.turnitin_data && submission.turnitin_data[submission.asset_string]
+      submission.turnitin_data[submission.asset_string]
     elsif is_online_upload? && file
       submission.turnitin_data[file.asset_string]
     else

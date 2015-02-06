@@ -23,7 +23,7 @@ describe 'peer_review_invitation.sms' do
     assessment_request_model
     @object = @assessment_request
     @object.reload
-    @object.context.should_not be_nil
+    expect(@object.context).not_to be_nil
     generate_message(:peer_review_invitation, :sms, @object)
   end
 end

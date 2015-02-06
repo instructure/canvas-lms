@@ -41,14 +41,14 @@ module Lti
         subject.shared_secret = nil
         subject.save
         error = subject.errors.find { |e| e == [:shared_secret, "can't be blank"] }
-        error.should_not == nil
+        expect(error).not_to eq nil
       end
 
       it 'requires a guid' do
         subject.guid = nil
         subject.save
         error = subject.errors.find { |e| e == [:guid, "can't be blank"] }
-        error.should_not == nil
+        expect(error).not_to eq nil
       end
 
       it 'must have a unique guid' do
@@ -63,19 +63,19 @@ module Lti
         tool_proxy.raw_data = 'raw_data'
         tool_proxy.save
         subject.save
-        subject.errors[:guid].should include("has already been taken")
+        expect(subject.errors[:guid]).to include("has already been taken")
       end
 
       it 'requires a product_version' do
         subject.product_version = nil
         subject.save
-        subject.errors[:product_version].should include("can't be blank")
+        expect(subject.errors[:product_version]).to include("can't be blank")
       end
 
       it 'requires a lti_version' do
         subject.lti_version = nil
         subject.save
-        subject.errors[:lti_version].should include("can't be blank")
+        expect(subject.errors[:lti_version]).to include("can't be blank")
       end
 
       it 'requires a product_family' do
@@ -87,19 +87,19 @@ module Lti
       it 'requires a context' do
         subject.context = nil
         subject.save
-        subject.errors[:context].should include("can't be blank")
+        expect(subject.errors[:context]).to include("can't be blank")
       end
 
       it 'require a workflow_state' do
         subject.workflow_state = nil
         subject.save
-        subject.errors[:workflow_state].should include("can't be blank")
+        expect(subject.errors[:workflow_state]).to include("can't be blank")
       end
 
       it 'requires raw_data' do
         subject.raw_data = nil
         subject.save
-        subject.errors[:raw_data].should include("can't be blank")
+        expect(subject.errors[:raw_data]).to include("can't be blank")
       end
 
       describe "#find_active_proxies_for_context" do
@@ -113,16 +113,16 @@ module Lti
           tool_proxy = create_tool_proxy(context: sub_account_2_1)
           tool_proxy.bindings.create!(context: sub_account_2_1)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 1
-          proxies.first.should == tool_proxy
+          expect(proxies.count).to eq 1
+          expect(proxies.first).to eq tool_proxy
         end
 
         it 'finds a tool_proxy for a parent account' do
           tool_proxy = create_tool_proxy(context: sub_account_1_1)
           tool_proxy.bindings.create!(context: sub_account_1_1)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 1
-          proxies.first.should == tool_proxy
+          expect(proxies.count).to eq 1
+          expect(proxies.first).to eq tool_proxy
         end
 
         it 'finds a tool_proxy for a course binding' do
@@ -130,22 +130,22 @@ module Lti
           tool_proxy = create_tool_proxy(context: course)
           tool_proxy.bindings.create!(context: course)
           proxies = described_class.find_active_proxies_for_context(course)
-          proxies.count.should == 1
-          proxies.first.should == tool_proxy
+          expect(proxies.count).to eq 1
+          expect(proxies.first).to eq tool_proxy
         end
 
         it "doesn't return tool_proxies that are disabled" do
           tool_proxy = create_tool_proxy(context: sub_account_2_1, workflow_state: 'disabled')
           tool_proxy.bindings.create!(context: sub_account_2_1)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 0
+          expect(proxies.count).to eq 0
         end
 
         it "doesn't return tool_proxies that are deleted" do
           tool_proxy = create_tool_proxy(context: sub_account_2_1, workflow_state: 'deleted')
           tool_proxy.bindings.create!(context: sub_account_2_1)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 0
+          expect(proxies.count).to eq 0
         end
 
         it "doesn't return tool_proxies when closest ancestor is disabled" do
@@ -153,7 +153,7 @@ module Lti
           tool_proxy.bindings.create!(context: sub_account_2_1, enabled: false)
           tool_proxy.bindings.create!(context: sub_account_1_1)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 0
+          expect(proxies.count).to eq 0
         end
 
         it 'handles multiple tool_proxies' do
@@ -162,9 +162,9 @@ module Lti
           tool_proxy2 = create_tool_proxy(context: sub_account_1_1)
           tool_proxy2.bindings.create!(context: sub_account_1_1)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 2
-          proxies.should include(tool_proxy1)
-          proxies.should include(tool_proxy2)
+          expect(proxies.count).to eq 2
+          expect(proxies).to include(tool_proxy1)
+          expect(proxies).to include(tool_proxy2)
         end
 
         it 'handles multiple bindings' do
@@ -172,8 +172,8 @@ module Lti
           tool_proxy.bindings.create!(context: sub_account_1_1)
           tool_proxy.bindings.create!(context: sub_account_2_1)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 1
-          proxies.first.should == tool_proxy
+          expect(proxies.count).to eq 1
+          expect(proxies.first).to eq tool_proxy
         end
 
         it "doesn't return tool proxies that are enabled at a higher binding and disabled at a lower binding" do
@@ -181,7 +181,7 @@ module Lti
           tool_proxy.bindings.create!(context: sub_account_1_1)
           tool_proxy.bindings.create!(context: sub_account_2_1, enabled: false)
           proxies = described_class.find_active_proxies_for_context(sub_account_2_1)
-          proxies.count.should == 0
+          expect(proxies.count).to eq 0
         end
 
       end

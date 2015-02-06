@@ -119,7 +119,7 @@ define [
     # Returns nothing.
     onDrop: (dragObject, $destination) ->
       # TODO: reduce duplication b/w this and OutcomesDirectoryView.initDroppable
-      $target         = dragObject.li
+      $target         = dragObject.$li
       model           = dragObject.model
       destinationView = $destination.data('view')
       originalView    = dragObject.parent
@@ -142,13 +142,13 @@ define [
       $sidebar = $target.parents('.wrapper:first')
       if dragObject = $sidebar.data('drag')
         # drop
-        $target.after(dragObject.li)
+        $target.after(dragObject.$li)
         @onDrop(dragObject, $target.parent())
       else
         # drag
         $target.attr('aria-grabbed', true)
         dragObject =
-          li: $target,
+          $li: $target,
           model: $target.data('view').model
           parent: $target.parent().data('view')
         $sidebar.data('drag', dragObject)
@@ -161,7 +161,7 @@ define [
     onEscapeKey: (e, $target) ->
       $sidebar = $target.parents('.wrapper:first')
       return unless dataObject = $sidebar.data('drag')
-      dataObject.li.data('parent', null).attr('aria-grabbed', false)
+      dataObject.$li.data('parent', null).attr('aria-grabbed', false)
       $sidebar.data('drag', null);
 
     # Internal: Update tabindex on $el and its siblings.

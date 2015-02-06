@@ -30,9 +30,9 @@ describe PageView do
       specs_require_sharding
 
       it "should not assign the default shard" do
-        PageView.new.shard.should == Shard.default
+        expect(PageView.new.shard).to eq Shard.default
         @shard1.activate do
-          PageView.new.shard.should == @shard1
+          expect(PageView.new.shard).to eq @shard1
         end
       end
   end
@@ -44,40 +44,40 @@ describe PageView do
         @page_view.request_id = "abcde1"
         @page_view.save!
       }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
-      PageView.find(@page_view.id).should == @page_view
+      expect(PageView.find(@page_view.id)).to eq @page_view
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "should not start a db transaction on save" do
       PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, :without_protection => true) }.store
       PageView.connection.expects(:transaction).never
-      PageView.find("abcdef").should be_present
+      expect(PageView.find("abcdef")).to be_present
     end
 
     describe "sharding" do
       specs_require_sharding
 
       it "should always assign the birth shard" do
-        PageView.new.shard.should == Shard.birth
+        expect(PageView.new.shard).to eq Shard.birth
         pv = nil
         u = User.create!
         @shard1.activate do
           pv = page_view_model
-          pv.shard.should == Shard.birth
+          expect(pv.shard).to eq Shard.birth
           pv.user = u
           pv.save!
-          pv.read_attribute(:user_id).should == u.local_id
+          expect(pv.read_attribute(:user_id)).to eq u.local_id
           pv = PageView.find(pv.request_id)
-          pv.should be_present
-          pv.shard.should == Shard.birth
+          expect(pv).to be_present
+          expect(pv.shard).to eq Shard.birth
         end
         pv = PageView.find(pv.request_id)
-        pv.should be_present
-        pv.shard.should == Shard.birth
+        expect(pv).to be_present
+        expect(pv.shard).to eq Shard.birth
         pv.interaction_seconds = 25
         pv.save!
         pv = PageView.find(pv.request_id)
-        pv.interaction_seconds.should == 25
+        expect(pv.interaction_seconds).to eq 25
       end
 
       it "should store and load from cassandra when the birth shard is not the default shard" do
@@ -87,7 +87,7 @@ describe PageView do
             @page_view.request_id = "abcde2"
             @page_view.save!
           }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
-          PageView.find(@page_view.id).should == @page_view
+          expect(PageView.find(@page_view.id)).to eq @page_view
           expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
@@ -102,32 +102,32 @@ describe PageView do
       pvs = []
       4.times { |i| pvs << page_view_model(:user => @user, :created_at => (5 - i).weeks.ago) }
       pager = @user.page_views
-      pager.should be_a PaginatedCollection::Proxy
+      expect(pager).to be_a PaginatedCollection::Proxy
       expect { pager.paginate() }.to raise_exception(ArgumentError)
       full = pager.paginate(:per_page => 4)
-      full.size.should == 4
-      full.next_page.should be_nil
+      expect(full.size).to eq 4
+      expect(full.next_page).to be_nil
 
       half = pager.paginate(:per_page => 2)
-      half.should == full[0,2]
-      half.next_page.should be_present
+      expect(half).to eq full[0,2]
+      expect(half.next_page).to be_present
 
       second_half = pager.paginate(:per_page => 2, :page => half.next_page)
-      second_half.should == full[2,2]
-      second_half.next_page.should be_nil
+      expect(second_half).to eq full[2,2]
+      expect(second_half.next_page).to be_nil
     end
 
     it "should halt pagination after a set time period" do
       p1 = page_view_model(:user => @user)
       p2 = page_view_model(:user => @user, :created_at => 13.months.ago)
       coll = @user.page_views.paginate(:per_page => 3)
-      coll.should == [p1]
-      coll.next_page.should be_blank
+      expect(coll).to eq [p1]
+      expect(coll.next_page).to be_blank
     end
 
     it "should ignore an invalid page" do
       @page_view.save!
-      @user.page_views.paginate(:per_page => 2, :page => '3').should == [@page_view]
+      expect(@user.page_views.paginate(:per_page => 2, :page => '3')).to eq [@page_view]
     end
 
     describe "db migrator" do
@@ -148,18 +148,18 @@ describe PageView do
 
         Setting.set('enable_page_views', 'cassandra')
         migrator = PageView::CassandraMigrator.new
-        PageView.find_all_by_id(moved.map(&:request_id)).size.should == 0
+        expect(PageView.find_all_by_id(moved.map(&:request_id)).size).to eq 0
         migrator.run_once(2)
-        PageView.find_all_by_id(moved.map(&:request_id)).size.should == 2
+        expect(PageView.find_all_by_id(moved.map(&:request_id)).size).to eq 2
         # should migrate all active accounts
-        PageView.find(moved_a3.request_id).request_id.should == moved_a3.request_id
+        expect(PageView.find(moved_a3.request_id).request_id).to eq moved_a3.request_id
         expect { PageView.find(moved_later.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         # it should resume where the last migrator left off
         migrator = PageView::CassandraMigrator.new
         # it could find the first two twice if we're on mysql, due to no sub-second precision,
         # so do a batch of 3
         migrator.run_once(3)
-        PageView.find(moved.map(&:request_id) + [moved_later.request_id]).size.should == 3
+        expect(PageView.find(moved.map(&:request_id) + [moved_later.request_id]).size).to eq 3
 
         expect { PageView.find(deleted.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         expect { PageView.find(old.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -174,23 +174,23 @@ describe PageView do
         migrator = PageView::CassandraMigrator.new
         migrator.run_once(2)
         expect { PageView.find(not_moved.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
-        PageView.find(newly_moved.request_id).request_id.should == newly_moved.request_id
+        expect(PageView.find(newly_moved.request_id).request_id).to eq newly_moved.request_id
       end
     end
   end
 
   it "should store directly to the db in db mode" do
     Setting.set('enable_page_views', 'db')
-    @page_view.store.should be_true
-    PageView.count.should == 1
-    PageView.find(@page_view.id).should == @page_view
+    expect(@page_view.store).to be_truthy
+    expect(PageView.count).to eq 1
+    expect(PageView.find(@page_view.id)).to eq @page_view
   end
 
   it "should not store if the page view has no user" do
     Setting.set('enable_page_views', 'db')
     @page_view.user = nil
-    @page_view.store.should be_false
-    PageView.count.should == 0
+    expect(@page_view.store).to be_falsey
+    expect(PageView.count).to eq 0
   end
 
   if Canvas.redis_enabled?
@@ -200,30 +200,30 @@ describe PageView do
       end
 
       it "should generate bucket names" do
-        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T13:41:17Z')).should be_starts_with 'active_users:2012-01-20T13:40:00Z'
-        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:25:00Z')).should be_starts_with 'active_users:2012-01-20T03:25:00Z'
-        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:29:59Z')).should be_starts_with 'active_users:2012-01-20T03:25:00Z'
+        expect(PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T13:41:17Z'))).to be_starts_with 'active_users:2012-01-20T13:40:00Z'
+        expect(PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:25:00Z'))).to be_starts_with 'active_users:2012-01-20T03:25:00Z'
+        expect(PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:29:59Z'))).to be_starts_with 'active_users:2012-01-20T03:25:00Z'
       end
 
       it "should do nothing if not enabled" do
         Setting.set('page_views_store_active_user_counts', 'false')
-        @page_view.store.should be_true
-        Canvas.redis.smembers(PageView.user_count_bucket_for_time(Time.now)).should == []
+        expect(@page_view.store).to be_truthy
+        expect(Canvas.redis.smembers(PageView.user_count_bucket_for_time(Time.now))).to eq []
       end
 
       it "should store if enabled" do
         Setting.set('page_views_store_active_user_counts', 'redis')
-        @page_view.store.should be_true
+        expect(@page_view.store).to be_truthy
       end
 
       it "should store user ids in the set for page views" do
         Setting.set('page_views_store_active_user_counts', 'redis')
         store_time = Time.zone.parse('2012-01-13T15:43:21Z')
         @page_view.created_at = store_time
-        @page_view.store.should be_true
+        expect(@page_view.store).to be_truthy
         bucket = PageView.user_count_bucket_for_time(store_time)
-        Canvas.redis.smembers(bucket).should == [@user.global_id.to_s]
-        Canvas.redis.ttl(bucket).should > 23.hours
+        expect(Canvas.redis.smembers(bucket)).to eq [@user.global_id.to_s]
+        expect(Canvas.redis.ttl(bucket)).to be > 23.hours
 
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
         @user1 = @user
@@ -232,11 +232,11 @@ describe PageView do
         pv3 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req2", :interaction_seconds => 5 }, :without_protection => true) }
         pv2.created_at = store_time
         pv3.created_at = store_time_2
-        pv2.store.should be_true
-        pv3.store.should be_true
+        expect(pv2.store).to be_truthy
+        expect(pv3.store).to be_truthy
 
-        Canvas.redis.smembers(bucket).sort.should == [@user1.global_id.to_s, @user2.global_id.to_s]
-        Canvas.redis.smembers(PageView.user_count_bucket_for_time(store_time_2)).should == [@user2.global_id.to_s]
+        expect(Canvas.redis.smembers(bucket).sort).to eq [@user1.global_id.to_s, @user2.global_id.to_s]
+        expect(Canvas.redis.smembers(PageView.user_count_bucket_for_time(store_time_2))).to eq [@user2.global_id.to_s]
       end
     end
   end
@@ -249,17 +249,17 @@ describe PageView do
     end
 
     it "should work with User objects" do
-      PageView.for_users([@user]).should == [@page_view]
-      PageView.for_users([User.create!]).should == []
+      expect(PageView.for_users([@user])).to eq [@page_view]
+      expect(PageView.for_users([User.create!])).to eq []
     end
 
     it "should work with a User ids" do
-      PageView.for_users([@user.id]).should == [@page_view]
-      PageView.for_users([@user.id + 1]).should == []
+      expect(PageView.for_users([@user.id])).to eq [@page_view]
+      expect(PageView.for_users([@user.id + 1])).to eq []
     end
 
     it "should with with an empty list" do
-      PageView.for_users([]).should == []
+      expect(PageView.for_users([])).to eq []
     end
   end
 
@@ -275,37 +275,84 @@ describe PageView do
 
     subject { PageView.generate(request, attributes) }
 
-    its(:url) { should == request.url }
-    its(:user) { should == user }
-    its(:controller) { should == params[:controller] }
-    its(:action) { should == params[:action] }
-    its(:session_id) { should == session[:id] }
-    its(:real_user) { should == user }
-    its(:user_agent) { should == request.user_agent }
-    its(:interaction_seconds) { should == 5 }
-    its(:created_at) { should_not be_nil }
-    its(:updated_at) { should_not be_nil }
-    its(:http_method) { should == 'get' }
-    its(:remote_ip) { should == '0.0.0.0' }
+    describe '#url' do
+      subject { super().url }
+      it { is_expected.to eq request.url }
+    end
+
+    describe '#user' do
+      subject { super().user }
+      it { is_expected.to eq user }
+    end
+
+    describe '#controller' do
+      subject { super().controller }
+      it { is_expected.to eq params[:controller] }
+    end
+
+    describe '#action' do
+      subject { super().action }
+      it { is_expected.to eq params[:action] }
+    end
+
+    describe '#session_id' do
+      subject { super().session_id }
+      it { is_expected.to eq session[:id] }
+    end
+
+    describe '#real_user' do
+      subject { super().real_user }
+      it { is_expected.to eq user }
+    end
+
+    describe '#user_agent' do
+      subject { super().user_agent }
+      it { is_expected.to eq request.user_agent }
+    end
+
+    describe '#interaction_seconds' do
+      subject { super().interaction_seconds }
+      it { is_expected.to eq 5 }
+    end
+
+    describe '#created_at' do
+      subject { super().created_at }
+      it { is_expected.not_to be_nil }
+    end
+
+    describe '#updated_at' do
+      subject { super().updated_at }
+      it { is_expected.not_to be_nil }
+    end
+
+    describe '#http_method' do
+      subject { super().http_method }
+      it { is_expected.to eq 'get' }
+    end
+
+    describe '#remote_ip' do
+      subject { super().remote_ip }
+      it { is_expected.to eq '0.0.0.0' }
+    end
 
     it "should filter sensitive url params" do
       @url = 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET'
       pv = PageView.generate(request, attributes)
-      pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+      expect(pv.url).to eq  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
     end
 
     it "should filter sensitive url params on the way out" do
       pv = PageView.generate(request, attributes)
       pv.update_attribute(:url, 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET')
       pv.reload
-      pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+      expect(pv.url).to eq  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
     end
 
     it "should force encoding on string fields" do
       request = stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII), :request_method => 'GET')
       pv = PageView.generate(request,attributes)
 
-      pv.remote_ip.encoding.should == Encoding::UTF_8
+      expect(pv.remote_ip.encoding).to eq Encoding::UTF_8
     end
   end
 
@@ -319,11 +366,11 @@ describe PageView do
         page_views = (0..3).map { |index| page_view_model }
         page_view_ids = page_views.map { |page_view| page_view.request_id }
 
-        PageView.find_all_by_id(page_view_ids).should == page_views
+        expect(PageView.find_all_by_id(page_view_ids)).to eq page_views
       end
 
       it "should return nothing with unknown request id" do
-        PageView.find_all_by_id(['unknown', 'unknown']).size.should eql(0)
+        expect(PageView.find_all_by_id(['unknown', 'unknown']).size).to eql(0)
       end
     end
 
@@ -334,11 +381,11 @@ describe PageView do
         page_views = (0..3).map { |index| page_view_model }
         page_view_ids = page_views.map { |page_view| page_view.request_id }
 
-        PageView.find_all_by_id(page_view_ids).should == page_views
+        expect(PageView.find_all_by_id(page_view_ids)).to eq page_views
       end
 
       it "should return nothing with unknown request id" do
-        PageView.find_all_by_id(['unknown', 'unknown']).size.should eql(0)
+        expect(PageView.find_all_by_id(['unknown', 'unknown']).size).to eql(0)
       end
     end
   end
@@ -351,11 +398,11 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find_by_id(pv.request_id).should == pv
+        expect(PageView.find_by_id(pv.request_id)).to eq pv
       end
 
       it "should return nothing with unknown request id" do
-        PageView.find_by_id('unknown').should be_nil
+        expect(PageView.find_by_id('unknown')).to be_nil
       end
     end
 
@@ -364,11 +411,11 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find_by_id(pv.request_id).should == pv
+        expect(PageView.find_by_id(pv.request_id)).to eq pv
       end
 
       it "should return nothing with unknown request id" do
-        PageView.find_by_id('unknown').should be_nil
+        expect(PageView.find_by_id('unknown')).to be_nil
       end
     end
   end
@@ -381,7 +428,7 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find(pv.request_id).should == pv
+        expect(PageView.find(pv.request_id)).to eq pv
       end
 
       it "should raise ActiveRecord::RecordNotFound with unknown request id" do
@@ -394,7 +441,7 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find(pv.request_id).should == pv
+        expect(PageView.find(pv.request_id)).to eq pv
       end
 
       it "should raise ActiveRecord::RecordNotFound with unknown request id" do
@@ -411,11 +458,11 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find_for_update(pv.request_id).should == pv
+        expect(PageView.find_for_update(pv.request_id)).to eq pv
       end
 
       it "should return nothing with unknown request id" do
-        PageView.find_for_update('unknown').should be_nil
+        expect(PageView.find_for_update('unknown')).to be_nil
       end
     end
 
@@ -424,7 +471,7 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find_for_update(pv.request_id).should == pv
+        expect(PageView.find_for_update(pv.request_id)).to eq pv
       end
     end
   end
@@ -437,19 +484,19 @@ describe PageView do
     end
 
     it "should return a PageView object" do
-      PageView.from_attributes(@attributes).should be_a(PageView)
+      expect(PageView.from_attributes(@attributes)).to be_a(PageView)
     end
 
     it "should look like an existing PageView" do
-      PageView.from_attributes(@attributes).should_not be_new_record
+      expect(PageView.from_attributes(@attributes)).not_to be_new_record
     end
 
     it "should use the provided attributes" do
-      PageView.from_attributes(@attributes).url.should == @attributes['url']
+      expect(PageView.from_attributes(@attributes).url).to eq @attributes['url']
     end
 
     it "should set missing attributes to nil" do
-      PageView.from_attributes(@attributes).user_id.should be_nil
+      expect(PageView.from_attributes(@attributes).user_id).to be_nil
     end
 
     context "db-backed" do
@@ -464,8 +511,8 @@ describe PageView do
         page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
-            page_view1.user_id.should == Shard.relative_id_for(user_id, @shard1, Shard.current)
-            page_view2.user_id.should == Shard.relative_id_for(user_id, @shard2, Shard.current)
+            expect(page_view1.user_id).to eq Shard.relative_id_for(user_id, @shard1, Shard.current)
+            expect(page_view2.user_id).to eq Shard.relative_id_for(user_id, @shard2, Shard.current)
           end
         end
       end
@@ -481,8 +528,8 @@ describe PageView do
         page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
-            page_view1.user_id.should == Shard.relative_id_for(user_id, Shard.default, Shard.current)
-            page_view2.user_id.should == Shard.relative_id_for(user_id, Shard.default, Shard.current)
+            expect(page_view1.user_id).to eq Shard.relative_id_for(user_id, Shard.default, Shard.current)
+            expect(page_view2.user_id).to eq Shard.relative_id_for(user_id, Shard.default, Shard.current)
           end
         end
       end

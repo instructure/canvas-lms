@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/gradebooks/blank_submission" do
   it "should render" do
     render "gradebooks/blank_submission"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

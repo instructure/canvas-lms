@@ -3,7 +3,7 @@
   :background-position left center
   :line-height 20px
   // give it a 1px top and bottom padding so that the bg-images dont get chopped off, and give it a 20px left to make room for bg-icon
-  :padding 1px 0 1px 20px 
+  :padding 1px 0 1px 26px 
   display: inline-block /* I am testing this out to get icons to not be chopped off at the bottom, if it breaks tell me -RS */
   
 
@@ -162,10 +162,17 @@ a.unlock
   :background-image url(/images/unlock.png)
 a.icon-grading
   +icon_link
-  +bg-image('grading_icon', 'png', no-repeat, left, center, 17px, 16px)
+  @if $use_high_contrast
+    background-image: url(/images/icon-checkmark-plus-success-high-contrast.svg)
+  @else
+    background-image: url(/images/icon-checkmark-plus-success.svg)
+  background-repeat: no-repeat
+  background-position: left center
+  background-size: 18px
 a.icon-grading-gray
   +icon_link
-  +bg-image('grading_icon_gray', 'png', no-repeat, left, center, 17px, 16px)
+  background: url(/images/icon-checkmark-plus-gray.svg) no-repeat left center
+  background-size: 18px
 a.admin
   :color #D15545
 

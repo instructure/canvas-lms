@@ -34,15 +34,15 @@ describe ConferencesController, type: :request do
     @student2.register!
 
     post "/courses/#{@course.id}/conferences", { :web_conference => {"duration"=>"60", "conference_type"=>"Wimba", "title"=>"let's chat", "description"=>""}, :user => { "all" => "1" } }
-    response.should be_redirect
+    expect(response).to be_redirect
     @conference = WebConference.first
-    Set.new(Message.all.map(&:user)).should == Set.new([@teacher, @student1, @student2])
+    expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2])
 
     @student3 = student_in_course(:active_all => true, :user => user_with_pseudonym(:username => "student3@example.com")).user
     @student3.register!
     put "/courses/#{@course.id}/conferences/#{@conference.id}", { :web_conference => { "title" => "moar" }, :user => { @student3.id => '1' } }
-    response.should be_redirect
-    Set.new(Message.all.map(&:user)).should == Set.new([@teacher, @student1, @student2, @student3])
+    expect(response).to be_redirect
+    expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2, @student3])
   end
 
   it "should find the correct conferences for group news feed" do
@@ -56,8 +56,8 @@ describe ConferencesController, type: :request do
     group_conference.add_initiator(@user)
 
     get "/courses/#{@course.id}/groups/#{@group.id}"
-    response.should be_success
-    assigns['current_conferences'].map(&:id).should == [group_conference.id]
+    expect(response).to be_success
+    expect(assigns['current_conferences'].map(&:id)).to eq [group_conference.id]
   end
 
   it "shouldn't show concluded users" do
@@ -71,14 +71,14 @@ describe ConferencesController, type: :request do
     @student2 = @enroll2.user
     @student2.register!
 
-    @enroll1.attributes['workflow_state'].should == 'active' 
-    @enroll2.attributes['workflow_state'].should == 'active' 
+    expect(@enroll1.attributes['workflow_state']).to eq 'active'
+    expect(@enroll2.attributes['workflow_state']).to eq 'active'
     @enroll2.update_attributes('workflow_state' => 'completed')
-    @enroll2.attributes['workflow_state'].should == 'completed'
+    expect(@enroll2.attributes['workflow_state']).to eq 'completed'
 
     get "/courses/#{@course.id}/conferences"
-    assigns['users'].member?(@teacher).should be_false
-    assigns['users'].member?(@student1).should be_true
-    assigns['users'].member?(@student2).should be_false
+    expect(assigns['users'].member?(@teacher)).to be_falsey
+    expect(assigns['users'].member?(@student1)).to be_truthy
+    expect(assigns['users'].member?(@student2)).to be_falsey
   end
 end

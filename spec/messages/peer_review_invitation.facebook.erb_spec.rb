@@ -25,7 +25,7 @@ describe 'peer_review_invitation.facebook' do
     assessment_request_model
     @object = @assessment_request
     @object.reload
-    @object.context.should_not be_nil
+    expect(@object.context).not_to be_nil
     generate_message(:peer_review_invitation, :facebook, @object)
   end
 end

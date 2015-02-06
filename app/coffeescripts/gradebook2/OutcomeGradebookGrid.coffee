@@ -9,6 +9,10 @@ define [
   'jst/gradebook2/outcome_gradebook_student_cell'
 ], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
+  ###
+  xsslint safeString.method cellHtml
+  ###
+
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']
 
@@ -142,7 +146,7 @@ define [
         options = _.extend({}, Grid.Util.COLUMN_OPTIONS, options)
         columns = _.map outcomes, (outcome) ->
           _.extend(id: "outcome_#{outcome.id}",
-                   name: outcome.title,
+                   name: _.escape(outcome.title),
                    field: "outcome_#{outcome.id}",
                    cssClass: 'outcome-result-cell',
                    outcome: outcome, options)
@@ -188,6 +192,7 @@ define [
         return null unless Grid.Util.sectionFilter(section, rollup)
         student = Grid.Util.lookupStudent(rollup.links.user)
         section = Grid.Util.lookupSection(rollup.links.section)
+        return null unless section
         row =
           student: _.extend(
             grades_html_url: "/courses/#{section.course_id}/grades/#{student.id}#tab-outcomes" # probably should get this from the enrollment api

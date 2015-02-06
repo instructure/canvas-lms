@@ -32,7 +32,7 @@ describe "/profile/communication" do
     assigns[:policies] = NotificationPolicy.for(@user)
     assigns[:user] = @user
     render "profile/communication"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

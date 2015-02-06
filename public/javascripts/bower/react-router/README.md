@@ -11,17 +11,10 @@ Docs
 - [Guide: Overview](/docs/guides/overview.md)
 - [API](/docs/api/)
 
+[Try it out on JSBin](http://jsbin.com/sixose/1/edit)
+
 Important Notes
 ---------------
-
-### **** NPM USERS THIS PACKAGE MOVED ****
-
-This package has moved from `react-nested-router` to `react-router`.
-
-Update your package.json to point to the new package, or if you aren't
-ready to update, make sure your package.json specifically points to
-`0.3.5` or less, `0.3.6` just throws an error telling you the package
-has moved.
 
 ### SemVer
 
@@ -30,7 +23,18 @@ Before our `1.0` release, breaking API changes will cause a bump to
 `0.5.0` will have breaking changes.
 
 Please refer to the [upgrade guide](/UPGRADE_GUIDE.md) and
-[changelog](/CHANGELOG) when upgrading.
+[changelog](/CHANGELOG.md) when upgrading.
+
+### App Dependencies
+
+We use the following dependencies from npm:
+
+- `when` for promises
+- `events` for event emitters.
+
+It is likely that your app will need dependencies like these. We
+recommend you use the same modules that the router uses to decrease the
+overall size of your application.
 
 Installation
 ------------
@@ -45,7 +49,7 @@ This library is written with CommonJS modules. If you are using
 browserify, webpack, or similar, you can consume it like anything else
 installed from npm.
 
-There is also a UMD build available on bower, find the library on
+There is also a global build available on bower, find the library on
 `window.ReactRouter`.
 
 Features
@@ -53,13 +57,16 @@ Features
 
 - Nested views mapped to nested routes
 - Modular construction of route hierarchy
-- Fully asynchronous transition hooks
+- Sync and async transition hooks
 - Transition abort / redirect / retry
 - Dynamic segments
 - Query parameters
 - Links with automatic `.active` class when their route is active
 - Multiple root routes
-- Hash or HTML5 history URLs
+- Hash or HTML5 history (with fallback) URLs
+- Declarative Redirect routes
+- Declarative NotFound routes
+- Browser scroll behavior with transitions
 
 Check out the `examples` directory to see how simple previously complex UI
 and workflows are to create.
@@ -70,16 +77,22 @@ What's it look like?
 ```js
 React.renderComponent((
   <Routes location="history">
-    <Route handler={App}>
-      <Route name="about" handler={About}/>
+    <Route path="/" handler={App}>
+      <DefaultRoute handler={Home} />
+      <Route name="about" handler={About} />
       <Route name="users" handler={Users}>
-        <Route name="user" path="/user/:userId" handler={User}/>
+        <Route name="recent-users" path="recent" handler={RecentUsers} />
+        <Route name="user" path="/user/:userId" handler={User} />
+        <NotFoundRoute handler={UserRouteNotFound}/>
       </Route>
     </Route>
-    <Route path="*" handler={NotFound}/>
+    <NotFoundRoute handler={NotFound}/>
+    <Redirect path="company" to="about" />
   </Routes>
 ), document.body);
 ```
+
+All of the `handler`s will render inside their parent route `handler`.
 
 See more in the [overview guide](/docs/guides/overview.md).
 
@@ -105,8 +118,8 @@ Benefits of This Approach
    application is represented by these routes.
 
 4. **URLs are your first thought, not an after-thought** - With React
-   Nested Router, you don't get UI on the page without configuring a url
-   first. Fortunately, its wildly productive this way, too.
+   Router, you don't get UI on the page without configuring a url first.
+   Fortunately, its wildly productive this way, too.
 
 Related Modules
 ---------------

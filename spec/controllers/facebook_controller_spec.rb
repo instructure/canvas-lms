@@ -39,14 +39,14 @@ describe FacebookController do
       @user = user_model
       UserService.create!(:user => @user, :service => 'facebook', :service_user_id => 'some_facebook_user_id')
       get 'index', :signed_request => signed_request(:user_id => 'some_facebook_user_id')
-      assigns[:user].should == @user
+      expect(assigns[:user]).to eq @user
     end
 
     it "should not find a user without a user_id" do
       @user = user_model
       UserService.create!(:user => @user, :service => 'facebook', :service_user_id => 'garbage')
       get 'index', :signed_request => signed_request
-      assigns[:user].should be_nil
+      expect(assigns[:user]).to be_nil
     end
   end
 
@@ -55,11 +55,20 @@ describe FacebookController do
       notification_model(category: 'TestWeekly')
       user = User.create!
       cc = user.communication_channels.create!(path: 'abc', path_type: 'facebook')
-      p = cc.notification_policies.create!(notification: @notification, frequency: 'daily')
       session[:facebook_canvas_user_id] = user.id
       post 'notification_preferences', types: { }
-      response.should be_redirect
-      p.reload.frequency.should == 'weekly'
+      expect(response).to be_redirect
+      expect(cc.notification_policies.where(notification_id: @notification).first.frequency).to eq 'weekly'
+    end
+
+    it "should not set mentioned preferences to default frequency" do
+      notification_model(category: 'TestWeekly')
+      user = User.create!
+      cc = user.communication_channels.create!(path: 'abc', path_type: 'facebook')
+      session[:facebook_canvas_user_id] = user.id
+      post 'notification_preferences', types: { 'TestWeekly' => 'daily' }
+      expect(response).to be_redirect
+      expect(cc.notification_policies.where(notification_id: @notification).first.frequency).to eq 'daily'
     end
   end
 end

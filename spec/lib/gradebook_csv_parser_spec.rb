@@ -23,12 +23,12 @@ require 'gradebook_csv_parser'
 describe CSVParser do
   context "initialize" do
     it "should require contents" do
-      lambda{CSVParser.new}.should raise_error
-      lambda{CSVParser.new('some contents')}.should_not raise_error
+      expect{CSVParser.new}.to raise_error
+      expect{CSVParser.new('some contents')}.not_to raise_error
     end
     
     it "should make contents accessible" do
-      CSVParser.new('some contents').contents.should eql('some contents')
+      expect(CSVParser.new('some contents').contents).to eql('some contents')
     end
   end
   
@@ -38,15 +38,15 @@ describe CSVParser do
     end
     
     it "should offer an array of arrays" do
-      @cp.gradebook.should be_is_a(Array)
+      expect(@cp.gradebook).to be_is_a(Array)
     end
     
     it "should offer a series of open structs to contain the gradebook details" do
-      @cp.gradebook.each {|row| row.each {|cell| cell.should be_is_a(OpenStruct)}}
+      @cp.gradebook.each {|row| row.each {|cell| expect(cell).to be_is_a(OpenStruct)}}
     end
     
     it "should be able to use run as an alias for gradebook" do
-      @cp.gradebook.should eql(@cp.run)
+      expect(@cp.gradebook).to eql(@cp.run)
     end
     
   end

@@ -42,25 +42,25 @@ describe Polling::PollsController, type: :request do
     it "returns all existing polls" do
       json = get_index
       poll_json = json['polls']
-      poll_json.size.should == 5
+      expect(poll_json.size).to eq 5
 
       poll_json.each_with_index do |poll, i|
-        poll['question'].should == "Example Poll #{5-i}"
+        expect(poll['question']).to eq "Example Poll #{5-i}"
       end
     end
 
     it "paginates to the jsonapi standard if requested" do
       json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
       poll_json = json['polls']
-      poll_json.size.should == 5
+      expect(poll_json.size).to eq 5
 
       poll_json.each_with_index do |poll, i|
-        poll['question'].should == "Example Poll #{5-i}"
+        expect(poll['question']).to eq "Example Poll #{5-i}"
       end
 
-      json.should have_key('meta')
-      json['meta'].should have_key('pagination')
-      json['meta']['primaryCollection'].should == 'polls'
+      expect(json).to have_key('meta')
+      expect(json['meta']).to have_key('pagination')
+      expect(json['meta']['primaryCollection']).to eq 'polls'
     end
 
     context "as a site admin" do
@@ -69,10 +69,10 @@ describe Polling::PollsController, type: :request do
 
         json = get_index
         poll_json = json['polls']
-        poll_json.size.should == 5
+        expect(poll_json.size).to eq 5
 
         poll_json.each_with_index do |poll, i|
-          poll['question'].should == "Example Poll #{5-i}"
+          expect(poll['question']).to eq "Example Poll #{5-i}"
         end
       end
     end
@@ -96,21 +96,21 @@ describe Polling::PollsController, type: :request do
     it "retrieves the poll specified" do
       json = get_show
       poll_json = json['polls'].first
-      poll_json['question'].should == 'An Example Poll'
+      expect(poll_json['question']).to eq 'An Example Poll'
     end
 
     context "as a teacher" do
       it "displays the total results of all sessions" do
         json = get_show
         poll_json = json['polls'].first
-        poll_json.should have_key("total_results")
+        expect(poll_json).to have_key("total_results")
       end
 
       it "returns the id of the user that created the poll" do
         json = get_show
         poll_json = json['polls'].first
-        poll_json.should have_key("user_id")
-        poll_json['user_id'].should == @teacher.id.to_s
+        expect(poll_json).to have_key("user_id")
+        expect(poll_json['user_id']).to eq @teacher.id.to_s
       end
     end
 
@@ -121,7 +121,7 @@ describe Polling::PollsController, type: :request do
 
         json = get_show
         poll_json = json['polls'].first
-        poll_json.should_not have_key("total_results")
+        expect(poll_json).not_to have_key("total_results")
       end
 
       it "shouldn't return the id of the user that created the poll" do
@@ -131,7 +131,7 @@ describe Polling::PollsController, type: :request do
 
         json = get_show
         poll_json = json['polls'].first
-        poll_json.should_not have_key("user_id")
+        expect(poll_json).not_to have_key("user_id")
       end
 
       it "is authorized if there are sessions that belong to a course or course section the user is enrolled in" do
@@ -139,7 +139,7 @@ describe Polling::PollsController, type: :request do
         @poll.poll_sessions.create!(course: @course)
 
         get_show(true)
-        response.code.should == '200'
+        expect(response.code).to eq '200'
       end
 
       it "is unauthorized if there are no sessions that belong to a course or course section the user is enrolled in" do
@@ -147,7 +147,7 @@ describe Polling::PollsController, type: :request do
         unenrolled = Course.create!(name: 'Unenrolled Course')
         @poll.poll_sessions.create!(course: unenrolled)
         get_show(true)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
 
     end
@@ -165,8 +165,8 @@ describe Polling::PollsController, type: :request do
     context "as a teacher" do
       it "creates a poll successfully" do
         post_create(question: 'A Test Poll', description: 'A test description.')
-        @teacher.polls.first.question.should == 'A Test Poll'
-        @teacher.polls.first.description.should == 'A test description.'
+        expect(@teacher.polls.first.question).to eq 'A Test Poll'
+        expect(@teacher.polls.first.description).to eq 'A test description.'
       end
     end
 
@@ -174,7 +174,7 @@ describe Polling::PollsController, type: :request do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
         post_create({question: 'New Title'}, true)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
     end
 
@@ -199,7 +199,7 @@ describe Polling::PollsController, type: :request do
     context "as a teacher" do
       it "updates a poll successfully" do
         put_update(question: 'A New Title')
-        @poll.reload.question.should == 'A New Title'
+        expect(@poll.reload.question).to eq 'A New Title'
       end
     end
 
@@ -207,7 +207,7 @@ describe Polling::PollsController, type: :request do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
         put_update({question: 'New Title'}, true)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
     end
 
@@ -242,8 +242,8 @@ describe Polling::PollsController, type: :request do
         @user = @teacher
         delete_destroy
 
-        response.code.should == '204'
-        Polling::Poll.find_by_id(@poll.id).should be_nil
+        expect(response.code).to eq '204'
+        expect(Polling::Poll.where(id: @poll)).not_to be_exists
       end
 
       it "deletes all associated poll choices" do
@@ -252,9 +252,9 @@ describe Polling::PollsController, type: :request do
 
         @user = @teacher
         delete_destroy
-        response.code.should == '204'
-        Polling::PollChoice.find_by_id(choice_a.id).should be_nil
-        Polling::PollChoice.find_by_id(choice_b.id).should be_nil
+        expect(response.code).to eq '204'
+        expect(Polling::PollChoice.where(id: choice_a)).not_to be_exists
+        expect(Polling::PollChoice.where(id: choice_b)).not_to be_exists
       end
     end
 
@@ -262,8 +262,8 @@ describe Polling::PollsController, type: :request do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
         delete_destroy
-        response.code.should == '401'
-        Polling::Poll.find_by_id(@poll.id).should == @poll
+        expect(response.code).to eq '401'
+        expect(Polling::Poll.where(id: @poll).first).to eq @poll
       end
     end
   end

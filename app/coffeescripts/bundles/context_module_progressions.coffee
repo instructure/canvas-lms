@@ -27,6 +27,7 @@ require [
   unless ENV.RESTRICTED_LIST
     # attach the view's scroll container once it's populated
     students.fetch success: ->
+      return if students.length == 0
       indexView.resetScrollContainer(indexView.$el.find('#progression_students .collectionViewItems'))
 
   indexView.render()

@@ -21,8 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ShardedBookmarkedCollection do
   before(:each) do
     @user = user(active_user: true)
-    @user.account_users.create! account: Account.find_or_create_by_workflow_state('active')
-    @user.account_users.create! account: Account.find_or_create_by_workflow_state('deleted')
+    @user.account_users.create! account: Account.create!
+    @user.account_users.create! account: Account.create! { |a| a.workflow_state = 'deleted' }
   end
 
   context "without sharding" do
@@ -31,8 +31,8 @@ describe ShardedBookmarkedCollection do
       collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.accounts) do |scope|
         scope.active
       end
-      collection.paginate(per_page: 10).size.should equal 1
-      collection.should be_is_a BookmarkedCollection::MergeProxy
+      expect(collection.paginate(per_page: 10).size).to equal 1
+      expect(collection).to be_is_a BookmarkedCollection::MergeProxy
     end
   end
 end

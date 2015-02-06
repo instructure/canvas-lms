@@ -9,25 +9,25 @@ describe ToursController do
   end
 
   it "should add dismissed tours to user preferences" do
-    @user.preferences[:dismissed_tours].should be_nil
+    expect(@user.preferences[:dismissed_tours]).to be_nil
     delete 'dismiss', :name => 'FakeTour'
     @user.reload
-    @user.preferences[:dismissed_tours].should == {:fake_tour => 1}
+    expect(@user.preferences[:dismissed_tours]).to eq({:fake_tour => 1})
   end
 
   it "should override old dismissed tours with new versions" do
     # set version one back as though the user dismissed v0 already
     @user.preferences[:dismissed_tours] = {:fake_tour => 0}
-    @user.preferences[:dismissed_tours].should == {:fake_tour => 0}
+    expect(@user.preferences[:dismissed_tours]).to eq({:fake_tour => 0})
     delete 'dismiss', :name => 'FakeTour'
     @user.reload
     # :fake_tour should be the current version (1) not the old version (0)
-    @user.preferences[:dismissed_tours].should == {:fake_tour => 1}
+    expect(@user.preferences[:dismissed_tours]).to eq({:fake_tour => 1})
   end
 
   it "should add dismissed tours to user session" do
     delete 'dismiss_session', :name => 'FakeTour'
-    request.session[:dismissed_tours].should == {:fake_tour => 1}
+    expect(request.session[:dismissed_tours]).to eq({:fake_tour => 1})
   end
 
 end

@@ -3,8 +3,8 @@ require 'spec_helper'
 module HandlebarsTasks
 
   expected_precompiled_template = <<-END
-define(['ember', 'compiled/ember/shared/helpers/common'], function(Ember) {
-  Ember.TEMPLATES['application'] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+define(["ember","compiled/ember/shared/helpers/common"], function(Ember) {
+  Ember.TEMPLATES['%s'] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   
@@ -19,7 +19,12 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   describe EmberHbs do
     describe "#compile_template" do
       it "outputs a precompiled template wrapped in AMD and registers with Ember.TEMPLATES" do
-        EmberHbs::compile_template("application", "foo").should == expected_precompiled_template
+        require 'tempfile'
+        file = Tempfile.new("foo")
+        file.write "foo"
+        file.close
+        EmberHbs::compile_template(file.path).should == expected_precompiled_template % EmberHbs::parse_name(file.path)
+        file.unlink
       end
     end
 

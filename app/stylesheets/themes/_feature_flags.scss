@@ -36,7 +36,7 @@ $left-offset:  16px;
 }
 
 .feature-flag .element_toggler:focus {
-  @include button-focus;
+  @if $use_high_contrast { @include button-focus; }
 }
 
 .feature-flag .btn {

@@ -22,13 +22,15 @@ class GradeCalculator
   def initialize(user_ids, course, opts = {})
     opts = opts.reverse_merge(:ignore_muted => true)
 
-    @course = course.is_a?(Course) ?
-      @course = course :
-      @course = Course.find(course)
-    @course_id = @course.id
-    assignment_scope = AssignmentGroup.assignment_scope_for_draft_state(@course)
-    @groups = @course.assignment_groups.active.includes(assignment_scope)
-    @assignments = @groups.flat_map(&assignment_scope).select(&:graded?)
+    @course = course.is_a?(Course) ? course : Course.find(course)
+    @groups = @course.assignment_groups.active
+    @grading_period = opts[:grading_period]
+
+    assignment_scope = @course.assignments.published.gradeable
+    @assignments = @grading_period ?
+                     @grading_period.assignments(assignment_scope) :
+                     assignment_scope.all
+
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}
     @final_updates = {}
@@ -49,18 +51,25 @@ class GradeCalculator
     @submissions = @course.submissions.
         except(:order, :select).
         for_user(@user_ids).
+        where(assignment_id: @assignments.map(&:id)).
         select("submissions.id, user_id, assignment_id, score")
     submissions_by_user = @submissions.group_by(&:user_id)
 
-    @user_ids.map do |user_id|
-      user_submissions = submissions_by_user[user_id] || []
-      if differentiated_assignments_on?
-        user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
+    scores = []
+    @user_ids.each_slice(100) do |batched_ids|
+      load_assignment_visibilities_for_users(batched_ids)
+      batched_ids.each do |user_id|
+        user_submissions = submissions_by_user[user_id] || []
+        if differentiated_assignments_on?
+          user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
+        end
+        current, current_groups = calculate_current_score(user_id, user_submissions)
+        final, final_groups = calculate_final_score(user_id, user_submissions)
+        scores << [[current, current_groups], [final, final_groups]]
       end
-      current, current_groups = calculate_current_score(user_id, user_submissions)
-      final, final_groups = calculate_final_score(user_id, user_submissions)
-      [[current, current_groups], [final, final_groups]]
+      clear_assignment_visibilities_cache
     end
+    scores
   end
 
   def compute_and_save_scores
@@ -158,16 +167,23 @@ class GradeCalculator
     end
   end
 
-  def assignment_ids_visible_to_user(user_id)
+  def load_assignment_visibilities_for_users(user_ids)
     @assignment_ids_visible_to_user ||= begin
       if differentiated_assignments_on?
-        AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: @user_ids)
+        AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: user_ids)
       else
         assignment_ids = @assignments.map(&:id)
-        @user_ids.reduce({}){|hash, id| hash[id] = assignment_ids; hash}
+        user_ids.reduce({}){|hash, id| hash[id] = assignment_ids; hash}
       end
     end
-    @assignment_ids_visible_to_user[user_id] || []
+  end
+
+  def clear_assignment_visibilities_cache
+    @assignment_ids_visible_to_user = nil
+  end
+
+  def assignment_ids_visible_to_user(user_id)
+    @assignment_ids_visible_to_user[user_id]
   end
 
   # see comments for dropAssignments in grade_calculator.coffee

@@ -20,52 +20,52 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe AssignmentOverridesController, type: :request do
   def validate_override_json(override, json)
-    json['id'].should == override.id
-    json['assignment_id'].should == override.assignment_id
-    json['title'].should == override.title
+    expect(json['id']).to eq override.id
+    expect(json['assignment_id']).to eq override.assignment_id
+    expect(json['title']).to eq override.title
 
     if override.due_at_overridden
-      json['due_at'].should == override.due_at.iso8601
-      json['all_day'].should == override.all_day
-      json['all_day_date'].should == override.all_day_date.to_s
+      expect(json['due_at']).to eq override.due_at.iso8601
+      expect(json['all_day']).to eq override.all_day
+      expect(json['all_day_date']).to eq override.all_day_date.to_s
     else
-      json.should_not have_key 'due_at'
-      json.should_not have_key 'all_day'
-      json.should_not have_key 'all_day_date'
+      expect(json).not_to have_key 'due_at'
+      expect(json).not_to have_key 'all_day'
+      expect(json).not_to have_key 'all_day_date'
     end
 
     if override.unlock_at_overridden
-      json['unlock_at'].should == override.unlock_at.iso8601
+      expect(json['unlock_at']).to eq override.unlock_at.iso8601
     else
-      json.should_not have_key 'unlock_at'
+      expect(json).not_to have_key 'unlock_at'
     end
 
     if override.lock_at_overridden
-      json['lock_at'].should == override.lock_at.iso8601
+      expect(json['lock_at']).to eq override.lock_at.iso8601
     else
-      json.should_not have_key 'lock_at'
+      expect(json).not_to have_key 'lock_at'
     end
 
     case override.set
     when Array
-      json['student_ids'].should == override.set.map(&:id)
-      json.should_not have_key 'group_id'
-      json.should_not have_key 'course_section_id'
+      expect(json['student_ids']).to eq override.set.map(&:id)
+      expect(json).not_to have_key 'group_id'
+      expect(json).not_to have_key 'course_section_id'
     when Group
-      json['group_id'].should == override.set_id
-      json.should_not have_key 'student_ids'
-      json.should_not have_key 'course_section_id'
+      expect(json['group_id']).to eq override.set_id
+      expect(json).not_to have_key 'student_ids'
+      expect(json).not_to have_key 'course_section_id'
     when CourseSection
-      json['course_section_id'].should == override.set_id
-      json.should_not have_key 'student_ids'
-      json.should_not have_key 'group_id'
+      expect(json['course_section_id']).to eq override.set_id
+      expect(json).not_to have_key 'student_ids'
+      expect(json).not_to have_key 'group_id'
     end
   end
 
   def expect_errors(errors)
     assert_status(400)
     json = JSON.parse(response.body)
-    json.should == {"errors" => errors}
+    expect(json).to eq({"errors" => errors})
   end
 
   def expect_error(error)
@@ -87,7 +87,7 @@ describe AssignmentOverridesController, type: :request do
                       :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s)
 
-      json.size.should == 1
+      expect(json.size).to eq 1
     end
 
     it "should exclude deleted overrides" do
@@ -98,7 +98,7 @@ describe AssignmentOverridesController, type: :request do
                       :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s)
 
-      json.size.should == 0
+      expect(json.size).to eq 0
     end
 
     it "should include overrides outside the user's sections if user is admin" do
@@ -107,13 +107,13 @@ describe AssignmentOverridesController, type: :request do
       @override.set = @course.course_sections.create!
       @override.save!
 
-      @course.sections_visible_to(@teacher).should_not include @override.set
+      expect(@course.sections_visible_to(@teacher)).not_to include @override.set
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides.json",
                       :controller => 'assignment_overrides', :action => 'index', :format => 'json',
                       :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s)
 
-      json.size.should == 1
+      expect(json.size).to eq 1
     end
 
     it "should have formatted overrides" do
@@ -203,7 +203,7 @@ describe AssignmentOverridesController, type: :request do
 
       @group = @course.groups.create!(:name => 'my group', :group_category => @assignment.group_category)
       @group.add_user(@teacher, 'accepted')
-      @course.groups_visible_to(@teacher).should include @group
+      expect(@course.groups_visible_to(@teacher)).to include @group
 
       @override.reload
       @override.set = @group
@@ -245,8 +245,8 @@ describe AssignmentOverridesController, type: :request do
                    :controller => 'assignment_overrides', :action => 'group_alias', :format => 'json',
                    :group_id => @group.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.should be_redirect
-      response.location.should match "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}"
+      expect(response).to be_redirect
+      expect(response.location).to match "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}"
     end
 
     it "should 404 for non-visible group" do
@@ -288,8 +288,8 @@ describe AssignmentOverridesController, type: :request do
                    :controller => 'assignment_overrides', :action => 'section_alias', :format => 'json',
                    :course_section_id => @course.default_section.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.should be_redirect
-      response.location.should match "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}"
+      expect(response).to be_redirect
+      expect(response.location).to match "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}"
     end
 
     it "should 404 for non-visible section" do
@@ -351,22 +351,22 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => @title })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.should_not be_nil
-        @override.set.should == [@student]
+        expect(@override).not_to be_nil
+        expect(@override.set).to eq [@student]
       end
 
       it "should set the adhoc override title" do
         api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => @title })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.title.should == @title
+        expect(@override.title).to eq @title
       end
 
       it "should recognize sis ids for an adhoc assignment override" do
         api_create_override(@course, @assignment, :assignment_override => { :student_ids => ["sis_login_id:#{@student.pseudonym.unique_id}"], :title => @title })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.set.should == [@student]
+        expect(@override.set).to eq [@student]
       end
 
       it "should error with wrong data type for student_ids" do
@@ -406,8 +406,8 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :group_id => @group.id })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.should_not be_nil
-        @override.set.should == @group
+        expect(@override).not_to be_nil
+        expect(@override.set).to eq @group
       end
 
       it "should error on invalid group_id" do
@@ -431,8 +431,8 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.should_not be_nil
-        @override.set.should == @course.default_section
+        expect(@override).not_to be_nil
+        expect(@override.set).to eq @course.default_section
       end
 
       it "should error on invalid course_section_id" do
@@ -452,8 +452,8 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.should_not be_nil
-        @override.set.should == @course.default_section
+        expect(@override).not_to be_nil
+        expect(@override.set).to eq @course.default_section
       end
     end
 
@@ -467,7 +467,7 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => @title, :group_id => @group.id })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.set.should == [@student]
+        expect(@override.set).to eq [@student]
       end
 
       it "should ignore course_section_id if there are student_ids" do
@@ -478,7 +478,7 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => @title, :course_section_id => @course.default_section.id })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.set.should == [@student]
+        expect(@override.set).to eq [@student]
       end
 
       it "should ignore course_section_id if there is a group_id" do
@@ -489,7 +489,7 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :group_id => @group.id, :course_section_id => @course.default_section.id })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.set.should == @group
+        expect(@override.set).to eq @group
       end
     end
 
@@ -521,18 +521,18 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :due_at => @due_at.iso8601 })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.due_at_overridden.should be_true
-        @override.due_at.to_i.should == @due_at.to_i
-        @override.unlock_at_overridden.should be_false
-        @override.lock_at_overridden.should be_false
+        expect(@override.due_at_overridden).to be_truthy
+        expect(@override.due_at.to_i).to eq @due_at.to_i
+        expect(@override.unlock_at_overridden).to be_falsey
+        expect(@override.lock_at_overridden).to be_falsey
       end
 
       it "should set a nil override due_at" do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :due_at => nil })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.due_at_overridden.should be_true
-        @override.due_at.should be_nil
+        expect(@override.due_at_overridden).to be_truthy
+        expect(@override.due_at).to be_nil
       end
 
       it "should error on invalid due_at" do
@@ -548,18 +548,18 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :unlock_at => @unlock_at.iso8601 })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.due_at_overridden.should be_false
-        @override.unlock_at_overridden.should be_true
-        @override.unlock_at.to_i.should == @unlock_at.to_i
-        @override.lock_at_overridden.should be_false
+        expect(@override.due_at_overridden).to be_falsey
+        expect(@override.unlock_at_overridden).to be_truthy
+        expect(@override.unlock_at.to_i).to eq @unlock_at.to_i
+        expect(@override.lock_at_overridden).to be_falsey
       end
 
       it "should set a nil override unlock_at" do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :unlock_at => nil })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.unlock_at_overridden.should be_true
-        @override.unlock_at.should be_nil
+        expect(@override.unlock_at_overridden).to be_truthy
+        expect(@override.unlock_at).to be_nil
       end
 
       it "should error on invalid unlock_at" do
@@ -575,18 +575,18 @@ describe AssignmentOverridesController, type: :request do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :lock_at => @lock_at.iso8601 })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.due_at_overridden.should be_false
-        @override.unlock_at_overridden.should be_false
-        @override.lock_at_overridden.should be_true
-        @override.lock_at.to_i.should == @lock_at.to_i
+        expect(@override.due_at_overridden).to be_falsey
+        expect(@override.unlock_at_overridden).to be_falsey
+        expect(@override.lock_at_overridden).to be_truthy
+        expect(@override.lock_at.to_i).to eq @lock_at.to_i
       end
 
       it "should set a nil override lock_at" do
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :lock_at => nil })
 
         @override = @assignment.assignment_overrides(true).first
-        @override.lock_at_overridden.should be_true
-        @override.lock_at.should be_nil
+        expect(@override.lock_at_overridden).to be_truthy
+        expect(@override.lock_at).to be_nil
       end
 
       it "should error on invalid lock_at" do
@@ -639,11 +639,11 @@ describe AssignmentOverridesController, type: :request do
       api_update_override(@course, @assignment, @override, :assignment_override => { :dummy => 'ignored' })
 
       @override.reload
-      @override.set.should == @course.default_section
-      @override.title.should == @course.default_section.name
-      @override.due_at_overridden.should be_false
-      @override.unlock_at_overridden.should be_false
-      @override.lock_at_overridden.should be_false
+      expect(@override.set).to eq @course.default_section
+      expect(@override.title).to eq @course.default_section.name
+      expect(@override.due_at_overridden).to be_falsey
+      expect(@override.unlock_at_overridden).to be_falsey
+      expect(@override.lock_at_overridden).to be_falsey
     end
 
     context "adhoc override" do
@@ -661,25 +661,25 @@ describe AssignmentOverridesController, type: :request do
       it "should ignore group_id and section_id" do
         api_update_override(@course, @assignment, @override, :assignment_override => { :group_id => group_model.id })
         @override.reload
-        @override.set.should == [@student]
+        expect(@override.set).to eq [@student]
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :course_section_id => @course.default_section.id })
         @override.reload
-        @override.set.should == [@student]
+        expect(@override.set).to eq [@student]
       end
 
       it "should allow changing the students in the set" do
         @other_student = student_in_course(:course => @course).user
         api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@other_student.id] })
         @override.reload
-        @override.set.should == [@other_student]
+        expect(@override.set).to eq [@other_student]
       end
 
       it "should allow changing the title" do
         @new_title = "new #@title"
         api_update_override(@course, @assignment, @override, :assignment_override => { :title => @new_title })
         @override.reload
-        @override.title.should == @new_title
+        expect(@override.title).to eq @new_title
       end
 
       it "should error if you try and duplicate a student in an adhoc set" do
@@ -716,15 +716,15 @@ describe AssignmentOverridesController, type: :request do
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@student.id] })
         @override.reload
-        @override.set.should == @original_group
+        expect(@override.set).to eq @original_group
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :group_id => @group.id })
         @override.reload
-        @override.set.should == @original_group
+        expect(@override.set).to eq @original_group
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :course_section_id => @course.default_section.id })
         @override.reload
-        @override.set.should == @original_group
+        expect(@override.set).to eq @original_group
       end
 
       it "should not allow changing the title" do
@@ -732,7 +732,7 @@ describe AssignmentOverridesController, type: :request do
         @group.add_user(@user, 'accepted')
         api_update_override(@course, @assignment, @override, :assignment_override => { :title => @new_title })
         @override.reload
-        @override.title.should == @group.name
+        expect(@override.title).to eq @group.name
       end
     end
 
@@ -750,22 +750,22 @@ describe AssignmentOverridesController, type: :request do
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@student.id] })
         @override.reload
-        @override.set.should == @course.default_section
+        expect(@override.set).to eq @course.default_section
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :group_id => @group.id })
         @override.reload
-        @override.set.should == @course.default_section
+        expect(@override.set).to eq @course.default_section
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :course_section_id => @other_section.id })
         @override.reload
-        @override.set.should == @course.default_section
+        expect(@override.set).to eq @course.default_section
       end
 
       it "should not allow changing the title" do
         @new_title = "new title"
         api_update_override(@course, @assignment, @override, :assignment_override => { :title => @new_title })
         @override.reload
-        @override.title.should == @course.default_section.name
+        expect(@override.title).to eq @course.default_section.name
       end
     end
 
@@ -784,8 +784,8 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => { :due_at => @due_at.iso8601 })
 
         @override.reload
-        @override.due_at_overridden.should be_true
-        @override.due_at.to_i.should == @due_at.to_i
+        expect(@override.due_at_overridden).to be_truthy
+        expect(@override.due_at.to_i).to eq @due_at.to_i
       end
 
       it "should set a nil override due_at" do
@@ -795,8 +795,8 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => { :due_at => nil })
 
         @override.reload
-        @override.due_at_overridden.should be_true
-        @override.due_at.should be_nil
+        expect(@override.due_at_overridden).to be_truthy
+        expect(@override.due_at).to be_nil
       end
 
       it "should clear a previous override if unspecified" do
@@ -806,7 +806,7 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => {})
 
         @override.reload
-        @override.due_at_overridden.should be_false
+        expect(@override.due_at_overridden).to be_falsey
       end
 
       it "should error on invalid due_at" do
@@ -831,8 +831,8 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => { :unlock_at => @unlock_at.iso8601 })
 
         @override.reload
-        @override.unlock_at_overridden.should be_true
-        @override.unlock_at.to_i.should == @unlock_at.to_i
+        expect(@override.unlock_at_overridden).to be_truthy
+        expect(@override.unlock_at.to_i).to eq @unlock_at.to_i
       end
 
       it "should set a nil override unlock_at" do
@@ -842,8 +842,8 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => { :unlock_at => nil })
 
         @override.reload
-        @override.unlock_at_overridden.should be_true
-        @override.unlock_at.should be_nil
+        expect(@override.unlock_at_overridden).to be_truthy
+        expect(@override.unlock_at).to be_nil
       end
 
       it "should clear a previous override if unspecified" do
@@ -853,7 +853,7 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => {})
 
         @override.reload
-        @override.unlock_at_overridden.should be_false
+        expect(@override.unlock_at_overridden).to be_falsey
       end
 
       it "should error on invalid unlock_at" do
@@ -878,8 +878,8 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => { :lock_at => @lock_at.iso8601 })
 
         @override.reload
-        @override.lock_at_overridden.should be_true
-        @override.lock_at.to_i.should == @lock_at.to_i
+        expect(@override.lock_at_overridden).to be_truthy
+        expect(@override.lock_at.to_i).to eq @lock_at.to_i
       end
 
       it "should set a nil override lock_at" do
@@ -889,8 +889,8 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => { :lock_at => nil })
 
         @override.reload
-        @override.lock_at_overridden.should be_true
-        @override.lock_at.should be_nil
+        expect(@override.lock_at_overridden).to be_truthy
+        expect(@override.lock_at).to be_nil
       end
 
       it "should clear a previous override if unspecified" do
@@ -900,7 +900,7 @@ describe AssignmentOverridesController, type: :request do
         api_update_override(@course, @assignment, @override, :assignment_override => {})
 
         @override.reload
-        @override.lock_at_overridden.should be_false
+        expect(@override.lock_at_overridden).to be_falsey
       end
 
       it "should error on invalid lock_at" do
@@ -934,7 +934,7 @@ describe AssignmentOverridesController, type: :request do
                :controller => 'assignment_overrides', :action => 'destroy', :format => 'json',
                :course_id => @course.id.to_s, :assignment_id => @assignment.id.to_s, :id => @override.id.to_s)
       @override.reload
-      @override.should be_deleted
+      expect(@override).to be_deleted
     end
 
     it "should return the override details" do

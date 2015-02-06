@@ -9,41 +9,55 @@ describe "external tool assignments" do
     @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
   end
 
-  it "should allow creating" do
+  it "should allow creating through index" do
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
-    click_option('#right-side select.assignment_groups_select', 'Assignments')
-    f('#right-side .add_assignment_link').click
-    f('#assignment_title').send_keys('test1')
+    f('.add_assignment').click
+    f('.create_assignment_dialog input[name="name"]').send_keys('test1')
     f('.ui-datepicker-trigger').click
     datepicker = datepicker_next
     datepicker.find_element(:css, '.ui-datepicker-ok').click
-    replace_content(f('#assignment_points_possible'), '5')
-    click_option('.assignment_submission_types', 'External Tool')
-    expect_new_page_load { f('.more_options_link').click }
+    replace_content(f('.create_assignment_dialog input[name="points_possible"]'), '5')
+    click_option('.create_assignment_dialog select[name="submission_types"]', 'External Tool')
+    f('.create_assignment').click
+    wait_for_ajaximations
+
+    a = @course.assignments(true).last
+    expect(a).to be_present
+    expect(a.submission_types).to eq 'external_tool'
+  end
+
+  it "should allow creating through the 'More Options' link" do
+    get "/courses/#{@course.id}/assignments"
+
+    #create assignment
+    f('.add_assignment').click
+    expect_new_page_load { f('.more_options').click }
+
+    f('#assignment_name').send_keys('test1')
     click_option('#assignment_submission_type', 'External Tool')
     f('#assignment_external_tool_tag_attributes_url').click
     keep_trying_until do
       fj('#context_external_tools_select td .tools .tool:first-child:visible').click
       wait_for_ajaximations
       #sleep 2 # wait for javascript to execute
-      f('#context_external_tools_select input#external_tool_create_url').should have_attribute('value', @t1.url)
+      expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t1.url)
     end
     keep_trying_until do
       ff('#context_external_tools_select td .tools .tool')[1].click
-      f('#context_external_tools_select input#external_tool_create_url').should have_attribute('value', @t2.url)
+      expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t2.url)
     end
     fj('.add_item_button:visible').click
-    f('#assignment_external_tool_tag_attributes_url').should have_attribute('value', @t2.url)
+    expect(f('#assignment_external_tool_tag_attributes_url')).to have_attribute('value', @t2.url)
     expect_new_page_load { submit_form('#edit_assignment_form') }
 
     a = @course.assignments(true).last
-    a.should be_present
-    a.submission_types.should == 'external_tool'
-    a.external_tool_tag.should be_present
-    a.external_tool_tag.url.should == @t2.url
-    a.external_tool_tag.new_tab.should be_false
+    expect(a).to be_present
+    expect(a.submission_types).to eq 'external_tool'
+    expect(a.external_tool_tag).to be_present
+    expect(a.external_tool_tag.url).to eq @t2.url
+    expect(a.external_tool_tag.new_tab).to be_falsey
   end
 
   it "should allow editing" do
@@ -53,18 +67,18 @@ describe "external tool assignments" do
 
     get "/courses/#{@course.id}/assignments/#{a.id}/edit"
     # don't display dialog on page load, since url isn't blank
-    f('#context_external_tools_select').should_not be_displayed
+    expect(f('#context_external_tools_select')).not_to be_displayed
     f('#assignment_external_tool_tag_attributes_url').click
     ff('#context_external_tools_select td .tools .tool')[0].click
-    f('#context_external_tools_select input#external_tool_create_url').should have_attribute('value', @t1.url)
+    expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t1.url)
     fj('.add_item_button:visible').click
-    f('#assignment_external_tool_tag_attributes_url').should have_attribute('value', @t1.url)
+    expect(f('#assignment_external_tool_tag_attributes_url')).to have_attribute('value', @t1.url)
 
     expect_new_page_load { submit_form('#edit_assignment_form') }
 
     a.reload
-    a.submission_types.should == 'external_tool'
-    a.external_tool_tag.should be_present
-    a.external_tool_tag.url.should == @t1.url
+    expect(a.submission_types).to eq 'external_tool'
+    expect(a.external_tool_tag).to be_present
+    expect(a.external_tool_tag.url).to eq @t1.url
   end
 end

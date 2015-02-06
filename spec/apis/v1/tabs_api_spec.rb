@@ -35,7 +35,7 @@ describe TabsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
                       { :include => ['external']})
-      json.should == [
+      expect(json).to eq [
         {
           "id" => "home",
           "html_url" => "/courses/#{@course.id}",
@@ -184,12 +184,12 @@ describe TabsController, type: :request do
                       { :include => ['external']})
 
       external_tabs = json.select {|tab| tab['type'] == 'external'}
-      external_tabs.length.should == 1
+      expect(external_tabs.length).to eq 1
       external_tabs.each do |tab|
-        tab.should include('url')
+        expect(tab).to include('url')
         uri = URI(tab['url'])
-        uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
-        uri.query.should include('id=')
+        expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        expect(uri.query).to include('id=')
       end
     end
 
@@ -197,7 +197,7 @@ describe TabsController, type: :request do
       group_with_user(:active_all => true)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :group_id => @group.to_param, :format => 'json'})
-      json.should == [
+      expect(json).to eq [
         {
           "id" => "home",
           "html_url" => "/groups/#{@group.id}",
@@ -267,8 +267,8 @@ describe TabsController, type: :request do
       @course.save
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                     :course_id => @course.to_param, :format => 'json'})
-      json.count.should == 3
-      json.each {|t| %w{home syllabus people}.should include(t['id'])}
+      expect(json.count).to eq 3
+      json.each {|t| expect(%w{home syllabus people}).to include(t['id'])}
     end
 
     describe "teacher in a course" do
@@ -289,7 +289,7 @@ describe TabsController, type: :request do
         @course.save
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
                                                                      :course_id => @course.to_param, :format => 'json'})
-        json.each { |t| t['position'].should == tab_order.find_index(@tab_lookup[t['id']]) + 1 }
+        json.each { |t| expect(t['position']).to eq tab_order.find_index(@tab_lookup[t['id']]) + 1 }
       end
 
       it 'should correctly label navigation items as unused' do
@@ -298,9 +298,9 @@ describe TabsController, type: :request do
                                                                      :course_id => @course.to_param, :format => 'json'})
         json.each do |t|
           if unused_tabs.include? t['id']
-            t['unused'].should be_true
+            expect(t['unused']).to be_truthy
           else
-            t['unused'].should be_false
+            expect(t['unused']).to be_falsey
           end
         end
       end
@@ -317,9 +317,9 @@ describe TabsController, type: :request do
                                                                      :course_id => @course.to_param, :format => 'json'})
         json.each do |t|
           if hidden_tabs.include? @tab_lookup[t['id']]
-            t['hidden'].should be_true
+            expect(t['hidden']).to be_truthy
           else
-            t['hidden'].should be_false
+            expect(t['hidden']).to be_falsey
           end
         end
       end
@@ -338,11 +338,11 @@ describe TabsController, type: :request do
                                                                      :course_id => @course.to_param, :format => 'json'})
         json.each do |t|
           if t['visibility'] == 'public'
-            public_visibility.should include(t['id'])
+            expect(public_visibility).to include(t['id'])
           elsif t['visibility'] == 'admins'
-            admins_visibility.should include(t['id'])
+            expect(admins_visibility).to include(t['id'])
           else
-            true.should be_false
+            expect(true).to be_falsey
           end
         end
       end
@@ -354,7 +354,7 @@ describe TabsController, type: :request do
         @course.save
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
                                                                      :course_id => @course.to_param, :format => 'json'})
-        json.each_with_index { |t, i| t['position'].should == i+1 }
+        json.each_with_index { |t, i| expect(t['position']).to eq i+1 }
       end
 
     end
@@ -368,8 +368,8 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                    :course_id => @course.to_param, :tab_id => tab_id,
                                                                    :format => 'json', :hidden => true})
-      json['hidden'].should == true
-      @course.reload.tab_configuration[json['position'] - 1]['hidden'].should == true
+      expect(json['hidden']).to eq true
+      expect(@course.reload.tab_configuration[json['position'] - 1]['hidden']).to eq true
     end
 
     it 'changes the position of the people tab to 2' do
@@ -378,8 +378,8 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                              :course_id => @course.to_param, :tab_id => tab_id,
                                                                              :format => 'json', :position => 2})
-      json['position'].should == 2
-      @course.reload.tab_configuration[1]['id'].should == @course.class::TAB_PEOPLE
+      expect(json['position']).to eq 2
+      expect(@course.reload.tab_configuration[1]['id']).to eq @course.class::TAB_PEOPLE
     end
 
     it "won't allow you to hide the home tab" do
@@ -388,7 +388,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                              :course_id => @course.to_param, :tab_id => tab_id,
                                                                              :format => 'json', :hidden => true})
-      result.should == 400
+      expect(result).to eq 400
     end
 
     it "won't allow you to move a tab to the first position" do
@@ -397,7 +397,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                              :course_id => @course.to_param, :tab_id => tab_id,
                                                                              :format => 'json', :position => 1})
-      result.should == 400
+      expect(result).to eq 400
     end
 
     it "won't allow you to move a tab to an invalid position" do
@@ -406,7 +406,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                                    :course_id => @course.to_param, :tab_id => tab_id,
                                                                                    :format => 'json', :position => 400})
-      result.should == 400
+      expect(result).to eq 400
     end
 
     it "doesn't allow a student to modify a tab" do
@@ -415,7 +415,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                                    :course_id => @course.to_param, :tab_id => tab_id,
                                                                                    :format => 'json', :position => 4})
-      result.should == 401
+      expect(result).to eq 401
     end
 
   end

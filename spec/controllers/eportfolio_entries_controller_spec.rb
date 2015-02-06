@@ -48,13 +48,13 @@ describe EportfolioEntriesController do
       @entry.content = [{:section_type => 'attachment', :attachment_id => attachment.id}]
       @entry.save!
       get 'show', :eportfolio_id => @portfolio.id, :id => @entry.id
-      response.should be_success
-      assigns[:category].should eql(@category)
-      assigns[:page].should eql(@entry)
-      assigns[:entries].should_not be_nil
-      assigns[:entries].should_not be_empty
-      assigns[:attachments].should_not be_nil
-      assigns[:attachments].should_not be_empty
+      expect(response).to be_success
+      expect(assigns[:category]).to eql(@category)
+      expect(assigns[:page]).to eql(@entry)
+      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:entries]).not_to be_empty
+      expect(assigns[:attachments]).not_to be_nil
+      expect(assigns[:attachments]).not_to be_empty
     end
     
     it "should work off of category and entry names" do
@@ -64,10 +64,10 @@ describe EportfolioEntriesController do
       @entry.name = "some entry"
       @entry.save!
       get 'show', :eportfolio_id => @portfolio.id, :category_name => @category.slug, :entry_name => @entry.slug
-      assigns[:category].should eql(@category)
-      assigns[:page].should eql(@entry)
-      assigns[:entries].should_not be_nil
-      assigns[:entries].should_not be_empty
+      expect(assigns[:category]).to eql(@category)
+      expect(assigns[:page]).to eql(@entry)
+      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:entries]).not_to be_empty
     end
   end
   
@@ -80,10 +80,10 @@ describe EportfolioEntriesController do
     it "should create entry" do
       user_session(@user)
       post 'create', :eportfolio_id => @portfolio.id, :eportfolio_entry => {:eportfolio_category_id => @category.id, :name => "some entry"}
-      response.should be_redirect
-      assigns[:category].should eql(@category)
-      assigns[:page].should_not be_nil
-      assigns[:page].name.should eql("some entry")
+      expect(response).to be_redirect
+      expect(assigns[:category]).to eql(@category)
+      expect(assigns[:page]).not_to be_nil
+      expect(assigns[:page].name).to eql("some entry")
     end
   end
   
@@ -97,9 +97,9 @@ describe EportfolioEntriesController do
     it "should update entry" do
       user_session(@user)
       put 'update', :eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => {:name => "new name"}
-      response.should be_redirect
-      assigns[:entry].should_not be_nil
-      assigns[:entry].name.should eql("new name")
+      expect(response).to be_redirect
+      expect(assigns[:entry]).not_to be_nil
+      expect(assigns[:entry].name).to eql("new name")
     end
   end
   
@@ -113,9 +113,9 @@ describe EportfolioEntriesController do
     it "should delete entry" do
       user_session(@user)
       delete 'destroy', :eportfolio_id => @portfolio.id, :id => @entry.id
-      response.should be_redirect
-      assigns[:entry].should_not be_nil
-      assigns[:entry].should be_frozen
+      expect(response).to be_redirect
+      expect(assigns[:entry]).not_to be_nil
+      expect(assigns[:entry]).to be_frozen
     end
   end
   
@@ -131,7 +131,7 @@ describe EportfolioEntriesController do
       begin
         get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => CanvasUUID.generate
       rescue => e
-        e.to_s.should eql("Not Found")
+        expect(e.to_s).to eql("Not Found")
       end
     end
   end

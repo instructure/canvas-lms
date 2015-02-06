@@ -46,16 +46,16 @@ describe LiveAssessments::AssessmentsController, type: :request do
         create_assessments([assessment_hash])
         data = json_parse
         assessment = LiveAssessments::Assessment.find(data['assessments'][0]['id'])
-        assessment.key.should == assessment_hash[:key]
-        assessment.title.should == assessment_hash[:title]
+        expect(assessment.key).to eq assessment_hash[:key]
+        expect(assessment.title).to eq assessment_hash[:title]
       end
 
       it "aligns an assessment when given an outcome" do
         create_assessments([assessment_hash.merge(links: {outcome: outcome.id})])
         data = json_parse
         assessment = LiveAssessments::Assessment.find(data['assessments'][0]['id'])
-        assessment.learning_outcome_alignments.count.should == 1
-        assessment.learning_outcome_alignments.first.learning_outcome.should == outcome
+        expect(assessment.learning_outcome_alignments.count).to eq 1
+        expect(assessment.learning_outcome_alignments.first.learning_outcome).to eq outcome
       end
 
       it "won't align an unrelated outcome" do
@@ -66,8 +66,8 @@ describe LiveAssessments::AssessmentsController, type: :request do
         assessment = LiveAssessments::Assessment.create!(assessment_hash.merge(context: assessment_course))
         create_assessments([assessment_hash])
         data = json_parse
-        data['assessments'].count.should == 1
-        data['assessments'][0]['id'].should == assessment.id.to_s
+        expect(data['assessments'].count).to eq 1
+        expect(data['assessments'][0]['id']).to eq assessment.id.to_s
       end
     end
 
@@ -93,9 +93,9 @@ describe LiveAssessments::AssessmentsController, type: :request do
         LiveAssessments::Assessment.create!(assessment_hash.merge(context: assessment_course, key: 'another assessment'))
         index_assessments
         data = json_parse
-        data['assessments'].count.should == 2
-        data['assessments'][0]['key'].should == assessment_hash[:key]
-        data['assessments'][1]['key'].should == 'another assessment'
+        expect(data['assessments'].count).to eq 2
+        expect(data['assessments'][0]['key']).to eq assessment_hash[:key]
+        expect(data['assessments'][1]['key']).to eq 'another assessment'
       end
     end
 

@@ -132,7 +132,7 @@ class Message < ActiveRecord::Base
   # Named scopes
   scope :for_asset_context_codes, lambda { |context_codes| where(:asset_context_code => context_codes) }
 
-  scope :for, lambda { |context| where(:context_type => context.class.base_ar_class.to_s, :context_id => context) }
+  scope :for, lambda { |context| where(:context_type => context.class.base_class.to_s, :context_id => context) }
 
   scope :after, lambda { |date| where("messages.created_at>?", date) }
 
@@ -230,6 +230,31 @@ class Message < ActiveRecord::Base
     polymorphic_url_without_context_host(subject, options)
   end
   alias_method_chain :polymorphic_url, :context_host
+
+  # Public: Helper to generate JSON suitable for publishing via Amazon SNS
+  #
+  # Currently pulls data from email template contents
+  #
+  # Returns a JSON string
+  def sns_json
+    @sns_json ||= begin
+      urls = {html_url: self.url}
+      urls[:api_url] = content(:api_url) if content(:api_url) # no templates define this right now
+      {
+        default: self.subject,
+        GCM: {
+          data: {
+            alert: self.subject,
+          }.merge(urls)
+        }.to_json,
+        APNS: {
+          aps: {
+            alert: self.subject
+          }
+        }.merge(urls).to_json
+      }.to_json
+    end
+  end
 
   # the hostname for user-specific links (e.g. setting notification prefs).
   # may be different from the asset/context host
@@ -711,6 +736,21 @@ class Message < ActiveRecord::Base
     complete_dispatch
   end
 
+  # Internal: Deliver the message through Yo.
+  #
+  # Returns nothing.
+  def deliver_via_yo
+    plugin = Canvas::Plugin.find(:yo)
+    if plugin && plugin.enabled? && plugin.setting(:api_token)
+      service = self.user.user_services.where(service: 'yo').first
+      Hey.api_token ||= plugin.setting(:api_token)
+      Hey::Yo.user(service.service_user_id, link: self.url)
+      complete_dispatch
+    else
+      cancel
+    end
+  end
+
   # Internal: Deliver the message through Facebook.
   #
   # Returns nothing.
@@ -727,6 +767,25 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_sms
     deliver_via_email
+  end
+
+  # Internal: Deliver the message using AWS SNS.
+  #
+  # Returns nothing.
+  def deliver_via_push
+    begin
+      self.user.notification_endpoints.all.each do |notification_endpoint|
+        notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
+      end
+      complete_dispatch
+    rescue StandardError => e
+      @exception = e
+      error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+      logger.error error_string
+      transmission_errors = error_string
+      cancel
+      raise e
+    end
   end
 
   private

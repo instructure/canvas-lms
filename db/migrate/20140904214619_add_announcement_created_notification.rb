@@ -17,7 +17,7 @@ class AddAnnouncementCreatedNotification < ActiveRecord::Migration
 
   def self.down
     return unless Shard.current == Shard.default
-    Notification.find_by_name('Announcement Created By You').try(:destroy)
-    Notification.find_by_name('Announcement Reply').try(:destroy)
+    Notification.where(name: 'Announcement Created By You').delete_all
+    Notification.where(name: 'Announcement Reply').delete_all
   end
 end

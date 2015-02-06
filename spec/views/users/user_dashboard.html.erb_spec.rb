@@ -31,7 +31,7 @@ describe "/users/user_dashboard" do
     assigns[:stream_items] = []
 
     render "users/user_dashboard"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should show announcements to users with no enrollments" do
@@ -47,6 +47,6 @@ describe "/users/user_dashboard" do
                                                           :end_at => Date.today + 2.days,
                                                           :subject => "My Global Announcement", :account => Account.default)]
     render "users/user_dashboard"
-    response.body.should match /My Global Announcement/
+    expect(response.body).to match /My Global Announcement/
   end
 end

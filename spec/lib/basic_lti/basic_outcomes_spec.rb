@@ -89,28 +89,28 @@ describe BasicLTI::BasicOutcomes do
       xml.css('resultData').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
-      request.code_major.should == 'success'
-      request.handle_request(tool).should be_true
+      expect(request.code_major).to eq 'success'
+      expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      submission.grade.should == (assignment.points_possible * 0.92).to_s
+      expect(submission.grade).to eq (assignment.points_possible * 0.92).to_s
     end
 
     it "accepts a result data without grade" do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-      request.code_major.should == 'success'
-      request.handle_request(tool).should be_true
+      expect(request.code_major).to eq 'success'
+      expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      submission.body.should == 'text data for canvas submission'
-      submission.grade.should be_nil
-      submission.workflow_state.should == 'submitted'
+      expect(submission.body).to eq 'text data for canvas submission'
+      expect(submission.grade).to be_nil
+      expect(submission.workflow_state).to eq 'submitted'
     end
 
     it "fails if neither result data or a grade is sent" do
       xml.css('resultData').remove
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-      request.code_major.should == 'failure'
+      expect(request.code_major).to eq 'failure'
     end
   end
 end

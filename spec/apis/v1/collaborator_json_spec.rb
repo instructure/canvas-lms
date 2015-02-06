@@ -32,12 +32,12 @@ describe Api::V1::Collaborator do
     it 'should properly serialize' do
       user = user_with_pseudonym
       collaborator = @collaboration.collaborators.create!(:user => user)
-      collaborator_json(collaborator, @current_user, nil).should == {
+      expect(collaborator_json(collaborator, @current_user, nil)).to eq({
         'collaborator_id' => user.id,
         'id'              => collaborator.id,
         'name'            => user.sortable_name,
         'type'            => 'user'
-        }
+        })
     end
   end
 
@@ -45,12 +45,12 @@ describe Api::V1::Collaborator do
     it 'should properly serialize' do
       group = group_model
       collaborator = @collaboration.collaborators.create!(:group => group)
-      collaborator_json(collaborator, @current_user, nil).should == {
+      expect(collaborator_json(collaborator, @current_user, nil)).to eq({
         'collaborator_id' => group.id,
         'id'              => collaborator.id,
         'name'            => group.name,
         'type'            => 'group'
-        }
+        })
     end
   end
 end

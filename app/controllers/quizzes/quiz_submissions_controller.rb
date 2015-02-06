@@ -23,8 +23,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   protect_from_forgery :except => [:create, :backup, :record_answer]
   before_filter :require_context
-  before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update ]
-  before_filter :require_quiz_submission, :only => [ :show ]
+  before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update, :log ]
+  before_filter :require_quiz_submission, :only => [ :show, :log ]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
@@ -62,9 +62,10 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       if @submission.preview? || (@submission.untaken? && @submission.attempt == sanitized_params[:attempt].to_i)
         @submission.mark_completed
         hash = {}
-        hash = @submission.submission_data if @submission.submission_data.is_a?(Hash) && @submission.submission_data[:attempt] == @submission.attempt
+        hash = @submission.submission_data if !@submission.graded? && @submission.submission_data[:attempt] == @submission.attempt
         params_hash = hash.deep_merge(sanitized_params) rescue sanitized_params
         @submission.submission_data = params_hash unless @submission.overdue?
+        @submission.record_answer(params_hash.dup)
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         Quizzes::SubmissionGrader.new(@submission).grade_submission
       end
@@ -158,7 +159,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   def update
     @submission = @quiz.quiz_submissions.find(params[:id])
     if authorized_action(@submission, @current_user, :update_scores)
-      @submission.update_scores(params)
+      @submission.update_scores(params.merge(:grader_id => @current_user.id))
       if params[:headless]
         redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1)
       else

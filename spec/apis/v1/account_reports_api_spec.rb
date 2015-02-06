@@ -43,13 +43,13 @@ describe 'Account Reports API', type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports",
                       { :controller => 'account_reports', :action => 'available_reports', :format => 'json', :account_id => @admin.account.id.to_s })
       json.each do |report|
-        report.key?('title').should be_true
-        report.key?('parameters').should be_true
-        report.key?('report').should be_true
+        expect(report.key?('title')).to be_truthy
+        expect(report.key?('parameters')).to be_truthy
+        expect(report.key?('report')).to be_truthy
 
         report[:parameters].each do |key, parameter|
-          parameter.key?('required').should be_true
-          parameter.key?('description').should be_true
+          expect(parameter.key?('required')).to be_truthy
+          expect(parameter.key?('description')).to be_truthy
         end unless report[:parameters].nil?
       end
     end
@@ -59,10 +59,10 @@ describe 'Account Reports API', type: :request do
     it 'should create a student report' do
       report = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { :report=> @report.report_type, :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s })
-      report.key?('id').should be_true
-      report.key?('status').should be_true
-      report.key?('progress').should be_true
-      report.key?('file_url').should be_true
+      expect(report.key?('id')).to be_truthy
+      expect(report.key?('status')).to be_truthy
+      expect(report.key?('progress')).to be_truthy
+      expect(report.key?('file_url')).to be_truthy
     end
 
     it 'should 404 for non existing reports' do
@@ -77,13 +77,13 @@ describe 'Account Reports API', type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                       { :report=> @report.report_type, :controller => 'account_reports', :action => 'index', :format => 'json', :account_id => @admin.account.id.to_s })
 
-      json.length.should >= 0
-      json.length.should <= 50
+      expect(json.length).to be >= 0
+      expect(json.length).to be <= 50
       json.each do |report|
-        report.key?('id').should be_true
-        report.key?('status').should be_true
-        report.key?('progress').should be_true
-        report.key?('file_url').should be_true
+        expect(report.key?('id')).to be_truthy
+        expect(report.key?('status')).to be_truthy
+        expect(report.key?('progress')).to be_truthy
+        expect(report.key?('file_url')).to be_truthy
       end
     end
   end
@@ -93,14 +93,14 @@ describe 'Account Reports API', type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}",
                       { :report=> @report.report_type, :controller => 'account_reports', :action => 'show', :format => 'json', :account_id => @admin.account.id.to_s, :id => @report.id.to_s })
 
-      json['id'].should == @report.id
-      json['status'].should == @report.workflow_state
-      json['progress'].should == @report.progress
-      json['file_url'].should == "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment_id}/download"
+      expect(json['id']).to eq @report.id
+      expect(json['status']).to eq @report.workflow_state
+      expect(json['progress']).to eq @report.progress
+      expect(json['file_url']).to eq "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment_id}/download"
       #test that attachment object is here, no need to test attachment json
-      json['attachment']['id'].should == @report.attachment_id
+      expect(json['attachment']['id']).to eq @report.attachment_id
       @report.parameters.each do |key, value|
-        json['parameters'][key].should == value
+        expect(json['parameters'][key]).to eq value
       end
     end
   end
@@ -110,14 +110,14 @@ describe 'Account Reports API', type: :request do
       json = api_call(:delete, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}",
                       { :report=> @report.report_type, :controller => 'account_reports', :action => 'destroy', :format => 'json', :account_id => @admin.account.id.to_s, :id => @report.id.to_s })
 
-      json['id'].should == @report.id
-      json['status'].should == @report.workflow_state
-      json['progress'].should == @report.progress
-      json['file_url'].should == "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment.id}/download"
+      expect(json['id']).to eq @report.id
+      expect(json['status']).to eq @report.workflow_state
+      expect(json['progress']).to eq @report.progress
+      expect(json['file_url']).to eq "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment.id}/download"
       @report.parameters.each do |key, value|
-        json['parameters'][key].should == value
+        expect(json['parameters'][key]).to eq value
       end
-      AccountReport.exists?(@report.id).should_not be_true
+      expect(AccountReport.exists?(@report.id)).not_to be_truthy
     end
   end
 end

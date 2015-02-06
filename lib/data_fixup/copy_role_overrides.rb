@@ -7,7 +7,7 @@ module DataFixup::CopyRoleOverrides
         unless old_role_override.invalid? || possible_new_role_overrides.detect{|ro|
           ro.context_id == old_role_override.context_id &&
           ro.context_type == old_role_override.context_type &&
-          ro.enrollment_type == old_role_override.enrollment_type
+          ro.role_id == old_role_override.role_id
         }
 
           dup = RoleOverride.new

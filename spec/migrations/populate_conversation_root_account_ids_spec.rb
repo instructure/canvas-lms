@@ -22,7 +22,7 @@ require 'db/migrate/20120402054921_populate_conversation_root_account_ids.rb'
 describe 'PopulateConversationRootAccountIds' do
   describe "up" do
     it "should work" do
-      pending "no longer possible since context_messages no longer exists"
+      skip "no longer possible since context_messages no longer exists"
       u = user
 
       # messages w/ account contexts
@@ -33,7 +33,7 @@ describe 'PopulateConversationRootAccountIds' do
       cn1.add_message(u, "test1").update_attribute(:context, a1a)
       cn1.add_message(u, "test2").update_attribute(:context, a1a)
       cn1.add_message(u, "test3").update_attribute(:context, a1b)
-      cn1.root_account_ids.should eql []
+      expect(cn1.root_account_ids).to eql []
 
       # context message on course
       u2 = user
@@ -43,7 +43,7 @@ describe 'PopulateConversationRootAccountIds' do
       cn2.add_message(u, "test")
       Conversation.connection.execute "INSERT INTO context_messages(context_id, context_type) VALUES(#{c2.id}, 'Course')"
       cn2.conversation_messages.update_all("context_message_id = (SELECT id FROM context_messages ORDER BY id DESC LIMIT 1)")
-      cn2.root_account_ids.should eql []
+      expect(cn2.root_account_ids).to eql []
 
       # context message on group
       u3 = user
@@ -54,7 +54,7 @@ describe 'PopulateConversationRootAccountIds' do
       cn3.add_message(u, "test")
       Conversation.connection.execute "INSERT INTO context_messages(context_id, context_type) VALUES(#{g3.id}, 'Group')"
       cn3.conversation_messages.update_all("context_message_id = (SELECT id FROM context_messages ORDER BY id DESC LIMIT 1)")
-      cn3.root_account_ids.should eql []
+      expect(cn3.root_account_ids).to eql []
 
       # submission
       u4 = user
@@ -65,7 +65,7 @@ describe 'PopulateConversationRootAccountIds' do
       s4 = as4.submit_homework(u4, :submission_type => "online_text_entry", :body => "")
       cn4 = Conversation.initiate([u, u4], true)
       cn4.add_message(u, '').update_attribute(:asset, s4)
-      cn4.root_account_ids.should eql []
+      expect(cn4.root_account_ids).to eql []
 
       # no root account info available
       u5 = user
@@ -74,11 +74,11 @@ describe 'PopulateConversationRootAccountIds' do
 
       PopulateConversationRootAccountIds.up
 
-      cn1.reload.root_account_ids.should eql [a1a.id, a1b.id]
-      cn2.reload.root_account_ids.should eql [a2.id]
-      cn3.reload.root_account_ids.should eql [a3.id]
-      cn4.reload.root_account_ids.should eql [a4.id]
-      cn5.reload.root_account_ids.should eql []
+      expect(cn1.reload.root_account_ids).to eql [a1a.id, a1b.id]
+      expect(cn2.reload.root_account_ids).to eql [a2.id]
+      expect(cn3.reload.root_account_ids).to eql [a3.id]
+      expect(cn4.reload.root_account_ids).to eql [a4.id]
+      expect(cn5.reload.root_account_ids).to eql []
     end
   end
 end

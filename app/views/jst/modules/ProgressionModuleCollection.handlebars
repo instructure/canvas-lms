@@ -9,7 +9,7 @@
     <ul class="collectionViewItems"></ul>
   {{else}}
     {{#if collection.atLeastOnePageFetched}}
-      {{#t "no_modules_found"}}No modules were found{{/t}}
+      <p class="message">{{#t "no_modules_found"}}No modules were found{{/t}}</p>
     {{/if}}
   {{/if}}
 </div>

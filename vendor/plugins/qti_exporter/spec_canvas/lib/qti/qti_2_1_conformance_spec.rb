@@ -20,7 +20,7 @@ if Qti.migration_executable
       @migration.migration_settings[:files_import_root_path] = @course_data[:files_import_root_path]
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
-      @migration.migration_issues.should be_empty
+      expect(@migration.migration_issues).to be_empty
     end
 
     after :each do
@@ -31,53 +31,53 @@ if Qti.migration_executable
 
     it "should import VE_IP_01" do
       import_fixture('VE_IP_01.zip')
-      @course.quizzes.count.should == 0
-      @course.assessment_questions.count.should == 1
+      expect(@course.quizzes.count).to eq 0
+      expect(@course.assessment_questions.count).to eq 1
       q = @course.assessment_questions.first
-      q.name.should == "QTI v2.1 Entry Profile Single T/F Item Test Instance"
+      expect(q.name).to eq "QTI v2.1 Entry Profile Single T/F Item Test Instance"
 
-      q.question_data['question_text'].should include("Answer the following question.")
-      q.question_data['question_text'].should include("Sigmund Freud and Carl Jung both belong to the psychoanalytic school of psychology.")
+      expect(q.question_data['question_text']).to include("Answer the following question.")
+      expect(q.question_data['question_text']).to include("Sigmund Freud and Carl Jung both belong to the psychoanalytic school of psychology.")
 
-      q.question_data['question_type'].should == 'multiple_choice_question'
-      q.question_data['answers'].count.should == 2
+      expect(q.question_data['question_type']).to eq 'multiple_choice_question'
+      expect(q.question_data['answers'].count).to eq 2
       answers = q.question_data['answers'].sort_by{|h| h['migration_id']}
-      answers.map{|a| a['text']}.sort.should == ['False', 'True']
-      answers.map{|a| a['weight']}.sort.should == [0, 100]
+      expect(answers.map{|a| a['text']}.sort).to eq ['False', 'True']
+      expect(answers.map{|a| a['weight']}.sort).to eq [0, 100]
     end
 
     it "should import VE_IP_02" do
       import_fixture('VE_IP_02.zip')
 
-      @course.quizzes.count.should == 0
-      @course.assessment_questions.count.should == 1
+      expect(@course.quizzes.count).to eq 0
+      expect(@course.assessment_questions.count).to eq 1
       q = @course.assessment_questions.first
-      q.attachments.count.should == 1
+      expect(q.attachments.count).to eq 1
       att = q.attachments.first
 
-      q.name.should == "QTI v2.1 Entry Profile Single MC/SR Item Test Instance"
+      expect(q.name).to eq "QTI v2.1 Entry Profile Single MC/SR Item Test Instance"
 
       ["<img id=\"figure1\" height=\"165\" width=\"250\" src=\"/assessment_questions/#{q.id}/files/#{att.id}/download?verifier=#{att.uuid}\" alt=\"Figure showing Rectangle ABCD divided into 12 equal boxes. 4 of the boxes are shaded.\">",
         "<span id=\"labelA\">A</span>", "<span id=\"labelB\">B</span>", "<span id=\"labelC\">C</span>", "<span id=\"labelD\">D</span>",
         "In the figure above, what fraction of the rectangle <em>ABCD</em> is", "shaded?"
       ].each do |text|
-        q.question_data['question_text'].should include(text)
+        expect(q.question_data['question_text']).to include(text)
       end
 
-      q.question_data['question_type'].should == 'multiple_choice_question'
+      expect(q.question_data['question_type']).to eq 'multiple_choice_question'
       answers = q.question_data['answers'].sort_by{|h| h['migration_id']}
-      answers.count.should == 5
-      answers.map{|h| h['weight']}.should == [0, 0, 0, 100, 0]
+      expect(answers.count).to eq 5
+      expect(answers.map{|h| h['weight']}).to eq [0, 0, 0, 100, 0]
     end
 
     it "should import VE_IP_03" do
       import_fixture('VE_IP_03.zip')
-      @course.quizzes.count.should == 0
-      @course.assessment_questions.count.should == 1
+      expect(@course.quizzes.count).to eq 0
+      expect(@course.assessment_questions.count).to eq 1
       q = @course.assessment_questions.first
 
-      q.name.should == "QTI v2.1 Entry Profile Single MC/MR Item Test Instance"
-      q.question_data['question_text'].split("\n").map(&:strip).should == [
+      expect(q.name).to eq "QTI v2.1 Entry Profile Single MC/MR Item Test Instance"
+      expect(q.question_data['question_text'].split("\n").map(&:strip)).to eq [
         "<span id=\"a\">Ms. Smith's class contains 24 students. </span>",
         "<span id=\"b\">Each student voted for his or her favorite color. </span>",
         "<span id=\"c\">The result of the class vote is shown </span>",
@@ -86,11 +86,11 @@ if Qti.migration_executable
       ]
 
 
-      q.question_data['question_type'].should == 'multiple_answers_question'
+      expect(q.question_data['question_type']).to eq 'multiple_answers_question'
       answers = q.question_data['answers'].sort_by{|h| h['migration_id']}
-      answers.count.should == 5
-      answers.map{|h| h['weight']}.should == [100, 100, 0, 100, 0]
-      answers.map{|h| h['text']}.should == [
+      expect(answers.count).to eq 5
+      expect(answers.map{|h| h['weight']}).to eq [100, 100, 0, 100, 0]
+      expect(answers.map{|h| h['text']}).to eq [
         "The majority of students voted for Red.",
         "Twice as many students voted for Red a voted for Blue.",
         "Two percent of students voted for Yellow.",
@@ -101,66 +101,66 @@ if Qti.migration_executable
 
     it "should import VE_IP_04" do
       import_fixture('VE_IP_04.zip')
-      @course.quizzes.count.should == 0
-      @course.assessment_questions.count.should == 1
+      expect(@course.quizzes.count).to eq 0
+      expect(@course.assessment_questions.count).to eq 1
       q = @course.assessment_questions.first
 
-      q.name.should == "QTI v2.1 Entry Profile Single FIB Item Test Instance"
-      q.question_data['question_text'].should include("Canada and the United States share 4 out of the 5 Great Lakes in central North America.")
-      q.question_data['question_text'].should include("Which lake is entirely within the boundaries of the United States?")
-      q.question_data['question_text'].should include("Type your answer here: [RESPONSE]")
+      expect(q.name).to eq "QTI v2.1 Entry Profile Single FIB Item Test Instance"
+      expect(q.question_data['question_text']).to include("Canada and the United States share 4 out of the 5 Great Lakes in central North America.")
+      expect(q.question_data['question_text']).to include("Which lake is entirely within the boundaries of the United States?")
+      expect(q.question_data['question_text']).to include("Type your answer here: [RESPONSE]")
 
-      q.question_data['question_type'].should == 'fill_in_multiple_blanks_question'
-      q.question_data['answers'].count.should == 1
+      expect(q.question_data['question_type']).to eq 'fill_in_multiple_blanks_question'
+      expect(q.question_data['answers'].count).to eq 1
       answer = q.question_data['answers'].first
-      answer['weight'].should == 100
-      answer['text'].should == 'Lake Michigan'
-      answer['blank_id'].should == 'RESPONSE'
+      expect(answer['weight']).to eq 100
+      expect(answer['text']).to eq 'Lake Michigan'
+      expect(answer['blank_id']).to eq 'RESPONSE'
     end
 
     it "should import VE_IP_05" do
       import_fixture('VE_IP_05.zip')
-      @course.quizzes.count.should == 0
-      @course.assessment_questions.count.should == 1
+      expect(@course.quizzes.count).to eq 0
+      expect(@course.assessment_questions.count).to eq 1
       q = @course.assessment_questions.first
 
-      q.name.should == "QTI v2.1 Entry Profile Single Essay Item Test Instance"
+      expect(q.name).to eq "QTI v2.1 Entry Profile Single Essay Item Test Instance"
 
-      q.attachments.count.should == 3
+      expect(q.attachments.count).to eq 3
       q.attachments.each do |att|
-        q.question_data['question_text'].should include("src=\"/assessment_questions/#{q.id}/files/#{att.id}/download?verifier=#{att.uuid}\"")
+        expect(q.question_data['question_text']).to include("src=\"/assessment_questions/#{q.id}/files/#{att.id}/download?verifier=#{att.uuid}\"")
       end
 
-      q.question_data['question_type'].should == 'essay_question'
-      q.question_data['answers'].count.should == 0
+      expect(q.question_data['question_type']).to eq 'essay_question'
+      expect(q.question_data['answers'].count).to eq 0
     end
 
     it "should import VE_IP_06" do
-      pending('hotspot questions')
+      skip('hotspot questions')
       import_fixture('VE_IP_06.zip')
     end
 
     it "should import VE_IP_07" do
       import_fixture('VE_IP_07.zip')
-      @course.quizzes.count.should == 0
-      @course.assessment_questions.count.should == 1
+      expect(@course.quizzes.count).to eq 0
+      expect(@course.assessment_questions.count).to eq 1
       q = @course.assessment_questions.first
 
-      q.name.should == "QTI v2.1 Core Profile Single Pattern Match Item Test Instance"
-      q.question_data['question_text'].split("\n").map(&:strip).select{|s| s.length > 0}.should == [
+      expect(q.name).to eq "QTI v2.1 Core Profile Single Pattern Match Item Test Instance"
+      expect(q.question_data['question_text'].split("\n").map(&:strip).select{|s| s.length > 0}).to eq [
         "Match the following characters to the Shakespeare play they appeared in:",
         "Capulet", "Demetrius", "Lysander", "Prospero",
         "A Midsummer-Night's Dream", "Romeo and Juliet", "The Tempest"
       ]
 
-      q.question_data['question_type'].should == 'matching_question'
+      expect(q.question_data['question_type']).to eq 'matching_question'
       answers = q.question_data['answers'].sort_by{|h| h['text']}
-      answers.count.should == 4
+      expect(answers.count).to eq 4
       matches = q.question_data['matches']
-      matches.count.should == 3
+      expect(matches.count).to eq 3
 
-      answers.map{|h| h['text']}.should == ["Capulet", "Demetrius", "Lysander", "Prospero"]
-      answers.map{|h| h['right']}.should == [
+      expect(answers.map{|h| h['text']}).to eq ["Capulet", "Demetrius", "Lysander", "Prospero"]
+      expect(answers.map{|h| h['right']}).to eq [
         "Romeo and Juliet",
         "A Midsummer-Night's Dream",
         "A Midsummer-Night's Dream",
@@ -169,14 +169,14 @@ if Qti.migration_executable
 
       answers.each do |h|
         match = matches.detect{|m| m['match_id'] == h['match_id']}
-        match['text'].should == h['right']
+        expect(match['text']).to eq h['right']
       end
     end
 
     it "should import VE_IP_11" do
       import_fixture('VE_IP_11.zip')
-      @course.assessment_questions.count.should == 5
-      @course.assessment_questions.map{|q| q.question_data['question_type']}.sort.should == [
+      expect(@course.assessment_questions.count).to eq 5
+      expect(@course.assessment_questions.map{|q| q.question_data['question_type']}.sort).to eq [
         "essay_question",
         "fill_in_multiple_blanks_question",
         "multiple_answers_question",
@@ -187,100 +187,100 @@ if Qti.migration_executable
 
     it "should import VE_TP_01" do
       import_fixture('VE_TP_01.zip')
-      @course.assessment_questions.count.should == 1
-      @course.quizzes.count.should == 1
+      expect(@course.assessment_questions.count).to eq 1
+      expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
-      quiz.quiz_questions.count.should == 2
+      expect(quiz.quiz_questions.count).to eq 2
 
       header = quiz.quiz_questions.detect{|q| q.position == 1}
-      header.question_data['question_type'].should == 'text_only_question'
-      header.question_data['question_text'].should == "QTI v2.1 Entry Profile Single Section Instance"
+      expect(header.question_data['question_type']).to eq 'text_only_question'
+      expect(header.question_data['question_text']).to eq "QTI v2.1 Entry Profile Single Section Instance"
 
       question = quiz.quiz_questions.detect{|q| q.position == 2}
-      question.question_data['question_type'].should == 'multiple_choice_question'
-      question.assessment_question_id.should == @course.assessment_questions.first.id
+      expect(question.question_data['question_type']).to eq 'multiple_choice_question'
+      expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
     it "should import VE_TP_02" do
       import_fixture('VE_TP_02.zip')
-      @course.assessment_questions.count.should == 1
-      @course.quizzes.count.should == 1
+      expect(@course.assessment_questions.count).to eq 1
+      expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
-      quiz.quiz_questions.count.should == 2
+      expect(quiz.quiz_questions.count).to eq 2
 
       header = quiz.quiz_questions.detect{|q| q.position == 1}
-      header.question_data['question_type'].should == 'text_only_question'
-      header.question_data['question_text'].should == "QTI v2.1 Entry Profile Single Section Instance"
+      expect(header.question_data['question_type']).to eq 'text_only_question'
+      expect(header.question_data['question_text']).to eq "QTI v2.1 Entry Profile Single Section Instance"
 
       question = quiz.quiz_questions.detect{|q| q.position == 2}
-      question.question_data['question_type'].should == 'multiple_choice_question'
-      question.assessment_question_id.should == @course.assessment_questions.first.id
+      expect(question.question_data['question_type']).to eq 'multiple_choice_question'
+      expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
     it "should import VE_TP_03" do
       import_fixture('VE_TP_03.zip')
-      @course.assessment_questions.count.should == 1
-      @course.quizzes.count.should == 1
+      expect(@course.assessment_questions.count).to eq 1
+      expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
-      quiz.quiz_questions.count.should == 2
+      expect(quiz.quiz_questions.count).to eq 2
 
       header = quiz.quiz_questions.detect{|q| q.position == 1}
-      header.question_data['question_type'].should == 'text_only_question'
-      header.question_data['question_text'].should == "QTI v2.1 Entry Profile Single Section Instance"
+      expect(header.question_data['question_type']).to eq 'text_only_question'
+      expect(header.question_data['question_text']).to eq "QTI v2.1 Entry Profile Single Section Instance"
 
       question = quiz.quiz_questions.detect{|q| q.position == 2}
-      question.question_data['question_type'].should == 'multiple_answers_question'
-      question.assessment_question_id.should == @course.assessment_questions.first.id
+      expect(question.question_data['question_type']).to eq 'multiple_answers_question'
+      expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
     it "should import VE_TP_04" do
       import_fixture('VE_TP_04.zip')
-      @course.assessment_questions.count.should == 1
-      @course.quizzes.count.should == 1
+      expect(@course.assessment_questions.count).to eq 1
+      expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
-      quiz.quiz_questions.count.should == 2
+      expect(quiz.quiz_questions.count).to eq 2
 
       header = quiz.quiz_questions.detect{|q| q.position == 1}
-      header.question_data['question_type'].should == 'text_only_question'
-      header.question_data['question_text'].should == "QTI v2.1 Entry Profile Single Section Instance"
+      expect(header.question_data['question_type']).to eq 'text_only_question'
+      expect(header.question_data['question_text']).to eq "QTI v2.1 Entry Profile Single Section Instance"
 
       question = quiz.quiz_questions.detect{|q| q.position == 2}
-      question.question_data['question_type'].should == 'fill_in_multiple_blanks_question'
-      question.assessment_question_id.should == @course.assessment_questions.first.id
+      expect(question.question_data['question_type']).to eq 'fill_in_multiple_blanks_question'
+      expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
     it "should import VE_TP_05" do
       import_fixture('VE_TP_05.zip')
-      @course.assessment_questions.count.should == 1
-      @course.quizzes.count.should == 1
+      expect(@course.assessment_questions.count).to eq 1
+      expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
-      quiz.quiz_questions.count.should == 2
+      expect(quiz.quiz_questions.count).to eq 2
 
       header = quiz.quiz_questions.detect{|q| q.position == 1}
-      header.question_data['question_type'].should == 'text_only_question'
-      header.question_data['question_text'].should == "QTI v2.1 Entry Profile Single Section Instance"
+      expect(header.question_data['question_type']).to eq 'text_only_question'
+      expect(header.question_data['question_text']).to eq "QTI v2.1 Entry Profile Single Section Instance"
 
       question = quiz.quiz_questions.detect{|q| q.position == 2}
-      question.question_data['question_type'].should == 'essay_question'
-      question.assessment_question_id.should == @course.assessment_questions.first.id
+      expect(question.question_data['question_type']).to eq 'essay_question'
+      expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
     it "should import VE_TP_06" do
       import_fixture('VE_TP_06.zip')
-      @course.assessment_questions.count.should == 5
-      @course.quizzes.count.should == 1
+      expect(@course.assessment_questions.count).to eq 5
+      expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
-      quiz.quiz_questions.count.should == 6
+      expect(quiz.quiz_questions.count).to eq 6
 
       header = quiz.quiz_questions.detect{|q| q.position == 1}
-      header.question_data['question_text'].should == "QTI v2.1 Entry Profile Single Section Instance with Multiple Items"
+      expect(header.question_data['question_text']).to eq "QTI v2.1 Entry Profile Single Section Instance with Multiple Items"
 
       questions = quiz.quiz_questions.sort_by(&:position)
-      questions.map{|q| q.question_data['question_type']}.should == [
+      expect(questions.map{|q| q.question_data['question_type']}).to eq [
         "text_only_question", "multiple_choice_question", "multiple_choice_question",
         "multiple_answers_question", "fill_in_multiple_blanks_question", "essay_question"
       ]
-      questions.select{|q| q.position > 1}.map(&:assessment_question_id).sort.should == @course.assessment_questions.map(&:id).sort
+      expect(questions.select{|q| q.position > 1}.map(&:assessment_question_id).sort).to eq @course.assessment_questions.map(&:id).sort
     end
 
   end

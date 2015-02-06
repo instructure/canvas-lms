@@ -27,14 +27,14 @@ describe SubAccountsController do
       
       post 'create', :account_id => root_account.id, :account => { :parent_account_id => root_account.id, :name => 'sub account' }
       sub_account = assigns[:sub_account]
-      sub_account.should_not be_nil
+      expect(sub_account).not_to be_nil
       
       post 'create', :account_id => root_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 1' }
       sub_sub_account_1 = assigns[:sub_account]
-      sub_sub_account_1.should_not be_nil
-      sub_sub_account_1.name.should == 'sub sub account 1'
-      sub_sub_account_1.parent_account.should == sub_account
-      sub_sub_account_1.root_account.should == root_account
+      expect(sub_sub_account_1).not_to be_nil
+      expect(sub_sub_account_1.name).to eq 'sub sub account 1'
+      expect(sub_sub_account_1.parent_account).to eq sub_account
+      expect(sub_sub_account_1.root_account).to eq root_account
     end
     
     it "should create sub-accounts with the right root account when inside a sub account" do
@@ -46,10 +46,10 @@ describe SubAccountsController do
       
       post 'create', :account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }
       sub_sub_account_2 = assigns[:sub_account]
-      sub_sub_account_2.should_not be_nil
-      sub_sub_account_2.name.should == 'sub sub account 2'
-      sub_sub_account_2.parent_account.should == sub_account
-      sub_sub_account_2.root_account.should == root_account
+      expect(sub_sub_account_2).not_to be_nil
+      expect(sub_sub_account_2.name).to eq 'sub sub account 2'
+      expect(sub_sub_account_2.parent_account).to eq sub_account
+      expect(sub_sub_account_2.root_account).to eq root_account
     end
   end
 
@@ -91,28 +91,28 @@ describe SubAccountsController do
       get 'index', :account_id => root_account.id
 
       @accounts = assigns[:accounts]
-      @accounts[root_account.id][:sub_account_count].should == 5
-      @accounts[root_account.id][:course_count].should == 0
-      @accounts[root_account.id][:sub_account_ids].sort.should == [sub_account_1.id, sub_account_2.id, sub_account_3.id, sub_account_4.id, sub_account_5.id].sort
+      expect(@accounts[root_account.id][:sub_account_count]).to eq 5
+      expect(@accounts[root_account.id][:course_count]).to eq 0
+      expect(@accounts[root_account.id][:sub_account_ids].sort).to eq [sub_account_1.id, sub_account_2.id, sub_account_3.id, sub_account_4.id, sub_account_5.id].sort
 
-      @accounts[sub_account_1.id][:sub_account_count].should == 0
-      @accounts[sub_account_1.id][:course_count].should == 0
-      @accounts[sub_account_1.id][:sub_account_ids].should == []
+      expect(@accounts[sub_account_1.id][:sub_account_count]).to eq 0
+      expect(@accounts[sub_account_1.id][:course_count]).to eq 0
+      expect(@accounts[sub_account_1.id][:sub_account_ids]).to eq []
 
-      @accounts[sub_account_2.id][:sub_account_count].should == 0
-      @accounts[sub_account_2.id][:course_count].should == 1
+      expect(@accounts[sub_account_2.id][:sub_account_count]).to eq 0
+      expect(@accounts[sub_account_2.id][:course_count]).to eq 1
 
-      @accounts[sub_account_3.id][:sub_account_count].should == 0
-      @accounts[sub_account_3.id][:course_count].should == 1
+      expect(@accounts[sub_account_3.id][:sub_account_count]).to eq 0
+      expect(@accounts[sub_account_3.id][:course_count]).to eq 1
 
-      @accounts[sub_account_4.id][:sub_account_count].should == 1
-      @accounts[sub_account_4.id][:sub_account_ids].should == [sub_sub_account.id]
-      @accounts[sub_sub_account.id][:sub_account_count].should == 1
-      @accounts[sub_sub_account.id][:sub_account_ids].should == []
-      @accounts[sub_sub_sub_account.id].should be_nil
+      expect(@accounts[sub_account_4.id][:sub_account_count]).to eq 1
+      expect(@accounts[sub_account_4.id][:sub_account_ids]).to eq [sub_sub_account.id]
+      expect(@accounts[sub_sub_account.id][:sub_account_count]).to eq 1
+      expect(@accounts[sub_sub_account.id][:sub_account_ids]).to eq []
+      expect(@accounts[sub_sub_sub_account.id]).to be_nil
 
-      @accounts[sub_account_5.id][:sub_account_count].should == 150
-      @accounts[sub_account_2.id][:sub_account_ids].should == []
+      expect(@accounts[sub_account_5.id][:sub_account_count]).to eq 150
+      expect(@accounts[sub_account_2.id][:sub_account_ids]).to eq []
     end
   end
 end

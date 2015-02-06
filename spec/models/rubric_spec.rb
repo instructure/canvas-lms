@@ -51,9 +51,9 @@ describe Rubric do
         }
       ]
       @rubric.save!
-      @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments(true).should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric).not_to be_new_record
+      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
     end
     
     it "should delete learning outcome tags when they no longer exist" do
@@ -81,9 +81,9 @@ describe Rubric do
         }
       ]
       @rubric.save!
-      @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments(true).should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric).not_to be_new_record
+      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @rubric.data = [{
         :points => 5,
         :description => "Row",
@@ -104,7 +104,7 @@ describe Rubric do
         ]
       }]
       @rubric.save!
-      @rubric.learning_outcome_alignments.active.should be_empty
+      expect(@rubric.learning_outcome_alignments.active).to be_empty
     end
 
     it "should create learning outcome associations for multiple outcome rows" do
@@ -153,9 +153,9 @@ describe Rubric do
         }
       ]
       @rubric.save!
-      @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments(true).should_not be_empty
-      @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
+      expect(@rubric).not_to be_new_record
+      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, @outcome2.id].sort)
     end
 
     it "should create outcome results when outcome-aligned rubrics are assessed" do
@@ -183,14 +183,14 @@ describe Rubric do
         }
       ]
       @rubric.save!
-      @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments(true).should_not be_empty
-      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
+      expect(@rubric).not_to be_new_record
+      expect(@rubric.learning_outcome_alignments(true)).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @assignment.learning_outcome_alignments.should_not be_empty
+      expect(@assignment.learning_outcome_alignments).not_to be_empty
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @assessment = @a.assess({
         :user => @user,
@@ -204,14 +204,14 @@ describe Rubric do
           }
         }
       })
-      @outcome.learning_outcome_results.should_not be_empty
+      expect(@outcome.learning_outcome_results).not_to be_empty
       @result = @outcome.learning_outcome_results.first
-      @result.user_id.should eql(@user.id)
-      @result.score.should eql(2.0)
-      @result.possible.should eql(3.0)
-      @result.original_score.should eql(2.0)
-      @result.original_possible.should eql(3.0)
-      @result.mastery.should be_false
+      expect(@result.user_id).to eql(@user.id)
+      expect(@result.score).to eql(2.0)
+      expect(@result.possible).to eql(3.0)
+      expect(@result.original_score).to eql(2.0)
+      expect(@result.original_possible).to eql(3.0)
+      expect(@result.mastery).to be_falsey
       n = @result.version_number
       @assessment = @a.assess({
         :user => @user,
@@ -226,11 +226,11 @@ describe Rubric do
         }
       })
       @result.reload
-      @result.version_number.should > n
-      @result.score.should eql(3.0)
-      @result.possible.should eql(3.0)
-      @result.original_score.should eql(2.0)
-      @result.mastery.should be_true
+      expect(@result.version_number).to be > n
+      expect(@result.score).to eql(3.0)
+      expect(@result.possible).to eql(3.0)
+      expect(@result.original_score).to eql(2.0)
+      expect(@result.mastery).to be_truthy
     end
   end
 
@@ -262,8 +262,8 @@ describe Rubric do
       @rubric.save!
 
       @rubric2 = Rubric.find(@rubric.id)
-      @rubric2.data.first[:points].should eql(0.5)
-      @rubric2.data.first[:ratings].first[:points].should eql(0.5)
+      expect(@rubric2.data.first[:points]).to eql(0.5)
+      expect(@rubric2.data.first[:ratings].first[:points]).to eql(0.5)
     end
   end
 
@@ -272,20 +272,20 @@ describe Rubric do
 
     r1 = Rubric.new :title => "rubric", :context => @course
     r1.save!
-    r1.title.should eql "rubric"
+    expect(r1.title).to eql "rubric"
 
     r2 = Rubric.new :title => "rubric", :context => @course
     r2.save!
-    r2.title.should eql "rubric (1)"
+    expect(r2.title).to eql "rubric (1)"
 
     r1.destroy
 
     r3 = Rubric.create! :title => "rubric", :context => @course
-    r3.title.should eql "rubric"
+    expect(r3.title).to eql "rubric"
 
     r3.title = "rubric"
     r3.save!
-    r3.title.should eql "rubric"
+    expect(r3.title).to eql "rubric"
   end
 
   context "#update_with_association" do
@@ -297,7 +297,7 @@ describe Rubric do
     end
 
     def test_rubric_associations(opts)
-      @rubric.should be_new_record
+      expect(@rubric).to be_new_record
       # need to run the test 2x because the code path is different for new rubrics
       2.times do
         @rubric.update_with_association(@teacher, {
@@ -323,15 +323,15 @@ describe Rubric do
 
     it "doesn't accidentally update assignment points" do
       test_rubric_associations(leave_different: true) do
-        @rubric.points_possible.should == 15
-        @assignment.reload.points_possible.should == 20
+        expect(@rubric.points_possible).to eq 15
+        expect(@assignment.reload.points_possible).to eq 20
       end
     end
 
     it "does update assignment points if you want it to" do
       test_rubric_associations(leave_different: false) do
-        @rubric.points_possible.should == 15
-        @assignment.reload.points_possible.should == 15
+        expect(@rubric.points_possible).to eq 15
+        expect(@assignment.reload.points_possible).to eq 15
       end
     end
   end

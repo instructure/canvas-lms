@@ -34,13 +34,13 @@ describe ToolProxyBinding do
     it 'requires a context' do
       subject.context = nil
       subject.save
-      subject.errors.first.should == [:context, "can't be blank"]
+      expect(subject.errors.first).to eq [:context, "can't be blank"]
     end
 
     it 'requires a tool_proxy' do
       subject.tool_proxy = nil
       subject.save
-      subject.errors.first.should == [:tool_proxy, "can't be blank"]
+      expect(subject.errors.first).to eq [:tool_proxy, "can't be blank"]
     end
 
   end

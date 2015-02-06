@@ -4,9 +4,11 @@ define [
   'react'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-  'compiled/views/FileBrowserView'
+  '../modules/BBTreeBrowserView'
+  'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
-], (I18n, $, React, withReactDOM, preventDefault, FileBrowserView, customPropTypes) ->
+  '../utils/moveStuff'
+], (I18n, $, React, withReactDOM, preventDefault, BBTreeBrowserView, RootFoldersFinder, customPropTypes, moveStuff) ->
 
   MoveDialog = React.createClass
     displayName: 'MoveDialog'
@@ -28,28 +30,37 @@ define [
         item: @props.thingsToMove[0]?.displayName()
       })
 
-      new FileBrowserView({
-        onlyShowFolders: true,
+      rootFoldersFinder = new RootFoldersFinder({
         rootFoldersToShow: @props.rootFoldersToShow
-        onClick: @onSelectFolder
-      }).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode()).find(':tabbable:first').focus();
+      })
+
+      @treeBrowserViewId = BBTreeBrowserView.create({
+          onlyShowFolders: true,
+          rootModelsFinder: rootFoldersFinder
+          rootFoldersToShow: @props.rootFoldersToShow
+          onClick: @onSelectFolder
+          focusStyleClass: 'MoveDialog__folderItem--focused'
+          selectedStyleClass: 'MoveDialog__folderItem--selected'
+        },
+        {
+          element: @refs.FolderTreeHolder.getDOMNode()
+        }).index
+
+      BBTreeBrowserView.getView(@treeBrowserViewId).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode()).find(':tabbable:first').focus()
+
+    componentWillUnmount: ->
+      BBTreeBrowserView.remove(@treeBrowserViewId)
 
     onSelectFolder: (event, folder) ->
       event.preventDefault()
       @setState(destinationFolder: folder)
 
     submit: ->
-      promises = @props.thingsToMove.map (thing) => thing.moveTo(@state.destinationFolder)
-      $(@refs.form.getDOMNode()).disableWhileLoading $.when(promises...).then =>
+      promise = moveStuff(@props.thingsToMove, @state.destinationFolder)
+      promise.then =>
         @props.closeDialog()
-        $.flashMessage(I18n.t('move_success', {
-          one: "%{item} moved to %{destinationFolder}",
-          other: "%{count} items moved to %{destinationFolder}"
-        }, {
-          count: @props.thingsToMove.length
-          item: @props.thingsToMove[0]?.displayName()
-          destinationFolder: @state.destinationFolder.displayName()
-        }))
+        BBTreeBrowserView.refresh()
+      $(@refs.form.getDOMNode()).disableWhileLoading(promise)
 
 
     render: withReactDOM ->

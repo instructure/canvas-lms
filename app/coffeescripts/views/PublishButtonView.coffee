@@ -3,8 +3,9 @@ define [
   'jquery'
   'compiled/fn/preventDefault'
   'Backbone'
+  'str/htmlEscape'
   'jquery.instructure_forms'
-], (I18n, $, preventDefault, Backbone) ->
+], (I18n, $, preventDefault, Backbone, htmlEscape) ->
 
   class PublishButton extends Backbone.View
     disabledClass: 'disabled'
@@ -167,7 +168,7 @@ define [
       @$el.attr 'aria-pressed', options.buttonClass is @publishedClass
       @$icon.addClass options.iconClass
 
-      @$text.html "&nbsp;#{options.text}"
+      @$text.html "&nbsp;#{htmlEscape(options.text)}"
 
       # unpublishable
       if !@model.get('unpublishable')? or @model.get('unpublishable')

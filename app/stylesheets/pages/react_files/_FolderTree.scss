@@ -1,0 +1,9 @@
+.FolderTree__folderItem--selected {
+  font-weight: bold;
+}
+
+.FolderTree__folderItem--focused {
+  & > .folderLabel {
+    background-color: $base-list-item-background--hover;
+  }
+}

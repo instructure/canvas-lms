@@ -31,14 +31,14 @@ describe Announcement do
       course.save!
       announcement = course.announcements.create!(valid_announcement_attributes)
 
-      announcement.should be_locked
+      expect(announcement).to be_locked
     end
 
     it "should not lock if its course does not have the lock_all_announcements setting" do
       course = Course.create!
       announcement = course.announcements.create!(valid_announcement_attributes)
 
-      announcement.should_not be_locked
+      expect(announcement).not_to be_locked
     end
 
     it "should not automatically lock if it is a delayed post" do
@@ -49,7 +49,7 @@ describe Announcement do
       announcement.workflow_state = 'post_delayed'
       announcement.save!
 
-      announcement.should be_post_delayed
+      expect(announcement).to be_post_delayed
     end
 
     it "should create a single job for delayed posting even though we do a double-save" do
@@ -71,24 +71,24 @@ describe Announcement do
       it "should sanitize message" do
         @a.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"
         @a.save!
-        @a.message.should eql("<a href=\"#\">only this should stay</a>")
+        expect(@a.message).to eql("<a href=\"#\">only this should stay</a>")
       end
 
       it "should sanitize objects in a message" do
         @a.message = "<object data=\"http://www.youtube.com/test\"></object>"
         @a.save!
         dom = Nokogiri(@a.message)
-        dom.css('object').length.should eql(1)
-        dom.css('object')[0]['data'].should eql("http://www.youtube.com/test")
+        expect(dom.css('object').length).to eql(1)
+        expect(dom.css('object')[0]['data']).to eql("http://www.youtube.com/test")
       end
 
       it "should sanitize objects in a message" do
         @a.message = "<object data=\"http://www.youtuube.com/test\" othertag=\"bob\"></object>"
         @a.save!
         dom = Nokogiri(@a.message)
-        dom.css('object').length.should eql(1)
-        dom.css('object')[0]['data'].should eql("http://www.youtuube.com/test")
-        dom.css('object')[0]['othertag'].should eql(nil)
+        expect(dom.css('object').length).to eql(1)
+        expect(dom.css('object')[0]['data']).to eql("http://www.youtuube.com/test")
+        expect(dom.css('object')[0]['othertag']).to eql(nil)
       end
     end
 
@@ -111,9 +111,9 @@ describe Announcement do
       announcement_model(:user => @teacher)
 
       to_users = @a.messages_sent[notification_name].map(&:user)
-      to_users.should include(@student)
-      to_users.should include(@observer)
-      @a.messages_sent["Announcement Created By You"].map(&:user).should include(@teacher)
+      expect(to_users).to include(@student)
+      expect(to_users).to include(@observer)
+      expect(@a.messages_sent["Announcement Created By You"].map(&:user)).to include(@teacher)
     end
   end
 end

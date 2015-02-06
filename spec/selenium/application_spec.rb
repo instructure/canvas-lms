@@ -9,9 +9,10 @@ describe "Authenticity Tokens" do
     token = driver.execute_script "return $.cookie('_csrf_token')"
     get('/')
     token2 = driver.execute_script "return $.cookie('_csrf_token')"
-    token.should_not == token2
-    CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token).should ==
+    expect(token).not_to eq token2
+    expect(CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token)).to eq(
       CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token2)
+    )
   end
 
   it "should change the unmasked token on logout" do
@@ -21,8 +22,9 @@ describe "Authenticity Tokens" do
     destroy_session(true)
     get('/')
     token2 = driver.execute_script "return $.cookie('_csrf_token')"
-    token.should_not == token2
-    CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token).should_not ==
+    expect(token).not_to eq token2
+    expect(CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token)).not_to eq(
         CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token2)
+    )
   end
 end

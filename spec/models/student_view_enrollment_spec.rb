@@ -24,14 +24,14 @@ describe StudentViewEnrollment do
     @student = User.create(:name => "some student")
     @course = Course.create(:name => "some course")
     @se = @course.enroll_student(@student)
-    @se.user_id.should eql(@student.id)
-    @course.students.should include(@student)
+    expect(@se.user_id).to eql(@student.id)
+    expect(@course.students).to include(@student)
     @assignment = @course.assignments.create!(:title => 'some assignment')
-    @course.assignments.should include(@assignment)
+    expect(@course.assignments).to include(@assignment)
     @submission = @assignment.submit_homework(@student)
     @assignment.reload
-    @submission.should_not be_nil
-    @assignment.submissions.should eql([@submission])
+    expect(@submission).not_to be_nil
+    expect(@assignment.submissions).to eql([@submission])
     @course.save!
     @se = @course.student_enrollments.first
   end
@@ -39,8 +39,8 @@ describe StudentViewEnrollment do
   it "should belong to a student" do
     @se.reload
     @student.reload
-    @se.user_id.should eql(@student.id)
-    @se.user.should eql(@student)
-    @se.user.id.should eql(@student.id)
+    expect(@se.user_id).to eql(@student.id)
+    expect(@se.user).to eql(@student)
+    expect(@se.user.id).to eql(@student.id)
   end
 end

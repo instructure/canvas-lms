@@ -1,0 +1,1 @@
+Helpers defined in this folder will be available to all app test suites. Also, they will run before any of the app test suites (or helpers).

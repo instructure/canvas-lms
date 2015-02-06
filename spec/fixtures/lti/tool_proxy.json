@@ -90,14 +90,8 @@
       {
         "message_type": "basic-lti-launch-request",
         "path": "handler/launchRequest",
-        "enabled_capability": [
-          "Result.autocreate"
-        ],
+        "enabled_capability": [ ],
         "parameter": [
-          {
-            "name": "result_url",
-            "variable": "Result.url"
-          },
           {
             "name": "discipline",
             "fixed": "chemistry"
@@ -122,14 +116,8 @@
           {
             "message_type": "basic-lti-launch-request",
             "path": "handler/launchRequest",
-            "enabled_capability": [
-              "Result.autocreate"
-            ],
+            "enabled_capability": [],
             "parameter": [
-              {
-                "name": "result_url",
-                "variable": "Result.url"
-              },
               {
                 "name": "discipline",
                 "fixed": "chemistry"
@@ -176,20 +164,9 @@
       {
         "@type": "RestServiceProfile",
         "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#ToolProxy.item",
-        "action": ["GET", "PUT"]
-      },
-      {
-        "@type": "RestServiceProfile",
-        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#Result.item",
-        "action": ["GET", "PUT"]
+        "action": ["GET"]
       }
     ],
-    "end_user_service": [
-      {
-        "@type": "RestServiceProfile",
-        "service": "http://lms.example.com/profile/b6ffa601-ce1d-4549-9ccf-145670a964d4#Result.item",
-        "action": ["PUT"]
-      }
-    ]
+    "end_user_service": []
   }
 }

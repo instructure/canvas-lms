@@ -25,21 +25,21 @@ describe "varied due dates" do
 
   def assert_coming_up_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    doc.at_css("#right-side .coming_up .event a .tooltip_text").text.should include(
+    expect(doc.at_css("#right-side .coming_up .event a .tooltip_text").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
 
   def assert_todo_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    doc.at_css("#right-side .to-do-list").text.should include(
+    expect(doc.at_css("#right-side .to-do-list").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
 
   def assert_recent_feedback_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    doc.at_css("#right-side .recent_feedback .event a .tooltip_text").text.should include(
+    expect(doc.at_css("#right-side .recent_feedback .event a .tooltip_text").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
@@ -193,38 +193,6 @@ describe "varied due dates" do
         login_as(@teacher.pseudonym.login, 'asdfasdf')
         get '/dashboard-sidebar'
         assert_todo_due_date wrap_partial(response), multiple_due_dates
-      end
-    end
-  end
-
-  context "on the assignments page" do
-
-    def formatted_date(string)
-      TextHelper.date_string(string)
-    end
-
-    context "an assignment that has a course due date and a section due date" do
-
-      describe "as an account admin, accessing the course assignments page" do
-        before do
-          account_admin_user(active_all: true)
-          user_session(@admin)
-        end
-
-        context "with overrides" do
-          it "shows multiple due dates" do
-            get course_assignments_path(@course)
-            response.body.should include multiple_due_dates
-          end
-        end
-
-        context "with no overrides" do
-          it "shows the course due date" do
-            AssignmentOverride.delete_all
-            get course_assignments_path(@course)
-            response.body.should include formatted_date(@course_due_date)
-          end
-        end
       end
     end
   end
