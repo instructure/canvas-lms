@@ -526,6 +526,14 @@ describe "Files API", type: :request do
               'thumbnail_url' => @att.thumbnail_url
       })
     end
+
+    it "should omit verifiers when using session auth" do
+      user_session(@user)
+      get @file_path
+      expect(response).to be_success
+      json = json_parse
+      expect(json['url']).to eq file_download_url(@att, :download => '1', :download_frd => '1')
+    end
     
     it "should return lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
