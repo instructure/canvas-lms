@@ -122,7 +122,7 @@ class AssignmentOverride < ActiveRecord::Base
       self.assignment_version = assignment.version_number if assignment
     end
 
-    self.title = set.name if set_type != 'ADHOC' && set
+    set_title_if_needed
   end
   protected :default_values
 
@@ -248,6 +248,30 @@ class AssignmentOverride < ActiveRecord::Base
       self.workflow_state != self.prior_version.workflow_state ||
       self.due_at_overridden != self.prior_version.due_at_overridden ||
       self.due_at_overridden && !Assignment.due_dates_equal?(self.due_at, self.prior_version.due_at))
+  end
+
+  def set_title_if_needed
+    return if self.workflow_state == "deleted"
+
+    if set_type != 'ADHOC' && set
+      self.title = set.name
+    elsif set_type == 'ADHOC' && set.any?
+      self.title ||= title_from_students(set)
+    end
+  end
+
+  def title_from_students(students)
+    sorted_students = (students || []).sort_by(&:name)
+    if sorted_students.count > 3
+      others_count = sorted_students.count - 2
+      first_two_students = sorted_students[0..1].map(&:name).join(", ")
+      I18n.t(
+        '%{first_two_students}, and %{others_count} others',
+        {first_two_students: first_two_students, others_count: others_count}
+      )
+    elsif sorted_students.any?
+      sorted_students.map(&:name).to_sentence
+    end
   end
 
   has_a_broadcast_policy

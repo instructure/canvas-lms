@@ -381,17 +381,57 @@ describe AssignmentOverridesController, type: :request do
         expect_error("unknown student ids: [\"#{@bad_id}\"]")
       end
 
-      it "should error without a title for an adhoc assignment override" do
-        raw_api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id] })
-        expect_error('title required with student_ids')
-      end
-
       it "should error if the assignment is a group assignment" do
         @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
 
         raw_api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => @title })
         expect_error('student_ids are not valid for group assignments')
+      end
+
+      context "title" do
+        before :once do
+          @override = assignment_override_model
+          names = ["Adam Aardvark", "Ben Banana", "Chipmunk Charlie", "Donald Duck", "Erik Erikson", "Freddy Frog"]
+          @students = names.map do |name|
+            student_in_course(course: @course, :user => user_with_pseudonym(name: name)).user
+          end
+          @course.reload
+        end
+
+        it "should concat students names if there are fewer than 4" do
+          student_ids = @students[0..1].map(&:id)
+          api_create_override(@course, @assignment, :assignment_override => { :student_ids => student_ids})
+          @override = @assignment.assignment_overrides(true).first
+          expect(@override.title).to eq("Adam Aardvark and Ben Banana")
+        end
+
+        it "should add an others count if there are more than 4" do
+          student_ids = @students.map(&:id)
+          api_create_override(@course, @assignment, :assignment_override => { :student_ids => student_ids})
+          @override = @assignment.assignment_overrides(true).first
+          expect(@override.title).to eq("Adam Aardvark, Ben Banana, and 4 others")
+        end
+
+        it "should alphabetize the students names" do
+          reversed_student_ids = @students.reverse.map(&:id)
+
+          api_create_override(@course, @assignment, :assignment_override => { :student_ids => reversed_student_ids})
+          @override = @assignment.assignment_overrides(true).first
+
+          expect(@override.title).to eq("Adam Aardvark, Ben Banana, and 4 others")
+        end
+
+        it "should prefer a given title" do
+          student_ids = @students.map(&:id)
+          api_create_override(
+            @course,
+            @assignment,
+            :assignment_override => { :student_ids => student_ids, title: "Preferred Title"}
+          )
+          @override = @assignment.assignment_overrides(true).first
+          expect(@override.title).to eq("Preferred Title")
+        end
       end
     end
 

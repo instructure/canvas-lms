@@ -92,9 +92,6 @@ module Api::V1::AssignmentOverride
         errors << "student_ids are not valid for group assignments"
       else
         set_type = 'ADHOC'
-
-        # require a title along with student ids on create
-        errors << "title required with student_ids" unless data[:title]
       end
     end
 
@@ -106,7 +103,7 @@ module Api::V1::AssignmentOverride
         students = []
       else
         # look up the students
-        students = api_find_all(assignment.context.students_visible_to(@current_user), student_ids)
+        students = api_find_all(assignment.context.students_visible_to(@current_user), student_ids).uniq
 
         # make sure they were all valid
         found_ids = students.map{ |s| [
@@ -153,7 +150,6 @@ module Api::V1::AssignmentOverride
 
     errors << "one of student_ids, group_id, or course_section_id is required" if !set_type && errors.empty?
 
-    # title of the adhoc override
     if set_type == 'ADHOC' && data.has_key?(:title)
       override_data[:title] = data[:title]
     end
@@ -211,8 +207,10 @@ module Api::V1::AssignmentOverride
       override.set = override_data[:section]
     end
 
-    if override.set_type == 'ADHOC' && override_data.has_key?(:title)
-      override.title = override_data[:title] || override.title
+    if override.set_type == 'ADHOC'
+      override.title = override_data[:title] ||
+                         override.title_from_students(override_data[:students]) ||
+                         override.title
     end
 
     [:due_at, :unlock_at, :lock_at].each do |field|
@@ -234,47 +232,48 @@ module Api::V1::AssignmentOverride
     return false
   end
 
-  def batch_update_assignment_overrides(assignment, overrides)
-    # extract list of kept/new overrides with their interpreted data (applied
-    # but not saved) and track defunct override to delete
-    defunct_override_ids = assignment.assignment_overrides.map(&:id).to_set
-    overrides = overrides.map do |override_params|
-      # find/build override
-      override = find_assignment_override(assignment, override_params[:id])
-      if override
-        defunct_override_ids.delete(override.id)
-      else
-        override = assignment.assignment_overrides.build
-        override.dont_touch_assignment = true
-      end
+  def batch_update_assignment_overrides(assignment, overrides_params)
+    override_param_ids = overrides_params.map{ |ov| ov[:id] }
+    existing_overrides = assignment.assignment_overrides.active
 
-      # interpret and apply the data
+    remaining_overrides = destroy_defunct_overrides(assignment, override_param_ids, existing_overrides)
+    ActiveRecord::Associations::Preloader.new(remaining_overrides, :assignment_override_students).run
+
+    overrides = overrides_params.map do |override_params|
+      override = get_override_from_params(override_params, assignment, remaining_overrides)
       data, errors = interpret_assignment_override_data(assignment, override_params, override.set_type)
       if errors
         override.errors.add(errors)
       else
         update_assignment_override_without_save(override, data)
       end
-
       override
     end
 
-    # delete the defunct overrides first, so that they don't get in the way if
-    # a new override targets the set of a deleted one
-    unless defunct_override_ids.empty?
-      assignment.assignment_overrides.
-        where(:id => defunct_override_ids.to_a).
-        each(&:destroy)
-    end
-
-    # stop now if there were validation errors
     raise ActiveRecord::RecordInvalid.new(assignment) unless assignment.valid?
 
-    # save the new/kept overrides
-    overrides.each{ |override| override.save! }
+    overrides.each(&:save!)
   end
 
-  def deserialize_overrides( overrides )
+  def destroy_defunct_overrides(assignment, override_param_ids, existing_overrides)
+    defunct_override_ids =  existing_overrides.map(&:id) - override_param_ids.map(&:to_i)
+    return existing_overrides if defunct_override_ids.empty?
+
+    assignment.assignment_overrides.where(:id => defunct_override_ids).destroy_all
+    existing_overrides.reject{|override| defunct_override_ids.include?(override.id)}
+  end
+  private :destroy_defunct_overrides
+
+  def get_override_from_params(override_params, assignment, potential_overrides)
+    potential_overrides.detect { |ov|
+      ov.id == override_params[:id].to_i
+    } || assignment.assignment_overrides.build.tap { |ov|
+      ov.dont_touch_assignment = true
+    }
+  end
+  private :get_override_from_params
+
+  def deserialize_overrides(overrides)
     if overrides.is_a?(Hash)
       return unless overrides.keys.all?{ |k| k.to_i.to_s == k.to_s }
       indices = overrides.keys.sort_by(&:to_i)
