@@ -17,6 +17,8 @@
 
 # @API Discussion Topics
 #
+# API for accessing and participating in discussion topics in groups and courses.
+#
 # @model FileAttachment
 #     {
 #       "id": "FileAttachment",
@@ -143,12 +145,12 @@
 #           "type": "datetime"
 #         },
 #         "locked": {
-#           "description": "whether or not this is locked for students to see.",
+#           "description": "Whether or not the discussion is 'closed for comments'.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "pinned": {
-#           "description": "whether or not the discussion has been 'pinned' by an instructor",
+#           "description": "Whether or not the discussion has been 'pinned' by an instructor",
 #           "example": false,
 #           "type": "boolean"
 #         },
