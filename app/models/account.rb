@@ -252,6 +252,8 @@ class Account < ActiveRecord::Base
         end
       end
     end
+    # prune nil or "" hash values to save space in the DB.
+    settings.reject! { |_, value| value.nil? || value == "" }
     settings
   end
 
