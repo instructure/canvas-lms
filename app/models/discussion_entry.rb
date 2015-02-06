@@ -298,12 +298,6 @@ class DiscussionEntry < ActiveRecord::Base
 
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
-
-    given { |user, session| self.discussion_topic.context.respond_to?(:collection) && self.discussion_topic.context.collection.grants_right?(user, session, :read) }
-    can :read
-
-    given { |user, session| self.discussion_topic.context.respond_to?(:collection) && self.discussion_topic.context.collection.grants_right?(user, session, :comment) }
-    can :create
   end
 
   scope :for_user, lambda { |user| where(:user_id => user).order("discussion_entries.created_at") }
