@@ -25,6 +25,15 @@ def download_from_cog
   ff('.al-options .ui-menu-item')[0].click
 end
 
+def edit_name_from_cog(file_name_new)
+  ff('.al-trigger')[0].click
+  fln("Rename").click
+  expect(f(".ef-edit-name-cancel")).to be_displayed
+  file_name_textbox_el = f('.input-block-level')
+  replace_content(file_name_textbox_el, file_name_new)
+  file_name_textbox_el.send_keys(:return)
+end
+
 # This method downloads the file from the file preview
 def download_from_preview
   fln("example.pdf").click
@@ -168,9 +177,9 @@ def create_new_folder
   f('.btn-add-folder').click
   f('.ef-edit-name-form').submit
   wait_for_ajaximations
-  get_all_folders.first
+  get_all_files_folders.first
 end
 
-def get_all_folders
+def get_all_files_folders
   new_folder = driver.find_elements(:class, 'ef-item-row')
 end

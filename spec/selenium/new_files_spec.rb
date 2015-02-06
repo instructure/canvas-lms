@@ -15,6 +15,36 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
         keep_trying_until { expect(f('.btn-upload')).to be_displayed }
       end
 
+      it "should edit file name" do
+        add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+               @course, "example.pdf")
+        get "/courses/#{@course.id}/files"
+        expect(fln("example.pdf")).to be_present
+        file_rename_to = "Example_edited.pdf"
+        edit_name_from_cog(file_rename_to)
+        wait_for_ajaximations
+        expect(fln("example.pdf")).not_to be_present
+        expect(fln(file_rename_to)).to be_present
+      end
+
+      it "should delete file from cog menu" do
+        file_name = "example.pdf"
+        add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+               @course, file_name)
+        get "/courses/#{@course.id}/files"
+        delete_from_cog
+        expect(get_all_files_folders.count).to eq 0
+      end
+
+      it "should delete file from toolbar" do
+        file_name = "example.pdf"
+        add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+               @course, file_name)
+        get "/courses/#{@course.id}/files"
+        delete_from_toolbar
+        expect(get_all_files_folders.count).to eq 0
+      end
+
       it "should display the new folder form" do
         click_new_folder_button
         expect(f("form.ef-edit-name-form")).to be_displayed
@@ -60,7 +90,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
      it "should create a new folder" do
        new_folder = create_new_folder
-       expect(get_all_folders.count).to eq 1
+       expect(get_all_files_folders.count).to eq 1
        expect(new_folder.text).to match /New Folder/
      end
 
@@ -72,8 +102,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
        1.upto(15) do |number_of_folders|
         folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
         create_new_folder
-        expect(get_all_folders.count).to eq number_of_folders
-        expect(get_all_folders.last.text).to match folder_regex
+        expect(get_all_files_folders.count).to eq number_of_folders
+        expect(get_all_files_folders.last.text).to match folder_regex
        end
 
        get "/courses/#{@course.id}/files"
