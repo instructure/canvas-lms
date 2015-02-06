@@ -403,6 +403,8 @@ module Api
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
+      next if self.respond_to?(:in_app?, true) && self.in_app?
+
       if match.obj_id
         obj   = preloaded_attachments[match.obj_id]
         obj ||= if context.is_a?(User) || context.nil?
