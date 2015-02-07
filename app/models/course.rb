@@ -2331,6 +2331,7 @@ class Course < ActiveRecord::Base
         tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !self.grants_right?(user, :create_conferences)
         tab[:hidden_unused] = true if tab[:id] == TAB_ANNOUNCEMENTS && !active_record_types[:announcements]
         tab[:hidden_unused] = true if tab[:id] == TAB_OUTCOMES && !active_record_types[:outcomes]
+        tab[:hidden_unused] = true if tab[:id] == TAB_DISCUSSIONS && !active_record_types[:discussions] && !allow_student_discussion_topics
       end
 
       # remove tabs that the user doesn't have access to
