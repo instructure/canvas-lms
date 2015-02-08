@@ -88,7 +88,7 @@ module SIS
         importer
       end
 
-      def process
+      def prepare
         @tmp_dirs = []
         @files.each do |file|
           if File.file?(file)
@@ -122,6 +122,13 @@ module SIS
             end
           end
         end
+
+        @csvs
+      end
+
+      def process
+        prepare
+
         @parallelism = 1 if @total_rows <= @minimum_rows_for_parallel
 
         # calculate how often we should update progress to get 1% resolution

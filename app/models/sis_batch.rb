@@ -24,7 +24,8 @@ class SisBatch < ActiveRecord::Base
   serialize :processing_errors, Array
   serialize :processing_warnings, Array
   belongs_to :attachment
-  belongs_to :batch_mode_term, :class_name => 'EnrollmentTerm'
+  belongs_to :generated_diff, class_name: 'Attachment'
+  belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [
@@ -37,6 +38,7 @@ class SisBatch < ActiveRecord::Base
   before_save :limit_size_of_messages
 
   validates_presence_of :account_id, :workflow_state
+  validates_length_of :diffing_data_set_identifier, maximum: 128
 
   attr_accessor :zip_path
   attr_accessible :batch_mode, :batch_mode_term
@@ -67,13 +69,7 @@ class SisBatch < ActiveRecord::Base
     batch.user = user
     batch.save
 
-    Attachment.skip_3rd_party_submits(true)
-    att = Attachment.new
-    att.context = batch
-    att.uploaded_data = attachment
-    att.display_name = t :upload_filename, "sis_upload_%{id}.zip", :id => batch.id
-    att.save!
-    Attachment.skip_3rd_party_submits(false)
+    att = create_data_attachment(batch, attachment, t(:upload_filename, "sis_upload_%{id}.zip", :id => batch.id))
     batch.attachment = att
 
     yield batch if block_given?
@@ -81,6 +77,18 @@ class SisBatch < ActiveRecord::Base
     batch.save!
 
     batch
+  end
+
+  def self.create_data_attachment(batch, data, display_name)
+    Attachment.new.tap do |att|
+      Attachment.skip_3rd_party_submits(true)
+      att.context = batch
+      att.uploaded_data = data
+      att.display_name = display_name
+      att.save!
+    end
+  ensure
+    Attachment.skip_3rd_party_submits(false)
   end
 
   workflow do
@@ -95,6 +103,23 @@ class SisBatch < ActiveRecord::Base
 
   def process
     self.class.queue_job_for_account(self.account)
+  end
+
+  def enable_diffing(data_set_id, opts = {})
+    if data[:import_type] == "instructure_csv"
+      self.diffing_data_set_identifier = data_set_id
+      if opts[:remaster]
+        self.diffing_remaster = true
+      end
+    end
+  end
+
+  def add_errors(messages)
+    self.processing_errors = (self.processing_errors || []) + messages
+  end
+
+  def add_warnings(messages)
+    self.processing_warnings = (self.processing_warnings || []) + messages
   end
 
   def self.queue_job_for_account(account)
@@ -148,6 +173,7 @@ class SisBatch < ActiveRecord::Base
 
   scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
   scope :importing, -> { where(:workflow_state => 'importing') }
+  scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
   def self.process_all_for_account(account)
     start_time = Time.now
@@ -177,8 +203,34 @@ class SisBatch < ActiveRecord::Base
   def process_instructure_csv_zip
     require 'sis'
     download_zip
+    generate_diff
+
     importer = SIS::CSV::Import.process(self.account, :files => [ @data_file.path ], :batch => self, :override_sis_stickiness => options[:override_sis_stickiness], :add_sis_stickiness => options[:add_sis_stickiness], :clear_sis_stickiness => options[:clear_sis_stickiness])
     finish importer.finished
+  end
+
+  def generate_diff
+    return if self.diffing_remaster # joined the chain, but don't actually want to diff this one
+    return unless self.diffing_data_set_identifier
+    previous_batch = self.account.sis_batches.
+      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).order(:created_at).last
+    previous_zip = previous_batch.try(:download_zip)
+    return unless previous_zip
+
+    diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
+    return unless diffed_data_file
+
+    self.data[:diffed_against_sis_batch_id] = previous_batch.id
+
+    self.generated_diff = SisBatch.create_data_attachment(
+      self,
+      Rack::Test::UploadedFile.new(diffed_data_file.path, 'application/zip'),
+      t(:diff_filename, "sis_upload_diffed_%{id}.zip", :id => self.id)
+    )
+    self.save!
+    # Success, swap out the original update for this new diff and continue.
+    @data_file.try(:close)
+    @data_file = diffed_data_file
   end
 
   def download_zip
@@ -263,6 +315,8 @@ class SisBatch < ActiveRecord::Base
       "override_sis_stickiness" => self.options[:override_sis_stickiness],
       "add_sis_stickiness" => self.options[:add_sis_stickiness],
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
+      "diffing_data_set_identifier" => self.diffing_data_set_identifier,
+      "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?

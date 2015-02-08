@@ -24,6 +24,10 @@ module SIS
         row.include?('user_id') && row.include?('login_id')
       end
 
+      def self.identifying_fields
+        %w[user_id].freeze
+      end
+
       # expected columns:
       # user_id,login_id,first_name,last_name,email,status
       def process(csv)

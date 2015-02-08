@@ -183,6 +183,16 @@
 #           "description": "Whether stickiness was cleared.",
 #           "example": "false",
 #           "type": "boolean"
+#         },
+#         "diffing_data_set_identifier": {
+#           "description": "The identifier of the data set that this SIS batch diffs against",
+#           "example": "account-5-enrollments",
+#           "type": "string"
+#         },
+#         "diffed_against_import_id": {
+#           "description": "The ID of the SIS Import that this import was diffed against",
+#           "example": 1,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -298,6 +308,17 @@ class SisImportsApiController < ApplicationController
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will
   #   overrule the behavior of 'add_sis_stickiness'
   #
+  # @argument diffing_data_set_identifier [String]
+  #   If set on a CSV import, Canvas will attempt to optimize the SIS import by
+  #   comparing this set of CSVs to the previous set that has the same data set
+  #   identifier, and only appliying the difference between the two. See the
+  #   SIS CSV Format documentation for more details.
+  #
+  # @argument diffing_remaster_data_set [Boolean]
+  #   If true, and diffing_data_set_identifier is sent, this SIS import will be
+  #   part of the data set, but diffing will not be performed. See the SIS CSV
+  #   Format documentation for details.
+  #
   # @returns SisImport
   def create
     if authorized_action(@account, @current_user, :manage_sis)
@@ -356,6 +377,9 @@ class SisImportsApiController < ApplicationController
         if batch_mode_term
           batch.batch_mode = true
           batch.batch_mode_term = batch_mode_term
+        elsif params[:diffing_data_set_identifier].present?
+          batch.enable_diffing(params[:diffing_data_set_identifier],
+                               remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
 
         batch.options ||= {}

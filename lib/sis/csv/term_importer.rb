@@ -24,6 +24,10 @@ module SIS
         #This matcher works because a course has long_name/short_name
         row.include?('term_id') && row.include?('name')
       end
+
+      def self.identifying_fields
+        %w[term_id].freeze
+      end
     
       # expected columns
       # account_id,parent_account_id,name,status
