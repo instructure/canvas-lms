@@ -1,6 +1,12 @@
-define ['jsx/external_apps/lib/ExternalAppsStore'], (store) ->
+define [
+  'jsx/external_apps/lib/ExternalAppsStore',
+  'helpers/fakeENV'
+], (store, fakeENV) ->
   module 'ExternalApps.ExternalAppsStore',
     setup: ->
+      fakeENV.setup({
+        CONTEXT_BASE_URL: "/courses/1"
+      })
       @server = sinon.fakeServer.create()
       store.reset()
       @tools = [

@@ -127,6 +127,7 @@ define [
       @clock.tick 20 # disableWhileLoading does its thing in a setTimeout
       equal @form.$(':disabled').length, 3
     @form.submit()
+    sendSuccess(@server)
 
   test 'submit delegates to saveFormData', 1, ->
     sinon.spy(@form, 'saveFormData')

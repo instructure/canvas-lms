@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'compiled/helpDialog'
   'helpers/fakeENV'

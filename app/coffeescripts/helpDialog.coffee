@@ -76,6 +76,7 @@ define [
       }, {
         step: =>
           #reposition vertically to reflect current height
+          @initDialog() unless @dialogInited
           @$dialog?.dialog('option', 'position', 'center')
         duration: 100
         complete: ->

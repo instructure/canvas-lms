@@ -10,13 +10,15 @@ define [
 
   FilesUsage = React.createClass
     displayName: 'FilesUsage'
+    url: ->
+      "/api/v1/#{@props.contextType}/#{@props.contextId}/files/quota"
 
     propTypes:
       contextType: customPropTypes.contextType.isRequired
       contextId: customPropTypes.contextId.isRequired
 
     update: ->
-      $.get "/api/v1/#{@props.contextType}/#{@props.contextId}/files/quota", (data) =>
+      $.get @url(), (data) =>
         @setState(data)
 
     componentDidMount: ->
