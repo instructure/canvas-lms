@@ -65,8 +65,6 @@ $canvas-light:                    #fff; // white
 
 $canvas-dark:                     #333;
 
-
-
 // Bootstrap Color Variable Overwrites
 //=======================
 // These overwrite the variables used by bootstrap using our
@@ -94,6 +92,7 @@ $canvas-dark:                     #333;
 // For variables throughout canvas we should be using custom names
 // and setting their colors using our two-tiered process
 
+
 // Examples of functional variable use:
 //
 //    $link-color: $canvas-primary;
@@ -107,7 +106,6 @@ $base-content-background-color: $canvas-light;
 $base-content-padding: 15px;
 $ic-base-header-background: $canvas-secondary;
 @if $use_high_contrast {$ic-base-header-background: #333;}
-
 $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
 $base-font-color--subdued: #696969;
@@ -119,8 +117,6 @@ $ic-base-color-icon-disabled: darken($canvas-neutral, 40);
 @if $use_high_contrast {$ic-base-color-icon-disabled: darken($canvas-neutral, 60);}
 $ic-base-dim-helper-text: darken($canvas-neutral, 33);
 @if $use_high_contrast {$ic-base-dim-helper-text: darken($canvas-neutral, 50);}
-
-$announcements_disscussion-summary-color: $canvas-dark;
 
 // These variables control the active and hover
 // states we have on the global left-hand sidenav in Canvas

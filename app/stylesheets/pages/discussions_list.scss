@@ -1,6 +1,8 @@
 @import "base/environment";
 @import "pages/shared/move_dialog";
 
+$announcements_disscussion-summary-color: $canvas-dark;
+
 // min width to ensure toolbar doesn't stagger
 #main { min-width: 700px; }
 
