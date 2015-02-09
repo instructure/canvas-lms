@@ -361,7 +361,7 @@ class GradebooksController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
-                         'Speedgrader is enabled only for published content.')
+                         'SpeedGrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
     end
 
