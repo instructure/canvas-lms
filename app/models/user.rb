@@ -1447,7 +1447,7 @@ class User < ActiveRecord::Base
           result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
             courses = Course.find(shard_course_ids)
             courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
-            Assignment.for_course(shard_course_ids).
+            assignments = Assignment.for_course(shard_course_ids).
               filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
               published.
               due_between_with_overrides(due_after,1.week.from_now).
@@ -1455,6 +1455,7 @@ class User < ActiveRecord::Base
               expecting_submission.
               need_submitting_info(id, limit).
               not_locked
+            select_available_assignments(assignments)
           end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
@@ -1919,14 +1920,23 @@ class User < ActiveRecord::Base
     opts[:limit] ||= 20
 
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).limit(opts[:limit]).reject(&:hidden?)
-    events += select_upcoming_assignments(Assignment.
-        published.
+    events += select_available_assignments(
+      select_upcoming_assignments(
+        Assignment.published.
         for_context_codes(context_codes).
         due_between_with_overrides(now, opts[:end_at]).
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
-      first(opts[:limit])
+      first(opts[:limit]))
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
+  end
+
+  def select_available_assignments(assignments)
+    return [] if assignments.empty?
+    enrollments = self.enrollments.where(:course_id => assignments.select{|a| a.context_type == "Course"}.map(&:context_id))
+    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    enrollments.select!{|e| e.participating?}
+    assignments.select{|a| a.context_type != "Course" || enrollments.any?{|e| e.course_id == a.context_id}}
   end
 
   def select_upcoming_assignments(assignments,opts)
