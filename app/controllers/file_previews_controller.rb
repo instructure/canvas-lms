@@ -62,7 +62,6 @@ class FilePreviewsController < ApplicationController
       end
       # mark item seen for module progression purposes
       @file.context_module_action(@current_user, :read) if @current_user
-      @file.record_inline_view
       log_asset_access(@file, "files", "files")
       # redirect to or render content for the file according to its type
       # crocodocs (if annotation requested)

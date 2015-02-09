@@ -526,7 +526,6 @@ class FilesController < ApplicationController
       elsif params[:inline]
         @attachment.context_module_action(@current_user, :read) if @current_user
         log_asset_access(@attachment, 'files', 'files')
-        @attachment.record_inline_view
         render :json => {:ok => true}
       else
         render_attachment(@attachment)
@@ -562,7 +561,6 @@ class FilesController < ApplicationController
              (attachment.canvadocable? ||
               (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
             attachment.context_module_action(@current_user, :read)
-            attachment.record_inline_view
           end
           if url = service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
             json[:attachment][:authenticated_s3_url] = url
