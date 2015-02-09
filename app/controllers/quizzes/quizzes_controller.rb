@@ -403,6 +403,8 @@ class Quizzes::QuizzesController < ApplicationController
           end
           @quiz.reload
           @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
+
+          @quiz.publish! if params[:publish]
         end
         flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
         format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }

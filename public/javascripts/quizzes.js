@@ -1683,16 +1683,14 @@ define([
       },
 
       beforeSubmit: function(data) {
-        $quiz_edit_wrapper
-          .find(".btn.save_quiz_button")
-          .attr('disabled', true)
-          .text(I18n.t('buttons.saving', "Saving..."));
+        $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', true);
+        $quiz_edit_wrapper.find(".btn.save_and_publish").attr('disabled', true);
       },
 
       success: function(data) {
         var $form = $(this);
         $quiz_edit_wrapper
-          .find(".btn.save_quiz_button")
+          .find(".btn.saving")
           .text(I18n.t('buttons.saved', "Saved!"));
         if (data.quiz.assignment) {
           var assignment = data.quiz.assignment;
@@ -1717,17 +1715,44 @@ define([
         $("#quiz_edit_wrapper")
           .find(".btn.save_quiz_button")
           .attr('disabled', false)
+          .removeClass("saving")
           .text(I18n.t('buttons.save', "Save"));
+        $("#quiz_edit_wrapper")
+          .find(".btn.save_and_publish")
+          .attr('disabled', false)
+          .removeClass("saving")
+          .text(I18n.t('buttons.save_and_publish', "Save & Publish"));
+        $("#quiz_edit_wrapper")
+          .find('input[name="publish"]')
+          .remove();
 
         $(this).trigger('xhrError', data);
         $(this).formErrors(data);
-        $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', false);
       }
     });
 
     $quiz_edit_wrapper.find(".save_quiz_button").click(function(event) {
       event.preventDefault();
       event.stopPropagation();
+      $quiz_edit_wrapper
+        .find(".btn.save_quiz_button")
+        .addClass("saving")
+        .text(I18n.t('buttons.saving', "Saving..."));
+      $quiz_options_form.data('submit_type', 'save_only').submit();
+    }).end();
+
+    $quiz_edit_wrapper.find(".save_and_publish").click(function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      var $publish_input = $(document.createElement('input'));
+      $publish_input.attr('type', 'hidden').attr('name', 'publish').attr('value', 'true');
+      $quiz_options_form.append($publish_input);
+
+      $quiz_edit_wrapper
+        .find(".btn.save_and_publish")
+        .addClass("saving")
+        .text(I18n.t('buttons.saving', "Saving..."));
       $quiz_options_form.data('submit_type', 'save_only').submit();
     }).end();
 

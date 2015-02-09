@@ -966,6 +966,20 @@ describe Quizzes::QuizzesController do
       expect(assigns[:quiz].title).to eql("some quiz")
     end
 
+    it "should publish if asked to" do
+      user_session(@teacher)
+      course_quiz
+      post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}, :publish => 'true'
+      expect(@quiz.reload.published).to be(true)
+    end
+
+    it "should not publish if not asked to" do
+      user_session(@teacher)
+      course_quiz
+      post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}
+      expect(@quiz.reload.published).to be(false)
+    end
+
     context 'post_to_sis' do
       before { @course.enable_feature!(:post_grades) }
 
