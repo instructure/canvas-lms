@@ -29,7 +29,8 @@ module Canvas::Migration
         :moodle_2
       elsif @archive.find_entry("imsmanifest.xml")
         data = @archive.read("imsmanifest.xml")
-        doc = ::Nokogiri::XML(data)
+        doc = create_xml_doc(data)
+
         if get_node_val(doc, 'metadata schema') =~ COMMON_CARTRIDGE_REGEX
           if !!doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::SYLLABUS}"] file[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::COURSE_SETTINGS}"]})
             :canvas_cartridge
@@ -79,7 +80,7 @@ module Canvas::Migration
     # Common Cartridge 1.3 supports having just a single xml file
     # if it's not CC 1.3 then we don't know how to handle it
     def check_flat_xml_file
-      doc = ::Nokogiri::XML(File.read(@archive.file))
+      doc = create_xml_doc(File.read(@archive.file))
       if get_node_val(doc, 'metadata schema') =~ COMMON_CARTRIDGE_REGEX &&
               get_node_val(doc, 'metadata schemaversion') == "1.3.0"
         :common_cartridge_1_3
