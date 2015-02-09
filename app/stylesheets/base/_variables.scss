@@ -108,8 +108,6 @@ $base-content-padding: 15px;
 $ic-base-header-background: $canvas-secondary;
 @if $use_high_contrast {$ic-base-header-background: #333;}
 
-
-
 $base-font-color-light: $canvas-light;
 $base-font-color-dark: $canvas-dark;
 $base-font-color--subdued: #696969;
@@ -123,8 +121,6 @@ $ic-base-dim-helper-text: darken($canvas-neutral, 33);
 @if $use_high_contrast {$ic-base-dim-helper-text: darken($canvas-neutral, 50);}
 
 $announcements_disscussion-summary-color: $canvas-dark;
-
-$gradebook_letter-grade-font: lighten($canvas-dark, 8%);
 
 // These variables control the active and hover
 // states we have on the global left-hand sidenav in Canvas
