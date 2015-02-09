@@ -153,20 +153,7 @@ def api_json_response(objects, opts = nil)
   JSON.parse(objects.to_json(opts.merge(:include_root => false)))
 end
 
-# passes the cb a piece of user content html text. the block should return the
-# response from the api for that field, which will be verified for correctness.
-def should_translate_user_content(course, include_verifiers=true)
-  attachment = attachment_model(:context => course)
-  content = %{
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
-      This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
-      Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
-      And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
-    </p>
-  }
-  html = yield content
+def check_document(html, course, attachment, include_verifiers)
   doc = Nokogiri::HTML::DocumentFragment.parse(html)
   img1 = doc.at_css('img#1')
   expect(img1).to be_present
@@ -182,12 +169,29 @@ def should_translate_user_content(course, include_verifiers=true)
   expect(video['src']).to match(%r{entryId=qwerty})
   expect(doc.css('a').last['data-api-endpoint']).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
   expect(doc.css('a').last['data-api-returntype']).to eq 'Page'
+end
+
+# passes the cb a piece of user content html text. the block should return the
+# response from the api for that field, which will be verified for correctness.
+def should_translate_user_content(course, include_verifiers=true)
+  attachment = attachment_model(:context => course)
+  content = %{
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
+      This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
+      Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
+      And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
+    </p>
+  }
+  html = yield content
+  check_document(html, course, attachment, include_verifiers)
 
   if include_verifiers
     # try again but with cookie auth; shouldn't have verifiers now
     @use_basic_auth = true
     html = yield content
-    expect(html).to_not include("verifier=#{attachment.uuid}")
+    check_document(html, course, attachment, false)
   end
 end
 
