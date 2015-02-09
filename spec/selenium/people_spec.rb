@@ -330,4 +330,23 @@ describe "people" do
       is_checked('#limit_privileges_to_course_section') == true
     end
   end
+
+  it "should filter by role ids" do
+    account_model
+    course_with_teacher_logged_in(:account => @account)
+    old_role = custom_student_role("Role")
+    old_role.deactivate!
+
+    new_role = @account.roles.new(:name => old_role.name)
+    new_role.base_role_type = "StudentEnrollment"
+    new_role.save!
+    new_role
+
+    student_in_course(:course => @course, :role => new_role, :name => "number2")
+
+    get "/courses/#{@course.id}/users"
+    click_option("select[name=enrollment_role_id]", new_role.id.to_s, :value)
+    wait_for_ajaximations
+    expect(ff('tr.rosterUser').count).to eq 1
+  end
 end
