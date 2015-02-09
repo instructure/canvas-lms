@@ -238,6 +238,7 @@ class UsersController < ApplicationController
         if logged_in_user
           service = UserService.where(user_id: @current_user, service: 'google_drive', service_domain: 'drive.google.com').first_or_initialize
           service.service_user_id = user_info['permissionId']
+          service.service_user_name = user_info['emailAddress']
           service.token = client.authorization.refresh_token
           service.secret = client.authorization.access_token
           service.save

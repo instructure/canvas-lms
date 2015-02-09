@@ -476,11 +476,11 @@ class SubmissionsController < ApplicationController
 
   def submit_google_doc(document_id)
     # fetch document from google
-    google_docs = google_docs_connection
+    google_docs = google_service_connection
     document_response, display_name, file_extension = google_docs.download(document_id)
 
     # error handling
-    unless document_response.try(:is_a?, Net::HTTPOK)
+    unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
       flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
     end
 

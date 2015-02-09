@@ -271,11 +271,13 @@
         <div id="submit_google_doc_form">
           <%= t 'messages.google_docs_auth_required', "Before you can submit assignments directly from Google Docs you need to authorize Canvas to access your Google Docs account:" %>
           <div style="font-size: 1.1em; text-align: center; margin: 10px;">
-            <a class="btn" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_docs', "Authorize Google Docs Access" %></a>
+            <%# TODO: do the right stuff %>
+            <a class="btn" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_docs', "Authorize Google Docs Access" %></a>
           </div>
         </div>
       <% end %>
     <% end %>
+
     <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
       <% if !feature_enabled?(:kaltura) %>
         <div id="submit_media_recording_form">

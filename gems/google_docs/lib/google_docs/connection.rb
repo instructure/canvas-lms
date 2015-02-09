@@ -31,7 +31,11 @@ module GoogleDocs
       @access_token ||= OAuth::AccessToken.new(consumer, @oauth_gdocs_access_token, @oauth_gdocs_access_token_secret)
     end
 
-    def get_service_user_info(access_token)
+    def service_type
+      :google_docs
+    end
+
+    def get_service_user_info(access_token=retrieve_access_token)
       doc = create_doc("Temp Doc: #{Time.now.strftime("%d %b %Y, %I:%M %p")}", access_token)
       delete_doc(doc, access_token)
       service_user_id = doc.entry.authors[0].email rescue nil
@@ -211,7 +215,7 @@ module GoogleDocs
       add_extension_namespace :gAcl, 'http://schemas.google.com/acl/2007'
     end
 
-    def create_doc(name, access_token)
+    def create_doc(name, access_token=retrieve_access_token)
       url = "https://docs.google.com/feeds/documents/private/full"
       entry = Atom::Entry.new do |entry|
         entry.title = name

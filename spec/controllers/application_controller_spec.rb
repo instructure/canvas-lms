@@ -137,10 +137,73 @@ describe ApplicationController do
       mock_current_user = mock()
       controller.instance_variable_set(:@real_current_user, mock_real_current_user)
       controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).returns(["real_current_user_token", "real_current_user_secret"])
+
+      GoogleDocs::DriveConnection.expects(:new).with("real_current_user_token", "real_current_user_secret")
+
+      controller.send(:google_drive_connection)
+    end
+
+    it "uses @current_user second" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).returns(["current_user_token", "current_user_secret"])
+
+      GoogleDocs::DriveConnection.expects(:new).with("current_user_token", "current_user_secret")
+      controller.send(:google_drive_connection)
+    end
+
+    it "queries user services if token isn't in the cache" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      mock_user_services = mock("mock_user_services")
+      mock_current_user.expects(:user_services).returns(mock_user_services)
+      mock_user_services.expects(:where).with(service: "google_drive").returns(stub(first: mock(token: "user_service_token", secret: "user_service_secret")))
+
+      GoogleDocs::DriveConnection.expects(:new).with("user_service_token", "user_service_secret")
+      controller.send(:google_drive_connection)
+    end
+
+    it "uses the session values if no users are set" do
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, nil)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      GoogleDocs::DriveConnection.expects(:new).with("session_token", "sesion_secret")
+
+      controller.send(:google_drive_connection)
+    end
+  end
+
+  describe "#google_drive_user_client" do
+    before :each do
+      settings_mock = mock()
+      settings_mock.stubs(:settings).returns({})
+      Canvas::Plugin.stubs(:find).returns(settings_mock)
+
+    end
+
+    it "uses @real_current_user first" do
+      mock_real_current_user = mock()
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, mock_real_current_user)
+      controller.instance_variable_set(:@current_user, mock_current_user)
 
       Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).returns(["real_current_user_refresh_token", "real_current_user_access_token"])
       GoogleDrive::Client.expects(:create).with({},"real_current_user_refresh_token", "real_current_user_access_token")
-      controller.send(:google_drive_connection)
+      controller.send(:google_drive_user_client)
     end
 
     it "uses @current_user second" do
@@ -149,7 +212,7 @@ describe ApplicationController do
       controller.instance_variable_set(:@current_user, mock_current_user)
       Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).returns(["current_user_refresh_token", "current_user_access_token"])
       GoogleDrive::Client.expects(:create).with({},"current_user_refresh_token", "current_user_access_token")
-      controller.send(:google_drive_connection)
+      controller.send(:google_drive_user_client)
     end
 
     it "queries user services if token isn't in the cache" do
@@ -165,7 +228,7 @@ describe ApplicationController do
 
       GoogleDrive::Client.expects(:create).with({}, "user_refresh_token", "user_access_token")
 
-      controller.send(:google_drive_connection)
+      controller.send(:google_drive_user_client)
     end
 
     it "uses the session values if no users are set" do
@@ -174,9 +237,8 @@ describe ApplicationController do
       session[:oauth_gdrive_access_token] = "access_token"
       session[:oauth_gdrive_refresh_token] = "refresh_token"
 
-      GoogleDrive::Client.expects(:create).with({}, "access_token", "refresh_token")
-
-      controller.send(:google_drive_connection)
+      GoogleDrive::Client.expects(:create).with({}, "refresh_token", "access_token")
+      controller.send(:google_drive_user_client)
     end
   end
 

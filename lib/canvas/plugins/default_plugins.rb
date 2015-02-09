@@ -82,7 +82,7 @@ Canvas::Plugin.register('google_docs', :collaborations, {
   :settings_partial => 'plugins/google_docs_settings',
   :validator => 'GoogleDocsValidator'
 })
-Canvas::Plugin.register('google_drive', :collaborations, {
+Canvas::Plugin.register('google_drive', nil, {
   :name => lambda{ t :name, 'Google Drive' },
   :description => lambda{ t :description, 'Google Drive file sharing' },
   :website => 'http://drive.google.com',

@@ -10,7 +10,7 @@ module GoogleDrive
     # @param [String] access_token
     #  Optional access_token
     def self.create(client_secrets, refresh_token = nil, access_token = nil)
-      client = Google::APIClient.new
+      client = Google::APIClient.new(application_name: "Instructure Google Drive", application_version: "0.0.1")
       client.authorization.client_id = client_secrets['client_id']
       client.authorization.client_secret = client_secrets['client_secret']
       client.authorization.redirect_uri = client_secrets['redirect_uri']

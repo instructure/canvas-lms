@@ -1819,14 +1819,36 @@ class ApplicationController < ActionController::Base
   end
 
   def google_drive_connection
+    return unless Canvas::Plugin.find(:google_drive).try(:settings)
+    ## @real_current_user first ensures that a masquerading user never sees the
+    ## masqueradee's files, but in general you may want to block access to google
+    ## docs for masqueraders earlier in the request
+    if logged_in_user
+      refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.where(service: "google_drive").first
+        service && [service.token, service.secret]
+      end
+    else
+      refresh_token = session[:oauth_gdrive_refresh_token]
+      access_token = session[:oauth_gdrive_access_token]
+    end
+
+    GoogleDocs::DriveConnection.new(refresh_token, access_token) if refresh_token && access_token
+  end
+
+  def google_service_connection
+    google_drive_connection || google_docs_connection
+  end
+
+  def google_drive_user_client
     if logged_in_user
       refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
         service = logged_in_user.user_services.where(service: "google_drive").first
         service && [service.token, service.access_token]
       end
     else
-      refresh_token = session[:oauth_gdrive_access_token]
-      access_token = session[:oauth_gdrive_refresh_token]
+      refresh_token = session[:oauth_gdrive_refresh_token]
+      access_token = session[:oauth_gdrive_access_token]
     end
     google_drive_client(refresh_token, access_token)
   end

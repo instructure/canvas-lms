@@ -67,8 +67,11 @@ class CollaborationsController < ApplicationController
 
     @collaborations = @context.collaborations.active
     log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
+    @google_drive_upgrade = logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
+      (!logged_in_user.user_services.where(service: 'google_drive').first || !(google_drive_connection.verify_access_token rescue false))
 
-    @google_docs_authorized = google_docs_connection.verify_access_token rescue false
+    @google_docs_authorized = !@google_drive_upgrade && google_service_connection.verify_access_token rescue false
+
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :collaboration_types => Collaboration.collaboration_types
   end
@@ -135,7 +138,7 @@ class CollaborationsController < ApplicationController
   def destroy
     @collaboration = @context.collaborations.find(params[:id])
     if authorized_action(@collaboration, @current_user, :delete)
-      @collaboration.delete_document if params[:delete_doc]
+      @collaboration.delete_document if value_to_boolean(params[:delete_doc])
       @collaboration.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :collaborations_url) }
@@ -180,5 +183,6 @@ class CollaborationsController < ApplicationController
       return false
     end
   end
+
 end
 

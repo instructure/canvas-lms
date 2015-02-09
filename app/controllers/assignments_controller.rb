@@ -129,11 +129,13 @@ class AssignmentsController < ApplicationController
       end
 
       begin
-        google_docs = google_docs_connection
+        google_docs = google_service_connection
+        @google_service = google_docs.service_type
         @google_docs_token = google_docs.retrieve_access_token
       rescue GoogleDocs::NoTokenError
         #do nothing
       end
+
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
@@ -164,8 +166,7 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        google_docs = google_docs_connection
-        docs = google_docs.list_with_extension_filter(assignment.allowed_extensions)
+        docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
       rescue GoogleDocs::NoTokenError
         #do nothing
       rescue => e
