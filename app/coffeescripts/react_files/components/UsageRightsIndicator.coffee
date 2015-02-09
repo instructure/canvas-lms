@@ -12,6 +12,8 @@ define [
   UsageRightsIndicator = React.createClass
     displayName: 'UsageRightsIndicator'
 
+    warningMessage: I18n.t('Before publishing this file, you must specify usage rights.')
+
     propTypes:
       model: customPropTypes.filesystemObject.isRequired
       userCanManageFilesForContext: React.PropTypes.bool.isRequired
@@ -31,9 +33,11 @@ define [
           button {
               className: 'UsageRightsIndicator__openModal btn-link'
               onClick: @handleClick
-              title: I18n.t('Before publishing this file, you must specify usage rights.')
+              title: @warningMessage
               'data-tooltip': 'top'
             },
+              span {className: 'screenreader-only'},
+                @warningMessage
               i {className: 'UsageRightsIndicator__warning icon-warning'}
         else
           null
