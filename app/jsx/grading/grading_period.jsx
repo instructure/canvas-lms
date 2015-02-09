@@ -15,7 +15,8 @@ function(React, $, I18n) {
         title: this.props.title,
         startDate: this.props.startDate,
         endDate: this.props.endDate,
-        weight: this.props.weight
+        weight: this.props.weight,
+        permissions: this.props.permissions
       };
     },
 
@@ -24,7 +25,8 @@ function(React, $, I18n) {
         title: nextProps.title,
         startDate: nextProps.startDate,
         endDate: nextProps.endDate,
-        weight: nextProps.weight
+        weight: nextProps.weight,
+        permissions: nextProps.permissions
       });
     },
 

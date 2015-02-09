@@ -67,11 +67,10 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def index
-    # inheritance check instead of #get_context?
-    @grading_periods = @context.grading_periods.active.order('start_date')
-    json, meta = paginate_for(@grading_periods)
-
     if authorized_action(@context, @current_user, :read)
+      # inheritance check instead of #get_context?
+      @grading_periods = @context.grading_periods.active.order('start_date')
+      json, meta = paginate_for(@grading_periods)
       render json: serialize_jsonapi(json, meta)
     end
   end
@@ -88,8 +87,7 @@ class GradingPeriodsController < ApplicationController
   #
   def show
     @grading_period = @context.grading_periods.active.find(params[:id])
-
-    if authorized_action(@grading_period, @current_user, :read)
+    if @grading_period && authorized_action(@grading_period, @current_user, :read)
       render json: serialize_jsonapi(@grading_period)
     end
   end
@@ -119,7 +117,7 @@ class GradingPeriodsController < ApplicationController
     grading_period_group = @context.grading_period_groups.first_or_create
     # another inheritance check here?
     @grading_period = grading_period_group.grading_periods.new(grading_period_params)
-    if authorized_action(@grading_period, @current_user, :create)
+    if @grading_period && authorized_action(@grading_period, @current_user, :manage)
       if @grading_period.save
         render json: serialize_jsonapi(@grading_period)
       else
@@ -150,7 +148,7 @@ class GradingPeriodsController < ApplicationController
     @grading_period = GradingPeriod.active.find(params[:id])
     grading_period_params = params[:grading_periods][0]
 
-    if authorized_action(@grading_period, @current_user, :update)
+    if @grading_period && authorized_action(@grading_period, @current_user, :manage)
       if @grading_period.update_attributes(grading_period_params)
         render json: serialize_jsonapi(@grading_period)
       else
@@ -166,7 +164,7 @@ class GradingPeriodsController < ApplicationController
   def destroy
     @grading_period = GradingPeriod.active.find(params[:id])
 
-    if authorized_action(@grading_period, @current_user, :delete)
+    if @grading_period && authorized_action(@grading_period, @current_user, :manage)
       @grading_period.destroy
       head :no_content
     end

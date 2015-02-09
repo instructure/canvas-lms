@@ -9,7 +9,7 @@ class GradingPeriod < ActiveRecord::Base
   validate :validate_dates
 
   set_policy do
-    [:read, :update, :create, :delete].each do |permission|
+    [:read, :manage].each do |permission|
       given { |user| grading_period_group.grants_right?(user, permission) }
       can permission
     end
