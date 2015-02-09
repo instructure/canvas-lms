@@ -99,8 +99,6 @@ $canvas-dark:                     #333;
 //    $link-color: $canvas-primary;
 //    $submit_button--on: $canvas-secondary;
 
-$eportfolio-name--disabled: #777;
-@if $use_high_contrast {$eportfolio-name--disabled: #686868;}
 
 // in these variables, "content" refers specifically to the #content div,
 // which is the main white page in between the left and right columns
