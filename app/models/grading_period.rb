@@ -5,7 +5,7 @@ class GradingPeriod < ActiveRecord::Base
   belongs_to :grading_period_group, :inverse_of => :grading_periods
   has_many :grading_period_grades
 
-  validates_presence_of :weight, :start_date, :end_date
+  validates_presence_of :start_date, :end_date
   validate :validate_dates
 
   set_policy do

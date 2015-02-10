@@ -12,8 +12,8 @@ describe "interaction with multiple grading periods" do
     @course.assignments.create!(assignment_group: @group1, due_at: 3.months.from_now)
     @course.assignments.create!(assignment_group: @group2, due_at: Time.now)
     gpg = @course.grading_period_groups.create!
-    @gp1 = gpg.grading_periods.create!(title: "Today", workflow_state: "active", weight: 50, start_date: 1.month.ago, end_date: 1.month.from_now)
-    @gp2 = gpg.grading_periods.create!(title: "Future", workflow_state: "active", weight: 50, start_date: 2.months.from_now, end_date: 4.months.from_now)
+    @gp1 = gpg.grading_periods.create!(title: "Today", workflow_state: "active", start_date: 1.month.ago, end_date: 1.month.from_now)
+    @gp2 = gpg.grading_periods.create!(title: "Future", workflow_state: "active", start_date: 2.months.from_now, end_date: 4.months.from_now)
   end
 
 

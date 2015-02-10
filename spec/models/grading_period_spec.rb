@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradingPeriod do
   before :once do
-    @grading_period = GradingPeriod.create(course_id: 1, weight: 25.0, start_date: Time.zone.now, end_date: 1.day.from_now)
+    @grading_period = GradingPeriod.create(course_id: 1, start_date: Time.zone.now, end_date: 1.day.from_now)
   end
 
   context "validation" do
@@ -28,32 +28,28 @@ describe GradingPeriod do
       expect(@grading_period).to be_valid
     end
 
-    it "should require a weight" do
-      expect(GradingPeriod.create(course_id: 1, start_date: Time.zone.now, end_date: 1.day.from_now )).to_not be_valid
-    end
-
     it "should require a start_date" do
-      expect(GradingPeriod.create(course_id: 1, weight: 25.0, end_date: 1.day.from_now)).to_not be_valid
+      expect(GradingPeriod.create(course_id: 1, end_date: 1.day.from_now)).to_not be_valid
     end
 
     it "should require an end_date" do
-      expect(GradingPeriod.create(course_id: 1, weight: 25.0, start_date: Time.zone.now)).to_not be_valid
+      expect(GradingPeriod.create(course_id: 1, start_date: Time.zone.now)).to_not be_valid
     end
 
     context "when end_date is before the start_date" do
       it "should not be able to create a grading period with end_date before the start_date" do
-        expect(GradingPeriod.create(course_id: 1, weight: 25.0, start_date: 2.days.from_now, end_date: Time.zone.now)).to_not be_valid
+        expect(GradingPeriod.create(course_id: 1, start_date: 2.days.from_now, end_date: Time.zone.now)).to_not be_valid
       end
 
       it "should not be able to update the end_date to be before the start_date" do
-        grading_period = GradingPeriod.create(course_id: 1, weight: 25.0, start_date: Time.zone.now, end_date: 1.day.from_now)
+        grading_period = GradingPeriod.create(course_id: 1, start_date: Time.zone.now, end_date: 1.day.from_now)
         expect(grading_period).to be_valid
         grading_period.update_attributes(end_date: 1.day.ago)
         expect(grading_period).not_to be_valid
       end
 
       it "should not be able to update the start_date to be after the end_date" do
-        grading_period = GradingPeriod.create(course_id: 1, weight: 25.0, start_date: Time.zone.now, end_date: 1.day.from_now)
+        grading_period = GradingPeriod.create(course_id: 1, start_date: Time.zone.now, end_date: 1.day.from_now)
         expect(grading_period).to be_valid
         grading_period.update_attributes(start_date: 2.days.from_now)
         expect(grading_period).not_to be_valid

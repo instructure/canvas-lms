@@ -23,8 +23,7 @@ describe "grading periods" do
         grading_period_group = @course.grading_period_groups.create!
         grading_period = grading_period_group.grading_periods.create!(title: "Course-level grading period",
                                                                       start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now,
-                                                                      weight: 0.50)
+                                                                      end_date: 30.days.from_now)
         get "/courses/#{@course.id}/grading_standards"
         expect(f("#period_title_#{grading_period.id}").attribute("value")).to eq("Course-level grading period")
       end
@@ -37,8 +36,7 @@ describe "grading periods" do
         grading_period_group = @course.root_account.grading_period_groups.create!
         grading_period = grading_period_group.grading_periods.create!(title: "Account-level grading period",
                                                                       start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now,
-                                                                      weight: 0.50)
+                                                                      end_date: 30.days.from_now)
         get "/courses/#{@course.id}/grading_standards"
         expect(f("#period_title_#{grading_period.id}").attribute("value")).to eq("Account-level grading period")
       end
@@ -73,8 +71,7 @@ describe "grading periods" do
         grading_period_group = @account.grading_period_groups.create!
         grading_period = grading_period_group.grading_periods.create!(title: "Account-level grading period",
                                                                       start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now,
-                                                                      weight: 0.50)
+                                                                      end_date: 30.days.from_now)
         get "/accounts/#{@account.id}/grading_standards"
         expect(f("#period_title_#{grading_period.id}").attribute("value")).to eq("Account-level grading period")
       end
@@ -83,8 +80,7 @@ describe "grading periods" do
         grading_period_group = @course.grading_period_groups.create!
         grading_period = grading_period_group.grading_periods.create!(title: "Course-level grading period",
                                                                       start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now,
-                                                                      weight: 0.50)
+                                                                      end_date: 30.days.from_now)
         get "/accounts/#{@account.id}/grading_standards"
         expect(f("#period_title_#{grading_period.id}")).to be_nil
       end

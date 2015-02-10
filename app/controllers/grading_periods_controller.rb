@@ -22,17 +22,12 @@
 # @model GradingPeriod
 #    {
 #       "id": "GradingPeriod",
-#       "required": ["id", "weight", "start_date", "end_date"],
+#       "required": ["id", "start_date", "end_date"],
 #       "properties": {
 #         "id": {
 #           "description": "The unique identifier for the grading period.",
 #           "example": 1023,
 #           "type": "integer"
-#         },
-#         "weight": {
-#           "description": "The weighted percentage on how much this particular period should count toward the total grade.",
-#           "type": "integer",
-#           "example": "25"
 #         },
 #         "start_date": {
 #           "description": "The start date of the grading period.",
@@ -45,6 +40,11 @@
 #           "example": "2014-05-07T17:07:00Z",
 #           "type": "string",
 #           "format": "date-time"
+#         },
+#         "weight": {
+#           "description": "The weighted percentage on how much this particular period should count toward the total grade.",
+#           "type": "integer",
+#           "example": "25"
 #         }
 #       }
 #    }
@@ -99,13 +99,13 @@ class GradingPeriodsController < ApplicationController
   #
   # Create a new grading period for the current user
   #
-  # @argument grading_periods[][weight] [Required, Number]
-  #   The percentage weight of how much the period should count toward the course grade.
-  #
   # @argument grading_periods[][start_date] [Required, Date]
   #   The date the grading period starts.
   #
   # @argument grading_periods[][end_date] [Required, Date]
+  #
+  # @argument grading_periods[][weight] [Number]
+  #   The percentage weight of how much the period should count toward the course grade.
   #
   # @example_response
   #   {
@@ -133,13 +133,13 @@ class GradingPeriodsController < ApplicationController
   #
   # Update an existing grading period.
   #
-  # @argument grading_periods[][weight] [Required, Number]
-  #   The percentage weight of how much the period should count toward the course grade.
-  #
   # @argument grading_periods[][start_date] [Required, Date]
   #   The date the grading period starts.
   #
   # @argument grading_periods[][end_date] [Required, Date]
+  #
+  # @argument grading_periods[][weight] [Number]
+  #   The percentage weight of how much the period should count toward the course grade.
   #
   # @example_response
   #   {
