@@ -430,7 +430,7 @@ class ExternalToolsController < ApplicationController
   end
   protected :basic_lti_launch_request
 
-  def content_item_selection_response(tool, placement, content_item_response)
+  def content_item_selection_response(tool, placement, content_item_response, attachment = nil)
     params = default_lti_params.merge(
       {
         #required params
@@ -442,7 +442,7 @@ class ExternalToolsController < ApplicationController
         context_title: @context.name,
         tool_consumer_instance_name: @domain_root_account.name,
         tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
-      }).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
+      }).merge(variable_expander(tool:tool, attachment:@file).expand_variables!(tool.set_custom_fields(placement)))
 
 
     lti_launch = Lti::Launch.new
@@ -477,23 +477,23 @@ class ExternalToolsController < ApplicationController
 
   def content_item_for_file
     #find the content title
-    file = Attachment.where(:id => params[:files].first).first
+    @file = Attachment.where(:id => params[:files].first).first
     if @context.is_a?(Account)
-      raise ActiveRecord::RecordNotFound unless file.context == @current_user
-    elsif file.context.is_a?(Course)
-      raise ActiveRecord::RecordNotFound unless file.context == @context
-    elsif file.context.is_a?(Group)
-      raise ActiveRecord::RecordNotFound unless file.context.context == @context
+      raise ActiveRecord::RecordNotFound unless @file.context == @current_user
+    elsif @file.context.is_a?(Course)
+      raise ActiveRecord::RecordNotFound unless @file.context == @context
+    elsif @file.context.is_a?(Group)
+      raise ActiveRecord::RecordNotFound unless @file.context.context == @context
     end
-    render_unauthorized_action if file.locked_for?(@current_user, check_policies: true)
+    render_unauthorized_action if @file.locked_for?(@current_user, check_policies: true)
 
     {
         "@type" => "ContentItemPlacement",
         "placementOf" => {
             "@type" => "FileItem",
-            "@id" => file_download_url(file, { :verifier => file.uuid, :download => '1', :download_frd => '1' }),
-            "mediaType" => file.content_type,
-            "title" => file.display_name
+            "@id" => file_download_url(@file, { :verifier => @file.uuid, :download => '1', :download_frd => '1' }),
+            "mediaType" => @file.content_type,
+            "title" => @file.display_name
         }
     }
   end

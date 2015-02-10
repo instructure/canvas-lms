@@ -25,7 +25,7 @@ module Lti
     attr_reader :context, :root_account, :controller, :current_user
 
     attr_accessor :current_pseudonym, :content_tag, :assignment,
-                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool
+                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment
 
     def self.register_expansion(name, permission_groups, proc, guard = -> { true })
       @expansions ||= {}
@@ -42,6 +42,9 @@ module Lti
     ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
+    MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
+    USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
+    MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
 
 
     def initialize(root_account, context, controller, opts = {})
@@ -267,6 +270,38 @@ module Lti
     register_expansion 'ToolConsumerProfile.url', [],
                        -> { @controller.named_context_url(@tool.context, :context_tool_consumer_profile_url, "339b6700-e4cb-47c5-a54f-3ee0064921a9", include_host: true )},
                        -> { @tool }
+
+    register_expansion 'Canvas.file.media.id', [],
+                       -> { (@attachment.media_object && @attachment.media_object.media_id) || @attachment.media_entry_id },
+                       MEDIA_OBJECT_ID_GUARD
+
+    register_expansion 'Canvas.file.media.type', [],
+                       -> {@attachment.media_object.media_type},
+                       MEDIA_OBJECT_GUARD
+
+    register_expansion 'Canvas.file.media.duration', [],
+                       -> {@attachment.media_object.duration},
+                       MEDIA_OBJECT_GUARD
+
+    register_expansion 'Canvas.file.media.size', [],
+                       -> {@attachment.media_object.total_size},
+                       MEDIA_OBJECT_GUARD
+
+    register_expansion 'Canvas.file.media.title', [],
+                       -> {@attachment.media_object.user_entered_title || @attachment.media_object.title},
+                       MEDIA_OBJECT_GUARD
+
+    register_expansion 'Canvas.file.usageRights.name', [],
+                       -> {@attachment.usage_rights.license_name},
+                       USAGE_RIGHTS_GUARD
+
+    register_expansion 'Canvas.file.usageRights.url', [],
+                       -> {@attachment.usage_rights.license_url},
+                       USAGE_RIGHTS_GUARD
+
+    register_expansion 'Canvas.file.usageRights.copyrightText', [],
+                       -> {@attachment.usage_rights.legal_copyright},
+                       USAGE_RIGHTS_GUARD
 
     private
 
