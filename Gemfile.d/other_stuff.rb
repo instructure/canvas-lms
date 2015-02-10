@@ -56,6 +56,7 @@ gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485
   gem 'jsmin', '1.0.1'
 gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
+gem 'jwt', '1.2.1'
 
 # native xml parsing, diigo
 gem 'libxml-ruby', '2.7.0', :require => 'xml/libxml'
