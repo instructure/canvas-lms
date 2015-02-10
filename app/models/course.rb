@@ -1860,6 +1860,15 @@ class Course < ActiveRecord::Base
     !!self.turnitin_settings
   end
 
+  def turnitin_id
+    if self[:turnitin_id].blank?
+      # the reason we don't just use the global_id all the time is so that the
+      # turnitin_id is preserved when shard splits/etc. occur
+      update_attribute(:turnitin_id, global_id)
+    end
+    self[:turnitin_id]
+  end
+
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
     return html unless html.present? && to_context
 
