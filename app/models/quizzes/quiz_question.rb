@@ -132,6 +132,11 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     data
   end
 
+  def assessment_question= aq
+    self.assessment_question_version = aq.version_number
+    super aq
+  end
+
   def delete_assessment_question
     if self.assessment_question && self.assessment_question.editable_by?(self)
       self.assessment_question.destroy
@@ -140,15 +145,28 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def create_assessment_question
     return if self.question_data && self.question_data.is_type?(:text_only)
-    self.assessment_question ||= AssessmentQuestion.new
-    if self.assessment_question.editable_by?(self)
-      self.assessment_question.question_data = self.question_data
-      self.assessment_question.initial_context = self.quiz.context if self.quiz && self.quiz.context
-      self.assessment_question.save if self.assessment_question.new_record?
-      self.assessment_question_id = self.assessment_question.id
-      self.assessment_question_version = self.assessment_question.version_number rescue nil
+
+    aq = self.assessment_question || AssessmentQuestion.new
+
+    if aq.editable_by?(self)
+      aq.question_data = self.question_data
+      aq.initial_context = self.quiz.context if self.quiz && self.quiz.context
+      aq.save! if aq.new_record?
     end
-    true
+
+    self.assessment_question = aq
+
+    return true
+  end
+
+  def update_assessment_question! aq
+    if assessment_question_version.blank? || assessment_question_version < aq.version_number
+      self.assessment_question = aq
+      self.question_data = aq.question_data
+      save!
+    end
+
+    return self
   end
 
   def validate_blank_questions
