@@ -54,12 +54,12 @@ describe Quizzes::QuizSubmissionEventsController do
       expect(response).to be_success
     end
 
-    it "should let the student in" do
+    it "should not let the student in" do
       user_session(@student)
 
       subject()
 
-      expect(response).to be_success
+      expect(response).to be_client_error
     end
 
     context 'when quiz_log_auditing feature flag is off' do
@@ -72,7 +72,7 @@ describe Quizzes::QuizSubmissionEventsController do
       end
 
       it "should redirect away" do
-        user_session(@student)
+        user_session(@teacher)
 
         subject()
 

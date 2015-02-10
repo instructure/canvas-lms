@@ -105,48 +105,26 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         student_in_course(course: @course)
       end
 
-      it 'should let me in' do
+      it 'should not let me in' do
         @quiz_submission = @quiz.generate_submission(@student)
-        expect(api_index()).to have_key('quiz_submission_events')
+        api_index({raw: true})
+        assert_status(401)
+      end
+    end
+
+    context 'as the teacher' do
+      before(:once) do
+        teacher_in_course(course: @course)
+        @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      context 'with the latest attempt' do
-        before(:once) do
-          @quiz_submission = @quiz.generate_submission(@student)
-          @quiz_submission.events.create!({
-            event_type: 'something',
-            event_data: [ 'test' ],
-            attempt: 1
-          })
-        end
-
-        it 'should work' do
-          json = api_index
-
-          expect(json).to have_key('quiz_submission_events')
-
-          json['quiz_submission_events'].tap do |events|
-            expect(events.count).to eq(1)
-
-            events[0].tap do |event|
-              expect(event).to have_key('id')
-              expect(event).to have_key('created_at')
-              expect(event['event_type']).to eq('something')
-              expect(event['event_data']).to eq([ 'test' ])
-            end
-          end
-        end
-
-        describe 'JSON-API compliance' do
-          it 'should conform to the JSON-API spec when returning the object' do
-            json = api_index
-            assert_jsonapi_compliance(json, 'quiz_submission_events')
-          end
-        end
+      it 'should let me in' do
+        expect(api_index()).to have_key('quiz_submission_events')
       end
 
       context 'with a specific attempt' do
         before(:once) do
+          student_in_course(course: @course)
           @quiz_submission = @quiz.generate_submission(@student)
           @quiz_submission.with_versioning(true, &:save!)
 
@@ -155,6 +133,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
 
           @quiz_submission.events.create!({ event_type: 'a', attempt: 1 })
           @quiz_submission.events.create!({ event_type: 'b', attempt: 2 })
+          teacher_in_course(course: @course)
         end
 
         it 'should work' do
@@ -169,16 +148,23 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
           end
         end
       end
-    end
 
-    context 'as the teacher' do
-      before(:once) do
-        teacher_in_course(course: @course)
-        @quiz_submission = @quiz.generate_submission(@student)
-      end
+      context 'with the latest attempt' do
+        before(:once) do
+          @quiz_submission = @quiz.generate_submission(@student)
+          @quiz_submission.events.create!({
+            event_type: 'something',
+            event_data: [ 'test' ],
+            attempt: 1
+          })
+        end
 
-      it 'should let me in' do
-        expect(api_index()).to have_key('quiz_submission_events')
+        describe 'JSON-API compliance' do
+          it 'should conform to the JSON-API spec when returning the object' do
+            json = api_index
+            assert_jsonapi_compliance(json, 'quiz_submission_events')
+          end
+        end
       end
     end
 
