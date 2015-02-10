@@ -921,6 +921,31 @@ describe Course, "gradebook_to_csv" do
     expect(rows[2][-5]).to  eq "25"     # ag2 final score
   end
 
+  it "handles nil assignment due_dates if the group and position are the same" do
+    course_with_student(:active_all => true)
+
+    assignment_group = @course.assignment_groups.create!(:name => "Some Assignment Group 1")
+
+    now = Time.now
+
+    @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 1, :assignment_group => assignment_group, :points_possible => 10)
+    @course.assignments.create!(:title => "Assignment 02", :due_at => nil, :position => 1, :assignment_group => assignment_group, :points_possible => 10)
+
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+
+    csv = @course.gradebook_to_csv
+    rows = CSV.parse(csv)
+    assignments = rows[0].each_with_object([]) do |column, collection|
+      collection << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
+    end
+
+    expect(csv).not_to be_nil
+    # make sure they retain the correct order
+    expect(assignments).to eq ["Assignment 01", "Assignment 02"]
+  end
+
   it "should alphabetize by sortable name with the test student at the end" do
     course
     ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].each{|name| student_in_course(:name => name)}
