@@ -350,6 +350,23 @@ describe "content migrations", :non_parallel do
       truncate_all_tables
     end
 
+    it "should show warning before self-copy" do
+      visit_page
+      select_migration_type
+      wait_for_ajaximations
+
+      # drop-down
+      click_option('#courseSelect', @course.id.to_s, :value)
+      wait_for_ajaximations
+
+      expect(f('#courseSelectWarning')).to be_displayed
+
+      click_option('#courseSelect', @copy_from.id.to_s, :value)
+      wait_for_ajaximations
+
+      expect(f('#courseSelectWarning')).to_not be_displayed
+    end
+
     it "should select by drop-down or by search box" do
       visit_page
       select_migration_type
