@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe CourseProgress do
   let(:progress_error) { {:error=>{:message=>'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course'}} }
@@ -182,6 +183,22 @@ describe CourseProgress do
       # check progress again
       progress = CourseProgress.new(@course, @user)
       expect(progress.requirement_completed_count).to eq 1
+    end
+
+    context "when the user is on a different shard than the course" do
+      specs_require_sharding
+
+      it "can return correct progress" do
+        pend_with_bullet
+
+        @shard1.activate { @shard_user = User.create!(name: 'outofshard') }
+        @course.enroll_student(@shard_user)
+
+        @module.update_for(@shard_user, :submitted, @tag)
+        @module.update_for(@shard_user, :submitted, @tag2)
+        progress = CourseProgress.new(@course, @shard_user)
+        expect(progress.requirement_completed_count).to eq 2
+      end
     end
   end
 end
