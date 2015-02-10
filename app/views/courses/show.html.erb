@@ -125,7 +125,7 @@
     <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
-  <% elsif @course_home_view != 'wiki' %>
+  <% else %>
     <% locals = {:title => t("Coming Up"), :display_count => 3, :period => "the next week", :contexts_to_link_to => @context, :upcoming => true} %>
     <% if @current_user %>
       <% cache(safe_cache_key([@current_user, @contexts, 'course_upcoming_events' ])) do %>
