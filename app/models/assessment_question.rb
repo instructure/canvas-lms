@@ -212,9 +212,14 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def find_or_create_quiz_question(quiz_id, exclude_ids=[])
-    finder = quiz_questions.where({ quiz_id: quiz_id })
-    finder = finder.where('id NOT IN (?)', exclude_ids) if exclude_ids.any?
-    finder.first || create_quiz_question(quiz_id)
+    query = quiz_questions.where(quiz_id: quiz_id)
+    query = query.where('id NOT IN (?)', exclude_ids) if exclude_ids.present?
+
+    if qq = query.first
+      qq.update_assessment_question! self
+    else
+      create_quiz_question(quiz_id)
+    end
   end
 
   def self.scrub(text)
@@ -233,27 +238,22 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def self.parse_question(qdata, assessment_question=nil)
     qdata = qdata.to_hash.with_indifferent_access
-    previous_data = assessment_question.question_data rescue {}
-    previous_data ||= {}
+    qdata[:question_name] ||= qdata[:name]
 
-    question = Quizzes::QuizQuestion::QuestionData.generate(
-      id: qdata[:id] || previous_data[:id],
-      regrade_option: qdata[:regrade_option] || previous_data[:regrade_option],
-      points_possible: qdata[:points_possible] || previous_data[:points_possible],
-      correct_comments: qdata[:correct_comments] || previous_data[:correct_comments],
-      incorrect_comments: qdata[:incorrect_comments] || previous_data[:incorrect_comments],
-      neutral_comments: qdata[:neutral_comments] || previous_data[:neutral_comments],
-      question_type: qdata[:question_type] || previous_data[:question_type],
-      question_name: qdata[:question_name] || qdata[:name] || previous_data[:question_name],
-      question_text: qdata[:question_text] || previous_data[:question_text],
-      answers: qdata[:answers] || previous_data[:answers],
-      formulas: qdata[:formulas] || previous_data[:formulas],
-      variables: qdata[:variables] || previous_data[:variables],
-      answer_tolerance: qdata[:answer_tolerance] || previous_data[:answer_tolerance],
-      formula_decimal_places: qdata[:formula_decimal_places] || previous_data[:formula_decimal_places],
-      matching_answer_incorrect_matches: qdata[:matching_answer_incorrect_matches] || previous_data[:matching_answer_incorrect_matches],
-      matches: qdata[:matches] || previous_data[:matches]
+    previous_data = if assessment_question.present?
+                      assessment_question.question_data || {}
+                    else
+                      {}
+                    end.with_indifferent_access
+
+    data = previous_data.merge(qdata.delete_if {|k, v| !v}).slice(
+      :id, :regrade_option, :points_possible, :correct_comments, :incorrect_comments,
+      :neutral_comments, :question_type, :question_name, :question_text, :answers,
+      :formulas, :variables, :answer_tolerance, :formula_decimal_places,
+      :matching_answer_incorrect_matches, :matches
     )
+
+    question = Quizzes::QuizQuestion::QuestionData.generate(data)
 
     question[:assessment_question_id] = assessment_question.id rescue nil
     question
