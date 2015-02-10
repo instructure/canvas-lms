@@ -171,8 +171,8 @@ define [
 #      @goingBack = false
 
     updateSidebarWidth: ->
-      sidebarWidth = if @directories.length is 1 then @directoryWidth + 1 else (@directoryWidth * 2) + 2
-      @$el.css width: (@directoryWidth * @directories.length) + @directories.length
+      sidebarWidth = if @directories.length is 1 then @directoryWidth else (@directoryWidth * 2)
+      @$el.css width: (@directoryWidth * @directories.length)
       @$sidebar.animate width: sidebarWidth
 
     renderDir: (dir) =>
@@ -226,7 +226,7 @@ define [
         ), 1500
 
     _scrollToDir: (dirIndex, model) ->
-      scrollLeft = (@directoryWidth + 1) * (if model instanceof Outcome then dirIndex - 1 else dirIndex)
+      scrollLeft = @directoryWidth * (if model instanceof Outcome then dirIndex - 1 else dirIndex)
       @$sidebar.animate {scrollLeft: scrollLeft}, duration: 200
       scrollTop = (@entryHeight + 1) * _.indexOf(@directories[dirIndex].views(), _.find(@directories[dirIndex].views(), (v) -> v.model is model))
       @directories[dirIndex].$el.animate {scrollTop: scrollTop}, duration: 200
