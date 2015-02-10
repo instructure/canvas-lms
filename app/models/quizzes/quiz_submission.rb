@@ -114,7 +114,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     can :read
 
     given {|user, session| quiz.context.grants_right?(user, session, :manage_grades) }
-    can :update_scores and can :add_attempts
+    can :update_scores and can :add_attempts and can :view_log
   end
 
   # override has_one relationship provided by simply_versioned

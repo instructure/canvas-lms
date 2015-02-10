@@ -118,7 +118,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
   #  }
   #
   def index
-    if authorized_action(@quiz_submission, @current_user, :read)
+    if authorized_action(@quiz_submission, @current_user, :view_log)
       unless @context.feature_enabled?(:quiz_log_auditing)
         reject! 400, "quiz log auditing must be enabled"
       end
