@@ -147,22 +147,6 @@ class BigBlueButtonConference < WebConference
     response[:deleted] if response
   end
 
-  def publish_recording(recording_id)
-    response = send_request(:publishRecordings, {
-      :recordID => recording_id,
-      :publish => true,
-      })
-    response[:published] if response
-  end
-
-  def unpublish_recording(recording_id)
-    response = send_request(:publishRecordings, {
-      :recordID => recording_id,
-      :publish => false,
-      })
-    response[:unpublished] if response
-  end
-
   def generate_request(action, options)
     query_string = options.to_query
     query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config[:secret_dec]))
