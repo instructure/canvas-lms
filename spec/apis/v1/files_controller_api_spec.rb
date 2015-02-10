@@ -695,6 +695,62 @@ describe "Files API", type: :request do
       expect(@att.folder_id).to eq @sub.id
     end
 
+    describe "rename where file already exists" do
+      before :once do
+        @existing_file = Attachment.create! filename: 'newname.txt', display_name: 'newname.txt', uploaded_data: StringIO.new('blah'), folder: @root, context: @course
+      end
+
+      it "should fail if on_duplicate isn't provided" do
+        api_call(:put, @file_path, @file_path_options, {name: 'newname.txt'}, {}, {expected_status: 409})
+        expect(@att.reload.display_name).to eq 'test.txt'
+        expect(@existing_file.reload).not_to be_deleted
+      end
+
+      it "should overwrite if asked" do
+        api_call(:put, @file_path, @file_path_options, {name: 'newname.txt', on_duplicate: 'overwrite'})
+        expect(@att.reload.display_name).to eq 'newname.txt'
+        expect(@existing_file.reload).to be_deleted
+        expect(@existing_file.replacement_attachment).to eq @att
+      end
+
+      it "should rename if asked" do
+        api_call(:put, @file_path, @file_path_options, {name: 'newname.txt', on_duplicate: 'rename'})
+        expect(@existing_file.reload).not_to be_deleted
+        expect(@existing_file.name).to eq 'newname.txt'
+        expect(@att.reload.display_name).not_to eq 'test.txt'
+        expect(@att.display_name).not_to eq 'newname.txt'
+        expect(@att.display_name).to start_with 'newname'
+        expect(@att.display_name).to end_with '.txt'
+      end
+    end
+
+    describe "move where file already exists" do
+      before :once do
+        @sub = @root.sub_folders.create! name: 'sub', context: @course
+        @existing_file = Attachment.create! filename: 'test.txt', display_name: 'test.txt', uploaded_data: StringIO.new('existing'), folder: @sub, context: @course
+      end
+
+      it "should fail if on_duplicate isn't provided" do
+        api_call(:put, @file_path, @file_path_options, {parent_folder_id: @sub.to_param}, {}, {expected_status: 409})
+        expect(@existing_file.reload).not_to be_deleted
+        expect(@att.reload.folder).to eq @root
+      end
+
+      it "should overwrite if asked" do
+        api_call(:put, @file_path, @file_path_options, {parent_folder_id: @sub.to_param, on_duplicate: 'overwrite'})
+        expect(@existing_file.reload).to be_deleted
+        expect(@att.reload.folder).to eq @sub
+        expect(@att.display_name).to eq @existing_file.display_name
+      end
+
+      it "should rename if asked" do
+        api_call(:put, @file_path, @file_path_options, {parent_folder_id: @sub.to_param, on_duplicate: 'rename'})
+        expect(@existing_file.reload).not_to be_deleted
+        expect(@att.reload.folder).to eq @sub
+        expect(@att.display_name).not_to eq @existing_file.display_name
+      end
+    end
+
     it "should return unauthorized error" do
       course_with_student(:course => @course)
       api_call(:put, @file_path, @file_path_options, {:name => "new name"}, {}, :expected_status => 401)

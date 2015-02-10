@@ -968,6 +968,14 @@ class FilesController < ApplicationController
   #   The new folder must be in the same context as the original parent folder.
   #   If the file is in a context without folders this does not apply.
   #
+  # @argument on_duplicate [Optional, String, "overwrite"|"rename"]
+  #   If the file is moved to a folder containing a file with the same name,
+  #   or renamed to a name matching an existing file, the API call will fail
+  #   unless this parameter is supplied.
+  #
+  #   "overwrite":: Replace the existing file with the same name
+  #   "rename":: Add a qualifier to make the new filename unique
+  #
   # @argument lock_at [DateTime]
   #   The datetime to lock the file at
   #
@@ -1005,7 +1013,12 @@ class FilesController < ApplicationController
       if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:usage_rights_required)
         return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request
       end
+      if (@attachment.folder_id_changed? || @attachment.display_name_changed?) && @attachment.folder.active_file_attachments.where(display_name: @attachment.display_name).where("id<>?", @attachment.id).exists?
+        return render json: {message: "file already exists; use on_duplicate='overwrite' or 'rename'"}, status: :conflict unless %w(overwrite rename).include?(params[:on_duplicate])
+        on_duplicate = params[:on_duplicate].to_sym
+      end
       if @attachment.save
+        @attachment.handle_duplicates(on_duplicate) if on_duplicate
         render :json => attachment_json(@attachment, @current_user)
       else
         render :json => @attachment.errors, :status => :bad_request
