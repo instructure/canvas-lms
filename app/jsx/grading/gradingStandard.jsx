@@ -4,23 +4,26 @@ define([
   'react',
   'jsx/grading/dataRow',
   'jquery',
-  'i18n!external_tools'
+  'i18n!external_tools',
+  'underscore'
 ],
-function(React, DataRow, $, I18n) {
+function(React, DataRow, $, I18n, _) {
   var update = React.addons.update;
   var GradingStandard = React.createClass({
 
     getInitialState: function() {
       return {
         editingStandard: $.extend(true, {}, this.props.standard),
-        saving: false
+        saving: false,
+        showAlert: false
       };
     },
 
     componentWillReceiveProps: function(nextProps) {
       this.setState({
         editingStandard: $.extend(true, {}, this.props.standard),
-        saving: nextProps.saving
+        saving: nextProps.saving,
+        showAlert: false
       });
     },
 
@@ -49,9 +52,15 @@ function(React, DataRow, $, I18n) {
     },
 
     triggerSaveGradingStandard: function() {
-      this.setState({saving: true}, function() {
-        this.props.onSaveGradingStandard(this.state.editingStandard);
-      });
+      if(this.standardIsValid()){
+        this.setState({saving: true}, function() {
+          this.props.onSaveGradingStandard(this.state.editingStandard);
+        });
+      }else{
+        this.setState({showAlert: true}, function() {
+          this.refs.invalidStandardAlert.getDOMNode().focus();
+        });
+      }
     },
 
     assessedAssignment: function() {
@@ -74,19 +83,54 @@ function(React, DataRow, $, I18n) {
       this.setState({editingStandard: newEditingStandard});
     },
 
-    titleChange: function(event) {
-      this.state.editingStandard.title = event.target.value;
-      this.setState({editingStandard: this.state.editingStandard});
+    changeTitle: function(event) {
+      var newEditingStandard = $.extend(true, {}, this.state.editingStandard);
+      newEditingStandard.title = (event.target.value);
+      this.setState({editingStandard: newEditingStandard});
     },
 
-    changeRowMinScore: function(index, newMinVal) {
-      this.state.editingStandard.data[index][1] = newMinVal;
-      this.setState({editingStandard: this.state.editingStandard});
+    changeRowMinScore: function(index, inputVal) {
+      var newEditingStandard = $.extend(true, {}, this.state.editingStandard);
+      var lastChar = inputVal.substr(inputVal.length - 1);
+      newEditingStandard.data[index][1] = inputVal;
+      this.setState({editingStandard: newEditingStandard});
     },
 
     changeRowName: function(index, newRowName) {
-      this.state.editingStandard.data[index][0] = newRowName;
-      this.setState({editingStandard: this.state.editingStandard});
+      var newEditingStandard = $.extend(true, {}, this.state.editingStandard);
+      newEditingStandard.data[index][0] = newRowName;
+      this.setState({editingStandard: newEditingStandard});
+    },
+
+    hideAlert: function() {
+      this.setState({showAlert: false}, function(){
+        this.refs.title.getDOMNode().focus();
+      });
+    },
+
+    standardIsValid: function() {
+      return this.rowDataIsValid() && this.rowNamesAreValid();
+    },
+
+    rowDataIsValid: function() {
+      if(this.state.editingStandard.data.length <= 1) return true;
+      var rowValues = _.map(this.state.editingStandard.data, function(dataRow){ return String(dataRow[1]).trim() });
+      var sanitizedRowValues = _.chain(rowValues).compact().uniq().value();
+      var inputsAreUniqueAndNonEmpty = (sanitizedRowValues.length === rowValues.length);
+      var valuesDoNotOverlap = !_.any(this.state.editingStandard.data, function(element, index, list){
+        if(index < 1) return false;
+        var thisMinScore = this.props.round(element[1]);
+        var aboveMinScore = this.props.round(list[index-1][1]);
+        return (thisMinScore >= aboveMinScore);
+      }, this);
+
+      return inputsAreUniqueAndNonEmpty && valuesDoNotOverlap;
+    },
+
+    rowNamesAreValid: function() {
+      var rowNames = _.map(this.state.editingStandard.data, function(dataRow){ return dataRow[0].trim() });
+      var sanitizedRowNames = _.chain(rowNames).compact().uniq().value();
+      return sanitizedRowNames.length === rowNames.length;
     },
 
     renderCannotManageMessage: function() {
@@ -114,7 +158,7 @@ function(React, DataRow, $, I18n) {
       if(this.props.editing){
         return (
           <div className="pull-left" tabIndex="0">
-            <input type="text" onChange={this.titleChange} className="grading_standard_title"
+            <input type="text" onChange={this.changeTitle} className="grading_standard_title"
                    name="grading_standard[title]" className="scheme_name" title={I18n.t("Grading standard title")}
                    value={this.state.editingStandard.title} ref="title"/>
           </div>
@@ -136,7 +180,7 @@ function(React, DataRow, $, I18n) {
         return (
           <DataRow key={idx} uniqueId={idx} row={item} siblingRow={array[idx - 1]} editing={this.props.editing}
                    onDeleteRow={this.deleteDataRow} onInsertRow={this.insertGradingStandardRow}
-                   onlyDataRowRemaining={!this.moreThanOneDataRowRemains()}
+                   onlyDataRowRemaining={!this.moreThanOneDataRowRemains()} round={this.props.round}
                    onRowMinScoreChange={this.changeRowMinScore} onRowNameChange={this.changeRowName}/>
         );
       }, this);
@@ -217,11 +261,43 @@ function(React, DataRow, $, I18n) {
       );
     },
 
+    renderInvalidStandardMessage: function() {
+      var message = "Invalid grading scheme";
+      if(!this.rowDataIsValid()) message = "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.";
+      if(!this.rowNamesAreValid()) message = "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.";
+      return (
+        <div id={"invalid_standard_message_" + this.props.uniqueId} className="alert-message" tabIndex="-1" ref="invalidStandardAlert">
+          {I18n.t("%{message}", { message: message })}
+        </div>
+      );
+    },
+
+    renderStandardAlert: function() {
+      if(!this.state.showAlert) return null;
+      if(this.standardIsValid()){
+        return (
+          <div id="valid_standard" className="alert alert-success">
+            <button aria-label="Close" className="dismiss_alert close" onClick={this.hideAlert}>×</button>
+            <div className="alert-message">
+              {I18n.t("Looks great!")}
+            </div>
+          </div>
+        );
+      }
+      return (
+        <div id="invalid_standard" className="alert alert-error">
+          <button aria-label="Close" className="dismiss_alert close" onClick={this.hideAlert}>×</button>
+          {this.renderInvalidStandardMessage()}
+        </div>
+      );
+    },
+
     render: function () {
       return (
         <div>
           <div className="grading_standard react_grading_standard pad-box-mini border border-trbl border-round"
                id={this.renderIdNames()}>
+            {this.renderStandardAlert()}
             <div>
               <table>
                 <caption className="screenreader-only">

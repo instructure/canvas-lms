@@ -32,8 +32,8 @@ function(React, GradingStandard, $, I18n, _) {
 
     formatStandardData: function(standardData) {
       return _.map(standardData, function(dataRow){
-        return [dataRow[0], dataRow[1] * 100];
-      });
+        return [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)];
+      }, this);
     },
 
     addGradingStandard: function() {
@@ -80,11 +80,12 @@ function(React, GradingStandard, $, I18n, _) {
       var newStandards = $.extend(true, [], this.state.standards);
       var indexToUpdate = this.state.standards.indexOf(this.getStandardById(standard.id));
       var type, url, data;
+      standard.title = standard.title.trim();
       if(this.standardNotCreated(standard)){
+        if(standard.title === "") standard.title = "New Grading Scheme";
         type = "POST";
         url = ENV.GRADING_STANDARDS_URL;
         data = this.dataFormattedForCreate(standard);
-        if((standard.title).trim() === "") standard.title = "New Grading Scheme";
       }else{
         type = "PUT";
         url = ENV.GRADING_STANDARDS_URL + "/" + standard.id;
@@ -119,7 +120,7 @@ function(React, GradingStandard, $, I18n, _) {
         var name = dataRow[0];
         var value = dataRow[1];
         formattedData["grading_standard"]["data"][i] = [
-          name,
+          name.trim(),
           this.roundToTwoDecimalPlaces(value) / 100
         ];
       }, this);
@@ -132,7 +133,7 @@ function(React, GradingStandard, $, I18n, _) {
         var name = dataRow[0];
         var value = dataRow[1];
         formattedData["grading_standard"]["standard_data"]["scheme_" + i] = {
-          name: name,
+          name: name.trim(),
           value: this.roundToTwoDecimalPlaces(value)
         };
       }, this);
@@ -183,8 +184,8 @@ function(React, GradingStandard, $, I18n, _) {
                                  uniqueId={s.grading_standard.id} standard={s.grading_standard}
                                  editing={!!s.editing} permissions={s.grading_standard.permissions}
                                  justAdded={!!s.justAdded} onSetEditingStatus={this.setEditingStatus}
+                                 round={this.roundToTwoDecimalPlaces} onDeleteGradingStandard={this.deleteGradingStandard}
                                  othersEditing={!s.editing && this.anyStandardBeingEdited()}
-                                 onDeleteGradingStandard={this.deleteGradingStandard}
                                  onSaveGradingStandard={this.saveGradingStandard}/>);
       }, this);
     },

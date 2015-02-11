@@ -76,6 +76,13 @@ def should_edit_a_grading_scheme_item
   expect(@grading_standard.data[0][0]).to eq 'F'
 end
 
+def should_not_update_invalid_grading_scheme_input
+  replace_content(grading_standard_rows[1].find_element(:css, '.standard_value'), '90')
+  save_and_reload_changes(@grading_standard)
+  expect(f("#invalid_standard_message_#{@grading_standard.id}")).to be_displayed
+  expect(@grading_standard.data[1][1]).to eq 0.8
+end
+
 def should_delete_a_grading_scheme_item
   data_count = @grading_standard.data.count
   grading_standard_rows[0].find_element(:css, '.delete_row_link').click

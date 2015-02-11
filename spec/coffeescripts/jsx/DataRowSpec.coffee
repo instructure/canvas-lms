@@ -14,6 +14,7 @@ define [
         uniqueId: 0
         row: ['A', 92.346]
         editing: false
+        round: (number)-> return Math.round(number * 100)/100;
 
       @dataRow = React.render(DataRow(props), $('<table>').appendTo('body')[0])
 
@@ -29,16 +30,11 @@ define [
   test 'getRowData() sets max score to 100 if there is no sibling row', ->
     deepEqual @dataRow.getRowData().maxScore, 100
 
-  test 'renderMinScore() returns the correct score for non-zero scores', ->
+  test 'renderMinScore() rounds the score if not in editing mode', ->
     deepEqual @dataRow.renderMinScore(), '92.35'
 
   test "renderMaxScore() returns a max score of 100 without a '<' sign", ->
     deepEqual @dataRow.renderMaxScore(), '100'
-
-  test 'roundToTwoDecimals() correctly rounds a number', ->
-    deepEqual @dataRow.roundToTwoDecimals(92.345), 92.35
-    deepEqual @dataRow.roundToTwoDecimals(92.344), 92.34
-    deepEqual @dataRow.roundToTwoDecimals(89.999), 90.00
 
   module 'DataRow being edited',
     setup: ->
@@ -47,6 +43,7 @@ define [
         uniqueId: 0
         row: ['A', 92.346]
         editing: true
+        round: (number)-> return Math.round(number * 100)/100;
         onRowMinScoreChange: ->
         onRowNameChange: ->
         onDeleteRow: ->
@@ -62,11 +59,11 @@ define [
   test 'does not accept non-numeric input', ->
     changeMinScore = sinon.spy(@dataRow.props, 'onRowMinScoreChange')
     Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: 'A'}})
-    deepEqual @dataRow.renderMinScore(), '92.35'
+    deepEqual @dataRow.renderMinScore(), '92.346'
     Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '*&@%!'}})
-    deepEqual @dataRow.renderMinScore(), '92.35'
+    deepEqual @dataRow.renderMinScore(), '92.346'
     Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '3B'}})
-    deepEqual @dataRow.renderMinScore(), '92.35'
+    deepEqual @dataRow.renderMinScore(), '92.346'
     ok changeMinScore.notCalled
 
   test 'does not call onRowMinScoreChange if the input is less than 0', ->
@@ -124,6 +121,7 @@ define [
         row: ['A-', 90.0]
         siblingRow: ['A', 92.346]
         editing: false
+        round: (number)-> return Math.round(number * 100)/100;
 
       @dataRow = React.renderComponent(DataRow(props), $('<table>').appendTo('body')[0])
 
@@ -132,35 +130,3 @@ define [
 
   test "shows the max score as the sibling's min score", ->
     deepEqual @dataRow.renderMaxScore(), '< 92.35'
-
-  module 'DataRow not being edited with a minScore of 0',
-    setup: ->
-      props =
-        key: 0
-        uniqueId: 0
-        row: ['F', 0.0]
-        editing: false
-
-      @dataRow = React.render(DataRow(props), $('<table>').appendTo('body')[0])
-
-    teardown: ->
-      React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
-
-  test 'renderMinScore() returns the correct score for scores of 0', ->
-    deepEqual @dataRow.renderMinScore(), '0'
-
-  module 'DataRow being edited with a blank min score',
-    setup: ->
-      props =
-        key: 0
-        uniqueId: 0
-        row: ['F', '']
-        editing: true
-
-      @dataRow = React.render(DataRow(props), $('<table>').appendTo('body')[0])
-
-    teardown: ->
-      React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
-
-  test 'renderMinScore() returns the empty string', ->
-    deepEqual @dataRow.renderMinScore(), ''

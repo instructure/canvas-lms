@@ -19,11 +19,12 @@ define [
         editing: false
         justAdded: false
         othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.render(GradingStandard(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -78,6 +79,7 @@ define [
         editing: false
         justAdded: false
         othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -106,6 +108,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -123,6 +126,12 @@ define [
 
   test 'renders the save button', ->
     ok @gradingStandard.refs.saveButton
+
+  test 'rowNamesAreValid() returns true with non-empty, unique row names', ->
+    deepEqual @gradingStandard.rowNamesAreValid(), true
+
+  test 'rowDataIsValid() returns true with non-empty, unique, non-overlapping row values', ->
+    deepEqual @gradingStandard.rowDataIsValid(), true
 
   test 'calls onSaveGradingStandard save button is clicked', ->
     saveGradingStandard = sinon.spy(@gradingStandard.props, 'onSaveGradingStandard')
@@ -163,9 +172,219 @@ define [
     deepEqual @gradingStandard.state.editingStandard.title, "Brand new title"
 
   test 'changes the min score on the editingStandard when changeRowMinScore is called', ->
-    @gradingStandard.changeRowMinScore(2, 0.23)
-    deepEqual @gradingStandard.state.editingStandard.data[2], ["F", 0.23]
+    @gradingStandard.changeRowMinScore(2, '23')
+    deepEqual @gradingStandard.state.editingStandard.data[2], ["F", '23']
 
   test 'changes the row name on the editingStandard when changeRowName is called', ->
     @gradingStandard.changeRowName(2, "Q")
     deepEqual @gradingStandard.state.editingStandard.data[2], ["Q", 0.00]
+
+  module "GradingStandard being edited with blank names",
+    setup: ->
+      props =
+        key: 1
+        standard:
+          id: 1
+          title: "Test Grading Standard"
+          data: [["A", 0.92], ["", 0.90], ["F", 0.00]]
+        permissions:
+          manage: true
+        editing: true
+        justAdded: false
+        othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
+        onSetEditingStatus: ->
+        onDeleteGradingStandard: ->
+        onSaveGradingStandard: ->
+
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+
+    teardown: ->
+      React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+
+  test 'rowNamesAreValid() returns false with empty row names', ->
+    deepEqual @gradingStandard.rowNamesAreValid(), false
+
+  test 'alerts the user that the input is invalid when they try to save', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    ok @gradingStandard.refs.invalidStandardAlert
+
+  test 'shows a messsage describing why the input is invalid', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
+      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
+
+  module "GradingStandard being edited with duplicate names",
+    setup: ->
+      props =
+        key: 1
+        standard:
+          id: 1
+          title: "Test Grading Standard"
+          data: [["A", 0.92], ["A", 0.90], ["F", 0.00]]
+        permissions:
+          manage: true
+        editing: true
+        justAdded: false
+        othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
+        onSetEditingStatus: ->
+        onDeleteGradingStandard: ->
+        onSaveGradingStandard: ->
+
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+
+    teardown: ->
+      React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+
+  test 'rowNamesAreValid() returns false with duplicate row names', ->
+    deepEqual @gradingStandard.rowNamesAreValid(), false
+
+  test 'alerts the user that the input is invalid when they try to save', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    ok @gradingStandard.refs.invalidStandardAlert
+
+  test 'shows a messsage describing why the input is invalid', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
+      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
+
+  module "GradingStandard being edited with empty values",
+    setup: ->
+      props =
+        key: 1
+        standard:
+          id: 1
+          title: "Test Grading Standard"
+          data: [["A", 0.92], ["B", 0.90], ["F", ""]]
+        permissions:
+          manage: true
+        editing: true
+        justAdded: false
+        othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
+        onSetEditingStatus: ->
+        onDeleteGradingStandard: ->
+        onSaveGradingStandard: ->
+
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+
+    teardown: ->
+      React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+
+  test 'rowDataIsValid() returns false with empty values', ->
+    deepEqual @gradingStandard.rowDataIsValid(), false
+
+  test 'alerts the user that the input is invalid when they try to save', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    ok @gradingStandard.refs.invalidStandardAlert
+
+  test 'shows a messsage describing why the input is invalid', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
+
+  module "GradingStandard being edited with duplicate values",
+    setup: ->
+      props =
+        key: 1
+        standard:
+          id: 1
+          title: "Test Grading Standard"
+          data: [["A", 0.92], ["B", 0.92], ["F", 0.00]]
+        permissions:
+          manage: true
+        editing: true
+        justAdded: false
+        othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
+        onSetEditingStatus: ->
+        onDeleteGradingStandard: ->
+        onSaveGradingStandard: ->
+
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+
+    teardown: ->
+      React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+
+  test 'rowDataIsValid() returns false with duplicate values', ->
+    deepEqual @gradingStandard.rowDataIsValid(), false
+
+  test 'alerts the user that the input is invalid when they try to save', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    ok @gradingStandard.refs.invalidStandardAlert
+
+  test 'shows a messsage describing why the input is invalid', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."  
+
+  module "GradingStandard being edited with values that round to the same number",
+    setup: ->
+      props =
+        key: 1
+        standard:
+          id: 1
+          title: "Test Grading Standard"
+          data: [["A", 0.92], ["B", 0.91996], ["F", 0.00]]
+        permissions:
+          manage: true
+        editing: true
+        justAdded: false
+        othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
+        onSetEditingStatus: ->
+        onDeleteGradingStandard: ->
+        onSaveGradingStandard: ->
+
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+
+    teardown: ->
+      React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+
+  test 'rowDataIsValid() returns false with if values round to the same number (91.996 rounds to 92)', ->
+    deepEqual @gradingStandard.rowDataIsValid(), false
+
+  test 'alerts the user that the input is invalid when they try to save', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    ok @gradingStandard.refs.invalidStandardAlert
+
+  test 'shows a messsage describing why the input is invalid', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
+
+  module "GradingStandard being edited with overlapping values",
+    setup: ->
+      props =
+        key: 1
+        standard:
+          id: 1
+          title: "Test Grading Standard"
+          data: [["A", 0.92], ["B", 0.93], ["F", 0.00]]
+        permissions:
+          manage: true
+        editing: true
+        justAdded: false
+        othersEditing: false
+        round: (number)-> return Math.round(number * 100)/100;
+        onSetEditingStatus: ->
+        onDeleteGradingStandard: ->
+        onSaveGradingStandard: ->
+
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+
+    teardown: ->
+      React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+
+  test 'rowDataIsValid() returns false if scheme values overlap', ->
+    deepEqual @gradingStandard.rowDataIsValid(), false
+
+  test 'alerts the user that the input is invalid when they try to save', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    ok @gradingStandard.refs.invalidStandardAlert
+
+  test 'shows a messsage describing why the input is invalid', ->
+    Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
+    deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."

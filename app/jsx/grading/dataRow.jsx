@@ -28,10 +28,6 @@ function(React, I18n) {
       });
     },
 
-    roundToTwoDecimals: function(number){
-      return Math.round(number * 100)/100;
-    },
-
     triggerRowNameChange: function(event){
       this.props.onRowNameChange(this.props.uniqueId, event.target.value);
     },
@@ -85,20 +81,14 @@ function(React, I18n) {
     },
 
     renderMaxScore: function(){
-      var maxScore = this.roundToTwoDecimals(this.getRowData().maxScore);
+      var maxScore = this.props.round(this.getRowData().maxScore);
       return maxScore === 100 ? String(maxScore) : "< " + maxScore;
     },
 
     renderMinScore: function(){
       var score = String(this.getRowData().minScore);
-      var roundedScore = String(this.roundToTwoDecimals(score));
-      if(this.props.editing && score === ''){
-        return '';
-      }else if(this.props.editing && score.charAt(score.length - 1) === '.'){
-        return roundedScore + '.';
-      }else{
-        return roundedScore;
-     }
+      if(!this.props.editing) return String(this.props.round(score));
+      return score;
     },
 
     renderDeleteLink: function(){
