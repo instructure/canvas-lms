@@ -59,14 +59,14 @@ define(function(require) {
 
           <table>
             <tr>
-              <th scope="col">
+              <th scope="row">
                 {I18n.t('session_table_headers.started_at', 'Started at')}
               </th>
               <td>{(new Date(this.props.submission.startedAt)).toString()}</td>
             </tr>
 
             <tr>
-              <th scope="col">
+              <th scope="row">
                 {I18n.t('session_table_headers.attempt', 'Attempt')}
               </th>
               <td>
