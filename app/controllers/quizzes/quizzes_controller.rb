@@ -211,8 +211,8 @@ class Quizzes::QuizzesController < ApplicationController
       js_env(hash)
 
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
+      if params[:take] && (@can_take = can_take_quiz?)
 
-      if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
           start_quiz!
@@ -867,7 +867,12 @@ class Quizzes::QuizzesController < ApplicationController
     elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       render :action => 'invalid_ip'
       false
-    elsif @context.soft_concluded?
+    elsif @section.present? && @section.restrict_enrollments_to_section_dates && @section.end_at < Time.now
+      false
+    elsif @context.restrict_enrollments_to_course_dates && @context.soft_concluded?
+      false
+    elsif @current_user.present? && @context.present? &&
+          @context.enrollments.where(user_id: @current_user.id).all? {|e| e.inactive? }
       false
     else
       true
