@@ -22,7 +22,13 @@ class SelfEnrollmentsController < ApplicationController
   include Api::V1::Course
 
   def new
+    @domain_root_account.reload
     js_env :PASSWORD_POLICY => @domain_root_account.password_policy
+    @login_label_name = t("email")
+
+    login_handle_name = @domain_root_account.login_handle_name
+    @login_label_name = login_handle_name if login_handle_name
+
     if !@current_user && delegated_authentication_url?
       store_location
       flash[:notice] = t('notices.login_required', "Please log in to join this course.")
