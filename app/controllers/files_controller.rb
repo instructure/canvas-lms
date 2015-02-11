@@ -502,11 +502,14 @@ class FilesController < ApplicationController
       end
       return
     end
-    if (params[:verifier] && params[:verifier] == @attachment.uuid) ||
+
+    verifier_checker = Attachments::Verification.new(@attachment)
+    if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read)) ||
         @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } ||
         authorized_action(@attachment, @current_user, :read)
       if params[:download]
-        if (params[:verifier] && params[:verifier] == @attachment.uuid) || (@attachment.grants_right?(@current_user, session, :download))
+        if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download)) ||
+            (@attachment.grants_right?(@current_user, session, :download))
           disable_page_views if params[:preview]
           begin
             send_attachment(@attachment)
@@ -554,7 +557,8 @@ class FilesController < ApplicationController
 
         json[:attachment][:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
 
-        if (params[:verifier] && params[:verifier] == attachment.uuid) ||
+        verifier_checker = Attachments::Verification.new(@attachment)
+        if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download)) ||
             attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in

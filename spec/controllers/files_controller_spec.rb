@@ -199,13 +199,23 @@ describe FilesController do
       assert_unauthorized
     end
 
-    it "should allow public access with verifier" do
-      Attachment.any_instance.stubs(:canvadoc_url).returns "stubby"
-      get 'show', :course_id => @course.id, :id => @file.id, :verifier => @file.uuid, :format => 'json'
-      expect(response).to be_success
-      expect(json_parse['attachment']).to_not be_nil
-      expect(json_parse['attachment']['canvadoc_session_url']).to eq "stubby"
-      expect(json_parse['attachment']['md5']).to be_nil
+    describe "with verifiers" do
+      it "should allow public access with legacy verifier" do
+        Attachment.any_instance.stubs(:canvadoc_url).returns "stubby"
+        get 'show', :course_id => @course.id, :id => @file.id, :verifier => @file.uuid, :format => 'json'
+        expect(response).to be_success
+        expect(json_parse['attachment']).to_not be_nil
+        expect(json_parse['attachment']['canvadoc_session_url']).to eq "stubby"
+        expect(json_parse['attachment']['md5']).to be_nil
+      end
+
+      it "should allow public access with new verifier" do
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        get 'show', :course_id => @course.id, :id => @file.id, :verifier => verifier, :format => 'json'
+        expect(response).to be_success
+        expect(json_parse['attachment']).to_not be_nil
+        expect(json_parse['attachment']['md5']).to be_nil
+      end
     end
 
     it "should assign variables" do
