@@ -223,13 +223,9 @@ input[type="button"] {
   &.btn-block, &.Button--block { width: 100%; }
 }
 
-// Set the backgrounds
-// -------------------------
+// The colors for these come from app/stylesheets/brandable_variables.json
+// Or the values the account sets in the Theme Editor
 
-$ic-brand-button--primary-bgd: $ic-brand-primary !default;
-$ic-brand-button--primary-text: $ic-color-light !default;
-$ic-brand-button--secondary-bgd: $ic-brand-secondary !default;
-$ic-brand-button--secondary-text: $ic-color-light !default;
 
 // Primary appears as blue
 .btn-primary, // <-- deprecated- do not use
@@ -339,4 +335,8 @@ $ic-brand-button--secondary-text: $ic-color-light !default;
     &:hover { @extend .Button--active; }
   }
   &.ui-state-disabled { @extend .Button.disabled; }
+}
+
+.Button--theme-editor-apply {
+  text-decoration: none;
 }

@@ -222,7 +222,6 @@ module ApplicationHelper
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true'
       # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
-      # (debug_assets is also used by jammit => you'll get unpackaged css AND js)
       !(params[:debug_assets] || params[:debug_js])
     else
       # allows overriding by adding ?optimized_js=1 to the url
@@ -247,7 +246,7 @@ module ApplicationHelper
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
     paths = js_bundles.inject([]) do |ary, (bundle, plugin)|
-      base_url = js_base_url
+      base_url = "#{js_base_url}"
       base_url += "/plugins/#{plugin}" if plugin
       ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
       ary << "#{base_url}/compiled/bundles/#{bundle}.js"
@@ -256,32 +255,50 @@ module ApplicationHelper
   end
 
   def include_css_bundles
-    unless jammit_css_bundles.empty?
-      bundles = jammit_css_bundles.map do |(bundle,plugin)|
-        bundle = variant_name_for(bundle)
-        plugin ? "plugins_#{plugin}_#{bundle}" : bundle
+    unless css_bundles.empty?
+      bundles = css_bundles.map do |(bundle,plugin)|
+        css_url_for(bundle, plugin)
       end
       bundles << {:media => 'all'}
-      include_stylesheets(*bundles)
+      stylesheet_link_tag(*bundles)
     end
   end
 
-  def variant_name_for(bundle_name)
+  def css_variant
     if k12?
-      variant = '_k12'
+      variant = 'k12'
     elsif use_new_styles?
-      variant = '_new_styles'
+      variant = 'new_styles'
     else
-      variant = '_legacy'
+      variant = 'legacy'
     end
-
     use_high_contrast = @current_user && @current_user.prefers_high_contrast?
-    variant += use_high_contrast ? '_high_contrast' : '_normal_contrast'
-    "#{bundle_name}#{variant}"
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
+  end
+
+  def css_url_for(bundle_name, plugin=false)
+    bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
+    content_md5 = BrandableCSS.fingerprint_for(bundle_path, css_variant)
+    File.join('/dist', 'brandable_css', active_brand_config.try(:md5).to_s,
+              css_variant, "#{bundle_path}-#{content_md5}.css")
+  end
+
+  def brand_variable(variable_name)
+    BrandableCSS.brand_variable_value(variable_name, active_brand_config)
+  end
+
+  def favicon
+    possibly_customized_favicon = brand_variable('ic-brand-favicon')
+    default_favicon = BrandableCSS.brand_variable_value('ic-brand-favicon')
+    if possibly_customized_favicon == default_favicon
+      return "favicon-green.ico" if Rails.env.development?
+      return "favicon-yellow.ico" if Rails.env.test?
+    end
+    possibly_customized_favicon
   end
 
   def include_common_stylesheets
-    include_stylesheets variant_name_for(:vendor), variant_name_for(:common), media: "all"
+    stylesheet_link_tag css_url_for(:vendor), css_url_for(:common), media: "all"
   end
 
   def sortable_tabs

@@ -1,0 +1,83 @@
+[{
+  "group_name": "Global Branding",
+  "variables": [{
+    "human_name": "Primary Color",
+    "variable_name": "ic-brand-primary",
+    "type": "color",
+    "default": "#0096db"
+  },{
+    "human_name": "Secondary Color",
+    "variable_name": "ic-brand-secondary",
+    "type": "color",
+    "default": "#5b6c79"
+  },{
+    "human_name": "Primary Button Color",
+    "variable_name": "ic-brand-button--primary-bgd",
+    "type": "color",
+    "default": "$ic-brand-primary"
+  },{
+    "human_name": "Primary Button Text Color",
+    "variable_name": "ic-brand-button--primary-text",
+    "type": "color",
+    "default": "#ffffff"
+  },{
+    "human_name": "Secondary Button",
+    "variable_name": "ic-brand-button--secondary-bgd",
+    "type": "color",
+    "default": "$ic-brand-secondary"
+  },{
+    "human_name": "Secondary Button Text Color",
+    "variable_name": "ic-brand-button--secondary-text",
+    "type": "color",
+    "default": "#ffffff"
+  },{
+    "human_name": "Link Color",
+    "variable_name": "ic-link-color",
+    "type": "color",
+    "default": "$ic-brand-primary"
+  }
+]
+},{
+  "group_name": "Logos & Watermarks",
+  "variables": [{
+    "human_name": "Main Logo",
+    "helper_text": "400x400, svg, png, jpg, gif",
+    "variable_name": "ic-brand-header-image",
+    "type": "image",
+    "accept": "image/png,image/gif,image/jpeg,image/svg",
+    "default": "/images/k-12-logo-placeholder.png"
+  },{
+    "human_name": "Favicon",
+    "helper_text": "use a single 16x16, 32x32, 48x48 ico file",
+    "variable_name": "ic-brand-favicon",
+    "type": "image",
+    "accept": "image/vnd.microsoft.icon,image/x-icon,image/png,image/gif",
+    "default": "/images/favicon.ico"
+  },{
+    "human_name": "Mobile Homescreen Icon",
+    "helper_text": "The shortcut icon for iOS/Android devices. 180x180 svg, png, jpg, gif",
+    "variable_name": "ic-brand-apple-touch-icon",
+    "type": "image",
+    "accept": "image/png,image/svg",
+    "default": "/images/apple-touch-icon.png"
+  },{
+    "human_name": "Windows Tile: Square",
+    "helper_text": "558x558 svg, png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)",
+    "variable_name": "ic-brand-msapplication-tile-square",
+    "type": "image",
+    "accept": "image/png,image/gif,image/jpeg",
+    "default": "/images/windows-tile.png"
+  },{
+    "human_name": "Windows Tile: Wide",
+    "helper_text": "558x270 svg, png, jpg, gif",
+    "variable_name": "ic-brand-msapplication-tile-wide",
+    "type": "image",
+    "accept": "image/png,image/gif,image/jpeg",
+    "default": "/images/windows-tile-wide.png"
+  },{
+    "human_name": "Windows Tile Color",
+    "variable_name": "ic-brand-msapplication-tile-color",
+    "type": "color",
+    "default": "$ic-brand-primary"
+  }]
+}]

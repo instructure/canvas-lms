@@ -2,21 +2,19 @@
   "name": "canvas-lms",
   "version": "0.0.0",
   "dependencies": {
-    "autoprefixer": "^2.2.0",
-    "coffee-script": "1.6.2",
-    "compute-cluster": "0.0.9",
-    "glob": "~3.2.9",
-    "js-yaml": "^3.1.0",
-    "lodash": "^2.4.1",
-    "mkdirp": "^0.5.0",
-    "node-sass": "0.9.3",
-    "react-tools": "0.11.2",
-    "requirejs": "~2.1.10",
-    "uglify-js": "~2.4.12"
+    "brandable_css": "0.0.30"
   },
   "devDependencies": {
+    "babel": "^5.6.10",
+    "coffee-script": "coffee-script is pinned to exact version matching 'coffee-script-source' bundler gem so all output matches",
+    "coffee-script": "1.6.2",
+    "compute-cluster": "0.0.9",
     "fleck": "~0.5.1",
     "gglobby": "0.0.2",
+    "glob": "^5.0.6",
+    "gulp": "^3.9",
+    "gulp-load-plugins": "^0.10.0",
+    "gulp-rev": "^5.0.1",
     "karma": "~0.10.9",
     "karma-coffee-preprocessor": "0.1.3",
     "karma-coverage": "~0.1.4",
@@ -27,7 +25,13 @@
     "karma-qunit": "~0.1.1",
     "karma-requirejs": "^0.2.2",
     "karma-safari-launcher": "~0.1.1",
+    "lodash": "^2.4.1",
+    "react-tools": "~0.11.2",
+    "requirejs": "~2.1.10",
     "testem": "~0.7.1",
+    "uglify-js": "~2.4.12",
+    "vinyl-fs": "vinly-fs is not actually required by us but is required by glup. Pinning it to 0.3.7 here because 0.3.8 doesn't work with symlinks. We should really be using npm-shrinkwrap and when we do, remove this.",
+    "vinyl-fs": "0.3.7",
     "xsslint": "0.1.0"
   },
   "repository": {
@@ -37,7 +41,6 @@
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --browsers Chrome,Firefox,Safari --single-run",
     "compress": "node script/compress.js",
-    "compile-sass": "node script/compile-sass.js",
     "preinstall": "script/gem_npm install",
     "preupdate": "script/gem_npm update"
   }

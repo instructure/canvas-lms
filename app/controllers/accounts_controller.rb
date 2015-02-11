@@ -454,21 +454,6 @@ class AccountsController < ApplicationController
           params[:account].delete :services
         end
         if @account.grants_right?(@current_user, :manage_site_settings)
-
-          # handle branding stuff
-          if @account.root_account? && params[:account][:settings]
-            (Account::BRANDING_SETTINGS - [:msapplication_tile_color]).each do |setting|
-              if params[:account][:settings]["#{setting}_remove"] == "1"
-                params[:account][:settings][setting] = nil
-              elsif params[:account][:settings][setting].present?
-                attachment = Attachment.create(uploaded_data: params[:account][:settings][setting], context: @account)
-                params[:account][:settings][setting] = attachment.authenticated_s3_url(:expires => 15.years)
-              end
-            end
-          end
-
-
-
           # If the setting is present (update is called from 2 different settings forms, one for notifications)
           if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
             # If set to default, remove the custom name so it doesn't get saved
@@ -491,7 +476,7 @@ class AccountsController < ApplicationController
           end
         else
           # must have :manage_site_settings to update these
-          ([ :admins_can_change_passwords,
+          [ :admins_can_change_passwords,
             :admins_can_view_notifications,
             :enable_alerts,
             :enable_eportfolios,
@@ -499,7 +484,7 @@ class AccountsController < ApplicationController
             :show_scheduler,
             :global_includes,
             :gmail_domain
-          ] + Account::BRANDING_SETTINGS).each do |key|
+          ].each do |key|
             params[:account][:settings].try(:delete, key)
           end
         end

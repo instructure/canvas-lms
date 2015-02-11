@@ -9,3 +9,9 @@
     <% end -%>
   </div>
 <% end %>
+
+<% if @account == @domain_root_account && use_new_styles? && can_do(@account, @current_user, :manage_site_settings) %>
+  <div class="rs-margin-lr">
+    <%= link_to t("Open Theme Editor"), brand_configs_new_path, :class => 'btn button-sidebar-wide' %>
+  </div>
+<% end %>

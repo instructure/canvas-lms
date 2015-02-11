@@ -24,7 +24,7 @@ class Account < ActiveRecord::Base
     :turnitin_host, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id
+    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
 
   EXPORTABLE_ATTRIBUTES = [:id, :name, :created_at, :updated_at, :workflow_state, :deleted_at,
     :default_time_zone, :external_status, :storage_quota,
@@ -118,6 +118,7 @@ class Account < ActiveRecord::Base
   has_many :user_account_associations
   has_many :report_snapshots
   has_many :external_integration_keys, :as => :context, :dependent => :destroy
+  belongs_to :brand_config, foreign_key: "brand_config_md5"
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -222,12 +223,6 @@ class Account < ActiveRecord::Base
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
-
-  BRANDING_SETTINGS = [:header_image, :favicon, :apple_touch_icon,
-                       :msapplication_tile_color, :msapplication_tile_square,
-                       :msapplication_tile_wide].freeze
-
-  BRANDING_SETTINGS.each { |setting| add_setting(setting, root_only: true) }
 
   def settings=(hash)
     @invalidate_settings_cache = true

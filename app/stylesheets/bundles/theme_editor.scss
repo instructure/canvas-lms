@@ -1,0 +1,357 @@
+@import "base/environment";
+// TODO
+// - make theme editor panel content (if exceeding browser height) scroll independently from preview area
+//// Vertical content alignment on elements in Theme editor
+///////
+.te-Flex {
+  display: flex;
+  .te-Flex__block {flex: 1;}
+  .te-Flex__end {
+    align-self: flex-end;
+  }
+  &.te-Flex--v-middle {
+    align-items: center;
+  }
+}
+//// Make sure we're using border-box
+///////
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+//// Override for Canvas full-width (may be taken out with responsive redesign)
+///////
+body, html {height: 100vh;margin: 0; padding: 0;}
+#main {
+  max-width: 100% !important;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.grid-row--fix {
+  overflow: hidden;
+  margin: 0;
+}
+//// Variables for theme editor
+///////
+$theme-editor-bgd: $ic-color-dark;
+$theme-editor-content-bgd: lighten($ic-color-dark, 10);
+$theme-editor-border-color: darken($ic-color-neutral, 30);
+//// Layout for Theme editor
+///////
+.Theme__container {
+  height: 100vh;
+  display: flex;
+}
+.Theme__editor {
+  height: 100vh;
+  width: 300px;
+  box-shadow: 0 0 8px $ic-color-dark;
+  background: $theme-editor-bgd;
+}
+.Theme__preview {
+  flex: 1;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  .grid-row {margin: 0;}
+}
+.Theme__preview-overlay {
+  background: rgba(255, 255, 255, 0.7);
+  height: 100vh;
+  width: 100%;
+  z-index: 8000;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+//// Theme Editor content
+///////
+
+.Theme__editor-header {
+  background: $ic-color-light;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  .Theme__editor-header_title {
+    padding: 0 0 0 $ic-sp;
+    margin: 0;
+    line-height: normal;
+    font-size: 18px;
+    font-weight: 500;
+    flex: 1;
+  }
+  .Theme__editor-header_actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .Theme__editor-Button--trigger {
+
+  }
+  .Theme__editor-header_button {
+    margin: 0 $ic-sp;
+  }
+
+}
+//// Tabs for Theme Editor
+///////
+
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.Theme__container {
+  opacity: 0.01;
+  animation: fadeIn ease-in 1;
+  animation-fill-mode:forwards;
+  animation-duration: 0.2s;
+}
+//// TE Panel Header
+///////
+// TODO: get tabs working properly
+.Theme__editor-tabs_list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.Theme__editor-tabs_panel {
+  color: $ic-color-light;
+}
+.Theme__editor-tabs_list {
+  background: $ic-color-neutral;
+}
+.Theme__editor-tabs_list-item {
+  font-size: 16px;
+  font-weight: 300;
+  padding: $ic-sp;
+  flex: 1;
+  text-align: center;
+  &:hover {
+    background: darken($ic-color-neutral, 10);
+    text-decoration: none;
+    @if $use_high_contrast {text-decoration: underline;}
+  }
+}
+.Theme__editor-tabs_list-item_link {
+  display: inline-block;
+  color: $ic-color-dark;
+  text-decoration: none;
+  @if $use_high_contrast {text-decoration: underline;}
+
+}
+
+//// Accordion styles for Theme Editor
+///////
+// There is a lot of overriding here to support our jquery
+// accordion ui, but the theme for theme editor
+@mixin animate-icon {
+  transform: rotate(90deg);
+}
+@mixin animate-hover {
+  transition: padding 0.2s;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.Theme__editor-accordion.ui-accordion {
+  .ui-accordion-header {
+    border: none;
+    background: $theme-editor-bgd;
+    font-weight: 300;
+    border-radius: 0;
+    &:not(:first-child) {
+      border-top: 1px solid $theme-editor-border-color;
+    }
+
+    // Default accordion state
+    &.ui-state-default {
+      background: $theme-editor-bgd;
+      box-shadow: none;
+      border: none;
+      border-bottom: 1px solid $theme-editor-border-color;
+      border-radius: 0;
+      padding: 8px $ic-sp;
+      margin-top: 0;
+      .Theme__editor-accordion-icon {
+        transform: rotate(-90deg);
+      }
+      &:last-child {
+        border-bottom: none;
+      }
+      // Link, Link hover & Focus accordion state
+      a {
+        color: $ic-color-light;
+        transition: color 0.2s;
+        border-radius: 0;
+        transition: padding 0.2s;
+        padding: $ic-sp/2 0;
+        font-weight: 500;
+        font-size: 14px;
+      }
+      &.ui-state-hover {
+        background: $ic-brand-primary;
+        .Theme__editor-accordion-icon {
+
+          @include animate-icon;
+        }
+      }
+      &.ui-state-focus {
+        background: $ic-brand-primary;
+        border: none;
+        outline: none;
+        a {
+          box-shadow: inset 0 0 0 2px $ic-brand-primary;
+        }
+        .Theme__editor-accordion-icon {
+          @include animate-icon;
+        }
+      }
+      // Active & Focus accordion state
+      &.ui-state-active {
+        border: none;
+        background: $theme-editor-bgd;
+        border-color: $theme-editor-content-bgd;
+        &.ui-state-focus {
+          a {
+            box-shadow: inset 0 0 0 2px $theme-editor-content-bgd;
+          }
+        }
+        .Theme__editor-accordion-icon {
+          @include animate-icon;
+        }
+      }
+      // Takes out un-needed jquery icon
+      > span {display: none;}
+    }
+  }
+  .ui-accordion-content {
+    background: $theme-editor-content-bgd;
+    padding: 0 $ic-sp;
+    color: $ic-color-light;
+    border: none;
+    border-radius: 0;
+    &.ui-accordion-content-active {
+      border-radius: 0;
+    }
+  }
+}
+//// Panel Content Styles
+//////
+.Theme__editor-accordion_element {
+  padding: $ic-sp 0;
+  margin: 0;
+}
+.Theme__editor-form--color {
+  display: flex;
+  align-items: center;
+  .Theme__editor-color-label {
+    padding: 0;
+    margin: 0;
+  }
+}
+////
+// Styles for color block
+////
+.Theme__editor-color_title {
+  flex: 1 80px;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+}
+.Theme__editor-color-block {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  .Theme__editor-color-block_input {
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    outline: none;
+  }
+  $te-input-height: 30px;
+  .Theme__editor-color-block_input-text {
+    width: 75px;
+    height: $te-input-height;
+    margin: 0 $ic-sp 0 0;
+    padding: 0 $ic-sp/2;
+    color: $ic-color-dark;
+    border: 1px solid $ic-color-neutral;
+    border-radius: 3px;
+    $te-placeholder-color: $ic-color-dark;
+    &::-webkit-input-placeholder   {color: $te-placeholder-color;}
+    &::-moz-placeholder            {color: $te-placeholder-color;}
+    &:-ms-input-placeholder        {color: $te-placeholder-color;}
+
+  }
+  .Theme__editor-color-block_label-sample {
+    border: 1px solid $ic-color-light;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .Theme__editor-color-block_input-sample {
+    visibility: hidden;
+    display: block;
+    width: $te-input-height;
+    height: $te-input-height;
+    box-shadow: none;
+  }
+}
+////
+// Styles for image upload block
+////
+.Theme__editor-upload {
+  .Theme__editor-form--upload {
+    width: 100%; // needed for IE to size image previews based on width of parent
+  }
+  .Theme__editor-upload_title {
+
+  }
+  .Theme__editor-image_upload {
+    flex: 100%;
+  }
+  .Theme__editor-upload_restrictions {
+    color: $ic-color-neutral;
+    font-style: italic;
+    display: block;
+    font-size: 12px;
+    font-weight: 100;
+    padding-top: $ic-sp/2;
+  }
+  .Theme__editor_preview-img-container {
+    padding: $ic-sp;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba($ic-color-neutral, 0.2);
+    background: rgba($ic-color-light, 0.1);
+    img {
+      width: 100%;
+    }
+  }
+  .Theme__editor-image_upload {
+    margin: $ic-sp 0;
+    position: relative;
+    .Theme__editor-image_upload-label {
+      display: flex;
+      align-items: center;
+    }
+    .Theme__editor-input_upload {
+      position: absolute;
+      top: 0;
+      left: 0;
+      visibility: hidden;
+      z-index: 1;
+    }
+    .Theme__editor-input_resets {
+      z-index: 2; // make sure these go over the hidden input box
+      display: flex;
+      align-items: flex-end;
+    }
+  }
+
+  .Theme__editor-placeholder {
+
+  }
+}
+
+

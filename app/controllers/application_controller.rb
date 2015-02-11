@@ -1658,16 +1658,35 @@ class ApplicationController < ActionController::Base
     super
   end
 
-  def jammit_css_bundles; @jammit_css_bundles ||= []; end
-  helper_method :jammit_css_bundles
+  def active_brand_config
+    @active_brand_config ||= begin
+      if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
+        nil
+      elsif session.key?(:brand_config_md5)
+        BrandConfig.find(session[:brand_config_md5]) if session[:brand_config_md5]
+      else
+        @domain_root_account.brand_config
+      end
+    end
+  end
+  helper_method :active_brand_config
 
-  def jammit_css(*args)
+  def css_bundles
+    @css_bundles ||= []
+  end
+  helper_method :css_bundles
+
+  def css_bundle(*args)
     opts = (args.last.is_a?(Hash) ? args.pop : {})
     Array(args).flatten.each do |bundle|
-      jammit_css_bundles << [bundle, opts[:plugin]] unless jammit_css_bundles.include? [bundle, opts[:plugin]]
+      css_bundles << [bundle, opts[:plugin]] unless css_bundles.include? [bundle, opts[:plugin]]
     end
     nil
   end
+  helper_method :css_bundle
+
+  alias_method :jammit_css, :css_bundle
+  deprecate :jammit_css
   helper_method :jammit_css
 
   def js_bundles; @js_bundles ||= []; end

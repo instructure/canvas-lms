@@ -112,3 +112,15 @@
 .ic-flash-error {
   background-color: #b94a48;
 }
+
+.ic-flash--Theme-Editor {
+  background-color: $ic-color-dark;
+}
+
+// Buttons in Flash actions
+a.Button--flash {
+  text-decoration: none;
+  @if $use_high_contrast {
+    text-decoration: underline;
+  }
+}

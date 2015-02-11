@@ -2,6 +2,7 @@ $LOAD_PATH << File.dirname(__FILE__)
 
 ignore! Listen::DirectoryRecord::DEFAULT_IGNORED_DIRECTORIES - ['vendor'] + [%r{vendor/(?!plugins)}]
 
+guard :brandable_css
 guard 'coffeescript', :input => 'app/coffeescripts',  :output => 'public/javascripts/compiled'
 guard 'coffeescript', :input => 'spec/coffeescripts', :output => 'spec/javascripts/compiled'
 guard 'coffeescript', :input => 'spec_canvas/coffeescripts', :output => 'spec_canvas/javascripts'
@@ -11,5 +12,8 @@ guard :ember_templates
 guard :ember_bundles
 guard :styleguide
 guard :js_extensions
-guard :compass
 guard :jsx
+
+guard 'gulp' do
+  watch(%r{^gulpfile.babel.js$})
+end

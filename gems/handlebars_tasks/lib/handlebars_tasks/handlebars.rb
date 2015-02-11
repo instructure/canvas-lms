@@ -65,10 +65,17 @@ module HandlebarsTasks
 
         dependencies = ['compiled/handlebars_helpers']
 
-        if css = get_css(id)
-          dependencies << "compiled/util/registerTemplateCss"
-          # arguments[1] will be the registerTemplateCss function
-          css_registration = "\narguments[1]('#{id}', #{MultiJson.dump css});\n"
+        # if a scss file named exactly like this exists, load it when this is loaded
+        if Dir.glob("app/stylesheets/jst/#{id}.s[ac]ss").first
+          bundle = "jst/#{id}"
+          require 'lib/brandable_css'
+          fingerprints = MultiJson.dump BrandableCSS.all_fingerprints_for(bundle)
+          dependencies << "compiled/util/brandableCss"
+          # arguments[1] will be brandableCss
+          css_registration = "
+            var fingerprint = #{fingerprints}[arguments[1].getCssVariant()];
+            arguments[1].loadStylesheet('#{bundle}-' + fingerprint);
+          "
         end
 
         # take care of `require`ing partials
@@ -88,21 +95,10 @@ define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{MultiJson.dump dependencies},
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['#{id}'] = template(#{data["template"]});
   #{partial_registration}
-      #{css_registration}
+  #{css_registration}
   return templates['#{id}'];
 });
         JS
-      end
-
-      def get_css(file_path)
-        if sass_file = Dir.glob("app/stylesheets/jst/#{file_path}.s[ac]ss").first
-          # renders the sass file to disk, then returns the css it wrote
-          # note: for now, all jst stylesheets will be just in 'legacy_normal_contrast'
-          system({"CANVAS_SASS_STYLE" => "compressed"}, "node script/compile-sass.js #{sass_file}")
-          File.read sass_file
-                      .sub(/^app\/stylesheets/, 'public/stylesheets_compiled/legacy_normal_contrast')
-                      .sub(/.s[ac]ss$/, '.css')
-        end
       end
 
       protected

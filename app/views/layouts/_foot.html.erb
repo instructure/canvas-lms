@@ -5,6 +5,17 @@
   // TODO: move this out when we have a single require call
   require = {
     translate: <%= include_js_translations? %>,
+    <%-
+      # Purposely not using action_controller.asset_host here, since
+      # any scripts require.js loads dynamically don't know about the
+      # md5 fingerprints to use. Since they don't have a fingerprint
+      # it would be unsafe to rely on serving them from an s3 bucket--
+      # deploys would overwrite what's there and you'd run into a case
+      # where a user talking to a server running old code gets a newer
+      # js file than they were expecting.
+      # By serving it from the same hostname they loaded the page from, it will
+      # have the same version of static assets as the code that host is running.
+    %>
     baseUrl: '<%= js_base_url %>',
     paths: <%= raw Canvas::RequireJs.paths(true) %>,
     packages : <%= raw Canvas::RequireJs.packages %>,
@@ -15,7 +26,8 @@
 </script>
 
 <%= javascript_include_tag "#{js_base_url}/vendor/require.js" %>
-<%= javascript_include_tag "#{js_base_url}/compiled/bundles/common" if include_common_bundle %>
+<% js_bundles.unshift([:common]) if include_common_bundle %>
+
 <%= include_js_bundles %>
 <%= include_account_js %>
 <%= render_js_blocks %>

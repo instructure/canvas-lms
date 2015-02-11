@@ -12,14 +12,8 @@
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
   <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
 
-  <link rel="icon" type="image/x-icon" href="<%=
-    @domain_root_account.settings[:favicon].presence ||
-    (Rails.env.development? && "/favicon-green.ico") ||
-    (Rails.env.test? && "/favicon-green.ico") ||
-    "/favicon.ico" %>"
-  />
-  <link rel="apple-touch-icon" href="<%= @domain_root_account.settings[:apple_touch_icon].presence || "/apple-touch-icon.png"  %>">
-
+  <%= favicon_link_tag(favicon) %>
+  <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
 
   <%= yield :auto_discovery %>
   <%= yield :head %>
@@ -48,4 +42,3 @@
       document.addEventListener('click', _earlyClick);
   </script>
 </head>
-
