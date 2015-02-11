@@ -391,7 +391,7 @@ class WebConference < ActiveRecord::Base
     given { |user, session| context.grants_right?(user, session, :manage_content) && !finished? }
     can :update
 
-    given { |user, session| context.grants_right?(user, session, :manage_content) && long_running? && active? }
+    given { |user, session| context.grants_right?(user, session, :manage_content) }
     can :close
   end
 
