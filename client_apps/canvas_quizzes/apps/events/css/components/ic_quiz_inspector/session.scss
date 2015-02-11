@@ -9,7 +9,7 @@
   box-shadow: 0 0 0 1px $borderColor;
   display: inline-block;
   border-radius: 2px;
-  background: $inactiveBg;
+  background: $canvas-neutral;
 }
 
 .ic-AttemptController__Attempt {
@@ -18,11 +18,10 @@
   text-align: center;
   line-height: 24px;
 
-  &, &:hover {
+  &, &:hover, &:focus {
     color: inherit;
     text-decoration: none;
-  }
-
+  }  
   &:first-of-type {
     border-radius: 2px 0 0 2px;
   }
@@ -38,9 +37,9 @@
   box-shadow: 0 0 0 1px $bg;
   margin-right: 1px;
   margin-left: 1px;
-
-  &, &:hover {
+  &, &:hover, &:focus {
     color: white;
     cursor: text;
+    text-decoration: none;
   }
 }
