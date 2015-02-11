@@ -161,38 +161,22 @@
             'before using External Learning and Collaboration Tools such as Google Docs because they may disclose and ' +
             'store your personal information elsewhere inside and outside Canada.</p>');
     });
-    utils.onPage(/^\/courses\/\d+\/settings\/?$/, function () {
-        var addedAppCenterNotice = false;
-        var addAppCenterNotice = function () {
-            if (addedAppCenterNotice) { return; } // only add it once
-            addedAppCenterNotice = true;
-            $('<div class="pia-notice">')
-                .insertBefore('#app_center_filter_wrapper')
-                .append('<p><strong>Is your app privacy compliant?</strong> There are <strong>personal legal ' +
-                    'consequences</strong> if you use an app that discloses and stores students&rsquo; personal ' +
-                    'information elsewhere inside or outside Canada without their consent. Unauthorized disclosure ' +
-                    'is a privacy protection offense under BC law. Employees and SFU are liable to investigation and ' +
-                    'possible fines. <strong>Before using any app</strong>, carefully review the complete ' +
-                    '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas Privacy Protection Notice</a> ' +
-                    'to <strong>understand your legal responsibilities</strong> and please contact ' +
-                    '<a href="mailto:learntech@sfu.ca">learntech@sfu.ca</a>. The Learning Technology Specialists in the ' +
-                    '<strong>Teaching and Learning Centre will help you</strong> complete an app privacy assessment ' +
-                    'and, if needed, advise you how to obtain students&rsquo; consent in the manner prescribed by law. ' +
-                    'By using apps in your course and the App Centre in Canvas, you acknowledge that you <strong>read ' +
-                    'the Privacy Protection Notice</strong> and will <strong>follow the described protection of privacy ' +
-                    'requirements and procedure</strong>.</p>');
-        };
-
-        // If App Center content is not present, wait for external tools to load before adding the notice.
-        if ($('#app_center_filter_wrapper').length == 0) {
-            $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
-                if (ajaxOptions.url && ajaxOptions.url.match(/api\/v1\/courses\/\d+\/external_tools/)) {
-                    addAppCenterNotice();
-                }
-            });
-        } else {
-            addAppCenterNotice();
-        }
+    utils.onPage(/^\/courses\/\d+\/settings/, function () {
+        $('<div class="pia-notice">')
+            .insertBefore('#external_tools')
+            .append('<p><strong>Is your app privacy compliant?</strong> There are <strong>personal legal ' +
+                'consequences</strong> if you use an app that discloses and stores students&rsquo; personal ' +
+                'information elsewhere inside or outside Canada without their consent. Unauthorized disclosure ' +
+                'is a privacy protection offense under BC law. Employees and SFU are liable to investigation and ' +
+                'possible fines. <strong>Before using any app</strong>, carefully review the complete ' +
+                '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas Privacy Protection Notice</a> ' +
+                'to <strong>understand your legal responsibilities</strong> and please contact ' +
+                '<a href="mailto:learntech@sfu.ca">learntech@sfu.ca</a>. The Learning Technology Specialists in the ' +
+                '<strong>Teaching and Learning Centre will help you</strong> complete an app privacy assessment ' +
+                'and, if needed, advise you how to obtain students&rsquo; consent in the manner prescribed by law. ' +
+                'By using apps in your course and the App Centre in Canvas, you acknowledge that you <strong>read ' +
+                'the Privacy Protection Notice</strong> and will <strong>follow the described protection of privacy ' +
+                'requirements and procedure</strong>.</p>');
     });
 
     // Fixes for Import Content page only

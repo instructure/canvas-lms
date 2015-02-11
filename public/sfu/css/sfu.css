@@ -140,10 +140,13 @@
 /* !-- PIA notice styles -- */
 
 .pia-notice {
-    margin: 2em 0;
     padding: 1em 1.5em;
     border: 1px solid #CCC;
     background: #EFEFEF;
+}
+
+#google_docs_description .pia-notice {
+    margin: 2em 0;
 }
 
 .pia-notice hr {
