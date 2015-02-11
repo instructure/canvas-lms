@@ -108,25 +108,20 @@
     utils.onPage(/^\/courses\/\d+$/, function() {
         // The Publish Course form ID attribute contains the course ID
         var publishFormId = location.pathname.replace('/courses/', 'edit_course_');
-        var noticeHtml = "<p>I confirm that the use of copyright protected materials in this course complies with Canada's <em>Copyright Act</em> and SFU Policy R30.04 - <em>Copyright Compliance and Administration</em>. </p>";
 
-        // Add it directly under the Publish Course button in the wizard
-        var $wizardPublishButton = $('#wizard_box #' + publishFormId);
-        var $readMoreLink = $('<a href="/sfu/copyright/disclaimer" class="element_toggler" aria-controls="copyright_dialog" target="_blank">Read more.</a>');
-        var $disclaimer = $('<iframe src="/sfu/copyright/disclaimer" seamless="seamless" width="100%" height="100%">').css('border', 'none');
-        $(noticeHtml)
-            .append($readMoreLink)
-            .insertAfter($wizardPublishButton);
-        // Use a modal dialog to display the full disclaimer
-        $('<form id="copyright_dialog" title="Copyright Disclaimer">')
-            .attr('data-turn-into-dialog', '{"width":600,"height":500,"modal":true}')
-            .append($disclaimer)
-            .hide()
-            .appendTo('body');
+        var confirmCopyright = function () {
+            return confirm("I confirm that the use of copyright protected materials in this course complies with" +
+                "Canada's Copyright Act and SFU Policy R30.04 - Copyright Compliance and Administration.");
+        };
 
-        // Show it in a dialog when the Publish button in the sidebar is clicked (abort publish if user hits Cancel)
+        // Show the notice in a confirmation dialog when the user clicks the Publish button in the sidebar or in the
+        // Setup Checklist (a.k.a. Course Wizard). Abort if user hits Cancel.
         $('#' + publishFormId + ' button.btn-publish').on('click', function () {
-            if (!confirm($(noticeHtml).text())) { return false; }
+            return confirmCopyright();
+        });
+        // NOTE: This assumes only the Publish the Course button uses a POST form in the Course Wizard.
+        $(document).on('submit', '.CourseWizard__modalOverlay form[method="post"]', function () {
+            return confirmCopyright();
         });
     });
 
