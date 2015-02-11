@@ -17,6 +17,17 @@ describe "grading standards" do
       should_delete_a_grading_scheme(@course, "/courses/#{@course.id}/grading_standards")
     end
 
+    it "should display correct info when multiple standards are added without refreshing page" do
+      course_with_teacher_logged_in
+      get "/courses/#{@course.id}/grading_standards"
+      should_add_a_grading_scheme(name: "First Grading Standard")
+      first_grading_standard = @new_grading_standard
+      should_add_a_grading_scheme(name: "Second Grading Standard")
+      second_grading_standard = @new_grading_standard
+      expect(fj("#grading_standard_#{first_grading_standard.id} span:eq(1)").text).to eq("First Grading Standard")
+      expect(fj("#grading_standard_#{second_grading_standard.id} span:eq(1)").text).to eq("Second Grading Standard")
+    end
+
     it "should allow setting a grading standard for an assignment" do
       course_with_teacher_logged_in
 

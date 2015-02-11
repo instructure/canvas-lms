@@ -1,1 +1,1 @@
-require ['jsx/grading/tab_container']
+require ['jsx/grading/tabContainer']
