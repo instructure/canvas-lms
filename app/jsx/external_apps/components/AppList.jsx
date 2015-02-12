@@ -17,8 +17,7 @@ define([
 
     statics: {
       willTransitionTo: function(transition, params, query) {
-        if (!ENV.APP_CENTER['enabled']) {
-          transition.abort();
+        if (!ENV.APP_CENTER.enabled) {
           transition.redirect('configurations');
         }
       }
