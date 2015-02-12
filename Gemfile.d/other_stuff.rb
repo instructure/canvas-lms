@@ -72,7 +72,7 @@ gem 'mini_magick', '1.3.2'
   gem 'subexec', '0.0.4'
 gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0'
-gem 'nokogiri', '1.5.6'
+gem 'nokogiri', '1.5.8'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false

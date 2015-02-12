@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
 
-  spec.add_dependency "nokogiri", "1.5.6"
+  spec.add_dependency "nokogiri", "~> 1.5.6"
   spec.add_dependency "libxml-ruby", "~> 2.7"
   spec.add_dependency "canvas_http"
   spec.add_dependency "canvas_sort"
