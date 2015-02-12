@@ -1,23 +1,25 @@
 /// TOC
 //============================================================================================
 //
-// - Brand Variants
-// - Color Variables
-// - Layout Variables
+// - Canvas Brand Variants
+// - Custom Branding
+// - Canvas LMS Color Sheet
+// - Canvas Theme Color Variables
 //
 //============================================================================================
 
+//======================
 // Canvas Brand Variants
-//=======================
+//======================
 // This imports the variables needed to support new styles {$use_new_styles}
 // accessibility ($use_high_contrast) and k12 ($is-k12).
 // You can also use the sass function that helps ensure color contrast ratio.
 // Look in /sass-functions/ for more information on how that is used
 @import "variant_variables";
 
-
-/// Custom Branding
-//=======================
+//================
+// Custom Branding
+//================
 // Pulls in variables in 'config/brand_variables.scss', if it exists.
 // See docs in config/brand_variables.scss.example.
 // In the future, this will be how we'll pull in the variables that
@@ -26,21 +28,20 @@
 // see: http://sass-lang.com/documentation/file.SASS_REFERENCE.html#variable_defaults_
 @import "brand_variables";
 
-
-/// Canvas LMS Color Sheet
+//=======================
+// Canvas LMS Color Sheet
 //=======================
 // Our color variables in Canvas are simple and easy to integrate
 // We use a two-tiered variable process with Canvas color variables.
 // When you need to use a color, please create a functional variable name
 // and use the color variable name of your choosing. See examples below.
 
-// New Canvas Theme Color Variables
-//=======================
+//=================================
+// Canvas Theme Color Variables
+//=================================
 // These are the new colors that we would like to start rebranding
 // all the canvas pages in. All of the app variables that denote a
 // color should use or be based off of one of these variables
-
-
 $canvas-primary:                  #0099e0 !default; // light blue
 @if $use_high_contrast { $canvas-primary: #0073ac; }
 
@@ -65,149 +66,210 @@ $canvas-light:                    #fff; // white
 
 $canvas-dark:                     #333;
 
+//====================================
 // Bootstrap Color Variable Overwrites
-//=======================
+//====================================
 // These overwrite the variables used by bootstrap using our
 // custom colors above
 
-// When the new_style feature flag is available to use, we
-// can uncomment these out. Right now they would overwrite
-// current canvas styles prematurely
+$gray-darker:            lighten(#000, 13.5%); // #222
+$gray-dark:              lighten(#000, 20%);   // #333
+$gray:                   lighten(#000, 33.5%); // #555
+$gray-light:             lighten(#000, 60%);   // #999
+$gray-lighter:           lighten(#000, 93.5%); // #eee
 
-// $brand-primary:         $canvas-primary;
-// $brand-success:         $canvas-success;
-// $brand-info:            $canvas-light;
-// $brand-warning:         $canvas-alert;
-// $brand-danger:          $canvas-danger;
-// $brand-inverse:         $canvas-neutral;
+//============================
+// Layout Functional Variables
+//============================
+$ic-body-background-color:      lighten($canvas-neutral, 4);
+$ic-content-background-color:   $canvas-light;
+$ic-content-padding:            15px;
+$ic-header-background:          $canvas-secondary;
 
-// $gray-darker:            lighten(#000, 13.5%);  // #222
-// $gray-dark:              lighten(#000, 20%);   // #333
-// $gray:                   lighten(#000, 33.5%); // #555
-// $gray-light:             lighten(#000, 60%);   // #999
-// $gray-lighter:           lighten(#000, 93.5%); // #eee
+//============================
+// List Functional Variables
+//============================
+$ic-list-item-background--hover:      #eef7ff;
+$ic-list-item-background--selected:   #d9edf9;
 
-// Global Functional Variables
-//=======================
-$ic-body-background-color: lighten($canvas-neutral, 4);
-$ic-content-background-color: $canvas-light;
-$ic-content-padding: 15px;
-$ic-header-background: $canvas-secondary;
-@if $use_high_contrast {$ic-header-background: #333;}
-$ic-font-color-light: $canvas-light;
-$ic-font-color-dark: $canvas-dark;
-$ic-font-color--subdued: #696969;
-$ic-border-color: $canvas-neutral;
-$ic-list-item-background--hover: #eef7ff;
-$ic-list-item-background--selected: #d9edf9;
+//================================
+// Global light background colors
+//================================
+// These background color variables can be used on hover states or focuse states
+// and meet our contrast needs when used with our main color variables
 
+
+$ic-bg-light-neutral:     lighten($canvas-neutral, 6%);
+$ic-bg-light-primary:     lighten($canvas-primary, 52%);
+@if $use_high_contrast { 
+$ic-bg-light-primary:     lighten($canvas-primary, 64%); 
+}
+$ic-bg-light-success:     lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
+$ic-bg-light-alert:       lighten($canvas-alert, 50%);
+@if $use_high_contrast { 
+$ic-bg-light-alert:       lighten($canvas-alert, 66%); 
+}
+$ic-bg-light-danger:      lighten($canvas-danger, 48%); // No high contrast color exists for legacy $canvas-danger
+
+//============================
+// List Functional Variables
+//============================
+$ic-list-item-background--hover:      $ic-bg-light-primary;
+$ic-list-item-background--selected:   $ic-bg-light-primary;
+
+//=====================
+// Global border colors
+//=====================
+
+$ic-border-color:         $canvas-neutral;
+// If it's a light border, it should be this color.
+$ic-border-light:         darken($canvas-neutral, 6);
+// If it's a dark border, it should be this color.
+$ic-border-dark:          darken($canvas-neutral, 23);
+
+//=============================
+// Link-color-related variables
+//=============================
+$ic-link-color:             darken($canvas-primary, 5%);
+@if $use_high_contrast { 
+$ic-link-color:             darken($canvas-primary, 2%); 
+}
+$ic-link-color-hover:       darken($ic-link-color, 10%);
+
+$ic-icon-link-color-hover: lighten($canvas-dark, 15%);
+@if $use_high_contrast { 
+$ic-icon-link-color-hover: $canvas-dark; 
+}
+
+$ic-icon-link-color:       lighten($canvas-dark, 30%);
+@if $use_high_contrast { 
+$ic-icon-link-color:       lighten($canvas-dark, 12%); 
+}
+
+// linkColor is a deprecated Bootstrap 2 variable. Please use $ic-link-color!
+$linkColor:                 $ic-link-color; // deprecated - do not use
+$linkColorHover:            $ic-link-color-hover; // deprecated - do not use
+
+//=====================
+// Text-color variables
+//=====================
+$ic-font-color-light:     $canvas-light;
+$ic-font-color-dark:      $canvas-dark;
+$ic-font-color--subdued:  lighten($canvas-dark, 21);
+$ic-hint-text:            lighten($canvas-dark, 40);
+
+// textColor is a deprecated Bootstrap 2 variable. Please use $ic-font-color-dark!
+$textColor:               $ic-font-color-dark; // deprecated - do not use
+
+//=====================
 // Course Nav Variables
-//=======================
+//=====================
 // These variables control the active and hover
 // states we have on the global left-hand sidenav in Canvas
-$ic-course-sidenav_list-item--bg-color: #fff;
-@if $use_high_contrast {$ic-course-sidenav_list-item--bg-color: #333;}
-$ic-course-sidenav_list-item--active-font-color: #0099e0;
-@if $use_high_contrast {$ic-course-sidenav_list-item--active-font-color: #fff;}
-$ic-course-sidenav_list-item--inactive-font-color: #ccc;
+$ic-course-sidenav_list-item--bg-color:               $canvas-light;
+@if $use_high_contrast {
+$ic-course-sidenav_list-item--bg-color:               $canvas-dark;
+}
+$ic-course-sidenav_list-item--active-font-color:      $canvas-primary;
+@if $use_high_contrast {
+$ic-course-sidenav_list-item--active-font-color:      $canvas-light;
+}
+$ic-course-sidenav_list-item--inactive-font-color:    darken($canvas-neutral, 12);
 
+//===============
 // Icon Variables
-//=======================
-$iconSpritePath:      "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default;
+//===============
+//To be used for any disabled icon states 
+$ic-color-icon-disabled:        darken($canvas-neutral, 40);
+@if $use_high_contrast {
+$ic-color-icon-disabled:        darken($canvas-neutral, 60);
+}
+$ic-dim-helper-text:            darken($canvas-neutral, 33);
+@if $use_high_contrast {
+$ic-dim-helper-text:            darken($canvas-neutral, 50);
+}
+
+// We don't use any glyph icons like Bootstrap. This is the overwrite. 
+$iconSpritePath:  "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default;
 $iconWhiteSpritePath: $iconSpritePath !default;
 
-//To be used for any disabled icon states 
-$ic-color-icon-disabled: darken($canvas-neutral, 40);
-@if $use_high_contrast {$ic-color-icon-disabled: darken($canvas-neutral, 60);}
-$ic-dim-helper-text: darken($canvas-neutral, 33);
-@if $use_high_contrast {$ic-dim-helper-text: darken($canvas-neutral, 50);}
-
+//==========================================================
 // Legacy Vendor Variables (please do not touch these files)
-//=======================
+//==========================================================
 // We will be phasing these out
 @import 'vendor/bootstrap/variables';
 @import 'vendor/jqueryui/variables';
 
+//==================
 // Layout Variables
-//=======================
-$right_side_width: 286px;
-$left_side_width: 175px;
-$min_main_width: 510px;
-$max_main_width: 1100px;
+//==================
+$right_side_width:          286px;
+$right_side_margin:         13px;
+$left_side_width:           175px;
+$min_main_width:            510px;
+$max_main_width:            1100px;
+$ic-sp:                     12px;
+$ic-border-radius:          $ic-sp/2;
+$spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
+$borderRadius:              4px;
+$contentBoxPadding:         8px;
 
-$identity-link-color: #fff;
-$menu-border-color: #ccc;
+//==============================
+// Legacy Global Color Variables - DO NOT USE
+//==============================
+// These variables we have reworked to use our canvas color variables for the
+// new UI, however they will need to be evaluated on a case-by-case basis of 
+// their use in Canvas in order to properly phase them out
+// Nothing changes in the legacy UI.
 
-$menu-background-color: #fff;
-$menu-text-color: ensure-contrast(#444, $menu-background-color);
-
-$menu-link-color: #456787;
-
-$right_side_text_color: #595959;
-$right_side_margin: 13px;
-
-// section tabs
-$section_tabs_bg_color: #f2f5f7;
-$section_tabs_color: #4b7092;
-$section_tabs_hover_background_color: darken(#e4e7e9, 2%);
-$section_tabs_border_top_color: #C6C6C6;
-$section_tabs_border_bottom_color: lighten($section_tabs_border_top_color, 4%);
-$section_tabs_to_be_hidden_color: #888;
-$hintTextColor: #888;
-
-$button-text-color: #525252;
-
-$ui-state-default-gradient-top: #ededed;
-$ui-state-default-gradient-bottom: #c4c4c4;
-
-
-// this is the blue color that we use all over the place when not in a gradiants
-$highlight-color: #06a9ee !default;
-// light blue hover color
-$hover-color: #E5F3FF !default;
-// this is the grey color for when things are disabled, or meant to contrast with $highlight-color
-$diminutive-color: #acacac;
-
-$masquerade-link-color: #ffa500;
-$ic-sp: 12px;
-$ic-border-radius: $ic-sp/2;
-
-// canvas stuff
-$lightBackground:               rgb(248, 250, 251);
-$altBG:                         #dfe9f0;
-$borderColor:                   #a8adb3;
-$borderRadius:                  4px;
-$toolbarBackground:             #D7E7F5;
-$toolbarBackgroundLight:        #E8F1F9;
-$listViewHeaderBackground:      rgb(225, 230, 235);
-$listViewHeaderBackgroundLight: lighten($listViewHeaderBackground, 5%);
-$contentBoxPadding:             8px;
-$listBorderColor:               lighten($borderColor, 5%);
-$activeBG:                      #d6ecfc;
-@if $use_high_contrast { $dimmedOpacity: 0.9; }
-@else { $dimmedOpacity: 0.6; }
-
-
-// Canvas K-12 brand color and global spacing variables
-@if $is-k12 {
-  $brand-k12: #2a89e8;
-  $brand-k12-dark: darken(desaturate($brand-k12, 21), 15);
-  $k12-sp: 12px;
-  $k12-header-primary-height: $k12-sp*8;
-  $k12-header-secondary-height: $k12-sp*4;
-  $k12-header-text: white;
-  $k12-transition: cubic-bezier(0,1,0.5,1);
+@if $use_new_styles {
+  $lightBackground:               lighten($canvas-neutral, 8);
+  $wellBackground:                $canvas-light;
+  $altBG:                         $ic-bg-light-neutral;
+  $borderColor:                   $ic-border-light;
+  $activeBG:                      $ic-bg-light-primary;
+}
+@else {
+  $lightBackground:               rgb(248, 250, 251);
+  $wellBackground:                #e8ecef;
+  $altBG:                         #dfe9f0;
+  $borderColor:                   #a8adb3;
+  $activeBG:                      #d6ecfc;
 }
 
-// Font Sizes
-$h1-font-size: 23px;
-$h2-font-size: 14px;
-$h3-font-size: 19px;
+//====================
+// Font Size Variables
+//====================
+$h1-font-size:  23px;
+$h2-font-size:  14px;
+$h3-font-size:  19px;
 
-$spacing-width: 20px;
+//=====================
+// Transition Variables
+//=====================
+// This is a pleasing transition that can be used when you need 
+// a transition timing function
+$ic-transition: cubic-bezier(0,1,0.5,1); 
 
-$wellBackground: #e8ecef;
+//=======================
+// Form-related variables
+//=======================
+$ic-horizontal-form-offset:       $ic-sp*19;
+$ic-label-line-height:            1.3;
+$ic-radio-checkbox-left-offset:   22px;
 
+//=====================================================
+// Canvas K-12 brand color and global spacing variables
+//=====================================================
+@if $is-k12 {
+  $brand-k12:                           #2a89e8;
+  $brand-k12-dark:                      darken(desaturate($brand-k12, 21), 15);
+  $k12-sp:                              12px;
+  $k12-header-primary-height:           $k12-sp*8;
+  $k12-header-secondary-height:         $k12-sp*4;
+  $k12-header-text:                     white;
+  $k12-transition:                      cubic-bezier(0,1,0.5,1);
+}
 // override bootstrap green buttons
 @if $is-k12 { $green: #25bc34; }
 @else { $green: #34832b !default; }
@@ -216,78 +278,3 @@ $wellBackground: #e8ecef;
 @if $is-k12 { $orange: #f55e22; }
 
 
-//
-// New-component variables that will eventually phase out the legacy stuff above
-//==================================================================================
-//
-
-$ic-transition: cubic-bezier(0,1,0.5,1); // this is a pleasing transition that can be used when you need a transition timing function
-
-/// Global light background colors
-//================================
-// These background color variables can be used on hover states or focuse states
-// and meet our contrast needs when used with our main color variables
-
-// $ic-bg-light-neutral
-$ic-bg-light-neutral: lighten($canvas-neutral, 6%);
-
-// $ic-bg-light-primary
-$ic-bg-light-primary: lighten($canvas-primary, 52%);
-@if $use_high_contrast { $ic-bg-light-primary: lighten($canvas-primary, 64%); }
-
-// $ic-bg-light-success
-$ic-bg-light-success: lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
-
-// $ic-bg-light-alert
-$ic-bg-light-alert: lighten($canvas-alert, 50%);
-@if $use_high_contrast { $ic-bg-light-alert: lighten($canvas-alert, 66%); }
-
-// $ic-bg-light-danger
-$ic-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color exists for legacy $canvas-danger
-
-
-/// Global border colors
-//======================
-
-// If it's a light border, it should be this color.
-@if $use_new_styles { $ic-border-light: #d0d7dc; } 
-// note: this was changed to a hex value, which is based off our $canvas-secondary color,
-// to retain the hint of blue that we want on borders, but won't get overwritten
-// when the theme editor is available
-@else { $ic-border-light: $menu-border-color; }
-
-// If it's a dark border, it should be this color.
-@if $use_new_styles { $ic-border-dark: #9facb7; }
-@else { $ic-border-dark: lighten(#4b5662, 20%); }
-
-
-/// Link-color-related variables
-//==============================
-
-$ic-link-color: darken($canvas-primary, 5%);
-@if $use_high_contrast { $ic-link-color: darken($canvas-primary, 2%); }
-$ic-link-color-hover: darken($ic-link-color, 10%);
-
-// linkColor is a deprecated Bootstrap 2 variable. Please use $ic-link-color!
-$linkColor: $ic-link-color; // deprecated - do not use
-$linkColorHover: $ic-link-color-hover; // deprecated - do not use
-
-$ic-icon-link-color-hover: lighten($canvas-dark, 15%);
-@if $use_high_contrast { $ic-icon-link-color-hover: $canvas-dark; }
-
-$ic-icon-link-color: lighten($canvas-dark, 30%);
-@if $use_high_contrast { $ic-icon-link-color: lighten($canvas-dark, 12%); }
-
-
-/// Text-color variables
-//======================
-$ic-text-color: $canvas-dark;
-
-// textColor is a deprecated Bootstrap 2 variable. Please use $ic-text-color!
-$textColor: $ic-text-color; // deprecated - do not use
-
-/// Form-related variables
-//==============================
-$ic-horizontal-form-offset: $ic-sp*19;
-$ic-label-line-height: 1.3;
-$ic-radio-checkbox-left-offset: 22px;

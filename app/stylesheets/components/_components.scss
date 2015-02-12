@@ -114,7 +114,7 @@
   
   // lists w/o headers still need a strong border
   & > ul + ul {
-    border-top: 1px solid $listBorderColor;
+    border-top: 1px solid $ic-border-light;
   }
 
   a.active {

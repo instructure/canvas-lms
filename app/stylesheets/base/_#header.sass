@@ -1,3 +1,11 @@
+$courses-dropdown-menu-bg: $canvas-light
+$course-dropdown-text-color: $canvas-dark
+$course-dropdown-link-color: $canvas-secondary
+$masquerade-link-color: $canvas-alert
+@if $use_high_contrast
+  $masquerade-link-color: $canvas-light
+
+
 #skip_navigation_link
   @include accessibility-prompt
   position: absolute
@@ -108,7 +116,7 @@
       &:hover, &:focus
         text-decoration: underline
     @else
-      color: $identity_link_color
+      color: $canvas-light
       @if $use_high_contrast
         text-decoration: none
       &:hover, &:focus
@@ -203,11 +211,11 @@
         @if $use_high_contrast == false
           text-decoration: none
       @else
-        color: $menu-text-color
+        color: $course-dropdown-text-color
         border-top-color: darken($canvas-secondary, 12%)
         border-left-color: darken($canvas-secondary, 12%)
         border-right-color: darken($canvas-secondary, 12%)
-        background-color: $menu-background-color
+        background-color: $courses-dropdown-menu-bg
 
     .menu-item-drop
       // bring it back on screen so you can see it
@@ -227,7 +235,7 @@
       // For browsers that support it, offset the dropdown by the height of the triangle shape in .menu-item-drop__inner-content
       top: calc(100% - 11px)
     @else
-      background-color: $menu-background-color    
+      background-color: $courses-dropdown-menu-bg    
       box-shadow: 0 2px 18px rgba(0, 0, 0, .30)
       // brings it down by one pixel so it doesn't overlap
       top: 41px
@@ -263,7 +271,7 @@
       .menu-item-heading
         display: block
         padding: 6px 12px
-        color: $menu-text-color
+        color: $course-dropdown-text-color
         font-size: 1.1em
         margin: 0
       &:first-child
@@ -277,7 +285,7 @@
       .subtitle
         display: block
         @if $use_high_contrast
-          color: $menu-text-color
+          color: $course-dropdown-text-color
         font-size: 9px
       .menu-item-drop-float-right
         float: right
