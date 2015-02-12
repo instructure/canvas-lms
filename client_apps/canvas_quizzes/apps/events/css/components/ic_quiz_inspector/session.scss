@@ -5,6 +5,16 @@
   }
 }
 
+.ic-QuizInspector__accessibility-warning {
+  color: $canvas-light;
+  background-color: $canvas-danger;
+  border: 1px dashed $canvas-light;
+  font-size: 14px;
+  position: absolute;
+  left: -20px;
+  top: 40px;
+}
+
 #ic-QuizInspector__AttemptController {
   box-shadow: 0 0 0 1px $borderColor;
   display: inline-block;
@@ -21,7 +31,7 @@
   &, &:hover, &:focus {
     color: inherit;
     text-decoration: none;
-  }  
+  }
   &:first-of-type {
     border-radius: 2px 0 0 2px;
   }
