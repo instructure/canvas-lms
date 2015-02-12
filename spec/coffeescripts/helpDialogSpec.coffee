@@ -24,10 +24,10 @@ require [
       @server.restore()
 
       # if we don't close it after each test, subsequent tests get messed up.
-      # additionally, closing it starts an animation, so tick past that.
       if helpDialog.$dialog?
-        helpDialog.$dialog.remove()
-        @clock.tick 200
+        helpDialog.$dialog.dialog('close')
+        helpDialog.$dialog = null
+
       @clock.restore()
 
       # reset the shared object
