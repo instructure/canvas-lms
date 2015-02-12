@@ -36,6 +36,7 @@ define [
     # pass back expandZip to preserve options that was possibly already made
     # in a previous modal
     handleReplaceClick: ->
+      @refs.dialogAdapter.close() if @props.closeOnResolve
       @props.onNameConflictResolved({
         file: @state.fileOptions.file
         dup: 'overwrite'
@@ -45,6 +46,7 @@ define [
     # pass back expandZip to preserve options that was possibly already made
     # in a previous modal
     handleChangeClick: ->
+      @refs.dialogAdapter.close() if @props.closeOnResolve
       @props.onNameConflictResolved({
         file: @state.fileOptions.file
         dup: 'rename'
@@ -106,7 +108,7 @@ define [
 
 
     render: withReactDOM ->
-      DialogAdapter open: @props.fileOptions?, title: I18n.t('rename_title', 'Copy'), onClose: @props.onClose,
+      DialogAdapter ref: 'dialogAdapter', open: @props.fileOptions?, title: I18n.t('rename_title', 'Copy'), onClose: @props.onClose,
         DialogContent {},
           @buildContent()
         DialogButtons {},

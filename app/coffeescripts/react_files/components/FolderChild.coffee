@@ -60,9 +60,14 @@ define [
 
     saveNameEdit: ->
       @setState editing: false, @focusNameLink
-      @props.model.save(name: @refs.newName.getDOMNode().value, {success: =>
+      newName = @refs.newName.getDOMNode().value
+      @props.model.save(name: newName, {
+        success: =>
           @focusNameLink()
-      })
+        error: (model, response) =>
+          $.flashError(I18n.t("A file named %{itemName} already exists in this folder.", itemName: newName)) if response.status == 409
+        }
+      )
 
     cancelEditingName: ->
       @props.model.collection.remove(@props.model) if @props.model.isNew()

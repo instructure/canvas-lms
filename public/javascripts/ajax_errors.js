@@ -111,7 +111,7 @@ define([
           var message = htmlEscape(I18n.t('errors.logged_out', "You are not currently logged in, possibly due to a long period of inactivity."))
           message += "<br\/><a href='/login' target='_new'>" + htmlEscape(I18n.t('links.login', 'Login')) + "<\/a>";
           $.flashError({ html: message }, 30000);
-        } else {
+        } else if (status != 409) {
           ajaxErrorFlash(I18n.t('errors.unhandled', "Oops! The last request didn't work out."), request);
         }
       }, function() {

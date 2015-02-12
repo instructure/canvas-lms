@@ -78,7 +78,7 @@ define [
     componentDidMount: ->
       @node = @getDOMNode()
 
-      options = 
+      options =
         modal: @props.modal
         close: @props.onClose
         open: @props.onOpen
@@ -88,6 +88,9 @@ define [
 
       @dialog = $(@node).dialog(options).data('dialog')
       @handlePropsChanged()
+
+    close: ->
+      @dialog.close()
 
     render: withReactDOM ->
       div {}
