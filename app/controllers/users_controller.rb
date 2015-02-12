@@ -1746,7 +1746,10 @@ class UsersController < ApplicationController
     ungraded_submissions = course.submissions.
         includes(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
+        except(:order).
+        order(:submitted_at).
         all
+
     ungraded_submissions.each do |submission|
       next unless student = data[submission.user_id]
       student[:ungraded] << submission
@@ -1764,6 +1767,7 @@ class UsersController < ApplicationController
         student[:last_user_note] = date
       end
     end
+
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
   end
