@@ -1026,9 +1026,9 @@ describe "Outcome Groups API", type: :request do
             expect(json["errors"]["calculation_int"][0]).not_to be_nil
             expect(json["errors"]["calculation_int"][0]["message"]).not_to be_nil
             if %w[highest latest].include?(method)
-              expect(json["errors"]["calculation_int"][0]["message"]).to include("'calculation_int' is not used with 'calculation_method'")
+              expect(json["errors"]["calculation_int"][0]["message"]).to include("A calculation value is not used with this calculation method")
             else
-              expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid 'calculation_int'")
+              expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid value for this calculation method")
             end
           end
         end

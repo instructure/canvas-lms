@@ -503,7 +503,7 @@ describe LearningOutcome do
           @outcome.save
           expect(@outcome).to have(1).error_on(:calculation_int)
           expect(@outcome).to have(1).errors
-          expect(outcome_errors(:calculation_int).first).to include("not a valid 'calculation_int'")
+          expect(outcome_errors(:calculation_int).first).to include("is not a valid value for this calculation method")
           @outcome.reload
           expect(@outcome.calculation_method).to eq(method)
           expect(@outcome.calculation_int).to eq(4)
@@ -571,6 +571,9 @@ describe LearningOutcome do
         ]
 
         calc_method.each do |method|
+          invalid_value_error = 'not a valid value for this calculation method'
+          unused_value_error = 'A calculation value is not used with this calculation method'
+
           it "should reject creation of a learning outcome with an illegal calculation_int for calculation_method of '#{method}'" do
             @outcome = @course.created_learning_outcomes.create(
               :title => 'outcome',
@@ -581,9 +584,9 @@ describe LearningOutcome do
             expect(@outcome).to have(1).error
             expect(@outcome).to have(1).error_on(:calculation_int)
             if %w[highest latest].include?(method)
-              expect(outcome_errors(:calculation_int).first).to include("'calculation_int' is not used with 'calculation_method'")
+              expect(outcome_errors(:calculation_int).first).to include(unused_value_error)
             else
-              expect(outcome_errors(:calculation_int).first).to include("not a valid 'calculation_int'")
+              expect(outcome_errors(:calculation_int).first).to include(invalid_value_error)
             end
 
             @outcome = LearningOutcome.new(
@@ -595,9 +598,9 @@ describe LearningOutcome do
             expect(@outcome).to have(1).error
             expect(@outcome).to have(1).error_on(:calculation_int)
             if %w[highest latest].include?(method)
-              expect(outcome_errors(:calculation_int).first).to include("'calculation_int' is not used with 'calculation_method'")
+              expect(outcome_errors(:calculation_int).first).to include(unused_value_error)
             else
-              expect(outcome_errors(:calculation_int).first).to include("not a valid 'calculation_int'")
+              expect(outcome_errors(:calculation_int).first).to include(invalid_value_error)
             end
           end
         end
@@ -776,9 +779,9 @@ describe LearningOutcome do
             expect(@outcome).to have(1).error_on(:calculation_int)
             expect(@outcome).to have(1).errors
             if %w[highest latest].include? method
-              expect(outcome_errors(:calculation_int).first).to include("'calculation_int' is not used with 'calculation_method'")
+              expect(outcome_errors(:calculation_int).first).to include("A calculation value is not used with this calculation method")
             else
-              expect(outcome_errors(:calculation_int).first).to include("not a valid 'calculation_int'")
+              expect(outcome_errors(:calculation_int).first).to include("not a valid value for this calculation method")
             end
             @outcome.reload
             expect(@outcome.calculation_method).to eq(method)
