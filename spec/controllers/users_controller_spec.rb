@@ -97,7 +97,7 @@ describe UsersController do
       get :oauth, {service: "google_drive", return_to: "http://example.com"}
 
       expect(response).to redirect_to "http://example.com/redirect"
-      json = JWT.decode(state, Canvas::Security::encryption_key).first
+      json = Canvas::Security.decode_jwt(state)
       expect(session[:oauth_gdrive_nonce]).to eq 'abc123'
       expect(json['redirect_uri']).to eq oauth_success_url(:service => 'google_drive')
       expect(json['return_to_url']).to eq "http://example.com"
@@ -136,7 +136,7 @@ describe UsersController do
       GoogleDrive::Client.stubs(:create).returns(client_mock)
 
       session[:oauth_gdrive_nonce] = 'abc123'
-      state = JWT.encode({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'}, Canvas::Security::encryption_key)
+      state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
       course_with_student_logged_in
 
       get :oauth_success, state: state, service: "google_drive", code: "some_code"
@@ -159,7 +159,7 @@ describe UsersController do
       GoogleDrive::Client.stubs(:create).returns(client_mock)
 
       session[:oauth_gdrive_nonce] = 'abc123'
-      state = JWT.encode({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'}, Canvas::Security::encryption_key)
+      state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
 
       get :oauth_success, state: state, service: "google_drive", code: "some_code"
 
@@ -178,7 +178,7 @@ describe UsersController do
       client_mock.stubs(:authorization).returns(authorization_mock)
       GoogleDrive::Client.stubs(:create).returns(client_mock)
 
-      state = JWT.encode({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'}, Canvas::Security::encryption_key)
+      state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
       get :oauth_success, state: state, service: "google_drive", code: "some_code"
 
       expect(response.code).to eq "401"

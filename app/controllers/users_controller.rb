@@ -162,7 +162,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "google_drive"
       redirect_uri = oauth_success_url(:service => 'google_drive')
       session[:oauth_gdrive_nonce] = SecureRandom.hex
-      state = JWT.encode({redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce]}, Canvas::Security::encryption_key)
+      state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
       redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
@@ -231,7 +231,7 @@ class UsersController < ApplicationController
           raise "Error getting user info from Google"
         end
 
-        json = JWT.decode(params[:state], Canvas::Security::encryption_key).first
+        json = Canvas::Security.decode_jwt(params[:state])
         render_unauthorized_action and return unless json['nonce'] && json['nonce'] == session[:oauth_gdrive_nonce]
         session.delete(:oauth_gdrive_nonce)
 
