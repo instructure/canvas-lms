@@ -33,7 +33,7 @@ module GoogleDocs
     end
 
     def service_type
-      :google_drive
+      'google_drive'
     end
 
     def download(document_id)
@@ -43,7 +43,7 @@ module GoogleDocs
       )
 
       file = response.data
-      file_info = get_file_info(file)
+      file_info = GoogleDocs::DriveEntry.get_file_data(file)
       result = api_client.execute(:uri => file_info[:url])
       if result.status == 200
 
@@ -139,7 +139,7 @@ module GoogleDocs
 
     def verify_access_token
       api_client.authorization.update_token!
-      return api_client.execute(:api_method => drive.about.get).status == 200
+      api_client.execute(:api_method => drive.about.get).status == 200
     end
 
     def self.config_check(settings)
@@ -158,26 +158,40 @@ module GoogleDocs
     end
 
     private
-    def list(extensions)
-      documents = api_client.execute!(:api_method => drive.files.list).data.to_hash
-      {
-        :name => '/',
-        :folders => [],
-        :files => documents['items'].map do |doc|
-          doc_info = get_file_info(doc)
 
-          if extensions.include?(doc_info[:ext])
-            {
-              :name => doc['title'],
-              :document_id => doc['id'],
-              :extension => doc_info[:ext],
-              :alternate_url => {
-                :href => doc_info[:url]
-              }
-            }
-          end
-        end.compact!
-      }
+    def list(extensions)
+      folderize_list(api_client.execute!(:api_method => drive.files.list, :parameters => {:maxResults => 0}).data.to_hash, extensions)
+    end
+
+
+    def folderize_list(documents, extensions)
+      root = GoogleDocs::DriveFolder.new('/')
+      folders = {nil => root}
+
+      documents['items'].each do |doc_entry|
+        entry = GoogleDocs::DriveEntry.new(doc_entry)
+        if folders.has_key?(entry.folder)
+          folder = folders[entry.folder]
+        else
+          folder = GoogleDocs::DriveFolder.new(get_folder_name_by_id(documents['items'], entry.folder))
+          root.add_folder folder
+          folders[entry.folder] = folder
+        end
+        folder.add_file(entry) unless doc_entry['mimeType'] && doc_entry['mimeType'] == 'application/vnd.google-apps.folder'
+      end
+
+      if extensions && extensions.length > 0
+        root.select { |e| extensions.include?(e.extension) }
+      else
+        root
+      end
+    end
+
+    def get_folder_name_by_id(entries, folder_id)
+      elements = entries.select do |entry|
+        entry['id'] == folder_id
+      end
+      elements.first ? elements.first['title'] : 'Unknown Folder'
     end
 
     def api_client
@@ -189,26 +203,6 @@ module GoogleDocs
       api_client.discovered_api('drive', 'v2')
     end
 
-    def get_file_info(file)
-      file_ext = {
-        ".docx" => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ".xlsx" => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ".pdf" => 'application/pdf',
-      }
-
-      e = file_ext.find {|extension, mime_type| file['exportLinks'] && file['exportLinks'][mime_type] }
-      if e.present?
-        {
-          url: file['exportLinks'][e.last],
-          ext: e.first
-        }
-      else
-        {
-          url: file['downloadUrl'],
-          ext: ".none"
-        }
-      end
-    end
   end
 end
 
