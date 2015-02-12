@@ -44,6 +44,16 @@
 
     &.service-hover .delete_service_link {
       display: inline;
+
+      img {
+        width: auto;
+        height: auto;
+      }
+    }
+
+    img {
+      width: 30px;
+      height: 30px;
     }
   }
 }
@@ -55,6 +65,8 @@
 
     img {
       vertical-align: middle;
+      width: 30px;
+      height: 30px;
     }
   }
 
