@@ -126,6 +126,13 @@ module Importers
       if hash[:grading_standard_migration_id]
         gs = context.grading_standards.where(migration_id: hash[:grading_standard_migration_id]).first
         item.grading_standard = gs if gs
+      elsif hash[:grading_standard_id] && migration
+        gs = GradingStandard.standards_for(context).where(id: hash[:grading_standard_id]).first unless migration.cross_institution?
+        if gs
+          item.grading_standard = gs if gs
+        else
+          migration.add_warning(t('errors.import.grading_standard_not_found', %{The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.}, :title => hash[:title]))
+        end
       end
       if quiz
         item.quiz = quiz

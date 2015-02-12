@@ -162,7 +162,13 @@ module CC
       node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
       node.assignment_group_identifierref CCHelper.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
-      node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if assignment.grading_standard && (!manifest || manifest.export_object?(assignment.grading_standard))
+      if assignment.grading_standard
+        if assignment.grading_standard.context == assignment.context
+          node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if (!manifest || manifest.export_object?(assignment.grading_standard))
+        else
+          node.grading_standard_external_identifier assignment.grading_standard.id
+        end
+      end
       node.workflow_state assignment.workflow_state
       if assignment.rubric
         assoc = assignment.rubric_association

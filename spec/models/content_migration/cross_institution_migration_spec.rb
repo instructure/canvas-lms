@@ -26,6 +26,10 @@ describe ContentMigration do
       # account rubric in assignment
       create_rubric_asmnt(@account)
 
+      # account grading standard in assignment
+      @assignment.grading_standard = grading_standard_for(@account)
+      @assignment.save!
+
       # account question bank in course quiz
       @bank = @account.assessment_question_banks.create!(:title => "account bank")
       aq = @bank.assessment_questions.create!(:question_data =>
@@ -46,6 +50,7 @@ describe ContentMigration do
       expect(@copy_to.learning_outcome_links.first.content).to eq @outcome
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(to_assignment.rubric).to eq @rubric
+      expect(to_assignment.grading_standard).to eq @standard
       expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to eq @bank
     end
 
@@ -61,12 +66,14 @@ describe ContentMigration do
       expect(@copy_to.learning_outcome_links.first.content.context).to eq @copy_to
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(to_assignment.rubric.context).to eq @copy_to
+      expect(to_assignment.grading_standard).to be_nil
       expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to be_nil
 
       expect(@cm.warnings.detect { |w| w =~ /account External Tool.+must be configured/ }).not_to be_nil
       expect(@cm.warnings.detect { |w| w =~ /external Rubric couldn't be found.+creating a copy/ }).not_to be_nil
       expect(@cm.warnings.detect { |w| w =~ /external Learning Outcome couldn't be found.+creating a copy/ }).not_to be_nil
       expect(@cm.warnings.detect { |w| w =~ /Couldn't find the question bank/ }).not_to be_nil
+      expect(@cm.warnings.detect { |w| w =~ /referenced a grading scheme that was not found/ }).not_to be_nil
     end
   end
 end
