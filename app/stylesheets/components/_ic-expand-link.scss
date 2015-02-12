@@ -118,7 +118,7 @@ by adding the `.ic-Expand-link--active` class to the
 ```
 */
 
-$ic-Expand-link-size: $can-sp*4;
+$ic-Expand-link-size: $ic-sp*4;
 
 @mixin ic-Expand-link-branding(
   $bg-color: rgba($canvas-dark, 0.8), 
@@ -155,7 +155,7 @@ $ic-Expand-link-size: $can-sp*4;
   overflow: hidden;
 
   .ic-Expand-link__trigger {
-    transition: all 1s $can-transition;
+    transition: all 1s $ic-transition;
     transform: translateX(-100%) translateX($ic-Expand-link-size);
     text-transform: uppercase;
     overflow: hidden;
@@ -183,7 +183,7 @@ $ic-Expand-link-size: $can-sp*4;
   .ic-Expand-link__text {
     display: flex;
     align-items: center;
-    padding: $can-sp;
+    padding: $ic-sp;
     line-height: 1.1;
     min-height: $ic-Expand-link-size;
   }
@@ -197,8 +197,8 @@ $ic-Expand-link-size: $can-sp*4;
     top: 0; right: 0;
     text-align: center;
     &:before {
-      top: $can-sp/2;
-      font-size: $ic-Expand-link-size - $can-sp;
+      top: $ic-sp/2;
+      font-size: $ic-Expand-link-size - $ic-sp;
     }
   }
 

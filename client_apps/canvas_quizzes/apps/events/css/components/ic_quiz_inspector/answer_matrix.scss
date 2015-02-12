@@ -37,7 +37,7 @@
 
   &.ic-Table--striped {
     th, td {
-      border: 1px solid $can-border-light;
+      border: 1px solid $ic-border-light;
       vertical-align: top;
     }
   }
@@ -77,7 +77,7 @@
 }
 
 #ic-AnswerMatrix__Legend {
-  background: $can-bg-light-neutral;
+  background: $ic-bg-light-neutral;
   padding: $whitespace;
 
   .ic-AnswerMatrix__Emblem {

@@ -1,11 +1,11 @@
 @import 'base/environment';
 
 .MoveDialog__folderItem--selected {
-  background-color: $base-list-item-background--selected
+  background-color: $ic-list-item-background--selected
 }
 
 .MoveDialog__folderItem--focused {
   & > .treeLabel {
-    background-color: $base-list-item-background--hover
+    background-color: $ic-list-item-background--hover
   }
 }

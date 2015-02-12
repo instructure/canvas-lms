@@ -87,64 +87,49 @@ $canvas-dark:                     #333;
 // $gray-light:             lighten(#000, 60%);   // #999
 // $gray-lighter:           lighten(#000, 93.5%); // #eee
 
-// Functional Variable Colors
+// Global Functional Variables
 //=======================
-// For variables throughout canvas we should be using custom names
-// and setting their colors using our two-tiered process
+$ic-body-background-color: lighten($canvas-neutral, 4);
+$ic-content-background-color: $canvas-light;
+$ic-content-padding: 15px;
+$ic-header-background: $canvas-secondary;
+@if $use_high_contrast {$ic-header-background: #333;}
+$ic-font-color-light: $canvas-light;
+$ic-font-color-dark: $canvas-dark;
+$ic-font-color--subdued: #696969;
+$ic-border-color: $canvas-neutral;
+$ic-list-item-background--hover: #eef7ff;
+$ic-list-item-background--selected: #d9edf9;
 
-
-// Examples of functional variable use:
-//
-//    $link-color: $canvas-primary;
-//    $submit_button--on: $canvas-secondary;
-
-
-// in these variables, "content" refers specifically to the #content div,
-// which is the main white page in between the left and right columns
-$base-body-background-color: lighten($canvas-neutral, 4);
-$base-content-background-color: $canvas-light;
-$base-content-padding: 15px;
-$ic-base-header-background: $canvas-secondary;
-@if $use_high_contrast {$ic-base-header-background: #333;}
-$base-font-color-light: $canvas-light;
-$base-font-color-dark: $canvas-dark;
-$base-font-color--subdued: #696969;
-$base-border-color: $canvas-neutral;
-$base-list-item-background--hover: #eef7ff;
-$base-list-item-background--selected: #d9edf9;
-// To be used for any disabled icon states
-$ic-base-color-icon-disabled: darken($canvas-neutral, 40);
-@if $use_high_contrast {$ic-base-color-icon-disabled: darken($canvas-neutral, 60);}
-$ic-base-dim-helper-text: darken($canvas-neutral, 33);
-@if $use_high_contrast {$ic-base-dim-helper-text: darken($canvas-neutral, 50);}
-
+// Course Nav Variables
+//=======================
 // These variables control the active and hover
 // states we have on the global left-hand sidenav in Canvas
+$ic-course-sidenav_list-item--bg-color: #fff;
+@if $use_high_contrast {$ic-course-sidenav_list-item--bg-color: #333;}
+$ic-course-sidenav_list-item--active-font-color: #0099e0;
+@if $use_high_contrast {$ic-course-sidenav_list-item--active-font-color: #fff;}
+$ic-course-sidenav_list-item--inactive-font-color: #ccc;
 
-$course-sidenav_list-item--bg-color: #fff;
-@if $use_high_contrast {$course-sidenav_list-item--bg-color: #333;}
-
-$course-sidenav_list-item--active-font-color: #0099e0;
-@if $use_high_contrast {$course-sidenav_list-item--active-font-color: #fff;}
-
-$course-sidenav_list-item--inactive-font-color: #ccc;
-
-$course-sidenav_list-item--hover-bg-color: #0099e0;
-@if $use_high_contrast {$course-sidenav_list-item--hover-bg-color: #333;}
-
-
-// Legacy Variables
+// Icon Variables
 //=======================
-// These are variables used throughout Canvas that need to be restructured and organized
-// Eventually we'd like to have these put into one of the two categories: Colors or Layout
-
 $iconSpritePath:      "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default;
 $iconWhiteSpritePath: $iconSpritePath !default;
 
+//To be used for any disabled icon states 
+$ic-color-icon-disabled: darken($canvas-neutral, 40);
+@if $use_high_contrast {$ic-color-icon-disabled: darken($canvas-neutral, 60);}
+$ic-dim-helper-text: darken($canvas-neutral, 33);
+@if $use_high_contrast {$ic-dim-helper-text: darken($canvas-neutral, 50);}
+
+// Legacy Vendor Variables (please do not touch these files)
+//=======================
+// We will be phasing these out
 @import 'vendor/bootstrap/variables';
 @import 'vendor/jqueryui/variables';
 
-
+// Layout Variables
+//=======================
 $right_side_width: 286px;
 $left_side_width: 175px;
 $min_main_width: 510px;
@@ -236,40 +221,44 @@ $wellBackground: #e8ecef;
 //==================================================================================
 //
 
-$can-sp: 12px; // use this variable -- or multiples of it -- to space things out and add padding, etc.
-$can-transition: cubic-bezier(0,1,0.5,1); // this is a pleasing transition that can be used when you need a transition timing function
+$ic-transition: cubic-bezier(0,1,0.5,1); // this is a pleasing transition that can be used when you need a transition timing function
 
 /// Global light background colors
 //================================
+// These background color variables can be used on hover states or focuse states
+// and meet our contrast needs when used with our main color variables
 
-// $can-bg-light-neutral
-$can-bg-light-neutral: lighten($canvas-neutral, 6%);
+// $ic-bg-light-neutral
+$ic-bg-light-neutral: lighten($canvas-neutral, 6%);
 
-// $can-bg-light-primary
-$can-bg-light-primary: lighten($canvas-primary, 52%);
-@if $use_high_contrast { $can-bg-light-primary: lighten($canvas-primary, 64%); }
+// $ic-bg-light-primary
+$ic-bg-light-primary: lighten($canvas-primary, 52%);
+@if $use_high_contrast { $ic-bg-light-primary: lighten($canvas-primary, 64%); }
 
-// $can-bg-light-success
-$can-bg-light-success: lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
+// $ic-bg-light-success
+$ic-bg-light-success: lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
 
-// $can-bg-light-alert
-$can-bg-light-alert: lighten($canvas-alert, 50%);
-@if $use_high_contrast { $can-bg-light-alert: lighten($canvas-alert, 66%); }
+// $ic-bg-light-alert
+$ic-bg-light-alert: lighten($canvas-alert, 50%);
+@if $use_high_contrast { $ic-bg-light-alert: lighten($canvas-alert, 66%); }
 
-// $can-bg-light-danger
-$can-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color exists for legacy $canvas-danger
+// $ic-bg-light-danger
+$ic-bg-light-danger: lighten($canvas-danger, 48%); // No high contrast color exists for legacy $canvas-danger
 
 
 /// Global border colors
 //======================
 
 // If it's a light border, it should be this color.
-@if $use_new_styles { $can-border-light: lighten($canvas-secondary, 42%); }
-@else { $can-border-light: $menu-border-color; }
+@if $use_new_styles { $ic-border-light: #d0d7dc; } 
+// note: this was changed to a hex value, which is based off our $canvas-secondary color,
+// to retain the hint of blue that we want on borders, but won't get overwritten
+// when the theme editor is available
+@else { $ic-border-light: $menu-border-color; }
 
 // If it's a dark border, it should be this color.
-@if $use_new_styles { $can-border-dark: lighten($canvas-secondary, 25%); }
-@else { $can-border-dark: lighten(#4b5662, 20%); }
+@if $use_new_styles { $ic-border-dark: #9facb7; }
+@else { $ic-border-dark: lighten(#4b5662, 20%); }
 
 
 /// Link-color-related variables

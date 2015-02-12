@@ -961,7 +961,7 @@ Reduce the width of your screen to see how the example components below both sca
 
 */
 
-@mixin ic-input-variant($border-color: $can-border-light, $color: $canvas-primary) {
+@mixin ic-input-variant($border-color: $ic-border-light, $color: $canvas-primary) {
   border-color: $border-color;
   &:focus {
     border-color: lighten($color, 10%);
@@ -1173,7 +1173,7 @@ select.ic-Input {
   margin-left: $ic-sp;
   position: relative;
   z-index: 1;
-  transition: all 0.2s $can-transition;  
+  transition: all 0.2s $ic-transition;  
   box-sizing: border-box;
   &.ic-Form-message--error { @include form-message-variant($canvas-danger); }
   &.ic-Form-message--success { @include form-message-variant($canvas-success); }
@@ -1304,7 +1304,7 @@ form.ic-Form-group { margin: 0; }
 .ic-Form-actions {
   box-sizing: border-box;
   margin-top: $ic-sp;
-  border: 1px solid $can-border-light;
+  border: 1px solid $ic-border-light;
   padding: $ic-sp;
   text-align: right;
   background: darken($canvas-light, 3%);
@@ -1330,7 +1330,7 @@ form.ic-Form-group { margin: 0; }
       box-sizing: border-box;
       border-radius: 100%;
       width: 16px; height: 16px;
-      border: 1px solid darken($can-border-light, 3%);
+      border: 1px solid darken($ic-border-light, 3%);
       position: absolute;
       top: 50%; left: 0;
       margin-top: -8px;
@@ -1427,7 +1427,7 @@ form.ic-Form-group { margin: 0; }
       border-radius: $baseBorderRadius;
       background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $canvas-light;
       background-size: 16px 48px;
-      border: 1px solid darken($can-border-light, 3%);
+      border: 1px solid darken($ic-border-light, 3%);
       outline: 2px solid transparent;
       outline-offset: -12px;
     }
@@ -1525,7 +1525,7 @@ form.ic-Form-group { margin: 0; }
   .ic-Label {
     height: 38px;
     background: $canvas-light;
-    border: 1px solid $can-border-light;
+    border: 1px solid $ic-border-light;
     display: flex;
     align-items: center;
     padding: $ic-sp/2 ($ic-sp - 4);
@@ -1543,7 +1543,7 @@ form.ic-Form-group { margin: 0; }
   }
 
   .ic-Input-group__add-on {
-    color: $base-font-color--subdued;
+    color: $ic-font-color--subdued;
     box-sizing: border-box; 
   }
 

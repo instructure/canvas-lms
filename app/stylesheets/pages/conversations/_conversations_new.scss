@@ -182,10 +182,10 @@
     position: relative;
 
     &.active {
-      background: $can-bg-light-primary;
+      background: $ic-bg-light-primary;
     }
     &:hover {
-      background: $can-bg-light-primary;
+      background: $ic-bg-light-primary;
     }
     &:hover .message-actions a, .message-actions a:focus {
       left: 0;

@@ -24,10 +24,10 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
 $table-shadow: 0 1px 0 #dde0e4
 
 $revision-sidebar-width: 270px
-$revision-sidebar-background-color: $base-body-background-color
+$revision-sidebar-background-color: $ic-body-background-color
 $revision-sidebar-selected-color: #ffffff
 $revision-sidebar-hover-color: lighten($canvas-neutral, 10)
-$revision-sidebar-dimmed-color: $ic-base-dim-helper-text
+$revision-sidebar-dimmed-color: $ic-dim-helper-text
 $revision-button-color: $canvas-secondary
 $revision-button-hover-color: $canvas-primary
 
@@ -41,7 +41,7 @@ $revision-button-hover-color: $canvas-primary
   background: white
   height: 33px
   max-width: $max_main_width
-  border-color: $menu-border-color
+  border-color: darken($ic-border-color, 10)
 
 .pages.with-left-side .sticky-toolbar .sticky
   margin-left: $left_side_width + 1px
@@ -178,7 +178,7 @@ $revision-button-hover-color: $canvas-primary
         :text-decoration inherit
         :color inherit
         &.clickable:hover
-          :background $base-list-item-background--hover
+          :background $ic-list-item-background--hover
           :text-decoration inherit
           :color inherit
         td:first-child

@@ -161,7 +161,7 @@ $announcements_disscussion-summary-color: $canvas-dark;
   }
 
   &:hover {
-    background: $base-list-item-background--hover;
+    background: $ic-list-item-background--hover;
   }
 
   a {
@@ -227,7 +227,7 @@ $announcements_disscussion-summary-color: $canvas-dark;
   }
 
   .discussion-status {
-    color: $ic-base-color-icon-disabled;
+    color: $ic-color-icon-disabled;
     width: 60px;
 
     .publish-icon {

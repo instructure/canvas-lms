@@ -95,8 +95,8 @@
           }
           &:hover {
             text-decoration: none;
-            background: $course-sidenav_list-item--bg-color;  
-            color: $course-sidenav_list-item--active-font-color;        
+            background: $ic-course-sidenav_list-item--bg-color;  
+            color: $ic-course-sidenav_list-item--active-font-color;        
           }
         }
 
@@ -134,11 +134,11 @@
     
     @else {
       /// active state colors and backgrounds on left sidenav            
-      background: $course-sidenav_list-item--bg-color;
-      color: $course-sidenav_list-item--active-font-color;
+      background: $ic-course-sidenav_list-item--bg-color;
+      color: $ic-course-sidenav_list-item--active-font-color;
       &:hover {      
-        background: $course-sidenav_list-item--bg-color;  
-        color: $course-sidenav_list-item--active-font-color;
+        background: $ic-course-sidenav_list-item--bg-color;  
+        color: $ic-course-sidenav_list-item--active-font-color;
       }
     }
   }

@@ -242,20 +242,20 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
   }
 
   tr {
-    &.ic-Table__row--bg-neutral { background-color: $can-bg-light-neutral; }
-    &.ic-Table__row--bg-success { background-color: $can-bg-light-success; }
-    &.ic-Table__row--bg-alert { background-color: $can-bg-light-alert; }
-    &.ic-Table__row--bg-danger { background-color: $can-bg-light-danger; }
+    &.ic-Table__row--bg-neutral { background-color: $ic-bg-light-neutral; }
+    &.ic-Table__row--bg-success { background-color: $ic-bg-light-success; }
+    &.ic-Table__row--bg-alert { background-color: $ic-bg-light-alert; }
+    &.ic-Table__row--bg-danger { background-color: $ic-bg-light-danger; }
   }
   
   th {
-    border-bottom-color: $can-border-dark;
+    border-bottom-color: $ic-border-dark;
     padding-bottom: $sp-table/2;
     font-weight: bold;
   }
   
   td { 
-    border-bottom-color: $can-border-light;
+    border-bottom-color: $ic-border-light;
     // If you need to add admin links to the far-right cell, enclose them in .ic-Table--actions
     .ic-Table__actions {
       position: relative;
@@ -270,7 +270,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
   
   &.ic-Table--striped {
     tbody {
-      tr:nth-child(odd) { background-color: $can-bg-light-neutral; }
+      tr:nth-child(odd) { background-color: $ic-bg-light-neutral; }
     }
   }
   
@@ -294,7 +294,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
         tr.ic-Table__row--bg-success,
         tr.ic-Table__row--bg-alert,
         tr.ic-Table__row--bg-danger {
-          &:hover { background-color: $can-bg-light-primary; }
+          &:hover { background-color: $ic-bg-light-primary; }
         }
       }
     

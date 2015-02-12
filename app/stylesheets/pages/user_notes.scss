@@ -8,7 +8,7 @@
   margin-left: 0px;
   margin-bottom: 1em;
   padding-bottom: 1em;
-  border-bottom: 1px solid $base-border-color;
+  border-bottom: 1px solid $ic-border-color;
 
   &:first-child {
     margin-top: 0px;
@@ -36,7 +36,7 @@
       .sub_title {
         margin-left: 0px;
         padding: 0 0 5px 0;
-        color: $base-font-color--subdued;
+        color: $ic-font-color--subdued;
         font-style: italic;
       }
     }
