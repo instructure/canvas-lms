@@ -48,6 +48,7 @@ class ActiveRecord::Base
     'role_overrides' => %w(context_code enrollment_type),
     'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name bio),
     'quizzes' => %w(root_quiz_id),
+    'sis_batches' => %w{batch_id},
     'stream_items' => %w{context_code item_asset_string},
     'stream_item_instances' => %w(context_code),
     'submissions' => %w(changed_since_publish late),
