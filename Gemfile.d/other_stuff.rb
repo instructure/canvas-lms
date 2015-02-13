@@ -1,6 +1,6 @@
 
 if CANVAS_RAILS3
-  gem 'rails', '3.2.21'
+  gem 'rails', '3.2.21', github: 'rails/rails', branch: '3-2-stable', ref: 'b344986bc3d94ca7821fc5e0eef1874882ac6cbb'
   gem 'rack', '1.4.5'
   gem 'builder', '3.0.0'
   gem 'tzinfo', '0.3.39'

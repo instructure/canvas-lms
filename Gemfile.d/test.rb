@@ -23,6 +23,7 @@ group :test do
     gem 'childprocess', '0.5.0'
     gem 'websocket', '1.0.7'
   gem 'test_after_commit', '0.4.0'
+  gem 'test-unit', '~> 3.0', :require => false, :platform => :ruby_22
   gem 'webmock', '1.16.1', :require => false
     gem 'addressable', '2.3.5'
     gem 'crack', '0.4.1'
