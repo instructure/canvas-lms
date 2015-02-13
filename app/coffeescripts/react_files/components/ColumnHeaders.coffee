@@ -74,9 +74,10 @@ define [
 
       header className:'ef-directory-header', role: 'row',
         div className: selectAllCheckboxClass, role: 'columnheader',
-          span {className: selectAllLabelClass },
+          label {htmlFor: "selectAllCheckbox", className: selectAllLabelClass },
             I18n.t('select_all', 'Select All')
           input {
+            id: "selectAllCheckbox"
             className: selectAllCheckboxClass
             type: 'checkbox'
             onFocus: (event) => @setState({hideToggleAll: false})
