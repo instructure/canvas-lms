@@ -93,7 +93,10 @@ module Importers
       self.prep_for_import(hash, context, migration)
 
       missing_links = hash.delete(:missing_links) || {}
-      import_warnings = hash.delete(:import_warnings)
+      import_warnings = hash.delete(:import_warnings) || []
+      if error = hash.delete(:import_error)
+        import_warnings += [error]
+      end
 
       if id = hash['assessment_question_id']
         AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash.to_yaml,

@@ -16,6 +16,14 @@ describe "Converting Canvas QTI" do
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::TRUE_FALSE
   end
+
+  it "should convert true false even when response ids are actually the answer text" do
+    # sigh
+    manifest_node=get_manifest_node('true_false2')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
+    hash[:answers].each { |a| a.delete(:id) }
+    expect(hash).to eq CanvasExpected::TRUE_FALSE
+  end
   
   it "should convert multiple answers" do
     manifest_node=get_manifest_node('multiple_answers')

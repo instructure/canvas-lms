@@ -23,7 +23,9 @@ describe Moodle::Converter do
   it "should successfully import the course" do
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
                         "Possible answers will need to be regenerated for Formula question",
-                        "Missing links found in imported content"]
+                        "Missing links found in imported content",
+                        "The importer couldn't determine the correct answers for this question."
+    ]
     expect(@cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}).to eq true
   end
 

@@ -184,7 +184,11 @@ class ChoiceInteraction < AssessmentItemConverter
           migration_id ||= r_if.at_css('member baseValue[baseType=identifier]')
           if migration_id
             migration_id = migration_id.text.strip()
-            if answer = answers_hash[migration_id]
+
+            answer = answers_hash[migration_id]
+            answer ||= answers_hash.values.detect{|a| a[:text] == migration_id}
+
+            if answer
               answer[:weight] = get_response_weight(r_if)
               answer[:feedback_id] ||= get_feedback_id(r_if)
               
