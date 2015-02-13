@@ -449,87 +449,6 @@ TEXT
       </div>
     </p>
   </div>
-  <div id="student_progression_dialog" style="display: none;" title="<%= t 'titles.student_progression', 'Module Progression by Student' %>">
-    <h2 style="margin-top: 0;"><%= t('headings.student_progress', %{Module Progress by Student}) %></h2>
-    <table class="side_tabs_table" style="width: 100%;">
-      <tr>
-        <td class="left">
-          <div style="display: none;">
-            <%= before_label('sort_by', %{Sort By}) %>
-            <a href="#"><%= t('links.sort_by_name', %{Name}) %></a> |
-            <a href="#"><%= t('links.sort_by_progress', %{Progress}) %></a>
-          </div>
-          <ul class="side_tabs student_list">
-            <li class="student blank" style="display: none;">
-              <a href="#">
-                <span class="name"><%= t('student_name', %{Student Name}) %></span>
-                <span class="id" style="display: none;">&nbsp;</span>
-              </a>
-              <div class="sub_content current_module"></div>
-            </li>
-          </ul>
-        </td>
-        <td class="right">
-          <div class="side_tabs_content">
-            <div style="text-align: right; padding-right: 5px;">
-              <a href="#" class="refresh refresh_progressions_link"><%= t('links.reload_student', %{Reload Student's Progress}) %></a>
-            </div>
-            <table class="module_progressions" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th>&nbsp;</th>
-                  <th><%= t('table_headings.module', %{Module}) %></th>
-                  <th><%= t('table_headings.state', %{State}) %></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="module blank" style="display: none;">
-                  <td class="icon">
-                    <i class="icon-check"></i>
-                    <i class="icon-lock"></i>
-                  </td>
-                  <td class="details">
-                    <span class="name">&nbsp;</span>
-                    <span class="id" style="display: none;">&nbsp;</span>
-                    <div class="still_need_completing" style="font-size: 0.6em; padding-left: 10px; color: #888; font-weight: normal;">
-                    </div>
-                  </td>
-                  <td class="progress" style="vertical-align: top;">&nbsp;</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-  <div id="module_progression_dialog" style="display: none;">
-    <h2 style="margin-top: 0;"><%= t 'headings.student_progress_for_module', "Student Progress for %{module}", :module => '<span class="module_name">&nbsp;</span>'.html_safe %></h2>
-    <div style="max-height: 200px; overflow: auto;">
-      <div>
-        <div class="completed_list progression_list" style="margin-bottom: 10px;">
-          <h3 style="margin: 0;"><%= t('headings.students_completed', %{Students who have Completed the Module}) %></h3>
-          <ul>
-          </ul>
-        </div>
-        <div class="started_list progression_list" style="margin-bottom: 10px;">
-          <h3 style="margin: 0;"><%= t('headings.students_in_progress', %{Students who are Working on the Module}) %></h3>
-          <ul>
-          </ul>
-        </div>
-        <div class="unlocked_list progression_list" style="margin-bottom: 10px;">
-          <h3 style="margin: 0;"><%= t('headings.students_unlocked', %{Students who have Unlocked (but not started) the Module}) %></h3>
-          <ul>
-          </ul>
-          </div>
-        <div class="locked_list progression_list" style="margin-bottom: 10px;">
-          <h3 style="margin: 0;"><%= t('headings.students_locked', %{Students who haven't Unlocked the Module}) %></h3>
-          <ul>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
 <% end %>
 <div style="display: none;">
   <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
@@ -583,26 +502,6 @@ TEXT
     <div class="collapsed">&nbsp;</div>
   </div>
 </div>
-<% if can_do(@context, @current_user, :manage_grades) %>
-<div style="display: none;" id="progression_list">
-  <a href="#" class="progression_list_url">&nbsp;</a>
-  <% cache([@context, @current_user, 'students_visible_to_user'].cache_key, :no_locale => true) do %>
-    <% @context.students_visible_to(@current_user).except(:select).select("users.id, users.name").order_by_sortable_name.each do |student| %>
-      <div class="student student_<%= student.id %>">
-        <div class="id"><%= student.id %></div>
-        <div class="name"><%= student.last_name_first %></div>
-        <div class="current_module">&nbsp;</div>
-        <div class="progressions">
-        </div>
-      </div>
-    <% end %>
-  <% end %>
-  <div class="progression" id="progression_list_blank">
-    <div class="context_module_id">&nbsp;</div>
-    <div class="workflow_state">&nbsp;</div>
-  </div>
-</div>
-<% end %>
 
 <% content_for :keyboard_navigation do %>
   <ul class="navigation_list" tabindex="-1">

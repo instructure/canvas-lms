@@ -121,16 +121,8 @@ define([
         }
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $(".loading_module_progressions_link").remove();
-          if(!user_id) {
-            $("#progression_list .student .progressions").empty();
-          } else {
-            $("#progression_list .student_" + user_id + " .progressions").empty();
-          }
           var current_user_id = $("#identity .user_id").text();
-          var $list_blank = $("#progression_list_blank");
           var $user_progression_list = $("#current_user_progression_list");
-          var $student_progression_list = $("#progression_list");
-          var lists_per_user = {};
           var progressions = [];
           for(var idx in data) {
             progressions.push(data[idx]);
@@ -162,24 +154,6 @@ define([
               if($user_progression.length > 0) {
                 progression.requirements_met = $.map(progression.requirements_met || [], function(r) { return r.id }).join(",");
                 $user_progression.fillTemplateData({data: progression});
-              }
-            }
-            var $progression = $list_blank.clone(true).removeAttr('id');
-            $progression.fillTemplateData({data: progression});
-            $progression.addClass('progression_' + progression.context_module_id);
-            $progression.data('progression', progression);
-            var $list_for_user = lists_per_user[progression.user_id];
-            if(!$list_for_user) {
-              $list_for_user = $student_progression_list.find(".student_" + progression.user_id + " .progressions");
-              lists_per_user[progression.user_id] = $list_for_user;
-            }
-            $list_for_user.append($progression);
-            if(progression.workflow_state == 'unlocked' || progression.workflow_state == 'started') {
-              if(!lists_per_user[progression.user_id].found) {
-                lists_per_user[progression.user_id].found = true
-                $list_for_user.parents(".student").fillTemplateData({
-                  data: {current_module: $("#context_module_" + progression.context_module_id + " .header .name").text() }
-                });
               }
             }
             progressionCnt++;
@@ -1517,19 +1491,6 @@ define([
         toggle();
       }
 
-    });
-    $(".refresh_progressions_link").click(function(event) {
-      event.preventDefault();
-      $(this).addClass('refreshing');
-      var $link = $(this);
-      var id = $("#student_progression_dialog").find(".student.selected_side_tab:first").getTemplateData({textValues: ['id']}).id;
-      if(id) {
-        modules.updateProgressions(id, function() {
-          $link.removeClass('refreshing');
-          $link.blur();
-          $("#student_progression_dialog").find(".student.selected_side_tab:first").click();
-        });
-      }
     });
     $(document).fragmentChange(function(event, hash) {
       if (hash == '#student_progressions') {
