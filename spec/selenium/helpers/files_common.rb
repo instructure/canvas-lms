@@ -52,6 +52,33 @@ def delete_from_toolbar
   confirm_delete_on_dialog
 end
 
+#This method sets permissions on files/folders
+# Params:
+# - rgba_color: background color of the cloud icon
+# - permission_flag: can take three values 0,1,2. 0-Publish, 1-Unpublish, 2-Restricted Access
+# - restricted_access_option: can take two values 0,1. 0-available to student with link, 1-available within given timeframe
+def permissions(rgba_color, permission_flag=0, restricted_access_option=0)
+  icon_background_color = rgba_color
+  f('.btn-link.published-status').click
+  wait_for_ajaximations
+  if permission_flag == 0 or permission_flag == 1 then
+     driver.find_elements(:name, 'permissions')[permission_flag].click
+  else
+     driver.find_elements(:name, 'permissions')[permission_flag].click
+     if restricted_access_option == 1 then
+        driver.find_elements(:name, 'restrict_options')[restricted_access_option].click
+        ff('.ui-datepicker-trigger.btn')[0].click
+        fln("15").click
+        ff('.ui-datepicker-trigger.btn')[1].click
+        fln("25").click
+     end
+  end
+  ff('.btn.btn-primary')[1].click
+  wait_for_ajaximations
+  icon_publish_color = f('.btn-link.published-status').css_value('color')
+  expect(icon_publish_color).to eq icon_background_color
+end
+
 def should_make_folders_in_the_menu_droppable
   course_with_teacher_logged_in
   get "/files"
