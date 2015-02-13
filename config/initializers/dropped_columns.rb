@@ -42,6 +42,7 @@ class ActiveRecord::Base
     'failed_jobs' => %w(original_id),
     'grading_periods' => %w(course_id account_id),
     'groups' => %w(sis_name type groupable_id groupable_type),
+    'messages' => %w(cc bcc),
     'notification_policies' => %w(user_id broadcast),
     'page_views' => %w(contributed),
     'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id crypted_webdav_access_code type),
