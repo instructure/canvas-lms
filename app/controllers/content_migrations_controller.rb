@@ -17,7 +17,6 @@
 #
 
 # @API Content Migrations
-# @beta
 #
 # API for accessing content migrations and migration issues
 # @model ContentMigration
