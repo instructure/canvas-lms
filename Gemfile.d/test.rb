@@ -12,8 +12,8 @@ group :test do
   gem 'thin', '1.6.3'
     gem 'eventmachine', '1.0.4'
 
-  gem 'rspec', '3.1.0'
-  gem 'rspec-rails', '3.1.0'
+  gem 'rspec', '3.2.0'
+  gem 'rspec-rails', '3.2.0'
   gem 'rspec-legacy_formatters', '1.0.0'
   gem 'rspec-collection_matchers', '1.1.2'
   gem 'once-ler', '0.0.15'
