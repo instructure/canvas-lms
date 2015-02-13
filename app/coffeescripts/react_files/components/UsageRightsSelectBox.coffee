@@ -132,23 +132,22 @@ define [
                 defaultValue: @props.copyright
               },
                 @renderCreativeCommonsOptions()
+        div {className: 'control-group'},
+          label {
+            className: 'control-label',
+            htmlFor: 'copyrightHolder'
+          },
+            I18n.t('Copyright Holder:')
+          div {className: 'controls'},
+            input {
+              id: 'copyrightHolder',
+              type: 'text',
+              ref: 'copyright',
+              defaultValue: @props.copyright if @props.copyright?
+              placeholder: I18n.t('(c) 2001 Acme Inc.')
+            }
         if @state.showMessage
           div {className: 'alert'},
             span {},
               i {className: 'icon-warning'}, null
               span {style: {paddingLeft: "10px"}}, I18n.t("If you do not select usage rights now, this file will be unpublished after it's uploaded.")
-        if @state.showTextBox and not @state.showMessage
-          div {className: 'control-group'},
-            label {
-              className: 'control-label',
-              htmlFor: 'copyrightHolder'
-            },
-              I18n.t('Copyright Holder:')
-            div {className: 'controls'},
-              input {
-                id: 'copyrightHolder',
-                type: 'text',
-                ref: 'copyright',
-                defaultValue: @props.copyright if @props.copyright?
-                placeholder: I18n.t('(c) 2001 Acme Inc.')
-              }
