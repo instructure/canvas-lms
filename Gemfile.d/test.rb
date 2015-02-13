@@ -7,7 +7,7 @@ group :test do
   gem 'bluecloth', '2.2.0' # for generating api docs
     gem 'redcarpet', '3.0.0'
   gem 'bullet_instructure', '4.0.3', :require => 'bullet'
-  gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
+  gem 'mocha', github: 'maneframe/mocha', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
     gem 'metaclass', '0.0.2'
   gem 'thin', '1.6.3'
     gem 'eventmachine', '1.0.4'

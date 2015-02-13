@@ -21,13 +21,15 @@ module MultiCache
     [Setting.get("#{key}_copies", 1).to_i, 1].max
   end
 
-  def self.fetch(key, &block)
-    Rails.cache.fetch("#{key}:#{rand(copies(key))}", &block)
+  def self.fetch(key, options = nil, &block)
+    options ||= {}
+    Rails.cache.fetch("#{key}:#{rand(options[:copies] || copies(key))}", options, &block)
   end
 
-  def self.delete(key)
-    (0...copies(key)).each do |i|
-      Rails.cache.delete("#{key}:#{i}")
+  def self.delete(key, options = nil)
+    options ||= {}
+    (0...(options[:copies] || copies(key))).each do |i|
+      Rails.cache.delete("#{key}:#{i}", options)
     end
   end
 end

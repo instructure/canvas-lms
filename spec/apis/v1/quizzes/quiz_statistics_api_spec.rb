@@ -62,6 +62,11 @@ describe Quizzes::QuizStatisticsController, type: :request do
       expect(json['quiz_statistics'][0]).to have_key('links')
       expect(json['quiz_statistics'][0]).not_to have_key('quiz_id')
     end
+    it "should return :no_content for large quizzes" do
+      Quizzes::QuizStatistics.stubs(:large_quiz?).returns true
+
+      expect(api_index(raw:true)).to be_equal(204)
+    end
 
     context 'JSON-API compliance' do
       it 'should conform to the JSON-API spec when returning the object' do

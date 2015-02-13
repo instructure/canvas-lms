@@ -17,6 +17,7 @@ requirejs.config({
       'vendor/backbone': 'canvas/vendor/backbone',
       'jquery': '../../../vendor/packages/jquery',
       'compiled/behaviors/authenticity_token': 'canvas/compiled/behaviors/authenticity_token',
+      'str/htmlEscape': 'canvas/str/htmlEscape',
     },
 
     'canvas/compiled/behaviors/authenticity_token': {
