@@ -897,6 +897,18 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
       end
+
+      it "should also have the right assignment_and_quiz_visibilities" do
+        expect(@teacher.assignment_and_quiz_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_truthy
+        expect(@student_1.assignment_and_quiz_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_truthy
+        expect(@student_2.assignment_and_quiz_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_falsey
+      end
+
+      it "should properly return differentiated assignments for teacher even without update rights" do
+        @course.account.role_overrides.create!(role: teacher_role, enabled: false, permission: :manage_content)
+        expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
+      end
+
       it "should properly return unpublished assignments" do
         @assignment.workflow_state = "unpublished"
         @assignment.save!

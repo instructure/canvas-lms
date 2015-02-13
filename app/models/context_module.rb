@@ -172,14 +172,17 @@ class ContextModule < ActiveRecord::Base
 
   set_policy do
     given {|user, session| self.context.grants_right?(user, session, :manage_content) }
-    can :read and can :create and can :update and can :delete
+    can :read and can :create and can :update and can :delete and can :read_as_admin
+
+    given {|user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
 
     given {|user, session| self.context.grants_right?(user, session, :read) }
     can :read
   end
 
   def locked_for?(user, opts={})
-    return false if self.grants_right?(user, :update)
+    return false if self.grants_right?(user, :read_as_admin)
     available = self.available_for?(user, opts)
     return {:asset_string => self.asset_string, :context_module => self.attributes} unless available
     return {:asset_string => self.asset_string, :context_module => self.attributes, :unlock_at => self.unlock_at} if self.to_be_unlocked
@@ -188,7 +191,7 @@ class ContextModule < ActiveRecord::Base
 
   def available_for?(user, opts={})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
-    if self.grants_right?(user, :update)
+    if self.grants_right?(user, :read_as_admin)
       return true
     elsif !self.active?
       return false
@@ -306,7 +309,7 @@ class ContextModule < ActiveRecord::Base
   def content_tags_visible_to(user, opts={})
     @content_tags_visible_to ||= {}
     @content_tags_visible_to[user.try(:id)] ||= begin
-      is_teacher = opts[:is_teacher] != false && self.grants_right?(user, :update)
+      is_teacher = opts[:is_teacher] != false && self.grants_right?(user, :read_as_admin)
       tags = is_teacher ? cached_not_deleted_tags : cached_active_tags
 
       if !is_teacher && differentiated_assignments_enabled? && user

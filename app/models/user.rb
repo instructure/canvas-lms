@@ -225,10 +225,9 @@ class User < ActiveRecord::Base
     end
   }
 
-  def assignment_and_quiz_visibilities(opts = {})
-     opts = {user_id: self.id}.merge(opts)
-     {assignment_ids: AssignmentStudentVisibility.where(opts).order('assignment_id desc').pluck(:assignment_id),
-      quiz_ids: Quizzes::QuizStudentVisibility.where(opts).order('quiz_id desc').pluck(:quiz_id)}
+  def assignment_and_quiz_visibilities(context)
+     {assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
+      quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id)}
   end
 
   def self.order_by_sortable_name(options = {})

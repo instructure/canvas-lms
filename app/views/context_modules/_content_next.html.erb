@@ -232,7 +232,7 @@ TEXT
   >
     <% editable = can_do(@context, @current_user, :manage_content) %>
     <% differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments) %>
-    <% visible_assignments = differentiated_assignments_on ? @current_user.try(:assignment_and_quiz_visibilities, {course_id: @context.id}) : true %>
+    <% visible_assignments = differentiated_assignments_on ? @current_user.try(:assignment_and_quiz_visibilities, @context) : true %>
     <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_6', collection_cache_key(@modules), Time.zone]%>
     <% cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments_on %>
     <% cache_key = cache_key_items.join('/') %>
