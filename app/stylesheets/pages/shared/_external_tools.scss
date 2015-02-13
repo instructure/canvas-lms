@@ -35,6 +35,23 @@ $app_height: 143px;
 }
 
 #external_tools {
+  .AddExternalToolButton{
+    display: flex;
+  }
+
+  .page-header{
+    display: flex;
+  }
+
+  .externalApps_label_text{
+    flex: 1 1;
+  }
+  .externalApps_buttons_container{
+    display: flex;
+    justify-content: flex-end;
+    flex: 2 2;
+  }
+
   h2 {
     margin: 10px 0;
   }
