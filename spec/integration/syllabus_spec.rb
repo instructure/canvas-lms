@@ -40,7 +40,7 @@ describe "syllabus" do
     anonymous_syllabus_access_allowed :public_syllabus
   end
 
-  it "should allow viewing files in a public syllabus" do
+  it "should allow viewing available files in a public syllabus" do
     course(:active_all => true)
     attachment_model
     @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
@@ -54,6 +54,25 @@ describe "syllabus" do
     expect(page.css('#identity a[href="/login"]')).not_to be_nil
     link = page.at_css('#course_syllabus a')
     expect(link.attributes['href'].value).to include("verifier=#{@attachment.uuid}")
+  end
+
+  it "should not allow viewing locked files in a public syllabus" do
+    course(:active_all => true)
+    attachment_model
+    @attachment.locked = true
+    @attachment.save!
+
+    @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
+    @course.public_syllabus = true
+    @course.save!
+
+    get "/courses/#{@course.id}/assignments/syllabus"
+
+    expect(response).to be_success
+    page = Nokogiri::HTML(response.body)
+    expect(page.css('#identity a[href="/login"]')).not_to be_nil
+    link = page.at_css('#course_syllabus a')
+    expect(link.attributes['href'].value).to_not include("verifier=#{@attachment.uuid}")
   end
 
   it "should display syllabus description on syllabus course home pages" do

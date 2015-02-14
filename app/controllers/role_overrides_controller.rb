@@ -444,7 +444,26 @@ class RoleOverridesController < ApplicationController
     end
   end
 
-  # Summary: 
+  # Internal API endpoint
+  # Used for checking Canvas permissions from Catalog
+  # Could be generalized for other use cases by adding to the whitelist
+
+  def check_account_permission
+    whitelist = %w(manage_catalog)
+    permission = params[:permission]
+
+    if whitelist.include?(permission)
+      render json: {
+        permission: permission,
+        granted: @context.grants_right?(@current_user, permission.to_sym)
+      }
+    else
+      render json: { message: t("Permission not found") },
+             status: :bad_request
+    end
+  end
+
+  # Summary:
   #   Adds ENV.CURRENT_ACCOUNT with the account we are working with.
   def set_js_env_for_current_account
     js_env :CURRENT_ACCOUNT => @context

@@ -67,7 +67,7 @@ module FeatureFlags
   # (helper method.  use lookup_feature_flag to test policy.)
   def feature_flag(feature)
     self.shard.activate do
-      result = Rails.cache.fetch(feature_flag_cache_key(feature)) do
+      result = MultiCache.fetch(feature_flag_cache_key(feature), copies: MultiCache.copies('feature_flags')) do
         self.feature_flags.where(feature: feature.to_s).first || :nil
       end
       result = nil if result == :nil
