@@ -7,6 +7,7 @@ define(function(require) {
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
   var Summary = require('jsx!./summary');
+  var Report = require('jsx!./summary/report');
   var ToggleDetailsButton = require('jsx!./questions/toggle_details_button');
   var QuestionRenderer = require('jsx!./question');
   var MultipleChoiceRenderer = require('jsx!./questions/multiple_choice');
@@ -49,50 +50,67 @@ define(function(require) {
       var props = this.props;
       var quizStatistics = this.props.quizStatistics;
       var submissionStatistics = quizStatistics.submissionStatistics;
+      if (!this.props.canBeLoaded) {
+        return(
+          <div id="canvas-quiz-statistics" className="canvas-quiz-statistics-noload">
+            <div id="sad-panda">
+              <img src="/images/sadpanda.svg"
+                alttext={I18n.t('sad-panda-alttext', "Sad things in panda land.")}
+                />
+              <p>
+                {I18n.t("quiz-stats-noshow-warning", "Even awesomeness has limits. We can't render statistics for this quiz, but you can download the reports.")}
+              </p>
+              <div className="links">
+                {this.renderQuizReports(this.props.quizReports)}
+              </div>
+            </div>
+          </div>
+        );
+      } else {
+        return(
+          <div id="canvas-quiz-statistics">
+            <ScreenReaderContent tagName="h1">
+              {I18n.t('title', 'Quiz Statistics')}
+            </ScreenReaderContent>
 
-      return(
-        <div id="canvas-quiz-statistics">
-          <ScreenReaderContent tagName="h1">
-            {I18n.t('title', 'Quiz Statistics')}
-          </ScreenReaderContent>
+            <Notifications notifications={this.props.notifications} />
 
-          <Notifications notifications={this.props.notifications} />
+            <section>
+              <Summary
+                pointsPossible={quizStatistics.pointsPossible}
+                scoreAverage={submissionStatistics.scoreAverage}
+                scoreHigh={submissionStatistics.scoreHigh}
+                scoreLow={submissionStatistics.scoreLow}
+                scoreStdev={submissionStatistics.scoreStdev}
+                durationAverage={submissionStatistics.durationAverage}
+                quizReports={this.props.quizReports}
+                scores={submissionStatistics.scores}
+                loading={this.props.isLoadingStatistics}
+                />
+            </section>
 
-          <section>
-            <Summary
-              pointsPossible={quizStatistics.pointsPossible}
-              scoreAverage={submissionStatistics.scoreAverage}
-              scoreHigh={submissionStatistics.scoreHigh}
-              scoreLow={submissionStatistics.scoreLow}
-              scoreStdev={submissionStatistics.scoreStdev}
-              durationAverage={submissionStatistics.durationAverage}
-              quizReports={this.props.quizReports}
-              scores={submissionStatistics.scores}
-              loading={this.props.isLoadingStatistics}
-              />
-          </section>
+            <section id="question-statistics-section">
+              <header className="padded">
+                <h2 className="section-title inline">
+                  {I18n.t('question_breakdown', 'Question Breakdown')}
+                </h2>
 
-          <section id="question-statistics-section">
-            <header className="padded">
-              <h2 className="section-title inline">
-                {I18n.t('question_breakdown', 'Question Breakdown')}
-              </h2>
+                <aside className="all-question-controls pull-right">
+                  <SightedUserContent tagName="div">
+                    <ToggleDetailsButton
+                      onClick={this.toggleAllDetails}
+                      expanded={quizStatistics.expandingAll}
+                      disabled={this.props.isLoadingStatistics}
+                      controlsAll />
+                  </SightedUserContent>
+                </aside>
+              </header>
 
-              <aside className="all-question-controls pull-right">
-                <SightedUserContent tagName="div">
-                  <ToggleDetailsButton
-                    onClick={this.toggleAllDetails}
-                    expanded={quizStatistics.expandingAll}
-                    disabled={this.props.isLoadingStatistics}
-                    controlsAll />
-                </SightedUserContent>
-              </aside>
-            </header>
-
-            {this.renderQuestions()}
-          </section>
-        </div>
-      );
+              {this.renderQuestions()}
+            </section>
+          </div>
+        );
+      }
     },
 
     renderQuestions: function() {
@@ -122,6 +140,17 @@ define(function(require) {
           </div>
         );
       }
+    },
+
+    renderQuizReports: function() {
+      var quizReports = this.props.quizReports;
+      if (typeof quizReports !== "undefined" && quizReports !== null && quizReports.length) {
+        return quizReports.map(this.renderReport);
+      }
+    },
+    renderReport: function(reportProps) {
+      reportProps.key = "report-" + reportProps.id;
+      return Report(reportProps);
     },
 
     renderQuestion: function(participantCount, question) {

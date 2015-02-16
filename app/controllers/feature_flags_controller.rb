@@ -232,7 +232,7 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "invalid feature" }, status: :bad_request unless feature_def
 
       # check whether the feature is locked
-      Rails.cache.delete(@context.feature_flag_cache_key(params[:feature]))
+      MultiCache.delete(@context.feature_flag_cache_key(params[:feature]), copies: MultiCache.copies('feature_flags'))
       current_flag = @context.lookup_feature_flag(params[:feature])
       if current_flag
         return render json: { message: "higher account disallows setting feature flag" }, status: :forbidden if current_flag.locked?(@context, @current_user)

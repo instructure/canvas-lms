@@ -26,23 +26,7 @@
     <span class="title"><%= t('headers.questions', "Questions") %></span>
     <span class="value"><%= @question_count || 0 %></span>
   </li>
-
-  <% if @quiz.lock_at || @quiz.unlock_at %>
-    <li>
-      <span class="title"><%= t('headers.available', "Available") %></span>
-      <span class="value">
-        <% if @quiz.lock_at && @quiz.unlock_at %>
-          <%= mt(:quiz_availabile_through, "%{start_time} - %{end_time}", :start_time => datetime_string(@quiz.unlock_at), :end_time => datetime_string(@quiz.lock_at)) %>
-          <span style="font-size: 0.8em;"><%= time_ago_in_words(Time.now + (@quiz.lock_at - @quiz.unlock_at)) rescue "" %></span>
-        <% elsif @quiz.lock_at %>
-          <%= t(:quiz_available_until, "until %{end_time}", :end_time => datetime_string(@quiz.lock_at)) %>
-        <% else %>
-          <%= t(:quiz_available_after, "after %{start_time}", :start_time => datetime_string(@quiz.unlock_at)) %>
-        <% end %>
-      </span>
-    </li>
-  <% end %>
-
+  <%= render :partial => "shared/available_dates", :locals => {:association => @quiz} %>
   <li>
     <span class="title"><%= t('headers.time_limit', "Time Limit") %></span>
     <span class="value">

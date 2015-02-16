@@ -25,11 +25,9 @@ define([
 
     nameTooLong (a) {
       if (a.name.length > 30){
-        console.log(a.name + "too long")
         return true 
       }
       else{
-        console.log(a.name + "not too long")
         return false
       }    
     },

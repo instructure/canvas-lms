@@ -6,6 +6,7 @@ namespace :js do
   desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
+    app = nil if app == 'NA'
     #browsers = ARGV[2] || 'Firefox,Chrome,Safari'
     browsers = ARGV[2] || 'Chrome'
     if app

@@ -102,9 +102,13 @@ class EnrollmentTerm < ActiveRecord::Base
   
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
-    existing_term = self.root_account.enrollment_terms.where(sis_source_id: self.sis_source_id).first
-    return true if !existing_term || existing_term.id == self.id 
-    
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
+    scope = root_account.enrollment_terms.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
+
+    return true unless scope.exists?
+
     self.errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", :sis_source_id => self.sis_source_id))
     false
   end

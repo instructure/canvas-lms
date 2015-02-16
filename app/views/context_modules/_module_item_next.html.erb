@@ -31,7 +31,7 @@
     <%= module_item.item_class if module_item %>
   "
 >
-<div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' unless editable %>">
+<div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %>">
     <div class="ig-title module-item-title ellipses">
       <% if editable || module_item.nil? %>
       <span

@@ -18,7 +18,10 @@
 
 # @API Enrollment Terms
 #
-# API for viewing enrollment terms.
+# API for viewing enrollment terms.  For all actions, the specified account
+# must be a root account and the caller must have permission to manage the
+# account (when called on non-root accounts, the errorwill be indicate the
+# appropriate root account).
 #
 # @model EnrollmentTerm
 #     {
@@ -65,9 +68,7 @@ class TermsApiController < ApplicationController
 
   # @API List enrollment terms
   #
-  # Return all of the terms in the account. Account must be a root account and
-  # requires permission to manage the account (when called on non-root
-  # accounts, will be directed to the appropriate root account).
+  # Return all of the terms in the account.
   #
   # @argument workflow_state[] [String, 'active'| 'deleted'| 'all']
   #   If set, only returns terms that are in the given state.
@@ -83,6 +84,6 @@ class TermsApiController < ApplicationController
     terms = terms.where(workflow_state: state) if state.present?
 
     terms = Api.paginate(terms, self, api_v1_enrollment_terms_url)
-    render json: {enrollment_terms: enrollment_terms_json(terms, @current_user, session)}
+    render json: { enrollment_terms: enrollment_terms_json(terms, @current_user, session) }
   end
 end

@@ -183,7 +183,8 @@ class GradebooksController < ApplicationController
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => Setting.get('gradebook2.submissions_chunk_size', '35').to_i,
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
-      :sections_url => api_v1_course_sections_url(@context),
+      :sections_url => api_v1_course_sections_url(@context, :include => 'passback_status'),
+      :course_url => api_v1_course_url(@context, :include => 'passback_status'),
       :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
       :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
       :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
@@ -216,6 +217,7 @@ class GradebooksController < ApplicationController
       :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
       :sis_app_url => Setting.get('sis_app_url', nil),
       :sis_app_token => Setting.get('sis_app_token', nil),
+      :post_grades_feature_enabled => @context.feature_enabled?(:post_grades),
       :list_students_by_sortable_name_enabled => @context.feature_enabled?(:gradebook_list_students_by_sortable_name)
     }
   end

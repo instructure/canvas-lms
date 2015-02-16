@@ -3,32 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 shared_examples_for "external tools tests" do
   include_examples "in-process server selenium tests"
 
-  def add_external_tool (*opts)
-    name = "external tool"
-    key = "1234567"
-    secret = "secret"
-    f("#tab-tools-link").click
-    f("#tab-tools .add_tool_link").click
-    f("#external_tool_name").send_keys(name)
-    f("#external_tool_consumer_key").send_keys(key)
-    f("#external_tool_shared_secret").send_keys(secret)
-    if opts.include? :xml
-      add_xml
-    elsif opts.include? :url
-      add_url
-    else
-      add_manual opts
-    end
-    fj('.ui-dialog:visible .btn-primary').click()
-    wait_for_ajax_requests
-   # ContextExternalTool.count.should != 0
-    tool = ContextExternalTool.last
-    expect(tool.name).to eq name
-    expect(tool.consumer_key).to eq key
-    expect(tool.shared_secret).to eq secret
-    tool_checker tool, opts
-  end
-
   def tool_checker (tool, opts)
 
     if (opts.include? :xml)

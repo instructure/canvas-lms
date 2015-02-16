@@ -54,8 +54,8 @@ define([
                 }
               </legend>
               <div className="row title-row">
-                <h5 className="muted span3">{I18n.t("Assignment Name")}</h5>
-                <h5 className="muted span2">{I18n.t("Due Date")}</h5>
+                <h5 className="muted span3" aria-hidden="true">{I18n.t("Assignment Name")}</h5>
+                <h5 className="muted span2" aria-hidden="true">{I18n.t("Due Date")}</h5>
               </div>
 
               {assignmentUtils.withOriginalErrors(assignments).map((a) => {

@@ -374,9 +374,9 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
-
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
+
       js_hash = {DISCUSSION_TOPIC: hash,
                  SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
                  GROUP_CATEGORIES: categories.
@@ -386,6 +386,27 @@ class DiscussionTopicsController < ApplicationController
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
                  POST_GRADES: @context.feature_enabled?(:post_grades),
                  DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
+      if @context.is_a?(Course)
+        js_hash['SECTION_LIST'] = sections.map { |section|
+          {
+            id: section.id,
+            name: section.name,
+            start_at: section.start_at,
+            end_at: section.end_at,
+            override_course_dates: section.restrict_enrollments_to_section_dates
+          }
+        }
+        js_hash['COURSE_DATE_RANGE'] = {
+          start_at: @context.start_at,
+          end_at: @context.conclude_at,
+          override_term_dates: @context.restrict_enrollments_to_course_dates
+        }
+        js_hash['TERM_DATE_RANGE'] = {
+          start_at: @context.enrollment_term.start_at,
+          end_at: @context.enrollment_term.end_at
+        }
+      end
+
       append_sis_data(js_hash)
       js_env(js_hash)
       render :action => "edit"
@@ -956,7 +977,7 @@ class DiscussionTopicsController < ApplicationController
       extra_params = {
         :headless => 1,
         :hide_student_names => params[:hide_student_names],
-        student_id => params[:student_id]
+        :student_id => params[:student_id]
       }
     end
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
@@ -982,7 +1003,7 @@ class DiscussionTopicsController < ApplicationController
 
       if !hash[:assignment].nil?
         if params[:due_at]
-          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null"  ? nil : params[:due_at].to_date
+          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null"  ? nil : params[:due_at]
         end
         hash[:assignment][:points_possible] = params[:points_possible] if params[:points_possible]
         hash[:assignment][:assignment_group_id] = params[:assignment_group_id] if params[:assignment_group_id]

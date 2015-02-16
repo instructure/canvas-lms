@@ -1,7 +1,7 @@
 # copied from
 # https://github.com/rails/jquery-ujs
 
-define ['jquery', 'compiled/behaviors/authenticity_token'], ($, authenticity_token) ->
+define ['jquery', 'compiled/behaviors/authenticity_token', 'str/htmlEscape'], ($, authenticity_token, htmlEscape) ->
 
   ##
   # Handles "data-method" on links such as:
@@ -11,12 +11,12 @@ define ['jquery', 'compiled/behaviors/authenticity_token'], ($, authenticity_tok
     href = link.data('url') || link.attr('href')
     method = link.data('method')
     target = link.attr('target')
-    form = $("<form method='post' action='#{href}'></form>")
-    metadataInput = "<input name='_method' value='#{method }' type='hidden' />"
-    metadataInput += "<input name='authenticity_token' type='hidden' />"
+    form = $("<form method='post' action='#{htmlEscape href}'></form>")
+    metadataInputHtml = "<input name='_method' value='#{htmlEscape method}' type='hidden' />"
+    metadataInputHtml += "<input name='authenticity_token' type='hidden' />"
 
     form.attr('target', target) if target
-    form.hide().append(metadataInput).appendTo('body').submit()
+    form.hide().append(metadataInputHtml).appendTo('body').submit()
 
 
   # For 'data-confirm' attribute:

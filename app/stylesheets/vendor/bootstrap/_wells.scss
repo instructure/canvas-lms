@@ -17,13 +17,3 @@
     border-color: rgba(0,0,0,.15);
   }
 }
-
-// Sizes
-.well-large {
-  padding: 24px;
-  @include border-radius($borderRadiusLarge);
-}
-.well-small {
-  padding: 9px;
-  @include border-radius($borderRadiusSmall);
-}

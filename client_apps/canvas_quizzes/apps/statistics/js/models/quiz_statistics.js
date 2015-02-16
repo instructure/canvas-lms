@@ -34,7 +34,7 @@ define(function(require) {
 
     // pick any answer set; they will all have the same response count, only
     // distributed differently:
-    if (question.answerSets) {
+    if (question.answerSets && question.answerSets.length > 0) {
       answerPool = question.answerSets[0].answers;
     }
     else {

@@ -8,7 +8,6 @@ require [
 
   # modules that do their own thing on every page that simply need to
   # be required
-  'translations/_core'
   'translations/_core_en'
   'jquery.ajaxJSON'
   'vendor/firebugx'

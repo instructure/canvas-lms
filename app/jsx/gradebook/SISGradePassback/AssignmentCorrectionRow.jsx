@@ -61,12 +61,15 @@ define([
               className={React.addons.classSet({
                 "error-circle": nameError || nameTooLongError
               })}
-            />
+            >
+              <label className="screenreader-only">{I18n.t("Name Error")}</label>
+            </div>
             <input
               ref="name"
               type="text"
+              aria-label={I18n.t("Assignment Name")}
               className="input-mlarge assignment-name"
-              placeholder={I18n.t("No Assignment Name")}
+              placeholder={assignment.name ? null : I18n.t("No Assignment Name")}
               defaultValue={assignment.name}
               onChange={this.updateAssignmentName}
             />
@@ -74,27 +77,30 @@ define([
             {nameTooLongError ? <div className="hint-text">The name must be under 30 characters</div> : ""}
           </div>
 
-          <div className="span2 date_field_container input-container">
-            <button
-              style={{visibility: assignment.please_ignore ? 'hidden' : ''}}
-              className="btn btn-link btn-ignore"
-              aria-label={I18n.t("Ignore Assignment")}
-              title={I18n.t("Ignore Assignment")}
-              onClick={this.ignoreAssignment}
-            ><i className="icon-minimize" /></button>
+          <div className="span2 date_field_container input-container assignment_correction_input">
             <div
               className={React.addons.classSet({
                 "error-circle": dueAtError
               })}
-            />
+            >
+              <label className="screenreader-only">{I18n.t("Date Error")}</label>
+            </div>
             <input
               ref="due_at"
               type="text"
+              aria-label={I18n.t("Due Date")}
               className="input-medium assignment-due-at"
-              placeholder={assignment.due_at ? null : 'No Due Date'}
+              placeholder={assignment.due_at ? null : I18n.t("No Due Date")}
               defaultValue={assignment.due_at ? assignment.due_at.toString($.datetime.defaultFormat) : null}
               onChange={this.checkDueAtChange}
             />
+            <button
+              style={{visibility: assignment.please_ignore ? 'hidden' : ''}}
+              className="btn btn-link btn-ignore assignment_correction_ignore"
+              aria-label={I18n.t("Ignore %{name}", {name: assignment.name})}
+              title={I18n.t("Ignore Assignment")}
+              onClick={this.ignoreAssignment}
+            ><i className="icon-minimize" /></button>
           </div>
         </div>
       )

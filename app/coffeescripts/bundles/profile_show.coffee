@@ -80,10 +80,10 @@ require [
       @$linkFields ?= @$ '#profile_link_fields'
       $row = $ """
         <tr>
-          <td><input aria-label="#{I18n.t("Link title")}" type="text" maxlength="255" name="link_titles[]" value="#{htmlEscape title}"></td>
+          <td><input aria-label="#{htmlEscape I18n.t("Link title")}" type="text" maxlength="255" name="link_titles[]" value="#{htmlEscape title}"></td>
           <td>→</td>
-          <td><input aria-label="#{I18n.t("Link Url")}" type="text" name="link_urls[]" value="#{htmlEscape url}"></td>
-          <td><a href="#" data-event="removeLinkRow"><span class="screenreader-only">#{I18n.t("Remove")}</span><i class="icon-end"></i></a></td>
+          <td><input aria-label="#{htmlEscape I18n.t("Link Url")}" type="text" name="link_urls[]" value="#{htmlEscape url}"></td>
+          <td><a href="#" data-event="removeLinkRow"><span class="screenreader-only">#{htmlEscape I18n.t("Remove")}</span><i class="icon-end"></i></a></td>
         </tr>
       """
       @$linkFields.append $row

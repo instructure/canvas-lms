@@ -26,8 +26,8 @@ define [
                       "#{dimensions.width}/height/#{dimensions.height}/bgcolor/000000/type/2/vid_sec/5"
 
       $thumbnail = $ "<span
-                        style='background-image: url(#{backgroundUrl});'
-                        class='media_comment_thumbnail media_comment_thumbnail-#{size}'
+                        style='background-image: url(#{htmlEscape(backgroundUrl)});'
+                        class='media_comment_thumbnail media_comment_thumbnail-#{htmlEscape(size)}'
                       >
                         <span class='media_comment_thumbnail_play_button'>
                           #{htmlEscape I18n.t 'click_to_view', 'Click to view'}

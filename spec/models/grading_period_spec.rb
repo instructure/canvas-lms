@@ -71,15 +71,8 @@ describe GradingPeriod do
 
   describe '#assignments' do
     before :once do
-      Account.default.set_feature_flag! :multiple_grading_periods, 'on'
       course_with_teacher active_all: true
-      gpg = @course.grading_period_groups.create!
-      now = Time.zone.now
-      @gp1, @gp2 = 2.times.map { |n|
-        gpg.grading_periods.create! start_date: n.months.since(now),
-          end_date: (n+1).months.since(now),
-          weight: 1
-      }
+      @gp1, @gp2 = grading_periods count: 2
       @a1, @a2 = [@gp1, @gp2].map { |gp|
         @course.assignments.create! due_at: gp.start_date + 1
       }

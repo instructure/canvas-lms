@@ -204,9 +204,9 @@
           text-decoration: none
       @else
         color: $menu-text-color
-        border-top-color: $menu-border-color
-        border-left-color: $menu-border-color
-        border-right-color: $menu-border-color
+        border-top-color: darken($canvas-secondary, 12%)
+        border-left-color: darken($canvas-secondary, 12%)
+        border-right-color: darken($canvas-secondary, 12%)
         background-color: $menu-background-color
 
     .menu-item-drop
@@ -249,13 +249,22 @@
       min-width: 270px
       width: 270px
       vertical-align: top
+
+      .menu-item-header-container
+        display: flex
+        align-items: center
+
+      .menu-item-customize
+        flex: 1
+        display: flex
+        justify-content: flex-end
+        padding: 6px 8px 6px 0
+
       .menu-item-heading
         display: block
-        padding: 9px 12px 3px
-        // border-bottom: 1px solid lighten($borderColor, 22%)
+        padding: 6px 12px
         color: $menu-text-color
         font-size: 1.1em
-        line-height: 20px
         margin: 0
       &:first-child
         border-left: none
@@ -321,7 +330,7 @@
           .name
             color: ensure-contrast($brand-k12-dark, #f0f0f0)
       @else
-        padding: 8px 12px
+        padding: 6px 12px
 
         
 .menu-item-drop.menuCustomListEditing
@@ -332,7 +341,6 @@
     background: #fff
     padding: 10px
     border: solid 1px #ccc
-
     position: absolute
     left: 0
     opacity: 0
@@ -375,10 +383,10 @@
 
   .customListOpen
     font-size: 11px
-    float: right
-    position: relative
-    top: -26px
-    right: 12px
+    //float: right
+    //position: relative
+    //top: -26px
+    //right: 12px
     @if $is-k12
       color: ensure-contrast($brand-k12-dark, #f0f0f0)
       .name
@@ -398,7 +406,7 @@
   opacity: 1
 
 .menu-item-drop .customListOpen
-  line-height: 28px
+  //line-height: 28px
   cursor: pointer
 
 .customListGhost

@@ -22,9 +22,22 @@ Router.Routes
 
 // mixins
 Router.ActiveState
-Router.AsyncState
-Router.PathState
-Router.RouteLookup
-Router.Transitions
+Router.CurrentPath
+Router.Navigation
+
+// methods
+Router.renderRoutesToString
+Router.renderRoutesToStaticMarkup
 ```
+
+Methods
+-------
+
+### `renderRoutesToString(routes, path, callback)`
+
+We will document this more when the data loading story finalizes.
+
+### `renderRoutesToStaticMarkup(routes, path, callback)`
+
+We will document this more when the data loading story finalizes.
 

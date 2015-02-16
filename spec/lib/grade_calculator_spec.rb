@@ -586,6 +586,29 @@ describe GradeCalculator do
       end
     end
 
+    context "grading periods" do
+      before :once do
+        student_in_course active_all: true
+        @gp1, @gp2 = grading_periods count: 2
+        @a1, @a2 = [@gp1, @gp2].map { |gp|
+          @course.assignments.create! due_at: gp.start_date + 1,
+            points_possible: 100
+        }
+        @a1.grade_student(@student, grade: 25)
+        @a2.grade_student(@student, grade: 75)
+      end
+
+      it "can compute grades for a grading period" do
+        gc = GradeCalculator.new([@student.id], @course, grading_period: @gp1)
+        (current, _), _ = gc.compute_scores.first
+        expect(current[:grade]).to eql 25.0
+
+        gc = GradeCalculator.new([@student.id], @course, grading_period: @gp2)
+        (current, _), _ = gc.compute_scores.first
+        expect(current[:grade]).to eql 75.0
+      end
+    end
+
     context "differentiated assignments grade calculation" do
       def set_up_course_for_differentiated_assignments(enabler_method)
           @course.send(enabler_method, :differentiated_assignments)

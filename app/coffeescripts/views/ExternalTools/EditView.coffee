@@ -3,8 +3,9 @@ define [
   'jquery'
   'jst/ExternalTools/EditView'
   'compiled/views/ValidatedFormView'
+  'str/htmlEscape'
   'compiled/jquery/fixDialogButtons'
-], (I18n, $, template, ValidatedFormView) ->
+], (I18n, $, template, ValidatedFormView, htmlEscape) ->
 
   class EditView extends ValidatedFormView
     template: template
@@ -64,7 +65,7 @@ define [
     addError: (input, message) ->
       input = $(input)
       input.parents('.control-group').addClass('error')
-      input.after("<span id='#{input.attr("name")}_error_message' class='help-inline'>#{message}</span>")
+      input.after("<span id='#{htmlEscape input.attr("name")}_error_message' class='help-inline'>#{htmlEscape message}</span>")
       input.attr('aria-describedby', "#{input.attr('name')}_error_message")
       input.attr('aria-invalid', 'true')
       input.one 'keypress', ->
@@ -76,7 +77,7 @@ define [
     onSaveFail: (xhr) =>
       super
       message = I18n.t 'generic_error', 'There was an error in processing your request'
-      @$el.prepend("<div class='alert alert-error'>#{message}</span>")
+      @$el.prepend("<div class='alert alert-error'>#{htmlEscape message}</span>")
       delay = (ms, func) -> setTimeout func, ms
       delay 1, -> @$("[aria-invalid='true']").first().focus()
 

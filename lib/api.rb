@@ -412,7 +412,7 @@ module Api
                 end
       end
 
-      next unless obj && (is_public || obj.grants_right?(user, nil, :download))
+      next unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         opts = {:verifier => obj.uuid, :only_path => true}

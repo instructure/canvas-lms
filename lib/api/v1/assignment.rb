@@ -100,6 +100,7 @@ module Api::V1::Assignment
                                            opts[:preloaded_user_content_attachments] || {})
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
+    hash['has_overrides'] = assignment.has_overrides?
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag

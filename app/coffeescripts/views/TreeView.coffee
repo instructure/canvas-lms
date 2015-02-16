@@ -19,6 +19,7 @@ define [
     @optionProperty 'href'
     @optionProperty 'focusStyleClass'
     @optionProperty 'selectedStyleClass'
+    @optionProperty 'autoFetch'
 
     defaults:
       nestingLevel: 1
@@ -127,6 +128,7 @@ define [
             className: 'folders'
             template: collectionTemplate
             scrollContainer: @$folderContents.closest('div[role=tabpanel]')
+            autoFetch: @autoFetch
           )
           @$folderContents.append(subtreesView.render().el)
           unless @onlyShowFolders

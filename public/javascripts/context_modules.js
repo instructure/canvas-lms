@@ -238,7 +238,7 @@ define([
           moduleSelectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
         $('#move_module_item_module_select').empty();
-        $('#move_module_item_module_select').append(moduleSelectOptions.join(''));
+        $('#move_module_item_module_select').append($.raw(moduleSelectOptions.join('')));
 
         // Trigger the change to make sure the list is initally populated.
         $('#move_module_item_module_select').trigger('change');
@@ -279,7 +279,7 @@ define([
 
         var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
         $('#move_context_module_select').empty();
-        $('#move_context_module_select').append(selectOptions.join(''));
+        $('#move_context_module_select').append($.raw(selectOptions.join('')));
         //$form.fillFormData(data, {object_name: 'context_module'});
         $form.dialog({
           autoOpen: false,
@@ -602,6 +602,7 @@ define([
     // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
       data.context_module.displayed_unlock_at = $.datetimeString(data.context_module.unlock_at);
+      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at, { localized: false });
       var $module = $("#context_module_" + data.context_module.id);
       $module.attr('aria-label', data.context_module.name);
       $module.find(".header").fillTemplateData({
@@ -668,6 +669,8 @@ define([
           data["context_module[completion_requirements][" + id + "][type]"] = $(this).find(".type").val();
           data["context_module[completion_requirements][" + id + "][min_score]"] = $(this).find(".min_score").val();
         });
+        var date = $.datetime.parse(data['context_module[unlock_at]']);
+        data['context_module[unlock_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
         return data;
       },
       beforeSubmit: function(data) {
@@ -932,7 +935,7 @@ define([
         var name = $(item).children().find('span.title').text();
         selectItemOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
       });
-      $('#move_module_item_select').append(selectItemOptions.join(''));
+      $('#move_module_item_select').append($.raw(selectItemOptions.join('')));
 
       // The case where the module has no items.
       if ($('#move_module_item_select').children().length === 0) {
@@ -1266,6 +1269,12 @@ define([
   };
 
   $(document).ready(function() {
+
+    if (ENV.IS_STUDENT) {
+      $('.context_module').addClass('student-view');
+      $('.context_module_item .ig-row').addClass('student-view');
+    }
+
     $('.publish-icon:visible').each(function(index, el) {
       var view = initPublishButton($(el));
       overrideModel(view.model, view);

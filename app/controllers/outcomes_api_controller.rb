@@ -74,6 +74,24 @@
 #           "example": 3,
 #           "type": "integer"
 #         },
+#         "calculation_method": {
+#           "description": "the method used to calculate a students score",
+#           "example": "decaying_average",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "decaying_average",
+#               "n_mastery",
+#               "latest",
+#               "highest"
+#             ]
+#           }
+#         },
+#         "calculation_int": {
+#           "description": "this defines the variable value used by the calculation_method. included only if calculation_method uses it",
+#           "example": 75,
+#           "type": "integer"
+#         },
 #         "ratings": {
 #           "description": "possible ratings for this outcome. included only if the outcome embeds a rubric criterion. omitted in the abbreviated form.",
 #           "type": "array",
@@ -143,29 +161,38 @@ class OutcomesApiController < ApplicationController
   #   The points corresponding to a new rating level for the embedded rubric
   #   criterion.
   #
+  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
+  #   The new calculation method.
+  #
+  # @argument calculation_int [Integer]
+  #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"
+  #
   # @returns Outcome
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
-  #        -X PUT \ 
-  #        -F 'title=Outcome Title' \ 
+  #        -X PUT \
+  #        -F 'title=Outcome Title' \
   #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9001' \
-  #        -F 'mastery_points=3' \ 
-  #        -F 'ratings[][description]=Exceeds Expectations' \ 
-  #        -F 'ratings[][points]=5' \ 
-  #        -F 'ratings[][description]=Meets Expectations' \ 
-  #        -F 'ratings[][points]=3' \ 
-  #        -F 'ratings[][description]=Does Not Meet Expectations' \ 
-  #        -F 'ratings[][points]=0' \ 
+  #        -F 'mastery_points=3' \
+  #        -F 'calculation_method=decaying_average' \
+  #        -F 'calculation_int=75' \
+  #        -F 'ratings[][description]=Exceeds Expectations' \
+  #        -F 'ratings[][points]=5' \
+  #        -F 'ratings[][description]=Meets Expectations' \
+  #        -F 'ratings[][points]=3' \
+  #        -F 'ratings[][description]=Does Not Meet Expectations' \
+  #        -F 'ratings[][points]=0' \
+  #        -F 'ratings[][points]=0' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
-  #        -X PUT \ 
+  #        -X PUT \
   #        --data-binary '{
   #              "title": "Outcome Title",
   #              "display_name": "Title for reporting",
@@ -177,14 +204,15 @@ class OutcomesApiController < ApplicationController
   #                { "description": "Meets Expectations", "points": 3 },
   #                { "description": "Does Not Meet Expectations", "points": 0 }
   #              ]
-  #            }' \ 
-  #        -H "Content-Type: application/json" \ 
+  #            }' \
+  #        -H "Content-Type: application/json" \
   #        -H "Authorization: Bearer <token>"
   #
   def update
     return unless authorized_action(@outcome, @current_user, :update)
 
-    @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid))
+    @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid, :calculation_method, :calculation_int))
+
     if params[:mastery_points] || params[:ratings]
       criterion = @outcome.data && @outcome.data[:rubric_criterion]
       criterion ||= {}
@@ -198,6 +226,7 @@ class OutcomesApiController < ApplicationController
       end
       @outcome.rubric_criterion = criterion
     end
+
     if @outcome.save
       render :json => outcome_json(@outcome, @current_user, session)
     else

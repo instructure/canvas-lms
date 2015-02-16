@@ -20,35 +20,34 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'alert' do
-  it "should render email" do
+  before do
     course_with_student
     @alert = @course.alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
+  end
+
+  it "should render email" do
     generate_message(:alert, :email, @alert, :asset_context => @course.enrollments.first)
   end
 
   it "should render facebook" do
-    course_with_student
-    @alert = @course.alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
     generate_message(:alert, :facebook, @alert, :asset_context => @course.enrollments.first)
   end
 
   it "should render sms" do
-    course_with_student
-    @alert = @course.alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
     generate_message(:alert, :sms, @alert, :asset_context => @course.enrollments.first)
   end
 
   it "should render summary" do
-    course_with_student
-    @alert = @course.alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
     generate_message(:alert, :summary, @alert, :asset_context => @course.enrollments.first)
   end
 
   it "should render twitter" do
-    course_with_student
-    @alert = @course.alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
     generate_message(:alert, :twitter, @alert, :asset_context => @course.enrollments.first)
     expect(@message.main_link).to be_present
     expect(@message.body).to be_present
+  end
+
+  it "should render push" do
+    generate_message(:alert, :push, @alert, asset_context: @course.enrollments.first)
   end
 end

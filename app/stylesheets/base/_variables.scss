@@ -13,8 +13,19 @@
 // accessibility ($use_high_contrast) and k12 ($is-k12). 
 // You can also use the sass function that helps ensure color contrast ratio. 
 // Look in /sass-functions/ for more information on how that is used
-
 @import "variant_variables";
+
+
+/// Custom Branding
+//=======================
+// Pulls in variables in 'config/brand_variables.scss', if it exists.
+// See docs in config/brand_variables.scss.example.
+// In the future, this will be how we'll pull in the variables that
+// a school sets in their "Theme Editor" interface.
+// Only variables here with a "!default" at the end are able to be overrideable by the school.
+// see: http://sass-lang.com/documentation/file.SASS_REFERENCE.html#variable_defaults_
+@import "brand_variables";
+
 
 /// Canvas LMS Color Sheet
 //=======================
@@ -30,10 +41,10 @@
 // color should use or be based off of one of these variables
 
 
-$canvas-primary:                  #0099e0; // light blue
+$canvas-primary:                  #0099e0 !default; // light blue
 @if $use_high_contrast { $canvas-primary: #0073ac; } 
 
-$canvas-secondary:                #5b6c79; // dark blue
+$canvas-secondary:                #5b6c79 !default; // dark blue
 @if $use_high_contrast { $canvas-secondary: #343c44; }
 
 $canvas-success:                  #00ad18; // green
@@ -183,9 +194,9 @@ $ui-state-default-gradient-bottom: #c4c4c4;
 
 
 // this is the blue color that we use all over the place when not in a gradiants
-$highlight-color: #06a9ee;
+$highlight-color: #06a9ee !default;
 // light blue hover color
-$hover-color: #E5F3FF;
+$hover-color: #E5F3FF !default;
 // this is the grey color for when things are disabled, or meant to contrast with $highlight-color
 $diminutive-color: #acacac;
 

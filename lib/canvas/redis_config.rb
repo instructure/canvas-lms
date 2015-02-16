@@ -25,12 +25,12 @@ module Canvas
     end
 
     def self.from_servers(servers, options)
-      factory.create(servers.map { |s|
+      raw_conn = factory.create(servers.map { |s|
         # convert string addresses to options hash, and disable redis-cache's
         # built-in marshalling code
         url_to_redis_options(s).merge(:marshalling => false).merge(options || {})
       })
+      ::Canvas::RedisWrapper.new(raw_conn)
     end
-
   end
 end

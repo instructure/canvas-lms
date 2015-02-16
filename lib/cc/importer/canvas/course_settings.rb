@@ -147,8 +147,6 @@ module CC::Importer::Canvas
         feed['migration_id'] = node['identifier']
         feed['title'] = get_node_val(node, 'title')
         feed['url'] = get_node_val(node, 'url')
-        feed['feed_type'] = get_node_val(node, 'feed_type')
-        feed['purpose'] = get_node_val(node, 'purpose')
         feed['verbosity'] = get_node_val(node, 'verbosity')
         feed['header_match'] = get_node_val(node, 'header_match')
         

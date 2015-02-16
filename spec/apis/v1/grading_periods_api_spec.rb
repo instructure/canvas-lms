@@ -21,7 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe GradingPeriodsController, type: :request do
   context "A grading period is associated with an account." do
     before :once do
-      account_with_grading_periods
+      @account = Account.default
+      account_admin_user(account: @account)
+      user_session(@admin)
+      grading_periods count: 3, context: @account
+      @account.grading_periods.last.destroy
     end
 
     describe 'GET index' do
@@ -159,7 +163,9 @@ describe GradingPeriodsController, type: :request do
 
   context "A grading period is associated with a course." do
     before :once do
-      course_with_grading_periods
+      course_with_teacher active_all: true
+      grading_periods count: 3, context: @course
+      @course.grading_periods.last.destroy
     end
 
     describe 'GET index' do

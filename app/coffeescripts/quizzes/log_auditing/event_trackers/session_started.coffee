@@ -13,6 +13,7 @@ define (require) ->
       debugConsole.log """
         I've been loaded by #{userAgent}.
         """
-      deliver({
-          'user_agent': userAgent
-        })
+      if location.href.indexOf("question") == -1 && location.href.indexOf("take") > 0
+        deliver({
+            'user_agent': userAgent
+          })

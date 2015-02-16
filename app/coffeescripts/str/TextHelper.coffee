@@ -52,9 +52,9 @@ define [
   th = 
     quoteClump: (lines) ->
       "<div class='quoted_text_holder'>
-        <a href='#' class='show_quoted_text_link'>#{I18n.t("quoted_text_toggle", "show quoted text")}</a>
+        <a href='#' class='show_quoted_text_link'>#{htmlEscape I18n.t("quoted_text_toggle", "show quoted text")}</a>
         <div class='quoted_text' style='display: none;'>
-          #{lines.join "\n"}
+          #{$.raw lines.join "\n"}
         </div>
       </div>"
   

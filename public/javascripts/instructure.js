@@ -324,15 +324,15 @@ define([
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
-            .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + externalLink + '"/>')
-            .append('<span class="screenreader-only">&nbsp;(' + externalLink + ')</span>');
+            .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
+            .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
         }).end()
           .find("a.instructure_file_link").each(function() {
               var $link = $(this),
                   $span = $("<span class='instructure_file_link_holder link_holder'/>");
               $link.removeClass('instructure_file_link').before($span).appendTo($span);
               if($link.attr('target') != '_blank') {
-            $span.append("<a href='" + $link.attr('href') + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
+            $span.append("<a href='" + htmlEscape($link.attr('href')) + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
                 "' style='padding-left: 5px;'><img src='/images/popout.png' alt='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) + "'/></a>");
           }
         });
@@ -341,7 +341,7 @@ define([
           var $link = $(this);
           if ( $.trim($link.text()) ) {
             var $span = $("<span class='instructure_scribd_file_holder link_holder'/>"),
-                        $scribd_link = $("<a class='scribd_file_preview_link' aria-hidden='true' tabindex='-1' href='" + $link.attr('href') + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
+                        $scribd_link = $("<a class='scribd_file_preview_link' aria-hidden='true' tabindex='-1' href='" + htmlEscape($link.attr('href')) + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
                             "' style='padding-left: 5px;'><img src='/images/preview.png' alt='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) + "'/></a>");
                     $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
                     $span.append($scribd_link);
@@ -364,10 +364,10 @@ define([
               id = $.youTubeID(href || "");
           if($link.hasClass('inline_disabled')) {
           } else if(id) {
-            var $after = $('<a href="'+ href +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + id + '/2.jpg)"/></a>')
+            var $after = $('<a href="'+ htmlEscape(href) +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + htmlEscape(id) + '/2.jpg)"/></a>')
               .click(function(event) {
                 event.preventDefault();
-                var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
+                var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
                 $video.find(".hide_youtube_embed_link").click(function(event) {
                   event.preventDefault();
                   $video.remove();
@@ -844,76 +844,6 @@ define([
         });
       }
     }
-
-    var $wizard_box = $("#wizard_box");
-
-    function setWizardSpacerBoxDispay(action){
-      $("#wizard_spacer_box").height($wizard_box.height() || 0).showIf(action === 'show');
-    }
-
-    var pathname = window.location.pathname;
-    $(".close_wizard_link").click(function(event) {
-      event.preventDefault();
-      userSettings.set('hide_wizard_' + pathname, true);
-      $wizard_box.slideUp('fast', function() {
-        $(".wizard_popup_link").slideDown('fast');
-        $('.wizard_popup_link').focus();
-        setWizardSpacerBoxDispay('hide');
-      });
-    });
-
-    $(".wizard_popup_link").click(function(event) {
-      event.preventDefault();
-      $(".wizard_popup_link").slideUp('fast');
-      $wizard_box.slideDown('fast', function() {
-        $wizard_box.triggerHandler('wizard_opened');
-        $wizard_box.focus();
-        $([document, window]).triggerHandler('scroll');
-      });
-    });
-
-    $wizard_box.ifExists(function($wizard_box){
-
-      $wizard_box.bind('wizard_opened', function() {
-        var $wizard_options = $wizard_box.find(".wizard_options"),
-            height = $wizard_options.height();
-        $wizard_options.height(height);
-        $wizard_box.find(".wizard_details").css({
-          maxHeight: height - 5,
-          overflow: 'auto'
-        });
-        setWizardSpacerBoxDispay('show');
-      });
-
-      $wizard_box.find(".wizard_options_list .option").click(function(event) {
-        var $this = $(this);
-        var $a = $(event.target).closest("a");
-        if($a.length > 0 && $a.attr('href') != "#") { return; }
-        event.preventDefault();
-        $this.parents(".wizard_options_list").find(".option.selected").removeClass('selected');
-        $this.addClass('selected');
-        var $details = $wizard_box.find(".wizard_details");
-        var data = $this.getTemplateData({textValues: ['header']});
-        data.link = data.header;
-        $details.fillTemplateData({
-          data: data
-        });
-        $details.find(".details").remove();
-        $details.find(".header").after($this.find(".details").clone(true).show());
-        var url = $this.find(".header").attr('href');
-        if(url != "#") {
-          $details.find(".link").show().attr('href', url);
-        } else {
-          $details.find(".link").hide();
-        }
-        $details.hide().fadeIn('fast');
-      });
-      setTimeout(function() {
-        if(!userSettings.get('hide_wizard_' + pathname)) {
-           // $(".wizard_popup_link.auto_open:first").click();
-        }
-      }, 500);
-    });
 
     // this is for things like the to-do, recent items and upcoming, it
     // happend a lot so rather than duplicating it everywhere I stuck it here

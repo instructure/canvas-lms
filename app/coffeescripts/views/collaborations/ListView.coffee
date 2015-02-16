@@ -58,8 +58,8 @@ define [
 
     render: =>
       @updateFilter([])
-      collaborators = @collection.map(@renderCollaborator)
-      @$el.html(collaborators.join(''))
+      collaboratorsHtml = @collection.map(@renderCollaborator).join('')
+      @$el.html(collaboratorsHtml)
       @updateFocus() if @currentIndex? && @hasFocus
       @hasFocus = false
       super

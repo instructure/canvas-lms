@@ -5,6 +5,7 @@ define [
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
+  'compiled/behaviors/firefox_number_fix'
 ], ($, _, {View}, template, GroupUsersView, GroupDetailView) ->
 
   class GroupView extends View

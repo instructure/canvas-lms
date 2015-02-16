@@ -58,6 +58,11 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [teacher_enrollment]).has_key?("needs_grading_count")).to be_truthy
     end
 
+    it 'should return storage_quota_used_mb if requested' do
+      pp @test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment])
+      expect(@test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment]).has_key?("storage_quota_used_mb")).to be_truthy
+    end
+
     it 'should not honor needs_grading_count for designers' do
       @designer_enrollment = @course1.enroll_designer(@me)
       @designer_enrollment.accept!
@@ -101,6 +106,13 @@ describe Api::V1::Course do
               'message' => 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course'
           }
       })
+    end
+
+    it "should include the total amount of invited and active students if 'total_students' flag is given" do
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
     end
 
     context "total_scores" do
@@ -285,6 +297,7 @@ describe CoursesController, type: :request do
             'start_at'                             => '2011-01-01T00:00:00-0700',
             'end_at'                               => '2011-05-01T00:00:00-0700',
             'is_public'                            => true,
+            'is_public_to_auth_users'              => false,
             'public_syllabus'                      => true,
             'allow_wiki_comments'                  => true,
             'allow_student_forum_attachments'      => true,
@@ -345,6 +358,7 @@ describe CoursesController, type: :request do
             'start_at'                             => '2011-01-01T00:00:00-0700',
             'end_at'                               => '2011-05-01T00:00:00-0700',
             'is_public'                            => true,
+            'is_public_to_auth_users'              => false,
             'public_syllabus'                      => true,
             'allow_wiki_comments'                  => true,
             'allow_student_forum_attachments'      => true,
@@ -788,6 +802,33 @@ describe CoursesController, type: :request do
       it "should return 401" do
         @user = @student
         raw_api_call(:delete, @path, @params, { :event => 'conclude' })
+        expect(response.code).to eql '401'
+      end
+    end
+  end
+
+  describe "reset content" do
+    before :once do
+      @user = @teacher
+      @path = "/api/v1/courses/#{@course.id}/reset_content"
+      @params = { :controller => 'courses', :action => 'reset_content', :format => 'json', :course_id => @course.id.to_s }
+    end
+    context "an authorized user" do
+      it "should be able to reset a course" do
+        Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
+
+        json = api_call(:post, @path, @params)
+        @course.reload
+        expect(@course.workflow_state).to eql 'deleted'
+        new_course = Course.find(json['id'])
+        expect(new_course.workflow_state).to eql 'created'
+        expect(json['workflow_state']).to eql 'unpublished'
+      end
+    end
+    context "an unauthorized user" do
+      it "should return 401" do
+        @user = @student
+        raw_api_call(:post, @path, @params)
         expect(response.code).to eql '401'
       end
     end
@@ -1279,6 +1320,25 @@ describe CoursesController, type: :request do
                       { :controller => 'courses', :action => 'index', :format => 'json' },
                       { :state => ['unpublished'] })
       expect(json.collect{ |c| c['id'].to_i }.sort).to eq [@course3.id, @course4.id]
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "returns courses for out-of-shard users" do
+        pend_with_bullet
+        @shard1.activate { @user = User.create!(name: 'outofshard') }
+        enrollment = @course1.enroll_student(@user)
+
+        @me = @user
+
+        json = api_call(:get, "/api/v1/courses.json",
+          { :controller => 'courses', :action => 'index', :format => 'json' },
+          { :state => ['available'] })
+
+        expect(json.size).to eq(1)
+        expect(json.first['id']).to eq(@course1.id)
+      end
     end
   end
 
@@ -2013,6 +2073,7 @@ describe CoursesController, type: :request do
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
         'is_public' => @course1.is_public,
+        'is_public_to_auth_users' => @course1.is_public_to_auth_users,
         'workflow_state' => @course1.workflow_state,
         'storage_quota_mb' => @course1.storage_quota_mb,
         'apply_assignment_group_weights' => false,
@@ -2215,7 +2276,11 @@ describe CoursesController, type: :request do
         'allow_student_forum_attachments' => false,
         'allow_student_discussion_editing' => true,
         'grading_standard_enabled' => false,
-        'grading_standard_id' => nil
+        'grading_standard_id' => nil,
+        'allow_student_organized_groups' => true,
+        'hide_distribution_graphs' => false,
+        'hide_final_grades' => false,
+        'lock_all_announcements' => false
       })
     end
 
@@ -2230,19 +2295,31 @@ describe CoursesController, type: :request do
       }, {
         :allow_student_discussion_topics => false,
         :allow_student_forum_attachments => true,
-        :allow_student_discussion_editing => false
+        :allow_student_discussion_editing => false,
+        :allow_student_organized_groups => false,
+        :hide_distribution_graphs => true,
+        :hide_final_grades => true,
+        :lock_all_announcements => true
       })
       expect(json).to eq({
         'allow_student_discussion_topics' => false,
         'allow_student_forum_attachments' => true,
         'allow_student_discussion_editing' => false,
         'grading_standard_enabled' => false,
-        'grading_standard_id' => nil
+        'grading_standard_id' => nil,
+        'allow_student_organized_groups' => false,
+        'hide_distribution_graphs' => true,
+        'hide_final_grades' => true,
+        'lock_all_announcements' => true
       })
       @course.reload
       expect(@course.allow_student_discussion_topics).to eq false
       expect(@course.allow_student_forum_attachments).to eq true
       expect(@course.allow_student_discussion_editing).to eq false
+      expect(@course.allow_student_organized_groups).to eq false
+      expect(@course.hide_distribution_graphs).to eq true
+      expect(@course.hide_final_grades).to eq true
+      expect(@course.lock_all_announcements).to eq true
     end
   end
 
