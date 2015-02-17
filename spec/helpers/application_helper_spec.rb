@@ -545,5 +545,21 @@ describe ApplicationHelper do
 
       expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :width=>800, :height=>400}])
     end
+
+    it "should not include tools from the domain_root_account for users" do
+      @domain_root_account = Account.default
+      account_admin_user
+      tool = @domain_root_account.context_external_tools.new(
+        :name => "bob",
+        :consumer_key => "test",
+        :shared_secret => "secret",
+        :url => "http://example.com"
+      )
+      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.save!
+      @context = @admin
+
+      expect(editor_buttons).to be_empty
+    end
   end
 end
