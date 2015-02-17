@@ -46,7 +46,7 @@ define [
 
     # get the content migration when ready and use progress api to pull migration progress
     getContentMigration: =>
-      $.getJSON("/api/v1/courses/#{@contextId}/content_migrations/#{@contentMigrationId}").then (results) =>
+      $.getJSON("/api/v1/#{@contextType}/#{@contextId}/content_migrations/#{@contentMigrationId}").then (results) =>
         if (!results.progress_url)
           setTimeout( =>
             @getContentMigration()
@@ -68,9 +68,9 @@ define [
 
     onMigrationComplete: ->
       # reload to get new files to appear
-      promise = @folder.files.fetch({reset: true}).then =>
-        @deferred.resolve()
-
+      @folder.folders.fetch({reset: true}).then =>
+        @folder.files.fetch({reset: true}).then =>
+          @deferred.resolve()
 
     trackProgress: (e) =>
       @progress = (e.loaded/ e.total)
