@@ -104,6 +104,8 @@
       <xs:element name="automatic_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="anonymous_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="grade_group_students_individually" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="external_tool_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="external_tool_external_identifier" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_url" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_new_tab" type="xs:boolean" minOccurs="0"/>
       <xs:element name="freeze_on_copy" type="xs:boolean" minOccurs="0"/>

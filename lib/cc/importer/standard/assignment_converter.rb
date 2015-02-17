@@ -93,6 +93,8 @@ module CC::Importer::Standard
       assignment["rubric_id"] = get_node_val(meta_doc, "rubric_external_identifier")
       assignment["quiz_migration_id"] = get_node_val(meta_doc, "quiz_identifierref")
       assignment["workflow_state"] = get_node_val(meta_doc, "workflow_state") if meta_doc.at_css("workflow_state")
+      assignment["external_tool_migration_id"] = get_node_val(meta_doc, "external_tool_identifierref") if meta_doc.at_css("external_tool_identifierref")
+      assignment["external_tool_id"] = get_node_val(meta_doc, "external_tool_external_identifier") if meta_doc.at_css("external_tool_external_identifier")
       if meta_doc.at_css("saved_rubric_comments comment")
         assignment[:saved_rubric_comments] = {}
         meta_doc.css("saved_rubric_comments comment").each do |comment_node|

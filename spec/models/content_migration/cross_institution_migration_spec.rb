@@ -8,10 +8,11 @@ describe ContentMigration do
       @account = @copy_from.account
       account_admin_user user: @cm.user, account: @account
 
-      # account external tool in module item and course navigation
+      # account external tool in module item, course navigation, and assignment submission
       @tool = @account.context_external_tools.build name: 'blah', url: 'https://blah.example.com',
         shared_secret: '123', consumer_key: '456'
       @tool.course_navigation = { enabled: 'true' }
+      @tool.homework_submission = { url: 'https://blah.example.com/sub' }
       @tool.save!
       mod = @copy_from.context_modules.create!
       @item = mod.add_item(type: 'external_tool', url: 'https://blah.example.com/what', id: @tool.id, title: 'what')
@@ -29,6 +30,13 @@ describe ContentMigration do
       # account grading standard in assignment
       @assignment.grading_standard = grading_standard_for(@account)
       @assignment.save!
+
+      # account external tool submission
+      @assignment2 = @copy_from.assignments.create! name: 'tool assignment', submission_types: 'external_tool', grading_type: 'points'
+      tag = @assignment2.build_external_tool_tag(:url => "https://blah.example.com/sub", :new_tab => true)
+      tag.content_type = 'ContextExternalTool'
+      tag.content_id = @tool.id
+      tag.save!
 
       # account question bank in course quiz
       @bank = @account.assessment_question_banks.create!(:title => "account bank")
@@ -51,6 +59,8 @@ describe ContentMigration do
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(to_assignment.rubric).to eq @rubric
       expect(to_assignment.grading_standard).to eq @standard
+      to_assignment2 = @copy_to.assignments.where(migration_id: mig_id(@assignment2)).first
+      expect(to_assignment2.external_tool_tag.content).to eq @tool
       expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to eq @bank
     end
 
@@ -67,6 +77,8 @@ describe ContentMigration do
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(to_assignment.rubric.context).to eq @copy_to
       expect(to_assignment.grading_standard).to be_nil
+      to_assignment2 = @copy_to.assignments.where(migration_id: mig_id(@assignment2)).first
+      expect(to_assignment2.external_tool_tag.content).to be_nil
       expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to be_nil
 
       expect(@cm.warnings.detect { |w| w =~ /account External Tool.+must be configured/ }).not_to be_nil

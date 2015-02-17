@@ -198,7 +198,14 @@ module CC
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
       end
       if assignment.external_tool_tag
-        node.external_tool_url assignment.external_tool_tag.url 
+        if (content = assignment.external_tool_tag.content) && content.is_a?(ContextExternalTool)
+          if content.context == assignment.context
+            node.external_tool_identifierref CCHelper.create_key(content)
+          else
+            node.external_tool_external_identifier content.id
+          end
+        end
+        node.external_tool_url assignment.external_tool_tag.url
         node.external_tool_new_tab assignment.external_tool_tag.new_tab
       end
     end
