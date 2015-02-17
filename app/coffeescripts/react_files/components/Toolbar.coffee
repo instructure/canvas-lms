@@ -114,6 +114,8 @@ define [
               role: 'button'
               'aria-label': I18n.t('view', 'View')
               'data-tooltip': ''
+              'aria-disabled': !showingButtons
+              disabled: !showingButtons
               tabIndex: -1 unless showingButtons # This is to make it okay for keyboard-nav when hidden.
             },
             i className: 'icon-eye'
