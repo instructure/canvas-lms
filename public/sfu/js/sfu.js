@@ -1,4 +1,11 @@
-/* jshint indent: 4 */
+/*
+    sfu.js
+    SFU-specific client-side modifications for Canvas
+
+    SFU require.js modules are located in $CANVAS_ROOT/public/javascripts/sfu-modules
+
+ */
+
 
 (function($) {
 
@@ -104,74 +111,34 @@
 
     // END CANVAS-192
 
-    // Add copyright compliance notice
+    /*  Add copyright compliance notice to the publish course button
+        When a course page loads, check to see if the course is unpublished.
+        If so, first immediately disable the publish button to allow time for the bundle to be required async.
+        Then load the CANVAS_ROOT/public/javascripts/sfu-modules/copyright_notice_modal_dialog bundle
+        This bundle handles attaching a click handler to the submit button (and re-enabling it).
+        The click handler renders the SFUCopyrightComplianceNoticeModalDialog react component.
+
+        If the course is published, nothing happens.
+    */
     utils.onPage(/^\/courses\/\d+$/, function() {
-        // The Publish Course form ID attribute contains the course ID
-        var publishFormId = location.pathname.replace('/courses/', 'edit_course_');
-
-        var confirmCopyright = function () {
-            return confirm("I confirm that the use of copyright protected materials in this course complies with" +
-                "Canada's Copyright Act and SFU Policy R30.04 - Copyright Compliance and Administration.");
-        };
-
-        // Show the notice in a confirmation dialog when the user clicks the Publish button in the sidebar or in the
-        // Setup Checklist (a.k.a. Course Wizard). Abort if user hits Cancel.
-        $('#' + publishFormId + ' button.btn-publish').on('click', function () {
-            return confirmCopyright();
-        });
-        // NOTE: This assumes only the Publish the Course button uses a POST form in the Course Wizard.
-        $(document).on('submit', '.CourseWizard__modalOverlay form[method="post"]', function () {
-            return confirmCopyright();
-        });
+        var $publishButton = $('.btn-publish')
+        if ($publishButton.length) {
+            $publishButton.attr('disabled', true);
+            require(['sfu-modules/copyright_notice_modal_dialog'], function(module) {
+                module.attachClickHandlerTo(location.pathname.replace('/courses/', 'edit_course_'));
+            });
+        }
     });
 
-    // Add privacy notices
+    /*  Add PIA notice to Google Docs section on /courses/DDDDD/collaborations
+        When the collaboration page loads, load the google_docs_pia_notice bundle
+        In the bundle, check the current user's role within the current course and
+        display the appropriate message.
+    */
     utils.onPage(/^\/courses\/\d+\/collaborations\/?$/, function () {
-        $('<div class="pia-notice">')
-            .appendTo('#google_docs_description td')
-            .append('<p><em>Google Docs notice for instructors</em></p>')
-            .append('<p><strong>Is your use of Google Docs privacy compliant?</strong> There are <strong>personal ' +
-                'legal consequences</strong> if you use an app that discloses and stores students&rsquo; personal ' +
-                'information elsewhere inside or outside Canada without their consent. Unauthorized disclosure is a ' +
-                'privacy protection offense under BC law. Employees and SFU are liable to investigation and possible ' +
-                'fines. <strong>Before using Google Docs</strong>, carefully review the complete ' +
-                '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas Privacy Protection Notice</a> ' +
-                'to <strong>understand your legal responsibilities</strong> and please contact ' +
-                '<a href="mailto:learntech@sfu.ca">learntech@sfu.ca</a>. The Learning Technology Specialists in the ' +
-                '<strong>Teaching and Learning Centre will help you</strong> with the student consent procedure that ' +
-                'you must use. By authorizing your SFU Canvas account to use Google Docs in your course, you ' +
-                'acknowledge that you <strong>read the Privacy Protection Notice</strong> and will <strong>follow the ' +
-                'described protection of privacy requirements and procedure</strong>.</p>')
-            .append('<hr />')
-            .append('<p><em>Google Docs notice for students</em></p>')
-            .append('<p><strong>Is your use of Google Docs privacy compliant?</strong> Google Docs is a collaboration ' +
-                'tool that allows you to create and share documents with other people. <strong>Before using Google ' +
-                'Docs</strong>, carefully review the <a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">' +
-                'Canvas Privacy Protection Notice</a> to <strong>understand the personal privacy implications</strong> ' +
-                'for yourself <strong>as well as your responsibilities to other persons</strong> and their information. ' +
-                'By authorizing your SFU Canvas account to use Google Docs, you acknowledge that you read and are ' +
-                'agreeing to the Privacy Protection Notice.</p>');
-        $('#right-side-wrapper').find('.rs-margin-all').append('<p>Please read the ' +
-            '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas@SFU Privacy Protection Notices</a> ' +
-            'before using External Learning and Collaboration Tools such as Google Docs because they may disclose and ' +
-            'store your personal information elsewhere inside and outside Canada.</p>');
-    });
-    utils.onPage(/^\/courses\/\d+\/settings/, function () {
-        $('<div class="pia-notice">')
-            .insertBefore('#external_tools')
-            .append('<p><strong>Is your app privacy compliant?</strong> There are <strong>personal legal ' +
-                'consequences</strong> if you use an app that discloses and stores students&rsquo; personal ' +
-                'information elsewhere inside or outside Canada without their consent. Unauthorized disclosure ' +
-                'is a privacy protection offense under BC law. Employees and SFU are liable to investigation and ' +
-                'possible fines. <strong>Before using any app</strong>, carefully review the complete ' +
-                '<a href="http://www.sfu.ca/canvasprivacynotice" target="_blank">Canvas Privacy Protection Notice</a> ' +
-                'to <strong>understand your legal responsibilities</strong> and please contact ' +
-                '<a href="mailto:learntech@sfu.ca">learntech@sfu.ca</a>. The Learning Technology Specialists in the ' +
-                '<strong>Teaching and Learning Centre will help you</strong> complete an app privacy assessment ' +
-                'and, if needed, advise you how to obtain students&rsquo; consent in the manner prescribed by law. ' +
-                'By using apps in your course and the App Centre in Canvas, you acknowledge that you <strong>read ' +
-                'the Privacy Protection Notice</strong> and will <strong>follow the described protection of privacy ' +
-                'requirements and procedure</strong>.</p>');
+        require(['sfu-modules/google_docs_pia_notice'], function(module) {
+            module.showGoogleDocsWarning();
+        });
     });
 
     // Fixes for Import Content page only

@@ -5,8 +5,9 @@ define([
   'underscore',
   'react',
   'i18n!course_wizard',
-  './ListItems'
-], function($, _, React, I18n, ListItems) {
+  './ListItems',
+  /* SFU MOD */ '../sfu_copyright_compliance_notice/SFUCopyrightComplianceNotice' /* END SFU MOD */
+], function($, _, React, I18n, ListItems, SFUCopyrightComplianceNotice) {
 
   var courseNotSetUpItem = {
     text: I18n.t("Great, so you've got a course. Now what? Well, before you go publishing it to the world, you may want to check and make sure you've got the basics laid out.  Work through the list on the left to ensure that your course is ready to use."),
@@ -119,6 +120,18 @@ define([
         }
       },
 
+      // SFU MOD
+      renderSFUCopyrightComplianceNotice: function() {
+        if (this.state.itemShown.key === 'publish_course') {
+          return (
+            <SFUCopyrightComplianceNotice className="sfu-ic-wizard-box__message-text__copyright_compliance" />
+          )
+        } else {
+          return null;
+        }
+      },
+      // END SFU MOD
+
       render: function () {
           return (
               <div className={this.props.className}>
@@ -134,6 +147,7 @@ define([
                       <p className="ic-wizard-box__message-text">
                         {this.state.itemShown.text}
                       </p>
+                      {this.renderSFUCopyrightComplianceNotice()}
                       <div className="ic-wizard-box__message-button">
                         {this.renderButton()}
                       </div>
