@@ -30,7 +30,7 @@
         padding-left: 0px;
         padding-bottom: 5px;
         font-size: 16px;
-        color: $canvas-secondary;
+        color: $ic-brand-secondary;
         font-weight: normal;
       }
       .sub_title {
@@ -44,11 +44,11 @@
     .delete_user_note_link {
       position: relative;
       top: 3px;
-      color: $canvas-dark;
+      color: $ic-color-dark;
     }
 
     .delete_user_note_link:hover {
-      color: lighten($canvas-dark, 10%);
+      color: lighten($ic-color-dark, 10%);
     }
   }
 

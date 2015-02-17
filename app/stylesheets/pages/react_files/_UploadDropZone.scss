@@ -20,7 +20,7 @@
 }
 .UploadDropZone__instructions__close {
   float: right;
-  color: $canvas-neutral;
+  color: $ic-color-neutral;
   font-size: -1.8em;
   pointer: cursor;
 }
@@ -28,7 +28,7 @@ i[class*=UploadDropZone__instructions--icon-upload]:before {
   font-size: 100px;
 }
 i[class*=UploadDropZone__instructions--icon-upload] {
-  color: $canvas-primary;
+  color: $ic-brand-primary;
   width: 100px;
   height: 100px;
 }

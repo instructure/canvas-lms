@@ -1,9 +1,9 @@
-$courses-dropdown-menu-bg: $canvas-light
-$course-dropdown-text-color: $canvas-dark
-$course-dropdown-link-color: $canvas-secondary
-$masquerade-link-color: $canvas-alert
+$courses-dropdown-menu-bg: $ic-color-light
+$course-dropdown-text-color: $ic-color-dark
+$course-dropdown-link-color: $ic-brand-secondary
+$masquerade-link-color: $ic-color-alert
 @if $use_high_contrast
-  $masquerade-link-color: $canvas-light
+  $masquerade-link-color: $ic-color-light
 
 
 #skip_navigation_link
@@ -116,7 +116,7 @@ $masquerade-link-color: $canvas-alert
       &:hover, &:focus
         text-decoration: underline
     @else
-      color: $canvas-light
+      color: $ic-color-light
       @if $use_high_contrast
         text-decoration: none
       &:hover, &:focus
@@ -212,9 +212,9 @@ $masquerade-link-color: $canvas-alert
           text-decoration: none
       @else
         color: $course-dropdown-text-color
-        border-top-color: darken($canvas-secondary, 12%)
-        border-left-color: darken($canvas-secondary, 12%)
-        border-right-color: darken($canvas-secondary, 12%)
+        border-top-color: darken($ic-brand-secondary, 12%)
+        border-left-color: darken($ic-brand-secondary, 12%)
+        border-right-color: darken($ic-brand-secondary, 12%)
         background-color: $courses-dropdown-menu-bg
 
     .menu-item-drop

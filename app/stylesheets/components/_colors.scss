@@ -7,65 +7,65 @@
 <div class="grid-row Colorguide-container--primary-theme">
   <div class="Colorguide-color Colorguide-color--primary">
     <span class="Colorguide-var">
-      Primary Blue
+      Brand Primary
       <br/>
-      $canvas-primary
+      $ic-brand-primary
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--secondary">
     <span class="Colorguide-var">
-      Secondary Grey
+      Brand Secondary
       <br/>
-      $canvas-secondary
+      $ic-brand-secondary
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--success">
     <span class="Colorguide-var ">
       Success Green
       <br/>
-      $canvas-success
+      $ic-color-success
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--neutral">
     <span class="Colorguide-var">
       Neutral Grey
       <br/>
-      $canvas-neutral
+      $ic-color-neutral
     </span>
   </div>  
   <div class="Colorguide-color Colorguide-color--action">
     <span class="Colorguide-var">
       Action Magenta
       <br/>
-      $canvas-action
+      $ic-color-action
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--danger">
     <span class="Colorguide-var">
       Danger Red
       <br/>
-      $canvas-danger
+      $ic-color-danger
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--alert">
     <span class="Colorguide-var">
       Alert Gold
       <br/>
-      $canvas-alert
+      $ic-color-alert
     </span>
   </div>  
   <div class="Colorguide-color Colorguide-color--light">
     <span class="Colorguide-var">
       Light White
       <br/>
-      $canvas-light
+      $ic-color-light
     </span>
   </div>    
   <div class="Colorguide-color Colorguide-color--dark">
     <span class="Colorguide-var">
       Dark Grey
       <br/>
-      $canvas-dark
+      $ic-color-dark
     </span>
   </div>
 </div>
@@ -78,65 +78,65 @@
 <div class="grid-row Colorguide-container--hc-theme">
   <div class="Colorguide-color Colorguide-color--primary">
     <span class="Colorguide-var">
-      Primary Blue
+      Brand Primary
       <br/>
-      $canvas-primary
+      $ic-brand-primary
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--secondary">
     <span class="Colorguide-var">
-      Secondary Grey
+      Brand Secondary
       <br/>
-      $canvas-secondary
+      $ic-brand-secondary
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--success">
     <span class="Colorguide-var ">
       Success Green
       <br/>
-      $canvas-success
+      $ic-color-success
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--neutral">
     <span class="Colorguide-var">
       Neutral Grey
       <br/>
-      $canvas-neutral
+      $ic-color-neutral
     </span>
   </div>  
   <div class="Colorguide-color Colorguide-color--action">
     <span class="Colorguide-var">
       Action Magenta
       <br/>
-      $canvas-action
+      $ic-color-action
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--danger">
     <span class="Colorguide-var">
       Danger Red
       <br/>
-      $canvas-danger
+      $ic-color-danger
     </span>
   </div>
   <div class="Colorguide-color Colorguide-color--alert">
     <span class="Colorguide-var">
       Alert Gold
       <br/>
-      $canvas-alert
+      $ic-color-alert
     </span>
   </div>  
   <div class="Colorguide-color Colorguide-color--light">
     <span class="Colorguide-var">
       Light White
       <br/>
-      $canvas-light
+      $ic-color-light
     </span>
   </div>    
   <div class="Colorguide-color Colorguide-color--dark">
     <span class="Colorguide-var">
       Dark Grey
       <br/>
-      $canvas-dark
+      $ic-color-dark
     </span>
   </div>
 </div>
@@ -155,7 +155,7 @@ While integrating new UI, it's best to use what we call a *functional variable* 
 ### Then we would write our scss it like:
 
 
-    $myCustomColor: $canvas-primary;
+    $myCustomColor: $ic-brand-primary;
     p.customColor {
       color: $myCustomColor;
     }
@@ -175,7 +175,7 @@ When you're in Canvas and changing old code and see a color that doesn't have a 
 
 ### The Best Way
 
-    $my-functional-variable: $canvas-primary;
+    $my-functional-variable: $ic-brand-primary;
 
     .class-name {
       color: $my-functional-variable;
@@ -199,16 +199,16 @@ We have specific flags that denote when a user has on High-Contrast mode. Most o
 
 ### The Better Way
 
-    $my-functional-variable: $canvas-primary;
+    $my-functional-variable: $ic-brand-primary;
 
     .class-name {
-      color: $canvas-primary; // this variable automatically switches when high contrast is on, yay!
+      color: $ic-brand-primary; // this variable automatically switches when high contrast is on, yay!
     }
 
 
 ### The Best Way
 
-    $my-functional-variable: $canvas-primary;
+    $my-functional-variable: $ic-brand-primary;
 
     .class-name {
       color: $my-functional-variable;

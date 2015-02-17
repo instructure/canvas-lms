@@ -1,7 +1,7 @@
 @import "base/environment";
 @import "pages/shared/move_dialog";
 
-$announcements_disscussion-summary-color: $canvas-dark;
+$announcements_disscussion-summary-color: $ic-color-dark;
 
 // min width to ensure toolbar doesn't stagger
 #main { min-width: 700px; }
@@ -250,11 +250,11 @@ $announcements_disscussion-summary-color: $canvas-dark;
     }
 
     .icon-discussion-check {
-      color: $canvas-success;
+      color: $ic-color-success;
     }
 
     .icon-discussion-x {
-      color: $canvas-danger;
+      color: $ic-color-danger;
     }
   }
 

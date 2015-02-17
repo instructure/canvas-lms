@@ -2,9 +2,9 @@
 ////////////////////////////////
 $preview-bg: rgba(#0f1317, 0.9);
 $preview-info-bg: lighten($preview-bg, 5%);
-$preview-border-color: darken($canvas-light, 45);
+$preview-border-color: darken($ic-color-light, 45);
 $preview-toggle-border: 1px solid $preview-border-color;
-$preview-font-color: $canvas-light;
+$preview-font-color: $ic-color-light;
 $spacing-width: 0;
 $preview-footer-height: 140px;
 $preview-header-height: 9vh;
@@ -114,12 +114,12 @@ $preview-header-height: 9vh;
   background: $preview-bg;
   white-space: nowrap;
   @include breakpoint(desktop) { padding: 0 24px; }
-  &:hover, &:focus { color: $canvas-light; text-decoration: none;}
+  &:hover, &:focus { color: $ic-color-light; text-decoration: none;}
   [class^=icon-] { margin-right: 3px; }
 
   &:hover, &:focus {
     background: rgba(white, 0.1);
-    border-bottom-color: lighten($canvas-primary, 15%);
+    border-bottom-color: lighten($ic-brand-primary, 15%);
   }
 
   &.ef-file-preview-button--active {
@@ -169,7 +169,7 @@ $preview-header-height: 9vh;
   padding: 20px 10px 24px;
   text-align: center;
   &:hover, &:focus {
-    border-color: lighten($canvas-primary, 15%);
+    border-color: lighten($ic-brand-primary, 15%);
     background: transparent;
   }
   i {

@@ -10,11 +10,11 @@
   margin: 0 0 $whitespace 0;
 
   &.is-warning .ic-Icon {
-    color: $canvas-danger;
+    color: $ic-color-danger;
   }
 
   &.is-ok .ic-Icon {
-    color: $canvas-success;
+    color: $ic-color-success;
   }
 
   &.is-neutral .ic-Icon {

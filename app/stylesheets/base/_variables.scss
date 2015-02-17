@@ -42,29 +42,29 @@
 // These are the new colors that we would like to start rebranding
 // all the canvas pages in. All of the app variables that denote a
 // color should use or be based off of one of these variables
-$canvas-primary:                  #0099e0 !default; // light blue
-@if $use_high_contrast { $canvas-primary: #0073ac; }
+$ic-brand-primary:                  #0099e0 !default; // light blue
+@if $use_high_contrast { $ic-brand-primary: #0073ac; }
 
-$canvas-secondary:                #5b6c79 !default; // dark blue
-@if $use_high_contrast { $canvas-secondary: #343c44; }
+$ic-brand-secondary:                #5b6c79 !default; // dark blue
+@if $use_high_contrast { $ic-brand-secondary: #343c44; }
 
-$canvas-success:                  #00ad18; // green
-@if $use_high_contrast { $canvas-success: #008a14; }
+$ic-color-success:                  #00ad18; // green
+@if $use_high_contrast { $ic-color-success: #008a14; }
 
-$canvas-neutral:                  hsl(0,0,90%);
+$ic-color-neutral:                  hsl(0,0,90%);
 
-$canvas-action:                   #ba3fa5; // magenta
-@if $use_high_contrast { $canvas-action: #a23891; }
+$ic-color-action:                   #ba3fa5; // magenta
+@if $use_high_contrast { $ic-color-action: #a23891; }
 
-$canvas-danger:                   #ad393a; // red
-@if $use_high_contrast { $canvas-danger: #a03536; }
+$ic-color-danger:                   #ad393a; // red
+@if $use_high_contrast { $ic-color-danger: #a03536; }
 
-$canvas-alert:                    #c48506; // gold
-@if $use_high_contrast { $canvas-alert: #9e6b05; }
+$ic-color-alert:                    #c48506; // gold
+@if $use_high_contrast { $ic-color-alert: #9e6b05; }
 
-$canvas-light:                    #fff; // white
+$ic-color-light:                    #fff; // white
 
-$canvas-dark:                     #333;
+$ic-color-dark:                     #333;
 
 //====================================
 // Bootstrap Color Variable Overwrites
@@ -81,10 +81,10 @@ $gray-lighter:           lighten(#000, 93.5%); // #eee
 //============================
 // Layout Functional Variables
 //============================
-$ic-body-background-color:      lighten($canvas-neutral, 4);
-$ic-content-background-color:   $canvas-light;
+$ic-body-background-color:      lighten($ic-color-neutral, 4);
+$ic-content-background-color:   $ic-color-light;
 $ic-content-padding:            15px;
-$ic-header-background:          $canvas-secondary;
+$ic-header-background:          $ic-brand-secondary;
 
 //============================
 // List Functional Variables
@@ -99,17 +99,17 @@ $ic-list-item-background--selected:   #d9edf9;
 // and meet our contrast needs when used with our main color variables
 
 
-$ic-bg-light-neutral:     lighten($canvas-neutral, 6%);
-$ic-bg-light-primary:     lighten($canvas-primary, 52%);
+$ic-bg-light-neutral:     lighten($ic-color-neutral, 6%);
+$ic-bg-light-primary:     lighten($ic-brand-primary, 52%);
 @if $use_high_contrast { 
-$ic-bg-light-primary:     lighten($canvas-primary, 64%); 
+$ic-bg-light-primary:     lighten($ic-brand-primary, 64%); 
 }
-$ic-bg-light-success:     lighten($canvas-success, 60%); // No high contrast color exists for legacy $canvas-success
-$ic-bg-light-alert:       lighten($canvas-alert, 50%);
+$ic-bg-light-success:     lighten($ic-color-success, 60%); // No high contrast color exists for legacy $ic-color-success
+$ic-bg-light-alert:       lighten($ic-color-alert, 50%);
 @if $use_high_contrast { 
-$ic-bg-light-alert:       lighten($canvas-alert, 66%); 
+$ic-bg-light-alert:       lighten($ic-color-alert, 66%); 
 }
-$ic-bg-light-danger:      lighten($canvas-danger, 48%); // No high contrast color exists for legacy $canvas-danger
+$ic-bg-light-danger:      lighten($ic-color-danger, 48%); // No high contrast color exists for legacy $ic-color-danger
 
 //============================
 // List Functional Variables
@@ -121,29 +121,29 @@ $ic-list-item-background--selected:   $ic-bg-light-primary;
 // Global border colors
 //=====================
 
-$ic-border-color:         $canvas-neutral;
+$ic-border-color:         $ic-color-neutral;
 // If it's a light border, it should be this color.
-$ic-border-light:         darken($canvas-neutral, 6);
+$ic-border-light:         darken($ic-color-neutral, 6);
 // If it's a dark border, it should be this color.
-$ic-border-dark:          darken($canvas-neutral, 23);
+$ic-border-dark:          darken($ic-color-neutral, 23);
 
 //=============================
 // Link-color-related variables
 //=============================
-$ic-link-color:             darken($canvas-primary, 5%);
+$ic-link-color:             darken($ic-brand-primary, 5%);
 @if $use_high_contrast { 
-$ic-link-color:             darken($canvas-primary, 2%); 
+$ic-link-color:             darken($ic-brand-primary, 2%); 
 }
 $ic-link-color-hover:       darken($ic-link-color, 10%);
 
-$ic-icon-link-color-hover: lighten($canvas-dark, 15%);
+$ic-icon-link-color-hover: lighten($ic-color-dark, 15%);
 @if $use_high_contrast { 
-$ic-icon-link-color-hover: $canvas-dark; 
+$ic-icon-link-color-hover: $ic-color-dark; 
 }
 
-$ic-icon-link-color:       lighten($canvas-dark, 30%);
+$ic-icon-link-color:       lighten($ic-color-dark, 30%);
 @if $use_high_contrast { 
-$ic-icon-link-color:       lighten($canvas-dark, 12%); 
+$ic-icon-link-color:       lighten($ic-color-dark, 12%); 
 }
 
 // linkColor is a deprecated Bootstrap 2 variable. Please use $ic-link-color!
@@ -153,10 +153,10 @@ $linkColorHover:            $ic-link-color-hover; // deprecated - do not use
 //=====================
 // Text-color variables
 //=====================
-$ic-font-color-light:     $canvas-light;
-$ic-font-color-dark:      $canvas-dark;
-$ic-font-color--subdued:  lighten($canvas-dark, 21);
-$ic-hint-text:            lighten($canvas-dark, 40);
+$ic-font-color-light:     $ic-color-light;
+$ic-font-color-dark:      $ic-color-dark;
+$ic-font-color--subdued:  lighten($ic-color-dark, 21);
+$ic-hint-text:            lighten($ic-color-dark, 40);
 
 // textColor is a deprecated Bootstrap 2 variable. Please use $ic-font-color-dark!
 $textColor:               $ic-font-color-dark; // deprecated - do not use
@@ -166,27 +166,27 @@ $textColor:               $ic-font-color-dark; // deprecated - do not use
 //=====================
 // These variables control the active and hover
 // states we have on the global left-hand sidenav in Canvas
-$ic-course-sidenav_list-item--bg-color:               $canvas-light;
+$ic-course-sidenav_list-item--bg-color:               $ic-color-light;
 @if $use_high_contrast {
-$ic-course-sidenav_list-item--bg-color:               $canvas-dark;
+$ic-course-sidenav_list-item--bg-color:               $ic-color-dark;
 }
-$ic-course-sidenav_list-item--active-font-color:      $canvas-primary;
+$ic-course-sidenav_list-item--active-font-color:      $ic-brand-primary;
 @if $use_high_contrast {
-$ic-course-sidenav_list-item--active-font-color:      $canvas-light;
+$ic-course-sidenav_list-item--active-font-color:      $ic-color-light;
 }
-$ic-course-sidenav_list-item--inactive-font-color:    darken($canvas-neutral, 12);
+$ic-course-sidenav_list-item--inactive-font-color:    darken($ic-color-neutral, 12);
 
 //===============
 // Icon Variables
 //===============
 //To be used for any disabled icon states 
-$ic-color-icon-disabled:        darken($canvas-neutral, 40);
+$ic-color-icon-disabled:        darken($ic-color-neutral, 40);
 @if $use_high_contrast {
-$ic-color-icon-disabled:        darken($canvas-neutral, 60);
+$ic-color-icon-disabled:        darken($ic-color-neutral, 60);
 }
-$ic-dim-helper-text:            darken($canvas-neutral, 33);
+$ic-dim-helper-text:            darken($ic-color-neutral, 33);
 @if $use_high_contrast {
-$ic-dim-helper-text:            darken($canvas-neutral, 50);
+$ic-dim-helper-text:            darken($ic-color-neutral, 50);
 }
 
 // We don't use any glyph icons like Bootstrap. This is the overwrite. 
@@ -223,8 +223,8 @@ $contentBoxPadding:         8px;
 // Nothing changes in the legacy UI.
 
 @if $use_new_styles {
-  $lightBackground:               lighten($canvas-neutral, 8);
-  $wellBackground:                $canvas-light;
+  $lightBackground:               lighten($ic-color-neutral, 8);
+  $wellBackground:                $ic-color-light;
   $altBG:                         $ic-bg-light-neutral;
   $borderColor:                   $ic-border-light;
   $activeBG:                      $ic-bg-light-primary;

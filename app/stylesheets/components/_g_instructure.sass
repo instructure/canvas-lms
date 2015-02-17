@@ -535,8 +535,8 @@ ul.group_list
   :margin-bottom 20px
 
 $wizard-icon-size: 120px
-$wizard-bg-color: $canvas-secondary
-$wizard-highlight-color: $canvas-primary
+$wizard-bg-color: $ic-brand-secondary
+$wizard-highlight-color: $ic-brand-primary
 
 @keyframes icon-slide-down
   from
@@ -616,16 +616,16 @@ $wizard-highlight-color: $canvas-primary
 
         &:hover
           @if $use_high_contrast == false
-            :background-color $canvas-light
+            :background-color $ic-color-light
         &.completed a
           :color #aaa
         &.selected
           @if $use_high_contrast
             a
-              :color $canvas-dark
+              :color $ic-color-dark
               :text-decoration none
           @else
-            :background-color $canvas-light
+            :background-color $ic-color-light
 
         a[class*=icon-], a[class^=icon-]
 
@@ -652,7 +652,7 @@ $wizard-highlight-color: $canvas-primary
     h3
       padding: 0
       margin: 0
-      border-bottom-color: rgba($canvas-light, 0.15)
+      border-bottom-color: rgba($ic-color-light, 0.15)
       font-weight: bold
 
     .wizard-box__feature-icon
@@ -675,12 +675,12 @@ $wizard-highlight-color: $canvas-primary
       i[class^=icon-]
         width: ($wizard-icon-size + $ic-sp*4)/2
         height: ($wizard-icon-size + $ic-sp*4)/2
-        background: $canvas-secondary
+        background: $ic-brand-secondary
         border-radius: 100%
         font-size: $wizard-icon-size/2
         &:before
           font-size: ($wizard-icon-size - $ic-sp)/2
-          color: $canvas-light
+          color: $ic-color-light
           line-height: ($wizard-icon-size + $ic-sp*4)/2
         @include breakpoint(desktop)
           width: $wizard-icon-size + $ic-sp*4
@@ -723,7 +723,7 @@ $wizard-highlight-color: $canvas-primary
       
     .wizard_content
       background: transparent
-      color: $canvas-light
+      color: $ic-color-light
       padding: 0
       border: none
       box-shadow: none
@@ -768,9 +768,9 @@ $wizard-highlight-color: $canvas-primary
           @include breakpoint(desktop)
             font-size: 15px
           &.selected
-            background: rgba($canvas-light, 0.1)
+            background: rgba($ic-color-light, 0.1)
             a.header
-              border-left-color: $canvas-primary
+              border-left-color: $ic-brand-primary
           &.completed
             a.header
               background-image: url("/images/wizard-todo-checked.svg")
@@ -781,7 +781,7 @@ $wizard-highlight-color: $canvas-primary
             width: 100%
             align-items: center
             padding: 8px $ic-sp*3 8px $ic-sp*3
-            color: $canvas-light
+            color: $ic-color-light
             text-decoration: none
             background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%
             background-size: 16px 16px
@@ -804,7 +804,7 @@ $wizard-highlight-color: $canvas-primary
       h3.wizard_details__headline
         font-size: $ic-sp*3
         line-height: 1
-        color: rgba($canvas-light, 0.95)
+        color: rgba($ic-color-light, 0.95)
         border-bottom: none
         flex: 0.75
         align-self: center
@@ -834,17 +834,17 @@ $wizard-highlight-color: $canvas-primary
         border: none
         border-radius: 0
         text-align: center
-        background: rgba($canvas-light, 0.85)
+        background: rgba($ic-color-light, 0.85)
         padding: $ic-sp*2
         overflow: visible !important
         animation-duration: 0.5s
         animation-name: icon-slide-up
         animation-timing-function: $ic-transition
         @if $use_high_contrast
-          background: $canvas-light
+          background: $ic-color-light
           color: desaturate(darken($wizard-bg-color, 25), 2)
         @else
-          background: rgba($canvas-light, 0.85)
+          background: rgba($ic-color-light, 0.85)
           color: desaturate(darken($wizard-bg-color, 20), 2)
         @include breakpoint(tablet)
           max-width: 600px
@@ -1695,7 +1695,7 @@ form.user_content_post_form
 
 .nav-badge
   border-radius: 30px;
-  background-color: $canvas-primary;
+  background-color: $ic-brand-primary;
   padding: 0 8px;
   font-size: 9px;
   color: #fff;

@@ -9,7 +9,7 @@
   transition: all 1s $ic-transition;
   width: 100%;
   height: 100%;
-  background: $canvas-secondary;
+  background: $ic-brand-secondary;
   position: fixed;
   bottom: 0; left: 0;
   box-sizing: border-box;
@@ -34,8 +34,8 @@
   display: flex;
   flex-direction: column;
   order: 1;
-  @if $use_high_contrast { background: $canvas-secondary; }
-  @else { background: rgba($canvas-secondary, 0.9); }
+  @if $use_high_contrast { background: $ic-brand-secondary; }
+  @else { background: rgba($ic-brand-secondary, 0.9); }
 
   @include breakpoint(mini-tablet) {
     flex-direction: row; 
@@ -54,8 +54,8 @@
   flex: 0 0 36px;
 
   &:hover, &:focus {
-    border-color: $canvas-primary;
-    background-color: rgba($canvas-light, 0.1);
+    border-color: $ic-brand-primary;
+    background-color: rgba($ic-color-light, 0.1);
   }
   @include breakpoint(mini-tablet) { 
     flex: 1;
@@ -95,26 +95,26 @@
   font-weight: 300;
 
   @if $use_high_contrast { 
-    color: $canvas-light;
+    color: $ic-color-light;
     &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
-      background-color: $canvas-primary;
+      background-color: $ic-brand-primary;
       color: canvas-light;
     }
   }
   @else { 
-    color: rgba($canvas-light, 0.9);
+    color: rgba($ic-color-light, 0.9);
     &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
-      background-color: rgba($canvas-light, 0.1);
-      color: $canvas-light;
+      background-color: rgba($ic-color-light, 0.1);
+      color: $ic-color-light;
     }
   }
 
   @include breakpoint(desktop) { font-size: 15px; }
 
   &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
-    border-left-color: $canvas-primary;
+    border-left-color: $ic-brand-primary;
     text-decoration: none;
-    color: $canvas-light;
+    color: $ic-color-light;
   }
 
   &.ic-wizard-box__content-trigger--checked {
@@ -127,8 +127,8 @@
   display: flex;
   flex-direction: column;
   
-  @if $use_high_contrast { background: rgba( $canvas-secondary, 0.9); }
-  @else { background: linear-gradient(to bottom, rgba($canvas-secondary, 0.75) 0%,rgba(0,0,0,0) 100%); }
+  @if $use_high_contrast { background: rgba( $ic-brand-secondary, 0.9); }
+  @else { background: linear-gradient(to bottom, rgba($ic-brand-secondary, 0.75) 0%,rgba(0,0,0,0) 100%); }
 }
 
 .ic-wizard-box__content {
@@ -146,7 +146,7 @@
   line-height: 0.85;
   font-size: $ic-sp*3;
   text-align: center;
-  color: $canvas-light;
+  color: $ic-color-light;
   font-weight: 700;
   margin: 0;
   @include breakpoint(mini-tablet) {
@@ -194,7 +194,7 @@
     transform: scale(0) translate3d(0,50%,0);
 
     display: block;
-    background: $canvas-secondary;
+    background: $ic-brand-secondary;
     width: 72px; height: 72px;
     border-radius: 100%;
     position: absolute;
@@ -212,7 +212,7 @@
 
     i[class*=icon-], i[class^=icon-] {
       width: auto; height: auto;
-      color: $canvas-light;
+      color: $ic-color-light;
       line-height: 1;
       &:before {
         font-size: $ic-sp*3;
@@ -243,7 +243,7 @@
   transition: all 1s $ic-transition;
   opacity: 0;
   transform: translate3d(0,50%,0);
-  background: rgba($canvas-light, 0.9);
+  background: rgba($ic-color-light, 0.9);
   padding: $ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2;
   box-shadow: 0 1px 4px 1px rgba(black, 0.3);
   text-align: center;
@@ -253,8 +253,8 @@
     transform: translate3d(0,0,0);
   }
   
-  @if $use_high_contrast { background: $canvas-light; }
-  @else { background: rgba($canvas-light, 0.9); }
+  @if $use_high_contrast { background: $ic-color-light; }
+  @else { background: rgba($ic-color-light, 0.9); }
 
   @include breakpoint(mini-tablet) {
     border-radius: $baseBorderRadius;

@@ -166,7 +166,7 @@ ul[class*=ac-] {
   &:hover {
     background: #bccef4;
     @if $use-high-contrast {
-      background: $canvas-light;  
+      background: $ic-color-light;  
     }
     border-color: #6f94e6;
   }
@@ -192,7 +192,7 @@ ul[class*=ac-] {
 // to a new conversation
 i[class*=icon-].icon-messageRecipient--cancel {
   &:before {
-    background: $canvas-primary;
+    background: $ic-brand-primary;
     border-radius: 10px;
     padding: 2px;
     font-size: 9px;
@@ -268,7 +268,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
 .ac-result-list {
   .context, .everyone {
     border-bottom: 1px solid $ic-border-light;
-    color: $canvas-primary;
+    color: $ic-brand-primary;
 
     &.selected, &:hover {
       color: #fff;

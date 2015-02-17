@@ -26,13 +26,13 @@ $gradebook_header_height: 52px
   form
     margin: 0
   @if $use_high_contrast
-    background-color: $canvas-dark
+    background-color: $ic-color-dark
   @else    
     background-color: #4b5662
   :padding 12px 25px 12px 12px
   :font-size 11px
   :text-align center
-  color: $canvas-light
+  color: $ic-color-light
   line-height: 15px
   position: relative
   min-width: 960px
@@ -215,7 +215,7 @@ $gradebook_header_height: 52px
     padding: 8px
     font-size: 12px
     border-top: 1px dashed $ic-border-light
-    background: $canvas-light
+    background: $ic-color-light
     &:first-of-type
       border-top: none
     .comment_citation
@@ -226,15 +226,15 @@ $gradebook_header_height: 52px
     .delete_comment_link
       float: right
       @if $use_high_contrast
-        color: lighten($canvas-dark, 12%)
+        color: lighten($ic-color-dark, 12%)
       @else
-        color: lighten($canvas-dark, 25%)
+        color: lighten($ic-color-dark, 25%)
       &:hover, &:focus
-        color: $canvas-dark
+        color: $ic-color-dark
         
 
   h2, .h2
-    background: lighten($canvas-neutral, 5%)
+    background: lighten($ic-color-neutral, 5%)
     border-bottom: 1px solid $ic-border-light
     border-top: 1px solid $ic-border-light
     font-size: 1.2em
@@ -245,7 +245,7 @@ $gradebook_header_height: 52px
 
   .content_box
     padding: 8px
-    background: $canvas-light
+    background: $ic-color-light
 
   #rightside_inner
     @extend %flex-1
@@ -273,7 +273,7 @@ $gradebook_header_height: 52px
   border-bottom: 7px solid #bbb
   border-bottom-left-radius: 5px
   z-index: 1000
-  background-color: $canvas-light
+  background-color: $ic-color-light
 
   .content_box
     padding-right: 24px
@@ -479,7 +479,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 .ui-selectmenu-item-header
   .not_submitted &
     @if $use_high_contrast
-      color: lighten($canvas-dark, 20%)
+      color: lighten($ic-color-dark, 20%)
     @else
       color: $grayLight
   .ui-selectmenu-status &
@@ -607,7 +607,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   border: 1px solid $borderColor
 
 #interim_results
-  color: $canvas-success
+  color: $ic-color-success
 
 .no-close
   .ui-dialog-titlebar-close

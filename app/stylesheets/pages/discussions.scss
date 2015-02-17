@@ -2,7 +2,7 @@
 
 $border: #C1C7CF;
 $borderRadius: 3px;
-$discussion-dark-text: $canvas-dark;
+$discussion-dark-text: $ic-color-dark;
 
 body.with-right-side.with-left-side {
   // toolbar needs it to be this wide
@@ -420,7 +420,7 @@ body.with-right-side.with-left-side {
 }
 
 .showMore:hover {
-  background: $canvas-light;
+  background: $ic-color-light;
   cursor: pointer;
   a {
     text-decoration: underline;
@@ -498,7 +498,7 @@ body.with-right-side.with-left-side {
 }
 
 .highlight .entry-content {
-  outline: 3px solid $canvas-primary;
+  outline: 3px solid $ic-brand-primary;
 }
 
 .highlight .entry .entry-content {
