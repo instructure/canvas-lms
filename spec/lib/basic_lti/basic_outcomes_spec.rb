@@ -116,6 +116,14 @@ describe BasicLTI::BasicOutcomes do
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
+    it 'handles tools that have a url mismatch with the assignment' do
+      assignment.external_tool_tag_attributes = {url: 'http://example.com/foo'}
+      assignment.save!
+      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+      expect(request.code_major).to eq 'failure'
+      expect(request.description).to eq 'Assignment is no longer associated with this tool'
+    end
+
     it "accepts a result data without grade" do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
