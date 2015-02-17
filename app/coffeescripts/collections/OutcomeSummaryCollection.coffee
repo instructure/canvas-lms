@@ -18,11 +18,25 @@ define [
     @optionProperty 'course_id'
     url: -> "/api/v1/courses/#{@course_id}/outcome_group_links?outcome_style=full"
 
-  class ResultCollection extends WrappedCollection
+  class RollupCollection extends WrappedCollection
     @optionProperty 'course_id'
     @optionProperty 'user_id'
     key: 'rollups'
     url: -> "/api/v1/courses/#{@course_id}/outcome_rollups?user_ids[]=#{@user_id}"
+
+  class ResultCollection extends WrappedCollection
+    @optionProperty 'course_id'
+    @optionProperty 'user_id'
+    key: 'outcome_results'
+    url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}"
+
+    scoresFor: (outcome) ->
+      _.compact(@map((result) ->
+        if result.get('links').learning_outcome == outcome.id
+          assessed_at: result.get('assessed_at')
+          score: result.get('score')
+      ))
+
 
   class OutcomeSummaryCollection extends Collection
     @optionProperty 'course_id'
@@ -36,6 +50,7 @@ define [
         groups: new GroupCollection([], course_id: @course_id)
         links: new LinkCollection([], course_id: @course_id)
         results: new ResultCollection([], course_id: @course_id, user_id: @user_id)
+        rollups: new RollupCollection([], course_id: @course_id, user_id: @user_id)
       @outcomeCache = new Collection()
 
     fetch: ->
@@ -45,8 +60,8 @@ define [
       dfd
 
     rollups: ->
-      studentResults = @rawCollections.results.at(0).get('scores')
-      pairs = studentResults.map((x) -> [x.links.outcome, x])
+      studentRollups = @rawCollections.rollups.at(0).get('scores')
+      pairs = studentRollups.map((x) -> [x.links.outcome, x])
       _.object(pairs)
 
     populateGroupOutcomes: ->
@@ -57,6 +72,7 @@ define [
         parent = @rawCollections.groups.get(link.get('outcome_group').id)
         rollup = rollups[outcome.id]
         outcome.set('score', rollup?.score)
+        outcome.set('scores', @rawCollections.results.scoresFor(outcome))
         outcome.set('result_title', rollup?.title)
         outcome.set('submission_time', rollup?.submitted_at)
         outcome.set('count', rollup?.count || 0)

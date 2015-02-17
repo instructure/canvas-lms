@@ -99,16 +99,16 @@ define [
       @attach()
       this
 
-    # Store all children views for easy access. 
-    #   ie: 
+    # Store all children views for easy access.
+    #   ie:
     #      @view.children # {@view1, @view2}
     #
     # @api private
-    
+
     storeChildrenViews: ->
       return unless @constructor.__childViews__
       @children = _.map @constructor.__childViews__, (viewObj) => @[viewObj.name]
-    
+
     ##
     # Sets the option properties
     #

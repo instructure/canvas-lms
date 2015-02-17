@@ -16,11 +16,7 @@ define [
       'keydown' : 'togglePopover'
       'mouseenter': 'mouseenter'
       'mouseleave': 'mouseleave'
-
     inside: false
-
-    initialize: ->
-      super
 
     # Overrides
     render: ->
@@ -50,6 +46,7 @@ define [
           verticalSide: 'bottom'
           manualOffset: 14
         })
+      @trigger('outcomes:popover:open')
 
     togglePopover: (e) =>
       keyPressed = @_getKey(e.keyCode)

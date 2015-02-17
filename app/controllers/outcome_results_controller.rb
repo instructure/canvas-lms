@@ -36,6 +36,11 @@
 #           "type": "integer",
 #           "description": "The student's score"
 #         },
+#         "assessed_at": {
+#           "description": "The datetime the resulting OutcomeResult was assessed.",
+#           "example": "2013-02-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
 #         "links": {
 #           "example": "{\"user\"=>\"3\", \"learning_outcome\"=>\"97\", \"alignment\"=>\"53\"}",
 #           "description": "Unique identifiers of objects associated with this result"

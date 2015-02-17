@@ -33,7 +33,7 @@ module Api::V1::OutcomeResults
   end
 
   def outcome_result_json(result)
-    hash = api_json(result, @current_user, session, only: %w(id score))
+    hash = api_json(result, @current_user, session, only: %w(id score assessed_at))
     hash[:links] = {
       user: result.user.id.to_s,
       learning_outcome: result.learning_outcome_id.to_s,

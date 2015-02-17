@@ -1,23 +1,32 @@
 define [
   'i18n!outcomes'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/grade_summary/ProgressBarView'
   'compiled/views/grade_summary/OutcomePopoverView'
+  'compiled/views/grade_summary/OutcomeLineGraphView'
   'jst/grade_summary/outcome'
   'jst/outcomes/outcomePopover'
-], (I18n, _, Backbone, ProgressBarView, OutcomePopoverView, template, popover_template) ->
+], (I18n, $, _, Backbone, ProgressBarView, OutcomePopoverView, OutcomeLineGraphView, template, popover_template) ->
   class OutcomeView extends Backbone.View
     tagName: 'li'
     className: 'outcome'
     template: template
 
     afterRender: ->
+      @outcomeLineGraphView = new OutcomeLineGraphView({
+        model: @model
+      })
+
       @popover = new OutcomePopoverView({
         el: @$('.alignment-info i')
         model: @model
         template: popover_template
       })
+      @popover.on 'outcomes:popover:open', =>
+        @outcomeLineGraphView.setElement($("div.outcome-details > div.line-graph"))
+        @outcomeLineGraphView.render()
 
     initialize: ->
       super

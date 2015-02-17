@@ -1,4 +1,5 @@
 <div class="outcome-details">
+  <div class="line-graph"></div>
   <div class="head-content" tabindex="0">
     {{#if path}}
     <div class="title">{{path}}</div>
@@ -21,8 +22,8 @@
     </div>
     {{else}}
     <div class="mastery-details pull-right" aria-hidden="true">
-      {{#if score}}
-        <span>{{score}} / {{mastery_points}}</span>
+      {{#if roundedScore}}
+        <span>{{roundedScore}} / {{mastery_points}}</span>
         {{#ifEqual status 'exceeds'}}
             <i class="icon-check-plus exceeds"></i>
         {{else}}

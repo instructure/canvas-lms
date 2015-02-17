@@ -24,6 +24,43 @@
     text-align: center;
     height: 150px
   }
+  .line-graph {
+    font-size: 10px;
+    .guides {
+      .tick {
+        stroke: lightgrey;
+        opacity: 0.7;
+      }
+      path {
+        stroke-width: 0;
+      }
+    }
+    .date-guides {
+      path {
+        stroke-width: 0;
+      }
+    }
+    .mastery-percentage-guide {
+      .tick {
+        stroke: #00B416;
+        opacity: 0.5;
+      }
+      path {
+        stroke-width: 0;
+      }
+    }
+    .trendline {
+      stroke: #9f9f9f
+    }
+    svg {
+      background: #f7f7f7
+    }
+    .domain {
+      fill: none;
+      stroke: black;
+      stroke-width: 1;
+    }
+  }
   .ratings {
     font-weight: normal;
     display: inline-block;
