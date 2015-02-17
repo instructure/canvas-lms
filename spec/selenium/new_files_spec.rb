@@ -34,26 +34,27 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       end
 
       it "should unpublish and publish a file from cog menu" do
-        permissions('rgba(128, 128, 128, 1)', 1, 0)
+        set_item_permissions(:unpublish)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        permissions('rgba(0, 173, 24, 1)', 0, 0)
+        expect(driver.find_element(:class => 'unpublished')).to be_displayed
+        set_item_permissions(:publish)
         expect(f('.btn-link.published-status.published')).to be_displayed
+        expect(driver.find_element(:class => 'published')).to be_displayed
       end
 
       it "should make file available to student with link" do
-        tooltip_text = "Hidden. Available with a link"
-        permissions('rgba(196, 133, 6, 1)', 2, 0)
+        set_item_permissions(:restricted_access, :available_with_link)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
+        expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
 
       it "should make file available to student within given timeframe" do
-        tooltip_text = "Hidden. Available with a link"
-        permissions('rgba(196, 133, 6, 1)', 2, 1)
+        set_item_permissions(:restricted_access, :available_with_timeline)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
+        expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
 
       it "should delete file from toolbar" do
-        file_name = "example.pdf"
         delete_from_toolbar
         expect(get_all_files_folders.count).to eq 0
       end
@@ -91,8 +92,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
           check_element_has_focus(f('.btn-view'))
         end
       end
-
-
    end
 
    context "File Downloads", :priority => "2" do
@@ -112,7 +111,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       end
    end
 
-   context "Publish Cloud Dialog", :priority => '3' do
+   context "Publish Cloud Dialog", :priority => '2' do
     before (:each) do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:better_file_browsing)
@@ -122,10 +121,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
     end
 
     it "should validate that file is published by default" do
-        publish_background_color = 'rgba(0, 173, 24, 1)'
         icon_publish_color = ff('.icon-publish')[0].css_value('color')
         expect(f('.btn-link.published-status.published')).to be_displayed
-        expect(icon_publish_color).to eq publish_background_color
     end
 
     it "should set focus to the close button when opening the dialog" do
@@ -137,7 +134,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
     end
    end
 
-   context "Usage Rights Dialog", :priority => '3' do
+   context "Usage Rights Dialog", :priority => '2' do
     before :each do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:better_file_browsing)
