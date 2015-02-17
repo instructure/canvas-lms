@@ -6,7 +6,7 @@ group :development do
   gem 'rb-fchange', :require => false
 
   gem "letter_opener"
-  gem 'spring', '1.1.3', :github => 'ccutrer/spring', :branch => 'reload_hang', :ref => 'a622f051501976cdbef452c9752c1af364c9ad26'
+  gem 'spring', '>= 1.3.0'
   gem 'spring-commands-rspec', '1.0.2'
 
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
