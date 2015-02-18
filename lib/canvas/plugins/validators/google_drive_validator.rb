@@ -20,32 +20,24 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
       {}
+    elsif res = check_json(settings)
+      plugin_setting.errors.add(:base, res)
+      false
     else
-      res = check_json(settings)
-      if res
-        plugin_setting.errors.add(:base, res)
-        false
+      if settings['client_secret_json'].present?
+        parsed = JSON.parse(settings['client_secret_json'])['web']
+        to_return = {
+          :client_id => parsed['client_id'],
+          :client_secret => parsed['client_secret'],
+          :redirect_uri => parsed['redirect_uris'][0], #we only care about the first one
+          :auth_uri => parsed['auth_uri'],
+          :token_uri => parsed['token_uri'],
+          :client_secret_json => ""
+         }
       else
-        if settings['client_secret_json'].present?
-          parsed = JSON.parse(settings['client_secret_json'])['web']
-          to_return = {
-            :client_id => settings['client_id'].presence || parsed['client_id'],
-            :client_secret => settings['client_secret'].presence || parsed['client_secret'],
-            :redirect_uri => settings['redirect_uri'].presence || parsed['redirect_uris'][0], #we only care about the first one
-            :auth_uri => settings['auth_uri'].presence || parsed['auth_uri'],
-            :token_uri => settings['token_uri'].presence || parsed['token_uri'],
-
-            #Do we want to keep this?
-            :client_secret_json => "" #settings['client_secret_json']
-
-          }
-        else
-          to_return = settings
-        end
-
-        to_return[:client_secrets] = to_return.clone
-        to_return
+         to_return = settings
       end
+      to_return
     end
   end
 
