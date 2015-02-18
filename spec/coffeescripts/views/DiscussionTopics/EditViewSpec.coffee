@@ -71,3 +71,12 @@ AssignmentGroupCollection, GroupCategorySelector, fakeENV) ->
   test 'hides the published icon for announcements', ->
     view = editView(isAnnouncement: true)
     equal view.$el.find('.published-status').length, 0
+
+  test 'validates the group category for non-assignment discussions', ->
+    clock = sinon.useFakeTimers()
+    view = editView()
+    clock.tick(1)
+    data = { group_category_id: 'new' }
+    errors = view.validateBeforeSave(data, [])
+    ok errors["groupCategorySelector"][0]["message"]
+    clock.restore()

@@ -255,14 +255,15 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       if @isTopic() && data.set_assignment is '1'
         if @assignmentGroupSelector?
           errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
-        unless ENV?.IS_LARGE_ROSTER
-          errors = @groupCategorySelector.validateBeforeSave(data, errors)
         data2 =
           assignment_overrides: @dueDateOverrideView.getAllDates(data.assignment.toJSON())
         errors = @dueDateOverrideView.validateBeforeSave(data2, errors)
         errors = @_validatePointsPossible(data, errors)
       else
         @model.set 'assignment', @model.createAssignment(set_assignment: false)
+
+      if !ENV?.IS_LARGE_ROSTER && @isTopic()
+        errors = @groupCategorySelector.validateBeforeSave(data, errors)
 
       if @isAnnouncement()
         unless data.message?.length > 0
