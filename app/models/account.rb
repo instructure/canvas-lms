@@ -1302,7 +1302,7 @@ class Account < ActiveRecord::Base
       :google_drive => {
         :name => t("account_settings.google_drive", "Google Drive"),
         :description => "",
-        :expose_to_ui => :service
+        :expose_to_ui => false
       },
       :google_docs_previews => {
         :name => t("account_settings.google_docs_preview", "Google Docs Preview"),

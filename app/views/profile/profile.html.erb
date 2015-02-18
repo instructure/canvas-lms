@@ -208,7 +208,7 @@ TEXT
         <li class="service clearfix" id="service_<%= service.service %>">
           <a href="<%= profile_user_service_url(service.id) %>" class="delete_service_link no-hover" style="float: right; padding-top: 0.5em; padding-right: 10px;" title="<%= t('titles.unregister_service', "Unregister Service") %>"><%= image_tag "delete_circle.png" %></a>
           <a href="<%= service.service_access_link %>">
-            <%= image_tag "#{service.service}.png", :style => "vertical-align: middle; float: left;" %> 
+            <%= image_tag "#{service.service}.png", :style => "vertical-align: middle; float: left;" %>
           </a>
           <div style="float: left; padding-left: 5px;">
             <%= service.service.titleize rescue t(:unknown_service, "Unknown") %>
@@ -263,7 +263,7 @@ TEXT
         </div>
       </li>
 
-      <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
+      <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_enabled?(:google_drive) || !feature_and_service_enabled?(:google_docs) || services.include?("google_drive") %>">
         <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png" %> <%= t('links.google_drive', "Google Drive") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_google_drive', "Authorize Google Drive") %>" id="unregistered_service_google_drive_dialog">
           <div>
@@ -340,7 +340,7 @@ TEXT
             <%= image_tag "linked_in.png", :style => "float: left; padding-right: 5px;" %>
             <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.linkedin_access', "LinkedIn Access") %></div>
             <%= t(:linkedin_description, <<-TEXT)
-            LinkedIn is a great resources for business networking, and can be 
+            LinkedIn is a great resources for business networking, and can be
             helpful long after you've finished your education.
             If you have a LinkedIn account, you can register it here.  Then if you
             allow fellow course/group members to see your registered services, they
@@ -364,7 +364,7 @@ TEXT
             <%= mt(:twitter_description, <<-TEXT)
 Twitter is a service for posting and subscribing to short messages.
 If you have a Twitter account, you can register it here.  Then if you allow
-fellow course/group members to see your registered services, they can 
+fellow course/group members to see your registered services, they can
 easily connect with your Twitter account.
 
 You can also sign up to have notifications sent to your Twitter account.
@@ -455,7 +455,7 @@ TEXT
             <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.diigo_login', "Diigo Login") %></div>
             <%= t(:diigo_description, <<-TEXT)
             Diigo is a social bookmarking tool tailored specifically to research and
-            education.  
+            education.
             Canvas's rich content editor will let you search your Diigo tags
             to easily link from within Canvas to other resources you find useful.
             TEXT
@@ -531,7 +531,7 @@ TEXT
       Open API* to come up with your own integrations.
       TEXT
     %></p>
-    
+
     <div class="loading_message"><%= t(:loading_token_details, "Loading Token Details...") %></div>
     <div class="error_loading_message"><%= t(:error_loading_token_details, "Error Loading Token Details") %></div>
     <div class="results">
