@@ -41,6 +41,14 @@ describe "context_modules" do
       wait_for_ajaximations
     end
 
+    def test_relock
+      wait_for_ajaximations
+      expect(f('#relock_modules_dialog')).to be_displayed
+      ContextModule.any_instance.expects(:relock_progressions).once
+      fj(".ui-dialog:visible .ui-button:first-child").click
+      wait_for_ajaximations
+    end
+
     it "should render as course home page" do
       create_modules(1)
       @course.default_view = 'modules'
@@ -216,8 +224,8 @@ describe "context_modules" do
       add_module('Edit Module')
       f('.ig-header-admin .al-trigger').click
       f('.edit_module_link').click
-      expect(f('.ui-dialog')).to be_displayed
       edit_form = f('#add_context_module_form')
+      expect(edit_form).to be_displayed
       edit_form.find_element(:id, 'context_module_name').send_keys(edit_text)
       submit_form(edit_form)
       expect(edit_form).not_to be_displayed
@@ -228,24 +236,29 @@ describe "context_modules" do
     it "should add and remove completion criteria" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+
+      @course.reload
+      smodule = @course.context_modules.first
+      smodule.publish!
       # add completion criterion
       f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
-      expect(f('.ui-dialog')).to be_displayed
       edit_form = f('#add_context_module_form')
+      expect(edit_form).to be_displayed
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
+
       submit_form(edit_form)
       expect(edit_form).not_to be_displayed
-      wait_for_ajax_requests
+      # should show relock warning since we're adding a completion requirement to an active module
+      test_relock
 
       # verify it was added
-      @course.reload
-      smodule = @course.context_modules.first
+      smodule.reload
       expect(smodule).not_to be_nil
       expect(smodule.completion_requirements).not_to be_empty
       expect(smodule.completion_requirements[0][:type]).to eq 'must_submit'
@@ -255,8 +268,8 @@ describe "context_modules" do
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
-      expect(f('.ui-dialog')).to be_displayed
       edit_form = f('#add_context_module_form')
+      expect(edit_form).to be_displayed
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
       ff('.cancel_button', dialog_for(edit_form)).last.click
@@ -268,8 +281,8 @@ describe "context_modules" do
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
-      expect(f('.ui-dialog')).to be_displayed
       edit_form = f('#add_context_module_form')
+      expect(edit_form).to be_displayed
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
       submit_form(edit_form)
@@ -282,8 +295,8 @@ describe "context_modules" do
       # and also make sure the form remembers that it's gone (#8329)
       f('.ig-header-admin .al-trigger').click
       f('.edit_module_link').click
-      expect(f('.ui-dialog')).to be_displayed
       edit_form = f('#add_context_module_form')
+      expect(edit_form).to be_displayed
       expect(ff('.completion_entry .delete_criterion_link', edit_form)).to be_empty
     end
 
@@ -523,16 +536,25 @@ describe "context_modules" do
       click_option('.criterion select', "the module, #{first_module_name}")
       submit_form(add_form)
       wait_for_ajaximations
-      db_module = ContextModule.last
-      context_module = f("#context_module_#{db_module.id}")
+      mod1 = @course.context_modules.where(:name => first_module_name).first
+      mod2 = @course.context_modules.where(:name => second_module_name).first
+      context_module = f("#context_module_#{mod2.id}")
       driver.action.move_to(context_module).perform
-      f("#context_module_#{db_module.id} .ig-header-admin .al-trigger").click
-      f("#context_module_#{db_module.id} .edit_module_link").click
-      expect(f('.ui-dialog')).to be_displayed
+      f("#context_module_#{mod2.id} .ig-header-admin .al-trigger").click
+      f("#context_module_#{mod2.id} .edit_module_link").click
+      expect(add_form).to be_displayed
       wait_for_ajaximations
       prereq_select = fj('.criterion select')
       option = first_selected_option(prereq_select)
       expect(option.text).to eq 'the module, ' + first_module_name
+
+      ff('.cancel_button', dialog_for(add_form)).last.click
+      wait_for_ajaximations
+      mod2.publish!
+
+      # should bring up relock dialog on publish
+      f("#context_module_#{mod1.id} .publish-icon").click
+      test_relock
     end
 
     it "should rearrange modules" do

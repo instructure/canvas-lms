@@ -540,7 +540,10 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5}}
       @module.save!
 
+      expect(@module2.evaluate_for(@user)).to be_completed
+      @module.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
+
       expect(@module.evaluate_for(@user)).to be_unlocked
       
       @assignment.reload
@@ -552,6 +555,8 @@ describe ContextModule do
 
       @submissions = @assignment.reload.grade_student(@user, :grade => "4", :grader => @teacher)
 
+      expect(@module2.evaluate_for(@user)).to be_completed
+      @module.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
       expect(@module.evaluate_for(@user)).to be_unlocked
       
@@ -707,6 +712,8 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5}}
       @module.save
       @module2.reload
+      expect(@module2.evaluate_for(@user)).to be_completed
+      @module.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
 
       @progression = @module.evaluate_for(@user)
@@ -725,6 +732,8 @@ describe ContextModule do
 
       @submissions = @assignment.reload.grade_student(@user, :grade => "4", :grader => @teacher)
 
+      expect(@module2.evaluate_for(@user)).to be_completed
+      @module.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
 
       @progression = @module.evaluate_for(@user)
@@ -996,6 +1005,67 @@ describe ContextModule do
       @module.destroy
       @module.restore
       expect(@module.reload).to be_unpublished
+    end
+  end
+
+  describe "#relock_warning?" do
+    before :each do
+      course(:active_all => true)
+    end
+
+    it "should be true when adding a prerequisite" do
+      mod1 = @course.context_modules.create!(:name => "some module")
+      mod2 = @course.context_modules.create!(:name => "some module2")
+
+      mod2.prerequisites = "module_#{mod1.id}"
+      mod2.save!
+
+      expect(mod2.relock_warning?).to be_truthy
+
+      mod2.prerequisites = ""
+      mod2.save!
+
+      expect(mod2.relock_warning?).to be_falsey
+    end
+
+    it "should be true when adding a completion requirement" do
+      mod = @course.context_modules.create!(:name => "some module")
+
+      quiz = @course.quizzes.create!(title: "some quiz")
+      quiz.publish!
+      tag = mod.add_item({id: quiz.id, type: 'quiz'})
+      mod.completion_requirements = {tag.id => {type: 'must_submit'}}
+      mod.save!
+
+      expect(mod.relock_warning?).to be_truthy
+
+      mod.completion_requirements = []
+      mod.save!
+
+      expect(mod.relock_warning?).to be_falsey
+    end
+
+    it "should be true when publishing a prerequisite" do
+      mod1 = @course.context_modules.new(:name => "some module")
+      mod1.workflow_state = "unpublished"
+      mod1.save!
+
+      mod2 = @course.context_modules.new(:name => "some module2")
+      mod2.prerequisites = "module_#{mod1.id}"
+      mod2.workflow_state = "unpublished"
+      mod2.save!
+
+      mod1.publish!
+      expect(mod1.relock_warning?).to be_falsey # mod2 is not active
+
+      mod2.publish!
+      mod1.unpublish!; mod1.publish!
+      expect(mod1.relock_warning?).to be_truthy # now mod2 is active
+
+      mod2.prerequisites = ""
+      mod2.save!
+      mod1.unpublish!; mod1.publish!
+      expect(mod1.relock_warning?).to be_falsey
     end
   end
 

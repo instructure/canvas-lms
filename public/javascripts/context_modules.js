@@ -27,6 +27,7 @@ define([
   'i18n!context_modules',
   'jquery' /* $ */,
   'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
+  'compiled/views/modules/RelockModulesDialog',
   'compiled/util/vddTooltip',
   'jst/_vddTooltip',
   'compiled/models/Publishable',
@@ -45,7 +46,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
+], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -559,6 +560,7 @@ define([
       el: $("#content"),
       modules: modules
     });
+    var relock_modules_dialog = new RelockModulesDialog();
 
     var $context_module_unlocked_at = $("#context_module_unlock_at");
     var valCache = '';
@@ -696,8 +698,10 @@ define([
             published: data.context_module.workflow_state == 'published',
             publishable: true
           };
-          initPublishButton($publishIcon, publishData);
+          var view = initPublishButton($publishIcon, publishData);
+          overrideModel(view.model, view);
         }
+        relock_modules_dialog.renderIfNeeded(data.context_module);
         $module.triggerHandler('update', data);
       },
       error: function(data, $module) {
@@ -1117,100 +1121,173 @@ define([
       modules.refreshModuleList();
       modules.refreshed = true;
     }, 1000);
-  }
 
-  function initNewItemPublishButton($item, data) {
-    var publishData = {
-      moduleType: data.type,
-      id: data.publishable_id,
-      moduleId: data.context_module_id,
-      courseId: data.context_id,
-      published: data.published,
-      publishable: data.publishable,
-      unpublishable: data.unpublishable,
-      content_details: data.content_details,
-      isNew: true
-    };
+    function initNewItemPublishButton($item, data) {
+      var publishData = {
+        moduleType: data.type,
+        id: data.publishable_id,
+        moduleId: data.context_module_id,
+        courseId: data.context_id,
+        published: data.published,
+        publishable: data.publishable,
+        unpublishable: data.unpublishable,
+        content_details: data.content_details,
+        isNew: true
+      };
 
-    initPublishButton($item.find('.publish-icon'), publishData);
-  }
-
-  var initPublishButton = function($el, data) {
-    data = data || $el.data();
-
-    if(data.moduleType == 'attachment'){
-      // Module isNew if it was created with an ajax request vs being loaded when the page loads
-      var moduleItem = {};
-
-      if (data.isNew){
-        // Data will have content_details on the object
-        moduleItem = data || {};
-
-        // make sure styles are applied to new module items
-        $el.attr('data-module-type', "attachment");
-      }else{
-        var module = _.find(ENV.MODULES, function(module){
-          return parseInt(module.id, 10) == parseInt(data.moduleId, 10);
-        });
-
-        // Find the matching module items with content_details
-        moduleItem = _.find(module.items, function(item){
-          return parseInt(data.moduleItemId, 10) == parseInt(item.id, 10);
-        });
-      }
-
-      // Make sure content_details isn't empty. You don't want to break something.
-      moduleItem.content_details = moduleItem.content_details || {};
-
-      var file = new ModuleFile({
-          id: moduleItem.content_id || moduleItem.id,
-          locked: moduleItem.content_details.locked,
-          hidden: moduleItem.content_details.hidden,
-          unlock_at: moduleItem.content_details.unlock_at,
-          lock_at: moduleItem.content_details.lock_at,
-          display_name: moduleItem.content_details.display_name,
-          thumbnail_url: moduleItem.content_details.thumbnail_url,
-          usage_rights: moduleItem.content_details.usage_rights
-        });
-
-      file.url = function(){
-        return "/api/v1/files/" + this.id;
-      }
-
-      var props = {
-        model: file,
-        togglePublishClassOn: $el.parents('.ig-row')[0],
-        userCanManageFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files,
-        usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required
-      }
-
-      React.renderComponent(PublishCloud(props), $el[0]);
-      return {model: file} // Pretending this is a backbone view
+      initPublishButton($item.find('.publish-icon'), publishData);
     }
 
-    var model = new PublishableModuleItem({
-      module_type: data.moduleType,
-      content_id: data.contentId,
-      id: data.id,
-      module_id: data.moduleId,
-      module_item_id: data.moduleItemId,
-      course_id: data.courseId,
-      published: data.published,
-      publishable: data.publishable,
-      unpublishable: data.unpublishable
+    var initPublishButton = function($el, data) {
+      data = data || $el.data();
+
+      if(data.moduleType == 'attachment'){
+        // Module isNew if it was created with an ajax request vs being loaded when the page loads
+        var moduleItem = {};
+
+        if (data.isNew){
+          // Data will have content_details on the object
+          moduleItem = data || {};
+
+          // make sure styles are applied to new module items
+          $el.attr('data-module-type', "attachment");
+        }else{
+          var module = _.find(ENV.MODULES, function(module){
+            return parseInt(module.id, 10) == parseInt(data.moduleId, 10);
+          });
+
+          // Find the matching module items with content_details
+          moduleItem = _.find(module.items, function(item){
+            return parseInt(data.moduleItemId, 10) == parseInt(item.id, 10);
+          });
+        }
+
+        // Make sure content_details isn't empty. You don't want to break something.
+        moduleItem.content_details = moduleItem.content_details || {};
+
+        var file = new ModuleFile({
+            id: moduleItem.content_id || moduleItem.id,
+            locked: moduleItem.content_details.locked,
+            hidden: moduleItem.content_details.hidden,
+            unlock_at: moduleItem.content_details.unlock_at,
+            lock_at: moduleItem.content_details.lock_at,
+            display_name: moduleItem.content_details.display_name,
+            thumbnail_url: moduleItem.content_details.thumbnail_url,
+            usage_rights: moduleItem.content_details.usage_rights
+          });
+
+        file.url = function(){
+          return "/api/v1/files/" + this.id;
+        }
+
+        var props = {
+          model: file,
+          togglePublishClassOn: $el.parents('.ig-row')[0],
+          userCanManageFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files,
+          usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required
+        }
+
+        React.renderComponent(PublishCloud(props), $el[0]);
+        return {model: file} // Pretending this is a backbone view
+      }
+
+      var model = new PublishableModuleItem({
+        module_type: data.moduleType,
+        content_id: data.contentId,
+        id: data.id,
+        module_id: data.moduleId,
+        module_item_id: data.moduleItemId,
+        course_id: data.courseId,
+        published: data.published,
+        publishable: data.publishable,
+        unpublishable: data.unpublishable
+      });
+
+      var view = new PublishIconView({model: model, el: $el[0]});
+      var row = $el.closest('.ig-row');
+
+      if (data.published) { row.addClass('ig-published'); }
+      // TODO: need to go find this item in other modules and update their state
+      model.on('change:published', function() {
+        view.$el.closest('.ig-row').toggleClass('ig-published', model.get('published'));
+        view.render();
+      });
+      view.render();
+      return view;
+    }
+
+    var moduleItems = {};
+    var updateModuleItem = function(attrs, model) {
+      var i, items, item, parsedAttrs;
+      items = moduleItems[itemContentKey(attrs) || itemContentKey(model)];
+      if (items) {
+        for (i = 0; i < items.length; i++) {
+          item = items[i];
+          parsedAttrs = item.model.parse(attrs);
+          item.model.set({published: parsedAttrs.published});
+        }
+      }
+    };
+
+    var overrideModuleModel = function(model) {
+      var publish = model.publish, unpublish = model.unpublish;
+      model.publish = function() {
+        return publish.apply(model, arguments).done(function(data) {
+          relock_modules_dialog.renderIfNeeded(data);
+          model
+            .fetch({data: {include: 'items'}})
+            .done(function(attrs) {
+              for (var i = 0; i < attrs.items.length; i++)
+                updateModuleItem(attrs.items[i], model);
+            });
+        });
+      };
+      model.unpublish = function() {
+        return unpublish.apply(model, arguments).done(function() {
+          model
+            .fetch({data: {include: 'items'}})
+            .done(function(attrs) {
+              for (var i = 0; i < attrs.items.length; i++)
+                updateModuleItem(attrs.items[i], model);
+            });
+        });
+      };
+    };
+    var overrideItemModel = function(model) {
+      var publish = model.publish, unpublish = model.unpublish;
+      model.publish = function() {
+        return publish.apply(model, arguments).done(function(attrs) {
+          updateModuleItem($.extend({published:true}, attrs), model);
+        });
+      };
+      model.unpublish = function() {
+        return unpublish.apply(model, arguments).done(function(attrs) {
+          updateModuleItem($.extend({published:false}, attrs), model);
+        });
+      };
+    };
+    var overrideModel = function(model, view) {
+      var contentKey = itemContentKey(model);
+      if (contentKey === null)
+        overrideModuleModel(model);
+      else
+        overrideItemModel(model);
+
+      moduleItems[contentKey] || (moduleItems[contentKey] = []);
+      moduleItems[contentKey].push({model: model, view: view});
+    };
+
+    $('.publish-icon:visible').each(function(index, el) {
+      var view = initPublishButton($(el));
+      overrideModel(view.model, view);
     });
 
-    var view = new PublishIconView({model: model, el: $el[0]});
-    var row = $el.closest('.ig-row');
-
-    if (data.published) { row.addClass('ig-published'); }
-    // TODO: need to go find this item in other modules and update their state
-    model.on('change:published', function() {
-      view.$el.closest('.ig-row').toggleClass('ig-published', model.get('published'));
+    $('.module-publish-link').each(function(i, element){
+      var $el = $(element);
+      var model = new Publishable({ published: $el.hasClass('published'), id: $el.attr('data-id') }, { url: $el.attr('data-url'), root: 'module' });
+      var view = new PublishButtonView({model: model, el: $el});
       view.render();
     });
-    view.render();
-    return view;
   }
 
   var content_type_map = {
@@ -1243,76 +1320,11 @@ define([
     }
   }
 
-  var moduleItems = {};
-  var updateModuleItem = function(attrs, model) {
-    var i, items, item, parsedAttrs;
-    items = moduleItems[itemContentKey(attrs) || itemContentKey(model)];
-    if (items) {
-      for (i = 0; i < items.length; i++) {
-        item = items[i];
-        parsedAttrs = item.model.parse(attrs);
-        item.model.set({published: parsedAttrs.published});
-      }
-    }
-  };
-
-  var overrideModuleModel = function(model) {
-    var publish = model.publish, unpublish = model.unpublish;
-    model.publish = function() {
-      return publish.apply(model, arguments).done(function() {
-        model
-          .fetch({data: {include: 'items'}})
-          .done(function(attrs) {
-            for (var i = 0; i < attrs.items.length; i++)
-              updateModuleItem(attrs.items[i], model);
-          });
-      });
-    };
-    model.unpublish = function() {
-      return unpublish.apply(model, arguments).done(function() {
-        model
-          .fetch({data: {include: 'items'}})
-          .done(function(attrs) {
-            for (var i = 0; i < attrs.items.length; i++)
-              updateModuleItem(attrs.items[i], model);
-          });
-      });
-    };
-  };
-  var overrideItemModel = function(model) {
-    var publish = model.publish, unpublish = model.unpublish;
-    model.publish = function() {
-      return publish.apply(model, arguments).done(function(attrs) {
-        updateModuleItem($.extend({published:true}, attrs), model);
-      });
-    };
-    model.unpublish = function() {
-      return unpublish.apply(model, arguments).done(function(attrs) {
-        updateModuleItem($.extend({published:false}, attrs), model);
-      });
-    };
-  };
-  var overrideModel = function(model, view) {
-    var contentKey = itemContentKey(model);
-    if (contentKey === null)
-      overrideModuleModel(model);
-    else
-      overrideItemModel(model);
-
-    moduleItems[contentKey] || (moduleItems[contentKey] = []);
-    moduleItems[contentKey].push({model: model, view: view});
-  };
-
   $(document).ready(function() {
    if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
     }
-
-    $('.publish-icon:visible').each(function(index, el) {
-      var view = initPublishButton($(el));
-      overrideModel(view.model, view);
-    });
 
     $('.external_url_link').click(function() {
       window.location = $(this).attr('data-item-href');
@@ -1531,12 +1543,6 @@ define([
       }
     });
 
-    $('.module-publish-link').each(function(i, element){
-      var $el = $(element);
-      var model = new Publishable({ published: $el.hasClass('published'), id: $el.attr('data-id') }, { url: $el.attr('data-url'), root: 'module' });
-      var view = new PublishButtonView({model: model, el: $el});
-      view.render();
-    });
 
   });
 

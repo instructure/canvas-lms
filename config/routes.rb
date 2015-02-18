@@ -1316,6 +1316,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/modules", action: :create, as: 'course_context_module_create'
       put "courses/:course_id/modules/:id", action: :update, as: 'course_context_module_update'
       delete "courses/:course_id/modules/:id", action: :destroy
+      put "courses/:course_id/modules/:id/relock", action: :relock
     end
 
     scope(controller: :context_module_items_api) do

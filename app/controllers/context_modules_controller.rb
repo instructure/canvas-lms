@@ -425,7 +425,11 @@ class ContextModulesController < ApplicationController
       end
       respond_to do |format|
         if @module.update_attributes(params[:context_module])
-          format.json { render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session}) }
+          format.json do
+            json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
+            json['context_module']['relock_warning'] = true if @module.relock_warning?
+            render :json => json
+          end
         else
           format.json { render :json => @module.errors, :status => :bad_request }
         end
