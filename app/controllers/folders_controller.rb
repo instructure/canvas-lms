@@ -606,7 +606,7 @@ class FoldersController < ApplicationController
         if @attachment.save
           # default to rename on race condition (if a file happened to be created after the check above, and on_duplicate was not given)
           @attachment.handle_duplicates(on_duplicate == 'overwrite' ? :overwrite : :rename)
-          render :json => attachment_json(@attachment, @current_user)
+          render :json => attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
         else
           render :json => @attachment.errors
         end

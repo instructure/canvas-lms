@@ -140,6 +140,7 @@ describe "Files API", type: :request do
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
       expect(response.headers["content-type"]).to eq "text/html; charset=utf-8"
+      expect(response.body).not_to include 'verifier='
     end
 
     it "should fail for an incorrect uuid" do
@@ -199,6 +200,15 @@ describe "Files API", type: :request do
       json = api_call(:get, @files_path, @files_path_options, {})
       res = json.map{|f|f['display_name']}
       expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
+      json.map{|f|f['url']}.each { |url| expect(url).to include 'verifier=' }
+    end
+
+    it "should omit verifiers using session auth" do
+      user_session(@user)
+      get @files_path
+      expect(response).to be_success
+      json = json_parse
+      json.map{|f|f['url']}.each { |url| expect(url).not_to include 'verifier=' }
     end
 
     it "should list files in saved order if flag set" do
@@ -679,13 +689,21 @@ describe "Files API", type: :request do
       unlock = 1.days.from_now
       lock = 3.days.from_now
       new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
-      api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 200)
+      json = api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 200)
+      expect(json['url']).to include 'verifier='
       @att.reload
       expect(@att.display_name).to eq "newname.txt"
       expect(@att.locked).to be_truthy
       expect(@att.hidden).to be_truthy
       expect(@att.unlock_at.to_i).to eq unlock.to_i
       expect(@att.lock_at.to_i).to eq lock.to_i
+    end
+
+    it "should omit verifier in-app" do
+      FilesController.any_instance.stubs(:in_app?).returns(true)
+      new_params = {:locked => 'true'}
+      json = api_call(:put, @file_path, @file_path_options, new_params)
+      expect(json['url']).not_to include 'verifier='
     end
 
     it "should move to another folder" do

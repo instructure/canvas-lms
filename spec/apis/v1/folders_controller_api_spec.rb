@@ -608,6 +608,15 @@ describe "Folders API", type: :request do
       file = Attachment.find(json['id'])
       expect(file.folder).to eq(@dest_folder)
       expect(file.root_attachment).to eq(@source_file)
+      expect(json['url']).to include 'verifier='
+    end
+
+    it "should omit verifier in-app" do
+      FoldersController.any_instance.stubs(:in_app?).returns(true)
+      @dest_context.enroll_teacher @user, enrollment_state: 'active'
+      json = api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
+                      @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param))
+      expect(json['url']).not_to include 'verifier='
     end
 
     context "within context" do
