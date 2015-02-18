@@ -220,9 +220,14 @@ input[type="button"] {
 // Set the backgrounds
 // -------------------------
 
+$ic-brand-button--primary-bgd: $ic-brand-primary !default;
+$ic-brand-button--primary-text: $ic-color-light !default;
+$ic-brand-button--secondary-bgd: $ic-brand-secondary !default;
+$ic-brand-button--secondary-text: $ic-color-light !default;
+
 .btn-primary, // <-- deprecated- do not use
 .Button--primary {
-  @include canvas-button($ic-brand-primary, $ic-color-light);
+  @include canvas-button($ic-brand-button--primary-bgd, $ic-brand-button--primary-text);
   @if $use_high_contrast {
     &:focus { @include button-focus($ic-color-action); }
   }
@@ -245,7 +250,7 @@ input[type="button"] {
 // Info appears as a neutral blue
 .btn-info, // <-- deprecated- do not use
 .Button--secondary {
-  @include canvas-button($ic-brand-secondary, $ic-color-light);
+  @include canvas-button($ic-brand-button--secondary-bgd, $ic-brand-button--secondary-text);
 }
 
 // Inverse appears as dark gray <-- deprecated- do not use
