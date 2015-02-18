@@ -15,13 +15,13 @@ define [
   Dictionary =
     mastery:
       color : '#8bab58'
-      label : I18n.t('mastery', 'mastery')
+      label : I18n.t('Meets Mastery')
     nearMastery:
       color : '#e0d679'
-      label : I18n.t('near_mastery', 'near mastery')
+      label : I18n.t('Near Mastery')
     remedial:
       color : '#dd5c5c'
-      label : I18n.t('remedial', 'remedial')
+      label : I18n.t('Well Below Mastery')
 
   class OutcomeGradebookView extends View
 

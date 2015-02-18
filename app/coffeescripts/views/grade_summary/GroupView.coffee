@@ -53,10 +53,10 @@ define [
 
     statusTooltip: ->
       switch @model.status()
-        when 'undefined' then I18n.t 'undefined', 'Unstarted'
-        when 'remedial' then I18n.t 'remedial', 'Remedial'
-        when 'near' then I18n.t 'near', 'Near mastery'
-        when 'mastery' then I18n.t 'mastery', 'Mastery'
+        when 'undefined' then I18n.t('Unstarted')
+        when 'remedial' then I18n.t('Well Below Mastery')
+        when 'near' then I18n.t('Near Mastery')
+        when 'mastery' then I18n.t('Meets Mastery')
 
     toJSON: ->
       json = super
