@@ -593,6 +593,10 @@ class Message < ActiveRecord::Base
     current_context.root_account
   end
 
+  def custom_logo
+    context_root_account && context_root_account.settings[:email_logo]
+  end
+
   # Internal: Set default values before save.
   #
   # Returns true.
