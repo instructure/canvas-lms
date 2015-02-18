@@ -32,7 +32,7 @@ gem 'barby', '0.5.0'
   gem 'chunky_png', '1.3.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.7'
-  gem 'adobe_connect', '1.0.0'
+  gem 'adobe_connect', '1.0.2'
 gem 'canvas_webex', '0.15'
 gem 'canvas-jobs', '0.9.11'
 gem 'daemons', '1.1.0'
@@ -72,7 +72,7 @@ gem 'mini_magick', '1.3.2'
   gem 'subexec', '0.0.4'
 gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0'
-gem 'nokogiri', '1.5.8'
+gem 'nokogiri', '1.6.6.2'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false
@@ -93,7 +93,7 @@ gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
   gem 'hashie', '2.0.5'
-gem 'sanitize', '2.0.3'
+gem 'sanitize', '2.0.6'
 gem 'shackles', '1.0.7'
 
 gem 'useragent', '0.10.0'
