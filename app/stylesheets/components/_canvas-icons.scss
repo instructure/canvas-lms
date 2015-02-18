@@ -269,20 +269,22 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-quiz-stats-high"></i> icon-quiz-stats-high</span>
   <span class="span3"><i class="icon-quiz-stats-deviation"></i> icon-quiz-stats-deviation</span>
   <span class="span3"><i class="icon-quiz-stats-time"></i> icon-quiz-stats-time</span>
-</div>
-<div class="row-fluid">
   <span class="span3"><i class="icon-cloud-lock"></i> icon-cloud-lock</span>
+</div>
+<div class="row-fluid">  
   <span class="span3"><i class="icon-eye"></i> icon-eye</span>
   <span class="span3"><i class="icon-files-copyright"></i> icon-files-copyright</span>
-</div>
-<div class="row-fluid">
   <span class="span3"><i class="icon-files-creative-commons"></i> icon-files-creative-commons</span>  
   <span class="span3"><i class="icon-files-fair-use"></i> icon-files-fair-use</span>  
-  <span class="span3"><i class="icon-files-obtained-permission"></i>icon-files-obtained-permission</span>  
 </div>
 <div class="row-fluid">
+  <span class="span3"><i class="icon-files-obtained-permission"></i>icon-files-obtained-permission</span>  
   <span class="span3"><i class="icon-files-public-domain"></i> icon-files-public-domain</span>  
   <span class="span3"><i class="icon-tour-info"></i> icon-tour-info</span>
+  <span class="span3"><i class="icon-import"></i> icon-import</span>  
+</div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-export"></i> icon-export</span>
 </div>
 */
 
@@ -425,6 +427,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-end:before { content: "\f12e"; }
 .icon-expand:before { content: "\f12f"; }
 .icon-expand-items:before { content: "\f130"; }
+.icon-export:before { content: "\f1b3"; }
 .icon-export-content:before { content: "\f131"; }
 .icon-eye:before { content: "\f132"; }
 .icon-facebook:before { content: "\f133"; }
@@ -450,6 +453,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-home:before { content: "\f147"; }
 .icon-hour-glass:before { content: "\f148"; }
 .icon-image:before { content: "\f149"; }
+.icon-import:before { content: "\f1b4"; }
 .icon-import-content:before { content: "\f14a"; }
 .icon-indent:before { content: "\f14b"; }
 .icon-indent2:before { content: "\f14c"; }

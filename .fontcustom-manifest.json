@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "7b54209a1163cdf4c2ce19d9da268eeff3a5cc8224f537c9180a7a906de67b67",
-    "current": "7b54209a1163cdf4c2ce19d9da268eeff3a5cc8224f537c9180a7a906de67b67"
+    "previous": "45380a21ad4888c3e12ec343210f29574bc0fee646f29bdba901f509b70eff27",
+    "current": "45380a21ad4888c3e12ec343210f29574bc0fee646f29bdba901f509b70eff27"
   },
   "fonts": [
     "public/font/canvas/canvas-icons.ttf",
@@ -206,6 +206,10 @@
       "codepoint": 61744,
       "source": "public/font/icons/expand-items.svg"
     },
+    "export": {
+      "codepoint": 61875,
+      "source": "public/font/icons/export.svg"
+    },
     "export-content": {
       "codepoint": 61745,
       "source": "public/font/icons/export-content.svg"
@@ -305,6 +309,10 @@
     "image": {
       "codepoint": 61769,
       "source": "public/font/icons/image.svg"
+    },
+    "import": {
+      "codepoint": 61876,
+      "source": "public/font/icons/import.svg"
     },
     "import-content": {
       "codepoint": 61770,
