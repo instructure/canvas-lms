@@ -519,10 +519,9 @@ class Group < ActiveRecord::Base
   end
   private :can_participate?
 
-  # courses lock this down a bit, but in a group, the fact that you are a
-  # member is good enough
   def user_can_manage_own_discussion_posts?(user)
-    true
+    return true unless self.context.is_a?(Course)
+    context.user_can_manage_own_discussion_posts?(user)
   end
 
   def is_a_context?
