@@ -55,7 +55,7 @@ class PluginsController < ApplicationController
   end
 
   protected
-  
+
   def find_plugin_setting
     if @plugin = Canvas::Plugin.find(params[:id])
       @plugin_setting = PluginSetting.find_by_name(@plugin.id)
