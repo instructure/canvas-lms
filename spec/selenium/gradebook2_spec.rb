@@ -168,6 +168,27 @@ describe "gradebook2" do
       expect(@second_assignment.reload).not_to be_muted
     end
 
+    context "unpublished course" do
+      before do
+        @course.claim!
+        get "/courses/#{@course.id}/gradebook2"
+      end
+
+      it "should not allow editing grades" do
+        cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+        expect(cell.text).to eq '10'
+        cell.click
+        expect(ff('.grade', cell)).to be_blank
+      end
+
+      it "should hide mutable actions from the menu" do
+        open_gradebook_settings do |menu|
+          expect(ff("a.gradebook_upload_link", menu)).to be_blank
+          expect(ff("a.set_group_weights", menu)).to be_blank
+        end
+      end
+    end
+
     context "concluded course" do
       before do
         @course.complete!
