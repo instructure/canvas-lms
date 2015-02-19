@@ -25,10 +25,6 @@ describe "grading periods" do
       end
 
       it "should show grading periods created by an associated account" do
-        pending("this test marked as pending until the grading periods API
-                  is changed to return grading periods created at the account
-                  level for a given course (in addition to returning grading periods
-                  created at the course level")
         account_grading_period = create_grading_periods_for(@course.root_account).first
         get "/courses/#{@course.id}/grading_standards"
         expect(f("#period_title_#{account_grading_period.id}").attribute("value")).to eq(account_grading_period.title)

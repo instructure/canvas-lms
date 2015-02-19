@@ -386,7 +386,7 @@ module Api::V1::Assignment
     if update_params.has_key?("grading_standard_id")
       standard_id = update_params.delete("grading_standard_id")
       if standard_id.present?
-        grading_standard = GradingStandard.standards_for(context).where(id: standard_id).first
+        grading_standard = GradingStandard.for(context).where(id: standard_id).first
         assignment.grading_standard = grading_standard if grading_standard
       else
         assignment.grading_standard = nil

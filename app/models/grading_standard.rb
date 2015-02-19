@@ -69,6 +69,12 @@ class GradingStandard < ActiveRecord::Base
     can :manage
   end
 
+  def self.for(context)
+    context_codes = [context.asset_string]
+    context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
+    GradingStandard.active.where(:context_code => context_codes.uniq)
+  end
+
   def version
     read_attribute(:version).presence || 1
   end
@@ -187,12 +193,6 @@ class GradingStandard < ActiveRecord::Base
       res[grade_name] = lower_bound.to_f
     end
     res
-  end
-
-  def self.standards_for(context)
-    context_codes = [context.asset_string]
-    context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
-    GradingStandard.active.where(:context_code => context_codes.uniq)
   end
 
   def standard_data=(params={})

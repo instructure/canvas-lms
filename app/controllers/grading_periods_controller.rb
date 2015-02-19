@@ -68,10 +68,11 @@ class GradingPeriodsController < ApplicationController
   #
   def index
     if authorized_action(@context, @current_user, :read)
-      # inheritance check instead of #get_context?
-      @grading_periods = @context.grading_periods.active.order('start_date')
-      json, meta = paginate_for(@grading_periods)
-      render json: serialize_jsonapi(json, meta)
+      # TODO: inheritance check instead of #get_context?
+      grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
+      paginated_grading_periods, meta = paginate_for(grading_periods)
+
+      render json: serialize_json_api(paginated_grading_periods, meta)
     end
   end
 
@@ -87,8 +88,10 @@ class GradingPeriodsController < ApplicationController
   #
   def show
     @grading_period = @context.grading_periods.active.find(params[:id])
+    # TODO: if there is no grading period found then this action will return
+    #       an empty body which is probably not what we want
     if @grading_period && authorized_action(@grading_period, @current_user, :read)
-      render json: serialize_jsonapi(@grading_period)
+      render json: serialize_json_api(@grading_period)
     end
   end
 
@@ -119,7 +122,7 @@ class GradingPeriodsController < ApplicationController
     @grading_period = grading_period_group.grading_periods.new(grading_period_params)
     if @grading_period && authorized_action(@grading_period, @current_user, :manage)
       if @grading_period.save
-        render json: serialize_jsonapi(@grading_period)
+        render json: serialize_json_api(@grading_period)
       else
         render json: @grading_period.errors, status: :bad_request
       end
@@ -150,7 +153,7 @@ class GradingPeriodsController < ApplicationController
 
     if @grading_period && authorized_action(@grading_period, @current_user, :manage)
       if @grading_period.update_attributes(grading_period_params)
-        render json: serialize_jsonapi(@grading_period)
+        render json: serialize_json_api(@grading_period)
       else
         render json: @grading_period.errors, status: :bad_request
       end
@@ -170,15 +173,15 @@ class GradingPeriodsController < ApplicationController
     end
   end
 
-  protected
+  private
+
   def paginate_for(grading_periods)
-    meta = {}
-    grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))
+    paginated_grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))
     meta[:primaryCollection] = 'grading_periods'
-    return grading_periods, meta
+    [paginated_grading_periods, meta]
   end
 
-  def serialize_jsonapi(grading_periods, meta = {})
+  def serialize_json_api(grading_periods, meta = {})
     grading_periods = Array.wrap(grading_periods)
 
     Canvas::APIArraySerializer.new(grading_periods, {

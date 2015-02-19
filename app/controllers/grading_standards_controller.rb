@@ -29,7 +29,7 @@ class GradingStandardsController < ApplicationController
         :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
         :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard
       })
-      @standards = GradingStandard.standards_for(@context).sorted.limit(100)
+      @standards = GradingStandard.for(@context).sorted.limit(100)
       respond_to do |format|
         format.html { }
         format.json {
@@ -58,7 +58,7 @@ class GradingStandardsController < ApplicationController
   end
 
   def update
-    @standard = GradingStandard.standards_for(@context).find(params[:id])
+    @standard = GradingStandard.for(@context).find(params[:id])
     if authorized_action(@standard, @current_user, :manage)
       @standard.user = @current_user
       respond_to do |format|
@@ -72,7 +72,7 @@ class GradingStandardsController < ApplicationController
   end
 
   def destroy
-    @standard = GradingStandard.standards_for(@context).find(params[:id])
+    @standard = GradingStandard.for(@context).find(params[:id])
     if authorized_action(@standard, @current_user, :manage)
       respond_to do |format|
         if @standard.destroy
@@ -83,4 +83,11 @@ class GradingStandardsController < ApplicationController
       end
     end
   end
+
+  private
+
+  def default_data
+    GradingStandard.default_grading_standard
+  end
+
 end

@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe GradingPeriodsController, type: :request do
+  context "A grading period is associated with an account." do
     before :once do
       @account = Account.default
       account_admin_user(account: @account)
@@ -27,42 +28,7 @@ describe GradingPeriodsController, type: :request do
       @account.grading_periods.last.destroy
     end
 
-  context "A grading period is associated with an account." do
     context "multiple grading periods feature flag turned on" do
-      describe 'GET index' do
-        def get_index(raw = false, data = {}, headers = {})
-          helper = method(raw ? :raw_api_call : :api_call)
-          helper.call(:get,
-                      "/api/v1/accounts/#{@account.id}/grading_periods",
-          { controller: 'grading_periods', action: 'index', format: 'json', account_id: @account.id },
-            data,
-            headers)
-        end
-
-        it "returns all existing grading periods" do
-          json = get_index
-          periods_json = json['grading_periods']
-          expect(periods_json.size).to eq(2)
-
-          periods_json.each do |period|
-            expect(period).to have_key('id')
-            expect(period).to have_key('weight')
-            expect(period).to have_key('start_date')
-            expect(period).to have_key('end_date')
-            expect(period).to have_key('title')
-            expect(period).to have_key('permissions')
-          end
-        end
-
-        it "paginates to the jsonapi standard" do
-          json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
-
-          expect(json).to have_key('meta')
-          expect(json['meta']).to have_key('pagination')
-          expect(json['meta']['primaryCollection']).to eq 'grading_periods'
-        end
-      end
-
       describe 'GET show' do
         before :once do
           @grading_period = @account.grading_periods.first
@@ -185,40 +151,6 @@ describe GradingPeriodsController, type: :request do
       @course.grading_periods.last.destroy
     end
     context "multiple grading periods feature flag turned on" do
-
-      describe 'GET index' do
-        def get_index(raw = false, data = {}, headers = {})
-          helper = method(raw ? :raw_api_call : :api_call)
-          helper.call(:get,
-                      "/api/v1/courses/#{@course.id}/grading_periods",
-          { controller: 'grading_periods', action: 'index', format: 'json', course_id: @course.id },
-            data,
-            headers)
-        end
-
-        it "returns all existing grading periods" do
-          json = get_index
-          periods_json = json['grading_periods']
-          expect(periods_json.size).to eq(2)
-
-          periods_json.each do |period|
-            expect(period).to have_key('id')
-            expect(period).to have_key('weight')
-            expect(period).to have_key('start_date')
-            expect(period).to have_key('end_date')
-            expect(period).to have_key('title')
-            expect(period).to have_key('permissions')
-          end
-        end
-
-        it "paginates to the jsonapi standard" do
-          json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
-
-          expect(json).to have_key('meta')
-          expect(json['meta']).to have_key('pagination')
-          expect(json['meta']['primaryCollection']).to eq 'grading_periods'
-        end
-      end
 
       describe 'GET show' do
         before :once do

@@ -1932,7 +1932,7 @@ class CoursesController < ApplicationController
         standard_id = params[:course].delete :grading_standard_id
         if @course.grants_right?(@current_user, session, :manage_grades)
           if standard_id.present?
-            grading_standard = GradingStandard.standards_for(@course).where(id: standard_id).first
+            grading_standard = GradingStandard.for(@course).where(id: standard_id).first
             @course.grading_standard = grading_standard if grading_standard
           else
             @course.grading_standard = nil

@@ -56,6 +56,8 @@ ENV["RAILS_ENV"] = 'test'
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
 
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
 module RSpec::Rails
