@@ -10,8 +10,7 @@ describe "grading periods" do
 
     context "with Multiple Grading Periods feature on" do
       before(:each) do
-        @course.root_account.allow_feature!(:multiple_grading_periods)
-        @course.account.enable_feature!(:multiple_grading_periods)
+        @course.root_account.enable_feature!(:multiple_grading_periods)
       end
 
       it "should contain a tab for grading periods" do
@@ -19,35 +18,25 @@ describe "grading periods" do
         expect(f(".grading_periods_tab")).to be_displayed
       end
 
-      it "should show grading periods created at the Course-level" do
-        grading_period_group = @course.grading_period_groups.create!
-        grading_period = grading_period_group.grading_periods.create!(title: "Course-level grading period",
-                                                                      start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now)
+      it "should show grading periods created at the course-level" do
+        course_grading_period = create_grading_periods_for(@course).first
         get "/courses/#{@course.id}/grading_standards"
-        expect(f("#period_title_#{grading_period.id}").attribute("value")).to eq("Course-level grading period")
+        expect(f("#period_title_#{course_grading_period.id}").attribute("value")).to eq(course_grading_period.title)
       end
 
-      it "should show grading periods created by an associated Account" do
+      it "should show grading periods created by an associated account" do
         pending("this test marked as pending until the grading periods API
-                  is changed to return grading periods created at the Account
+                  is changed to return grading periods created at the account
                   level for a given course (in addition to returning grading periods
-                  created at the Course level")
-        grading_period_group = @course.root_account.grading_period_groups.create!
-        grading_period = grading_period_group.grading_periods.create!(title: "Account-level grading period",
-                                                                      start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now)
+                  created at the course level")
+        account_grading_period = create_grading_periods_for(@course.root_account).first
         get "/courses/#{@course.id}/grading_standards"
-        expect(f("#period_title_#{grading_period.id}").attribute("value")).to eq("Account-level grading period")
+        expect(f("#period_title_#{account_grading_period.id}").attribute("value")).to eq(account_grading_period.title)
       end
 
       it "should allow grading periods to be deleted" do
         grading_period_selector = '.grading-period'
-        grading_period_group = @course.grading_period_groups.create!
-        grading_period = grading_period_group.grading_periods.create!(title: "Delete me, please!",
-                                                                      start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now,
-                                                                      weight: 1)
+        create_grading_periods_for(@course)
         get "/courses/#{@course.id}/grading_standards"
         expect(ff(grading_period_selector).length).to be 1
 
@@ -74,8 +63,7 @@ describe "grading periods" do
 
     context "with Multiple Grading Periods feature on" do
       before(:each) do
-        @account.allow_feature!(:multiple_grading_periods)
-        @course.account.enable_feature!(:multiple_grading_periods)
+        @account.enable_feature!(:multiple_grading_periods)
       end
 
       it "should contain a tab for grading periods" do
@@ -83,22 +71,16 @@ describe "grading periods" do
         expect(f(".grading_periods_tab")).to be_displayed
       end
 
-      it "should show grading periods created at the Account-level" do
-        grading_period_group = @account.grading_period_groups.create!
-        grading_period = grading_period_group.grading_periods.create!(title: "Account-level grading period",
-                                                                      start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now)
+      it "should show grading periods created at the account-level" do
+        account_grading_period = create_grading_periods_for(@account).first
         get "/accounts/#{@account.id}/grading_standards"
-        expect(f("#period_title_#{grading_period.id}").attribute("value")).to eq("Account-level grading period")
+        expect(f("#period_title_#{account_grading_period.id}").attribute("value")).to eq(account_grading_period.title)
       end
 
-      it "should NOT show grading periods created by Courses under this account" do
-        grading_period_group = @course.grading_period_groups.create!
-        grading_period = grading_period_group.grading_periods.create!(title: "Course-level grading period",
-                                                                      start_date: Time.zone.now,
-                                                                      end_date: 30.days.from_now)
+      it "should NOT show grading periods created by courses under this account" do
+        course_grading_period = create_grading_periods_for(@course).first
         get "/accounts/#{@account.id}/grading_standards"
-        expect(f("#period_title_#{grading_period.id}")).to be_nil
+        expect(f("#period_title_#{course_grading_period.id}")).to be_nil
       end
     end
 

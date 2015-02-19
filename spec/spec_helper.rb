@@ -477,8 +477,33 @@ RSpec.configure do |config|
         account.allow_feature!(:differentiated_assignments)
         @course.enable_feature!(:differentiated_assignments)
       end
+      create_grading_periods_for(@course, opts) if opts[:grading_periods]
     end
     @course
+  end
+
+  def create_grading_periods_for(context, opts={})
+    opts = { mgp_flag_enabled: true }.merge(opts)
+    context.root_account = Account.default if !context.root_account
+    context.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
+    gp_group = context.grading_period_groups.create!
+    class_name = context.class.name.demodulize
+    periods = opts[:grading_periods] || [:current]
+    periods.each.with_index(1) do |timeframe, index|
+      cutoff_dates = {
+        current: { start_date: index.months.ago,
+                   end_date: index.months.from_now },
+        old:     { start_date: (index + 1).months.ago,
+                   end_date: index.months.ago },
+        future:  { start_date: index.months.from_now,
+                   end_date: (index + 1).months.from_now }
+      }
+      period_params = cutoff_dates[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
+      new_period = gp_group.grading_periods.create!(period_params)
+      new_period[:workflow_state] = 'active'
+      new_period.save!
+    end
+    gp_group.grading_periods
   end
 
   def account_with_role_changes(opts={})
@@ -501,8 +526,10 @@ RSpec.configure do |config|
     account_admin_user(opts)
   end
 
-  def account_admin_user(opts={:active_user => true})
+  def account_admin_user(opts={})
+    opts = { active_user: true }.merge(opts)
     account = opts[:account] || Account.default
+    create_grading_periods_for(account, opts) if opts[:grading_periods]
     @user = opts[:user] || account.shard.activate { user(opts) }
     @admin = @user
 
