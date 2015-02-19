@@ -2135,7 +2135,7 @@ class CoursesController < ApplicationController
       # destroy the exising student
       @fake_student = @context.student_view_student
       # but first, remove all existing quiz submissions / submissions
-      Submission.where(quiz_submission_id: @fake_student.quiz_submissions.select(:id)).destroy_all
+      @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.destroy_all
 
       @fake_student.destroy
