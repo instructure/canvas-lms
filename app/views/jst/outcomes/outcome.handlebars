@@ -94,17 +94,26 @@
   </div>
 </div>
 
+{{#if assessed}}
+  <div id="assessed_info_banner" class="alert alert-info">
+    <span>{{#t}}This outcome has been used to assess a student and cannot be edited or deleted{{/t}}</span>
+  </div>
+{{/if}}
+
 {{#unless readOnly}}
   <a href="#" style="float:right" class="move_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
     {{#t}}Move Outcome{{/t}}
   </a>
-    {{#if native}}
-    <a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+
+  {{#if native}}
+    <a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
+      {{#if assessed}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
       {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
     </a>
-    {{/if}}
-  <a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+  {{/if}}
+
+  <a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
+    {{#if assessed}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
     {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
   </a>
 {{/unless}}
-

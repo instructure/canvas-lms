@@ -34,6 +34,10 @@ define [
         "points_possible" : "5"
         "mastery_points" : "3"
         "url" : "blah"
+        "calculation_method" : "decaying_average"
+        "calculation_int" : 65
+        "assessed" : false
+        "can_edit" : true
     $.extend base.outcome, options if options
     base
 
@@ -136,7 +140,7 @@ define [
     equal view.$el.find('#calculation_method').val(), 'decaying_average'
     equal view.$el.find('#calculation_int').val(), '65'
     ok view.$el.find('#calculation_int_left_side').is(':visible')
-    #view.remove()
+    view.remove()
 
   test 'calculation int updates when the calculation method is changed', ->
     view = createView(model: newOutcome('calculation_method' : 'decaying_average', 'calculation_int' : 4), state: 'edit')
@@ -153,4 +157,30 @@ define [
     changeSelectedCalcMethod(view, 'latest')
     equal view.$el.find('#calculation_method').val(), 'latest'
     equal view.$el.find('#calculation_int_example').text(), "Use the most recent score"
+    view.remove()
+
+  test 'edit and delete buttons are disabled for outcomes that have been assessed', ->
+    view = createView(model: newOutcome('assessed' : true, 'native' : true, 'can_edit' : true), state: 'show')
+    ok view.$el.find('.edit_button').length > 0
+    ok view.$el.find('.delete_button').length > 0
+    ok view.$el.find('.edit_button').attr('disabled')
+    ok view.$el.find('.delete_button').attr('disabled')
+    view.remove()
+
+  test 'edit and delete buttons are enabled for outcomes that have not been assessed', ->
+    view = createView(model: newOutcome('assessed' : false, 'native' : true, 'can_edit' : true), state: 'show')
+    ok view.$el.find('.edit_button').length > 0
+    ok view.$el.find('.delete_button').length > 0
+    ok not view.$el.find('.edit_button').attr('disabled')
+    ok not view.$el.find('.delete_button').attr('disabled')
+    view.remove()
+
+  test 'an informative banner is displayed when edit/delete buttons are disabled', ->
+    view = createView(model: newOutcome('assessed' : true, 'native' : true), state: 'show')
+    ok view.$el.find('#assessed_info_banner').length > 0
+    view.remove()
+
+  test 'the banner is not displayed when edit/delete buttons are enabled', ->
+    view = createView(model: newOutcome('assessed' : false, 'native' : true), state: 'show')
+    ok not view.$el.find('#assessed_info_banner').length > 0
     view.remove()
