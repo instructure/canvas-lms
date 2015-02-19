@@ -29,37 +29,6 @@ describe GradingPeriodsController, type: :request do
     end
 
     context "multiple grading periods feature flag turned on" do
-      describe 'GET show' do
-        before :once do
-          @grading_period = @account.grading_periods.first
-        end
-
-        def get_show(raw = false, data = {})
-          helper = method(raw ? :raw_api_call : :api_call)
-          helper.call(:get,
-                      "/api/v1/accounts/#{@account.id}/grading_periods/#{@grading_period.id}",
-          { controller: 'grading_periods', action: 'show', format: 'json',
-            account_id: @account.id,
-            id: @grading_period.id,
-          }, data)
-        end
-
-        it "retrieves the grading period specified" do
-          json = get_show
-          period = json['grading_periods'].first
-          expect(period['id']).to eq(@grading_period.id.to_s)
-          expect(period['weight']).to eq(@grading_period.weight)
-          expect(period['title']).to eq(@grading_period.title)
-          expect(period['permissions']).to eq("read" => true, "manage" => true)
-        end
-
-        it "doesn't return deleted grading periods" do
-          @grading_period.destroy
-          get_show(true)
-          expect(response.status).to eq 404
-        end
-      end
-
       describe 'POST create' do
         def post_create(params, raw=false)
           helper = method(raw ? :raw_api_call : :api_call)

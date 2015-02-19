@@ -18,15 +18,18 @@
 
 class GradingStandard < ActiveRecord::Base
   include Workflow
+
   attr_accessible :title, :standard_data
+
   belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   belongs_to :user
   has_many :assignments
+
 
   EXPORTABLE_ATTRIBUTES = [:id, :title, :data, :context_id, :context_type, :created_at, :updated_at, :user_id, :usage_count, :context_code, :workflow_state, :version]
   EXPORTABLE_ASSOCIATIONS = [:context, :user, :assignments]
 
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   validates_presence_of :context_id, :context_type, :workflow_state, :data
   validate :valid_grading_scheme_data
 

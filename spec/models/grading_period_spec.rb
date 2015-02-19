@@ -61,7 +61,7 @@ describe GradingPeriod do
     it { is_expected.to be_destroyed }
   end
 
-  describe "#for" do
+  describe ".for" do
 
     context "when context is an account" do
       let(:account) { Account.new }
@@ -83,6 +83,20 @@ describe GradingPeriod do
         finder.expects(:grading_periods).once
         GradingPeriod.for(course)
       end
+    end
+  end
+
+  describe ".context_find" do
+    let(:account) { mock }
+    let(:finder) { mock }
+    let(:grading_period) { mock }
+    let(:id) { 1 }
+
+    it "delegates" do
+      grading_period.expects(:id).returns(1)
+      GradingPeriod.expects(:for).with(account).returns([grading_period])
+
+      expect(GradingPeriod.context_find(context: account, id: id)).to eq grading_period
     end
   end
 

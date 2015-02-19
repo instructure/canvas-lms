@@ -29,6 +29,11 @@
 #           "example": 1023,
 #           "type": "integer"
 #         },
+#         "title": {
+#           "description": "The title for the grading period.",
+#           "example": "First Block",
+#           "type": "string"
+#         },
 #         "start_date": {
 #           "description": "The start date of the grading period.",
 #           "example": "2014-01-07T15:04:00Z",
@@ -68,7 +73,6 @@ class GradingPeriodsController < ApplicationController
   #
   def index
     if authorized_action(@context, @current_user, :read)
-      # TODO: inheritance check instead of #get_context?
       grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
       paginated_grading_periods, meta = paginate_for(grading_periods)
 
@@ -87,11 +91,12 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def show
-    @grading_period = @context.grading_periods.active.find(params[:id])
-    # TODO: if there is no grading period found then this action will return
-    #       an empty body which is probably not what we want
-    if @grading_period && authorized_action(@grading_period, @current_user, :read)
-      render json: serialize_json_api(@grading_period)
+    params_id = params[:id].to_i
+    grading_period = GradingPeriod.context_find(context: @context, id: params_id)
+    fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
+
+    if authorized_action(grading_period, @current_user, :read)
+      render json: serialize_json_api(grading_period)
     end
   end
 

@@ -27,8 +27,19 @@ class GradingPeriod < ActiveRecord::Base
     joins(:grading_period_group).where(grading_period_groups: context_with_ids)
   }
 
+  # Takes a context and returns an Array (not an ActiveRecord::Relation)
   def self.for(context)
     "GradingPeriod::#{context.class}GradingPeriodFinder".constantize.new(context).grading_periods
+  end
+
+  # the keyword arguemnts version of this method is as follow:
+  # def self.context_find(context: context, id: id)
+  def self.context_find(options = {}) # in preperation for keyword arguments
+    fail ArgumentCountError unless options.count == 2
+    fail ArgumentError unless context = options.fetch(:context)
+    fail ArgumentError unless id = options.fetch(:id)
+
+    self.for(context).detect { |grading_period| grading_period.id == id }
   end
 
   # save the previous definition of `destroy` and alias it to `destroy!`

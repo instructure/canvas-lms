@@ -18,37 +18,37 @@
 require_relative '../spec_helper'
 
 describe GradingPeriodsController do
+  let(:root_account) { Account.default }
+  let(:sub_account) { root_account.sub_accounts.create! }
+
+  let(:create_grading_periods) { -> (context, start) {
+      context.grading_period_groups.create!
+             .grading_periods.create!(weight: 1,
+                                      start_date: start,
+                                      end_date: (Time.zone.now + 10.days))
+    }
+  }
+
+  let(:remove_while) { -> (string) {
+      string.sub(%r{^while\(1\);}, '')
+    }
+  }
+
+  before do
+    account_admin_user(account: sub_account)
+    user_session(@admin)
+
+    root_account.allow_feature!(:multiple_grading_periods)
+    root_account.enable_feature!(:multiple_grading_periods)
+
+    create_grading_periods.call(root_account, 3.days.ago)
+    create_grading_periods.call(sub_account, Time.zone.now)
+  end
+
   describe "GET index" do
-    let(:root_account) { Account.default }
-    let(:sub_account) { root_account.sub_accounts.create! }
-
-    let(:create_grading_periods) { ->(context, start) {
-        context.grading_period_groups.create!
-               .grading_periods.create!(weight: 1,
-                                        start_date: start,
-                                        end_date: (Time.zone.now + 10.days))
-      }
-    }
-
-    let(:remove_while) { ->(string) {
-        string.sub(%r{^while\(1\);}, '')
-      }
-    }
-
-    before do
-      account_admin_user(account: sub_account)
-      user_session(@admin)
-
-      root_account.allow_feature!(:multiple_grading_periods)
-      root_account.enable_feature!(:multiple_grading_periods)
-
-      create_grading_periods.call(root_account, 3.days.ago)
-      create_grading_periods.call(sub_account, Time.zone.now)
-    end
-
     context "when context is a sub account" do
       before do
-        get :index, {account_id: sub_account.id}
+        get :index, { account_id: sub_account.id }
         @json = JSON.parse(remove_while.call(response.body))
       end
 
@@ -73,12 +73,36 @@ describe GradingPeriodsController do
 
         create_grading_periods.call(course, 5.days.ago)
 
-        get :index, {course_id: course.id}
+        get :index, { course_id: course.id }
         @json = JSON.parse(remove_while.call(response.body))
       end
 
       it "contains three grading periods" do
         expect(@json['grading_periods'].count).to eql 3
+      end
+    end
+  end
+
+  describe "GET show" do
+
+    context "when context is a sub account" do
+      it "contains one grading periods" do
+        get :show, { account_id: sub_account.id, id: sub_account.grading_periods.first.id }
+        @json = JSON.parse(remove_while.call(response.body))
+        expect(@json['grading_periods'].count).to eql 1
+      end
+    end
+
+    context "when context is a course" do
+      let(:course) { Course.create!(account: sub_account) }
+      let(:grading_period) { create_grading_periods.call(course, 5.days.ago) }
+      let(:root_grading_period) { root_account.grading_periods.first }
+
+      it "matches ids" do
+        get :show, { course_id: course.id, id: root_grading_period.id }
+        json = JSON.parse(remove_while.call(response.body))
+        period = json['grading_periods'].first
+        expect(period['id']).to eq root_grading_period.id.to_s
       end
     end
   end
