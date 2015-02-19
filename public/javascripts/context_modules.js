@@ -419,7 +419,7 @@ define([
         $item.fillTemplateData({
           data: data,
           id: 'context_module_item_' + data.id,
-          hrefValues: ['id', 'context_module_id']
+          hrefValues: ['id', 'context_module_id', 'content_id']
         });
         for(var idx = 0; idx < 10; idx++) {
           $item.removeClass('indent_' + idx);
