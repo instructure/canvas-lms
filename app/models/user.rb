@@ -773,16 +773,22 @@ class User < ActiveRecord::Base
 
   def gmail
     res = gmail_channel.path rescue nil
-    res ||= self.user_services.
-        where(service_domain: "google.com").
-        limit(1).pluck(:service_user_id).first
+    res ||= google_drive_address
+    res ||= google_docs_address
     res || email
   end
 
   def google_docs_address
-    self.user_services.
-        where(service: 'google_docs').
-        limit(1).pluck(:service_user_id).first
+    google_service_address('google_docs')
+  end
+
+  def google_drive_address
+    google_service_address('google_drive')
+  end
+
+  def google_service_address(service_name)
+    self.user_services.where(service: service_name)
+      .limit(1).pluck(service_name == 'google_drive' ? :service_user_name : :service_user_id).first
   end
 
   def email=(e)

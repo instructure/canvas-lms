@@ -131,7 +131,7 @@ describe UsersController do
       settings_mock.stubs(:settings).returns({})
       authorization_mock = mock('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
       drive_mock = mock('drive_mock', about: mock(get: nil))
-      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id'}))
+      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id', 'user' => {'emailAddress' => 'blah@blah.com'}}))
       client_mock.stubs(:authorization).returns(authorization_mock)
       GoogleDrive::Client.stubs(:create).returns(client_mock)
 
@@ -143,6 +143,7 @@ describe UsersController do
 
       service = UserService.where(user_id: @user, service: 'google_drive', service_domain: 'drive.google.com').first
       expect(service.service_user_id).to eq 'permission_id'
+      expect(service.service_user_name).to eq 'blah@blah.com'
       expect(service.token).to eq 'refresh_token'
       expect(service.secret).to eq 'access_token'
       expect(session[:oauth_gdrive_nonce]).to be_nil
