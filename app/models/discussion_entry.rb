@@ -40,6 +40,9 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :editor, :class_name => 'User'
   has_one :external_feed_entry, :as => :asset
 
+  has_many :attachment_associations, :as => :context
+  has_many :attachments, :through => :attachment_associations
+
   before_create :infer_root_entry_id
   after_save :update_discussion
   after_save :context_module_action_later

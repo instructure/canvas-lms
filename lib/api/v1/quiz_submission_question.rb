@@ -99,10 +99,26 @@ module Api::V1::QuizSubmissionQuestion
       data[:flagged] = to_boolean(qs.submission_data["question_#{qq.id}_marked"])
       data[:answer] = answer_serializer.deserialize(qs.submission_data, true)
     else
-      question_data = qs.submission_data.select {|h| h[:question_id] == qq.id}
-      return data if question_data.empty?
+      submission_data = qs.submission_data.select {|h| h[:question_id] == qq.id}
+      return data if submission_data.empty?
+
+      submission_data = submission_data.first
+      question = qq.question_data
+
+      case question["question_type"]
+        when "multiple_choice_question"
+          data[:answer] = submission_data[:answer_id]
+        when "multiple_answers_question"
+          data[:answer] = question.answers.each_with_object([]) do |a, out|
+            key = ["answer", a[:id]].join("_").to_sym
+            if ActiveRecord::ConnectionAdapters::Column.value_to_boolean(submission_data[key])
+              out << a[:id]
+            end
+          end
+      end
+      
       data[:flagged] = false
-      data[:correct] = question_data.first[:correct]
+      data[:correct] = submission_data[:correct]
     end
     data
   end

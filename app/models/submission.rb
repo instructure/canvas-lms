@@ -251,6 +251,26 @@ class Submission < ActiveRecord::Base
 
     given do |user|
       self.assignment &&
+        self.assignment.context &&
+        user &&
+        self.user &&
+        (
+          self.assignment.context.student_enrollments.where(
+            user_id: user,
+            associated_user_id: self.user,
+            workflow_state: 'active'
+          ).exists?  ||
+          self.assignment.context.teacher_enrollments.where(
+            user_id: user,
+            associated_user_id: self.user,
+            workflow_state: 'active'
+          ).exists?
+        )
+    end
+    can :read and can :read_comments and can :comment
+
+    given do |user|
+      self.assignment &&
         !self.assignment.muted? &&
         self.assignment.context &&
         user &&

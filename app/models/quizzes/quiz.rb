@@ -1187,6 +1187,14 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def publish
+    # If already published, the beforesave trigger won't fire because
+    # the workflow state won't have changed
+    if self.published? && self.unpublished_changes?
+      Rails.logger.info "Quiz #{self.id} forced to republish"
+      self.generate_quiz_data
+      self.published_at = Time.zone.now
+    end
+
     self.workflow_state = 'available'
   end
 

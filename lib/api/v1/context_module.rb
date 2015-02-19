@@ -38,6 +38,11 @@ module Api::V1::ContextModule
       hash['completed_at'] = progression.completed_at
     end
     has_update_rights = context_module.grants_right?(current_user, :update)
+
+    if has_update_rights && ! progression
+      progression = context_module.context_module_progressions
+    end
+
     hash['published'] = context_module.active? if has_update_rights
     tags = context_module.content_tags_visible_to(@current_user,
       opts.slice(
@@ -133,7 +138,18 @@ module Api::V1::ContextModule
     if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }
       ch = { 'type' => criterion[:type] }
       ch['min_score'] = criterion[:min_score] if criterion[:type] == 'min_score'
-      ch['completed'] = !!(progression.requirements_met.present? && progression.requirements_met.detect{|r|r[:type] == criterion[:type] && r[:id] == content_tag.id}) if progression
+
+      if progression
+        if progression.is_a? ContextModuleProgression
+          ch['completed'] = !!(progression.requirements_met.present? && progression.requirements_met.detect{|r|r[:type] == criterion[:type] && r[:id] == content_tag.id})
+        else
+          ch['completed'] = {}
+          
+          progression.map do |p|
+            ch['completed'][p.user.id] = !!(p.requirements_met.present? && p.requirements_met.detect{|r|r[:type] == criterion[:type] && r[:id] == content_tag.id})
+          end
+        end
+      end
       hash['completion_requirement'] = ch
     end
 

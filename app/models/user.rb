@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
 
   # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
-    col = table ? "#{table}.sortable_name" : 'sortable_name'
+    col = table ? "#{table}.sortable_name" : 'users.sortable_name'
     best_unicode_collation_key(col)
   end
 

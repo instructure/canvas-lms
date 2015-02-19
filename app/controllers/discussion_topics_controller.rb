@@ -864,7 +864,8 @@ class DiscussionTopicsController < ApplicationController
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement pinned
-                                group_category_id allow_rating only_graders_can_rate sort_by_rating).freeze
+                                group_category_id allow_rating only_graders_can_rate sort_by_rating
+                                attachments).freeze
 
   def process_discussion_topic(is_new = false)
     @errors = {}
@@ -881,13 +882,16 @@ class DiscussionTopicsController < ApplicationController
     prior_version = @topic.generate_prior_version
     process_podcast_parameters(discussion_topic_hash)
 
-    if is_new
-      @topic.user = @current_user
-    elsif discussion_topic_hash.except(*%w{pinned}).present? # don't update editor if the only thing that changed was the pinned status
-      @topic.editor = @current_user
+    if params[:user_id] && authorized_action(@context, @current_user, :manage_content)
+      user = User.find(params[:user_id])
+      @topic.user = user
+    else
+      user = @current_user
     end
-    @topic.current_user = @current_user
-    @topic.content_being_saved_by(@current_user)
+
+    @topic.send(is_new ? :user= : :editor=, user)
+    @topic.current_user = user
+    @topic.content_being_saved_by(user)
 
     if discussion_topic_hash.has_key?(:message)
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
@@ -1056,29 +1060,41 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def apply_attachment_parameters
-    # handle creating/removing attachment
-    if @topic.grants_right?(@current_user, session, :attach)
-      attachment = params[:attachment] &&
-                   params[:attachment].size > 0 &&
-                   params[:attachment]
+    return unless params[:attachment] &&
+                  @topic.grants_right?(@current_user, session, :attach)
 
-      return if attachment && attachment.size > 1.kilobytes &&
-        quota_exceeded(@context, named_context_url(@context, :context_discussion_topics_url))
+    attachments = params[:attachment].is_a?(Array) ? params[:attachment] : [params[:attachment]]
 
-      if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
-        @topic.transaction do
-          att = @topic.attachment
-          @topic.attachment = nil
-          @topic.save! if !@topic.new_record?
-          att.destroy
+    if quota_exceeded(@context, named_context_url(@context, :context_discussion_topics_url))
+      attachments.each { |attachment| return if attachment.size > 1.kilobytes }
+    end
+
+    if params.has_key?(:remove_attachment)
+      @topic.transaction do
+        att = @topic.attachments
+        @topic.attachment = nil
+        @topic.attachments = []
+        @topic.save! if !@topic.new_record?
+        att.each { |a| a.destroy }
+      end
+    else
+      attachments.each do |attachment|
+        next unless attachment
+
+        if attachment.is_a?(Hash) && attachment.has_key?(:id)
+          att = Attachment.find(attachment[:id])
+          next unless att.user == @current_user
+        else
+          next if attachment.size == 0
+          att = @context.attachments.create!(:uploaded_data => attachment, :user => @current_user)
         end
+
+        @attachment ||= att
+        @topic.attachments << att
       end
 
-      if attachment
-        @attachment = @context.attachments.create!(:uploaded_data => attachment)
-        @topic.attachment = @attachment
-        @topic.save
-      end
+      @topic.attachment = @attachment
+      @topic.save
     end
   end
 

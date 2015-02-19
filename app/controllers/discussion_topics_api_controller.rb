@@ -603,15 +603,40 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def save_entry
-    has_attachment = params[:attachment].present? && params[:attachment].size > 0 &&
-      @entry.grants_right?(@current_user, session, :attach)
-    return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobytes &&
-      quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+    if params.has_key?(:attachment)
+      attachments = params[:attachment].is_a?(Array) ? params[:attachment] : [params[:attachment]]
+
+      if attachments.length > 0 &&
+         quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+        attachments.each { |a| return if a.size > 1.kilobytes }
+      end
+    else
+      attachments = nil
+    end
+
     if @entry.save
       @entry.update_topic
       log_asset_access(@topic, 'topics', 'topics', 'participate')
-      if has_attachment
-        @attachment = (@current_user || @context).attachments.create(:uploaded_data => params[:attachment])
+      @entry.context_module_action
+
+      if attachments && attachments.length > 0 &&
+         @entry.grants_right?(@current_user, session, :attach)
+
+        attachments.each do |uploaded|
+          next unless uploaded
+
+          if uploaded.is_a?(Hash) && uploaded.has_key?(:id)
+            a = Attachment.find(uploaded[:id])
+            next unless a.user == @current_user
+          else
+            next if uploaded.size == 0
+            a = (@current_user || @context).attachments.create(:uploaded_data => uploaded, :user => @current_user)
+          end
+
+          @entry.attachments << a
+          @attachment ||= a
+        end
+
         @entry.attachment = @attachment
         @entry.save
       end

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= conversation_url(asset.conversation_id) %>
+  <%= root_url(protocol: 'https') + Bocce.link(asset) %>
 <% end %>
 
 <% define_content :user_name do %>
@@ -7,12 +7,12 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %>
+  <%= t :subject, "%{user_name} just sent you a message.", :user_name => content(:user_name) %>
 <% end %>
 
 <% define_content :footer_link do %>
   <a href="<%= content :link %>">
-    <%= t :view_message, "View this message in Conversations" %>
+    <%= t :view_message, "View this conversation" %>
   </a>
 <% end %>
 
@@ -23,11 +23,7 @@
 
 <%= asset.body %>
 
-<% if asset.has_media_objects? %>
-  <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
-<% else %>
-  <%= t("You can reply to this message in Canvas by replying directly to this email, or by clicking this link: %{link}.", link: content(:link)) %>
-<% end %>
+<%= content :link %>
 
 <% unless asset.attachments.empty? %>
   <%= t :attached_files, "Attached Files:" %>

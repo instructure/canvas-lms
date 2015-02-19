@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id, anchor: "entry-#{asset.id}") %>
+  <%= root_url(protocol: 'https') + Bocce.link(asset) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -13,10 +13,6 @@
 <% end %>
 
 <p><%= t :body, "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %></p>
-
-<p>
-<%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
-</p>
 
 <% if avatar_enabled? %>
   <table border="0" style="border-collapse: collapse">
@@ -33,26 +29,12 @@
               <b><%= author_short_name%></b>
             </td>
           </tr>
-          <tr>
-            <td valign="top" align="left">
-              <a href="mailto:<%= author_email_address %>">
-                <%= author_email_address%>
-              </a>
-            </td>
-          </tr>
         </table>
       </td>
     </tr>
   </table>
-<% else %>
-  <p height="30px"></p>
-  <p>
-    <b><%= author_short_name%></b>
-    <br/>
-    <a href="mailto:<%= author_email_address %>">
-      <%= author_email_address%>
-    </a>
-  </p>
 <% end %>
 
-<p><%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %></p>
+<p>
+<%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
+</p>

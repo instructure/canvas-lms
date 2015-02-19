@@ -1,62 +1,222 @@
-<html>
-<body style="background-color: #FFFFFF;">
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title></title>
 
-<center>
-  <table cellpadding="8" cellspacing="0" style="margin: 0; padding: 0; width:728px;" border="0">
-    <tr>
-      <td valign="top">
-        <table cellpadding="0" cellspacing="0" align="center" style="background-color: #ffffff;">
-          <tr>
-            <td>
-              <table cellpadding="0" cellspacing="0" style="" border="0" align="center">
-                <tr>
-                  <td colspan="3" height="36"></td>
-                </tr>
-                <tr>
-                  <td width="36"></td>
-                  <td width="454" style="font-size: 14px; color: #444444; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif'; border-collapse: collapse;" align="left" valign="top">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<style type="text/css">
+  /* FONTS */
+    @media screen {
+           @font-face {
+          font-family: 'Avenir';
+          font-style: normal;
+          font-weight: 400;
+          src: local('Avenir'), local('Avenir'), url(https://fonts.gstatic.com/s/Avenir/v11/qIIYRU-oROkIk8vfvxw6QvesZW2xOQ-xsNqO47m55DA.woff) format('woff');
+        }
+        
+        @font-face {
+          font-family: 'Avenir Black';
+          font-style: normal;
+          font-weight: 700;
+          src: local('Avenir Black'), local('Avenir-Black'), url(https://fonts.gstatic.com/s/Avenir/v11/qdgUG4U09HnJwhYI-uK18wLUuEpTyoUstqEm5AMlJo4.woff) format('woff');
+        }
+        
+        @font-face {
+          font-family: 'Avenir';
+          font-style: italic;
+          font-weight: 400;
+          src: local('Avenir Italic'), local('Avenir-Italic'), url(https://fonts.gstatic.com/s/Avenir/v11/RYyZNoeFgb0l7W3Vu1aSWOvvDin1pK8aKteLpeZ5c0A.woff) format('woff');
+        }
+        
+        @font-face {
+          font-family: 'Avenir';
+          font-style: italic;
+          font-weight: 700;
+          src: local('Avenir Bold Italic'), local('Avenir-BoldItalic'), url(https://fonts.gstatic.com/s/Avenir/v11/HkF_qI1x_noxlxhrhMQYELO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
+    }
+    }
+    
+    /* CLIENT-SPECIFIC STYLES */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; }
 
-                    <%= inner_html %>
+    /* RESET STYLES */
+    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    table { border-collapse: collapse !important; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
 
-                  </td>
-                  <td width="36"></td>
+    /* iOS BLUE LINKS */
+    a[x-apple-data-detectors] {
+        color: inherit !important;
+        text-decoration: none !important;
+        font-size: inherit !important;
+        font-family: inherit !important;
+        font-weight: inherit !important;
+        line-height: inherit !important;
+    }
+    
+  /* MOBILE STYLES */
+  @media screen and (max-width:600px){
+    h1 {
+      font-size: 32px !important;
+      line-height: 32px !important;
+    }
+  }
+
+    /* ANDROID CENTER FIX */
+    div[style*="margin: 16px 0;"] { margin: 0 !important; }
+</style>
+</head>
+<body style="background-color: #EFF1F2; margin: 0 !important; padding: 0 !important;">
+
+<!-- HIDDEN PREHEADER TEXT -->
+<div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Avenir', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
+</div>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <!-- LOGO -->
+    <tbody><tr>
+        <td bgcolor="#ee243c" align="center">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                <tbody><tr>
+                    <td align="center" valign="top" style="padding: 40px 10px 40px 10px;">
+                        <a href="https://online.berklee.edu/?pid=7371" target="_blank">
+                            <img alt="Logo" src="https://online.berklee.edu/assets/berklee-white-inverse-logo.png?v=2" width="40" style="display: block; width:40px; max-width: 40px; min-width: 40px; font-family: 'Avenir', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
+                        </a>
+                    </td>
                 </tr>
-                <tr>
-                  <td colspan="3" height="36"></td>
-                </tr>
-              </table>
+            </tbody>
+          </table>
+            <!--[if (gte mso 9)|(IE)]>
             </td>
-          </tr>
-        </table>
-        <table cellpadding="0" cellspacing="0" align="center" border="0" style="background-color: #ffffff;">
-          <tr>
-            <td height="60"></td>
-          </tr>
-          <tr>
-            <td align="center"> <img src="<%= custom_logo || "https://lh3.googleusercontent.com/D1pgZeJZrBFc_n_EnEWpj9BQpVUaQ6xj2FYl1ZaxhDN4c-x8X69DqfJ258Eb0u7sXyuvYI533FkaCouBv6131tpxMbd1CpjZDEMr2kN4t8_Epitm77c" %>" alt=""></td>
-          </tr>
-          <tr>
-            <td height="15"></td>
-          </tr>
-          <tr>
-            <td style="padding: 0; border-collapse: collapse;">
-              <table cellpadding="0" cellspacing="0" align="center" border="0">
-                <tr style="font-size: 11px; color: #a8b9c6; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
-                  <% if !content(:footer_link).blank? %>
-                    <td width="375" align="center">
-                    <%= content(:footer_link).html_safe %></td>
-                    <td width="50" align="center"> | </td>
-                  <% end %>
-                  <td width="375" align="center"><a href="<%= communication_profile_url %>">
-                    <%= t 'click_to_preferences', "Update your notification settings" %></a></td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </td>
+            </tr>
+            </table>
+            <![endif]-->
+        </td>
     </tr>
-  </table>
-</center>
-</body>
-</html>
+    <!-- HERO -->
+    <tr>
+        <td bgcolor="#ee243c" align="center" style="padding: 0px 10px 0px 10px;">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                <tbody><tr>
+                    <td bgcolor="#ffffff" align="left" valign="top" style="padding: 30px 30px 00px 30px; border-radius: 2px 2px 0px 0px; color: #111111; font-family:'Avenir', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">
+                    </td>
+                </tr>
+            </tbody></table>
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+        </td>
+    </tr>
+    <!-- COPY BLOCK -->
+    <tr>
+        <td bgcolor="#EFF1F2" align="center" style="padding: 0px 0px 0px 0px;">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+              <!-- COPY -->
+              <tbody><tr>
+                <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 30px 30px; color: #666; font-family:  Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+                  <%= inner_html %>
+                </td>
+              </tr>
+            <!--Button-->
+              <% if content(:footer_link) %>
+              <tr>
+                    <td bgcolor="#ffffff" align="center" style="padding: 30px 30px 30px 30px; color: #666666; font-family: 'Avenir', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+                      <table border="0" cellspacing="0" cellpadding="0">
+                          <tbody><tr>
+                              <td align="center" style="border-radius: 26px;" bgcolor="#ffffff ">
+                                  <span style="font-size: 16px; font-family: Open Sans, Helvetica, Arial, sans-serif; color: #666; text-decoration: none; border-radius: 3px; background-color: none; padding: 8px 16px; border: 1px solid #666; display: block;">
+                                    <%= content(:footer_link).html_safe %>
+                                  </span>
+                              </td>
+                          </tr>
+                      </tbody></table>
+                  </td>       
+              </tr>
+              <% end %>
+              <!-- End Button-->
+              <tr>
+                <td align="left" bgcolor="#ffffff" style="padding: 0px 30px 0px 0px; color: #111111; font-family: 'Avenir', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">&nbsp;</td>
+              </tr>
+              <!-- COPY -->
+            </tbody></table>
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+        </td>
+  </tr>
+    <!-- SUPPORT CALLOUT -->
+    <tr>
+        <td bgcolor="#EFF1F2" align="center" style="padding: 30px 10px 0px 10px;">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+        </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr>
+        <td bgcolor="#EFF1F2" align="center" style="padding: 0px 10px 0px 10px;">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+              <!-- SOCIAL -->
+              <tbody>
+              <!-- CONTACT -->
+              <tr>
+                <td bgcolor="#EFF1F2" align="center" style="padding: 0px 30px 30px 30px; color: #666666; font-family: 'Avenir', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">
+                  <p style="margin: 0;">Need Assistance?<br>
+                    <a href="tel:18662375533" style="text-decoration: none; color:#666666;">1-866-BERKLEE (USA)</a><br>
+                    <a href="tel:16177472146" style="text-decoration: none; color:#666666;">+1-617-747-2146</a> (INTL)<br> 
+                    <a href="mailto:advisors@online.berklee.edu" style="color: #111111; font-weight: 700;">advisors@online.berklee.edu</a></p>
+                </td>
+              </tr>
+              <!-- ADDRESS -->
+              <tr>
+                <td bgcolor="#EFF1F2" align="center" style="padding: 0px 30px 30px 30px; color: #666666; font-family: 'Avenir', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">
+                  <p style="margin: 0;"><strong>Berklee College of Music</strong><br>
+                    1140 Boylston St. | Boston, MA 02215 <br>
+                    Berklee College of Music is fully accredited by the New England Association of Schools and Colleges (NEASC).</p>
+                </td>
+              </tr>
+            </tbody></table>
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+        </td>
+    </tr>
+</tbody></table>
+
+
+</body></html>

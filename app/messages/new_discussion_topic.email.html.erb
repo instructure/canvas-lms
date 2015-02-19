@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset]) %>
+  <%= root_url(protocol: 'https') + Bocce.link(asset) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -16,7 +16,7 @@
 
 <p><strong><%= asset.title %></strong></p>
 
-<%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
+<%= html_to_simple_html(asset.message, :base_url => root_url) %>
 
 <% if asset.attachment %>
   <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">

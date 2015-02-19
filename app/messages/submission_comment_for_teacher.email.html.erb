@@ -17,7 +17,7 @@
          :user => asset.submission.user.short_name,
          :assignment => asset.submission.assignment.title %></p>
 
-<%= format_message(asset.comment).first %>
+<%= html_to_simple_html(asset.comment, :base_url => dashboard_url) %>
 
 <% if avatar_enabled? %> 
   <table border="0" style="border-collapse: collapse">
@@ -67,7 +67,7 @@
   <p style="margin: 0px;"><%= t "#messages.conversation_message.email.attached_files", "Attached Files:" %></p>
   <ul style="padding-left: 20px;">
     <% asset.attachments.each do |attachment| %>
-    <li><a href="<%= file_download_url(attachment) %>"><%= attachment.display_name %> - <%= attachment.readable_size %></a></li>
+    <li><a href="<%= file_download_url(attachment, verifier: attachment.uuid) %>"><%= attachment.display_name %> - <%= attachment.readable_size %></a></li>
     <% end %>
   </ul>
 </div>

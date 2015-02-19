@@ -49,7 +49,7 @@ class WikiPage < ActiveRecord::Base
   before_save :default_submission_values,
     if: proc { self.context.try(:feature_enabled?, :conditional_release) }
   before_save :set_revised_at
-  before_validation :ensure_unique_title
+  before_validation :ensure_unique_url
   after_save  :touch_wiki_context
   after_save  :update_assignment,
     if: proc { self.context.try(:feature_enabled?, :conditional_release) }

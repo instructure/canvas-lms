@@ -1,0 +1,15 @@
+common: &default_settings
+  license_key: 1234
+  app_name: Canvas
+  agent_enabled: false
+  log_level: info
+
+development:
+  agent_enabled: false
+
+test:
+  <<: *default_settings
+  monitor_mode: false
+
+production:
+  <<: *default_settings

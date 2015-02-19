@@ -49,7 +49,7 @@ class DiscussionTopic < ActiveRecord::Base
     TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
   end
 
-  attr_readonly :context_id, :context_type, :user_id
+  attr_readonly :context_id, :context_type
 
   has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy
   has_many :rated_discussion_entries, -> { order(
@@ -67,6 +67,9 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :discussion_entry_participants, :through => :discussion_entries
 
   belongs_to :user
+
+  has_many :attachment_associations, :as => :context
+  has_many :attachments, :through => :attachment_associations
 
   validates_presence_of :context_id, :context_type
   validates_inclusion_of :discussion_type, :in => DiscussionTypes::TYPES

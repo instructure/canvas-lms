@@ -1001,9 +1001,11 @@ class ConversationsController < ApplicationController
         @current_user.all_conversations.sent
       when 'archived'
         @current_user.conversations.archived
-      else
-        params[:scope] = 'inbox'
+      when 'inbox'
         @current_user.conversations.default
+      else
+        params[:scope] = 'all'
+        @current_user.all_conversations
     end
 
     filters = param_array(:filter)

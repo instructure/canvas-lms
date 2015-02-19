@@ -139,7 +139,7 @@ class SubmissionsController < ApplicationController
   API_SUBMISSION_TYPES = {
     "online_text_entry" => ["body"].freeze,
     "online_url" => ["url"].freeze,
-    "online_upload" => ["file_ids"].freeze,
+    "online_upload" => ["file_ids", "body"].freeze,
     "media_recording" => ["media_comment_id", "media_comment_type"].freeze,
     "basic_lti_launch" => ["url"].freeze
   }.freeze

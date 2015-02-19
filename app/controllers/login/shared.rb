@@ -53,12 +53,11 @@ module Login::Shared
       elsif session[:course_uuid] && user &&
           (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
         claim_session_course(course, user)
-        format.html { redirect_to(course_url(course, :login_success => '1')) }
+        format.html { redirect_to(course_url(course)) }
       elsif session[:confirm]
         format.html do
           redirect_to(registration_confirmation_path(session.delete(:confirm),
                                                      enrollment: session.delete(:enrollment),
-                                                     login_success: 1,
                                                      confirm: (user.id == session.delete(:expected_user_id) ? 1 : nil)))
         end
       else
@@ -66,7 +65,7 @@ module Login::Shared
         # assumed that if that URL is found rather than using the default,
         # they must have cookies enabled and we don't need to worry about
         # adding the :login_success param to it.
-        format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
+        format.html { redirect_back_or_default(dashboard_url()) }
       end
       format.json { render :json => pseudonym.as_json(:methods => :user_code), :status => :ok }
     end

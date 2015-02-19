@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= conversation_url(asset.conversation_id) %>
+  <%= root_url(protocol: 'https') + Bocce.link(asset) %>
 <% end %>
 
 <% define_content :user_name do %>
@@ -7,7 +7,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %>
+  <%= t :subject, "%{user_name} just sent you a message.", :user_name => content(:user_name) %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -22,9 +22,7 @@
 </h4>
 <% end %>
 
-<p>
-  <%= format_message(asset.body).first %>
-</p>
+<p><%= html_to_simple_html(asset.body, :base_url => dashboard_url) %></p>
 
 <% if avatar_enabled? %>
   <table border="0" style="border-collapse: collapse">
@@ -62,14 +60,6 @@
     </a>
   </p>
 <% end %>
-
-<% if asset.has_media_objects? %>
-<p><%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %></p>
-<% else %>
-<p><%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email." %></p>
-<% end %>
-
-
 
 <% unless asset.attachments.empty? %>
 <div style="margin-top: 20px; padding: 10px; background-color: #f3f3f3;">

@@ -93,7 +93,14 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def serialize_additional_topic_fields(topic, context, user, opts={})
-    attachments = topic.attachment ? [attachment_json(topic.attachment, user)] : []
+    if topic.attachments.present?
+      attachments = topic.attachments.map { |a| attachment_json(a, user) }
+    elsif topic.attachment.present?
+      attachments = [attachment_json(topic.attachment, user)]
+    else
+      attachments = []
+    end
+
     html_url    = named_context_url(context, :context_discussion_topic_url,
                                     topic, include_host: true)
     url         = if topic.podcast_enabled?
@@ -188,13 +195,23 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def discussion_entry_attachment(entry, user, context)
-    return {} unless entry.attachment
     url_options = {}
     url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
-    json = {attachment: attachment_json(entry.attachment, user, url_options)}
-    json[:attachments] = [json[:attachment]]
 
-    json
+    if entry.attachments.present?
+      attachments = entry.attachments.map { |a| attachment_json(a, user, url_options) }
+    elsif entry.attachment.present?
+      attachments = [attachment_json(entry.attachment, user, url_options)]
+    else
+      attachments = []
+    end
+
+    return {} if attachments.empty?
+
+    {
+      attachment: attachments.first,
+      attachments: attachments
+    }
   end
 
   # Internal: Serialize a DiscussionEntry's read state.

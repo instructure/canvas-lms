@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset]) %>
+  <%= root_url(protocol: 'https') + Bocce.link(asset) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -14,12 +14,14 @@
 
 <%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
 
-<% if asset.attachment %>
+<% if asset.attachments.present? %>
 <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
-  <p style="margin: 0px;"><%= t :attached_file, "Attached File" %></p>
+  <p style="margin: 0px;"><%= t :attached_file, "Attached File" + ( (asset.attachments.length > 1) ? "s" : "" ) %></p>
+
   <ul style="padding-left: 20px;">
-    <li><%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
-      <%= polymorphic_url([asset.context, :file_download], file_id: asset.attachment) %>
+    <% asset.attachments.each do |attachment| %>
+      <li><a href="<%= file_download_url(attachment, verifier: attachment.uuid) %>"><%= attachment.display_name %> - <%= attachment.readable_size %></a></li>
+    <% end %>
   </ul>
 </div>
 <% end %>

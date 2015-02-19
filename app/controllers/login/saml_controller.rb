@@ -26,6 +26,12 @@ class Login::SamlController < ApplicationController
   before_filter :fix_ms_office_redirects, only: :new
 
   def new
+    reset_session_for_login
+
+    if params.has_key? :return_to
+      session[:return_to] = params[:return_to]
+    end
+
     auth_redirect(aac)
   end
 

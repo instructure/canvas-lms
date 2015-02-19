@@ -342,7 +342,9 @@ class ActiveRecord::Base
     "#{value} LIKE #{pattern}"
   end
 
+  # PG 9.2 dies at the CAST(LOWER(replace...))
   def self.best_unicode_collation_key(col)
+    return col
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
       # Postgres just defers to the C library which is different for each platform. The best

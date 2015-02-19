@@ -216,8 +216,15 @@ class SubmissionComment < ActiveRecord::Base
 
   def attachments
     return Attachment.none unless attachment_ids.present?
-    ids = attachment_ids.split(",").map(&:to_i)
-    attachments = submission.assignment.attachments.where(id: ids)
+    # PRM: Canvas wants to limit comment attachments to those already associated
+    # with the assignment, or some such nonsense.  We need arbitrary attachments,
+    # so this change just accepts whatever is in the attachment_ids field and
+    # returns those objects.
+    return Attachment.find((attachment_ids || "").split(","))
+    ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
+    attachments = associated_attachments
+    attachments += submission.assignment.attachments rescue []
+    attachments.select { |a| ids.include?(a.id) }
   end
 
   def self.preload_attachments(comments)

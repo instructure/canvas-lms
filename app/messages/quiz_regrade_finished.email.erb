@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= course_quiz_url(asset.quiz.context, asset.quiz) %>
+  <%= root_url(protocol: 'https') + Bocce.link(asset) %>
 <% end %>
 
 <% define_content :subject do %>

@@ -1055,7 +1055,7 @@ class Attachment < ActiveRecord::Base
 
     given { |user|
       owner = self.user
-      context_type == 'Assignment' && user == owner
+      user == owner
     }
     can :attach_to_submission_comment
   end

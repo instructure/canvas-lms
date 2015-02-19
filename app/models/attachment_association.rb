@@ -18,6 +18,6 @@
 
 class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
-  belongs_to :context, polymorphic: [:conversation_message, :submission, :course, :group]
+  belongs_to :context, polymorphic: [:conversation_message, :submission, :course, :group, :discussion_topic, :discussion_entry]
   attr_accessible :attachment, :context
 end

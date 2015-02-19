@@ -230,7 +230,15 @@ class ContextModuleItemsApiController < ApplicationController
       scope = mod.content_tags_visible_to(@student || @current_user)
       scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
       items = Api.paginate(scope, self, route)
-      prog = @student ? mod.evaluate_for(@student) : nil
+
+      if @student
+        prog = mod.evaluate_for(@student)
+      elsif authorized_action(@context, @current_user, :update)
+        prog = mod.context_module_progressions
+      else
+        prog = nil
+      end
+
       includes = Array(params[:include])
       opts = {}
 

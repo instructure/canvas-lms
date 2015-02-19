@@ -150,6 +150,10 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  concern :bocce do
+    get 'join_chat', controller: :bocce, action: :join_chat
+  end
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -402,6 +406,8 @@ CanvasRails::Application.routes.draw do
     delete 'test_student' => 'courses#reset_test_student'
     get 'content_migrations' => 'content_migrations#index'
     get 'link_validator' => 'courses#link_validator', :as => :link_validator
+
+    concerns :bocce
   end
 
   get 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', as: :quiz_statistics_download, download: '1'
