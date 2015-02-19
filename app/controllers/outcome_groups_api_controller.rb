@@ -176,10 +176,20 @@ class OutcomeGroupsApiController < ApplicationController
     return unless can_read_outcomes
 
     url = polymorphic_url [:api_v1, @context, :outcome_group_links]
+
     links = @context.learning_outcome_links.preload(:learning_outcome_content).order(:id)
     links = Api.paginate(links, self, url)
+
+    outcome_params = params.slice(:outcome_style, :outcome_group_style)
+
+    unless params["outcome_style"] == "abbrev"
+      outcome_ids = links.map(&:content_id)
+      ret = LearningOutcomeResult.uniq.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+      # ret is now a list of outcomes that have been assessed
+      outcome_params[:assessed_outcomes] = ret
+    end
+
     render json: links.map { |link|
-      outcome_params = params.slice(:outcome_style, :outcome_group_style)
       outcome_link_json(link, @current_user, session, outcome_params)
     }
   end

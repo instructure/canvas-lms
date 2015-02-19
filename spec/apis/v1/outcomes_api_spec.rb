@@ -36,23 +36,27 @@ describe "Outcomes API", type: :request do
 
   def outcome_json(outcome=@outcome, presets={})
     retval = {
-      "id"          => presets[:id]           || outcome.id,
-      "context_id"  => presets[:context_id]   || outcome.context_id,
-      "context_type"=> presets[:context_type] || outcome.context_type,
-      "title"       => presets[:title]        || outcome.title,
-      "display_name"=> presets[:display_name] || outcome.display_name,
-      "url"         => presets[:url]          || api_v1_outcome_path(:id => outcome.id),
-      "vendor_guid" => presets[:vendor_guid]  || outcome.vendor_guid,
-      "can_edit"    => presets[:can_edit]     || true,
-      "description" => presets[:description]  || outcome.description
+      "id"                 => presets[:id]                 || outcome.id,
+      "context_id"         => presets[:context_id]         || outcome.context_id,
+      "context_type"       => presets[:context_type]       || outcome.context_type,
+      "title"              => presets[:title]              || outcome.title,
+      "display_name"       => presets[:display_name]       || outcome.display_name,
+      "url"                => presets[:url]                || api_v1_outcome_path(:id => outcome.id),
+      "vendor_guid"        => presets[:vendor_guid]        || outcome.vendor_guid,
+      "can_edit"           => presets[:can_edit]           || true,
+      "description"        => presets[:description]        || outcome.description,
+      "assessed"           => presets[:assessed]           || outcome.assessed?,
+      "calculation_method" => presets[:calculation_method] || outcome.calculation_method,
     }
 
+    if %w[decaying_average n_mastery].include?(retval["calculation_method"])
+      retval["calculation_int"] = presets[:calculation_int] || outcome.calculation_int
+    end
+
     if criterion = outcome.data && outcome.data[:rubric_criterion]
-      retval["calculation_method"] = presets[:calculation_method] || outcome.calculation_method
-      retval["calculation_int"]    = presets[:calculation_int]    || outcome.calculation_int
-      retval["points_possible"]    = presets[:points_possible]    || criterion[:points_possible].to_i
-      retval["mastery_points"]     = presets[:mastery_points]     || criterion[:mastery_points].to_i
-      retval["ratings"]            = presets[:ratings]            || criterion[:ratings].map{ |d| d.stringify_keys }
+      retval["points_possible"] = presets[:points_possible] || criterion[:points_possible].to_i
+      retval["mastery_points"]  = presets[:mastery_points]  || criterion[:mastery_points].to_i
+      retval["ratings"]         = presets[:ratings]         || criterion[:ratings].map{ |d| d.stringify_keys }
     end
 
     return retval
@@ -205,13 +209,13 @@ describe "Outcomes API", type: :request do
           "context_id" => @account.id,
           "context_type" => "Account",
           "calculation_method" => "highest",
-          "calculation_int" => nil,
           "title" => @outcome.title,
           "display_name" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
           "vendor_guid" => "vendorguid9000",
           "can_edit" => true,
-          "description" => @outcome.description
+          "description" => @outcome.description,
+          "assessed" => false
         })
       end
 
@@ -246,7 +250,7 @@ describe "Outcomes API", type: :request do
           "points_possible" => 5,
           "mastery_points" => 3,
           "calculation_method" => "highest",
-          "calculation_int" => nil,
+          "assessed" => false,
           "ratings" => [
             { "points" => 5, "description" => "Exceeds Expectations" },
             { "points" => 3, "description" => "Meets Expectations" },
@@ -382,13 +386,13 @@ describe "Outcomes API", type: :request do
           "context_id" => @account.id,
           "context_type" => "Account",
           "calculation_method" => "highest",
-          "calculation_int" => nil,
           "vendor_guid" => "vendorguid9000",
           "title" => "New Title",
           "display_name" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
           "can_edit" => true,
-          "description" => "New Description"
+          "description" => "New Description",
+          "assessed" => false
         })
       end
 
@@ -616,6 +620,29 @@ describe "Outcomes API", type: :request do
         :description => "Description of my outcome",
         :vendor_guid => "vendorguid9000"
       )
+    end
+
+    describe "show" do
+      context "properly reports whether it has been assessed" do
+        it "reports not being assessed" do
+          json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'show',
+                       :id => @outcome.id.to_s,
+                       :format => 'json')
+          expect(json).to eq(outcome_json(@outcome, { :assessed => false } ))
+        end
+
+        it "reports being assessed" do
+          assess_outcome(@outcome)
+          json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'show',
+                       :id => @outcome.id.to_s,
+                       :format => 'json')
+          expect(json).to eq(outcome_json(@outcome, { :assessed => true } ))
+        end
+      end
     end
 
     describe "update" do
