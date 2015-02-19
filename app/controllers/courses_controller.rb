@@ -1777,7 +1777,7 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # @argument account_id [Required, Integer]
+  # @argument course[account_id] [Required, Integer]
   #   The unique ID of the account to create to course under.
   #
   # @argument course[name] [String]
