@@ -193,14 +193,25 @@ describe "announcements" do
     end
 
     it "should create a delayed announcement" do
-      skip("193")
       get course_announcements_path(@course)
       create_announcement_option('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
       datepicker_next
       f('.ui-datepicker-time .ui-datepicker-ok').click
       expect_new_page_load { submit_form('.form-actions') }
-      expect(f('.discussion-fyi')).to include_text('This topic will not be visible')
+      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
+    end
+
+    it "allows creating a delayed announcement with an attachment" do
+      get course_announcements_path(@course)
+      create_announcement_option('input[type=checkbox][name=delay_posting]')
+      f('.ui-datepicker-trigger').click
+      datepicker_next
+      f('.ui-datepicker-time .ui-datepicker-ok').click
+      name, path, data = get_file('testfile1.txt')
+      f('#discussion_attachment_uploaded_data').send_keys(path)
+      expect_new_page_load { submit_form('.form-actions') }
+      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
     end
 
     it "should add and remove an external feed to announcements" do

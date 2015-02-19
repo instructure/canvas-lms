@@ -33,11 +33,10 @@ define [
           attr
         else if !_.isEmpty(attr) and (_.isArray(attr) or typeof attr is 'object')
           toForm(attr, key, _.isArray(attr))
+        else if !"#{key}".match(/^_/) and attr? and attr instanceof Date
+          $("<input/>", { name: key, value: attr.toISOString() })[0]
         else if !"#{key}".match(/^_/) and attr? and typeof attr isnt 'object' and typeof attr isnt 'function'
-          $el = $ "<input/>",
-            name: key
-            value: attr
-          $el[0]
+          $("<input/>", { name: key, value: attr })[0]
       _.flatten(inputs)
     $form = $("""
       <form enctype='multipart/form-data' target='#{iframeId}' action='#{htmlEscape options.url ? model.url()}' method='POST'>
