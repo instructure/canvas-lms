@@ -52,13 +52,13 @@
         <span class="ui-buttonset">
           <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
             <a class="gradebook_upload_link ui-button" href="#">
-              <i class="icon-gradebook-import"></i>
+              <i class="icon-import"></i>
               <%= t('upload_scores', 'Import') %>
             </a>
           <% end %>
 
           <a class="ui-button" id=download_csv href="<%= context_url(@context, :context_gradebook_url) %>.csv">
-            <i class="icon-gradebook-export"></i>
+            <i class="icon-export"></i>
             <%= t('download_scores', 'Export') %>
           </a>
         </span>
