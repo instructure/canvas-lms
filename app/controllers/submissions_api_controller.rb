@@ -299,7 +299,7 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
 
-    if params[:grading_period_id] && multiple_grading_periods?
+    if params[:grading_period_id].presence && multiple_grading_periods?
       assignments = GradingPeriod.find(params[:grading_period_id]).assignments(assignment_scope)
     else
       assignments = assignment_scope.all

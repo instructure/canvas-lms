@@ -76,6 +76,15 @@ describe AssignmentGroupsController do
         expect(response).to be_success
       end
     end
+
+    context "multiple grading periods feature enabled" do
+      it "should not throw an error when grading_period_id is passed in as empty string" do
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+        user_session(@teacher)
+        get 'index', :course_id => @course.id, :include => ["assignments", "assignment_visibility"], :grading_period_id => "", :format => :json
+        expect(response).to be_success
+      end
+    end
   end
 
   describe "POST 'reorder'" do

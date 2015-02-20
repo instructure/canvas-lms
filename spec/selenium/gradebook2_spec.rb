@@ -8,6 +8,13 @@ describe "gradebook2" do
       gradebook_data_setup
     end
 
+    it "should load the gradebook when the multiple grading periods feature is enabled and no grading periods have been created" do
+      @course.root_account.enable_feature!(:multiple_grading_periods)
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      expect(f('#gradebook-grid-wrapper')).to be_displayed
+    end
+
     it "hides unpublished/shows published assignments" do
       assignment = @course.assignments.create! title: 'unpublished'
       assignment.unpublish
