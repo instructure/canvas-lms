@@ -5427,7 +5427,6 @@ fa-IR:
       formatting: "در حال قالب بندی، کلید down را برای انتخاب فشار دهید"
       rte_help: "قسمت دارای متن غنی. ALT F10 را برای نوار ابزار فشار دهید. ALT F8 را برای راهنمایی فشار دهید."
   either_the_url_or_domain_should_be_set_c29cf8c1: "نشانی اینترنتی یا دامنه باید تعیین شود."
-  element_option_missing_error_an_element_to_attach__be433478: "خطای مفقود بودن گزینه «عنصر»: یک عنصر برای وصل کردن نمای مرورگر درخت TreeBrowserView به آن، باید در هنگام تنظیم گزینه ارائه به «درست» برای نمای مرورگر درخت BBTreeBrowserView تعیین گردد"
   email: 
     default_from_name: "نرم افزار کانواس شرکت Instructure"
   email_is_invalid_e0d982eb: "پست اکترونیکی معتبر نیست!"
