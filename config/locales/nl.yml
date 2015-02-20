@@ -11479,11 +11479,9 @@ nl:
       students_who_got_a_certain_score: 
         one: "Een cursist heeft een score van %{score}% behaalt."
         other: "%{count} cursisten hebben een score van %{score}% behaald."
-        zero: "Geen enkele cursist heeft een score van {score}% behaalt."
       students_who_scored_in_a_range: 
         one: "Een cursist heeft een score tussen %{start}  en %{end}%."
         other: "%{count} cursisten hebben een score tussen %{start} en %{end}%."
-        zero: "Geen enkele cursist heeft een score tussen {start} en %{end}%."
       table_description: "Samenvattingsstatistieken over alles wat is ingeleverd"
     title: Toetsstatistieken
     unknown_answer: "Iets anders"
