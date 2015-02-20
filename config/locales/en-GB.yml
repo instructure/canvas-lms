@@ -4836,7 +4836,7 @@ en-GB:
       tomorrow: Tomorrow
       yesterday: Yesterday
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
+      date_at_time: "%b %-d at %k:%M"
       default: "%d/%m/%Y"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
@@ -14353,8 +14353,8 @@ en-GB:
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: " %d %B, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "less than a minute ago"
     pm: pm
     ranges: 
