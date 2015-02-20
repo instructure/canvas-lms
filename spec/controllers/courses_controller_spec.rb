@@ -1197,6 +1197,40 @@ describe CoursesController do
       @course.reload
       expect(@course.account_id).to eq account2.id
     end
+
+    describe "touching content when public visibility changes" do
+      before :each do
+        user_session(@teacher)
+        @assignment = @course.assignments.create!(:name => "name")
+        @time = 1.day.ago
+        Assignment.where(:id => @assignment).update_all(:updated_at => @time)
+
+        @assignment.reload
+        expect(@assignment.updated_at).to eq @time
+      end
+
+      it "should touch content when is_public is updated" do
+        put 'update', :id => @course.id, :course => { :is_public => true }
+
+        @assignment.reload
+        expect(@assignment.updated_at).to_not eq @time
+      end
+
+      it "should touch content when is_public_to_auth_users is updated" do
+        put 'update', :id => @course.id, :course => { :is_public_to_auth_users => true }
+
+        @assignment.reload
+        expect(@assignment.updated_at).to_not eq @time
+      end
+
+      it "should not touch content when neither is updated" do
+        put 'update', :id => @course.id, :course => { :name => "name" }
+
+        @assignment.reload
+        expect(@assignment.updated_at).to eq @time
+      end
+    end
+
   end
 
   describe "POST 'unconclude'" do
