@@ -2,11 +2,12 @@ define [
   'jquery'
   'Backbone'
   'underscore'
+  'i18n!content_migrations'
   'jst/content_migrations/subviews/CourseFindSelect'
   'jst/courses/autocomplete_item'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
-], ($, Backbone, _, template, autocompleteItemTemplate) ->
+], ($, Backbone, _, I18n, template, autocompleteItemTemplate) ->
   class CourseFindSelectView extends Backbone.View
     @optionProperty 'current_user_id', 'show_select'
     template: template
@@ -14,6 +15,7 @@ define [
     els: 
       '#courseSearchField'   : '$courseSearchField'
       '#courseSelect'        : '$courseSelect'
+      '#courseSelectWarning' : '$selectWarning'
 
     events: 
       'change #courseSelect' : 'updateSearch'
@@ -118,6 +120,11 @@ define [
     # @api private
 
     setSourceCourseId: (id) ->
+      if id == ENV.COURSE_ID?.toString()
+        @$selectWarning.show()
+      else
+        @$selectWarning.hide()
+
       @model.set('settings', {source_course_id: id})
       if course = _.find(@courses, (c) -> c.id == id)
         @trigger 'course_changed', course
@@ -138,7 +145,6 @@ define [
       unless settings?.source_course_id
         errors.courseSearchField = [
           type: "required"
-          message: "You must select a course to copy content from"
+          message: I18n.t("You must select a course to copy content from")
         ]
-
       errors

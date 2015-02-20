@@ -5,7 +5,7 @@
 #group_categories_tabs {
   margin: 0 -1em -1em;
   > .collectionViewItems {
-    padding: 10px 0 0 1em;
+    padding: 10px 130px 0 1em;
   }
   > .tab-panel {
     position: relative;
@@ -19,7 +19,6 @@
 }
 .group-categories-actions {
   height: 36px;
-  padding-bottom: 10px;
   z-index: 1;
   position: relative;
 }

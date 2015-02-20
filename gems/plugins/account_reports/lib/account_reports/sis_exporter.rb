@@ -387,7 +387,7 @@ module AccountReports
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
-          headers = ['course_id', 'user_id', 'role', 'section_id', 'status', 'associated_user_id']
+          headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id', 'status', 'associated_user_id']
         else
           headers = []
           headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -395,6 +395,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
           headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
           headers << I18n.t('#account_reports.report_header_role', 'role')
+          headers << I18n.t('#account_reports.report_header_role_id', 'role_id')
           headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
           headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
           headers << I18n.t('#account_reports.report_header_status', 'status')
@@ -458,6 +459,7 @@ module AccountReports
             row << e.user_id unless @sis_format
             row << e.pseudonym_sis_id
             row << e.sis_role
+            row << e.role_id
             row << e.course_section_id unless @sis_format
             row << e.course_section_sis_id
             row << e.enroll_state

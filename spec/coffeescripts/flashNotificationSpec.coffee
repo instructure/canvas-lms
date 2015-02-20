@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'compiled/jquery.rails_flash_notifications'
 ], ($) ->

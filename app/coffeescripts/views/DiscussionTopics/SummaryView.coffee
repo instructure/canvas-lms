@@ -18,11 +18,21 @@ define [
     events:
       'change .toggleSelected' : 'toggleSelected'
       'click' : 'openOnClick'
+      'click .icon-lock':  'toggleLocked'
+      'click .icon-trash': 'onDelete'
+
+    els:
+      '.discussion-actions .al-trigger' : '$gearButton'
+
+    # Public: I18n translations.
+    messages:
+      confirm: I18n.t('Are you sure you want to delete this announcement?')
 
     initialize: ->
       super
       @model.on 'change reset', @render, this
       @model.on 'destroy', @remove, this
+      @prevEl = null
 
     toJSON: ->
       json = super
@@ -52,6 +62,43 @@ define [
       @model.selected = !@model.selected
       @model.trigger 'change:selected'
       @$el.toggleClass 'selected', @model.selected
+
+    toggleLocked: (e) =>
+      e.preventDefault()
+      e.stopPropagation()
+      locked = !@model.get('locked')
+      pinned = if locked then false else @model.get('pinned')
+      @model.save({locked: locked, pinned: pinned}, { success: (model, response, options) =>
+        @$gearButton.focus()
+      })
+
+    onDelete: (e) =>
+      e.preventDefault()
+      e.stopPropagation()
+      if confirm(@messages.confirm)
+        @preservePrevItem()
+        @delete()
+        @goToPrevItem()
+      else
+        @$gearButton.focus()
+
+    delete: ->
+      @model.destroy()
+      @$el.remove()
+
+    preservePrevItem: ->
+      prevEl = @$el.prev()
+      if prevEl.length != 0
+        @prevEl = prevEl.data("id")
+      else
+        @prevEl = null
+
+    goToPrevItem: ->
+      if @prevEl
+        prevEl = $(".discussion-topic[data-id=\"#{@prevEl}\"]")
+        prevEl.find('.al-trigger').focus()
+      else
+        $("#searchTerm").focus()
 
     openOnClick: (event) ->
       window.location = @model.get('html_url') unless $(event.target).closest(':focusable, label').length

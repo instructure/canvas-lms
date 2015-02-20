@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 1
+Warning: replacing bad NMTOKEN "5309" with "RESPONSE_5309"
+Warning: replacing bad NMTOKEN "239" with "RESPONSE_239"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: replacing bad NMTOKEN "239_fb" with "FEEDBACK_239_fb"
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="ic4fa222080e0acadc1a93a1b847fadab"
+ title="true false"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="10" />
+<instructureField name="question_type" value="true_false_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response1" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>Generating QTI is 
+<strong>super</strong> awesome!</p>
+<p>
+</p>
+<p>oh, and &amp;amp;</p>
+<choiceInteraction responseIdentifier="response1" shuffle="false" maxChoices="1">
+<simpleChoice identifier="RESPONSE_5309" fixed="true">
+<p>true</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_239" fixed="true">
+<p>false</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="response1"/><baseValue baseType="identifier">false</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_239_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response1"/><baseValue baseType="identifier">false</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_239_fb">
+<p>You're an idiot.</p></modalFeedback>
+</assessmentItem>

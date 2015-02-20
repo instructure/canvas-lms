@@ -1,3 +1,6 @@
+$listViewHeaderBackground:      $ic-color-neutral;
+$listViewHeaderBackgroundLight: $ic-bg-light-neutral;
+
 #groups {
 
   /*== Icons ==*/
@@ -27,14 +30,14 @@
   /*== Assignment groups ==*/
   .assignment_group {
     background: $lightBackground;
-    border: 1px solid $listBorderColor;
+    border: 1px solid $ic-border-light;
     margin-bottom: 16px;
   }
 
   .group_header {
     @include clearfix;
     @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground, $gray);
-    border-bottom: 1px solid $listBorderColor;
+    border-bottom: 1px solid $ic-border-light;
     padding: 4px 12px;
     text-shadow: none;
     .name {
@@ -339,7 +342,7 @@
   a {
     display: block;
     margin-top: 3px;
-    color: $right_side_text_color;
+    color: $ic-font-color-dark;
     padding-left: 5px;
   }
 }

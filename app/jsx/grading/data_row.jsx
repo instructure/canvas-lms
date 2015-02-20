@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'react',
+  'old_unsupported_dont_use_react',
   'i18n!external_tools'
 ],
 function(React, I18n) {

@@ -195,21 +195,23 @@ describe "calendar2" do
       end
 
       it "should have a working today button" do
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#month').click
-        wait_for_ajaximations
+        load_month_view
+        date = Time.now.strftime("%-d")
 
-        #Check for highlight to be present on this month
-        expect(f(".fc-state-highlight")).not_to be_nil
+        # Check for highlight to be present on this month
+        # this class is also present on the mini calendar so we need to make
+        #   sure that they are both present
+        expect(ff(".fc-state-highlight").size).to eq 2
 
         # Switch the month and verify that there is no highlighted day
         change_calendar
-        expect(f(".fc-state-highlight")).to be_nil
+        expect(ff(".fc-state-highlight").size).to eq 0
 
         # Go back to the present month. Verify that there is a highlighted day
         change_calendar(:today)
-        expect(f(".fc-state-highlight")).not_to be_nil
+        expect(ff(".fc-state-highlight").size).to eq 2
+        # Check the date in the second instance which is the main calendar
+        expect(ffj(".fc-state-highlight")[1].text).to include(date)
       end
 
       it "should show the location when clicking on a calendar event" do

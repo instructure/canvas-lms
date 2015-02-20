@@ -7,8 +7,7 @@ module DataFixup::MoveScribdDocsToRootAttachments
         ra = a.root_attachment
         # bad data!
         next unless ra
-        # choose the latest inline view
-        ra.last_inline_view = [a.last_inline_view, ra.last_inline_view].compact.max
+
         # if the root doesn't have a scribd doc, move it over
         if !ra.scribd_doc
           ra.scribd_doc = a.scribd_doc

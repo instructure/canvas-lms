@@ -96,7 +96,7 @@ describe "admin settings tab" do
           f("#account_settings_self_enrollment option[value=#{value}]").click
         end
         click_submit
-        expect(Account.default[:settings][:self_enrollment]).to eq value
+        expect(Account.default[:settings][:self_enrollment]).to eq value.presence
         expect(f("#account_settings_self_enrollment")).to have_value value
       end
 
@@ -272,8 +272,8 @@ describe "admin settings tab" do
         replace_content(f("#account_settings_equella_endpoint"), "")
         replace_content(f("#account_settings_equella_teaser"), "")
         click_submit
-        expect(Account.default.settings[:equella_endpoint]).to eq ""
-        expect(Account.default.settings[:equella_teaser]).to eq ""
+        expect(Account.default.settings[:equella_endpoint]).to be_nil
+        expect(Account.default.settings[:equella_teaser]).to be_nil
         expect(fj("#account_settings_equella_endpoint:visible")).to be_nil
         expect(fj("#account_settings_equella_teaser:visible")).to be_nil
       end

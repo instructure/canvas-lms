@@ -301,7 +301,7 @@ class Quizzes::QuizzesApiController < ApplicationController
           scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
         end
 
-        unless is_authorized_action?(@context, @current_user, :manage_assignments)
+        unless @context.grants_right?(@current_user, session, :manage_assignments)
           scope = scope.available
         end
 

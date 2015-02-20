@@ -49,7 +49,7 @@ define([
   };
 
   store.fetch = function () {
-    var url = this.getState().links.next || ENV.CONTEXT_BASE_URL + '/app_center/apps?per_page=' + PER_PAGE;
+    var url = this.getState().links.next || '/api/v1' + ENV.CONTEXT_BASE_URL + '/app_center/apps?per_page=' + PER_PAGE;
     this.setState({ isLoading: true });
     $.ajax({
       url: url,

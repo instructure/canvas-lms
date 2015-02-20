@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'report_generated.email' do
   it "should render" do
     @object = Account.default.account_reports.create!(user: User.create!)
+    @object.attachment = attachment_model
     @object.update_attribute :workflow_state, :complete
     generate_message(:report_generated, :email, @object)
   end

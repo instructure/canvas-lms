@@ -281,6 +281,8 @@ module AttachmentFu # :nodoc:
         res = self.create_or_update_thumbnail(tmp, target_size.to_s, actual_size)
       rescue AWS::S3::Errors::NoSuchKey => e
         logger.warn("error when trying to make thumbnail for attachment_id: #{self.id} (the image probably doesn't exist on s3) error details: #{e.inspect}")
+      rescue ThumbnailError => e
+        logger.warn("error creating thumbnail for attachment_id #{self.id}: #{e.inspect}")
       ensure
         tmp.unlink if tmp
       end
@@ -393,10 +395,12 @@ module AttachmentFu # :nodoc:
     end
 
     def find_existing_attachment_for_md5
-      if self.md5.present? && ns = self.infer_namespace
-        scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
-        scope = scope.where("id<>?", self) unless new_record?
-        scope.first
+      self.shard.activate do
+        if self.md5.present? && ns = self.infer_namespace
+          scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
+          scope = scope.where("id<>?", self) unless new_record?
+          scope.first
+        end
       end
     end
 

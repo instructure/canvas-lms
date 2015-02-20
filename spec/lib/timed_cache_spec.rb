@@ -29,10 +29,10 @@ describe "TimedCache" do
       expect(cache.clear).to eq false
       expect(cleared).to eq 0
 
-      Timecop.travel(70.seconds)
-
-      expect(cache.clear).to eq true
-      expect(cleared).to eq 1
+      Timecop.travel(70.seconds) do
+        expect(cache.clear).to eq true
+        expect(cleared).to eq 1
+      end
     end
   end
 end

@@ -79,16 +79,24 @@ module Canvas
           Bundler.require 'redis'
           require_dependency 'canvas/redis'
           Canvas::Redis.patch
-          # merge in redis.yml, but give precedence to cache_store.yml
-          #
-          # the only options currently supported in redis-cache are the list of
-          # servers, not key prefix or database names.
-          config = (ConfigFile.load('redis', env) || {}).merge(config)
-          config_options = config.symbolize_keys.except(:key, :servers, :database)
-          servers = config['servers']
-          if servers
-            servers = config['servers'].map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
-            @cache_stores[env] = :redis_store, servers
+          # if cache and redis data are configured identically, we want to share connections
+          if config == {} && env == Rails.env && Canvas.redis_enabled?
+            # A bit of gymnastics to wrap an existing Redis::Store into an ActiveSupport::Cache::RedisStore
+            store = ActiveSupport::Cache::RedisStore.new([])
+            store.instance_variable_set(:@data, Canvas.redis.__getobj__)
+            @cache_stores[env] = store
+          else
+            # merge in redis.yml, but give precedence to cache_store.yml
+            #
+            # the only options currently supported in redis-cache are the list of
+            # servers, not key prefix or database names.
+            config = (ConfigFile.load('redis', env) || {}).merge(config)
+            config_options = config.symbolize_keys.except(:key, :servers, :database)
+            servers = config['servers']
+            if servers
+              servers = config['servers'].map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
+              @cache_stores[env] = :redis_store, servers
+            end
           end
         when 'memory_store'
           @cache_stores[env] = :memory_store

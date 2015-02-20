@@ -17,9 +17,9 @@
 #
 
 module ContextModulesHelper
-  def cache_if_module(context_module, editable, differentiated_assignments, user, &block)
+  def cache_if_module(context_module, editable, differentiated_assignments, user, context, &block)
     if context_module
-      visible_assignments = (differentiated_assignments && user) ? user.assignment_and_quiz_visibilities(course_id: context_module.context_id) : []
+      visible_assignments = (differentiated_assignments && user) ? user.assignment_and_quiz_visibilities(context) : []
       cache_key_items = ['context_module_render_11_', context_module.cache_key, editable, true, Time.zone]
       cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments
       cache_key = cache_key_items.join('/')

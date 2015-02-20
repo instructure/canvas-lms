@@ -756,7 +756,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.closed_for_comment_for?(user, :check_policies => true) }
+    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) }
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
@@ -768,7 +768,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.active? && self.context.grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| !self.closed_for_comment_for?(user, :check_policies => true) &&
+    given { |user, session| !self.locked_for?(user, :check_policies => true) &&
         self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :reply and can :read
 
@@ -986,19 +986,13 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def closed_for_comment_for?(user, opts={})
-    return true if self.locked? && !(opts[:check_policies] && self.grants_right?(user, :update))
-    lock = self.locked_for?(user, opts)
-    return false unless lock
-    return false if !self.is_announcement && lock.include?(:unlock_at)
-    lock
-  end
-
   # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the
   #         delayed_post_at is in the future or the group assignment is locked. This does not determine
   #         the visibility of the topic to the user, only that they are unable to reply.
   def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, :update)
+    return {:asset_string => self.asset_string} if self.locked?
+
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)

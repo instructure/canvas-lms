@@ -1031,6 +1031,11 @@ shared_examples_for "all selenium tests" do
     temp_file
   end
 
+  def check_element_has_focus(element)
+    active_element = driver.execute_script('return document.activeElement')
+    expect(active_element).to eq(element)
+  end
+
   def flash_message_present?(type=:warning, message_regex=nil)
     messages = ff("#flash_message_holder .ic-flash-#{type.to_s}")
     return false if messages.length == 0

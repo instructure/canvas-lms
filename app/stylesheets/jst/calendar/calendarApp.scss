@@ -149,7 +149,6 @@
   padding: 10px;
   border-bottom: 1px solid #eeeeee;
   word-wrap: normal;
-  max-height: 245px;
   &:last-child {
     border-bottom: none;
   }
@@ -215,7 +214,7 @@
     opacity: 0.7;
   }
   .fc-button-content {
-    color: $ic-text-color;
+    color: $ic-font-color-dark;
     text-shadow: white 0 1px 1px;
   }
   &.fc-corner-left {
@@ -250,6 +249,6 @@
 // Make adjustment to calendar modal tab styles to accommodate updated tab design
 #edit_event .ui-tabs-nav {
   li { 
-    //a { color: $canvas-light; }
+    //a { color: $ic-color-light; }
   }
 }

@@ -621,7 +621,7 @@ RSpec.configure do |config|
 
   def student_in_section(section, opts={})
     student = opts.fetch(:user) { user }
-    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section)
+    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section, :force_update => true)
     student.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
@@ -664,6 +664,7 @@ RSpec.configure do |config|
   def course_with_student_submissions(opts={})
     course_with_teacher_logged_in(opts)
     student_in_course
+    @course.claim! if opts[:unpublished]
     submission_count = opts[:submissions] || 1
     submission_count.times do |s|
       assignment = @course.assignments.create!(:title => "test #{s} assignment")

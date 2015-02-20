@@ -533,6 +533,18 @@ describe DiscussionTopic do
       expect(@topic.reload.child_topics).to be_empty
     end
 
+    it "should refresh when groups are added to a group_category" do
+      group_category = @course.group_categories.create!(:name => "category")
+
+      topic = @course.discussion_topics.build(:title => "topic")
+      topic.group_category = group_category
+      topic.save!
+
+      group = @course.groups.create!(:name => "group 1", :group_category => group_category)
+      expect(topic.reload.child_topics.size).to eq 1
+      expect(group.reload.discussion_topics.size).to eq 1
+    end
+
     context "in a group discussion" do
       before :once do
         group_discussion_assignment
@@ -1338,6 +1350,10 @@ describe DiscussionTopic do
       Timecop.travel(Time.now + 20.seconds)
     end
 
+    after :each do
+      Timecop.return
+    end
+
     it "should return nil if the view has not been built yet, and schedule a job" do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       expect(@topic.materialized_view).to be_nil
@@ -1439,6 +1455,14 @@ describe DiscussionTopic do
       expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
+    it "should not allow replies from students to topics locked based on date" do
+      discussion_topic_model
+      @topic.unlock_at = 1.day.from_now
+      @topic.save!
+      @topic.reply_from(:user => @teacher, :text => "reply") # should not raise error
+      student_in_course(:course => @course)
+      expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+    end
   end
 
   describe "locked flag" do

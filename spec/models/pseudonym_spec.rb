@@ -338,7 +338,7 @@ describe Pseudonym do
 
     it 'should claim a cas ticket' do
       Canvas.redis.expects(:expire).with(redis_key, 1.day).returns(false).once
-      Canvas.redis.expects(:set).with(redis_key, @pseudonym.global_id, { ex: 1.day, nx: true }).once
+      Canvas.redis.expects(:set).with(redis_key, @pseudonym.global_id, { ex: 1.day, nx: true, raw: true }).once
       @pseudonym.claim_cas_ticket(cas_ticket)
     end
 
@@ -349,10 +349,10 @@ describe Pseudonym do
     end
 
     it 'should check cas ticket expiration' do
-      Canvas.redis.expects(:get).with(redis_key).returns(@pseudonym.global_id.to_s)
+      Canvas.redis.expects(:get).with(redis_key, raw: true).returns(@pseudonym.global_id.to_s)
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_falsey
 
-      Canvas.redis.expects(:get).with(redis_key).returns(Pseudonym::CAS_TICKET_EXPIRED)
+      Canvas.redis.expects(:get).with(redis_key, raw: true).returns(Pseudonym::CAS_TICKET_EXPIRED)
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_truthy
     end
 

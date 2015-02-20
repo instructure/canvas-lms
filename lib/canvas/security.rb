@@ -17,6 +17,12 @@
 #
 
 module Canvas::Security
+  class InvalidToken < RuntimeError
+  end
+
+  class TokenExpired < RuntimeError
+  end
+
   def self.encryption_key
     @encryption_key ||= begin
       res = config && config['encryption_key']
@@ -82,6 +88,49 @@ module Canvas::Security
       return true if hmac == real_hmac
     end
     false
+  end
+
+  # Creates a JWT token string
+  #
+  # body (Hash) - The contents of the JWT token
+  # expires (Time) - When the token should expire. `nil` for no expiration
+  # key (String) - The key to sign with. `nil` will use the currently configured key
+  #
+  # Returns the token as a string.
+  def self.create_jwt(body, expires = nil, key = nil)
+    jwt_body = body
+    if expires
+      jwt_body = jwt_body.merge({ exp: expires.to_i })
+    end
+    JWT.encode(jwt_body, key || encryption_key)
+  end
+
+  # Verifies and decodes a JWT token
+  #
+  # token (String) - The token to decode
+  # keys (Array) - An array of keys to use verifying. Will be added to the current
+  #                set of keys
+  #
+  # Returns the token body as a Hash if it's valid.
+  #
+  # Raises Canvas::Security::TokenExpired if the token has expired, and
+  # Canvas::Security::InvalidToken if the token is otherwise invalid.
+  def self.decode_jwt(token, keys = [])
+    keys += encryption_keys
+
+    keys.each do |key|
+      begin
+        body = JWT.decode(token, key)[0]
+        return body.with_indifferent_access
+      rescue JWT::ExpiredSignature
+        raise Canvas::Security::TokenExpired
+      rescue JWT::DecodeError
+        # Keep looping, to try all the keys. If none succeed,
+        # we raise below.
+      end
+    end
+
+    raise Canvas::Security::InvalidToken
   end
 
   def self.validate_encryption_key(overwrite = false)

@@ -42,9 +42,8 @@ module BasicLTI
         raise InvalidSourceId, 'Assignment is invalid' unless assignment
 
         tag = assignment.external_tool_tag if assignment
-        if !tag || tool != ContextExternalTool.find_external_tool(tag.url, course)
-          raise InvalidSourceId, 'Assignment is no longer associated with this tool'
-        end
+        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
+
         return course, assignment, user
       end
     end
@@ -91,6 +90,10 @@ module BasicLTI
 
       def result_score
         @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
+      end
+
+      def result_total_score
+        @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultTotalScore > textString').try(:content)
       end
 
       def result_data_text
@@ -164,6 +167,7 @@ module BasicLTI
       def handle_replaceResult(tool, course, assignment, user)
         text_value = self.result_score
         new_score = Float(text_value) rescue false
+        raw_score = Float(self.result_total_score) rescue false
         error_message = nil
         submission_hash = {:submission_type => 'external_tool'}
 
@@ -175,7 +179,9 @@ module BasicLTI
           submission_hash[:submission_type] = 'online_url'
         end
 
-        if new_score
+        if raw_score
+          submission_hash[:grade] = raw_score
+        elsif new_score
           if (0.0 .. 1.0).include?(new_score)
             submission_hash[:grade] = "#{new_score * 100}%"
           else
@@ -189,8 +195,11 @@ module BasicLTI
           self.code_major = 'failure'
           self.description = error_message
         elsif assignment.points_possible.nil?
-          submission = Submission.create!(submission_hash.merge(:user => user,
-                                                                :assignment => assignment))
+
+          unless submission = Submission.where(user_id: user.id, assignment_id: assignment).first
+            submission = Submission.create!(submission_hash.merge(:user => user,
+                                                                  :assignment => assignment))
+          end
           submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<-NO_POINTS, :grade => submission_hash[:grade]))
 An external tool attempted to grade this assignment as %{grade}, but was unable
 to because the assignment has no points possible.
@@ -202,7 +211,7 @@ to because the assignment has no points possible.
             @submission = assignment.submit_homework(user, submission_hash.clone)
           end
 
-          if new_score
+          if new_score || raw_score
             @submission = assignment.grade_student(user, submission_hash).first
           end
 

@@ -16,8 +16,13 @@ define [
   test 'restore delegates to model.restore', ->
     revision = new WikiPageRevision
     view = new WikiPageRevisionView model: revision
-    @mock(revision).expects('restore').atLeast(1).returns($.Deferred())
+    sinon.stub(view, 'windowLocation').returns({
+      href: ""
+      reload: -> true
+    })
+    @mock(revision).expects('restore').atLeast(1).returns($.Deferred().resolve())
     view.restore()
+    view.windowLocation.restore()
 
   test 'toJSON serializes expected values', ->
     attributes =

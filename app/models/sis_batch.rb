@@ -28,7 +28,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :account_id, :batch_id, :ended_at, :errored_attempts, :workflow_state, :data, :created_at, :updated_at, :attachment_id, :processing_errors,
+    :id, :account_id, :ended_at, :errored_attempts, :workflow_state, :data, :created_at, :updated_at, :attachment_id, :processing_errors,
     :processing_warnings, :batch_mode, :options, :user_id
   ]
 

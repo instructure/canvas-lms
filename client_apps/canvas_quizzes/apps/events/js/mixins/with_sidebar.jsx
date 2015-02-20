@@ -1,5 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
+  var React = require('react');
   return {
     render: function() {
       return (

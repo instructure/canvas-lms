@@ -143,6 +143,10 @@ module Canvas
               deps: ['jquery'],
               exports: '$'
             },
+            'vendor/jquery.smartbanner': {
+              deps: ['jquery'],
+              exports: '$'
+            },
             'handlebars': {
               deps: ['bower/handlebars/handlebars.runtime.amd'],
               exports: 'Handlebars'

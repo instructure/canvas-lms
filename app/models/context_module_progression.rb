@@ -127,6 +127,8 @@ class ContextModuleProgression < ActiveRecord::Base
       self.workflow_state = 'completed'
     elsif result.started?
       self.workflow_state = 'started'
+    else
+      self.workflow_state = 'unlocked'
     end
 
     if result.changed?
@@ -264,9 +266,6 @@ class ContextModuleProgression < ActiveRecord::Base
     if self.locked?
       self.workflow_state = 'unlocked' if prerequisites_satisfied?
     end
-    if self.unlocked?
-      self.workflow_state = 'locked' if !prerequisites_satisfied?
-    end
     return !self.locked?
   end
   private :check_prerequisites
@@ -320,7 +319,6 @@ class ContextModuleProgression < ActiveRecord::Base
     self.evaluated_at = Time.now.utc
     self.current = true
     self.requirements_met ||= []
-    self.workflow_state = 'locked'
 
     if check_prerequisites
       evaluate_requirements_met

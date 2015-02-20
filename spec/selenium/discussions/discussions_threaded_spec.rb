@@ -50,6 +50,19 @@ context "threaded discussions" do
     edit_entry(entry, edit_text)
   end
 
+  it "should not allow students to edit replies to a locked topic" do
+    user_session(@student)
+    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    @topic.lock!
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajaximations
+
+    fj("#entry-#{entry.id} .al-trigger").click
+    wait_for_ajaximations
+
+    expect(fj('.al-options:visible').text).to_not include("Edit")
+  end
+
   it "should delete a reply" do
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"

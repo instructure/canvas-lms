@@ -12,7 +12,6 @@ describe "web conference" do
   context "with no conferences" do
     before (:each) do
       get "/courses/#{@course.id}/conferences"
-      wait_for_ajaximations
     end
 
     it "should create a web conference" do

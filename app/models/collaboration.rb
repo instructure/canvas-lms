@@ -308,6 +308,7 @@ class Collaboration < ActiveRecord::Base
         users_to_remove.uniq!
       end
       # make real user objects, instead of just ids, cause that's what this code expects
+      users_to_remove.reject! {|id| id == self.user.id}
       users_to_remove = users_to_remove.map { |id| User.send(:instantiate, 'id' => id) }
       remove_users_from_document(users_to_remove)
     end

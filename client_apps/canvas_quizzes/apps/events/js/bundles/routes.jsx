@@ -9,22 +9,33 @@ define(function(require) {
   var Route = ReactRouter.Route;
   var Routes = ReactRouter.Routes;
   var DefaultRoute = ReactRouter.DefaultRoute;
+  var NotFoundRoute = ReactRouter.NotFoundRoute;
+
+  var currentPath = window.location.pathname
+    , re = new RegExp('\(.*\/log)')
+    , matches = re.exec(currentPath)
+    , baseUrl = "";
+
+  if(matches) {
+    baseUrl = matches[0];
+  }
 
   return (
-    <Routes location="hash">
-      <Route name="app" path="/" handler={AppRoute}>
+    <Routes location="history">
+      <Route name="app" path={baseUrl +'/?'} handler={AppRoute}>
         <DefaultRoute handler={EventStreamRoute} />
+        <NotFoundRoute handler={AppRoute}/>
 
         <Route
           addHandlerKey
           name="question"
-          path="/questions/:id"
+          path={baseUrl + "/questions/:id"}
           handler={QuestionRoute} />
 
         <Route
           addHandlerKey
           name="answer_matrix"
-          path="/answer_matrix"
+          path={baseUrl + "/answer_matrix"}
           handler={AnswerMatrixRoute} />
       </Route>
     </Routes>

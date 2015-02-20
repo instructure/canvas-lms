@@ -1,6 +1,6 @@
-require [
+define [
   'Backbone'
-], (Backbone) -> 
-  module 'FileMigrationSpec', 
-    setup: -> 
-    teardown: -> 
+], (Backbone) ->
+  module 'FileMigrationSpec',
+    setup: ->
+    teardown: ->

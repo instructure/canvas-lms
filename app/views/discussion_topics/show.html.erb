@@ -55,7 +55,7 @@
     <div class="headerBar">
       <div class="row-fluid form-inline" style="overflow: visible;">
         <div class="pull-right">
-          <% if can_do(@context, @current_user, :moderate_forum) %>
+          <% if !@topic.is_announcement && can_do(@context, @current_user, :moderate_forum) %>
             <button
               id="topic_publish_button"
               data-id='<%= @topic.id %>'
@@ -196,7 +196,11 @@
 
         <div class="discussion-section message_wrapper">
           <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
-
+          <% if @unlock_at && @unlock_at > Time.now && @topic.is_a?(Announcement) %>
+            <div class="discussion-fyi">
+              <%= t 'announcement_locked', 'The content of this announcement will not be visible to users until %{date}', :date => datetime_string(@unlock_at) %>
+            </div>
+          <% end %>
           <% if @locked %>
             <div class="discussion-fyi">
               <% if @topic.is_a? Announcement %>

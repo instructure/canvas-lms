@@ -27,9 +27,11 @@
 
   &:first-child {
     padding-left: 10px;
+    border-radius: 1em 0 0 1em
   }
   &:last-child {
     padding-right: 10px;
     border-right: none;
+    border-radius: 0 1em 1em 0
   }
 }

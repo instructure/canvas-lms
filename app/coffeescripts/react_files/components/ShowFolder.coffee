@@ -1,7 +1,7 @@
 define [
   'underscore'
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/filesEnv'
@@ -153,6 +153,7 @@ define [
               externalToolsForContext: @props.externalToolsForContext
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
+              modalOptions: @props.modalOptions
 
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
 

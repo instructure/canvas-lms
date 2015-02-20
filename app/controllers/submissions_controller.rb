@@ -131,7 +131,7 @@ class SubmissionsController < ApplicationController
       @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_right?(@current_user, session, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
-    @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first rescue nil
+    @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
     if authorized_action(@submission, @current_user, :read)
       respond_to do |format|
         json_handled = false
@@ -476,11 +476,11 @@ class SubmissionsController < ApplicationController
 
   def submit_google_doc(document_id)
     # fetch document from google
-    google_docs = google_docs_connection
+    google_docs = google_service_connection
     document_response, display_name, file_extension = google_docs.download(document_id)
 
     # error handling
-    unless document_response.try(:is_a?, Net::HTTPOK)
+    unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
       flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
     end
 

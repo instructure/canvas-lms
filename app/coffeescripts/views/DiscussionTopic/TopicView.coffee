@@ -166,6 +166,7 @@ define [
         modelData = @model.toJSON()
         modelData.showBoxReplyLink = true
         modelData.root = true
+        modelData.isForMainDiscussion = true
         html = replyTemplate modelData
         @$('#discussion_topic').append html
       super

@@ -1685,7 +1685,7 @@ describe User do
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
         end.to_not raise_error
-
+        
         expect(events.first).to eq assignment2
         expect(events.second).to eq assignment
       end
@@ -2876,5 +2876,14 @@ describe User do
       @account.account_users.create!(:user => @user, :role => admin_role)
       expect(@user.roles(@account)).to eq %w[user admin]
     end
+  end
+
+  it "should not grant user_notes rights to restricted users" do
+    course_with_ta(:active_all => true)
+    student_in_course(:course => @course, :active_all => true)
+    @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_user_notes)
+
+    expect(@student.grants_right?(@ta, :create_user_notes)).to be_falsey
+    expect(@student.grants_right?(@ta, :read_user_notes)).to be_falsey
   end
 end

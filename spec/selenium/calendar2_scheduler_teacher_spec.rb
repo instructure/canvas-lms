@@ -27,6 +27,17 @@ describe "scheduler" do
       expect(f('#edit_event')).not_to be_nil
     end
 
+    it "should not enforce minimum event lengths when loading appointment times into the edit group form" do
+      date = Date.today.to_s
+      create_appointment_group(:new_appointments => [[date + ' 12:00:00', date + ' 12:13:00']])
+      get "/calendar2"
+      click_scheduler_link
+      wait_for_ajaximations
+      click_appointment_link
+      click_al_option('.edit_link')
+      expect(f('.end_time')['value']).to include(":13")
+    end
+
     it "should split time slots" do
       start_time_text = '02'
       end_time_text = '06'

@@ -19,7 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentQuestion do
-
   before :once do
     course
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
@@ -202,5 +201,37 @@ describe AssessmentQuestion do
     expect(question.question_data[:name]).to eq "new name"
     expect(data.object_id).to eq question.question_data.object_id
   end
-  
+
+  describe '#find_or_create_quiz_question' do
+    let(:assessment_question){assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))}
+    let(:quiz){quiz_model}
+
+    it 'should create a quiz_question when one does not exist' do
+      expect do
+        assessment_question.find_or_create_quiz_question(quiz.id)
+      end.to change{AssessmentQuestion.count}.by(1)
+    end
+
+    it 'should find an existing quiz_question' do
+      qq = assessment_question.find_or_create_quiz_question(quiz.id)
+
+      expect do
+        qq2 = assessment_question.find_or_create_quiz_question(quiz.id)
+        expect(qq2.id).to eql(qq.id)
+      end.to_not change{AssessmentQuestion.count}
+    end
+
+    it 'should find and update an out of date quiz_question' do
+      qq = assessment_question.find_or_create_quiz_question(quiz.id)
+
+      assessment_question.name = 'changed'
+      assessment_question.with_versioning(&:save!)
+
+      expect(qq.assessment_question_version).to_not eql(assessment_question.version_number)
+
+      qq2 = assessment_question.find_or_create_quiz_question(quiz.id)
+      expect(qq.assessment_question_version).to_not eql(qq2.assessment_question_version)
+      expect(qq2.assessment_question_version).to eql(assessment_question.version_number)
+    end
+  end
 end

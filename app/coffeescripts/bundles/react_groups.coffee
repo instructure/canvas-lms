@@ -1,5 +1,5 @@
 require [
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/groups/StudentView',
 ], (React, StudentView) ->
 

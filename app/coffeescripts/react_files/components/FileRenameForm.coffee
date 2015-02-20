@@ -1,6 +1,6 @@
 define [
   'i18n!file_rename_form'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react/shared/utils/withReactDOM'
   './DialogAdapter'
   './DialogContent'

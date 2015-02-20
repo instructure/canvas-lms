@@ -255,6 +255,50 @@ describe EnrollmentsApiController, type: :request do
         expect(JSON.parse(response.body)['message']).to eql 'Can\'t add an enrollment to a concluded course.'
       end
 
+      it "should allow enrollments to be added to an active section of a concluded course if the user is already enrolled" do
+        other_section = @course.course_sections.create!
+        @course.enroll_user(@unenrolled_user, "StudentEnrollment", :section => other_section)
+
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @section.end_at = 1.day.from_now
+        @section.restrict_enrollments_to_section_dates = true
+        @section.save!
+        expect(@section).to_not be_concluded
+        api_call :post, @path, @path_options, {
+            :enrollment => {
+                :user_id                            => @unenrolled_user.id,
+                :type                               => 'StudentEnrollment',
+                :enrollment_state                   => 'active',
+                :course_section_id                  => @section.id,
+                :limit_privileges_to_course_section => true
+            }
+        }
+      end
+
+      it "should not allow enrollments to be added to an active section of a concluded course if the user is not already enrolled" do
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @section.end_at = 1.day.from_now
+        @section.restrict_enrollments_to_section_dates = true
+        @section.save!
+        raw_api_call :post, @path, @path_options, {
+                              :enrollment => {
+                                  :user_id                            => @unenrolled_user.id,
+                                  :type                               => 'StudentEnrollment',
+                                  :enrollment_state                   => 'active',
+                                  :course_section_id                  => @section.id,
+                                  :limit_privileges_to_course_section => true
+                              }
+                          }
+
+        expect(JSON.parse(response.body)['message']).to eql 'Can\'t add an enrollment to a concluded course.'
+      end
+
       it "should not enroll a user lacking a pseudonym on the course's account" do
         foreign_user = user
         api_call_as_user @admin, :post, @path, @path_options, { :enrollment => { :user_id => foreign_user.id } }, {},
@@ -1328,6 +1372,56 @@ describe EnrollmentsApiController, type: :request do
 
           raw_api_call(:delete, "#{@path}?type=delete", @params.merge(:type => 'delete'))
           expect(response.code).to eql '401'
+        end
+      end
+    end
+
+    describe "show" do
+      before(:once) do
+        @account = Account.default
+        account_admin_user(account: @account)
+        student_in_course active_all: true
+        @base_path = "/api/v1/accounts/#{@account.id}/enrollments"
+        @params = { :controller => 'enrollments_api', :action => 'show', :account_id => @account.to_param,
+                    :format => 'json' }
+      end
+
+      context "admin" do
+        before(:once) do
+          @user = @admin
+        end
+
+        it "should show other's enrollment" do
+          json = api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param))
+          expect(json['id']).to eql(@enrollment.id)
+        end
+      end
+
+      context "student" do
+        before(:once) do
+          @user = @student
+        end
+
+        it "should show own enrollment" do
+          json = api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param))
+          expect(json['id']).to eql(@enrollment.id)
+        end
+
+        it "should not show other's enrollment" do
+          student = @student
+          other_enrollment = student_in_course(active_all: true)
+          @user = student
+          api_call(:get, @base_path + "/#{other_enrollment.id}", @params.merge(id: other_enrollment.to_param), {}, {}, { expected_status: 401 })
+        end
+      end
+
+      context "no user" do
+        before(:once) do
+          @user = nil
+        end
+
+        it "should not show enrollment" do
+          json = api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param), {}, {}, { expected_status: 401 })
         end
       end
     end

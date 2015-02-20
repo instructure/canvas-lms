@@ -1,9 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'react'
-  'react-router'
-  'react-modal'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
+  'old_unsupported_dont_use_react-modal'
   '../modules/customPropTypes'
   'i18n!file_preview'
   './FriendlyDatetime'
@@ -170,13 +170,15 @@ define [
                 },
                   i {className: 'icon-download'}
                   ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
-              a {
-                role: 'button'
-                className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"
+              button {
+                type: 'button'
+                className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active' else ''}"
                 onClick: @toggle('showInfoPanel')
               },
-                i {className: 'icon-info'}
-                ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
+                # wrap content in a div because firefox doesn't support display: flex on buttons
+                div {},
+                  i {className: 'icon-info'}
+                  ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
               ReactRouter.Link {
                 to: @getRouteIdentifier(),
                 query: @getNavigationParams(except: 'only_preview'),
@@ -190,6 +192,7 @@ define [
             @renderArrowLink('left') if @state.otherItems?.length > 0
             if @state.displayedItem
               iframe {
+                title: I18n.t('File Preview')
                 src: @state.displayedItem.get 'preview_url'
                 className: 'ef-file-preview-frame'
               }

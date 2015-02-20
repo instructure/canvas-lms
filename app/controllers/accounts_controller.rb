@@ -324,7 +324,7 @@ class AccountsController < ApplicationController
       # account settings (:manage_account_settings)
       account_settings = account_params.select {|k, v| [:name, :default_time_zone].include?(k.to_sym)}.with_indifferent_access
       unless account_settings.empty?
-        if is_authorized_action?(@account, @current_user, :manage_account_settings)
+        if @account.grants_right?(@current_user, session, :manage_account_settings)
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
@@ -337,7 +337,7 @@ class AccountsController < ApplicationController
       quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb,
                                                       :default_group_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
       unless quota_settings.empty?
-        if is_authorized_action?(@account, @current_user, :manage_storage_quotas)
+        if @account.grants_right?(@current_user, session, :manage_storage_quotas)
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
             next unless quota_settings.has_key?(quota_type)
 
@@ -434,6 +434,21 @@ class AccountsController < ApplicationController
           params[:account].delete :services
         end
         if @account.grants_right?(@current_user, :manage_site_settings)
+
+          # handle branding stuff
+          if @account.root_account? && params[:account][:settings]
+            (Account::BRANDING_SETTINGS - [:msapplication_tile_color]).each do |setting|
+              if params[:account][:settings]["#{setting}_remove"] == "1"
+                params[:account][:settings][setting] = nil
+              elsif params[:account][:settings][setting].present?
+                attachment = Attachment.create(uploaded_data: params[:account][:settings][setting], context: @account)
+                params[:account][:settings][setting] = attachment.authenticated_s3_url(:expires => 15.years)
+              end
+            end
+          end
+
+
+
           # If the setting is present (update is called from 2 different settings forms, one for notifications)
           if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
             # If set to default, remove the custom name so it doesn't get saved
@@ -456,7 +471,7 @@ class AccountsController < ApplicationController
           end
         else
           # must have :manage_site_settings to update these
-          [ :admins_can_change_passwords,
+          ([ :admins_can_change_passwords,
             :admins_can_view_notifications,
             :enable_alerts,
             :enable_eportfolios,
@@ -464,7 +479,7 @@ class AccountsController < ApplicationController
             :show_scheduler,
             :global_includes,
             :gmail_domain
-          ].each do |key|
+          ] + Account::BRANDING_SETTINGS).each do |key|
             params[:account][:settings].try(:delete, key)
           end
         end
@@ -540,7 +555,7 @@ class AccountsController < ApplicationController
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         ENABLE_LTI2: @account.root_account.feature_enabled?(:lti2_ui),
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
-        CONTEXT_BASE_URL: "/api/v1/accounts/#{@context.id}"
+        CONTEXT_BASE_URL: "/accounts/#{@context.id}"
       })
     end
   end

@@ -82,6 +82,7 @@
       <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
       <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="grading_standard_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="grading_standard_external_identifier" type="xs:string" minOccurs="0"/>
       <xs:element name="rubric_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="rubric_external_identifier" type="xs:string" minOccurs="0"/>
       <xs:element name="rubric_use_for_grading" type="xs:boolean" minOccurs="0"/>
@@ -103,6 +104,8 @@
       <xs:element name="automatic_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="anonymous_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="grade_group_students_individually" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="external_tool_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="external_tool_external_identifier" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_url" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_new_tab" type="xs:boolean" minOccurs="0"/>
       <xs:element name="freeze_on_copy" type="xs:boolean" minOccurs="0"/>
@@ -497,6 +500,8 @@
         <xs:element name="allowed_attempts" type="xs:integer" minOccurs="0"/>
         <xs:element name="one_question_at_a_time" type="xs:boolean" minOccurs="0"/>
         <xs:element name="cant_go_back" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="one_time_results" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="show_correct_answers_last_attempt" type="xs:boolean" minOccurs="0"/>
         <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
 
         <xs:element name="quiz_type" minOccurs="0" default="practice_quiz">

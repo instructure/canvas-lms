@@ -51,23 +51,23 @@
 .ui-dialog .ui-dialog-titlebar { 
   padding: .4em 1em; position: relative;
   &.ui-widget-header {
-    background: $canvas-light;
+    background: $ic-color-light;
     padding: 16px 12px;
-    border-bottom: 1px solid $can-border-light;
+    border-bottom: 1px solid $ic-border-light;
   }
 }
 
 .ui-dialog.ui-widget-content {
   border: none;
-  box-shadow: 0 1px 4px 1px rgba($canvas-secondary, 0.95);
+  box-shadow: 0 1px 4px 1px rgba($ic-brand-secondary, 0.95);
 }
 
 // note that these styles are shared in both .ui-dialog and .ui-datepicker
 
 .ui-datepicker .ui-datepicker-time,
 .ui-dialog .ui-dialog-buttonpane {
-  background-color: lighten($canvas-neutral, 5%);
-  border-top: 1px solid $can-border-light;
+  background-color: lighten($ic-color-neutral, 5%);
+  border-top: 1px solid $ic-border-light;
 }
 
 .ui-dialog .ui-dialog-buttonpane {

@@ -470,7 +470,7 @@ describe GradebooksController do
         expect(response).to be_redirect
         expect(flash[:notice]).to eq I18n.t(
           :speedgrader_enabled_only_for_published_content,
-                           'Speedgrader is enabled only for published content.')
+                           'SpeedGrader is enabled only for published content.')
 
         # Published assignment and draft state enabled
         @assign.publish

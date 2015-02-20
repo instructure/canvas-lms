@@ -782,7 +782,13 @@ describe ConversationsController, type: :request do
                 "forwarded_messages" => [
                   {
                           "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [],
-                          "attachments" => [{'filename' => attachment.filename, 'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png', 'id' => attachment.id, 'size' => attachment.size,
+                          "attachments" => [{'filename' => attachment.filename,
+                                             'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
+                                             'content-type' => 'image/png',
+                                             'display_name' => 'test my file? hai!&.png',
+                                             'id' => attachment.id,
+                                             'folder_id' => attachment.folder_id,
+                                             'size' => attachment.size,
                                              'unlock_at' => nil,
                                              'locked' => false,
                                              'hidden' => false,
@@ -962,6 +968,7 @@ describe ConversationsController, type: :request do
                 "content-type" => "unknown/unknown",
                 "display_name" => "test.txt",
                 "id" => attachment.id,
+                "folder_id" => attachment.folder_id,
                 "size" => attachment.size,
                 'unlock_at' => nil,
                 'locked' => false,
@@ -982,6 +989,17 @@ describe ConversationsController, type: :request do
         "context_name" => conversation.context_name,
         "context_code" => conversation.conversation.context_code,
       })
+    end
+
+    it "should still include attachment verifiers when using session auth" do
+      conversation = conversation(@bob)
+      attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
+      message = conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
+      conversation.reload
+      user_session(@user)
+      get "/api/v1/conversations/#{conversation.conversation_id}"
+      json = json_parse
+      expect(json['messages'][0]['attachments'][0]['url']).to eq "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}"
     end
 
     it "should use participant's last_message_at and not consult the most recent message" do

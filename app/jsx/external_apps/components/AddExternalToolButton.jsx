@@ -95,7 +95,7 @@ define([
     render() {
       return (
         <span className="AddExternalToolButton">
-          <a href="#" role="button" aria-label={I18n.t('Add App')} className="btn btn-primary add_tool_link lm pull-right" onClick={this.openModal}>{I18n.t('Add App')}</a>
+          <a href="#" role="button" aria-label={I18n.t('Add App')} className="btn btn-primary add_tool_link lm" onClick={this.openModal}>{I18n.t('Add App')}</a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
             isOpen={this.state.modalIsOpen}

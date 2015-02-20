@@ -138,6 +138,22 @@ describe Submission do
       @submission.reload
       expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute
     end
+
+    it "should not create multiple versions on submission for discussion topics" do
+      course_with_student_logged_in(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "some topic")
+      @assignment = @course.assignments.create(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @topic.assignment_id = @assignment.id
+      @topic.save!
+
+      Timecop.freeze(1.second.ago) do
+        @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+      end
+      @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+      expect(@student.submissions.first.submission_history.count).to eq 1
+    end
   end
 
   context "broadcast policy" do
@@ -1105,6 +1121,22 @@ describe Submission do
       s.save
       expect(a1.crocodoc_document(true)).to eq cd
       expect(a2.crocodoc_document).to eq a2.crocodoc_document
+    end
+  end
+
+  describe "cross-shard attachments" do
+    specs_require_sharding
+    it "should work" do
+      @shard1.activate do
+        @student = user(:active_user => true)
+        @attachment = Attachment.create! uploaded_data: StringIO.new('blah'), context: @student, filename: 'blah.txt'
+      end
+      course(:active_all => true)
+      @course.enroll_user(@student, "StudentEnrollment").accept!
+      @assignment = @course.assignments.create!
+
+      sub = @assignment.submit_homework(@user, attachments: [@attachment])
+      expect(sub.attachments).to eq [@attachment]
     end
   end
 end

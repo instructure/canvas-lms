@@ -18,8 +18,9 @@ define [
   activePopovers = []
 
   class Popover
-    constructor: (clickEvent, @content, @options = {}) ->
-      @trigger = $(clickEvent.currentTarget)
+    constructor: (triggerEvent, @content, @options = {}) ->
+      @trigger = $(triggerEvent.currentTarget)
+      @triggerAction = triggerEvent.type
       @el = $(@content)
               .addClass('carat-bottom')
               .data('popover', this)
@@ -42,16 +43,16 @@ define [
         event.preventDefault()
         @hide()
 
-      @show(clickEvent)
+      @show(triggerEvent)
 
-    show: (clickEvent) ->
+    show: (triggerEvent) ->
       popoverToHide.hide() while popoverToHide = activePopovers.pop()
       activePopovers.push(this)
       id = "popover-#{idCounter++}"
       @trigger.attr
         "aria-expanded" : true
         "aria-controls" : id
-      @previousTarget = clickEvent.currentTarget
+      @previousTarget = triggerEvent.currentTarget
 
       @el
         .attr(
@@ -60,20 +61,22 @@ define [
         .appendTo(document.body)
         .show()
       @position()
-      @el.find(':tabbable').first().focus()
-      setTimeout(
-        () =>
-          @el.find(':tabbable').first().focus()
-        , 100
-      )
+      unless triggerEvent.type == "mouseenter"
+        @el.find(':tabbable').first().focus()
+        setTimeout(
+          () =>
+            @el.find(':tabbable').first().focus()
+          , 100
+        )
 
       # handle sticking the carat right above where you clicked on the button, bounded by the dialog
       @el.find(".ui-menu-carat").remove()
+      additionalOffset = @options.manualOffset || 0
       differenceInOffset = @trigger.offset().left - @el.offset().left
-      actualOffset = clickEvent.pageX - @trigger.offset().left
+      actualOffset = triggerEvent.pageX - @trigger.offset().left
       leftBound = Math.max(0, @trigger.width() / 2 - @el.width() / 2) + 20
       rightBound = @trigger.width() - leftBound
-      caratOffset = Math.min(Math.max(leftBound, actualOffset), rightBound) + differenceInOffset
+      caratOffset = Math.min(Math.max(leftBound, actualOffset), rightBound) + differenceInOffset + additionalOffset
       $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(@el)
 
       @positionInterval = setInterval @position, 200
@@ -102,7 +105,7 @@ define [
         my: 'center '+(if @options.verticalSide == 'bottom' then 'top' else 'bottom'),
         at: 'center '+(@options.verticalSide || 'top'),
         of: @trigger,
-        offset: '0 -10px',
+        offset: if @options.verticalSide == 'bottom' then '0px 10px' else '0px -10px',
         within: 'body',
         collision: 'flipfit '+(if @options.verticalSide then 'none' else 'flipfit')
         using: using

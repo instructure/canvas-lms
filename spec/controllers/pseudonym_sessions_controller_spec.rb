@@ -96,7 +96,23 @@ describe PseudonymSessionsController do
     expect(assigns[:pseudonym_session]).not_to be_nil
   end
 
-  it "should login if authenticity token is not provided and referrer is trusted" do
+  it "should re-render if authenticity token is invalid and referer is not trusted" do
+    controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
+    post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty' }, :authenticity_token => '42'
+    assert_status(400)
+    expect(response).to render_template('new')
+    expect(flash[:error]).to match(/invalid authenticity token/i)
+  end
+
+  it "should re-render if authenticity token is invalid and referer is trusted" do
+    controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
+    post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty' }, :authenticity_token => '42'
+    assert_status(400)
+    expect(response).to render_template('new')
+    expect(flash[:error]).to match(/invalid authenticity token/i)
+  end
+
+  it "should login if authenticity token is invalid and referer is trusted" do
     Account.any_instance.expects(:trusted_referer?).returns(true)
     post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty' }
     expect(response).to be_redirect
@@ -104,8 +120,6 @@ describe PseudonymSessionsController do
     expect(assigns[:user]).to eq @user
     expect(assigns[:pseudonym]).to eq @pseudonym
     expect(assigns[:pseudonym_session]).not_to be_nil
-    expect(response.headers.key?('X-Account-Trusted-Referrer')).to be_truthy
-    expect(response.headers['X-Account-Trusted-Referrer']).to eq 'true'
   end
 
   context "ldap" do

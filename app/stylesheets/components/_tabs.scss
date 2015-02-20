@@ -52,11 +52,11 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
 
 .ui-tabs {
   .ui-tabs-panel {
-    border-color: $can-border-light;
+    border-color: $ic-border-light;
     padding: 14px;
   }
   .ui-tabs-nav {
-    border-bottom-color: $can-border-light;
+    border-bottom-color: $ic-border-light;
     li { 
       background: transparent;
       border-color: transparent;
@@ -69,13 +69,14 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         @if $use_high_contrast { text-decoration: underline; }
 
         // special handling for Calendar tabs with solid-color header backgrounds
-        #edit_event & { color: $canvas-light; }
+        #edit_event & { color: $ic-color-light; }
       }
-      &.ui-state-hover {
-        background: $canvas-light;
-        border-color: $can-border-light;
+      &.ui-state-hover,
+      &:hover {
+        background: $ic-color-light;
+        border-color: $ic-border-light;
         a {
-          color: $canvas-dark;
+          color: $ic-color-dark;
           @if $use_high_contrast { text-decoration: none; }
           
           // special handling for Calendar tabs with solid-color header backgrounds
@@ -87,19 +88,20 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         @if $use_high_contrast { @include button-focus; }
         @else {
           outline: none;
-          border-color: $can-border-light;
-          background: $canvas-light;
+          border-color: $ic-border-light;
+          background: $ic-color-light;
         }
       }
       &.ui-tabs-active,
-      &.ui-tabs-active.ui-state-hover {
-        border-color: $can-border-light;
-        background: $canvas-light;
+      &.ui-tabs-active.ui-state-hover,
+      &.ui-tabs-active:hover {
+        border-color: $ic-border-light;
+        background: $ic-color-light;
         a {
           @if $use_high_contrast { text-decoration: none; }
 
           // special handling for Calendar tabs with solid-color header backgrounds
-          #edit_event & { color: $canvas-dark; }
+          #edit_event & { color: $ic-color-dark; }
         }
       }
     }

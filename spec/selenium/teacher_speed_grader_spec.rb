@@ -379,6 +379,29 @@ describe "speed grader" do
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 
+  it "should allow commenting using rubric" do
+    student_submission
+    @association.use_for_grading = true
+    @association.save!
+
+    @rubric.data.detect{ |row| row[:learning_outcome_id] == @outcome.id }[:ignore_for_scoring] = true
+    @rubric.save!
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+    to_comment = 'special rubric comment'
+    keep_trying_until do
+      f('.toggle_full_rubric').click
+      expect(f('#rubric_full')).to be_displayed
+    end
+    f('#rubric_full tr.learning_outcome_criterion .criterion_comments img').click
+    f('textarea.criterion_comments').send_keys(to_comment)
+    f('#rubric_criterion_comments_dialog .save_button').click
+    f('#rubric_full .save_rubric_button').click
+    saved_comment = f('#rubric_summary_container .rubric_table tr.learning_outcome_criterion .rating_comments_dialog_link')
+    expect(saved_comment.text).to eq to_comment
+  end
+
   it "should create a comment on assignment" do
     #pending("failing because it is dependant on an external kaltura system")
 
@@ -719,4 +742,36 @@ describe "speed grader" do
       expect(f("#average_score")).to include_text("5 / 10 (50%)")
     end
   end
+
+
+    it "should only display 2 decimal points on a quiz submission" do
+      # generate a proper teacher and student in the course, then switch sessions to the teacher
+      course_with_teacher_logged_in
+      course_with_student(:course => @course, :active_all => true)
+
+      # create our quiz and our multiple answers question
+      @context = @course
+      @q = quiz_model
+      answers = [ {'id' => 1, 'text' => 'one', 'weight' => 100},
+                  {'id' => 2, 'text' => 'two', 'weight' => 100},
+                  {'id' => 3, 'text' => 'three', 'weight' => 100},
+                  {'id' => 4, 'text' => 'four', 'weight' => 0} ]
+      @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_answers_question', 'answers' => answers, :points_possible => 4})
+      @q.generate_quiz_data
+      @q.tap(&:save)
+
+      # create a submission and answer our question
+      qs = @q.generate_submission(@student)
+      (1..4).each do |var|
+         qs.submission_data["question_#{@quest1.id}_answer_#{var}"] = "1"
+      end
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      # navigate to speedgrader and confirm the point value is rounded to the nearest hundredth
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@q.assignment_id}"
+      in_frame('speedgrader_iframe') do
+        # sometimes jquery likes to be slow to load, so we do a keep trying so it can try again if $ is undefined
+        keep_trying_until { expect(driver.execute_script("return $('#question_#{@quest1.id} .question_input')[0].value")).to eq "2.67" }
+      end
+    end
 end

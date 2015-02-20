@@ -983,6 +983,24 @@ describe Attachment do
     end
   end
 
+  describe "thumbnail source image size limitation" do
+    before(:once) do
+      local_storage! # s3 attachment data is stubbed out, so there is no image to identify the size of
+      course
+    end
+
+    it 'creates thumbnails for smaller images' do
+      att = @course.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'ok.jpg'
+      expect(att.thumbnail).not_to be_nil
+      expect(att.thumbnail.width).not_to be_nil
+    end
+
+    it 'does not create thumbnails for larger images' do
+      att = @course.attachments.create! :uploaded_data => one_hundred_megapixels_of_highly_compressed_png_data, :filename => '3vil.png'
+      expect(att.thumbnail).to be_nil
+    end
+  end
+
   context "notifications" do
     before :once do
       course_model(:workflow_state => "available")

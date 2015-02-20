@@ -259,6 +259,7 @@ class EnrollmentsApiController < ApplicationController
   # @returns Enrollment
 
   def show
+    render_unauthorized_action and return false unless @current_user
     enrollment = Enrollment.find(params[:id])
     if enrollment.user_id == @current_user.id || enrollment.root_account == @context && authorized_action(@context, @current_user, [:read_roster])
       #render enrollment object if requesting user is the current_user or user is authorized to read enrollment.
@@ -367,7 +368,6 @@ class EnrollmentsApiController < ApplicationController
 
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
-    errors << @@errors[:concluded_course] if @context.concluded?
     return render_create_errors(errors) if errors.present?
 
     # create enrollment
@@ -378,11 +378,20 @@ class EnrollmentsApiController < ApplicationController
     end
     params[:enrollment][:course_section_id] = @section.id if @section.present?
     if params[:enrollment][:course_section_id].present?
-      params[:enrollment][:section] = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
+      @section = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
+      params[:enrollment][:section] = @section
     end
     api_user_id = params[:enrollment].delete(:user_id)
     user = api_find(User, api_user_id)
     raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
+
+    if @context.concluded?
+      # allow moving users already in the course to open sections
+      unless @section && user.enrollments.where(course_id: @context).exists? && !@section.concluded?
+        return render_create_errors([@@errors[:concluded_course]])
+      end
+    end
+
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session)) :

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context.id %>/pages/<%= asset.url %>
+  <%= polymorphic_url([asset.context, :wiki_page], id: asset.url) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -16,4 +16,4 @@
 
 <p><strong><%= html_to_text(asset.title).titleize %></strong></p>
 
-<p><%= CanvasTextHelper.truncate_text(html_to_text(asset.body, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}"), :max_length => 200) %></p>
+<p><%= CanvasTextHelper.truncate_text(html_to_text(asset.body, :base_url => dashboard_url), :max_length => 200) %></p>

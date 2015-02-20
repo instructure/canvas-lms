@@ -298,6 +298,7 @@ class Assignment < ActiveRecord::Base
 
   def update_grades_if_details_changed
     if points_possible_changed? || muted_changed? || workflow_state_changed?
+      Rails.logger.info "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
       connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
@@ -522,7 +523,7 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_unmuted
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      assignment.recently_unmuted
+      assignment.context.available? && assignment.recently_unmuted
     }
 
   end
@@ -1165,7 +1166,7 @@ class Assignment < ActiveRecord::Base
         })
         homework.submitted_at = Time.now
 
-        homework.with_versioning(:explicit => true) do
+        homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             if student == original_student
               homework.broadcast_group_submission
@@ -1264,7 +1265,6 @@ class Assignment < ActiveRecord::Base
 
     submissions = self.submissions.where(:user_id => students)
                   .includes(:submission_comments,
-                            :attachments,
                             :versions,
                             :quiz_submission)
 
@@ -1279,14 +1279,15 @@ class Assignment < ActiveRecord::Base
           :submission_comments => {
             :methods => avatar_methods,
             :only => comment_fields
-          },
-          :attachments => {
-            :only => [:mime_class, :comment_id, :id, :submitter_id ]
-          },
+          }
         },
         :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
+      json['attachments'] = sub.attachments.map{|att| att.as_json(
+          :only => [:mime_class, :comment_id, :id, :submitter_id ]
+      )}
 
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|

@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %>
+  <%= course_url(asset) %>
 <% end -%>
 <%= t :body, "Canvas Alert - New Course: %{course}, %{account}", :course => asset.name, :account => asset.root_account.name %>

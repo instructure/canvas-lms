@@ -1,27 +1,34 @@
 define [
   'i18n!react_files'
-  'react'
+  'old_unsupported_dont_use_react'
   '../modules/customPropTypes'
   'compiled/models/Folder'
   '../modules/filesEnv'
-  '../utils/openUsageRightsDialog'
-], (I18n, React, customPropTypes, Folder, filesEnv, openUsageRightsDialog) ->
+  './UsageRightsDialog'
+], (I18n, React, customPropTypes, Folder, filesEnv, UsageRightsDialog) ->
 
   {button, span, i} = React.DOM
 
   UsageRightsIndicator = React.createClass
     displayName: 'UsageRightsIndicator'
 
+    warningMessage: I18n.t('Before publishing this file, you must specify usage rights.')
+
     propTypes:
       model: customPropTypes.filesystemObject.isRequired
       userCanManageFilesForContext: React.PropTypes.bool.isRequired
       usageRightsRequiredForContext: React.PropTypes.bool.isRequired
+      modalOptions: React.PropTypes.object.isRequired
 
     handleClick: (event) ->
       event.preventDefault()
 
-      openUsageRightsDialog([@props.model], {returnFocusTo: @getDOMNode()})
+      contents = UsageRightsDialog(
+        closeModal: @props.modalOptions.closeModal
+        itemsToManage: [@props.model]
+      )
 
+      @props.modalOptions.openModal(contents, => @getDOMNode().focus())
 
     render: ->
       if (@props.model instanceof Folder) || (!@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))
@@ -31,9 +38,11 @@ define [
           button {
               className: 'UsageRightsIndicator__openModal btn-link'
               onClick: @handleClick
-              title: I18n.t('Before publishing this file, you must specify usage rights.')
+              title: @warningMessage
               'data-tooltip': 'top'
             },
+              span {className: 'screenreader-only'},
+                @warningMessage
               i {className: 'UsageRightsIndicator__warning icon-warning'}
         else
           null

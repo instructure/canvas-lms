@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ContextModule do
   def course_module
-    course_with_student_logged_in
+    course_with_student_logged_in(:active_all => true)
     @module = @course.context_modules.create!(:name => "some module")
   end
 

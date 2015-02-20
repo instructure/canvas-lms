@@ -338,4 +338,16 @@ define([
       ENV.submissions.push({assignment_id: assignmentId, score: score});
     }
   }
+
+
+  $(document).on('change', '#grading_periods_selector', function(e){
+    var newGP = $(this).val();
+    if(matches = location.href.match(/grading_period_id=\d*/)){
+      location.href = location.href.replace(matches[0], "grading_period_id=" + newGP);
+    }else if(matches = location.href.match(/#tab-assignments/)){
+      location.href = location.href.replace(matches[0], "") + "?grading_period_id=" + newGP + matches[0];
+    }else {
+      location.href += "?grading_period_id=" + newGP;
+    }
+  });
 });

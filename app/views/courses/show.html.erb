@@ -13,7 +13,7 @@
 <% content_for :right_side do %>
   <div id="course_show_secondary">
     <% @can_manage_content = can_do(@context, @current_user, :manage_content) %>
-    <% if @can_manage_content && can_do(@context, @current_user, :change_course_state) && @context.unpublishable? %>
+    <% if @can_manage_content && can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
       <div id="course_status" class="text-center">
         <h4>
           <%= t('headers.course_status', %{Course Status}) %>
@@ -125,7 +125,7 @@
     <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
-  <% elsif @course_home_view != 'wiki' %>
+  <% else %>
     <% locals = {:title => t("Coming Up"), :display_count => 3, :period => "the next week", :contexts_to_link_to => @context, :upcoming => true} %>
     <% if @current_user %>
       <% cache(safe_cache_key([@current_user, @contexts, 'course_upcoming_events' ])) do %>

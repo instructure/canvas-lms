@@ -148,15 +148,25 @@ describe "calendar2" do
       #   when checking for "today", we need to look for the second instance of the class
 
       # Check for highlight to be present on this week
-      expect(ff(".fc-today")[1]).not_to be_nil
+      expect(ff(".fc-today").size).to eq 2
+
+      # Get the month so we can check to see if the month changes
+      starting_month = f(".fc-header-title").text
 
       # Change calendar week and make sure that the highlight is not there
+      # If the month does not change, it should still be on the mini calendar so we still expect 1
+      # If the month changes, we should expect 0
       change_calendar
-      expect(ff(".fc-today")[1]).to be_nil
+      changed_month = f(".fc-header-title").text
+      if (starting_month == changed_month)
+        expect(ff(".fc-today").size).to eq 1
+      else
+        expect(ff(".fc-today").size).to eq 0
+      end
 
-      # Back to today. Make sure that the highlight is present s
+      # Back to today. Make sure that the highlight is present
       change_calendar(:today)
-      expect(ff(".fc-today")[1]).not_to be_nil
+      expect(ff(".fc-today").size).to eq 2
     end
 
     it "should show the location when clicking on a calendar event" do

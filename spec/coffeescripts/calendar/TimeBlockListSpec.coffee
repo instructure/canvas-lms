@@ -1,5 +1,5 @@
 # requires jquery and date.js
-require [
+define [
   'jquery'
   'compiled/calendar/TimeBlockList'
 ], ($, TimeBlockList) ->

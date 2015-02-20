@@ -4,7 +4,6 @@ define [
   'underscore'
   'Backbone'
   'jst/gradebook2/section_to_show_menu'
-
   'compiled/jquery.kylemenu'
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, _, {View}, template) ->

@@ -11,15 +11,30 @@ next to it where it is declared in the real sass sheet.
 
 As we decide upon new variables that we want to be able to set, remember to add them to
 both "config/brand_variables.sass.example" as well as your "config/brand_variables.sass" locally.
+
 */
 
+//// Canvas Primary Palette
+////////////////////////////////////////////////
+// $ic-brand-primary
+// $ic-brand-secondary
+// $linkColor
 
-$canvas-primary: orange;
-$canvas-secondary: indigo;
-$linkColor: deeppink;
+//// Instructure Canvas (IC) Global Variables
+////////////////////////////////////////////////
 
+// $ic-body-background-color
+// $ic-content-background-color
+// $ic-font-color-light
+// $ic-font-color-dark
+// $ic-font-color--subdued
+// $ic-border-color
+// $ic-list-item-background--hover
+// $ic-list-item-background--selected
 
-// this is the blue color that we use all over the place when not in a gradiant
-$highlight-color: fuchsia;
-// light blue hover color
-$hover-color: mistyrose;
+//// Buttons
+////////////////////////////
+// $ic-brand-button--primary-bgd
+// $ic-brand-button--primary-text
+// $ic-brand-button--secondary-bgd
+// $ic-brand-button--secondary-text

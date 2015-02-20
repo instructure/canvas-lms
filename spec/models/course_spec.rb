@@ -921,6 +921,31 @@ describe Course, "gradebook_to_csv" do
     expect(rows[2][-5]).to  eq "25"     # ag2 final score
   end
 
+  it "handles nil assignment due_dates if the group and position are the same" do
+    course_with_student(:active_all => true)
+
+    assignment_group = @course.assignment_groups.create!(:name => "Some Assignment Group 1")
+
+    now = Time.now
+
+    @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 1, :assignment_group => assignment_group, :points_possible => 10)
+    @course.assignments.create!(:title => "Assignment 02", :due_at => nil, :position => 1, :assignment_group => assignment_group, :points_possible => 10)
+
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+
+    csv = @course.gradebook_to_csv
+    rows = CSV.parse(csv)
+    assignments = rows[0].each_with_object([]) do |column, collection|
+      collection << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
+    end
+
+    expect(csv).not_to be_nil
+    # make sure they retain the correct order
+    expect(assignments).to eq ["Assignment 01", "Assignment 02"]
+  end
+
   it "should alphabetize by sortable name with the test student at the end" do
     course
     ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].each{|name| student_in_course(:name => name)}
@@ -1293,6 +1318,23 @@ describe Course, "tabs_available" do
       expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
       expect(tab_ids.length).to be > 0
       expect(@course.tabs_available(@user).map{|t| t[:label] }.compact.length).to eql(tab_ids.length)
+    end
+
+    it "should handle hidden_unused correctly for discussions" do
+      tabs = @course.uncached_tabs_available(@teacher)
+      dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
+      expect(dtab[:hidden_unused]).to be_falsey
+
+      @course.allow_student_discussion_topics = false
+      tabs = @course.uncached_tabs_available(@teacher)
+      dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
+      expect(dtab[:hidden_unused]).to be_truthy
+
+      @course.allow_student_discussion_topics = true
+      discussion_topic_model
+      tabs = @course.uncached_tabs_available(@teacher)
+      dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
+      expect(dtab[:hidden_unused]).to be_falsey
     end
   end
 
@@ -3765,6 +3807,20 @@ describe Course do
       @course.enroll_user(@user1)
 
       expect(@course.enrollments.count).to eq enrollment_count
+    end
+
+    it "should not set an active enrollment back to invited on re-enrollment" do
+      course(:active_all => true)
+      user
+      enrollment = @course.enroll_user(@user)
+      enrollment.accept!
+
+      expect(enrollment).to be_active
+
+      @course.enroll_user(@user)
+
+      enrollment.reload
+      expect(enrollment).to be_active
     end
 
     it 'should allow deleted enrollments to be resurrected as active' do

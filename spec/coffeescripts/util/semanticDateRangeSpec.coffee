@@ -27,7 +27,7 @@ define ['compiled/util/semanticDateRange'], (semanticDateRange) ->
           Jan 1, 1970, 12:00am
         </time> -
         <time datetime='1970-01-01T01:00:00.000Z'>
-           1:00am
+          1:00am
         </time>
       </span>
       """
@@ -44,7 +44,7 @@ define ['compiled/util/semanticDateRange'], (semanticDateRange) ->
       """
 
   test 'no date', ->
-    equal semanticDateRange(null, null), 
+    equal semanticDateRange(null, null),
       """
       <span class="date-range date-range-no-date">
         No Date
@@ -53,7 +53,7 @@ define ['compiled/util/semanticDateRange'], (semanticDateRange) ->
 
   test 'can take ISO strings', ->
     date = (new Date(0)).toISOString()
-    equal semanticDateRange(date, date), 
+    equal semanticDateRange(date, date),
       """
       <span class="date-range">
         <time datetime='1970-01-01T00:00:00.000Z'>

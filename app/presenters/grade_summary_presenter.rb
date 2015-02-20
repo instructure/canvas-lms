@@ -110,9 +110,12 @@ class GradeSummaryPresenter
     @groups ||= @context.assignment_groups.active.all
   end
 
-  def assignments
+  def assignments(gp_id = nil)
     @assignments ||= begin
       visible_assignments = AssignmentGroup.visible_assignments(student, @context, groups, [:assignment_overrides])
+      if gp_id
+        visible_assignments = GradingPeriod.find(gp_id).assignments(visible_assignments)
+      end
       group_index = groups.index_by(&:id)
       visible_assignments.select { |a| a.submission_types != 'not_graded'}.map { |a|
         # prevent extra loads

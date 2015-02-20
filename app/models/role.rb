@@ -36,7 +36,7 @@ class Role < ActiveRecord::Base
     # this is an override to take advantage of built-in role caching since those are by far the most common
     def role
       self.association(:role).target ||= self.shard.activate do
-        Role.get_role_by_id(read_attribute(:role_id)) || (self.respond_to?(:default_role) && self.default_role)
+        Role.get_role_by_id(read_attribute(:role_id)) || (self.respond_to?(:default_role) ? self.default_role : nil)
       end
       super
     end

@@ -194,7 +194,7 @@ describe ContextModuleProgression do
     end
   end
 
-  it "should invalidate progressions if a prerequisite changes" do
+  it "should not invalidate progressions if a prerequisite changes, until manually relocked" do
     @module.unpublish!
     setup_modules
     @module3.prerequisites = "module_#{@module2.id}"
@@ -204,6 +204,13 @@ describe ContextModuleProgression do
 
     @module.reload
     @module.publish!
+    progression2.reload
+    progression3.reload
+    expect(progression2).to be_completed
+    expect(progression3).to be_completed
+
+    @module.relock_progressions
+
     progression2.reload
     progression3.reload
     expect(progression2).to be_locked

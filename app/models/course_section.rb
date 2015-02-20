@@ -77,6 +77,15 @@ class CourseSection < ActiveRecord::Base
     course.available?
   end
 
+  def concluded?
+    now = Time.now
+    if self.end_at && self.restrict_enrollments_to_section_dates
+      self.end_at < now
+    else
+      self.course.concluded?
+    end
+  end
+
   def touch_all_enrollments
     return if new_record?
     self.enrollments.update_all(:updated_at => Time.now.utc)

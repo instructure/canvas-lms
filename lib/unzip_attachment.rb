@@ -88,6 +88,7 @@ class UnzipAttachment
   # Tempfile will unlink its new file as soon as f is garbage collected.
   def process
 
+    Folder.reset_path_lookups!
     with_unzip_configuration do
       zip_stats.validate_against(context)
 

@@ -150,7 +150,7 @@ define [
 
   test 'should format in profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
-    equal $.timeString(new Date(0)), ' 7:00pm'
+    equal $.timeString(new Date(0)), '7:00pm'
 
   module 'datetimeString',
     setup: ->
@@ -165,7 +165,7 @@ define [
 
   test 'should format in profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
-    equal $.datetimeString(new Date(0)), 'Dec 31, 1969 at  7:00pm'
+    equal $.datetimeString(new Date(0)), 'Dec 31, 1969 at 7:00pm'
 
   test 'should translate into the profile locale', ->
     tz.changeLocale(portuguese, 'pt_PT')

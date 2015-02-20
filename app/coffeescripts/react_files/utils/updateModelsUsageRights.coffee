@@ -2,7 +2,8 @@ define [
   'underscore'
   'compiled/models/Folder'
   'compiled/models/File'
-], (_, Folder, File) ->
+  'compiled/models/ModuleFile'
+], (_, Folder, File, ModuleFile) ->
 
   ###
   # Sets usage rights on the models in memory based on the response from the
@@ -16,6 +17,7 @@ define [
     # Seperate the models array into a file group and a folder group.
     {files, folders} = _.groupBy models, (item) ->
       return 'files' if item instanceof File
+      return 'files' if item instanceof ModuleFile
       return 'folders' if item instanceof Folder
     # We'll go ahead and update the files and remove the id from our list.
     if files

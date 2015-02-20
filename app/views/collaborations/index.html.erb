@@ -57,7 +57,7 @@ HEREDOC
 </div>
 <div id="collaborations">
 <% @collaborations.each do |collaboration| %>
-  <% if can_do(collaboration, @current_user, :read) %>
+  <% if can_do(collaboration, @current_user, :read) && !collaboration.is_a?(GoogleDocsCollaboration) || (collaboration.is_a?(GoogleDocsCollaboration) && !@google_drive_upgrade) %>
     <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
       <% if can_do(collaboration, @current_user, :delete) %>
       <div class="links">
@@ -76,6 +76,19 @@ HEREDOC
                                           :at => datetime_string(collaboration.created_at) %>
       </span>
     </div>
+  <% elsif @google_drive_upgrade %>
+      <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
+        <h3><%= collaboration.title %></h3>
+        <div style="margin-bottom: 5px;" class="description">
+          <a href="<%= oauth_url(:service => :google_drive, :return_to => (request.url)) %>"><%= t 'google.drive.upgrade.description', "To access this collaboration you must authorize Canvas to access your Google Drive account" %></a>
+        </div>
+      <span <%= context_sensitive_datetime_title(collaboration.created_at, @context) %> style="font-size: 0.8em;">
+        <%= t :started_by, "Started by *%{user}*, %{at}",
+              :user => context_user_name(@context, collaboration.user),
+              :wrapper => "<a href=\"#{context_url(@context, :context_user_url, collaboration.user_id)}\" class=\"collaborator_link\">\\1</a>",
+              :at => datetime_string(collaboration.created_at) %>
+      </span>
+      </div>
   <% end %>
 <% end %>
 </div>

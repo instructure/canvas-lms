@@ -29,16 +29,21 @@ describe Announcement do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
+      student_in_course(:course => course)
       announcement = course.announcements.create!(valid_announcement_attributes)
 
       expect(announcement).to be_locked
+      expect(announcement.grants_right?(@student, :reply)).to be_falsey
     end
 
     it "should not lock if its course does not have the lock_all_announcements setting" do
       course = Course.create!
+      student_in_course(:course => course)
+
       announcement = course.announcements.create!(valid_announcement_attributes)
 
       expect(announcement).not_to be_locked
+      expect(announcement.grants_right?(@student, :reply)).to be_truthy
     end
 
     it "should not automatically lock if it is a delayed post" do

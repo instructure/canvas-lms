@@ -165,6 +165,24 @@ describe AssignmentsController do
       get 'show', :course_id => @course.id, :id => a.id
       GoogleDocs::Connection.unstub(:config)
     end
+
+    it 'should force users to use google drive if availible' do
+      user_session(@student)
+      a = @course.assignments.create(:title => "some assignment")
+      plugin = Canvas::Plugin.find(:google_drive)
+      plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(:name => plugin.id, :settings => plugin.default_settings)
+      plugin_setting.posted_settings = {}
+      plugin_setting.save!
+      google_docs_mock = mock('google_docs')
+      google_docs_mock.stubs(:service_type).returns(nil)
+      google_docs_mock.stubs(:retrieve_access_token).returns(nil)
+      controller.stubs(:google_service_connection).returns(google_docs_mock)
+      get 'show', :course_id => @course.id, :id => a.id
+
+      expect(response).to be_success
+      expect(assigns(:google_drive_upgrade)).to be_truthy
+    end
+
   end
 
   describe "GET 'syllabus'" do

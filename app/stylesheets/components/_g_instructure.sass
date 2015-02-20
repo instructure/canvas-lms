@@ -535,8 +535,8 @@ ul.group_list
   :margin-bottom 20px
 
 $wizard-icon-size: 120px
-$wizard-bg-color: $canvas-secondary
-$wizard-highlight-color: $canvas-primary
+$wizard-bg-color: $ic-brand-secondary
+$wizard-highlight-color: $ic-brand-primary
 
 @keyframes icon-slide-down
   from
@@ -616,16 +616,16 @@ $wizard-highlight-color: $canvas-primary
 
         &:hover
           @if $use_high_contrast == false
-            :background-color $canvas-light
+            :background-color $ic-color-light
         &.completed a
           :color #aaa
         &.selected
           @if $use_high_contrast
             a
-              :color $canvas-dark
+              :color $ic-color-dark
               :text-decoration none
           @else
-            :background-color $canvas-light
+            :background-color $ic-color-light
 
         a[class*=icon-], a[class^=icon-]
 
@@ -652,7 +652,7 @@ $wizard-highlight-color: $canvas-primary
     h3
       padding: 0
       margin: 0
-      border-bottom-color: rgba($canvas-light, 0.15)
+      border-bottom-color: rgba($ic-color-light, 0.15)
       font-weight: bold
 
     .wizard-box__feature-icon
@@ -664,31 +664,31 @@ $wizard-highlight-color: $canvas-primary
         display: block
         text-align: center
         margin: 0
-        margin: -($can-sp*6) 0 $can-sp*2
+        margin: -($ic-sp*6) 0 $ic-sp*2
         transform: translate3d(0,0,0) scale(0.7)
         transform-origin: center top
         animation-duration: 0.5s
         animation-name: icon-slide-down
-        animation-timing-function: $can-transition
+        animation-timing-function: $ic-transition
         animation-fill-mode: forwards
 
       i[class^=icon-]
-        width: ($wizard-icon-size + $can-sp*4)/2
-        height: ($wizard-icon-size + $can-sp*4)/2
-        background: $canvas-secondary
+        width: ($wizard-icon-size + $ic-sp*4)/2
+        height: ($wizard-icon-size + $ic-sp*4)/2
+        background: $ic-brand-secondary
         border-radius: 100%
         font-size: $wizard-icon-size/2
         &:before
-          font-size: ($wizard-icon-size - $can-sp)/2
-          color: $canvas-light
-          line-height: ($wizard-icon-size + $can-sp*4)/2
+          font-size: ($wizard-icon-size - $ic-sp)/2
+          color: $ic-color-light
+          line-height: ($wizard-icon-size + $ic-sp*4)/2
         @include breakpoint(desktop)
-          width: $wizard-icon-size + $can-sp*4
-          height: $wizard-icon-size + $can-sp*4
+          width: $wizard-icon-size + $ic-sp*4
+          height: $wizard-icon-size + $ic-sp*4
           font-size: $wizard-icon-size
           &:before
-            font-size: $wizard-icon-size - $can-sp
-            line-height: $wizard-icon-size + $can-sp*4
+            font-size: $wizard-icon-size - $ic-sp
+            line-height: $wizard-icon-size + $ic-sp*4
 
 
     .wizard-box__container
@@ -709,21 +709,21 @@ $wizard-highlight-color: $canvas-primary
       width: 100%
 
     .wizard-box__logo
-      padding: $can-sp
+      padding: $ic-sp
       flex: 0 0 34%
       @include breakpoint(desktop)
-        flex: 0 0 $can-sp*10
-        padding: $can-sp*2
+        flex: 0 0 $ic-sp*10
+        padding: $ic-sp*2
       
       .svg-canvas-logo
         display: block
-        width: $can-sp*10
+        width: $ic-sp*10
         @include breakpoint(desktop)
-          width: $can-sp*12
+          width: $ic-sp*12
       
     .wizard_content
       background: transparent
-      color: $canvas-light
+      color: $ic-color-light
       padding: 0
       border: none
       box-shadow: none
@@ -752,7 +752,7 @@ $wizard-highlight-color: $canvas-primary
 
       .wizard_options_list
         margin: 0
-        padding: $can-sp
+        padding: $ic-sp
         flex: 1
         display: flex
         flex-direction: column
@@ -768,9 +768,9 @@ $wizard-highlight-color: $canvas-primary
           @include breakpoint(desktop)
             font-size: 15px
           &.selected
-            background: rgba($canvas-light, 0.1)
+            background: rgba($ic-color-light, 0.1)
             a.header
-              border-left-color: $canvas-primary
+              border-left-color: $ic-brand-primary
           &.completed
             a.header
               background-image: url("/images/wizard-todo-checked.svg")
@@ -780,17 +780,17 @@ $wizard-highlight-color: $canvas-primary
             display: flex
             width: 100%
             align-items: center
-            padding: 8px $can-sp*3 8px $can-sp*3
-            color: $canvas-light
+            padding: 8px $ic-sp*3 8px $ic-sp*3
+            color: $ic-color-light
             text-decoration: none
-            background: url("/images/wizard-todo-unchecked.svg") no-repeat $can-sp 50%
+            background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%
             background-size: 16px 16px
             line-height: 1.2
-            border-left: $can-sp/3 solid transparent
+            border-left: $ic-sp/3 solid transparent
             @include breakpoint(desktop)
-              background-position: $can-sp*2 50%
-              background-size: $can-sp*2 $can-sp*2
-              padding-left: $can-sp*5
+              background-position: $ic-sp*2 50%
+              background-size: $ic-sp*2 $ic-sp*2
+              padding-left: $ic-sp*5
             
       .wizard_details__layout
         flex: 2
@@ -802,26 +802,26 @@ $wizard-highlight-color: $canvas-primary
           align-items: center
 
       h3.wizard_details__headline
-        font-size: $can-sp*3
+        font-size: $ic-sp*3
         line-height: 1
-        color: rgba($canvas-light, 0.95)
+        color: rgba($ic-color-light, 0.95)
         border-bottom: none
         flex: 0.75
         align-self: center
         text-align: center
         @include breakpoint(mini-tablet)
-          font-size: $can-sp*5
+          font-size: $ic-sp*5
           letter-spacing: -1px
           flex: 1
         @include breakpoint(desktop)
-          font-size: $can-sp*7
+          font-size: $ic-sp*7
           display: flex
           width: 100%
           justify-content: center
           align-self: auto
 
       .wizard_details__calltoaction
-        margin-top: $can-sp*2
+        margin-top: $ic-sp*2
 
       .wizard_details__container
         flex: 3
@@ -834,22 +834,22 @@ $wizard-highlight-color: $canvas-primary
         border: none
         border-radius: 0
         text-align: center
-        background: rgba($canvas-light, 0.85)
-        padding: $can-sp*2
+        background: rgba($ic-color-light, 0.85)
+        padding: $ic-sp*2
         overflow: visible !important
         animation-duration: 0.5s
         animation-name: icon-slide-up
-        animation-timing-function: $can-transition
+        animation-timing-function: $ic-transition
         @if $use_high_contrast
-          background: $canvas-light
+          background: $ic-color-light
           color: desaturate(darken($wizard-bg-color, 25), 2)
         @else
-          background: rgba($canvas-light, 0.85)
+          background: rgba($ic-color-light, 0.85)
           color: desaturate(darken($wizard-bg-color, 20), 2)
         @include breakpoint(tablet)
           max-width: 600px
-          border-radius: $can-sp/2
-          padding: $can-sp*3
+          border-radius: $ic-sp/2
+          padding: $ic-sp*3
 
         p
           line-height: 1.5
@@ -859,7 +859,7 @@ $wizard-highlight-color: $canvas-primary
             margin-bottom: 0
 
         a.link
-          padding: $can-sp $can-sp*2
+          padding: $ic-sp $ic-sp*2
           background-image: none
           
 
@@ -1695,7 +1695,7 @@ form.user_content_post_form
 
 .nav-badge
   border-radius: 30px;
-  background-color: $canvas-primary;
+  background-color: $ic-brand-primary;
   padding: 0 8px;
   font-size: 9px;
   color: #fff;

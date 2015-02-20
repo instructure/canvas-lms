@@ -1,6 +1,6 @@
 
 if CANVAS_RAILS3
-  gem 'rails', '3.2.21'
+  gem 'rails', '3.2.21', github: 'rails/rails', branch: '3-2-stable', ref: 'b344986bc3d94ca7821fc5e0eef1874882ac6cbb'
   gem 'rack', '1.4.5'
   gem 'builder', '3.0.0'
   gem 'tzinfo', '0.3.39'
@@ -21,7 +21,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4'
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.2.25'
+gem 'switchman', '1.2.28'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
 
@@ -31,8 +31,8 @@ gem "aws-sdk", '1.52.0'
 gem 'barby', '0.5.0'
   gem 'chunky_png', '1.3.0'
 gem 'bcrypt-ruby', '3.0.1'
-gem 'canvas_connect', '0.3.6'
-  gem 'adobe_connect', '1.0.0'
+gem 'canvas_connect', '0.3.7'
+  gem 'adobe_connect', '1.0.2'
 gem 'canvas_webex', '0.15'
 gem 'canvas-jobs', '0.9.11'
 gem 'daemons', '1.1.0'
@@ -56,6 +56,7 @@ gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485
   gem 'jsmin', '1.0.1'
 gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
+gem 'jwt', '1.2.1'
 
 # native xml parsing, diigo
 gem 'libxml-ruby', '2.7.0', :require => 'xml/libxml'
@@ -71,7 +72,7 @@ gem 'mini_magick', '1.3.2'
   gem 'subexec', '0.0.4'
 gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0'
-gem 'nokogiri', '1.5.6'
+gem 'nokogiri', '1.6.6.2'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false
@@ -85,14 +86,14 @@ gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
 gem 'net-ldap', '0.10.1'
 gem 'ruby-duration', '3.2.0'
-gem 'ruby-saml-mod', '0.2.2'
+gem 'ruby-saml-mod', '0.2.3'
 gem 'rubycas-client', '2.3.9'
 gem 'rubyzip', '1.1.1', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
   gem 'hashie', '2.0.5'
-gem 'sanitize', '2.0.3'
+gem 'sanitize', '2.0.6'
 gem 'shackles', '1.0.7'
 
 gem 'useragent', '0.10.0'
@@ -132,6 +133,7 @@ gem 'canvas_unzip', :path => 'gems/canvas_unzip'
 gem 'canvas_uuid', :path => 'gems/canvas_uuid'
 gem 'facebook', :path => 'gems/facebook'
 gem 'google_docs', :path => 'gems/google_docs'
+gem 'google_drive', :path => 'gems/google_drive'
 gem 'html_text_helper', :path => 'gems/html_text_helper'
 gem 'incoming_mail_processor', :path => 'gems/incoming_mail_processor'
 gem 'json_token', :path => 'gems/json_token'

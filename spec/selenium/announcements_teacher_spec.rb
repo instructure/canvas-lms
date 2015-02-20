@@ -20,7 +20,6 @@ describe "announcements" do
           what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => @user) : announcement_model(:title => title, :user => @user)
         end
         get url
-        wait_for_ajaximations
         @checkboxes = ff('.toggleSelected')
       end
 
@@ -81,6 +80,39 @@ describe "announcements" do
         @context = @course
       end
 
+      it "should have a lock that appears and disappears when the cog menu is used to lock/unlock the announcement for comments" do
+        title = "My announcement"
+        announcement_model(:title => title, :user => @user)
+        get url
+
+        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+        f('.discussion-actions .al-trigger').click
+        wait_for_ajaximations
+        f('.al-options li a.icon-lock').click
+        wait_for_ajaximations
+        expect(f('.discussion-info-icons .icon-lock')).not_to be_nil
+        f('.discussion-actions .al-trigger').click
+        wait_for_ajaximations
+        f('.al-options li a.icon-lock').click
+        wait_for_ajaximations
+        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+      end
+
+      it "should remove an announcement when it is deleted from the delete option in the cog menu" do
+        title = "My announcement"
+        announcement_model(:title => title, :user => @user)
+        get url
+
+        expect(f('.discussion-topic')).not_to be_nil
+        f('.discussion-actions .al-trigger').click
+        f('.al-options li a.icon-trash').click
+        alert_present?
+        alert = driver.switch_to.alert
+        expect(alert.text).to match "Are you sure you want to delete this announcement?"
+        alert.accept
+        expect(f('.discussion-topic')).to be_nil
+      end
+
       it "should start a new topic" do
         get url
 
@@ -96,6 +128,20 @@ describe "announcements" do
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
+      end
+
+      it "should perform front-end validation for message" do
+        topic_title = 'new topic with file'
+        get url
+
+        expect_new_page_load { f('.btn-primary').click }
+        replace_content(f('input[name=title]'), topic_title)
+        filename, fullpath, data = get_file("testfile5.zip")
+        f('input[name=attachment]').send_keys(fullpath)
+        submit_form('.form-actions')
+        wait_for_ajaximations
+
+        expect(ff('.error_box').any?{|box| box.text.include?("A message is required")}).to be_truthy
       end
 
       it "should add an attachment to a graded topic" do
@@ -134,7 +180,6 @@ describe "announcements" do
       it "should reorder topics" do
         3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
         get url
-        wait_for_ajax_requests
 
         topics = ff('.discussion-topic')
         driver.action.move_to(topics[0]).perform
@@ -160,7 +205,6 @@ describe "announcements" do
 
     it "should add and remove an external feed to announcements" do
       get "/courses/#{@course.id}/announcements"
-      wait_for_ajaximations
 
       #add external feed to announcements
       feed_name = 'http://www.google.com'
@@ -190,7 +234,7 @@ describe "announcements" do
     end
 
     it "should remove delayed_post_at when unchecking delay_posting" do
-      topic = announcement_model(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago)
+      topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
 

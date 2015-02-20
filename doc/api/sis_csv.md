@@ -368,8 +368,13 @@ enrollments.csv
 <tr>
 <td>role</td>
 <td>text</td>
-<td><b>Required field</b>. student, teacher, ta, observer, designer, or a custom role defined
+<td><b>Required field if role_id missing</b>. student, teacher, ta, observer, designer, or a custom role defined
 by the account</td>
+</tr>
+<tr>
+<td>role_id</td>
+<td>text</td>
+<td><b>Required field if role missing</b>. Uses a role id, either built-in or defined by the account</td>
 </tr>
 <tr>
 <td>section_id</td>

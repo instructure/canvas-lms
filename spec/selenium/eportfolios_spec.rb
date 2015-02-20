@@ -48,6 +48,7 @@ describe "eportfolios" do
       wait_for_ajaximations
       fj('.done_editing_button:visible').click
       wait_for_ajaximations
+      f('#content').click
       expect(f('#page_list')).to include_text(page_title)
       get "/eportfolios/#{@eportfolio.id}/category/I_made_this_page"
       wait_for_ajaximations

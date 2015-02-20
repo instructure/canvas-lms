@@ -52,7 +52,8 @@ module Lti
         name: external_tool.name,
         description: external_tool.description,
         installed_locally: external_tool.context == @context,
-        enabled: true
+        enabled: true,
+        tool_configuration: external_tool.tool_configuration
       }
     end
 
@@ -63,7 +64,8 @@ module Lti
         name: tool_proxy.name,
         description: tool_proxy.description,
         installed_locally: tool_proxy.context == @context,
-        enabled: tool_proxy.workflow_state == 'active'
+        enabled: tool_proxy.workflow_state == 'active',
+        tool_configuration: nil
       }
     end
 

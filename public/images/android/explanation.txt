@@ -1,0 +1,4 @@
+this is the android logo file that is submitted with the app to the google play
+store, included here so that we can show a banner to users who log into the
+canvas web app from an android device, directing them to download the app. see
+app/coffeescripts/smartbanner.coffee for where that happens.

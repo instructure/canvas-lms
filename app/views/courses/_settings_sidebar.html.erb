@@ -111,7 +111,9 @@
            next if skip_custom_role?(cr)
         %>
           <tr>
-            <td><%= cr[:label] %>:</td>
+            <td>
+              <%= cr[:label] %><% if cr[:workflow_state] == 'inactive' %> (<%= t('role.inactive', 'inactive') %>)<% end %>:
+            </td>
             <td><%= user_count(cr[:count]) %></td>
           </tr>
         <% end %>

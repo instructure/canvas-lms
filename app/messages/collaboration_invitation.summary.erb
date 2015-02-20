@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations/<%= asset.collaboration.id %>
+  <%= polymorphic_url([asset.collaboration.context, asset.collaboration]) %>
 <% end %>
 
 <% define_content :subject do %>

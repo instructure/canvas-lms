@@ -9,12 +9,14 @@ module Importers
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
           begin
             item = import_from_migration(tool, migration.context, migration)
-            if item.consumer_key == 'fake' || item.shared_secret == 'fake'
-              migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
-            end
           rescue
             migration.add_import_warning(t('#migration.external_tool_type', "External Tool"), tool[:title], $!)
           end
+        end
+      end
+      migration.imported_migration_items_by_class(ContextExternalTool).each do |tool|
+        if tool.consumer_key == 'fake' || tool.shared_secret == 'fake'
+          migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => tool.name))
         end
       end
     end
@@ -84,7 +86,7 @@ module Importers
       domain ||= (URI.parse(url).host rescue nil) if url
       return unless url || domain
 
-      settings = create_tool_settings(hash).with_indifferent_access.except(:custom_fields)
+      settings = create_tool_settings(hash).with_indifferent_access.except(:custom_fields, :vendor_extensions)
 
       migration.imported_migration_items_by_class(ContextExternalTool).each do |tool|
         next unless matching_settings?(hash, tool, settings)
@@ -127,6 +129,7 @@ module Importers
     def self.generalize_tool_name(tool)
       if tool.domain
         tool.name = CanvasTextHelper.truncate_text(tool.domain, :max_length => 100)
+        tool.description = "A combined configuration for all tools with the domain: #{tool.domain}"
         tool.save! if tool.changed?
       end
     end
@@ -135,7 +138,7 @@ module Importers
       tool.privacy_level == (hash[:privacy_level] || 'name_only') &&
         tool.consumer_key == (hash[:consumer_key] || 'fake') &&
         tool.shared_secret == (hash[:shared_secret] || 'fake') &&
-        tool.settings.with_indifferent_access.except(:custom_fields) == settings
+        tool.settings.with_indifferent_access.except(:custom_fields, :vendor_extensions) == settings
     end
   end
 end

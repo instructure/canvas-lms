@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmission do
-
   context 'with course and quiz' do
   before(:once) do
     course
@@ -138,6 +137,29 @@ describe Quizzes::QuizSubmission do
       v = qs.versions.current.model
       expect(v.score).to eq 45
       expect(v.fudge_points).to eq -5
+    end
+
+    context 'on a graded_survey' do
+      it "should award all points for a graded_survey" do
+        @quiz.update_attributes(points_possible: 42, quiz_type: 'graded_survey')
+
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "wrong" }
+        Quizzes::SubmissionGrader.new(qs).grade_submission
+
+        # sanity check
+        qs.reload
+        expect(qs.score).to eq 42
+        expect(qs.kept_score).to eq 42
+
+        qs.update_scores({:fudge_points => -5, :question_score_1 => 50})
+        expect(qs.score).to eq 42
+        expect(qs.fudge_points).to eq -5
+        expect(qs.kept_score).to eq 42
+        v = qs.versions.current.model
+        expect(v.score).to eq 42
+        expect(v.fudge_points).to eq -5
+      end
     end
 
     it "should not allow updating scores on an uncompleted submission" do
@@ -424,8 +446,50 @@ describe Quizzes::QuizSubmission do
     s.with_versioning(true, &:save!)
     expect(s.kept_score).to eql(5.0)
 
+    q.update_attributes!(scoring_policy: "keep_average")
+    s.reload
+    s.with_versioning(true, &:save!)
+    expect(s.kept_score).to eql(4.0)
+
+    q.update_attributes!(:scoring_policy => "keep_highest")
     s.update_scores(:submission_version_number => 2, :fudge_points => 6.0)
     expect(s.kept_score).to eql(6.0)
+  end
+
+  it "should calculate average score to a precision of 2" do
+    q = @course.quizzes.create!(scoring_policy: "keep_average")
+    s = q.quiz_submissions.new
+    s.workflow_state = "complete"
+    s.score = 2.0
+    s.attempt = 1
+    s.with_versioning(true, &:save!)
+
+    s.score = 4.0
+    s.attempt = 2
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(2)
+
+    s.score = 5.0
+    s.attempt = 3
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(3)
+
+    s.score = 6.0
+    s.attempt = 4
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(4)
+    expect(s.kept_score).to eql(4.25)
+
+    s.score = 7.0
+    s.attempt = 5
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(5)
+
+    s.score = 8.0
+    s.attempt = 6
+    s.with_versioning(true, &:save!)
+    expect(s.version_number).to eql(6)
+    expect(s.kept_score).to eql(5.33)
   end
 
   it "should calculate highest score based on most recent version of an attempt" do

@@ -31,7 +31,7 @@ li.quiz
   cursor: pointer
 
   .ellipses, i[class^=icon-]:not(.icon-publish):not(.icon-quiz)
-    color: darken($canvas-neutral, 40)
+    color: darken($ic-color-neutral, 40)
 
   .ig-title
     right: 554px
@@ -470,7 +470,7 @@ div#content
       :float right
       :font-size 0.9em
       :font-weight bold
-      :color darken($canvas-neutral, 55)
+      :color darken($ic-color-neutral, 55)
       :margin-top 0.1em
 
   .text
@@ -887,7 +887,7 @@ ul#question_list
       color: #595959
       margin-right: 4px
     &.answered a
-      color: darken($canvas-primary, 15)
+      color: darken($ic-brand-primary, 15)
     &.answered.current_question a
       color: #396eb2
     &.marked
@@ -897,7 +897,7 @@ ul#question_list
         @include bg-image(flagged_question_hc, png, no-repeat, 3px, 7px, transparent, 10px, 8px)
 
     &.current_question
-      :color $right_side_text_color !important
+      :color $ic-font-color-dark !important
       :font-weight bold
     &.correct
       :color #080
@@ -1478,6 +1478,12 @@ ul#quiz_versions
     .blank_id_select
       width: auto
       min-width: 220px
+  .essay_question
+    .answers
+      .question_input
+        width: 100%
+    .tinymce-keyboard-shortcuts-toggle
+      float: right
 
 #left-side
   position: absolute

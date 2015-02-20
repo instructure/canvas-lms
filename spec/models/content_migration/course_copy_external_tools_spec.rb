@@ -54,15 +54,19 @@ describe ContentMigration do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
       tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
       tag_from.content_type = 'ContextExternalTool'
+      tag_from.content_id = @tool_from.id
       tag_from.save!
 
       run_course_copy
 
+      tool_to = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
+      expect(tool_to).not_to be_nil
       asmnt_2 = @copy_to.assignments.first
       expect(asmnt_2.submission_types).to eq "external_tool"
       expect(asmnt_2.external_tool_tag).not_to be_nil
       tag_to = asmnt_2.external_tool_tag
       expect(tag_to.content_type).to eq tag_from.content_type
+      expect(tag_to.content_id).to eq tool_to.id
       expect(tag_to.url).to eq tag_from.url
       expect(tag_to.new_tab).to eq tag_from.new_tab
     end

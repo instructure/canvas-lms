@@ -42,10 +42,7 @@ describe CollaborationsController do
 
     it "should assign variables" do
       user_session(@student)
-      mock_user_service = mock()
-      @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
-      GoogleDocs::Connection.any_instance.expects(:verify_access_token).returns(true)
+      controller.stubs(:google_docs_connection).returns(mock(verify_access_token:true))
 
       get 'index', :course_id => @course.id
 
@@ -55,9 +52,7 @@ describe CollaborationsController do
 
     it "should handle users without google authorized" do
       user_session(@student)
-      mock_user_service = mock()
-      @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: nil, secret: nil)))
+      controller.stubs(:google_docs_connection).returns(mock(verify_access_token:false))
 
       get 'index', :course_id => @course.id
 
@@ -67,15 +62,27 @@ describe CollaborationsController do
 
     it "should assign variables when verify raises" do
       user_session(@student)
-      mock_user_service = mock()
-      @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
-      GoogleDocs::Connection.any_instance.expects(:verify_access_token).raises("Error")
+      google_docs_connection_mock = mock()
+      google_docs_connection_mock.expects(:verify_access_token).raises("Error")
+      controller.stubs(:google_docs_connection).returns(google_docs_connection_mock)
 
       get 'index', :course_id => @course.id
 
       expect(response).to be_success
       expect(assigns(:google_docs_authorized)).to eq false
+    end
+
+    it 'handles users that need to upgrade to google_drive' do
+      user_session(@student)
+      plugin = Canvas::Plugin.find(:google_drive)
+      plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(:name => plugin.id, :settings => plugin.default_settings)
+      plugin_setting.posted_settings = {}
+      plugin_setting.save!
+      get 'index', :course_id => @course.id
+
+      expect(response).to be_success
+      expect(assigns(:google_docs_authorized)).to be_falsey
+      expect(assigns(:google_drive_upgrade)).to be_truthy
     end
 
     it "should not allow the student view student to access collaborations" do
@@ -94,9 +101,7 @@ describe CollaborationsController do
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
 
-      mock_user_service = mock()
-      @user.expects(:user_services).returns(mock_user_service)
-      mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
+      #controller.stubs(:google_docs_connection).returns(mock(verify_access_token:false))
 
       get 'index', :group_id => group.id
       expect(response).to be_success
