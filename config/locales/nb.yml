@@ -3881,7 +3881,6 @@ nb:
     other_recipients: 
       one: "og 1 annen"
       other: "og %{count} andre"
-    result_status: "Den autofullfør har% {resultater} oppføringer oppført, kan du bruke opp og ned piltastene for å navigere til en oppføring, og trykk deretter på enter for å legge til personen i Til feltet."
     star: "Merk med stjerne"
     star_conversation: "Merk samtalen med stjerne"
     submission_comment_form_dialog: 
@@ -3902,7 +3901,6 @@ nb:
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Fant ikke Canvas CSV importere overskrifter"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 Oppdraget med feil"
-    other: "% {count} Oppdrager med feil"
     zero: "Ingen Oppdrager med feil, Klikk på Fortsett"
   count_files_updated_4570a8a: 
     one: "1 fil oppdatert"
@@ -12565,7 +12563,6 @@ nb:
     move: Flytt
     move_question: 
       one: "Hvor ønsker du å flytte %{item}?"
-      other: "Hvor ønsker du å flytte disse% {count} elementer?"
     move_success: 
       one: "%{item} flyttet til %{destinationFolder}"
       other: "%{count} elementer flyttet til %{destinationFolder}"
