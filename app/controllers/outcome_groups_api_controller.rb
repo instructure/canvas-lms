@@ -176,7 +176,7 @@ class OutcomeGroupsApiController < ApplicationController
     return unless can_read_outcomes
 
     url = polymorphic_url [:api_v1, @context, :outcome_group_links]
-    links = @context.learning_outcome_links.order(:id)
+    links = @context.learning_outcome_links.preload(:learning_outcome_content).order(:id)
     links = Api.paginate(links, self, url)
     render json: links.map { |link|
       outcome_params = params.slice(:outcome_style, :outcome_group_style)
