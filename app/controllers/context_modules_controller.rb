@@ -29,10 +29,10 @@ class ContextModulesController < ApplicationController
       @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
 
       @menu_tools = {}
-      [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu].each do |type|
-        @menu_tools[type] = ContextExternalTool.all_tools_for(@context, :type => type,
-          :root_account => @domain_root_account, :current_user => @current_user)
-      end
+      placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
+      tools = ContextExternalTool.all_tools_for(@context, placements: placements,
+                                        :root_account => @domain_root_account, :current_user => @current_user).to_a
+      placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
     end
   end
   include ModuleIndexHelper
