@@ -1134,6 +1134,33 @@ describe "Module Items API", type: :request do
                       {:expected_status => 401})
     end
 
+    describe "PUT 'mark_as_done'" do
+      it "should fulfill must-mark-done requirement" do
+        @module = @course.context_modules.create(:name => "mark_as_done_module")
+        wiki_page = @course.wiki.wiki_pages.create!(:title => "mark_as_done page", :body => "")
+        wiki_page.workflow_state = 'active'
+        wiki_page.save!
+        @tag = @module.add_item(:id => wiki_page.id, :type => 'wiki_page')
+        @module.completion_requirements = {
+          @tag.id => { :type => 'must_mark_done' },
+        }
+        @module.save!
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
+                 :controller => "context_module_items_api",
+                 :action     => "mark_as_done",
+                 :format     => "json",
+                 :course_id  => @course.to_param,
+                 :module_id  => @module.to_param,
+                 :id => @tag.to_param,
+                 )
+        expect(@module.evaluate_for(@user).requirements_met).to be_any do |rm|
+          rm[:type] == "must_mark_done" && rm[:id] == @tag.id 
+        end
+      end
+    end
+
     describe "POST 'mark_item_read'" do
       it "should fulfill must-view requirement" do
         api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}/mark_read",

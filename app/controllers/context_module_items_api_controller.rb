@@ -498,7 +498,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
       _module_item(user).context_module_action(user, :done)
-      render :nothing => true, :status => :no_content
+      render :json => { :message => t('OK') }
     end
   end
 
