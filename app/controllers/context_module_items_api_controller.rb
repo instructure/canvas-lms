@@ -508,7 +508,7 @@ class ContextModuleItemsApiController < ApplicationController
       progression = _module_item(user).progression_for_user(@current_user)
       progression.delete_requirement(params[:id].to_i)
       progression.evaluate
-      render :nothing => true, :status => :no_content
+      render :json => { :message => t('OK') }
     end
   end
 

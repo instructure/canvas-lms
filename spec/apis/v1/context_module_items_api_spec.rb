@@ -1134,8 +1134,8 @@ describe "Module Items API", type: :request do
                       {:expected_status => 401})
     end
 
-    describe "PUT 'mark_as_done'" do
-      it "should fulfill must-mark-done requirement" do
+    context 'mark_as_done' do
+      before :once do
         @module = @course.context_modules.create(:name => "mark_as_done_module")
         wiki_page = @course.wiki.wiki_pages.create!(:title => "mark_as_done page", :body => "")
         wiki_page.workflow_state = 'active'
@@ -1145,7 +1145,9 @@ describe "Module Items API", type: :request do
           @tag.id => { :type => 'must_mark_done' },
         }
         @module.save!
-
+      end
+  
+      def mark_done_api_call
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
                  :controller => "context_module_items_api",
@@ -1155,8 +1157,32 @@ describe "Module Items API", type: :request do
                  :module_id  => @module.to_param,
                  :id => @tag.to_param,
                  )
-        expect(@module.evaluate_for(@user).requirements_met).to be_any do |rm|
-          rm[:type] == "must_mark_done" && rm[:id] == @tag.id 
+      end
+
+      describe "PUT" do
+        it "should fulfill must-mark-done requirement" do
+          mark_done_api_call
+          expect(@module.evaluate_for(@user).requirements_met).to be_any do |rm|
+            rm[:type] == "must_mark_done" && rm[:id] == @tag.id 
+          end
+        end
+      end
+  
+      describe "DELETE" do
+        it "should remove must-mark-done requirement" do
+          mark_done_api_call
+          api_call(:delete,
+                   "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
+                   :controller => "context_module_items_api",
+                   :action     => "mark_as_not_done",
+                   :format     => "json",
+                   :course_id  => @course.to_param,
+                   :module_id  => @module.to_param,
+                   :id => @tag.to_param,
+                   )
+          expect(@module.evaluate_for(@user).requirements_met).to be_none do |rm|
+            rm[:type] == "must_mark_done"
+          end
         end
       end
     end
