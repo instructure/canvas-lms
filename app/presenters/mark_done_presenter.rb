@@ -41,7 +41,8 @@ class MarkDonePresenter
   def checked?
     return false unless has_requirement?
     progression = @module.context_module_progressions.find{|p| p[:user_id] == @user.id}
-    !!progression.requirements_met.find{|r| r[:id] == @item.id && r[:type] == "must_mark_done" } 
+    return false unless progression
+    !!progression.requirements_met.find {|r| r[:id] == @item.id && r[:type] == "must_mark_done" } 
   end
 
   def api_url
