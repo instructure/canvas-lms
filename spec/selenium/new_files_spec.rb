@@ -57,6 +57,22 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
         delete_from_toolbar
         expect(get_all_files_folders.count).to eq 0
       end
+
+      context "preview" do
+        before do
+          fln("example.pdf").click
+        end
+
+        it "tabs through all buttons in the header button bar" do
+          buttons = ff('.ef-file-preview-header-buttons > *')
+          driver.execute_script("$('.ef-file-preview-header-buttons').children().first().focus()")
+          buttons.each do |button|
+            check_element_has_focus(button)
+            button.send_keys("\t")
+          end
+        end
+      end
+
    end
 
    context "File Downloads", :priority => "2" do
@@ -129,18 +145,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       expect(f('.ReactModal__Content')).to eq(nil)
     end
 
-    def element_has_focus(element)
-      active_element = driver.execute_script('return document.activeElement')
-      expect(active_element).to eq(element)
-    end
-
     it "should set usage rights on a file via the modal by clicking the indicator" do
       f('.UsageRightsIndicator__openModal').click
       wait_for_ajaximations
       set_usage_rights_in_modal
       react_modal_hidden
       # a11y: focus should go back to the element that was clicked.
-      element_has_focus(f('.UsageRightsIndicator__openModal'))
+      check_element_has_focus(f('.UsageRightsIndicator__openModal'))
       verify_usage_rights_ui_updates
     end
 
@@ -151,7 +162,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       set_usage_rights_in_modal
       react_modal_hidden
       # a11y: focus should go back to the element that was clicked.
-      element_has_focus(f('.ef-links-col button[aria-label="Settings"]'))
+      check_element_has_focus(f('.ef-links-col button[aria-label="Settings"]'))
       verify_usage_rights_ui_updates
     end
 
@@ -162,7 +173,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       set_usage_rights_in_modal
       react_modal_hidden
       # a11y: focus should go back to the element that was clicked.
-      element_has_focus(f('.Toolbar__ManageUsageRights'))
+      check_element_has_focus(f('.Toolbar__ManageUsageRights'))
       verify_usage_rights_ui_updates
     end
 

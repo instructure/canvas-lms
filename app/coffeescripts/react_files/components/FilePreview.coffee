@@ -170,13 +170,15 @@ define [
                 },
                   i {className: 'icon-download'}
                   ' ' + I18n.t('file_preview_headerbutton_download', 'Download')
-              a {
-                role: 'button'
-                className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active'}"
+              button {
+                type: 'button'
+                className: "ef-file-preview-header-info ef-file-preview-button #{if @state.showInfoPanel then 'ef-file-preview-button--active' else ''}"
                 onClick: @toggle('showInfoPanel')
               },
-                i {className: 'icon-info'}
-                ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
+                # wrap content in a div because firefox doesn't support display: flex on buttons
+                div {},
+                  i {className: 'icon-info'}
+                  ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
               ReactRouter.Link {
                 to: @getRouteIdentifier(),
                 query: @getNavigationParams(except: 'only_preview'),

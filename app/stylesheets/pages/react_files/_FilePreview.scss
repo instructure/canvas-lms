@@ -109,7 +109,6 @@ $preview-header-height: 9vh;
   font-size: 14px;
   border: none;
   text-align: center;
-  display: flex;
   align-items: center;
   background: $preview-bg;
   white-space: nowrap;
@@ -130,6 +129,12 @@ $preview-header-height: 9vh;
     border-left: 1px solid $preview-border-color;
     border-right: 1px solid $preview-border-color;
   }
+}
+
+// To support flex in buttons, we need to use an internal div
+// see https://bugzilla.mozilla.org/show_bug.cgi?id=984869
+a.ef-file-preview-button, button.ef-file-preview-button div {
+  display: flex;
 }
 
 /// __File Preview Content
