@@ -1770,10 +1770,6 @@ describe User do
           expect(@student2.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
           expect(@student1.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_falsey
         end
-
-        it "should not return students outside the class" do
-          expect(@student3.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
-        end
       end
 
       context "differentiated_assignments off" do

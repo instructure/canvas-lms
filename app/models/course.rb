@@ -2632,8 +2632,12 @@ class Course < ActiveRecord::Base
   end
 
   def includes_student?(user)
+    includes_user?(user, student_enrollments)
+  end
+
+  def includes_user?(user, enrollment_scope=enrollments)
     return false if user.nil? || user.new_record?
-    student_enrollments.where(user_id: user).exists?
+    enrollment_scope.where(user_id: user).exists?
   end
 
   def update_one(update_params, user, update_source = :manual)
