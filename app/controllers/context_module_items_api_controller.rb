@@ -505,9 +505,10 @@ class ContextModuleItemsApiController < ApplicationController
   def mark_as_not_done
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
-      progression = _module_item(user).progression_for_user(@current_user)
-      progression.delete_requirement(params[:id].to_i)
-      progression.evaluate
+      if progression = _module_item(user).progression_for_user(@current_user)
+        progression.delete_requirement(params[:id].to_i)
+        progression.evaluate
+      end
       render :json => { :message => t('OK') }
     end
   end

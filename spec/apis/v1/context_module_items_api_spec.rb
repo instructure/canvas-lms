@@ -1184,6 +1184,18 @@ describe "Module Items API", type: :request do
             rm[:type] == "must_mark_done"
           end
         end
+
+        it "should work even when there is none must-mark-done requirement to delete" do
+          api_call(:delete,
+                   "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
+                   :controller => "context_module_items_api",
+                   :action     => "mark_as_not_done",
+                   :format     => "json",
+                   :course_id  => @course.to_param,
+                   :module_id  => @module.to_param,
+                   :id => @tag.to_param,
+                   )
+        end
       end
     end
 
