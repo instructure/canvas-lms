@@ -113,6 +113,11 @@ define [
       @addCountsToHeader() unless @addedCountsToHeader
       @$el.toggleClass 'collapsed'
 
+      if @$el.hasClass('collapsed')
+        $el.attr('title', I18n.t('Expand Subdiscussion'))
+      else
+        $el.attr('title', I18n.t('Collapse Subdiscussion'))
+
     expand: ->
       @$el.removeClass 'collapsed'
 

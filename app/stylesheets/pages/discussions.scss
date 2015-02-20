@@ -547,7 +547,7 @@ body.with-right-side.with-left-side {
   }
 }
 
-.collapsable:hover {
+.collapsable:hover, .collapsable:focus {
   cursor: pointer;
   &:before {
     display: block;
@@ -563,6 +563,17 @@ body.with-right-side.with-left-side {
   }
 }
 
+#collapse-discussion {
+  &:focus {
+    display: block;
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    height: 0px;
+    width: 0px;
+  }
+}
 .collapsed .collapsable:hover {
   border-color: white;
 }
