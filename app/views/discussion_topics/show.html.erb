@@ -237,7 +237,7 @@
 
           <% if @topic.attachment %>
             <div>
-              <a href="<%= context_url(@topic.context, :context_file_download_url, @topic.attachment_id) %>" class="<%= @topic.attachment.mime_class %>"><%= @topic.attachment.display_name %></a>
+              <a href="<%= context_url(@topic.attachment.context, :context_file_download_url, @topic.attachment_id) %>" class="<%= @topic.attachment.mime_class %>"><%= @topic.attachment.display_name %></a>
             </div>
           <% end %>
         </div>

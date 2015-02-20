@@ -167,6 +167,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic.message = self.message
           topic.title = "#{self.title} - #{group.name}"
           topic.assignment_id = self.assignment_id
+          topic.attachment_id = self.attachment_id
           topic.group_category_id = self.group_category_id
           topic.user_id = self.user_id
           topic.discussion_type = self.discussion_type

@@ -582,10 +582,20 @@ describe DiscussionTopic do
       it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
         @topic.refresh_subtopics
         subtopics = @topic.reload.child_topics
-        subtopics.each {|st| expect(st.discussion_type).to eq 'side_comment' }
+        subtopics.each do |st|
+          expect(st.discussion_type).to eq 'side_comment'
+          expect(st.attachment_id).to be_nil
+        end
+
+        attachment_model(context: @course)
         @topic.discussion_type = 'threaded'
+        @topic.attachment = @attachment
         @topic.save!
-        subtopics.each {|st| expect(st.reload.discussion_type).to eq 'threaded' }
+        subtopics = @topic.reload.child_topics
+        subtopics.each do |st|
+          expect(st.discussion_type).to eq 'threaded'
+          expect(st.attachment_id).to eq @attachment.id
+        end
       end
 
       it "should not rename the assignment to match a subtopic" do
