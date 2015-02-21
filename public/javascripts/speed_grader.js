@@ -1633,7 +1633,7 @@ define([
       var grade = "";
       if ( EG.currentStudent.submission !== undefined ) {
         submission = EG.currentStudent.submission;
-        if ( submission.grade !== null ) {
+        if ( submission.grade !== null && !Number.isNaN(parseFloat(submission.grade)) ) {
           grade = round(submission.grade, 2);
         }
       }
