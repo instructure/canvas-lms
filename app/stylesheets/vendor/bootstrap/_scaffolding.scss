@@ -11,7 +11,7 @@ body {
   font-family: $baseFontFamily;
   font-size: $baseFontSize;
   line-height: $baseLineHeight;
-  color: $textColor;
+  color: $ic-text-color;
   background-color: $bodyBackground;
 }
 
@@ -20,9 +20,9 @@ body {
 // -------------------------
 
 a {
-  color: $linkColor;
+  color: $ic-link-color;
   
-  &:hover, &:focus { color: $linkColorHover; }
+  &:hover, &:focus { color: darken($ic-link-color, 10%); }
 
   @if $use_high_contrast { 
     text-decoration: underline;

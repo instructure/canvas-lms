@@ -363,7 +363,7 @@ class CoursesController < ApplicationController
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.each do |e|
           if [:completed, :rejected].include?(e.state_based_on_date)
-            @past_enrollments << e
+            @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
@@ -996,9 +996,14 @@ class CoursesController < ApplicationController
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
-      js_env :APP_CENTER => {
-        enabled: Canvas::Plugin.find(:app_center).enabled?
-      }
+      js_env({
+        :APP_CENTER => {
+          enabled: Canvas::Plugin.find(:app_center).enabled?
+        },
+        ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
+        LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
+        CONTEXT_BASE_URL: "/courses/#{@context.id}"
+      })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :manage_content)

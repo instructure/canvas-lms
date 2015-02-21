@@ -36,11 +36,19 @@ module Lti
     validates_inclusion_of :workflow_state, in: ['active', 'deleted', 'disabled']
 
     def self.find_active_proxies_for_context(context)
+      find_all_proxies_for_context(context).where('lti_tool_proxies.workflow_state = ?', 'active')
+    end
+
+    def self.find_installed_proxies_for_context(context)
+      find_all_proxies_for_context(context).where('lti_tool_proxies.workflow_state <> ?', 'deleted')
+    end
+
+    def self.find_all_proxies_for_context(context)
       account_ids = context.account_chain.map { |a| a.id }
 
       account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i})" }.unshift("('#{context.class.name}',#{context.id},#{0})").join(',')
 
-      subquery = ToolProxyBinding.select('DISTINCT ON (lti_tool_proxies.id) lti_tool_proxy_bindings.*').joins(:tool_proxy).where('lti_tool_proxies.workflow_state = ?', 'active').
+      subquery = ToolProxyBinding.select('DISTINCT ON (lti_tool_proxies.id) lti_tool_proxy_bindings.*').joins(:tool_proxy).
         joins("INNER JOIN ( VALUES #{account_sql_string}) as x(context_type, context_id, ordering) ON lti_tool_proxy_bindings.context_type = x.context_type AND lti_tool_proxy_bindings.context_id = x.context_id").
         where('(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?) OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))', context.class.name, context.id, 'Account', account_ids).
         order('lti_tool_proxies.id, x.ordering').to_sql

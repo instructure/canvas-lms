@@ -312,16 +312,17 @@ define([
     $("#show_all_details_link").click(function(event) {
       event.preventDefault();
       $button = $('#show_all_details_link');
-
-      $("tr.rubric_assessments").toggle();
-      $("tr.comments").toggle();
-      $button.toggleClass('showAll')
+      $button.toggleClass('showAll');
 
       if ($button.hasClass('showAll')) {
         $button.text(I18n.t('hide_all_details_button', 'Hide All Details'));
+        $("tr.rubric_assessments").show();
+        $("tr.comments").show();
       }
       else {
         $button.text(I18n.t('show_all_details_button', 'Show All Details'));
+        $("tr.rubric_assessments").hide();
+        $("tr.comments").hide();
       }
     });
 

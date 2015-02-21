@@ -108,7 +108,6 @@ describe "quizzes" do
 
     context "who gets logged out while taking a quiz" do
       it "should be notified and able to relogin" do
-        skip('193')
         # setup a quiz and start taking it
         quiz_with_new_questions(!:goto_edit)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -119,7 +118,6 @@ describe "quizzes" do
         ff('.answers .answer_input input')[0].click
         wait_for_ajaximations
         expect(f('#last_saved_indicator').text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
-
         # now kill our session (like logging out)
         destroy_session(false)
 
@@ -142,6 +140,34 @@ describe "quizzes" do
         # we should be back at the quiz show page
         expect(driver.find_element(:link_text, 'Resume Quiz')).to be_present
       end
+    end
+  end
+
+  context "multiple fill in the blanks" do
+    it "should display mfitb responses in their respective boxes on submission view page" do
+      # create new multiple fill in the blank quiz and question
+      course_with_student_logged_in
+      @quiz = quiz_model({
+                             :course => @course,
+                             :time_limit => 5
+                         })
+
+      question = @quiz.quiz_questions.create!(:question_data => fill_in_multiple_blanks_question_data )
+      @quiz.generate_quiz_data
+      @quiz.tap(&:save)
+      # create and grade a submission on our mfitb quiz
+      qs = @quiz.generate_submission(@student)
+      # this generates 6 answers on our submission for each blank in fill_in_multiple_blanks_question_data
+      (1..6).each do |var|
+        qs.submission_data["question_#{question.id}_#{AssessmentQuestion.variable_id("answer#{var}")}"] = ("this is my answer ##{var}")
+      end
+      response_array = qs.submission_data.values
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/"
+      wait_for_ajaximations
+      answer_fields = ff('.question_input')
+      answer_array = answer_fields.map { |element| driver.execute_script("return $(arguments[0]).val()", element) }
+      expect(answer_array).to eq response_array
     end
   end
 

@@ -3,7 +3,7 @@ class GrandfatherDefaultAccountSelfRegistration < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
-    return unless Shard.current == Account.default.shard
+    return unless Account.default && Shard.current == Account.default.shard
     account = Account.default
     if account.no_enrollments_can_create_courses?
       account.settings[:self_registration] = true

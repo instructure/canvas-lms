@@ -46,7 +46,8 @@ class ContextExternalTool < ActiveRecord::Base
     :user_navigation, :course_navigation, :account_navigation, :resource_selection,
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
     :course_settings_sub_navigation, :global_navigation,
-    :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu
+    :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu,
+    :tool_configuration
   ]
 
   CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types]}
@@ -480,7 +481,7 @@ class ContextExternalTool < ActiveRecord::Base
     scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
     scope = scope.placements(*placements)
     scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
-    scope.order(ContextExternalTool.best_unicode_collation_key('name'))
+    scope.order("#{ContextExternalTool.best_unicode_collation_key('context_external_tools.name')}, context_external_tools.id")
   end
 
   def self.find_external_tool_by_id(id, context)
@@ -589,7 +590,8 @@ class ContextExternalTool < ActiveRecord::Base
   def self.serialization_excludes; [:shared_secret,:settings]; end
 
   # sets the custom fields from the main tool settings, and any on individual resource type settings
-  def set_custom_fields(hash, resource_type)
+  def set_custom_fields(resource_type)
+    hash = {}
     fields = [settings[:custom_fields] || {}]
     fields << (settings[resource_type.to_sym][:custom_fields] || {}) if resource_type && settings[resource_type.to_sym]
     fields.each do |field_set|
@@ -602,21 +604,7 @@ class ContextExternalTool < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def substituted_custom_fields(placement, substitutions)
-    custom_fields = {}
-    set_custom_fields(custom_fields, placement)
-
-    custom_fields.each do |k,v|
-      if substitutions.has_key?(v)
-        if substitutions[v].respond_to?(:call)
-          custom_fields[k] = substitutions[v].call
-        else
-          custom_fields[k] = substitutions[v]
-        end
-      end
-    end
+    hash
   end
 
   def resource_selection_settings

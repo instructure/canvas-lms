@@ -11,15 +11,18 @@
 /*
 @styleguide Progress Bar
 
+<br/>
 We use jQuery UI progress bar
+<br/>
 
 ```html
+
+<a id="animateProgress" href="#" class="Button Button--primary">Click Me</a>
+<br/><br/>
 <div id="progressbar" class="ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 100%;">
 	<div class="ui-progressbar-value ui-widget-header ui-corner-left" style="width: 50%;"></div>
 </div>
 ```
-### Test it
-View progress bar with a <a id="animateProgress" href="#">random number</a>
 
 */
 

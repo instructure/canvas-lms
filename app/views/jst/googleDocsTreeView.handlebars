@@ -1,9 +1,9 @@
 {{#each tree.folders}}
-<li class="folder">
+<li class="folder" tabindex="0" role="menuitem">
   {{name}}
   <ul>
     {{#each files}}
-    <li class="file {{extension}}" id="document_{{document_id}}">
+    <li class="file {{extension}}" id="document_{{document_id}}" tabindex="0" role="button" aria-live="true">
       <span class="filename">{{name}}</span>
       <a class="popout no-hover" href="{{alternate_url.href}}" title="{{../../title_text}}" target="_blank">
         <img src="/images/popout.png"/>
@@ -15,7 +15,7 @@
 </li>
 {{/each}}
 {{#each tree.files}}
-<li class="file {{extension}}" id="document_{{document_id}}">
+<li class="file {{extension}}" id="document_{{document_id}}" tabindex="0" role="button">
   <span class="filename">{{name}}</span>
   <a class="popout no-hover" href="{{alternate_url.href}}" title="{{../title_text}}" target="_blank">
     <img src='/images/popout.png'/>

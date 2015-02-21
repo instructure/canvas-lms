@@ -217,7 +217,7 @@
 #     }
 #
 class DiscussionTopicsController < ApplicationController
-  before_filter :require_context, :except => :public_feed
+  before_filter :require_context_and_read_access, :except => :public_feed
 
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
@@ -694,6 +694,7 @@ class DiscussionTopicsController < ApplicationController
 
   def public_feed
     return unless get_feed_context
+
     feed = Atom::Feed.new do |f|
       f.title = t :discussion_feed_title, "%{title} Discussion Feed", :title => @context.name
       f.links << Atom::Link.new(:href => polymorphic_url([@context, :discussion_topics]), :rel => 'self')

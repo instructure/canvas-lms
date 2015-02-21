@@ -174,13 +174,23 @@ I18n.strftime = function(date, format) {
 
 I18n.Utils.HtmlSafeString = htmlEscape.SafeString; // this is what we use elsewhere in canvas, so make i18nliner use it too
 I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
+
+// when inferring the key at runtime (i.e. js/coffee or inline hbs `t`
+// call), signal to normalizeKey that it shouldn't be scoped.
+// TODO: make i18nliner-js set i18n_inferred_key, which will DRY things up
+// slightly
+var origInferKey = I18n.CallHelpers.inferKey;
+I18n.CallHelpers.inferKey = function() {
+  return "#" + origInferKey.apply(this, arguments);
+};
+
 I18n.CallHelpers.normalizeKey = function(key, options) {
   if (key[0] === '#') {
     key = key.slice(1);
     delete options.scope;
   }
   return key;
-}
+};
 
 if (window.ENV && window.ENV.lolcalize) {
   I18n.CallHelpers.normalizeDefault = i18nLolcalize;

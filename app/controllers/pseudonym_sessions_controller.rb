@@ -21,6 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
+  before_filter :run_login_hooks, :only => [:new, :create, :otp_login, :saml_consume, :oauth2_token]
   skip_before_filter :require_reacceptance_of_terms
 
   def new

@@ -431,6 +431,13 @@ describe DiscussionTopicsController, type: :request do
         expect(json).to eq @response_json.merge("subscribed" => @topic.subscribed?(@user))
       end
 
+      it "should require course to be published for students" do
+        @course.claim
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+                        {}, :expected_status => 401)
+      end
+
       it "should properly translate a video media comment in the discussion topic's message" do
         @topic.update_attributes(
           message: '<p><a id="media_comment_m-spHRwKY5ATHvPQAMKdZV_g" class="instructure_inline_media_comment video_comment" href="/media_objects/m-spHRwKY5ATHvPQAMKdZV_g">this is a media comment</a></p>'
@@ -1022,7 +1029,7 @@ describe DiscussionTopicsController, type: :request do
 
   it "should translate user content in topics" do
     should_translate_user_content(@course) do |user_content|
-      @topic = create_topic(@course, :title => "Topic 1", :message => user_content)
+      @topic ||= create_topic(@course, :title => "Topic 1", :message => user_content)
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics",
         { :controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s })
@@ -1701,6 +1708,7 @@ describe DiscussionTopicsController, type: :request do
       course_with_teacher
       create_topic(@course, :title => "topic", :message => "topic")
       course_with_observer_logged_in(:course => @course)
+      @course.offer
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                       { :controller => 'discussion_topics', :action => 'index', :format => 'json',
                         :course_id => @course.id.to_s })

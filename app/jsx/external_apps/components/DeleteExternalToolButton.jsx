@@ -5,10 +5,8 @@ define([
   'i18n!external_tools',
   'react',
   'react-modal',
-  'jsx/external_apps/lib/store'
+  'jsx/external_apps/lib/ExternalAppsStore'
 ], function ($, I18n, React, Modal, store) {
-
-  var CLOSE_TIMEOUT = 150;
 
   return React.createClass({
     displayName: 'DeleteExternalToolButton',
@@ -46,7 +44,7 @@ define([
       e.preventDefault();
       this.isDeleting = true;
       this.closeModal(() => {
-        store.deleteExternalTool(this.props.tool);
+        store.delete(this.props.tool);
         this.isDeleting = false;
       });
     },
@@ -54,7 +52,7 @@ define([
     render() {
       return (
         <span className="DeleteExternalToolButton">
-          <a href="#" role="button" aria-label={I18n.t('Delete %{toolName} App', {toolName: this.props.tool.attributes.name})} className="delete_tool_link lm" onClick={this.openModal}>
+          <a href="#" ref="btnTriggerDelete" role="button" aria-label={I18n.t('Delete %{toolName} App', { toolName: this.props.tool.name })} className="delete_tool_link lm" onClick={this.openModal}>
             <i className="icon-trash btn"></i>
           </a>
           <Modal className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
@@ -66,7 +64,7 @@ define([
 
               <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
                 <div className="ReactModal__Header-Title">
-                  <h4>{I18n.t('Delete %{tool} App?', {tool: this.props.tool.attributes.name})}</h4>
+                  <h4>{I18n.t('Delete %{tool} App?', {tool: this.props.tool.name})}</h4>
                 </div>
                 <div className="ReactModal__Header-Actions">
                   <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
@@ -82,8 +80,8 @@ define([
 
               <div className="ReactModal__InnerSection ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
-                  <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
-                  <button type="button" className="btn btn-danger" onClick={this.deleteTool}>{I18n.t('Delete')}</button>
+                  <button ref="btnClose" type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
+                  <button ref="btnDelete" type="button" className="btn btn-danger" onClick={this.deleteTool}>{I18n.t('Delete')}</button>
                 </div>
               </div>
             </div>

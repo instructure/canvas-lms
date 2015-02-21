@@ -67,7 +67,7 @@ $revision-button-hover-color: $canvas-primary
   &:hover
     color: #005580
     text-decoration: underline
- 
+
 .pages
   .header-bar-outer-container
     :min-height 64px
@@ -84,8 +84,17 @@ $revision-button-hover-color: $canvas-primary
         :box-shadow $shadow
       .header-left-flex
         flex: 1
+        float: none
+        white-space: nowrap
+        overflow: hidden
+        .course-title
+          text-overflow: ellipsis
+          overflow: hidden
+      .header-right-flex
+        padding-left: $ic-sp
       .flex-container
         display: flex
+        align-items:center
 
   .header-bar-outer-container.page-changed
     :height 103px
@@ -132,7 +141,7 @@ $revision-button-hover-color: $canvas-primary
           :padding-left 12px
         &:last-child
           :padding-right 12px
-          
+
       .header-row
         :text-transform uppercase
         a.sort-field

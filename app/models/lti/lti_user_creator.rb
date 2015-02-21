@@ -11,12 +11,11 @@ module Lti
         StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
     }
 
-    def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context, variable_substitutor = nil)
+    def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context)
       @canvas_user = canvas_user
       @canvas_root_account = canvas_root_account
       @canvas_context = canvas_context
       @opaque_identifier = canvas_tool.opaque_identifier_for(@canvas_user)
-      @variable_substitutor = variable_substitutor
       @pseudonym = false
     end
 

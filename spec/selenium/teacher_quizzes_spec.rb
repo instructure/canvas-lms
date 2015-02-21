@@ -245,7 +245,6 @@ describe "quizzes" do
       expect(f('.attempts_left').text).to eq '3'
     end
 
-    
     it "should indicate when it was last saved" do
       take_quiz do
         indicator = f('#last_saved_indicator')

@@ -119,10 +119,9 @@ class ExternalToolsController < ApplicationController
 
     opts = {
         resource_type: @resource_type,
-        launch_url: params[:url],
-        custom_substitutions: common_variable_substitutions
+        launch_url: params[:url]
     }
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), opts)
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), variable_expander, opts)
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = params[:url]
@@ -213,11 +212,10 @@ class ExternalToolsController < ApplicationController
     # generate the launch
     opts = {
         launch_url: launch_url,
-        resource_type: params[:launch_type],
-        custom_substitutions: common_variable_substitutions
+        resource_type: params[:launch_type]
     }
 
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), opts)
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), variable_expander(assignment: assignment), opts)
 
     launch_settings = {
       'launch_url' => adapter.launch_url,
@@ -418,17 +416,12 @@ class ExternalToolsController < ApplicationController
 
     opts = {
         resource_type: selection_type,
-        selected_html: params[:selection],
-        custom_substitutions: common_variable_substitutions
+        selected_html: params[:selection]
     }
+    assignment = selection_type == 'homework_submission' && @context.assignments.active.find(params[:assignment_id])
 
-    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
-    if selection_type == 'homework_submission'
-      assignment = @context.assignments.active.find(params[:assignment_id])
-      lti_launch.params = adapter.generate_post_payload_for_homework_submission(assignment)
-    else
-      lti_launch.params = adapter.generate_post_payload
-    end
+    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander(assignemnt: assignment, tool: tool), opts)
+    lti_launch.params = assignment ? adapter.generate_post_payload_for_homework_submission(assignment) : adapter.generate_post_payload
 
     lti_launch.resource_url = adapter.launch_url
     lti_launch.link_text = tool.label_for(selection_type.to_sym)
@@ -438,7 +431,8 @@ class ExternalToolsController < ApplicationController
   protected :basic_lti_launch_request
 
   def content_item_selection_response(tool, placement, content_item_response)
-    params = default_lti_params.merge({
+    params = default_lti_params.merge(
+      {
         #required params
         lti_message_type: 'ContentItemSelectionResponse',
         lti_version: 'LTI-1p0',
@@ -448,7 +442,8 @@ class ExternalToolsController < ApplicationController
         context_title: @context.name,
         tool_consumer_instance_name: @domain_root_account.name,
         tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
-    }).merge(tool.substituted_custom_fields(placement, common_variable_substitutions))
+      }).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
+
 
     lti_launch = Lti::Launch.new
     lti_launch.resource_url = tool.extension_setting(placement, :url)
@@ -824,6 +819,33 @@ class ExternalToolsController < ApplicationController
     elsif !is_authorized_action?(@context, @current_user, :read)
       render_unauthorized_action
     end
+  end
+
+  def variable_expander(opts = {})
+    default_opts = {
+      current_user: @current_user,
+      current_pseudonym: @current_pseudonym,
+      tool: @tool }
+    Lti::VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
+  end
+
+  def default_lti_params
+    lti_helper = Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user)
+
+    params = {
+      context_id: Lti::Asset.opaque_identifier_for(@context),
+      tool_consumer_instance_guid: @domain_root_account.lti_guid,
+      roles: lti_helper.current_lis_roles,
+      launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
+      launch_presentation_document_target: 'iframe',
+      ext_roles: lti_helper.all_roles,
+      # launch_presentation_width:,
+      # launch_presentation_height:,
+      # launch_presentation_return_url: return_url,
+    }
+
+    params.merge!(user_id: Lti::Asset.opaque_identifier_for(@current_user)) if @current_user
+    params
   end
 
 end

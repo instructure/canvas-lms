@@ -942,10 +942,13 @@ class UsersController < ApplicationController
     @lti_launch = Lti::Launch.new
     opts = {
         resource_type: @resource_type,
-        link_code: @opaque_id,
-        custom_substitutions: common_variable_substitutions
+        link_code: @opaque_id
     }
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, opts)
+    variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
+                                                                        current_user: @current_user,
+                                                                        current_pseudonym: @current_pseudonym,
+                                                                        tool: @tool})
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)
@@ -959,6 +962,7 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
+    run_login_hooks
     js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
            :PASSWORD_POLICY => @domain_root_account.password_policy
     render :layout => 'bare'
@@ -1035,6 +1039,7 @@ class UsersController < ApplicationController
   #
   # @returns User
   def create
+    run_login_hooks
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
@@ -1680,12 +1685,9 @@ class UsersController < ApplicationController
     student_enrollments.each { |e| data[e.user.id] = { :enrollment => e, :ungraded => [] } }
 
     # find last interactions
-    last_comment_dates = SubmissionComment.for_context(course).
-        group(:recipient_id).
-        where("author_id = ? AND recipient_id IN (?)", teacher, ids).
-        maximum(:created_at)
-    last_comment_dates.each do |user_id, date|
-      next unless student = data[user_id]
+    last_comment_dates = SubmissionCommentInteraction.in_course_between(course, teacher.id, ids)
+    last_comment_dates.each do |(user_id, author_id), date|
+      next unless student = data[user_id.to_i]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.
@@ -1702,7 +1704,10 @@ class UsersController < ApplicationController
     ungraded_submissions = course.submissions.
         includes(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
+        except(:order).
+        order(:submitted_at).
         all
+
     ungraded_submissions.each do |submission|
       next unless student = data[submission.user_id]
       student[:ungraded] << submission
@@ -1720,6 +1725,7 @@ class UsersController < ApplicationController
         student[:last_user_note] = date
       end
     end
+
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
   end

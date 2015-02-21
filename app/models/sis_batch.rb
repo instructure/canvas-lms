@@ -127,6 +127,7 @@ class SisBatch < ActiveRecord::Base
     if self.workflow_state == 'created'
       self.workflow_state = :importing
       self.progress = 0
+      self.started_at = Time.now.utc
       self.save
 
       import_scheme = SisBatch.valid_import_types[self.data[:import_type]]
@@ -201,7 +202,7 @@ class SisBatch < ActiveRecord::Base
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
-    self.ended_at = Time.now
+    self.ended_at = Time.now.utc
     self.save
   end
 
@@ -250,6 +251,7 @@ class SisBatch < ActiveRecord::Base
     self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
       "created_at" => self.created_at,
+      "started_at" => self.started_at,
       "ended_at" => self.ended_at,
       "updated_at" => self.updated_at,
       "progress" => self.progress,

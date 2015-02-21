@@ -52,7 +52,8 @@ define([
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
   'compiled/badge_counts',
-  'vendor/jquery.placeholder'
+  'vendor/jquery.placeholder',
+  'compiled/smartbanner'
 ], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
@@ -392,7 +393,7 @@ define([
       $("a.scribd_file_preview_link").live('click', function(event) {
         event.preventDefault();
         var $link = $(this).loadingImage({image_size: 'small'}).hide();
-        $.ajaxJSON($link.attr('href').replace(/\/download.*/, ""), 'GET', {}, function(data) {
+        $.ajaxJSON($link.attr('href').replace(/\/download/, ""), 'GET', {}, function(data) {
           var attachment = data && data.attachment;
           $link.loadingImage('remove');
           if (attachment &&

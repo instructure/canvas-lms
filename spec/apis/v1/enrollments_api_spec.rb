@@ -1332,6 +1332,56 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
+    describe "show" do
+      before(:once) do
+        @account = Account.default
+        account_admin_user(account: @account)
+        student_in_course active_all: true
+        @base_path = "/api/v1/accounts/#{@account.id}/enrollments"
+        @params = { :controller => 'enrollments_api', :action => 'show', :account_id => @account.to_param,
+                    :format => 'json' }
+      end
+
+      context "admin" do
+        before(:once) do
+          @user = @admin
+        end
+
+        it "should show other's enrollment" do
+          json = api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param))
+          expect(json['id']).to eql(@enrollment.id)
+        end
+      end
+
+      context "student" do
+        before(:once) do
+          @user = @student
+        end
+
+        it "should show own enrollment" do
+          json = api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param))
+          expect(json['id']).to eql(@enrollment.id)
+        end
+
+        it "should not show other's enrollment" do
+          student = @student
+          other_enrollment = student_in_course(active_all: true)
+          @user = student
+          api_call(:get, @base_path + "/#{other_enrollment.id}", @params.merge(id: other_enrollment.to_param), {}, {}, { expected_status: 401 })
+        end
+      end
+
+      context "no user" do
+        before(:once) do
+          @user = nil
+        end
+
+        it "should not show enrollment" do
+          json = api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param), {}, {}, { expected_status: 401 })
+        end
+      end
+    end
+
     describe "filters" do
       it "should properly filter by a single enrollment type" do
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment", @params.merge(:type => %w{StudentEnrollment}))

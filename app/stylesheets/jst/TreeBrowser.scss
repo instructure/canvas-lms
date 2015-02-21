@@ -1,6 +1,6 @@
 @import 'base/environment';
 
-.folderTree {
+.tree {
   font-size: 12px;
   &, ul {
     @include reset-list;

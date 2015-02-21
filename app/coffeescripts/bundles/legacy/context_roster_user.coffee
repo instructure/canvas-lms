@@ -45,8 +45,6 @@ require [
           $(this).find(".conclude_enrollment_link_holder").slideUp()
           $(this).find(".unconclude_enrollment_link_holder").slideDown()
 
-    # $(this).find(".completed_at").text("just now");
-    # $(this).find(".completed_at_holder").slideDown();
     $(".elevate_enrollment_link,.restrict_enrollment_link").click (event) ->
       limit = (if $(this).hasClass("restrict_enrollment_link") then "1" else "0")
       $user = $(this).parents(".tr")
@@ -56,9 +54,10 @@ require [
       , ((data) ->
           $user.loadingImage "remove"
           $(".elevate_enrollment_link_holder,.restrict_enrollment_link_holder").slideToggle()
-        ), (data) ->
-        $.flashError I18n.t("enrollment_change_failed", "Enrollment privilege change failed, please try again")
-        $user.loadingImage "remove"
+        ), ((data) ->
+          $.flashError I18n.t("enrollment_change_failed", "Enrollment privilege change failed, please try again")
+          $user.loadingImage "remove"
+        )
       event.preventDefault()
 
     $(".delete_enrollment_link").click (event) ->

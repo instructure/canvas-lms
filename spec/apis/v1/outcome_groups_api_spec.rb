@@ -985,7 +985,7 @@ describe "Outcome Groups API", type: :request do
         expect(json["errors"]["calculation_method"]).not_to be_nil
         expect(json["errors"]["calculation_method"][0]).not_to be_nil
         expect(json["errors"]["calculation_method"][0]["message"]).not_to be_nil
-        expect(json["errors"]["calculation_method"][0]["message"]).to include("inclusion")
+        expect(json["errors"]["calculation_method"][0]["message"]).to include("calculation_method must be one of")
       end
 
       context "should fail (400) to create a new outcome with an illegal calculation_int" do
@@ -1025,7 +1025,11 @@ describe "Outcome Groups API", type: :request do
             expect(json["errors"]["calculation_int"]).not_to be_nil
             expect(json["errors"]["calculation_int"][0]).not_to be_nil
             expect(json["errors"]["calculation_int"][0]["message"]).not_to be_nil
-            expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid calculation_int")
+            if %w[highest latest].include?(method)
+              expect(json["errors"]["calculation_int"][0]["message"]).to include("'calculation_int' is not used with calculation_method")
+            else
+              expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid calculation_int")
+            end
           end
         end
       end

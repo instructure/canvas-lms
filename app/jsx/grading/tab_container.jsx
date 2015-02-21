@@ -3,26 +3,34 @@
 define([
   'react',
   'jsx/grading/grading_standard',
+  'jsx/grading/grading_period',
   'jquery',
   'i18n!external_tools',
   'underscore',
   'jquery.instructure_misc_plugins'
 ],
-function(React, GradingStandard, $, I18n, _) {
+function(React, GradingStandard, GradingPeriod, $, I18n, _) {
 
   var TabContainer = React.createClass({
 
     getInitialState: function() {
-      return {standards: null};
+      return {standards: null, periods: null};
     },
 
     componentWillMount: function() {
       $.getJSON(ENV.GRADING_STANDARDS_URL)
       .done(this.gotStandards)
+
+      $.getJSON(ENV.GRADING_PERIODS_URL)
+      .done(this.gotPeriods)
     },
 
     gotStandards: function(standards) {
       this.setState({standards: standards});
+    },
+
+    gotPeriods: function(periods) {
+      this.setState({periods: periods.grading_periods});
     },
 
     componentDidMount: function() {
@@ -99,7 +107,11 @@ function(React, GradingStandard, $, I18n, _) {
                 <li><a href="#grading-periods-tab" className="grading_periods_tab"> {I18n.t('Grading Periods')}</a></li>
                 <li><a href="#grading-standards-tab" className="grading_standards_tab"> {I18n.t('Grading Schemes')}</a></li>
               </ul>
-              <div id="grading-periods-tab"/>
+              <div id="grading-periods-tab">
+                <div id="grading_periods" className="content-box">
+                  {this.renderGradingPeriods()}
+                </div>
+              </div>
               <div id="grading-standards-tab">
                 <div className="rs-margin-all pull-right">
                   <a href="#" onClick={this.addGradingStandard} className="btn pull-right add_standard_link">
@@ -135,6 +147,8 @@ function(React, GradingStandard, $, I18n, _) {
     renderStandards: function() {
       if(!this.state.standards){
         return null;
+      } else if(this.state.standards.length === 0){
+        return <h3>{I18n.t("No grading standards to display")}</h3>;
       }
       var self = this;
       return this.state.standards.map(function(s){
@@ -143,8 +157,19 @@ function(React, GradingStandard, $, I18n, _) {
                  justAdded={!!s.justAdded} onDeleteGradingStandard={self.deleteGradingStandard}
                  onDeleteGradingStandardNoWarning={self.deleteGradingStandardNoWarning}/>);
       });
-    }
+    },
 
+    renderGradingPeriods: function() {
+      if(!this.state.periods){
+        return null;
+      } else if(this.state.periods.length === 0){
+        return <h3>{I18n.t("No grading periods to display")}</h3>;
+      }
+      return this.state.periods.map(function(p){
+        return (<GradingPeriod key={p.id} title={p.title} startDate={new Date(p.start_date)}
+                               endDate={new Date(p.end_date)} weight={p.weight}/>);
+      });
+    }
   });
 
   React.renderComponent(<TabContainer/>, document.getElementById("react_grading_tabs"));

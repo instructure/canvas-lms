@@ -43,7 +43,7 @@ describe "collaborations" do
                               execute_script = false)
     Array(urls).each do |url|
       get url
-      wait_for_ajaximations
+
       if execute_script
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end
@@ -144,8 +144,6 @@ describe "collaborations" do
 
           get "/courses/#{@course.id}/collaborations"
 
-          wait_for_ajaximations
-
           keep_trying_until {
             expect(ffj('.available-users:visible li').length).to eq 1
           }
@@ -159,7 +157,6 @@ describe "collaborations" do
 
           get "/courses/#{@course.id}/collaborations"
 
-          wait_for_ajaximations
           fj('.available-users:visible a').click
           keep_trying_until {
             expect(ffj('.members-list li').length).to eq 1
@@ -173,8 +170,6 @@ describe "collaborations" do
           @student.update_attribute(:name, 'Don Draper')
 
           get "/courses/#{@course.id}/collaborations"
-
-          wait_for_ajaximations
 
           fj('.available-users:visible a').click
           fj('.members-list a').click
@@ -202,8 +197,6 @@ describe "collaborations" do
 
       user_session(@student)
       get "/courses/#{@course.id}/collaborations"
-
-      wait_for_ajaximations
 
       ff('#collaborations .collaboration').length == 1
     end

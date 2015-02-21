@@ -1127,7 +1127,8 @@ define([
         if (!this.id) {return;}
         label = $('label[for="'+this.id+'"]');
         if (!label.length) {return;}
-        label.append($('<span />').text('*').attr('title', I18n.t('errors.field_is_required', "This field is required")));
+        // Added the if statement to prevent the JS from adding the asterisk to the forgot password placeholder.
+        if (this.id != 'pseudonym_session_unique_id_forgot') {label.append($('<span />').text('*').attr('title', I18n.t('errors.field_is_required', "This field is required")));}
       });
     });
   };

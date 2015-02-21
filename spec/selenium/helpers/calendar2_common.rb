@@ -43,7 +43,10 @@ def make_event(params = {})
   }.with_indifferent_access.merge(params)
   c = CalendarEvent.new :description => opts[:description],
                         :start_at => opts[:start],
-                        :title => opts[:title]
+                        :title => opts[:title],
+                        :location_name => opts[:location_name],
+                        :location_address => opts[:location_address],
+                        :all_day => opts[:all_day]
   c.context = opts[:context]
   c.save!
   c
@@ -97,6 +100,7 @@ def create_assignment_event(assignment_title, should_add_date = false, publish =
   keep_trying_until { expect(f('.fc-view-month .fc-event-title')).to include_text(assignment_title) }
 end
 
+# Creates event from clicking on the mini calendar
 def create_calendar_event(event_title, should_add_date = false, should_add_location = false)
   middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
   find_middle_day.click
@@ -111,6 +115,21 @@ def create_calendar_event(event_title, should_add_date = false, should_add_locat
   submit_form(edit_event_form)
   wait_for_ajax_requests
   keep_trying_until { expect(f('.fc-view-month .fc-event-title')).to include_text(event_title) }
+end
+
+
+# Creates event from the 'edit event' modal
+def event_from_modal(event_title, should_add_date = false, should_add_location = false)
+  edit_event_dialog = f('#edit_event_tabs')
+  expect(edit_event_dialog).to be_displayed
+  edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
+  title = edit_event_form.find_element(:id, 'calendar_event_title')
+  keep_trying_until { title.displayed? }
+  replace_content(title, event_title)
+  add_date(middle_number) if should_add_date
+  replace_content(f('#calendar_event_location_name'), 'location title') if should_add_location
+  submit_form(edit_event_form)
+  wait_for_ajax_requests
 end
 
 def get_header_text
@@ -131,4 +150,22 @@ end
 def create_published_middle_day_assignment
   get "/calendar2"
   create_assignment_event(name = 'new assignment', false, true)
+end
+
+def load_week_view
+  get "/calendar2"
+  f('#week').click
+  wait_for_ajaximations
+end
+
+def load_month_view
+  get "/calendar2"
+  f('#month').click
+  wait_for_ajaximations
+end
+
+def load_agenda_view
+  get "/calendar2"
+  f('#agenda').click
+  wait_for_ajaximations
 end

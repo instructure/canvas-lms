@@ -4,7 +4,7 @@ define([
   'i18n!external_tools',
   'react',
   'react-router',
-  'jsx/external_apps/lib/store',
+  'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/components/AppTile',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/AppFilters'
@@ -34,7 +34,7 @@ define([
 
     componentDidMount: function() {
       store.addChangeListener(this.onChange);
-      store.fetchAll();
+      store.fetch();
     },
 
     componentWillUnmount: function() {
@@ -42,8 +42,8 @@ define([
     },
 
     apps() {
-      if (store.getState().isLoadingApps) {
-        return <div className="loadingIndicator"></div>;
+      if (store.getState().isLoading) {
+        return <div ref="loadingIndicator" className="loadingIndicator"></div>;
       } else {
         return store.filteredApps().map(function (app, index) {
           return <AppTile key={index} app={app} />;

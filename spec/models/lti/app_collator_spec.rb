@@ -27,7 +27,7 @@ module Lti
     context 'pagination' do
       it 'paginates correctly' do
         3.times do |_|
-          tp = create_tool_proxy(account: account)
+          tp = create_tool_proxy(account: account, name: 'aaa')
           tp.bindings.create(context: account)
         end
         3.times { |_| new_valid_external_tool(account) }
@@ -59,7 +59,8 @@ module Lti
                                    name: tool_proxy.name,
                                    description: tool_proxy.description,
                                    installed_locally: true,
-                                   enabled: true
+                                   enabled: true,
+                                   tool_configuration: nil
                                  })
 
       end
@@ -77,7 +78,8 @@ module Lti
                                     name: external_tool.name,
                                     description: external_tool.description,
                                     installed_locally: true,
-                                    enabled: true
+                                    enabled: true,
+                                    tool_configuration: nil
                                   })
       end
 

@@ -25,7 +25,7 @@ describe "assignments" do
       accept_alert
       wait_for_ajaximations
 
-      expect(ffj('.student_reviews:first .peer_reviews li:visible')).to be_empty
+      expect(fj('.student_reviews:first .peer_reviews').text()).to match /None Assigned/
       expect(@assignment.submissions.map(&:assessment_requests).flatten.length).to eq 1
     end
   end

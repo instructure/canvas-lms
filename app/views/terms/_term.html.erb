@@ -83,7 +83,7 @@
   </td>
   <td class="links">
     <a href="#" class="edit_term_link no-hover"><i class="icon-edit standalone-icon"></i></a>
-    <% if term && !term.courses.active.empty? %>
+    <% if term && term.courses.active.exists? %>
       <a href="#" class="cant_delete_term_link no-hover"><i class="icon-end standalone-icon"></i></a>
     <% elsif term != @context.default_enrollment_term %>
       <a href="#" class="delete_term_link no-hover"><i class="icon-trash standalone-icon"></i></a>

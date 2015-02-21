@@ -1,6 +1,7 @@
 <div class="ui-dialog-buttonset attachments">
-  <label for="file_input" class="ui-button ui-widget ui-state-default ui-corner-all attach-file"
-          type="button" role="button"
+  <{{#if isIE10}}label for="file_input" role="button"{{else}}button{{/if}}
+          class="ui-button ui-widget ui-state-default ui-corner-all attach-file"
+          type="button"
           title="{{#t "titles.add_attachment"}}Add an attachment{{/t}}">
     <span class="ui-button-text">
       <i class="icon-paperclip"></i>
@@ -8,7 +9,7 @@
         {{#t "titles.add_attachment"}}Add an attachment{{/t}}
       </span>
     </span>
-  </label>
+  </{{#if isIE10}}label{{else}}button{{/if}}>
 
   <button class="ui-button ui-widget ui-state-default ui-corner-all attach-media"
           type="button"

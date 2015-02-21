@@ -1,15 +1,16 @@
 define [
+  'i18n!treeBrowser'
   'Backbone'
   'underscore'
   'jst/TreeBrowser'
   'compiled/views/TreeView'
-], (Backbone, _, template, TreeView) ->
+], (I18n, Backbone, _, template, TreeView) ->
 
   class TreeBrowserView extends Backbone.View
 
     template: template
     @optionProperty 'rootModelsFinder'
-    @optionProperty 'onlyShowFolders'
+    @optionProperty 'onlyShowSubtrees'
     @optionProperty 'onClick'
     @optionProperty 'dndOptions'
     @optionProperty 'href'
@@ -19,7 +20,7 @@ define [
 
     # Handle keyboard events for accessibility.
     events:
-      'keydown .folderTree[role=tree]': (event) ->
+      'keydown .tree[role=tree]': (event) ->
         switch event.which
           when 35 then key = 'end'
           when 36 then key = 'home'
@@ -33,11 +34,11 @@ define [
         event.stopPropagation()
         # Handle the first arrow keypress, when nothing is focused.
         # Focus the first item.
-        focusedId = @$folderTree.attr('aria-activedescendant')
+        focusedId = @$tree.attr('aria-activedescendant')
         if not focusedId
           @focusFirst()
         else
-          $focused = @$folderTree.find "##{focusedId}"
+          $focused = @$tree.find "##{focusedId}"
           switch key
             when 'up' then @focusPrev $focused
             when 'down' then @focusNext $focused
@@ -47,18 +48,21 @@ define [
             when 'end' then @focusLast $focused
             when 'enter' then @activateCurrent $focused
 
+    setActiveTree: (tree, dialogTree) ->
+      dialogTree.activeTree = tree
+
     afterRender: ->
-      @$folderTree = @$el.children('.folderTree')
+      @$tree = @$el.children('.tree')
       for rootModel in @rootModelsFinder.find()
         new TreeView({
           model: rootModel,
-          onlyShowFolders: @onlyShowFolders
+          onlyShowSubtrees: @onlyShowSubtrees
           onClick: @onClick
           dndOptions: @dndOptions
           href: @href
           selectedStyleClass: @selectedStyleClass
           autoFetch: @autoFetch
-        }).$el.appendTo(@$folderTree)
+        }).$el.appendTo(@$tree)
       super
 
     destroyView: ->
@@ -71,22 +75,23 @@ define [
     setFocus: ($to, $from) ->
       if not $to?.length or $from?.is? $to
         return
-      @$folderTree.find('[role=treeitem]').not($to).attr('aria-selected', false).removeClass(@focusStyleClass)
+      @$tree.find('[role=treeitem]').not($to).attr('aria-selected', false).removeClass(@focusStyleClass)
       $to.attr 'aria-selected', true
       $to.addClass(@focusStyleClass)
+      $.screenReaderFlashMessageExclusive($to.attr('aria-label'))
       toId = $to.attr 'id'
       if not toId
         toId = _.uniqueId 'treenode-'
         $to.attr 'id', toId
-      @$folderTree.attr 'aria-activedescendant', toId
+      @$tree.attr 'aria-activedescendant', toId
 
 
     # focus the first item in the tree.
-    focusFirst: -> @setFocus @$folderTree.find '[role=treeitem]:first'
+    focusFirst: -> @setFocus @$tree.find '[role=treeitem]:first'
 
     # focus the last item in the tree.
     focusLast: ($from) ->
-      $to = $folderTree.find '[role=treeitem][aria-level=1]'
+      $to = $tree.find '[role=treeitem][aria-level=1]'
       level = 1
       # if the last item is expanded, focus the last node from the last expanded item.
       while @ariaPropIsTrue($to, 'aria-expanded') and $to.find('[role=treeitem]:first').length
@@ -94,7 +99,7 @@ define [
         $to = $to.find "[role=treeitem][aria-level=#{level}]:last"
       @setFocus $to, $from
 
-      @setFocus @$folderTree.find '[role=treeitem]:first'
+      @setFocus @$tree.find '[role=treeitem]:first'
 
     # Focus the next item in the tree.
     # if the current element is expanded, focus it's first child.
@@ -150,17 +155,21 @@ define [
       if @ariaPropIsTrue $current, 'aria-expanded'
         @setFocus $current.find('[role=treeitem]:first'), $current
       else
-        $current.find('.folderLabel:first').click()
-        @$folderTree.focus()
+        $current.find('.treeLabel:first').click()
+        @$tree.focus()
 
     collapseCurrent: ($current) ->
       if @ariaPropIsTrue $current, 'aria-expanded'
-        $current.find('.folderLabel:first').click()
-        @$folderTree.focus()
+        $current.find('.treeLabel:first').click()
+        @$tree.focus()
       else
         @setFocus $current.parent().closest('[role=treeitem]'), $current
 
     activateCurrent: ($current) ->
       $current.find('a:first').trigger('selectItem')
+      $.screenReaderFlashMessage( I18n.t("Selected %{subtree}", {subtree: $current.attr("aria-label")}) )
 
     ariaPropIsTrue: ($e, attrib) -> $e.attr(attrib)?.toLowerCase?() is 'true'
+
+    focusOnOpen: =>
+      @$tree.focus();

@@ -85,11 +85,16 @@ class TermsController < ApplicationController
   #
   def destroy
     @term = api_find(@context.enrollment_terms, params[:id])
-    @term.destroy
-    if api_request?
-      render :json => enrollment_term_json(@term, @current_user, session)
+    @term.workflow_state = 'deleted'
+
+    if @term.save
+      if api_request?
+        render :json => enrollment_term_json(@term, @current_user, session)
+      else
+        render :json => @term
+      end
     else
-      render :json => @term
+      render :json => @term.errors, :status => :bad_request
     end
   end
 

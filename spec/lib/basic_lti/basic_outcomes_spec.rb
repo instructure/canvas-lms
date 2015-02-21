@@ -95,6 +95,27 @@ describe BasicLTI::BasicOutcomes do
       expect(submission.grade).to eq (assignment.points_possible * 0.92).to_s
     end
 
+    it "rejects a grade for an assignment with no points possible" do
+      xml.css('resultData').remove
+      assignment.points_possible = nil
+      assignment.save!
+      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+      expect(request.code_major).to eq 'failure'
+      expect(request.description).to eq 'Assignment has no points possible.'
+    end
+
+    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission " do
+      xml.css('resultData').remove
+      assignment.points_possible = nil
+      assignment.save!
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+      expect(request.code_major).to eq 'failure'
+      expect(request.description).to eq 'Assignment has no points possible.'
+    end
+
     it "accepts a result data without grade" do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)

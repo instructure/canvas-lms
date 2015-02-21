@@ -17,7 +17,10 @@ module.exports = function(TranslateCall) {
   };
 
   ScopedTranslateCall.prototype.normalize = function() {
-    if (!this.inferredKey) this.key = this.normalizeKey(this.key);
+    // TODO: make i18nliner-js use the latter, just like i18nliner(.rb) ...
+    // i18nliner-handlebars can't use the former
+    if (!this.inferredKey && !this.options.i18n_inferred_key)
+      this.key = this.normalizeKey(this.key);
     TranslateCall.prototype.normalize.call(this);
   };
 

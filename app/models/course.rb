@@ -163,6 +163,7 @@ class Course < ActiveRecord::Base
   has_many :assignments, :as => :context, :dependent => :destroy, :order => 'assignments.created_at'
   has_many :calendar_events, :as => :context, :conditions => ['calendar_events.workflow_state != ?', 'cancelled'], :dependent => :destroy
   has_many :submissions, :through => :assignments, :order => 'submissions.updated_at DESC', :dependent => :destroy
+  has_many :submission_comments, as: :context
   has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
   has_many :active_discussion_topics, :as => :context, :class_name => 'DiscussionTopic', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user
   has_many :all_discussion_topics, :as => :context, :class_name => "DiscussionTopic", :include => :user, :dependent => :destroy
@@ -221,12 +222,12 @@ class Course < ActiveRecord::Base
 
   before_save :assign_uuid
   before_validation :assert_defaults
-  before_save :set_update_account_associations_if_changed
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :set_self_enrollment_code
+  before_save :touch_root_folder_if_necessary
   before_validation :verify_unique_sis_source_id
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -288,14 +289,10 @@ class Course < ActiveRecord::Base
     !!@skip_updating_account_associations
   end
 
-  def set_update_account_associations_if_changed
-    @should_update_account_associations = self.root_account_id_changed? || self.account_id_changed?
-    @should_delay_account_associations = !self.new_record?
-    true
-  end
-
   def update_account_associations_if_changed
-    send_now_or_later_if_production(@should_delay_account_associations ? :later : :now, :update_account_associations) if @should_update_account_associations && !self.class.skip_updating_account_associations?
+    if (self.root_account_id_changed? || self.account_id_changed?) && !self.class.skip_updating_account_associations?
+      send_now_or_later_if_production(new_record? ? :now : :later, :update_account_associations)
+    end
   end
 
   def module_based?
@@ -806,6 +803,15 @@ class Course < ActiveRecord::Base
     true
   end
 
+  # to ensure permissions on the root folder are updated after hiding or showing the files tab
+  def touch_root_folder_if_necessary
+    if tab_configuration_changed?
+      files_tab_was_hidden = tab_configuration_was && tab_configuration_was.any? { |h| h['id'] == TAB_FILES && h['hidden'] }
+      Folder.root_folders(self).each { |f| f.touch } if files_tab_was_hidden != tab_hidden?(TAB_FILES)
+    end
+    true
+  end
+
   def update_final_scores_on_weighting_scheme_change
     if @group_weighting_scheme_changed
       connection.after_transaction_commit { self.recompute_student_scores }
@@ -813,7 +819,9 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores(student_ids = nil)
-    Enrollment.recompute_final_score(student_ids || self.student_ids, self.id)
+    student_ids ||= self.student_ids
+    Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
+    Enrollment.recompute_final_score(student_ids, self.id)
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
@@ -1087,7 +1095,7 @@ class Course < ActiveRecord::Base
           end
         )
     end
-    can :read_user_notes, :view_all_grades
+    can :view_all_grades
 
     # Teacher or Designer of a concluded course
     given do |user|
@@ -1476,9 +1484,9 @@ class Course < ActiveRecord::Base
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = calc.assignments.sort_by { |a|
-      [a.assignment_group_id, a.position, a.due_at, a.title]
-    }
+    assignments = calc.assignments.sort_by do |a|
+      [a.assignment_group_id, a.position, a.due_at || CanvasSort::Last, a.title]
+    end
     groups = calc.groups
 
     read_only = t('csv.read_only_field', '(read only)')
@@ -1512,7 +1520,7 @@ class Course < ActiveRecord::Base
       }
       row << "Current Points" << "Final Points" if include_points
       row << "Current Score" << "Final Score"
-      row << "Final Grade" if self.grading_standard_enabled?
+      row << "Current Grade" << "Final Grade" if grading_standard_enabled?
       csv << row
 
       group_filler_length = groups.size * (include_points ? 4 : 2)
@@ -1580,6 +1588,7 @@ class Course < ActiveRecord::Base
           row << current_info[:total] << final_info[:total] if include_points
           row << current_info[:grade] << final_info[:grade]
           if self.grading_standard_enabled?
+            row << score_to_grade(current_info[:grade])
             row << score_to_grade(final_info[:grade])
           end
           csv << row
@@ -1609,8 +1618,28 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def participants(include_observers=false)
-    (participating_admins + participating_students + (include_observers ? participating_observers : [])).uniq
+  def active_course_level_observers
+    participating_observers.observing_full_course(self.id)
+  end
+
+  def participants(include_observers=false, opts={})
+    participants = []
+    participants += participating_admins
+
+    applicable_students = if opts[:excluded_user_ids]
+                 participating_students.reject{|p| opts[:excluded_user_ids].include?(p.id)}
+               else
+                 participating_students
+               end
+
+    participants += applicable_students
+
+    if include_observers
+      participants += User.observing_students_in_course(applicable_students.map(&:id), self.id)
+      participants += User.observing_full_course(self.id)
+    end
+
+    participants.uniq
   end
 
   def enroll_user(user, type='StudentEnrollment', opts={})
@@ -1641,7 +1670,7 @@ class Course < ActiveRecord::Base
           order("course_section_id<>#{section.id}").
           first
       end
-      if e
+      if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
         if e.workflow_state == 'deleted'
           e.sis_batch_id = nil
