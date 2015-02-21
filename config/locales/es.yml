@@ -10785,7 +10785,7 @@ es:
         authorize_google_docs: "Autorizar el Acceso a Google Docs"
         authorize_twitter: "Autorizar Acceso a Twitter"
         generate_token: "Generar Componente Léxico"
-        new_access_token: "Componente Léxico de Acceso Nuevo"
+        new_access_token: "Solicitar Código de Acceso"
         regenerate_token: "Regenerar Componente Léxico"
         register_facebook_account: "Registrar su Cuenta de Facebook"
         register_linkedin_account: "Registrar su Cuenta de LinkedIn"
@@ -10801,11 +10801,7 @@ es:
       facebook_description: "Si tiene una cuenta de Facebook, puede instalar la aplicación de Canvas y recibir notificaciones en su perfil. Puede especificar que tipos de notificaciones quiere y con qué frecuencia desea que se envíen. "
       feature_options: "Opciones de características"
       full_token_warning: "**Copie este componente léxico ahora**. Una vez que deje esta página no podrá recuperar el componente léxico, y tendrá que regenerarlo para obtener un valor nuevo.\n"
-      generate_access_token_description: |
-          Componentes léxicos de acceso son los que permiten que aplicaciones de terceros tengan acceso a recursos de Canvas en su parte.
-          Estos componentes léxicos normalmente se crean automáticamente para las aplicaciones a medida que se necesitan, pero si 
-          [está desarrollando una proyecto nuevo o limitado](%{documentation_url})
-          puede generar el componente léxico desde aquí.
+      generate_access_token_description: "Códigos de acceso son los que permiten que aplicaciones de terceros tengan acceso a recursos de Canvas en su parte. Estos códigos de acceso normalmente se crean automáticamente para las aplicaciones según sea necesario, pero si [está desarrollando una proyecto nuevo o limitado](%{documentation_url}) puede generar el código de acceso desde aquí."
       google_docs_description: "Una vez que nos autoriza el acceso a su cuenta de Google Docs, podrá enviar sus tareas directo desde Google Docs, y podrá crear y compartir documentos con miembros de sus clases. "
       headers: 
         application_abbrev: Aplicación
@@ -10903,7 +10899,7 @@ es:
         click_to_change_profile_pic: "Haga click para cambiar su foto de perfil"
         delicious_login: "Inicio de Sesión de Delicious"
         diigo_login: "Inicio de sesión en Diigo"
-        new_access_token: "Nuevo Componente Léxico de Acceso"
+        new_access_token: "Solicitar Código de Acceso"
         register_skype: "Registrar Skype"
         remove_account_from_profile: "Remover la cuenta de este perfil"
         unregister_service: "Cancelar el Servicio"
