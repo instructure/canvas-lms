@@ -1630,7 +1630,10 @@ define([
 
     showGrade: function(){
       var submission;
-      var grade = "";
+      var grade = EG.currentStudent.submission === undefined ? 
+                  "" :
+                  EG.currentStudent.submission.grade; 
+
       if ( EG.currentStudent.submission !== undefined ) {
         submission = EG.currentStudent.submission;
         if ( submission.grade !== null && !Number.isNaN(parseFloat(submission.grade)) ) {
