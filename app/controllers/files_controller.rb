@@ -552,6 +552,8 @@ class FilesController < ApplicationController
           }
         }
 
+        json[:attachment][:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
+
         if (params[:verifier] && params[:verifier] == attachment.uuid) ||
             attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
