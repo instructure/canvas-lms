@@ -15,8 +15,7 @@ define [
   # Model representing an entry in discussion topic
   class Entry extends Backbone.Model
 
-    defaults:
-
+    defaults: ->
       ##
       # Attributes persisted with the server
       id: null

@@ -40,7 +40,7 @@ define [
 
 
     attachKeyboardShortcuts: =>
-      $('.toggle-wrapper').first().before((new KeyboardShortcuts()).render().$el)
+      @view.$('.toggle-wrapper').first().before((new KeyboardShortcuts()).render().$el)
 
     ##
     # Shows or hides the TinyMCE editor for a reply
