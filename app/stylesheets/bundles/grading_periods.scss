@@ -1,6 +1,8 @@
 @import "base/environment";
 
 #grading_periods {
+  margin-bottom: 0;
+
   .grading-period:nth-child(n+2) {
     border-top: none;
   }
@@ -22,7 +24,30 @@
   .buttons-grid-row {
     width: 250px;
   }
+
   label {
     font-weight: bold;
   }
+}
+
+.new-grading-period {
+  border-right-style: dashed;
+  border-bottom-style: dashed;
+  border-left-style: dashed;
+  border-top-style: none;
+  border-width: 2px;
+
+  font-size: 16px;
+
+  #add-grading-period-button {
+    text-decoration: none;
+  }
+
+  .grading-period-add-icon {
+    margin-right: 2px;
+  }
+}
+
+.no-active-grading-periods {
+  border-top-style: dashed;
 }
