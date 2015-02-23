@@ -40,7 +40,14 @@ define [
       @focusNameLink()
 
     focusNameInput: ->
-      @previouslyFocusedElement = document.activeElement
+
+      # If the activeElement is currently the "body" that means they clicked on some type of cog to enable this state.
+      # This is an edge case that ensures focus remains in context of whats being edited, in this case, the nameLink
+      @previouslyFocusedElement = if document.activeElement.nodeName == "BODY"
+                                    @refs.nameLink?.getDOMNode()
+                                  else
+                                    document.activeElement
+
       setTimeout () =>
         @refs.newName?.getDOMNode().focus()
       , 0
