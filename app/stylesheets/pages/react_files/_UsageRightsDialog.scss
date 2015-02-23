@@ -1,9 +1,13 @@
+
+$usage-rights-alert-background: $canvas-alert;
+$usage-rights-alert-text: $canvas-light;
+
 .UsageRightsDialog__fileName {
   font-weight: bold;
 }
 
 .UsageRightsDialog__warning {
-  color: $canvas-alert;
+  color: $usage-rights-alert-text;
   margin-right: 10px;
 }
 
@@ -34,4 +38,9 @@
     background-size:contain;
     background-repeat:no-repeat;
   }
+}
+
+.UsageRightsDialog__differentRightsMessage {
+  background-color: $usage-rights-alert-background;
+  color: $usage-rights-alert-text;
 }

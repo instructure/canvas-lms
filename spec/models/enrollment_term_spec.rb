@@ -82,4 +82,26 @@ describe EnrollmentTerm do
       expect(@term.overridden_term_dates([student_enrollment, ta_enrollment])).to eq([nil, nil])
     end
   end
+
+  describe "deletion" do
+    it "should not be able to delete a default term" do
+      account_model
+      expect { @account.default_enrollment_term.destroy }.to raise_error
+    end
+
+    it "should not be able to delete an enrollment term with active courses" do
+      account_model
+      @term = @account.enrollment_terms.create!
+      course account: @account
+      @course.enrollment_term = @term
+      @course.save!
+
+      expect { @term.destroy }.to raise_error
+
+      @course.destroy
+
+      @term.destroy
+    end
+  end
+
 end

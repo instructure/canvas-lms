@@ -12,14 +12,14 @@
         &nbsp;
         <span class="current-selection-label"></span>
       </span>
-      <select class="course-filter" id="course-filter" aria-labelledby="course-filter-description"></select>
+      <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
 
       <span aria-hidden="true" class="screenreader-only" id="type-filter-description">
         <%= t(:filter_messages_by_type, "Filter messages by type") %>
         &nbsp;
         <span class="current-selection-label"></span>
       </span>
-      <select class="type-filter show-tick" id="type-filter" aria-labelledby="type-filter-description">
+      <select class="type-filter show-tick" id="type-filter" aria-haspopup="true" aria-labelledby="type-filter-description">
         <option value="inbox"><%= t(:inbox, "Inbox") %></option>
         <option value="unread"><%= t(:unread, "Unread") %></option>
         <option value="starred"><%= t(:starred, "Starred") %></option>
@@ -118,13 +118,10 @@
                  aria-expanded="false"
                  aria-activedescendant=""
                  aria-owns="ac-result-list-2"
-                 aria-labelledby="ac-placeholder-1"
-                 aria-autocomplete="list"
-                 role="combobox" />
-
-          <span class="ac-placeholder" id="ac-placeholder-1">
-            <%= t(:search_by_user, "Search by user") %>
-          </span>
+                 aria-label="<%= t("Search by user") %>"
+                 aria-autocomplete="list" />
+          <span aria-live="polite" class="ac-results-status screenreader-only" id="ac-input-description"></span>
+          <span aria-live="polite" class="ac-selected-name screenreader-only"></span>
 
           <a href="#"
              class="ac-clear"

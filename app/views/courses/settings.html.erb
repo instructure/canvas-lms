@@ -243,8 +243,7 @@ TEXT
           </span>
           <div>
             <%= f.check_box :is_public, :class => "is_public_checkbox" %>
-            <%= f.label :is_public, :en => "Make this course publicly visible" %>
-            <span class="aside checklabelfix"><%= t('help.public_course', %{(student data will remain private)}) %></span>
+            <%= f.label :is_public, t("Make this course publicly visible (student data will remain private)") %>
           </div>
           <div>
             <span>

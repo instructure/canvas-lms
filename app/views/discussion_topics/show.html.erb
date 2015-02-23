@@ -196,7 +196,11 @@
 
         <div class="discussion-section message_wrapper">
           <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
-
+          <% if @unlock_at && @unlock_at > Time.now && @topic.is_a?(Announcement) %>
+            <div class="discussion-fyi">
+              <%= t 'announcement_locked', 'The content of this announcement will not be visible to users until %{date}', :date => datetime_string(@unlock_at) %>
+            </div>
+          <% end %>
           <% if @locked %>
             <div class="discussion-fyi">
               <% if @topic.is_a? Announcement %>

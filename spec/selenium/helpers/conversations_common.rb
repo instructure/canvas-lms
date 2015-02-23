@@ -15,7 +15,6 @@ end
 
 def get_conversations
   get conversations_path
-  wait_for_ajaximations
 end
 
 def conversation_setup

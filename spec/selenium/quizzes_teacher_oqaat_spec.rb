@@ -28,9 +28,8 @@ describe "One Question at a Time Quizzes" do
       end
 
       it "displays one question at a time but you cant go back" do
-        skip("193")
         preview_the_quiz
-        sequential_flow
+        check_if_cant_go_back
       end
 
       it "saves answers and grades the quiz" do

@@ -63,9 +63,7 @@
       padding: 5px 0 5px 0
     .outcome_information_link i
       margin-bottom: -3px
-    .delete_button
-      margin-right: 1em
-    .edit_group_button
+    .delete_button, .edit_button, .edit_group_button, .move_group_button
       margin-right: 1em
 ul.outcome-level
   padding: 0
@@ -76,6 +74,7 @@ ul.outcome-level
   width: 200px
   overflow-x: hidden
   overflow-y: auto
+  box-sizing: border-box
   &.outcome-level-hover, &.outcome-level-hover li
     background: white
   li
@@ -99,10 +98,10 @@ ul.outcome-level
       white-space: nowrap
       &:hover
         background: white
-      
+
       i[class*=icon-]:before, i[class^=icon-]:before
         vertical-align: baseline
-      
+
     &.selected
       a
         background-color: $toolbarBackgroundLight
@@ -145,13 +144,13 @@ table.criterion td
 h5, .h5
   margin-top: 0
   margin-bottom: 10px
-  color: $linkColor
+  color: $ic-link-color
   font-weight: normal
   min-height: 1em
   &.total
     font-weight: bold
     @if $use_high_contrast
-      color: $textColor
+      color: $ic-text-color
 
 table.criterion .edit
   display: none
@@ -176,16 +175,16 @@ table.criterion .insert
   cursor: pointer
   a
     @if $use_high_contrast
-      color: $textColor
+      color: $ic-text-color
     @else
       color: $grayLight
 
     text-decoration: none
   &:hover
     a
-      color: $linkColor
+      color: $ic-link-color
     span
-      border-top-color: $linkColor
+      border-top-color: $ic-link-color
 
 .arrow-icon
   width: 0
@@ -198,7 +197,7 @@ table.criterion .insert
   border-top-style: solid
   display: block
   @if $use_high_contrast
-    border-top-color: $textColor
+    border-top-color: $ic-text-color
   @else
     border-top-color: $grayLight
 
@@ -207,3 +206,6 @@ table.criterion .insert
   
 .outcomes-edit-row
   text-align: left
+
+.no-outcomes-warning
+  margin: 10px 40px 10px 40px

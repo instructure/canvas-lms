@@ -70,6 +70,17 @@ describe Assignment do
     expect(@submission.versions.length).to eql(1)
   end
 
+  it "should validate grading_type inclusion" do
+    @invalid_grading_type = "invalid"
+    @assignment = Assignment.new(assignment_valid_attributes.merge({
+      course: @course,
+      grading_type: @invalid_grading_type
+    }))
+
+    expect(@assignment).not_to be_valid
+    expect(@assignment.errors[:grading_type]).not_to be_nil
+  end
+
   describe "#has_student_submissions?" do
     before :once do
       setup_assignment_with_students
@@ -1426,6 +1437,38 @@ describe Assignment do
         expect(@assignment.participants.include?(@teacher)).to be_truthy
         expect(@assignment.participants.include?(@ta)).to be_truthy
       end
+
+      context "including observers" do
+        before do
+          oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
+          @course_level_observer = oe.user
+
+          oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
+          oe.associated_user_id = @student1.id
+          oe.save!
+          @student1_observer = oe.user
+
+          oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
+          oe.associated_user_id = @student2.id
+          oe.save!
+          @student2_observer = oe.user
+        end
+
+        it "should include course_level observers" do
+          expect(@assignment.participants(include_observers: true).include?(@course_level_observer)).to be_truthy
+        end
+
+        it "should exclude student observers if their student does not have visibility" do
+          expect(@assignment.participants(include_observers: true).include?(@student1_observer)).to be_truthy
+          expect(@assignment.participants(include_observers: true).include?(@student2_observer)).to be_falsey
+        end
+
+        it "should exclude all observers unless opt is given" do
+          expect(@assignment.participants.include?(@student1_observer)).to be_falsey
+          expect(@assignment.participants.include?(@student2_observer)).to be_falsey
+          expect(@assignment.participants.include?(@course_level_observer)).to be_falsey
+        end
+      end
     end
 
     describe "with differentiated_assignments off" do
@@ -1434,8 +1477,36 @@ describe Assignment do
         @course.disable_feature!(:differentiated_assignments)
       end
 
-      it 'returns all users in the course' do
+      it 'normally returns all users in the course' do
         expect(@assignment.participants.length).to eq 4
+      end
+
+      it "should exclude students when given the option" do
+        expect( @assignment.participants(excluded_user_ids: [@student1.id]) ).to_not be_include(@student1)
+        expect( @assignment.participants(excluded_user_ids: [@student1.id]) ).to be_include(@student2)
+      end
+
+      context "including observers" do
+        before :once do
+          oe = @assignment.context.enroll_user(user_with_pseudonym, 'ObserverEnrollment',:enrollment_state => 'active')
+          @course_level_observer = oe.user
+
+          oe = @assignment.context.enroll_user(user_with_pseudonym, 'ObserverEnrollment',:enrollment_state => 'active')
+          oe.associated_user_id = @student1.id
+          oe.save!
+          @student1_observer = oe.user
+        end
+        it "should include course_level observers" do
+          expect( @assignment.participants(include_observers: true) ).to be_include(@course_level_observer)
+        end
+        it "should include student observers if their student is participating" do
+          expect( @assignment.participants(include_observers: true) ).to be_include(@student1)
+          expect( @assignment.participants(include_observers: true) ).to be_include(@student1_observer)
+        end
+        it "should exclude student observers if their student is explicitly excluded" do
+          expect( @assignment.participants(include_observers: true, excluded_user_ids: [@student1.id]) ).to_not be_include(@student1)
+          expect( @assignment.participants(include_observers: true, excluded_user_ids: [@student1.id]) ).to_not be_include(@student1_observer)
+        end
       end
     end
   end

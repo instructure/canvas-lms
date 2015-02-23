@@ -299,7 +299,7 @@ class FilesController < ApplicationController
 
       url = context_index ? context_files_url : api_v1_list_files_url(folder)
       @files = Api.paginate(scope, self, url)
-      render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files, :include => params[:include])
+      render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files, :include => params[:include], :omit_verifier_in_app => true)
     end
   end
 
@@ -463,7 +463,7 @@ class FilesController < ApplicationController
     raise ActiveRecord::RecordNotFound if @attachment.deleted?
     params[:include] = Array(params[:include])
     if authorized_action(@attachment,@current_user,:read)
-      render :json => attachment_json(@attachment, @current_user, {}, { include: params[:include] })
+      render :json => attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: true })
     end
   end
 
@@ -502,7 +502,7 @@ class FilesController < ApplicationController
       end
       return
     end
-    if (params[:download] && params[:verifier] && params[:verifier] == @attachment.uuid) ||
+    if (params[:verifier] && params[:verifier] == @attachment.uuid) ||
         @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } ||
         authorized_action(@attachment, @current_user, :read)
       if params[:download]
@@ -545,10 +545,16 @@ class FilesController < ApplicationController
         end
         format.html { render :action => 'show' }
       end
-      if request.format == :json
-        options = {:permissions => {:user => @current_user}}
-        can_download = attachment.grants_right?(@current_user, session, :download)
-        if can_download
+      format.json do
+        json = {
+          :attachment => {
+            :workflow_state => attachment.workflow_state,
+            :content_type => attachment.content_type
+          }
+        }
+
+        if (params[:verifier] && params[:verifier] == attachment.uuid) ||
+            attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
           # some form.
@@ -558,18 +564,15 @@ class FilesController < ApplicationController
             attachment.context_module_action(@current_user, :read)
             attachment.record_inline_view
           end
-          options[:methods] = []
-          options[:methods] << :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
+          if url = service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
+            json[:attachment][:authenticated_s3_url] = url
+          end
+          json[:attachment].merge! doc_preview_json(attachment, @current_user)
+
           log_asset_access(attachment, "files", "files")
         end
+        render :json => json
       end
-      format.json {
-        render :json => attachment.as_json(options).tap { |json|
-          if can_download
-            json['attachment'].merge! doc_preview_json(attachment, @current_user)
-          end
-        }
-      }
     end
   end
   protected :render_attachment
@@ -831,7 +834,7 @@ class FilesController < ApplicationController
       @attachment.context.file_upload_success_callback(@attachment)
     end
 
-    json = attachment_json(@attachment,@current_user)
+    json = attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
     # render as_text for IE, otherwise it'll prompt
     # to download the JSON response
     render :json => json, :as_text => in_app?
@@ -1005,7 +1008,7 @@ class FilesController < ApplicationController
         return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request
       end
       if @attachment.save
-        render :json => attachment_json(@attachment, @current_user)
+        render :json => attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
       else
         render :json => @attachment.errors, :status => :bad_request
       end
@@ -1039,7 +1042,7 @@ class FilesController < ApplicationController
           redirect_to named_context_url(@context, :context_files_url)
         }
         if api_request?
-          format.json { render :json => attachment_json(@attachment, @current_user) }
+          format.json { render :json => attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true }) }
         else
           format.json { render :json => @attachment }
         end

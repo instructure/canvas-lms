@@ -1,12 +1,9 @@
 /*
 @styleguide Accordion
 
-For accessibility reasons, we use the jQuery UI accordion. To create an accordion widget, use the markup below and initialize it with the following coffeescript: 
+## Default Accordion
 
-```javascript
-$("div#styleguide_demo_accordion1").accordion header: "h3"
-```
-### Default accordion
+For accessibility reasons, we use the jQuery UI accordion. 
 
 ```html
 <div class="accordion" id="styleguide_demo_accordion1">
@@ -31,14 +28,21 @@ $("div#styleguide_demo_accordion1").accordion header: "h3"
       Content for Section 3
     </div>
   </div>
-
+  
 </div>
+<br/>
 ```
 
 
-### Mini accordion
+```js
+$("div#styleguide_demo_accordion1").accordion({header: "h3"}) 
+```
 
-Default accordion a little big for your UI needs? Simply add the **.ui-accordion--mini** class to the parent **.accordion** element, and you'll get a scaled-down version.
+## Mini accordion
+
+Default accordion a little big for your UI needs?
+
+Simply add the **.ui-accordion--mini** class to the parent **.accordion** element, and you'll get a scaled-down version.
 
 ```html
 <div class="accordion ui-accordion--mini" id="styleguide_demo_accordion2">
@@ -65,6 +69,7 @@ Default accordion a little big for your UI needs? Simply add the **.ui-accordion
   </div>
 
 </div>
+<br/>
 ```
 
 */

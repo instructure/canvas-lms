@@ -83,9 +83,6 @@ def create_da_discussion
 end
 
 def submit_quiz(quizobject)
-  user_session(@student)
-  get "/courses/#{@course.id}/quizzes/#{quizobject.id}"
-  f("#take_quiz_link").click
-  wait_for_ajaximations
-  f("#submit_quiz_button").click
+  qs = quizobject.generate_submission(@student)
+  Quizzes::SubmissionGrader.new(qs).grade_submission
 end

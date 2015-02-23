@@ -87,45 +87,6 @@ module Lti
           expect(response).to eq 400
           expect(JSON.parse(body)).to eq({"error" => "Invalid Capabilities"})
         end
-
-        context "navigation tabs caching" do
-
-          it 'clears the cache for apps that have navigation placements' do
-            enable_cache do
-              course_with_teacher_logged_in(:active_all => true)
-              nav_cache = Lti::NavigationCache.new(@course.root_account)
-              cache_key = nav_cache.cache_key
-              tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-              json = JSON.parse(tool_proxy_fixture)
-              json[:format] = 'json'
-              json[:account_id] = @course.account.id
-              rh = json['tool_profile']['resource_handler'].first
-              rh[:ext_placements] = ['Canvas.placements.courseNavigation']
-              headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-              response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", json.to_json, headers
-              expect(response).to eq 201
-
-              expect(nav_cache.cache_key).to_not eq cache_key
-            end
-          end
-
-          it 'does not clear the cache for apps that do not have navigation placements' do
-            enable_cache do
-              nav_cache = Lti::NavigationCache.new(account.root_account)
-              cache_key = nav_cache.cache_key
-
-              course_with_teacher_logged_in(:active_all => true)
-              tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-              headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-              response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
-              expect(response).to eq 201
-
-              expect(nav_cache.cache_key).to eq cache_key
-            end
-          end
-
-        end
-
       end
 
     end

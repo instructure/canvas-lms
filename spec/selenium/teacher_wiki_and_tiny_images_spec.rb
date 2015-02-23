@@ -160,7 +160,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       keep_trying_until { expect(f('#wiki_page_show')).to be_displayed }
       check_element_attrs(f('#wiki_page_show img'), :src => 'http://example.com/image.png', :alt => 'alt text')
     end
-    
+
     describe "canvas images" do
       before do
         @course_root = Folder.root_folders(@course).first
@@ -171,14 +171,14 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         wait_for_ajaximations
         f('a.edit-wiki').click
       end
-      
+
       it "should add a course image" do
         add_canvas_image(driver, 'Course files', 'course.jpg')
         f('form.edit-form button.submit').click
         keep_trying_until { expect(f('#wiki_page_show')).to be_displayed }
         check_element_attrs(f('#wiki_page_show img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
       end
-      
+
       it "should add a user image" do
         skip('testbot fragile')
         add_canvas_image(driver, 'My files', 'teacher.jpg')

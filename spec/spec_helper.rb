@@ -621,7 +621,7 @@ RSpec.configure do |config|
 
   def student_in_section(section, opts={})
     student = opts.fetch(:user) { user }
-    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section)
+    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section, :force_update => true)
     student.save!
     enrollment.workflow_state = 'active'
     enrollment.save!

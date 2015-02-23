@@ -2,13 +2,13 @@ module DataFixup::RemoveDuplicateEnrollments
   def self.run
     recalulate_grades_for = Set.new
     Enrollment.
-      select("user_id, type, role_name, course_section_id, associated_user_id").
+      select("user_id, type, role_name AS role_name_unhidden, course_section_id, associated_user_id").
       group("user_id, type, role_name, course_section_id, associated_user_id").
       having("COUNT(*) > 1").find_each do |e|
       scope = Enrollment.
         where(user_id: e.user_id,
               type: e.type,
-              role_name: e.role_name,
+              role_name: e.role_name_unhidden,
               course_section_id: e.course_section_id,
               associated_user_id: e.associated_user_id)
 

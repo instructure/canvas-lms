@@ -90,7 +90,19 @@ module XMLHelper
   end
 
   def open_file_xml(path)
-    File.exists?(path) ? ::Nokogiri::XML(open(path)) : nil
+    File.exists?(path) ? create_xml_doc(open(path)) : nil
+  end
+
+  def create_xml_doc(string_or_io)
+    doc = ::Nokogiri::XML(string_or_io)
+    if doc.encoding != 'UTF-8'
+      begin
+        doc.at_css('*')
+      rescue Encoding::CompatibilityError
+        doc.encoding = 'UTF-8'
+      end
+    end
+    doc
   end
 end
 end

@@ -141,7 +141,7 @@ Which is you?", :count => @merge_opportunities.length %>
               <%= agree_to_terms %>
             </label>
           <% else %>
-            <a href="<%= @domain_root_account.privacy_policy_url %>" target="_blank"><%= t "#site.view_privacy_policy", "View Privacy Policy" %></a>
+            <a href="<%= privacy_policy_url %>" target="_blank"><%= t "#site.view_privacy_policy", "View Privacy Policy" %></a>
           <% end %>
         </div>
       </div>

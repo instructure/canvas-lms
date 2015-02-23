@@ -39,24 +39,23 @@ describe "outcomes" do
       it "should require a title less than 255 chars" do
         should_validate_short_description_length
       end
-    end
 
     context "create/edit/delete outcome groups" do
+        it "should create an outcome group (root level)" do
+          should_create_an_outcome_group_root_level
+        end
 
-      it "should create an outcome group (root level)" do
-        should_create_an_outcome_group_root_level
-      end
+        it "should create a learning outcome with a new rating (nested)" do
+          should_create_a_learning_outcome_with_a_new_rating_nested
+        end
 
-      it "should create a learning outcome with a new rating (nested)" do
-        should_create_a_learning_outcome_with_a_new_rating_nested
-      end
+        it "should edit an outcome group" do
+          should_edit_an_outcome_group
+        end
 
-      it "should edit an outcome group" do
-        should_edit_an_outcome_group
-      end
-
-      it "should delete an outcome group" do
-        should_delete_an_outcome_group
+        it "should delete an outcome group" do
+          should_delete_an_outcome_group
+        end
       end
     end
 
@@ -100,6 +99,37 @@ describe "outcomes" do
         wait_for_ajaximations
 
         expect(f('#alignments').text).to match(/#{@rubric.title}/)
+      end
+    end
+  end
+
+  context "account outcomes" do
+    context "create/edit/delete outcome groups" do
+      context "account level", :priority => 2 do
+
+        let(:outcome_url) { "/accounts/self/outcomes" }
+        let(:who_to_login) { "admin" }
+        let(:account) { Account.first }
+
+        before(:each) do
+          course_with_admin_logged_in
+        end
+
+        it "should create an outcome group (root level)" do
+          should_create_an_outcome_group_root_level
+        end
+
+        it "should create a learning outcome with a new rating (nested)" do
+          should_create_a_learning_outcome_with_a_new_rating_nested
+        end
+
+        it "should edit an outcome group" do
+          should_edit_an_outcome_group
+        end
+
+        it "should delete an outcome group" do
+          should_delete_an_outcome_group
+        end
       end
     end
   end

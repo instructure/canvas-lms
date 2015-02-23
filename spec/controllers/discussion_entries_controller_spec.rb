@@ -42,6 +42,13 @@ describe DiscussionEntriesController do
       get 'show', :course_id => @course.id, :id => @entry.id
       assert_unauthorized
     end
+
+    it "should require course to be published for students" do
+      user_session(@student)
+      @course.claim
+      get 'show', :course_id => @course.id, :id => @entry.id
+      assert_unauthorized
+    end
     
     it "should assign variables" do
       user_session(@student)

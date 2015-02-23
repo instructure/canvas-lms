@@ -25,6 +25,8 @@ define [
       '.unassigned-users-heading': '$unassignedUsersHeading'
       '.groups-with-count': '$groupsHeading'
 
+    _previousSearchTerm = ""
+
     initialize: (options) ->
       @groups = @model.groups()
       # TODO: move all of these to GroupCategoriesView#createItemView
@@ -58,9 +60,12 @@ define [
 
     filterChange: (event) ->
       search_term = event.target.value
+      return if search_term == _previousSearchTerm #Don't rerender if nothing has changed
+
       @options.unassignedUsersView.setFilter(search_term)
 
       @_setUnassignedHeading(@originalCount) unless search_term.length >= 3
+      _previousSearchTerm = search_term
 
     attach: ->
       @model.on 'destroy', @remove, this

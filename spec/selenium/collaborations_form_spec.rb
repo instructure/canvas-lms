@@ -43,7 +43,6 @@ describe "collaborations" do
                               execute_script = false)
     Array(urls).each do |url|
       get url
-      wait_for_ajaximations
       if execute_script
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end

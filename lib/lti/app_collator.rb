@@ -24,11 +24,11 @@ module Lti
     def bookmarked_collection
       external_tools_scope = ContextExternalTool.all_tools_for(@context)
       external_tools_collection = BookmarkedCollection.wrap(ExternalToolNameBookmarker, external_tools_scope)
-      tool_proxy_scope = ToolProxy.find_active_proxies_for_context(@context)
+      tool_proxy_scope = ToolProxy.find_installed_proxies_for_context(@context)
       tool_proxy_collection = BookmarkedCollection.wrap(ToolProxyNameBookmarker, tool_proxy_scope)
       BookmarkedCollection.merge(
         ['external_tools', external_tools_collection],
-        ['message)handlers', tool_proxy_collection]
+        ['message_handlers', tool_proxy_collection]
       )
     end
 
@@ -52,7 +52,8 @@ module Lti
         name: external_tool.name,
         description: external_tool.description,
         installed_locally: external_tool.context == @context,
-        enabled: true
+        enabled: true,
+        tool_configuration: external_tool.tool_configuration
       }
     end
 
@@ -63,7 +64,8 @@ module Lti
         name: tool_proxy.name,
         description: tool_proxy.description,
         installed_locally: tool_proxy.context == @context,
-        enabled: tool_proxy.workflow_state == 'active'
+        enabled: tool_proxy.workflow_state == 'active',
+        tool_configuration: nil
       }
     end
 

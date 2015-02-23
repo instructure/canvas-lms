@@ -95,7 +95,6 @@ end
 
 def should_create_a_learning_outcome_with_a_new_rating_root_level
   get outcome_url
-  wait_for_ajaximations
 
   ## when
   # create outcome

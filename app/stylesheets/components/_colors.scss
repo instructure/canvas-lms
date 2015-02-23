@@ -1,18 +1,158 @@
 /*
-@styleguide Canvas Colors
+@styleguide Colors
 
-## How to use our color variables...
 
-### **...when implementing new ui**
+## 3:1 Default Colors
+
+<div class="grid-row Colorguide-container--primary-theme">
+  <div class="Colorguide-color Colorguide-color--primary">
+    <span class="Colorguide-var">
+      Primary Blue
+      <br/>
+      $canvas-primary
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--secondary">
+    <span class="Colorguide-var">
+      Secondary Grey
+      <br/>
+      $canvas-secondary
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--success">
+    <span class="Colorguide-var ">
+      Success Green
+      <br/>
+      $canvas-success
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--neutral">
+    <span class="Colorguide-var">
+      Neutral Grey
+      <br/>
+      $canvas-neutral
+    </span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--action">
+    <span class="Colorguide-var">
+      Action Magenta
+      <br/>
+      $canvas-action
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--danger">
+    <span class="Colorguide-var">
+      Danger Red
+      <br/>
+      $canvas-danger
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--alert">
+    <span class="Colorguide-var">
+      Alert Gold
+      <br/>
+      $canvas-alert
+    </span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--light">
+    <span class="Colorguide-var">
+      Light White
+      <br/>
+      $canvas-light
+    </span>
+  </div>    
+  <div class="Colorguide-color Colorguide-color--dark">
+    <span class="Colorguide-var">
+      Dark Grey
+      <br/>
+      $canvas-dark
+    </span>
+  </div>
+</div>
+
+
+## 4.5:1 High Contrast Colors
+
+**Note**: We are forcing high-contrast mode here to show color changes
+<br/>
+<div class="grid-row Colorguide-container--hc-theme">
+  <div class="Colorguide-color Colorguide-color--primary">
+    <span class="Colorguide-var">
+      Primary Blue
+      <br/>
+      $canvas-primary
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--secondary">
+    <span class="Colorguide-var">
+      Secondary Grey
+      <br/>
+      $canvas-secondary
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--success">
+    <span class="Colorguide-var ">
+      Success Green
+      <br/>
+      $canvas-success
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--neutral">
+    <span class="Colorguide-var">
+      Neutral Grey
+      <br/>
+      $canvas-neutral
+    </span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--action">
+    <span class="Colorguide-var">
+      Action Magenta
+      <br/>
+      $canvas-action
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--danger">
+    <span class="Colorguide-var">
+      Danger Red
+      <br/>
+      $canvas-danger
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--alert">
+    <span class="Colorguide-var">
+      Alert Gold
+      <br/>
+      $canvas-alert
+    </span>
+  </div>  
+  <div class="Colorguide-color Colorguide-color--light">
+    <span class="Colorguide-var">
+      Light White
+      <br/>
+      $canvas-light
+    </span>
+  </div>    
+  <div class="Colorguide-color Colorguide-color--dark">
+    <span class="Colorguide-var">
+      Dark Grey
+      <br/>
+      $canvas-dark
+    </span>
+  </div>
+</div>
+
+## Using color variables implementing new UI
 
 While integrating new UI, it's best to use what we call a *functional variable* to pull in our main canvas variables.
 
-For example, if our code looks like this:
+
+### For example, if our code looks like this:
+
 
     <p class="i-need-a-specific-color">Hello, Pando!</p>
 
 
-Then we would write our scss it like:
+### Then we would write our scss it like:
 
 
     $myCustomColor: $canvas-primary;
@@ -21,17 +161,19 @@ Then we would write our scss it like:
     }
 
 
-### **...when changing old code**
+## Using color variables when updating old code
 
 When you're in Canvas and changing old code and see a color that doesn't have a variable attached, be sure to change it and give it a functional variable or one of our primary canvas colors
 
-The Bad Way
+
+### The Bad Way
 
     .class-name {
       color: #123456;
     }
 
-The Best Way
+
+### The Best Way
 
     $my-functional-variable: $canvas-primary;
 
@@ -40,11 +182,12 @@ The Best Way
     }
 
 
-### **...with accessibility in mind**
+## Using color variables with accessibility in mind
 
 We have specific flags that denote when a user has on High-Contrast mode. Most of our color variables have a high-contrast equivalent already built into Canvas, however, for the occasion where some tweaking needs to happen, be sure to make use of sass functions (such as ```lighten()``` and ```darken()```) to help change our primary palette.
 
-The Bad Way
+### The Bad Way
+
 
     .class-name {
       color: #123456;
@@ -54,7 +197,7 @@ The Bad Way
     }
 
 
-The Better Way
+### The Better Way
 
     $my-functional-variable: $canvas-primary;
 
@@ -63,7 +206,7 @@ The Better Way
     }
 
 
-The Best Way
+### The Best Way
 
     $my-functional-variable: $canvas-primary;
 
@@ -71,79 +214,11 @@ The Best Way
       color: $my-functional-variable;
     }
 
+## tl;dr
 
-### **Canvas Color Variables**
-
-Note: There is only one set of variables, high-contrast mode changes color automagically when on
-
-<div class="Colorguide-container">
-  <div class="Colorguide-container--primary-theme">
-    <strong>Normal</strong>
-    <div class="Colorguide-color Colorguide-color--primary">
-      <span class="Colorguide-var">$canvas-primary</span>
-    </div>
-    <div class="Colorguide-color Colorguide-color--secondary">
-      <span class="Colorguide-var">$canvas-secondary</span>
-    </div>
-    <div class="Colorguide-color Colorguide-color--success">
-      <span class="Colorguide-var ">$canvas-success</span>
-    </div>
-
-    <div class="Colorguide-color Colorguide-color--neutral">
-      <span class="Colorguide-var">$canvas-neutral</span>
-    </div>  
-    <div class="Colorguide-color Colorguide-color--action">
-      <span class="Colorguide-var">$canvas-action</span>
-    </div>
-    <div class="Colorguide-color Colorguide-color--danger">
-      <span class="Colorguide-var">$canvas-danger</span>
-    </div>
-
-    <div class="Colorguide-color Colorguide-color--alert">
-      <span class="Colorguide-var">$canvas-alert</span>
-    </div>  
-    <div class="Colorguide-color Colorguide-color--light">
-      <span class="Colorguide-var">$canvas-light</span>
-    </div>    
-    <div class="Colorguide-color Colorguide-color--dark">
-      <span class="Colorguide-var">$canvas-dark</span>
-    </div>
-  </div>
-  <div class="Colorguide-container--hc-theme">
-    <strong>High Contrast</strong>    
-    <div class="Colorguide-color Colorguide-color--primary">
-    </div>
-    <div class="Colorguide-color Colorguide-color--secondary">
-    </div>
-    <div class="Colorguide-color Colorguide-color--success">
-    </div>
-    <div class="Colorguide-color Colorguide-color--neutral">
-    </div>  
-    <div class="Colorguide-color Colorguide-color--action">
-    </div>
-    <div class="Colorguide-color Colorguide-color--danger">
-    </div>
-    <div class="Colorguide-color Colorguide-color--alert">
-    </div>
-    <div class="Colorguide-color Colorguide-color--light">
-    </div>  
-    <div class="Colorguide-color Colorguide-color--dark">
-    </div> 
-  </div>
-</div>
-
-
-
-
-
-
-
-<div class="styleguide-section__component-notes">
-  <h4 class="codeBlock__note-title">tl;dr</h4>
-  <p class="codeBlock__note-description">Use color variables when adding colors to your elements.</p>
-  <p class="codeBlock__note-description">Do not use hex codes in .scss or .sass files.</p>
-  <p class="codeBlock__note-description">If that color needs to be tweaked, use the scss functions for <pre><code>lighten($my-color, 10%)</code></pre> and <pre><code>darken($my-color, 10%)</code></pre></p>
-  <p class="codeBlock__note-description">High Contrast colors are automatically pulled in based on the canvas color variables.</p>
-</div>
+  - Use color variables when adding colors to your elements.
+  - Do not use hex codes in .scss or .sass files.
+  - If that color needs to be tweaked, use the scss functions for `lighten($my-color, 10%)` and `darken($my-color, 10%)`
+  - High Contrast colors are automatically pulled in based on the canvas color variables.
 
 */

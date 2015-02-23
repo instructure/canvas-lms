@@ -427,6 +427,22 @@ module SeleniumTestsHelperMethods
     driver.execute_async_script(js)
   end
 
+  # add some JS translations to the current page; they'll be merged in at
+  # the root level, so the top-most key should be the locale, e.g.
+  #
+  #   set_translations fr: {key: "Bonjour"}
+  def set_translations(translations)
+    add_translations = "$.extend(true, I18n, {translations: #{translations.to_json}});"
+    if ENV['USE_OPTIMIZED_JS']
+      driver.execute_script <<-JS
+        define('translations/test', ['i18nObj', 'jquery'], function(I18n, $) {
+          #{add_translations}
+        });
+      JS
+    else
+      driver.execute_script add_translations
+    end
+  end
 end
 
 shared_examples_for "all selenium tests" do

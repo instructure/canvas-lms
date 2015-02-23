@@ -497,7 +497,7 @@ class SubmissionsApiController < ApplicationController
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument include["visibility"] [String]
+  # @argument include[visibility] [String]
   #   Whether this assignment is visible to the owner of the submission
   #
   # @argument submission[posted_grade] [String]

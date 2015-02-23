@@ -544,7 +544,7 @@ describe "Outcomes API", type: :request do
           expect(json["errors"]["calculation_method"]).not_to be_nil
           # make sure there's no errors except on calculation_method
           expect(json["errors"].except("calculation_method")).to be_empty
-          expect(json["errors"]["calculation_method"][0]["message"]).to include("inclusion")
+          expect(json["errors"]["calculation_method"][0]["message"]).to include("calculation_method must be one of")
         end
 
         context "sensible error message for an incorrect calculation_int" do
@@ -554,7 +554,8 @@ describe "Outcomes API", type: :request do
             "highest" => nil,
             "latest" => nil,
           }
-          error_message = "not a valid calculation_int"
+          norm_error_message = "not a valid calculation_int"
+          no_calc_int_error_message = "'calculation_int' is not used with calculation_method"
           bad_calc_int = 1500
 
           method_to_int.each do |method, int|
@@ -588,7 +589,11 @@ describe "Outcomes API", type: :request do
               expect(json["errors"]["calculation_int"]).not_to be_nil
               # make sure there's no errors except on calculation_method
               expect(json["errors"].except("calculation_int")).to be_empty
-              expect(json["errors"]["calculation_int"][0]["message"]).to include(error_message)
+              if %w[highest latest].include?(method)
+                expect(json["errors"]["calculation_int"][0]["message"]).to include(no_calc_int_error_message)
+              else
+                expect(json["errors"]["calculation_int"][0]["message"]).to include(norm_error_message)
+              end
             end
           end
         end

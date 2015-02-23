@@ -63,6 +63,16 @@ describe "LTI integration tests" do
     end
   }
 
+  let(:controller) do
+    request_mock = mock('request')
+    request_mock.stubs(:host).returns('/my/url')
+    request_mock.stubs(:scheme).returns('https')
+    m = mock('controller')
+    m.stubs(:request).returns(request_mock)
+    m.stubs(:logged_in_user).returns(@user || user)
+    m
+  end
+
   let(:return_url) { '/return/url' }
 
   it "generates the correct post payload" do
@@ -83,7 +93,12 @@ describe "LTI integration tests" do
     pseudonym.save!
 
     adapter = Lti::LtiOutboundAdapter.new(canvas_tool, canvas_user, canvas_course)
-    adapter.prepare_tool_launch(return_url, custom_substitutions: {'$Canvas.api.domain' => root_account.domain})
+
+    variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller, {
+                                                                        current_user: canvas_user,
+                                                                        current_pseudonym: pseudonym})
+
+    adapter.prepare_tool_launch(return_url, variable_expander)
     post_payload = adapter.generate_post_payload
 
     expect(post_payload['oauth_consumer_key']).to eq canvas_tool.consumer_key
@@ -91,29 +106,29 @@ describe "LTI integration tests" do
     expect(post_payload['context_id']).to eq canvas_tool.opaque_identifier_for(canvas_course)
     expect(post_payload['context_label']).to eq canvas_course.course_code
     expect(post_payload['context_title']).to eq canvas_course.name
-    expect(post_payload['custom_canvas_enrollment_state']).to eq '$Canvas.enrollment.enrollmentState'
+    expect(post_payload['custom_canvas_enrollment_state']).to eq 'active'
     expect(post_payload['custom_canvas_api_domain']).to eq root_account.domain
     expect(post_payload['custom_canvas_course_id']).to eq canvas_course.id.to_s
-    expect(post_payload['custom_canvas_user_id']).to eq '$Canvas.user.id'
-    expect(post_payload['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+    expect(post_payload['custom_canvas_user_id']).to eq canvas_user.id.to_s
+    expect(post_payload['custom_canvas_user_login_id']).to eq 'login_id'
     expect(post_payload['custom_variable_canvas_api_domain']).to eq root_account.domain
     expect(post_payload['custom_variable_canvas_assignment_id']).to eq '$Canvas.assignment.id'
     expect(post_payload['custom_variable_canvas_assignment_points_possible']).to eq '$Canvas.assignment.pointsPossible'
     expect(post_payload['custom_variable_canvas_assignment_title']).to eq '$Canvas.assignment.title'
     expect(post_payload['custom_variable_canvas_course_id']).to eq canvas_course.id.to_s
-    expect(post_payload['custom_variable_canvas_enrollment_enrollment_state']).to eq '$Canvas.enrollment.enrollmentState'
-    expect(post_payload['custom_variable_canvas_membership_concluded_roles']).to eq '$Canvas.membership.concludedRoles'
-    expect(post_payload['custom_variable_canvas_user_id']).to eq '$Canvas.user.id'
-    expect(post_payload['custom_variable_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+    expect(post_payload['custom_variable_canvas_enrollment_enrollment_state']).to eq 'active'
+    expect(post_payload['custom_variable_canvas_membership_concluded_roles']).to eq 'Learner'
+    expect(post_payload['custom_variable_canvas_user_id']).to eq canvas_user.id.to_s
+    expect(post_payload['custom_variable_canvas_user_login_id']).to eq 'login_id'
     expect(post_payload['launch_presentation_document_target']).to eq 'iframe'
     expect(post_payload['launch_presentation_locale']).to eq 'en'
     expect(post_payload['launch_presentation_return_url']).to eq '/return/url'
-    expect(post_payload['lis_course_offering_sourcedid']).to eq '$CourseSection.sourcedId'
+    expect(post_payload['lis_course_offering_sourcedid']).to eq 'course_sis_id'
     expect(post_payload['lis_person_contact_email_primary']).to eq canvas_user.email
     expect(post_payload['lis_person_name_family']).to eq canvas_user.last_name
     expect(post_payload['lis_person_name_full']).to eq canvas_user.name
     expect(post_payload['lis_person_name_given']).to eq canvas_user.first_name
-    expect(post_payload['lis_person_sourcedid']).to eq '$Person.sourcedId'
+    expect(post_payload['lis_person_sourcedid']).to eq 'sis id!'
     expect(post_payload['lti_message_type']).to eq 'basic-lti-launch-request'
     expect(post_payload['lti_version']).to eq 'LTI-1p0'
     expect(post_payload['oauth_callback']).to eq 'about:blank'
@@ -132,7 +147,8 @@ describe "LTI integration tests" do
 
   it "generates userless post payload" do
     adapter = Lti::LtiOutboundAdapter.new(canvas_tool, nil, canvas_course)
-    adapter.prepare_tool_launch(return_url)
+    variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+    adapter.prepare_tool_launch(return_url, variable_expander)
     post_payload = adapter.generate_post_payload
 
     expect(post_payload['lis_person_contact_email_primary']).to eq nil
@@ -160,7 +176,8 @@ describe "LTI integration tests" do
       @course.save!
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(@account, @course, controller, {current_user: @user})
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
       expect(hash['lti_message_type']).to eq 'basic-lti-launch-request'
       expect(hash['lti_version']).to eq 'LTI-1p0'
@@ -172,16 +189,16 @@ describe "LTI integration tests" do
       expect(hash['context_id']).to eq @tool.opaque_identifier_for(@course)
       expect(hash['context_title']).to eq @course.name
       expect(hash['context_label']).to eq @course.course_code
-      expect(hash['custom_canvas_user_id']).to eq '$Canvas.user.id'
-      expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+      expect(hash['custom_canvas_user_id']).to eq @user.id.to_s
+      expect(hash['custom_canvas_user_login_id']).to eq 'nobody@example.com'
       expect(hash['custom_canvas_course_id']).to eq @course.id.to_s
-      expect(hash['custom_canvas_api_domain']).to eq '$Canvas.api.domain'
-      expect(hash['lis_course_offering_sourcedid']).to eq '$CourseSection.sourcedId'
+      expect(hash['custom_canvas_api_domain']).to eq HostUrl.context_host(@account, controller.request.host)
+      expect(hash['lis_course_offering_sourcedid']).to eq @course.sis_source_id
       expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
       expect(hash['lis_person_name_full']).to eq 'A Name'
       expect(hash['lis_person_name_family']).to eq 'Name'
       expect(hash['lis_person_name_given']).to eq 'A'
-      expect(hash['lis_person_sourcedid']).to eq '$Person.sourcedId'
+      expect(hash['lis_person_sourcedid']).to eq 'testfun'
       expect(hash['launch_presentation_locale']).to eq I18n.default_locale.to_s
       expect(hash['launch_presentation_document_target']).to eq 'iframe'
       expect(hash['launch_presentation_return_url']).to eq 'http://www.google.com'
@@ -197,7 +214,8 @@ describe "LTI integration tests" do
       I18n.localizer = lambda { :es }
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
       expect(hash['launch_presentation_locale']).to eq 'es'
       I18n.localizer = lambda { :en }
@@ -211,7 +229,8 @@ describe "LTI integration tests" do
       canvas_tool.context = sub_account
 
       adapter = Lti::LtiOutboundAdapter.new(canvas_tool, @user, sub_account)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, sub_account, controller)
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['custom_canvas_account_id']).to eq sub_account.id.to_s
@@ -228,7 +247,8 @@ describe "LTI integration tests" do
       @tool = sub_account.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @user)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       hash['custom_canvas_account_id'] = sub_account.id.to_s
@@ -240,7 +260,8 @@ describe "LTI integration tests" do
 
     it "should include URI query parameters" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com?a=1&b=2', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com?a=1&b=2', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['a']).to eq '1'
@@ -249,7 +270,8 @@ describe "LTI integration tests" do
 
     it "should not allow overwriting other parameters from the URI query string" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com?user_id=123&oauth_callback=1234', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com?user_id=123&oauth_callback=1234', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['user_id']).to eq @tool.opaque_identifier_for(@user)
@@ -261,7 +283,8 @@ describe "LTI integration tests" do
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123}, :name => 'tool')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash.keys.select{|k| k.match(/^custom_/) }.sort).to eq ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
@@ -280,7 +303,8 @@ describe "LTI integration tests" do
       expect(@tool.include_email?).to eql(false)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['lis_person_name_given']).to be_nil
@@ -296,7 +320,8 @@ describe "LTI integration tests" do
       expect(@tool.include_email?).to eql(false)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['lis_person_name_given']).to eq 'User'
@@ -312,7 +337,8 @@ describe "LTI integration tests" do
       expect(@tool.include_email?).to eql(true)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['lis_person_name_given']).to eq nil
@@ -328,7 +354,8 @@ describe "LTI integration tests" do
       expect(@tool.include_email?).to eql(true)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['lis_person_name_given']).to eq 'User'
@@ -343,7 +370,8 @@ describe "LTI integration tests" do
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, user, @course)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
       expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
@@ -354,8 +382,9 @@ describe "LTI integration tests" do
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       html = "<p>this has <a href='#'>a link</a></p>"
-      adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456', selected_html: html)
+      adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456', selected_html: html)
 
       hash = adapter.generate_post_payload
       expect(hash['text']).to eq CGI::escape(html)
@@ -374,7 +403,8 @@ describe "LTI integration tests" do
       assignment_model(:submission_types => "external_tool", :course => @course, :points_possible => 5, :title => "an assignment")
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      adapter.prepare_tool_launch('http://www.yahoo.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller, { current_user: @user, assignment: @assignment })
+      adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       adapter.generate_post_payload_for_assignment(@assignment, "/my/test/url", "/my/other/test/url")
     end
 
@@ -413,7 +443,8 @@ describe "LTI integration tests" do
     @tool.save!
 
     adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-    adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456', resource_type: 'editor_button')
+    variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+    adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456', resource_type: 'editor_button')
     hash = adapter.generate_post_payload
 
     expect(hash['launch_presentation_width']).to eq '1000'
@@ -461,11 +492,13 @@ describe "LTI integration tests" do
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, user1, @course)
-      adapter.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash1 = adapter.generate_post_payload
 
       adapter2 = Lti::LtiOutboundAdapter.new(@tool, user2, @course)
-      adapter2.prepare_tool_launch('http://www.google.com', launch_url: 'http://www.yahoo.com', link_code: '123456')
+      variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
+      adapter2.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash2 = adapter2.generate_post_payload
 
       expect(hash1['user_id']).not_to eq hash2['user_id']

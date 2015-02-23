@@ -279,23 +279,3 @@ describe "assignments" do
     end
   end
 end
-
-def setup_sections_and_overrides_all_future
-  # All in the future by default
-  @unlock_at = Time.now.utc + 6.days
-  @due_at    = Time.now.utc + 10.days
-  @lock_at   = Time.now.utc + 11.days
-
-  @assignment.due_at    = @due_at
-  @assignment.unlock_at = @unlock_at
-  @assignment.lock_at   = @lock_at
-  @assignment.save!
-  # 2 course sections, student in second section.
-  @section1 = @course.course_sections.create!(:name => 'Section A')
-  @section2 = @course.course_sections.create!(:name => 'Section B')
-  @course.student_enrollments.scoped.delete_all  # get rid of existing student enrollments, mess up section enrollment
-  # Overridden lock dates for 2nd section - different dates, but still in future
-  @override = assignment_override_model(:assignment => @assignment, :set => @section2,
-                                        :lock_at => @lock_at + 12.days,
-                                        :unlock_at => Time.now.utc + 3.days)
-end

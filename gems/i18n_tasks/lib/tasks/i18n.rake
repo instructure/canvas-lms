@@ -64,6 +64,7 @@ namespace :i18n do
     require 'action_controller'
     require 'active_record'
     require 'will_paginate'
+    I18n.load_path.unshift(*WillPaginate::I18n.load_path)
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
     require 'i18nema'

@@ -193,6 +193,52 @@ describe "calendar2" do
         expect(details.text).to include(@course.default_section.name)
         expect(details.find_element(:css, '.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
+
+      it "should have a working today button" do
+        load_month_view
+        date = Time.now.strftime("%-d")
+
+        # Check for highlight to be present on this month
+        # this class is also present on the mini calendar so we need to make
+        #   sure that they are both present
+        expect(ff(".fc-state-highlight").size).to eq 2
+
+        # Switch the month and verify that there is no highlighted day
+        change_calendar
+        expect(ff(".fc-state-highlight").size).to eq 0
+
+        # Go back to the present month. Verify that there is a highlighted day
+        change_calendar(:today)
+        expect(ff(".fc-state-highlight").size).to eq 2
+        # Check the date in the second instance which is the main calendar
+        expect(ffj(".fc-state-highlight")[1].text).to include(date)
+      end
+
+      it "should show the location when clicking on a calendar event" do
+        location_name = "brighton"
+        location_address = "cottonwood"
+        make_event(:location_name => location_name, :location_address => location_address)
+        load_month_view
+
+        #Click calendar item to bring up event summary
+        f(".fc-event-title").click
+
+        #expect to find the location name and address
+        expect(f('.event-details-content').text).to include_text(location_name)
+        expect(f('.event-details-content').text).to include_text(location_address)
+      end
+
+      it "should bring up a calendar date picker when clicking on the month" do
+        load_month_view
+
+        #Click on the month header
+        f('.navigation_title').click
+
+        # Expect that a the event picker is present
+        # Check various elements to verify that the calendar looks good
+        expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
+        expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+      end
     end
   end
 end

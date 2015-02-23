@@ -120,7 +120,6 @@ describe "calendar2" do
       submit_form('#edit_assignment_form')
       wait_for_ajax_requests
       f("#undated-events-button").click
-      f("#undated-events-button").click
       expect(f('.fc-event')).to be_nil
       expect(f('.undated_event_title').text).to include_text("undate me")
     end
@@ -236,6 +235,5 @@ describe "calendar2" do
         expect(f("#context-list li[data-context=user_#{@user.id}]")).to have_class('not-checked')
       end
     end
-
   end
 end

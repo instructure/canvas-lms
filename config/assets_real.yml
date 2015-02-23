@@ -92,6 +92,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/assignments/new_assignments.css
   grading_standards:
     - public/stylesheets/compiled/pages/compiler-grading_standards.css
+  grading_periods:
+    - public/stylesheets/compiled/pages/grading_periods.css
   login:
     - public/stylesheets/compiled/pages/compiler-login.css
   otp_login:

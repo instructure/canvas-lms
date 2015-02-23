@@ -207,6 +207,24 @@ class User < ActiveRecord::Base
     where(:quiz_student_visibilities => { :quiz_id => quiz_id, :course_id => course_id })
   }
 
+  scope :observing_students_in_course, lambda {|observee_ids, course_ids|
+    joins(:enrollments).where(enrollments: {type: 'ObserverEnrollment', associated_user_id: observee_ids, course_id: course_ids, workflow_state: 'active'})
+  }
+
+  # when an observer is added to a course they get an enrollment where associated_user_id is nil. when they are linked to
+  # a student, this first enrollment stays the same, but a new one with an associated_user_id is added. thusly to find
+  # course observers, you take the difference between all active observers and active observers with associated users
+  scope :observing_full_course, lambda {|course_ids|
+    active_observer_scope = joins(:enrollments).where(enrollments: {type: 'ObserverEnrollment', course_id: course_ids, workflow_state: 'active'})
+    users_observing_students = active_observer_scope.where("enrollments.associated_user_id IS NOT NULL").pluck(:id)
+
+    if users_observing_students == [] || users_observing_students == nil
+      active_observer_scope
+    else
+      active_observer_scope.where("users.id NOT IN (?)", users_observing_students)
+    end
+  }
+
   def assignment_and_quiz_visibilities(opts = {})
      opts = {user_id: self.id}.merge(opts)
      {assignment_ids: AssignmentStudentVisibility.where(opts).order('assignment_id desc').pluck(:assignment_id),
@@ -992,7 +1010,7 @@ class User < ActiveRecord::Base
     can :rename
 
     given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
-    can :read_profile and can :create_user_notes and can :read_user_notes
+    can :read_profile
 
     # by default this means that the user we are given is an administrator
     # of an account of one of the courses that this user is enrolled in, or
@@ -1002,9 +1020,6 @@ class User < ActiveRecord::Base
 
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
-
-    given { |user| self.check_courses_right?(user, :read_user_notes) }
-    can :read_user_notes
 
     given do |user|
       user && (
@@ -2157,9 +2172,12 @@ class User < ActiveRecord::Base
   def roles(root_account)
     return @roles if @roles
     @roles = ['user']
-    enrollment_types = root_account.enrollments.where(type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'], user_id: self, workflow_state: 'active').uniq.pluck(:type)
-    @roles << 'student' if enrollment_types.include?('StudentEnrollment')
-    @roles << 'teacher' unless (enrollment_types & ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).empty?
+    valid_types = %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]
+
+    # except where in order to include StudentViewEnrollment's
+    enrollment_types = root_account.all_enrollments.where(type: valid_types, user_id: self, workflow_state: 'active').uniq.pluck(:type)
+    @roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+    @roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     @roles << 'admin' unless root_account.all_account_users_for(self).empty?
     @roles
   end
@@ -2366,7 +2384,6 @@ class User < ActiveRecord::Base
       shards = self.associated_shards
       unless allow_implicit
         # only search the shards with trusted accounts
-
         trusted_shards = account.root_account.trusted_account_ids.map{|id| Shard.shard_for(id) }
         trusted_shards << account.root_account.shard
 

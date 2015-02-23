@@ -12,10 +12,12 @@ define [
   UsageRightsIndicator = React.createClass
     displayName: 'UsageRightsIndicator'
 
+    warningMessage: I18n.t('Before publishing this file, you must specify usage rights.')
+
     propTypes:
       model: customPropTypes.filesystemObject.isRequired
-      userCanManageFilesForContext: React.PropTypes.bool
-      usageRightsRequiredForContext: React.PropTypes.bool
+      userCanManageFilesForContext: React.PropTypes.bool.isRequired
+      usageRightsRequiredForContext: React.PropTypes.bool.isRequired
 
     handleClick: (event) ->
       event.preventDefault()
@@ -27,13 +29,18 @@ define [
       if (@props.model instanceof Folder) || (!@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))
         null
       else if (@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))
-        button {
-            className: 'UsageRightsIndicator__openModal btn-link'
-            onClick: @handleClick
-            title: I18n.t('Before publishing this file, you must specify usage rights.')
-            'data-tooltip': 'top'
-          },
-                i {className: 'UsageRightsIndicator__warning icon-warning'}
+        if @props.userCanManageFilesForContext
+          button {
+              className: 'UsageRightsIndicator__openModal btn-link'
+              onClick: @handleClick
+              title: @warningMessage
+              'data-tooltip': 'top'
+            },
+              span {className: 'screenreader-only'},
+                @warningMessage
+              i {className: 'UsageRightsIndicator__warning icon-warning'}
+        else
+          null
       else
         useJustification = @props.model.get('usage_rights').use_justification
         iconClass = switch useJustification
@@ -45,6 +52,7 @@ define [
         button {
           className: 'UsageRightsIndicator__openModal btn-link'
           onClick: @handleClick
+          disabled: !@props.userCanManageFilesForContext
           title: @props.model.get('usage_rights').license_name
           'data-tooltip': 'top'
           },

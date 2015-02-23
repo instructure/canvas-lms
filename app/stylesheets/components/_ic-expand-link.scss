@@ -1,13 +1,15 @@
 /*
 @styleguide Expanding Message Link
 
+<br/>
+
 A right- or left-aligned link that expands on hover or
 focus to reveal a prompt. Useful for close buttons or
 navigations.
 
 The Expanding Message Link can be expanded via javascript
-by adding the **.ic-Expand-link--active** class to the
-**.ic-Expand-link** element.
+by adding the `.ic-Expand-link--active` class to the
+`.ic-Expand-link` element.
 
 ```html
 <div class="content-box">

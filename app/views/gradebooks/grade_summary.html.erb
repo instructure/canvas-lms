@@ -8,9 +8,6 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide"><%= t(:faculty_journal, "Faculty Journal for %{user}", :user => context_user_name(@context, @user)) %></a>
-    <% end %>
     <% if @context.hide_final_grades? %>
       <div class="student_assignment final_grade" style="font-size: 1.2em;">
         <%= t('labels.final_grade_hidden', "Calculation of totals has been disabled") %>

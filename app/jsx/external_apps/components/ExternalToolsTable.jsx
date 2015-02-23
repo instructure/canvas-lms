@@ -4,9 +4,11 @@ define([
   'underscore',
   'i18n!external_tools',
   'react',
-  'jsx/external_apps/lib/store',
-  'jsx/external_apps/components/ExternalToolsTableRow'
-], function(_, I18n, React, store, ExternalToolsTableRow) {
+  'jsx/external_apps/lib/ExternalAppsStore',
+  'jsx/external_apps/components/ExternalToolsTableRow',
+  'jsx/external_apps/components/InfiniteScroll'
+], function(_, I18n, React, store, ExternalToolsTableRow, InfiniteScroll) {
+
   return React.createClass({
     displayName: 'ExternalToolsTable',
 
@@ -18,47 +20,53 @@ define([
       this.setState(store.getState());
     },
 
-    componentDidMount: function() {
+    componentDidMount() {
       store.addChangeListener(this.onChange);
-      store.fetchAll();
+      store.fetch();
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount() {
       store.removeChangeListener(this.onChange);
     },
 
+    loadMore(page) {
+      if (store.getState().hasMore && !store.getState().isLoading) {
+        store.fetch();
+      }
+    },
+
+    loader() {
+      return <div className="loadingIndicator"></div>;
+    },
+
     trs() {
-      return store.getState().externalTools.map(function (tool) {
-        return <ExternalToolsTableRow key={tool.id} tool={tool} />
+      if (store.getState().externalTools.length == 0) {
+        return null;
+      }
+      return store.getState().externalTools.map(function (tool, idx) {
+        return <ExternalToolsTableRow key={idx} tool={tool} />
       }.bind(this));
     },
 
     render() {
-      if (store.getState().isLoadingExternalTools) {
-        return (
-          <div className="ExternalToolsTable">
-            <div className="loadingIndicator"></div>
-          </div>
-        );
-      } else {
-        return (
-          <div className="ExternalToolsTable">
+      return (
+        <div className="ExternalToolsTable">
+          <InfiniteScroll pageStart={0} loadMore={this.loadMore} hasMore={store.getState().hasMore} loader={this.loader()}>
             <table className="table table-striped">
               <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
               <thead>
                 <tr>
-                  <th scope="col" width="30%" style={{ 'padding-left': '30px' }}>{I18n.t('Name')}</th>
-                  <th scope="col" width="50%">{I18n.t('Extensions')}</th>
-                  <th scope="col" width="20%">&nbsp;</th>
+                  <th scope="col" width="70%">{I18n.t('Name')}</th>
+                  <th scope="col" width="30%">&nbsp;</th>
                 </tr>
               </thead>
               <tbody className="collectionViewItems">
                 {this.trs()}
               </tbody>
             </table>
-          </div>
-        );
-      }
+          </InfiniteScroll>
+        </div>
+      );
     }
   });
 });

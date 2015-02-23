@@ -79,16 +79,18 @@ class NotificationMessageCreator
           else
             if @notification.summarizable?
               delayed_messages += build_summaries_for(user, default_channel)
-
-              if too_many_messages_for?(user) && no_daily_messages_in(delayed_messages)
-                delayed_messages << build_fallback_for(user)
-              end
             end
+          end
+        end
 
-            unless user.pre_registered?
-              immediate_messages += build_immediate_messages_for(user)
-              dashboard_messages << build_dashboard_message_for(user) if @notification.dashboard? && @notification.show_in_feed?
-            end
+        unless @notification.registration?
+          if @notification.summarizable? && too_many_messages_for?(user) && no_daily_messages_in(delayed_messages)
+            delayed_messages << build_fallback_for(user)
+          end
+
+          unless user.pre_registered?
+            immediate_messages += build_immediate_messages_for(user)
+            dashboard_messages << build_dashboard_message_for(user) if @notification.dashboard? && @notification.show_in_feed?
           end
         end
       end
@@ -140,7 +142,7 @@ class NotificationMessageCreator
     delayed_message
   end
 
-  def build_immediate_messages_for(user, channels=immediate_channels_for(user))
+  def build_immediate_messages_for(user, channels=immediate_channels_for(user).reject(&:unconfirmed?))
     return [] unless asset_filtered_by_user(user)
     messages = []
     message_options = message_options_for(user)

@@ -832,18 +832,24 @@ SwaggerOperation.prototype.urlify = function(args) {
     }
   }
 
-  var queryParams = "";
+  var queryParams = [];
   for(var i = 0; i < params.length; i ++){
     var param = params[i];
-    if(param.paramType === 'query') {
-      if(queryParams !== '')
-        queryParams += "&";
-      if(args[param.name] !== undefined)
-        queryParams += encodeURIComponent(param.name) + '=' + encodeURIComponent(args[param.name]);
+    if(param.paramType === 'query' && args[param.name] !== undefined) {
+      var value = args[param.name];
+      if(param.type === 'array') {
+        var values = value.split(",");
+        for(var j = 0; j < values.length; j++) {
+          queryParams.push(encodeURIComponent(param.name) + '[]=' + encodeURIComponent(values[j]));
+        }
+      } else {
+        queryParams.push(encodeURIComponent(param.name) + '=' + encodeURIComponent(value));
+      }
     }
   }
-  if ((queryParams != null) && queryParams.length > 0)
-    url += '?' + queryParams;
+  if (queryParams.length > 0) {
+    url += '?' + queryParams.join("&");
+  }
   return url;
 };
 

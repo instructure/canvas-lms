@@ -162,6 +162,15 @@ module Lti
           expect(params['custom_canvas.module_item.id']).to eq tag.id
         end
 
+        it 'sets the launch to window' do
+          tag = message_handler.context_module_tags.create!(context: account, tag_type: 'context_module', new_tab: true)
+          tag.context_module =  ContextModule.create!(context: Course.create!)
+          tag.save!
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' }
+          expect(response.code).to eq "200"
+          expect(assigns[:lti_launch].launch_type).to eq 'window'
+        end
+
         it 'returns the locale' do
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
           params = assigns[:lti_launch].params.with_indifferent_access
@@ -190,6 +199,27 @@ module Lti
           expect(Base64.urlsafe_decode64(params[:resource_link_id])).to eq "Account_#{account.id},MessageHandler_#{message_handler.id},my_custom_postfix"
         end
 
+
+      end
+
+      context 'tool settings' do
+        it 'creates the tool proxy setting object' do
+          message_handler.parameters = [{ "name" => "tool_settings", "variable" => "ToolProxy.custom.url" }]
+          message_handler.save!
+          expect(ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).size).to eq 0
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          expect(ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).size).to eq 1
+        end
+
+        it 'initializes the tool proxy setting with the custom data from the tool proxy' do
+          message_handler.parameters = [{ "name" => "tool_settings", "variable" => "ToolProxy.custom.url" }]
+          message_handler.save!
+          tool_proxy.raw_data = {"custom" => {"data"=> 42}}
+          tool_proxy.save!
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id, params: {tool_launch_context: 'my_custom_context'}
+          tool_setting = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).first
+          expect(tool_setting.custom).to eq({"data"=>42})
+        end
 
       end
 

@@ -145,9 +145,7 @@ describe "interaction with differentiated quizzes" do
       end
       it "should show previous submissions on inaccessible quizzes" do
         create_section_override_for_assignment(@da_quiz)
-        user_session(@student)
         submit_quiz(@da_quiz)
-        user_session(@observer)
         # destroy the override and automatically generated grade providing visibility to the current student
         AssignmentOverride.find(@da_quiz.assignment_overrides.first!).destroy
         @da_quiz.assignment.grade_student(@user, {:grade => nil})

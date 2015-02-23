@@ -290,7 +290,7 @@ CanvasRails::Application.routes.draw do
           get :record_answer
           post :record_answer
         end
-        resources :events, controller: 'quizzes/quiz_submission_events', path: :log
+        resources :events, controller: 'quizzes/quiz_submission_events', path: "log#{full_path_glob}"
       end
 
       post 'extensions/:user_id' => 'quizzes/quiz_submissions#extensions', as: :extensions
@@ -518,8 +518,10 @@ CanvasRails::Application.routes.draw do
     resources :external_tools do
       get :finished
       get :resource_selection
+      collection do
+        get :retrieve
+      end
     end
-
 
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
@@ -756,6 +758,9 @@ CanvasRails::Application.routes.draw do
   end
 
   get 'courses/:course_id/outcome_rollups' => 'outcome_results#rollups', as: 'course_outcome_rollups'
+
+  get 'terms_of_use' => 'legal_information#terms_of_use', as: 'terms_of_use_redirect'
+  get 'privacy_policy' => 'legal_information#privacy_policy', as: 'privacy_policy_redirect'
 
   ### API routes ###
 

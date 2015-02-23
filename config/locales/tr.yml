@@ -31,6 +31,8 @@ tr:
   LongTextEditor: 
     cancel: İptal
     save: Kaydet
+  a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
+  a_table_that_contains_the_grading_scheme_data_each_d461c205: "Notlandırma şema verisini içeren tablo. Her satırda bir isim, maksimum yüzde ve minimum yüzde vardır. Ayrıca, her satırda bir alt satır eklemek ve mevcut satırı silmek için bir simge vardır."
   academic_benchmark: 
     api_error: "%{auth} yetkilendirmesi için standartlar güncellenemedi."
     bad_ab_file: "Sağlanan Academic Benchmark dosyasında hata meydana geldi."
@@ -268,7 +270,6 @@ tr:
       logout_response_from_idp: "IdP'den LogoutResponse"
       saml_required: "SAML Yapılandırması için SAML'ın test edilmesi gereklidir"
   account_level_8c2c1cdc: "(hesap seviyesi)"
-  account_navigation_configured_946bf47e: "Hesap gezinme menüsü yapılandırıldı"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Hesap onay son tarihi başlangıç tarihinden sonra olamaz"
@@ -400,7 +401,6 @@ tr:
   account_user: 
     types: 
       account_admin: "Hesap Yöneticisi"
-  accountmembership_cf18d743: HesapÜyeliği
   accounts: 
     account_name_required: "Hesap ismi boş olamaz"
     account_quotas_not_updated: "Kullanıcı kotaları güncellenmedi"
@@ -1251,9 +1251,9 @@ tr:
           one: "1 hata bu %{model} nin kaydedilmesini engelledi"
           other: "%{count} kadar hata bu %{model} nin kaydedilmesini engelledi"
   add_app_baf540f: "Uygulama Ekle"
+  add_attachment_93868828: "Ek Ekle"
   add_course_assignments_628ed6d0: "Ödev Ekle"
   add_course_calendar_events_146154a5: "Ders Takvim Olay Ekle"
-  add_external_tool_6ef00052: "Harici Araç Ekle"
   add_files_to_the_course_da6ffd32: "Kursa Yeni Dosya Ekle"
   add_grading_scheme_81e23c05: "Notlandırma şeması ekle"
   add_module_item: 
@@ -1264,7 +1264,7 @@ tr:
     add_topic_to: "%{module} modülüne tartışma başlığı ekle"
   add_students_to_the_course_874be8fb: "Derse Öğrenci Ekle"
   add_tas_to_the_course_2aac6e02: "Derse Öğretim Elemanı Yardımcıları Ekle"
-  add_tool_4a5e66c8: "Araç Ekle"
+  add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
   after_date_981cd41b: "%{date}'dan sonra"
   after_last_attempt_c9168da2: "Son Girişten Sonra"
   ajax_errors: 
@@ -1357,6 +1357,7 @@ tr:
   angel_file_description: "Angel .zip dışarı aktarma formatı"
   announcement: 
     no_title: "Başlık Yok"
+  announcement_fb4cb645: Duyuru
   announcements: 
     announcements_crumb: Duyurular
     error_draft_state: "Bu başlık taslak olarak değiştirilemiyor çünkü bu bir duyurudur."
@@ -1376,7 +1377,6 @@ tr:
       podcast_title_course: "Ders Duyurularına Ait Podcast Akışları"
       podcast_title_group: "Grup Duyurularına Ait Podcast Akışı"
     index_view: 
-      announcement_fb4cb645: Duyuru
       announcements_title: Duyurular
       delete: Sil
       loading: Yükleniyor...
@@ -1538,7 +1538,6 @@ tr:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Kilitli ödevleri olan grubu silemezsiniz."
-  assignment_menu_configured_7a5f4eec: "Ödev menüsü yapılandırıldı"
   assignment_muter: 
     mute_assignment: "Ödevi Beklet"
     muting_assignment: "Ödev beklemeye alınıyor..."
@@ -1919,9 +1918,6 @@ tr:
       reviews_per_user: "Kullanıcı Başına Değerlendirme"
     points_possible_number: "Olası puanlar bir sayı değeri olmalı"
     positive_number: "Pozitif bir sayı kullanmalısınız"
-    post_to_sis_selector: 
-      include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Okulunuzun Öğrenc Bilgi Sistemine göderirken bu ödevin notlarını da dahil et"
-      post_grades_to_sis_97ece878: "Notları ÖBS'ye Gönder"
     redirect_page: 
       redirect_message: |-
           Ödev bir web bağlantısı ve şimdi bu sayfaya yönlendiriliyorsunuz.
@@ -2168,7 +2164,6 @@ tr:
   bb_name: "Blackboard Dönüştürücü"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Cesaretinizi toplayıp öğretim üyesine bu bağlantıyı düzeltmesini söyleyin."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Bu dosyayı yayınlamadan önce kullanıcı haklarını belirtmelisiniz."
-  before_publishing_you_must_set_usage_rights_on_you_233ce7b4: "Yayınlamadan önce dosyalarınızda kullanıcı haklarını belirtmelisiniz. Bu ayar hesap yöneticiniz tarafından belirlenir. Bir sorunla karşılaşırsanız lütfen yöneticiniz ile iletişime geçin."
   better_file_browsing_description: |-
       Yeni, daha basit ve kullanımı kolay dosya arama arayüzü. Bu özelliği ders düzeyinde etkinleştirirseniz,
       dersteki tüm kullanıcılar yeni arayüzü görebilirler. Kullanıcılar kişisel dosya sayfasına ('/files') gittiklerinde
@@ -2287,10 +2282,12 @@ tr:
     update: Güncelle
     view_account_roster: "Hesap Listesini Göster"
     view_course_roster: "Ders Listesini Göster"
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Varsayılan olarak bütün bağlantılar ders içinde etkinleştirilmiştir. Öğrenciler, içeriği olmayan bölümlere verilen bağlantıları göremezler. Örneğin, hiç kısa sınav oluşturmadıysanız kısa sınav bağlantısını göremezler. Bu bağlantıları sıralayabilir ya da öğrencilerinizin erişmesini istemediğiniz ders bölümleri varsa  bunları devre dışı bırakabilirsiniz."
   by_url_a163275e: "URL'ye göre"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: kapat
+  calculation_int_is_not_a_valid_calculation_int_for_561f72fa: "'%{calculation_int}' geçerli bir calculation_int for calculation_method of '%{calculation_method}' değildir. Geçerli aralık '%{valid_calculation_ints}'"
   calculator: 
     buttons: 
       save: Kaydet
@@ -2380,7 +2377,6 @@ tr:
     agenda_view: 
       due: Bitiş
       loading: Yükleniyor
-      no_events: "Bu tarihten sonra olay yok."
       starts_at: "Şu zamanda başlıyor"
     agenda_view_displaying_start_end: "Şu and a gösterilen %{start} ile %{end} arası"
     appointment_group_deletion_details: "Bunu silerseniz öğrencilerin tarafından kaydolunan herhangi görüşme de silinecektir."
@@ -2790,6 +2786,7 @@ tr:
   canvas_cartridge_file_description: "Canvas Dersi Dışarı Aktarma Paketi"
   canvas_cartridge_name: "Canvas Kartuş İçe Aktarıcı"
   canvas_revision_unknown: Bilinmiyor
+  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas şu anda gönderilerinizi kaydetme sonrası tekrardan notlandırıyor, bu biraz zaman alabilir."
   cc: 
     by: "CC Özelliği"
     by_nc: "CC Özelliği Ticari Olmayan"
@@ -3319,13 +3316,8 @@ tr:
     media_objects_not_configured: "Ortam Nesneleri yapılandırılmamış"
     new_roster_user: 
       completed_enrollment: "*%{completed_at}* tamamlandı"
-      confirm: 
-        conclude_student: "Bu öğrencinin kaydını sonlandırmak istediğinize emin misiniz?"
-        delete_enrollment: "Bu öğrencinin kaydını silmek istediğinize emin misiniz?"
       enrolled_as: "%{enrollment_type} olarak derse kaydedildi"
       enrollment_linked_to: "*%{linked_user}* ile ilişkilendirildi"
-      error: 
-        enrollment_change_failed: "Derse kayıt ayrıcalık değişikliği başarısız oldu, lütfen tekrar deneyin"
       labels: 
         user_privileges: Ayrıcalıklar
       legends: 
@@ -3787,7 +3779,6 @@ tr:
         unsubscribe: "Takibi Bırak"
       inbox_actions_description: "Mesaj Hareketleri Menüsü"
       read_more: "daha fazla..."
-    course_name: "Ders adı"
     course_options: 
       course_options: 
         concluded: Sonlandırıldı
@@ -3812,7 +3803,6 @@ tr:
       page_title_header: "Karşılıklı Konuşmalar"
       reply: Yanıtla
       reply_all: "Hepsini yanıtla"
-      search_by_user: "Kullanıcıya göre ara"
       search_for_recipients: "Alıcılar içinde ara"
       search_names_groups_courses: "İsim, grup ve derse göre ara"
       sending: gönderiliyor
@@ -3931,6 +3921,9 @@ tr:
     one: "1 dakika"
     other: "%{count} dakika"
     zero: "1 dakikadan daha az"
+  count_students_will_get_num_points_c970fc01: 
+    one: "1 öğrenci %{num} puan alacak"
+    other: "%{count} öğrenci %{num} puan alacak"
   course: 
     access_denied: "Erişim reddedildi"
     batch_update_message: 
@@ -4033,7 +4026,6 @@ tr:
       file: "Bilinmeyen dosya"
       topic: "Bilinmeyen konu"
       wiki_page: "Bilinmeyen wiki sayfası"
-  course_home_sub_navigation_configured_5b80b8bf: "Dersin ana sayfası alt gezinmesi yapılandırıldı"
   course_list: 
     favorited_tooltip: "Dersler menüsünden çıkarmak için tıklayınız."
     nonfavorited_tooltip: "Dersler menüsüne eklemek için tıklayınız."
@@ -4111,7 +4103,6 @@ tr:
       wiki_id: "Wiki Idsi"
       workflow_state: "İş akış Durumu"
   course_members_are_free_to_join_9b2603d4: "Ders üyeleri katılabilir"
-  course_navigation_configured_a48400fe: "Ders gezinme menüsü yapılandırıldı"
   course_restore: 
     restore_error: "Ders onarımı denemesi başarısız oldu. Ders onarılamıyor."
   course_search: 
@@ -4161,7 +4152,6 @@ tr:
       move_course: "Dersi Taşı"
       reset_course_content_dialog_help: "Ders İçeriğini Sıfırla"
       section_enrollments: "Seçilenleri Dahil Et"
-  course_settings_sub_navigation_configured_e6c41593: "Ders ayarları alt gezinmesi yapılandırıldı"
   course_setup_wizard_is_showing_a7c087c1: "Kurs Kurulum Sihirbazı görünüyor."
   course_statistics: 
     unknown: bilinmeyen
@@ -4447,7 +4437,6 @@ tr:
         sections: "Ders Bölümleri"
       help: 
         edit_navigation: "Ders menüsündeki öğeleri yeniden sıralamak için sürükleyip bırakın."
-        public_course: "(öğrenci bilgileri gizli kalacaktır)"
       images: 
         alt: 
           delete: Sil
@@ -4482,7 +4471,6 @@ tr:
         hide_distribution_graphs: "Öğrencilerin not dağılım grafiklerini gizle"
         hide_final_grades: "Öğrenci değerlendirme özeti toplamını gizle"
         indexed: "Bu dersi herkese açık ders listesine dahil et"
-        is_public: "Bu ders herkes tarafından görülebilsin"
         language: Dil
         license: Lisans
         open_enrollment: "Dersin ana sayfasına \"Bu Derse Katıl\" bağlantısı ekle"
@@ -5052,6 +5040,7 @@ tr:
   differentiated_assignments_description: |-
       Farklılaşmış Ödevler ödevin hangi bölüm(ler) için geçerli olacağını seçmeyi sağlayan *beta* bir özelliktir.
       Ödev içermeyen bölümlerde ders içeriğinde bu görünmez ve finla notları bu notlar olmadan hesaplanır.
+  disable_a5c05db3: "Devre Dışı"
   discussion_entries: 
     created_entry_notice: "Girdi başarıyla oluşturuldu."
     deleted_entry_notice: "Bu girdi silindi"
@@ -5068,7 +5057,6 @@ tr:
     atom_no_author: "Yazar Yok"
     default_title: "Başlık Yok"
     empty_message: "Mesaj yok"
-  discussion_topic_menu_configured_1b518ef2: "Tartışma Konusu menüsü yapılandırıldı"
   discussion_topics: 
     assignment_details: 
       available_from: Kullanılabilir
@@ -5121,7 +5109,6 @@ tr:
       new_quiz: "Yeni Kısa Sınav"
     edit_crumb: Düzenle
     edit_view: 
-      add_attachment_93868828: "Ek Ekle"
       allow_threaded_replies: "Yanıtlara izin ver"
       attachment: "Dosya Eki"
       available_from: Kullanılabilen
@@ -5136,7 +5123,6 @@ tr:
       page_header_title: "Yeni Tartışma"
       points_possible: "Olası Puanlar"
       post_at: Gönderi
-      remove_attachment_ceae0973: "Ekli Dosyayı Kaldır"
       save: Kaydet
       saving: Kaydediliyor...
       topic_title: "Konu Başlığı"
@@ -5343,16 +5329,25 @@ tr:
     unsubscribe: "Bu başlığı artık takip etmiyorsunuz"
     unsubscribed: "Takip Edilmiyor"
     unsubscribed_hint: "Bu başlığı takip etmiyorsunuz. Takip etmek için tıklayınız."
+  display_course_catalog: "Bu kök hesapta \"Bu dersi herkese açık dersler listesi\" işareti etkinleştirilmiş olarak aranabilir ders listesi göster."
   domain_3b54c511: Alan
+  due_date_6a281fe3: "Bitiş Tarihi: %{date}"
   due_date_822625d8: "Bitiş Tarihi"
+  due_date_cannot_be_after_course_end_fd128a14: "Bitiş tarihi dersin bitiminden sonra olamaz"
+  due_date_cannot_be_after_section_end_b0f54388: "Bitiş tarihi bölüm bitiminden sonra olamaz"
+  due_date_cannot_be_after_term_end_5d504cb1: "Bitiş tarihi dönem sonundan sonra olamaz"
+  due_date_cannot_be_before_course_start_ecc523ba: "Bitiş tarihi dersin başlangıcından önce olamaz"
+  due_date_cannot_be_before_section_start_f8950484: "Bitiş tarihi bölümün başlangıcından önce olamaz"
+  due_date_cannot_be_before_term_start_ea660b2c: "Bitiş tarihi dönemin başlangıcından önce olamaz"
   due_dates: 
     due_at: "bitiş: %{assignment_due_date_time}"
     multiple_due_dates: "Bitiş: Çoklu Tarih"
     no_due_date: "bitiş: Bitiş Tarihi Yok"
+  due_datetime_f5a81b81: "Teslim Tarihi: %{dateTime}"
+  due_multiple_dates_cc0ee3f5: "Teslim Tarihi: Birden Çok Gün"
   e_mail_only_2cc5e513: "Sadece E-Posta"
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Dönüştürücü"
-  edit_external_tool_472a475: "Harici Araçları Düzenle"
   edit_grading_scheme_53091236: "Notlandırma Şemasını Düzenle"
   edit_permissions_for_count_items_d65e3855: 
     one: "Şunun için izinleri düzenle: %{itemName}"
@@ -5432,13 +5427,16 @@ tr:
     titles: 
       font_size: "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
       formatting: "Format, aşağı tuşa basın ve seçin"
-  editor_button_configured_b9419357: "Düzenleyici butonu yapılandırıldı"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Web adresi ya da alan adından biri belirtilmeli."
+  element_option_missing_error_an_element_to_attach__be433478: "`öğe` seçeneği eksik hatası: BBTreeBrowserView için dönüştürme seçeneği 'evet' olarak ayarlanacaksa TreeBrowserView'e eklenecek bir öğe beliritlmeli."
   email: 
     default_from_name: "Instructure Canvas"
   email_is_invalid_e0d982eb: "Eposta adresi geçersiz!"
   ember_modules_description: "Ember'de yeniden yazılan Modüller. Harici konumlardan sürüklemeyi etkinleştirmek için gömülü sürükle bırak API'sini kullanır."
+  enable_6f5d1328: Etkin
+  enable_gradebook_list_students_by_sortable_name: "Öğrencileri Not Defterinde sıralanmış isimleri ile listeleyin. Sıralanmış isimler varsayılan olarak 'Soy adı, Adı' şeklindedir fakat ayarlarda değiştirilebilir."
   enable_multiple_grading_periods: "Hesap yöneticisinde çoklu notlandırma periyotlarını etkinleştirip Not Defterinde kullanın."
+  end_date_e0093ed7: "Bitiş Tarihi"
   enrollment: 
     default_course_name: Ders
     default_email: "Eposta yok"
@@ -5637,6 +5635,7 @@ tr:
         html_content: "HTML/Gömülü İçerik"
         portfolio: "Asıl ePortfolyoya Git"
         rich_content: "Zengin Metin İçeriği"
+        share: "Size özel ePortfolyoya erişim için bu bağlantıyı kopyalayıp izin vermek istediklerinizle paylaşın:"
         view_original: "Orijinal Dosyayı Göster"
         wizard: "Başlarken Sihirbazı"
       login_required: "Bu sayfada yorum yapabilmek için *oturum açmalısınız*."
@@ -5731,6 +5730,7 @@ tr:
   error_deleting_name_reason_11f9d399: "%{name}'i silerken hata oluştu: %{reason}"
   error_message_2b9d12ee: "Hata: %{message}"
   error_uploading_file_e2d31b56: "Dosya yüklemesinde hata."
+  error_while_importing_csv_please_contact_support_e_57e6b3b: "CSV dosyasının içer aktarımında hata. (Hata raporu %{number})"
   errors: 
     bad_navigation_config: "Geçersiz ders sekme yapılandırması"
     blank: Zorunlu
@@ -5779,7 +5779,7 @@ tr:
   everyone_854554dd: Herkes
   example_https_example_com_config_xml_be5f36ac: "Örneğin: https://example.com/config.xml"
   expand_or_collapse_calendars_9854b0d0: "Takvimi Genişlet ve Topla"
-  extensions_7250a0bb: Eklentiler
+  expand_or_collapse_undated_items_b901de09: "Tarihi belirlenmemiş öğeleri genişlet veya topla"
   external_apps_f5490181: "Harici Uygulamalar"
   external_content: 
     cancel: 
@@ -5816,6 +5816,7 @@ tr:
       phrase_to_look_for: "Kelime aramak için"
       posts_added: "Gönderi Eklendi"
       remove_feed: "%{display_name}'ı kaldır"
+  external_integration_keys_8b4f4548: "Harici Entegrasyon Anahtarları"
   external_tools: 
     account_navigation_configured: "Hesap gezinme menüsü yapılandırıldı"
     app_full_view: 
@@ -5998,6 +5999,7 @@ tr:
     differentiated_assignments_course_disable_warning: "Sınıflandırılmış ödevleri devre dışı bırakmak tüm yayınlanmış ödevlerin öğrenciler tarafından görülmesine neden olur."
     ember_modules: "Ember Modulleri"
     google_docs_domain_restriction: "Google Docs Alan Adı Kısıtlamaları"
+    gradebook_list_students_by_sortable_name: "Not Defteri - Öğrencileri Sıralanabilir İsimlere göre listele"
     high_contrast: "Yüksek Çözünürlüklü Stilleri Kullan"
     html5_first_videos: "Video oynatmak için HTML5 tercih edin"
     k12: "K-12'ye has özellikler"
@@ -6007,6 +6009,7 @@ tr:
     new_quiz_statistics: "Yeni Kısa Sınav İstatistikleri Sayfası"
     new_styles: "Yeni Stilleri Kullan"
     post_grades: "Notları ÖBS'ye Gönder"
+    quiz_log_auditing: "Kısa Sınav Kayıt Denetleme"
     student_groups: "Yeni Öğrenci Grubu Sayfası"
     student_outcome_gradebook: "Öğrenci Öğrenme Yeterlilik Not Defteri"
   file_list_updated_38e2a5ad: "Dosya listesi güncellendi"
@@ -6045,6 +6048,7 @@ tr:
     published_status: Yayınlandı
     restricted_status: "%{from_date} tarihinden %{until_date} tarihine kadar geçerli"
     unpublished_status: Yayınlanmadı
+  filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} dosyası şu kullanım hakları ile yayınlanmıştır: %{usage_right}"
   files: 
     alts: 
       file: Dosya
@@ -6205,9 +6209,13 @@ tr:
     upload_error: "Dosyanın yüklenmesinde hata meydana geldi"
     warnings: 
       file_uploaded_without_response: "Dosya yüklenmiş olabilir fakat sunucu cevap vermiyor. Onaylamak için sayfayı yeniden yükleyin."
+  files_and_folder_contents_only_available_to_studen_944f9166: "Öğrenciler dosyalar ve klasör içeriklerine yalnızca bu bağlantı ile erişebilirler. Öğrenci dosyalarında görülmez."
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Çevreleyen metni okuyun , boşluğu doldurun"
   filter_announcements_by_unread_495eeeb3: "filtrelenmiş okunmamış duyurular"
   filter_by_name_34cbe139: "İsme göre filtrele"
+  filter_discussions_by_assignments_757924ed: "tartışmaları ödevlere göre filtrele"
+  filter_discussions_by_unread_6c48322: "tartışmaları okunmamışlara göre filtrele"
+  filter_replies_by_unread_caf870ea: "Yanıtları okunmamışlara göre filtrele"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr'da Creative Commons Lisanslı görseller bul"
     search: Ara
@@ -6246,7 +6254,6 @@ tr:
     invitation: davet
     question: soru
     warning: uyarı
-  global_navigation_configured_9e7bd94c: "Genel gezinme yapılandırıldı"
   google_docs_domain_restriction_description: |-
       Google Docs Alan Adı Sınırlaması Google Docs gönderileri ve işbirliklerinin tek bir alan
       adı altında toplanmasına izin verir. Onaylanmamış alan adı üzerinden ödev göndermeye 
@@ -6545,7 +6552,6 @@ tr:
       disabled_for_student_view: "Test Öğrencisi notları, genel not istatistiklerine dahil edilmez."
       expand: "Tüm öğrenme yeterlilik çıktı gruplarını genişlet."
       expand_title: Genişlet
-      faculty_journal: "%{user} için Öğretim Üyesi Kaydı"
       for_course: "Bu ders için,"
       grading_in_progress: "Öğretim elemanı notlar üzerinde çalışıyor"
       headers: 
@@ -6595,7 +6601,6 @@ tr:
       accessibility_warning: "Uyarı: Not Defteri Izgara Görünümü erişilemez. Bireysel Görünümü kullanmak için buraya tıklayın. "
       arrange_columns_by_due_date: "Sütunları son teslim tarihine göre düzenle"
       arrange_columns_by_group: "Sütunları ödev grubuna göre düzenle"
-      download_scores: "Notları İndir (.csv)"
       filter_by_student: "Öğrenci ismine veya ikincil kimliğe göre filtrele"
       grades: Notlar
       hide_student_names: "Öğrenci İsimlerini Gösterme"
@@ -6607,7 +6612,7 @@ tr:
       set_group_weights: "Grup Ağırlıklarını Ayarla"
       show_attendance_columns: "Devam Sütunlarını Göster"
       show_concluded_enrollments: "Sonlandırılmış Ders Kayıtlarını Göster"
-      upload_scores: "Notları Yükle (.csv'den)"
+      upload_scores: "İçeri Aktar"
       view_grading_history: "Notlandırma Geçmişini Göster"
     grades: 
       complete: Tamam
@@ -6800,6 +6805,7 @@ tr:
       saving: Kaydediliyor...
     titles: 
       grading_scheme_info: "Notlandırma Şemasını Göster/Düzenle"
+  great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Harika şimdi bir dersiniz var... Sırada ne var? Şey, dersinizi tüm dünyaya açmadan önce, temelde her şeyin hazır olduğunu kontrol etmek isteyebilirsiniz. Dersinizin kullanıma hazır olduğundan emin olmak için soldaki listeyi inceleyin."
   group: 
     greater_than_1: "1'den büyük olmalıdır"
     memeber: Üye
@@ -6833,16 +6839,20 @@ tr:
     name_unavailable: "%{name} zaten kullanılıyor."
     self_signup_for_courses: "Hızlı kayıt, sadece ders grupları veya topluluklar için etkin olabilir"
   group_category_locked: "Öğrenciler bu ödev için gönderim yaptıkları için grup kategorisi değiştirilemez."
+  group_group_name_is_for_a_different_section_4d84d256: "%{group_name} grubu başka bir bölüm içindir"
   group_group_name_is_full_297880d6: "%{group_name} Grubu dolu"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "%{group_name} Grubuna katılım sadece davetiye ile olabilir"
+  group_is_for_a_different_section_6a843a4d: "Grup farklı bir bölüm içindir"
   group_is_full_56849d78: "Grup dolu"
   group_is_joined_by_invitation_only_d00f5a63: "Gruba giriş sadece davetiye ile olabilir"
+  group_leader_user_name_6f24bebb: "grup lideri %{user_name}"
   group_members_ae5489ed: "grup üyeleri"
   group_membership: 
     errors: 
       group_full: "Bu grup dolu"
       not_in_group_section: "%{student} öğrencisi %{group} grubunun diğer üyeleriyle bir bölüm paylaşmıyor."
   group_name_b69c144: "Grup İsmi"
+  group_name_in_group_category_name_group_category_29bf3254: "%{group_name} grubu %{group_category_name} grup kategorisindedir"
   group_name_is_required_5547bc0b: "Grup ismi gereklidir"
   group_settings: 
     invitation_sent: "Davet gönderildi"
@@ -7022,7 +7032,6 @@ tr:
         too_short: "Lütfen aramak istediğiniz kriteri 3 veya daha fazla karakterle ifade edin"
       assign_to_group_menu: 
         add_to_group: "Grup Ekle"
-        all_groups_full: "Bu grup dolu."
         all_groups_full_suggestion: "Ya grup sınırlılıklarını değiştirin ya da daha fazla grup ekleyin."
         assign_user_to_group: "Bu gruba kullanıcı ata"
         assign_user_to_group_name: "Gruba %{name} kullanıcısını ata"
@@ -7113,7 +7122,6 @@ tr:
         save: Kaydet
         saving: Kaydediliyor...
       group_user: 
-        assign_to_group: "Ödev Grubu"
         assign_user_to_group: "%{name}'i bir gruba ata"
         edit_group_membership: "%{name}'in üyeliğini düzenle"
         group_leader: "Grup Lideri"
@@ -7185,6 +7193,10 @@ tr:
     unassigned_students: "Atanmamış Öğrenciler (%{count})"
     unassigned_users: "Atanmamış Kullanıcılar (%{count})"
   groups_6c90e26a: Gruplar
+  groups_are_a_good_place_to_collaborate_on_projects_7386830f: "Gruplar projelerde işbirliği yapmak veya çalışma oturumları ve benzer şeyleri yapmak için idealdir.\n\
+      Her grup için takvim, wiki, tartışma ve biraz dosyalama alanı sağlanmaktadır. Gruplar bu belgeler\n\
+      üzerinde işbirliği yapabilir ve hatta web konferanslarını düzenleyebilirler. Aslında daha çok\n\
+      proje odaklı olarak az sayıda öğrenci ile çalışabileceğiniz küçük bir derse benzetebiliriz. "
   help_dialog: 
     Back: Geri
     Help: Yardım
@@ -7255,16 +7267,19 @@ tr:
       create: "%{model} Oluştur"
       submit: "%{model} Kaydet"
       update: "%{model} Güncelle"
+  here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Takvimi daha iyi anlamak ve ödev olmayan olayları dersinize eklemek için harika bir fırsat. Merak etmeyin, size bu konuda yardımcı olacağız."
+  hidden_files_inside_will_be_available_with_links_9bdf702b: "Gizlidir, buradaki dosyalar bağlantılar ile kullanılabilir."
   high_contrast_description: |-
       Canvas kullanıcı ara biriminin yüksek çözünürlüklü versiyonunu isterseniz bunu etkinleştirin. 
       Görme engeli olan veya okumada zorluk çeken kişiler için yararlı olabilir.
   high_score_47924c1a: "En Yüksek: %{score}"
   highest_28ad71e6: "En Yüksek"
-  homework_submission_configured_35c56ff0: "Ev ödevi gönderimi ayarlandı"
   html5_first_videos_description: |-
       Varsayılan olarak, Canvas videoları oynatmak için önce Flash'ı deneyecek. Önce HTML5'i
       kullanıp sonra Flash'a dönmek için bu seçeneği etkinleştirin.
   html_editor_fb2ab713: "HTML Düzenleyici"
+  i_have_obtained_permission_to_use_this_file_6386f087: "Bu dosyayı kullanmak için iznim var."
+  i_hold_the_copyright_71ee91b1: "Telif hakkı bendedir"
   ic_actions: 
     manage: yönet
   icons: 
@@ -7274,8 +7289,13 @@ tr:
     online_url_submission: "Çevrimiçi URL Gönderimi"
     quiz_submission: "Kısa Sınav Gönderimi"
     text_entry_submission: "Metin Yazma Şeklinde Gönderim"
+  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "Etkinleştirilirse yayınlanmadan önce içerik tasarımcıları dosyalar için telif ve lisans bilgisini vermelidir"
+  if_you_change_an_assignment_s_points_possible_you__25a0edad: "Bir ödevin olası puanlarını değiştirirseniz ödevi yeniden notlandırmalısınız."
+  if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Kullanım haklarını şimdi seçmezseniz, yüklendikten sonra bu dosya yayınlanmayacak."
+  if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Çıkarsanız, şu anda hazırlanan zip'li dosya indirmesi iptal edilecek."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Başka bir öğrenme yönetim sistemi kullanıyorsanız buradaki malzemelerinizi Canvas'a taşımak isteyebilirsiniz. İçeriğinizi Canvas'a kolayca aktarma sürecini birlikte yapalım."
   ignore_assignment_738b3c99: "Ödevi Gözardı Et"
+  ignore_name_55edc6fe: "%{name} yoksay"
   ignore_these_3940f6f5: "Bu Geçersiz"
   image_8ad06: Resim
   images: 
@@ -7314,6 +7334,7 @@ tr:
     title_for_topics_category: "%{category} Başlıkları"
     warnings: 
       truncated_wiki_title: "Şu wiki sayfanın başlığı kesildi : %{title}"
+  include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Okulunuzun Öğrenc Bilgi Sistemine göderirken bu ödevin notlarını da dahil et"
   info: 
     notices: 
       error_reported: "Yardımınız için teşekkürler! Bunu düzelteceğiz"
@@ -7322,6 +7343,7 @@ tr:
       start_a_group: "Grup başlat"
     styleguide: 
       manage: Yönet
+  insert_row_below_25187f89: "Alta satır ekle"
   installed_7b284a91: Yüklü
   instructions: 
     authorize_google_docs: "Belgeler üzerinde işbirliği içinde çalışmadan önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
@@ -7393,6 +7415,7 @@ tr:
   invalid_xml_syntax: "Geçersiz XML yazımı"
   invite_5b1fcbcd: "Davet et"
   items_items_selected_5b55e566: "%{items} öğe seçildi"
+  items_selected_have_different_usage_rights_52b325cc: "Seçili öğelerin farklı kullanım hakları var."
   jobs: 
     columns: 
       attempt: "giriş hakkı"
@@ -7501,6 +7524,8 @@ tr:
       view_all_or_customize: "Tümünü Göster veya Yapılandır"
     mobile_auth: 
       log_in_to_canvas: "Canvas'ta Oturum Aç"
+    styleguide: 
+      default_page_title: "Canvas LMS"
   learning_mastery_gradebook_description: |-
       Öğrenme Yeterliliği Not Defteri öğretmenlerin dersin öğrenme çıktılarına göre öğrencileri ve 
       ders 
@@ -7527,6 +7552,9 @@ tr:
         not_authenticated: "Bu sayfaya erişim için oturum açmalısınız"
         student_not_found: "Öğrenci bulunamadı"
         teacher_not_found: "Öğretmen bulunamadı"
+      lti: 
+        api: 
+          status_unauthorized: yetkilendirilmemiş
       not_authorized: "kullanıcının bu eylem için yetkisi yok"
       status_unauthenticated: doğrulanmamış
       status_unauthorized: yetkilendirilmemiş
@@ -7617,6 +7645,8 @@ tr:
   locales: 
     tr: "Türkçe (crowd-sourced)"
   lock_date_cannot_be_after_course_end_a473158b: "Kilitleme tarihi dersin bitiş tarihinden sonra olamaz"
+  lock_date_cannot_be_after_section_end_d37da70c: "Kilitleme tarihi bölüm sonundan sonra olamaz"
+  lock_date_cannot_be_after_term_end_cf1a188f: "Kilitleme tarihi dönem sonundan sonra olamaz"
   lock_date_cannot_be_before_due_date_ac30f54: "Kilit tarihi bitiş tarihinden önce olamaz"
   logged_out_user: "Oturum Kapatan Kullanıcı %{user_counter}"
   low_score_4eeb95b2: "En Düşük : %{score}"
@@ -7633,6 +7663,8 @@ tr:
     register_tool: "Kayıt Aracı"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle İçe Aktarma"
+  make_sure_you_choose_the_most_appropiate_option_as_93079937: "Öğrencilerin puanlarının etkilenmeyeceği en uygun seçeneği seçtiğinizden emin olun : "
+  malformed_csv_aaa4b7f2: "Bozuk CSV"
   manage_avatars: 
     errors: 
       update_failed: "Güncelleme hatası, lütfen tekrar deneyin"
@@ -7641,6 +7673,7 @@ tr:
     prompts: 
       delete_avatar: "Bu kullanıcının profil resmini silmek istediğinize emin misiniz?"
       lock_avatar: "Bu resmi kilitlerseniz onaylanır ve kullanıcı güncelleyemez. Devam edilsin mi?"
+  manage_group_group_name_ac8578c6: "%{group_name} grubunu yönet"
   manage_usage_rights_c5a8c216: "Kullanım Şartlarını Yönet"
   manual_entry_e4a4f99a: "Elle Giriş"
   mathquill: 
@@ -7690,6 +7723,7 @@ tr:
     upload: Yükle
     uploading: Yükleniyor...
   median_score_4657e907: "Ortalama: %{score}"
+  member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{max_membership} maksimum üyeden %{member_count} üye"
   members_af25c21d: Üyeler
   membership_by_invitation_only_9bc27199: "Yalnızca davetli  üyelik"
   menu: 
@@ -9664,7 +9698,6 @@ tr:
   migration_issues: 
     errors: 
       valid_workflow_state: "Geçerli bir iş akış durumu göndermeli"
-  migration_selection_configured_c6ed9b28: "Aktarım seçimi yapılandırıldı"
   missing_percent_94534638: "Kayıp: %{percent}"
   module_item_types: 
     assignment: Ödev
@@ -9675,7 +9708,6 @@ tr:
     page: Sayfa
     quiz: "Kısa Sınav"
     sub_header: "Alt Başlık"
-  module_menu_configured_cdf62584: "Modül menüsü ayarlandı"
   modules: 
     add: 
       assignment: 
@@ -9714,6 +9746,12 @@ tr:
       Save: Kaydet
       cancel: İptal
       creating: Oluşturuluyor...
+    assignments_to_grade: 
+      one: "1 ödevde notlandırılmamış gönderiler var"
+      other: "%{count} ödevde notlandırılmamış gönderiler var"
+    assignments_to_post: 
+      one: "Ödevi göndermeye hazırsnız"
+      other: "%{count} ödevi göndermeye hazırsınız."
     create: 
       assignment: 
         cancel: İptal
@@ -9806,6 +9844,7 @@ tr:
   moodle_dropdown_warning_title: "Çoklu Açılır Kutular sorusu doğru içeri aktarılmamış olabilir"
   moodle_formula_many_warning_title: "Bu soru bankasında %{count} sayıda olası cevapları yeniden oluşturulması gereken Formül soruları bulunmaktadır."
   moodle_formula_warning_title: "Formül sorusu için olası cevaplar yeniden oluşturulmalı"
+  more_courses_5ebbe998: "Daha Fazla Dersler"
   move_dialog: 
     cancel: İptal
     save: Kaydet
@@ -9813,6 +9852,7 @@ tr:
     where_to_move: "*%{name}*'ı taşımak istediğinize emin misiniz?"
   move_dialog_select: 
     move_to_end: "-- Alt kısımda --"
+  must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "'file_ids' and/or 'folder_ids' parametresi sağlanmalı"
   mute_dialog: 
     curving_assignments: "Ödevlere çan eğrisi uygulama"
     grade_change_notifications: "Değerlendirme bildirimleri değişikliği"
@@ -9823,6 +9863,7 @@ tr:
     students_will_see: "Öğrenciler bu ödevin askıya alındığını görebilecekler."
     submission_comments: "Gönderim yorumları"
     sure_you_want_to_mute: "Bu ödevi askıya almak istediğinize emin misiniz? Bu ödev askıdayken öğenciler yeni bildirim almayacak ve şunları göremeyecekler:"
+  muted_283cfa0f: "(askıya alınmış)"
   my_dashboard_b724020: Özetim
   n_a_d6f6c42f: Yok
   name: "Academic Benchmark İçeri Aktarıcı"
@@ -9834,21 +9875,29 @@ tr:
   new_account_role_6e5c4964: "Yeni Hesap Rolü"
   new_course_role_6a7bb75f: "Yeni Kurs Rolü"
   new_facebook_message: "Canvas'tan yeni bir mesajınız var"
+  new_outcome_7fba8c7d: "Yeni Öğrenme Çıktısı"
+  new_quiz_statistics_desc: "Ders için yeni kısa sınav istatistik sayfasını etkinleştir."
   new_styles_description: |-
       Canvas Ara Birimi üzerinde iyileştirme yapıyoruz. Canvas ara biriminin basit ve
       güncellenmiş görünümüne katılmak için bu özelliği etkinleştirin. Bu özellik
       "Devam Eden bir süreç" ve gerçek kullanıcılı eğitim veren sitelerde henüz etkinleştirilmemeli.
   new_title_cb9ceb2f: "Yeni Başlık"
+  next_40e12421: Sonraki
   next_steps_ce0f0d0c: "Sonraki Adımlar"
   no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_content_has_been_added_f36bab43: "* Hiçbir içerik eklenmedi"
   no_due_date_44271c53: "Bitiş Tarihi Yok"
+  no_due_date_6e6a23c1: "(bitiş tarihi yok)"
   no_e16d9132: Hayır
   no_migration_file: "İçerik taşıma için dosya gereklidir."
   no_students_have_taken_the_quiz_yet_e667644b: "Henüz bu kısa sınavı alan öğrenci yok"
   no_students_have_taken_the_survey_yet_d378cd35: "Henüz anketi alan öğrenci yok"
+  no_usage_rights_object_supplied_304b8d40: "'usage_rights' nesnesi sağlanmamış"
   not_a_number: "pozitif bir sayı olmalı"
   not_installed_37a21a76: "Yüklü Değil"
+  note_some_items_fall_outside_the_start_and_or_end__feab0642: "Not: bazı öğeler dersin başlangıç ve/veya bitiş tarihinin dışında kalıyor"
+  note_students_have_submitted_work_for_these_assign_7bc34e28: "NOT: Öğrenciler bu ödevler için notlandırılmamış çalışmalar gönderdiler. Bu notları şimdi gönderirseniz, öğrencilerin en son gönderilerini notlandırdıktan sonra puanlarını yeniden göndermeniz gerekecek."
+  note_this_login_s_account_uses_delegated_authentic_89227914: "Not: Bu oturum hesabı yetkilendirilmiş kimlik doğrulama kullanıyor fakat yedek Canvas şifre doğrulamaya izin veriyor. Bu formdaki şifre alanları yedek Canvas şifresini günceller, yetkilendirilmiş kimlik doğrulamakini *değil*."
   notification: 
     added_to_conversation_description: "Karşılıklı konuşmaya eklendiniz"
     added_to_conversation_display: "Karşılıklı Konuşmalara Eklendi"
@@ -10071,6 +10120,10 @@ tr:
       other: Diğer
       parent: "Ana E-Posta"
       scheduling: Zamanlanıyor
+  now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Dersiniz hazır olduğuna göre muhtemelen artık bu denetim listesine ihtiyacınız olmayacak. Fakat daha sonra yeni bir şeyler denemek istersiniz diye veya dersinizin içeriğinde değişiklikler yaparken biraz yardıma ihtiyacınız olabilir diye hazır tutacağız."
+  num_messages_c1949bbc: 
+    one: "1 mesaj"
+    other: "%{num} mesaj"
   num_page_views_b087ba5: 
     one: "1 sayfa görünümü"
     other: "%{num} sayfa görüntülemesi"
@@ -10116,6 +10169,7 @@ tr:
   of_students_5d1af0d2: "Öğrenci Sayısı"
   ok_c47544a2: Tamam
   on_time_percent_eebffe38: "Zamanında: %{percent}"
+  once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
   one_per_line_format_name_value_79647700: "Her bir satır. Format: isim=değer"
   options: 
     ? "no"
@@ -10221,7 +10275,6 @@ tr:
       description: "Öğrenme çıktısını açıklayın"
       display_name: "Takma ad (opsiyonel)"
       mastery: "Yeterlilik düzeyi"
-      new_outcome_7fba8c7d: "Yeni Öğrenme Çıktısı"
       points: "%{points_possible} Puan"
       title: "Bu öğrenme çıktısına isim verin"
       total_points: "Toplam Puan"
@@ -10315,6 +10368,10 @@ tr:
     save_button: Kaydet
     saving_button: Kaydediliyor...
     warnings: 
+      overwrite_changes: |-
+          Siz düzenlemeye başladıktan sonra yapılmış olan diğer değişikliklerin üzerine yazmak üzeresiniz.
+          
+          Değişiklikler üzerine yazılsın mı?
       unsaved_changes: "Değişiklikler kaydedilmedi. Değişiklikleri kaydetmeden devam etmek istediğinize emin misiniz?"
   paginated_collection: 
     no_items: "Öğe bulunamadı."
@@ -10327,7 +10384,14 @@ tr:
   paypal: 
     exception: "Üzgünüz, bir hata oluştu, lütfen daha sonra tekrar deneyin."
   pdf_d8236d9a: PDF
+  percent_of_students_scored_score_53d2c4d5: "%{score} puan alan öğrenciler %{percent} "
+  percentused_of_bytesavailable_used_894e2327: "Kullanılabilir %{bytesAvailable} %{percentUsed}% o"
+  permissions: 
+    manage_webhooks: "Webhook'ları yönet"
   plain_text_e3ab33aa: "Düz metin"
+  please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
+  please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
+  please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Lütfen hangi sayfayı görüntülediğinizi ve hangi bağlantıya tıkladığınızı bildirin."
   plugins: 
     academic_benchmark_importer: 
       description: "Bu eklenti ile Akademik Karşılaştırma standartları Canvas'a aktarılabilir."
@@ -10376,6 +10440,9 @@ tr:
       labels: 
         api_key: "API Key"
         base_url: "Temel URL"
+    canvas_webhooks: 
+      description: "Canvas için Webhooks eklentisi"
+      name: "Canvas Webhook"
     crocodoc: 
       description: "Belge ön izleme seçeneği olarak Crocodoc'u etkinleştir"
       name: Crocodoc
@@ -10387,6 +10454,11 @@ tr:
       description: "Diigo Entegrasyonu"
       name: Diigo
     diigo_settings: 
+      description: |-
+          [Diigo'da yeni uygulama](%{diigo_url}) kaydettirmelisiniz.
+          
+          
+          * Uygulamanızı kaydettirdikten sonra API Anahtarınızı not edin
       labels: 
         api_key: "API Anahtarı"
     dim_dim_settings: 
@@ -10471,6 +10543,16 @@ tr:
       description: "ÖBS için Notları Dışa Aktarma"
       name: "Notları Dışa Aktarma"
     grade_export_settings: 
+      description: |-
+          Bu eklenti sayesinde final notları bir öğrenci bilgi sisteminde (ÖBS) yayınlanacaktır. Etkinleştirildiğinde kullanıcıya not defteri içinde notları yayınlaması için bir seçenek sunulacaktır. Bu durum, belirlenmiş yayınlama uç noktasına POST isteği ile gerçekleşecektir. Her tür kendi içerik biçimi ve mime türünü tanımlar. Uç noktadan gelen yanıtlar önemli değildir ve şimdilik yok sayılır.
+          
+          Örneğin, Instructure formatındaki CSV 'text/csv' mime türündeki bir csv dosyasını belirlenmiş uç noktaya aşağıdaki sütunları içerecek şekilde gönderir:
+          
+          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
+          
+          (Not: "not" sütununa, dersin bir not standardı varsa geri dönülür)
+          
+          Yayınlanan dersteki her bir öğrenci için yayınlanmış csv dosyasında 1 veya daha fazla satır olacaktır. Özellikle, öğrencinin dersin kök hesabındaki her hesabı için 1 satır olacaktır. Çoğunlukla bu durumda her öğrenci için 1 satır oluşur fakat öğrencinin birden fazla hesabı varsa her biri için ayrı bir satır olacaktır.
       labels: 
         format_type: "Çıktı formatı tipi"
         publish_endpoint: "Yayınlanacak uç nokta"
@@ -10579,12 +10661,14 @@ tr:
     notices: 
       settings_updated: "Eklenti ayarları başarıyla güncellendi"
     panda_pub_settings: 
+      description: "PandaPub, yapılandırıldığında Canvas'ın bazı bölümlerinin olaylarla ilgili bildirimleri değişiklikleri oylamak yerine tarayıcı içinde almasına izin veren  bir pub/sub hizmetidir."
       labels: 
         application_id: "Uygulama Id"
         base_url: "Temel URL"
         key_id: "Anahtar ID"
         key_secret: "Gizli Anahtar"
     pandapub: 
+      description: "Pub/Sub hizmeti"
       name: PandaPub
     qti_converter_settings: 
       labels: 
@@ -10662,9 +10746,11 @@ tr:
       description: "Sadece Yo"
       name: Yo
     yo_settings: 
+      description: "[Yo api token](%{yo_url}) a ihtiyacınız olacak."
       labels: 
         api_token: "Api token"
   points_bb475533: Puanlar
+  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Seçili notlandırma türü için olası puanlar 0 veya daha fazla olmalı"
   polling: 
     poll_sessions: 
       errors: 
@@ -10676,6 +10762,7 @@ tr:
         poll_choice_belongs_to_poll: "Bu anket seçeneği mevcut ankete ait değil."
         poll_is_published: "Bu anket oturumu gönderiye açık değil."
         user_and_poll_session_uniqueness: "Her bir anket oturumu için yalnızca bir seçim yapabilir."
+  possible_score_5e0a328e: "Olası: %{score}"
   post_grades_39c52870: "Notları Gönder"
   post_grades_description: |-
       Notları Gönder seçeneği ile öğretmenler etkinleştirilmiş ÖBS'lere notları gönderebilir:
@@ -10898,6 +10985,14 @@ tr:
           ve genel mesaj akışınızda görünmeyecek.
       unknown_service: Bilinmiyor
       web_services: "Halihazırda kullandığınız web araçları bağlantıları ile Canvas yaşamınızı oldukça kolaylaştırabilir. Ne demek istediğimizi öğrenmek için \"Diğer Servisler\" altındaki servislerden herhangi birine tıklayın."
+      yo_description: |-
+          Yo tek sekmeli sıfır karakter iletişim aracıdır.
+          Yo hesabınız varsa burada kaydettirebilirsiniz. Sonrasında
+          ders/grup 
+          arkadaşlarınızın kayıt olduğunuz hizmetleri görmelerine izin verirseniz Yo hesabınıza
+          kolayca bağlanabilirler.
+          
+          Ayrıca bildirimlerin Yo hesabınıza gönderilmesi için hesap oluşturabilirsiniz.
     purpose_required: "Amaç gereklidir"
     resending: "tekrar gönderiliyor..."
     secondary_nav: 
@@ -11017,7 +11112,9 @@ tr:
   pseudonym_sessions: 
     debug: 
       logout_redirect: "LogoutRequest IdP'ye gönderildi"
-      logout_response_redirect_from_idp: "IdP'den Çıkış Cevabı Alındı"
+      logout_request_redirect_from_idp: "IdP'den LogoutRequest Alındı"
+      logout_response_redirect_from_idp: "IdP'den LogoutRequest Alındı"
+      logout_response_redirect_to_idp: "IdP'ye LogoutResponse Gönderiliyor"
       redirect_from_idp: "IdP'den LoginResponse alındı"
     default_app_name: "Üçüncü Parti Uygulamalar"
     errors: 
@@ -11276,12 +11373,18 @@ tr:
     event_stream: 
       headers: 
         action_log: "Hareket Kaydı"
+      notices: 
+        no_events_available: "Kısa sınav oturumu boyunca kaydedilmiş olay yoktu"
+      page_blurred: "Canvas kısa sınav oturum sayfasını görüntüleme durduruldu..."
       page_focused: "Devam Et."
       question_answered: 
         one: "Verilen cevap"
         other: "Soruya verilen cevaplar:"
       question_flagged: "İşaretlenmiş sorular:"
       question_unflagged: "İşaretlenmemiş sorular:"
+      question_viewed: 
+        one: "Soruyu gördü (muhtemelen okudu)"
+        other: "Aşağıdaki soruları gördü (muhtemelen okudu):"
       session_started: "Oturum başladı"
     inverted_table_view: 
       headers: 
@@ -11308,24 +11411,41 @@ tr:
       attempt: Hak
       started_at: Başlangıç
     table_view: 
+      buttons: 
+        go_to_stream: "Akışı Gör"
       headers: 
         question: "Soru %{position}"
+        timestamp: "Tarih bilgisi"
       legend: 
+        dotted_circle: "Noktalı Daire"
+        dotted_circle_desc: "Doğru olup olmadığına bakılmaksızın bir cevap."
         empty_circle: "Boş İşaret"
         empty_circle_desc: "Boş cevap."
         filled_circle: "Dolu İşaret"
+        filled_circle_desc: "Sorunun son cevabı, geçerli olacak olan bu."
       options: 
         expand_all: "Tüm cevapları genişlet"
-  quiz_menu_configured_b9aa5c0d: "Kısa sınav menüsü ayarlandı"
+        invert: "Tersine Çevir"
+        truncate: "Metinsel cevapları kırp"
+      page_header: "Cevap Dizisi"
+  quiz_log_auditing_desc: |-
+      kısa sınav gönderimi için olayların izlenmesini ve gönderim yapıldığında
+      bu olayların kaydının gösterilmesini özelliğini etkinleştir.
   quiz_reports: 
     cancel_generation: İptal
+    download_item_analysis: "Öğe analiz raporunu indir."
+    download_student_analysis: "Öğrenci analiz raporunu indir."
     generatable: "Rapor asla oluşturulmadı."
+    generate_item_analysis_report: "Öğe analiz raporu oluştur."
+    generate_student_analysis_report: "Öğrenci analiz raporu oluştur."
     generated_at: "Oluşturuldu: %{date}"
     generating: "Rapor oluşturuluyor..."
     generation_almost_done: "Neredeyse tamamlandı."
     generation_complete: "Raporunuz oluşturuldu."
+    generation_halfway: "Yarısından az kaldı."
     generation_started: "Raporunuz oluşturuluyor."
     item_analysis: "Öğe Analizi"
+    non_generatable_report_notice: "Anket Kısa Sınavları için rapor oluşturulamaz."
     quiz_report_generator: 
       download_report_name: "%{report_name} indir"
       generate_report_name: "%{report_name} yarat"
@@ -11344,6 +11464,7 @@ tr:
         other: "%{count} cevap."
         zero: "Cevap yok."
       audible_correct_answer_indicator: "Doğru cevap."
+      audible_description: "Bu tabloda verilen yanıtların sayısı ile birlikte soruya verilen cevaplar listelenmektedir."
       response_count: 
         one: "1 öğrenci"
         other: "%{count} öğrenci"
@@ -11359,6 +11480,9 @@ tr:
     correct_multiple_response_ratio: "Öğrencileriniz %{ratio}% oranında doğru cevap verdi."
     correct_response_ratio: "Öğrencileriniz %{ratio}% oranında bu soruya doğru cevap verdi."
     discrimination_index: 
+      audible_bottom_bracket: "Dip grup:"
+      audible_bracket_aced: "Bu gruptaki öğrencilerin tamamı doğru cevap verdi."
+      audible_bracket_failed: "Bu gruptaki öğrencilerin biri bile doğru cevap veremedi."
       discrimination_index_dialog_title: "Ayrışma Endeks Göstergesi"
     download_submissions: "Tüm Dosyaları İndir"
     duration_in_hours: 
@@ -12512,11 +12636,11 @@ tr:
         email: Eposta
         name: Ad
     welcome_to_canvas: "Canvas'a Hoşgeldiniz!"
+  remove_attachment_ceae0973: "Ekli Dosyayı Kaldır"
   remove_f47dc62a: Kaldır
   remove_row_c198da5a: "Satırı sil"
   rename_45608f54: "Yeniden adlandır"
   reply_from_name: "Canvas Bildirimleri aracılığı ile %{name}"
-  resource_selection_configured_d45b553d: "Kaynak seçimi yapılandırıldı"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
@@ -12833,6 +12957,7 @@ tr:
     enrollments_tas: "Öğretim Yardımcıları"
     enrollments_teachers: Öğretmenler
     student_groups: "Öğrenci Grupları"
+  search_by_user_dd3ad189: "Kullanıcıya göre ara"
   search_entries_or_author_63fb0a86: "Girdi ya da yazar arayın"
   search_groups_or_people_6c15d6ad: "Grupları veya İnsanları Ara"
   search_title_body_or_author_1d26711f: "Başlık, metin veya yazar ara"
@@ -12914,7 +13039,6 @@ tr:
         crosslist_this_section: "Bu Bölümün Çarpraz Listesini Oluştur"
         current_enrollments: "Varolan Kayıtlar"
         decrosslist_section: "Bu Bölümü Çarpraz Listeden Kaldır"
-  sections_sections_bbd9f6b7: "Bölümler: %{sections}"
   select_content: "İçerik Seçiniz"
   select_content_checkbox: 
     select_content_error: "Bir içerik seçeneği seçmelisiniz"
@@ -13518,6 +13642,8 @@ tr:
         quiz_name: "Kısa Sınav Adı"
         topic_name: "Konu Adı"
         url: URL
+        wiki_page_name: "Sayfa Adı"
+        wiki_page_namem: "Ödev Adı"
       loading: Yükleniyor...
       new_assignment_option: "[ Yeni Ödev ]"
       new_file_option: "[ Yeni Dosya ]"
@@ -13788,6 +13914,7 @@ tr:
     online_url: "Çevrimiçi URL"
     previous_object: "Önceki %{type}"
     student_hidden_name: "Öğrenci %{position}"
+  start_date_e937be8a: "Başlangıç Tarihi"
   statistics: 
     csv_columns: 
       attempt: "giriş hakkı"
@@ -13806,9 +13933,6 @@ tr:
     inexact_answer: "%{lower_bound} ile %{upper_bound}"
     no_answer: "Cevap Yok"
   step: Adım
-  student_921b864d: 
-    one: "1 öğrenci"
-    other: "%{count} öğrenci"
   student_id: "Öğrenci ID"
   student_name: "Öğrenci adı"
   students_who_have_taken_the_quiz_count_69dbbda0: 
@@ -13983,7 +14107,6 @@ tr:
       two_words_connector: veya
       words_connector: ", "
     help_menu: 
-      community_support_description: "Eşlerle birlikte etkileşim halinde olun ve yardımlaşın."
       community_support_forums: "İletişim Destek Forumu"
       contact_support: "İletişim Desteği"
       contact_support_sub_text: "Zaman hassasiyetli sorunlarınız için yardım alın."
@@ -14294,6 +14417,7 @@ tr:
     outcome_artifacts: "Çıktı Eserleri"
     people: Kişi
     view_in_separate_window: "Ayrı Pencerede Görüntüle"
+  to_c4c44f4b: ile
   too_many_members_b8b15069: "Çok fazla üye mevcut"
   tooltips: 
     finished: tamamlandı
@@ -14302,11 +14426,7 @@ tr:
       more_message: "ve %{count} daha fazla..."
   tours: 
     quiz_regrade: 
-      first_bullet: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
       got_it: "Tamam, anladım"
-      second_bullet: "Öğrencilerin puanlarının etkilenmeyeceği en uygun seçeneği seçtiğinizden emin olun : "
-      third_bullet: "Canvas şu anda gönderilerinizi kaydetme sonrası tekrardan notlandırıyor, bu biraz zaman alabilir."
-      try_later: "Kısa sınavı zaten almış öğrenciler için tekrardan değerlendirme seçeneğini ayarladınız."
   tree_browser: 
     folder_tree_instructions: "Ağaç üzerinde gezinmek için aşağı ve yukarı ok tuşlarını kullanın. Klasörleri genişletmek için sağ oka, daraltmak için sol oka ve seçmek için enter tuşuna basın."
   turnitin: 
@@ -14338,6 +14458,7 @@ tr:
   until_date_949017c4: "%{date}'e kadar"
   untitled_assignment_59354b34: "başlıksız ödev"
   unused_courses_title: "Kullanılmayan Kurslar"
+  update_4d8ee62: Güncelle
   updated_group_group_name_727b1d98: "%{group_name} Grubu Güncellendi"
   upload_button: 
     upload: Yükle
@@ -14423,7 +14544,6 @@ tr:
       updating_user_details: "Kullanıcı Ayrıntıları Güncelleniyor..."
     notices: 
       image_reported: "Bu resim raporlandı"
-  user_navigation_configured_135ee933: "Kullanıcı gezinme menüsü yapılandırıldı"
   user_notes: 
     confirms: 
       delete_journal_entry: "Görev girişini silmek istediğinize emin misiniz?"
@@ -14886,7 +15006,6 @@ tr:
       title_characters: "Başlık, en az bir harf veya sayı içermelidir"
       title_too_long: "Başlık, maksimum %{max_characters} karakter içerebilir"
     unknown_user_name: Bilinmiyor
-  wiki_page_menu_configured_de3078c9: "Wiki sayfa menüsü ayarlandı"
   wiki_pages: 
     index: 
       titles: 
@@ -14907,11 +15026,21 @@ tr:
     invalid_editing_roles: "Verilen düzenleme rolleri geçersiz"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Tüm puanlardan yüksek olanını ata"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Tüm puanlardan sonuncusunu ata"
+  will_paginate: 
+    next_label: "İleri &#8594;"
+    page_entries_info: 
+      single_page: 
+        zero: "%{model} bulunamadı"
+      single_page_html: 
+        zero: "%{model} bulunamadı"
+    page_gap: "&hellip;"
+    previous_label: "&#8592; Önceki"
   wimba_conference: 
     external_urls: 
       archive: Arşiv
       archive_link: "Arşiv(leri) görüntüle"
   xml_configuration_5ea1b942: "XML Ayarları"
+  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Kısa sınavı zaten almış öğrenciler için tekrardan değerlendirme seçeneğini ayarladınız."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Bu kısa sınavdaki sorularda değişiklikler yaptınız.* Siz kısa sınavı kaydedene kadar bu değişiklikler öğrenciler tarafından görülemeyecek."
   your_content_has_been_exported_bbb57764: "İçeriğiniz dışarı aktarıldı."
   your_message_has_been_sent_thank_you_e0284316: "Mesajınız başarıyla gönderildi. Teşekkürler!"

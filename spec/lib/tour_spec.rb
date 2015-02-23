@@ -29,7 +29,7 @@ describe Tour do
     end
   end
 
-  describe "set_tours" do
+  describe "tours_to_run" do
 
     class FakeUser
       def preferences
@@ -47,11 +47,6 @@ describe Tour do
       def session
         {:dismissed_tours => {:dismissed => 1}}
       end
-      def js_env(hash = {})
-        @js_env ||= {}
-        hash.each { |k,v| @js_env[k] = v }
-        @js_env
-      end
       def api_request?; false; end
       include Tour
     end
@@ -61,43 +56,37 @@ describe Tour do
     end
 
     def tour_included?(name)
-      tours = @controller.js_env[:TOURS]
+      tours = @controller.tours_to_run
       tours && tours.include?(name.to_s.classify)
     end
 
     it "should add tours to js_env" do
       Tour.tour(:fake, 1, 'controller#action') { true }
-      @controller.set_tours
       expect(tour_included?(:fake)).to be_truthy
     end
 
     it "should not include an tour if the block returns false" do
       Tour.tour(:fake, 1, 'controller#action') { false }
-      @controller.set_tours
       expect(tour_included?(:fake)).to be_falsey
     end
 
     it "should include an tour if no block is given" do
       Tour.tour :fake, 1, 'controller#action'
-      @controller.set_tours
       expect(tour_included?(:fake)).to be_truthy
     end
 
     it "should not include an tour if user has dismissed it" do
       Tour.tour :dismissed, 1, 'controller#action'
-      @controller.set_tours
       expect(tour_included?(:dismissed)).to be_falsey
     end
 
     it "should not exclude an tour if user has dismissed an old version of it" do
       Tour.tour :dismissed, 2, 'controller#action'
-      @controller.set_tours
       expect(tour_included?(:dismissed)).to be_truthy
     end
 
     it "should not include an tour if user has dismissed it this session" do
       Tour.tour :dismissed, 1, 'controller#action'
-      @controller.set_tours
       expect(tour_included?(:dismissed)).to be_falsey
     end
 

@@ -138,6 +138,22 @@ describe Submission do
       @submission.reload
       expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute
     end
+
+    it "should not create multiple versions on submission for discussion topics" do
+      course_with_student_logged_in(:active_all => true)
+      @topic = @course.discussion_topics.create(:title => "some topic")
+      @assignment = @course.assignments.create(:title => "some discussion assignment")
+      @assignment.submission_types = 'discussion_topic'
+      @assignment.save!
+      @topic.assignment_id = @assignment.id
+      @topic.save!
+
+      Timecop.freeze(1.second.ago) do
+        @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+      end
+      @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+      expect(@student.submissions.first.submission_history.count).to eq 1
+    end
   end
 
   context "broadcast policy" do

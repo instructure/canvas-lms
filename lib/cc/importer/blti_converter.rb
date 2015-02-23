@@ -101,7 +101,7 @@ module CC::Importer
     end
     
     def convert_blti_xml(xml)
-      doc = Nokogiri::XML(xml)
+      doc = create_xml_doc(xml)
       begin
         tool = convert_blti_link(doc)
         check_for_unescaped_url_properties(tool) if tool

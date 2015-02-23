@@ -260,3 +260,18 @@ fieldset.rate_app_wrapper {
     color: $canvas-danger;
   }
 }
+
+.ConfigurationForm {
+  margin-bottom: 0px;
+
+  .control-group {
+    margin-bottom: 2px;
+  }
+  input.input-block-level {
+    height: 38px;
+  }
+  label {
+    display: block;
+    margin-bottom: 2px;
+  }
+}
