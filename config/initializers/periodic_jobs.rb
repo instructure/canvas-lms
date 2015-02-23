@@ -87,7 +87,7 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', :priority => Delayed::LOW_PRIORITY do
     Shard.with_each_shard do
-      Attachment.send_later_enqueue_args(:do_notifications, strand: "Attachment.do_notifications:#{Shard.current.database_server.id}")
+      Attachment.send_later_enqueue_args(:do_notifications, strand: "Attachment.do_notifications:#{Shard.current.database_server.id}", max_attempts: 1)
     end
   end
 
