@@ -217,7 +217,7 @@ We have specific flags that denote when a user has on High-Contrast mode. Most o
 ## tl;dr
 
   - Use color variables when adding colors to your elements.
-  - Do not use hex codes in .scss or .sass files.
+  - Do not use hex codes in .scss files.
   - If that color needs to be tweaked, use the scss functions for `lighten($my-color, 10%)` and `darken($my-color, 10%)`
   - High Contrast colors are automatically pulled in based on the canvas color variables.
 

@@ -1,0 +1,683 @@
+@import "base/environment";
+
+// print button for grades summary page
+.print-grades {
+  float: right;
+  @media print {
+    display: none;
+  }
+}
+
+#grading_periods_selector {
+  margin-bottom: 0px;
+}
+
+// styles for grade summary tables
+#grades_summary {
+  border-collapse: collapse;
+  border-bottom: 1px solid #eee;
+  @media print {
+    border-bottom: none;
+    a {
+      text-decoration: none !important;
+      color: black;
+    }
+  }
+}
+
+#grades_summary thead th {
+  border-top: none;
+  font-size: 1em;
+  padding: 4px 5px 2px;
+  font-weight: bold;
+  background-color: #444;
+  color: #fff;
+  text-align: left;
+  @media print {
+    text-transform: uppercase;
+    color: black;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+    padding-left: 0;
+  }
+}
+
+#grades_summary tr {
+  > * {
+    padding: 5px;
+    text-align: left;
+    border-top: 2px solid black;
+    background-color: #fff;
+    @media print {
+      border-top: 1px solid black;
+      color: black !important;
+      background-color: transparent !important;
+    }
+  }
+}
+
+#grades_summary tr.comments td {
+  border-width: 0;
+  font-size: 0.8em;
+  padding-left: 30px;
+  @media print {
+    padding-left: 0;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+}
+
+#grades_summary tr.rubric_assessments > td {
+  border-width: 0;
+  padding-left: 30px;
+  table.rubric {
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+}
+
+#grades_summary tr.editable:hover > * {
+  background-color: lighten(#cdf, 6%);
+}
+
+#grades_summary tr.editable.student_assignment.dropped:hover td.points_possible {
+  background-image: url(/images/earmark_hover.png);
+}
+
+#grades_summary tr.student_assignment.dropped td {
+  color: #ccc;
+  @media print {
+    color: black;
+  }
+}
+
+#grades_summary tr.student_assignment.dropped td.points_possible {
+  background-image: url(/images/earmark.png);
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+
+#grades_summary tr.student_assignment.dropped td a {
+  color: #aaa;
+  @media print {
+    color: black;
+    font-weight: normal;
+  }
+}
+
+#grades_summary th.assignment_score {
+  text-align: center;
+}
+
+#grades_summary td.assignment_score {
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#grades_summary tr > .assignment_score:hover .grade {
+  font-weight: bold;
+}
+
+#grades_summary tr > .assignment_score .grade.changed {
+  color: #800;
+  font-weight: bold;
+}
+
+#grades_summary th.possible {
+  text-align: right;
+  white-space: nowrap;
+}
+
+#grades_summary td a, #grades_summary th a {
+  @if $use_high-contrast {
+    color: $ic-font-color-dark;
+    text-decoration: underline;
+    &:hover, &:focus {
+      text-decoration: none;
+    }
+  }
+}
+
+#grades_summary td.possible {
+  text-align: right;
+  padding-right: 15px;
+}
+
+#grades_summary td.details {
+  text-align: right;
+  padding-left: 0;
+  white-space: nowrap;
+  // 4 x 20 pixel icons
+  min-width: 80px;
+}
+
+#grades_summary th.title {
+  font-size: 1.1em;
+  font-weight: normal;
+  padding-left: 20px;
+  word-break: break-all;
+  @media print {
+    padding-left: 0;
+    font-size: 1em;
+    font-weight: normal;
+  }
+}
+
+#grades_summary th.title .context {
+  visibility: hidden;
+  font-size: 0.8em;
+  padding-left: 10px;
+  line-height: 0.5em;
+  color: darken($ic-color-neutral, 40);
+  @media print {
+    visibility: visible;
+    margin: 5px 0;
+    padding: 0;
+  }
+}
+
+#grades_summary th.title .context.context_hover {
+  visibility: visible;
+}
+
+#grades_summary td.due {
+  font-size: 0.8em;
+  white-space: nowrap;
+  @media print {
+    font-size: 1em;
+  }
+}
+
+#grades_summary tr.assignment_graded > * {
+  background-color: #eee;
+  @media print {
+    background-color: transparent;
+    &.title {
+      font-weight: bold;
+    }
+  }
+}
+
+#grades_summary tr.final_grade > * {
+  background-color: #666;
+  color: #eee;
+  font-size: 1.5em;
+  font-weight: bold;
+  @media print {
+    background-color: transparent;
+    text-transform: uppercase;
+    border-top: 2px solid black;
+    font-size: 1.2em;
+  }
+}
+
+#grades_summary tr.group_total {
+  td, th[scope=row] {
+    background-color: #ccc;
+    border-top-width: 0;
+    font-weight: bold;
+    @media print {
+      background-color: transparent;
+      border-top-width: 1px;
+      text-transform: uppercase;
+      &.title .context {
+        display: none;
+      }
+    }
+  }
+}
+
+#grades_summary tr.group_total td.possible {
+  font-weight: normal;
+  font-size: 0.8em;
+}
+
+.revert_score_link {
+  position: absolute;
+  top: 2px;
+  left: 0px;
+  display: none;
+  &:hover, &:focus {
+    opacity: 0.7;
+  }
+}
+
+#grades_summary .tooltip {
+  position: relative;
+  z-index: 10;
+  outline: none;
+  @if $use_high_contrast {
+    text-decoration: none;
+  }
+  &:hover, &:focus {
+    text-decoration: none;
+    .tooltip_wrap, .tooltip_text {
+      visibility: visible;
+    }
+  }
+  &:active {
+    outline: none;
+    text-decoration: none;
+    .tooltip_wrap, .tooltip_text {
+      visibility: visible;
+    }
+  }
+  .tooltip_wrap, .tooltip_text {
+    display: block;
+    visibility: hidden;
+  }
+  .tooltip_wrap {
+    background: url("/images/tooltip_carat.png") no-repeat left bottom;
+    bottom: 15px;
+    padding-bottom: 3px;
+    position: absolute;
+    // ie puts the tooltips too low.
+    .ie & {
+      bottom: 25px;
+    }
+  }
+  .tooltip_text {
+    background-color: #444;
+    background-position: left bottom;
+    color: #fff;
+    left: 0px;
+    max-width: 250px;
+    padding: 2px 7px 2px;
+    white-space: nowrap;
+    table tr td {
+      background-color: transparent;
+      font-size: 1em;
+      padding: 0 2px;
+      border-width: 0px;
+    }
+  }
+  .right {
+    right: 0px;
+    background-position: right bottom;
+  }
+}
+
+#observer_user_url {
+  font-size: 0.8em;
+  border: 1px solid #aaa;
+}
+
+#only_consider_graded_assignments_wrapper {
+  label {
+    font-size: 0.8em;
+    display: block;
+  }
+}
+
+.score_details_table {
+  font-size: 1.3em;
+  width: 100%;
+  border: 1px solid black;
+}
+
+a.screenreader-toggle {
+  font-weight: normal;
+  padding-right: 5px;
+  #grades_summary .score_details_table & {
+    color: white;
+  }
+}
+
+.grade-summary-graph-component {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  overflow: hidden;
+  border-style: solid;
+  border-color: darken($ic-color-neutral, 38);
+}
+
+div.rubric-toggle {
+  padding-bottom: 5px;
+}
+
+.ui-tabs .ui-tabs-panel {
+  border: none;
+  padding: 0;
+}
+
+.outcome-toggles {
+  float: right;
+  position: absolute;
+  right: 1em;
+  margin-top: -2.3em;
+  .btn {
+    margin-left: 0.5em;
+  }
+  a[class*=icon-]:before, a[class^=icon-]:before {
+    margin: 0;
+  }
+}
+
+#assignments {
+  padding: 1em 0;
+}
+
+$outcome-border: 1px solid #BCC2CA;
+
+#outcomes {
+  h2 {
+    font-size: 1.4em;
+    font-weight: bold;
+  }
+  .group {
+    border: $outcome-border;
+    border-radius: 3px;
+    margin-top: 1em;
+  }
+  h3 {
+    font-size: 1.2em;
+    margin-left: 1em;
+    float: left;
+  }
+  .group-description {
+    cursor: pointer;
+    overflow: hidden;
+    padding: 10px 15px 10px 15px;
+    &:hover {
+      background-color: #f7f7f7;
+    }
+    .outcome-icon i {
+      line-height: 40px;
+    }
+    .group-title {
+      margin: 0;
+      font-size: 20px;
+      line-height: 40px;
+    }
+    .group-status {
+      float: right;
+      top: 8px;
+      font-size: 30px;
+      position: relative;
+      strong {
+        color: #2a333b;
+      }
+      span {
+        display: block;
+        font-size: 14px;
+      }
+      .pill {
+        color: white;
+        background-color: $gray;
+        .has-mastery {
+          background-color: $green;
+        }
+        .no-mastery {
+          background-color: $grayLight;
+        }
+      }
+    }
+  }
+  .undefined > i {
+    color: #C0C0C0;
+  }
+  .remedial > i {
+    color: #F76A66;
+  }
+  .near > i {
+    color: #DFB056;
+  }
+  .mastery > i {
+    color: #5DC28F;
+  }
+  .outcomes {
+    background-color: #f7f7f7;
+  }
+  ul {
+    margin-left: 0;
+  }
+  li {
+    list-style-type: none;
+    overflow: hidden;
+    .outcome-icon {
+      float: left;
+      margin-right: 15px;
+    }
+  }
+  li.group {
+    i.collapsed-arrow {
+      display: block;
+    }
+    i.expanded-arrow {
+      display: none;
+    }
+  }
+  li.group.expanded {
+    i.collapsed-arrow {
+      display: none;
+    }
+    i.expanded-arrow, li.outcome {
+      display: block;
+    }
+  }
+  li.outcome {
+    padding: 20px 15px 20px 15px;
+    border-top: $outcome-border;
+    display: none;
+    .outcome-properties {
+      float: left;
+      width: 70%;
+    }
+    .description {
+      color: #2a333b;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      p {
+        display: inline;
+      }
+    }
+    .title {
+      font-weight: bold;
+      h4 {
+        padding: 0;
+        margin: 0;
+        font-size: inherit;
+        font-weight: bold;
+      }
+    }
+    .alignment-info {
+      float: right;
+      text-align: right;
+      width: 165px;
+      padding-top: 10px;
+      i {
+        margin: 0px 10px;
+        cursor: pointer;
+      }
+      i:before {
+        font-size: 1.5em;
+      }
+    }
+  }
+}
+
+.outcome-details {
+  position: absolute;
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #b0afaf;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  max-width: 500px;
+  min-width: 250px;
+  padding: 18px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  .last-assessment {
+    color: $grayLight;
+    font-size: $fontSizeSmall;
+  }
+  .mastery-details i:before {
+    font-size: 1.5em;
+  }
+  .mastery:before {
+    color: #5DC28F;
+  }
+  .near-mastery {
+    color: #DFB056;
+  }
+  .remedial:before {
+    color: #F76A66;
+  }
+  .method-details {
+    background-color: $ic-color-neutral;
+    margin-bottom: 0px;
+    margin-top: 10px;
+    div {
+      padding-bottom: 10px;
+    }
+    span {
+      display: inline-block;
+      font-style: italic;
+    }
+    .example {
+      color: $grayLight;
+      font-size: $fontSizeSmall;
+    }
+    .left-content {
+      float: left;
+    }
+    .right-content {
+      padding-left: 10px;
+    }
+    .method-description {
+      width: 320px;
+    }
+  }
+}
+
+@media print {
+  #navpills, .course_selector, .outcome-toggles {
+    display: none;
+  }
+  #outcomes {
+    .groups {
+      li.group li.outcome {
+        display: block;
+      }
+    }
+  }
+  .outcome-bar-wrapper {
+    .bar {
+      border: 1px solid black;
+      padding: 3px;
+      background: none !important;
+      .bar-marker {
+        width: 0px !important;
+        border: 3px solid black;
+        height: 10px !important;
+      }
+      .bar-progress {
+        border: 1px solid black;
+        background: none !important;
+        &.remedial {
+          box-shadow: inset 0 0 0 1000px #F76A66;
+        }
+        &.near {
+          box-shadow: inset 0 0 0 1000px #DFB056;
+        }
+        &.mastery {
+          box-shadow: inset 0 0 0 1000px #5DC28F;
+        }
+      }
+    }
+  }
+}
+
+.outcome-bar-wrapper {
+  .bar {
+    background: #e1e1e1;
+    position: relative;
+    .bar-marker {
+      position: absolute;
+      width: 3px;
+      background: #f7f7f7;
+      z-index: 5;
+      height: 8px;
+      top: 0;
+    }
+    .bar-progress {
+      height: 8px;
+      &.remedial {
+        background: #F76A66;
+      }
+      &.near {
+        background: #DFB056;
+      }
+      &.mastery {
+        background: #5DC28F;
+      }
+    }
+  }
+  .score {
+    color: #959595;
+    font-size: 18px;
+    float: left;
+    strong {
+      color: #2a333b;
+    }
+  }
+}
+
+.outcome-modal {
+  padding: 7px 0;
+  .title {
+    float: left;
+    font-weight: bold;
+  }
+  .outcome-bar-wrapper {
+    float: right;
+    .score {
+      text-align: right;
+      margin-right: 5px;
+      letter-spacing: 1px;
+    }
+    .bar {
+      float: left;
+      width: 170px;
+      top: 6px;
+    }
+  }
+  .description {
+    padding: 5px 0 15px;
+    clear: both;
+    p {
+      margin: 0;
+    }
+  }
+  .alignments ul {
+    margin: 0 0 5px;
+    border-top: 1px solid #d7d7d7;
+  }
+  .alignment {
+    list-style: none;
+    overflow: auto;
+    border-bottom: 1px solid #ebebeb;
+    line-height: 35px;
+    .title {
+      font-weight: normal;
+    }
+    .outcome-bar-wrapper {
+      .bar {
+        top: 13px;
+      }
+      .score {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.ui-widget.ui-tooltip {
+  max-width: 500px;
+}

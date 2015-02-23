@@ -1,0 +1,89 @@
+$crumb_border_radius: 5px;
+
+.chevron-crumbs {
+  @include reset-list;
+  margin: 0 0 1em 0;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: $crumb_border_radius;
+  overflow: hidden;
+  color: #595959;
+  background-color: #f2f2f2;
+  a {
+    font-size: 13px;
+    color: inherit;
+    text-decoration: none !important;
+    &:hover, &:active {
+      background-color: inherit !important;
+      color: inherit;
+      text-decoration: underline !important;
+    }
+    span {
+      display: block;
+    }
+    .title {
+      font-size: 1.1em;
+    }
+  }
+  .chevron-crumb {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+    float: left;
+    padding-right: 2px;
+    height: 40px;
+    margin-left: 11px;
+    padding-left: 20px;
+    padding-right: 10px;
+    &.first {
+      @include border-left-radius($crumb_border_radius);
+      margin-left: 0;
+    }
+  }
+  .chevron-outer,
+  .chevron-inner {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-bottom-width: 0;
+    background: none;
+  }
+  .chevron-outer {
+    border-bottom: 21px dotted transparent;
+    border-top: 21px dotted transparent;
+    border-left: 14px solid #fff;
+    right: -14px;
+    top: auto;
+    bottom: 50%;
+    margin-bottom: -20px;
+  }
+  .chevron-inner {
+    border-bottom: 18px dotted transparent;
+    border-top: 18px dotted transparent;
+    border-left: 11px solid #fff;
+    right: auto;
+    left: -14px;
+    bottom: -18px;
+    border-left-color: #f2f2f2;
+  }
+  .active {
+    font-weight: bold;
+    background-color: #E3E3E3;
+    .chevron-inner {
+      border-left-color: #E3E3E3;
+    }
+  }
+  .before-active {
+    .chevron-inner {
+      background-color: #E3E3E3;
+      border-bottom-width: 21px;
+      border-top-width: 21px;
+      margin-bottom: -4px;
+    }
+  }
+  #hide-scratch {
+    float: right;
+    margin-right: 1em;
+  }
+}

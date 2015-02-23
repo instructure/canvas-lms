@@ -1,0 +1,100 @@
+.submission_details_dialog {
+  .more-details-link {
+    font-size: 1.2em;
+    line-height: 42px;
+  }
+  h1, .h1 {
+    margin: 20px 0 0;
+    padding: 0 12px;
+    font-size: 23px;
+  }
+  .submission-details {
+    padding: 10px;
+    h1, .h1 {
+      margin: 0 -10px 15px;
+      border-bottom: 1px solid #bbb;
+    }
+    h2, h2 select, .h2, .h2 select {
+      font-size: 15px;
+    }
+  }
+  .submission_detail {
+    font-size: 1.1em;
+    margin: 3px 0 10px;
+  }
+  .rubric-link {
+    font-weight: bold;
+  }
+  .submisison-attachment {
+    padding: 3px 0;
+    a {
+      font-size: 11px;
+    }
+    a.turnitin_similarity_score {
+      font-size: 10px;
+    }
+  }
+  .submission_details_comments {
+    overflow: auto;
+    max-height: 200px;
+    border-top: 1px solid #bbb;
+    padding: 0 12px;
+    position: relative;
+    background: #A3A3A3 url(/images/messages/messages-background.png) 0 0 repeat;
+  }
+  .comment {
+    background: #fff;
+    clear: both;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    &:last-child {
+      border-bottom: none;
+    }
+    .middle {
+      padding-left: 69px;
+    }
+    .avatar {
+      float: left;
+    }
+    time {
+      float: right;
+      color: #777;
+      font-size: 11px;
+    }
+    address {
+      font-style: normal;
+      font-weight: bold;
+      margin: 0;
+    }
+    .comment_attachments a {
+      padding-top: 4px;
+    }
+  }
+}
+
+.submission_details_add_comment_form {
+  position: relative;
+  border-top: 1px solid #bbb;
+  background-color: #F2F2F2;
+  margin: 0px;
+  padding: 5px 10px;
+  label {
+    font-weight: bold;
+    display: block;
+  }
+  #add_a_comment {
+    width: 99%;
+    display: block;
+  }
+  #group-comment-container {
+    float: left;
+    label {
+      display: inline;
+      font-weight: normal;
+    }
+  }
+  .btn {
+    float: right;
+  }
+}
