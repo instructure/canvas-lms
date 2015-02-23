@@ -906,6 +906,22 @@ define [
       @setDownloadCsvUrl()
       @renderTotalHeader()
 
+      if !!window.chrome
+        $('.ui-menu-item').on('mouseout', @fix_chrome_render_bug)
+        $('.grading-period-select-button').click(@fix_chrome_render_bug)
+        $('#gradebook_settings').click(@fix_chrome_render_bug)
+        $(document.body).click(@fix_chrome_render_bug)
+
+    # CNVS-18276 - chrome 40 rendering issue
+    # is fixed in chrome 42. in the meantime, force repaint
+    # when a dropdown or dropdown item is clicked, when a dropdown
+    # menu item hover occurs
+    fix_chrome_render_bug: (e) ->
+      gradebook_grid = document.getElementById('gradebook_grid')
+      gradebook_grid.style.display = 'none'
+      gradebook_grid.offsetHeight
+      gradebook_grid.style.display = 'block'
+
     setDownloadCsvUrl: ->
       if @show_concluded_enrollments
         $("#download_csv")[0].href += "?include_priors=true"
