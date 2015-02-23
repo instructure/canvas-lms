@@ -91,7 +91,21 @@ describe ContentMigration do
       expect(@copy_to.assignments.where(migration_id: mig_id(@assignment)).first).to be_nil
     end
 
-    it "should copy the assignment group and grading standard in selective copy" do
+    it "should copy the assignment group and grading standard in complete copy" do
+      graded_discussion_topic
+      gs = make_grading_standard(@copy_from, title: 'One')
+      group = @copy_from.assignment_groups.create!(:name => "new group")
+      @assignment.assignment_group = group
+      @assignment.grading_standard = gs
+      @assignment.save!
+      run_course_copy
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
+      expect(new_topic.assignment).to be_present
+      expect(new_topic.assignment.assignment_group.migration_id).to eql mig_id(group)
+      expect(new_topic.assignment.grading_standard.migration_id).to eql mig_id(gs)
+    end
+
+    it "should copy the grading standard (but not assignment group) in selective copy" do
       graded_discussion_topic
       gs = make_grading_standard(@copy_from, title: 'One')
       group = @copy_from.assignment_groups.create!(:name => "new group")
@@ -102,7 +116,7 @@ describe ContentMigration do
       run_course_copy
       new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
       expect(new_topic.assignment).to be_present
-      expect(new_topic.assignment.assignment_group.migration_id).to eql mig_id(group)
+      expect(new_topic.assignment.assignment_group.migration_id).to be_nil
       expect(new_topic.assignment.grading_standard.migration_id).to eql mig_id(gs)
     end
 

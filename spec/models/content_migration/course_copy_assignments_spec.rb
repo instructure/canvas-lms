@@ -43,7 +43,7 @@ describe ContentMigration do
       expect(to_outcomes).to eql [mig_id(@outcome)]
     end
 
-    it "should link assignments to assignment groups on selective copy" do
+    it "should link assignments to assignment groups when copying all assignments" do
       g = @copy_from.assignment_groups.create!(:name => "group")
       from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
 
@@ -52,6 +52,29 @@ describe ContentMigration do
 
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       expect(to_assign.assignment_group).to eq @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
+    end
+
+    it "should link assignments to assignment groups when copying entire assignment group" do
+      g = @copy_from.assignment_groups.create!(:name => "group")
+      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+
+      @cm.copy_options = {:assignment_groups => {mig_id(g) => true}, :assignments => {mig_id(from_assign) => true}}
+      run_course_copy
+
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      expect(to_assign.assignment_group).to eq @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
+    end
+
+    it "should not link assignments to assignment groups when copying single assignment" do
+      g = @copy_from.assignment_groups.create!(:name => "group")
+      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+
+      @cm.copy_options = {:assignments => {mig_id(from_assign) => true}}
+      run_course_copy
+
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      expect(@copy_to.assignment_groups.where(migration_id: mig_id(g)).first).to be_nil
+      expect(to_assign.assignment_group.migration_id).to be_nil
     end
 
     it "should link assignments to assignment groups on complete export" do

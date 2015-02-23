@@ -630,14 +630,23 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(qq2.question_data['points_possible']).to eq qq.question_data['points_possible']
     end
 
-    it "should copy the assignment group in selective copy" do
+    it "should copy the assignment group in full copy" do
+      group = @copy_from.assignment_groups.create!(:name => "new group")
+      quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => group.id)
+      quiz.publish!
+      run_course_copy
+      dest_quiz = @copy_to.quizzes.where(migration_id:  mig_id(quiz)).first
+      expect(dest_quiz.assignment_group.migration_id).to eql mig_id(group)
+    end
+
+    it "should not copy the assignment group in selective copy" do
       group = @copy_from.assignment_groups.create!(:name => "new group")
       quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => group.id)
       quiz.publish!
       @cm.copy_options = { 'everything' => '0', 'quizzes' => { mig_id(quiz) => "1" } }
       run_course_copy
       dest_quiz = @copy_to.quizzes.where(migration_id:  mig_id(quiz)).first
-      expect(dest_quiz.assignment_group.migration_id).to eql mig_id(group)
+      expect(dest_quiz.assignment_group.migration_id).to be_nil
     end
 
     it "should not copy the assignment group in selective export" do

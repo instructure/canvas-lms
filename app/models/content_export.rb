@@ -237,6 +237,7 @@ class ContentExport < ActiveRecord::Base
 
     asset_type ||= obj.class.table_name
     return true if is_set?(selected_content["all_#{asset_type}"])
+    return true if is_set?(selected_content["all_assignments"]) && asset_type == "assignment_groups"
 
     return false unless selected_content[asset_type]
     return true if is_set?(selected_content[asset_type][select_content_key(obj)])
