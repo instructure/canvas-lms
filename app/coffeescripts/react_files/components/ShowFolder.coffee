@@ -119,7 +119,7 @@ define [
           @state.errorMessages.map (error) ->
             div className: 'muted', error.message
       return div({ref: 'emptyDiv'}) unless @props.currentFolder
-      div role: 'grid',
+      div role: 'grid', style: {flex: "1 1 auto"},
 
         div {
           ref: 'accessibilityMessage'
