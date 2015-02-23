@@ -145,13 +145,12 @@ define [
   test "#validateBeforeSave validates dates by section when date range set for
     custom section and section set to override course dates", ->
     ENV.COURSE_DATE_RANGE.override_term_dates = true
-    @override.set('course_section_id', 1)
 
     day1 = Date.parse "December 16, 2016"
     day2 = Date.parse "December 31, 1999"
 
     data =
-      {lock_at: day1}
+      {lock_at: day1, course_section_id: 1}
     errors = {}
 
     errs = @dueDateView.validateBeforeSave(data,errors,false)
@@ -160,7 +159,7 @@ define [
     @dueDateView.$el.hideErrors()
 
     data =
-      {unlock_at: day2}
+      {unlock_at: day2, course_section_id: 1}
     errors = {}
 
     errs = @dueDateView.validateBeforeSave(data,errors,false)
@@ -170,7 +169,7 @@ define [
 
     errors = {}
     data =
-      {due_at: day1}
+      {due_at: day1, course_section_id: 1}
 
     errs = @dueDateView.validateBeforeSave(data,errors,false)
     error = errs.assignmentOverrides.due_at
@@ -179,7 +178,7 @@ define [
 
     errors = {}
     data =
-      {due_at: day2}
+      {due_at: day2, course_section_id: 1}
 
     errs = @dueDateView.validateBeforeSave(data,errors,false)
     error = errs.assignmentOverrides.due_at
@@ -188,7 +187,6 @@ define [
 
   test "#validateBeforeSave validates dates by term when no date range is
     set for custom section or course dates", ->
-    @override.set('course_section_id', 2)
 
     day1 = Date.parse "December 16, 2016"
     day2 = Date.parse "December 31, 1999"
@@ -233,8 +231,6 @@ define [
     priorities when null values exist", ->
     ENV.COURSE_DATE_RANGE.override_term_dates = true
 
-    @override.set('course_section_id', 3)
-
     day1 = Date.parse "December 16, 2016"
     day2 = Date.parse "December 31, 1999"
 
@@ -248,7 +244,7 @@ define [
     @dueDateView.$el.hideErrors()
 
     data =
-      {unlock_at: day2}
+      {unlock_at: day2, course_section_id: 3}
     errors = {}
 
     errs = @dueDateView.validateBeforeSave(data,errors,false)
@@ -267,7 +263,7 @@ define [
 
     errors = {}
     data =
-      {due_at: day2}
+      {due_at: day2, course_section_id: 3}
 
     errs = @dueDateView.validateBeforeSave(data,errors,false)
     error = errs.assignmentOverrides.due_at
