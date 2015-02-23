@@ -54,7 +54,7 @@ define [
 
       @form.find('.ag_contexts_selector').click preventDefault @toggleContextsMenu
 
-      timeBlocks = ([appt.start, appt.end, true] for appt in @apptGroup.appointmentEvents || [] )
+      timeBlocks = ([appt.start_at, appt.end_at, true] for appt in @apptGroup.appointments || [] )
       @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks)
 
       @form.find('[name="slot_duration"]').change (e) =>
