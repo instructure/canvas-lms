@@ -16,16 +16,32 @@ define [
       @server = sinon.fakeServer.create()
       ENV.current_user_roles = ["admin", "teacher"]
       ENV.GRADING_STANDARDS_URL = "/courses/1/grading_standards"
-      ENV.DEFAULT_GRADING_STANDARD_DATA =
-      [['A', 0.94], ['A-', 0.90], ['B+', 0.87],
-       ['B', 0.84], ['B-', 0.80], ['C+', 0.77],
-       ['C', 0.74], ['C-', 0.70], ['D+', 0.67],
-       ['D', 0.64], ['D-', 0.61], ['F', 0.0]]
+      ENV.DEFAULT_GRADING_STANDARD_DATA = [
+        ['A', 0.94], ['A-', 0.90], ['B+', 0.87],
+        ['B', 0.84], ['B-', 0.80], ['C+', 0.77],
+        ['C', 0.74], ['C-', 0.70], ['D+', 0.67],
+        ['D', 0.64], ['D-', 0.61], ['F', 0.0]
+      ]
+      @processedDefaultData = [
+        ['A', 94], ['A-', 90], ['B+', 87],
+        ['B', 84], ['B-', 80], ['C+', 77],
+        ['C', 74], ['C-', 70], ['D+', 67],
+        ['D', 64], ['D-', 61], ['F', 0]
+      ]
       @indexData = [
         grading_standard:
           id: 1
           title: "Hard to Fail"
           data: [['A', 0.20], ['F', 0.0]]
+          permissions:
+            read: true
+            manage: true
+      ]
+      @processedIndexData = [
+        grading_standard:
+          id: 1
+          title: "Hard to Fail"
+          data: [['A', 20], ['F', 0]]
           permissions:
             read: true
             manage: true
@@ -58,11 +74,11 @@ define [
       ENV.DEFAULT_GRADING_STANDARD_DATA = null
       @server.restore()
 
-  test 'gets the standards data from the grading standards controller', ->
-    deepEqual @gradingStandardCollection.state.standards, @indexData
+  test 'gets the standards data from the grading standards controller, and multiplies data values by 100 (i.e. .20 becomes 20)', ->
+    deepEqual @gradingStandardCollection.state.standards, @processedIndexData
 
   test 'getStandardById gets the correct standard by its id', ->
-    deepEqual @gradingStandardCollection.getStandardById(1), _.first(@indexData)
+    deepEqual @gradingStandardCollection.getStandardById(1), _.first(@processedIndexData)
 
   test 'getStandardById returns undefined for a id that doesn\'t match a standard', ->
     deepEqual @gradingStandardCollection.getStandardById(10), undefined
@@ -75,7 +91,7 @@ define [
   test 'adds the default standard when the add button is clicked', ->
     Simulate.click(@gradingStandardCollection.refs.addButton.getDOMNode())
     newStandard = _.first(@gradingStandardCollection.state.standards).grading_standard
-    deepEqual newStandard.data, ENV.DEFAULT_GRADING_STANDARD_DATA
+    deepEqual newStandard.data, @processedDefaultData
 
 
   test 'does not save the new standard on the backend when the add button is clicked', ->
@@ -108,10 +124,10 @@ define [
   test 'setEditingStatus removes the standard if the user clicks "Cancel" on a not-yet-saved standard', ->
     Simulate.click(@gradingStandardCollection.refs.addButton.getDOMNode())
     deepEqual @gradingStandardCollection.state.standards.length, 2
-    deepEqual _.first(@gradingStandardCollection.state.standards).grading_standard.data, ENV.DEFAULT_GRADING_STANDARD_DATA
+    deepEqual _.first(@gradingStandardCollection.state.standards).grading_standard.data, @processedDefaultData
     @gradingStandardCollection.setEditingStatus(-1, false)
     deepEqual @gradingStandardCollection.state.standards.length, 1
-    deepEqual _.first(@gradingStandardCollection.state.standards).grading_standard.data, _.first(@indexData).grading_standard.data
+    deepEqual _.first(@gradingStandardCollection.state.standards).grading_standard.data, _.first(@processedIndexData).grading_standard.data
 
   test 'setEditingStatus sets the editing status to true on a saved standard, when true is passed in', ->
     @gradingStandardCollection.setEditingStatus(1, true)

@@ -154,38 +154,18 @@ define [
     @gradingStandard.deleteDataRow(0)
     deepEqual @gradingStandard.state.editingStandard.data, [["F", 0.00]]
 
-  test 'does not alter the standard when deleteDataRow is called (only the editingStandard is altered)', ->
-    @gradingStandard.deleteDataRow(1)
-    deepEqual @gradingStandard.state.standard.data, [["A", 0.92], ["A-", 0.90], ["F", 0.00]]
-
   test 'inserts the correct row on the editingStandard when insertGradingStandardRow is called', ->
     @gradingStandard.insertGradingStandardRow(1)
-    deepEqual @gradingStandard.state.editingStandard.data, [["A", 0.92], ["A-", 0.90], ["", " "], ["F", 0.00]]
-
-  test 'does not insert a row on the standard when insertGradingStandardRow is called (only the editingStandard is altered)', ->
-    @gradingStandard.insertGradingStandardRow(1)
-    deepEqual @gradingStandard.state.standard.data, [["A", 0.92], ["A-", 0.90], ["F", 0.00]]
+    deepEqual @gradingStandard.state.editingStandard.data, [["A", 0.92], ["A-", 0.90], ["", ""], ["F", 0.00]]
 
   test 'changes the title on the editingStandard when title input changes', ->
     Simulate.change(@gradingStandard.refs.title.getDOMNode(), {target: {value: 'Brand new title'}})
     deepEqual @gradingStandard.state.editingStandard.title, "Brand new title"
 
-  test 'does not change the title on the standard when title input changes (only the editingStandard is altered)', ->
-    Simulate.change(@gradingStandard.refs.title.getDOMNode(), {target: {value: 'Brand new title'}})
-    deepEqual @gradingStandard.state.standard.title, "Test Grading Standard"
-
   test 'changes the min score on the editingStandard when changeRowMinScore is called', ->
     @gradingStandard.changeRowMinScore(2, 0.23)
     deepEqual @gradingStandard.state.editingStandard.data[2], ["F", 0.23]
 
-  test 'does not change the min score on the standard when changeRowMinScore is called (only the editingStandard is altered)', ->
-    @gradingStandard.changeRowMinScore(2, 0.23)
-    deepEqual @gradingStandard.state.standard.data[2], ["F", 0.00]
-
   test 'changes the row name on the editingStandard when changeRowName is called', ->
     @gradingStandard.changeRowName(2, "Q")
     deepEqual @gradingStandard.state.editingStandard.data[2], ["Q", 0.00]
-
-  test 'does not change the row name on the standard when changeRowName is called (only the editingStandard is altered)', ->
-    @gradingStandard.changeRowName(2, "Q")
-    deepEqual @gradingStandard.state.standard.data[2], ["F", 0.00]

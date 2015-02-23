@@ -10,40 +10,26 @@ function(React, I18n) {
 
     getInitialState: function() {
       return {
-        row: this.getRowData(this.props),
-        siblingRow: this.getSiblingRowData(this.props),
-        editing: this.props.editing,
-        displayZeroAsBlank: false,
-        stillEntering: false,
         showInsertRowLink: false,
         showBottomBorder: false
       };
     },
 
-    getRowData: function(props){
-      var rowData = {name: props.row[0], minScore: props.row[1], maxScore: null};
-      rowData.maxScore = props.uniqueId === 0 ? 1.0 : props.siblingRow[1];
+    getRowData: function(){
+      var rowData = {name: this.props.row[0], minScore: this.props.row[1], maxScore: null};
+      rowData.maxScore = this.props.uniqueId === 0 ? 100 : this.props.siblingRow[1];
       return rowData;
-    },
-
-    getSiblingRowData: function(props){
-      return !props.siblingRow ? null : { name: props.siblingRow[0], minScore: props.siblingRow[1] };
     },
 
     componentWillReceiveProps: function(nextProps) {
       this.setState({
-        row: this.getRowData(nextProps),
-        siblingRow: this.getSiblingRowData(nextProps),
-        editing: nextProps.editing,
-        displayZeroAsBlank: false,
-        stillEntering: false,
         showInsertRowLink: false,
         showBottomBorder: false
       });
     },
 
-    decimalToPercent: function(decimal){
-      return Math.round(decimal * 10000)/100;
+    roundToTwoDecimals: function(number){
+      return Math.round(number * 100)/100;
     },
 
     triggerRowNameChange: function(event){
@@ -52,17 +38,8 @@ function(React, I18n) {
 
     triggerRowMinScoreChange: function(event){
       var inputVal = event.target.value;
-      var lastChar = inputVal.substr(inputVal.length - 1);
       if(inputVal >= 0 && inputVal <= 100){
-        var newRow = this.state.row;
-        newRow.minScore = inputVal / 100;
-        if(inputVal === "" || lastChar === "."){
-          this.setState({row: newRow,
-                         displayZeroAsBlank: inputVal === "",
-                         stillEntering: lastChar === "."});
-        } else{
-          this.props.onRowMinScoreChange(this.props.uniqueId, this.state.row.minScore);
-        };
+        this.props.onRowMinScoreChange(this.props.uniqueId, inputVal);
       }
     },
 
@@ -87,9 +64,10 @@ function(React, I18n) {
     renderInsertRowLink: function(){
       if(this.state.showInsertRowLink){
         return (
-          <a href="#" className="insert_grading_standard_link" onMouseEnter={this.showBottomBorder}
-             onFocus={this.showBottomBorder} onBlur={this.hideBottomBorder}
-             onMouseLeave={this.hideBottomBorder} onClick={this.triggerInsertRow}>
+          <a href="#" ref="insertRowLink" className="insert_grading_standard_link"
+             onMouseEnter={this.showBottomBorder} onFocus={this.showBottomBorder}
+             onBlur={this.hideBottomBorder} onMouseLeave={this.hideBottomBorder}
+             onClick={this.triggerInsertRow}>
             <i className="icon-add standalone-icon">
               <span className="screenreader-only">{I18n.t("Insert row below")}</span>
             </i>
@@ -107,21 +85,27 @@ function(React, I18n) {
     },
 
     renderMaxScore: function(){
-      var maxScore = this.decimalToPercent(this.state.row.maxScore);
-      return maxScore === 100 ? maxScore : "< " + maxScore;
+      var maxScore = this.roundToTwoDecimals(this.getRowData().maxScore);
+      return maxScore === 100 ? String(maxScore) : "< " + maxScore;
     },
 
     renderMinScore: function(){
-      if(this.state.editing && this.state.row.minScore === 0 && this.state.displayZeroAsBlank) return "";
-      if(this.state.stillEntering) return this.decimalToPercent(this.state.row.minScore) + ".";
-      return this.decimalToPercent(this.state.row.minScore);
+      var score = String(this.getRowData().minScore);
+      var roundedScore = String(this.roundToTwoDecimals(score));
+      if(this.props.editing && score === ''){
+        return '';
+      }else if(this.props.editing && score.charAt(score.length - 1) === '.'){
+        return roundedScore + '.';
+      }else{
+        return roundedScore;
+     }
     },
 
     renderDeleteLink: function(){
       if(this.props.onlyDataRowRemaining) return null;
       return(
-        <a href="#" onClick={this.triggerDeleteRow} className="delete_row_link no-hover"
-           title={I18n.t('Remove row')}>
+        <a href="#" ref="deleteLink" onClick={this.triggerDeleteRow}
+           className="delete_row_link no-hover" title={I18n.t('Remove row')}>
           <i className="icon-end standalone-icon">
             <span className="screenreader-only">{I18n.t("Remove Row")}</span>
           </i>
@@ -131,23 +115,23 @@ function(React, I18n) {
 
     renderViewMode: function() {
       return (
-        <tr className="grading_standard_row react_grading_standard_row">
+        <tr className="grading_standard_row react_grading_standard_row" ref="viewContainer">
           <td className="insert_row_icon_container"/>
           <td className="row_name_container">
-            <div className="name">
-              {this.state.row.name}
+            <div className="name" ref="name">
+              {this.getRowData().name}
             </div>
           </td>
           <td className="row_cell max_score_cell" ariaLabel={I18n.t('Upper limit of range')} >
             <div>
-              <span className="max_score" title="Upper limit of range">
+              <span className="max_score" ref="maxScore" title="Upper limit of range">
                 {this.renderMaxScore() + "%"}
               </span>
             </div>
           </td>
           <td className="row_cell">
             <div>
-              <span className="range_to">{I18n.t("to %{minScore}%", {minScore: this.renderMinScore()})}</span>
+              <span className="range_to" ref="minScore">{I18n.t("to %{minScore}%", {minScore: this.renderMinScore()})}</span>
               <span className="min_score">
               </span>
             </div>
@@ -162,6 +146,7 @@ function(React, I18n) {
         <tr className={this.state.showBottomBorder ?
                        "grading_standard_row react_grading_standard_row border_below" :
                        "grading_standard_row react_grading_standard_row"}
+            ref="editContainer"
             onMouseEnter={this.showInsertRowLink} onMouseLeave={this.hideInsertRowLink}
             onFocus={this.showInsertRowLink}>
           <td className="insert_row_icon_container" tabIndex="0">
@@ -169,11 +154,10 @@ function(React, I18n) {
           </td>
           <td className="row_name_container">
             <div>
-              <input type="text" onChange={this.triggerRowNameChange} className="standard_name"
-                     title={I18n.t('Range name')} ariaLabel={I18n.t('Range name')}
+              <input type="text" ref="nameInput" onChange={this.triggerRowNameChange}
+                     className="standard_name" title={I18n.t('Range name')} ariaLabel={I18n.t('Range name')}
                      name={"grading_standard[standard_data][scheme_" + this.props.uniqueId + "[name]"}
-                     value={this.state.row.name}>
-              </input>
+                     value={this.getRowData().name}/>
             </div>
           </td>
           <td className="row_cell max_score_cell edit_max_score">
@@ -185,8 +169,9 @@ function(React, I18n) {
           <td className="row_cell">
             <div>
               <span className="range_to" ariaHidden="true">{I18n.t("to ")}</span>
-              <input type="text" onChange={this.triggerRowMinScoreChange} className="standard_value"
-                     title={I18n.t('Lower limit of range')} ariaLabel={I18n.t('Lower limit of range')}
+              <input type="text" ref="minScoreInput" onChange={this.triggerRowMinScoreChange}
+                     className="standard_value" title={I18n.t('Lower limit of range')}
+                     ariaLabel={I18n.t('Lower limit of range')}
                      name={"grading_standard[standard_data][scheme_" + this.props.uniqueId + "][value]"}
                      value={this.renderMinScore()}/>
               <span ariaHidden="true"> % </span>
@@ -200,7 +185,7 @@ function(React, I18n) {
     },
 
     render: function () {
-      return this.state.editing ? this.renderEditMode() : this.renderViewMode();
+      return this.props.editing ? this.renderEditMode() : this.renderViewMode();
     }
   });
 

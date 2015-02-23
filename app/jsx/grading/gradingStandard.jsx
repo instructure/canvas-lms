@@ -7,12 +7,11 @@ define([
   'i18n!external_tools'
 ],
 function(React, DataRow, $, I18n) {
-
+  var update = React.addons.update;
   var GradingStandard = React.createClass({
 
     getInitialState: function() {
       return {
-        standard: this.props.standard,
         editingStandard: $.extend(true, {}, this.props.standard),
         saving: false
       };
@@ -20,7 +19,6 @@ function(React, DataRow, $, I18n) {
 
     componentWillReceiveProps: function(nextProps) {
       this.setState({
-        standard: nextProps.standard,
         editingStandard: $.extend(true, {}, this.props.standard),
         saving: nextProps.saving
       });
@@ -33,7 +31,7 @@ function(React, DataRow, $, I18n) {
     componentDidUpdate: function(prevProps, prevState) {
       if(this.props.editing !== prevProps.editing){
        this.refs.title.getDOMNode().focus();
-       this.setState({editingStandard: $.extend(true, {}, this.state.standard)})
+       this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
       }
     },
 
@@ -51,19 +49,19 @@ function(React, DataRow, $, I18n) {
     },
 
     triggerSaveGradingStandard: function() {
-      this.setState({saving: true},
-        this.props.onSaveGradingStandard(this.state.editingStandard)
-      );
+      this.setState({saving: true}, function() {
+        this.props.onSaveGradingStandard(this.state.editingStandard);
+      });
     },
 
     assessedAssignment: function() {
-      return !!(this.state.standard && this.state.standard["assessed_assignment?"]);
+      return !!(this.props.standard && this.props.standard["assessed_assignment?"]);
     },
 
     deleteDataRow: function(index) {
       if(this.moreThanOneDataRowRemains()){
-        this.state.editingStandard.data.splice(index, 1);
-        this.setState({editingStandard: this.state.editingStandard});
+        var newEditingStandard = update(this.state.editingStandard, {data: {$splice:  [[index, 1]]}});
+        this.setState({editingStandard: newEditingStandard});
       }
     },
 
@@ -72,8 +70,8 @@ function(React, DataRow, $, I18n) {
     },
 
     insertGradingStandardRow: function(index) {
-      this.state.editingStandard.data.splice(index + 1, 0, [""," "]);
-      this.setState({editingStandard: this.state.editingStandard});
+      var newEditingStandard = update(this.state.editingStandard, {data: {$splice:  [[index + 1, 0, ["", ""]]]}});
+      this.setState({editingStandard: newEditingStandard});
     },
 
     titleChange: function(event) {
@@ -93,23 +91,23 @@ function(React, DataRow, $, I18n) {
 
     renderCannotManageMessage: function() {
       if(this.props.permissions.manage && this.props.othersEditing) return null;
-      if(this.state.standard.context_name){
+      if(this.props.standard.context_name){
         return (
           <div ref="cannotManageMessage">
-            {I18n.t("(%{context}: %{contextName})", { context: this.state.standard.context_type.toLowerCase(), contextName: this.state.standard.context_name })}
+            {I18n.t("(%{context}: %{contextName})", { context: this.props.standard.context_type.toLowerCase(), contextName: this.props.standard.context_name })}
           </div>
         );
       }
       return (
         <div ref="cannotManageMessage">
-          {I18n.t("(%{context} level)", { context: this.state.standard.context_type.toLowerCase() })}
+          {I18n.t("(%{context} level)", { context: this.props.standard.context_type.toLowerCase() })}
         </div>
       );
     },
 
     renderIdNames: function() {
       if(this.assessedAssignment()) return "grading_standard_blank";
-      return "grading_standard_" + (this.state.standard ? this.state.standard.id : "blank");
+      return "grading_standard_" + (this.props.standard ? this.props.standard.id : "blank");
     },
 
     renderTitle: function() {
@@ -126,14 +124,14 @@ function(React, DataRow, $, I18n) {
         <div className="pull-left" tabIndex="0">
           <div className="title" ref="title">
             <span className="screenreader-only">{I18n.t("Grading standard title")}</span>
-            {this.state.standard.title}
+            {this.props.standard.title}
           </div>
         </div>
       );
     },
 
     renderDataRows: function() {
-      var data = this.props.editing ? this.state.editingStandard.data : this.state.standard.data;
+      var data = this.props.editing ? this.state.editingStandard.data : this.props.standard.data;
       return data.map(function(item, idx, array){
         return (
           <DataRow key={idx} uniqueId={idx} row={item} siblingRow={array[idx - 1]} editing={this.props.editing}
