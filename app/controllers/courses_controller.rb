@@ -1711,9 +1711,14 @@ class CoursesController < ApplicationController
 
   def copy
     get_context
-    authorized_action(@context, @current_user, :read) &&
-      authorized_action(@context, @current_user, :read_as_admin) &&
-      authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
+    return unless authorized_action(@context, @current_user, :read_as_admin)
+
+    account = @context.account
+    unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+      account = @domain_root_account.manually_created_courses_account
+    end
+    return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
+
     # For prepopulating the date fields
     js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
     js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
