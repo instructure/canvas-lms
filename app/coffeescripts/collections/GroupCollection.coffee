@@ -30,7 +30,14 @@ define [
     @optionProperty 'category'
     @optionProperty 'loadAll'
 
-    _defaultUrl: -> '/api/v1/users/self/groups'
+    _defaultUrl: ->
+      if @forCourse
+        url = super
+        unless ENV.CAN_MANAGE_GROUPS
+          url = url + "?only_own_groups=1"
+        url
+      else
+        '/api/v1/users/self/groups'
 
     url: ->
       if @category?
