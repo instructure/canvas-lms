@@ -269,7 +269,6 @@ ja:
       logout_request_to_idp: "IdP に送信された LogoutRequest"
       logout_response_from_idp: "IdP からの LogoutResponse"
       saml_required: "SAML をテストするには SAML の設定が必要です"
-  account_level_8c2c1cdc: "(アカウント レベル)"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: アカウントのお知らせの終了時刻が開始時刻よりも前になっています
@@ -1249,6 +1248,7 @@ ja:
         header: 
           one: "%{count} 個のエラーがあるため、この %{model} を保存できません"
           other: "%{count} 個のエラーがあるため、この %{model} を保存できません"
+  activity_13915493: アクティビティ
   add_app_baf540f: アプリの追加
   add_attachment_93868828: 添付ファイルの追加
   add_course_assignments_628ed6d0: コースの課題の追加
@@ -1346,6 +1346,7 @@ ja:
     student_in_course: 
       analytics: 分析
       page_title: "分析: %{course} -- %{student}"
+  analytics_c94ba601: 分析
   and_count_more_43eae021: "あと %{count} 件..."
   ange_name: "Angel コンバータ"
   angel: 
@@ -1384,6 +1385,7 @@ ja:
       rss_feed: "RSS フィード"
       suggestions: "提案:"
       there_are_no_announcements_show: 表示するアナウンスはありません
+      title_add_announcement: アナウンスの追加
       try_different_more_general_or_fewer_keywords: 別のキーワードや、より一般的なキーワードを指定するか、キーワードの数を減らして試してください。
       try_disabling_the_unread_filters: "\"未読\" フィルタを無効にしてみてください。"
       unread: 未読
@@ -1434,7 +1436,6 @@ ja:
       please_log_in: セキュリティのため、続行するにはパスワードを入力してください
       titles: 
         suspended: 教育機関のアカウントが一時停止されました
-      unsupported_browser: "ご利用のブラウザは Canvas の最小要件を満たしていません。サポートされるブラウザについては *Canvas ガイド* を参照してください。"
     wiki_front_page_default_content_course: "新しいコースの Wiki へようこそ!"
     wiki_front_page_default_content_group: "新しいグループの Wiki へようこそ!"
   appointment_group: 
@@ -1456,10 +1457,9 @@ ja:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "この %{count} アイテムを削除してよろしいですか?"
     other: "この %{count} アイテムを削除してよろしいですか?"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: このアナウンスを削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: この採点スキームを削除してもよろしいですか?
   are_you_sure_you_want_to_remove_this_tool_7363f90b: このツールを削除してもよろしいですか?
-  aria_labels: 
-    unlock_at_date: ロック解除日付
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
   assessment_question: 
     default_question_name: 問題
@@ -2285,7 +2285,6 @@ ja:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: 閉じる
-  calculation_int_is_not_a_valid_calculation_int_for_561f72fa: "'%{calculation_int}' は、calculation_method '%{calculation_method}' の有効な calculation_int ではありません。有効な範囲は、'%{valid_calculation_ints}' です"
   calculator: 
     buttons: 
       save: 保存
@@ -2908,6 +2907,7 @@ ja:
   common_cartridge_display: "コモン カートリッジ"
   common_cartridge_file_description: "コモン カートリッジ 1.x パッケージ"
   common_cartridge_name: "コモン カートリッジ インポーター"
+  communication_5255723c: コミュニケーション
   communication_channel: 
     body: "Canvas 検証コードは %{verification_code} です"
     default_facebook_account: "Facebook アカウント"
@@ -3484,12 +3484,6 @@ ja:
       headings: 
         add_prerequisite: "%{name} への前提条件の追加"
         course_modules: "コース モジュール"
-        student_progress: "モジュールの進捗 (受講生別)"
-        student_progress_for_module: "%{module} の受講生の進捗"
-        students_completed: モジュールを完了した受講生
-        students_in_progress: モジュールで作業中の受講生
-        students_locked: モジュールをロック解除していない受講生
-        students_unlocked: "モジュールをロック解除した (が開始していない) 受講生"
       help: 
         create: |-
             コース モジュールを利用すると、課題、ページ、ファイルなどを、より小さなセクションまたは単元に編成することができます。モジュールは、テーマを軸として展開することも、特定のトピックに焦点を合わせることも、あるいは単に時間軸に沿ってグループ分けすることもできます。
@@ -3547,16 +3541,12 @@ ja:
         new_tab: 新しいタブに読み込み
         publish_final_grade: このモジュールの完了時に、受講生の最終的な成績を公開します
         require_sequential_progress: 受講生は、このモジュールの要件を順番に満たす必要があります
-        sort_by: 並べ替え
         title: タイトル
         unlock_at: ロック解除の日時
         url: URL
       links: 
         add_prerequisite: 前提条件を追加
         add_requirement: 要件を追加
-        reload_student: 受講生の進捗を再読み込み
-        sort_by_name: 名前
-        sort_by_progress: 進捗
         student_progress: 進捗を表示
         title: 
           remove_prerequisite: この前提条件を削除
@@ -3588,12 +3578,6 @@ ja:
         instructions: モジュールの選択
         name: "モジュール「%{module}」"
       select_prerequisite: 前提条件のタイプを選択します。受講生は、すべての前提条件が満たされるまで、モジュールを表示できません。
-      student_name: 受講生名
-      table_headings: 
-        module: モジュール
-        state: 状態
-      titles: 
-        student_progression: "モジュールの進捗 (受講生別)"
     context_module: 
       unpublish: 未公開
     context_module_next: 
@@ -4652,6 +4636,7 @@ ja:
       rss_feed: "%{course} のフィード"
     unauthorized: 
       invalid_link: ご利用になった登録リンクは、有効でないようです。インストラクタまでお問い合せの上、コースに正しく登録されているかご確認ください。
+  courses_43204aae: コース
   create_item_base: 
     there_was_an_error: "「%{title}」の保存中にエラーが発生しました。もう一度やり直してください。"
   create_module_item: 
@@ -4754,6 +4739,7 @@ ja:
       student: 
         count: 不正解の受講生数
         ratio: 受講生の不正解率
+  current_score_6c81792: 現在のスコア
   curve_grades_dialog: 
     average_score: 平均スコア
     buttons: 
@@ -5085,7 +5071,6 @@ ja:
       manage: 管理
       move: 移動先...
       no_due_date: 期日なし
-      open_to_comments: コメントを受け付ける
       pin: 固定
       unpin: 固定の解除
       user_subscribed: このトピックを購読しています。購読を中止するにはクリックします。
@@ -5242,8 +5227,12 @@ ja:
       post_message: メッセージの投稿
     summary_view: 
       attached_file_name: "添付: %{display_name}"
+      close_for_comments: コメントを締め切る
+      delete: 削除
       drag_up_or_down_to_reorder: 上下にドラッグして並べ替え
       locked: このトピックへのコメントは締め切られています
+      manage: 管理
+      open_to_comments: コメントを受け付ける
       this_topic_is_used_for_grading: このトピックは採点に使用されます。
       topic_podcast_feed: "トピックのポッドキャスト フィード"
     this_is_a_group_discussion: "これはグループ ディスカッションです"
@@ -5255,6 +5244,7 @@ ja:
     user_settings_view: 
       manually_mark_as_read: 投稿を手動で既読にする
       my_settings: マイ設定
+  discussion_topics_b35ac745: "ディスカッション トピック"
   discussions: 
     are_your_sure_delete: このエントリを削除してもよろしいですか?
     cant_subscribe_not_in_group: 購読するにはこのグループのメンバーであることが必要です
@@ -5775,6 +5765,7 @@ ja:
     unsaved_changes: 未保存の変更内容があります。
     wrong_file_extension: "選択した拡張子 \"%{extension}\" のファイルは、提出が許可されていません"
   everyone_854554dd: 全員
+  example_84698b7d: 例
   example_https_example_com_config_xml_be5f36ac: "例: https://example.com/config.xml"
   expand_or_collapse_calendars_9854b0d0: カレンダーの展開と折りたたみ
   expand_or_collapse_undated_items_b901de09: 日付のないアイテムの展開と折りたたみ
@@ -6023,6 +6014,7 @@ ja:
     file_preview_infotable_name: 名前
     file_preview_infotable_size: サイズ
     file_preview_infotable_status: 状況
+  file_preview_eedb43f2: ファイルのプレビュー
   file_previews: 
     lock_explanation: 
       messages: 
@@ -6709,7 +6701,7 @@ ja:
       new_assessment_option: "[新しいアセスメント]"
       no_annotation: このドキュメントには注釈を使用できません
       not_newest_notice: "注:これは最新の提出物ではありません"
-      page_header_title: Speedgrader
+      page_header_title: SpeedGrader
       page_title: "%{assignment_name}、SpeedGrader、 %{course_name}"
       sort_by: 
         status: "提出物の状態ごと (採点が必要、未提出など)"
@@ -6720,13 +6712,11 @@ ja:
         download_file: このファイルをダウンロード
         not_newest: 上のドロップダウンを使用して、表示対象の提出物を変更
         preview_file: このファイルのプレビュー
-        speedgrader_options: "Speedgrader オプション"
       tooltips: 
         file_attachment: ファイル添付
         media_comment: "メディア コメント"
         speech_recognition: 音声認識
     speed_grader_disabled: "SpeedGrader は、このコースでは無効になっています"
-    speedgrader_enabled_only_for_published_content: "SpeedGrader は、公開済みのコンテンツに対してのみ有効になります。"
     student_attendance: 
       headers: 
         assignment: 課題
@@ -6765,6 +6755,7 @@ ja:
       total: 合計
   graded_quiz_7fabdf1f: 採点済みのクイズ
   graded_survey_c0f0c395: 採点済みのサーベイ
+  grades_a61eba0a: 成績
   grading_box: 
     out_of_points_possible: "配点: %{assignment.points_possible}"
   grading_cell: 
@@ -7483,6 +7474,7 @@ ja:
   last_user_access_title: "最終ユーザ アクセス"
   late_percent_b91d01b3: "遅延: %{percent}"
   latest_f604a75: 前回
+  latest_score_905aa87b: 直近のスコア
   launch_url_e150bd41: "URL を起動"
   layouts: 
     application: 
@@ -7638,6 +7630,7 @@ ja:
   lock_date_cannot_be_after_term_end_cf1a188f: ロック日を期間の終了日より後にすることはできません
   lock_date_cannot_be_before_due_date_ac30f54: ロック日を期日より前にすることはできません
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
+  logo_a040ae0e: ロゴ
   low_score_4eeb95b2: "低: %{score}"
   lower_limit_of_range_6ddd4983: 範囲の下限
   lti: 
@@ -7711,6 +7704,7 @@ ja:
     track_uploaded_successfully: トラックは正常にアップロードされました。ブラウザを更新してください。
     upload: アップロード
     uploading: アップロードしています...
+  media_recordings_749aef6d: メディアの記録
   median_score_4657e907: "中央値: %{score}"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "最大 %{max_membership} 人中 %{member_count} 人"
   members_af25c21d: メンバー
@@ -7731,6 +7725,7 @@ ja:
     send_message: メッセージの送信
   message_students_dialog: 
     recipients: "受信者:"
+  message_this_student_6d14043d: この受講生にメッセージを送る
   messages: 
     account_suspended: 
       email: 
@@ -9037,15 +9032,6 @@ ja:
     messages: 
       failure: 電子メールを送信する際にエラーが発生しました。ページを再読み込みしてから、もう一度試してください。
       success: 電子メールは配信されています。
-    migration_export_ready: 
-      email: 
-        body: コンテンツの準備が整い、ご自分のコースにインポートできる状態になっています。
-        html: 
-          body: コンテンツの準備が整い、ご自分のコースにインポートできる状態になっています。
-          link_message2: "インポートするコンテンツのアイテムを選択するには、*このリンク* をクリックしてください"
-          subject: "コースをインポートする準備が整いました: %{course_name}"
-        link_message: "インポートするアイテムを選択するには、このリンクをクリックしてください:"
-        subject: "コースを取り出す準備が整いました: %{course_name}"
     new_account_user: 
       email: 
         body: "%{account} の新しいアカウント管理者"
@@ -9070,7 +9056,6 @@ ja:
       email: 
         html: 
           attached_file: 添付ファイル
-          download: ダウンロード
           link: アナウンスを表示
         labels: 
           file_included: ファイルが含まれています
@@ -9743,6 +9728,7 @@ ja:
     assignments_to_post: 
       one: "%{count} 件の課題を投稿する準備ができました。"
       other: "%{count} 件の課題を投稿する準備ができました。"
+    continue: 続行
     create: 
       assignment: 
         cancel: キャンセル
@@ -9862,7 +9848,6 @@ ja:
   name_3806192d: "名前:"
   name_error_fee4236: 名前エラー
   name_only_5f56718e: 名前のみ
-  new_2b97b0d9: 新規作成
   new_account_role_6e5c4964: 新しいアカウントの役割
   new_course_role_6a7bb75f: 新しいコースの役割
   new_facebook_message: "Canvas からの新しいメッセージがあります"
@@ -10035,7 +10020,6 @@ ja:
       group_membership_accepted: "グループ メンバーシップが受諾されました"
       group_membership_rejected: "グループ メンバーシップが拒否されました"
       merge_email_communication_channel: 電子メールの伝達経路の統合
-      migration_export_ready: 移行のためのエクスポート準備が整いました
       migration_import_failed: 移行のためのインポートに失敗しました
       migration_import_finished: 移行のためのインポートが完了しました
       new_account_user: "新しいアカウント ユーザ"
@@ -10266,8 +10250,6 @@ ja:
         total: "%{points_possible} 点"
       total_points: 合計点
       use_for_scoring: 採点にこの基準を使用
-    outcome_alignment: 
-      delete_title: 注釈への関連付けに基づいたアライメントは削除できませんこれらの関連付けを削除するには、そのアセットの注釈から当該行を削除する必要があります。
     outcome_criterion: 学習成果の基準
     outcome_form: 
       criterion: 基準の評価
@@ -10950,15 +10932,6 @@ ja:
         register_skype: "Skype の登録"
         remove_account_from_profile: このプロフィールからアカウントを削除
         unregister_service: サービスの登録解除
-      twitter_description: |-
-          Twitter は、短いメッセージの投稿と定期購読を行うためのサービスです。
-          Twitter アカウントをお持ちであれば、ここでそのアカウントを登録できます。次に、
-          仲間のコース/グループ メンバーに対して、ご自分が登録しているサービスの表示を許可すれば、 
-          Twitter アカウントと簡単につながることができます。
-          
-          サインアップして、お知らせを自分の Twitter アカウントに送るようにも設定できます。
-          この場合、お知らせは自分から自分へのダイレクト メッセージとして送信され、
-          公開ストリームには表示されません。
       unknown_service: 不明
       web_services: "Canvas では、ご利用の Web ツールと結び付けることで、受講生活がはるかに便利になります。\"他のサービス\" で任意のサービスをクリックすると、詳細が表示されます。"
       yo_description: |-
@@ -11607,6 +11580,7 @@ ja:
       comments_on_answer: ユーザがこの解答を選択した場合のコメント
       comments_on_question: この問題についてのコメント
       comments_on_wrong_match: ユーザのこの整合の解答が間違っていた場合のコメント
+      correct_answer: 正解
       message_text: "メッセージ テキスト"
       other_incorrect_matches: 不正解となる他の整合選択肢
       possible_answer: 考えられる解答
@@ -12304,7 +12278,6 @@ ja:
           lock_survey: 今すぐこのサーベイをロックする
           unlock_quiz: 今すぐ受講生にこのクイズを答えさせる
           unlock_survey: 今すぐ受講生にこのサーベイを答えさせる
-        course_concluded_notice: コースが完了しているため、このクイズは利用できません。
         labels: 
           available_until: 次の日時まで
           no_time_limit: 時間制限なし
@@ -13097,7 +13070,9 @@ ja:
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "既に **%{course}** に登録されています。"
-      switch_users: "現在、*%{user}* としてサインインしています。**別のユーザとしてサインインしてください**。"
+      buttons: 
+        go_to_course: コースに移動
+        go_to_dashboard: ダッシュボードに移動
     authenticate: 
       buttons: 
         enroll_in_course: コースへの登録
@@ -13124,7 +13099,6 @@ ja:
         enroll_in_course: コースへの登録
         next: 次へ
       getting_started: "**%{course}** に登録しています"
-      switch_users: "現在、*%{user}* としてサインインしています。**別のユーザとしてサインインしてください**。"
     course_full: 
       class_full: "**%{course}** に登録されました。ご迷惑をおかけしたことをお詫びいたします。"
     enrollment_closed: 
@@ -13940,6 +13914,8 @@ ja:
       back: 戻る
       close: 閉じる
       forward: 早送り
+  smartbanner: 
+    android_banner_view_button: 表示
   source_code_2395ca74: "ソース コード"
   speed_grader: 
     submissions_dropdown: 
@@ -13997,6 +13973,7 @@ ja:
   step: 手順
   stream_items_api: 
     assessment_request_title: "%{title} のピア レビュー"
+  student_5da6bfd1: 受講生
   student_assignment_outcome_map_title: 受講生の能力
   student_groups_desc: |-
       これにより、アカウントの新しい受講生グループ ページが有効になります。新しいページでは、グループのサインアップをより動的に
@@ -14010,6 +13987,7 @@ ja:
   student_summary: 
     student_summary_table_ascending: "%{sortText} の昇順で並べ替えられた受講生概要の表"
     student_summary_table_descending: "%{sortText} の降順で並べ替えられた受講生概要の表"
+  students_1b8cd07b: 受講生
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "既にこのクイズに回答した受講生 (%{count})"
     other: "既にこのクイズに回答した受講生 (%{count})"
@@ -14228,6 +14206,7 @@ ja:
   take_the_quiz_again_8ea51a6c: もう一度クイズに答える
   take_the_survey_ada59508: サーベイに答える
   take_the_survey_again_24ce22c2: もう一度サーベイに答える
+  teachers_52e2423f: 講師
   terms: 
     index: 
       date: 
@@ -14309,7 +14288,6 @@ ja:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: このフォルダは現在ロックされており、表示できません。
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "これは、信頼する URL のカンマ区切りリストです。このリストの URL を信頼すると、Canvas へのログインの際に CSRF トークンがパイパスされます。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: これは、関連ファイルがない状態でコースのコンテンツをインポートしたことが原因で発生したと考えられます。
-  this_outcome_has_been_used_to_assess_a_student_cal_16409bda: "この成果は、受講生を査定するために使用されています。Calculation メソッドは %{old_value} に固定されています。"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*このクイズは未公開です* 公開されるまでは、講師のみがこのクイズを表示できます。"
   this_student_wrote_f1a3f22d: "この受講生の記述:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "これによって、Canvas が SIS に成績を投稿することを認証できます"
@@ -14572,8 +14550,6 @@ ja:
   usage_right_ff96f3e2: "使用\b権:"
   usage_rights_f0960ad6: 使用権
   usage_rights_have_been_set_d1b433c7: 使用権が設定されています。
-  usage_rights_modal: 
-    saving: 保存しています...
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "次に含まれるすべてのファイルに使用権が設定されます:"
   used_by_permission_314a78dd: 許諾により使用
   user: 
@@ -15168,6 +15144,7 @@ ja:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "コースをサポートする TA を割り当てることもできます。TA は、あなたに代わって受講生の提出物の採点、ディスカッションの進行サポート、期日や課題の詳細の更新を行うことができます。"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "%{min} 以上の数字を設定する必要があります"
   you_must_specify_a_usage_right_5eb57f87: 使用権を指定する必要があります。
+  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "ご利用のブラウザは Canvas の最小要件を満たしていません。サポートされるブラウザについては *Canvas ガイド* を参照してください。"
   your_content_has_been_exported_bbb57764: コンテンツがエクスポートされました。
   your_message_has_been_sent_thank_you_e0284316: メッセージが送信されました。ありがとうございます!
   your_search_encountered_the_following_errors_fc3e5e7f: 
