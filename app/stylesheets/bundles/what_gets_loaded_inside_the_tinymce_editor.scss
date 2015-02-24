@@ -26,3 +26,5 @@ body, td, pre {
 .mceItemTable, .mceItemTable td, .mceItemTable th, .mceItemTable caption, .mceItemVisualAid {
   border: 1px dashed #888;
 }
+
+@import "our_custom_tiny_mce_stuff/_tinymce.editor_box.scss";

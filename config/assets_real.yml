@@ -145,10 +145,7 @@ stylesheets:
   notification_preferences:
     - public/stylesheets/compiled/pages/notification_preferences.css
   tinymce:
-    #leaving this area alone for now, tinymce is its own beast
-    - public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css
-    - public/stylesheets/compiled/vendor/tiny_like_ck_with_external_tools.css
-    - public/javascripts/tinymce/jscripts/tiny_mce/plugins/inlinepopups/skins/clearlooks2/window.css
+    - public/stylesheets/compiled/bundles/tinymce.css
   messages:
     - public/stylesheets/compiled/pages/messages.css
   user_notes:
