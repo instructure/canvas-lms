@@ -111,6 +111,8 @@ define [
 
     render: withReactDOM ->
 
+      selectCheckboxLabel = I18n.t('Select %{itemName}', itemName: @props.model.displayName())
+
       keyboardCheckboxClass = classSet({
         'screenreader-only': @state.hideKeyboardCheck
         'multiselectable-toggler': true
@@ -124,6 +126,7 @@ define [
         label className: keyboardCheckboxClass, role: 'gridcell',
           input {
             type: 'checkbox'
+            'aria-label': selectCheckboxLabel
             onFocus: => @setState({hideKeyboardCheck: false})
             onBlur: => @setState({hideKeyboardCheck: true})
             className: keyboardCheckboxClass
@@ -131,7 +134,7 @@ define [
             onChange: -> #noop, will be caught by 'click' on root node
           }
           span {className: keyboardLabelClass},
-            I18n.t('labels.select', 'Select This Item')
+            selectCheckboxLabel
 
         div className:'ef-name-col ellipsis', role: 'rowheader',
           if @state.editing
