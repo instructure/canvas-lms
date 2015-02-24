@@ -591,14 +591,6 @@ body.with-right-side.with-left-side {
   @include clearfix;
 }
 
-.headerBar-left {
-  float: left;
-}
-
-.headerBar-right {
-  float: right;
-}
-
 #filterResults {
   .entry {
     margin-top: 0;

@@ -4,7 +4,24 @@
 
 {{#ifAll atLeastOnePageFetched length}}
   <div class="headerBar clearfix">
-    <div class="headerBar-right form-inline">
+    <div class="pull-left form-inline index_view_filter_form">
+      <input id="searchTerm"
+             placeholder="{{t "Search title, body, or author"}}"
+             aria-label="{{t "Search title, body, or author"}}"
+             value="{{searchTerm}}"
+             type="search">
+      <span id="discussionsFilter">
+        <input type="checkbox"
+               id="onlyUnread"
+               aria-label="{{t "filter discussions by unread"}}"
+               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+        <input type="checkbox"
+               id="onlyGraded"
+               aria-label="{{t "filter discussions by assignments"}}"
+               {{#if onlyGraded}}checked{{/if}}/><label aria-hidden="true" for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
+      </span>
+    </div>
+    <div class="pull-right form-inline">
       {{#if options.atom_feed_url}}
         <a class="btn"
            href="{{options.atom_feed_url}}"
@@ -39,23 +56,6 @@
         <i class="icon-settings"></i>
         <span class="screenreader-only">{{#t "edit_settings"}}Edit Discussions Settings{{/t}}</span>
       </button>
-    </div>
-    <div class="headerBar-left form-inline index_view_filter_form">
-      <input id="searchTerm"
-             placeholder="{{t "Search title, body, or author"}}"
-             aria-label="{{t "Search title, body, or author"}}"
-             value="{{searchTerm}}"
-             type="search">
-      <span id="discussionsFilter">
-        <input type="checkbox"
-               id="onlyUnread"
-               aria-label="{{t "filter discussions by unread"}}"
-               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
-        <input type="checkbox"
-               id="onlyGraded"
-               aria-label="{{t "filter discussions by assignments"}}"
-               {{#if onlyGraded}}checked{{/if}}/><label aria-hidden="true" for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
-      </span>
     </div>
   </div>
 
