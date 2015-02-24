@@ -8,6 +8,7 @@ define [
     constructor: (opts) ->
       @rootFoldersToShow = opts.rootFoldersToShow
       @contentTypes = opts.contentTypes
+      @useVerifiers = opts.useVerifiers
 
     find: ->
       return @rootFoldersToShow if @rootFoldersToShow
@@ -22,7 +23,7 @@ define [
           contextFiles.url = "/api/v1/#{contextTypeAndId[0]}/#{contextTypeAndId[1]}/folders/root"
           contextFiles.fetch()
 
-        myFiles = new Folder({contentTypes: @contentTypes})
+        myFiles = new Folder({contentTypes: @contentTypes, useVerifiers: @useVerifiers})
         myFiles.set 'custom_name', I18n.t('my_files', 'My files')
         myFiles.url = '/api/v1/users/self/folders/root'
         myFiles.fetch()

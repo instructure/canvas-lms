@@ -33,6 +33,7 @@ define [
 
     fetch: (options = {}) ->
       options.data = _.extend content_types: @parentFolder?.contentTypes, options.data || {}
+      options.data.use_verifiers = 1 if @parentFolder?.useVerifiers
       res = super options
 
     parse: (response) ->

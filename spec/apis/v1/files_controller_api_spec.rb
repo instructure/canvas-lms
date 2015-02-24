@@ -211,6 +211,14 @@ describe "Files API", type: :request do
       json.map{|f|f['url']}.each { |url| expect(url).not_to include 'verifier=' }
     end
 
+    it "should not omit verifiers using session auth if params[:use_verifiers] is given" do
+      user_session(@user)
+      get @files_path + "?use_verifiers=1"
+      expect(response).to be_success
+      json = json_parse
+      json.map{|f|f['url']}.each { |url| expect(url).to include 'verifier=' }
+    end
+
     it "should list files in saved order if flag set" do
       json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(:sort_by => 'position'), {})
       res = json.map{|f|f['display_name']}
@@ -547,7 +555,15 @@ describe "Files API", type: :request do
       json = json_parse
       expect(json['url']).to eq file_download_url(@att, :download => '1', :download_frd => '1')
     end
-    
+
+    it "should not omit verifiers when using session auth and params[:use_verifiers] is given" do
+      user_session(@user)
+      get @file_path + "?use_verifiers=1"
+      expect(response).to be_success
+      json = json_parse
+      expect(json['url']).to eq file_download_url(@att, :download => '1', :download_frd => '1', :verifier => @att.uuid)
+    end
+
     it "should return lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
       att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
