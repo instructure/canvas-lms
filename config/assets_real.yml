@@ -17,155 +17,151 @@ compress_assets: off
 
 stylesheets:
   course_wizard:
-    - public/stylesheets/compiled/pages/course_wizard/compiler-course_wizard.css
+    - public/stylesheets/compiled/bundles/course_wizard.css
   react_files:
-    - public/stylesheets/compiled/pages/react_files/compiler-react_files.css
+    - public/stylesheets/compiled/bundles/react_files.css
   instructure_eportfolio:
-    - public/stylesheets/compiled/pages/instructure_eportfolio.css
+    - public/stylesheets/compiled/bundles/instructure_eportfolio.css
   course_show:
-    - public/stylesheets/compiled/pages/course_show.css
+    - public/stylesheets/compiled/bundles/course_show.css
   course_list:
-    - public/stylesheets/compiled/pages/course_list.css
+    - public/stylesheets/compiled/bundles/course_list.css
   content_migrations:
-    - public/stylesheets/compiled/pages/content_migrations.css
+    - public/stylesheets/compiled/bundles/content_migrations.css
   vendor:
-    - public/stylesheets/compiled/pages/g_vendor.css
+    - public/stylesheets/compiled/bundles/vendor.css
   common:
-    - public/stylesheets/compiled/base/c-common.css
+    - public/stylesheets/compiled/bundles/common.css
   context_modules:
-    - public/stylesheets/compiled/pages/context_modules.css
+    - public/stylesheets/compiled/bundles/context_modules.css
   context_modules2:
-    - public/stylesheets/compiled/pages/context_modules2.css
+    - public/stylesheets/compiled/bundles/context_modules2.css
   modules_next:
-    - public/stylesheets/compiled/pages/modules_next.css
+    - public/stylesheets/compiled/bundles/modules_next.css
   context_module_progressions:
-    - public/stylesheets/compiled/pages/context_module_progressions.css
+    - public/stylesheets/compiled/bundles/context_module_progressions.css
   dashboard:
-    - public/stylesheets/compiled/pages/dashboard/dashboard.css
+    - public/stylesheets/compiled/bundles/dashboard.css
   registration:
-    - public/stylesheets/compiled/pages/registration.css
+    - public/stylesheets/compiled/bundles/registration.css
   profile_show:
-    - public/stylesheets/compiled/pages/profile/show.css
+    - public/stylesheets/compiled/bundles/profile_show.css
   profile_edit:
-    - public/stylesheets/compiled/pages/profile/edit.css
+    - public/stylesheets/compiled/bundles/profile_edit.css
   facebook:
-    - public/stylesheets/compiled/pages/facebook.css
+    - public/stylesheets/compiled/bundles/facebook.css
   speed_grader:
-    - public/stylesheets/compiled/pages/speed_grader.css
+    - public/stylesheets/compiled/bundles/speed_grader.css
   conferences:
-    - public/stylesheets/compiled/pages/conferences.css
+    - public/stylesheets/compiled/bundles/conferences.css
   gradebook_uploads:
-    - public/stylesheets/compiled/pages/gradebook_uploads.css
+    - public/stylesheets/compiled/bundles/gradebook_uploads.css
   calendar2:
-    - public/stylesheets/compiled/pages/calendar/calendar2.css
+    - public/stylesheets/compiled/bundles/calendar2.css
   agenda_view:
-    - public/stylesheets/compiled/pages/agenda/agenda_view.css
+    - public/stylesheets/compiled/bundles/agenda_view.css
   course_settings:
-    - public/stylesheets/compiled/pages/course_settings/compiler-course_settings.css
+    - public/stylesheets/compiled/bundles/course_settings.css
   discussions:
-    - public/stylesheets/compiled/pages/discussions.css
+    - public/stylesheets/compiled/bundles/discussions.css
   discussions_list:
-    - public/stylesheets/compiled/pages/discussions_list.css
+    - public/stylesheets/compiled/bundles/discussions_list.css
   full_files:
-    - public/stylesheets/compiled/pages/full_files.css
+    - public/stylesheets/compiled/bundles/full_files.css
   datagrid:
-    - public/stylesheets/compiled/pages/datagrid.css
+    - public/stylesheets/compiled/bundles/datagrid.css
   gradebook_history:
-    - public/stylesheets/compiled/pages/gradebook_history.css
+    - public/stylesheets/compiled/bundles/gradebook_history.css
   gradebook2:
-    - public/stylesheets/compiled/pages/gradebook2/compiler-gradebook2.css
+    - public/stylesheets/compiled/bundles/gradebook2.css
   screenreader_gradebook:
-    - public/stylesheets/compiled/pages/screenreader_gradebook/compiler-screenreader_gradebook.css
+    - public/stylesheets/compiled/bundles/screenreader_gradebook.css
   attendance:
-    - public/stylesheets/compiled/pages/attendance.css
+    - public/stylesheets/compiled/bundles/attendance.css
   quizzes:
-    - public/stylesheets/compiled/pages/quizzes/compiler-quizzes.css
+    - public/stylesheets/compiled/bundles/quizzes.css
   quizzes_ember:
-    - public/stylesheets/compiled/pages/ember_quizzes/quizzes_ember.css
+    - public/stylesheets/compiled/bundles/quizzes_ember.css
   moderate_quiz:
-    - public/stylesheets/compiled/pages/moderate_quiz.css
+    - public/stylesheets/compiled/bundles/moderate_quiz.css
   assignments:
-    - public/stylesheets/compiled/pages/assignments/compiler-assignments.css
+    - public/stylesheets/compiled/bundles/assignments.css
   assignments_edit:
-    - public/stylesheets/compiled/pages/assignments/assignments_edit.css
+    - public/stylesheets/compiled/bundles/assignments_edit.css
   new_assignments:
-    - public/stylesheets/compiled/pages/assignments/new_assignments.css
+    - public/stylesheets/compiled/bundles/new_assignments.css
   grading_standards:
-    - public/stylesheets/compiled/pages/compiler-grading_standards.css
+    - public/stylesheets/compiled/bundles/grading_standards.css
   grading_periods:
-    - public/stylesheets/compiled/pages/grading_periods.css
+    - public/stylesheets/compiled/bundles/grading_periods.css
   login:
-    - public/stylesheets/compiled/pages/compiler-login.css
+    - public/stylesheets/compiled/bundles/login.css
   otp_login:
-    - public/stylesheets/compiled/pages/otp_login.css
+    - public/stylesheets/compiled/bundles/otp_login.css
   roster:
-    - public/stylesheets/compiled/pages/roster.css
+    - public/stylesheets/compiled/bundles/roster.css
   roster_user:
-    - public/stylesheets/compiled/pages/roster_user.css
+    - public/stylesheets/compiled/bundles/roster_user.css
   learning_outcomes:
-    - public/stylesheets/compiled/pages/learning_outcomes.css
+    - public/stylesheets/compiled/bundles/learning_outcomes.css
   grade_summary:
-    - public/stylesheets/compiled/pages/grade_summary.css
+    - public/stylesheets/compiled/bundles/grade_summary.css
   context_list:
-    - public/stylesheets/compiled/pages/context_list.css
+    - public/stylesheets/compiled/bundles/context_list.css
   page_views:
-    - public/stylesheets/compiled/pages/page_views.css
+    - public/stylesheets/compiled/bundles/page_views.css
   prior_users:
-    - public/stylesheets/compiled/pages/prior_users.css
+    - public/stylesheets/compiled/bundles/prior_users.css
   reports:
-    - public/stylesheets/compiled/pages/reports.css
+    - public/stylesheets/compiled/bundles/reports.css
   statistics:
-    - public/stylesheets/compiled/pages/statistics.css
+    - public/stylesheets/compiled/bundles/statistics.css
   slickgrid:
-    - public/javascripts/vendor/slickgrid/slick.grid.css
+    - public/stylesheets/compiled/bundles/slickgrid.css
   sub_accounts:
-    - public/stylesheets/compiled/pages/sub_accounts.css
+    - public/stylesheets/compiled/bundles/sub_accounts.css
   user_grades:
-    - public/stylesheets/compiled/pages/user_grades.css
+    - public/stylesheets/compiled/bundles/user_grades.css
   user_logins:
-    - public/stylesheets/compiled/pages/user_logins.css
+    - public/stylesheets/compiled/bundles/user_logins.css
   account_settings:
-    - public/stylesheets/compiled/pages/account_settings/compiler-account_settings.css
+    - public/stylesheets/compiled/bundles/account_settings.css
   account_admin_tools:
-    - public/stylesheets/compiled/pages/account_admin_tools.css
+    - public/stylesheets/compiled/bundles/account_admin_tools.css
   select_content_dialog:
-    - public/stylesheets/compiled/pages/select_content_dialog.css
+    - public/stylesheets/compiled/bundles/select_content_dialog.css
   conversations_new:
-    # TODO: we need to look at what's being used here and if we can get purge this file and use
-    # the styles in /bootstrap/
-    - public/javascripts/vendor/bootstrap-select/bootstrap-select.css
-    # end
-    - public/stylesheets/compiled/pages/conversations/compiler-conversations.css
+    - public/stylesheets/compiled/bundles/conversations_new.css
   alerts:
-    - public/stylesheets/compiled/pages/alerts.css
+    - public/stylesheets/compiled/bundles/alerts.css
   developer_keys:
-    - public/stylesheets/compiled/pages/developer_keys.css
+    - public/stylesheets/compiled/bundles/developer_keys.css
   edit_calendar_event_full:
-    - public/stylesheets/compiled/pages/calendar/editCalendarEventFull.css
+    - public/stylesheets/compiled/bundles/edit_calendar_event_full.css
   notification_preferences:
-    - public/stylesheets/compiled/pages/notification_preferences.css
+    - public/stylesheets/compiled/bundles/notification_preferences.css
   tinymce:
     - public/stylesheets/compiled/bundles/tinymce.css
   messages:
-    - public/stylesheets/compiled/pages/messages.css
+    - public/stylesheets/compiled/bundles/messages.css
   user_notes:
-    - public/stylesheets/compiled/pages/user_notes.css
+    - public/stylesheets/compiled/bundles/user_notes.css
   imports:
-    - public/stylesheets/compiled/pages/imports.css
+    - public/stylesheets/compiled/bundles/imports.css
   styleguide:
-    - public/stylesheets/compiled/pages/styleguide/compiler-styleguide.css
+    - public/stylesheets/compiled/bundles/styleguide.css
   locale:
-    - public/stylesheets/compiled/pages/locale.css
+    - public/stylesheets/compiled/bundles/locale.css
   mobile_auth:
-    - public/stylesheets/compiled/pages/mobile_auth.css
+    - public/stylesheets/compiled/bundles/mobile_auth.css
   all_courses:
-    - public/stylesheets/compiled/pages/all_courses.css
+    - public/stylesheets/compiled/bundles/all_courses.css
   external_tool_full_width:
-    - public/stylesheets/compiled/pages/external_tools/full_width.css
+    - public/stylesheets/compiled/bundles/external_tool_full_width.css
   terms:
-    - public/stylesheets/compiled/pages/terms.css
+    - public/stylesheets/compiled/bundles/terms.css
   # Client Apps:
   canvas_quizzes:
-    - public/stylesheets/compiled/client_apps/canvas_quizzes.css
+    - public/stylesheets/compiled/bundles/canvas_quizzes.css
 
   <%= plugin_assets.anchors_yml %>
