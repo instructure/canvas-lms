@@ -96,7 +96,6 @@ CanvasRails::Application.routes.draw do
 
   concern :media do
     get 'media_download' => 'users#media_download'
-    get 'media_download.:type' => 'users#media_download', as: :typed_media_download
   end
 
   concern :users do
