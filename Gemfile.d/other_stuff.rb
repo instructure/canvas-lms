@@ -62,7 +62,7 @@ gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a 
 gem 'mail', '2.5.4'
   gem 'treetop', '1.4.15'
     gem 'polyglot', '0.3.5'
-gem 'instructure-marginalia', '1.1.6', :require => false
+gem 'marginalia', '1.3.0', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
