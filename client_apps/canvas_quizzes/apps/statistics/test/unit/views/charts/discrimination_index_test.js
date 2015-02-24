@@ -35,9 +35,17 @@ define(function(require) {
       expect(find('.index').className).toMatch('negative');
     });
 
-    it('shows a "-" sign when positive', function() {
+    it('shows a "+" sign when below the threshold and above 0', function() {
       setProps({
         discriminationIndex: K.DISCRIMINATION_INDEX_THRESHOLD - 0.1
+      });
+
+      expect(find('.sign').innerText).toEqual('+');
+    });
+
+    it('shows a "-" sign when below 0', function(){
+      setProps({
+        discriminationIndex: -0.1
       });
 
       expect(find('.sign').innerText).toEqual('-');
