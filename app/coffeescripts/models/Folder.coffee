@@ -15,6 +15,7 @@ define [
 
     initialize: (options) ->
       @contentTypes ||= options?.contentTypes
+      @useVerifiers ||= options?.useVerifiers
       @setUpFilesAndFoldersIfNeeded()
       @on 'change:sort change:order', @setQueryStringParams
       super
@@ -28,6 +29,7 @@ define [
     parse: (response) ->
       json = super
       @contentTypes ||= response.contentTypes
+      @useVerifiers ||= response.useVerifiers
       @setUpFilesAndFoldersIfNeeded()
 
       @folders.url = response.folders_url
@@ -152,6 +154,7 @@ define [
       if response
         _.each response, (folder) =>
           folder.contentTypes = @parentFolder.contentTypes
+          folder.useVerifiers = @parentFolder.useVerifiers
       super
 
 
