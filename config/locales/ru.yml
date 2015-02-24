@@ -271,7 +271,6 @@ ru:
       logout_request_to_idp: "Запрос выхода отправлен IdP"
       logout_response_from_idp: "Ответ выхода от IdP"
       saml_required: "SAML конфигурация необходима для тестрирования "
-  account_level_8c2c1cdc: "(уровень учетной записи)"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Время окончания уведомления учетной записи предшествует времени начала"
@@ -1249,6 +1248,7 @@ ru:
           few: "%{count} ошибки запрещают данную %{model} от сохранения"
           one: "1 ошибка запрещает данную %{model} от сохранения"
           other: "%{count} ошибки запрещают данную %{model} от сохранения"
+  activity_13915493: Активность
   add_app_baf540f: "Добавить приложение"
   add_attachment_93868828: "Добавить вложение"
   add_course_assignments_628ed6d0: "Добавить задания курса"
@@ -1346,6 +1346,7 @@ ru:
     student_in_course: 
       analytics: Аналитика
       page_title: "Аналитика: %{course} -- %{student}"
+  analytics_c94ba601: Аналитика
   and_count_more_43eae021: "и более %{count}…"
   ange_name: "Конвертер Angel"
   angel: 
@@ -1385,6 +1386,7 @@ ru:
       rss_feed: "Канал RSS"
       suggestions: "Предложения:"
       there_are_no_announcements_show: "Нет объявлений для отображения"
+      title_add_announcement: "Добавить объявление"
       try_different_more_general_or_fewer_keywords: "Попробуйте другие, более общие, или меньше ключевых слов."
       try_disabling_the_unread_filters: "Попробуйте отключить фильтр \"Непрочитанные\"."
       unread: Непрочитанное
@@ -1435,7 +1437,6 @@ ru:
       please_log_in: "В целях безопасности, пожалуйста, введите ваш пароль для продолжения"
       titles: 
         suspended: "Организация временно отключена"
-      unsupported_browser: "Ваш браузер не соответствует минимальным требованиям Canvas. Посетите *руководство пользователя Canvas* для получения полного списка поддерживаемых браузеров."
     wiki_front_page_default_content_course: "Добро пожаловать в wiki нового курса!"
     wiki_front_page_default_content_group: "Добро пожаловать в wiki новой группы!"
   appointment_group: 
@@ -1458,10 +1459,9 @@ ru:
     few: "Вы уверены, что хотите удалить эти %{count} элемента?"
     one: "Вы уверены, что хотите удалить %{name}?"
     other: "Вы уверены, что хотите удалить эти %{count} элементов?"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Удалить объявление?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Вы уверены, что хотите удалить эту схему оценок?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Вы уверены, что хотите удалить этот инструмент?"
-  aria_labels: 
-    unlock_at_date: "Разблокировать в дату"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Когда вы начнете набирать текст в этом поле, список групп будет автоматически фильтроваться, оставляя только те названия, которые соответствуют вашему вводу."
   assessment_question: 
     default_question_name: Вопрос
@@ -2295,7 +2295,6 @@ ru:
   c_2001_acme_inc_283f7f80: "(c) 2001 г. Acme Inc."
   c_modal_form: 
     close: закрыть
-  calculation_int_is_not_a_valid_calculation_int_for_561f72fa: "'%{calculation_int}' не является допустимым calculation_int для calculation_method типа '%{calculation_method}'. Допустимый диапазон – '%{valid_calculation_ints}'"
   calculator: 
     buttons: 
       save: Сохранить
@@ -2921,6 +2920,7 @@ ru:
   common_cartridge_display: "Общий картридж"
   common_cartridge_file_description: "Пакет Common Cartridge 1.x"
   common_cartridge_name: "Импортер Common Cartridge"
+  communication_5255723c: Связь
   communication_channel: 
     body: "Ваш код подтверждения в Canvas: %{verification_code}"
     default_facebook_account: "Учетная запись Facebook"
@@ -3492,12 +3492,6 @@ ru:
       headings: 
         add_prerequisite: "Добавить предварительное условие к %{name}"
         course_modules: "Модули курса"
-        student_progress: "Ход выполнения модуля студентом"
-        student_progress_for_module: "Ход выполнения студентом %{module}"
-        students_completed: "Студенты, завершившие модуль"
-        students_in_progress: "Студенты, работающие с модулем"
-        students_locked: "Студенты, которые еще не разблокировали модуль"
-        students_unlocked: "Студенты, которые разблокировали (но не начали) модуль"
       help: 
         create: |-
             Модули курса позволяют систематизировать задания, страницы, файлы и т. д. в меньшие разделы или единицы. Модули могут быть посвящены теме, определенному разделу или просто сгруппированы хронологически.
@@ -3555,16 +3549,12 @@ ru:
         new_tab: "Загрузить в новой вкладке"
         publish_final_grade: "Опубликовать итоговую оценку студента после завершения данного модуля"
         require_sequential_progress: "Студенты должны выполнять требования в данном модуле последовательно."
-        sort_by: "Упорядочить по"
         title: Заголовок
         unlock_at: Разблокировать
         url: URL-адрес
       links: 
         add_prerequisite: "Добавить предварительное условие"
         add_requirement: "Добавить требование"
-        reload_student: "Перезагрузить ход выполнения студентом"
-        sort_by_name: Имя
-        sort_by_progress: "Ход выполнения"
         student_progress: "Просмотреть ход выполнения"
         title: 
           remove_prerequisite: "Удалить это предварительное условие"
@@ -3596,12 +3586,6 @@ ru:
         instructions: "Выбрать модуль"
         name: "модуль, %{module}"
       select_prerequisite: "Выберите тип предварительного условия. Модуль не виден студентам до выполнения всех предварительных условий."
-      student_name: "Имя студента"
-      table_headings: 
-        module: Модуль
-        state: Состояние
-      titles: 
-        student_progression: "Ход выполнения модуля студентом"
     context_module: 
       unpublish: "Отметить публикацию"
     context_module_next: 
@@ -4673,6 +4657,7 @@ ru:
       rss_feed: "Поток %{course}"
     unauthorized: 
       invalid_link: "Используемая ссылка регистрации больше недействительна.  Обратитесь к инструктору курса и убедитесь в правильности регистрации."
+  courses_43204aae: Курсы
   create_item_base: 
     there_was_an_error: "Произошла ошибка при сохранении \"%{title}\". Пожалуйста, повторите попытку."
   create_module_item: 
@@ -4775,6 +4760,7 @@ ru:
       student: 
         count: "Количество неверно ответивших студентов"
         ratio: "Коэффициент неверно ответивших студентов"
+  current_score_6c81792: "Текущая оценка"
   curve_grades_dialog: 
     average_score: "Средний балл"
     buttons: 
@@ -5128,7 +5114,6 @@ ru:
       manage: Управлять
       move: "Переместить в…"
       no_due_date: "Нет даты выполнения"
-      open_to_comments: "Открыть для комментариев"
       pin: Привязать
       unpin: "Отменить привязку"
       user_subscribed: "Вы подписаны на данную тему. Щелкните, чтобы отменить подписку."
@@ -5287,8 +5272,12 @@ ru:
       post_message: "Опубликовать сообщение"
     summary_view: 
       attached_file_name: "Прикрепленные файлы: %{display_name}"
+      close_for_comments: "Закрыть для комментариев"
+      delete: Удалить
       drag_up_or_down_to_reorder: "Перетащите вверх или вниз, чтобы изменить порядок следования"
       locked: "Эта тема закрыта для комментариев"
+      manage: Управлять
+      open_to_comments: "Открыть для комментариев"
       this_topic_is_used_for_grading: "Эта тема используется для выставления оценок"
       topic_podcast_feed: "Канал подкастов темы"
     this_is_a_group_discussion: "Это групповое обсуждение"
@@ -5300,6 +5289,7 @@ ru:
     user_settings_view: 
       manually_mark_as_read: "Отметить сообщения как прочитанные вручную"
       my_settings: "Мои настройки"
+  discussion_topics_b35ac745: "Темы обсуждений"
   discussions: 
     are_your_sure_delete: "Действительно хотите удалить эту запись?"
     cant_subscribe_not_in_group: "Чтобы подписаться, вы должны быть в данной группе"
@@ -5825,6 +5815,7 @@ ru:
     unsaved_changes: "Вы сохранили не все изменения."
     wrong_file_extension: "Выбранный вами файл с расширением \"%{extension}\" не разрешен для отправки."
   everyone_854554dd: Все
+  example_84698b7d: Пример
   example_https_example_com_config_xml_be5f36ac: "Пример: https://example.com/config.xml"
   expand_or_collapse_calendars_9854b0d0: "Развернуть или свернуть календари"
   expand_or_collapse_undated_items_b901de09: "Развернуть или свернуть элементы без даты"
@@ -6073,6 +6064,7 @@ ru:
     file_preview_infotable_name: Имя
     file_preview_infotable_size: "	Размер"
     file_preview_infotable_status: Состояние
+  file_preview_eedb43f2: "Предварительный просмотр файла"
   file_previews: 
     lock_explanation: 
       messages: 
@@ -6769,7 +6761,7 @@ ru:
       new_assessment_option: "[Новая проверка знаний]"
       no_annotation: "Аннотации не доступны в данном документе"
       not_newest_notice: "Примечание: Это не самая последняя отправка"
-      page_header_title: "	Speedgrader"
+      page_header_title: SpeedGrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
         status: "по состоянию отправки (требуется оценка, не отправлено и т.д.)"
@@ -6780,13 +6772,11 @@ ru:
         download_file: "Загрузить этот файл"
         not_newest: "используйте раскрывающийся список выше для изменения отправки для поиска"
         preview_file: "Просмотреть этот файл"
-        speedgrader_options: "Опции Speedgrader"
       tooltips: 
         file_attachment: "Файловые вложения"
         media_comment: "Мультимедийный комментарий"
         speech_recognition: "Распознавание речи"
     speed_grader_disabled: "SpeedGrader отключен для этого курса"
-    speedgrader_enabled_only_for_published_content: "Speedgrader разрешен только для опубликованного содержимого."
     student_attendance: 
       headers: 
         assignment: Задание
@@ -6827,6 +6817,7 @@ ru:
       total: Всего
   graded_quiz_7fabdf1f: "Оцененная контрольная работа"
   graded_survey_c0f0c395: "Оцененный опрос"
+  grades_a61eba0a: Оценки
   grading_box: 
     out_of_points_possible: "из %{assignment.points_possible}"
   grading_cell: 
@@ -7550,6 +7541,7 @@ ru:
   last_user_access_title: "Последний доступ пользователя"
   late_percent_b91d01b3: "Опоздавшие: %{percent}"
   latest_f604a75: Последняя
+  latest_score_905aa87b: "Последняя оценка"
   launch_url_e150bd41: "URL-адрес запуска"
   layouts: 
     application: 
@@ -7710,6 +7702,7 @@ ru:
   lock_date_cannot_be_after_term_end_cf1a188f: "Дата блокировки не может быть позднее окончания семестра"
   lock_date_cannot_be_before_due_date_ac30f54: "Дата блокировки не может быть раньше даты выполнения"
   logged_out_user: "Вышедший из системы пользователь %{user_counter}"
+  logo_a040ae0e: Логотип
   low_score_4eeb95b2: "Низкая: %{score}"
   lower_limit_of_range_6ddd4983: "Нижняя граница диапазона"
   lti: 
@@ -7783,6 +7776,7 @@ ru:
     track_uploaded_successfully: "	Звуковая запись успешно загружена; пожалуйста, обновите свой браузер. "
     upload: Загрузить
     uploading: Загрузка...
+  media_recordings_749aef6d: "Записи мультимедийных данных"
   median_score_4657e907: "Медиана: %{score}"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} участника (-ов) превысили максимальное значение %{max_membership}"
   members_af25c21d: Участники
@@ -7803,6 +7797,7 @@ ru:
     send_message: "Отправить сообщение"
   message_students_dialog: 
     recipients: "Получатели:"
+  message_this_student_6d14043d: "Отправить сообщение этому студенту"
   messages: 
     account_suspended: 
       email: 
@@ -9125,15 +9120,6 @@ ru:
     messages: 
       failure: "Произошла ошибка при отправке вашего электронного сообщения. Перезагрузите страницу и попробуйте еще раз."
       success: "Идет доставка вашего электронного сообщения."
-    migration_export_ready: 
-      email: 
-        body: "Ваш контент готов к импорту в ваш курс. "
-        html: 
-          body: "Ваше содержание готово к импорту в ваш курс. "
-          link_message2: "Щелкните *эту ссылку*, чтобы выбрать для импорта необходимые элементы вашего содержимого"
-          subject: "Ваше содержание для курса %{course_name} готово к импорту "
-        link_message: "Нажмите на данную ссылку, чтобы выбрать какие элементы вашего контента необходимо импортировать:"
-        subject: "Извлечение курса готово: %{course_name}"
     new_account_user: 
       email: 
         body: "Новая учетная запись администратора для %{account}"
@@ -9158,7 +9144,6 @@ ru:
       email: 
         html: 
           attached_file: "Прикрепленный файл"
-          download: скачать
           link: "Просмотреть объявления"
         labels: 
           file_included: "Файл включен"
@@ -9833,6 +9818,7 @@ ru:
       few: "Вы готовы разместить %{count} задания."
       one: "Вы готовы разместить 1 задание."
       other: "Вы готовы разместить %{count} заданий."
+    continue: Продолжить
     create: 
       assignment: 
         cancel: Отменить
@@ -9952,7 +9938,6 @@ ru:
   name_3806192d: "Имя:"
   name_error_fee4236: "Ошибка имени"
   name_only_5f56718e: "Только имя"
-  new_2b97b0d9: новый
   new_account_role_6e5c4964: "Новая роль учетной записи"
   new_course_role_6a7bb75f: "Новая роль курса"
   new_facebook_message: "У вас есть новое сообщение от Canvas"
@@ -10125,7 +10110,6 @@ ru:
       group_membership_accepted: "Членство в группе принято"
       group_membership_rejected: "Членство в группе отклонено"
       merge_email_communication_channel: "Объединить канал электронных сообщений"
-      migration_export_ready: "Экспорт переноса готов"
       migration_import_failed: "Сбой импорта переноса"
       migration_import_finished: "Импорт переноса завершен"
       new_account_user: "Новый пользователь учетной записи"
@@ -10360,8 +10344,6 @@ ru:
         total: "%{points_possible} баллов"
       total_points: "Общее число баллов"
       use_for_scoring: "Используйте данный критерий для оценки"
-    outcome_alignment: 
-      delete_title: "Невозможно удалить соответствие на основе связей рубрики. Для удаления таких соответствий необходимо удалить строку из рубрики актива"
     outcome_criterion: "Критерии результата обучения"
     outcome_form: 
       criterion: "Рейтинги критерия"
@@ -11064,15 +11046,6 @@ ru:
         register_skype: "Регистрация Skype"
         remove_account_from_profile: "Удалить учетную запись из этого профиля"
         unregister_service: "Отменить регистрацию сервиса"
-      twitter_description: |-
-          Twitter — это сервис для публикации и подписки на короткие сообщения.
-          Если у вас есть учетная запись Twitter, вы можете зарегистрировать ее здесь. Далее, если вы разрешите
-          членам группы/курса просматривать зарегистрированные сервисы, они могут 
-          просто подключаться к вашей учетной записи Twitter.
-          
-          Вы также можете подписаться на отправку уведомлений на вашу учетную запись в Twitter.
-          Эти уведомления будут отправляться как сообщения вам от
-          вас напрямую и не будут отображаться в вашем публичном потоке.
       unknown_service: Неизвестно
       web_services: "Canvas может упростить вашу работу, связав вашу учетную запись с веб-инструментами, которые вы уже используете. Щелкните любой сервис в разделе \"Другие сервисы\", чтобы увидеть, что мы имеем в виду."
       yo_description: |-
@@ -11738,6 +11711,7 @@ ru:
       comments_on_answer: "Комментарии, если пользователь выбирает этот ответ"
       comments_on_question: "Комментарии для этого вопроса"
       comments_on_wrong_match: "Комментарии, если этот ответ пользователя неверный"
+      correct_answer: "Правильный ответ"
       message_text: "Текст сообщения"
       other_incorrect_matches: "Другие варианты неправильных ответов"
       possible_answer: "Возможный ответ"
@@ -12447,7 +12421,6 @@ ru:
           lock_survey: "Заблокировать этот опрос сейчас"
           unlock_quiz: "Позволить студентам начать эту контрольную работу сейчас"
           unlock_survey: "Позволить студентам начать этот опрос сейчас"
-        course_concluded_notice: "Эта контрольная работа больше недоступна, поскольку курс уже завершен."
         labels: 
           available_until: До
           no_time_limit: "Нет ограничения времени"
@@ -13265,7 +13238,9 @@ ru:
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "Вы уже зарегистрированы на **%{course}**."
-      switch_users: "В настоящий момент вы вошли в систему как *%{user}*. **Войти в систему как другой пользователь**."
+      buttons: 
+        go_to_course: "Перейти к курсу"
+        go_to_dashboard: "Перейти к информационной панели"
     authenticate: 
       buttons: 
         enroll_in_course: "Зарегистрироваться на курсе"
@@ -13292,7 +13267,6 @@ ru:
         enroll_in_course: "Зарегистрироваться на курсе"
         next: Далее
       getting_started: "Вы регистрируетесь на **%{course}**"
-      switch_users: "В настоящий момент вы вошли в систему как *%{user}*. **Войти в систему как другой пользователь**."
     course_full: 
       class_full: "Регистрация на курс **%{course}** завершена. Приносим извинения за неудобства."
     enrollment_closed: 
@@ -14114,6 +14088,8 @@ ru:
       back: Назад
       close: Закрыть
       forward: Переслать
+  smartbanner: 
+    android_banner_view_button: ОБЗОР
   source_code_2395ca74: "Код источника"
   speed_grader: 
     submissions_dropdown: 
@@ -14172,6 +14148,7 @@ ru:
   step: Шаг
   stream_items_api: 
     assessment_request_title: "Рассмотрение коллегами для %{title}"
+  student_5da6bfd1: Студент
   student_assignment_outcome_map_title: "Полномочия студента"
   student_groups_desc: |-
       Это разрешает новую страницу группы студента для учетной записи. Новая страница была создана для того, чтобы обеспечить более динамичное взаимодействие при
@@ -14186,6 +14163,7 @@ ru:
   student_summary: 
     student_summary_table_ascending: "Таблица сводных данных студентов, сортированная по возрастанию по %{sortText}"
     student_summary_table_descending: "	Таблица сводных данных студентов, сортированная по убыванию по %{sortText}"
+  students_1b8cd07b: Студенты
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Студенты, взявшие контрольную работу (%{count})"
     other: "Студенты, взявшие контрольную работу (%{count})"
@@ -14408,6 +14386,7 @@ ru:
   take_the_quiz_again_8ea51a6c: "Снова принять контрольную работу"
   take_the_survey_ada59508: "Принять опрос"
   take_the_survey_again_24ce22c2: "Снова принять опрос"
+  teachers_52e2423f: Учителя
   terms: 
     index: 
       date: 
@@ -14491,7 +14470,6 @@ ru:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Эта папка в данный момент заблокирована и недоступна для просмотра."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Это список надежных URL-адресов, перечисленных через запятую. Если URL-адрес находится в списке надежных, при входе с него в систему Canvas будет пропускаться использование маркера CSRF."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Скорее всего, это произошло потому, что вы импортировали содержимое курса без связанных с ним файлов."
-  this_outcome_has_been_used_to_assess_a_student_cal_16409bda: "Этот результат был использован для проверки знаний студента. Метод вычислений зафиксирован на %{old_value}"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Данная контрольная работа не опубликована* Только учителя могут просматривать эту контрольную работу до публикации."
   this_student_wrote_f1a3f22d: "Этот студент написал:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Это позволит вам входить в систему Canvas, чтобы размещать оценки в SIS"
@@ -14756,8 +14734,6 @@ ru:
   usage_right_ff96f3e2: "Право на использование:"
   usage_rights_f0960ad6: "Права на использование"
   usage_rights_have_been_set_d1b433c7: "Права на использование были установлены."
-  usage_rights_modal: 
-    saving: Сохранение...
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Права на использование будут установлены для всех файлов, находящихся в:"
   used_by_permission_314a78dd: "Используется с разрешения"
   user: 
@@ -15361,6 +15337,7 @@ ru:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Вы можете назначить несколько ассистентов, чтобы они помогали вам с курсом. Ассистенты могут оценивать отправки студентов, помогать модерировать обсуждения и даже обновлять даты выполнения и сведения о задании."
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Вы должны задать число равное или превышающее %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Вы должны указать право на использование"
+  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Ваш браузер не соответствует минимальным требованиям Canvas. Посетите *руководство пользователя Canvas* для получения полного списка поддерживаемых браузеров."
   your_content_has_been_exported_bbb57764: "Ваше содержимое было экспортировано."
   your_message_has_been_sent_thank_you_e0284316: "Ваше сообщение было отправлено. Спасибо!"
   your_search_encountered_the_following_errors_fc3e5e7f: 
