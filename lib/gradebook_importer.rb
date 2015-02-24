@@ -203,12 +203,10 @@ class GradebookImporter
 
   def process_submissions(row, student)
     l = []
-    student_visibile_assignments = @visible_assignments[student.id] if @visible_assignments
-
     @assignments.each_with_index do |assignment, idx|
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       grade = row[idx + @student_columns]
-      grade = '' if @visible_assignments && !student_visibile_assignments.try(:include?, assignment_id)
+      grade = '' if !assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
       new_submission = {
         'grade' => grade,
         'assignment_id' => assignment_id
@@ -216,6 +214,14 @@ class GradebookImporter
       l << new_submission
     end
     student.gradebook_importer_submissions = l
+  end
+
+  def assignment_visible_to_student(student, assignment, assignment_id, visible_assignments)
+    return true if !visible_assignments # wont be set if DA is off
+    return true if assignment.new_record? || student.new_record?
+
+    assignments_visible_to_student = visible_assignments[student.id].to_set
+    assignments_visible_to_student.try(:include?, assignment_id)
   end
 
   def as_json(options={})
