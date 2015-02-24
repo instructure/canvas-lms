@@ -269,7 +269,6 @@ zh:
       logout_request_to_idp: "已向 IdP 发送 LogoutRequest"
       logout_response_from_idp: "来自 IdP 的 LogoutResponse"
       saml_required: "如果要测试 SAML，需要先配置 SAML。"
-  account_level_8c2c1cdc: （帐户级别）
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帐户通知结束时间早于开始时间
@@ -1249,6 +1248,7 @@ zh:
         header: 
           one: "%{count} 个错误阻止保存此 %{model}"
           other: "%{count} 个错误阻止保存此 %{model}"
+  activity_13915493: 活动
   add_app_baf540f: 添加应用程序
   add_attachment_93868828: 添加附件
   add_course_assignments_628ed6d0: 添加课程作业
@@ -1346,6 +1346,7 @@ zh:
     student_in_course: 
       analytics: 分析
       page_title: "分析：%{course} - %{student}"
+  analytics_c94ba601: 分析
   and_count_more_43eae021: "以及另外 %{count} 项…"
   ange_name: "Angel 转换器"
   angel: 
@@ -1384,6 +1385,7 @@ zh:
       rss_feed: "RSS 信息源"
       suggestions: "建议:"
       there_are_no_announcements_show: 没有要显示的通告
+      title_add_announcement: 添加通告
       try_different_more_general_or_fewer_keywords: 尝试其它、更常用或更少的关键字。
       try_disabling_the_unread_filters: 尝试禁用“未读”筛选器。
       unread: 未读
@@ -1434,7 +1436,6 @@ zh:
       please_log_in: 为安全起见，请输入您的密码方可继续
       titles: 
         suspended: 机构已挂起
-      unsupported_browser: "您的浏览器不符合 Canvas 的最低要求。请访问 *Canvas 指南* 了解受支持浏览器的完整列表。"
     wiki_front_page_default_content_course: 欢迎使用新课程维基！
     wiki_front_page_default_content_group: 欢迎使用新小组维基！
   appointment_group: 
@@ -1456,10 +1457,9 @@ zh:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "是否确实要删除这 %{count} 项？"
     other: "是否确实要删除这 %{count} 项？"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: 是否确定要删除此通告?
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否确定要删除此评分方案?
   are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否确定要删除此工具？
-  aria_labels: 
-    unlock_at_date: 解锁日期
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
   assessment_question: 
     default_question_name: 问题
@@ -2285,7 +2285,6 @@ zh:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: 关闭
-  calculation_int_is_not_a_valid_calculation_int_for_561f72fa: "“%{calculation_int}”不是针对“%{calculation_method}”的  calculation_method 的有效 calculation_int。有效范围是“%{valid_calculation_ints}”"
   calculator: 
     buttons: 
       save: 保存
@@ -2907,6 +2906,7 @@ zh:
   common_cartridge_display: "Common Cartridge"
   common_cartridge_file_description: "Common Cartridge 1.x 包"
   common_cartridge_name: "Common Cartridge 导入器"
+  communication_5255723c: 通信
   communication_channel: 
     body: "您的 Canvas 验证码为 %{verification_code}"
     default_facebook_account: "Facebook 帐户"
@@ -3483,12 +3483,6 @@ zh:
       headings: 
         add_prerequisite: "添加先修课程到 %{name}"
         course_modules: 课程单元
-        student_progress: 学生学习单元的进度
-        student_progress_for_module: "%{module} 的学生学习进度"
-        students_completed: 已完成单元的学生
-        students_in_progress: 正在学习单元的学生
-        students_locked: 未解锁单元的学生
-        students_unlocked: 已解锁（但未启动）单元的学生
       help: 
         create: |-
             课程单元可让您将作业、页面、文件等组织为更小的班级或单元。单元可围绕主题组织，集中于具体的课题，或只是按时间顺序组织。
@@ -3546,16 +3540,12 @@ zh:
         new_tab: 在新选项卡中加载
         publish_final_grade: 完成此单元时为学生发布最终评分
         require_sequential_progress: 学生必须按顺序浏览此单元中的要求
-        sort_by: 排序方式
         title: 标题
         unlock_at: 解锁时间
         url: URL
       links: 
         add_prerequisite: 添加先修课程
         add_requirement: 添加要求
-        reload_student: 重新加载学生的进度
-        sort_by_name: 名称
-        sort_by_progress: 进度
         student_progress: 查看进度
         title: 
           remove_prerequisite: 删除此先修课程
@@ -3587,12 +3577,6 @@ zh:
         instructions: 选择单元
         name: "单元 %{module}"
       select_prerequisite: 选择先修课程的类型。学生在所有先修课程完成之前无法查看单元。
-      student_name: 学生姓名
-      table_headings: 
-        module: 单元
-        state: 状态
-      titles: 
-        student_progression: 学生学习单元的进度
     context_module: 
       unpublish: 取消发布
     context_module_next: 
@@ -4651,6 +4635,7 @@ zh:
       rss_feed: "%{course} 馈送"
     unauthorized: 
       invalid_link: 您使用的注册链接可能不再有效。请联系课程教师，确保您仍能正确注册。
+  courses_43204aae: 课程
   create_item_base: 
     there_was_an_error: "保存 \"%{title}\" 时出错，请重试。"
   create_module_item: 
@@ -4753,6 +4738,7 @@ zh:
       student: 
         count: 出错的学生人数
         ratio: 出错的学生比率
+  current_score_6c81792: 当前分数
   curve_grades_dialog: 
     average_score: 平均分数
     buttons: 
@@ -5084,7 +5070,6 @@ zh:
       manage: 管理
       move: 移动到…
       no_due_date: 无截止时间
-      open_to_comments: 开放评论
       pin: 固定
       unpin: 取消固定
       user_subscribed: 您已订阅此主题。单击可取消订阅。
@@ -5241,8 +5226,12 @@ zh:
       post_message: 发布消息
     summary_view: 
       attached_file_name: "已附加: %{display_name}"
+      close_for_comments: 关闭评论
+      delete: 删除
       drag_up_or_down_to_reorder: 向上或向下拖动以重新排序
       locked: 此主题已关闭评论
+      manage: 管理
+      open_to_comments: 开放评论
       this_topic_is_used_for_grading: 此主题用于评分
       topic_podcast_feed: 主题播客动态消息
     this_is_a_group_discussion: 这是小组讨论
@@ -5254,6 +5243,7 @@ zh:
     user_settings_view: 
       manually_mark_as_read: 将帖子手动标记为已读
       my_settings: 我的设置
+  discussion_topics_b35ac745: 讨论主题
   discussions: 
     are_your_sure_delete: 是否确定要删除此条目?
     cant_subscribe_not_in_group: 您必须在此小组中才能订阅
@@ -5774,6 +5764,7 @@ zh:
     unsaved_changes: 您有未保存的更改。
     wrong_file_extension: "您所选的扩展名为 \"%{extension}\" 的文件不允许进行提交"
   everyone_854554dd: 所有人
+  example_84698b7d: 示例
   example_https_example_com_config_xml_be5f36ac: "示例：https://example.com/config.xml"
   expand_or_collapse_calendars_9854b0d0: 展开或折叠日历
   expand_or_collapse_undated_items_b901de09: 展开或折叠未注明日期的项
@@ -6022,6 +6013,7 @@ zh:
     file_preview_infotable_name: 名称
     file_preview_infotable_size: 大小
     file_preview_infotable_status: 状态
+  file_preview_eedb43f2: 文件预览
   file_previews: 
     lock_explanation: 
       messages: 
@@ -6720,13 +6712,11 @@ zh:
         download_file: 下载此文件
         not_newest: 使用上述下拉菜单更改要查看的提交文件
         preview_file: 预览此文件
-        speedgrader_options: 快速评分器可选功能
       tooltips: 
         file_attachment: 文件附件
         media_comment: 媒体评论
         speech_recognition: 语音识别
     speed_grader_disabled: 对此课程禁用快速评分器
-    speedgrader_enabled_only_for_published_content: 仅为已发布内容启用快速评分器。
     student_attendance: 
       headers: 
         assignment: 作业
@@ -6765,6 +6755,7 @@ zh:
       total: 总计
   graded_quiz_7fabdf1f: 评分测验
   graded_survey_c0f0c395: 评分调查
+  grades_a61eba0a: 评分
   grading_box: 
     out_of_points_possible: "满分 %{assignment.points_possible} 分"
   grading_cell: 
@@ -7482,6 +7473,7 @@ zh:
   last_user_access_title: 上次用户访问
   late_percent_b91d01b3: "延迟：%{percent}"
   latest_f604a75: 最新
+  latest_score_905aa87b: 最新分数
   launch_url_e150bd41: "启动 URL"
   layouts: 
     application: 
@@ -7639,6 +7631,7 @@ zh:
   lock_date_cannot_be_after_term_end_cf1a188f: 锁定日期不能晚于学期结束日期
   lock_date_cannot_be_before_due_date_ac30f54: 锁定时间不能早于截止时间
   logged_out_user: "注销的用户 %{user_counter}"
+  logo_a040ae0e: 徽标
   low_score_4eeb95b2: "低分：%{score}"
   lower_limit_of_range_6ddd4983: 范围的下限
   lti: 
@@ -7712,6 +7705,7 @@ zh:
     track_uploaded_successfully: 曲目已成功上载；请刷新您的浏览器。
     upload: 上传
     uploading: 正在上传...
+  media_recordings_749aef6d: 媒体录音
   median_score_4657e907: "中等分数：%{score}"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "最多 %{max_membership} 中的 %{member_count} 个成员"
   members_af25c21d: 成员
@@ -7732,6 +7726,7 @@ zh:
     send_message: 发送邮件
   message_students_dialog: 
     recipients: 收件人：
+  message_this_student_6d14043d: 向此学生发送消息
   messages: 
     account_suspended: 
       email: 
@@ -9036,15 +9031,6 @@ zh:
     messages: 
       failure: 发送电子邮件时出错。请重新加载此页，然后重试。
       success: 正在传送您的电子邮件。
-    migration_export_ready: 
-      email: 
-        body: 您的内容已准备好导入到您的课程中。
-        html: 
-          body: 您的内容已准备好导入到您的课程中。
-          link_message2: 单击*此链接*选择要导入的内容项
-          subject: "课程提取就绪: %{course_name}"
-        link_message: 单击此链接选择要导入的内容项：
-        subject: "课程提取就绪: %{course_name}"
     new_account_user: 
       email: 
         body: "%{account} 的新帐户管理员"
@@ -9069,7 +9055,6 @@ zh:
       email: 
         html: 
           attached_file: 附件文件
-          download: 下载
           link: 查看通告
         labels: 
           file_included: 包括的文件
@@ -9742,6 +9727,7 @@ zh:
     assignments_to_post: 
       one: "您准备好发布 %{count} 项作业。"
       other: "您准备好发布 %{count} 项作业。"
+    continue: 继续
     create: 
       assignment: 
         cancel: 取消
@@ -9861,7 +9847,6 @@ zh:
   name_3806192d: 姓名：
   name_error_fee4236: 名称错误
   name_only_5f56718e: 仅限姓名
-  new_2b97b0d9: 新建
   new_account_role_6e5c4964: 新建帐户角色
   new_course_role_6a7bb75f: 新建课程角色
   new_facebook_message: "您有来自 Canvas 的新消息"
@@ -10033,7 +10018,6 @@ zh:
       group_membership_accepted: 小组成员资格已接受
       group_membership_rejected: 小组成员资格已拒绝
       merge_email_communication_channel: 合并电子邮件通信渠道
-      migration_export_ready: 迁移导出就绪
       migration_import_failed: 迁移导入失败
       migration_import_finished: 迁移导入完成
       new_account_user: 新帐户用户
@@ -10264,8 +10248,6 @@ zh:
         total: "%{points_possible} 分"
       total_points: 总得分
       use_for_scoring: 使用此标准打分
-    outcome_alignment: 
-      delete_title: 无法删除基于评分标准关联的作业。要删除这些关联，您需要从评估的评分标准中删除该行
     outcome_criterion: 学习成果标准
     outcome_form: 
       criterion: 标准等级
@@ -10966,15 +10948,6 @@ zh:
         register_skype: "注册 Skype"
         remove_account_from_profile: 从此个人资料中删除帐户
         unregister_service: 取消注册服务
-      twitter_description: |-
-          Twitter 是一个用于发布和订阅短信息的服务。
-          如果您拥有 Twitter 帐户，可在此处进行注册。然后，如果您允许
-          其它课程/小组成员查看您注册的访问，他们就可以 
-          轻松地与您的 Twitter 帐户联系。
-          
-          您还可以注册以将通知发送到您的 Twitter 帐户。
-          这些通知将作为直接消息让您自己发送给
-          自己，并且将不会在公共流中出现。
       unknown_service: 未知
       web_services: "通过将 Canvas 绑定到您已经使用的网络工具，它可以让您的生活轻松许多。单击\"其它服务\"中的任何服务，了解此项功能。"
       yo_description: |-
@@ -11625,6 +11598,7 @@ zh:
       comments_on_answer: 用户选择此答案时的评论
       comments_on_question: 此问题的评论
       comments_on_wrong_match: 用户匹配错误时的评论
+      correct_answer: 正确回答
       message_text: 消息文本
       other_incorrect_matches: 其它不正确的匹配可选功能
       possible_answer: 可能的答案
@@ -12337,7 +12311,6 @@ zh:
           lock_survey: 立即锁定此调查
           unlock_quiz: 立即允许学生进行此测验
           unlock_survey: 立即允许学生进行此调查
-        course_concluded_notice: 因为课程已结束，不再提供此测验。
         labels: 
           available_until: 直到
           no_time_limit: 无时间限制
@@ -13131,7 +13104,9 @@ zh:
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "您已经登记了 **%{course}**。"
-      switch_users: "您当前是以 *%{user}* 身份登录的。**请使用另一个用户身份登录**。"
+      buttons: 
+        go_to_course: 转到课程
+        go_to_dashboard: 转到您的面板
     authenticate: 
       buttons: 
         enroll_in_course: " 登记课程"
@@ -13158,7 +13133,6 @@ zh:
         enroll_in_course: 登记课程
         next: 下一页
       getting_started: "您正在登记 **%{course}**"
-      switch_users: "您当前是用 *%{user}* 身份登录的。**请使用另一个用户身份登录**。"
     course_full: 
       class_full: "**%{course}** 的登记已满。很抱歉给您带来不便。"
     enrollment_closed: 
@@ -13976,6 +13950,8 @@ zh:
       back: 返回
       close: 关闭
       forward: 转发
+  smartbanner: 
+    android_banner_view_button: 查看
   source_code_2395ca74: 源代码
   speed_grader: 
     submissions_dropdown: 
@@ -14033,6 +14009,7 @@ zh:
   step: 步骤
   stream_items_api: 
     assessment_request_title: "%{title} 的同伴审阅"
+  student_5da6bfd1: 学生
   student_assignment_outcome_map_title: 学生能力
   student_groups_desc: |-
       这可以为帐户启用新学生组页面。新页面的构建可提供动态程度更高的组注册
@@ -14047,6 +14024,7 @@ zh:
   student_summary: 
     student_summary_table_ascending: "学生摘要表按 %{sortText} 升序排序"
     student_summary_table_descending: "学生摘要表按 %{sortText} 降序排序"
+  students_1b8cd07b: 学生
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "参加测验的学生 (%{count})"
     other: "参加测验的学生 (%{count})"
@@ -14267,6 +14245,7 @@ zh:
   take_the_quiz_again_8ea51a6c: 再次参加测验
   take_the_survey_ada59508: 参加调查
   take_the_survey_again_24ce22c2: 再次参加调查
+  teachers_52e2423f: 教师
   terms: 
     index: 
       date: 
@@ -14348,7 +14327,6 @@ zh:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此文件夹目前已锁定并且无法查看。
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "这是一个受信任 URL的逗号分隔列表。登录 Canvas 时，信任此列表中的任何 URL 将绕过 CSRF 令牌。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: 这很可能发生，因为您导入了不带关联文件的课程内容。
-  this_outcome_has_been_used_to_assess_a_student_cal_16409bda: "此结果已用于评估学生。计算方法固定为 %{old_value}"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
   this_student_wrote_f1a3f22d: 该学生写道：
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "这将允许您在 Canvas 中进行身份验证，以便将分数发布至 SIS"
@@ -14611,8 +14589,6 @@ zh:
   usage_right_ff96f3e2: 使用权限：
   usage_rights_f0960ad6: 使用权限
   usage_rights_have_been_set_d1b433c7: 已设置使用权限。
-  usage_rights_modal: 
-    saving: 正在保存...
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: 将为此中包含的所有文件设置使用权限：
   used_by_permission_314a78dd: 按权限使用
   user: 
@@ -15207,6 +15183,7 @@ zh:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: 您可能要指定一些助教帮助您教授课程。助教可以帮助您批改学生提交项、引导讨论以及更新到期日期和作业详细信息。
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "您必须将其设置为大于或等于 %{min} 的数值"
   you_must_specify_a_usage_right_5eb57f87: 您必须指定使用权限。
+  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "您的浏览器不符合 Canvas 的最低要求。请访问 *Canvas 指南* 了解受支持浏览器的完整列表。"
   your_content_has_been_exported_bbb57764: 您的内容已被导出。
   your_message_has_been_sent_thank_you_e0284316: 您的消息已发送。谢谢！
   your_search_encountered_the_following_errors_fc3e5e7f: 
