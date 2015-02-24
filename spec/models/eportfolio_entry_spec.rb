@@ -136,4 +136,13 @@ describe EportfolioEntry do
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
   end
+
+  it "Should update eportfolio date" do
+      eportfolio_model
+      old_time = 1.day.ago
+      @eportfolio.update_attribute(:updated_at, old_time)
+      @eportfolio_entry.name = "update test"
+      @eportfolio_entry.save!
+      expect(@eportfolio.updated_at.to_i).not_to eq(old_time.to_i)
+    end
 end
