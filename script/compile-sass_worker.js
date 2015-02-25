@@ -32,7 +32,12 @@ process.on('message', function(variantAndSassFile){
   sass.render({
     file: sassFile,
     success: function(css){
-      css = autoprefixer.process(css, {cascade: false})
+      try {
+        css = autoprefixer.process(css, {cascade: false})
+      } catch (e) {
+        console.log("FAILED on: " + sassFile, e.message)
+        throw e
+      }
       fs.writeFile(cssFile, css, function(err) {
         if (err) return console.log(err)
         process.send('complete')

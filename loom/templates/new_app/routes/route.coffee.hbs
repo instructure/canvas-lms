@@ -1,7 +1,0 @@
-define ['ember', 'ic-ajax'], (Ember, ajax) ->
-
-  {{routeName}} = Ember.Route.extend
-
-    model: ->
-      ajax '/api/v1/users/self/activity_stream'
-
