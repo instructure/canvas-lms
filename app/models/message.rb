@@ -230,6 +230,11 @@ class Message < ActiveRecord::Base
             alert: self.subject,
           }.merge(urls)
         }.to_json,
+        APNS_SANDBOX: {
+          aps: {
+            alert: self.subject
+          }
+        }.merge(urls).to_json,
         APNS: {
           aps: {
             alert: self.subject
