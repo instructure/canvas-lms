@@ -9,7 +9,7 @@ define([
 ], function({Routes, Route, Redirect}, Root, AppList, AppDetails, Configurations) {
 
   var currentPath = window.location.pathname
-    , re = new RegExp('\(.*\/settings)')
+    , re = /(.*\/settings|.*\/details)/
     , matches = re.exec(currentPath)
     , baseUrl = matches[0];
 
