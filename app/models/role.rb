@@ -264,13 +264,12 @@ class Role < ActiveRecord::Base
   end
 
   def self.manageable_roles_by_user(user, course)
-    manageable = ['ObserverEnrollment', 'DesignerEnrollment']
+    manageable = []
     if course.grants_right?(user, :manage_students)
-      manageable << 'StudentEnrollment'
+      manageable += ['StudentEnrollment', 'ObserverEnrollment']
     end
     if course.grants_right?(user, :manage_admin_users)
-      manageable << 'TeacherEnrollment'
-      manageable << 'TaEnrollment'
+      manageable += ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
     elsif course.teacherless?
       manageable << 'TeacherEnrollment'
     end

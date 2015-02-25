@@ -94,8 +94,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     el.find_element(:css, '.mce_instructure_image').click
     dialog = ff('.ui-dialog').reverse.detect(&:displayed?)
     f('a[href="#tabUploaded"]', dialog).click
-    keep_trying_until { expect(f('.folderLabel', dialog)).to be_displayed }
-    folder_el = ff('.folderLabel', dialog).detect { |el| el.text == folder }
+    keep_trying_until { expect(f('.treeLabel', dialog)).to be_displayed }
+    folder_el = ff('.treeLabel', dialog).detect { |el| el.text == folder }
     expect(folder_el).not_to be_nil
     folder_el.click unless folder_el['class'].split.include?('expanded')
     keep_trying_until { expect(f('.treeFile', dialog)).to be_displayed }

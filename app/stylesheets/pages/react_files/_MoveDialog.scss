@@ -3,7 +3,7 @@
 }
 
 .MoveDialog__folderItem--focused {
-  & > .folderLabel {
+  & > .treeLabel {
     background-color: $base-list-item-background--hover
   }
 }

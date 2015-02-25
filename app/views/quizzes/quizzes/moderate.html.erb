@@ -220,7 +220,8 @@
 <div style="display: none;">
   <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone) %></span>
   <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id, :page => params[:page], :last_updated_at => "{{ update }}") %>" class="update_url">&nbsp;</span>
-  <span class="last_updated_at"><%= @submissions.map(&:updated_at).max.try(:in_time_zone).try(:iso8601) %></span>
+  <% last_updated_at = @submissions.empty? ? nil : (@submissions.map(&:updated_at).max - 5.minutes).in_time_zone.iso8601 %>
+  <span class="last_updated_at"><%= last_updated_at %></span>
   <a href="<%= context_url(@context, :context_quiz_extensions_url, @quiz.id, "{{ user_id }}") %>" class="extension_url">&nbsp;</a>
   <a href="<%= context_url(@context, :api_v1_outstanding_quiz_submission_index_url) %>" class="outstanding_index_url">&nbsp;</a>
   <a href="<%= context_url(@context, :api_v1_outstanding_quiz_submission_grade_url) %>" class="outstanding_grade_url">&nbsp;</a>

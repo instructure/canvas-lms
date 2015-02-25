@@ -21,7 +21,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4'
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.2.27'
+gem 'switchman', '1.2.28'
 gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
 gem 'will_paginate', '3.0.4', :require => false
 
@@ -31,7 +31,7 @@ gem "aws-sdk", '1.52.0'
 gem 'barby', '0.5.0'
   gem 'chunky_png', '1.3.0'
 gem 'bcrypt-ruby', '3.0.1'
-gem 'canvas_connect', '0.3.6'
+gem 'canvas_connect', '0.3.7'
   gem 'adobe_connect', '1.0.0'
 gem 'canvas_webex', '0.15'
 gem 'canvas-jobs', '0.9.11'
@@ -48,13 +48,13 @@ gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.9'
 gem 'i18nema', '0.0.8', :platforms => [:ruby_20, :ruby_21, :ruby_22]
 gem 'i18nema19', '0.0.8', :platform => :ruby_19
-gem 'i18nliner', '0.0.9'
+gem 'i18nliner', '0.0.11'
 gem 'icalendar', '1.5.4'
 gem 'ims-lti', '2.0.0.beta.18'
 gem 'jammit', :github => 'documentcloud/jammit', :ref => '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
-gem 'json', '1.8.1'
+gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 
 # native xml parsing, diigo

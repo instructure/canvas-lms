@@ -66,7 +66,7 @@ describe "assignment groups" do
     expect(get_value("#assignment_group_id")).to eq ag2.id.to_s
   end
 
-  it "should edit group details" do
+  it "should edit group details", :priority => "1" do
     assignment_group = @course.assignment_groups.create!(:name => "first test group")
     4.times do
       @course.assignments.create(:title => 'other assignment', :assignment_group => assignment_group)
@@ -74,30 +74,33 @@ describe "assignment groups" do
     assignment = @course.assignments.create(:title => 'assignment with rubric', :assignment_group => assignment_group)
 
     get "/courses/#{@course.id}/assignments"
+    wait_for_ajaximations
 
     #edit group grading rules
     f("#ag_#{assignment_group.id}_manage_link").click
     fj(".edit_group:visible:first").click
+    #change the name
+    f("#ag_#{assignment_group.id}_name").clear
+    f("#ag_#{assignment_group.id}_name").send_keys('name change')
     #set number of lowest scores to drop
+    f("#ag_#{assignment_group.id}_drop_lowest").clear
     f("#ag_#{assignment_group.id}_drop_lowest").send_keys('1')
     #set number of highest scores to drop
+    f("#ag_#{assignment_group.id}_drop_highest").clear
     f("#ag_#{assignment_group.id}_drop_highest").send_keys('2')
     #set assignment to never drop
-
     fj('.add_never_drop:visible').click
     keep_trying_until { fj('.never_drop_rule select').present? }
-
     click_option('.never_drop_rule select', assignment.title)
-    keep_trying_until do
-      fj('.create_group:visible').click
-      wait_for_ajaximations
-
-      #verify grading rules
-      assignment_group.reload
-      expect(assignment_group.rules_hash["drop_lowest"]).to eq 1
-      expect(assignment_group.rules_hash["drop_highest"]).to eq 2
-      expect(assignment_group.rules_hash["never_drop"]).to eq [assignment.id]
-    end
+    #save it
+    fj('.create_group:visible').click
+    wait_for_ajaximations
+    assignment_group.reload
+    #verify grading rules
+    expect(assignment_group.name).to match 'name change'
+    expect(assignment_group.rules_hash["drop_lowest"]).to eq 1
+    expect(assignment_group.rules_hash["drop_highest"]).to eq 2
+    expect(assignment_group.rules_hash["never_drop"]).to eq [assignment.id]
   end
 
   it "should edit assignment groups grade weights" do
@@ -186,26 +189,49 @@ describe "assignment groups" do
     expect(ags.collect(&:position)).to eq [1,3,2,4,5]
   end
 
-  it "should allow quick-adding an assignment to a group", :priority => "2" do
+  it "should allow quick-adding an assignment to a group", :priority => "1" do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
+    time = Timecop.freeze(2015,2,7,4,15).utc
+    current_time = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+    assignment_name, assignment_points = ["Do this", "13"]
 
+    # Navigates to assignments index page.
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
+    # Finds and clicks the Add Assignment button on an assignment group.
     f("#assignment_group_#{ag.id} .add_assignment").click
     wait_for_ajaximations
 
-    replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
-    replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+    # Enters in values for Name, Due, and Points, then clicks save.
+    replace_content(f("#ag_#{ag.id}_assignment_name"), assignment_name)
+    replace_content(f("#ag_#{ag.id}_assignment_due_at"), current_time)
+    replace_content(f("#ag_#{ag.id}_assignment_points"), assignment_points)
     fj('.create_assignment:visible').click
     wait_for_ajaximations
 
+    # Checks for correct values in back end.
     a = ag.reload.assignments.last
     expect(a.name).to eq "Do this"
+    expect(a.due_at).to eq time
     expect(a.points_possible).to eq 13 
 
-    expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match "Do this"
+    # Checks Assignments Index page UI for correct values.
+    expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match "#{assignment_name}"
+    expect(ff("#assignment_group_#{ag.id} .assignment-date-due").last.text).to match current_time
+    expect(f("#assignment_#{a.id} .non-screenreader").text).to match "#{assignment_points} pts"
+
+    # Navigates to Assignment Show page.
+    get "/courses/#{@course.id}/assignments/#{a.id}"
+    wait_for_ajaximations
+
+    # Checks Assignment Show page for correct values.
+    expect(f(".title").text).to match "#{assignment_name}"
+    expect(f(".points_possible").text).to match "#{assignment_points}"
+    expect(f(".assignment_dates").text).to match "#{current_time}"
+    Timecop.return
+
   end
 
   it "should allow quick-adding two assignments to a group (dealing with form re-render)", :priority => "2" do

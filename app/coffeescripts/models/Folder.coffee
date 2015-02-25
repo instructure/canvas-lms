@@ -41,6 +41,12 @@ define [
       unless @files
         @files = new FilesCollection [], parentFolder: this
 
+    getSubtrees: ->
+      @folders
+
+    getItems: ->
+      @files
+
     expand: (force=false, options={}) ->
       @isExpanded = true
       @trigger 'expanded'
@@ -55,7 +61,7 @@ define [
       fetchDfd = @fetch() if selfHasntBeenFetched || force
       $.when(fetchDfd).done =>
         foldersDfd = @folders.fetch() unless @get('folders_count') is 0
-        filesDfd = @files.fetch() if (@get('files_count') isnt 0) and !options.onlyShowFolders
+        filesDfd = @files.fetch() if (@get('files_count') isnt 0) and !options.onlyShowSubtrees
         $.when(foldersDfd, filesDfd).done(@expandDfd.resolve)
 
     collapse: ->

@@ -787,10 +787,13 @@ define([
   $.extend(INST, {
     refreshGrades: function(){
       var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
+      var currentStudentIDAsOfAjaxCall = EG.currentStudent.id;
       $.getJSON( url,
         function(data){
-          EG.currentStudent.submission = data.submission;
-          EG.showGrade();
+          if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
+            EG.currentStudent.submission = data.submission;
+            EG.showGrade();
+          }
       });
     },
     refreshQuizSubmissionSnapshot: function(data) {
@@ -1265,8 +1268,11 @@ define([
 
     showSubmissionDetails: function(){
       //if there is a submission
-      if (this.currentStudent.submission && this.currentStudent.submission.submitted_at) {
+      var currentSubmission = this.currentStudent.submission;
+      if (currentSubmission && currentSubmission.submitted_at) {
         this.refreshSubmissionsToView();
+        var lastIndex = currentSubmission.submission_history.length - 1;
+        $("#submission_to_view option:eq(" + lastIndex + ")").attr("selected", "selected");
         $submission_details.show();
       }
       else { //there's no submission
@@ -1623,17 +1629,23 @@ define([
     },
 
     showGrade: function(){
-      $grade.val( typeof EG.currentStudent.submission != "undefined" &&
-                  EG.currentStudent.submission.grade !== null ?
-                  EG.currentStudent.submission.grade : "")
-            .attr('disabled', typeof EG.currentStudent.submission != "undefined" &&
-                              EG.currentStudent.submission.submission_type === 'online_quiz');
+      var submission;
+      var grade = "";
+      if ( EG.currentStudent.submission !== undefined ) {
+        submission = EG.currentStudent.submission;
+        if ( submission.grade !== null ) {
+          grade = round(submission.grade, 2);
+        }
+      }
+
+      $grade.val(grade)
+            .attr('disabled', typeof submission != "undefined" &&
+                              submission.submission_type === 'online_quiz');
 
       $('#submit_same_score').hide();
-      if (typeof EG.currentStudent.submission != "undefined" &&
-          EG.currentStudent.submission.score !== null) {
-        $score.text(round(EG.currentStudent.submission.score, round.DEFAULT));
-        if (!EG.currentStudent.submission.grade_matches_current_submission) {
+      if (typeof submission != "undefined" && submission.score !== null) {
+        $score.text(round(submission.score, round.DEFAULT));
+        if (!submission.grade_matches_current_submission) {
           $('#submit_same_score').show();
         }
       } else {

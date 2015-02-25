@@ -1,0 +1,53 @@
+<%-
+  
+  content_for :head, include_common_stylesheets
+
+-%>
+<%-
+  @locale = raw I18n.locale.to_json
+  @body_classes ||= []
+  @body_classes << "context-#{@context.asset_string}" if @context
+  yield :pre_html
+
+-%><!DOCTYPE html>
+<!--[if gte IE 9 ]><html class="Sg-only ie ie9 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
+<!--[if !(IE)]><!--> <html class="Sg-only not-ie scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
+    <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
+
+    <%= yield :auto_discovery %>
+    <%= yield :head %>
+    <%= yield :meta_tags %>
+    <%= include_custom_meta_tags %>
+    <%= include_css_bundles %>
+    <%= yield :stylesheets %>
+    <%= include_account_css %>
+    <script>
+      // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
+        function _earlyClick(e){
+          var cur = e.target || e.srcElement;
+          while ( cur && cur.ownerDocument ) {
+            if ( cur.getAttribute('href') == '#' ) {
+              e.preventDefault();
+              _earlyClick.clicks = _earlyClick.clicks || [];
+              _earlyClick.clicks.push(cur);
+              break;
+            }
+            cur = cur.parentNode;
+          }
+        }
+        document.addEventListener('click', _earlyClick);
+    </script>
+  </head>
+  <body class="Sg-only">
+
+    <div id="application">
+      <div id="main" class="Sg-only">
+      <%= yield %>
+      </div>s
+      <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+    </div> <!-- #application -- this is important to keep since it kicks off some of our js examples -->
+  </body>
+</html>

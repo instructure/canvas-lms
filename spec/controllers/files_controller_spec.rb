@@ -199,6 +199,15 @@ describe FilesController do
       assert_unauthorized
     end
 
+    it "should allow public access with verifier" do
+      Attachment.any_instance.stubs(:canvadoc_url).returns "stubby"
+      get 'show', :course_id => @course.id, :id => @file.id, :verifier => @file.uuid, :format => 'json'
+      expect(response).to be_success
+      expect(json_parse['attachment']).to_not be_nil
+      expect(json_parse['attachment']['canvadoc_session_url']).to eq "stubby"
+      expect(json_parse['attachment']['md5']).to be_nil
+    end
+
     it "should assign variables" do
       user_session(@teacher)
       get 'show', :course_id => @course.id, :id => @file.id

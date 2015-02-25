@@ -477,7 +477,7 @@ module ApplicationHelper
   end
 
   def editor_buttons
-    tools = []
+    return [] if @context.is_a?(Group)
     contexts = []
     contexts << @context if @context && @context.respond_to?(:context_external_tools)
     contexts += @context.account_chain if @context.respond_to?(:account_chain)
@@ -736,7 +736,7 @@ module ApplicationHelper
   end
 
   def include_account_css
-    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :k12) || @domain_root_account.try(:feature_enabled?, :use_new_styles)
+    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :use_new_styles)
     includes = get_global_includes.inject([]) do |css_includes, global_include|
       css_includes << global_include[:css] if global_include[:css].present?
       css_includes
@@ -825,8 +825,8 @@ module ApplicationHelper
     t("#user.registration.agree_to_terms_and_privacy_policy",
       "You agree to the *terms of use* and acknowledge the **privacy policy**.",
       wrapper: {
-        '*' => link_to('\1', @domain_root_account.terms_of_use_url, target: '_blank'),
-        '**' => link_to('\1', @domain_root_account.privacy_policy_url, target: '_blank')
+        '*' => link_to('\1', terms_of_use_url, target: '_blank'),
+        '**' => link_to('\1', privacy_policy_url, target: '_blank')
       }
     )
   end

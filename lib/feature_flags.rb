@@ -29,7 +29,7 @@ module FeatureFlags
 
   def feature_allowed?(feature)
     flag = lookup_feature_flag(feature)
-    return flag.allowed? if flag
+    return flag.enabled? || flag.allowed? if flag
     false
   end
 

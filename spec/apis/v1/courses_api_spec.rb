@@ -59,7 +59,6 @@ describe Api::V1::Course do
     end
 
     it 'should return storage_quota_used_mb if requested' do
-      pp @test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment])
       expect(@test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment]).has_key?("storage_quota_used_mb")).to be_truthy
     end
 

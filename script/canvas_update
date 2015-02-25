@@ -6,8 +6,8 @@ function usage {
 }
 
 function echo_console_and_log {
-  echo $1
-  echo $1 >>$LOG
+  echo "$1"
+  echo "$1" >>"$LOG"
 }
 
 function is_git_dir {
@@ -32,10 +32,10 @@ function intro_message {
   echo "Bringing Canvas up to date ..."
   echo "  Log file is $LOG"
 
-  echo >>$LOG
-  echo "-----------------------------" >>$LOG
-  echo "Canvas Update ($(date)):" >>$LOG
-  echo "-----------------------------" >>$LOG
+  echo >>"$LOG"
+  echo "-----------------------------" >>"$LOG"
+  echo "Canvas Update ($(date)):" >>"$LOG"
+  echo "-----------------------------" >>"$LOG"
 }
 
 function update_plugins {
@@ -44,11 +44,11 @@ function update_plugins {
   # precipitated changes to the database.
   for PLUGIN in vendor/plugins/*; do
     (
-      cd $PLUGIN
+      cd "$PLUGIN"
       if is_git_dir; then
         echo_console_and_log "  Updating plugin $PLUGIN ..."
-        ( git checkout master >>$LOG 2>&1 && \
-          git pull --rebase >>$LOG 2>&1 ) || \
+        ( git checkout master >>"$LOG" 2>&1 && \
+          git pull --rebase >>"$LOG" 2>&1 ) || \
         ( echo "  failed to pull plugin (see $LOG)"; kill -INT $$ )
       fi
     )
@@ -57,13 +57,13 @@ function update_plugins {
 
 function rebase_canvas {
   echo_console_and_log "  Pulling Canvas code ..."
-  ( git checkout master >>$LOG 2>&1 && git pull --rebase >>$LOG 2>&1 ) || \
+  ( git checkout master >>"$LOG" 2>&1 && git pull --rebase >>"$LOG" 2>&1 ) || \
     ( echo "  failed to pull Canvas (see $LOG)"; kill -INT $$ )
 }
 
 function bundle_install_with_check {
   echo_console_and_log "  Checking your gems (bundle check) ..."
-  if bundle check >>$LOG 2>&1 ; then
+  if bundle check >>"$LOG" 2>&1 ; then
     echo_console_and_log "  Gems are up to date, no need to bundle install ..."
   else
     bundle_install
@@ -73,45 +73,45 @@ function bundle_install_with_check {
 function bundle_install {
   echo_console_and_log "  Installing gems (bundle install) ..."
   rm Gemfile.lock* >/dev/null 2>&1
-  bundle install >>$LOG 2>&1 || \
+  bundle install >>"$LOG" 2>&1 || \
     ( echo "  failed to bundle install (see $LOG)"; kill -INT $$ )
 }
 
 function rake_db_migrate_dev_and_test {
   echo_console_and_log "  Migrating DB ..."
-  RAILS_ENV=development bundle exec rake db:migrate >>$LOG 2>&1 || \
+  RAILS_ENV=development bundle exec rake db:migrate >>"$LOG" 2>&1 || \
     ( echo "  failed to migrate db (development) (see $LOG)"; kill -INT $$ )
-  RAILS_ENV=test        bundle exec rake db:migrate >>$LOG 2>&1 || \
+  RAILS_ENV=test        bundle exec rake db:migrate >>"$LOG" 2>&1 || \
     ( echo "  failed to migrate db (test) (see $LOG)"; kill -INT $$ )
 }
 
 function npm_install {
   echo_console_and_log "  Installing npm packages ..."
-  npm install >>$LOG 2>&1 || \
+  npm install >>"$LOG" 2>&1 || \
     ( echo "  failed to install npm packages (see $LOG)"; kill -INT $$ )
 }
 
 function generate_js {
   echo_console_and_log "  Generating JS ..."
-  bundle exec rake js:generate >>$LOG 2>&1 || \
+  bundle exec rake js:generate >>"$LOG" 2>&1 || \
     ( echo "  failed to generate JS (see $LOG)"; kill -INT $$ )
 }
 
 function generate_css {
   echo_console_and_log "  Generating CSS ..."
-  npm run compile-sass >>$LOG 2>&1 || \
+  npm run compile-sass >>"$LOG" 2>&1 || \
     ( echo "  failed to generate CSS (see $LOG)"; kill -INT $$ )
 }
 
 function generate_css_styleguide {
   echo_console_and_log "  Generating CSS Styleguide ..."
-    bundle exec rake css:styleguide >>$LOG 2>&1 || \
+    bundle exec rake css:styleguide >>"$LOG" 2>&1 || \
     ( echo "  failed to generate Styleguide (see $LOG)"; kill -INT $$ )
 }
 
 function generate_docs {
   echo_console_and_log "  Generating Docs ..."
-    bundle exec rake doc:api >>$LOG 2>&1 || \
+    bundle exec rake doc:api >>"$LOG" 2>&1 || \
     ( echo "  failed to generate Docs (see $LOG)"; kill -INT $$ )
 }
 
@@ -142,7 +142,7 @@ function update_canvas {
   tips
 }
 
-LOG=`pwd`/log/canvas_update.log
+LOG="$(pwd)/log/canvas_update.log"
 
 # default options
 PERFORM_UPDATE=true

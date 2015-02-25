@@ -77,64 +77,65 @@ define([
                   .appendTo("body");
               });
             })
-            .bind('selection', function(event, data) {
-              var editor = $dialog.data('editor') || ed;
-              if(data.return_type == 'lti_launch_url') {
-                if($("#external_tool_retrieve_url").attr('href')) {
-                  var external_url = $.replaceTags($("#external_tool_retrieve_url").attr('href'), 'url', data.url);
-                  $("#" + ed.id).editorBox('create_link', {
-                    url: external_url,
-                    title: data.title,
-                    text: data.text
-                  });
-                } else {
-                  console.log("cannot embed basic lti links in this context");
-                }
-              } else if(data.return_type == 'image_url') {
-                var html = $("<div/>").append($("<img/>", {
-                  src: data.url,
-                  alt: data.alt
-                }).css({
-                  width: data.width,
-                  height: data.height
-                })).html();
-                $("#" + ed.id).editorBox('insert_code', html);
-              } else if(data.return_type == 'url') {
-                $("#" + ed.id).editorBox('create_link', {
-                  url: data.url,
-                  title: data.title,
-                  text: data.text,
-                  target: data.target == '_blank' ? '_blank' : null
-                });
-              } else if(data.return_type == 'file') {
-                $("#" + ed.id).editorBox('create_link', {
-                  url: data.url,
-                  title: data.filename,
-                  text: data.filename
-                });
-              } else if(data.return_type == 'iframe') {
-                var html = $("<div/>").append($("<iframe/>", {
-                  src: data.url,
-                  title: data.title,
-                  allowfullscreen: "true",
-                  webkitallowfullscreen: "true",
-                  mozallowfullscreen: "true"
-                }).css({
-                  width: data.width,
-                  height: data.height
-                })).html();
-                $("#" + ed.id).editorBox('insert_code', html);
-              } else if(data.return_type == 'rich_content') {
-                $("#" + ed.id).editorBox('insert_code', data.html);
-              } else if(data.return_type == 'error' && data.message) {
-                alert(data.message);
-              } else {
-                console.log("unrecognized embed type: " + data.return_type);
-              }
-              $("#external_tool_button_dialog iframe").attr('src', 'about:blank');
-              $("#external_tool_button_dialog").dialog('close');
-            });
         }
+        $(window).unbind("externalContentReady");
+        $(window).bind("externalContentReady", function(event, data){
+          var editor = $dialog.data('editor') || ed;
+          if(data.return_type == 'lti_launch_url') {
+            if($("#external_tool_retrieve_url").attr('href')) {
+              var external_url = $.replaceTags($("#external_tool_retrieve_url").attr('href'), 'url', data.url);
+              $("#" + ed.id).editorBox('create_link', {
+                url: external_url,
+                title: data.title,
+                text: data.text
+              });
+            } else {
+              console.log("cannot embed basic lti links in this context");
+            }
+          } else if(data.return_type == 'image_url') {
+            var html = $("<div/>").append($("<img/>", {
+              src: data.url,
+              alt: data.alt
+            }).css({
+              width: data.width,
+              height: data.height
+            })).html();
+            $("#" + editor.id).editorBox('insert_code', html);
+          } else if(data.return_type == 'url') {
+            $("#" + editor.id).editorBox('create_link', {
+              url: data.url,
+              title: data.title,
+              text: data.text,
+              target: data.target == '_blank' ? '_blank' : null
+            });
+          } else if(data.return_type == 'file') {
+            $("#" + editor.id).editorBox('create_link', {
+              url: data.url,
+              title: data.filename,
+              text: data.filename
+            });
+          } else if(data.return_type == 'iframe') {
+            var html = $("<div/>").append($("<iframe/>", {
+              src: data.url,
+              title: data.title,
+              allowfullscreen: "true",
+              webkitallowfullscreen: "true",
+              mozallowfullscreen: "true"
+            }).css({
+              width: data.width,
+              height: data.height
+            })).html();
+            $("#" + editor.id).editorBox('insert_code', html);
+          } else if(data.return_type == 'rich_content') {
+            $("#" + editor.id).editorBox('insert_code', data.html);
+          } else if(data.return_type == 'error' && data.message) {
+            alert(data.message);
+          } else {
+            console.log("unrecognized embed type: " + data.return_type);
+          }
+          $dialog.find('iframe').attr('src', 'about:blank');
+          $dialog.dialog('close')
+        });
         $dialog.dialog('option', 'title', 'Embed content from ' + button.name);
         $dialog.dialog('close')
           .dialog('option', 'width', button.width || 800)

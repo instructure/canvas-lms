@@ -3,7 +3,7 @@
 define([
   'i18n!external_tools',
   'react',
-  'jsx/external_apps/lib/store'
+  'jsx/external_apps/lib/AppCenterStore'
 ], function (I18n, React, store) {
 
   return React.createClass({
@@ -44,13 +44,13 @@ define([
               <div className="col-xs-7">
                 <ul className="nav nav-pills">
                   <li className={activeFilter === 'all' ? 'active' : ''}>
-                    <a onClick={this.handleFilterClick.bind(this, 'all')} href="#" role="tab" aria-selected="false">{I18n.t('All')}</a>
+                    <a ref="tabAll" onClick={this.handleFilterClick.bind(this, 'all')} href="#" role="tab" aria-selected="false">{I18n.t('All')}</a>
                   </li>
                   <li className={activeFilter === 'not_installed' ? 'active' : ''}>
-                    <a onClick={this.handleFilterClick.bind(this, 'not_installed')} href="#" role="tab" aria-selected="false">{I18n.t('Not Installed')}</a>
+                    <a ref="tabNotInstalled" onClick={this.handleFilterClick.bind(this, 'not_installed')} href="#" role="tab" aria-selected="false">{I18n.t('Not Installed')}</a>
                   </li>
                   <li className={activeFilter === 'installed' ? 'active' : ''}>
-                    <a onClick={this.handleFilterClick.bind(this, 'installed')} href="#" role="tab" aria-selected="false">{I18n.t('Installed')}</a>
+                    <a ref="tabInstalled" onClick={this.handleFilterClick.bind(this, 'installed')} href="#" role="tab" aria-selected="false">{I18n.t('Installed')}</a>
                   </li>
                 </ul>
               </div>

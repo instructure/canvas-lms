@@ -29,6 +29,7 @@ class GradingStandardsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_grades)
       js_env({
         :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
+        :GRADING_PERIODS_URL => context_url(@context, :api_v1_context_grading_periods_url),
         :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?
       })
       @standards = GradingStandard.standards_for(@context).sorted.limit(100)

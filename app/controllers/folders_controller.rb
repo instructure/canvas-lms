@@ -115,7 +115,7 @@ class FoldersController < ApplicationController
     end
   end
 
-  
+
   # @API List folders
   # @subtopic Folders
   # Returns the paginated list of folders in the folder.
@@ -236,16 +236,16 @@ class FoldersController < ApplicationController
       end
     end
   end
-  
+
   def download
     if authorized_action(@context, @current_user, :read)
       @folder = @context.folders.find(params[:folder_id])
       user_id = @current_user && @current_user.id
-      
+
       # Destroy any previous zip downloads that might exist for this folder, 
       # except the last one (cause we might be able to use it)
       folder_filename = "#{t :folder_filename, "folder"}.zip"
-      
+
       @attachments = Attachment.where(context_id: @folder,
                                       context_type: @folder.class.to_s,
                                       display_name: folder_filename,
@@ -260,7 +260,7 @@ class FoldersController < ApplicationController
         @attachment.destroy!
         @attachment = nil
       end
-      
+
       if @attachment.nil?
         @attachment = @folder.file_attachments.build(:display_name => folder_filename)
         @attachment.user_id = user_id
@@ -465,11 +465,11 @@ class FoldersController < ApplicationController
   def process_folder_params(parameters, api_request)
     folder_params = (api_request ? parameters : parameters[:folder]) || {}
     folder_params.slice(:name, :parent_folder_id, :parent_folder_path, :folder_id,
-                        :source_folder_id, :lock_at, :unlock_at, :locked, 
+                        :source_folder_id, :lock_at, :unlock_at, :locked,
                         :hidden, :context, :position, :just_hide)
   end
   private :process_folder_params
-  
+
   def destroy
     @folder = Folder.find(params[:id])
     if authorized_action(@folder, @current_user, :delete)

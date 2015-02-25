@@ -318,15 +318,11 @@ class ContentMigration < ActiveRecord::Base
       else
         # find worker and queue for conversion
         begin
-          if Canvas::Migration::Worker.const_defined?(plugin.settings['worker'])
-            self.workflow_state = :exporting
-            worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
-            job = Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
-            self.save
-            job
-          else
-            raise NameError
-          end
+          worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
+          self.workflow_state = :exporting
+          job = Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
+          self.save
+          job
         rescue NameError
           self.workflow_state = 'failed'
           message = "The migration plugin #{migration_type} doesn't have a worker."

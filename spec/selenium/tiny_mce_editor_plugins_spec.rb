@@ -18,13 +18,13 @@ describe "Tiny MCE editor plugins" do
     fj('.imageSourceTabs a:contains(Canvas)').click
     wait_for_ajaximations
 
-    f('.insertUpdateImageTabpane .folderLabel').click
+    f('.insertUpdateImageTabpane .treeLabel').click
     wait_for_ajaximations
 
-    driver.execute_script("$('.folderContents .folders li').last().get(0).scrollIntoView()")
+    driver.execute_script("$('.treeContents .subtrees li').last().get(0).scrollIntoView()")
     wait_for_ajaximations
 
-    expect(ff('.folderContents .folders li').length).to eq 11
+    expect(ff('.treeContents .subtrees li').length).to eq 11
     close_visible_dialog
   end
 end

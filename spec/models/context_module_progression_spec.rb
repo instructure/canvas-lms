@@ -27,23 +27,26 @@ describe ContextModuleProgression do
     @course.enroll_student(@user)
   end
 
+  def setup_modules
+    @assignment = @course.assignments.create!(:title => "some assignment")
+    @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+    @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+    @module.workflow_state = 'unpublished'
+    @module.save!
+
+    @module2 = @course.context_modules.create!(:name => "another module")
+    @module2.publish
+    @module2.prerequisites = "module_#{@module.id}"
+    @module2.save!
+
+    @module3 = @course.context_modules.create!(:name => "another module again")
+    @module3.publish
+    @module3.save!
+  end
+
   context "prerequisites_satisfied?" do
     before do
-
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
-      @module.workflow_state = 'unpublished'
-      @module.save!
-
-      @module2 = @course.context_modules.create!(:name => "another module")
-      @module2.publish
-      @module2.prerequisites = "module_#{@module.id}"
-      @module2.save!
-
-      @module3 = @course.context_modules.create!(:name => "another module again")
-      @module3.publish
-      @module3.save!
+      setup_modules
     end
 
     it "should correctly ignore already-calculated context_module_prerequisites" do
@@ -189,5 +192,21 @@ describe ContextModuleProgression do
       expect { new_progression = progression.evaluate! }.to_not raise_error
       expect(new_progression.workflow_state).to eq 'locked'
     end
+  end
+
+  it "should invalidate progressions if a prerequisite changes" do
+    @module.unpublish!
+    setup_modules
+    @module3.prerequisites = "module_#{@module2.id}"
+    @module3.save!
+    progression2 = @module2.evaluate_for(@user)
+    progression3 = @module3.evaluate_for(@user)
+
+    @module.reload
+    @module.publish!
+    progression2.reload
+    progression3.reload
+    expect(progression2).to be_locked
+    expect(progression3).to be_locked
   end
 end

@@ -52,6 +52,7 @@ class Account < ActiveRecord::Base
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
+  has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
   has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
   has_many :account_users, :dependent => :destroy
@@ -108,8 +109,11 @@ class Account < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
-  before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
+
+  before_save :setup_quota_cache_invalidation
+  after_save :invalidate_quota_caches_if_changed
+
   after_create :default_enrollment_term
 
   serialize :settings, Hash
@@ -290,14 +294,6 @@ class Account < ActiveRecord::Base
     true
   end
 
-  def terms_of_use_url
-    Setting.get('terms_of_use_url', 'http://www.canvaslms.com/policies/terms-of-use')
-  end
-
-  def privacy_policy_url
-    Setting.get('privacy_policy_url', 'http://www.canvaslms.com/policies/privacy-policy')
-  end
-
   def terms_required?
     Setting.get('terms_required', 'true') == 'true'
   end
@@ -334,6 +330,11 @@ class Account < ActiveRecord::Base
   def ensure_defaults
     self.uuid ||= CanvasSlug.generate_securish_uuid
     self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if self.respond_to?(:lti_guid)
+    self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
+    self.root_account_id ||= self.parent_account_id
+    self.parent_account_id ||= self.root_account_id
+    Account.invalidate_cache(self.id) if self.id
+    true
   end
 
   def verify_unique_sis_source_id
@@ -354,17 +355,8 @@ class Account < ActiveRecord::Base
     false
   end
 
-  def set_update_account_associations_if_changed
-    self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
-    self.root_account_id ||= self.parent_account_id
-    self.parent_account_id ||= self.root_account_id
-    Account.invalidate_cache(self.id) if self.id
-    @should_update_account_associations = self.parent_account_id_changed? || self.root_account_id_changed?
-    true
-  end
-
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations
+    send_later_if_production(:update_account_associations) if self.parent_account_id_changed? || self.root_account_id_changed?
   end
 
   def equella_settings
@@ -499,6 +491,27 @@ class Account < ActiveRecord::Base
     nil
   end
 
+  def setup_quota_cache_invalidation
+    @quota_invalidations = []
+    unless self.new_record?
+      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
+      @quota_invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
+    end
+  end
+
+  def invalidate_quota_caches_if_changed
+    Account.send_later_if_production(:invalidate_quota_caches, self.id, @quota_invalidations) if @quota_invalidations.present?
+  end
+
+  def self.invalidate_quota_caches(account_id, keys)
+    account_ids = Account.sub_account_ids_recursive(account_id) + [account_id]
+    keys.each do |quota_key|
+      account_ids.each do |id|
+        Rails.cache.delete([quota_key, id].cache_key)
+      end
+    end
+  end
+
   def quota
     Rails.cache.fetch(['current_quota', self.id].cache_key) do
       read_attribute(:storage_quota) ||
@@ -531,8 +544,6 @@ class Account < ActiveRecord::Base
     if parent_account && parent_account.default_storage_quota == val
       val = nil
     end
-    clear_sub_account_quota_cache('default_storage_quota')
-    clear_sub_account_quota_cache('current_quota')
     write_attribute(:default_storage_quota, val)
   end
 
@@ -569,7 +580,6 @@ class Account < ActiveRecord::Base
         (self.parent_account && self.parent_account.default_group_storage_quota == val)
       val = nil
     end
-    clear_sub_account_quota_cache('default_group_storage_quota')
     write_attribute(:default_group_storage_quota, val)
   end
 
@@ -579,15 +589,6 @@ class Account < ActiveRecord::Base
 
   def default_group_storage_quota_mb=(val)
     self.default_group_storage_quota = val.try(:to_i).try(:megabytes)
-  end
-
-  def clear_sub_account_quota_cache(quota_key)
-    return unless self.id
-    account_ids = Account.sub_account_ids_recursive(self.id)
-    account_ids << self.id
-    account_ids.each do |account_id|
-      Rails.cache.delete([quota_key, account_id].cache_key)
-    end
   end
 
   def turnitin_shared_secret=(secret)

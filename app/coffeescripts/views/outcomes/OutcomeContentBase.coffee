@@ -40,6 +40,7 @@ define [
       'click .edit_button': 'edit'
       'click .cancel_button': 'cancel'
       'click .delete_button': 'delete'
+      'click .move_button' : 'move'
       'keyup input.outcome_title': 'updateTitle'
     , ValidatedFormView::events
 
@@ -114,6 +115,7 @@ define [
       @model.setUrlTo switch @state
         when 'add' then 'add'
         when 'delete' then 'delete'
+        when 'move' then 'move'
         else 'edit'
 
     # overriding superclass
@@ -161,6 +163,10 @@ define [
           @remove()
           $('.add_outcome_link').focus()
         error: => $.flashError I18n.t('flash.deleteError', 'Something went wrong. Unable to delete at this time.')
+
+    move: (e) =>
+      e.preventDefault()
+      @trigger 'move', @model
 
     resetModel: ->
       @model.set @_modelAttributes

@@ -501,7 +501,8 @@
 #         },
 #         "rubric": {
 #           "description": "(Optional) A list of scoring criteria and ratings for each rubric criterion. Included if there is an associated rubric.",
-#           "$ref": "RubricCriteria"
+#           "type": "array",
+#           "items": { "$ref": "RubricCriteria" }
 #         },
 #         "assignment_visibility": {
 #           "description": "(Optional) If 'assignment_visibility' is included in the 'include' parameter, includes an array of student IDs who can see this assignment.",

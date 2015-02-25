@@ -96,7 +96,7 @@ describe 'Account Reports API', type: :request do
       expect(json['id']).to eq @report.id
       expect(json['status']).to eq @report.workflow_state
       expect(json['progress']).to eq @report.progress
-      expect(json['file_url']).to eq "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment_id}/download"
+      expect(json['file_url']).to eq "http://www.example.com/accounts/#{@admin.account.id}/files/#{@report.attachment_id}/download"
       #test that attachment object is here, no need to test attachment json
       expect(json['attachment']['id']).to eq @report.attachment_id
       @report.parameters.each do |key, value|
@@ -113,7 +113,7 @@ describe 'Account Reports API', type: :request do
       expect(json['id']).to eq @report.id
       expect(json['status']).to eq @report.workflow_state
       expect(json['progress']).to eq @report.progress
-      expect(json['file_url']).to eq "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment.id}/download"
+      expect(json['file_url']).to eq "http://www.example.com/accounts/#{@admin.account.id}/files/#{@report.attachment.id}/download"
       @report.parameters.each do |key, value|
         expect(json['parameters'][key]).to eq value
       end

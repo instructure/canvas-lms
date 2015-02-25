@@ -480,7 +480,7 @@ describe LearningOutcome do
       @outcome.save
       expect(@outcome).to have(1).error_on(:calculation_method)
       expect(@outcome).to have(1).error
-      expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
+      expect(outcome_errors(:calculation_method).first).to include("calculation_method must be one of")
       @outcome.reload
       expect(@outcome.calculation_method).to eq('latest')
     end
@@ -549,7 +549,7 @@ describe LearningOutcome do
       expect(@outcome).not_to be_valid
       expect(@outcome).to have(1).error
       expect(@outcome).to have(1).error_on(:calculation_method)
-      expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
+      expect(outcome_errors(:calculation_method).first).to include("calculation_method must be one of")
 
       @outcome = LearningOutcome.new(
         :title => 'outcome',
@@ -558,7 +558,7 @@ describe LearningOutcome do
       expect(@outcome).not_to be_valid
       expect(@outcome).to have(1).error
       expect(@outcome).to have(1).error_on(:calculation_method)
-      expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
+      expect(outcome_errors(:calculation_method).first).to include("calculation_method must be one of")
     end
 
     context "illegal calculation ints" do
@@ -580,7 +580,11 @@ describe LearningOutcome do
             expect(@outcome).not_to be_valid
             expect(@outcome).to have(1).error
             expect(@outcome).to have(1).error_on(:calculation_int)
-            expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            if %w[highest latest].include?(method)
+              expect(outcome_errors(:calculation_int).first).to include("calculation_int' is not used with calculation_method")
+            else
+              expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            end
 
             @outcome = LearningOutcome.new(
               :title => 'outcome',
@@ -590,7 +594,11 @@ describe LearningOutcome do
             expect(@outcome).not_to be_valid
             expect(@outcome).to have(1).error
             expect(@outcome).to have(1).error_on(:calculation_int)
-            expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            if %w[highest latest].include?(method)
+              expect(outcome_errors(:calculation_int).first).to include("calculation_int' is not used with calculation_method")
+            else
+              expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            end
           end
         end
       end
@@ -727,7 +735,7 @@ describe LearningOutcome do
         @outcome.save
         expect(@outcome).to have(1).error_on(:calculation_method)
         expect(@outcome).to have(1).errors
-        expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
+        expect(outcome_errors(:calculation_method).first).to include("calculation_method must be one of")
         @outcome.reload
         expect(@outcome.calculation_method).not_to eq('foo bar baz qux')
         expect(@outcome.calculation_method).to eq('highest')
@@ -740,7 +748,7 @@ describe LearningOutcome do
         @outcome.save
         expect(@outcome).to have(1).error
         expect(@outcome).to have(1).error_on(:calculation_method)
-        expect(outcome_errors(:calculation_method).first).to include("is not included in the list")
+        expect(outcome_errors(:calculation_method).first).to include("calculation_method must be one of")
         @outcome.reload
         expect(@outcome.calculation_method).not_to be_nil
         expect(@outcome.calculation_method).to eq('highest')
@@ -767,7 +775,11 @@ describe LearningOutcome do
             @outcome.save
             expect(@outcome).to have(1).error_on(:calculation_int)
             expect(@outcome).to have(1).errors
-            expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            if %w[highest latest].include? method
+              expect(outcome_errors(:calculation_int).first).to include("calculation_int' is not used with calculation_method")
+            else
+              expect(outcome_errors(:calculation_int).first).to include("not a valid calculation_int")
+            end
             @outcome.reload
             expect(@outcome.calculation_method).to eq(method)
             expect(@outcome.calculation_int).to eq(int)

@@ -83,7 +83,7 @@ define(['jquery'],function($) {
         createDropdown: function() {
             var drop =
                 "<div class='btn-group bootstrap-select'>" +
-                    "<button type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" +
+                    "<button type='button' aria-haspopup='true' class='btn dropdown-toggle' data-toggle='dropdown'>" +
                         "<div class='filter-option pull-left'></div>&nbsp;" +
                         "<div class='caret'></div>" +
                     "</button>" +
@@ -153,6 +153,7 @@ define(['jquery'],function($) {
                     if ($this.index() == 0) {
                         //Get the opt group label
                         var label = $this.parent().attr('label');
+                        var content_type = $this.parent().data('content-type');
                         var labelSubtext = $this.parent().data('subtext') !== undefined ? '<small class="muted">'+$this.parent().data('subtext')+'</small>' : '';
                         var labelIcon = $this.parent().data('icon') ? '<i class="'+$this.parent().data('icon')+'"></i> ' : '';
                         label = labelIcon + '<span class="text">' + label + labelSubtext + '</span>';
@@ -162,7 +163,7 @@ define(['jquery'],function($) {
                           _liA.push(
                             '<div class="div-contain"><div class="divider"></div></div>'+
                             '<a role="button" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
-                            '<div class="dropdown-menu open" tabindex="0"><ul class="dropdown-menu inner" role="group">'
+                            '<div class="dropdown-menu open" data-content-type="' + content_type + '" tabindex="0"><ul class="dropdown-menu inner" role="group">'
                             );
                           _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index, $this ));
                         } else if ($this[0].index != 0) {
@@ -210,7 +211,6 @@ define(['jquery'],function($) {
             if (!this.multiple && this.$element.find('option:selected').length==0 && !_this.options.title) {
                 this.$element.find('option').eq(0).prop('selected', true).attr('selected', 'selected');
             }
-
             return $(_liHtml);
         },
 

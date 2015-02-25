@@ -1,9 +1,15 @@
 /*
 @styleguide Border Classes
 
-the `.border` class defines the border style and color with no width. Additional variations of this define the side(s) and radius(s) of the element. Examples are combined with `.content-box` and `.pad-box-mini`.
+<br/>
 
-### Full Border
+The `.border` class defines the border style and color with no width. 
+
+Additional variations of this define the side(s) and radius(s) of the element. Examples are combined with `.content-box` and `.pad-box-mini`.
+
+<br/>
+
+## Full Border
 
 ```html
 
@@ -12,7 +18,7 @@ the `.border` class defines the border style and color with no width. Additional
 </div>
 ```
 
-### Partial Borders
+## Partial Borders
 
 ```html
 <div class="content-box pad-box-mini border border-rbl">
@@ -40,7 +46,7 @@ the `.border` class defines the border style and color with no width. Additional
 </div>
 ```
 
-### Border Radius
+## Border Radius
 
 Combines with `.border` and `.border-trbl`
 

@@ -102,7 +102,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def get_front_page_url
-    self.front_page_url if self.has_front_page?
+    self.front_page_url || DEFAULT_FRONT_PAGE_URL if self.has_front_page?
   end
 
   def unset_front_page!

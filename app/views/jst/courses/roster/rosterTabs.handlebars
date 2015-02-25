@@ -1,12 +1,12 @@
-<li class="static ui-state-default ui-corner-top ui-tabs-active ui-state-active" >
-  <a href="#" class="ui-tabs-anchor" >{{#t 'everyone_tab'}}Everyone{{/t}}</a>
+<li class="static ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" >
+  <a href="#" class="ui-tabs-anchor" role="presentation">{{#t 'everyone_tab'}}Everyone{{/t}}</a>
 </li>
 {{#each collection}}
-  <li class="ui-state-default ui-corner-top" >
-    <a href="/courses/{{course_id}}/groups#tab-{{id}}" class="group-category-tab-link ui-tabs-anchor">
+  <li role="tab" class="ui-state-default ui-corner-top" >
+    <a href="/courses/{{course_id}}/groups#tab-{{id}}" class="group-category-tab-link ui-tabs-anchor" role="presentation">
       {{name}}
     </a>
   </li>
 {{else}}
-  <li class="static ui-state-default ui-corner-top" ><a href="/courses/{{course.id}}/groups" class="ui-tabs-anchor" >{{#t 'groups'}}Groups{{/t}}</a></li>
+  <li class="static ui-state-default ui-corner-top" ><a href="/courses/{{course.id}}/groups" class="ui-tabs-anchor" role="presentation">{{#t 'groups'}}Groups{{/t}}</a></li>
 {{/each}}

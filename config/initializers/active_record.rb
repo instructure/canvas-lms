@@ -784,7 +784,7 @@ ActiveRecord::Relation.class_eval do
             ORDER BY #{arel.orders.map { |x| v.send(:visit, x) }.join(', ')} LIMIT #{v.send(:visit, arel.limit)}"
         return connection.delete(sql, "#{name} Delete all")
       else
-        scope = scoped.select(primary_key)
+        scope = scoped.except(:select).select("#{quoted_table_name}.#{primary_key}")
         return unscoped.where(primary_key => scope).delete_all
       end
     end

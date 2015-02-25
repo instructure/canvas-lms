@@ -15,7 +15,6 @@ describe "groups" do
     g1.save!
 
     get "/groups/#{g1.id}"
-    wait_for_ajaximations
 
     keep_trying_until do
       f('#edit_group').click
@@ -32,7 +31,6 @@ describe "groups" do
     g1 = @course.groups.create!(:name => "my group")
 
     get "/courses/#{@course.id}/groups"
-    wait_for_ajaximations
 
     expect(ff("#group_#{g1.id}")).to be_empty
   end
@@ -46,7 +44,6 @@ describe "groups" do
       student_in_course
 
       get "/courses/#{@course.id}/groups"
-      wait_for_ajaximations
 
       keep_trying_until do
         f(".add_group_link").click
