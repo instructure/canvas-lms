@@ -76,7 +76,7 @@ gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false
 gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
-gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
+gem 'ratom', '0.9.0', :require => "atom"
 gem 'rdiscount', '1.6.8'
 gem 'ritex', '1.0.1'
 
