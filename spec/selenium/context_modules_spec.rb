@@ -618,6 +618,17 @@ describe "context_modules" do
       expect(tag.indent).to eq 1
     end
 
+    it "should return focus to the cog menu when closing the edit dialog for an item" do
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      tag = ContentTag.last
+
+      f("#context_module_item_#{tag.id} .al-trigger").click
+      hover_and_click("#context_module_item_#{tag.id} .edit_item_link")
+      keep_trying_until { fj('.cancel_button:visible') }.click
+      check_element_has_focus(fj("#context_module_item_#{tag.id} .al-trigger"))
+    end
+
     it "should still display due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
 

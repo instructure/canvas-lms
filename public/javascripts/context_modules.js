@@ -850,6 +850,7 @@ define([
     });
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
+      var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
       var $item = $(this).parents(".context_module_item");
       var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab']});
       data.indent = modules.currentIndent($item);
@@ -860,6 +861,9 @@ define([
         title: I18n.t('titles.edit_item', "Edit Item Details"),
         open: function(){
           $(this).find('input[type=text],textarea,select').first().focus();
+        },
+        close: function () {
+          $cogLink.focus();
         },
         minWidth: 320
       }).fixDialogButtons();
