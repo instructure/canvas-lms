@@ -131,7 +131,7 @@ define([
               <TextInput
                 ref="domain"
                 id="domain"
-                name={this.props.domain}
+                defaultValue={this.props.domain}
                 label={I18n.t('Domain')}
                 errors={this.state.errors} />
             </div>
