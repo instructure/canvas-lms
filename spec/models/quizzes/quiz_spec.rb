@@ -1432,17 +1432,23 @@ describe Quizzes::Quiz do
     context "show_correct_answers_last_attempt is true" do
       let(:user) { User.create! }
 
-      it "shows the correct answers on last attempt" do
+      it "shows the correct answers on last attempt completed" do
         quiz = @course.quizzes.create!({
           title: 'test quiz',
           show_correct_answers: true,
           show_correct_answers_last_attempt: true,
-          allowed_attempts: 1
+          allowed_attempts: 2
         })
 
         quiz.publish!
 
         submission = quiz.generate_submission(user)
+        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission.complete!
+
+        submission = quiz.generate_submission(user)
+        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission.complete!
 
         expect(quiz.show_correct_answers?(user, submission)).to be_truthy
       end
