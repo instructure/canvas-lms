@@ -79,10 +79,16 @@ class CalendarsController < ApplicationController
       @view_start = event.start_at.in_time_zone.strftime("%Y-%m-%d")
     end
     @contexts_json = @contexts.map do |context|
-      if context.respond_to? :appointment_groups
+      ag_permission = false
+      if context.respond_to?(:appointment_groups) && context.grants_right?(@current_user, session, :manage_calendar)
         ag = AppointmentGroup.new(:contexts => [context])
         ag.update_contexts_and_sub_contexts
-        can_create_ags = ag.grants_right? @current_user, session, :create
+        if ag.grants_right? @current_user, session, :create
+          ag_permission = {:all_sections => true}
+        else
+          section_ids = context.section_visibilities_for(@current_user).map { |v| v[:course_section_id] }
+          ag_permission = {:all_sections => false, :section_ids => section_ids} if section_ids.any?
+        end
       end
       info = {
         :name => context.name,
@@ -101,12 +107,18 @@ class CalendarsController < ApplicationController
         :can_create_calendar_events => context.respond_to?("calendar_events") && CalendarEvent.new.tap{|e| e.context = context}.grants_right?(@current_user, session, :create),
         :can_create_assignments => context.respond_to?("assignments") && Assignment.new.tap{|a| a.context = context}.grants_right?(@current_user, session, :create),
         :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.select([:id, :name]).map {|g| { :id => g.id, :name => g.name } } : [],
-        :can_create_appointment_groups => can_create_ags
+        :can_create_appointment_groups => ag_permission
       }
       if context.respond_to?("course_sections")
-        info[:course_sections] = context.course_sections.active.select([:id, :name]).map {|cs| { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name } }
+        info[:course_sections] = context.course_sections.active.select([:id, :name]).map do |cs|
+          hash = { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name}
+          if ag_permission
+            hash[:can_create_ag] = ag_permission[:all_sections] || ag_permission[:section_ids].include?(cs.id)
+          end
+          hash
+        end
       end
-      if info[:can_create_appointment_groups] && context.respond_to?("group_categories")
+      if ag_permission && ag_permission[:all_sections] && context.respond_to?("group_categories")
         info[:group_categories] = context.group_categories.active.select([:id, :name]).map {|gc| { :id => gc.id, :asset_string => gc.asset_string, :name => gc.name } }
       end
       info

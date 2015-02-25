@@ -22,8 +22,8 @@ define [
       @$sectionCheckboxes = @$listItem.find('[name="sections[]"]')
       @$sectionCheckboxes.change @sectionChange
 
-    toggleSections: (jsEvent) =>
-      $(jsEvent.target).toggleClass('ag-sections-expanded')
+    toggleSections: (e) =>
+      @$listItem.find('.ag_sections_toggle').toggleClass('ag-sections-expanded')
       @$sectionsList.toggleClass('hidden')
 
     change: =>
@@ -58,23 +58,25 @@ define [
         else
           @setState('partial')
 
-    disable: ->
+    disableSelf: ->
       @$contentCheckbox.prop('disabled', true)
-      @disableSections()
 
     disableSections: ->
       @$sectionCheckboxes.prop('disabled', true)
 
+    disableAll: ->
+      @disableSelf()
+      @disableSections()
+
     lock: ->
       @locked = true
-      @disable()
-      @disableSections()
+      @disableAll()
 
     isChecked: -> @state != 'off'
 
     sections: ->
       checked = @$sectionCheckboxes.filter(':checked')
-      if checked.length == @$sectionCheckboxes.length
+      if checked.length == @$sectionCheckboxes.length && !@$contentCheckbox.attr('disabled')
         []
       else
         _.map(checked, (cb) -> cb.value)
@@ -104,6 +106,7 @@ define [
           item.lock()
       else
         contextsBySubContext = {}
+
         for c in @contexts
           for section in c.course_sections
             contextsBySubContext[section.asset_string] = c.asset_string
@@ -120,6 +123,11 @@ define [
           if item.state == 'off'
             item.setState('on')
             item.lock()
+
+        for c, item of @contextSelectorItems
+          unless item.locked || item.context.can_create_appointment_groups.all_sections
+            item.toggleSections()
+            item.disableSelf()
 
       $('.ag_contexts_done').click preventDefault closeCB
 

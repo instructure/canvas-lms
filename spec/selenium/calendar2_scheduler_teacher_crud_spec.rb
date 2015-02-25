@@ -74,6 +74,33 @@ describe "scheduler" do
       expect(ffj('.ag_sections input:checked').size).to eq 1
     end
 
+    it "should allow section limited teachers to create appointment groups for their own sections" do
+      course_with_teacher_logged_in(:limit_privileges_to_course_section => true)
+      @course.course_sections.create! :name => 'other section'
+
+      section_name = "seeable section"
+      section = @course.default_section
+      section.name = section_name
+      section.save!
+
+      get "/calendar2"
+      click_scheduler_link
+      fill_out_appointment_group_form("blah", :skip_contexts => true)
+      f('.ag_contexts_selector').click
+      expect(f('.ag_sections_toggle.ag-sections-expanded')).to_not be_nil # should already be expanded
+      expect(f('[name="context_codes[]"]').attribute("disabled")).to_not be_nil # course checkbox should be disabled
+      expect(ff("[name='sections[]']").count).to eq 1 # should only show one section
+
+      f("[name='sections[]'][value='#{section.asset_string}']").click
+      f('.ag_contexts_done').click
+
+      submit_appointment_group_form
+
+      @course.reload
+      new_group = @course.appointment_groups.first
+      expect(new_group.sub_contexts.first).to eq section
+    end
+
     it "should delete an appointment group" do
       create_appointment_group
       get "/calendar2"
