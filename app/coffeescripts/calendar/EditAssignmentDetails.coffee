@@ -49,7 +49,9 @@ define [
       data = @$form.getFormData( object_name: 'assignment' )
       params = {}
       if data.title then params['title'] = data.title
-      if data.due_at then params['due_at'] = data.due_at
+      if data.due_at and @$form.find(".datetime_field").data('unfudged-date')
+          params['due_at'] = @$form.find(".datetime_field").data('unfudged-date').toISOString()
+
       if data.assignment_group_id then params['assignment_group_id'] = data.assignment_group_id
       params['return_to'] = window.location.href
       pieces[0] += "?" + $.param(params)
@@ -134,4 +136,3 @@ define [
       @event.start = dueAt
       @event.save(params)
       @closeCB()
-
