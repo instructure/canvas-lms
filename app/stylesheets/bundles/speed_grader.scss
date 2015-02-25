@@ -108,11 +108,7 @@ $gradebook_header_height: 52px;
       &:hover, &:focus {
         background-position: left -31px;
       }
-      &:focus {
-        @if $use_high_contrast {
-          @include button-focus;
-        }
-      }
+      &:focus { @include button-focus-light; }
       &:active {
         background-position: bottom left;
       }

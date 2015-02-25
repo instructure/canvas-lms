@@ -194,9 +194,6 @@
     line-height: 20px;
     margin: auto;
     display: inline-block;
-    &:focus { 
-      @if $use_high_contrast { @include button-focus; }
-    }
 
     .icon-mini-arrow-down {
       vertical-align: middle;

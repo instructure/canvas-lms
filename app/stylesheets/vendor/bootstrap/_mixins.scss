@@ -282,14 +282,6 @@
   border-bottom: 1px solid $bottom;
 }
 
-// Button focus state
-@mixin button-focus($color: $ic-brand-primary) {
-  outline: 2px solid lighten($color, 10%);
-  outline-offset: -2px;
-  box-shadow: inset 0 0 2px 2px rgba($color, 0.4);
-  text-decoration: none;
-}
-
 // Accessibility prompts (visible through keyboard navigation focus)
 // If the prompt is not a clickable link, set $is-link to false when including the mixin
 @mixin accessibility-prompt($is-link: true) {
@@ -308,6 +300,27 @@
   @if $is-link {
     &:focus { text-decoration: underline; }
   }
+}
+
+@mixin ic-focus-base {
+  outline-width: 1px;
+  outline-color: transparent;
+  outline-style: solid;
+}
+
+@mixin ic-focus-variant($color: $ic-link-color, $offset: -1px) {
+  outline-offset: $offset;
+  outline-color: $color;
+}
+
+@mixin button-focus-light {
+  @if $use_high_contrast { box-shadow: inset 0 0 0 2px lighten($ic-link-color, 4%); }
+  @else { box-shadow: inset 0 0 0 1px lighten($ic-link-color, 4%); } 
+}
+
+@mixin button-focus-dark { 
+  @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-color-light; }
+  @else { box-shadow: inset 0 0 0 1px $ic-color-light;  }
 }
 
 // Button backgrounds
@@ -337,19 +350,18 @@
 
 }
 
-
 // Updated replacement mixin for buttonBackground ^^
-@mixin canvas-button( $button-color, $text-color) {
+@mixin canvas-button($button-color, $text-color) {
   background: $button-color;
   color: $text-color;
   border: 1px solid darken($button-color, 15%);
-
-  &:hover, &:focus {
-    background: darken($button-color, 6%);
+  &:focus { color: $text-color; }
+  &:hover {
+    background: darken($button-color, 5%);
     color: $text-color;
     
     // handle jquery UI ui-button conflicts
-    &.ui-state-hover, &.ui-state-focus {
+    &.ui-state-hover {
       background: darken($button-color, 6%);
       color: $text-color;
       border-color: darken($button-color, 15%);
@@ -364,10 +376,16 @@
       border-color: darken($button-color, 65%);
       color: $ic-color-light;
     }
-    &:active { background: darken($button-color, 8%); }
+    &:focus { @include button-focus-light; }
+    // handle jquery UI ui-button states
+    &.ui-state-focus.ui-state-active { 
+      &:focus { @include button-focus-dark; } 
+    }
+    &:active { background: darken($button-color, 8%); } 
   }
 
   @else {
+    &:focus { @include button-focus-dark; }
     &.active, &.Button--active, &:active {
       background: darken($button-color, 8%);
       box-shadow: none;

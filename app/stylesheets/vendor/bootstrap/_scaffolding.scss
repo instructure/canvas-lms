@@ -21,18 +21,18 @@ body {
 
 a {
   color: $ic-link-color;
-  
-  &:hover, &:focus { color: darken($ic-link-color, 10%); }
+  &:focus, &:hover { color: darken($ic-link-color, 10%); }
 
-  @if $use_high_contrast { 
+  @if $use_high_contrast {
     text-decoration: underline;
-    &:hover, &:focus { text-decoration: none; }
-    &:focus { @include button-focus; }
+    &:focus, &:hover { text-decoration: none; }
+    @include ic-focus-base;
+    &:focus { @include ic-focus-variant($color: $ic-link-color, $offset: -1px); }
   }
 
   @else { 
     text-decoration: none;
-    &:hover, &:focus { text-decoration: underline; }
+    &:focus, &:hover { text-decoration: underline; }
   }
 
 }
