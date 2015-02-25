@@ -21,7 +21,6 @@ require 'csv'
 require 'net/http'
 require 'uri'
 require 'nokogiri'
-require 'libxml'
 require 'multipart'
 
 
