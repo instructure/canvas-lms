@@ -1527,4 +1527,23 @@ describe DiscussionTopic do
       expect(topics.first.list_scope.map(&:id)).to eq ids
     end
   end
+
+  describe "context_module_action" do
+    context "group discussion" do
+      before :once do
+        group_assignment_discussion
+        @module = @course.context_modules.create!
+        @topic_tag = @module.add_item(type: 'discussion_topic', id: @root_topic.id)
+        @module.completion_requirements = { @topic_tag.id => { type: 'must_contribute' } }
+        @module.save!
+        student_in_course active_all: true
+        @group.add_user @student, 'accepted'
+      end
+
+      it "fulfills module completion requirements on the root topic" do
+        @topic.reply_from(user: @student, text: "huttah!")
+        expect(@student.context_module_progressions.where(context_module_id: @module).first.requirements_met).to include({id: @topic_tag.id, type: 'must_contribute'})
+      end
+    end
+  end
 end

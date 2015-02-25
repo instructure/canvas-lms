@@ -850,6 +850,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def context_module_action(user, action, points=nil)
+    return self.root_topic.context_module_action(user, action, points) if self.root_topic
     tags_to_update = self.context_module_tags.to_a
     if self.for_assignment?
       tags_to_update += self.assignment.context_module_tags
