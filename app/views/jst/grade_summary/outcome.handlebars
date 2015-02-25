@@ -1,12 +1,16 @@
 <div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}" aria-label="{{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}">
   {{#if scoreDefined}}
-    {{#ifEqual status 'mastery'}}
-      {{addIcon 'check'}}
+    {{#ifEqual status 'exceeds'}}
+      {{addIcon 'check-plus'}}
     {{else}}
-      {{#ifEqual status 'near'}}
-        {{addIcon 'plus'}}
+      {{#ifEqual status 'mastery'}}
+        {{addIcon 'check'}}
       {{else}}
-        {{addIcon 'x'}}
+        {{#ifEqual status 'near'}}
+          {{addIcon 'plus'}}
+        {{else}}
+          {{addIcon 'x'}}
+        {{/ifEqual}}
       {{/ifEqual}}
     {{/ifEqual}}
   {{else}}

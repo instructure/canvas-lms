@@ -35,3 +35,4 @@ define [
         when 'remedial' then I18n.t('Well Below Mastery')
         when 'near' then I18n.t('Near Mastery')
         when 'mastery' then I18n.t('Meets Mastery')
+        when 'exceeds' then I18n.t('Exceeds Mastery')

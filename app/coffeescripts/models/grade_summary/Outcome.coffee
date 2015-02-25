@@ -17,7 +17,9 @@ define [
       if @scoreDefined()
         score = @get('score')
         mastery = @get('mastery_points')
-        if score >= mastery
+        if score >= mastery + (mastery / 2)
+          'exceeds'
+        else if score >= mastery
           'mastery'
         else if score >= mastery / 2
           'near'

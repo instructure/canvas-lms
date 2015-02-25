@@ -12,6 +12,10 @@ define [
     outcome = new Outcome({score: 4, mastery_points: 3})
     equal outcome.status(), 'mastery'
 
+  test "#status should be exceeds if the score is 150% or more of mastery points", ->
+    outcome = new Outcome({score: 4.5, mastery_points: 3})
+    equal outcome.status(), 'exceeds'
+
   test "#status should be near if the score is greater than half the mastery points", ->
     outcome = new Outcome({score: 2, mastery_points: 3})
     equal outcome.status(), 'near'

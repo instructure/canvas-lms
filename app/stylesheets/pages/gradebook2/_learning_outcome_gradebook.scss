@@ -1,3 +1,5 @@
+@import 'pages/shared/_outcome_colors';
+
 $border-light: #d3d9d9;
 $border-sidebar: #c9d0d6;
 $border-dark:  #bbb;
@@ -5,9 +7,6 @@ $default-link-color: #0088cc;
 $font-color: #555;
 $header-child-margin: 10px 8px 2px 8px;
 $header-font-color: #627382;
-$mastery-green: #8bab58;
-$mastery-yellow: #e0d670;
-$mastery-red: #dd5c5c;
 $page-light: #f3f5f7;
 $page-dark: #ebeff2;
 
@@ -351,7 +350,8 @@ $page-dark: #ebeff2;
   margin-left: 10px;
   vertical-align: text-top;
 
-  &.mastery      { background: $mastery-green; }
-  &.near-mastery { background: $mastery-yellow; }
-  &.remedial     { background: $mastery-red; }
+  &.exceeds      { background: $exceeds-color; }
+  &.mastery      { background: $mastery-color; }
+  &.near-mastery { background: $near-color; }
+  &.remedial     { background: $remedial-color; }
 }

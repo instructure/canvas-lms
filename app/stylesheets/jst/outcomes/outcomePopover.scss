@@ -1,4 +1,5 @@
 @import 'base/environment';
+@import 'pages/shared/_outcome_colors';
 
 .outcome-details {
   position: absolute;
@@ -56,14 +57,17 @@
   .mastery-details i:before {
     font-size: 1.5em;
   }
+  .exceeds:before {
+    color: $exceeds-color;
+  }
   .mastery:before {
-    color: #5DC28F;
+    color: $mastery-color;
   }
   .near-mastery {
-    color: #DFB056;
+    color: $near-color;
   }
   .remedial:before {
-    color: #F76A66;
+    color: $remedial-color;
   }
   .method-details {
     background-color: $ic-color-neutral;

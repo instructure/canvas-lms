@@ -23,13 +23,17 @@
     <div class="mastery-details pull-right" aria-hidden="true">
       {{#if score}}
         <span>{{score}} / {{mastery_points}}</span>
-        {{#ifEqual status 'mastery'}}
-          <i class="icon-check mastery"></i>
+        {{#ifEqual status 'exceeds'}}
+            <i class="icon-check-plus exceeds"></i>
         {{else}}
-          {{#ifEqual status 'near'}}
-          <i class="icon-plus near-mastery"></i>
+          {{#ifEqual status 'mastery'}}
+            <i class="icon-check mastery"></i>
           {{else}}
-          <i class="icon-x remedial"></i>
+            {{#ifEqual status 'near'}}
+            <i class="icon-plus near-mastery"></i>
+            {{else}}
+            <i class="icon-x remedial"></i>
+            {{/ifEqual}}
           {{/ifEqual}}
         {{/ifEqual}}
       {{else}}
@@ -48,7 +52,7 @@
     </div>
     <div class="screenreader-only">
       {{#if score}}
-        {{#t}}Current Mastery Score: {{score}} out of {{masteryPoints}}{{/t}}
+        {{#t}}Current Mastery Score: {{score}} out of {{mastery_points}}{{/t}}
       {{else}}
         {{#t}}No score yet{{/t}}
       {{/if}}

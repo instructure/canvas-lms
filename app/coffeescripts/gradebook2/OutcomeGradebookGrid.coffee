@@ -14,7 +14,7 @@ define [
   ###
 
   Grid =
-    filter: ['mastery', 'near-mastery', 'remedial']
+    filter: ['exceeds', 'mastery', 'near-mastery', 'remedial']
 
     averageFn: 'mean'
 
@@ -353,6 +353,8 @@ define [
       masteryClassName: (score, outcome) ->
         mastery     = outcome.mastery_points
         nearMastery = mastery / 2
+        exceedsMastery = mastery + (mastery / 2)
+        return 'exceeds' if score >= exceedsMastery
         return 'mastery' if score >= mastery
         return 'near-mastery' if score >= nearMastery
         'remedial'
