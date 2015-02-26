@@ -1459,7 +1459,7 @@ ru:
     few: "Вы уверены, что хотите удалить эти %{count} элемента?"
     one: "Вы уверены, что хотите удалить %{name}?"
     other: "Вы уверены, что хотите удалить эти %{count} элементов?"
-  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Удалить объявление?"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Вы уверены, что хотите удалить это объявление?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Вы уверены, что хотите удалить эту схему оценок?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Вы уверены, что хотите удалить этот инструмент?"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Когда вы начнете набирать текст в этом поле, список групп будет автоматически фильтроваться, оставляя только те названия, которые соответствуют вашему вводу."
@@ -14089,7 +14089,7 @@ ru:
       close: Закрыть
       forward: Переслать
   smartbanner: 
-    android_banner_view_button: ОБЗОР
+    android_banner_view_button: ПРОСМОТР
   source_code_2395ca74: "Код источника"
   speed_grader: 
     submissions_dropdown: 
@@ -15308,7 +15308,7 @@ ru:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Сохранит самую высокую из ваших оценок"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Сохранит самую последнюю из ваших оценок"
   will_paginate: 
-    next_label: "Следующий &#8594;"
+    next_label: "Далее &#8594;"
     page_entries_info: 
       multi_page: "Отображается %{model} %{from} - %{to} из %{count} в общей сложности"
       multi_page_html: "Отображается %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> из <b>%{count}</b> в общей сложности"
@@ -15321,7 +15321,7 @@ ru:
         other: "Отображаются <b>все&nbsp;%{count}</b> %{model}"
         zero: "%{model} не найдены"
     page_gap: "&hellip;"
-    previous_label: "&#8592; Предыдущая"
+    previous_label: "&#8592; Назад"
   wimba_conference: 
     external_urls: 
       archive: Архив
@@ -15337,7 +15337,7 @@ ru:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Вы можете назначить несколько ассистентов, чтобы они помогали вам с курсом. Ассистенты могут оценивать отправки студентов, помогать модерировать обсуждения и даже обновлять даты выполнения и сведения о задании."
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Вы должны задать число равное или превышающее %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Вы должны указать право на использование"
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Ваш браузер не соответствует минимальным требованиям Canvas. Посетите *руководство пользователя Canvas* для получения полного списка поддерживаемых браузеров."
+  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Ваш браузер не соответствует минимальным требованиям Canvas. Перейдите к *руководству пользователя Canvas* для получения полного списка поддерживаемых браузеров."
   your_content_has_been_exported_bbb57764: "Ваше содержимое было экспортировано."
   your_message_has_been_sent_thank_you_e0284316: "Ваше сообщение было отправлено. Спасибо!"
   your_search_encountered_the_following_errors_fc3e5e7f: 
