@@ -97,7 +97,7 @@ define [
             ref: "publishCloud"
             className:'btn-link published-status restricted'
             title: @getRestrictedText()
-            'aria-label': @getRestrictedText(),
+            'aria-label': @getRestrictedText() + ' - ' + I18n.t('Click to modify'),
               i className:'icon-cloud-lock'
         else if @state.published && @state.hidden
           button
@@ -107,7 +107,7 @@ define [
             ref: "publishCloud"
             className:'btn-link published-status hiddenState'
             title: I18n.t('hidden_title', 'Hidden. Available with a link')
-            'aria-label': I18n.t('label.hidden', 'Hidden. Available with a link'),
+            'aria-label': I18n.t('Hidden. Available with a link - Click to modify'),
               i className:'icon-cloud-lock'
         else if @state.published
           button
@@ -117,7 +117,7 @@ define [
             ref: "publishCloud",
             className:'btn-link published-status published'
             title: I18n.t('published_title', 'Published')
-            'aria-label': I18n.t('label.published', 'Published'),
+            'aria-label': I18n.t('Published - Click to modify'),
               i className:'icon-publish'
         else
           button
@@ -127,7 +127,7 @@ define [
             ref: "publishCloud"
             className:'btn-link published-status unpublished'
             title: I18n.t('unpublished_title', 'Unpublished')
-            'aria-label': I18n.t('label.unpublished', 'Unpublished'),
+            'aria-label': I18n.t('Unpublished - Click to modify'),
               i className:'icon-unpublish'
       else
         if @state.published && @state.restricted
