@@ -173,7 +173,9 @@
 
 .event-detail-overflow {
   min-height: 30px;
+  min-width: 160px;
   max-width: 395px;
+  max-height: 495px;
   margin-bottom: 6px;
   overflow: auto;
 }
