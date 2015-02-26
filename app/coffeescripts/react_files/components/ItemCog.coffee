@@ -68,7 +68,7 @@ define [
           type: 'button'
           ref: 'settingsCogBtn'
           className: 'al-trigger al-trigger-gray btn btn-link'
-          'aria-label': I18n.t('settings', 'Settings')
+          'aria-label': I18n.t('Actions')
           'data-popup-within' : "#wrapper"
           'data-append-to-body' : true
         },

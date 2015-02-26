@@ -176,13 +176,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
     end
 
     it "should set usage rights on a file via the cog menu" do
-      f('.ef-links-col button[aria-label="Settings"]').click
+      f('.ef-links-col .al-trigger').click
       f('.ItemCog__OpenUsageRights a').click
       wait_for_ajaximations
       set_usage_rights_in_modal
       react_modal_hidden
       # a11y: focus should go back to the element that was clicked.
-      check_element_has_focus(f('.ef-links-col button[aria-label="Settings"]'))
+      check_element_has_focus(f('.ef-links-col .al-trigger'))
       verify_usage_rights_ui_updates
     end
 
