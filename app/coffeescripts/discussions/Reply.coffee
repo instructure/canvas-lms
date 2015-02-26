@@ -143,19 +143,20 @@ define [
     # Adds an attachment
     addAttachment: ($el) ->
       @form.find('ul.discussion-reply-attachments').append(replyAttachmentTemplate())
+      @form.find('ul.discussion-reply-attachments input').focus()
       @form.find('a.discussion-reply-add-attachment').hide() # TODO: when the data model allows it, tweak this to support multiple in the UI
 
     ##
     # Removes an attachment
     removeAttachment: ($el) ->
       $el.closest('ul.discussion-reply-attachments li').remove()
-      @form.find('a.discussion-reply-add-attachment').show()
+      @form.find('a.discussion-reply-add-attachment').show().focus()
 
     ##
     # Removes all attachments
     removeAttachments: ->
       @form.find('ul.discussion-reply-attachments').empty()
-      @form.find('a.discussion-reply-add-attachment').show()
+      @form.find('a.discussion-reply-add-attachment').show().focus()
 
   _.extend Reply.prototype, Backbone.Events
 
