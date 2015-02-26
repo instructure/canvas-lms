@@ -149,9 +149,11 @@ define [
       e.preventDefault() if e
 
       if !!@$el.find('#calculation_method').val()
-        intInfo = CALC_METHODS[@$el.find('#calculation_method').val()]
+        calc_method = @$el.find('#calculation_method').val()
       else
-        intInfo = CALC_METHODS[@$el.find('#calculation_method').data('calculation-method')]
+        calc_method = @$el.find('#calculation_method').data('calculation-method')
+
+      intInfo = CALC_METHODS[calc_method]
 
       if intInfo.showCalcIntSettingBox
         @$el.find('#calculation_int_left_side').show()
@@ -163,6 +165,16 @@ define [
       @$el.find('#calculation_int_example_line_1').text(intInfo.calcIntExampleLine1)
       @$el.find('#calculation_int_example_line_2').text(intInfo.calcIntExampleLine2)
       @$el.find('#calculation_int_example_line_3').text(intInfo.calcIntExampleLine3)
+
+      if @state in ['edit', 'add'] && calc_method in ['n_mastery', 'decaying_average']
+        calc_int_el = @$el.find('#calculation_int')
+        calc_int = parseInt(calc_int_el.val())
+
+        switch calc_method
+          when 'n_mastery'
+            calc_int_el.val("5") if !calc_int || calc_int > 5
+          when 'decaying_average'
+            calc_int_el.val("65") if !calc_int || calc_int == 5
 
     # Update rating form field elements and the total.
     updateRatings: ->

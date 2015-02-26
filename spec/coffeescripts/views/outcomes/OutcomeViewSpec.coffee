@@ -183,4 +183,26 @@ define [
   test 'the banner is not displayed when edit/delete buttons are enabled', ->
     view = createView(model: newOutcome('assessed' : false, 'native' : true), state: 'show')
     ok not view.$el.find('#assessed_info_banner').length > 0
+
+  test 'calculation int gets set intelligently when the calc method is changed', ->
+    view = createView(model: newOutcome('calculation_method' : 'highest'), state: 'edit')
+    changeSelectedCalcMethod(view, 'n_mastery')
+    equal view.$el.find('#calculation_int').val(), '5'
+    changeSelectedCalcMethod(view, 'decaying_average')
+    equal view.$el.find('#calculation_int').val(), '65'
+    changeSelectedCalcMethod(view, 'n_mastery')
+    equal view.$el.find('#calculation_int').val(), '5'
+    view.$el.find('#calculation_int').val('4')
+    equal view.$el.find('#calculation_int').val(), '4'
+    changeSelectedCalcMethod(view, 'decaying_average')
+    equal view.$el.find('#calculation_int').val(), '4'
+    changeSelectedCalcMethod(view, 'highest')
+    changeSelectedCalcMethod(view, 'decaying_average')
+    equal view.$el.find('#calculation_int').val(), '4'
+    view.remove()
+
+  test 'calc int is not incorrectly changed to 65 when starting as n mastery and 5', ->
+    view = createView(model: newOutcome('calculation_method' : 'n_mastery', 'calculation_int' : 5), state: 'edit')
+    changeSelectedCalcMethod(view, 'n_mastery')
+    equal view.$el.find('#calculation_int').val(), '5'
     view.remove()
