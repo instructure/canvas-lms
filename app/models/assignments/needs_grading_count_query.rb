@@ -43,7 +43,7 @@ module Assignments
     def manual_count
       assignment.shard.activate do
         Rails.cache.fetch(['assignment_user_grading_manual_count', assignment, user].cache_key) do
-          all_submissions.count
+          all_submissions.count(:id, distinct: true)
         end
       end
     end
