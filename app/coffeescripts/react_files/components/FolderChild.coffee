@@ -13,8 +13,9 @@ define [
   'compiled/fn/preventDefault'
   './PublishCloud'
   './UsageRightsIndicator'
+  '../modules/FocusStore'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator) ->
+], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator, FocusStore) ->
 
   classSet = React.addons.classSet
 
@@ -104,6 +105,10 @@ define [
         $.screenReaderFlashMessage message
         return false
 
+    handleFileLinkClick: ->
+      FocusStore.setItemToFocus @refs.nameLink.getDOMNode()
+      @props.previewItem()
+
     render: withReactDOM ->
 
       keyboardCheckboxClass = classSet({
@@ -162,7 +167,7 @@ define [
           else
             a {
               href: @props.model.get('url')
-              onClick: preventDefault(@props.previewItem)
+              onClick: preventDefault(@handleFileLinkClick)
               className: 'media'
               ref: 'nameLink'
             },

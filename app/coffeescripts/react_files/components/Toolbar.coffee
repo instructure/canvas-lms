@@ -11,9 +11,11 @@ define [
   '../utils/deleteStuff'
   '../modules/customPropTypes'
   './RestrictedDialogForm'
+  'compiled/fn/preventDefault'
+  '../modules/FocusStore'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactDOM, UploadButton, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
+], (_, I18n, React, Router, withReactDOM, UploadButton, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, $) ->
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
@@ -86,6 +88,10 @@ define [
 
       @props.modalOptions.openModal(contents, => @refs.usageRightsBtn.getDOMNode().focus())
 
+    openPreview: ->
+      FocusStore.setItemToFocus(@refs.previewLink.getDOMNode())
+      @transitionTo(@props.getPreviewRoute(), {splat: @props.currentFolder?.urlPath()}, @props.getPreviewQuery())
+
     render: withReactDOM ->
       showingButtons = @props.selectedItems.length
       downloadTitle = if @props.selectedItems.length is 1
@@ -115,10 +121,10 @@ define [
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
 
 
-          Router.Link {
-              to: @props.getPreviewRoute()
-              query: @props.getPreviewQuery()
-              params: {splat: @props.currentFolder?.urlPath()}
+          a {
+              ref: 'previewLink'
+              href: '#'
+              onClick: preventDefault(@openPreview)
               className: 'ui-button btn-view'
               title: I18n.t('view', 'View')
               role: 'button'

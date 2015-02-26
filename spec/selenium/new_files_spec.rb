@@ -71,7 +71,27 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
             button.send_keys("\t")
           end
         end
+
+        it "returns focus to the link that was clicked when closing with the esc key" do
+          driver.execute_script('return document.activeElement').send_keys :escape
+          check_element_has_focus(fln("example.pdf"))
+        end
+
+        it "returns focus to the link when the close button is clicked" do
+          f('.ef-file-preview-header-close').click
+          check_element_has_focus(fln("example.pdf"))
+        end
       end
+
+      context "Toolbar Previews" do
+        it "returns focus to the preview toolbar button when closed" do
+          ff('.ef-item-row')[0].click
+          f('.btn-view').click
+          f('.ef-file-preview-header-close').click
+          check_element_has_focus(f('.btn-view'))
+        end
+      end
+
 
    end
 

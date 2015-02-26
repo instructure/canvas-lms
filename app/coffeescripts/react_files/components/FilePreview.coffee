@@ -16,7 +16,8 @@ define [
   '../utils/collectionHandler'
   './FilePreviewInfoPanel'
   '../modules/filesEnv'
-], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, File, FilesystemObject, preventDefault, withReactDOM, collectionHandler, FilePreviewInfoPanel, filesEnv) ->
+  '../modules/FocusStore'
+], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, File, FilesystemObject, preventDefault, withReactDOM, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
 
   FilePreview = React.createClass
 
@@ -148,6 +149,7 @@ define [
 
     closeModal: ->
       @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(except: 'only_preview'))
+      FocusStore.setFocusToItem()
 
     toggle: (key) ->
       newState = {}
@@ -179,10 +181,9 @@ define [
                 div {},
                   i {className: 'icon-info'}
                   ' ' + I18n.t('file_preview_headerbutton_info', 'Info')
-              ReactRouter.Link {
-                to: @getRouteIdentifier(),
-                query: @getNavigationParams(except: 'only_preview'),
-                params: @props.params,
+              a {
+                href: '#'
+                onClick: preventDefault(@closeModal)
                 className: 'ef-file-preview-header-close ef-file-preview-button',
               },
                 i {className: 'icon-end'}
