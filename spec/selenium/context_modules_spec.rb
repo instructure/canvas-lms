@@ -646,6 +646,22 @@ describe "context_modules" do
       expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
     end
 
+    context "Keyboard Accessibility" do
+      it "should set focus to the first drag handle after the + Module button" do
+        # Add two modules, so the drag handles show up.
+        course_module
+        course_module
+        get "/courses/#{@course.id}/modules"
+
+        driver.execute_script("$('.add_module_link').focus()")
+        add_module_link = f('.add_module_link')
+        add_module_link.send_keys("\t")
+        first_handle = f('.icon-drag-handle')
+        check_element_has_focus(first_handle)
+
+      end
+    end
+
     context "multiple overridden due dates" do
       def create_section_override(section, due_at)
         override = assignment_override_model(:assignment => @assignment)
