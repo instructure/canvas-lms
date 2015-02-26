@@ -1043,6 +1043,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/users', action: :create
       get 'accounts/:account_id/users', action: :index, as: 'account_users'
 
+      get 'users/:id', action: :api_show
       put 'users/:id', action: :update
       post 'users/:user_id/files', action: :create_file
 

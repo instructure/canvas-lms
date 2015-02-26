@@ -98,7 +98,7 @@
 #           "format": "date-time"
 #         },
 #         "time_zone": {
-#           "description": "Optional: This field is only returned in ceratin API calls, and will return the IANA time zone name of the user's preferred timezone.",
+#           "description": "Optional: This field is only returned in certain API calls, and will return the IANA time zone name of the user's preferred timezone.",
 #           "example": "America/Denver",
 #           "type": "string"
 #         },
@@ -968,6 +968,33 @@ class UsersController < ApplicationController
           render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
                                     @current_user.pseudonym.account) }
       end
+    end
+  end
+
+  # @API Show user details
+  #
+  # Shows details for user.
+  #
+  # Also includes an attribute "permissions", a non-comprehensive list of permissions for the user.
+  # Example:
+  #   !!!javascript
+  #   "permissions": {
+  #    "can_update_name": true, // Whether the user can update their name.
+  #    "can_update_avatar": false // Whether the user can update their avatar.
+  #   }
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/self \
+  #       -X GET \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @returns User
+  def api_show
+    @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
+    if @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
+      render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions}, @current_user.pseudonym.account)
+    else
+      render_unauthorized_action
     end
   end
 
