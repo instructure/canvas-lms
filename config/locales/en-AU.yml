@@ -7806,6 +7806,7 @@ en-AU:
   manage_usage_rights_c5a8c216: "Manage Usage Rights"
   manual_entry_e4a4f99a: "Manual Entry"
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mastery score reflects the most recent graded assignment or quiz."
+  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Mastery score reflects the highest score of a graded assignment or quiz."
   mathquill: 
     tabs: 
       arrows: Arrows
@@ -9823,6 +9824,7 @@ en-AU:
     errors: 
       valid_workflow_state: "Must send a valid workflow state"
   missing_percent_94534638: "Missing: %{percent}"
+  model_is_already_located_in_newgroup_e5cea361: "%{model} is already located in %{newGroup}"
   module_item_types: 
     assignment: Assignment
     disuccsion: Discussion
@@ -9954,6 +9956,8 @@ en-AU:
       no_students_found: "No students were found"
       progression_header: "Module Progression"
       student_progress: "Student Progress"
+    relock_modules: "Re-Lock Modules"
+    requirements_changed: "Requirements Changed"
   modules_item_controller: 
     max_score_complete: "scored no more than a *score*"
     max_score_incomplete: "must score no more than a *score*"
@@ -9970,6 +9974,7 @@ en-AU:
   moodle_formula_many_warning_title: "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated"
   moodle_formula_warning_title: "Possible answers will need to be regenerated for Formula question"
   more_courses_5ebbe998: "More Courses"
+  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Most recent score counts as 75% of mastery weight, average of all other scores count as 25% of weight."
   move_dialog: 
     cancel: Cancel
     save: Save
@@ -9977,6 +9982,9 @@ en-AU:
     where_to_move: "Where would you like to move *%{name}*?"
   move_dialog_select: 
     move_to_end: "-- At the bottom --"
+  move_outcome_ce497e6c: "Move Outcome"
+  move_outcome_group_cfa1a505: "Move Outcome Group"
+  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Must achieve mastery at least 2 times. Scores above mastery will be averaged to calculate final score."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Must supply 'file_ids' and/or 'folder_ids' parameter"
   mute_dialog: 
     curving_assignments: "Curving assignments"
@@ -9994,7 +10002,10 @@ en-AU:
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Name
   name_3806192d: "Name:"
+  name_app_has_been_deleted_fb2d9426: "%{name} app has been deleted"
   name_error_fee4236: "Name Error"
+  name_has_been_successfully_installed_but_has_not_y_c3148b96: "*name* has been successfully installed but has not yet been enabled."
+  name_is_currently_status_9065c996: "*name* is currently **status**."
   name_only_5f56718e: "Name Only"
   new_account_role_6e5c4964: "New Account Role"
   new_course_role_6a7bb75f: "New Course Role"
@@ -10010,15 +10021,20 @@ en-AU:
   next_steps_ce0f0d0c: "Next Steps"
   no_assignment_name_adbb215b: "No Assignment Name"
   no_content_has_been_added_f36bab43: "* No content has been added"
+  no_directory_is_selected_please_select_a_directory_46ded46: "No directory is selected, please select a directory before clicking 'move'"
   no_due_date_44271c53: "No Due Date"
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: "No"
+  no_grading_periods_to_display_ad25c8f3: "No grading periods to display"
+  no_grading_schemes_to_display_8b0e92e7: "No grading schemes to display"
   no_migration_file: "File required for content migration."
+  no_score_yet_c94e919b: "No score yet"
   no_students_have_taken_the_quiz_yet_e667644b: "No Students have taken the quiz yet"
   no_students_have_taken_the_survey_yet_d378cd35: "No Students have taken the survey yet"
   no_usage_rights_object_supplied_304b8d40: "No 'usage_rights' object supplied"
   not_a_number: "must be a positive number"
   not_installed_37a21a76: "Not Installed"
+  not_now_97efd947: "Not now"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Note: some items fall outside the start and/or end dates of the course"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "NOTE: Students have submitted work for these assignments that has not been graded. If you post these grades now, youwill need to re-post their scores after grading their latest submissions."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Note: This login's account uses delegated authentication, but allows fallback Canvas password authentication. The password fields in this form update the fallback Canvas password, *not* the delegated authentication."
@@ -10252,6 +10268,7 @@ en-AU:
       other: Other
       parent: "Parent Emails"
       scheduling: Scheduling
+  now_click_the_agenda_button_607fb40e: "Now click the *Agenda* button"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Now that your course is set up and available, you probably won't need this checklist anymore. But we'll keep it around in case you realise later you want to try something new, or you just want a little extra help as you make changes to your course content."
   num_messages_c1949bbc: 
     one: "1 message"
@@ -10300,9 +10317,11 @@ en-AU:
     observing: Observing
   of_students_5d1af0d2: "# of students"
   ok_c47544a2: OK
+  okay_got_it_d686d4e8: "Ok, got it"
   on_time_percent_eebffe38: "On Time: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Once you’ve changed an answer you’ll need to choose an option before updating the question."
   one_per_line_format_name_value_79647700: "One per line. Format: name=value"
+  ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} on time, %{late} late, %{missing} missing"
   options: 
     ? "no"
     : "No"
@@ -10328,6 +10347,7 @@ en-AU:
   outcome_results: 
     outcomes_filename: Outcomes
   outcome_results_title: "Outcome Results"
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Outcome: %{title} has a status of %{statusTooltip}"
   outcomes: 
     account_standards: "Account Standards"
     account_standards_description: "To the left you'll notice the standards your institution has created for you to use in your courses."
@@ -10511,12 +10531,14 @@ en-AU:
     view_more_link: "View More"
   paginated_view: 
     loading_more_results: "Loading more results"
+  participations_1823832d: Participations
   paste_xml_cda3a64e: "Paste XML"
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
   pdf_d8236d9a: PDF
   percent_of_students_scored_score_53d2c4d5: "%{percent} of students scored %{score}"
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% of %{bytesAvailable} used"
+  permission_not_found_620b80d1: "Permission not found"
   permissions: 
     manage_webhooks: "Manage webhooks"
   plain_text_e3ab33aa: "Plain text"
@@ -10669,6 +10691,18 @@ en-AU:
       labels: 
         api_key: "OAuth Consumer Key"
         secret_key: "OAuth Consumer Secret"
+    google_drive: 
+      description: "Google Drive file sharing"
+      name: "Google Drive"
+    google_drive_settings: 
+      description: "Paste the contents of client_secrets.json below. The text boxes above will be automatically filled in based on the content given below."
+      labels: 
+        auth_uri: "Auth URI"
+        client_id: "Client ID"
+        client_secret: "Client Secret"
+        client_secret_json: "Client secrets json"
+        redirect_uri: "Redirect URI"
+        token_uri: "Token URI"
     grade_export: 
       description: "Mark Export for SIS"
       name: "Mark Export"
@@ -10902,6 +10936,7 @@ en-AU:
     labels: 
       requirements_must_be_completed: "The following requirements need to be completed before this page will be unlocked"
   presentation_2d9387ca: Presentation
+  press_spacebar_for_more_details_on_this_outcome_f6713a42: "press spacebar for more details on this outcome"
   privacy_290109ea: Privacy
   product_name: Canvas
   profile: 
@@ -10973,6 +11008,7 @@ en-AU:
       buttons: 
         add_picture_file: "Add File"
         authorize_google_docs: "Authorize Google Docs Access"
+        authorize_google_drive: "Authorise Google Drive Access"
         authorize_twitter: "Authorize Twitter Access"
         generate_token: "Generate Token"
         new_access_token: "New Access Token"
@@ -11000,6 +11036,7 @@ en-AU:
           applications as needed, but if [you're developing a new or limited
           project](%{documentation_url}) you can just generate the token from here.
       google_docs_description: "Once you authorize us to see your Google Docs you'll be able to submit your assignments directly from Google Docs, and create and share documents with members of your classes."
+      google_drive_description: "Once you authorise us to see your Google Drive you'll be able to submit your assignments directly from Google Drive, and create and share documents with members of your classes."
       headers: 
         application_abbrev: App
         dates: Dates
@@ -11008,6 +11045,7 @@ en-AU:
         facebook_access: "Facebook Access"
         generate_access_token: "Generate an Access Token"
         google_docs_access: "Google Docs Access"
+        google_drive_access: "Google Drive Access"
         inbox_opt_out: "Conversations Inbox Opt-out"
         linkedin_access: "LinkedIn Access"
         loading_images: "Loading Images..."
@@ -11068,6 +11106,7 @@ en-AU:
         edit_settings: "Edit Settings"
         facebook: Facebook
         google_docs: "Google Docs"
+        google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "more options"
         reconfigure_mfa: "Reconfigure Multi-Factor Authentication"
@@ -11090,6 +11129,7 @@ en-AU:
         access_token_details: "Access Token Details"
         authorize_facebook: "Authorize Facebook"
         authorize_google_docs: "Authorize Google Docs"
+        authorize_google_drive: "Authorise Google Drive"
         authorize_linkedin: "Authorize LinkedIn"
         authorize_twitter: "Authorize Twitter"
         authorize_yo: "Yo Login"
@@ -11100,6 +11140,15 @@ en-AU:
         register_skype: "Register Skype"
         remove_account_from_profile: "Remove account from this profile"
         unregister_service: "Unregister Service"
+      twitter_description: |-
+          Twitter is a service for posting and subscribing to short messages.
+          If you have a Twitter account, you can register it here.  Then if you allow
+          fellow course/group members to see your registered services, they can
+          easily connect with your Twitter account.
+          
+          You can also sign up to have notifications sent to your Twitter account.
+          These notifications will be sent as direct messages to yourself from
+          yourself, and won't appear in your public stream.
       unknown_service: Unknown
       web_services: "Canvas can make your life a lot easier by tying itself in with the web tools you already use. Click any of the services in \"Other Services\" to see what we mean."
       yo_description: |-
@@ -11504,6 +11553,8 @@ en-AU:
     inverted_table_view: 
       headers: 
         question: Question
+    links: 
+      log_accessibility_warning: "Warning: The Table View is not accessible to screenreaders. Please use the current view instead."
     loading: Loading...
     navigation: 
       links: 
@@ -11625,10 +11676,12 @@ en-AU:
     no_answer: "No Answer"
     question_breakdown: "Question Breakdown"
     question_header: "Question %{position}"
+    quiz-stats-noshow-warning: "Even awesomeness has limits. We can't render statistics for this quiz, but you can download the reports."
     response_student_count: 
       one: "1 student"
       other: "%{count} students"
       zero: Nobody
+    sad-panda-alttext: "Sad things in panda land."
     speedgrader: "View in SpeedGrader"
     summary: 
       audible_chart_description: "%{above_average} students scored above or at the average, and %{below_average} below."
@@ -12448,6 +12501,7 @@ en-AU:
           lock_survey: "Lock this Survey Now"
           unlock_quiz: "Let Students Take this Quiz Now"
           unlock_survey: "Let Students Take this Survey Now"
+        course_concluded_notice: "This quiz is no longer available as the course has been concluded."
         labels: 
           available_until: Until
           no_time_limit: "No time limit"
@@ -12732,9 +12786,11 @@ en-AU:
     updated_at: "Date Modified"
     updated_at_short: Modified
     view: View
+  read_more_about_windows_tiles_ac4ae6f5: "Read more about windows tiles"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha not configured"
   recent_student: 
     last_logged_in: "last logged in %{last_login}"
+  recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Decaying Average"
   recently_deleted_courses_title: "Recently Deleted Courses"
   recipient_input: 
     context_search_placeholder: "Enter a name, course, or group"
@@ -12783,12 +12839,16 @@ en-AU:
         email: Email
         name: Name
     welcome_to_canvas: "Welcome to Canvas!"
+  registration_url_60e0eaaa: "Registration URL"
+  remind_me_next_time_6402eb7d: "Remind me next time"
   remove_attachment_ceae0973: "Remove Attachment"
   remove_f47dc62a: Remove
   remove_row_c198da5a: "Remove row"
   remove_row_f9d59cba: "Remove Row"
   rename_45608f54: Rename
   reply_from_name: "%{name} via Canvas Notifications"
+  reply_to_comment_72d96728: "Reply to Comment"
+  reply_to_main_discussion_29823888: "Reply to Main Discussion"
   require_usage_rights_for_uploaded_files_4507865b: "Require Usage Rights for Uploaded Files"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -12835,6 +12895,7 @@ en-AU:
       manage_assignments: "Manage (add / edit / delete) assignments and quizzes"
       manage_calendar: "Add, edit and delete events on the course calendar"
       manage_canvasnet_courses: "Manage Canvas Network courses"
+      manage_catalog: "Manage catalogue"
       manage_content: "Manage all other course content"
       manage_courses: "Manage ( add / edit / delete ) courses"
       manage_demos: "Manage demos"
@@ -13238,6 +13299,7 @@ en-AU:
       find_links_using_service: "Find links using %{service}"
   select_navigation_links_68e1e924: "Select Navigation Links"
   selected_answer: "You selected this answer."
+  selected_subtree_a7693937: "Selected %{subtree}"
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "You are already enrolled in **%{course}**."
@@ -13314,6 +13376,7 @@ en-AU:
       labels: 
         recaptcha_private_key: "ReCAPTCHA Private Key"
         recaptcha_public_key: "ReCAPTCHA Public Key"
+  setup_checklist_eb8b00b8: "Setup Checklist"
   shared: 
     account_notification: 
       close: close
@@ -14010,6 +14073,10 @@ en-AU:
       titles: 
         uploading: "Uploading, Please Wait."
   shared_secret_892c88f2: "Shared Secret"
+  show_by_date_e3967761: "Show by Date"
+  show_by_type_c5d61732: "Show by Type"
+  show_lti_2_configuration_ui_94ce35a9: "Show LTI 2 Configuration UI"
+  show_me_76823679: "Show me"
   sis_agent_token_authentication_2a0b29e3: "SIS Agent Token Authentication"
   sis_batch: 
     errors: 
@@ -14088,6 +14155,10 @@ en-AU:
       close: Close
       forward: Forward
   smartbanner: 
+    android_banner_author: "Instructure Inc."
+    android_banner_in_google_play: "In Google Play"
+    android_banner_price: FREE
+    android_banner_title: "Canvas by Instructure"
     android_banner_view_button: VIEW
   source_code_2395ca74: "Source code"
   speed_grader: 
@@ -14126,6 +14197,7 @@ en-AU:
     previous_object: "Previous %{type}"
     student_hidden_name: "Student %{position}"
   start_date_e937be8a: "Start Date"
+  starts_on_date_a777f505: "Starts on Date"
   statistics: 
     csv_columns: 
       attempt: attempt
@@ -14147,6 +14219,7 @@ en-AU:
   stream_items_api: 
     assessment_request_title: "Peer Review for %{title}"
   student_5da6bfd1: Student
+  student_921b864d: student
   student_assignment_outcome_map_title: "Student Competency"
   student_groups_desc: |-
       This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
@@ -14329,6 +14402,7 @@ en-AU:
       gathering_files: "Gathering Files..."
   submit_a3cc6859: Submit
   submitted_datetime_fa2e9287: "Submitted: %{dateTime}"
+  successfully_moved_model_to_newgroup_f7b7aa5a: "Successfully moved %{model} to %{newGroup}"
   support: 
     array: 
       last_word_connector: ", and "
@@ -14338,6 +14412,7 @@ en-AU:
       two_words_connector: " and "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Contact your ASC first for assistance. If they are unable to help, please contact us."
       community_support_forums: "Community Support Forums"
       contact_support: "Contact Support"
       contact_support_sub_text: "Get assistance with time-sensitive issues."
@@ -14345,6 +14420,7 @@ en-AU:
       curriculum_assessment_errata_description: "View already reported assessment and curricula errors. Search for \"errata.\""
       networking_academy_description: "View Cisco answers to the most commonly asked questions."
       networking_academy_faqs: "Networking Academy FAQs"
+      support_desk_livechat: "Support Desk Live Chat"
   switch_to_3f310557: "Switch To"
   switch_to_group_group_name_786b913b: "Switch to group %{group_name}"
   syllabus: "Course Syllabus"
@@ -14438,15 +14514,25 @@ en-AU:
         unspecified: whenever
       timespan: "%{start_at} *to* %{end_at}"
   text_document_eacbcdb7: "Text document"
+  the_app_was_activated_a84e055f: "The app was activated"
   the_app_was_added_58e2836a: "The app was added"
   the_app_was_added_successfully_3f785a23: "The app was added successfully"
+  the_app_was_deactivated_573520ab: "The app was deactivated"
   the_app_was_updated_successfully_3d71cd1b: "The app was updated successfully"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download.  Uploading and organising your files is easy with Canvas.  We'll show you how."
+  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "The logo image in the top right Canvas header. 200x200 svg or png"
   the_material_is_in_the_public_domain_279c39a3: "The material is in the public domain"
   the_material_is_licensed_under_creative_commons_3242cb5e: "The material is licensed under Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "The material is subject to fair use exception"
   the_module_item_is_locked_27fe420b: "The module item is locked."
+  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "The shortcut icon for iOS/Android devices. 180x180 png or svg"
+  the_state_parameter_is_required_ffadf213: "The state parameter is required"
+  the_top_track_represents_days_on_which_the_student_2a347099: "The top track represents days on which the *student sent messages* to course instructors. The bottom track is for **messages from the instructors** to the student."
+  there_are_count_results_in_the_list_e74f6e36: 
+    one: "There is 1 result in the list"
+    other: "There are %{count} results in the list"
   there_was_a_problem_adding_the_grading_scheme_92d6d907: "There was a problem adding the grading scheme"
+  there_was_a_problem_deleting_the_grading_period_50ce07c5: "There was a problem deleting the grading period"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "There was a problem deleting the grading scheme"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "There was a problem saving the grading scheme"
   there_was_an_error_in_processing_your_request_6513a49a: "There was an error in processing your request"
@@ -14462,6 +14548,8 @@ en-AU:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "This folder is currently locked and unavailable to view."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "This is a comma separated list of URL's to trust. Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "This most likely happened because you imported course content without its associated files."
+  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "This outcome has been used to assess a student. The calculation method is fixed"
+  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "This outcome has been used to assess a student. The calculation value is fixed"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
   this_student_wrote_f1a3f22d: "This student wrote:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting grades to SIS"
@@ -14670,6 +14758,7 @@ en-AU:
   to_35c6baa2: "to "
   to_c4c44f4b: to
   to_minscore_43e5452e: "to %{minScore}%"
+  to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "To view assignments, make sure the *Agenda* view is active."
   too_many_members_b8b15069: "Too many members"
   tooltips: 
     finished: finished
@@ -14725,6 +14814,7 @@ en-AU:
   usage_rights_f0960ad6: "Usage Rights"
   usage_rights_have_been_set_d1b433c7: "Usage rights have been set."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Usage rights will be set for all of the files contained in:"
+  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Use a *single 16x16, 32x32, 48x48 ico file*."
   used_by_permission_314a78dd: "Used by Permission"
   user: 
     default_user_name: User
@@ -14857,6 +14947,7 @@ en-AU:
       diigo: "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
       facebook: "Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups."
       google_docs: "Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations."
+      google_drive: "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
       linked_in: "LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace."
       skype: "Skype is a free tool for online voice and video calls."
       twitter: "Twitter is a great resource for out-of-class communication."
@@ -14932,6 +15023,8 @@ en-AU:
     facebook_fail: "Facebook authorization failed."
     google_docs_added: "Google Docs access authorized!"
     google_docs_fail: "Google Docs authorization failed. Please try again"
+    google_drive_added: "Google Drive account successfully added!"
+    google_drive_fail: "Google Drive authorisation failed. Please try again"
     grades: 
       average_grades: 
         one: "average for 1 student"
@@ -15122,9 +15215,12 @@ en-AU:
   validate: 
     is_required: "This field is required"
   video_b9f27375: Video
+  view_analytics_91a3b7a: "View Analytics"
   view_app_center_6c89a3fe: "View App Centre"
   view_app_configurations_52b52441: "View App Configurations"
+  view_course_analytics_eefe6b2: "View Course Analytics"
   view_name_app_62a2ad8e: "View %{name} app"
+  view_student_analytics_6b8ccd42: "View Student Analytics"
   visit_864b4060: Visit
   visit_group_group_name_7a816081: "Visit group %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu."
@@ -15135,7 +15231,9 @@ en-AU:
       weekly_message: 
         one: "This Canvas installation is only for testing, and will reset every %{count} weeks."
         other: "This Canvas installation is only for testing, and will reset every %{count} weeks."
+  we_were_unable_to_activate_the_app_578defe7: "We were unable to activate the app."
   we_were_unable_to_add_the_app_418877ef: "We were unable to add the app."
+  we_were_unable_to_deactivate_the_app_5e2632f3: "We were unable to deactivate the app."
   we_were_unable_to_update_the_app_659f5bc6: "We were unable to update the app."
   web_conference: 
     default_name_for_courses: "Course Web Conference"
@@ -15153,6 +15251,7 @@ en-AU:
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
+  where_would_you_like_to_move_title_fabd6e8f: "Where would you like to move %{title}?"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Choose a Language--"
@@ -15290,6 +15389,7 @@ en-AU:
     cannot_update_published: "You are not allowed to update the published state of this wiki page"
     cannot_update_title: "You are not allowed to update the title of this wiki page"
     invalid_editing_roles: "The provided editing roles are invalid"
+  will_keep_the_average_of_all_your_scores_d7e6b733: "Will keep the average of all your scores"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Will keep the highest of all your scores"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Will keep the latest of all your scores"
   will_paginate: 
@@ -15311,20 +15411,34 @@ en-AU:
     external_urls: 
       archive: Archive
       archive_link: "View archive(s)"
+  windows_square_tile_4c00879e: "Windows Square Tile"
+  windows_tile_color_2b786bd9: "Windows Tile Colour"
+  windows_wide_tile_a3302508: "Windows Wide Tile"
+  would_you_like_to_enable_this_app_ccdf735d: "Would you like to enable this app?"
+  would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?"
   xml_configuration_5ea1b942: "XML Configuration"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "You are logged in at %{institution1} using your credentials from %{institution2}"
   you_are_the_group_leader_for_this_group_b8629b70: "you are the group leader for this group"
+  you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "You can hide or show a course’s assignments by toggling them on or off."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "You can now set regrade options for students who have already taken the quiz."
+  you_have_changed_the_progression_requirements_for__6772bc89: "You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*You have made changes to the questions in this quiz.* These changes will not appear for students until you save the quiz."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "You have no outcomes. *Click here* to create one."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "You have no outcomes. Click here to go to the outcomes page."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "You have reached the maximum webhooks per account limit (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "You have reached the maximum webhooks per user limit (%{max})"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you."
+  you_must_select_a_course_to_copy_content_from_e7bd9e09: "You must select a course to copy content from"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "You must set it to a number greater than or equal to %{min}"
   you_must_specify_a_usage_right_5eb57f87: "You must specify a usage right."
+  your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Your Assignment list can now be found on the *Calendar* page."
+  your_assignments_list_has_improved_3eded80e: "Your *Assignments* list has improved!"
+  your_assignments_will_show_here_listed_by_due_date_18dc880f: "Your Assignments will show here listed by due date."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers."
   your_content_has_been_exported_bbb57764: "Your content has been exported."
   your_message_has_been_sent_thank_you_e0284316: "Your message has been sent. Thank you!"
+  your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Your profile photo could not be uploaded. You may have exceeded your upload limit."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Your search encountered the following error:"
     other: "Your search encountered the following errors:"
