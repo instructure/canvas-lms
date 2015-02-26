@@ -9,7 +9,7 @@ class CleanupDuplicateExternalFeeds < ActiveRecord::Migration
       duplicate_scope = ExternalFeed.where(baddie.attributes.slice(*uniq_fields))
       keeper = duplicate_scope.order(:id).first.id
       duplicate_scope.where('id != ?', keeper).find_ids_in_batches do |id_batch|
-        Announcement.where(external_feed_id: id_batch).update_all(external_feed_id: keeper)
+        DiscussionTopic.where(external_feed_id: id_batch).update_all(external_feed_id: keeper)
         ExternalFeedEntry.where(external_feed_id: id_batch).delete_all
         ExternalFeed.where(id: id_batch).delete_all
       end
