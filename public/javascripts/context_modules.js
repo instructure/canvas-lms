@@ -230,7 +230,7 @@ define([
           autoOpen: false,
           modal: true,
           width: 600,
-          height: 300,
+          height: 400,
           close: function () {
             modules.hideMoveModule(true);
             returnFocusTo.focus()
