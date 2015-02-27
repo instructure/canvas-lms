@@ -264,7 +264,7 @@ describe "API Authentication", type: :request do
           Onelogin::Saml::Response.any_instance.stubs(:name_qualifier).returns(nil)
           Onelogin::Saml::Response.any_instance.stubs(:session_index).returns(nil)
 
-          get 'saml_consume', :SAMLResponse => "foo"
+          post 'saml_consume', :SAMLResponse => "foo"
         end
       end
 
