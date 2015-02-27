@@ -380,6 +380,30 @@ describe "context_modules" do
       @assignment.context_module_tags.each { |tag| expect(tag.title).to eq 'again' }
     end
 
+    it "should not create a duplicate page if you publish after renaming" do
+      mod = @course.context_modules.create! name: 'TestModule'
+      page = @course.wiki.wiki_pages.create title: 'A Page'
+      page.workflow_state = 'unpublished'
+      page.save!
+      page_count = @course.wiki.wiki_pages.count
+      tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
+
+      get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
+
+      item = f("#context_module_item_#{tag.id}")
+      edit_module_item(item) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
+      end
+
+      item = f("#context_module_item_#{tag.id}")
+      item.find_element(:css, '.publish-icon').click
+      wait_for_ajax_requests
+
+      expect(@course.wiki.wiki_pages.count).to eq page_count
+      expect(page.reload).to be_published
+    end
+
     it "should add the 'with-completion-requirements' class to rows that have requirements" do
       mod = @course.context_modules.create! name: 'TestModule'
       tag = mod.add_item({:id => @assignment.id, :type => 'assignment'})

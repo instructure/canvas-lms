@@ -41,7 +41,7 @@ module ContextModulesHelper
     if item.nil?
       ''
     elsif (item.content_type_class == 'wiki_page')
-      item.content.url
+      "page_id:#{item.content.id}"
     else
       (item.content && item.content.respond_to?(:published?) ? item.content.id : item.id)
     end
