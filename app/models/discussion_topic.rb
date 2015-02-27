@@ -886,12 +886,18 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def course
+    @course ||= context.is_a?(Group) ? context.context : context
+  end
+
   def active_participants_with_visibility
-    return active_participants unless context.feature_enabled?(:differentiated_assignments)
-    users_with_visibility = AssignmentStudentVisibility.where(assignment_id: self.assignment_id).pluck(:user_id)
+    return active_participants if !self.for_assignment? || !course.feature_enabled?(:differentiated_assignments)
+    users_with_visibility = AssignmentStudentVisibility.where(assignment_id: self.assignment_id, course_id: course.id).pluck(:user_id)
+
+    admin_ids = course.participating_admins.pluck(:id)
+    users_with_visibility.concat(admin_ids)
+
     # observers will not be returned, which is okay for the functions current use cases (but potentially not others)
-    instructor_ids = context.participating_instructors.pluck(:id)
-    users_with_visibility.concat(instructor_ids)
     active_participants.select{|p| users_with_visibility.include?(p.id)}
   end
 
@@ -910,11 +916,12 @@ class DiscussionTopic < ActiveRecord::Base
 
     subscribed_users = participating_users(sub_ids)
 
-    if context.feature_enabled?(:differentiated_assignments) && self.for_assignment?
-      students_with_visibility = AssignmentStudentVisibility.where(course_id: context_id, assignment_id: assignment_id).pluck(:user_id)
-      admin_ids = self.context.participating_admins.pluck(:id)
-      observer_ids = self.context.participating_observers.pluck(:id)
-      observed_students = ObserverEnrollment.observed_student_ids_by_observer_id(self.context,observer_ids)
+    if course.feature_enabled?(:differentiated_assignments) && self.for_assignment?
+      students_with_visibility = AssignmentStudentVisibility.where(course_id: course.id, assignment_id: assignment_id).pluck(:user_id)
+
+      admin_ids = course.participating_admins.pluck(:id)
+      observer_ids = course.participating_observers.pluck(:id)
+      observed_students = ObserverEnrollment.observed_student_ids_by_observer_id(course, observer_ids)
 
       subscribed_users.select!{ |user|
         students_with_visibility.include?(user.id) || admin_ids.include?(user.id) ||

@@ -231,13 +231,9 @@ describe DiscussionTopic do
         @assignment.save!
         @topic.assignment_id = @assignment.id
         @topic.save!
-        @entry1 = @topic.discussion_entries.create!(:message => "second message", :user => @student)
-        @entry1.created_at = 1.week.ago
-        @entry1.save
 
         @course.enroll_student(@student2, :enrollment_state => 'active')
         @section = @course.course_sections.create!(name: "test section")
-        @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
         create_section_override_for_assignment(@assignment, {course_section: @section})
         @course.reload
@@ -264,6 +260,45 @@ describe DiscussionTopic do
               expect(@topic.active_participants_with_visibility.include?(user)).to be_truthy
             end
             expect(@topic.active_participants_with_visibility.include?(@student2)).to be_falsey
+          end
+
+          it "should work when ungraded and context is a course" do
+            group_category = @course.group_categories.create(:name => "new cat")
+            @topic = @course.discussion_topics.create(:title => "group topic")
+            @topic.save!
+
+            expect(@topic.context).to eq(@course)
+            expect(@topic.active_participants_with_visibility.include?(@student1)).to be_truthy
+            expect(@topic.active_participants_with_visibility.include?(@student2)).to be_truthy
+          end
+
+          it "should work when ungraded and context is a group" do
+            group_category = @course.group_categories.create(:name => "new cat")
+            @group = @course.groups.create(:name => "group", :group_category => group_category)
+            @group.add_user(@student1)
+            @topic = @group.discussion_topics.create(:title => "group topic")
+            @topic.save!
+
+            expect(@topic.context).to eq(@group)
+            expect(@topic.active_participants_with_visibility.include?(@student1)).to be_truthy
+            expect(@topic.active_participants_with_visibility.include?(@student2)).to be_falsey
+          end
+
+          it "should work for subtopics for graded assignments" do
+            group_discussion_assignment
+            ct = @topic.child_topics.first
+            ct.context.add_user(@student)
+
+            @section = @course.course_sections.create!(name: "test section")
+            student_in_section(@section, user: @student)
+            create_section_override_for_assignment(@assignment, {course_section: @section})
+
+            @topic = @topic.child_topics.first
+            @topic.subscribe(@student)
+            @topic.save!
+
+            expect(@topic.context.class).to eq(Group)
+            expect(@topic.active_participants_with_visibility.include?(@student)).to be_truthy
           end
         end
       end
@@ -887,6 +922,18 @@ describe DiscussionTopic do
           observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
           @topic.subscribe(@observer)
           expect(@topic.subscribers).to include(@observer)
+        end
+
+        it "should work for graded subtopics" do
+          group_discussion_assignment
+          ct = @topic.child_topics.first
+          ct.context.add_user(@student)
+
+          @topic = @topic.child_topics.first
+          @topic.subscribe(@student)
+          @topic.save!
+
+          expect(@topic.subscribers).to include(@student)
         end
 
       end
