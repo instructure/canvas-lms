@@ -188,7 +188,9 @@
             </div>
 
             <div class="discussion-header-right pull-right">
-              <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at, context: @topic.context %></div>
+              <% if can_do(@context, @current_user, :moderate_forum) %>
+                <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at, context: @topic.context %></div>
+              <% end %>
               <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
             </div>
           </div>
