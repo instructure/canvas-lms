@@ -18,7 +18,9 @@
 
 define([
   'compiled/editor/stocktiny',
-], function(tinymce) {
+  'i18n!editor',
+  'str/htmlEscape'
+], function(tinymce, I18n, htmlEscape) {
 
   tinymce.create('tinymce.plugins.InstructureEquation', {
     init : function(ed, url) {
@@ -29,7 +31,7 @@ define([
       });
 
       ed.addButton('instructure_equation', {
-        title: 'Insert Math Equation',
+        title: htmlEscape(I18n.t('Insert Math Equation')),
         cmd: 'instructureEquation',
         image: url + '/img/button.gif'
       });
