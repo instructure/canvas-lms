@@ -36,68 +36,34 @@ describe SubmissionComment do
     SubmissionComment.create!(@valid_attributes)
   end
 
-  it "should dispatch notifications on create regardless of how long ago the submission was created" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save
-    @course.offer
-    te = @course.enroll_teacher(user)
-    se = @course.enroll_student(user)
-    @assignment.reload
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
-    @submission.save
-    Notification.create(:name => 'Submission Comment')
-    Notification.create(:name => 'Submission Comment For Teacher')
-    @comment = @submission.add_comment(:author => te.user, :comment => "some comment")
-    expect(@comment.messages_sent.keys.sort).to eq ["Submission Comment"]
-    @comment.clear_broadcast_messages
-    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    expect(@comment.messages_sent.keys.sort).to eq ["Submission Comment", "Submission Comment For Teacher"]
-  end
+  describe 'notifications' do
+    before(:once) do
+      Notification.create(:name => 'Submission Comment')
+      Notification.create(:name => 'Submission Comment For Teacher')
+    end
 
-  it "should dispatch notification on create if assignment is published" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save
-    @course.offer
-    @course.enroll_teacher(user)
-    se = @course.enroll_student(user)
-    @assignment.reload
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
-    @submission.created_at = Time.now - 60
-    @submission.save
-    Notification.create(:name => 'Submission Comment')
-    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    expect(@comment.messages_sent).to be_include('Submission Comment')
-  end
+    it "dispatches notifications on create for published assignment" do
+      comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+      expect(comment.messages_sent.keys.sort).to eq ["Submission Comment"]
 
-  it "should not dispatch notification on create if course is unpublished" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save
-    @course.enroll_teacher(user)
-    se = @course.enroll_student(user)
-    @assignment.reload
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
-    @submission.created_at = Time.now - 60
-    @submission.save
-    Notification.create(:name => 'Submission Comment')
-    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    expect(@comment.messages_sent).to_not be_include('Submission Comment')
-  end
+      comment = @submission.add_comment(:author => @student, :comment => "some comment")
+      expect(comment.messages_sent.keys.sort).to eq ["Submission Comment For Teacher"]
+    end
 
-  it "should dispatch notification on create to teachers even if submission not submitted yet" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save
-    @course.offer
-    @course.enroll_teacher(user)
-    se = @course.enroll_student(user)
-    @submission = @assignment.find_or_create_submission(se.user)
-    @submission.save
-    Notification.create(:name => 'Submission Comment For Teacher')
-    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    expect(@comment.messages_sent).to be_include('Submission Comment For Teacher')
+    it "should not dispatch notification on create if course is unpublished" do
+      @course.complete
+      @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+      expect(@course).to_not be_available
+      expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
+    end
+
+    it "should dispatch notification on create to teachers even if submission not submitted yet" do
+      student_in_course(active_all: true)
+      @submission = @assignment.find_or_create_submission(@student)
+      @comment = @submission.add_comment(:author => @student, :comment => "some comment")
+      expect(@submission).to be_unsubmitted
+      expect(@comment.messages_sent).to be_include('Submission Comment For Teacher')
+    end
   end
 
   it "should allow valid attachments" do

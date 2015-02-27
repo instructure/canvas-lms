@@ -180,6 +180,7 @@ class WikiPage < ActiveRecord::Base
     true
   end
 
+  attr_reader :wiki_page_changed
   def notify_of_update=(val)
     @wiki_page_changed = Canvas::Plugin.value_to_boolean(val)
   end
@@ -324,9 +325,9 @@ class WikiPage < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :updated_wiki_page
     p.to { participants }
-    p.whenever do |record|
-      return false unless record.created_at < Time.now - 30.minutes
-      (record.published? && @wiki_page_changed && record.prior_version) || record.changed_state(:active)
+    p.whenever do |wiki_page|
+      BroadcastPolicies::WikiPagePolicy.new(wiki_page).
+        should_dispatch_updated_wiki_page?
     end
   end
 

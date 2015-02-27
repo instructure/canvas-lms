@@ -700,44 +700,44 @@ class Submission < ActiveRecord::Base
 
     p.dispatch :assignment_submitted_late
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever {|record|
-      policy = BroadcastPolicies::SubmissionPolicy.new(record)
-      policy.should_dispatch_assignment_submitted_late?
+    p.whenever { |submission|
+      BroadcastPolicies::SubmissionPolicy.new(submission).
+        should_dispatch_assignment_submitted_late?
     }
 
     p.dispatch :assignment_submitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever {|record|
-      policy = BroadcastPolicies::SubmissionPolicy.new(record)
-      policy.should_dispatch_assignment_submitted?
+    p.whenever { |submission|
+      BroadcastPolicies::SubmissionPolicy.new(submission).
+        should_dispatch_assignment_submitted?
     }
 
     p.dispatch :assignment_resubmitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever {|record|
-      policy = BroadcastPolicies::SubmissionPolicy.new(record)
-      policy.should_dispatch_assignment_resubmitted?
+    p.whenever { |submission|
+      BroadcastPolicies::SubmissionPolicy.new(submission).
+        should_dispatch_assignment_resubmitted?
     }
 
     p.dispatch :group_assignment_submitted_late
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever {|record|
-      policy = BroadcastPolicies::SubmissionPolicy.new(record)
-      policy.should_dispatch_group_assignment_submitted_late?
+    p.whenever { |submission|
+      BroadcastPolicies::SubmissionPolicy.new(submission).
+        should_dispatch_group_assignment_submitted_late?
     }
 
     p.dispatch :submission_graded
     p.to { student }
-    p.whenever {|record|
-      policy = BroadcastPolicies::SubmissionPolicy.new(record)
-      policy.should_dispatch_submission_graded?
+    p.whenever { |submission|
+      BroadcastPolicies::SubmissionPolicy.new(submission).
+        should_dispatch_submission_graded?
     }
 
     p.dispatch :submission_grade_changed
     p.to { student }
-    p.whenever {|record|
-      policy = BroadcastPolicies::SubmissionPolicy.new(record)
-      policy.should_dispatch_submission_grade_changed?
+    p.whenever { |submission|
+      BroadcastPolicies::SubmissionPolicy.new(submission).
+        should_dispatch_submission_grade_changed?
     }
 
   end

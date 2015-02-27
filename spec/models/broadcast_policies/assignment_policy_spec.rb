@@ -87,5 +87,24 @@ module BroadcastPolicies
       specify { wont_send_when { assignment.stubs(:created_at).returns 20.minutes.ago } }
       specify { wont_send_when { assignment.stubs(:points_possible).returns prior_version.points_possible } }
     end
+
+    describe '#should_dispatch_assignment_unmuted?' do
+      before do
+        assignment.stubs(:recently_unmuted).returns true
+      end
+
+      it 'is true when the dependent inputs are true' do
+        expect(policy.should_dispatch_assignment_unmuted?).to be_truthy
+      end
+
+      def wont_send_when
+        yield
+        expect(policy.should_dispatch_assignment_unmuted?).to be_falsey
+      end
+
+      specify { wont_send_when { context.stubs(:available?).returns false } }
+      specify { wont_send_when { assignment.stubs(:recently_unmuted).returns false } }
+
+    end
   end
 end

@@ -507,22 +507,22 @@ class Assignment < ActiveRecord::Base
       participants(include_observers: true, excluded_user_ids: excluded_ids)
     }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_due_date_changed?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_due_date_changed?
     }
 
     p.dispatch :assignment_changed
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_changed?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_created?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_created?
     }
     p.filter_asset_by_recipient { |assignment, user|
       assignment.overridden_for(user)
@@ -531,7 +531,8 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_unmuted
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      assignment.context.available? && assignment.recently_unmuted
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_unmuted?
     }
 
   end

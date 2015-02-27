@@ -360,7 +360,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_reserved_by_user
     to { appointment_group.instructors }
     whenever {
-      appointment_group && parent_event &&
+      user && appointment_group && parent_event &&
       just_created &&
       context == appointment_group.participant_for(user)
     }
