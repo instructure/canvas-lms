@@ -2,6 +2,15 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 zh: 
+  1_item_scores_5512cd03: "1- 项目分数"
+  2_final_score_7b0fd15e: "2- 最终分数"
+  451_message: 
+    description: 因为您位于受美国贸易限制的国家/地区，您无法获得访问此网站的授权。
+    headings: 
+      page: 未授权
+    title: 未授权
+  558x270_png_a5e13e53: "558x270 png"
+  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png（1.8 倍标准平铺大小，因此可根据需要放大或缩小）"
   EditAppointmentGroupDetails: 
     affect_reservations: 这将如何影响预订?
     and_n_contexts: "以及其它 %{n} 门课程"
@@ -31,6 +40,9 @@ zh:
   LongTextEditor: 
     cancel: 取消
     save: 保存
+  _section_not_synced_yet_cd07d0dd: "-- 章节尚未同步"
+  a_calculation_value_is_not_used_with_this_calculat_b1e854b4: 此计算方法未使用计算值
+  a_message_is_required_129e1814: 需要消息
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: 一个表格，包含评分方案名称和用于编辑或删除该方案的图标。
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 一个表格，包含评分方案数据。每行包含名称、最大百分比和最小百分比。此外，每行包含一个用于在下面添加新行的图标，以及一个用于删除当前行的图标。
   academic_benchmark: 
@@ -59,6 +71,7 @@ zh:
       facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs Preview"
+      google_drive: "Google Drive"
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
@@ -310,6 +323,7 @@ zh:
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
     report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
     report_header_canvas_parent_id: canvas_parent_id
     report_header_canvas_section_id: canvas_section_id
     report_header_canvas_term_id: canvas_term_id
@@ -340,9 +354,11 @@ zh:
     report_header_long__name: long_name
     report_header_long_name: 完整名称
     report_header_name: 姓名
+    report_header_nonxlist_course_id: nonxlist_course_id
     report_header_outcome_score: 结果分数
     report_header_parent_account_id: parent_account_id
     report_header_role: 角色
+    report_header_role_id: role_id
     report_header_section: 章节
     report_header_section__id: section_id
     report_header_section_id: "章节 id"
@@ -892,6 +908,7 @@ zh:
         allow_invitation_previews: 邀请预览
         allow_sending_scores_in_emails: 学生可以选择通过电子邮件通知接收分数
         allow_sis_import: "SIS 导入"
+        apple_touch_icon_remove: 恢复为默认值
         author_email_in_notifications: 显示发件人用于用户交互通知的电子邮件地址
         canvas_authentication: "Canvas 身份验证"
         default_language: 默认语言
@@ -906,9 +923,11 @@ zh:
         equella: Equella
         equella_endpoint: "Equella 端点"
         equella_teaser: "Equella 评论"
+        favicon_remove: 恢复为默认值
         global_includes: "全局 CSS/JavaScript 包含"
         global_javascript: "全局 JavaScript URL"
         global_stylesheet: "全局 CSS URL"
+        header_image_remove: 恢复为默认值
         help_link_available_to: 有效
         help_link_subtext: 子文本
         help_link_text: 链接提示
@@ -917,6 +936,8 @@ zh:
         login_handle_name: 登录标签
         message: 消息
         mfa_settings: 多重身份验证
+        msapplication_tile_square_remove: 恢复为默认值
+        msapplication_tile_wide_remove: 恢复为默认值
         name: 帐户名
         no_enrollments_can_create_courses: 未注册用户
         open_registration: 开放注册
@@ -1238,6 +1259,7 @@ zh:
         default: 
           zero_activity: 
             text: "此报告显示某个给定学期中注册了任意课程的所有学生。在生成的 csv 文件中，自该日期起尚未访问课程的每项用户注册将具有一行。"
+  achieve_mastery_count_times_8c9bbcec: "达到掌握程度 %{count} 次"
   activerecord: 
     errors: 
       messages: 
@@ -1249,6 +1271,8 @@ zh:
           one: "%{count} 个错误阻止保存此 %{model}"
           other: "%{count} 个错误阻止保存此 %{model}"
   activity_13915493: 活动
+  activity_by_category_9c2033d1: 按类别划分的活动
+  activity_by_date_878c5b49: 按日期划分的活动
   add_app_baf540f: 添加应用程序
   add_attachment_93868828: 添加附件
   add_course_assignments_628ed6d0: 添加课程作业
@@ -1261,6 +1285,7 @@ zh:
     add_page_to: "添加页面到 %{module}"
     add_quiz_to: "添加测验到 %{module}"
     add_topic_to: "添加讨论主题到 %{module}"
+  add_new_group_7ac49f31: 添加新组
   add_students_to_the_course_874be8fb: 向课程添加学生
   add_tas_to_the_course_2aac6e02: 向课程添加助教
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "添加您的作业。您可以只列一个长列表，或者将其分为几组 - 甚至可以为每个作业组指定权重。"
@@ -1320,6 +1345,7 @@ zh:
       threshold_should_be_numeric: 这应该是正数
   all_4321c3a1: 全部
   all_finished_time_to_publish_your_course_click_the_b6f07217: 全部完成？该发布您的课程了！单击下面的按钮使其成为正式课程！通过发布，学生将可以开始参加该课程。
+  all_grading_periods_77974940: 所有评分时段
   all_students_have_taken_the_quiz_b558f8b4: 所有学生均已参加测验
   all_students_have_taken_the_survey_494f9f42: 所有学生均已参加调查
   allow_lor_tools: "允许用户查看和使用针对 LOR 配置的外部工具。"
@@ -1346,7 +1372,9 @@ zh:
     student_in_course: 
       analytics: 分析
       page_title: "分析：%{course} - %{student}"
+  analytics_account_name_filter_name_c0fb1a7b: "分析：%{account_name} -- %{filter_name}"
   analytics_c94ba601: 分析
+  analytics_course_code_student_name_d63bab4c: "分析：%{course_code} -- %{student_name}"
   and_count_more_43eae021: "以及另外 %{count} 项…"
   ange_name: "Angel 转换器"
   angel: 
@@ -1396,6 +1424,7 @@ zh:
   anonymous_e1b8ad27: 匿名
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最后一次尝试后将显示答案
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center 将出现在课程或帐户的设置页上的“应用程序”选项卡中。下面提供的 URL 应指向有效的 App Center 终端（例如，%{url} -- 确保略去末尾斜杠）"
+  apple_touch_icon_2c258bb3: "Apple 触控图标"
   application: 
     errors: 
       feed_not_found: 找不到馈送。
@@ -1457,9 +1486,12 @@ zh:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "是否确实要删除这 %{count} 项？"
     other: "是否确实要删除这 %{count} 项？"
-  are_you_sure_you_want_to_delete_this_announcement_293d51a8: 是否确定要删除此通告?
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: 是否确定要删除此通告？
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: 是否确定要删除此评分时段？
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否确定要删除此评分方案?
   are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否确定要删除此工具？
+  aria_labels: 
+    unlock_at_date: 解锁日期
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
   assessment_question: 
     default_question_name: 问题
@@ -1467,6 +1499,7 @@ zh:
     default_imported_title: 导入的问题
     default_title: "无名称 - %{course}"
     default_unfiled_title: 未归档的问题
+  assign_reviews_on_date_7e48ec50: 分配审阅日期
   assignment: 
     assignment_group_must_have_group: 请为此作业选择作业小组
     at_least_one_file_type: 请指定至少一个允许使用的文件类型
@@ -2031,6 +2064,7 @@ zh:
       links: 
         add_another_file: 添加其它文件
         authorize_google_docs: "授权 Google Docs 访问"
+        authorize_google_drive: "授权访问 Google Drive"
         find_file: 单击此处查找您已上传的文件
         submit: 
           external_tool: 更多
@@ -2042,6 +2076,7 @@ zh:
       loading_tools: 正在加载工具...
       messages: 
         google_docs_auth_required: "必须授权 Canvas 访问您的 Google Docs 帐户，然后才可直接从 Google Docs 提交作业:"
+        google_drives_auth_required: "您需要授权 Canvas 访问您的 Google Drive 帐户，然后才能直接从 Google Drive 提交作业："
         media_recording_ready: 可以提交!单击"提交作业"按钮以完成。
         media_recordings_disabled: "没有为此 Canvas 网站启用媒体记录，您无法提交这些类型的作业。请联系教师更改此作业的设置，或者要求系统管理员启用媒体记录。"
         submitting: 正在提交...
@@ -2154,14 +2189,19 @@ zh:
   available_after_unlock_at_b5682224: "%{unlock_at} 之后可供使用"
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} 之后、%{lock_at} 之前可供使用"
   available_from_587ce92f: 开始时间
+  available_from_date_43b5e11d: 可供使用的起始日期
+  available_until_date_cd125c62: 可供使用的截止日期
   available_until_f3b9c4ed: 可供使用的截止日期
   available_until_lock_at_ab022445: "%{lock_at} 之前可供使用"
+  average_49c63f9b: 平均
   back_to_app_center_95420d83: "返回 App Center"
   bb_display: "Blackboard 学习"
   bb_file_description: "Blackboard 6/7/8/9 export .zip 文件"
   bb_name: "Blackboard 转换器"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: 成为勇者，要求您的导师修复此链接。
   before_publishing_this_file_you_must_specify_usage_2229d20b: 发布此文件之前，必须指定使用权限。
+  before_publishing_you_must_set_usage_rights_on_you_dcd7b567: 发布之前，必须设定文件的使用权限。
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: "此搜索字段下方是 %{content_type} 列表。当您输入时，将过滤该列表以匹配您的查询。将按照您选择的任何选项来过滤会话消息。"
   better_file_browsing_description: |-
       一个更为简单和用户友好的全新文件浏览界面。如果您在课程级别启用此界面，
       该课程中的所有用户将看到这一新界面。要在某人
@@ -2249,6 +2289,7 @@ zh:
     add_item: 添加项目
     apply: 应用
     authorize_google_docs: "授权 Google Docs 访问"
+    authorize_google_drive: "授权访问 Google Drive"
     back_to_outcomes: 返回成果
     cancel: 取消
     choose_a_file: 选择文件
@@ -2281,6 +2322,7 @@ zh:
     view_account_roster: 查看帐户清单
     view_course_roster: 查看课程清单
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: 默认情况下，所有链接都针对课程启用。学生将不会看到不含内容的各章节的链接。例如，如果您没有创建任何测验，他们将不会看到测验链接。如果您不希望学生访问课程的某些区域，则可以排序和明确禁用这些链接。
+  by_lti_2_registration_url_e421e523: "按照 LTI 2 注册 URL"
   by_url_a163275e: "通过 URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
@@ -2784,7 +2826,7 @@ zh:
   canvas_cartridge_file_description: "Canvas 课程导出包"
   canvas_cartridge_name: "Canvas Cartridge 导入器"
   canvas_revision_unknown: 未知
-  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas 将在您保存测验后对您的所有提交项重新评分，此过程可能要用几分钟时间。"
+  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas 将在您保存测验后对您的所有提交项重新评分，此过程可能需要几分钟。"
   cc: 
     by: "CC Attribution"
     by_nc: "CC Attribution Non-Commercial"
@@ -11598,7 +11640,7 @@ zh:
       comments_on_answer: 用户选择此答案时的评论
       comments_on_question: 此问题的评论
       comments_on_wrong_match: 用户匹配错误时的评论
-      correct_answer: 正确回答
+      correct_answer: 正确答案
       message_text: 消息文本
       other_incorrect_matches: 其它不正确的匹配可选功能
       possible_answer: 可能的答案
@@ -15175,7 +15217,7 @@ zh:
   xml_configuration_5ea1b942: "XML 配置"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用来自 %{institution2} 的凭据登录到 %{institution1}"
   you_are_the_group_leader_for_this_group_b8629b70: 您是此组的组长
-  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: 您现在可以为已经参加测验的学生设置重新评分可选功能。
+  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: 您现在可以为已经参加测验的学生设置重新评分选项。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已对此测验中的问题进行了更改。* 这些更改将不会对学生显示，直到您保存测验。"
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "您已达到每帐户限制的最大网勾数 (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "您已达到每用户限制的最大网勾数 (%{max})"
@@ -15183,7 +15225,7 @@ zh:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: 您可能要指定一些助教帮助您教授课程。助教可以帮助您批改学生提交项、引导讨论以及更新到期日期和作业详细信息。
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "您必须将其设置为大于或等于 %{min} 的数值"
   you_must_specify_a_usage_right_5eb57f87: 您必须指定使用权限。
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "您的浏览器不符合 Canvas 的最低要求。请访问 *Canvas 指南* 了解受支持浏览器的完整列表。"
+  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "您的浏览器不符合 Canvas 的最低要求。请访问 *Canvas 指南* 查看受支持浏览器的完整列表。"
   your_content_has_been_exported_bbb57764: 您的内容已被导出。
   your_message_has_been_sent_thank_you_e0284316: 您的消息已发送。谢谢！
   your_search_encountered_the_following_errors_fc3e5e7f: 
