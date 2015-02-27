@@ -127,9 +127,9 @@ def assignment_setup_defaults
   @student_name_3 = "student 3"
 
   @student_1_total_ignoring_ungraded = "100%"
-  @student_2_total_ignoring_ungraded = "66.7%"
-  @student_3_total_ignoring_ungraded = "66.7%"
-  @student_1_total_treating_ungraded_as_zeros = "18.8%"
+  @student_2_total_ignoring_ungraded = "66.67%"
+  @student_3_total_ignoring_ungraded = "66.67%"
+  @student_1_total_treating_ungraded_as_zeros = "18.75%"
   @student_2_total_treating_ungraded_as_zeros = "12.5%"
   @student_3_total_treating_ungraded_as_zeros = "12.5%"
   @default_password = "qwerty"

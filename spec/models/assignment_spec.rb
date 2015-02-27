@@ -1025,7 +1025,7 @@ describe Assignment do
         @sub.reload
         expect(@sub.score).to eql(15.2)
         expect(@sub.grade).to eql('F')
-        expect(@enrollment.reload.computed_current_score).to eq 50.7
+        expect(@enrollment.reload.computed_current_score).to eq 50.67
       end
 
       it "should accept lowercase letter grades" do
@@ -1070,7 +1070,7 @@ describe Assignment do
         @sub.reload
         expect(@sub.score).to eql(15.2)
         expect(@sub.grade).to eql('0')
-        expect(@enrollment.reload.computed_current_score).to eq 50.7
+        expect(@enrollment.reload.computed_current_score).to eq 50.67
       end
 
       it "should accept lowercase gpa grades" do

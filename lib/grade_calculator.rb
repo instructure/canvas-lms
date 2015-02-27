@@ -352,7 +352,7 @@ class GradeCalculator
         final_grade *= 100.0 / full_weight
       end
 
-      {:grade => final_grade.try(:round, 1)}
+      {:grade => final_grade.try(:round, 2)}
     else
       total, possible = group_sums.reduce([0,0]) { |(m,n),gs|
         [m + gs[:score], n + gs[:possible]]
@@ -360,7 +360,7 @@ class GradeCalculator
       if possible > 0
         final_grade = (total.to_f / possible) * 100
         {
-          :grade => final_grade.round(1),
+          :grade => final_grade.round(2),
           :total => total.to_f,
           :possible => possible,
         }

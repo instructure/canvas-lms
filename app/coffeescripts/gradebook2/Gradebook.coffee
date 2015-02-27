@@ -63,8 +63,8 @@ define [
         default_max: 200
         max: 400
       total:
-        min: 85
-        max: 100
+        min: 95
+        max: 110
 
     DISPLAY_PRECISION = 2
 
@@ -613,10 +613,8 @@ define [
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
 
-      # rounds percentage to one decimal place
-      percentage = Math.round((val.score / val.possible) * 1000) / 10
+      percentage = @calculateAndRoundGroupTotalScore val.score, val.possible
       percentage = 0 if isNaN(percentage)
-
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
         letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
@@ -636,6 +634,10 @@ define [
     htmlContentFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
       val
+
+    calculateAndRoundGroupTotalScore: (score, possible_points) =>
+      grade = (score / possible_points) * 100
+      round(grade, DISPLAY_PRECISION)
 
     calculateStudentGrade: (student) =>
       if student.loaded

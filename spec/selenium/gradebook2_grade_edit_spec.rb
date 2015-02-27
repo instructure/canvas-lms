@@ -77,7 +77,7 @@ describe "editing grades" do
   end
 
   it "should change grades and validate course total is correct" do
-    expected_edited_total = "33.3%"
+    expected_edited_total = "33.33%"
     get "/courses/#{@course.id}/gradebook"
 
     #editing grade for first row, first cell
