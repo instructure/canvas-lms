@@ -301,6 +301,16 @@ END
       state: 'hidden',
       root_opt_in: true
     },
+    'allow_people_to_see_ie8_does_not_work' =>
+    {
+      display_name: -> { I18n.t('Allow IE8 to try to use the site in order to see that it will not work') },
+      description: -> { I18n.t('this is just to allow people to see what it would be like if we let IE8 users try to use canvas. It should not be enabled in any real environment since using IE8 will not work at all.  this screencast shows the type of things that will go wrong http://screencast.com/t/5znh8jhi5vWO') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true,
+      beta: true
+    },
     'lti2_ui' =>
       {
         display_name: -> { I18n.t('Show LTI 2 Configuration UI') },
