@@ -25,7 +25,8 @@ define [
         wrappers[new Array(parseInt(key.replace('w', '')) + 2).join('*')] = value
         delete options[key]
       options.wrapper = wrappers if wrappers['*']
-      options[key] = this[key] for key in this
+      unless this instanceof Window
+        options[key] = this[key] for key in this
       new Handlebars.SafeString htmlEscape(I18n.t(args..., options))
 
     __i18nliner_escape: (val) ->
