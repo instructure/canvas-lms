@@ -618,16 +618,66 @@ describe "context_modules" do
       expect(tag.indent).to eq 1
     end
 
-    it "should return focus to the cog menu when closing the edit dialog for an item" do
-      get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      tag = ContentTag.last
+    context "module item cog focus management" do
 
-      f("#context_module_item_#{tag.id} .al-trigger").click
-      hover_and_click("#context_module_item_#{tag.id} .edit_item_link")
-      keep_trying_until { fj('.cancel_button:visible') }.click
-      check_element_has_focus(fj("#context_module_item_#{tag.id} .al-trigger"))
+      before :each do
+        get "/courses/#{@course.id}/modules"
+        add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+        @tag = ContentTag.last
+        f("#context_module_item_#{@tag.id} .al-trigger").click
+      end
+
+      it "should return focus to the cog menu when closing the edit dialog for an item" do
+        hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
+        keep_trying_until { fj('.cancel_button:visible') }.click
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when indenting" do
+        hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when outdenting" do
+        hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
+        f("#context_module_item_#{@tag.id} .al-trigger").click
+        hover_and_click("#context_module_item_#{@tag.id} .outdent_item_link")
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when closing the move dialog" do
+        hover_and_click("#context_module_item_#{@tag.id} .move_module_item_link")
+        f('#move_module_item_cancel_btn').click
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when cancelling a delete" do
+        hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.dismiss
+        wait_for_ajaximations
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the previous module item cog when deleting a module item." do
+        add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+        @tag2 = ContentTag.last
+        hover_and_click("#context_module_item_#{@tag2.id} .delete_item_link")
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the parent module's cog when deleting the last module item." do
+        hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        check_element_has_focus(f("#context_module_#{@tag.context_module_id} .al-trigger"))
+      end
     end
+
 
     it "should still display due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
