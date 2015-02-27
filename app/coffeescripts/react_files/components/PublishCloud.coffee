@@ -1,13 +1,16 @@
 define [
   'jquery'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   'i18n!broccoli_cloud'
   'compiled/models/FilesystemObject'
   './RestrictedDialogForm'
   '../modules/customPropTypes'
   'compiled/jquery.rails_flash_notifications'
-], ($, React, withReactDOM, I18n, FilesystemObject, RestrictedDialogForm, customPropTypes) ->
+], ($, React, withReactElement, I18n, FilesystemObject, RestrictedDialogFormComponent, customPropTypes) ->
+
+  RestrictedDialogForm = React.createFactory RestrictedDialogFormComponent
+
   PublishCloud = React.createClass
     displayName: 'PublishCloud'
 
@@ -80,14 +83,14 @@ define [
           React.unmountComponentAtNode this
           $(this).remove()
 
-      React.renderComponent(RestrictedDialogForm({
+      React.render(RestrictedDialogForm({
         usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         models: [@props.model]
         closeDialog: -> $dialog.dialog('close')
       }), $dialog[0])
 
 
-    render: withReactDOM ->
+    render: withReactElement ->
       if @props.userCanManageFilesForContext
         if @state.published && @state.restricted
           button

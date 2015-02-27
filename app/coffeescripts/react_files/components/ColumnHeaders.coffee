@@ -1,13 +1,14 @@
 define [
   'i18n!react_files'
   'underscore'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'react-router'
+  'compiled/react/shared/utils/withReactElement'
   'compiled/fn/preventDefault'
-], (I18n, _, React, ReactRouter, withReactDOM, preventDefault) ->
+], (I18n, _, React, ReactRouter, withReactElement, preventDefault) ->
 
   classSet = React.addons.classSet
+  Link = React.createFactory ReactRouter.Link
 
   columns = [
     displayName: I18n.t('name', 'Name')
@@ -48,6 +49,8 @@ define [
       areAllItemsSelected: React.PropTypes.func.isRequired
       splat: React.PropTypes.string
 
+    mixins: [ReactRouter.State]
+
     getInitialState: ->
       return {
         hideToggleAll: true
@@ -60,9 +63,9 @@ define [
         'desc'
       _.defaults({sort: property, order: order}, query)
 
-    render: withReactDOM ->
-      sort = @props.query.sort or 'name'
-      order = @props.query.order or 'asc'
+    render: withReactElement ->
+      sort = @getQuery().sort or 'name'
+      order = @getQuery().order or 'asc'
 
       selectAllCheckboxClass = classSet({
         'screenreader-only': @state.hideToggleAll
@@ -112,8 +115,8 @@ define [
             role: 'columnheader'
             'aria-sort': {asc: 'ascending', desc: 'descending'}[isSortedCol and order] or 'none'
           },
-            ReactRouter.Link _.defaults({
-              query: @queryParamsFor(@props.query, column.property)
+            Link _.defaults({
+              query: @queryParamsFor(@getQuery(), column.property)
               className: 'ef-plain-link'
             }, @props),
 

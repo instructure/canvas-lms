@@ -1,10 +1,12 @@
 define [
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   '../modules/UploadQueue'
   './UploadProgress'
   'compiled/jquery.rails_flash_notifications'
-], (React, withReactDOM, UploadQueue, UploadProgress) ->
+], (React, withReactElement, UploadQueue, UploadProgressComponent) ->
+
+  UploadProgress = React.createFactory UploadProgressComponent
 
   CurrentUploads = React.createClass
     displayName: 'CurrentUploads'
@@ -27,7 +29,7 @@ define [
       percent = currentUploader.roundProgress()
       $.screenReaderFlashMessage "#{name} - #{percent}%"
 
-    render: withReactDOM ->
+    render: withReactElement ->
       div className: ('current_uploads' if @state.currentUploads.length),
         if @state.currentUploads.length
           div className: 'current_uploads__uploaders',

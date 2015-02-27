@@ -1,6 +1,6 @@
 define [
   'jquery'
-  'old_unsupported_dont_use_react'
+  'react'
   'jsx/context_modules/FileSelectBox'
 ], ($, React, FileSelectBox) ->
 
@@ -9,7 +9,7 @@ define [
   wrapper = document.getElementById('fixtures')
 
   renderComponent = ->
-    React.renderComponent(FileSelectBox({contextString: 'test_3'}), wrapper)
+    React.render(React.createFactory(FileSelectBox)({contextString: 'test_3'}), wrapper)
 
   module 'FileSelectBox',
     setup: ->

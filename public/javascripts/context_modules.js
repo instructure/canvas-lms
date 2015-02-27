@@ -20,7 +20,7 @@ define([
   'underscore',
   'compiled/models/ModuleFile',
   'compiled/react_files/components/PublishCloud',
-  'old_unsupported_dont_use_react',
+  'react',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
   'INST' /* INST */,
@@ -1211,7 +1211,7 @@ define([
           usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required
         }
 
-        React.renderComponent(PublishCloud(props), $el[0]);
+        React.render(PublishCloud(props), $el[0]);
         return {model: file} // Pretending this is a backbone view
       }
 

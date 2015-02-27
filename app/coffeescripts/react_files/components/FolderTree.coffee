@@ -1,13 +1,14 @@
 define [
   'jquery'
   'i18n!folder_tree'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
+  'react'
+  'react-router'
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
+  'compiled/react/shared/utils/withReactElement'
   'compiled/jquery.rails_flash_notifications'
-], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes) ->
+], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes, withReactElement) ->
 
   FolderTree = React.createClass
     displayName: 'FolderTree'
@@ -16,7 +17,7 @@ define [
       rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
       rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
 
-    mixins: [Router.Navigation, Router.ActiveState]
+    mixins: [Router.Navigation, Router.State]
 
     componentDidMount: ->
       rootFoldersFinder = new RootFoldersFinder({
@@ -77,5 +78,5 @@ define [
       expandFolder(0)
 
 
-    render: ->
-      React.DOM.div( {className:"ef-folder-list", ref: 'FolderTreeHolder'})
+    render: withReactElement ->
+      div( {className:"ef-folder-list", ref: 'FolderTreeHolder'})

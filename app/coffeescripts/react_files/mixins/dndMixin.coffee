@@ -1,12 +1,13 @@
 define [
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
+  'react'
   '../components/DragFeedback'
   '../utils/moveStuff'
   'compiled/models/Folder'
   'jquery'
   'underscore'
-], (I18n, React, DragFeedback, moveStuff, Folder, $, _) ->
+], (I18n, React, DragFeedbackComponent, moveStuff, Folder, $, _) ->
+  DragFeedback = React.createFactory DragFeedbackComponent
 
   dndMixin =
 
@@ -14,7 +15,7 @@ define [
 
     renderDragFeedback: ({pageX, pageY}) ->
       @dragHolder ||= $('<div>').appendTo(document.body)
-      React.renderComponent(DragFeedback({
+      React.render(DragFeedback({
         pageX: pageX
         pageY: pageY
         itemsToDrag: @itemsToDrag()
@@ -61,7 +62,12 @@ define [
     onItemDrop: (event, destinationFolder, callback) ->
       return unless (event.dataTransfer.getData('Text') or event.dataTransfer.getData('text/plain')) is 'in_a_dndMixin_drag'
       event.preventDefault()
-      moveStuff(@itemsToDrag(), destinationFolder)
-      @clearSelectedItems()
-      callback(event) if callback
+      moveStuff(@itemsToDrag(), destinationFolder).then(
+        ->
+          callback({success: true, event}) if callback
+        , ->
+          callback({success: false, event}) if callback
+      ).done(@clearSelectedItems)
+#      @clearSelectedItems()
+#      callback(event) if callback
 

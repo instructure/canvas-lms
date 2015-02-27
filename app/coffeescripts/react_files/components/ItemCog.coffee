@@ -1,7 +1,7 @@
 define [
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
   '../modules/filesEnv'
@@ -14,7 +14,10 @@ define [
   '../utils/deleteStuff'
   'jquery'
   'jqueryui/dialog'
-], (I18n, React, withReactDOM, preventDefault, customPropTypes, filesEnv, File, Folder, UsageRightsDialog, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) ->
+], (I18n, React, withReactElement, preventDefault, customPropTypes, filesEnv, File, Folder, UsageRightsDialogComponent, RestrictedDialogFormComponent, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) ->
+
+  UsageRightsDialog = React.createFactory UsageRightsDialogComponent
+  RestrictedDialogForm = React.createFactory RestrictedDialogFormComponent
 
   ItemCog = React.createClass
     displayName: 'ItemCog'
@@ -31,7 +34,7 @@ define [
 
       @props.modalOptions.openModal(contents, => @refs.settingsCogBtn.getDOMNode().focus())
 
-    render: withReactDOM ->
+    render: withReactElement ->
       if @props.model instanceof File
         externalToolMenuItems = @props.externalToolsForContext.map (tool) =>
           if @props.model.externalToolEnabled(tool)
@@ -62,7 +65,7 @@ define [
             returnFocusTo: @refs.settingsCogBtn.getDOMNode()
           })
 
-      span style: "min-width": "45px",
+      span style: minWidth: "45px",
 
         button {
           type: 'button'

@@ -1,13 +1,19 @@
 define [
   'i18n!zip_file_options_form'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   './DialogAdapter'
   './DialogContent'
   './DialogButtons'
-], (I18n, React, withReactDOM, DialogAdapter, DialogContent, DialogButtons) ->
+], (I18n, React, withReactElement, DialogAdapterComponent, DialogContentComponent, DialogButtonsComponent) ->
+
+  DialogAdapter = React.createFactory DialogAdapterComponent
+  DialogContent = React.createFactory DialogContentComponent
+  DialogButtons = React.createFactory DialogButtonsComponent
 
   ZipFileOptionsForm = React.createClass
+
+    displayName: 'ZipFileOptionsForm'
 
     propTypes:
       onZipOptionsResolved: React.PropTypes.func.isRequired
@@ -25,7 +31,7 @@ define [
         message = I18n.t('message', 'Would you like to expand the contents of "%{fileName}" into the current folder, or upload the zip file as is?', {fileName: name})
       message
 
-    render: withReactDOM ->
+    render: withReactElement ->
 
       DialogAdapter open: @props.fileOptions?, title: I18n.t('zip_options', 'Zip file options'), onClose: @props.onClose,
         DialogContent {},

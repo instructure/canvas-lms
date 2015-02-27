@@ -1,10 +1,10 @@
 define [
   'underscore'
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
+  'react'
+  'react-router'
   '../mixins/BackboneMixin'
-  'compiled/react/shared/utils/withReactDOM'
+  'compiled/react/shared/utils/withReactElement'
   './FriendlyDatetime'
   './ItemCog'
   './FilesystemObjectThumbnail'
@@ -15,8 +15,14 @@ define [
   './UsageRightsIndicator'
   '../modules/FocusStore'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator, FocusStore) ->
+], (_, I18n, React, ReactRouter, BackboneMixin, withReactElement, FriendlyDatetimeComponent, ItemCogComponent, FilesystemObjectThumbnailComponent, friendlyBytes, Folder, preventDefault, PublishCloudComponent, UsageRightsIndicatorComponent, FocusStore) ->
 
+  FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
+  ItemCog = React.createFactory ItemCogComponent
+  PublishCloud = React.createFactory PublishCloudComponent
+  UsageRightsIndicator = React.createFactory  UsageRightsIndicatorComponent
+  Link = React.createFactory ReactRouter.Link
+  FilesystemObjectThumbnail = React.createFactory FilesystemObjectThumbnailComponent
   classSet = React.addons.classSet
 
   FolderChild = React.createClass
@@ -87,6 +93,7 @@ define [
         role: 'row'
         'aria-selected': @props.isSelected
         draggable: !@state.editing
+        ref: 'FolderChild'
         onDragStart: =>
           @props.toggleSelected() unless @props.isSelected
           @props.dndOptions.onItemDragStart arguments...
@@ -99,7 +106,10 @@ define [
         attrs.onDragLeave = attrs.onDragEnd = (event) =>
           @props.dndOptions.onItemDragLeaveOrEnd(event, toggleActive(false))
         attrs.onDrop = (event) =>
-          @props.dndOptions.onItemDrop(event, @props.model, toggleActive(false))
+          @props.dndOptions.onItemDrop(event, @props.model, ({success, event}) =>
+            toggleActive(false)
+            React.unmountComponentAtNode(@refs.FolderChild.parentNode) if success
+          )
       attrs
 
     checkForAccess: (event) ->
@@ -114,8 +124,8 @@ define [
       FocusStore.setItemToFocus @refs.nameLink.getDOMNode()
       @props.previewItem()
 
-    render: withReactDOM ->
 
+    render: withReactElement ->
       selectCheckboxLabel = I18n.t('Select %{itemName}', itemName: @props.model.displayName())
 
       keyboardCheckboxClass = classSet({

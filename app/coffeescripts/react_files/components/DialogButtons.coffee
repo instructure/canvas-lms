@@ -1,9 +1,11 @@
 define [
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
-], (React, withReactDOM) ->
+  'react'
+  'compiled/react/shared/utils/withReactElement'
+], (React, withReactElement) ->
 
   DialogButtons = React.createClass
 
-    render: withReactDOM ->
+    displayName: 'DialogButtons'
+
+    render: withReactElement ->
       div {}, @props.children

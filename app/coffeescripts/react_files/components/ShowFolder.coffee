@@ -1,9 +1,9 @@
 define [
+  'react'
+  'react-router'
   'underscore'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
   'i18n!react_files'
-  'compiled/react/shared/utils/withReactDOM'
+  'compiled/react/shared/utils/withReactElement'
   '../modules/filesEnv'
   './ColumnHeaders'
   './LoadingIndicator'
@@ -15,15 +15,21 @@ define [
   './FilePreview'
   './UploadDropZone'
   '../utils/forceScreenreaderToReparse'
-], (_, React, Router, I18n, withReactDOM, filesEnv, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploads, FilePreview, UploadDropZone, forceScreenreaderToReparse) ->
+], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
 
+  ColumnHeaders = React.createFactory ColumnHeadersComponent
+  LoadingIndicator = React.createFactory LoadingIndicatorComponent
+  FolderChild = React.createFactory FolderChildComponent
+  CurrentUploads = React.createFactory CurrentUploadsComponent
+  FilePreview = React.createFactory FilePreviewComponent
+  UploadDropZone = React.createFactory UploadDropZoneComponent
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
   ShowFolder = React.createClass
     displayName: 'ShowFolder'
 
-    mixins: [Router.Navigation]
+    mixins: [Router.Navigation, Router.State]
 
     debouncedForceUpdate: _.debounce ->
       @forceUpdate() if @isMounted()
@@ -50,7 +56,7 @@ define [
       '/' + (splat || '')
 
     getCurrentFolder: ->
-      path = @buildFolderPath(@props.params.splat)
+      path = @buildFolderPath(@getParams().splat)
 
       if filesEnv.showingAllContexts
         pluralAssetString = path.split('/')[1]
@@ -62,10 +68,10 @@ define [
 
       Folder.resolvePath(contextType, contextId, path).then (rootTillCurrentFolder) =>
         currentFolder = rootTillCurrentFolder[rootTillCurrentFolder.length - 1]
-        @props.onResolvePath({currentFolder, rootTillCurrentFolder, showingSearchResults:false})
+        @props.onResolvePath {currentFolder, rootTillCurrentFolder, showingSearchResults: false, pathname: window.location.pathname}
 
         [currentFolder.folders, currentFolder.files].forEach (collection) =>
-          updateAPIQuerySortParams(collection, @props.query)
+          updateAPIQuerySortParams(collection, @getQuery())
           # TODO: use scroll position to only fetch the pages we need
           getAllPages(collection, @debouncedForceUpdate)
       , (jqXHR) =>
@@ -73,7 +79,7 @@ define [
           parsedResponse = $.parseJSON(jqXHR.responseText)
         if parsedResponse
           @setState errorMessages: parsedResponse.errors
-          @redirectToCourseFiles() if @props.query.preview?
+          @redirectToCourseFiles() if @getQuery().preview?
 
     componentWillMount: ->
       @registerListeners(@props)
@@ -93,16 +99,17 @@ define [
     componentWillReceiveProps: (newProps) ->
       @unregisterListeners()
       return unless newProps.currentFolder
+      @getCurrentFolder() if window.location.pathname isnt newProps.pathname
       @registerListeners(newProps)
-      [newProps.currentFolder.folders, newProps.currentFolder.files].forEach (collection) ->
-        updateAPIQuerySortParams(collection, newProps.query)
+      [newProps.currentFolder.folders, newProps.currentFolder.files].forEach (collection) =>
+        updateAPIQuerySortParams(collection, @getQuery())
 
     redirectToCourseFiles: ->
       isntPreviousFolder = @props.currentFolder? and (@previousIdentifier? isnt @props.currentFolder.get('id').toString())
-      isPreviewForFile = @props.name isnt 'rootFolder' and @props.query.preview? and @previousIdentifier isnt @props.query.preview
+      isPreviewForFile = window.location.pathname isnt filesEnv.baseUrl and @getQuery().preview? and @previousIdentifier isnt @getQuery().preview
 
       if isntPreviousFolder or isPreviewForFile
-        @previousIdentifier = @props.currentFolder?.get('id').toString() or @props.query.preview.toString()
+        @previousIdentifier = @props.currentFolder?.get('id').toString() or @getQuery().preview.toString()
 
         unless isPreviewForFile
           message = I18n.t('This folder is currently locked and unavailable to view.')
@@ -110,10 +117,10 @@ define [
           $.screenReaderFlashMessage message
 
         setTimeout(=>
-          @transitionTo filesEnv.baseUrl, {}, @props.query
+          @transitionTo filesEnv.baseUrl, {}, @getQuery()
         , 0)
 
-    render: withReactDOM ->
+    render: withReactElement ->
       if @state?.errorMessages
         return div {},
           @state.errorMessages.map (error) ->
@@ -131,20 +138,20 @@ define [
         CurrentUploads({})
         ColumnHeaders {
           ref: 'columnHeaders'
-          to: (if @props.params.splat then 'folder' else 'rootFolder')
-          query: @props.query
-          params: @props.params
+          to: (if @getParams().splat then 'folder' else 'rootFolder')
+          query: @getQuery()
+          params: @getParams()
           toggleAllSelected: @props.toggleAllSelected
           areAllItemsSelected: @props.areAllItemsSelected
           usageRightsRequiredForContext: @props.usageRightsRequiredForContext
-          splat: @props.params.splat
+          splat: @getParams().splat
         }
         if @props.currentFolder.isEmpty()
           div ref: 'folderEmpty', className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
         else
-          @props.currentFolder.children(@props.query).map (child) =>
+          @props.currentFolder.children(@getQuery()).map (child) =>
             FolderChild
-              key:child.cid
+              key: child.cid
               model: child
               isSelected: child in @props.selectedItems
               toggleSelected: @props.toggleItemSelected.bind(null, child)
@@ -159,10 +166,10 @@ define [
 
         # Prepare and render the FilePreview if needed.
         # As long as ?preview is present in the url.
-        if @props.query.preview?
+        if @getQuery().preview?
           FilePreview
             usageRightsRequiredForContext: @props.usageRightsRequiredForContext
             currentFolder: @props.currentFolder
-            params: @props.params
-            query: @props.query
+            params: @getParams()
+            query: @getQuery()
 

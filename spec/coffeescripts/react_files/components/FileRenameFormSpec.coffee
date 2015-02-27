@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/FileRenameForm'
   'compiled/models/Folder'
@@ -15,7 +15,7 @@ define [
             id: 999
             name: 'original_name.txt'
           name: 'options_name.txt'
-      @form = React.renderComponent(FileRenameForm(props), $('<div>').appendTo('body')[0])
+      @form = React.render(React.createFactory(FileRenameForm)(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
       #TODO: oddness with the current modal implementation makes teardown not work
@@ -73,7 +73,7 @@ define [
     ok(@form.state.isEditing)
     Simulate.click(@form.refs.commitChangeBtn.getDOMNode())
 
-  test 'onNameConflicResolved preserves expandZip option when renaming', ->
+  test 'onNameConflictResolved preserves expandZip option when renaming', ->
     expect(2)
     @form.setProps(
       fileOptions:
@@ -87,7 +87,7 @@ define [
     ok(@form.state.isEditing)
     Simulate.click(@form.refs.commitChangeBtn.getDOMNode())
 
-  test 'onNameConflicResolved preserves expandZip option when replacing', ->
+  test 'onNameConflictResolved preserves expandZip option when replacing', ->
     expect(1)
     @form.setProps(
       fileOptions:

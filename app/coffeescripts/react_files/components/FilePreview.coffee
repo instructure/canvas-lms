@@ -1,9 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
-  'old_unsupported_dont_use_react-modal'
+  'react'
+  'react-router'
+  'react-modal'
   '../modules/customPropTypes'
   'i18n!file_preview'
   './FriendlyDatetime'
@@ -12,18 +12,22 @@ define [
   'compiled/models/File'
   'compiled/models/FilesystemObject'
   'compiled/fn/preventDefault'
-  'compiled/react/shared/utils/withReactDOM'
+  'compiled/react/shared/utils/withReactElement'
   '../utils/collectionHandler'
   './FilePreviewInfoPanel'
   '../modules/filesEnv'
   '../modules/FocusStore'
-], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetime, friendlyBytes, Folder, File, FilesystemObject, preventDefault, withReactDOM, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
+], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetimeComponent, friendlyBytes, Folder, File, FilesystemObject, preventDefault, withReactElement, collectionHandler, FilePreviewInfoPanelComponent, filesEnv, FocusStore) ->
+
+  FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
+  FilePreviewInfoPanel = React.createFactory FilePreviewInfoPanelComponent
+  Link = React.createFactory ReactRouter.Link
 
   FilePreview = React.createClass
 
     displayName: 'FilePreview'
 
-    mixins: [React.addons.PureRenderMixin, ReactRouter.Navigation]
+    mixins: [React.addons.PureRenderMixin, ReactRouter.Navigation, ReactRouter.State]
 
     propTypes:
       currentFolder: customPropTypes.folder
@@ -52,8 +56,8 @@ define [
     getItemsToView: (props, cb) ->
       # Sets up our collection that we will be using.
       initialItem = null
-      onlyIdsToPreview = props.query.only_preview?.split(',')
-      files = if !!props.query.search_term
+      onlyIdsToPreview = @getQuery().only_preview?.split(',')
+      files = if !!@getQuery().search_term
                 props.collection.models
               else
                 props.currentFolder.files.models
@@ -62,10 +66,12 @@ define [
                       return true unless onlyIdsToPreview
                       file.id in onlyIdsToPreview
 
-      visibleFile = props.query.preview and _.findWhere(files, {id: props.query.preview})
+      visibleFile = @getQuery().preview and _.findWhere(files, {id: @getQuery().preview})
 
       if !visibleFile
-        new File({id: props.query.preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include":"usage_rights"}) if props.usageRightsRequiredForContext).success (file) ->
+        responseDataRequested = ["enhanced_preview_url"]
+        responseDataRequested.push("usage_rights") if props.usageRightsRequiredForContext
+        new File({id: @getQuery().preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
@@ -78,7 +84,7 @@ define [
       otherItems: items.otherItems
       currentFolder: props.currentFolder
       params: props.params
-      otherItemsString: (props.query.only_preview if props.query.only_preview)
+      otherItemsString: (@getQuery().only_preview if @getQuery().only_preview)
       otherItemsIsBackBoneCollection: items.otherItems instanceof Backbone.Collection
 
     setUpOtherItemsQuery: (otherItems) ->
@@ -87,7 +93,7 @@ define [
       ).join(',')
 
     getRouteIdentifier: ->
-      if @props.query.search_term
+      if @getQuery().search_term
         'search'
       else if @props.currentFolder?.urlPath()
         'folder'
@@ -97,7 +103,7 @@ define [
     getNavigationParams: (opts = {id: null, except: []}) ->
       obj =
         preview: (opts.id if opts.id)
-        search_term: (@props.query.search_term if @props.query.search_term)
+        search_term: (@getQuery().search_term if @getQuery().search_term)
         only_preview: (@state.otherItemsString if @state.otherItemsString)
 
       _.each obj, (v, k) ->
@@ -116,7 +122,7 @@ define [
       if (event.keyCode is $.ui.keyCode.RIGHT)
         nextItem = collectionHandler.getNextInRelationTo(@state.otherItems, @state.displayedItem)
 
-      @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(id: nextItem.id))
+      @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(id: nextItem.id))
 
     renderArrowLink: (direction) ->
       # TODO: Refactor this to use the collectionHandler
@@ -136,19 +142,19 @@ define [
       else
         @state.otherItems[goToItemIndex]
       if (@state.otherItemsString)
-        @props.params.only_preview = @state.otherItemsString
+        @getParams().only_preview = @state.otherItemsString
       div {className: 'col-xs-1 ef-file-arrow_container'},
-        ReactRouter.Link {
+        Link {
           to: @getRouteIdentifier()
           query: (@getNavigationParams(id: goToItem.id) if goToItem)
-          params: @props.params
+          params: @getParams()
           className: 'ef-file-preview-container-arrow-link'
         },
           div {className: 'ef-file-preview-arrow-link'},
             i {className: "icon-arrow-open-#{direction}"}
 
     closeModal: ->
-      @transitionTo(@getRouteIdentifier(), @props.params, @getNavigationParams(except: 'only_preview'))
+      @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(except: 'only_preview'))
       FocusStore.setFocusToItem()
 
     toggle: (key) ->
@@ -157,7 +163,7 @@ define [
       return =>
         @setState(newState)
 
-    render: withReactDOM ->
+    render: withReactElement ->
       ReactModal {isOpen: true, onRequestClose: @closeModal, className: 'ReactModal__Content--ef-file-preview', overlayClassName: 'ReactModal__Overlay--ef-file-preview', closeTimeoutMS: 10},
         div {className: 'ef-file-preview-overlay'},
           div {className: 'ef-file-preview-header'},
