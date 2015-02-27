@@ -2,6 +2,15 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 tr: 
+  1_item_scores_5512cd03: "1- Öğe puanları"
+  2_final_score_7b0fd15e: "2- Final puanı"
+  451_message: 
+    description: "Birleşik Devletler ticari sınırlılıkları uygulanan bir ülkede bulunduğunuz için bu siteye erişme yetkiniz yok."
+    headings: 
+      page: "Yetki Yok"
+    title: "Yetki Yok"
+  558x270_png_a5e13e53: "558x270 png"
+  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png (1.8x standart desen boyutu, bu sayede istenildiği gibi büyültülüp küçültülebilir)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Bu durum rezervasyonları nasıl etkileyecek?"
     and_n_contexts: "ve diğer %{n}"
@@ -31,6 +40,9 @@ tr:
   LongTextEditor: 
     cancel: İptal
     save: Kaydet
+  _section_not_synced_yet_cd07d0dd: "-- Bölüm henüz senkronize edilmedi"
+  a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Bu hesaplama yöntemiyle bir hesaplama değeri kullanılmıyor "
+  a_message_is_required_129e1814: "Bir mesaj gerekli"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Notlandırma şema verisini içeren tablo. Her satırda bir isim, maksimum yüzde ve minimum yüzde vardır. Ayrıca, her satırda bir alt satır eklemek ve mevcut satırı silmek için bir simge vardır."
   academic_benchmark: 
@@ -59,6 +71,7 @@ tr:
       facebook: Facebook
       google_docs: "Google Drive"
       google_docs_preview: "Google Drive Önizlemesi"
+      google_drive: "Google Drive"
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
@@ -310,6 +323,7 @@ tr:
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
     report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
     report_header_canvas_parent_id: canvas_parent_id
     report_header_canvas_section_id: canvas_section_id
     report_header_canvas_term_id: canvas_term_id
@@ -340,9 +354,11 @@ tr:
     report_header_long__name: long_name
     report_header_long_name: "uzun isim"
     report_header_name: ad
+    report_header_nonxlist_course_id: nonxlist_course_id
     report_header_outcome_score: "çıktı puanı"
     report_header_parent_account_id: parent_account_id
     report_header_role: rol
+    report_header_role_id: role_id
     report_header_section: bölüm
     report_header_section__id: section_id
     report_header_section_id: "bölüm id"
@@ -892,6 +908,7 @@ tr:
         allow_invitation_previews: "Davetleri Görüntüle"
         allow_sending_scores_in_emails: "Öğrenciler puanlarını eposta bildirimi olarak alabilirler"
         allow_sis_import: "ÖBS İçe Aktarımları"
+        apple_touch_icon_remove: "Varsayılan geri dön"
         author_email_in_notifications: "Kullanıcı etkileşim Bildirimleri için gönderenin eposta adresini göster"
         canvas_authentication: "Canvas Kimlik Doğrulaması"
         default_language: "Varsayılan Dil"
@@ -906,9 +923,11 @@ tr:
         equella: Equella
         equella_endpoint: "Equella Endpoint"
         equella_teaser: "Equella Yorumları"
+        favicon_remove: "Varsayılan geri dön"
         global_includes: "Genel CSS/JavaScript dosyaları içerir"
         global_javascript: "Genel JavaScript URL'si"
         global_stylesheet: "Genel CSS URL'si"
+        header_image_remove: "Varsayılan geri dön"
         help_link_available_to: "Şunlar kullanabilir"
         help_link_subtext: Alt-metin
         help_link_text: "Link için görüntülenecek metin"
@@ -917,6 +936,8 @@ tr:
         login_handle_name: "Oturum Açma Etiketi"
         message: Mesaj
         mfa_settings: "Çoklu Kimlik Doğrulama"
+        msapplication_tile_square_remove: "Varsayılan geri dön"
+        msapplication_tile_wide_remove: "Varsayılan geri dön"
         name: "Hesap Adı"
         no_enrollments_can_create_courses: "Hiçbir kayıtlı olmayan kullanıcılar"
         open_registration: "Açık Kayıt"
@@ -1239,6 +1260,7 @@ tr:
         default: 
           zero_activity: 
             text: "Bu rapor, belirli bir dönemde, herhangi bir derste kayıtlı tüm öğrencileri gösterir. Oluşturulan csv dosyasında dersi başladığından beri ziyaret etmeyen her öğrenci kaydı için bir satır bulunmaktadır."
+  achieve_mastery_count_times_8c9bbcec: "%{count} defa yeterlilik sağlayın"
   activerecord: 
     errors: 
       messages: 
@@ -1250,6 +1272,8 @@ tr:
           one: "1 hata bu %{model} nin kaydedilmesini engelledi"
           other: "%{count} kadar hata bu %{model} nin kaydedilmesini engelledi"
   activity_13915493: Etkinlik
+  activity_by_category_9c2033d1: "Kategoriye göre Etkinlik"
+  activity_by_date_878c5b49: "Güne göre Etkinlik"
   add_app_baf540f: "Uygulama Ekle"
   add_attachment_93868828: "Ek Ekle"
   add_course_assignments_628ed6d0: "Ödev Ekle"
@@ -1262,6 +1286,7 @@ tr:
     add_page_to: "%{module} modülüne sayfa ekle"
     add_quiz_to: "%{module} modülüne kısa sınav ekle"
     add_topic_to: "%{module} modülüne tartışma başlığı ekle"
+  add_new_group_7ac49f31: "Yeni grup ekle"
   add_students_to_the_course_874be8fb: "Derse Öğrenci Ekle"
   add_tas_to_the_course_2aac6e02: "Derse Öğretim Elemanı Yardımcıları Ekle"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
@@ -1321,6 +1346,7 @@ tr:
       threshold_should_be_numeric: "Pozitif bir sayı olmalıdır"
   all_4321c3a1: Tümü
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Her şey tamam mı? Dersinizi yayınlama zamanı! Yayınlamak için aşağıdaki butona tıklayın! Dersi yayınladığınızda kullanıcılar derse katılmaya başlayacaklar."
+  all_grading_periods_77974940: "Tüm Notlandırma Periyotları"
   all_students_have_taken_the_quiz_b558f8b4: "Tüm öğrenciler bu kısa sınavı aldı"
   all_students_have_taken_the_survey_494f9f42: "Tüm öğrenciler bu anketi aldı"
   allow_lor_tools: "Kullanıcılar LOR için yapılandırılmış harici araçları görüp kullanabilsinler."
@@ -1347,7 +1373,9 @@ tr:
     student_in_course: 
       analytics: Analiz
       page_title: "Analiz: %{course} -- %{student}"
+  analytics_account_name_filter_name_c0fb1a7b: "Analitikler: %{account_name} -- %{filter_name}"
   analytics_c94ba601: Analiz
+  analytics_course_code_student_name_d63bab4c: "Analitikler: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "ve %{count} fazlası... "
   ange_name: "Açı Dönüştürücü"
   angel: 
@@ -1397,6 +1425,7 @@ tr:
   anonymous_e1b8ad27: Anonim
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Son teşebbüsünüzden sonra cevaplar gösterilecektir"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Bir dersin veya Hesabın ayarlar sayfasındaki \"Uygulamalar\" sekmesinde Uygulama Merkezi görülecektir. Aşağıdaki URL geçerli bir Uygulama Merkezine yönlenmelidir (örneğin %{url} -- sondaki kesme işaretini yazmayın"
+  apple_touch_icon_2c258bb3: "Apple Touch Simgesi"
   application: 
     errors: 
       feed_not_found: "Akış bulunamadı."
@@ -1459,8 +1488,11 @@ tr:
     one: "%{name} öğesini silmek istediğinizden emin misiniz?"
     other: "%{count} öğeyi silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Bu duyuru silmek istediğinizden emin misiniz?"
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Bu notlandırma şemasını silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı silmek istediğinize emin misiniz?"
+  aria_labels: 
+    unlock_at_date: "Şu tarihte kilitle"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Bu alanı doldururken girdiğiniz harflere uyan isimlere göre grup adları otomatikl olarak filtrelencektir."
   assessment_question: 
     default_question_name: Soru
@@ -1468,6 +1500,7 @@ tr:
     default_imported_title: "İçe Aktarılmış Sorular"
     default_title: "İsim Yok - %{course}"
     default_unfiled_title: "Dosyalanmamış Sorular"
+  assign_reviews_on_date_7e48ec50: "Şu Tarihte Gözden Geçirme Ata"
   assignment: 
     assignment_group_must_have_group: "Lütfen ödev için bir ödev grubu seçiniz"
     at_least_one_file_type: "Lütfen izin verilen bir dosya tipi seçiniz"
@@ -2033,6 +2066,7 @@ tr:
       links: 
         add_another_file: "Başka Bir Dosya Ekle"
         authorize_google_docs: "Google Drive Erişimine İzin ver"
+        authorize_google_drive: "Google Drive Erişimine İzin Ver"
         find_file: "Önceden yüklenmiş olan bir dosyayı bulmak için buraya tıklayın"
         submit: 
           external_tool: "Daha Fazla"
@@ -2044,6 +2078,7 @@ tr:
       loading_tools: "Araçlar yükleniyor..."
       messages: 
         google_docs_auth_required: "Google Drive dan ödev göndermeden önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
+        google_drives_auth_required: "Google Drive'dan doğrudan ödev göndermeden önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
         media_recording_ready: "Gönderime Hazır! Tamamlamak için  'Ödevi Gönder' düğmesine tıklayınız."
         media_recordings_disabled: "Bu Canvas sitesinde ortam dosyası kaydı etkinleştirilmediği için bu tür ödev dosyalarını gönderemezseniz. Bu ödev ayarlarının değiştirilip ortam dosyalarının kaydının etkinleştirilmesi için lütfen öğretim elemanı ya da sistem yönetici ile iletişime geçin."
         submitting: Gönderiliyor...
@@ -2156,14 +2191,19 @@ tr:
   available_after_unlock_at_b5682224: "%{unlock_at} tarihinden sonra geçerli"
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} tarihinden sonra %{lock_at} tarihine kadar geçerli"
   available_from_587ce92f: Kullanılabilen
+  available_from_date_43b5e11d: "Etkin Olduğu Tarih"
+  available_until_date_cd125c62: "Son Geçerlilik Tarihi"
   available_until_f3b9c4ed: "Şu tarihe kadar geçerli"
   available_until_lock_at_ab022445: "%{lock_at} tarihine kadar geçerli"
+  average_49c63f9b: Ortalama
   back_to_app_center_95420d83: "Uygulama Merkezine Geri Dön"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 .zip dışarı aktarma dosyası"
   bb_name: "Blackboard Dönüştürücü"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Cesaretinizi toplayıp öğretim üyesine bu bağlantıyı düzeltmesini söyleyin."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Bu dosyayı yayınlamadan önce kullanıcı haklarını belirtmelisiniz."
+  before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Yayınlamadan önce dosyalarınızdaki kullanım haklarını ayarlamalısınız."
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: "Bu arama alanının altında %{content_type} listesi vardır. Siz yazarken liste sorgu eşleşmesine göre filtrelenecektir.  Karşılıklı yapılan mesajlaşmalar belirlediğiniz seçeneğe göre filtrelenir."
   better_file_browsing_description: |-
       Yeni, daha basit ve kullanımı kolay dosya arama arayüzü. Bu özelliği ders düzeyinde etkinleştirirseniz,
       dersteki tüm kullanıcılar yeni arayüzü görebilirler. Kullanıcılar kişisel dosya sayfasına ('/files') gittiklerinde
@@ -2251,6 +2291,7 @@ tr:
     add_item: "Öğe Ekle"
     apply: Uygula
     authorize_google_docs: "Google Drive Erişimine İzin Ver"
+    authorize_google_drive: "Google Drive Erişimine İzin Verin"
     back_to_outcomes: "Çıktılara Geri Dön"
     cancel: İptal
     choose_a_file: "Bir Dosya Seçin"
@@ -2283,10 +2324,14 @@ tr:
     view_account_roster: "Hesap Listesini Göster"
     view_course_roster: "Ders Listesini Göster"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Varsayılan olarak bütün bağlantılar ders içinde etkinleştirilmiştir. Öğrenciler, içeriği olmayan bölümlere verilen bağlantıları göremezler. Örneğin, hiç kısa sınav oluşturmadıysanız kısa sınav bağlantısını göremezler. Bu bağlantıları sıralayabilir ya da öğrencilerinizin erişmesini istemediğiniz ders bölümleri varsa  bunları devre dışı bırakabilirsiniz."
+  by_lti_2_registration_url_e421e523: "LTI 2 Kayıt URL'sine göre"
   by_url_a163275e: "URL'ye göre"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: kapat
+  calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "Bu hesaplama yöntemi için '%{calculation_int}' geçerli bir değer değil. Bu değer '%{valid_calculation_ints_min}' ile '%{valid_calculation_ints_max}' arasında olmalı"
+  calculation_method_fe281f9: "Hesaplama Yöntemi"
+  calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "hesaplama yöntemi şunlardan biri olmalı: %{calc_methods}"
   calculator: 
     buttons: 
       save: Kaydet
@@ -2376,6 +2421,7 @@ tr:
     agenda_view: 
       due: Bitiş
       loading: Yükleniyor
+      no_events: "*Bu tarihten sonra etkinlik yok.*"
       starts_at: "Şu zamanda başlıyor"
     agenda_view_displaying_start_end: "Şu and a gösterilen %{start} ile %{end} arası"
     appointment_group_deletion_details: "Bunu silerseniz öğrencilerin tarafından kaydolunan herhangi görüşme de silinecektir."
@@ -2766,6 +2812,7 @@ tr:
         create_assignment: "Yeni Ödev Oluştur"
         delete: "Olay/Ödev Sil"
         new: "Yeni Olay Oluştur"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Değerlendirme listesi ilişkisine göre uyuşan öğeleri silemezsiniz. Bu ilişkileri kaldırmak için öğenin değerlendirme listesinden satırı kaldırmalısınız"
   cancel_caeb1e68: İptal
   canvas: 
     migration: 
@@ -4446,7 +4493,7 @@ tr:
         course_lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         course_name: Ad
         course_section_name: "Yeni Bölüm Ekle"
-        course_status_published: "Kurs Yayınlanıyor"
+        course_status_published: "Ders Yayınlanıyor"
         course_status_unpublished: "Kurs Yayınlanmıyor"
         course_visibility: Görünebilirlik
         enrollment_term_id: Dönem
@@ -6523,6 +6570,7 @@ tr:
     grade: 
       muted: Bekletiliyor
     grade_summary: 
+      all_grading_periods: "Tüm Notlandırma Periyotları"
       assessment_by: "Ödevi yapan %{name}"
       assignments: Ödevler
       buttons: 
@@ -10521,6 +10569,8 @@ tr:
       labels: 
         api_key: "OAuth Consumer Key"
         secret_key: "OAuth Consumer Secret"
+    google_drive: 
+      name: "Google Drive"
     grade_export: 
       description: "ÖBS için Notları Dışa Aktarma"
       name: "Notları Dışa Aktarma"
@@ -10829,6 +10879,7 @@ tr:
       buttons: 
         add_picture_file: "Dosya Ekle"
         authorize_google_docs: "Google Drive Erişimine İzin Ver"
+        authorize_google_drive: "Google Drive Erişimine İzin Ver"
         authorize_twitter: "Twitter Erişimine İzin ver"
         generate_token: "Token Üret"
         new_access_token: "Yeni Access Token"
@@ -10924,6 +10975,7 @@ tr:
         edit_settings: "Ayarları Düzenle"
         facebook: Facebook
         google_docs: "Google Drive"
+        google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "daha fazla seçenek"
         reconfigure_mfa: "Çoklu Kimlik Doğrulamayı Tekrar Yapılandır"
