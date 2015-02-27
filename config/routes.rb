@@ -724,7 +724,7 @@ CanvasRails::Application.routes.draw do
   end
 
   post 'object_snippet' => 'context#object_snippet'
-  match 'saml_consume' => 'pseudonym_sessions#saml_consume', via: [:get, :post]
+  post 'saml_consume' => 'pseudonym_sessions#saml_consume'
   match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
