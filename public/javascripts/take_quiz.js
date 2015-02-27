@@ -755,7 +755,9 @@ define([
         $timer.text($timeRunningTimeRemaining.text());
       }
     });
-    QuizLogAuditing.start();
+    if(location.href.indexOf("preview=1") == -1){
+      QuizLogAuditing.start();
+    }
     QuizLogAuditingEventDumper(false);
   });
 

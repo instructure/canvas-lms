@@ -1529,12 +1529,13 @@ describe Quizzes::QuizzesController do
 
       context "when the current user is active or inactive" do
         before do
-          current_user = subject.instance_variable_set(:@current_user, User.new)
-          current_user.stubs(:id).returns(123)
+          @current_user = subject.instance_variable_set(:@current_user, User.new)
+          @current_user.stubs(:id).returns(123)
         end
 
         it "returns false for inactive users" do
           @context.stubs(:enrollments).returns(stub(:where => stub(:all? => true)))
+          @context.stubs(:grants_right?).with(@current_user, :read_as_admin).returns false
 
           expect(return_value).to eq false
         end
