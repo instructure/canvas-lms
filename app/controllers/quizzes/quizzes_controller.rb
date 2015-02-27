@@ -871,8 +871,10 @@ class Quizzes::QuizzesController < ApplicationController
       false
     elsif @context.restrict_enrollments_to_course_dates && @context.soft_concluded?
       false
-    elsif @current_user.present? && @context.present? &&
-          @context.enrollments.where(user_id: @current_user.id).all? {|e| e.inactive? }
+    elsif @current_user.present? &&
+          @context.present? &&
+          @context.enrollments.where(user_id: @current_user.id).all? {|e| e.inactive? } &&
+          !@context.grants_right?(@current_user, :read_as_admin)
       false
     else
       true
