@@ -57,7 +57,7 @@ module GoogleDocs
     end
 
 
-    def download(document_id)
+    def download(document_id, not_supported=nil)
       access_token = retrieve_access_token
       entry = fetch_list(access_token).entries.map { |e| GoogleDocs::Entry.new(e) }.find { |e| e.document_id == document_id }
       if entry

@@ -36,15 +36,15 @@ module GoogleDocs
       'google_drive'
     end
 
-    def download(document_id)
+    def download(document_id, extensions)
       response = api_client.execute!(
         :api_method => drive.files.get,
         :parameters => { :fileId => document_id }
       )
 
-      file = response.data
-      file_info = GoogleDocs::DriveEntry.get_file_data(file)
-      result = api_client.execute(:uri => file_info[:url])
+      file = response.data.to_hash
+      entry = GoogleDocs::DriveEntry.new(file, extensions)
+      result = api_client.execute(:uri => entry.download_url)
       if result.status == 200
 
         # hack to make it seem like the old object
@@ -53,7 +53,7 @@ module GoogleDocs
         end
 
         # TODO: get extension from response header
-        [result, file.title, file_info[:ext]]
+        [result, file['title'],  entry.extension]
       else
         raise DriveConnectionException
       end
@@ -169,7 +169,7 @@ module GoogleDocs
       folders = {nil => root}
 
       documents['items'].each do |doc_entry|
-        entry = GoogleDocs::DriveEntry.new(doc_entry)
+        entry = GoogleDocs::DriveEntry.new(doc_entry, extensions)
         if folders.has_key?(entry.folder)
           folder = folders[entry.folder]
         else

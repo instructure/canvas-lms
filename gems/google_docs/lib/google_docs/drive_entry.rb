@@ -20,9 +20,10 @@ module GoogleDocs
 
     attr_reader :document_id, :folder, :entry
 
-    def initialize(google_drive_entry)
+    def initialize(google_drive_entry, preferred_extensions=nil)
       @entry = google_drive_entry
       @document_id = @entry['id']
+      @preferred_extensions = preferred_extensions
       parent = @entry['parents'].length > 0 ? @entry['parents'][0] : nil
       @folder = (parent == nil || parent['isRoot'] ? nil : parent['id'])
     end
@@ -35,52 +36,8 @@ module GoogleDocs
       alternate_url rescue "https://docs.google.com/document/d/#{@document_id}/edit?usp=drivesdk"
     end
 
-
-    def self.get_file_data(file)
-
-      # Order is important.
-
-      file_ext = {
-          #documents
-          'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'doc' => 'application/vnd.oasis.opendocument.text',
-
-          #presentations
-          'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-
-          #sheets
-          'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'xls' => 'application/x-vnd.oasis.opendocument.spreadsheet',
-
-          #PDF
-          'pdf' => 'application/pdf',
-
-          #zip
-          'zip' => 'application/zip',
-      }
-
-      e = file_ext.find do |extension, mime_type|
-
-        (file['exportLinks'] && file['exportLinks'][mime_type]) ||
-        (file['downloadUrl'] && mime_type.match(file['mimeType']))
-
-      end
-      if e.present?
-        {
-            url: (file['exportLinks'] && file['exportLinks'][e.last]) || file['downloadUrl'],
-            ext: e.first
-        }
-      else
-        {
-            url: file['downloadUrl'],
-            ext: 'none'
-        }
-      end
-    end
-
-
     def extension
-      GoogleDocs::DriveEntry.get_file_data(@entry)[:ext]
+      get_file_data[:ext]
     end
 
     def display_name
@@ -88,7 +45,7 @@ module GoogleDocs
     end
 
     def download_url
-      GoogleDocs::DriveEntry.get_file_data(@entry)[:url]
+      get_file_data[:url]
     end
 
     def to_hash
@@ -98,6 +55,56 @@ module GoogleDocs
         :extension => extension,
         :alternate_url => {:href => alternate_url}
       }
+    end
+
+    private
+    def get_file_data()
+      # First we check export links for our preferred formats
+      # then we fail over to the file properties
+      if @entry['exportLinks']
+        url, extension = preferred_export_link @preferred_extensions
+      end
+
+      # we'll have to find the url and extensions some other place
+      extension ||= @entry['fileExtension'] if @entry.has_key? 'fileExtension'
+      extension ||= 'none'
+
+      url ||= @entry['downloadUrl'] if @entry.has_key? 'downloadUrl'
+
+      {
+        url: url,
+        ext: extension
+      }
+    end
+
+    def preferred_export_link(preferred_extensions=nil)
+
+      # Order is important
+      # we return the first matching mime type
+      preferred_mime_types = %w{
+        application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        application/vnd.oasis.opendocument.text
+        application/vnd.openxmlformats-officedocument.presentationml.presentation
+        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+        application/x-vnd.oasis.opendocument.spreadsheet
+        application/pdf
+        application/zip
+      }
+
+      url, extension = preferred_mime_types.map do |mime_type|
+        next unless @entry['exportLinks'][mime_type]
+
+        current_url = @entry['exportLinks'][mime_type]
+        current_extension = /([a-z]+)$/.match(current_url).to_s
+
+        # our extension is in the preferred list or we have no preferences
+        [current_url, current_extension] if (preferred_extensions && preferred_extensions.include?(current_extension)) || !preferred_extensions
+      end.find{|i|i}
+
+      # if we dont have any "preferred extension" just return the default.
+      # they will be filtered out by the folderize method
+      return preferred_export_link if url == nil && preferred_extensions
+      [url, extension]
     end
 
   end
