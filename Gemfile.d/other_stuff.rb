@@ -101,6 +101,7 @@ gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
 gem 'hey', '1.3.0'
+gem 'aroi', '0.0.2'
 
 gem 'active_polymorph', :path => 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'

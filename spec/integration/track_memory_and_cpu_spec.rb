@@ -17,6 +17,7 @@ describe "memory and cpu tracking", type: :request do
     # user_dashboard_view doesn't get populated here as there is no view_runtime to populate
     CanvasStatsd::Statsd.expects(:timing).with('request.users.user_dashboard.db', kind_of(Numeric))
     CanvasStatsd::Statsd.expects(:timing).with('request.users.user_dashboard.sql', kind_of(Numeric))
+    CanvasStatsd::Statsd.expects(:timing).with('request.users.user_dashboard.active_record', kind_of(Numeric))
     get "/"
   end
 end

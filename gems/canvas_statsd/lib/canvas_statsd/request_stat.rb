@@ -2,6 +2,7 @@ module CanvasStatsd
   class RequestStat
 
     attr_accessor :sql_count
+    attr_accessor :ar_count
 
     def initialize(name, start, finish, id, payload, statsd=CanvasStatsd::Statsd)
       @name = name
@@ -18,6 +19,7 @@ module CanvasStatsd
         @statsd.timing("request.#{controller}.#{action}.view", view_runtime) if view_runtime
         @statsd.timing("request.#{controller}.#{action}.db", db_runtime) if db_runtime
         @statsd.timing("request.#{controller}.#{action}.sql", sql_count) if sql_count
+        @statsd.timing("request.#{controller}.#{action}.active_record", ar_count) if ar_count
       end
     end
 
