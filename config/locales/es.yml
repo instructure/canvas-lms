@@ -2,6 +2,15 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 es: 
+  1_item_scores_5512cd03: "2- Puntuación de los elementos"
+  2_final_score_7b0fd15e: "2. Puntuación final"
+  451_message: 
+    description: "No tiene autorización para acceder a este sitio porque no reside en un país sujeto a restricciones de comercio con los EE. UU."
+    headings: 
+      page: "No autorizado"
+    title: "No autorizado"
+  558x270_png_a5e13e53: "558x270 png"
+  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png (1,8 veces la escala estándar, por lo que se puede escalar más o menos en caso necesario)"
   EditAppointmentGroupDetails: 
     affect_reservations: "¿Cómo afectará esto a las reservas?"
     and_n_contexts: "y %{n} otros"
@@ -31,6 +40,9 @@ es:
   LongTextEditor: 
     cancel: Cancelar
     save: Guardar
+  _section_not_synced_yet_cd07d0dd: "-- Sección no sincronizada aún"
+  a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "En este método de cálculo no se utiliza un valor de cálculo"
+  a_message_is_required_129e1814: "Se necesita un mensaje"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Una tabla que contiene el nombre del esquema de calificación e iconos para editar o borrar el esquema."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Una tabla que contiene información sobre el esquema de calificación. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un icono para añadir más filas debajo y otro icono para borrar la línea actual."
   academic_benchmark: 
@@ -59,6 +71,7 @@ es:
       facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Vista previa de Google Docs"
+      google_drive: "Google Drive"
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
@@ -309,6 +322,7 @@ es:
     report_header_canvas_associated_user_id: ID_usuario_asociado_Canvas
     report_header_canvas_course_id: ID_curso_Canvas
     report_header_canvas_group_id: ID_grupo_Canvas
+    report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
     report_header_canvas_parent_id: ID_primaria_Canvas
     report_header_canvas_section_id: ID_sección_Canvas
     report_header_canvas_term_id: ID_período_Canvas
@@ -339,9 +353,11 @@ es:
     report_header_long__name: "Nombre largo"
     report_header_long_name: "Nombre largo"
     report_header_name: nombre
+    report_header_nonxlist_course_id: nonxlist_course_id
     report_header_outcome_score: "puntuación del resultado"
     report_header_parent_account_id: ID_cuenta_primaria
     report_header_role: función
+    report_header_role_id: role_id
     report_header_section: sección
     report_header_section__id: "ID de la sección"
     report_header_section_id: "ID de la sección"
@@ -885,6 +901,7 @@ es:
         allow_invitation_previews: "Vistas previas de Invitaciones"
         allow_sending_scores_in_emails: "Estudiantes pueden optar para recibir calificaciones por correo electrónico"
         allow_sis_import: "Importaciones de SIS"
+        apple_touch_icon_remove: "Volver a predeterminado"
         author_email_in_notifications: "Mostrar las direcciones de correo electrónico del remitente para las notificaciones de interacciones del usuario"
         canvas_authentication: "Autenticación de Canvas"
         default_language: "Lenguaje Predeterminado"
@@ -899,9 +916,11 @@ es:
         equella: Equella
         equella_endpoint: "Punto Final/Terminal de Equella"
         equella_teaser: "Comentarios de Equella"
+        favicon_remove: "Volver a predeterminado"
         global_includes: "CSS/JavaScript Global incluye"
         global_javascript: "Global JavaScript URL"
         global_stylesheet: "Global CSS URL"
+        header_image_remove: "Volver a predeterminado"
         help_link_available_to: "Disponible para"
         help_link_subtext: Subtexto
         help_link_text: "Texto que aparecerá para el enlace"
@@ -910,6 +929,8 @@ es:
         login_handle_name: "Etiqueta de inicio de sesión"
         message: Mensaje
         mfa_settings: "Autenticación de factores múltiples"
+        msapplication_tile_square_remove: "Volver a predeterminado"
+        msapplication_tile_wide_remove: "Volver a predeterminado"
         name: "Nombre de Cuenta"
         no_enrollments_can_create_courses: "Usuarios sin inscripciones"
         open_registration: "Registro Abierto"
@@ -1233,6 +1254,7 @@ es:
         default: 
           zero_activity: 
             text: "En este informe aparecen todos los alumnos inscritos en cualquier curso en un periodo en concreto.  El archivo csv que se genera incluirá una línea por inscripción de usuario que no haya visitado el curso desde la fecha."
+  achieve_mastery_count_times_8c9bbcec: "Alcanza el dominio %{count} veces"
   activerecord: 
     errors: 
       messages: 
@@ -1244,6 +1266,8 @@ es:
           one: "1 error prohibió que este %{model} fuera guardado"
           other: "%{count} errores prohibieron que este %{model} fuera guardado"
   activity_13915493: Actividad
+  activity_by_category_9c2033d1: "Actividad por categoría"
+  activity_by_date_878c5b49: "Actividad por fecha"
   add_app_baf540f: "Añadir aplicación"
   add_attachment_93868828: "Agregar adjunto"
   add_course_assignments_628ed6d0: "Agregar tareas del curso"
@@ -1256,6 +1280,7 @@ es:
     add_page_to: "Añadir una página a %{module}"
     add_quiz_to: "Añadir una evaluación a %{module}"
     add_topic_to: "Añadir temas de debate a %{module}"
+  add_new_group_7ac49f31: "Agregar nuevo grupo"
   add_students_to_the_course_874be8fb: "Agregar estudiantes al curso"
   add_tas_to_the_course_2aac6e02: "Agregar APs al curso"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Agregar sus tareas. Puede hacer una sola lista larga o dividirla en grupos, e incluso especificar las ponderaciones para cada grupo de tareas."
@@ -1315,6 +1340,7 @@ es:
       threshold_should_be_numeric: "Este debería ser un número positivo"
   all_4321c3a1: Todo
   all_finished_time_to_publish_your_course_click_the_b6f07217: "¿Ha terminado? Ahora, por supuesto, hay que publicar. Haga clic en el botón que aparece a continuación para hacerlo oficial. La publicación permitirá que los usuarios comiencen a participar en el curso."
+  all_grading_periods_77974940: "Todos los períodos de calificaciones"
   all_students_have_taken_the_quiz_b558f8b4: "Todos los alumnos han realizado el cuestionario"
   all_students_have_taken_the_survey_494f9f42: "Todos los alumnos han realizado la encuesta"
   allow_lor_tools: "Permitir a los usuarios ver y utilizar herramientas externas configuradas para LOR."
@@ -1341,7 +1367,9 @@ es:
     student_in_course: 
       analytics: Análisis
       page_title: "Análisis: %{course} -- %{student}"
+  analytics_account_name_filter_name_c0fb1a7b: "Análisis: %{account_name} -- %{filter_name}"
   analytics_c94ba601: Análisis
+  analytics_course_code_student_name_d63bab4c: "Análisis: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "y %{count} más…"
   ange_name: "Conversor de Angel"
   angel: 
@@ -1391,6 +1419,7 @@ es:
   anonymous_e1b8ad27: Anónimo
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Las respuestas se mostrarán tras su último intento"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center aparecerá en la pestaña \"Apps\" en la página de configuración de un curso o una cuenta. La URL que aparece más abajo deberá dirigir a un punto del App Center válido (por ejemplo, %{url}, asegúrese de omitir la barra final."
+  apple_touch_icon_2c258bb3: "Icono táctil de Apple"
   application: 
     errors: 
       feed_not_found: "No se pudo encontrar el canal."
@@ -1453,8 +1482,11 @@ es:
     one: "¿Está seguro de que desea borrar %{name}?"
     other: "¿Está seguro de que desea borrar estos %{count} elementos?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "¿Seguro que quiere borrar este anuncio?"
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "¿Está seguro de que desea eliminar este período de calificaciones?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "¿Seguro que quiere borrar este esquema de calificaciones?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "¿Está seguro de que desea eliminar esta herramienta?"
+  aria_labels: 
+    unlock_at_date: "Desbloquear en fecha"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Al escribir en este campo, la lista de grupos se filtrará automáticamente para incluir solo aquellos cuyo nombre coincida con su entrada."
   assessment_question: 
     default_question_name: Pregunta
@@ -1462,6 +1494,7 @@ es:
     default_imported_title: "Preguntas Importadas"
     default_title: "Sin Nombre - %{course}"
     default_unfiled_title: "Preguntas sin archivar"
+  assign_reviews_on_date_7e48ec50: "Asignar revisiones en fecha"
   assignment: 
     assignment_group_must_have_group: "Seleccione un grupo de trabajo para esta tarea"
     at_least_one_file_type: "Especifique al menos un tipo de archivo permitido"
@@ -2026,6 +2059,7 @@ es:
       links: 
         add_another_file: "Agregue Otro Archivo"
         authorize_google_docs: "Autorize Acceso a Google Docs"
+        authorize_google_drive: "Autorizar acceso a Google Drive"
         find_file: "Haga click aqui para encontrar un archivo que ya ha cargado"
         submit: 
           external_tool: Más
@@ -2039,6 +2073,7 @@ es:
         google_docs_auth_required: |-
             Antes de enviar tareas directamente desde Google Docs necesita
                      Autorizar Canvas para accesar su cuenta de Google Docs:
+        google_drives_auth_required: "Antes de poder enviar tareas directamente desde Google Drive, debe autorizar que Canvas pueda acceder a su cuenta de Google Drive:"
         media_recording_ready: "¡Listo para Enviar! Haga click en el botón “Enviar Tarea” para finalizar."
         media_recordings_disabled: "Grabaciones de media no estan disponibles para este sitio de Canvas, y no podrá enviar estos tipos de tareas. Por favor contacte a su instructor acerca de cambiar las configuraciones para esta tarea, o su administrador de sistema acerca de activar grabaciones de media."
         submitting: Enviando...
@@ -2149,14 +2184,19 @@ es:
   available_after_unlock_at_b5682224: "Disponible a partir de %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Disponible a partir de %{unlock_at} hasta %{lock_at}"
   available_from_587ce92f: "Disponible desde"
+  available_from_date_43b5e11d: "Disponible desde fecha"
+  available_until_date_cd125c62: "Disponible hasta fecha"
   available_until_f3b9c4ed: "Disponible hasta"
   available_until_lock_at_ab022445: "Disponible hasta %{lock_at}"
+  average_49c63f9b: Promedio
   back_to_app_center_95420d83: "Volver al Centro de aplicaciones"
   bb_display: "Blackboard Learn"
   bb_file_description: "Archivo .zip de exportación de Blackboard 6/7/8/9"
   bb_name: "Blackboard Converter"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Sea un héroe y pida a su instructor que arregle este enlace."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Antes de publicar este archivo debe especificar los derechos de uso."
+  before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Antes de publicar, debe consutar los derechos de uso de sus archivos."
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: "A continuación de este campo de búsqueda hay una lista de %{content_type}. A medida que esctibe texto, la lista se filtrará para coincidir con su búsqueda. Los mensajes de conversación se filtrarán mediante la opción que desee seleccionar."
   better_file_browsing_description: "Nueva interfaz de exploración de archivos más fácil de usar y más sencilla. Si la activa en este curso, todos los usuarios del curso verán la nueva interfaz. Si desea utilizarla para que aparezca cuando alguien va a la página de archivos personales de un usuario (\"/files), deberá habilitarla para la cuenta de la que son miembros."
   big_blue_button_conference: 
     conference_is_recorded: "Esta conferencia se está grabando."
@@ -2241,6 +2281,7 @@ es:
     add_item: "Agregar Elemento"
     apply: Aplicar
     authorize_google_docs: "Autorizar el Acceso a Google Docs"
+    authorize_google_drive: "Autorizar acceso a Google Drive"
     back_to_outcomes: "Regresar a Resultados"
     cancel: Cancelar
     choose_a_file: "Elegir un archivo"
@@ -2273,10 +2314,14 @@ es:
     view_account_roster: "Ver Nómina de la Cuenta"
     view_course_roster: "Ver Nómina del Curso"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Todos los vínculos están habilitados de manera predeterminada para un curso. Los alumnos no verán los vínculos a las secciones que no tienen contenido. Por ejemplo, si no ha creado ninguna evaluación, no verán el vínculo a ellas. Puede ordenar y deshabilitar específicamente los vínculos con partes del curso a las que no desea que accedan los alumnos. "
+  by_lti_2_registration_url_e421e523: "A través de la URL de registro LTI 2"
   by_url_a163275e: "Por URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: cerrar
+  calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' no es un valor válido para este método de cálculo. El valor debe estar entre '%{valid_calculation_ints_min}' y '%{valid_calculation_ints_max}'"
+  calculation_method_fe281f9: "Método de cálculo"
+  calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method debe ser uno de los siguientes: %{calc_methods}"
   calculator: 
     buttons: 
       save: Guardar
@@ -2366,6 +2411,7 @@ es:
     agenda_view: 
       due: "Fecha límite"
       loading: Cargando
+      no_events: "*Sin eventos después de esta fecha.*"
       starts_at: "Comienza el:"
     agenda_view_displaying_start_end: "Ahora se muestran %{start} hasta %{end}"
     appointment_group_deletion_details: "Al borrarlo también borrará cualquier cita que se hayan realizado los alumnos."
@@ -2757,6 +2803,7 @@ es:
         create_assignment: "Crear una Tarea Nueva"
         delete: "Borre un Evento/Tarea"
         new: "Crear un Evento Nuevo"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "No se pudieron borrar las asignaciones basadas en asociaciones de rúbricas. Para borrar estas asociaciones debe eliminar la fila de la rúbrica de la tarea."
   cancel_caeb1e68: Cancelar
   canvas: 
     migration: 
@@ -2793,6 +2840,8 @@ es:
       update_assignment_points: "¿Cambiar los puntos posibles para que coincida con esta rúbrica?"
   choose_a_course_home_page_8059c7b: "Escoja una página de inicio del curso"
   choose_usage_rights_33683854: "Elegir derechos de uso..."
+  clear_file_name_text_field_fce73840: "Borrar el campo de texto del nombre del archivo"
+  click_here_on_the_calendar_link_c9965631: "Haga clic aquí en el enlace del *Calendario*"
   close_and_return_to_canvas_80544344: "Cerrar y volver a Canvas"
   close_d634289d: Cerrar
   collaboration: 
@@ -2867,6 +2916,10 @@ es:
           [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url})
           para trabajar colaborativamente en tareas como trabajos en grupo y toma de notas. Esta página es un lugar fácil para seguirle la pista a estas colaboraciones, y también 	  para establecerlas sin tener que intercambiar correos electrónicos.
       description_teacher: "**¿Qué queremos decir con colaboradores?** Estamos hablando de herramientas en-línea que sus estudiantes probablemente ya conocen.Los estudiantes pueden usar recursos 	  como [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url}) para trabajar colaborativamente en tareas como tareas en grupo o toma de notas. Esta página les da (y a 	  usted) un lugar para seguirle la pista a estas colaboraciones y también para establecerlos sin tener que intercambiar correos electrónicos."
+      google: 
+        drive: 
+          upgrade: 
+            description: "Para acceder a esta colaboración debe autorizar a Canvas a acceder a su cuenta de Google Drive"
       how_to_start_a_new_collaboration: "Para encontrar más acerca de un tipo particular de colaboración, haga click en \"Comenzar una Nueva Colaboración\" y luego escojer el tipo del menú desplegable."
       links: 
         delete: "Borre esta Colaboración"
@@ -2878,6 +2931,7 @@ es:
         current: "Colaboraciones Actuales"
     titles: 
       delete: "¿Borrar esta colaboración?"
+  collapse_list_of_group_members_for_groupname_d6c66fa0: "Contraer la lista de miembros del grupo por %{groupName}"
   coming_up_4348b0bd: Proximamente
   comm_messages: 
     from_beginning: "el comienzo"
@@ -2949,6 +3003,7 @@ es:
     profile: 
       notices: 
         contact_registered: "Método de contacto registrado"
+  concluded_courses_94782e21: "Cursos finalizados"
   conferences: 
     concluded_conference: 
       delete: Borrar
@@ -3019,6 +3074,7 @@ es:
         started: "Iniciado %{time}"
     type_disabled_error: "Este tipo de conferencia ya no esta activada para este sitio de Canvas"
   config_url_e96ceaf3: "Configurar URL"
+  configurate_tool_app_5a721f2c: "¿Configurar la aplicación %{tool}?"
   configuration_type_25a084a4: "Tipo de configuración"
   confirm_dialog: 
     cancel: Cancelar
@@ -6487,6 +6543,7 @@ es:
     grade: 
       muted: Obviada
     grade_summary: 
+      all_grading_periods: "Todos los períodos de calificaciones"
       assessment_by: "Evaluación para %{name}"
       assignments: Tareas
       buttons: 
@@ -10468,6 +10525,8 @@ es:
       labels: 
         api_key: "Código de Consumidor OAuth"
         secret_key: "Secreto de Consumidor OAuth"
+    google_drive: 
+      name: "Google Drive"
     grade_export: 
       description: "Exportar Calificaciones para SIS"
       name: "Grade Exportar"
@@ -10765,6 +10824,7 @@ es:
       buttons: 
         add_picture_file: "Agregar Archivo"
         authorize_google_docs: "Autorizar el Acceso a Google Docs"
+        authorize_google_drive: "Autorizar acceso a Google Drive"
         authorize_twitter: "Autorizar Acceso a Twitter"
         generate_token: "Generar Componente Léxico"
         new_access_token: "Solicitar Código de Acceso"
@@ -10853,6 +10913,7 @@ es:
         edit_settings: "Editar las configuraciones"
         facebook: Facebook
         google_docs: "Google Docs"
+        google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "más opciones"
         reconfigure_mfa: "Reconfigurar la autenticación de factores múltiples"
