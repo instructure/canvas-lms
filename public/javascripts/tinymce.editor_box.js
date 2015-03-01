@@ -35,6 +35,9 @@ define([
   'i18nObj',
   'jquery',
   'compiled/editor/editorAccessibility', /* editorAccessibility */
+  'tinymce.editor_box_list',
+  'tinymce.config',
+  'tinymce.commands',
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves or else we have
                         // build problems
@@ -43,54 +46,18 @@ define([
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.ba-tinypubsub'
-], function(I18nObj, $, EditorAccessibility, INST) {
+], function(I18nObj, $,
+            EditorAccessibility, EditorBoxList, EditorConfig, EditorCommands,
+            INST) {
 
   var enableBookmarking = !!INST.browser.ie;
   $(document).ready(function() {
     enableBookmarking = !!INST.browser.ie;
   });
 
-  function EditorBoxList() {
-    this._textareas = {};
-    this._editors = {};
-    this._editor_boxes = {};
-  };
-
-  $.extend(EditorBoxList.prototype, {
-    _addEditorBox: function(id, box) {
-      $.publish('editorBox/add', id, box);
-      this._editor_boxes[id] = box;
-      this._editors[id] = tinyMCE.get(id);
-      this._textareas[id] = $("textarea#" + id);
-    },
-    _removeEditorBox: function(id) {
-      delete this._editor_boxes[id];
-      delete this._editors[id];
-      delete this._textareas[id];
-      $.publish('editorBox/remove', id);
-      if ($.isEmptyObject(this._editors)) $.publish('editorBox/removeAll');
-    },
-    _getTextArea: function(id) {
-      if(!this._textareas[id]) {
-        this._textareas[id] = $("textarea#" + id);
-      }
-      return this._textareas[id];
-    },
-    _getEditor: function(id) {
-      if(!this._editors[id]) {
-        this._editors[id] = tinyMCE.get(id);
-      }
-      return this._editors[id];
-    },
-    _getEditorBox: function(id) {
-      return this._editor_boxes[id];
-    }
-  });
-
   var $instructureEditorBoxList = new EditorBoxList();
 
   function fillViewportWithEditor(editorID, elementToLeaveInViewport){
-
     var $iframe = $("#"+editorID+"_ifr");
     if ($iframe.length) {
       var newHeight = $(window).height() - ($iframe.offset().top + elementToLeaveInViewport.height() + 1);
@@ -113,77 +80,20 @@ define([
     if(width == 0) {
       width = $textarea.closest(":visible").width();
     }
-    var instructure_buttons = ",instructure_image,instructure_equation";
-    for(var idx in INST.editorButtons) {
-      // maxVisibleEditorButtons should be the max number of external tool buttons
-      // that are visible, INCLUDING the catchall "more external tools" button that
-      // will appear if there are too many to show at once.
-      if(INST.editorButtons.length <= INST.maxVisibleEditorButtons || idx < INST.maxVisibleEditorButtons - 1) {
-        instructure_buttons = instructure_buttons + ",instructure_external_button_" + INST.editorButtons[idx].id;
-      } else if(!instructure_buttons.match(/instructure_external_button_clump/)) {
-        instructure_buttons = instructure_buttons + ",instructure_external_button_clump";
-      }
-    }
-    if(INST && INST.allowMediaComments && (INST.kalturaSettings && !INST.kalturaSettings.hide_rte_button)) {
-      instructure_buttons = instructure_buttons + ",instructure_record";
-    }
-    var equella_button = INST && INST.equellaEnabled ? ",instructure_equella" : "";
-    instructure_buttons = instructure_buttons + equella_button;
 
-    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
-    var buttons2 = "";
-    var buttons3 = "";
+    var editorConfig = new EditorConfig(tinymce, INST, width, id);
 
-    if (width < 359 && width > 0) {
-      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright";
-      buttons2 = "outdent,indent,sup,sub,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
-      buttons3 = "fontsizeselect,formatselect";
-    } else if (width < 600) {
-      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,sup,sub,bullist,numlist";
-      buttons2 = "table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
-    }
-
-    var editor_css = "/stylesheets_compiled/legacy_normal_contrast/bundles/tinymce.css";
-
-    var tinyOptions = $.extend({
-      mode : "exact",
-      elements: id,
-      theme : "advanced",
-      plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links," +
-               "instructure_embed,instructure_image,instructure_equation,instructure_record,instructure_equella," +
-               "media,paste,table,inlinepopups",
-      dialog_type: 'modal',
-      language_load: false,
-      relative_urls: false,
-      remove_script_host: true,
-      theme_advanced_buttons1: buttons1,
-      theme_advanced_toolbar_location : "top",
-      theme_advanced_toolbar_align : "center",
-      theme_advanced_buttons2: buttons2,
-      theme_advanced_buttons3: buttons3,
-
-      theme_advanced_resize_horizontal : false,
-      theme_advanced_resizing : true,
-      theme_advanced_blockformats : "p,h2,h3,h4,pre",
-      theme_advanced_more_colors: false,
-      extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox|allowfullscreen|webkitallowfullscreen|mozallowfullscreen]",
-      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css",
-      editor_css: editor_css,
+    var tinyOptions = $.extend(editorConfig.defaultConfig(), {
       auto_focus: options.focus ? id : null,
-
-      onchange_callback: function(e) {
-        $("#" + id).trigger('change');
-      },
-
       setup : function(ed) {
-        var $editor = $("#" + ed.editorId);
+        var $editor = $("#" + ed.id);
         var focus = function() {
           $(document).triggerHandler('editor_box_focus', $editor);
           $.publish('editorBox/focus', $editor);
         };
-        
+
         // Make shift+tab take the user to the previous focusable element in the DOM.
-        var focusPrevious = function (ed, event) {
+        var focusPrevious = function (event) {
           if (event.keyCode == 9 && event.shiftKey) {
             var $cur = $(ed.getContainer());
             while (true) {
@@ -200,22 +110,36 @@ define([
             return true;
           }
         };
-        
-        ed.onClick.add(focus);
-        ed.onKeyPress.add(focus);
-        ed.onKeyUp.add(focusPrevious);
-        ed.onActivate.add(focus);
-        ed.onEvent.add(function() {
+
+        ed.on('click', focus);
+        ed.on('keypress', focus);
+        ed.on('keyup', focusPrevious);
+
+        // KeyboardShortcuts.coffee needs to listen to events
+        // fired from inside the editor, so we pass out
+        // keyup events to the document
+        ed.on('keyup', function(e){
+          $(document).trigger("editorKeyUp", [e]);
+        });
+
+        ed.on('activate', focus);
+
+        ed.on('change', function() {
+          $editor.trigger('change');
+        });
+
+        // no equivalent of "onEvent" in tinymce4
+        ed.on('keyup keydown click mousedown', function() {
           if(enableBookmarking && ed.selection) {
             $textarea.data('last_bookmark', ed.selection.getBookmark(1));
           }
         });
 
-        ed.onInit.add(function(){
+        ed.on('init', function(){
           new EditorAccessibility(ed).accessiblize();
         });
 
-        ed.onInit.add(function(){
+        ed.on('init', function(){
           $(window).triggerHandler("resize");
 
           // this is a hack so that when you drag an image from the wikiSidebar to the editor that it doesn't
@@ -250,8 +174,10 @@ define([
             });
           }
         });
-      }
-    }, options.tinyOptions || {});
+
+      } // function setup()
+
+    }, options.tinyOptions || {}); // var tinyOptions
 
     tinyMCE.init(tinyOptions);
 
@@ -426,8 +352,8 @@ define([
         content = $instructureEditorBoxList._getEditor(id).getContent();
       }
     } catch(e) {
-      if(tinyMCE && tinyMCE.getInstanceById(id)) {
-        content = tinyMCE.getInstanceById(id).getContent();
+      if(tinyMCE && tinyMCE.get(id)) {
+        content = tinyMCE.get(id).getContent();
       } else {
         content = this.val() || '';
       }
@@ -508,12 +434,7 @@ define([
   };
 
   $.fn._removeEditor = function() {
-    var id = this.attr('id');
-    this.data('rich_text', false);
-    if(tinyMCE && tinyMCE.execCommand) {
-      tinyMCE.execCommand('mceRemoveControl', false, id);
-      $instructureEditorBoxList._removeEditorBox(id);
-    }
+    EditorCommands.remove(this, $instructureEditorBoxList)
   };
 
   $.fn._setContentCode = function(val) {

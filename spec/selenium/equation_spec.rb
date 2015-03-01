@@ -3,6 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 describe "equation editor" do
   include_examples "quizzes selenium tests"
 
+  let(:equation_selector){ "div[aria-label='Insert Math Equation'] button" }
+
+
   it "should remove bookmark when clicking close" do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
@@ -12,7 +15,7 @@ describe "equation editor" do
     type_in_tiny 'textarea#quiz_description', 'foo'
 
     equation_editor = keep_trying_until do
-      f('.mce_instructure_equation').click
+      f(equation_selector).click
       wait_for_ajaximations
       equation_editor = fj(".mathquill-editor:visible")
       expect(equation_editor).not_to be_nil
@@ -55,7 +58,7 @@ describe "equation editor" do
       wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
 
       equation_editor = keep_trying_until do
-        question.find_element(:css, '.mce_instructure_equation').click
+        question.find_element(:css, equation_selector).click
         wait_for_ajaximations
         equation_editor = fj(".mathquill-editor:visible")
         expect(equation_editor).not_to be_nil

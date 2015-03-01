@@ -10,7 +10,7 @@
 
 /*global tinymce:true */
 /*eslint consistent-this:0 */
-
+define(['bower/tinymce/tinymce'], function(tinymce){
 tinymce.PluginManager.add('textcolor', function(editor) {
 	var cols, rows;
 
@@ -269,4 +269,5 @@ tinymce.PluginManager.add('textcolor', function(editor) {
 		},
 		onclick: onButtonClick
 	});
+});
 });

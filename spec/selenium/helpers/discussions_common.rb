@@ -73,7 +73,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def validate_entry_text(discussion_entry, text)
     keep_trying_until do
-      expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
+      f("#entry-#{discussion_entry.id}").text.to_s.include?(text)
     end
   end
 

@@ -36,7 +36,15 @@ define [
     Simulate.click(@form.refs.renameBtn.getDOMNode())
     Simulate.click(@form.refs.clearNameFieldButton.getDOMNode())
     equal(@form.refs.newName.getDOMNode().value, '')
-    ok($(@form.refs.newName.getDOMNode()).is(':focus'))
+    # this has been failing intermittantly because sometimes the test
+    # finishes before focus is restored, so we're going to try many
+    # times before we really say it's failing.  So far, adding this
+    # retry loop has resulted in 10/10 passes when before it was failing
+    # 1/3 runs on a local machine ~EthanVizitei
+    unless $(@form.refs.newName.getDOMNode()).is(':focus')
+      gotFocus = false
+      gotFocus = true if $(@form.refs.newName.getDOMNode()).is(':focus') for [1..25]
+      equal(gotFocus, true)
 
   test 'isEditing displays file name when no options name exists', ->
     @form.setProps(fileOptions: {file: {name: 'file_name.md'}})

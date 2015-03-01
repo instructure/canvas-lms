@@ -4,7 +4,7 @@
 
 /*jshint smarttabs:true, undef:true, latedef:true, curly:true, bitwise:true, camelcase:true */
 /*globals $code */
-
+define(['bower/tinymce/tinymce'], function(tinymce){
 (function(exports, undefined) {
 	"use strict";
 
@@ -1623,3 +1623,4 @@ define("tinymce/pasteplugin/Plugin", [
 
 expose(["tinymce/pasteplugin/Utils","tinymce/pasteplugin/WordFilter"]);
 })(this);
+});
