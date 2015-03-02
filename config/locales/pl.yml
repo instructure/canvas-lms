@@ -2841,7 +2841,7 @@ pl:
   canvas_cartridge_file_description: "Paczka eksportu kursu Canvas"
   canvas_cartridge_name: "Canvas Cartridge Importer"
   canvas_revision_unknown: Nieznany
-  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas oceni wszystkie przesłane zadania po zapisaniu testu, może to zająć kilka minut."
+  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Program Canvas oceni wszystkie przesłane zadania po zapisaniu testu, może to zająć kilka minut."
   cc: 
     by: "Przypisanie CC"
     by_nc: "Niekomercyjne przypisanie CC"
@@ -5351,7 +5351,7 @@ pl:
       post_message: "Zamieść wiadomość"
     summary_view: 
       attached_file_name: "Załączono: %{display_name}"
-      close_for_comments: "Temat zablokowany"
+      close_for_comments: "Komentarze zablokowane"
       delete: Usuń
       drag_up_or_down_to_reorder: "Przeciągnij w górę lub dół, aby zmienić kolejność"
       locked: "Do tematu nie można dodawać komentarzy"
@@ -6167,7 +6167,7 @@ pl:
     file_preview_infotable_name: Nazwa
     file_preview_infotable_size: Rozmiar
     file_preview_infotable_status: Status
-  file_preview_eedb43f2: "Pogląd pliku"
+  file_preview_eedb43f2: "Podgląd pliku"
   file_previews: 
     lock_explanation: 
       messages: 
@@ -7518,7 +7518,7 @@ pl:
   installed_by_admin_97c3a721: "Zainstalowane przez administratora"
   instructions: 
     authorize_google_docs: "Aby rozpocząć współpracę związaną z dokumentami, należy zezwolić systemowi Canvas na dostęp do konta Google Docs użytkownika:"
-    authorize_google_drive: "Zanim będzie możliwa współpraca nad dokumentami, konieczne będzie autoryzowanie systemu Canvas w zakresie dostępu do konta na dysku Google:"
+    authorize_google_drive: "Zanim będzie możliwa współpraca nad dokumentami, konieczne jest autoryzowanie systemu Canvas w zakresie dostępu do konta na dysku Google:"
   instructors_4b491a07: instruktorzy
   instructure: 
     alerts: 
@@ -7862,7 +7862,7 @@ pl:
   manage_group_group_name_ac8578c6: "Zarządzaj grupą %{group_name}"
   manage_usage_rights_c5a8c216: "Zarządzaj prawami użytkowania"
   manual_entry_e4a4f99a: "Wpis ręczny"
-  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Wynik punktowy biegłości odzwierciedla najbardziej aktualne ocenione zadanie lub test."
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Wynik punktowy biegłości odzwierciedla najnowsze ocenione zadanie lub test."
   mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Wynik punktowy biegłości odzwierciedla najwyższy wynik punktowy ocenionego zadania lub testu."
   mathquill: 
     tabs: 
@@ -10119,6 +10119,7 @@ pl:
   not_now_97efd947: "Nie teraz"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Uwaga: niektóre elementy wychodzą poza daty rozpoczęcia i/lub zakończenia kursu."
   note_students_have_submitted_work_for_these_assign_7bc34e28: "UWAGA: Uczestnicy przesłali pracę związaną z tymi zadaniami, która nie została oceniona. Jeśli zamieścisz te oceny teraz, będzie trzeba ponownie zamieścić ich wyniki po ocenieniu najnowszych przesłanych przez nich zadań."
+  note_this_login_s_account_uses_delegated_authentic_89227914: "Uwaga: Konto tego loginu wykorzystuje uwierzytelnianie delegowane, ale umożliwia uwierzytelnianie rezerwowego hasła do systemu Canvas. Pola hasła w tym fomularzu aktualizują rezerwowe hasło do systemu, a *nie* uwierzytelnianie delegowane."
   notification: 
     added_to_conversation_description: "Dodano Cię do rozmowy"
     added_to_conversation_display: "Dodano do konwersacji"
@@ -10349,7 +10350,7 @@ pl:
       other: Inne
       parent: "Adresy e-mail rodziców"
       scheduling: Planowanie
-  now_click_the_agenda_button_607fb40e: "Kliknij teraz przycisk *Agenda*"
+  now_click_the_agenda_button_607fb40e: "Kliknij teraz przycisk *Harmonogram*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Teraz kiedy Twój kurs jest skonfigurowany i dostępny, prawdopodobnie nie będzie Ci już potrzebna ta lista kontrolna. Jednak zachowamy ją na wypadek, jeśli uświadomisz sobie później, że chcesz spróbować czegoś nowego lub po prostu chcesz uzyskać dodatkową pomoc podczas dokonywania zmian w zawartości kursu."
   num_messages_c1949bbc: 
     few: "%{num} wiadomości"
@@ -10404,7 +10405,7 @@ pl:
   ok_c47544a2: OK
   okay_got_it_d686d4e8: "W porządku, mam"
   on_time_percent_eebffe38: "Na czas: %{percent}"
-  once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Po zmianie odpowiedzi trzeba wybrać opcję przed zaktualizowaniem pytania."
+  once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Po zmianie odpowiedzi trzeba wybrać jakąś opcję, a następnie zaktualizować pytanie."
   one_per_line_format_name_value_79647700: "Pojedynczo w linii. Format: nazwa=wartość"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} na czas, %{late} spóźnione, %{missing} brakujące"
   options: 
@@ -10485,6 +10486,7 @@ pl:
       instructions: 
         main: 
           manage: 
+            description: "*Wyniki są tu tworzone, aby śledzić poziom biegłości podczas kursu. Aby rozpocząć, sprawdź pasek menu na górze. Kliknij przycisk Nowy, aby utworzyć nowy wynik lub przycisk Nowa grupa w celu utworzenia nowej grupy, w której będzie można organizować wyniki. Przycisk Znajdź umożliwia korzystanie z wyników, które zostały utworzone przez instytucję. Po utworzeniu i użyciu wyników będziesz w stanie skorzystać z panelu po lewej stronie w celu odnajdywania swoich wyników. Możesz przeciągać i upuszczać wyniki między różnymi poziomami, aby utworzyć strukturę.* *System Canvas umożliwia również dodawanie wyników do rubryk oceniania, można więc szacować biegłość podczas oceniania zadań. Po ustawieniu wyników kliknij Zarządzaj rubrykami, aby rozpocząć korzystanie z wyników do oceniania.*"
             title: "Ustawianie wyników"
     mastery: Biegłość
     mastery_error: "Musi być większe lub równe 0"
@@ -10786,7 +10788,7 @@ pl:
         auth_uri: "Uwierzytelnienie URI"
         client_id: "Identyfikator klienta"
         client_secret: "Tajny klucz klienta"
-        client_secret_json: "Tajny klucz klienta json"
+        client_secret_json: "Tajne klucze klienta json"
         redirect_uri: "Przekierowanie URI"
         token_uri: "Token URI"
     grade_export: 
@@ -14357,7 +14359,7 @@ pl:
   stream_items_api: 
     assessment_request_title: "Recenzja uczestnika za %{title}"
   student_5da6bfd1: Uczestnik
-  student_921b864d: Uczestnik
+  student_921b864d: uczestnik
   student_assignment_outcome_map_title: "Kompetencje uczestnika"
   student_groups_desc: |-
       Umożliwia to dodanie strony z nową grupą studentów do konta. Nowa strona została utworzona w celu szybszego rejestrowania
@@ -14905,7 +14907,7 @@ pl:
   to_35c6baa2: do
   to_c4c44f4b: do
   to_minscore_43e5452e: "do %{minScore}%"
-  to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Aby wyświetlić zadania, upewnij się, że aktywny jest widok *Agenda*."
+  to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Aby wyświetlić zadania, upewnij się, że aktywny jest widok *Harmonogram*."
   too_many_members_b8b15069: "Zbyt duża liczba członków"
   tooltips: 
     finished: ukończono
@@ -15586,7 +15588,7 @@ pl:
   you_must_specify_a_usage_right_5eb57f87: "Musisz określić prawo użytkowania."
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Twoja lista zadań znajduje się teraz na stronie *Kalendarz*."
   your_assignments_list_has_improved_3eded80e: "Twoja lista *Zadania* została ulepszona!"
-  your_assignments_will_show_here_listed_by_due_date_18dc880f: "Twoje zadania pojawią się tutaj na liście, ułożone według terminu dostarczenia."
+  your_assignments_will_show_here_listed_by_due_date_18dc880f: "Twoje zadania pojawią się w tym miejscu, ułożone według terminu dostarczenia."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Przeglądarka nie spełnia minimalnych wymagań dotyczących systemu Canvas. Odwiedź *Przewodnik systemu Canvas* w celu uzyskania informacji na temat obsługiwanych przeglądarek."
   your_content_has_been_exported_bbb57764: "Twoja zawartość została wyeksportowana."
   your_message_has_been_sent_thank_you_e0284316: "Twoja wiadomość została wysłana. Dziękujemy!"
