@@ -324,7 +324,7 @@ class Quizzes::QuizzesController < ApplicationController
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      if params[:assignment] && @context.feature_enabled?(:post_grades)
+      if params[:assignment].present? && @context.feature_enabled?(:post_grades) && @quiz.assignment
         @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
         @quiz.assignment.save
       end
