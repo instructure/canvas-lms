@@ -197,8 +197,11 @@ class AssociateInteraction < AssessmentItemConverter
   end
 
   def get_all_answers_for_crazy_n_squared_match_by_index_thing
+    use_prev_elements = false
     @doc.css('div.RESPONSE_BLOCK choiceInteraction').each_with_index do |ci, i|
-      a = ci.next_element
+      use_prev_elements = true if i == 0 && ci.previous_element
+      a = use_prev_elements ? ci.previous_element : ci.next_element
+      next unless a
       answer = {}
       extract_answer!(answer, a)
       answer[:id] = unique_local_id
