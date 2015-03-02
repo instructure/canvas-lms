@@ -715,14 +715,6 @@ CanvasRails::Application.routes.draw do
   get 'facebook/settings' => 'facebook#settings'
   post 'facebook/notification_preferences' => 'facebook#notification_preferences'
 
-  resources :interaction_tests do
-    collection do
-      get :next
-      get :register
-      post :groups
-    end
-  end
-
   post 'object_snippet' => 'context#object_snippet'
   post 'saml_consume' => 'pseudonym_sessions#saml_consume'
   match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]
