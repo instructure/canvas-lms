@@ -297,7 +297,8 @@
     }
   }
   .events_list {
-    margin-bottom: 20px;
+    @if $use_new_styles { margin-bottom: $ic-sp*2; }
+    @else { margin-bottom: 20px; }
     .event-list-view-calendar {
       float: right;
       font-size: 10px;
@@ -307,6 +308,9 @@
         vertical-align: middle;
       }
     }
+  }
+  @if $use_new_styles {
+    * + .events_list { margin-top: $ic-sp*2; }
   }
   table.assignments {
     width: 100%;

@@ -1,47 +1,77 @@
 <% if @current_user %>
-  <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
+  <ul role="navigation" id="menu" <% if use_new_styles? %>class="ic-app-header__menu-list"<% end %> aria-label="<%= t('navigation.main', 'Main Navigation') %>">
     <%- cache([@current_user, k12?, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
-    <li id="courses_menu_item" class="menu-item">
+
+    <li id="courses_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %>">
       <%= render(:partial => 'shared/home_menu') %>
     </li>
     <%- end -%>
-    <li id="grades_menu_item" class="menu-item">
-      <a href="<%= grades_path %>" class="menu-item-no-drop">
-        <% if k12? %>
-          <%= render(:partial => 'shared/svg/svg_icon_grades') %>
-          <div class="menu-item__text">
+    <li id="grades_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %>">
+      <a href="<%= grades_path %>" class="menu-item-no-drop <% if use_new_styles? %>ic-app-header__menu-list-link<% end %>">
+        <% if k12? %><%= render(:partial => 'shared/svg/svg_icon_grades.svg') %><% end %>
+        <% if use_new_styles? %>
+          <div class="menu-item-icon-container"><%= render(:partial => 'shared/svg/svg_icon_grades_new_styles.svg') %></div>
         <% end %>
+        <% if k12? or use_new_styles? %><div class="menu-item__text"><% end %>
         <%= t('menu.grades', 'Grades') %>
-        <% if k12? %></div><% end %>
+        <% if k12? or use_new_styles? %></div><% end %>
       </a>
     </li>
-    <li id="calendar_menu_item" class="menu-item">
-      <a href="<%= calendar_path %>" class="menu-item-no-drop">
-        <% if k12? %>
-          <%= render(:partial => 'shared/svg/svg_icon_calendar') %>
-          <div class="menu-item__text">
+    <li id="calendar_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %>">
+      <a href="<%= calendar_path %>" class="menu-item-no-drop <% if use_new_styles? %>ic-app-header__menu-list-link<% end %>">
+        <% if k12? %><%= render(:partial => 'shared/svg/svg_icon_calendar.svg') %><% end %>
+        <% if use_new_styles? %>
+          <div class="menu-item-icon-container"><%= render(:partial => 'shared/svg/svg_icon_calendar_new_styles.svg') %></div>
         <% end %>
+        <% if k12? or use_new_styles? %><div class="menu-item__text"><% end %>
         <%= t('menu.calendar', 'Calendar') %>
-        <% if k12? %></div><% end %>
+        <% if k12? or use_new_styles? %></div><% end %>
       </a>
     </li>
-    <%# Inbox menu item currently only for K-12 %>
-    <% if k12? %>
+    <%# Inbox menu item currently only for K-12 and new styles %>
+    <% if k12? or use_new_styles? %>
       <% unless @current_user.fake_student? %>
-        <li id="inbox_menu_item" class="menu-item">
-          <a href="<%= conversations_path %>" class="menu-item-no-drop">
-            <div class="icon-badge-combo">
-              <div class="icon-badge-combo__icon"><%= render(:partial => 'shared/svg/svg_icon_mail') %></div>
-              <% unless @current_user.disabled_inbox? %>
-                <% unread = @current_user.unread_conversations_count %>
-                <span class="icon-badge-combo__badge" <% if unread == 0 %> style="display: none;"<% end %>><%= unread %></span>
-              <% end %>
-            </div>
+        <li id="inbox_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %>">
+          <a href="<%= conversations_path %>" class="menu-item-no-drop <% if use_new_styles? %>ic-app-header__menu-list-link<% end %>">
+
+            <% if k12? %>
+              <div class="icon-badge-combo">
+                <div class="icon-badge-combo__icon"><%= render(:partial => 'shared/svg/svg_icon_mail.svg') %></div>
+                <% unless @current_user.disabled_inbox? %>
+                  <% unread = @current_user.unread_conversations_count %>
+                  <span class="icon-badge-combo__badge" <% if unread == 0 %> style="display: none;"<% end %>><%= unread %></span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if use_new_styles? %>
+              <div class="menu-item-icon-container">
+                <%= render(:partial => 'shared/svg/svg_icon_inbox.svg') %>
+                <% unless @current_user.disabled_inbox? %>
+                  <% unread = @current_user.unread_conversations_count %>
+                  <span class="menu-item__badge" <% if unread == 0 %> style="display: none;"<% end %>><%= unread %></span>
+                <% end %>
+              </div>
+            <% end %>
             <div class="menu-item__text"><%= t 'links.inbox', "Inbox" %></div>
           </a>
         </li>  
       <% end %>
     <% end %>
     <%= render(:partial => 'external_tools/global_nav_menu_items') %>
+
+    <%# Temp fix: Need to incorporate all the logic from /shared/identity.html.erb when we have subnav panel along with a way to pull in an avatar %>
+    <% if use_new_styles? %>
+      <li class="ic-app-header__menu-list-item">
+        <%= link_to settings_profile_path, class: "ic-app-header__menu-list-link" do %>
+          <div class="menu-item-icon-container">
+            <div class="ic-avatar">              
+                <%= image_tag("panda-profile-placeholder.jpg", class: "ic-avatar__image", alt:"") %>              
+            </div>
+          </div>
+          <div class="menu-item__text"><%= t('Settings') %></div>
+        <% end %>
+      </li>
+    <% end %>
   </ul>
 <% end %>

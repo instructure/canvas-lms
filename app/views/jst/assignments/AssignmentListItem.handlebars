@@ -3,8 +3,11 @@
   class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}}"
   data-item-id="{{labelId}}"
 >
-
-  <div class="ig-details row-fluid">
+  {{#if ENV.use_new_styles}}
+    <div class="ig-details">
+  {{else}}
+    <div class="ig-details row-fluid">
+  {{/if}}
     {{#if canManage}}
       <div class="{{spanWidth}} ellipses modules">
         {{#if has_modules}}

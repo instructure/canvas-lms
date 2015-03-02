@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
     crumb = <<-END
-      <i class="icon-home standalone-icon"
+      <i class="icon-home"
          title="#{title}">
         <span class="screenreader-only">#{title}</span>
       </i>

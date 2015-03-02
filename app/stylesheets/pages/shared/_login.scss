@@ -9,9 +9,15 @@ $modal_box_padding: 20px;
 
 body.modal {
   #footer {
-    display: block !important;
-    width: $modal_box_width + 20px;
-    margin: 20px auto;
+    @if $use_new_styles {
+      display: block !important;
+      @include breakpoint(desktop) { display: flex !important; }
+    }
+    @else {
+      display: block !important;
+      width: $modal_box_width + 20px;
+      margin: 20px auto;  
+    } 
   }
   #main {
     background-color: transparent;

@@ -1,10 +1,11 @@
 <% if @domain_root_account.feature_enabled?(:lor_for_account) || (@current_user && @current_user.feature_enabled?(:lor_for_user)) %>
   <% visibility = ContextExternalTool.global_navigation_visibility_for_user(@domain_root_account, @current_user) %>
 
-  <% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility), k12?]) do %>
+  <% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility), k12?, use_new_styles?]) do %>
     <% tools = ContextExternalTool.global_navigation_tools(@domain_root_account, visibility) %>
     <% tools.each do |tool| %>
-      <li id="<%= tool.asset_string %>_menu_item" class="menu-item">
+      <li id="<%= tool.asset_string %>_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %>">
+      <% unless use_new_styles? %>
         <a class='menu-item-no-drop' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
           <% if k12? %>
             <%# Hardcoding Commons logo in to help K-12 sales demos, until a way to give the nav items logos is built out %>
@@ -14,6 +15,7 @@
           <%= tool.label_for(:global_navigation) %>
           <% if k12? %></div><% end %>
         </a>
+      <% end %>
       </li>
     <% end %>
   <% end %>

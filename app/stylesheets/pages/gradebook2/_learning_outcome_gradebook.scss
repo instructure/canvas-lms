@@ -13,15 +13,24 @@ $page-dark: #ebeff2;
 
 /* bootstrap overrides */
 .nav-pills li a {
-  color: #585e63;
-  padding-bottom: 5px;
-  padding-top: 6px;
+  @if $use_new_styles { color: $ic-color-dark; }
+  @else {
+    color: #585e63;
+    padding-bottom: 5px;
+    padding-top: 6px;  
+  }
 }
 
 .gradebook-navigation-pills {
-  font-size: 14px;
-  margin: $header-child-margin;
-}
+  @if $use_new_styles {
+    margin: 0;
+  }
+  @else {
+    font-size: 14px;
+    margin: $header-child-margin;
+  }
+}  
+
 
 /* page overrides */
 #breadcrumbs {
@@ -169,15 +178,28 @@ $page-dark: #ebeff2;
   }
 }
 
-.gradebook-header .section-button-placeholder {
-  float: right;
-  margin: $header-child-margin;
-  position: relative;
-  top: 1px;
-
-  .section-select-button {
-    padding: 3px 12px 3px 12px;
+.gradebook-header {
+  
+  @if $use_new_styles {
+    @include clearfix;
+    padding: $ic-sp 0 $ic-sp/2;
+    + .assignment-gradebook-container {
+      #gradebook-toolbar { border-top: 1px solid $ic-border-light; }
+    }
+    .gradebook-navigation { margin-top: 3px; }
   }
+  
+  .section-button-placeholder {
+    position: relative;
+    float: right;
+    @if $use_new_styles == false {
+      margin: $header-child-margin;
+      top: 1px;
+      .section-select-button { padding: 3px 12px 3px 12px; }
+    }
+    
+  }
+
 }
 
 .gradebook-navigation {

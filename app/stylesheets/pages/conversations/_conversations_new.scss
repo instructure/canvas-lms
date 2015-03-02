@@ -10,8 +10,19 @@
   bottom: 0;
   margin-bottom: 0;
   display: none;
-  width: 100%;
   box-sizing: border-box;
+  @if $use_new_styles {
+    top: 0 !important; // need a more elegant way of doing this
+    left: $ic-header-primary-width - $ic-sp;
+    width: calc(100% - (#{$ic-header-primary-width} - #{$ic-sp}) );
+    @include breakpoint(wide) { 
+      left: $ic-header-primary-width;
+      width: calc(100% - #{$ic-header-primary-width});
+    }
+  }
+  @else {
+    width: 100%;  
+  }
 }
 
 #footer {
@@ -29,16 +40,23 @@
 .conversations {
   min-width: 1160px;
   position: relative;
+  @if $use_new_styles { min-width: 0; }
 }
 
 .conversations .panel {
-  background: #f1f1f1;
-  border-bottom: 1px solid #acacac;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
   box-sizing: border-box;
   color: #555;
   height: 58px;
   padding: 9px 12px 0 12px;
+  @if $use_new_styles {
+    background: $lightBackground;
+    border-bottom: 1px solid $ic-border-light;
+  }
+  @else {
+    background: #f1f1f1;
+    border-bottom: 1px solid #acacac;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+  }
 
   > div {
     display: inline-block;

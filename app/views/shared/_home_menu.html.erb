@@ -1,21 +1,35 @@
 <% @current_user.set_menu_data(session[:enrollment_uuid]) %>
-<a href="<%= courses_path %>" class="menu-item-title">
-<% if k12? %>
-  <%= render(:partial => 'shared/svg/svg_icon_courses') %>
-  <div class="menu-item__text">
-<% end %>
-  <%= @current_user.menu_data[:group_memberships_count].zero? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
-  <span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i>
-<% if k12? %></div><% end %>
-</a>
-<div class="menu-item-drop">
-  <% if k12? %><div class="menu-item-drop__inner-content"><% end %>
-  <table cellspacing="0">
-    <tr>
-      <%= render(:partial => "shared/menu_courses", :locals => menu_courses_locals) %>
-      <%= render(:partial => "shared/menu_section", :locals => menu_groups_locals) %>
-      <%= render(:partial => "shared/menu_section", :locals => menu_accounts_locals) %>
-    </tr>
-  </table>
+
+<%# Temporary for new styles. This link needs to be wired up with the future sliding secondary nav %>
+<% if use_new_styles? %>
+  <a href="<%= courses_path %>" class="ic-app-header__menu-list-link">
+    <div class="menu-item-icon-container"><%= render(:partial => 'shared/svg/svg_icon_courses_new_styles.svg') %></div>
+    <div class="menu-item__text">
+      <%= @current_user.menu_data[:group_memberships_count].zero? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
+    </div>
+  </a>
+
+<%# If default/k-12 UI, the regular courses dropdown appears %>
+<% else %>
+  <a href="<%= courses_path %>" class="menu-item-title">
+  <% if k12? %>
+    <%= render(:partial => 'shared/svg/svg_icon_courses') %>
+    <div class="menu-item__text">
+  <% end %>
+    <%= @current_user.menu_data[:group_memberships_count].zero? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
+    <span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i>
   <% if k12? %></div><% end %>
-</div>
+  </a>
+  <div class="menu-item-drop">
+    <% if k12? %><div class="menu-item-drop__inner-content"><% end %>
+    <table cellspacing="0">
+      <tr>
+        <%= render(:partial => "shared/menu_courses", :locals => menu_courses_locals) %>
+        <%= render(:partial => "shared/menu_section", :locals => menu_groups_locals) %>
+        <%= render(:partial => "shared/menu_section", :locals => menu_accounts_locals) %>
+      </tr>
+    </table>
+    <% if k12? %></div><% end %>
+  </div>
+
+<% end %>

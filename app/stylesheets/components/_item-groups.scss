@@ -159,15 +159,24 @@
 */
 
 .item-group {
-  background-color: $wellBackground;
-  border: 1px solid darken($wellBackground, 7%);
-  padding: 9px;
-  border-radius: 3px;
-  margin-bottom: 20px;
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    padding: $ic-sp;
+    border-radius: $baseBorderRadius;
+    margin-bottom: $ic-sp*2;
+    background-color: $lightBackground;
+  }
+  @else {
+    border: 1px solid darken($wellBackground, 7%);
+    background-color: $wellBackground; 
+    padding: 9px; 
+    border-radius: 3px;
+    margin-bottom: 20px;
+  }
 }
 
-.ig-header, .ig-text {
-  padding-left: 30px;
+@if $use_new_styles == false {
+  .ig-header, .ig-text { padding-left: 30px; }
 }
 
 .ig-header .name {
@@ -183,9 +192,15 @@
 }
 
 .ig-header {
-  padding-top: 5px;
-  padding-bottom: 5px;
   min-height: 30px;
+  @if $use_new_styles {
+    padding-top: $ic-sp/2;
+    padding-bottom: $ic-sp/2;
+  }
+  @else {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
 
   .ig-header-title {
     text-decoration: none;
@@ -218,18 +233,26 @@
 }
 
 .ig-list li {
-  margin: 4px 0;
+  @if $use_new_styles { margin: $ic-sp/2 0; }
+  @else { margin: 4px 0; }
 }
 
 .ig-list .ig-row {
   position: relative;
   display: block;
-  height: 40px;
-  background: #fff;
-  border: 1px solid #c1c7cf;
   border-radius: 3px;
-  box-shadow: 0 1px 0 #dde0e4;
   color: $ic-font-color--subdued;
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    min-height: 40px;
+    background: $ic-color-light;
+  }
+  @else {
+    border: 1px solid #c1c7cf; 
+    box-shadow: 0 1px 0 #dde0e4;
+    background: #fff;
+    height: 40px;
+  }
 
   a.ig-title {
     color: $ic-font-color--subdued;
@@ -278,14 +301,14 @@
 }
 
 .ig-title {
-  position: absolute;
-  left: 30px;
-  right: 430px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-weight: bold;
+  position: absolute;
+  left: 30px;
   top: 9px;
+  right: 430px;
 }
 
 .ig-details {
@@ -297,14 +320,15 @@
 }
 
 .ig-admin {
-  position: absolute;
   white-space: nowrap;
+  right: 3px;
+  top: 10px;
+  position: absolute;
   right: 3px;
   top: 10px;
 
   .publish-icon {
     margin-right: 22px;
-    
 
     i[class*=icon-]:before,
     i[class^=icon-]:before {
