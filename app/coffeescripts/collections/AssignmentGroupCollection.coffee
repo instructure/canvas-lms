@@ -45,16 +45,16 @@ define [
 
     comparator: 'position'
 
-    userIsStudent: ->
-      _.include(ENV.current_user_roles, "student")
+    canReadGrades: ->
+      ENV.PERMISSIONS.read_grades
 
     getGrades: ->
-      if @userIsStudent() || ENV.observed_student_ids.length == 1
+      if @canReadGrades() && ENV.observed_student_ids.length <= 1
         collection = new SubmissionCollection
-        if @userIsStudent()
-          collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
-        else
+        if ENV.observed_student_ids.length == 1
           collection.url = => "#{@courseSubmissionsURL}?student_ids[]=#{ENV.observed_student_ids[0]}&per_page=#{PER_PAGE_LIMIT}"
+        else
+          collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
         collection.loadAll = true
         collection.on 'fetched:last', =>
           @loadGradesFromSubmissions(collection.toArray())
