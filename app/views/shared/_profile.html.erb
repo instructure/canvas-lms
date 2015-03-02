@@ -10,6 +10,9 @@
     <div class="image-block-image profile-avatar-wrapper">
       <% if @user_data[:can_edit] %>
         <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
+      <% elsif @user != @current_user %>
+        <%= avatar(@user_data[:id], size: 128, url: report_avatar_image_url(@user.id),
+          class: "report_avatar_link", title: t("Click to report profile picture"), show_flag: true) %>
       <% else %>
         <%= avatar(@user_data[:id], size: 128, url: nil) %>
       <% end %>

@@ -1239,12 +1239,12 @@ class User < ActiveRecord::Base
   end
 
   def report_avatar_image!(associated_context=nil)
-    if avatar_state == :approved || avatar_state == :locked
-      avatar_state = 're_reported'
+    if self.avatar_state == :approved || self.avatar_state == :locked
+      self.avatar_state = 're_reported'
     else
-      avatar_state = 'reported'
+      self.avatar_state = 'reported'
     end
-    save!
+    self.save!
   end
 
   def avatar_state

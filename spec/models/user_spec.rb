@@ -2882,4 +2882,11 @@ describe User do
     expect(@student.grants_right?(@ta, :create_user_notes)).to be_falsey
     expect(@student.grants_right?(@ta, :read_user_notes)).to be_falsey
   end
+
+  it "should change avatar state on reporting" do
+    user
+    @user.report_avatar_image!
+    @user.reload
+    expect(@user.avatar_state).to eq :reported
+  end
 end

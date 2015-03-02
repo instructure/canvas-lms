@@ -16,7 +16,7 @@
 .profile-avatar-wrapper {
   margin-right: 20px !important;
 
-  .profile-link {
+  a {
     float: left;
     position: relative;
   }
@@ -25,7 +25,7 @@
     box-shadow: 0 2 4 rgba(0, 0, 0, 0.5);
   }
 
-  .icon-edit {
+  i {
     background: rgba(0, 0, 0, .75);
     bottom: 2px;
     color: #fff;
@@ -42,7 +42,7 @@
     }
   }
 
-  &:hover .icon-edit {
+  &:hover i {
     visibility: visible;
   }
 }
