@@ -635,6 +635,7 @@ describe "context_modules" do
 
       it "should return focus to the module item cog when indenting" do
         hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
+        wait_for_ajaximations
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
@@ -642,6 +643,7 @@ describe "context_modules" do
         hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
         f("#context_module_item_#{@tag.id} .al-trigger").click
         hover_and_click("#context_module_item_#{@tag.id} .outdent_item_link")
+        wait_for_ajaximations
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
