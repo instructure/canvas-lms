@@ -3076,11 +3076,13 @@ es:
   config_url_e96ceaf3: "Configurar URL"
   configurate_tool_app_5a721f2c: "¿Configurar la aplicación %{tool}?"
   configuration_type_25a084a4: "Tipo de configuración"
+  configure_toolname_app_651371be: "Configurar la aplicación %{toolName}"
   confirm_dialog: 
     cancel: Cancelar
     submit: Enviar
   confirm_dialog_component: 
     ok: Aceptar
+  consumer_key_57d9fcf1: "Código del consumidor"
   consumer_key_6f94ba11: "Código del consumidor"
   content_exports: 
     buttons: 
@@ -3243,6 +3245,7 @@ es:
       choose_migration_file: 
         migration_text: Original
       course_find_select: 
+        copy_into_self_warning: "Ha seleccionado copiar el curso dentro de sí mismo. Tenga presente que esta acción duplicará el contenido seleccionado."
         course_name: "Nombre del curso"
         include_completed_courses: "Incluir los cursos finalizados"
         or: o
@@ -3483,8 +3486,10 @@ es:
         restore_items: "Recuerde que a veces algunos artículos pueden haber perdido alguna de la información asociada cuando son borrados. Asegúrese de confirmar los resultados de cualquier restauración que haga."
       restore_failed: "se ha producido un fallo en la restauración"
       restoring: restaurando...
+  context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
     url_or_domain_required: "Deben establecerse la URL o el dominio."
+  context_level_56d88f5b: "(nivel %{context})"
   context_module: 
     requirements: 
       max_score: "debe obtener no más de %{score}"
@@ -3935,6 +3940,15 @@ es:
     one: "1 minuto"
     other: "%{count} minutos"
     zero: "menos de 1 minuto"
+  count_page_views_b40102b3: 
+    one: "1 vista de la página"
+    other: "%{count} vistas de las páginas"
+  count_participations_ac8f82b7: 
+    one: "1 participación"
+    other: "%{count} participaciones"
+  count_students_30e46120: 
+    one: "1 alumno"
+    other: "%{count} alumnos"
   count_students_will_get_num_points_c970fc01: 
     one: "1 alumno obtendrá %{num} puntos"
     other: "%{count} alumnos obtendrán %{num} puntos"
