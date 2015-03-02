@@ -5,18 +5,18 @@ zh:
   1_item_scores_5512cd03: "1- 项目分数"
   2_final_score_7b0fd15e: "2- 最终分数"
   451_message: 
-    description: 因为您位于受美国贸易限制的国家/地区，您无法获得访问此网站的授权。
+    description: 因为您所在的国家/地区受美国贸易限制的约束，您无法获得此网站的访问授权。
     headings: 
       page: 未授权
     title: 未授权
   558x270_png_a5e13e53: "558x270 png"
   558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png（1.8 倍标准平铺大小，因此可根据需要放大或缩小）"
   EditAppointmentGroupDetails: 
-    affect_reservations: 这将如何影响预订?
-    and_n_contexts: "以及其它 %{n} 门课程"
-    and_n_sectionCodes: "以及其它 %{n}  门课程"
+    affect_reservations: 这将如何影响预订？
+    and_n_contexts: "以及其他 %{n} 门课程"
+    and_n_sectionCodes: "以及其他 %{n}  门课程"
     bad_max_appts: 您必须至少允许每名参加者拥有一个约会
-    bad_per_slot: 您必须允许一个时段至少有一个约会
+    bad_per_slot: 您必须至少允许一个时段有一个约会
     context_required: 您需要选择一个日程表
     select_calendars: 选择日程表
   EditGroupAssignmentView: 
@@ -2193,7 +2193,7 @@ zh:
   available_until_date_cd125c62: 可供使用的截止日期
   available_until_f3b9c4ed: 可供使用的截止日期
   available_until_lock_at_ab022445: "%{lock_at} 之前可供使用"
-  average_49c63f9b: 平均
+  average_49c63f9b: 平均分
   back_to_app_center_95420d83: "返回 App Center"
   bb_display: "Blackboard 学习"
   bb_file_description: "Blackboard 6/7/8/9 export .zip 文件"
@@ -2939,7 +2939,7 @@ zh:
       google: 
         drive: 
           upgrade: 
-            description: "要访问此协作，您必须授权 Canvas 访问您的 Google Drive 帐户"
+            description: "要访问此项协作，您必须授权 Canvas 访问您的 Google Drive 帐户"
       how_to_start_a_new_collaboration: 要了解有关特定协作类型的详细信息，请单击"开始新协作"，然后从下拉列表中选择该类型。
       links: 
         delete: 删除此协作
@@ -5512,6 +5512,7 @@ zh:
       formatting: 格式，按下即可选择
       rte_help: "富文本区域。按 ALT F10 显示工具栏。按 ALT F8 显示帮助。"
   either_the_url_or_domain_should_be_set_c29cf8c1: "应设置 URL 或域名。"
+  element_option_missing_error_an_element_to_attach__be433478: "`element` 选项缺失错误：针对 BBTreeBrowserView 将渲染选项设置为 'true' 时，必须指定 TreeBrowserView 附加到的一个元素"
   email: 
     default_from_name: "Instructure Canvas"
   email_is_invalid_e0d982eb: 电子邮件无效！
@@ -6830,7 +6831,7 @@ zh:
         media_comment: 媒体评论
         speech_recognition: 语音识别
     speed_grader_disabled: 对此课程禁用快速评分器
-    speedgrader_enabled_only_for_published_content: 仅为已发布内容启用快速评分器。
+    speedgrader_enabled_only_for_published_content: 仅为已发布的内容启用快速评分器。
     student_attendance: 
       headers: 
         assignment: 作业
@@ -10680,12 +10681,12 @@ zh:
     google_drive_settings: 
       description: "粘贴下面 client_secrets.json 的内容。上面的文本框将根据下面给出的内容自动填充。"
       labels: 
-        auth_uri: "授权 URI"
+        auth_uri: "授权 URL"
         client_id: "客户端 ID"
         client_secret: 客户端密钥
         client_secret_json: "客户端密钥 json"
-        redirect_uri: "重定向 URI"
-        token_uri: "令牌 URI"
+        redirect_uri: "重定向 URL"
+        token_uri: "令牌 URL"
     grade_export: 
       description: "SIS 评分导出"
       name: 评分导出
@@ -12788,7 +12789,7 @@ zh:
   recaptcha_not_configured_3a6ef9ee: "Recaptcha 未配置"
   recent_student: 
     last_logged_in: "上次登录时间 %{last_login}"
-  recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} 平均衰减"
+  recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} 衰减平均分"
   recently_deleted_courses_title: 近期删除的课程
   recipient_input: 
     context_search_placeholder: 输入姓名、课程或小组
@@ -14527,7 +14528,7 @@ zh:
   the_module_item_is_locked_27fe420b: 单元项已锁定。
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "iOS/Android 设备的快捷方式图标。180x180 png 或 svg"
   the_state_parameter_is_required_ffadf213: 需要状态参数
-  the_top_track_represents_days_on_which_the_student_2a347099: "顶部轨道表示 *学生将消息发送* 给课程导师的时段。底部轨道表示 **消息从导师发送** 给学生的时段。"
+  the_top_track_represents_days_on_which_the_student_2a347099: "顶部轨道表示 *学生将消息发送* 给课程导师的期间。底部轨道表示 **消息从导师发送** 给学生的期间。"
   there_are_count_results_in_the_list_e74f6e36: 
     one: "列表中有 %{count} 个结果"
     other: "列表中有 %{count} 个结果"
@@ -15023,7 +15024,7 @@ zh:
     facebook_fail: "Facebook 授权失败。"
     google_docs_added: "Google Docs 访问已授权！"
     google_docs_fail: "Google Docs 授权失败。请重试"
-    google_drive_added: "Google Drive 帐户已成功添加！"
+    google_drive_added: "已成功添加 Google Drive 帐户！"
     google_drive_fail: "Google Drive 授权失败。请重试"
     grades: 
       average_grades: 
@@ -15411,7 +15412,7 @@ zh:
   windows_tile_color_2b786bd9: "Windows 磁贴颜色"
   windows_wide_tile_a3302508: "Windows 宽磁贴"
   would_you_like_to_enable_this_app_ccdf735d: 是否要启用此应用程序？
-  would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您希望让学生继续学习该课程，还是希望重新锁定这些单元，直到新要求设定完毕？
+  would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您要让学生继续学习该课程，还是希望重新锁定这些单元，直到新要求设定完毕？
   xml_configuration_5ea1b942: "XML 配置"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用来自 %{institution2} 的凭据登录到 %{institution1}"
   you_are_the_group_leader_for_this_group_b8629b70: 您是此组的组长
