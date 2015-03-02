@@ -28,6 +28,9 @@ CanvasRails::Application.routes.draw do
     post :remove_messages
   end
 
+  post "/external_auth_observers/redirect_login" => 'login/external_auth_observers#redirect_login',
+       as: :external_auth_validation
+
   # So, this will look like:
   # http://instructure.com/register/5R32s9iqwLK75Jbbj0
   match 'register/:nonce' => 'communication_channels#confirm', as: :registration_confirmation, via: [:get, :post]
@@ -623,6 +626,7 @@ CanvasRails::Application.routes.draw do
   # deprecated alias
   get 'saml_logout' => 'login/saml#destroy'
   get 'login/saml/:id' => 'login/saml#new', as: :saml_login
+  get 'saml_observee' => 'login/saml#observee_validation', as: :saml_observee
   post 'login/saml' => 'login/saml#create'
   # deprecated alias
   post 'saml_consume' => 'login/saml#create'

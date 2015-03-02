@@ -7,15 +7,16 @@ define [
   'jst/registration/teacherDialog'
   'jst/registration/studentDialog'
   'jst/registration/parentDialog'
+  'jst/registration/samlDialog'
   'compiled/util/addPrivacyLinkToDialog'
   'str/htmlEscape'
   'compiled/jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog, htmlEscape) ->
+], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, samlDialog, addPrivacyLinkToDialog, htmlEscape) ->
 
   $nodes = {}
-  templates = {teacherDialog, studentDialog, parentDialog}
+  templates = {teacherDialog, studentDialog, parentDialog, samlDialog}
 
   # we do this in coffee because of this hbs 1.3 bug:
   # https://github.com/wycats/handlebars.js/issues/748
@@ -30,13 +31,15 @@ define [
       ]
     )
 
-  signupDialog = (id, title) ->
+  signupDialog = (id, title, path=null) ->
     return unless templates[id]
     $node = $nodes[id] ?= $('<div />')
+    path ||= "/users"
     html = templates[id](
       account: ENV.ACCOUNT.registration_settings
       terms_required: ENV.ACCOUNT.terms_required
       terms_html: termsHtml(ENV.ACCOUNT)
+      path: path
     )
     $node.html html
     $node.find('.date-field').datetime_field()
@@ -52,10 +55,19 @@ define [
       errorFormatter: registrationErrors
       success: (data) =>
         # they should now be authenticated (either registered or pre_registered)
-        if data.course
+        if data.redirect
+          window.location = data.redirect
+        else if data.course
           window.location = "/courses/#{data.course.course.id}?registration_success=1"
         else
           window.location = "/?registration_success=1"
+      error: (data) =>
+        if data.error
+          error_msg = data.error.message
+          $("input[name='#{htmlEscape data.error.input_name}']").
+          next('.error_message').
+          text(htmlEscape error_msg)
+          $.screenReaderFlashMessage(error_message)
 
     $node.dialog
       resizable: false

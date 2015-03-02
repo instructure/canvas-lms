@@ -25,18 +25,8 @@ class Login::SamlController < ApplicationController
   before_filter :run_login_hooks, :check_sa_delegated_cookie, only: [:new, :create]
 
   def new
-    increment_saml_stat("login_attempt")
     reset_session_for_login
-    settings = aac.saml_settings(request.host_with_port)
-    request = Onelogin::Saml::AuthRequest.new(settings)
-    forward_url = request.generate_request
-    if aac.debugging? && !aac.debug_get(:request_id)
-      aac.debug_set(:request_id, request.id)
-      aac.debug_set(:to_idp_url, forward_url)
-      aac.debug_set(:to_idp_xml, request.request_xml)
-      aac.debug_set(:debugging, "Forwarding user to IdP for authentication")
-    end
-    redirect_to delegated_auth_redirect_uri(forward_url)
+    auth_redirect(aac)
   end
 
   def create
@@ -106,7 +96,19 @@ class Login::SamlController < ApplicationController
       aac.debug_set(:is_valid_login_response, 'true') if debugging
 
       if response.success_status?
+        # for parent using self-registration to observe a student
+        # the student is logged out after validation
+        # and registration process resumed
+        if session[:parent_registration]
+          expected_unique_id = session[:parent_registration][:observee][:unique_id]
+          session[:parent_registration][:unique_id_match] = (expected_unique_id == unique_id)
+          saml = ExternalAuthObservation::Saml.new(@domain_root_account, request, response)
+          redirect_to saml.logout_url
+          return
+        end
+
         pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
+
         if pseudonym
           # We have to reset the session again here -- it's possible to do a
           # SAML login without hitting the #new action, depending on the
@@ -179,6 +181,48 @@ class Login::SamlController < ApplicationController
       return render status: :bad_request, text: "SAMLRequest or SAMLResponse required"
     end
 
+    # for parent using self-registration to observe a student
+    # following saml validation of student
+    # resume registration process
+    if session[:parent_registration]
+      session[:parent_registration][:logged_out] = true
+      if session[:parent_registration][:unique_id_match]
+        if session[:parent_registration][:observee_only].present?
+          # TODO: a race condition exists where the observee unique_id is
+          # already checked during pre-login form submit, but might have gone
+          # away during login. this should be very rare, and we don't have a
+          # mechanism for displaying and correcting the error yet.
+
+          # create the observee relationship, then send them back to that index
+          complete_observee_addition(session[:parent_registration])
+          redirect_to observees_profile_path
+        else
+          # TODO: a race condition exists where the observer unique_id and
+          # observee unique_id are already checked during pre-login form
+          # submit, but the former might have been taken or the latter gone
+          # away during login. this should be very rare, and we don't have a
+          # mechanism for displaying and correcting the error yet.
+
+          # create the observer user connected to the observee
+          pseudonym = complete_parent_registration(session[:parent_registration])
+
+          # log the new user in and send them to the dashboard
+          PseudonymSession.new(pseudonym).save
+          redirect_to dashboard_path(registration_success: 1)
+        end
+      else
+        flash[:error] = t("We're sorry, a login error has occurred, please check your child's credentials and try again.")
+        if session[:parent_registration][:observee_only].present?
+          redirect_to observees_profile_path
+          session.delete(:parent_registration)
+        else
+          redirect_to canvas_login_path
+          session.delete(:parent_registration)
+        end
+      end
+      return
+    end
+
     if params[:SAMLResponse]
       increment_saml_stat("logout_response_received")
       saml_response = Onelogin::Saml::LogoutResponse.parse(params[:SAMLResponse])
@@ -234,6 +278,10 @@ class Login::SamlController < ApplicationController
     end
   end
 
+  def observee_validation
+    auth_redirect(@domain_root_account.parent_registration_aac)
+  end
+
   protected
 
   def aac
@@ -245,5 +293,71 @@ class Login::SamlController < ApplicationController
 
   def increment_saml_stat(key)
     CanvasStatsd::Statsd.increment("saml.#{CanvasStatsd::Statsd.escape(request.host)}.#{key}")
+  end
+
+  def auth_redirect(aac)
+    increment_saml_stat("login_attempt")
+    settings = aac.saml_settings(request.host_with_port)
+    request = Onelogin::Saml::AuthRequest.new(settings)
+    forward_url = request.generate_request
+    if aac.debugging? && !aac.debug_get(:request_id)
+      aac.debug_set(:request_id, request.id)
+      aac.debug_set(:to_idp_url, forward_url)
+      aac.debug_set(:to_idp_xml, request.request_xml)
+      aac.debug_set(:debugging, "Forwarding user to IdP for authentication")
+    end
+    forward_url << '&ForceAuthn=true' if session[:parent_registration]
+    redirect_to delegated_auth_redirect_uri(forward_url)
+  end
+
+  def complete_observee_addition(registration_data)
+    observee_unique_id = registration_data[:observee][:unique_id]
+    observee = @domain_root_account.pseudonyms.by_unique_id(observee_unique_id).first.user
+    unless @current_user.user_observees.where(user_id: observee).exists?
+      @current_user.user_observees.create! do |uo|
+        uo.user_id = observee.id
+      end
+      @current_user.touch
+    end
+  end
+
+  def complete_parent_registration(registration_data)
+    user_name = registration_data[:user][:name]
+    terms_of_use = registration_data[:user][:terms_of_use]
+    observee_unique_id = registration_data[:observee][:unique_id]
+    observer_unique_id = registration_data[:pseudonym][:unique_id]
+
+    # create observer with specificed name
+    user = User.new
+    user.name = user_name
+    user.terms_of_use = terms_of_use
+    user.initial_enrollment_type = 'observer'
+    user.workflow_state = 'pre_registered'
+    user.require_presence_of_name = true
+    user.require_acceptance_of_terms = @domain_root_account.terms_required?
+    user.validation_root_account = @domain_root_account
+
+    # add the desired pseudonym
+    pseudonym = user.pseudonyms.build(account: @domain_root_account)
+    pseudonym.account.email_pseudonyms = true
+    pseudonym.unique_id = observer_unique_id
+    pseudonym.workflow_state = 'active'
+    pseudonym.user = user
+    pseudonym.account = @domain_root_account
+
+    # add the email communication channel
+    cc = user.communication_channels.build(path_type: CommunicationChannel::TYPE_EMAIL, path: observer_unique_id)
+    cc.workflow_state = 'unconfirmed'
+    cc.user = user
+    user.save!
+
+    # set the new user (observer) to observe the target user (observee)
+    observee = @domain_root_account.pseudonyms.active.by_unique_id(observee_unique_id).first.user
+    user.user_observees << user.user_observees.create!{ |uo| uo.user_id = observee.id }
+
+    notify_policy = Users::CreationNotifyPolicy.new(false, unique_id: observer_unique_id)
+    notify_policy.dispatch!(user, pseudonym, cc)
+
+    pseudonym
   end
 end

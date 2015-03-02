@@ -119,6 +119,10 @@ class AccountAuthorizationConfigsPresenter
     account.account_authorization_configs.new(auth_type)
   end
 
+  def parent_reg_selected
+    account.parent_registration?
+  end
+
   private
   def ip_addresses_setting
     Setting.get('account_authorization_config_ip_addresses', nil)

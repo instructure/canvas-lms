@@ -35,7 +35,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def self.recognized_params
     [ :log_in_url, :log_out_url, :requested_authn_context,
       :certificate_fingerprint, :identifier_format,
-      :login_attribute, :idp_entity_id ].freeze
+      :login_attribute, :idp_entity_id, :parent_registration ].freeze
   end
 
   def self.deprecated_params

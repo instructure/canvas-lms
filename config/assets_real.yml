@@ -16,6 +16,8 @@ compress_assets: off
 
 
 stylesheets:
+  saml_fields:
+    - public/stylesheets/compiled/bundles/saml_fields.css
   course_wizard:
     - public/stylesheets/compiled/bundles/course_wizard.css
   react_files:
