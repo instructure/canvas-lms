@@ -26,9 +26,11 @@
         <%= before_label :threshold, "threshold" %>
         <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{criterion.mastery_points rescue 5}</span>}.html_safe %>
       </div>
-      <div class="links editing">
-        <a href="#" class="edit_criterion_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit_description', 'Edit criterion description' %></span></a>
-      </div>
+      <% if !learning_outcome_criterion %>
+        <div class="links editing">
+          <a href="#" class="edit_criterion_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit_description', 'Edit criterion description' %></span></a>
+        </div>
+      <% end %>
     </div>
     <% if rubric && !rubric.free_form_criterion_comments && assessment_rating && assessment_rating[:comments] %>
       <div class="assessment-comments">
@@ -68,13 +70,14 @@
             <div class="description rating_description_value"><%= rating.description %></div>
             <span class="nobr"><%= t :points, "%{points} pts", :points => %{<span class="points">#{rating.points}</span>}.html_safe %></span>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
-            <div class="links">
-              <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit', 'Edit rating' %></span></a>
-              <a href="#" class="delete_rating_link"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t 'icons.delete', 'Delete rating' %></span></a>
-
-              <!-- Hidden if last -->
-              <a href="#" class="add_rating_link_after"><i class="icon-add standalone-icon"></i><span class="screenreader-only"><%= t 'icons.add_new_rating_after', 'Add new rating category after current rating' %></span></a>
-            </div>
+            <% if !learning_outcome_criterion %>
+              <div class="links">
+                <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit', 'Edit rating' %></span></a>
+                <a href="#" class="delete_rating_link"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t 'icons.delete', 'Delete rating' %></span></a>
+                <!-- Hidden if last -->
+                <a href="#" class="add_rating_link_after"><i class="icon-add standalone-icon"></i><span class="screenreader-only"><%= t 'icons.add_new_rating_after', 'Add new rating category after current rating' %></span></a>
+              </div>
+            <% end %>
           </div>
           </td>
         <% end %>
