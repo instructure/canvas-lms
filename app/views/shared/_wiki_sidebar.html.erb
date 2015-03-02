@@ -31,15 +31,17 @@
                 <% end %>
               <% end %>
             </ul>
-            <%= link_to t('links.new_page', "Link to a New Page"), polymorphic_url([@context, :wiki_page], action: :new), :id => 'new_page_link', :class => "add" %>
-            <form id="new_page_drop_down" style="display:none; margin: 5px;">
-              <div class="row-fluid">
-                <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
-                <input type="text" name="new_page_name" id="new_page_name" class="span12">
-                <input type="hidden" name="new_page_url_prefix" value="<%= polymorphic_path([@context, :wiki_pages]) %>" id="new_page_url_prefix" />
-                <button id="new_page_submit" class="btn btn-small" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
-              </div>
-            </form>
+            <% if can_do(@wiki, @current_user, :create_page) %>
+              <%= link_to t('links.new_page', "Link to a New Page"), polymorphic_url([@context, :wiki_page], action: :new), :id => 'new_page_link', :class => "add" %>
+              <form id="new_page_drop_down" style="display:none; margin: 5px;">
+                <div class="row-fluid">
+                  <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
+                  <input type="text" name="new_page_name" id="new_page_name" class="span12">
+                  <input type="hidden" name="new_page_url_prefix" value="<%= polymorphic_path([@context, :wiki_pages]) %>" id="new_page_url_prefix" />
+                  <button id="new_page_submit" class="btn btn-small" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
+                </div>
+              </form>
+            <% end %>
         </div>
       </div>
       <% end %>
