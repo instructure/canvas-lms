@@ -113,6 +113,7 @@ define([
                 ref="sharedSecret"
                 id="sharedSecret"
                 defaultValue={this.props.sharedSecret}
+                placeholder={this.props.consumerKey ? I18n.t('[Unchanged]') : null} // Assume that if we have a consumer key, we have a secret
                 label={I18n.t('Shared Secret')}
                 errors={this.state.errors} />
             </div>
