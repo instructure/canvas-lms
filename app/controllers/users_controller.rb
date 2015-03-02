@@ -468,6 +468,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    session.delete(:parent_registration) if session[:parent_registration]
     check_incomplete_registration
     get_context
 
@@ -1250,9 +1251,7 @@ class UsersController < ApplicationController
 
     @invalid_observee_creds = nil
     if @user.initial_enrollment_type == 'observer'
-      # TODO: SAML/CAS support
-      if observee_pseudonym = Pseudonym.authenticate(params[:observee] || {},
-          [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
+      if (observee_pseudonym = authenticate_observee)
         @observee = observee_pseudonym.user
       else
         @invalid_observee_creds = Pseudonym.new
@@ -1964,5 +1963,12 @@ class UsersController < ApplicationController
 
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
+  end
+
+  private
+
+  def authenticate_observee
+    Pseudonym.authenticate(params[:observee] || {},
+                           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
   end
 end

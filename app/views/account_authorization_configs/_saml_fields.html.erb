@@ -1,3 +1,4 @@
+<% jammit_css :saml_fields %>
 <div class="ic-Form-control">
   <%= f.label :idp_entity_id, t('IdP Entity ID'), class: 'ic-Label' %>
   <%= f.text_field :idp_entity_id, class: 'ic-Input' %>
@@ -29,3 +30,17 @@
                {},
                class: 'ic-Input') %>
 </div>
+<% if @account.settings[:self_registration] %>
+    <div id="parent_reg_selected" data-parent-reg-selected="<%= presenter.parent_reg_selected %>"></div>
+    <div class="ic-Form-control">
+      <%= f.label :parent_registration, "Parent Registration", class: 'ic-Label' %>
+      <%= f.check_box :parent_registration, class: "parent_reg_warning" %>
+      <span class="SAML_parent_default" ><%= t "Use this configuration for parent/observer registration" %></span>
+      <div class="parent_form_message">
+        <div class="parent_form_message_layout">
+          <i class="parent_icon_warning"></i>
+          <span class="parent_warning_message"></span>
+        </div>
+      </div>
+    </div>
+<% end %>

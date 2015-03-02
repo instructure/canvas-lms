@@ -826,4 +826,11 @@ module ApplicationHelper
   def active_path?(to_test)
     request.fullpath.include? to_test
   end
+
+  def link_to_parent_signup(auth_type)
+    template = auth_type.present? ? "#{auth_type.downcase}Dialog" : "parentDialog"
+    path = auth_type.present? ? external_auth_validation_path : users_path
+    link_to(t("Parents sign up here"), '#', id: "signup_parent", class: "signup_link",
+            data: {template: template, path: path}, title: t("Parent Signup"))
+  end
 end

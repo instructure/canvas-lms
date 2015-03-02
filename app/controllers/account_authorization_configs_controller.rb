@@ -420,6 +420,12 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The attribute to use to look up the user's login in Canvas. Either
   #   'user_id' (the default), or 'screen_name'
   #
+  # - parent_registration [Optional]
+  #
+  #   Accepts a boolean value, true designates the authentication service
+  #   for use on parent registrations.  Only one service can be selected
+  #   at a time so if set to true all others will be set to false
+  #
   # - account_authorization_config[n] (deprecated)
   #   The nth service specification as described above. For instance, the
   #   auth_type of the first service is given by the
@@ -526,6 +532,8 @@ class AccountAuthorizationConfigsController < ApplicationController
       aac_data = strong_params.fetch(:account_authorization_config, strong_params)
       position = aac_data.delete(:position)
       data = filter_data(aac_data)
+      deselect_parent_registration(data)
+
       account_config = @account.account_authorization_configs.build(data)
       update_deprecated_account_settings_data(aac_data, account_config)
 
@@ -571,6 +579,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       return
     end
 
+    deselect_parent_registration(data)
     aac.update_attributes(data)
 
     if position.present?
@@ -930,5 +939,11 @@ class AccountAuthorizationConfigsController < ApplicationController
       @account.public_send("#{setting}=".to_sym, setting_val)
     end
     @account.save!
+  end
+
+  def deselect_parent_registration(data)
+    if data[:parent_registration] == 'true' || data[:parent_registration] == '1'
+      @account.account_authorization_configs.update_all(parent_registration: false)
+    end
   end
 end
