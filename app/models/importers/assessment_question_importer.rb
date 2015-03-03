@@ -95,7 +95,10 @@ module Importers
       missing_links = hash.delete(:missing_links) || {}
       import_warnings = hash.delete(:import_warnings) || []
       if error = hash.delete(:import_error)
-        import_warnings += [error]
+        import_warnings << error
+      end
+      if error = hash.delete(:qti_error)
+        import_warnings << error
       end
 
       if id = hash['assessment_question_id']

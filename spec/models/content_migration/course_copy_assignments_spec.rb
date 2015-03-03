@@ -266,15 +266,17 @@ describe ContentMigration do
       end
 
       it "should not copy for teacher" do
-        run_course_copy
+        warnings = [
+            "The assignment \"lock locky\" could not be copied because it is locked.",
+            "The topic \"topic\" could not be copied because it is locked.",
+            "The quiz \"quiz\" could not be copied because it is locked."]
+
+        run_course_copy(warnings)
 
         expect(@copy_to.assignments.count).to eq 0
         expect(@copy_to.quizzes.count).to eq 0
         expect(@copy_to.discussion_topics.count).to eq 0
-        expect(@cm.content_export.error_messages).to eq [
-                ["The assignment \"lock locky\" could not be copied because it is locked.", nil],
-                ["The topic \"topic\" could not be copied because it is locked.", nil],
-                ["The quiz \"quiz\" could not be copied because it is locked.", nil]]
+        expect(@cm.content_export.error_messages.sort).to eq warnings.sort.map{|w| [w, nil]}
       end
 
       it "should not mark assignment as copied if not set to be frozen" do
@@ -282,7 +284,10 @@ describe ContentMigration do
         @asmnt.copied = false
         @asmnt.save!
 
-        run_course_copy
+        warnings = ["The topic \"topic\" could not be copied because it is locked.",
+                    "The quiz \"quiz\" could not be copied because it is locked."]
+
+        run_course_copy(warnings)
 
         asmnt_2 = @copy_to.assignments.where(migration_id: mig_id(@asmnt)).first
         expect(asmnt_2.freeze_on_copy).to be_nil

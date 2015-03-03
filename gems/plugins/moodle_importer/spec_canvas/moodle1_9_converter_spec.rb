@@ -24,9 +24,10 @@ describe Moodle::Converter do
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
                         "Possible answers will need to be regenerated for Formula question",
                         "Missing links found in imported content",
+                        "There was an error exporting an assessment question - No question type used",
                         "The importer couldn't determine the correct answers for this question."
     ]
-    expect(@cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}).to eq true
+    expect(@cm.warnings.all?{|w| allowed_warnings.find{|aw| w.start_with?(aw)}}).to eq true
   end
 
   it "should import files" do

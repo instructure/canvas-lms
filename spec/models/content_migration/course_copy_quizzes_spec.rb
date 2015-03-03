@@ -143,9 +143,7 @@ describe ContentMigration do
                           :answers =>
                                   [{:migration_id => "QUE_1016_A1", :text => "<br />", :weight => 100, :id => 8080},
                                    {:migration_id => "QUE_1017_A2", :text => "<pre>", :weight => 0, :id => 2279}]}.with_indifferent_access
-      qq = sp.quiz_questions.create!
-      qq.write_attribute(:question_data, data)
-      qq.save!
+      qq = sp.quiz_questions.create!(:question_data => data)
       sp.generate_quiz_data
       sp.published_at = Time.now
       sp.workflow_state = 'available'
@@ -176,8 +174,7 @@ describe ContentMigration do
 
     it "should generate numeric ids for answers" do
       q = @copy_from.quizzes.create!(:title => "test quiz")
-      mc = q.quiz_questions.create!
-      mc.write_attribute(:question_data, {
+      mc = q.quiz_questions.create!(:question_data => {
           points_possible: 1,
           question_type: "multiple_choice_question",
           question_name: "mc",
@@ -186,9 +183,7 @@ describe ContentMigration do
           answers: [{ text: 'blue', weight: 0, id: 123 },
                     { text: 'yellow', weight: 100, id: 456 }]
       }.with_indifferent_access)
-      mc.save!
-      tf = q.quiz_questions.create!
-      tf.write_attribute(:question_data, {
+      tf = q.quiz_questions.create!(:question_data => {
           points_possible: 1,
           question_type: "true_false_question",
           question_name: "tf",
@@ -197,7 +192,6 @@ describe ContentMigration do
           answers: [{ text: "True", weight: 100, id: 9608 },
                     { text: "False", weight: 0, id: 9093 }]
       }.with_indifferent_access)
-      tf.save!
       q.generate_quiz_data
       q.workflow_state = 'available'
       q.save!
@@ -218,8 +212,7 @@ describe ContentMigration do
 
     it "should make true-false question answers consistent" do
       q = @copy_from.quizzes.create!(:title => "test quiz")
-      tf = q.quiz_questions.create!
-      tf.write_attribute(:question_data, {
+      tf = q.quiz_questions.create!(:question_data => {
            points_possible: 1,
            question_type: "true_false_question",
            question_name: "tf",
@@ -228,7 +221,6 @@ describe ContentMigration do
            answers: [{ text: "false", weight: 0, id: 9093 },
                      { text: "true", weight: 100, id: 9608 }]
        }.with_indifferent_access)
-      tf.save!
       q.generate_quiz_data
       q.workflow_state = 'available'
       q.save!
@@ -242,8 +234,7 @@ describe ContentMigration do
 
     it "should import invalid true-false questions as multiple choice" do
       q = @copy_from.quizzes.create!(:title => "test quiz")
-      tf_bad = q.quiz_questions.create!
-      tf_bad.write_attribute(:question_data, {
+      tf_bad = q.quiz_questions.create!(:question_data => {
           points_possible: 1,
           question_type: "true_false_question",
           question_name: "tf",
@@ -252,7 +243,6 @@ describe ContentMigration do
           answers: [{ text: "foo", weight: 0, id: 9093 },
                     { text: "tr00", weight: 100, id: 9608 }]
       }.with_indifferent_access)
-      tf_bad.save!
       q.generate_quiz_data
       q.workflow_state = 'available'
       q.save!
@@ -266,17 +256,15 @@ describe ContentMigration do
 
     it "should escape html characters in text answers" do
       q = @copy_from.quizzes.create!(:title => "test quiz")
-      fimb = q.quiz_questions.create!
-      fimb.write_attribute(:question_data, {
-                                               points_possible: 1,
-                                               question_type: "fill_in_multiple_blanks_question",
-                                               question_name: "tf",
-                                               name: "tf",
-                                               question_text: "this statement is false. [orisit]",
-                                               answers: [{ text: "<p>foo</p>", weight: 100, id: 9093, blank_id: "orisit" },
-                                                         { text: "<div/>tr00", weight: 100, id: 9608, blank_id: "orisit" }]
-                                           }.with_indifferent_access)
-      fimb.save!
+      fimb = q.quiz_questions.create!(:question_data => {
+         points_possible: 1,
+         question_type: "fill_in_multiple_blanks_question",
+         question_name: "tf",
+         name: "tf",
+         question_text: "this statement is false. [orisit]",
+         answers: [{ text: "<p>foo</p>", weight: 100, id: 9093, blank_id: "orisit" },
+                   { text: "<div/>tr00", weight: 100, id: 9608, blank_id: "orisit" }]
+      }.with_indifferent_access)
       q.generate_quiz_data
       q.workflow_state = 'available'
       q.save!
@@ -346,9 +334,9 @@ describe ContentMigration do
 
     it "should omit deleted questions in banks" do
       bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      q1 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
-      q2 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
-      q3 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}]})
+      q1 = bank1.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      q2 = bank1.assessment_questions.create!(:question_data => {'question_name' => 'test question 2', 'question_type' => 'essay_question'})
+      q3 = bank1.assessment_questions.create!(:question_data => {'question_name' => 'test question 3', 'question_type' => 'essay_question'})
       q2.destroy
 
       run_course_copy
@@ -440,7 +428,7 @@ describe ContentMigration do
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       @attachment = attachment_with_context(@copy_from)
       @attachment2 = @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-      data = {"name" => "Hi", "question_text" => <<-HTML.strip, "answers" => [{"id" => 1}, {"id" => 2}]}
+      data = {'question_type' => 'text_only_question', "name" => "Hi", "question_text" => <<-HTML.strip}
       File ref:<img src="/courses/#{@copy_from.id}/files/#{@attachment.id}/download">
       different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
       media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
@@ -486,9 +474,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
                              {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
 
       q1 = @copy_from.quizzes.create!(:title => 'quiz1')
-      qq = q1.quiz_questions.create!
-      qq.write_attribute(:question_data, data)
-      qq.save!
+      qq = q1.quiz_questions.create!(:question_data => data)
 
       run_course_copy
 

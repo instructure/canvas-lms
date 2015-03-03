@@ -28,7 +28,7 @@ shared_examples_for "course copy" do
       er = ErrorReport.last
       expect("#{er.message} - #{er.backtrace}").to eq ""
     end
-    expect(@cm.warnings).to eq warnings
+    expect(@cm.warnings).to match_array warnings
     expect(@cm.workflow_state).to eq 'imported'
     @copy_to.reload
   end
