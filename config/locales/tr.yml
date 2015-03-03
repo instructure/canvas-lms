@@ -2849,6 +2849,8 @@ tr:
       update_assignment_points: "Değerlendirme listesine uyması için olası puanlar değiştirilsin mi?"
   choose_a_course_home_page_8059c7b: "Bir Ders Ana Sayfası Seçin"
   choose_usage_rights_33683854: "Kullanıcı haklarını seçin..."
+  clear_file_name_text_field_fce73840: "Dosya adı metin alanını temizle"
+  click_here_on_the_calendar_link_c9965631: "*Takvim* bağlantısı üzerinde buraya tıklayın"
   close_and_return_to_canvas_80544344: "Kapat ve Canvas'a geri dön"
   close_d634289d: Kapat
   collaboration: 
@@ -3019,6 +3021,7 @@ tr:
     profile: 
       notices: 
         contact_registered: "İletişim yöntemi kaydedildi!"
+  concluded_courses_94782e21: "Tamamlanmış Dersler"
   conferences: 
     concluded_conference: 
       delete: Sil
