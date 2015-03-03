@@ -138,6 +138,7 @@ class AssignmentsController < ApplicationController
 
       @google_drive_upgrade = !!(logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
           (!logged_in_user.user_services.where(service: 'google_drive').first || !(google_docs.verify_access_token rescue false)))
+      @google_authed = @google_docs_token and not @google_drive_upgrade
 
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))

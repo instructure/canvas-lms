@@ -209,7 +209,7 @@
     <% if @domain_root_account.feature_enabled?(:google_docs_domain_restriction) &&
           @domain_root_account.settings[:google_docs_domain] &&
          !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
-      <div id="submit_google_doc_form" class="google_doc_form <%= @google_docs_token ? '' : 'hide' %>">
+      <div id="submit_google_doc_form" class="google_doc_form <%= @google_authed ? '' : 'hide' %>">
         <p class="alert alert-error">
           <i class="icon-warning"></i>
           <%= t(:invalid_google_docs_domain, 'Invalid domain') %>
@@ -226,7 +226,7 @@
        </p>
         </div>
      <% else %>
-      <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), { :id => "submit_google_doc_form", :class => "submit_assignment_form google_doc_form #{@google_docs_token ? '' : 'hide'}"}) do %>
+      <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), { :id => "submit_google_doc_form", :class => "submit_assignment_form google_doc_form #{@google_authed ? '' : 'hide'}"}) do %>
         <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
         <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
         <table class="formtable" style="width: 100%;">
@@ -270,7 +270,7 @@
       <% end %>
     <% end %>
   <% if @google_drive_upgrade %>
-    <div id="submit_google_doc_form" class="google_doc_form auth <%= @google_docs_token ? 'hide' : '' %>">
+    <div id="submit_google_doc_form" class="google_doc_form auth <%= @google_drive_upgrade ? '' : 'hide' %>">
       <%= t 'messages.google_drives_auth_required', "Before you can submit assignments directly from Google Drive you need to authorize Canvas to access your Google Drive account:" %>
       <div style="font-size: 1.1em; text-align: center; margin: 10px;">
         <a class="btn" id="auth-google" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_drive', "Authorize Google Drive Access" %></a>
