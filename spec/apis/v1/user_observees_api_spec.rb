@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -261,6 +261,16 @@ describe UserObserveesController, type: :request do
       create_call({observee: observee}, api_user: disallowed_admin, expected_status: 401)
 
       expect(parent.reload.observed_users).to eq []
+    end
+
+    it 'should not allow a user to observe oneself' do
+      observee = {
+        unique_id: student_pseudonym.unique_id,
+        password: student_pseudonym.password,
+      }
+      expect(create_call({observee: observee}, api_user: student, expected_status: 401))
+
+      expect(student.reload.observed_users).to eq []
     end
   end
 

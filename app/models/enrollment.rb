@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -55,6 +55,7 @@ class Enrollment < ActiveRecord::Base
   validates_inclusion_of :associated_user_id, :in => [nil],
                          :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
                          :message => "only ObserverEnrollments may have an associated_user_id"
+  validate :cant_observe_self, :if => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' }
 
   validate :valid_role?
 
@@ -82,6 +83,10 @@ class Enrollment < ActiveRecord::Base
 
   def ensure_role_id
     self.role_id ||= self.role.id
+  end
+
+  def cant_observe_self
+    self.errors.add(:associated_user_id, "Cannot observe yourself") if self.user_id == self.associated_user_id
   end
 
   def valid_role?

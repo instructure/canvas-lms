@@ -266,6 +266,24 @@ describe UserMerge do
       expect(ContextModuleProgression.where(user_id:user2, context_module_id:[context_module, context_module2],workflow_state:'completed').count).to eq 2
     end
 
+    it "should remove observer enrollments that observe themselves (target)" do
+      enrollment1 = course1.enroll_user(user1, 'StudentEnrollment', enrollment_state: 'active')
+      enrollment2 = course1.enroll_user(user2, 'ObserverEnrollment', enrollment_state: 'active', associated_user_id: user1.id)
+
+      UserMerge.from(user1).into(user2)
+      expect(enrollment1.reload.user).to eql user2
+      expect(enrollment2.reload.workflow_state).to eql 'deleted'
+    end
+
+    it "should remove observer enrollments that observe themselves (source)" do
+      enrollment1 = course1.enroll_user(user1, 'StudentEnrollment', enrollment_state: 'active')
+      enrollment2 = course1.enroll_user(user2, 'ObserverEnrollment', enrollment_state: 'active', associated_user_id: user1.id)
+
+      UserMerge.from(user2).into(user1)
+      expect(enrollment1.reload.user).to eql user1
+      expect(enrollment2.reload.workflow_state).to eql 'deleted'
+    end
+
     it "should move and uniquify observee enrollments" do
       course2
       course1.enroll_user(user1)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1682,7 +1682,9 @@ class CoursesController < ApplicationController
       enrollment = @context.observer_enrollments.find(params[:enrollment_id])
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != 'none'
-      enrollment.update_attribute(:associated_user_id, student && student.id)
+      # this is used for linking and un-linking enrollments
+      enrollment.associated_user_id = student ? student.id : nil
+      enrollment.save!
       render :json => enrollment.as_json(:methods => :associated_user_name)
     end
   end

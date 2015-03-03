@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -128,6 +128,25 @@ describe EnrollmentsApiController, type: :request do
             }
           }
         expect(Enrollment.find(json['id'])).to be_an_instance_of ObserverEnrollment
+      end
+
+      it "should not create a new observer enrollment for self" do
+        raw_api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type    => 'ObserverEnrollment',
+              :enrollment_state => 'active',
+              :associated_user_id => @unenrolled_user.id,
+              :course_section_id => @section.id,
+              :limit_privileges_to_course_section => true
+            }
+          }
+
+        expect(response.code).to eql '400'
+        expect(JSON.parse(response.body)).to eq(
+          {"errors"=>{"associated_user_id"=>[{"attribute"=>"associated_user_id", "type"=>"Cannot observe yourself", "message"=>"Cannot observe yourself"}]}}
+        )
       end
 
       it "should default new enrollments to the 'invited' state in the default section" do

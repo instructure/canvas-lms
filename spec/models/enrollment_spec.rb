@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -115,6 +115,14 @@ describe Enrollment do
 
     @enrollment.associated_user_id = nil
     expect(@enrollment).to be_valid
+  end
+
+  it "should not allow an associated_user_id = user_id" do
+    observed = User.create!
+    @enrollment.type = 'ObserverEnrollment'
+    @enrollment.user_id = observed.id
+    @enrollment.associated_user_id = observed.id
+    expect(@enrollment).to_not be_valid
   end
 
   context "permissions" do
