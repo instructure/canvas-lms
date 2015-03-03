@@ -594,16 +594,33 @@ describe FilesController do
         @file.update_attribute(:locked, true)
       end
 
-      it "should not publish if usage_rights unset" do
-        put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:locked => "false"}
-        expect(@file.reload).to be_locked
+      context "without better_file_browsing" do
+        before do
+          @course.disable_feature! :better_file_browsing
+        end
+
+        it "should publish without usage rights" do
+          put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:locked => "false"}
+          expect(@file.reload).not_to be_locked
+        end
       end
 
-      it "should publish if usage_rights set" do
-        @file.usage_rights = @course.usage_rights.create! use_justification: 'public_domain'
-        @file.save!
-        put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:locked => "false"}
-        expect(@file.reload).not_to be_locked
+      context "with better_file_browsing" do
+        before do
+          @course.enable_feature! :better_file_browsing
+        end
+
+        it "should not publish if usage_rights unset" do
+          put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:locked => "false"}
+          expect(@file.reload).to be_locked
+        end
+
+        it "should publish if usage_rights set" do
+          @file.usage_rights = @course.usage_rights.create! use_justification: 'public_domain'
+          @file.save!
+          put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:locked => "false"}
+          expect(@file.reload).not_to be_locked
+        end
       end
     end
   end
@@ -746,6 +763,7 @@ describe FilesController do
     end
 
     it "should create the file in locked state if :usage_rights_required is enabled" do
+      @course.enable_feature! :better_file_browsing
       @course.enable_feature! :usage_rights_required
       user_session(@teacher)
       post 'create_pending', {:attachment => {

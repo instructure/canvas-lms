@@ -802,6 +802,7 @@ describe "Files API", type: :request do
     context "with usage_rights_required" do
       before do
         @course.enable_feature! :usage_rights_required
+        @course.enable_feature! :better_file_browsing
         user_session(@teacher)
         @att.update_attribute(:locked, true)
       end

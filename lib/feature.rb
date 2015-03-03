@@ -296,7 +296,7 @@ END
     'usage_rights_required' =>
     {
       display_name: -> { I18n.t('Require Usage Rights for Uploaded Files') },
-      description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published') },
+      description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published. Only applies if Better File Browsing is also enabled.') },
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true
