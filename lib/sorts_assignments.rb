@@ -1,6 +1,6 @@
 class SortsAssignments
 
-  VALID_BUCKETS = %i(past overdue undated ungraded upcoming future)
+  VALID_BUCKETS = [:past, :overdue, :undated, :ungraded, :upcoming, :future]
   AssignmentsSortedByDueDate = Struct.new(*VALID_BUCKETS)
 
   def self.by_due_date(opts)
