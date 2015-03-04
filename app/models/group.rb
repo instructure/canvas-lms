@@ -429,7 +429,6 @@ class Group < ActiveRecord::Base
   set_policy do
     given { |user| user && self.has_member?(user) }
     can :create_collaborations and
-    can :create_conferences and
     can :manage_calendar and
     can :manage_content and
     can :manage_files and
@@ -469,7 +468,6 @@ class Group < ActiveRecord::Base
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
     can :create and
     can :create_collaborations and
-    can :create_conferences and
     can :delete and
     can :manage and
     can :manage_admin_users and
@@ -499,6 +497,9 @@ class Group < ActiveRecord::Base
 
     given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
     can :leave
+
+    given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
+    can :create_conferences
   end
 
   def users_visible_to(user)

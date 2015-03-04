@@ -216,4 +216,40 @@ describe WebConference do
 
   end
 
+  context "creation rights" do
+    it "should let teachers create conferences" do
+      course_with_teacher(:active_all => true)
+      expect(@course.web_conferences.scoped.new.grants_right?(@teacher, :create)).to be_truthy
+
+      group(:context => @course)
+      expect(@group.web_conferences.scoped.new.grants_right?(@teacher, :create)).to be_truthy
+    end
+
+    it "should not let teachers create conferences if the permission is disabled" do
+      course_with_teacher(:active_all => true)
+      @course.account.role_overrides.create!(:role => teacher_role, :permission => "create_conferences", :enabled => false)
+      expect(@course.web_conferences.scoped.new.grants_right?(@teacher, :create)).to be_falsey
+
+      group(:context => @course)
+      expect(@group.web_conferences.scoped.new.grants_right?(@teacher, :create)).to be_falsey
+    end
+
+    it "should let students create conferences" do
+      course_with_student(:active_all => true)
+      expect(@course.web_conferences.scoped.new.grants_right?(@student, :create)).to be_truthy
+
+      group_with_user(:user => @student, :context => @course)
+      expect(@group.web_conferences.scoped.new.grants_right?(@student, :create)).to be_truthy
+    end
+
+    it "should not let students create conferences if the permission is disabled" do
+      course_with_student(:active_all => true)
+      @course.account.role_overrides.create!(:role => student_role, :permission => "create_conferences", :enabled => false)
+      expect(@course.web_conferences.scoped.new.grants_right?(@student, :create)).to be_falsey
+
+      group_with_user(:user => @student, :context => @course)
+      expect(@group.web_conferences.scoped.new.grants_right?(@student, :create)).to be_falsey
+    end
+  end
+
 end
