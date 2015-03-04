@@ -131,7 +131,7 @@ class AssignmentsController < ApplicationController
       begin
         google_docs = google_service_connection
         @google_service = google_docs.service_type
-        @google_docs_token = google_docs.retrieve_access_token
+        @google_docs_token = google_service_connection.verify_access_token && google_docs.retrieve_access_token rescue false
       rescue GoogleDocs::NoTokenError
         # Just fail I guess.
       end
@@ -172,6 +172,8 @@ class AssignmentsController < ApplicationController
       begin
         docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
       rescue GoogleDocs::NoTokenError
+        #do nothing
+      rescue ArgumentError
         #do nothing
       rescue => e
         ErrorReport.log_exception(:oauth, e)
