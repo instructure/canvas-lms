@@ -451,6 +451,20 @@ describe AssignmentsApiController, type: :request do
         @assignment = @course.assignments.create :name => 'differentiated assignment'
       end
 
+      it "should include overrides if overrides flag is included in the params" do
+        @course.account.enable_feature!(:differentiated_assignments)
+        assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments",
+          {
+            controller: 'assignments_api',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id.to_s,
+          },
+            :include => ['overrides']
+          )
+        expect(assignments_json[0].keys).to include("overrides")
+      end
+
       it "should exclude the only_visible_to_overrides flag if differentiated assignments is off" do
         @json = api_get_assignment_in_course(@assignment, @course)
         expect(@json.has_key?('only_visible_to_overrides')).to be_falsey
@@ -2319,6 +2333,21 @@ describe AssignmentsApiController, type: :request do
           :include => ['assignment_visibility']
         )
       end
+
+      it "should include overrides if overrides flag is included in the params" do
+        assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}.json",
+          {
+            controller: 'assignments_api',
+            action: 'show',
+            format: 'json',
+            course_id: @course.id.to_s,
+            id: @assignment1.id.to_s
+          },
+          :include => ['overrides']
+        )
+        expect(assignments_json.keys).to include("overrides")
+      end
+
 
       it "returns any assignment" do
         json1 = api_get_assignment_in_course @assignment1, @course
