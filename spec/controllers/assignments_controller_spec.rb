@@ -166,7 +166,7 @@ describe AssignmentsController do
       GoogleDocs::Connection.unstub(:config)
     end
 
-    it 'should force users to use google drive if availible' do
+    it 'should force users to use google drive if available' do
       user_session(@student)
       a = @course.assignments.create(:title => "some assignment")
       plugin = Canvas::Plugin.find(:google_drive)
@@ -174,6 +174,7 @@ describe AssignmentsController do
       plugin_setting.posted_settings = {}
       plugin_setting.save!
       google_docs_mock = mock('google_docs')
+      google_docs_mock.stubs(:verify_access_token).returns(true)
       google_docs_mock.stubs(:service_type).returns(nil)
       google_docs_mock.stubs(:retrieve_access_token).returns(nil)
       controller.stubs(:google_service_connection).returns(google_docs_mock)
