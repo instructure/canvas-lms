@@ -1484,7 +1484,7 @@ pt:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Tem a certeza de que pretende eliminar %{name}?"
     other: "Tem a certeza de que pretende eliminar estes %{count} itens?"
-  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Tem certeza de que deseja excluir este anúncio?"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Tem a certeza de que pretende eliminar este anúncio?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Tem a certeza de que pretende eliminar este período de avaliação?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Tem a certeza de que pretende eliminar este esquema de avaliação?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Tem a certeza de que pretende remover esta ferramenta?"
@@ -5424,7 +5424,7 @@ pt:
   each_bar_represents_the_number_of_page_views_on_th_442f8465: "Cada barra representa o número de *visualizações da página* no dia em questão. Uma barra cor de laranja indica que o aluno **realizou uma ação** numa disciplina no dia em questão."
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Cada barra representa o número de *visualizações da página* no dia em questão. Uma barra cor de laranja indica que o aluno **realizou uma ação** na disciplina no dia em questão."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Cada barra representa o número de visualizações da página relacionadas com a categoria em questão."
-  each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Cada linha é uma tarefa. O losango é a data de entrega e a barra vai até à data de envio. A cor verde indica um *envio dentro do prazo*, a cor amarela indica um **envio atrasado** e a cor vermelha indica um ***envio em falta***. Os losangos cinzentos representam tarefas sem data de entrega, colocados aquando do envio."
+  each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Cada linha é uma tarefa. O losango é a data de entrega e a barra vai até à data de envio. A cor verde indica um *envio dentro do prazo*, a cor amarela indica um **envio atrasado** e a cor vermelha indica um ***envio em falta***. Os losangos cinzentos representam tarefas sem datas de entrega, colocados aquando do envio."
   ecollege_file_description: Ecollege
   ecollege_name: "Conversor Ecollege"
   edit_app_b0cc1c17: "Editar aplicação"
@@ -6114,7 +6114,7 @@ pt:
     file_preview_infotable_name: Nome
     file_preview_infotable_size: Tamanho
     file_preview_infotable_status: Estado
-  file_preview_eedb43f2: "Visualização do arquivo"
+  file_preview_eedb43f2: "Pré-visualização do ficheiro"
   file_previews: 
     lock_explanation: 
       messages: 
@@ -7793,7 +7793,7 @@ pt:
   manage_group_group_name_ac8578c6: "Gerir o grupo %{group_name}"
   manage_usage_rights_c5a8c216: "Gerir direitos de utilização"
   manual_entry_e4a4f99a: "Introdução manual"
-  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "A pontuação de domínio reflete a tarefa ou o teste mais recente sujeito a avaliação."
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "A pontuação de domínio reflete a tarefa ou o teste avaliado mais recente."
   mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "A pontuação de domínio reflete a pontuação mais alta de uma tarefa ou de um teste avaliado."
   mathquill: 
     tabs: 
@@ -7862,7 +7862,7 @@ pt:
     send_message: "Enviar mensagem"
   message_students_dialog: 
     recipients: "Destinatários:"
-  message_this_student_6d14043d: "Enviar menagem a este aluno"
+  message_this_student_6d14043d: "Enviar mensagem a este aluno"
   messages: 
     account_suspended: 
       email: 
@@ -12778,7 +12778,7 @@ pt:
     updated_at: "Data de modificação"
     updated_at_short: Modificado
     view: Ver
-  read_more_about_windows_tiles_ac4ae6f5: "Saber mais sobre mosaicos de janelas"
+  read_more_about_windows_tiles_ac4ae6f5: "Saber mais sobre mosaicos do Windows"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha não configurado"
   recent_student: 
     last_logged_in: "último início de sessão em %{last_login}"
@@ -13368,7 +13368,7 @@ pt:
       labels: 
         recaptcha_private_key: "Chave privada ReCAPTCHA"
         recaptcha_public_key: "Chave pública ReCAPTCHA"
-  setup_checklist_eb8b00b8: "Configurar lista de verificação"
+  setup_checklist_eb8b00b8: "Lista de verificação da configuração"
   shared: 
     account_notification: 
       close: fechar
@@ -14151,7 +14151,7 @@ pt:
     android_banner_in_google_play: "No Google Play"
     android_banner_price: GRATUITO
     android_banner_title: "Canvas da Instructure"
-    android_banner_view_button: EXIBIR
+    android_banner_view_button: VER
   source_code_2395ca74: Código-fonte
   speed_grader: 
     submissions_dropdown: 
@@ -14519,7 +14519,7 @@ pt:
   the_module_item_is_locked_27fe420b: "O item do módulo está bloqueado."
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Ícone de atalho para dispositivos iOS/Android. 180x180 png ou svg"
   the_state_parameter_is_required_ffadf213: "É necessário o parâmetro de estado"
-  the_top_track_represents_days_on_which_the_student_2a347099: "A faixa superior representa dias em que o *aluno enviou mensagens* aos instrutores de disciplinas. A faixa inferior representa **mensagens dos instrutores** para o aluno."
+  the_top_track_represents_days_on_which_the_student_2a347099: "A faixa superior representa dias em que o *aluno enviou mensagens* a instrutores de disciplinas. A faixa inferior representa **mensagens dos instrutores** para o aluno."
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Existe 1 resultado na lista"
     other: "Existem %{count} resultados na lista"
