@@ -253,9 +253,9 @@ describe QuizzesHelper do
     end
 
     it "should select the user's answer" do
-      html = multiple_dropdowns_question(question: { question_text: "some <select name='question_4'><option value='val'>val</option></select>"},
+      html = multiple_dropdowns_question(question: { question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'},
                                          answer_list: ['val'])
-      expect(html).to eq "some <select name='question_4'><option value='val' selected>val</option></select>"
+      expect(html).to eq 'some <select class="question_input" name="question_4"><option value="val" selected>val</option></select>'
       expect(html).to be_html_safe
     end
   end

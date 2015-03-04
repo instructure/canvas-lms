@@ -446,15 +446,20 @@ module QuizzesHelper
     answer_list = hash_get(options, :answer_list)
     res      = user_content hash_get(question, :question_text)
     index  = 0
-    res.to_str.gsub %r{<select.*?name=['"](question_.*?)['"].*?>.*?</select>} do |match|
+    doc = Nokogiri::HTML.fragment(res)
+    selects = doc.css(".question_input")
+    selects.each do |s|
       if answer_list && !answer_list.empty?
         a = answer_list[index]
         index += 1
       else
-        a = hash_get(answers, $1)
+        question_id = s["name"]
+        a = hash_get(answers, question_id)
       end
-      match.sub(%r{(<option.*?value=['"]#{ERB::Util.h(a)}['"])}, '\\1 selected')
-    end.html_safe
+      opt_tag = s.children.css("option[value='#{a}']").first
+      opt_tag["selected"] = "selected"
+    end
+    doc.to_s.html_safe
   end
 
   def duration_in_minutes(duration_seconds)
@@ -551,7 +556,7 @@ module QuizzesHelper
   def score_to_keep_message(quiz=@quiz)
     case quiz.scoring_policy
     when "keep_highest"
-      I18n.t("Will keep the highest of all your scores") 
+      I18n.t("Will keep the highest of all your scores")
     when "keep_latest"
       I18n.t("Will keep the latest of all your scores")
     when "keep_average"
