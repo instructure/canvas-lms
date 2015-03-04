@@ -264,6 +264,10 @@ define([
         tree.render();
         tree.on('activate-file', function(file_id){
           $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
+          var submitButton = $("#submit_google_doc_form").find("[disabled].btn-primary");
+          if(submitButton) {
+            submitButton.removeAttr("disabled")
+          }
         });
 
       }, 'json');
@@ -345,6 +349,11 @@ define([
   });
 
   $("#submit_google_doc_form").submit(function() {
+    // make sure we have a document selected
+    if (!$("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val()){
+      return false
+    }
+
     $("#uploading_google_doc_message").dialog({
       title: I18n.t('titles.uploading', "Uploading Submission"),
       modal: true,
