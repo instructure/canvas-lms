@@ -796,7 +796,7 @@ RSpec.configure do |config|
       pseudonym.stubs(:id).returns(pseudonym.object_id)
     end
 
-    session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil, :used_basic_auth? => false)
+    session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil)
 
     PseudonymSession.stubs(:find).returns(session)
   end

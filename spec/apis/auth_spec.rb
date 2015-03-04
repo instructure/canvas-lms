@@ -36,31 +36,6 @@ describe "API Authentication", type: :request do
     consider_all_requests_local(true)
   end
 
-  context "sharding" do
-    specs_require_sharding
-
-    it "should use developer key + basic auth access on the default shard from a different shard" do
-      @shard1.activate do
-        @account = Account.create!
-        # this will continue to be supported until we notify api users and explicitly phase it out
-        user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123', :account => @account)
-        course_with_teacher(:user => @user, :account => @account)
-      end
-      LoadAccount.stubs(:default_domain_root_account).returns(@account)
-
-      get "/api/v1/courses.json"
-      expect(response.response_code).to eq 401
-      get "/api/v1/courses.json?api_key=#{@key.api_key}"
-      expect(response.response_code).to eq 401
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
-      expect(response.response_code).to eq 401
-      get "/api/v1/courses.json", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-      expect(response).to be_success
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-      expect(response).to be_success
-    end
-  end
-
   if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
     it "should require a valid client id" do
       get "/login/oauth2/auth", :response_type => 'code', :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
@@ -138,39 +113,10 @@ describe "API Authentication", type: :request do
         course_with_teacher(:user => @user)
       end
 
-      it "should allow basic auth" do
-        get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
-            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
-        expect(response.response_code).to eq 401
-        get "/api/v1/courses.json", {},
-            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-        expect(response).to be_success
-      end
-
-      it "should allow basic auth with api key" do
+      it "should not allow basic auth with api key" do
         get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-        expect(response).to be_success
-      end
-
-      it "should fail without api key" do
-        post "/api/v1/courses/#{@course.id}/assignments.json",
-             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
         expect(response.response_code).to eq 401
-        post "/api/v1/courses/#{@course.id}/assignments.json",
-             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-        expect(response.response_code).to eq 401
-      end
-
-      it "should allow post with api key and basic auth" do
-        post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
-             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-        expect(response).to be_success
-        expect(@course.assignments.count).to eq 1
-        expect(@course.assignments.first.title).to eq 'test assignment'
-        expect(@course.assignments.first.points_possible).to eq 5.3
       end
     end
 
@@ -796,16 +742,6 @@ describe "API Authentication", type: :request do
       user_with_pseudonym(:user => @user)
       raw_api_call(:get, "/api/v1/users/self/profile",
                       :controller => "profile", :action => "settings", :user_id => "self", :format => "json")
-      expect(response).to be_success
-      raw_json = response.body
-      expect(raw_json).not_to match(%r{^while\(1\);})
-      json = JSON.parse(raw_json)
-      expect(json['id']).to eq @user.id
-    end
-
-    it "should not prepend the CSRF protection to HTTP Basic API requests" do
-      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-      get "/api/v1/users/self/profile", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
       expect(response).to be_success
       raw_json = response.body
       expect(raw_json).not_to match(%r{^while\(1\);})

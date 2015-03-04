@@ -1532,7 +1532,7 @@ class ApplicationController < ActionController::Base
   end
 
   def in_app?
-    @pseudonym_session && !@pseudonym_session.used_basic_auth?
+    @pseudonym_session
   end
 
   def json_as_text?
