@@ -78,6 +78,10 @@ class AssociateInteraction < AssessmentItemConverter
         end
       end
     end
+
+    @question[:answers].each do |answer|
+      answer[:right] = ::CGI.unescapeHTML(answer[:right]) if answer[:right]
+    end
   end
   
   def get_canvas_matches(match_map)
