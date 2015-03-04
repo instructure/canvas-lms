@@ -17,6 +17,6 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec_canvas/**/*"]
 
   s.add_dependency "rails", ">= 3.2", "< 4.2"
-  s.add_dependency "moodle2cc", "0.2.16"
+  s.add_dependency "moodle2cc", "0.2.17"
   s.add_dependency "thor", "0.18.1"
 end
