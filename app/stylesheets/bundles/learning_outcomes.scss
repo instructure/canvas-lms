@@ -203,8 +203,10 @@ table.criterion .edit {
     margin-bottom: 8px;
   }
   .buttons button {
-    float: right;
     margin-left: 4px;
+  }
+  .buttons .button-container {
+    float: right;
   }
 }
 

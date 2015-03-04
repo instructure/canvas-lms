@@ -24,12 +24,17 @@
 
       <div class="buttons row-fluid">
         <div class="span12">
-          <button
-            class="btn btn-small btn-primary save_rating_link"
-            aria-controls="edit_rating_{{_index}}"
-            type="button"
-          >{{#t "close_rating"}}Ok{{/t}}</button>
-          <button class="btn btn-small delete_rating_link" type="button">{{#t "delete_criterion"}}Delete{{/t}}</button>
+          <div class="button-container">
+            <button
+              class="btn btn-small delete_rating_link"
+              type="button"
+            >{{#t "delete_criterion"}}Delete{{/t}}</button>
+            <button
+              class="btn btn-small btn-primary save_rating_link"
+              aria-controls="edit_rating_{{_index}}"
+              type="button"
+            >{{#t "close_rating"}}Ok{{/t}}</button>
+          </div>
         </div>
       </div>
     </div>
