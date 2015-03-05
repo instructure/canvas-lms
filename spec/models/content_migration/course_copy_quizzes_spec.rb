@@ -684,5 +684,63 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(group1_copy.assessment_question_bank_id).to eq bank1_copy.id
       expect(group2_copy.assessment_question_bank_id).to eq bank2_copy.id
     end
+
+    it "hould copy stuff" do
+      data1 = {:question_type => "file_upload_question",
+               :points_possible => 10,
+               :question_text => "why is this question terrible"
+      }.with_indifferent_access
+
+      data2 = {:question_type => "essay_question",
+               :points_possible => 10,
+               :question_text => "so terrible"
+      }.with_indifferent_access
+
+      data3 = {
+          :question_type => "multiple_choice_question",
+          :question_name => "test fun",
+          :name => "test fun",
+          :points_possible => 10,
+          :question_text => "<strong>html for fun</strong>",
+          :answers =>
+              [{:migration_id => "QUE_1016_A1", :text => "<br />", :weight => 100, :id => 8080},
+               {:migration_id => "QUE_1017_A2", :text => "<pre>", :weight => 0, :id => 2279}]}.with_indifferent_access
+
+      q = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
+      q.quiz_questions.create!(:question_data => data1)
+      q.quiz_questions.create!(:question_data => data2)
+      q.quiz_questions.create!(:question_data => data3)
+      q.generate_quiz_data
+      q.save!
+
+      run_course_copy
+      q_copy = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+      expect(q_copy.quiz_questions.count).to eq 3
+      q_copy.quiz_questions.each do |qq|
+        # should link quiz questions
+        expect(qq.assessment_question_id).to_not be_nil
+      end
+
+      @cm.copy_options = {:all_quizzes => true}
+      run_course_copy
+
+      # should not duplicate the questions
+      q_copy.reload
+      expect(q_copy.quiz_questions.count).to eq 3
+      q_copy.quiz_questions.each do |qq|
+        # should unlink them since the new quiz questions are possibly overwritten
+        expect(qq.assessment_question_id).to be_nil
+      end
+
+      @cm.copy_options = {:everything => true}
+      run_course_copy
+
+      q_copy.reload
+      expect(q_copy.quiz_questions.count).to eq 3
+      q_copy.quiz_questions.each do |qq|
+        # should re-link them
+        expect(qq.assessment_question_id).to_not be_nil
+      end
+    end
   end
 end
