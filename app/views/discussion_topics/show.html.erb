@@ -75,7 +75,7 @@
 
           <% if @current_user.present? %>
             <div class="admin-links">
-              <a class="al-trigger btn announcement_cog" href="#">
+              <a class="al-trigger btn announcement_cog" href="#" role="button">
                 <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
                 <span class="screenreader-only">
                    <% if @topic.is_a?(Announcement) %>
