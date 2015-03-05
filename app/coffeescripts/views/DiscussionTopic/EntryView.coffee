@@ -64,8 +64,14 @@ define [
       @$el.attr 'id', "entry-#{@model.get 'id'}"
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
-      @model.on 'change:editor', @render
-      @model.on 'change:editor', (entry) -> entry.trigger('edited')
+      @model.on 'change:editor', (entry) =>
+        @render()
+        entry.trigger('edited')
+      @model.on 'change:replies', (model, value) =>
+        if _.isEmpty(value)
+          delete @treeView
+        else
+          @renderTree()
 
     toggleRead: (e) ->
       e.preventDefault()
@@ -170,8 +176,6 @@ define [
       descendants = (opts.descendants or @options.descendants) - 1
       children = opts.children or @options.children
       collection = new EntryCollection replies, perPage: children
-      boundReplies = collection.map (x) -> x.attributes
-      @model.set 'replies', boundReplies
 
       page = collection.getPageAsCollection 0
       @treeView = new @options.treeView
@@ -181,6 +185,9 @@ define [
         threaded: @options.threaded
         showMoreDescendants: @options.showMoreDescendants
       @treeView.render()
+
+      boundReplies = collection.map (x) -> x.attributes
+      @model.set 'replies', boundReplies
 
     renderDescendantsLink: ->
       stats = @countPosterity()
