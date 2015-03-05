@@ -119,10 +119,10 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def create
-    grading_period_params = params[:grading_periods][0]
+    grading_period_params = params[:grading_periods].first
     # grabbing the first grading_period_group for now, until
     # we decide to allow for multiple grading_period_groups later
-    grading_period_group = @context.grading_period_groups.first_or_create
+    grading_period_group = @context.grading_period_groups.active.first_or_create
     # another inheritance check here?
     @grading_period = grading_period_group.grading_periods.new(grading_period_params)
     if @grading_period && authorized_action(@grading_period, @current_user, :manage)

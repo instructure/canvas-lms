@@ -1459,12 +1459,22 @@ describe Enrollment do
     end
   end
 
-  describe "destroy" do
+  describe "#destroy" do
     it "should update user_account_associations" do
       course_with_teacher(:active_all => 1)
       expect(@user.associated_accounts).to eq [Account.default]
       @enrollment.destroy
       expect(@user.associated_accounts(true)).to eq []
+    end
+
+    it "should delete its grading period grades" do
+      course_with_teacher
+      grading_period_group = Account.default.grading_period_groups.create
+      grading_period = grading_period_group.grading_periods.create(start_date: Time.zone.now, end_date: 30.days.from_now)
+      grading_period_grade = @enrollment.grading_period_grades.create(grading_period_id: grading_period.id)
+      expect(grading_period_grade.workflow_state).to eq('active')
+      @enrollment.destroy
+      expect(grading_period_grade.workflow_state).to eq('deleted')
     end
   end
 

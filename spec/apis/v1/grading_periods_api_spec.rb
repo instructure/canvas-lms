@@ -25,7 +25,7 @@ describe GradingPeriodsController, type: :request do
       account_admin_user(account: @account)
       user_session(@admin)
       grading_periods count: 3, context: @account
-      @account.grading_periods.last.destroy
+      @account.grading_periods.active.last.destroy
     end
 
     context "multiple grading periods feature flag turned on" do
@@ -42,7 +42,7 @@ describe GradingPeriodsController, type: :request do
         it "creates a grading period successfully" do
           now = Time.zone.now
           post_create(weight: 99, start_date: 1.month.since(now), end_date: 2.month.since(now))
-          expect(@account.grading_periods.last.weight).to eq(99)
+          expect(@account.grading_periods.active.last.weight).to eq(99)
         end
       end
 
@@ -117,13 +117,13 @@ describe GradingPeriodsController, type: :request do
     before :once do
       course_with_teacher active_all: true
       grading_periods count: 3, context: @course
-      @course.grading_periods.last.destroy
+      @course.grading_periods.active.last.destroy
     end
     context "multiple grading periods feature flag turned on" do
 
       describe 'GET show' do
         before :once do
-          @grading_period = @course.grading_periods.first
+          @grading_period = @course.grading_periods.active.first
         end
 
         def get_show(raw = false, data = {})
@@ -165,7 +165,7 @@ describe GradingPeriodsController, type: :request do
         it "creates a grading period successfully" do
           now = Time.zone.now
           post_create(weight: 99, start_date: 1.month.since(now), end_date: 2.month.since(now))
-          expect(@course.grading_periods.last.weight).to eq(99)
+          expect(@course.grading_periods.active.last.weight).to eq(99)
         end
       end
 

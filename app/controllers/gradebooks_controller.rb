@@ -51,7 +51,7 @@ class GradebooksController < ApplicationController
         gp_id = nil
         if multiple_grading_periods?
           set_current_grading_period
-          @grading_periods = get_grading_periods
+          @grading_periods = get_active_grading_periods
           gp_id = @current_grading_period_id unless view_all_grading_periods?
         end
 
@@ -194,7 +194,7 @@ class GradebooksController < ApplicationController
     @current_grading_period_id == "0"
   end
 
-  def get_grading_periods
+  def get_active_grading_periods
     @context.grading_periods.active.map { |gp| {id: gp.id, title: gp.title} }
   end
 
@@ -232,7 +232,7 @@ class GradebooksController < ApplicationController
       :speed_grader_enabled => @context.allows_speed_grader?,
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
       :multiple_grading_periods_enabled => multiple_grading_periods?,
-      :grading_periods => get_grading_periods,
+      :active_grading_periods => get_active_grading_periods,
       :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),

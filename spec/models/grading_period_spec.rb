@@ -19,10 +19,13 @@
 require_relative '../spec_helper'
 
 describe GradingPeriod do
-  subject { GradingPeriod.new(params) }
+  subject { grading_period }
+  let(:grading_period) { grading_period_group.grading_periods.build(params) }
+  let(:grading_period_group) { account.grading_period_groups.create!(account: account) }
+  let(:account) { Account.create! }
 
   let(:params) do
-    { course_id: 1, start_date: Time.zone.now, end_date: 1.day.from_now }
+    { start_date: Time.zone.now, end_date: 1.day.from_now }
   end
 
   it { is_expected.to be_valid }
@@ -52,7 +55,6 @@ describe GradingPeriod do
     it "does not destroy" do
       expect(subject).to_not be_destroyed
     end
-
   end
 
   describe "#destroy!" do

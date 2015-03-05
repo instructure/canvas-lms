@@ -86,7 +86,7 @@ define [
       @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
-      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.grading_periods
+      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.active_grading_periods
       @gradingPeriodToShow = userSettings.contextGet('gradebook_current_grading_period') || ENV.GRADEBOOK_OPTIONS.current_grading_period_id
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange

@@ -4,9 +4,9 @@ class GradingPeriod < ActiveRecord::Base
   attr_accessible :weight, :start_date, :end_date, :title
 
   belongs_to :grading_period_group, :inverse_of => :grading_periods
-  has_many :grading_period_grades
+  has_many :grading_period_grades, dependent: :destroy
 
-  validates_presence_of :start_date, :end_date
+  validates :start_date, :end_date, :grading_period_group_id, presence: true
   validate :validate_dates
 
   set_policy do
@@ -50,6 +50,7 @@ class GradingPeriod < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     save!
+    run_callbacks :destroy
   end
 
   def assignments(assignment_scope)

@@ -38,8 +38,8 @@ describe GradingPeriod::CourseGradingPeriodFinder do
     end
 
     it "finds grading periods for the account if the course doesn't have any" do
-      c2 = Course.create! account: sub_account
-      grading_periods = GradingPeriod::CourseGradingPeriodFinder.new(c2).grading_periods
+      course = Course.create!(account: sub_account)
+      grading_periods = GradingPeriod::CourseGradingPeriodFinder.new(course).grading_periods
       expect(grading_periods).to eq [sub_account_grading_period]
     end
   end
