@@ -1872,4 +1872,15 @@ class ApplicationController < ActionController::Base
   def self.region
     nil
   end
+
+  def show_request_delete_account
+    false
+  end
+  helper_method :show_request_delete_account
+
+  def request_delete_account_link
+    nil
+  end
+  helper_method :request_delete_account_link
 end
+
