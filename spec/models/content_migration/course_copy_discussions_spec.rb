@@ -51,7 +51,9 @@ describe ContentMigration do
     end
 
     it "should properly copy selected delayed announcements" do
-      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 1.hour.from_now)
+      from_time = 1.hour.from_now
+      until_time = 25.hours.from_now
+      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: from_time, lock_at: until_time)
       from_ann.workflow_state = "post_delayed"
       from_ann.save!
 
@@ -62,6 +64,8 @@ describe ContentMigration do
 
       to_ann = @copy_to.announcements.where(migration_id: mig_id(from_ann)).first
       expect(to_ann.workflow_state).to eq "post_delayed"
+      expect(to_ann.delayed_post_at.to_i).to eq from_time.to_i
+      expect(to_ann.lock_at.to_i).to eq until_time.to_i
     end
 
     it "should not copy announcements if not selected" do
