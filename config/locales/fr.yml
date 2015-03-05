@@ -5,7 +5,7 @@ fr:
   1_item_scores_5512cd03: "1- Notes par élément"
   2_final_score_7b0fd15e: "2- Note finale"
   451_message: 
-    description: "Vous n’êtes pas autorisé à accéder à ce site, parce que vous vous trouvez dans un pays dont les échanges commerciaux avec les États-Unis ."
+    description: "Vous n’êtes pas autorisé à accéder à ce site, parce que vous vous trouvez dans un pays soumis aux restrictions américaines sur les échanges commerciaux."
     headings: 
       page: "Non autorisé"
     title: "Non autorisé"
@@ -41,6 +41,7 @@ fr:
     cancel: Annuler
     save: Enregistrer
   _section_not_synced_yet_cd07d0dd: "-- Section pas encore synchronisée"
+  a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Une valeur de calcul n’est pas utilisée avec cette méthode de calcul"
   a_message_is_required_129e1814: "Message obligatoire"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Un tableau avec le nom du système de notation et des icônes permettant de modifier ou supprimer ce système."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Un tableau qui contient les données du système de notation. Chaque ligne comporte un nom, un pourcentage maximum et un pourcentage minimum, ainsi qu’une icône pour ajouter une ligne en dessous et une icône pour supprimer la ligne actuelle."
@@ -1257,6 +1258,7 @@ fr:
         default: 
           zero_activity: 
             text: "Ce rapport montre tous les étudiants inscrits à un cours d’un trimestre donné. Le fichier CSV résultant contient une ligne par inscription d’utilisateurs qui n’ont pas consulté le cours depuis la date indiquée."
+  achieve_mastery_count_times_8c9bbcec: "Parvenir à la maîtrise %{count} fois "
   activerecord: 
     errors: 
       messages: 
@@ -1496,6 +1498,7 @@ fr:
     default_imported_title: "Questions importées"
     default_title: "Pas de nom - %{course}"
     default_unfiled_title: "Questions non classées"
+  assign_reviews_on_date_7e48ec50: "Attribuer des révisions à la date"
   assignment: 
     assignment_group_must_have_group: "Sélectionnez un groupe pour cette tâche."
     at_least_one_file_type: "Spécifiez au moins un type de fichier autorisé"
@@ -2195,6 +2198,7 @@ fr:
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Jouez au héros et demandez à votre instructeur de corriger ce lien."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Avant de publier ce fichier, vous devez spécifier les droits d’utilisation."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Avant la publication, vous devez définir les droits d’utilisation de vos fichiers."
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: "Sous ce champ de recherche se trouve une liste de %{content_type}. Au fur et à mesure que vous tapez, la liste est filtrée pour correspondre à votre demande. Les messages de conversation sont filtrés en fonction de l’option que vous sélectionnez."
   better_file_browsing_description: |-
       Une nouvelle interface, plus simple et plus conviviale. Si vous l’activez au niveau des cours,
       tous les utilisateurs concernés la verront. Pour qu’elle s’affiche lorsque quelqu’un 
@@ -2803,6 +2807,7 @@ fr:
         create_assignment: "Créer une nouvelle tâche"
         delete: "Supprimer un événement/une tâche"
         new: "Créer un événement"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Impossible de supprimer les alignements d’après des associations de barème. Pour supprimer ces associations, vous devez enlever la ligne du barème des contenus."
   cancel_caeb1e68: Annuler
   canvas: 
     migration: 
@@ -3251,6 +3256,7 @@ fr:
       choose_migration_file: 
         migration_text: Source
       course_find_select: 
+        copy_into_self_warning: "Votre sélection aura pour effet de copier ce cours dans lui-même. Notez que cela dupliquera tout le contenu sélectionné."
         course_name: "Nom du cours"
         include_completed_courses: "Inclure les cours terminés"
         or: ou
@@ -4797,6 +4803,7 @@ fr:
         count: "Nombre d’étudiants ayant donné des réponses erronées"
         ratio: "Ratio d’étudiants ayant donné des réponses erronées"
   current_3ce5414a: "Actuelle :"
+  current_mastery_score_score_out_of_masterypoints_80addfb7: "Niveau de maîtrise actuel : %{score} sur %{masteryPoints}"
   current_score_6c81792: "Note actuelle"
   current_total_67bf5f72: "Total actuel :"
   curve_grades_dialog: 
@@ -5381,6 +5388,9 @@ fr:
     unsubscribed: Désabonné
     unsubscribed_hint: "Vous n’êtes pas abonné à ce sujet. Cliquez pour vous abonner."
   display_course_catalog: "Affichez une liste des cours consultable dans ce compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
+  distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
+      Répartition des notes actuelles pour tous les étudiants inscrits
+              aux cours de ce département.
   domain_3b54c511: Domaine
   don_t_show_again_15d8253e: "Ne plus afficher "
   due_by_c263dc10: "À rendre pour le"
@@ -5401,10 +5411,14 @@ fr:
   due_on_date_aa4725cd: "Date d’échéance :"
   due_on_date_ffc98ebc: "Date d’échéance"
   e_mail_only_2cc5e513: "E-mail uniquement"
+  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Chaque barre symbolise un travail. La couche verte représente le pourcentage d’étudiants qui ont rendu le travail *à temps*. Les travaux **en retard** sont signalés en jaune et ceux qui ***manquent*** sont en rouge."
+  each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Chaque barre symbolise un travail. Les *fines moustaches verticales* partent de la plus basse note, quel que soit l’étudiant, et rejoignent la note la plus élevée. La **barre plus épaisse** relie le 25e centile au 75e, avec la valeur ***médiane signalée***."
+  each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Chaque barre symbolise un travail. La fine moustache part de la plus basse note, quel que soit l’étudiant, et rejoint la note la plus élevée. La barre plus épaisse relie le 25e centile au 75e, et la valeur médiane est indiquée. La note de l’étudiant est signalée par un point."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Chaque barre représente le nombre de *consultations de page* de ce jour-là. Une barre orange indique que l’étudiant **a effectué une action** dans le cours ce jour-là."
   each_bar_represents_the_number_of_page_views_on_th_442f8465: "Chaque barre représente le nombre de *consultations de page* de ce jour-là. Une barre orange indique qu'un utilisateur **a effectué une action** dans un cours ce jour-là."
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Chaque barre représente le nombre de *consultations de page* de ce jour-là. Une barre orange indique qu'un utilisateur **a effectué une action** dans le cours ce jour-là."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Chaque barre représente le nombre de consultations de page relatives à cette catégorie."
+  each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Chaque barre symbolise un travail. Le losange indique la date d’échéance et la barre va jusqu’à la date d’envoi. La couleur verte représente * un envoi à temps*, la couleur jaune ** un envoi en retard** et la couleur rouge un *** travail manquant***. Les losanges gris sont des travaux sans date d’échéance, placés à l’heure de l’envoi."
   ecollege_file_description: Ecollege
   ecollege_name: "Convertisseur Ecollege"
   edit_app_b0cc1c17: "Modifier l’application"
@@ -5843,6 +5857,8 @@ fr:
   example_final_score_a92b30b9: "Exemple de note finale]]"
   example_https_example_com_config_xml_be5f36ac: "Exemple : https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Exemple : https://lti-tool-provider-example.herokuapp.com/register"
+  example_item_scores_6726c689: "Exemple de note d’élément"
+  expand_collapse_title_outcome_group_239f0a9d: "expand/collapse %{title} Outcome Group"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Développer la liste des membres du groupe %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Développer ou réduire les calendriers"
   expand_or_collapse_undated_items_b901de09: "Développer ou réduire les éléments non datés"
@@ -7758,6 +7774,8 @@ fr:
   manage_group_group_name_ac8578c6: "Gérer le groupe %{group_name}"
   manage_usage_rights_c5a8c216: "Gérer les droits d’utilisation"
   manual_entry_e4a4f99a: "Saisie manuelle"
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Le niveau de maîtrise atteint reflète le dernier travail ou questionnaire noté."
+  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Le niveau de maîtrise atteint reflète le meilleur résultat d’un travail ou questionnaire noté."
   mathquill: 
     tabs: 
       arrows: Flèches
@@ -9919,6 +9937,7 @@ fr:
   moodle_formula_many_warning_title: "%{count} questions avec formule issues de cette banque nécessiteront une nouvelle génération des réponses possibles"
   moodle_formula_warning_title: "Les réponses possibles devront être générées à nouveau pour la question utilisant une formule"
   more_courses_5ebbe998: "Cours supplémentaires"
+  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Le dernier résultat représente 75 % de l'évaluation de la maîtrise, la moyenne de tous les autres résultats intervient pour 25 %."
   move_dialog: 
     cancel: Annuler
     save: Enregistrer
@@ -9926,6 +9945,9 @@ fr:
     where_to_move: "Où voulez-vous déplacer *%{name}* ?"
   move_dialog_select: 
     move_to_end: "-- Tout en bas --"
+  move_outcome_ce497e6c: "Déplacer le résultat"
+  move_outcome_group_cfa1a505: "Déplacer le groupe de résultats"
+  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Doit atteindre le niveau de maîtrise au moins 2 fois. Les notes supérieures à ce niveau seront intégrées dans le calcul de la note finale sous forme de moyenne."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Le paramètre file_ids et/ou folder_ids est obligatoire"
   mute_dialog: 
     curving_assignments: "Courbe des tâches"
@@ -9969,6 +9991,7 @@ fr:
   no_grading_periods_to_display_ad25c8f3: "Aucune période de notation à afficher"
   no_grading_schemes_to_display_8b0e92e7: "Aucun système de notation à afficher"
   no_migration_file: "Fichier requis pour la migration de ce contenu."
+  no_score_yet_c94e919b: "Pas encore de résultat"
   no_students_have_taken_the_quiz_yet_e667644b: "Aucun étudiant n’a encore répondu au questionnaire"
   no_students_have_taken_the_survey_yet_d378cd35: "Aucun étudiant n’a encore répondu à l’enquête"
   no_usage_rights_object_supplied_304b8d40: "Aucun objet usage_rights fourni"
@@ -10637,7 +10660,12 @@ fr:
     google_drive_settings: 
       description: "Collez le contenu de client_secrets.json ci-dessous. Les zones de texte ci-dessus se rempliront automatiquement en fonction des éléments fournis ci-dessous."
       labels: 
+        auth_uri: "URI d’authentification"
         client_id: "ID client"
+        client_secret: "Code secret du client"
+        client_secret_json: "Json des codes secrets des clients "
+        redirect_uri: "URI de redirection"
+        token_uri: "URI du jeton"
     grade_export: 
       description: "Exportation de note pour SIS"
       name: "Exportation de note"
@@ -10871,7 +10899,7 @@ fr:
     labels: 
       requirements_must_be_completed: "Les conditions requises suivantes doivent être remplies pour déverrouiller cette page."
   presentation_2d9387ca: Présentation
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "Appuyez sur la barre d'espacement pour plus de détails sur ce résultat"
+  press_spacebar_for_more_details_on_this_outcome_f6713a42: "Appuyez sur la barre d’espacement pour plus de détails sur ce résultat"
   privacy_290109ea: Confidentialité
   product_name: Canvas
   profile: 
@@ -10971,6 +10999,7 @@ fr:
           les applications selon les besoins, mais si [vous développez un projet
           nouveau ou limité](%{documentation_url}) vous pouvez simplement générer le jeton à partir d’ici.
       google_docs_description: "Une fois que vous nous avez autorisés à voir vos documents Google Docs, vous pourrez envoyer vos tâches directement à partir de Google Docs et créer et partager vos documents avec d’autres membres de votre classe."
+      google_drive_description: "Dès que vous nous aurez autorisés à voir votre Google Drive, vous pourrez envoyer vos travaux directement depuis Google Drive, et créer et partager des documents avec les autres étudiants."
       headers: 
         application_abbrev: Appl.
         dates: Dates
@@ -11074,6 +11103,15 @@ fr:
         register_skype: "Enregistrer Skype"
         remove_account_from_profile: "Supprimer le compte de ce profil"
         unregister_service: "Annuler l’enregistrement de ce service"
+      twitter_description: |-
+          Twitter est un service permettant de publier de petits messages et de s'y abonner.
+          Si vous avez un compte Twitter, vous pouvez l’enregistrer ici.  Ensuite, si vous
+          autorisez les autres membres du cours ou du groupe à voir les services que
+          vous avez enregistrés, ceux-ci pourront facilement vous contacter via votre compte Twitter.
+          
+          Vous pouvez également vous inscrire pour faire envoyer des notifications sur votre compte Twitter.
+          Ces notifications vous seront envoyées sous forme de messages directs par 
+          vous-même. Elles ne seront pas affichées dans vos messages publics.
       unknown_service: Inconnu
       web_services: "Canvas peut vous simplifier la vie en se jumelant aux outils Web que vous utilisez déjà. Cliquez sur un service dans Autres services pour le constater par vous-même."
       yo_description: |-
@@ -11476,6 +11514,8 @@ fr:
     inverted_table_view: 
       headers: 
         question: Question
+    links: 
+      log_accessibility_warning: "Avertissement : le mode Tableau View n’est pas compatible avec les lecteurs d’écran. Utilisez plutôt la vue actuelle."
     loading: Chargement...
     navigation: 
       links: 
@@ -11597,6 +11637,7 @@ fr:
     no_answer: "Aucune réponse"
     question_breakdown: "Détails de la question"
     question_header: "Question %{position}"
+    quiz-stats-noshow-warning: "Même le génie a ses limites. Nous ne pouvons pas fournir de statistiques pour ce questionnaire, mais vous pouvez télécharger les rapports."
     response_student_count: 
       one: "1 étudiant"
       other: "%{count} étudiants"
@@ -12828,6 +12869,7 @@ fr:
       manage_assignments: "Gérer (ajouter/modifier/supprimer) les tâches et les questionnaires"
       manage_calendar: "Ajouter, modifier et supprimer des événements dans le calendrier du cours"
       manage_canvasnet_courses: "Gérer les cours du réseau Canvas"
+      manage_catalog: "Gérer le catalogue"
       manage_content: "Gérer tous les autres contenus du cours"
       manage_courses: "Gérer (ajouter/modifier/supprimer) des cours"
       manage_demos: "Gérer les démonstrations"
@@ -13231,6 +13273,7 @@ fr:
       find_links_using_service: "Chercher des liens à l’aide de %{service}"
   select_navigation_links_68e1e924: "Sélectionner des liens de navigation"
   selected_answer: "Vous avez sélectionné cette réponse."
+  selected_subtree_a7693937: "%{subtree} sélectionné"
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "Vous êtes déjà inscrit à **%{course}**."
@@ -14005,6 +14048,7 @@ fr:
   show_by_date_e3967761: "Afficher par date"
   show_by_type_c5d61732: "Afficher par type"
   show_lti_2_configuration_ui_94ce35a9: "Afficher l’interface utilisateur de configuration LTI 2 "
+  show_me_76823679: "Me montrer"
   sis_agent_token_authentication_2a0b29e3: "Authentification par jeton d’Agent SIS"
   sis_batch: 
     errors: 
@@ -14340,6 +14384,7 @@ fr:
       two_words_connector: " et "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Contactez d’abord votre centre d’assistance. Si ce service ne peut pas vous aider, contactez-nous."
       community_support_forums: "Forums d’assistance de la communauté"
       contact_support: "Contacter l’assistance technique"
       contact_support_sub_text: "Obtenir de l’aide pour les problèmes urgents"
@@ -14347,6 +14392,7 @@ fr:
       curriculum_assessment_errata_description: "Consultez les erreurs déjà signalées pour le programme et l’évaluation. Recherchez « errata »."
       networking_academy_description: "Consultez les réponses de Cisco aux questions les plus fréquentes."
       networking_academy_faqs: "FAQ Networking Academy"
+      support_desk_livechat: "Dialogue en direct avec le service d’assistance"
   switch_to_3f310557: "Passer dans"
   switch_to_group_group_name_786b913b: "Passer dans le groupe %{group_name}"
   syllabus: "Programme du cours"
@@ -14453,6 +14499,7 @@ fr:
   the_module_item_is_locked_27fe420b: "L’élément de module est verrouillé."
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "L’icône du raccourci pour les appareils iOS/Android. PNG ou SVG 180 x 180"
   the_state_parameter_is_required_ffadf213: "Le paramètre d’état est obligatoire."
+  the_top_track_represents_days_on_which_the_student_2a347099: "En haut, vous voyez quels jours * l’étudiant a envoyé des messages* aux enseignants du cours. En bas, vous voyez les **messages envoyés par les instructeurs** à l’étudiant."
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Il y a 1 résultat dans la liste"
     other: "Il y a %{count} résultats dans la liste"
@@ -14739,6 +14786,7 @@ fr:
   usage_rights_f0960ad6: "Droits d’utilisation"
   usage_rights_have_been_set_d1b433c7: "Les droits d’utilisation ont été définis."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Les droits d’utilisation seront définis pour tous les fichiers contenus dans :"
+  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Utilisez un *seul fichier .ico 16 x 16, 32 x 32, 48 x 48*."
   used_by_permission_314a78dd: "Utilisé avec autorisation"
   user: 
     default_user_name: Utilisateur
@@ -14871,6 +14919,7 @@ fr:
       diigo: "Diigo est un outil collaboratif de partage de liens. Vous pouvez marquer à l’aide d’une étiquette n’importe quelle page sur Internet afin d’y revenir plus tard. Vous pouvez également créer un lien vers les comptes Diigo des autres utilisateurs à fin de partager des liens de centres d’intérêts communs."
       facebook: "En listant votre profil Facebook, vous pouvez vous connecter plus facilement avec les amis de votre classe ou de votre groupe."
       google_docs: "Les étudiants peuvent utiliser Google Docs pour collaborer sur des projets de groupes. Google Docs permet la modification collaborative de documents, feuilles de calcul et présentations en temps réel."
+      google_drive: "Les étudiants peuvent utiliser Google Drive pour travailler en collaboration sur des projets de groupe. Google Drive permet la collaboration en temps réel sur des documents, des feuilles de calculs et des présentations."
       linked_in: "LinkedIn est une ressource d’entrée dans les réseaux professionnels. Bon nombre des relations que vous nouez pendant votre parcours scolaire pourront vous être utiles dans votre vie professionnelle."
       skype: "Skype est un outil gratuit d’appel vocal et vidéo en ligne."
       twitter: "Twitter est un excellent moyen de communication en dehors de la classe."
@@ -15138,9 +15187,12 @@ fr:
   validate: 
     is_required: "Ce champ est obligatoire."
   video_b9f27375: Vidéo
+  view_analytics_91a3b7a: "Voir les analyses"
   view_app_center_6c89a3fe: "Afficher le centre d’applications"
   view_app_configurations_52b52441: "Afficher les configurations d’applications"
+  view_course_analytics_eefe6b2: "Voir les analyses du cours"
   view_name_app_62a2ad8e: "Voir l’application %{name}"
+  view_student_analytics_6b8ccd42: "Voir les analyses pour les étudiants"
   visit_864b4060: Visiter
   visit_group_group_name_7a816081: "Visiter le groupe %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Avertissement : pour une meilleure accessibilité lors du déplacement des fichiers, utilisez l’option Accéder à la boîte de dialogue figurant dans le menu."
@@ -15309,6 +15361,7 @@ fr:
     cannot_update_published: "Vous ne pouvez pas changer l’état « publié » de cette page Wiki"
     cannot_update_title: "Vous ne pouvez pas actualiser le titre de cette page Wiki"
     invalid_editing_roles: "Les rôles de modification fournis ne sont pas valides."
+  will_keep_the_average_of_all_your_scores_d7e6b733: "La moyenne de toutes vos notes sera conservée"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Votre note la plus élevée sera conservée"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Votre dernière note sera conservée"
   will_paginate: 
@@ -15331,11 +15384,16 @@ fr:
       archive: Archiver
       archive_link: "Afficher les archives"
   would_you_like_to_enable_this_app_ccdf735d: "Voulez-vous activer cette application ?"
+  would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Voulez-vous laisser les étudiants continuer le cours ou préférez-vous verrouiller à nouveau ces modules jusqu’à ce que les nouvelles conditions soient remplies ?"
   xml_configuration_5ea1b942: "Configuration XML "
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Vous êtes connecté à %{institution1} avec vos informations de connexion de %{institution2}"
   you_are_the_group_leader_for_this_group_b8629b70: "vous êtes le responsable de ce groupe"
+  you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Vous pouvez masquer ou afficher les travaux d’un cours."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Vous pouvez maintenant recalculer la note des options pour les étudiants qui ont déjà répondu au questionnaire."
+  you_have_changed_the_progression_requirements_for__6772bc89: "Vous avez changé les critères de progression pour un cours actif. Des étudiants ont peut-être déjà commencé ce module ou avancé dans d’autres qui dépendent de celui-ci."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Vous avez modifié les questions de ce questionnaire.* Ces changements ne seront visibles pour les étudiants que lorsque vous aurez enregistré le questionnaire."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Vous n’avez pas de résultats. *Cliquez ici* pour en créer un."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Vous n’avez pas de résultats. Cliquez ici pour accéder à la page des résultats."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Vous avez atteint le nombre maximum de webhooks défini par la limite du compte (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Vous avez atteint le nombre maximum de webhooks défini par la limite de l’utilisateur (%{max})"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Vous en voudrez vous aussi. Quel est l’intérêt de dispenser un cours si personne n’écoute ?"
