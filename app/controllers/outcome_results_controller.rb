@@ -372,7 +372,8 @@ class OutcomeResultsController < ApplicationController
     reject! "users not specified and no access to all grades", :forbidden unless params[:user_ids]
     user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
     enrollments = @context.enrollments.where(user_id: user_ids)
-    reject! "specified users not enrolled" unless enrollments.length == user_ids.length
+    enrollment_user_ids = enrollments.map(&:user_id).uniq
+    reject! "specified users not enrolled" unless enrollment_user_ids.length == user_ids.length
     reject! "not authorized to read grades for specified users", :forbidden unless enrollments.all? do |e|
       e.grants_right?(@current_user, session, :read_grades)
     end

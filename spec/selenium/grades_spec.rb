@@ -277,6 +277,39 @@ describe "grades" do
       #check rubric comment
       expect(fj('.assessment-comments:visible div').text).to eq 'not bad, not bad'
     end
+
+    context "with outcome gradebook enabled" do
+      before :once do
+        Account.default.set_feature_flag!('student_outcome_gradebook', 'on')
+      end
+
+      before :each do
+        @outcome_group ||= @course.root_outcome_group
+        @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+        @outcome_group.add_outcome(@outcome)
+      end
+
+      it "should show the outcome gradebook" do
+        get "/courses/#{@course.id}/grades/"
+        expect(f('#navpills')).not_to be_nil
+        f('a[href="#outcomes"]').click
+        wait_for_ajaximations
+
+        expect(ff('#outcomes li.outcome').count).to eq @course.learning_outcome_links.count
+      end
+
+      it "should show the outcome gradebook if the student is in multiple sections" do
+        @other_section = @course.course_sections.create(:name => "the other section")
+        @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
+
+        get "/courses/#{@course.id}/grades/"
+        expect(f('#navpills')).not_to be_nil
+        f('a[href="#outcomes"]').click
+        wait_for_ajaximations
+
+        expect(ff('#outcomes li.outcome').count).to eq @course.learning_outcome_links.count
+      end
+    end
   end
 
   context "as an observer" do
