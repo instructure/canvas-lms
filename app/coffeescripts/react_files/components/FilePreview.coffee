@@ -193,6 +193,7 @@ define [
             @renderArrowLink('left') if @state.otherItems?.length > 0
             if @state.displayedItem
               iframe {
+                allowFullScreen: true
                 title: I18n.t('File Preview')
                 src: @state.displayedItem.get 'preview_url'
                 className: 'ef-file-preview-frame'
