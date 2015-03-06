@@ -121,10 +121,6 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, false)
     end
 
-    it "should click on 'restrict students from viewing courses before start date'" do
-      check_box_verifier("#account_settings_restrict_student_future_view", :restrict_student_future_view)
-    end
-
     it "should set trusted referers for account" do
       trusted_referers = 'https://example.com,http://example.com'
       set_value f("#account_settings_trusted_referers"), trusted_referers

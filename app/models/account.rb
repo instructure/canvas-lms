@@ -177,7 +177,7 @@ class Account < ActiveRecord::Base
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, :root_only => true
-  add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
+  add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false # NO LONGER VISIBLE - MOVED TO COURSE SETTING
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false

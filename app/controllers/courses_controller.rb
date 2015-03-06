@@ -362,12 +362,13 @@ class CoursesController < ApplicationController
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.each do |e|
-          if [:completed, :rejected].include?(e.state_based_on_date)
-            @past_enrollments << e unless e.workflow_state == "invited"
-          else
+          state = e.state_based_on_date
+          if [:completed, :rejected].include?(state)
+            @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
+          elsif state != :inactive
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
-              @future_enrollments << e unless %w(StudentEnrollment ObserverEnrollment).include?(e.type) && e.root_account.settings[:restrict_student_future_view]
+              @future_enrollments << e
             else
               @current_enrollments << e
             end
@@ -1055,7 +1056,9 @@ class CoursesController < ApplicationController
       :allow_student_organized_groups,
       :hide_final_grades,
       :hide_distribution_graphs,
-      :lock_all_announcements
+      :lock_all_announcements,
+      :restrict_student_past_view,
+      :restrict_student_future_view
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,

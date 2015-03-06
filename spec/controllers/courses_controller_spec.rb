@@ -132,6 +132,47 @@ describe CoursesController do
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
       end
+
+      it "should not include the course if the caller is a student or observer and the course restricts students viewing courses after the end date" do
+        course1 = Account.default.courses.create!(:restrict_student_past_view => true)
+        course1.offer!
+
+        enrollment = course_with_student course: course1
+        enrollment.accept!
+
+        teacher = user_with_pseudonym(:active_all => true)
+        teacher_enrollment = course_with_teacher course: course1, :user => teacher
+        teacher_enrollment.accept!
+
+        course1.conclude_at = 1.month.ago
+        course1.save!
+
+        course1.enrollment_term.update_attribute(:end_at, 1.month.ago)
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:current_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to be_empty
+
+        observer = user_with_pseudonym(active_all: true)
+        o = @student.user_observers.build; o.observer = observer; o.save!
+        user_session(observer)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:current_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to be_empty
+
+        $bloo = true
+        user_session(teacher)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to eq [teacher_enrollment]
+        expect(assigns[:current_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to be_empty
+      end
     end
 
     describe 'current_enrollments' do
@@ -246,6 +287,7 @@ describe CoursesController do
         enrollment1 = course_with_student course: course1
         enrollment1.root_account.settings[:restrict_student_future_view] = true
         enrollment1.root_account.save!
+        expect(course1.restrict_student_future_view?).to be_truthy # should inherit
 
         user_session(@student)
         get 'index'
@@ -262,6 +304,15 @@ describe CoursesController do
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
+
+        teacher = user_with_pseudonym(:active_all => true)
+        teacher_enrollment = course_with_teacher course: course1, :user => teacher
+        user_session(teacher)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:current_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to eq [teacher_enrollment]
       end
     end
  end
@@ -526,29 +577,57 @@ describe CoursesController do
       assert_unauthorized
     end
 
-    it "should show unauthorized/authorized to a student for a future course depending on restrict_student_future_view setting" do
-      course_with_student_logged_in(:active_course => 1)
-      a = @course.root_account
-      a.settings[:restrict_student_future_view] = true
-      a.save!
-
-      @course.start_at = Time.now + 2.weeks
-      @course.restrict_enrollments_to_course_dates = true
-      @course.save!
-
-      get 'show', :id => @course.id
-      assert_status(401)
-      expect(assigns[:unauthorized_message]).not_to be_nil
-
-      a.settings[:restrict_student_future_view] = false
-      a.save!
-
+    def check_course_show(should_show)
       controller.instance_variable_set(:@context_all_permissions, nil)
       controller.instance_variable_set(:@js_env, nil)
 
       get 'show', :id => @course.id
-      expect(response).to be_success
-      expect(assigns[:context]).to eql(@course)
+      if should_show
+        expect(response).to be_success
+        expect(assigns[:context]).to eql(@course)
+      else
+        assert_status(401)
+      end
+    end
+
+    it "should show unauthorized/authorized to a student for a future course depending on restrict_student_future_view setting" do
+      course_with_student_logged_in(:active_course => 1)
+
+      @course.start_at = Time.now + 2.weeks
+      @course.restrict_enrollments_to_course_dates = true
+      @course.restrict_student_future_view = true
+      @course.save!
+
+      check_course_show(false)
+      expect(assigns[:unauthorized_message]).not_to be_nil
+
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      check_course_show(true)
+    end
+
+    it "should show unauthorized/authorized to a student for a past course depending on restrict_student_past_view setting" do
+      course_with_student_logged_in(:active_course => 1)
+
+      @course.conclude_at = 2.weeks.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.restrict_student_past_view = true
+      @course.save!
+
+      check_course_show(false)
+
+      # manually completed
+      @course.conclude_at = 2.weeks.from_now
+      @course.save!
+      @student.enrollments.first.complete!
+
+      check_course_show(false)
+
+      @course.restrict_student_past_view = false
+      @course.save!
+
+      check_course_show(true)
     end
 
     context "show feedback for the current course only on course front page" do

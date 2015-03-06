@@ -167,11 +167,6 @@ TEXT
                     <%= settings.label :allow_sending_scores_in_emails, :en => "Students can opt-in to receiving scores in email notifications" %>
                     </td>
                   </tr>
-                  <tr>
-                    <td colspan="2"><%= settings.check_box :restrict_student_future_view, :checked => @account.settings[:restrict_student_future_view] %>
-                      <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
-                    </td>
-                  </tr>
                   <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                     <tr>
                       <td colspan="2"><%= settings.check_box :include_students_in_global_survey, checked: @account.include_students_in_global_survey?%>

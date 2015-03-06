@@ -255,6 +255,15 @@ TEXT
             <%= f.check_box :indexed %>
             <%= f.label :indexed, :en => "Include this course in the public course index" %>
           </div>
+          <br/>
+          <div>
+            <%= f.check_box :restrict_student_past_view %>
+            <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing course after end date" %>
+          </div>
+          <div>
+            <%= f.check_box :restrict_student_future_view %>
+            <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing course before start date" %>
+          </div>
         </td>
       </tr><tr>
         <td class="form-label"><label for="course_course_format"><%= before_label('course_format', %{Format}) %></label></td>
