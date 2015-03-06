@@ -1567,8 +1567,7 @@ class CoursesController < ApplicationController
     can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_remove
       respond_to do |format|
-        @enrollment.workflow_state = 'active'
-        if @enrollment.save
+        if @enrollment.unconclude
           format.json { render :json => @enrollment }
         else
           format.json { render :json => @enrollment, :status => :bad_request }

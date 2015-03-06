@@ -449,6 +449,13 @@ class Enrollment < ActiveRecord::Base
     self.save
   end
 
+  def unconclude
+    self.workflow_state = 'active'
+    self.completed_at = nil
+    self.user.touch
+    self.save
+  end
+
   def defined_by_sis?
     !!self.sis_source_id
   end
