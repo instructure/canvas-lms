@@ -1959,7 +1959,12 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
-        event = params[:course].delete(:event)
+	if ![:claim, :offer].include? params[:course][:event]
+        	flash[:error] = t['errors.unknownevent','Course event type unknown')
+		params[:course].delete(:event)
+		redirect_to(course_url(@course)) and return
+	end
+	event = params[:course].delete(:event)
         event = event.to_sym
         if event == :claim && !@course.unpublishable?
           flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
