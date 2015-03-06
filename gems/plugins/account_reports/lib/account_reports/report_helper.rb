@@ -90,6 +90,12 @@ module AccountReports::ReportHelper
     end
   end
 
+  def assignment_group
+    if(assignment_group_id = (@account_report.has_parameter? "assignment_group_id") || (@account_report.has_parameter? "assignment_group"))
+      @assignment_group = course.assignment_groups.find(assignment_group_id)
+    end
+  end
+
   def section
     if section_id = (@account_report.has_parameter? "section_id")
       @section ||= api_find(root_account.course_sections, section_id)
