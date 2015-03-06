@@ -82,6 +82,9 @@ module AuthenticationMethods
         raise AccessTokenError
       end
       @access_token.used!
+
+      RequestContextGenerator.add_meta_header('at', @access_token.global_id)
+      RequestContextGenerator.add_meta_header('dk', @access_token.developer_key.global_id) if @access_token.developer_key
     end
   end
 
