@@ -38,11 +38,10 @@ function(React, GradingStandard, $, I18n, _) {
         grading_standard: {
           permissions: { manage: true },
           title: "",
-          data: ENV.DEFAULT_DATA,
+          data: ENV.DEFAULT_GRADING_STANDARD_DATA,
           id: -1
         }
       };
-
       newStandards.unshift(newStandard);
       this.setState({standards: newStandards});
     },
@@ -68,40 +67,73 @@ function(React, GradingStandard, $, I18n, _) {
       }
     },
 
-    standardBeingEdited: function() {
+    anyStandardBeingEdited: function() {
       return !!_.find(this.state.standards, function(standard){return standard.editing});
     },
 
     saveGradingStandard: function(standard) {
       var indexToUpdate = this.state.standards.indexOf(this.getStandardById(standard.id));
-      if(standard.title === "" && this.standardNotCreated(standard)) standard.title = "New Grading Scheme";
-      var self = this;
+      var type, url, data;
+      if(this.standardNotCreated(standard)){
+        type = "POST";
+        url = ENV.GRADING_STANDARDS_URL;
+        data = this.dataFormattedForCreate(standard);
+        if((standard.title).trim() === "") standard.title = "New Grading Scheme";
+      }else{
+        type = "PUT";
+        url = ENV.GRADING_STANDARDS_URL + "/" + standard.id;
+        data = this.dataFormattedForUpdate(standard);
+      }
       $.ajax({
-        type: this.standardNotCreated(standard) ? "POST" : "PUT",
-        url: this.standardNotCreated(standard) ? ENV.GRADING_STANDARDS_URL : ENV.GRADING_STANDARDS_URL + "/" + standard.id,
-        data: this.dataFormattedForUpdate(standard),
-        dataType: "json"
+        type: type,
+        url: url,
+        dataType: "json",
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        context: this
       })
         .success(function(updatedStandard){
-          self.state.standards[indexToUpdate] = updatedStandard;
-          self.setState({standards: self.state.standards});
+          this.state.standards[indexToUpdate] = updatedStandard;
+          this.setState({standards: this.state.standards}, function(){
+            $.flashMessage(I18n.t("Grading scheme saved"))
+          });
         })
         .error(function(){
-          self.state.standards[indexToUpdate].grading_standard.saving = false;
-          self.setState({standards: self.state.standards});
-          $.flashError(I18n.t("There was a problem saving the grading scheme"));
+          this.state.standards[indexToUpdate].grading_standard.saving = false;
+          this.setState({standards: this.state.standards}, function(){
+            $.flashError(I18n.t("There was a problem saving the grading scheme"))
+          });
         });
+    },
+
+    dataFormattedForCreate: function(standard) {
+      var formattedData = { grading_standard: standard };
+      _.each(standard.data, function(dataRow, i){
+        var name = dataRow[0];
+        var value = dataRow[1] * 100;
+        formattedData["grading_standard"]["data"][i] = [
+          name,
+          this.roundToTwoDecimalPlaces(value) / 100
+        ];
+      }, this);
+      return formattedData;
     },
 
     dataFormattedForUpdate: function(standard) {
       var formattedData = { grading_standard: { title: standard.title, standard_data: {} } };
-      for(i = 0; i < standard.data.length; i++){
+      _.each(standard.data, function(dataRow, i){
+        var name = dataRow[0];
+        var value = dataRow[1] * 100;
         formattedData["grading_standard"]["standard_data"]["scheme_" + i] = {
-          name: standard.data[i][0],
-          value: Math.round(standard.data[i][1] * 10000)/100
+          name: name,
+          value: this.roundToTwoDecimalPlaces(value)
         };
-      };
+      }, this);
       return formattedData;
+    },
+
+    roundToTwoDecimalPlaces: function(number) {
+      return Math.round(number * 100)/100;
     },
 
     deleteGradingStandard: function(event, uniqueId) {
@@ -115,7 +147,9 @@ function(React, GradingStandard, $, I18n, _) {
             $(this).remove();
           });
           var newStandards = _.reject(self.state.standards, function(standard){ return standard.grading_standard.id === uniqueId });
-          self.setState({standards: newStandards});
+          self.setState({standards: newStandards}, function(){
+            $.flashMessage(I18n.t("Grading scheme deleted"))
+          });
         },
         error: function() {
           $.flashError(I18n.t("There was a problem deleting the grading scheme"));
@@ -129,7 +163,7 @@ function(React, GradingStandard, $, I18n, _) {
 
     getAddButtonCssClasses: function() {
       var classes = "btn pull-right add_standard_link"
-      if(!this.hasAdminOrTeacherRole() || this.standardBeingEdited()) classes += " disabled"
+      if(!this.hasAdminOrTeacherRole() || this.anyStandardBeingEdited()) classes += " disabled"
       return classes;
     },
 
@@ -137,25 +171,24 @@ function(React, GradingStandard, $, I18n, _) {
       if(!this.state.standards){
         return null;
       } else if(this.state.standards.length === 0){
-        return <h3>{I18n.t("No grading schemes to display")}</h3>;
+        return <h3 ref="noSchemesMessage">{I18n.t("No grading schemes to display")}</h3>;
       }
-      var self = this;
       return this.state.standards.map(function(s){
-        return (<GradingStandard key={s.grading_standard.id} uniqueId={s.grading_standard.id}
-                                 standard={s.grading_standard} editing={!!s.editing}
-                                 permissions={s.grading_standard.permissions}
-                                 justAdded={s.justAdded} onSetEditingStatus={self.setEditingStatus}
-                                 othersEditing={!s.editing && self.standardBeingEdited()}
-                                 onDeleteGradingStandard={self.deleteGradingStandard}
-                                 onSaveGradingStandard={self.saveGradingStandard}/>);
-      });
+        return (<GradingStandard ref={"gradingStandard" + s.grading_standard.id} key={s.grading_standard.id}
+                                 uniqueId={s.grading_standard.id} standard={s.grading_standard}
+                                 editing={!!s.editing} permissions={s.grading_standard.permissions}
+                                 justAdded={!!s.justAdded} onSetEditingStatus={this.setEditingStatus}
+                                 othersEditing={!s.editing && this.anyStandardBeingEdited()}
+                                 onDeleteGradingStandard={this.deleteGradingStandard}
+                                 onSaveGradingStandard={this.saveGradingStandard}/>);
+      }, this);
     },
 
     render: function () {
       return(
         <div>
           <div className="rs-margin-all pull-right">
-            <a href="#" onClick={this.addGradingStandard} className={this.getAddButtonCssClasses()}>
+            <a href="#" ref="addButton" onClick={this.addGradingStandard} className={this.getAddButtonCssClasses()}>
               <i className="icon-add"/>
               {I18n.t(" Add grading scheme")}
             </a>

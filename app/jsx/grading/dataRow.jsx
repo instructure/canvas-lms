@@ -117,6 +117,18 @@ function(React, I18n) {
       return this.decimalToPercent(this.state.row.minScore);
     },
 
+    renderDeleteLink: function(){
+      if(this.props.onlyDataRowRemaining) return null;
+      return(
+        <a href="#" onClick={this.triggerDeleteRow} className="delete_row_link no-hover"
+           title={I18n.t('Remove row')}>
+          <i className="icon-end standalone-icon">
+            <span className="screenreader-only">{I18n.t("Remove Row")}</span>
+          </i>
+        </a>
+      );
+    },
+
     renderViewMode: function() {
       return (
         <tr className="grading_standard_row react_grading_standard_row">
@@ -181,12 +193,7 @@ function(React, I18n) {
             </div>
           </td>
           <td className="row_cell last_row_cell">
-            <a href="#" onClick={this.triggerDeleteRow} className="delete_row_link no-hover"
-               title={I18n.t('Remove row')}>
-              <i className="icon-end standalone-icon">
-                <span className="screenreader-only">{I18n.t("Remove Row")}</span>
-              </i>
-            </a>
+            {this.renderDeleteLink()}
           </td>
         </tr>
       );
