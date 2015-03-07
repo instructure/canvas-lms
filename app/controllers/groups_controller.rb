@@ -123,7 +123,7 @@
 #         },
 #         "permissions": {
 #           "description": "optional: the permissions the user has for the group. returned only for a single group and include[]=permissions",
-#           "example": "{\"create_discussion_topic\"=>true}",
+#           "example": "{\"create_discussion_topic\"=>true,\"create_announcement\"=>true}",
 #           "type": "map",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }

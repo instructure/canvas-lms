@@ -804,7 +804,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def self.context_allows_user_to_create?(context, user, session)
-    DiscussionTopic.new(context: context).grants_right?(user, session, :create)
+    new(context: context).grants_right?(user, session, :create)
   end
 
   def context_allows_user_to_create?(user)

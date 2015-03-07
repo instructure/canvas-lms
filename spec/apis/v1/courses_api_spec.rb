@@ -2133,6 +2133,13 @@ describe CoursesController, type: :request do
       expect(json["permissions"].has_key?("create_discussion_topic")).to be_truthy
     end
 
+    it 'should include permission create_announcement' do
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=permissions", { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => [ "permissions" ] })
+      expect(json.has_key?("permissions")).to be_truthy
+      expect(json["permissions"].has_key?("create_announcement")).to be_truthy
+      expect(json["permissions"]["create_announcement"]).to be_truthy # The setup makes this user a teacher of the course too
+    end
+
     context "when scoped to account" do
       before :once do
         @admin = account_admin_user(:account => @course.account, :active_all => true)

@@ -48,7 +48,8 @@ describe "Groups API", type: :request do
     if opts[:include_permissions]
       json['permissions'] = {
         'join' => group.grants_right?(@user, nil, :join),
-        'create_discussion_topic' => DiscussionTopic.context_allows_user_to_create?(group, @user, nil)
+        'create_discussion_topic' => DiscussionTopic.context_allows_user_to_create?(group, @user, nil),
+        'create_announcement' => Announcement.context_allows_user_to_create?(group, @user, nil)
       }
     end
     if opts[:include_category]
@@ -225,6 +226,15 @@ describe "Groups API", type: :request do
     expect(json.has_key?("permissions")).to be_truthy
     expect(json["permissions"].has_key?("create_discussion_topic")).to be_truthy
   end
+
+  it 'should include permission create_student_announcements' do
+    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => [ "permissions" ]))
+
+    expect(json.has_key?("permissions")).to be_truthy
+    expect(json["permissions"].has_key?("create_announcement")).to be_truthy
+    expect(json['permissions']['create_announcement']).to be_truthy
+  end
+
 
   it "should allow searching by SIS ID" do
     @community.update_attribute(:sis_source_id, 'abc')
