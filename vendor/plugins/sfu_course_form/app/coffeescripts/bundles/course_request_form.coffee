@@ -2,6 +2,7 @@ require [
   'jquery'
   'underscore'
   'Backbone'
+  'react',
   'sfu_course_form/compiled/models/User'
   'sfu_course_form/compiled/models/Term'
   'sfu_course_form/compiled/models/Course'
@@ -12,8 +13,9 @@ require [
   'sfu_course_form/compiled/views/courses/CourseListView'
   'sfu_course_form/compiled/views/courses/SelectableCourseListView'
   'sfu_course_form/compiled/collections/SandboxList'
-  'sfu_course_form/compiled/views/sandboxes/SandboxListView'
-], ($, _, Backbone, User, Term, Course, AmaintTermList, TermList, TermListView, CourseList, CourseListView, SelectableCourseListView, SandboxList, SandboxListView) ->
+  'sfu_course_form/compiled/views/sandboxes/SandboxListView',
+  'jsx/sfu_copyright_compliance_notice/SFUCopyrightComplianceNotice'
+], ($, _, Backbone, React, User, Term, Course, AmaintTermList, TermList, TermListView, CourseList, CourseListView, SelectableCourseListView, SandboxList, SandboxListView, SFUCopyrightComplianceNotice) ->
 
   user = {}
   currentUser = {}
@@ -240,6 +242,11 @@ require [
       crosslistTitle.text 'No cross-list'
 
   $(document).ready ->
+
+    React.renderComponent(SFUCopyrightComplianceNotice({
+      className: 'sfu-ic-wizard-box__message-text__copyright_compliance',
+    }), document.getElementsByClassName('copyright')[0])
+
     # attach behavior to action links
     $('button.action').bind 'click', handleActionClick
 

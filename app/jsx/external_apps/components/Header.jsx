@@ -4,8 +4,9 @@ define([
   'underscore',
   'i18n!external_tools',
   'react',
-  'react-router'
-], function (_, I18n, React, {Link}) {
+  'react-router',
+  /* SFU MOD */ '../../sfu_pia_notice/SFUPrivacyNotice' /* END SFU MOD */
+], function (_, I18n, React, {Link}, SFUPrivacyNotice) {
 
   return React.createClass({
     displayName: 'Header',
@@ -31,7 +32,12 @@ define([
             <p>{I18n.t('Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools.')}</p>
             <p dangerouslySetInnerHTML={{ __html: paragraph }}></p>
           </div>
+
+          {/* SFU MOD */}
+          <SFUPrivacyNotice alertStyle="alert" usage="external_apps" />
+          {/* END SFU MOD */}
         </div>
+
       )
     }
   });

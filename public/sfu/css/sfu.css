@@ -152,3 +152,24 @@
 .pia-notice hr {
     border-top: 1px solid #CCC;
 }
+
+
+.sfu-ic-wizard-box__message-text__copyright_compliance {
+    font-size: 12px;
+    margin-top: 24px;
+}
+.SFUPrivacyNotice .icon-warning {
+    display: inline;
+}
+
+.SFUPrivacyNotice .icon-warning:before {
+    font-size: inherit;
+}
+
+.SFUPrivacyNotice .icon-warning:after {
+    content: "\00";
+}
+
+.SFUPrivacyNotice.alert {
+    color: #695129;
+}
