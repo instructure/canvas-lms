@@ -147,7 +147,9 @@ define([
                       <p className="ic-wizard-box__message-text">
                         {this.state.itemShown.text}
                       </p>
+                      {/* SFU MOD */}
                       {this.renderSFUCopyrightComplianceNotice()}
+                      {/* END SFU MOD */}
                       <div className="ic-wizard-box__message-button">
                         {this.renderButton()}
                       </div>

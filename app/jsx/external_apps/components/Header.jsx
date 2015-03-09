@@ -33,8 +33,9 @@ define([
             <p dangerouslySetInnerHTML={{ __html: paragraph }}></p>
           </div>
 
+          {/* SFU MOD */}
           <SFUPrivacyNotice alertStyle="alert" usage="external_apps" />
-
+          {/* END SFU MOD */}
         </div>
 
       )
