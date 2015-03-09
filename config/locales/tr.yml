@@ -2935,6 +2935,10 @@ tr:
           veya not tutma gibi etkinliklerde işbirliği halinde çalışmak için kullanabilirler. 
           Bu sayfada öğrenciler (ve siz) bu işbirliklerinin takibini kolayca yapabilir ve eposta 
           adreslerini alma ile uğraşmadan bu kaynakları oluşturabilirler.
+      google: 
+        drive: 
+          upgrade: 
+            description: "Bu işbirliği etkinliğine katılmak için Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz."
       how_to_start_a_new_collaboration: |-
           Belirli bir türde işbirliği hakkında billgi edinmek için "Yeni Bir İşbirliği Başlat" a tıklayıp sarkık menüden uygun
           plan türü seçin.
@@ -2948,6 +2952,7 @@ tr:
         current: "Geçerli İşbirliği Çalışmaları"
     titles: 
       delete: "Çalışma ekibini sil?"
+  collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} için grup üyeleri listesini daraltın"
   coming_up_4348b0bd: "Yaklaşan Olaylar"
   comm_messages: 
     from_beginning: başlangıç
@@ -3092,13 +3097,16 @@ tr:
         started: "%{time} saatinde başladı"
     type_disabled_error: "Bu Canvas sitesinde bu türde bir konferans artık bulunmamakta"
   config_url_e96ceaf3: "Ayar URL'si"
+  configurate_tool_app_5a721f2c: "%{tool} Uygulaması Yapılandırılsın mı?"
   configuration_type_25a084a4: "Yapılandırma Türü"
+  configure_toolname_app_651371be: "%{toolName} Uygulamasını Yapılandır"
   confirm_dialog: 
     cancel: İptal
     submit: Gönder
   confirm_dialog_component: 
     ok: Tamam
-  consumer_key_6f94ba11: "Müşteri Anahtarı"
+  consumer_key_57d9fcf1: "Kullanıcı anahtarı"
+  consumer_key_6f94ba11: "Kullanıcı Anahtarı"
   content_exports: 
     buttons: 
       process: "Veriyi İşle"
@@ -3260,6 +3268,7 @@ tr:
       choose_migration_file: 
         migration_text: Kaynak
       course_find_select: 
+        copy_into_self_warning: "Bu dersi kendi içine kopyalamayı seçtiniz. Bu durumda seçili tüm içeriğin kopyası oluşturulacaktır."
         course_name: "Ders ismi"
         include_completed_courses: "Tamamlanan dersleri içer"
         or: veya
@@ -4955,7 +4964,7 @@ tr:
   delete_grading_scheme_6b308832: "Notlandırma Şemasını Sil"
   delete_quiz_142b8099: "Kısa Sınavı Sil"
   delete_survey_56fddbbd: "Anket Sil"
-  delete_tool_app_9c9f6d35: "%{tool} Uygulaması Silinsin Mi?"
+  delete_tool_app_9c9f6d35: "%{tool} Uygulaması Silinsin mi?"
   delete_toolname_app_85f9d4ee: "%{toolName} Uygulaması Silindi"
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo siteler için Recaptcha ayarları yapılmış olmalıdır. Canvas'ın bu uygulaması için lütfen site yöneticiniz ile görüşün."
   demos: 
@@ -5877,7 +5886,7 @@ tr:
       cancel: İptal
       delete: Sil
     cannot_locate_launch_request: "Çalıştırma isteği başarısız, lütfen tekrar deneyiniz."
-    consumer_key: "Müşteri Anahtarı"
+    consumer_key: "Kullanıcı Anahtarı"
     course_home_sub_navigation_configured: "Dersin ana sayfası alt gezinmesi yapılandırıldı"
     course_navigation_configured: "Ders gezinme menüsü yapılandırıldı"
     course_settings_sub_navigation_configured: "Ders ayarları alt gezinmesi yapılandırıldı"
@@ -5893,7 +5902,7 @@ tr:
       by_xml: "XML Yapıştır"
       config_url: "Yapılandırma URL'i"
       configuration_type: "Yapılandırma Türü"
-      consumer_key: "Müşteri Anahtarı"
+      consumer_key: "Kullanıcı Anahtarı"
       custom_feilds_explanation: "Her bir satır. Format: isim=değer"
       custom_fields: "Varsayılan Alanlar"
       description: Açıklama
@@ -5917,7 +5926,7 @@ tr:
       editor_button_configured: "Düzenleyici butonu yapılandırıldı"
       homework_submission_configured: "Ev ödevi gönderimi ayarlandı"
       labels: 
-        consumer_key: "Müşteri Anahtarı"
+        consumer_key: "Kullanıcı Anahtarı"
         description: Açıklama
         domain: Alan
         extras: Ekstralar
@@ -10753,7 +10762,7 @@ tr:
           * Uygulamanızı kaydettikten sonra Consumer key ve Consumer secret'i bir yere kaydedin
       domain_name: "alan adı"
       labels: 
-        api_key: "Müşteri Anahtarı"
+        api_key: "Kullanıcı Anahtarı"
         secret_key: "Consumer Secret"
     webct_scraper_settings: 
       description: |-
