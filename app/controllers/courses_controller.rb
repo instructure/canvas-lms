@@ -1058,6 +1058,8 @@ class CoursesController < ApplicationController
       :lock_all_announcements
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
+    @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
+      { :priority => Delayed::LOW_PRIORITY }, changes)
 
     if @course.save
       Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
@@ -1430,7 +1432,7 @@ class CoursesController < ApplicationController
     end
 
     @context_enrollment ||= @pending_enrollment
-    if is_authorized_action?(@context, @current_user, :read)
+    if @context.grants_right?(@current_user, session, :read)
       log_asset_access("home:#{@context.asset_string}", "home", "other")
 
       check_incomplete_registration
@@ -1711,9 +1713,14 @@ class CoursesController < ApplicationController
 
   def copy
     get_context
-    authorized_action(@context, @current_user, :read) &&
-      authorized_action(@context, @current_user, :read_as_admin) &&
-      authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
+    return unless authorized_action(@context, @current_user, :read_as_admin)
+
+    account = @context.account
+    unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+      account = @domain_root_account.manually_created_courses_account
+    end
+    return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
+
     # For prepopulating the date fields
     js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
     js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
@@ -1777,7 +1784,7 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # @argument account_id [Required, Integer]
+  # @argument course[account_id] [Required, Integer]
   #   The unique ID of the account to create to course under.
   #
   # @argument course[name] [String]
@@ -1883,6 +1890,7 @@ class CoursesController < ApplicationController
     logging_source = api_request? ? :api : :manual
 
     if authorized_action(@course, @current_user, :update)
+      return render_update_success if params[:for_reload]
       params[:course] ||= {}
       if params[:course].has_key?(:syllabus_body)
         params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
@@ -1959,6 +1967,13 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+	 # John Stauffacher (john.stauffacher@gmail.com) - prevents a nasty conversion from params to_sym 
+         if !["claim", "offer"].include? params[:course][:event]
+            flash[:error] = t('errors.unknownevent','Course event type unknown')
+            params[:course].delete(:event)
+            redirect_to(course_url(@course)) and return
+         end
+
         event = params[:course].delete(:event)
         event = event.to_sym
         if event == :claim && !@course.unpublishable?
@@ -1975,32 +1990,40 @@ class CoursesController < ApplicationController
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
-      respond_to do |format|
-        @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
+      @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
 
-        @course.attributes = params[:course]
-        changes = changed_settings(@course.changes, @course.settings, old_settings)
+      @course.attributes = params[:course]
+      changes = changed_settings(@course.changes, @course.settings, old_settings)
+      @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
+        { :priority => Delayed::LOW_PRIORITY }, changes)
 
-        if params[:for_reload] || @course.save
-          Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
-          @current_user.touch
-          if params[:update_default_pages]
-            @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
-          end
-          format.html {
-            flash[:notice] = t('notices.updated', 'Course was successfully updated.')
-            redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to])
-          }
-          format.json do
-            if api_request?
-              render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
-            else
-             render :json => @course.as_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
-            end
-          end
-        else
+      if @course.save
+        Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
+        @current_user.touch
+        if params[:update_default_pages]
+          @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
+        end
+        render_update_success
+      else
+        respond_to do |format|
           format.html { render :action => "edit" }
           format.json { render :json => @course.errors, :status => :bad_request }
+        end
+      end
+    end
+  end
+
+  def render_update_success
+    respond_to do |format|
+      format.html {
+        flash[:notice] = t('notices.updated', 'Course was successfully updated.')
+        redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to])
+      }
+      format.json do
+        if api_request?
+          render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
+        else
+          render :json => @course.as_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
         end
       end
     end
@@ -2135,7 +2158,7 @@ class CoursesController < ApplicationController
       # destroy the exising student
       @fake_student = @context.student_view_student
       # but first, remove all existing quiz submissions / submissions
-      Submission.where(quiz_submission_id: @fake_student.quiz_submissions.select(:id)).destroy_all
+      @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.destroy_all
 
       @fake_student.destroy
