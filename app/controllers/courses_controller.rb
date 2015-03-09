@@ -1959,6 +1959,7 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+	# Contributed by john stauffacher (john.stauffacher@gmail.com) - fixing an unsafe cast of arbitrary data to symbol 
 	if ![:claim, :offer].include? params[:course][:event]
         	flash[:error] = t['errors.unknownevent','Course event type unknown')
 		params[:course].delete(:event)
