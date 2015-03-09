@@ -218,6 +218,11 @@ class Enrollment < ActiveRecord::Base
         joins(:course).
         where("enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment') AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
 
+  scope :instructor, -> {
+    select(:course_id).
+        joins(:course).
+        where("enrollments.type IN ('TeacherEnrollment','TaEnrollment') AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
+
   scope :of_admin_type, -> { where(:type => ['TeacherEnrollment','TaEnrollment', 'DesignerEnrollment']) }
 
   scope :of_instructor_type, -> { where(:type => ['TeacherEnrollment', 'TaEnrollment']) }
