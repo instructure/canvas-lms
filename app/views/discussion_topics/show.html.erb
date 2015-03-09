@@ -116,12 +116,13 @@
 
                 <% if @presenter.should_show_rubric?(@current_user) %>
                   <li>
-                    <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
-                    <% if can_do(@topic.assignment, @current_user, :update) %>
-                      <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
-                    <% end %>
-
-                    <a class="rubric_dialog_trigger" href="#" data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
+                    <a
+                      class="rubric_dialog_trigger"
+                      href="#"
+                      data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>"
+                      data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>"
+                      data-focus-returns-to=".announcement_cog"
+                    >
                       <i class="icon-rubric" aria-hidden="hidden"></i>
                       <%= @presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
                     </a>
@@ -150,6 +151,12 @@
                 <% end %>
               </ul>
             </div>
+            <% if @presenter.should_show_rubric?(@current_user) %>
+              <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
+              <% if can_do(@topic.assignment, @current_user, :update) %>
+                <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
+              <% end %>
+            <% end %>
           <% end %>
         </div>
       </div>
