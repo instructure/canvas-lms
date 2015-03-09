@@ -1,18 +1,24 @@
 <td class="rating">
   <div class="rating-wrap">
-    <div class="show">
+    <div class="show" aria-expanded="true">
       <h5>{{description}}</h5>
       <span class="points">{{points}}</span> {{#t "points"}}Points{{/t}}
       <a
         href="#"
-        class="edit_rating active element_toggler"
+        class="edit_rating active"
         title='{{#t "edit_criterion_rating_title"}}Edit "{{description}} criterion rating{{/t}}'
         aria-label='{{#t "edit_criterion_rating_title"}}Edit "{{description}} criterion rating{{/t}}'
         role=button
         tabindex=0
         aria-controls="edit_rating_{{_index}}"><i class="icon-edit"></i></a>
     </div>
-    <div class="edit" id="edit_rating_{{_index}}" role=region tabindex=-1>
+    <div
+      class="edit"
+      id="edit_rating_{{_index}}"
+      role=region
+      aria-expanded="false"
+      tabindex=-1
+    >
       <div class="row-fluid" class="outcomes-edit-row">
         <div class="span7">
           <input type="text" name="ratings[{{_index}}][description]" class="outcome_rating_description" value="{{description}}" aria-label="{{#t "rating_description"}}Criterion rating description{{/t}}">
