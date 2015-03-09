@@ -11,6 +11,7 @@
 #   - controller
 #   - action
 #   - job_tag
+#   - rake_task
 #   - hostname
 #   - pid
 #   - context_id
