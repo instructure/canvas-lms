@@ -9,7 +9,7 @@ if config[:components].present?
   module Marginalia
     module Comment
       class << self
-        attr_accessor :rake_task
+        attr_accessor :migration, :rake_task
 
         def context_id
           RequestContextGenerator.request_id

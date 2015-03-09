@@ -11,6 +11,7 @@
 #   - controller
 #   - action
 #   - job_tag
+#   - migration
 #   - rake_task
 #   - hostname
 #   - pid

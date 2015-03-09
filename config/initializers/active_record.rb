@@ -1256,6 +1256,9 @@ module Migrator
 
   def execute_migration_in_transaction(migration, direct)
     old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
+    if defined?(Marginalia)
+      old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
+    end
     if down? && !Rails.env.test? && !$confirmed_migrate_down
       require 'highline'
       if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
@@ -1267,6 +1270,7 @@ module Migrator
     super
   ensure
     ActiveRecord::Base.in_migration = old_in_migration
+    Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
   end
 end
 ActiveRecord::Migrator.prepend(Migrator)
