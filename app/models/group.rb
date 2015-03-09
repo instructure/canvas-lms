@@ -179,6 +179,16 @@ class Group < ActiveRecord::Base
     raise "DONT USE THIS, use .short_name instead" unless Rails.env.production?
   end
 
+  def context_available?
+    return false unless self.context
+    case self.context
+    when Course
+      self.context.available?
+    else
+      true
+    end
+  end
+
   def appointment_context_codes
     {:primary => [context_string], :secondary => [group_category.asset_string]}
   end
@@ -320,17 +330,20 @@ class Group < ActiveRecord::Base
     new_group_memberships = all_group_memberships - old_group_memberships
     new_group_memberships.sort_by!(&:user_id)
     users.sort_by!(&:id)
-    notification_name = options[:notification_name] || "New Context Group Membership"
-    notification = BroadcastPolicy.notification_finder.by_name(notification_name)
     users.each {|user| clear_permissions_cache(user) }
 
-    users.each_with_index do |user, index|
-      BroadcastPolicy.notifier.send_later_enqueue_args(:send_notification,
-                                                         {:priority => Delayed::LOW_PRIORITY},
-                                                         new_group_memberships[index],
-                                                         notification_name.parameterize.underscore.to_sym,
-                                                         notification,
-                                                         [user])
+    if self.context_available?
+      notification_name = options[:notification_name] || "New Context Group Membership"
+      notification = BroadcastPolicy.notification_finder.by_name(notification_name)
+
+      users.each_with_index do |user, index|
+        BroadcastPolicy.notifier.send_later_enqueue_args(:send_notification,
+                                                           {:priority => Delayed::LOW_PRIORITY},
+                                                           new_group_memberships[index],
+                                                           notification_name.parameterize.underscore.to_sym,
+                                                           notification,
+                                                           [user])
+      end
     end
     new_group_memberships
   end

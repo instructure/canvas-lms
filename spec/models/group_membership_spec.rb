@@ -116,6 +116,28 @@ describe GroupMembership do
     expect(membership.messages_sent).to be_empty
   end
 
+  it "should dispatch a message if the course is available" do
+    course_with_teacher(active_all: true)
+    student    = user_model
+    group      = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
+    membership = group.group_memberships.build(user: student)
+    @course.enroll_student(student).accept!
+    Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+    membership.save!
+    expect(membership.messages_sent).to_not be_empty
+  end
+
+  it "should not dispatch a message if the course is unpublished" do
+    course_with_teacher
+    student    = user_model
+    group      = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
+    membership = group.group_memberships.build(user: student)
+    @course.enroll_student(student)
+    Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+    membership.save!
+    expect(membership.messages_sent).to be_empty
+  end
+
   it "should be invalid if group wants a common section, but doesn't have one with the user" do
     course_with_teacher(:active_all => true)
     section1 = @course.course_sections.create
