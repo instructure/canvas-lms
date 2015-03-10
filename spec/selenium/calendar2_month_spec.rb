@@ -40,7 +40,6 @@ describe "calendar2" do
       it "should not show scheduler button if it is disabled" do
         account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
         get "/calendar2"
-        wait_for_ajaximations
         ff('.calendar_view_buttons .ui-button').each do |button|
           expect(button.text).not_to match(/scheduler/i)
         end
@@ -111,7 +110,6 @@ describe "calendar2" do
         expect(fj('.fc-event:visible')).to be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
-        wait_for_ajax_requests
         expect(fj('.fc-event:visible')).to be_nil
       end
 
@@ -128,7 +126,6 @@ describe "calendar2" do
         expect(fj('.fc-event-inner')).to be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
-        wait_for_ajax_requests
         expect(fj('.fc-event-inner')).to be_nil
       end
 
@@ -143,7 +140,6 @@ describe "calendar2" do
         frozen_assignment.save!
 
         get("/calendar2")
-        wait_for_ajaximations
         fj('.fc-event:visible').click
         wait_for_ajaximations
         expect(f('.delete_event_link')).to be_nil
@@ -163,7 +159,6 @@ describe "calendar2" do
         make_event(start: eventStart)
 
         get "/calendar2"
-        wait_for_ajaximations
         expect(f('.fc-event')).to be_nil
         eventStartText = eventStart.strftime("%Y %m %d")
         quick_jump_to_date(eventStartText)
@@ -183,7 +178,6 @@ describe "calendar2" do
         e1.save!
 
         get "/calendar2"
-        wait_for_ajaximations
         events = ffj('.fc-event:visible')
         expect(events.size).to eq 2
         events.first.click

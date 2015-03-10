@@ -21,7 +21,6 @@ describe "calendar2" do
         it "should add the event class to days with events" do
           c = make_event
           get "/calendar2"
-          wait_for_ajax_requests
 
           events = ff("#minical .event")
           expect(events.size).to eq 1

@@ -19,7 +19,6 @@ describe "calendar2" do
       it "should create an event by hitting the '+' in the top bar" do
         event_title = 'new event'
         get "/calendar2"
-        wait_for_ajaximations
 
         fj('#create_new_event_link').click
         edit_event_dialog = f('#edit_event_tabs')

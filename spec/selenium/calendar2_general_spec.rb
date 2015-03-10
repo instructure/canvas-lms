@@ -31,7 +31,6 @@ describe "calendar2" do
       app2.reserve_for(student2, student2)
 
       get '/calendar2'
-      wait_for_ajaximations
       fj('.fc-event').click
       wait_for_ajaximations
 
@@ -54,7 +53,6 @@ describe "calendar2" do
       assignment2 = @course.active_assignments.create(:name => "Assignment 2", :assignment_group => group2, :due_at => Time.zone.now)
 
       get "/calendar2"
-      wait_for_ajaximations
       events = ff('.fc-event')
       event1 = events.detect { |e| e.text =~ /Assignment 1/ }
       event2 = events.detect { |e| e.text =~ /Assignment 2/ }
@@ -132,7 +130,6 @@ describe "calendar2" do
         ag.appointments.first.reserve_for(@user, @user)
 
         get "/calendar2"
-        wait_for_ajaximations
 
         open_edit_event_dialog
         description = 'description...'
@@ -156,7 +153,6 @@ describe "calendar2" do
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
         make_event(:start => event_start)
         get "/calendar2"
-        wait_for_ajaximations
         f('.fc-event').click
         expect(f('.event-details-timestring').text).to include event_start.strftime("%b %e")
       end
@@ -169,7 +165,6 @@ describe "calendar2" do
             due_at: event_start,
         )
         get "/calendar2"
-        wait_for_ajaximations
         f('.fc-event').click
         expect(f('.event-details-timestring').text).to include event_start.strftime("%b %e")
       end
@@ -196,7 +191,6 @@ describe "calendar2" do
         end
 
         get "/calendar2"
-        wait_for_ajaximations
         f('.fc-event').click
         expect(f('.event-details-timestring').text).to include override_start.strftime("%b %e")
       end

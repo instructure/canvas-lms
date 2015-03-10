@@ -46,7 +46,6 @@ describe "scheduler" do
                                    [tomorrow + ' 14:00:00', current_date = tomorrow + ' 15:00:00'],
                                ])
       get "/calendar2"
-      wait_for_ajaximations
       click_scheduler_link
       click_appointment_link
 
@@ -72,7 +71,6 @@ describe "scheduler" do
                                    [tomorrow + ' 16:00:00', current_date = tomorrow + ' 17:00:00'],
                                ])
       get "/calendar2"
-      wait_for_ajaximations
       click_scheduler_link
       click_appointment_link
 
@@ -92,7 +90,6 @@ describe "scheduler" do
       ag = AppointmentGroup.first
       ag.appointments.first.reserve_for(@user, @user)
       get "/calendar2"
-      wait_for_ajaximations
       click_scheduler_link
       wait_for_ajaximations
       click_appointment_link
