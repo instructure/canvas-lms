@@ -1222,7 +1222,7 @@ es:
       account_reports: 
         unused_courses: 
           main: 
-            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, debates, archivos, módulos, páginas o cuestionarios."
+            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, foros, archivos, módulos, páginas o cuestionarios."
     update_failed_notice: "Configuraciones de actualización de cuenta falló"
     user_access_csv_parameters: 
       account_reports: 
@@ -1279,7 +1279,7 @@ es:
     add_file_to: "Añadir un archivo a %{module}"
     add_page_to: "Añadir una página a %{module}"
     add_quiz_to: "Añadir una evaluación a %{module}"
-    add_topic_to: "Añadir temas de debate a %{module}"
+    add_topic_to: "Añadir temas de foro a %{module}"
   add_new_group_7ac49f31: "Agregar nuevo grupo"
   add_students_to_the_course_874be8fb: "Agregar estudiantes al curso"
   add_tas_to_the_course_2aac6e02: "Agregar APs al curso"
@@ -1520,7 +1520,7 @@ es:
     submission_action_take_quiz: "Realizar %{title}"
     submission_action_turn_in_assignment: "Enviar %{title}"
     submission_types: 
-      a_discussion_post: "una publicación de debate"
+      a_discussion_post: "una publicación de foro"
       a_file_upload: "una carga de archivo"
       a_media_recording: "una grabación de contenido audiovisual"
       a_quiz: "un cuestionario"
@@ -1668,7 +1668,7 @@ es:
       assignment_type: "Tipo:"
       cancel: Cancelar
       differentiated_due_dates: "Fecha de vencimiento diferenciada"
-      discussion_type: Debate
+      discussion_type: Foro
       external_tool_type: "Herramienta externa"
       more: "Más opciones"
       multiple_due_dates: "Varias fechas límite"
@@ -2557,7 +2557,7 @@ es:
     event_on_this_day: "Hay un evento en este día"
     event_type: 
       assignment: Tarea
-      discussion: Debate
+      discussion: Foro
       event: Evento
       quiz: Evaluación
     input_is_invalid_date: "El texto introducido no tiene un formato de fecha válido."
@@ -3904,7 +3904,7 @@ es:
     other_recipients: 
       one: "1 otro"
       other: "%{count} otros"
-    result_status: "La función autocompletar ha encontrado %{results} entradas. Utilice las teclas de dirección hacia arriba o hacia abajo para navegar hasta un listado. A continuación, presione la tecla Entrar para agregrar a la persona al campo Para."
+    result_status: "La función autocompletar ha encontrado %{results} respuestas. Utilice las teclas de dirección hacia arriba o hacia abajo para navegar hasta un listado. A continuación, presione la tecla Entrar para agregrar a la persona al campo Para."
     star: Señalar
     star_conversation: "Marcar conversación como destacada"
     submission_comment_form_dialog: 
@@ -4042,7 +4042,7 @@ es:
       quizzes: "Algunas evaluaciones no se pudieron exportar"
       resources: "No se pudieron enlazar algunos recursos."
       rubrics: "No se pudieron exportar rúbricas"
-      topic: "El tema de discusión \"%{title}\" no se pudo exportar"
+      topic: "El tema de foro \"%{title}\" no se pudo exportar"
       topic_is_locked: "El tema \"%{title}\" no pudo copiarse porque está bloqueado.\n"
       topics: "No se pudieron exportar algunos temas"
       web_links: "No se pudieron exportar algunos enlaces a páginas web"
@@ -4082,8 +4082,8 @@ es:
     field_label: 
       abstract_course_id: "ID del resumen del curso"
       account_id: "ID de cuenta"
-      allow_student_discussion_editing: "Permitir la edición de los debates entre alumnos"
-      allow_student_discussion_topics: "Permitir los temas de debate entre alumnos"
+      allow_student_discussion_editing: "Permitir la edición de foro entre alumnos"
+      allow_student_discussion_topics: "Permitir los temas de foro entre alumnos"
       allow_student_forum_attachments: "Permitir los archivos adjuntos en el foro de alumnos"
       allow_student_organized_groups: "Permitir los grupos organizados por alumnos"
       allow_student_wiki_edits: "Permitir la edición de Wiki del alumno"
@@ -4116,7 +4116,7 @@ es:
       self_enrollment: Autoinscripción
       self_enrollment_code: "Código de autoinscripción"
       self_enrollment_limit: "Límite de autoinscripción"
-      show_all_discussion_entries: "Mostrar todas las entradas del debate"
+      show_all_discussion_entries: "Mostrar todas las respuestas del foro"
       show_public_context_messages: "Mostrar mensaje de contexto público"
       sis_batch_id: "ID de lote SIS"
       sis_source_id: "ID de fuente SIS"
@@ -4479,9 +4479,9 @@ es:
         toggle_navigation_dragging: Espacio
       labels: 
         account_id: Departamento
-        allow_student_discussion_editing: "Permitir que los alumnos editen o eliminen sus propias publicaciones en los debates"
-        allow_student_discussion_topics: "Permitir que los usuarios creen temas de debate"
-        allow_student_forum_attachments: "Permitir que los alumnos adjunten archivos a los debates"
+        allow_student_discussion_editing: "Permitir que los alumnos editen o eliminen sus propias publicaciones en los foros"
+        allow_student_discussion_topics: "Permitir que los usuarios creen temas de foro"
+        allow_student_forum_attachments: "Permitir que los alumnos adjunten archivos a los foros"
         allow_student_organized_groups: "Permitir que los alumnos organicen sus propios grupos"
         conclude_at: Finaliza
         course_code: "Código del Curso"
@@ -4563,7 +4563,7 @@ es:
       headings: 
         current_users: "Usuarios Actuales"
       help: 
-        reset_course_content: "Si reconfigura el contenido del curso se borrarán permanentemente todas las tareas, debates, evaluaciones, módulos, rúbricas, páginas, archivos, resultados, grupos de preguntas, colaboraciones, conferencias y cualquier otro contenido. Esta acción es irreversible y la información *no puede* recuperarse. ¿Está seguro que desea continuar?"
+        reset_course_content: "Si reconfigura el contenido del curso se borrarán permanentemente todas las tareas, foros, evaluaciones, módulos, rúbricas, páginas, archivos, resultados, grupos de preguntas, colaboraciones, conferencias y cualquier otro contenido. Esta acción es irreversible y la información *no puede* recuperarse. ¿Está seguro que desea continuar?"
       links: 
         calendar: "Calendario del Curso"
         conclude: "Finalizar este Curso"
@@ -4638,8 +4638,8 @@ es:
       assignment_groups: "Grupos de Tareas"
       assignments: Tareas
       course_rubrics: "Rúbricas del Curso"
-      discussion_posts: "Mensajes de la Discusión"
-      discussion_topic: "Tema de Discusión"
+      discussion_posts: "Mensajes de la Foro"
+      discussion_topic: "Tema de Foro"
       discussions: Foros
       file_count: 
         one: "1 archivo"
@@ -4656,7 +4656,7 @@ es:
         media_files: "Archivos de Medios de Comunicación"
         uploaded_files: "Archivos Cargados"
       new: Nuevo
-      new_discussion_entries: "Nuevas Entradas en la Discusión"
+      new_discussion_entries: "Nuevas Respuestas en la Foro"
       new_discussions: "Nuevos Foros"
       number_of_assignments: "# Tareas"
       number_of_submissions: "# Envíos"
@@ -4691,7 +4691,7 @@ es:
   create_module_item: 
     assignment_name: "Nombre de tarea"
   create_module_item_quiz: 
-    discussion_name: "Nombre del debate"
+    discussion_name: "Nombre del foro"
     file_to_upload: "Archivo para cargar"
     graded_quiz: "Cuestionario calificado"
     graded_survey: "Encuesta calificada"
@@ -4829,10 +4829,10 @@ es:
     disable_dashboard: "Regresar al antiguo panel de control"
     discussions_collapse: 
       one: "Contraer %{count} debate"
-      other: "Contraer %{count} debates"
+      other: "Contraer %{count} foros"
     discussions_expand: 
       one: "Expandir %{count} debate"
-      other: "Expandir %{count} debates"
+      other: "Expandir %{count} foros"
     enable_dashboard: "Pruebe el nuevo panel de control"
     show_more_link: 
       show_less: "Mostrar menos"
@@ -5090,7 +5090,7 @@ es:
   discussion_entry: 
     atom_no_author: "Sin Autor"
     default_user_name: "Nombre de usuario"
-  discussion_group_category_locked: "Las categorías grupales no se pueden configurar directamente en las tareas de debate, sino que debe hacerse en el propio debate"
+  discussion_group_category_locked: "Las categorías grupales no se pueden configurar directamente en las tareas de foro, sino que debe hacerse en el propio foro"
   discussion_topic: 
     atom_no_author: "Sin Autor"
     default_title: "Sin Título"
@@ -5103,7 +5103,7 @@ es:
       for: Para
       graded_discussion_and_points: 
         one: "Este es un debate con calificación: *vale 1 punto*"
-        other: "Este es un debate con calificación: *vale %{count} puntos*"
+        other: "Este es un foro con calificación: *vale %{count} puntos*"
       show_due_dates: "Mostrar fechas de vencimiento"
       until: Hasta
     cannot_unpublish_with_replies: "No se puede cancelar la publicación si hay respuestas de alumnos"
@@ -5112,7 +5112,7 @@ es:
       other: "¿Está seguro de que quiere borrar estos %{count} anuncios?"
     confirm_delete_discussion_topic: 
       one: "¿Está seguro de que quiere borrar este tema de debate?"
-      other: "¿Está seguro de que quiere borrar estos %{count} temas de debate?"
+      other: "¿Está seguro de que quiere borrar estos %{count} temas de foro?"
     create_new_crumb: "Crear nuevo"
     default_discussion_title: "Sin Título"
     deleted_topic_notice: "Ese tema ha sido borrado"
@@ -5120,7 +5120,7 @@ es:
       close_for_comments: "No admite comentarios"
       delete: Borrar
       due: "Fecha límite"
-      graded_discussion: "Debate con calificación:"
+      graded_discussion: "Foro con calificación:"
       last_post_date: "Última publicación %{display_last_reply_at}"
       manage: Manejar
       move: "Mover a..."
@@ -5130,15 +5130,15 @@ es:
       unpin: Desanclar
       user_subscribed: "Está susctrito a este tema. Haga clic aquí para cancelar la suscripción."
       user_unsubscribed: "No está suscrito a este tema. Haga clic aquí para suscribirse."
-    discussion_feed_title: "Canal de Discusión %{title}"
+    discussion_feed_title: "Canal de Foro %{title}"
     discussion_list: 
-      no_pinned_discussions: "Actualmente no tiene debates anclados"
-      pinned_instructions: "Para anclar un debate en la parte superior de la página, arrastre un debate aquí o seleccione Anclar en el menú de configuración de debates."
-      there_are_no_discussions_show: "No hay debates que mostrar en esta sección."
+      no_pinned_discussions: "Actualmente no tiene foros anclados"
+      pinned_instructions: "Para anclar un foro en la parte superior de la página, arrastre un debate aquí o seleccione Anclar en el menú de configuración de debates."
+      there_are_no_discussions_show: "No hay foros que mostrar en esta sección."
     discussions_settings_view: 
       allow_student_discussion_editing: "Editar y eliminar sus propias publicaciones"
-      allow_student_topics: "Crear temas de debate"
-      attach_files: "Adjuntar archivos a los debates"
+      allow_student_topics: "Crear temas de foro"
+      attach_files: "Adjuntar archivos a los foros"
       manually_mark_as_read: "Marcar manualmente los comentarios como leídos"
       my_settings: "Mi configuración"
       student_settings: "Configuración de los alumnos"
@@ -5156,9 +5156,9 @@ es:
       delay_posting: "Atrasar la publicación"
       enable_podcast_feed: "Activar el feed de podcast"
       include_replies_in_podcast_feed: "Incluír respuestas en el feed de podcast"
-      only_visible_to_overrides_note: "Nota: Este debate *solo* se podrá ver en las secciones que se especifican a continuación:"
+      only_visible_to_overrides_note: "Nota: Este foro *solo* se podrá ver en las seccione(s) que se especifican a continuación:"
       options: Opciones
-      page_header_title: "Nuevo debate"
+      page_header_title: "Nuevo Foro"
       points_possible: "Puntos posibles"
       post_at: "Publicar en"
       save: Guardar
@@ -5181,36 +5181,36 @@ es:
         other: "Mostrar %{count} más Contribuciones"
     error_draft_state_unauthorized: "No tiene permiso para marcar este tema como borrador."
     error_draft_state_with_posts: "Este tema no se puede marcar como borrador porque contiene publicaciones."
-    error_group_announcement: "No puede utilizar un debate grupal en un anuncio."
-    error_group_change: "No puede cargar la configuración de grupos en un debate con respuestas."
+    error_group_announcement: "No puede utilizar un foro grupal en un anuncio."
+    error_group_change: "No puede cargar la configuración de grupos en un foro con respuestas."
     group_assignment_discussion_entry: 
       posts: 
         one: "1 Contribución"
         other: "%{count} Contribuciones"
       separated_conversation_notice: "La conversación para este tema ha sido separado en grupos diferentes. Debajo están todos los grupos de temas al que se tiene acceso."
     group_discussion: 
-      separated_conversation_notice: "Este debate es grupal, por lo que cada grupo tiene su propia conversación para este tema. Estas son las conversaciones a las que tiene acceso:"
-    group_discussion_locked: "Los alumnos ya han realizado envíos para este debate, por lo que no se puede cambiar la configuración de grupo."
-    group_discussion_title: "Debate grupal"
+      separated_conversation_notice: "Este foro es grupal, por lo que cada grupo tiene su propia conversación para este tema. Estas son las conversaciones a las que tiene acceso:"
+    group_discussion_locked: "Los alumnos ya han realizado envíos para este foro, por lo que no se puede cambiar la configuración de grupo."
+    group_discussion_title: "Foro Grupal"
     index: 
       course_discussions_atom_feed_title: "Canal Atom de Foros del Curso"
     index_view: 
       assignments: Tareas
       delete: Borrar
-      discussion_topics: "Temas de debate"
-      edit_settings: "Editar la configuración de los debates"
+      discussion_topics: "Temas de Foro"
+      edit_settings: "Editar la Configuración de los Foros"
       loading: Cargando...
       lock_for_comments: "Buscar comentarios"
       make_sure_all_search_terms_are_spelled_correctly: "Asegurarse de que todos los términos de búsqueda están escritos correctamente."
-      new_discussion: "*Comenzar un* debate"
+      new_discussion: "*Comenzar un* Foro"
       rss_feed: "Feed RSS"
       start_one_now: "Comenzar uno ahora"
       suggestions: "Sugerencias:"
-      there_are_no_discussion_topics_to_show: "No hay temas de debate que mostrar"
+      there_are_no_discussion_topics_to_show: "No hay temas de foro que mostrar"
       try_different_more_general_or_fewer_keywords: "Intente con menos palabras clave o con palabras clave diferentes o más generales."
       try_disabling_the_unread_or_assignments_filters: "Intente desactivar los filtros \"No Leído\" o \"Tareas\"."
       unread: "No leído"
-      your_search_did_not_match_any_discussion_topics: "Su búsqueda no coincidió con ningún tema de discusión."
+      your_search_did_not_match_any_discussion_topics: "Su búsqueda no coincidió con ningún tema de foro."
     new_and_total_badge: 
       reply_count_tooltip: 
         one: "1 respuesta."
@@ -5221,7 +5221,7 @@ es:
         other: "%{count} respuestas sin leer."
         zero: "No hay respuestas sin leer."
     notices: 
-      discussion_not_availible: "No tiene acceso al debate solicitado."
+      discussion_not_availible: "No tiene acceso al foro solicitado."
     page_nav: 
       Page: Página
       current_page: Actual
@@ -5242,11 +5242,11 @@ es:
       announcement_locked_until: "Este anuncio está bloqueado hasta las %{time}"
       authors_name: "Nombre del Autor"
       collapse_replies: "Ocultar respuestas"
-      confirm_delete_discussion: "¿Seguro que quiere borrar esta dirección?"
+      confirm_delete_discussion: "¿Seguro que quiere borrar este foro?"
       delete: Borrar
       delete_current_message: "Borrar el Mensaje Actual"
-      discussion_atom_feed_title: "Canal de Discusión Atom"
-      discussion_podcast_feed_title: "Canal de Discusión de Podcasts"
+      discussion_atom_feed_title: "Canal de Foro Atom"
+      discussion_podcast_feed_title: "Canal de Foro de Podcasts"
       edit: Editar
       edit_current_message: "Editar el Mensaje Actual"
       edited_by: "Este tema fue editado por %{user}"
@@ -5259,7 +5259,7 @@ es:
       lock_topic: "Cerrado a Comentarios"
       locked: "Este tema está cerrado a comentarios"
       manage_announcement: "Gestionar anuncio"
-      manage_discussion: "Gestionar el debate"
+      manage_discussion: "Gestionar el Foro"
       mark_all_as_read: "Marcar todas como leídas"
       mark_all_as_unread: "Marcar todas como no leídas"
       next_message: "Siguiente Mensaje"
@@ -5291,7 +5291,7 @@ es:
       open_to_comments: "Admite comentarios"
       this_topic_is_used_for_grading: "Este tema se usa para calificar"
       topic_podcast_feed: "Canal de Podcast del Tema"
-    this_is_a_group_discussion: "Este es un debate grupal"
+    this_is_a_group_discussion: "Este es un Foro Grupal"
     topic_deleted_notice: "%{topic_title} borrado correctamente"
     unread_count_tooltip: 
       one: "1 respuesta sin leer."
@@ -5300,19 +5300,19 @@ es:
     user_settings_view: 
       manually_mark_as_read: "Marcar manualmente los comentarios como leídos"
       my_settings: "Mi configuración"
-  discussion_topics_b35ac745: "Temas de debate"
+  discussion_topics_b35ac745: "Temas de Foro"
   discussions: 
     are_your_sure_delete: "¿Seguro que quiere borrar esta entrada?"
     cant_subscribe_not_in_group: "Debe pertenecer a este grupo para poder suscribirse"
     cant_subscribe_not_in_group_set: "Debe pertenecer a un grupo asociado para poder suscribirse"
     closed_for_comments: "No admite comentarios"
-    confirm_delete_discussion_topic: "¿Está seguro de que desea borrar este tema de debate?"
+    confirm_delete_discussion_topic: "¿Está seguro de que desea borrar este tema de foro?"
     delete: Borrar
     deleted_entry: 
       deleted: "Eliminada por *%{editor_name}* el %{edited_at}"
-    discussion_participant: "Participante del debate"
-    discussions: Debates
-    edit_settings: "Editar la configuración de los debates"
+    discussion_participant: "Participante del Foro"
+    discussions: Foros
+    edit_settings: "Editar la configuración de los foros"
     entry_collection_view: 
       add_reply_to_topic: "Agregar respuesta al tema"
     entry_content: 
@@ -5322,7 +5322,7 @@ es:
       edited_comment: "Editado por *%{editor.display_name}* el %{edited_at}"
       go_to_parent: "Ir al inicio"
       go_to_topic: "Ir a un tema"
-      manage_discussion_entry: "Gestionar la entrada de debate"
+      manage_discussion_entry: "Gestionar la entrada de foro"
       open_in_speedgrader: "Abrir en el calificador rápido"
       unknown_author: ">Autor desconocido"
       write_a_reply: Responder
@@ -5342,7 +5342,7 @@ es:
     ordered_by_recent_activity: "Ordenado por actividad reciente"
     participant: 
       anonymous_user: Anónimo
-    pinned_discussions: "Debates anclados"
+    pinned_discussions: "Foros Anclados"
     reply: 
       error_saving_reply: "*Se ha producido un error*, por favor envie su respuesta en otro momento"
       saving_reply: "Guardando la respuesta..."
@@ -5357,7 +5357,7 @@ es:
     results_entry: 
       authors_name: "Nombre del Autor"
       unknown_author: "Autor desconocido"
-      view_in_discussion: "Ver en debate"
+      view_in_discussion: "Ver en Foro"
     show_all_n_replies: 
       one: "Mostrar una  respuesta"
       other: "Mostrar las %{count} respuestas"
@@ -5912,7 +5912,7 @@ es:
     dialog_title_add_tool: "Añadir nueva aplicación"
     dialog_title_edit_tool: "Editar la herramienta externa"
     dialog_title_rate_tool: "¿Cómo califica esta herramienta?"
-    discussion_topic_menu_configured: "Menú de temas de debate configurado"
+    discussion_topic_menu_configured: "Menú de Temas de Foro configurado"
     edit_view: 
       anonymous: Anónimo
       by_url: "Por URL"
@@ -6279,8 +6279,8 @@ es:
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Rellene el espacio en blanco, lea el texto que lo acompaña"
   filter_announcements_by_unread_495eeeb3: "filtrar anuncios por no leídos"
   filter_by_name_34cbe139: "Filtrar por nombre"
-  filter_discussions_by_assignments_757924ed: "filtar debates por tareas"
-  filter_discussions_by_unread_6c48322: "filtrar debates por no leídos"
+  filter_discussions_by_assignments_757924ed: "filtar foros por tareas"
+  filter_discussions_by_unread_6c48322: "filtrar foros por no leídos"
   filter_replies_by_unread_caf870ea: "filtrar respuestas por no leídas"
   find_flickr_image_view: 
     find_cc_on_flickr: "Buscar imágenes de Creative Commons en Flickr"
@@ -6494,7 +6494,7 @@ es:
       quiz: "Envío de Evaluación"
       turnitin: "Tiene una calificación de Turnitin"
     titles: 
-      discussion: "Envío de la Discusión"
+      discussion: "Envío de la Foro"
       media: "Envío de Comentario de Media"
       media_recording: "Envío de grabación multimedia"
       quiz_review: "Esta evaluación necesita revisión"
@@ -7115,9 +7115,9 @@ es:
         saving: Guardando...
         where_to_move: "¿Dónde desea mover a *%{userName}*?"
       group_categories: 
-        account_group_explanation: "Las cuentas de grupos de alumnos son una buena forma de agrupar estudiantes sin enlazarlos a ningún curso específico. Cada grupo de alumnos tendrá su propio calendario, foro de debate y herramientas de colaboración para que puedan organizarse y trabajar más eficientemente."
+        account_group_explanation: "Las cuentas de grupos de alumnos son una buena forma de agrupar estudiantes sin enlazarlos a ningún curso específico. Cada grupo de alumnos tendrá su propio calendario, foro y herramientas de colaboración para que puedan organizarse y trabajar más eficientemente."
         add_group_set: "Agregar conjunto de grupos"
-        course_group_explanation: "Los grupos de alumnos son una buena forma de organizar a los alumnos para tareas como proyectos o ensayos. Cada grupo de alumnos tendrá su propio calendario, foro de debate y herramientas de colaboración para que puedan organizarse y trabajar más eficientemente."
+        course_group_explanation: "Los grupos de alumnos son una buena forma de organizar a los alumnos para tareas como proyectos o ensayos. Cada grupo de alumnos tendrá su propio calendario, foro y herramientas de colaboración para que puedan organizarse y trabajar más eficientemente."
         group_assignment_instructions: "Puede agrupar a los alumnos al azar en grupos de un tamaño específico o crearlos y organizarlos manualmente. Una vez que se hayan creado los grupos, puede configurar que las tareas sean \"envíos de grupo\", lo que significa que cada grupo realizará un solo envío que agrupará a todos los usuarios de ese grupo."
         group_set: "Conjunto de grupos"
         headings: 
@@ -7262,7 +7262,7 @@ es:
   groups_6c90e26a: Grupos
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Los grupos son ideales para colaborar en proyectos o para determinar horarios para sesiones de estudio
-                      y similares.  Cada grupo tiene un calendario, un wiki, debates y cierto espacio para guardar
+                      y similares.  Cada grupo tiene un calendario, un wiki, foros y cierto espacio para guardar
                       archivos.  Los grupos pueden colaborar en documentos o incluso programar conferencias web.
                       En realidad es como un minicurso en el que puede trabajar con una cantidad inferior de alumnos para centrarse
                       más en un proyecto determinado.
@@ -7309,8 +7309,8 @@ es:
       assignment_label: "Visite los anuncios del curso"
       conversation_details: "Detalles de la conversación"
       conversation_label: "Visite las convesaciones"
-      discussion_details: "Detalles del debate"
-      discussion_label: "Visite los debates del curso"
+      discussion_details: "Detalles del Foro"
+      discussion_label: "Visite los Foros del Curso"
       peer_review_details: "Detalles de la revisión por pares"
       peer_review_label: "Visite las revisiones por pares del curso"
       x_more: "%{x} más..."
@@ -7325,7 +7325,7 @@ es:
         other: "*%{count}* mensajes de conversación"
       x_new_in_discussions: 
         one: "*1* debate"
-        other: "*%{count}* debates"
+        other: "*%{count}* Foros"
       x_new_in_peer_reviews: 
         one: "*1* revisión por pares"
         other: "*%{count}* revisiones por pares"
@@ -7352,12 +7352,12 @@ es:
   ic_actions: 
     manage: gestionar
   icons: 
-    discussion_submission: "Envío de debates"
+    discussion_submission: "Envío de Foros"
     file_upload_submission: "Envío de archivos cargados"
     media_submission: "Envío de contenido multimedia"
     online_url_submission: "Envío de URL online"
     quiz_submission: "Envío de evaluaciones"
-    text_entry_submission: "Envío de entradas de texto"
+    text_entry_submission: "Envío de Respuestas de Texto"
   if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "Si está habilitado, los diseñadores de contenido deben proporcionar los derechos de autor y la información sobre la licencia de los archivos antes de publicarlos."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "En caso de estar habilitados, los usuarios podrán configurar las herramientas LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si modifica el número de puntos posibles de la tarea, deberá calificarla de nuevo."
@@ -7651,7 +7651,7 @@ es:
         calendar_events: "Eventos del calendario"
         context_modules: Módulos
         course_settings: "Configuración del curso"
-        discussion_topics: "Temas de debate"
+        discussion_topics: "Temas de Foro"
         external_tools: "Herramientas externas"
         groups: "Grupos de alumnos"
         learning_outcomes: "Resultados de aprendizaje"
@@ -7671,7 +7671,7 @@ es:
             Asistencia técnica de Canvas "
         subject: "Respuesta al Mensaje Falló: %{subject}"
       locked_topic: 
-        body: "El mensaje títulado \"%{subject}\" no se ha podido entregar porque el tema de debate está bloqueado. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.\n\n\
+        body: "El mensaje títulado \"%{subject}\" no se ha podido entregar porque el tema de foro está bloqueado. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.\n\n\
             Gracias.\n\
             Asistencia técnica de Canvas "
         subject: "Respuesta al Mensaje Falló: %{subject}"
@@ -7704,7 +7704,7 @@ es:
   link_title_d959a7b3: "Título del vínculo"
   link_url_cf96376: "URL del vínculo"
   linked_assignment_message: "vinculado con la tarea '%{title}'"
-  linked_discussion_topic_message: "vinculado con el tema de debate '%{title}'"
+  linked_discussion_topic_message: "vinculado con el tema de Foro '%{title}'"
   linked_quiz_message: "vinculado con la evaluación '%{title}'"
   links: 
     dashboard: "Mi Tablero de Instrumentos"
@@ -7902,7 +7902,7 @@ es:
         subject: "Alerta: %{user_name}"
         ungraded_count_description: "%{count} o más tareas no han sido calificadas"
         ungraded_timespan_description: "Un envío se ha dejado sin calificar durante %{count} días"
-        usernote_description: "No han habido entradas a la revista de profesores durante %{count} días"
+        usernote_description: "No han habido respuestas a la revista de profesores durante %{count} días"
       facebook: 
         body: 
           one: "Una alerta ha sido activada para %{student} porque la siguiente condición se ha cumplido:"
@@ -7920,8 +7920,8 @@ es:
           one: "Uno o más envíos no han sido calificados durante uno o más dias"
           other: "Uno o más envíos no han sido calificados durante %{count} o más días"
         usernote_description: 
-          one: "No hay entradas en la revista de la facultad durante uno o más días"
-          other: "No hay entradas en la revista de la facultad durante %{count} o más días"
+          one: "No hay respuestas en la revista de la facultad durante uno o más días"
+          other: "No hay respuestas en la revista de la facultad durante %{count} o más días"
       sms: 
         body: "Una alerta ha sido activada para %{student}"
         body_student: "Una alerta ha sido activada para usted"
@@ -7944,8 +7944,8 @@ es:
           one: "Uno o más envios se han dejado sin calificar durante uno o más días"
           other: "Uno o más envios se han dejado sin calificar durante %{count} o más días"
         usernote_description: 
-          one: "No hay entradas en la revista de la facultad durante uno o más días"
-          other: "No hay entradas en la revista de la facultad durante %{count} o más días"
+          one: "No hay respuestas en la revista de la facultad durante uno o más días"
+          other: "No hay respuestas en la revista de la facultad durante %{count} o más días"
       twitter: 
         body: "Una alerta ha sido activada para %{student}"
         body_student: "Una alerta ha sido activada para usted"
@@ -9261,24 +9261,24 @@ es:
         body: "Alerta de Canvas - Comentario: %{discussion_topic}, %{course}."
     new_discussion_topic: 
       email: 
-        body: "Una nueva discusión ha sido comenzada que le puede interesar:"
+        body: "Una nueva foro ha sido comenzada que le puede interesar:"
         details: "Unirse a la conversación aquí:"
         html: 
           attached_file: "Archivo adjunto"
-          body: "Ha comenzado una nueva discusión que le puede interesar:"
+          body: "Ha comenzado una nueva foro que le puede interesar:"
           download: descargar
           link: "Haga clic aquí para participar en la conversación"
-          subject: "Nueva discusión - %{discussion_topic}: %{course}"
+          subject: "Nueva Foro - %{discussion_topic}: %{course}"
         labels: 
           file_included: "Archivo Incluído"
-        subject: "Discusión Nueva - %{discussion_topic}: %{course}"
+        subject: "Nueva Foro - %{discussion_topic}: %{course}"
       facebook: 
         body: "Tema Nuevo de Foro: %{discussion_topic}, %{course}"
       sms: 
         body: "Tema Nuevo para %{course}:"
         details: "Más información en %{url}"
       summary: 
-        subject: "Discusión Nueva - %{discussion_topic}: %{course}"
+        subject: "Nueva Foro - %{discussion_topic}: %{course}"
       twitter: 
         subject: "Alerta de Canvas - Tema: %{discussion_topic}, %{course}"
     new_event_created: 
@@ -9743,7 +9743,7 @@ es:
     assignment_group_type: "Grupo de trabajo"
     assignment_type: Tarea
     calendar_event_type: "Evento del calendario"
-    discussion_topic_type: "Tema de discusión"
+    discussion_topic_type: "Tema de Foro"
     ecollege: 
       course_not_found: "No se ha encontrado el curso de ECollege."
     external_feed_type: "Canal externo"
@@ -9766,7 +9766,7 @@ es:
   model_is_already_located_in_newgroup_e5cea361: "%{model} ya está ubicado en %{newGroup}"
   module_item_types: 
     assignment: Tarea
-    disuccsion: Debate
+    disuccsion: Foro
     external_tool: "Herramienta externa"
     external_url: "URL externa"
     file: Archivo
@@ -9779,7 +9779,7 @@ es:
         add_assignments: "Agregar tareas"
         loading_assignments: "Cargando tareas..."
       discussion: 
-        add_topics: "Agregar temas de debate"
+        add_topics: "Agregar Temas de Foro"
       file: 
         add_files: "Agregar archivos"
       header: 
@@ -9798,7 +9798,7 @@ es:
       add_new_item: "Agregar nuevo elemento"
       assignment: Tarea
       content_page: "Página de contenido"
-      discussion: Debate
+      discussion: Foro
       external_tool: "Herramienta externa"
       external_url: "URL externa"
       file: Archivo
@@ -9824,7 +9824,7 @@ es:
         create: Crear
       discussion: 
         cancel: Cancelar
-        create_discussion: "Crear debate"
+        create_discussion: "Crear Foro"
       file: 
         cancel: Cancelar
         upload: Cargar
@@ -10007,8 +10007,8 @@ es:
       appointment_signups: "Registros para citas"
       calendar: Calendario
       course_content: "Contenido del Curso"
-      discussion: Discusión
-      discussion_entry: "Ingreso de Discusión"
+      discussion: Foro
+      discussion_entry: "Ingreso de Foro"
       due_date: "Fecha Límite"
       files: Archivos
       grading: Calificación
@@ -10034,10 +10034,10 @@ es:
         * Contenido de las evaluaciones⏎
         * Contenido de las tareas
     course_content_display: "Contenido del Curso"
-    discussion_description: "Nuevo tema de debate en su curso"
-    discussion_display: Discusión
-    discussion_post_description: "Nueva publicación de debate para un tema al que está suscrito"
-    discussion_post_display: "Publicación de debate"
+    discussion_description: "Nuevo tema de foro en su curso"
+    discussion_display: Foro
+    discussion_post_description: "Nueva publicación de foro para un tema al que está suscrito"
+    discussion_post_display: "Publicación de foro"
     due_date_description: "Modificación de la fecha de vencimiento de la tarea"
     due_date_display: "Fecha de entrega"
     files_description: "Nuevo archivo añadido a su curso"
@@ -10127,8 +10127,8 @@ es:
       new_context_group_membership: "Nueva Membresía de Contexto de Grupo"
       new_context_group_membership_invitation: "Nueva Invitación de Membresía de Contexto de Grupo"
       new_course: "Curso Nuevo"
-      new_discussion_entry: "Nueva Entrada de Discusión"
-      new_discussion_topic: "Tema de la Discusión Nueva"
+      new_discussion_entry: "Nueva Entrada de Foro"
+      new_discussion_topic: "Tema de la Foro Nueva"
       new_event_created: "Se Creó un Evento Nuevo"
       new_file_added: "Archivo nuevo agregado"
       new_files_added: "Archivos nuevos agregados"
@@ -12205,7 +12205,7 @@ es:
         manage: Gestionar
         minutes: Minutos
         new_assignment: "Nueva tarea"
-        new_discussion: "Nuevo debate"
+        new_discussion: "Nuevo Foro"
         one_question_at_a_time: "Mostrar una pregunta cada vez"
         one_time_results: "Solo una vez después de cada intento"
         only_visible_to_overrides_note: "Nota: Esta evaluación **solo** se puede ver en las secciones que aparecen a contunaución:"
@@ -12765,7 +12765,7 @@ es:
   rename_45608f54: Renombrar
   reply_from_name: "%{name} a través de Notificaciones de Canvas"
   reply_to_comment_72d96728: "Responder al comentario"
-  reply_to_main_discussion_29823888: "Responder al debate principal"
+  reply_to_main_discussion_29823888: "Responder al Foro Principal"
   require_usage_rights_for_uploaded_files_4507865b: "Requerir los derechos de uso para los archivos cargados"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -12834,7 +12834,7 @@ es:
       manage_storage_quotas: "Gestionar cuotas de almacenamiento"
       manage_students: "Agregar/remover estudiantes para el curso"
       manage_user_logins: "Modificar los detalles de ingreso para los usuarios"
-      manage_user_notes: "Manejar las entradas a la revista de los profesores"
+      manage_user_notes: "Manejar las respuestas a la revista de los profesores"
       manage_user_observers: "Gestionar observadores para los usuarios"
       manage_wiki: "Manejar las wiki (agregar / editar / borrar páginas)"
       managed_jobs: "Manejar los trabajos del fondo"
@@ -12842,7 +12842,7 @@ es:
       post_to_forum: "Publicar a foros"
       read_course_content: "Ver contenido del curso"
       read_course_list: "Ver la lista de los cursos"
-      read_forum: "Ver los debates"
+      read_forum: "Ver los foros"
       read_messages: "Ver las notificaciones enviadas a los usuarios"
       read_question_banks: "Ver y enlazar todos los grupos de preguntas"
       read_reports: "Ver los reportes de uso para este curso"
@@ -13116,7 +13116,7 @@ es:
     enrollments_teachers: Profesores
     student_groups: "Grupos de Estudiantes"
   search_by_user_dd3ad189: "Búsqueda por usuario"
-  search_entries_or_author_63fb0a86: "Buscar entradas o autor"
+  search_entries_or_author_63fb0a86: "Buscar respuestas o autor"
   search_groups_or_people_6c15d6ad: "Buscar grupos o personas"
   search_title_body_or_author_1d26711f: "Buscar título, texto o autor"
   section: 
@@ -13793,7 +13793,7 @@ es:
       assignment_item_select_label: "Seleccione la tarea que desea asociar o agregue una tarea seleccionando \"Nueva tarea\"."
       assignment_notice: "Seleccione la tarea que quiere asociar con este *módulo*, o agregue una tarea seleccionando \"Tarea Nueva\"."
       content_page_item: "Página de Contenido"
-      discussion_item: Discusión
+      discussion_item: Foro
       discussion_topic_select_label: "Seleccione el tema que quiera asociar o agregue un tema seleccionando \"Nuevo Tema\"."
       domain_match_notice: "para usar esta herramienta, el dominio debe coincidir con %{domain}"
       external_tool_item: "Herramienta Externa"
@@ -14086,7 +14086,7 @@ es:
     assignment_order_assignment_groups: "Por grupo de trabajo y posición"
     assignment_order_due_date: "Por fecha límite"
     assignment_unmuted: "Haga clic para desactivar audio"
-    discussion_topic: "Tema de debate"
+    discussion_topic: "Tema de Foro"
     external_tool: "Herramienta externa"
     final_point_ratio: "%{pointRatio} puntos"
     invalid_group_warning: 
@@ -14279,14 +14279,14 @@ es:
       teachers_notified_of_comments: "Profesores y la personas que hicieron envíos serán notificados de todos los comentarios"
     show_preview: 
       anonymous_username: "Este alumno"
-      discussion_submission_description: "Los envíos para esta tarea son comentarios en la discusión de la tarea. Debajo están los comentarios a la discusión para %{user}, o puede *ver la discusión completa*."
-      discussion_submission_description_without_link: "Los envíos de esta tarea son publicaciones en el debate de la tarea. A continuación aparecen las publicaciones de debate de %{user}."
+      discussion_submission_description: "Los envíos para esta tarea son comentarios en la foro de la tarea. Debajo están los comentarios a la foro para %{user}, o puede *ver la foro completa*."
+      discussion_submission_description_without_link: "Los envíos de esta tarea son publicaciones en el foro  de la tarea. A continuación aparecen las publicaciones de foro de %{user}."
       entry_no_image: "Recuerde que esta página puede haber cambiado desde que ocurrió el envío original."
       entry_with_image: "Hemos incluído una vista previa de cómo se miraba la pagina cuando fue enviada. O puede hacer click para ver el envío original."
       external_url_submission: "Este envío fue una URL hacia una página externa."
       file_uploads_for_user: "Cargas de Archivos para **%{user}**"
-      group_discussion_submission_description: "Los envíos de esta tarea son publicaciones del debate de la tarea dentro del grupo. A continuación aparecen las publicaciones del debate de %{user}. También puede *ver toda el debate de grupo*."
-      group_discussion_submission_description_without_link: "Los envíos de esta tarea son publicaciones en el debate de la tarea para este grupo. A continuación aparecen las publicaciones de debate de %{user}."
+      group_discussion_submission_description: "Los envíos de esta tarea son publicaciones del foro de la tarea dentro del grupo. A continuación aparecen las publicaciones del foro de %{user}. También puede *ver toda el foro de grupo*."
+      group_discussion_submission_description_without_link: "Los envíos de esta tarea son publicaciones en el foro  de la tarea para este grupo. A continuación aparecen las publicaciones de foro de %{user}."
       media_comment_link: "Este envío es una grabación. *Haga clic aquí para verlo*."
       no_files: "No se cargaron archivos para este envío"
       no_preview_available: "Vista Previa No Disponible"
@@ -14297,7 +14297,7 @@ es:
       preview_submission: "Ver una vista previa del envío"
       preview_title: "Vista previa de %{title}"
       quiz_submission: "Este envío fue un envío de evaluación. Redirigiendo a la página de evaluaciones."
-      show_entire_discussion: "Mostrar la Discusión Completa"
+      show_entire_discussion: "Mostrar la Foro Completa"
       url_preview: "Vista Previa del URL"
       view_feedback_button: "Consultar comentarios"
       view_original_submission: "Ver el Envío Original para %{user}"
@@ -14643,9 +14643,9 @@ es:
       url: URL
   title: 
     edit_announcement: "Editar anuncios"
-    edit_topic: "Editar el tema de debate"
+    edit_topic: "Editar el Tema de Foro"
     new_announcement: "Nuevo anuncio"
-    new_topic: "Nuevo tema de debate"
+    new_topic: "Nuevo Tema de Foro"
   title_separator: ": "
   titles: 
     aligned_items: "Asignar Elementos"
@@ -14653,7 +14653,7 @@ es:
     announcements: Anuncios
     assignments: Tareas
     come_back_later: "Marcó esta pregunta para regresar a ella"
-    discussion: Discusión
+    discussion: Foro
     discussions: Foros
     error_reports: "Reportes de Error"
     learning_outcomes: "Resultados de Aprendizaje"
@@ -15326,7 +15326,7 @@ es:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Ha alcanzado el número máximo de webhooks por límite de cuenta (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Ha alcanzado el número máximo de webhooks por límite de usuario (%{max})"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Seguro que quiere algunos de estos. ¿Cuál es la gracia de impartir un curso si nadie le escucha?"
-  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Es posible que desee asignar alguna AP para que le ayude con este curso. Las AP pueden calificar las entregas de los alumnos, ayudar a moderar los debates e incluso actualizar las fechas de vencimiento y detalles de las tareas por usted."
+  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Es posible que desee asignar alguna AP para que le ayude con este curso. Las AP pueden calificar las entregas de los alumnos, ayudar a moderar los foros e incluso actualizar las fechas de vencimiento y detalles de las tareas por usted."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Debe seleccionar un curso para poder copiar el contenido del mismo."
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Debe configurarlas con un número mayor o igual a %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Debe especificar un derecho de uso."
