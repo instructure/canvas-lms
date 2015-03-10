@@ -9,10 +9,8 @@
   <%= t :subject, "Finish Registration: Canvas" %>
 <% end %>
 
-<% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t :link, "Click here to finish the registration process" %>
-  </a>
-<% end %>
+<a href="<%= content(:link) %>">
+  <%= t :link, "Click here to finish the registration process" %>
+</a>
 
 <p><%= t :body, "You have been registered for a Canvas account at %{account}!  Before you can log in and start using Canvas, you'll need to finish the configuration process.", :account => p.account.display_name %></p>

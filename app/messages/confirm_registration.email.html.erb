@@ -11,11 +11,9 @@
   <%= t :subject, "Confirm Registration: %{product_name}", product_name: product_name %>
 <% end %>
 
-<% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t :details, "Click here to finish the registration process" %>
-  </a>
-<% end %>
+<a href="<%= content(:link) %>">
+  <%= t :link, "Click here to finish the registration process" %>
+</a>
 
 <p><%= t :body,
       "Thank you for registering with %{product_name}!  This email is confirmation that the user %{user} is registering for a new account at %{website}.",
