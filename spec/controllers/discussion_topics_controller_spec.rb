@@ -28,7 +28,7 @@ describe DiscussionTopicsController do
 
   def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic", :pinned => opts[:pinned])
-    user = @user || opts[:user]
+    user = opts[:user] || @user
     if user && !opts[:skip_set_user]
       @topic.user = user
     end
@@ -95,7 +95,7 @@ describe DiscussionTopicsController do
       render_views
 
       before :once do
-        course_topic(:with_assignment => true, :user => @teacher)
+        course_topic(user: @teacher, with_assignment: true)
         @section = @course.course_sections.create!(:name => "I <3 Discusions")
         @override = assignment_override_model(:assignment => @topic.assignment,
                                   :due_at => Time.now,
@@ -143,14 +143,14 @@ describe DiscussionTopicsController do
 
     it "should display speedgrader when not for a large course" do
       user_session(@teacher)
-      course_topic(:with_assignment => true)
+      course_topic(user: @teacher, with_assignment: true)
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
     end
 
     it "should hide speedgrader when for a large course" do
       user_session(@teacher)
-      course_topic(:with_assignment => true)
+      course_topic(user: @teacher, with_assignment: true)
       Course.any_instance.stubs(:large_roster?).returns(true)
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
@@ -158,7 +158,7 @@ describe DiscussionTopicsController do
 
     it "should setup speedgrader template for variable substitution" do
       user_session(@teacher)
-      course_topic(:with_assignment => true)
+      course_topic(user: @teacher, with_assignment: true)
       get 'show', :course_id => @course.id, :id => @topic.id
 
       # this is essentially a unit test for app/coffeescripts/models/Entry.coffee,
@@ -208,21 +208,57 @@ describe DiscussionTopicsController do
       expect(response).to be_success
     end
 
-    it "should assign groups from the topic's category if the topic is a group discussion" do
-      user_session(@teacher)
-      course_topic(:with_assignment => true)
+    context 'group discussions' do
+      before(:once) do
+        @group_category = @course.group_categories.create(:name => 'category 1')
+        @group1 = @course.groups.create!(:group_category => @group_category)
+        @group2 = @course.groups.create!(:group_category => @group_category)
 
-      # set up groups
-      group_category1 = @course.group_categories.create(:name => 'category 1')
-      group_category2 = @course.group_categories.create(:name => 'category 2')
-      @course.groups.create!(:group_category => group_category1)
-      @course.groups.create!(:group_category => group_category1)
-      @course.groups.create!(:group_category => group_category2)
-      @topic.group_category = group_category1
-      @topic.save!
+        group_category2 = @course.group_categories.create(:name => 'category 2')
+        @course.groups.create!(:group_category => group_category2)
+      end
 
-      get 'show', :course_id => @course.id, :id => @topic.id
-      expect(assigns[:groups].size).to eql(2)
+      it "should assign groups from the topic's category" do
+        user_session(@teacher)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(assigns[:groups].size).to eql(2)
+      end
+
+      it "should redirect to the student's group" do
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
+        expect(response).to redirect_to redirect_path
+      end
+
+      it "should redirect to the student's group even if students can view all groups" do
+        @course.account.role_overrides.create!(
+          role: student_role,
+          permission: 'view_group_pages',
+          enabled: true
+        )
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
+        expect(response).to redirect_to redirect_path
+      end
     end
 
     context 'publishing' do
@@ -463,7 +499,7 @@ describe DiscussionTopicsController do
       group = @course.groups.create!(:group_category => group_category)
       group.add_user(@student)
 
-      course_topic(:with_assignment => true, :user => @teacher)
+      course_topic(user: @teacher, with_assignment: true)
       @topic.group_category = group_category
       @topic.save!
       @topic.publish!
