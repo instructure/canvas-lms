@@ -58,6 +58,20 @@ describe DiscussionTopicsController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should load for :view_group_pages students" do
+      @course.account.role_overrides.create!(
+        role: student_role,
+        permission: 'view_group_pages',
+        enabled: true
+      )
+      @group_category = @course.group_categories.create(:name => 'gc')
+      @group = @course.groups.create!(:group_category => @group_category)
+      user_session(@student)
+
+      get 'index', :group_id => @group.id
+      expect(response).to be_success
+    end
   end
 
   describe "GET 'show'" do

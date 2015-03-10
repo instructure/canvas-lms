@@ -453,6 +453,7 @@ class Group < ActiveRecord::Base
     can :manage_wiki and
     can :post_to_forum and
     can :read and
+    can :read_forum and
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
@@ -496,6 +497,7 @@ class Group < ActiveRecord::Base
     can :moderate_forum and
     can :post_to_forum and
     can :read and
+    can :read_forum and
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
@@ -503,7 +505,7 @@ class Group < ActiveRecord::Base
     can :view_unpublished_items
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
-    can :read and can :read_roster
+    can :read and can :read_forum and can :read_roster
 
     # Participate means the user is connected to the group somehow and can be
     given { |user| user && can_participate?(user) }
