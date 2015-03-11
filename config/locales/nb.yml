@@ -2,6 +2,15 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nb: 
+  1_item_scores_5512cd03: "1- Element poeng"
+  2_final_score_7b0fd15e: "2- Sluttresultat"
+  451_message: 
+    description: "Du er ikke autorisert til å få tilgang til denne siden fordi du befinner i et land underlagt U.S. handelsrestriksjoner."
+    headings: 
+      page: "Ikke Autorisert"
+    title: "Ikke Autorisert"
+  558x270_png_a5e13e53: "558x270 png"
+  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png (1.8x the standard tile size, so it can be scaled up or down as needed)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Hvordan vil dette påvirke reservasjoner?"
     and_n_contexts: "og %{n} andre"
@@ -31,6 +40,9 @@ nb:
   LongTextEditor: 
     cancel: Avbryt
     save: Lagre
+  _section_not_synced_yet_cd07d0dd: "-- Seksjon synkroniseres ikke ennå"
+  a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "En beregnede verdien brukes ikke med denne beregningsmetoden"
+  a_message_is_required_129e1814: "En melding kreves"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell som inneholder navnet på gradering ordningen og ikoner for å redigere eller slette ordningen."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som inneholder gradering ordningen data. Hver rad inneholder et navn, en maksimal prosent, og en minimum prosent. I tillegg inneholder hver rad et ikon for å legge til en ny rad under, og et ikon for å slette gjeldende rad."
   academic_benchmark: 
@@ -59,6 +71,7 @@ nb:
       facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs forhåndsvisning"
+      google_drive: "Google Drive"
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
@@ -310,6 +323,7 @@ nb:
     report_header_canvas_associated_user_id: canvas_assosiert_bruker_id
     report_header_canvas_course_id: canvas_kurs_id
     report_header_canvas_group_id: canvas_gruppe_id
+    report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
     report_header_canvas_parent_id: canvas_oopphavs_id
     report_header_canvas_section_id: canvas_klasse_id
     report_header_canvas_term_id: canvas_semester_id
@@ -340,9 +354,11 @@ nb:
     report_header_long__name: langt_navn
     report_header_long_name: "langt navn"
     report_header_name: navn
+    report_header_nonxlist_course_id: nonxlist_course_id
     report_header_outcome_score: "resultat for læringsmål"
     report_header_parent_account_id: opphav_konto_id
     report_header_role: rolle
+    report_header_role_id: role_id
     report_header_section: klasse
     report_header_section__id: klasse_id
     report_header_section_id: klasse-ID
@@ -893,6 +909,7 @@ nb:
         allow_invitation_previews: "Forhåndsvisning av invitasjon"
         allow_sending_scores_in_emails: "Studenter kan velge å motta resultater i epostvarsler"
         allow_sis_import: SIS-importer
+        apple_touch_icon_remove: "Tilbakestilt til standard"
         author_email_in_notifications: "Vis epostadressen av senderen for brukermedvirkning Varslinger"
         canvas_authentication: Canvas-autentisering
         default_language: "Standard språk"
@@ -907,9 +924,11 @@ nb:
         equella: Equella
         equella_endpoint: Equella-sluttpunkt
         equella_teaser: Equella-kommentarer
+        favicon_remove: "Tilbakestilt til standard"
         global_includes: "Globale CSS-/JavaScript-inkluderinger"
         global_javascript: "Global JavaScript-URL"
         global_stylesheet: "Global CSS-URL"
+        header_image_remove: "Tilbakestilt til standard"
         help_link_available_to: "Tilgjengelig for"
         help_link_subtext: Undertekst
         help_link_text: "Tekst som vises for lenke"
@@ -918,6 +937,8 @@ nb:
         login_handle_name: "Logg inn Etikett"
         message: Beskjed
         mfa_settings: "Flerfaktors autentisering"
+        msapplication_tile_square_remove: "Tilbakestilt til standard"
+        msapplication_tile_wide_remove: "Tilbakestilt til standard"
         name: Kontonavn
         no_enrollments_can_create_courses: "Brukere uten kurspåmeldinger"
         open_registration: "Åpen registrering"
@@ -1239,6 +1260,7 @@ nb:
         default: 
           zero_activity: 
             text: "Denne rapporten viser alle studenter som er påmeldt kurs i et gitt semester. Den resulterende CSV-filen vil ha én rad per brukerpåmelding som ikke har besøkt kurset siden datoen."
+  achieve_mastery_count_times_8c9bbcec: "Oppnå mestring %{count} ganger"
   activerecord: 
     errors: 
       messages: 
@@ -1250,6 +1272,8 @@ nb:
           one: "1 feil forhindret denne %{model} fra å bli lagret"
           other: "%{count} feil forhindret denne %{model} fra å bli lagret"
   activity_13915493: Aktivitet
+  activity_by_category_9c2033d1: "Aktivitet etter Kategori"
+  activity_by_date_878c5b49: "Aktivitet etter Dato"
   add_app_baf540f: "Legg til app"
   add_attachment_93868828: "Legg til vedlegg"
   add_course_assignments_628ed6d0: "Legg til oppgaver for kurset"
@@ -1262,6 +1286,7 @@ nb:
     add_page_to: "Legge sider til %{module}"
     add_quiz_to: "Legg spørrekonkurranser til %{module}"
     add_topic_to: "Legg diskusjonsemner til %{module}"
+  add_new_group_7ac49f31: "Legg til ny gruppe"
   add_students_to_the_course_874be8fb: "Legg til studenter til kurset"
   add_tas_to_the_course_2aac6e02: "Legg til Læringsassistenter til kurset"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legge til dine oppdrag. Du kan bare lage en lang liste, eller bryte dem opp i grupper - og selv spesifisere vekter for hvert oppdrag gruppe."
@@ -1321,6 +1346,7 @@ nb:
       threshold_should_be_numeric: "Dette skal være et positivt tall"
   all_4321c3a1: Alle
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Alt ferdig? Tid for å publisere din kurset! Klikk på knappen under for å gjøre det offisielt! Publisering vil tillate brukerne til å begynne å delta på kurset."
+  all_grading_periods_77974940: "Alle Gradering Perioder"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt prøven"
   all_students_have_taken_the_survey_494f9f42: "Alle studenter har tatt undersøkelsen"
   allow_lor_tools: "Tillat brukere for å vise og bruke eksterne verktøy som er konfigurert for LOR."
@@ -1347,7 +1373,9 @@ nb:
     student_in_course: 
       analytics: Analytics
       page_title: "Analytics: %{course} -- %{student}"
+  analytics_account_name_filter_name_c0fb1a7b: "Analyser: %{account_name} -- %{filter_name}"
   analytics_c94ba601: Analytics
+  analytics_course_code_student_name_d63bab4c: "Analyser: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "og %{count} mer..."
   ange_name: Angel-konvertør
   angel: 
@@ -1397,6 +1425,7 @@ nb:
   anonymous_e1b8ad27: Anonym
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svarene vil bli vist etter ditt siste forsøk"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Senter vil vises i \"Apps\" kategorien på siden av enten et kurs eller konto innstillinger. URL som er angitt nedenfor skal peke til en gyldig App senter endepunkt (for example, %{url} -- sørg for å utelate etterfølgende skråstrek"
+  apple_touch_icon_2c258bb3: "Apple Trykk Ikon"
   application: 
     errors: 
       feed_not_found: "Fant ikke strømmen."
@@ -1459,8 +1488,11 @@ nb:
     one: "Er du sikker på at du vil slette %{name}?"
     other: "Er du sikker på at du vil slette disse %{count} elementer?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Er du sikker på at du vil slette denne kunngjøringen?"
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette dette gradering periode?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette denne karaktersettingsplanen?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne dette verktøyet?"
+  aria_labels: 
+    unlock_at_date: "Lås opp på dato"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Etter hvert som du skriver tekst i dette feltet, vil listen over grupper bli automatisk filtrert til kun å inneholde de som har et navn som passer med det du skriver inn. "
   assessment_question: 
     default_question_name: Spørsmål
@@ -1468,6 +1500,7 @@ nb:
     default_imported_title: "Importerte spørsmål"
     default_title: "Uten navn - %{course}"
     default_unfiled_title: "Ikke lagrede spørsmål"
+  assign_reviews_on_date_7e48ec50: "Tildele Anmeldelser på dato"
   assignment: 
     assignment_group_must_have_group: "Velg en oppgavegruppe for denne oppgaven"
     at_least_one_file_type: "Angi minst én tillatt filtype"
@@ -2031,6 +2064,7 @@ nb:
       links: 
         add_another_file: "Legg til en ny fil"
         authorize_google_docs: "Autoriser Google Docs-tilgang"
+        authorize_google_drive: "Autorisere Google Drive Access"
         find_file: "Klikk her for å finne en fil du har lastet opp tidligere"
         submit: 
           external_tool: Mer
@@ -2042,6 +2076,7 @@ nb:
       loading_tools: "Laster verktøy …"
       messages: 
         google_docs_auth_required: "Før du kan levere oppgaver direkte fra Google Docs må du gi Canvas tilgang til din Google Docs konto:"
+        google_drives_auth_required: "Før du kan sende inn oppgaver direkte fra Google Drive må du autorisere Canvas til å få tilgang til din Google Drive konto:"
         media_recording_ready: "Klar for innlevering! Klikk 'Lever oppgave' knappen for å avslutte."
         media_recordings_disabled: "Medieopptak er ikke aktivisert for denne Canvasinstallasjonen, og du vil ikke kunne levere denne type oppgaver. Vennligst kontakt fagansvarlig/lærer for å endre innstillingene for denne oppgaven, eller din systemadministrator for evt. å aktivisere medieopptak."
         submitting: "Sender inn..."
@@ -2153,14 +2188,19 @@ nb:
   available_after_unlock_at_b5682224: "Tilgjengelig etter %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Tilgjengelig etter %{unlock_at} inntil %{lock_at}"
   available_from_587ce92f: "Tilgjengelig fra"
+  available_from_date_43b5e11d: "Tilgjengelig Fra Dato"
+  available_until_date_cd125c62: "Tilgjengelig Inntil Date"
   available_until_f3b9c4ed: "Tilgjengelig Frem til"
   available_until_lock_at_ab022445: "Tilgjengelig til %{lock_at}"
+  average_49c63f9b: Gjennomsnittlig
   back_to_app_center_95420d83: "Tilbake til appsenteret"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: Blackboard-konvertør
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Vær en helt og spør din instruktør for å fikse denne linken."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Før du publiserer denne filen, må du spesifisere bruksrettigheter."
+  before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Før du publisere, må du sette bruksrettigheter på filene dine."
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: "Nedenfor dette søkefeltet er en liste over %{content_type}. Som du skriver, vil listen bli filtrert til samsvarer med søket. Samtalemeldinger vil bli filtrert av hvilken alternativ du valgte."
   better_file_browsing_description: |-
       Et nytt, enklere, mer brukervennlig fil surfing grensesnitt. Hvis du slår dette på ved kursnivå
       deretter alle brukere som er i dette kurset vil se det nye grensesnittet. For å få det til å viser opp når noen
@@ -2248,6 +2288,7 @@ nb:
     add_item: "Legg til punkt"
     apply: Bruk
     authorize_google_docs: "Autoriser Google Docs-tilgang"
+    authorize_google_drive: "Autorisere Google Drive Access"
     back_to_outcomes: "Tilbake til læringsmål"
     cancel: Avbryt
     choose_a_file: "Velg en fil "
@@ -2280,10 +2321,14 @@ nb:
     view_account_roster: "Se kontodeltagere"
     view_course_roster: "Se kursets deltagere"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard alle koblinger er aktivert for et kurs. Studentene vil ikke se lenker til seksjoner som ikke har innhold. For eksempel, hvis du ikke har opprettet noen quizer, de vil ikke se quizer link. Du kan sortere og eksplisitt deaktivere disse linkene hvis det er områder av kurset trenger du ikke at elevene din får tilgang."
+  by_lti_2_registration_url_e421e523: "Av LTI 2 Registrering URL"
   by_url_a163275e: "Etter URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: lukk
+  calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' er ikke en gyldig verdi for denne beregnings metoden. Verdien må være mellom '%{valid_calculation_ints_min}' og '%{valid_calculation_ints_max}'"
+  calculation_method_fe281f9: "Beregnings Metode"
+  calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "beregnings_metode må være en av de følgende: %{calc_methods}"
   calculator: 
     buttons: 
       save: Lagre
@@ -2764,6 +2809,7 @@ nb:
         create_assignment: "Lag en ny oppgave"
         delete: "Slett en hendelse/oppgave"
         new: "Opprett en ny hendelse"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette justeringer basert på Rubrikk foreninger. For å fjerne disse assosiasjonene du trenger å fjerne rad fra eiendelens rubrikk"
   cancel_caeb1e68: Avbryt
   canvas: 
     migration: 
@@ -2800,6 +2846,8 @@ nb:
       update_assignment_points: "Endre oppnåelige poeng for å passe med vurderingen?"
   choose_a_course_home_page_8059c7b: "Velg en startside for kurset"
   choose_usage_rights_33683854: "Velg bruksrettigheter..."
+  clear_file_name_text_field_fce73840: "Klar filnavnet tekstfeltet"
+  click_here_on_the_calendar_link_c9965631: "Klikk her på *Kalender* lenken"
   close_and_return_to_canvas_80544344: "Lukk og retur til Canvas"
   close_d634289d: Lukk
   collaboration: 
@@ -2886,6 +2934,10 @@ nb:
           for å samarbeide om gruppeoppgaver og notater. Denne siden gir dem
           (og deg) et sted hvor man enkelt kan holde styr på disse samarbeidene, og lar dem sette dem opp
           uten å måtte utveksle e-postadresser.
+      google: 
+        drive: 
+          upgrade: 
+            description: "For å få tilgang til dette samarbeidet må du autorisere Canvas for å få tilgang til din Google Drive konto"
       how_to_start_a_new_collaboration: "For å finne ut mer om en spesiell type samarbeid, klikk på \"Start et nytt samarbeid\" og velg typen i nedtrekksmenyen."
       links: 
         delete: "Slett dette Samarbeidet"
@@ -2897,6 +2949,7 @@ nb:
         current: "Gjeldende samarbeid"
     titles: 
       delete: "Slette samarbeid?"
+  collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
   coming_up_4348b0bd: "Kommer snart"
   comm_messages: 
     from_beginning: begynnelsen
@@ -2968,6 +3021,7 @@ nb:
     profile: 
       notices: 
         contact_registered: "Kontaktmetode er registrert!"
+  concluded_courses_94782e21: "Konkludert Kurs"
   conferences: 
     concluded_conference: 
       delete: Slett
@@ -3038,12 +3092,15 @@ nb:
         started: "Startet %{time}"
     type_disabled_error: "Denne type konferanse er ikke lenger mulig med denne Canvas-installasjonen"
   config_url_e96ceaf3: "Konfig URL"
+  configurate_tool_app_5a721f2c: "Konfigurere %{tool} App?"
   configuration_type_25a084a4: Konfigurasjonstype
+  configure_toolname_app_651371be: "Konfigurere %{toolName} App"
   confirm_dialog: 
     cancel: Avbryt
     submit: "Send inn"
   confirm_dialog_component: 
     ok: Ok
+  consumer_key_57d9fcf1: "Forbruker nøkkel"
   consumer_key_6f94ba11: "Consumer Key"
   content_exports: 
     buttons: 
@@ -3206,6 +3263,7 @@ nb:
       choose_migration_file: 
         migration_text: Kilde
       course_find_select: 
+        copy_into_self_warning: "Du har valgt til å kopiere dette kurset inn i seg selv. Merk at dette vil duplisere alle valgt innhold."
         course_name: Kursnavn
         include_completed_courses: "Inkludert fullførte kurs"
         or: eller
@@ -3446,8 +3504,10 @@ nb:
         restore_items: "Merk at noen elementer kan ha mistet tilknyttede data da de ble slettet. Pass på å bekrefte resultatene av gjenopprettinger du foretar."
       restore_failed: "gjenoppretting mislyktes"
       restoring: "gjenoppretter …"
+  context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
     url_or_domain_required: "Enten URL-en eller domenet må angis."
+  context_level_56d88f5b: "(%{context} level)"
   context_module: 
     requirements: 
       max_score: "må ha et resultat på maksimum %{score}"
@@ -3899,6 +3959,15 @@ nb:
     one: "1 minutt"
     other: "%{count} minutter"
     zero: "under 1 minutt"
+  count_page_views_b40102b3: 
+    one: "1 sidevisning"
+    other: "%{count} sidevisninger"
+  count_participations_ac8f82b7: 
+    one: "1 deltakelse"
+    other: "%{count} andeler"
+  count_students_30e46120: 
+    one: "1 student"
+    other: "%{count} studenter"
   count_students_will_get_num_points_c970fc01: 
     one: "1 student vil få %{num} poeng"
     other: "%{count} Studentene vil få %{num} poeng"
@@ -4449,6 +4518,7 @@ nb:
         hide_distribution_graphs: "Skjul karakterfordelingsgrafen for studentene"
         hide_final_grades: "Skjul totalen i studentens karakteroversikt"
         indexed: "Inkluder dette kurset i den åpne kursoversikten"
+        is_public_to_auth_users: "Gjøre dette kurs synlig til godkjente brukere"
         language: Språk
         license: Lisens
         open_enrollment: "Legg til en \"Delta i dette kurset\" lenke på kursets hjemmeside"
@@ -4524,6 +4594,8 @@ nb:
         reset: "Tilbakestill kursinnhold"
         stats: Kursstatistikk
         student_view: Studentvisning
+      role: 
+        inactive: inaktiv
     show: 
       change_home_page: Endre
       details: 
@@ -4735,7 +4807,10 @@ nb:
       student: 
         count: "Feil studentantall"
         ratio: "Feil studentratio"
+  current_3ce5414a: "Nåværende:"
+  current_mastery_score_score_out_of_masterypoints_80addfb7: "Nåværende Mestring Poeng: %{score} ut av %{masteryPoints}"
   current_score_6c81792: "Gjeldende resultat"
+  current_total_67bf5f72: "Nåværende Totalt:"
   curve_grades_dialog: 
     average_score: "Gjennomsnittlig resultat"
     buttons: 
@@ -4895,6 +4970,7 @@ nb:
   default_question_name: Spørsmål
   default_question_text: Spørsmålstekst
   delete_a6efa79d: Slette
+  delete_grading_period_dba36e59: "Slett gradering periode"
   delete_grading_scheme_6b308832: "Slett karaktersettingsplan"
   delete_quiz_142b8099: "Slett prøve"
   delete_survey_56fddbbd: "Slett undersøkelse"
@@ -5021,6 +5097,7 @@ nb:
       Klasser som ikke har noen oppgave vil ikke se oppgaven i sitt kursinnhold og deres sluttresultat vil være
       basert på øvrige oppgaver.
   disable_a5c05db3: "Slå av"
+  disabled_18c33a73: (deaktivert)
   discussion_entries: 
     created_entry_notice: "Innleggingen ble opprettet."
     deleted_entry_notice: "Innleggingen er slettet"
@@ -5067,6 +5144,7 @@ nb:
       manage: Behandle
       move: "Flytt til…"
       no_due_date: "Ingen frist"
+      open_for_comments: "Åpen for kommentarer"
       pin: Fest
       unpin: "Fjern festing"
       user_subscribed: "Du abonnerer på dette temaet. Klikk for å avslutte abonnement."
@@ -5315,6 +5393,8 @@ nb:
     unsubscribed_hint: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
   display_course_catalog: "Vis søkbar liste over kurs i dette root kontoen med \"Inkluder dette kurset i den offentlige kurset indeks\" flagg aktivert."
   domain_3b54c511: Domene
+  don_t_show_again_15d8253e: "viser ikke igjen"
+  due_by_c263dc10: "frist ved"
   due_date_6a281fe3: "Frist: %{date}"
   due_date_822625d8: Frist
   due_date_cannot_be_after_course_end_fd128a14: "Forfallsdato kan ikke være etter kurs slutt"
@@ -5329,6 +5409,8 @@ nb:
     no_due_date: "leveres innen: Ingen frist"
   due_datetime_f5a81b81: "Frist: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "Frist: Flere datoer"
+  due_on_date_aa4725cd: "Frist Dato"
+  due_on_date_ffc98ebc: "Frist Dato"
   e_mail_only_2cc5e513: "Kun epost"
   ecollege_file_description: Ecollege
   ecollege_name: Ecollege-konvertør
@@ -6517,6 +6599,7 @@ nb:
     grade: 
       muted: Passiv
     grade_summary: 
+      all_grading_periods: "Alle Gradering Perioder"
       assessment_by: "Vurdert av %{name}"
       assignments: Oppgaver
       buttons: 
@@ -10519,6 +10602,8 @@ nb:
       labels: 
         api_key: "OAuth Consumer Key"
         secret_key: "OAuth Consumer Secret"
+    google_drive: 
+      name: "Google Drive"
     grade_export: 
       description: "Karaktereksport for SIS"
       name: Karaktereksport
@@ -10819,6 +10904,7 @@ nb:
       buttons: 
         add_picture_file: "Legg til fil"
         authorize_google_docs: "Autoriser Google Docs-tilgang"
+        authorize_google_drive: "Autorisere Google Drive Access"
         authorize_twitter: "Autoriser Twitter-tilgang"
         generate_token: "Generer symbol"
         new_access_token: "Nytt tilgangssymbol"
@@ -10907,6 +10993,7 @@ nb:
         edit_settings: "Rediger innstillinger"
         facebook: Facebook
         google_docs: "Google Docs"
+        google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "flere valg"
         reconfigure_mfa: "Rekonfigurer flerfaktors autentisering"
