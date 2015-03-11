@@ -5485,6 +5485,7 @@ de:
       formatting: "Formatierung, zum Auswählen Nach-Unten-Taste drücken"
       rte_help: "Rich-Text-Bereich. Drücken Sie ALT und F10, um die Symbolleiste anzuzeigen. Drücken Sie ALT und F8, um die Hilfe anzuzeigen."
   either_the_url_or_domain_should_be_set_c29cf8c1: "Entweder URL oder Domain festlegen."
+  element_option_missing_error_an_element_to_attach__be433478: "Fehler wegen fehlender Option `element`: Beim Festlegen der Ausgabeoption 'true' für BBTreeBrowserView muss ein Element angegeben werden, an das die TreeBrowserView angefügt werden soll."
   email: 
     default_from_name: "Instructure Canvas"
   email_is_invalid_e0d982eb: "Die E-Mail ist ungültig."
