@@ -2,6 +2,15 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nl: 
+  1_item_scores_5512cd03: "1- Item scores"
+  2_final_score_7b0fd15e: "2. Laatste score"
+  451_message: 
+    description: "Je hebt geen toestemming tot deze website, omdat je in een land bent dat onderhevig is aan VS handelsbeperkingen."
+    headings: 
+      page: "Geen toestemming"
+    title: "Geen toestemming"
+  558x270_png_a5e13e53: "558 x 270 png"
+  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558 x 558 png (1.8 x de standaard tegelgrootte, zodat het naar behoefte naar boven of naar beneden geschaald kan worden)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Wat is de invloed hiervan op reserveringen?"
     and_n_contexts: "en %{n} anderen"
@@ -31,6 +40,9 @@ nl:
   LongTextEditor: 
     cancel: Annuleren
     save: Opslaan
+  _section_not_synced_yet_cd07d0dd: "--Sectie nog niet gesynchroniseerd"
+  a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Een rekenwaarde is niet gebruikt met deze rekenmethode"
+  a_message_is_required_129e1814: "Een bericht is vereist"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Een tabel met de naam van het beoordelingsschema en pictogrammen om het schema te bewerken of te verwijderen. "
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Een tabel met de data van het beoordelingsschema . Elke rij bevat een naam, een maximum percentage, en een minimum percentage. Elke rij heeft ook een pictogram om een nieuwe rij eronder toe te voegen en een pictogram on de huidige rij te verwijderen. "
   academic_benchmark: 
@@ -59,6 +71,7 @@ nl:
       facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Voorbeeldweergave in Google Docs."
+      google_drive: "Google Drive"
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
@@ -310,6 +323,7 @@ nl:
     report_header_canvas_associated_user_id: canvas_gekoppelde_gebruikers_id
     report_header_canvas_course_id: canvas_cursus_id
     report_header_canvas_group_id: canvas_groeps_id
+    report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
     report_header_canvas_parent_id: canvas_ouder_id
     report_header_canvas_section_id: canvas_sectie_id
     report_header_canvas_term_id: canvas_periode_id
@@ -340,9 +354,11 @@ nl:
     report_header_long__name: lange_naam
     report_header_long_name: "lange naam"
     report_header_name: naam
+    report_header_nonxlist_course_id: nonxlist_course_id
     report_header_outcome_score: resultaat
     report_header_parent_account_id: ouder_account_id
     report_header_role: functie
+    report_header_role_id: rol_id
     report_header_section: sectie
     report_header_section__id: sectie_id
     report_header_section_id: sectie-id
@@ -893,6 +909,7 @@ nl:
         allow_invitation_previews: "Uitnodiging voorbeelden"
         allow_sending_scores_in_emails: "Cursisten kunnen ervoor kiezen om uitslagen per e-mail te ontvangen"
         allow_sis_import: SIS-imports
+        apple_touch_icon_remove: "Terug naar standaard"
         author_email_in_notifications: "Het e-mailadres van zender voor gebruiker interactie meldingen aangeven"
         canvas_authentication: Canvas-verificatie
         default_language: Standaardtaal
@@ -907,9 +924,11 @@ nl:
         equella: Equella
         equella_endpoint: Equella-eindpunt
         equella_teaser: Equella-opmerkingen
+        favicon_remove: "Terug naar standaard"
         global_includes: "Algemene CSS/Java Script bevat"
         global_javascript: "Algemene JavaScript-URL"
         global_stylesheet: "Algemene CSS-URL"
+        header_image_remove: "Terug naar standaard"
         help_link_available_to: "Beschikbaar voor"
         help_link_subtext: Subtekst
         help_link_text: "Tekst om bij link weer te geven "
@@ -918,6 +937,8 @@ nl:
         login_handle_name: Aanmeldingslabel
         message: Bericht
         mfa_settings: Multi-Factor-verificatie
+        msapplication_tile_square_remove: "Terug naar standaard"
+        msapplication_tile_wide_remove: "Terug naar standaard"
         name: Accountnaam
         no_enrollments_can_create_courses: "Gebruikers zonder inschrijvingen"
         open_registration: "Open registratie"
@@ -1247,6 +1268,8 @@ nl:
           one: "Dit %{model} is niet opgeslagen door een fout"
           other: "Dit %{model} is niet opgeslagen door %{count} fouten"
   activity_13915493: Activiteit
+  activity_by_category_9c2033d1: "Activiteit per categorie"
+  activity_by_date_878c5b49: "Activititeit op datum"
   add_app_baf540f: "App toevoegen "
   add_attachment_93868828: "Bijlage toevoegen"
   add_course_assignments_628ed6d0: "Cursusopdrachten toevoegen "
@@ -10492,6 +10515,8 @@ nl:
       labels: 
         api_key: OAuth-consumentensleutel
         secret_key: OAuth-consumentengeheim
+    google_drive: 
+      name: "Google Drive"
     grade_export: 
       description: "Cijferexport voor SIS"
       name: Cijferexport
@@ -10883,6 +10908,7 @@ nl:
         edit_settings: "Instellingen bewerken"
         facebook: Facebook
         google_docs: "Google Docs"
+        google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "meer opties"
         reconfigure_mfa: "Multi-Factor-verificatie opnieuw configureren"
