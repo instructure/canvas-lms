@@ -104,8 +104,8 @@ module Outcomes
           calculation_method: outcome.calculation_method || "highest",
           calculation_int: outcome.calculation_int
         })
-        latest_result = outcome_results.max_by{|result| result.submitted_at.to_i}
-        if !latest_result.submitted_at
+        latest_result = outcome_results.max_by{|result| result_time(result)}
+        if !latest_result.submitted_at && !latest_result.assessed_at
           # don't pass in a title for comparison if there are no submissions with timestamps
           # otherwise grab the portion of the title that has the assignment/quiz's name
           latest_result.title = nil
@@ -144,7 +144,7 @@ module Outcomes
     end
     #scoring methods
     def latest(results)
-      results.max_by{|result| result.submitted_at.to_i}.score
+      results.max_by{|result| result_time(result) }.score
     end
 
     def n_mastery(results, n_of_scores)
@@ -158,10 +158,14 @@ module Outcomes
       #default grading method with weight of 75 if none selected
       return nil if results.length < 2
 
-      scores = results.sort_by{|result| result.submitted_at.to_i}.map(&:score)
+      scores = results.sort_by{|result| result_time(result) }.map(&:score)
       latestWeighted = scores.pop * (0.01 * weight)
-      olderAvgWeighted = (scores.sum / scores.length) * (0.01 * (100 - weight)).round(2)
-      latestWeighted + olderAvgWeighted
+      olderAvgWeighted = (scores.sum / scores.length) * (0.01 * (100 - weight))
+      (latestWeighted + olderAvgWeighted).round(2)
+    end
+
+    def result_time(result)
+      (result.submitted_at || result.assessed_at).to_i
     end
 
     class << self
