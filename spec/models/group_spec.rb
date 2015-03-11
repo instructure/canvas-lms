@@ -643,4 +643,29 @@ describe Group do
       expect(@group.users(true)).to eq [@student]
     end
   end
+
+  describe 'includes_user?' do
+    before do
+      user_model
+      pseudonym_model(:user_id => @user.id)
+    end
+
+    it "returns true if a user is in the group" do
+      @group.add_user(@user)
+      expect(@group.includes_user?(@user)).to be_truthy
+    end
+
+    it "returns false if the user is not in the group" do
+      expect(@group.includes_user?(@user)).to be_falsey
+    end
+
+    it "returns false if no user object is given" do
+      expect(@group.includes_user?(nil)).to be_falsey
+    end
+
+    it "returns false if an unsaved user is given" do
+      @user = User.new
+      expect(@group.includes_user?(@user)).to be_falsey
+    end
+  end
 end
