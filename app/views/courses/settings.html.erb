@@ -274,7 +274,7 @@ TEXT
           <%= f.select :course_format, format_options %>
         </td>
       </tr><tr>
-        <td class="form-label"><label><%= before_label('course_description', %{Description}) %></label></td>
+        <td class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></td>
         <td colspan="3">
           <%= f.text_area :public_description, :style => "height: 100px;" %>
         </td>
