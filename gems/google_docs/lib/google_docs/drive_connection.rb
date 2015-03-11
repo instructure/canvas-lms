@@ -181,10 +181,10 @@ module GoogleDocs
       end
 
       if extensions && extensions.length > 0
-        root.select { |e| extensions.include?(e.extension) }
-      else
-        root
+        root = root.select { |e| extensions.include?(e.extension) }
       end
+
+      root.select { |e| !e.in_trash? }
     end
 
     def get_folder_name_by_id(entries, folder_id)
