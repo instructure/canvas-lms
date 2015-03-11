@@ -107,6 +107,11 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def includes_user?(user, membership_scope=group_memberships)
+    return false if user.nil? || user.new_record?
+    membership_scope.where(user_id: user).exists?
+  end
+
   alias_method :participating_users_association, :participating_users
 
   def participating_users(user_ids = nil)
