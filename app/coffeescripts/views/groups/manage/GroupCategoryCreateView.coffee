@@ -70,3 +70,6 @@ define [
         unless create_group_count > 0
           errors["create_group_count"] = [{type: 'positive_group_count', message: @messages.positive_group_count}]
       errors
+
+    setFocusAfterError: ->
+      @$('#newGroupSubmitButton').focus()

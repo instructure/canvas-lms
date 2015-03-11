@@ -63,7 +63,9 @@ define [
         disablingDfd = new $.Deferred()
         saveDfd = @saveFormData(data)
         saveDfd.then(@onSaveSuccess, @onSaveFail)
-        saveDfd.fail -> disablingDfd.reject()
+        saveDfd.fail =>
+          disablingDfd.reject()
+          @setFocusAfterError() if @setFocusAfterError
 
         unless @dontRenableAfterSaveSuccess
           saveDfd.done -> disablingDfd.resolve()
