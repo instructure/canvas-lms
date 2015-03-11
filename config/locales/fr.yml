@@ -2416,6 +2416,7 @@ fr:
     agenda_view: 
       due: Échéance
       loading: Chargement
+      no_events: "*Aucun événement après cette date.*"
       starts_at: "Commence à"
     agenda_view_displaying_start_end: "Vue actuelle : de %{start} à %{end}"
     appointment_group_deletion_details: "La suppression de cet élément entraînera la suppression de tous les rendez-vous pris par les étudiants."
@@ -5501,7 +5502,9 @@ fr:
     titles: 
       font_size: "Taille du texte. Appuyez pour sélectionner."
       formatting: "Mise en forme. Appuyez pour sélectionner."
+      rte_help: "Zone de texte enrichi. Appuyez sur Alt F10 pour afficher la barre d’outils et sur Alt F8 pour accéder à l’Aide."
   either_the_url_or_domain_should_be_set_c29cf8c1: "Vous devez définir l’URL ou le domaine."
+  element_option_missing_error_an_element_to_attach__be433478: "Erreur – option `élément` manquante : un élément auquel associer TreeBrowserView doit être spécifié lorsque l’option de rendu a la valeur « true » pour BBTreeBrowserView."
   email: 
     default_from_name: "Instructure Canvas"
   email_is_invalid_e0d982eb: "E-mail non valide !"
@@ -5858,7 +5861,7 @@ fr:
   example_https_example_com_config_xml_be5f36ac: "Exemple : https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Exemple : https://lti-tool-provider-example.herokuapp.com/register"
   example_item_scores_6726c689: "Exemple de note d’élément"
-  expand_collapse_title_outcome_group_239f0a9d: "expand/collapse %{title} Outcome Group"
+  expand_collapse_title_outcome_group_239f0a9d: "développer/réduire le groupe de résultats %{title}"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Développer la liste des membres du groupe %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Développer ou réduire les calendriers"
   expand_or_collapse_undated_items_b901de09: "Développer ou réduire les éléments non datés"
@@ -11642,7 +11645,7 @@ fr:
       one: "1 étudiant"
       other: "%{count} étudiants"
       zero: Personne
-    sad-panda-alttext: "Tout ne va pas pour le mieux dans le meilleur des mondes."
+    sad-panda-alttext: "Tout n'est pas rose dans le monde des pandas."
     speedgrader: "Voir dans SpeedGrader"
     summary: 
       audible_chart_description: "%{above_average} étudiants sont dans la moyenne ou au-dessus, et %{below_average} sont en dessous."
@@ -12556,6 +12559,7 @@ fr:
         score: Note
         time: Heure
       take_quiz: 
+        audible_quiz_timer_shortcut_description: "Remarque : ce questionnaire est à remplir dans un temps imparti. Vous pouvez vérifier le temps restant à tout moment en appuyant sur la combinaison de touches MAj, ALT et T... Encore : MAJ, ALT et T..."
         buttons: 
           next: Suivant
           out_of_time_submit: OK
@@ -12761,10 +12765,11 @@ fr:
     updated_at: "Date de modification"
     updated_at_short: Modifiés
     view: Afficher
-  read_more_about_windows_tiles_ac4ae6f5: "En savoir plus sur les mosaïques des fenêtres"
+  read_more_about_windows_tiles_ac4ae6f5: "En savoir plus sur les mosaïques Windows"
   recaptcha_not_configured_3a6ef9ee: "ReCaptcha non configuré"
   recent_student: 
     last_logged_in: "dernière connexion : %{last_login}"
+  recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} moyenne de décroissance"
   recently_deleted_courses_title: "Cours supprimés récemment"
   recipient_input: 
     context_search_placeholder: "Saisissez un nom, un cours ou un groupe"
@@ -13350,6 +13355,7 @@ fr:
       labels: 
         recaptcha_private_key: "Clé privée ReCAPTCHA"
         recaptcha_public_key: "Clé publique ReCAPTCHA"
+  setup_checklist_eb8b00b8: "Liste de vérification de la configuration"
   shared: 
     account_notification: 
       close: fermer
@@ -14520,8 +14526,8 @@ fr:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ce dossier est actuellement verrouillé et non consultable."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Il s’agit d’une liste d’URL de confiance séparées par des virgules. La confiance accordée à n’importe quelle URL de cette liste rend inutile le jeton CSRF lors de la connexion à Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Cela est très probablement dû au fait que vous avez importé le contenu du cours sans ses fichiers associés."
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "Ce résultat a été utilisé pour évaluer un étudiant. La méthode de calcul est rectifiée."
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "Ce résultat a été utilisé pour évaluer un étudiant. La valeur de calcul est corrigée."
+  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "Ce résultat a été utilisé pour évaluer un étudiant. La méthode de calcul ne peut pas être modifiée"
+  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "Ce résultat a été utilisé pour évaluer un étudiant. La valeur de calcul ne peut pas être modifiée."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Ce questionnaire n’est pas publié.* Seuls les enseignants peuvent le voir tant qu’il n’est pas publié."
   this_student_wrote_f1a3f22d: "Cet étudiant a écrit :"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Cela vous permettra d’authentifier Canvas pour publier les notes sur SIS."
@@ -15383,6 +15389,9 @@ fr:
     external_urls: 
       archive: Archiver
       archive_link: "Afficher les archives"
+  windows_square_tile_4c00879e: "Mosaïque carrée Windows"
+  windows_tile_color_2b786bd9: "Couleur des mosaïques Windows"
+  windows_wide_tile_a3302508: "Grande mosaïque Windows"
   would_you_like_to_enable_this_app_ccdf735d: "Voulez-vous activer cette application ?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Voulez-vous laisser les étudiants continuer le cours ou préférez-vous verrouiller à nouveau ces modules jusqu’à ce que les nouvelles conditions soient remplies ?"
   xml_configuration_5ea1b942: "Configuration XML "
