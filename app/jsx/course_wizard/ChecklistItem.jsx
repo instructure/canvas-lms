@@ -1,8 +1,9 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react'
-], function(React) {
+  'old_unsupported_dont_use_react',
+  'i18n!course_wizard'
+], function(React, I18n) {
 
   var ChecklistItem = React.createClass({
       displayName: 'ChecklistItem',
@@ -37,9 +38,14 @@ define([
       },
 
       render: function () {
+          var completionMessage = (this.props.complete) ? I18n.t('(Item Complete)') : I18n.t('(Item Incomplete)');
+
           return (
               <a href="#" id={this.props.id} className={this.state.classNameString} onClick={this.handleClick}>
-                <span>{this.props.title}</span>
+                <span>
+                  {this.props.title}
+                  <span className="screenreader-only">{completionMessage}</span>
+                </span>
               </a>
           );
       }
