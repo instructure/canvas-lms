@@ -255,6 +255,18 @@ module Lti
                        -> { @assignment.points_possible },
                        ASSIGNMENT_GUARD
 
+    register_expansion 'Canvas.assignment.unlockAt', [],
+                       -> { @assignment.unlock_at },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.lockAt', [],
+                       -> { @assignment.lock_at },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.dueAt', [],
+                       -> { @assignment.due_at },
+                       ASSIGNMENT_GUARD
+
     register_expansion 'LtiLink.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_link_id) },
                        -> { @tool_setting_link_id }
