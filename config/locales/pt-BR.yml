@@ -3966,10 +3966,10 @@ pt-BR:
     other: "%{count} minutos"
     zero: "Menos de 1 minuto"
   count_page_views_b40102b3: 
-    one: "1 exibições de página"
+    one: "1 exibição de página"
     other: "%{count} exibições de página"
   count_participations_ac8f82b7: 
-    one: "1 participações"
+    one: "1 participação"
     other: "%{count} participações"
   count_students_30e46120: 
     one: "1 alunos"
@@ -11643,7 +11643,7 @@ pt-BR:
       audible_bracket_aced: "Todos os alunos nessa faixa responderam corretamente."
       audible_bracket_failed: "Nem um único aluno nessa faixa forneceu uma resposta correta."
       audible_chart_description: "Esta tabela lista como cada faixa de alunos da classe respondeu a esta pergunta. As faixas estudantis são compostas com base em sua pontuação. A faixa superior consiste de mais de 27%, enquanto que a faixa do meio consiste em 46%, e a faixa inferior consiste em menos de 27%."
-      audible_discrimination_index: "Índice de Discriminação:%{number}."
+      audible_discrimination_index: "Índice de Discriminação: %{number}."
       audible_middle_bracket: "Faixa do meio:"
       audible_response_ratio_distribution: "%{correct_ratio}% dos alunos nessa faixa respondeu corretamente."
       audible_top_bracket: "Faixa superior:"
@@ -14539,7 +14539,7 @@ pt-BR:
   the_state_parameter_is_required_ffadf213: "O parâmetro de estado é necessário"
   the_top_track_represents_days_on_which_the_student_2a347099: "A faixa superior representa os dias em que o  *aluno enviou mensagens*  para instrutores do curso. A faixa inferior é para  **mensagens dos instrutores** para o aluno."
   there_are_count_results_in_the_list_e74f6e36: 
-    one: "Há 1 resultados na lista"
+    one: "Há 1 resultado na lista"
     other: "Há %{count} resultados na lista"
   there_was_a_problem_adding_the_grading_scheme_92d6d907: "Ocorreu um problema ao adicionar o esquema de avaliação"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Houve um problema ao excluir o período de pontuação"
