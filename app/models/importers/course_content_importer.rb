@@ -120,8 +120,8 @@ module Importers
       Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(65)
 
       # and second time...
-      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(70)
-      Importers::ContextModuleImporter.process_migration(data, migration);migration.update_import_progress(72)
+      Importers::ContextModuleImporter.process_migration(data, migration);migration.update_import_progress(70)
+      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(72)
       Importers::DiscussionTopicImporter.process_migration(data, migration);migration.update_import_progress(75)
       Importers::WikiPageImporter.process_migration(data, migration);migration.update_import_progress(80)
       Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(85)
