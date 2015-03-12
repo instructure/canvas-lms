@@ -60,8 +60,13 @@ Rails.configuration.after_initialize do
   end
 
   if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
-    Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor.process', '*/1 * * * *' do
-      IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process
+    Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor#process', '*/1 * * * *' do
+      imp = IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
+      IncomingMailProcessor::IncomingMessageProcessor.workers.times do |worker_id|
+        imp.send_later_enqueue_args(:process,
+                                    {strand: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
+                                    {worker_id: worker_id})
+      end
     end
   end
 
