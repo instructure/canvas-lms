@@ -1361,6 +1361,7 @@ class CoursesController < ApplicationController
   end
   protected :check_for_xlist
 
+  include Api::V1::ContextModule
   include ContextModulesController::ModuleIndexHelper
 
   # @API Get a single course
