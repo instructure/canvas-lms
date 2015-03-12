@@ -19,7 +19,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       wait_for_ajaximations
 
-      f('#sidebar_content .submit_assignment_link').click
+      f('.submit_assignment_link').click
       expect(ff('#submit_google_doc_form')).to be_empty
 
       # navigate off the page and dismiss the alert box to avoid problems

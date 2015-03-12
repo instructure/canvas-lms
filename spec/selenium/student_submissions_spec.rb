@@ -128,7 +128,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
       expect(f('#sidebar_content .details')).to include_text "Not Turned In!"
-      expect(f('#sidebar_content a.submit_assignment_link').text).to eq "Submit Assignment"
+      expect(f('.submit_assignment_link').text).to eq "Submit Assignment"
     end
 
     it "should not show as turned in or not turned in when assignment doesnt expect a submission" do
@@ -140,7 +140,7 @@ describe "submissions" do
       # expect
       expect(f('#sidebar_content .details')).not_to include_text "Turned In!"
       expect(f('#sidebar_content .details')).not_to include_text "Not Turned In!"
-      expect(f('#sidebar_content a.submit_assignment_link')).to be_nil
+      expect(f('.submit_assignment_link')).to be_nil
     end
 
     it "should not allow blank submissions for text entry" do
