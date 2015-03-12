@@ -119,6 +119,15 @@ define([
       else {
         $("#no_changes_detected").show();
       }
+
+      // Only allow the submit button to be clicked once.
+      $('#gradebook_grid_form button[type=submit]').click(function() {
+        $(this).prop("disabled", true);
+        $(this).parents('form').submit()
+        window.setTimeout(function(that) {
+                            that.prop("disabled", false);
+                          }, 500, $(this));
+      })
     },
 
     handleThingsNeedingToBeResolved: function(){
