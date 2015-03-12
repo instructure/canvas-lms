@@ -19,7 +19,14 @@
 module Canvas::Plugins::Validators::GoogleDriveValidator
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
-      {}
+      {
+        :client_id => '',
+        :client_secret => '',
+        :redirect_uri => '',
+        :auth_uri => '',
+        :token_uri => '',
+        :client_secret_json => ''
+      }
     elsif res = check_json(settings)
       plugin_setting.errors.add(:base, res)
       false
