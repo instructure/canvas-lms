@@ -596,6 +596,11 @@ body.ie {
   }
 }
 
+.publish-icon button {
+  border: 0;
+  padding: 0;
+}
+
 @media screen and (max-width: 1024px) {
   .with-left-side.modules {
     min-width: 700px;

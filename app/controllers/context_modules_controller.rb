@@ -33,6 +33,16 @@ class ContextModulesController < ApplicationController
       tools = ContextExternalTool.all_tools_for(@context, placements: placements,
                                         :root_account => @domain_root_account, :current_user => @current_user).to_a
       placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
+
+      @modules_json = @modules.map{|mod| module_json(mod, @current_user, session, nil, ['content_details', 'items']) }
+
+      js_env :course_id => @context.id,
+        :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
+        :MODULES => @modules_json,
+        :MODULE_FILE_PERMISSIONS => {
+           usage_rights_required: @context.feature_enabled?(:usage_rights_required),
+           manage_files: @context.grants_right?(@current_user, session, :manage_files)
+        }
     end
   end
   include ModuleIndexHelper
@@ -41,22 +51,13 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       log_asset_access("modules:#{@context.asset_string}", "modules", "other")
       load_modules
+
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
         ActiveRecord::Associations::Preloader.new(@modules, :content_tags).run
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
-
-      @modules_json = @modules.map{|mod| module_json(mod, @current_user, session, nil, ['content_details', 'items']) }
-
-      js_env :course_id => @context.id,
-             :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
-             :MODULES => @modules_json,
-             :MODULE_FILE_PERMISSIONS => {
-               usage_rights_required: @context.feature_enabled?(:usage_rights_required),
-               manage_files: @context.grants_right?(@current_user, session, :manage_files)
-             }
     end
   end
 
