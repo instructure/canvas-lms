@@ -643,6 +643,12 @@ class PseudonymSessionsController < ApplicationController
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'login')
 
+    # Since the user just logged in, we'll reset the context to include their info.
+    setup_live_events_context
+    # TODO: Only send this if the current_pseudonym's root account matches the current root
+    # account?
+    Canvas::LiveEvents.logged_in(session)
+
     otp_passed ||= @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'], request.remote_ip)
     if !otp_passed
       mfa_settings = @current_user.mfa_settings
@@ -712,6 +718,7 @@ class PseudonymSessionsController < ApplicationController
   def logout_current_user
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'logout')
+    Canvas::LiveEvents.logged_out
     Lti::LogoutService.queue_callbacks(@current_pseudonym)
     super
   end

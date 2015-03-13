@@ -21,7 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe ApplicationController do
 
   before :each do
-    controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
+    controller.stubs(:request).returns(stub(:host_with_port => "www.example.com",
+                                            :host => "www.example.com",
+                                            :headers => {}))
   end
 
   describe "#twitter_connection" do
@@ -438,6 +440,8 @@ describe ApplicationController do
       acct.save!
       controller.instance_variable_set(:@domain_root_account, acct)
       req = mock()
+
+      req.stubs(:host).returns('www.example.com')
       req.stubs(:headers).returns({})
       controller.stubs(:request).returns(req)
       controller.send(:assign_localizer)

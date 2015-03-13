@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_page_view
   before_filter :require_reacceptance_of_terms
   before_filter :clear_policy_cache
+  before_filter :setup_live_events_context
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -59,6 +60,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
+  after_filter :teardown_live_events_context
   include Tour
 
   add_crumb(proc {
@@ -507,6 +509,10 @@ class ApplicationController < ActionController::Base
         set_badge_counts_for(@context, @current_user, @current_enrollment)
       end
     end
+
+    # There is lots of interesting information set up in here, that we want
+    # to place into the live events context.
+    setup_live_events_context
   end
 
   # This is used by a number of actions to retrieve a list of all contexts
@@ -1882,5 +1888,37 @@ class ApplicationController < ActionController::Base
     nil
   end
   helper_method :request_delete_account_link
-end
 
+  def setup_live_events_context
+    ctx = {}
+    ctx[:root_account_id] = @domain_root_account.global_id if @domain_root_account
+    ctx[:user_id] = @current_user.global_id if @current_user
+    ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
+    ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym
+    ctx[:hostname] = request.host
+    ctx[:user_agent] = request.headers['User-Agent']
+    ctx[:context_type] = @context.class.to_s if @context
+    ctx[:context_id] = @context.global_id if @context
+    if @context_membership
+      ctx[:context_role] =
+        if @context_membership.respond_to?(:role)
+          @context_membership.role.name
+        elsif @context_membership.respond_to?(:type)
+          @context_membership.type
+        else
+          @context_membership.class.to_s
+        end
+    end
+
+    if tctx = Thread.current[:context]
+      ctx[:request_id] = tctx[:request_id]
+      ctx[:session_id] = tctx[:session_id]
+    end
+
+    LiveEvents.set_context(ctx)
+  end
+
+  def teardown_live_events_context
+    LiveEvents.clear_context!
+  end
+end

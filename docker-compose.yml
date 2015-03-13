@@ -9,6 +9,17 @@ selenium:
   ports:
     - "5900:5900"
 
+kinesis:
+  build: ./docker-compose/kinesalite
+  command: "--path /var/lib/kinesalite"
+  volumes:
+    - "tmp/cache:/var/lib/kinesalite"
+  ports:
+    - "4567:4567"
+  environment:
+    VIRTUAL_HOST: kinesis.docker
+    VIRTUAL_PORT: 4567
+
 web:
   build: ./docker-compose
   command: bundle exec bin/rails s
@@ -20,6 +31,7 @@ web:
     - postgres
     - redis
     - selenium
+    - kinesis
   environment:
     RACK_ENV: development
     VIRTUAL_HOST: canvas.docker
@@ -32,6 +44,7 @@ jobs:
   links:
     - postgres
     - redis
+    - kinesis
   environment:
     RACK_ENV: development
 

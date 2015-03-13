@@ -824,6 +824,7 @@ RSpec.configure do |config|
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
       pseudonym.stubs(:id).returns(pseudonym.object_id)
+      pseudonym.stubs(:unique_id).returns('unique_id')
     end
 
     session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil)
