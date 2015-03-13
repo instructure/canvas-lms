@@ -20,6 +20,34 @@ describe "Navigating to wiki pages" do
     end
   end
 
+  describe "Accessibility" do
+
+    def check_header_focus(attribute)
+      f("[data-sort-field='#{attribute}']").click()
+      wait_for_ajaximations
+      check_element_has_focus(f("[data-sort-field='#{attribute}']"))
+    end
+
+    before do
+      account_model
+      course_with_teacher_logged_in :account => @account
+      @course.wiki.wiki_pages.create!(:title => "Foo")
+      @course.wiki.wiki_pages.create!(:title => "Bar")
+      @course.wiki.wiki_pages.create!(:title => "Baz")
+    end
+
+    it "returns focus to the header item clicked while sorting" do
+      get "/courses/#{@course.id}/pages"
+
+      check_header_focus('title')
+      check_header_focus('created_at')
+      check_header_focus('updated_at')
+
+
+    end
+  end
+
+
   describe "Permissions" do
     before do
       course_with_teacher
