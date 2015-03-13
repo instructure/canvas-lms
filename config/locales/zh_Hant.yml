@@ -5229,6 +5229,7 @@ zh_Hant:
     show: 
       add_rubric: 新增題目
       announcement_closed: 已結束本宣告以徵求意見
+      announcement_locked: "用戶將看不到此宣告的內容，直至 %{date}"
       announcement_locked_until: "此宣告已被鎖定，直至 %{time}"
       authors_name: 作者姓名
       collapse_replies: 收起回覆
@@ -13929,6 +13930,8 @@ zh_Hant:
   shared_secret_892c88f2: 共用密碼
   show_by_date_e3967761: 按日期顯示
   show_by_type_c5d61732: 按類型顯示
+  show_lti_2_configuration_ui_94ce35a9: "顯示 LTI 2 配置 UI"
+  show_me_76823679: 給我看看
   sis_agent_token_authentication_2a0b29e3: "SIS 代理權杖驗證"
   sis_batch: 
     errors: 
@@ -14006,6 +14009,12 @@ zh_Hant:
       back: 返回
       close: 關閉
       forward: 轉寄
+  smartbanner: 
+    android_banner_author: "Instructure Inc."
+    android_banner_in_google_play: "在 Google Play 中"
+    android_banner_price: 免費
+    android_banner_title: "Canvas 由 Instructure 提供"
+    android_banner_view_button: 查看
   source_code_2395ca74: 源代碼
   speed_grader: 
     submissions_dropdown: 
@@ -14043,6 +14052,7 @@ zh_Hant:
     previous_object: "上一個 %{type}"
     student_hidden_name: "學生 %{position}"
   start_date_e937be8a: 開始日期
+  starts_on_date_a777f505: 開始日期
   statistics: 
     csv_columns: 
       attempt: 嘗試
@@ -14064,6 +14074,7 @@ zh_Hant:
   stream_items_api: 
     assessment_request_title: "%{title} 的同儕審閱 "
   student_5da6bfd1: 學生
+  student_921b864d: 學生
   student_assignment_outcome_map_title: 學生能力
   student_groups_desc: 這為帳戶啟用新學生群組頁面。新頁面用於提供更動態的群組註冊體驗。
   student_id: "學生 ID"
@@ -14240,6 +14251,7 @@ zh_Hant:
       gathering_files: 正在收集檔案...
   submit_a3cc6859: 提交
   submitted_datetime_fa2e9287: "已提交：%{dateTime}"
+  successfully_moved_model_to_newgroup_f7b7aa5a: "將 %{model} 成功移動至 %{newGroup}"
   support: 
     array: 
       last_word_connector: ，以及
@@ -14249,6 +14261,7 @@ zh_Hant:
       two_words_connector: 以及
       words_connector: ，
     help_menu: 
+      community_support_description: "請先聯系您的 ASC 獲得幫助。如果他們無法提供幫助，請聯系我們。"
       community_support_forums: 社區支援論壇
       contact_support: 連絡支援
       contact_support_sub_text: 獲取有關時間敏感問題的援助。
@@ -14256,6 +14269,7 @@ zh_Hant:
       curriculum_assessment_errata_description: 檢視已報告的評估和課程錯誤。搜尋『勘誤表』。
       networking_academy_description: 檢視最常見問題的Cisco答案。
       networking_academy_faqs: "Networking Academy（網路技術學院）常見問題解答"
+      support_desk_livechat: 支持桌面實時聊天
   switch_to_3f310557: 切換至
   switch_to_group_group_name_786b913b: "切換至群組 %{group_name}"
   syllabus: 課程教學大綱
@@ -14349,15 +14363,23 @@ zh_Hant:
         unspecified: 無論何時
       timespan: "%{start_at} *至* %{end_at}"
   text_document_eacbcdb7: 文字文件
+  the_app_was_activated_a84e055f: 應用程式已激活
   the_app_was_added_58e2836a: 該應用程式已添加
   the_app_was_added_successfully_3f785a23: 該應用程式已成功添加
+  the_app_was_deactivated_573520ab: 應用程式已停用
   the_app_was_updated_successfully_3d71cd1b: 該應用程式已成功更新
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "檔案索引標籤可用來分享教學幻燈片、範例文件、學習幫助說明等——您的學生希望下載的任何東西。Canvas 系統能夠讓您輕鬆上傳和組織您的檔案。我們將為您逐一演示。"
+  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas 右上角標題中的標誌影像。200x200 svg 或 png"
   the_material_is_in_the_public_domain_279c39a3: 該材料在公用網域中。
   the_material_is_licensed_under_creative_commons_3242cb5e: 該材料在創意共享項下獲得授權
   the_material_is_subject_to_fair_use_exception_41bc6a4b: 該材料存在公平使用的例外情況。
   the_module_item_is_locked_27fe420b: 該模組項目已鎖定。
+  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "iOS/Android 設備的捷徑圖示。180x180 png 或 svg"
+  the_state_parameter_is_required_ffadf213: 需要狀態參數
   the_top_track_represents_days_on_which_the_student_2a347099: "頂部軌道表示 *學生將訊息發送* 給課程導師的期間。底部軌道表示 **訊息從導師發送** 給學生的期間。"
+  there_are_count_results_in_the_list_e74f6e36: 
+    one: "列表中有 %{count} 個結果"
+    other: "列表中有 %{count} 個結果"
   there_was_a_problem_adding_the_grading_scheme_92d6d907: 在添加評分配置時發生了一個問題
   there_was_a_problem_deleting_the_grading_period_50ce07c5: 刪除評分時段時遇到問題
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: 在刪除評分配置時發生了一個問題
@@ -14375,6 +14397,8 @@ zh_Hant:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此資料夾目前已鎖定，無法檢視。
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "這是一個可信任的 URL 的清單，以逗號分開。信任此清單中的任何 URL 將讓您在登入 Canvas  時略過 CSRF 權杖。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: 這很有可能發生，因為您匯入的課程內容未包含任何相關檔案。
+  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: 此成果已用於評估學生。計算方法是固定的
+  this_outcome_has_been_used_to_assess_a_student_the_ac470670: 此成果以用於評估學生。計算值是固定的
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*此測驗未發佈*在此測驗發佈之前，只有教師可以看到。"
   this_student_wrote_f1a3f22d: 這位學生寫到：
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "這將讓您對 Canvas 進行驗證，以便將分數發佈到 SIS上"
@@ -14583,6 +14607,7 @@ zh_Hant:
   to_35c6baa2: 至
   to_c4c44f4b: 至
   to_minscore_43e5452e: "至 %{minScore}%"
+  to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要檢視任務，請確保 *議程* 檢視處於活動狀態。"
   too_many_members_b8b15069: 成員太多
   tooltips: 
     finished: 已完成
@@ -14638,6 +14663,7 @@ zh_Hant:
   usage_rights_f0960ad6: 使用權
   usage_rights_have_been_set_d1b433c7: 使用權已設定。
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: 將為如下資料夾所包含的所有檔案設定使用權：
+  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "使用 *單個 16x16、32x32、48x48 圖示檔案*。"
   used_by_permission_314a78dd: 經授權使用
   user: 
     default_user_name: 使用者
@@ -14847,6 +14873,7 @@ zh_Hant:
     google_docs_added: "Google Docs 存取已授權！"
     google_docs_fail: "Google Docs 授權失敗。請再試一次"
     google_drive_added: "已成功添加 Google Drive 帳戶！"
+    google_drive_fail: "Google Drive 授權失敗。請重試"
     grades: 
       average_grades: 
         one: "%{count} 個學生的平均值"
@@ -15033,9 +15060,12 @@ zh_Hant:
   validate: 
     is_required: 此欄位為必填項
   video_b9f27375: 視頻
+  view_analytics_91a3b7a: 檢視分析
   view_app_center_6c89a3fe: 檢視應用程式中心
   view_app_configurations_52b52441: 檢視應用程式設定
+  view_course_analytics_eefe6b2: 檢視課程分析
   view_name_app_62a2ad8e: "檢視 %{name} 應用程式"
+  view_student_analytics_6b8ccd42: 檢視學生分析
   visit_864b4060: 訪問
   visit_group_group_name_7a816081: "訪問群組 %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: 警告：爲了提高移動檔案的可存取性，請使用功能表中的『移動到對話方塊』選項。
@@ -15046,7 +15076,9 @@ zh_Hant:
       weekly_message: 
         one: "此 Canvas 安裝僅用於測試，並會每 %{count} 週重設。"
         other: "此 Canvas 安裝僅用於測試，並會每 %{count} 週重設。"
+  we_were_unable_to_activate_the_app_578defe7: 我們無法激活該應用程式。
   we_were_unable_to_add_the_app_418877ef: 我們無法添加該應用程式。
+  we_were_unable_to_deactivate_the_app_5e2632f3: 我們無法停用該應用程式。
   we_were_unable_to_update_the_app_659f5bc6: 我們無法更新該應用程式。
   web_conference: 
     default_name_for_courses: "課程 Web 會議"
@@ -15064,6 +15096,7 @@ zh_Hant:
   webct_file_description: "Blackboard Vista/CE，WebCT 6+ 課程"
   webct_name: "Blackboard Vista/CE (WebCT)"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 當人們訪問課程時，這就是他們將看到的頁面。您可以將其設定為顯示一個活動流、課程模組清單、一個課程教學大綱或一個您描寫您自己的自訂頁面。預設顯示為課程活動流。
+  where_would_you_like_to_move_title_fabd6e8f: "您要將 %{title} 移至何處？"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--選擇語言--"
@@ -15201,6 +15234,7 @@ zh_Hant:
     cannot_update_published: "您無權更新此 Wiki 頁面的已發佈狀態"
     cannot_update_title: "您無權更新此 Wiki 頁面的標題"
     invalid_editing_roles: 所提供的編輯角色是無效的
+  will_keep_the_average_of_all_your_scores_d7e6b733: 將保留您所有分數的平均分
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: 將保留所有分數中的最高分數
   will_keep_the_latest_of_all_your_scores_431d23f9: 將保留所有分數中的最新分數
   will_paginate: 
@@ -15222,6 +15256,9 @@ zh_Hant:
     external_urls: 
       archive: 封存
       archive_link: 檢視存檔
+  windows_square_tile_4c00879e: "Windows 方形磁貼"
+  windows_tile_color_2b786bd9: "Windows 磁貼顏色"
+  windows_wide_tile_a3302508: "Windows 寬磁貼"
   would_you_like_to_enable_this_app_ccdf735d: 是否要啟用此應用程式？
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您要讓學生繼續學習該課程，還是希望重新鎖定這些模組，直至新要求設定完畢？
   xml_configuration_5ea1b942: "XML 配置"
