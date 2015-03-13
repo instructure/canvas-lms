@@ -1257,6 +1257,7 @@ nl:
         default: 
           zero_activity: 
             text: "Dit rapport toont alle cursisten die voor iedere cursus in een bepaalde periode staan ingeschreven. Het daaruitvoortvloeiende CSV-bestand zal een rij per ingeschreven gebruiker hebben die de cursus sinds die datum nog niet heeft bezocht."
+  achieve_mastery_count_times_8c9bbcec: "Meesterschap %{count} keer bereiken "
   activerecord: 
     errors: 
       messages: 
@@ -1421,7 +1422,7 @@ nl:
   anonymous_e1b8ad27: "Anoniem "
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "De antwoorden zullen na jouw laatste poging aangegeven worden."
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center zal in het tabblad \"Apps\" verschijnen op de pagina met instellingen voor óf een cursus óf account. De URL hieronder moet naar het eindpunt van een geldig App Center wijzen (bijvoorbeeld %{url} -- zorg ervoor dat je de slash aan het einde weglaat "
-  apple_touch_icon_2c258bb3: "Apple Touch Icoon"
+  apple_touch_icon_2c258bb3: "Apple Touch Pictogram"
   application: 
     errors: 
       feed_not_found: "Kan feed niet vinden."
@@ -2318,6 +2319,7 @@ nl:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc. "
   c_modal_form: 
     close: sluiten
+  calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' is geen geldige waarde voor deze berekeningsmethode. De waarde moet tussen '%{valid_calculation_ints_min}' en '%{valid_calculation_ints_max}' liggen"
   calculation_method_fe281f9: Berekeningsmethode
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation-method moet een van het volgende zijn: %{calc_methods}"
   calculator: 
@@ -2839,7 +2841,7 @@ nl:
   choose_a_course_home_page_8059c7b: "Een startpagina voor de cursus kiezen  "
   choose_usage_rights_33683854: "Gebruiksrechten kiezen...  "
   clear_file_name_text_field_fce73840: "Bestandsnaam van tekstveld wissen"
-  click_here_on_the_calendar_link_c9965631: "Hier klikken op de *kalender* link"
+  click_here_on_the_calendar_link_c9965631: "Hier klikken op de *kalender* koppeling"
   close_and_return_to_canvas_80544344: "Sluiten en naar Canvas terugkeren  "
   close_d634289d: "Sluiten  "
   collaboration: 
@@ -2916,7 +2918,7 @@ nl:
       google: 
         drive: 
           upgrade: 
-            description: "Om toegang te krijgen tot deze samenwerking moet je Canvas machtigen toeang te krijgen tot je Google Drive-account"
+            description: "Om toegang te krijgen tot deze samenwerking moet je Canvas machtigen tot je Google Drive-account geven"
       how_to_start_a_new_collaboration: "Op \"Een nieuwe samenwerking starten\" klikken om meer te weten te komen over een bepaald  type samenwerking en kies dan dat type samenwerking uit de vervolgkeuzelijst."
       links: 
         delete: "Deze samenwerking verwijderen"
@@ -5375,7 +5377,7 @@ nl:
     unsubscribed_hint: "Je bent niet aangemeld voor dit onderwerp. Klikken om je aan te melden."
   display_course_catalog: "Een lijst met cursussen, die je kunt doorlopen in dit hoofdaccount aangeven met de markering \"Deze cursus opnemen in de openbare cursus index\". "
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
-      Verdeling van huidige beoordelingen in cursussen over alle ingeschreven studenten
+      Verdeling van huidige beoordelingen in cursussen over alle ingeschreven cursisten
       in afdelingscursussen.
   domain_3b54c511: "Domein "
   don_t_show_again_15d8253e: "niet opnieuw tonen"
@@ -5397,14 +5399,14 @@ nl:
   due_on_date_aa4725cd: "Verschuldigd op datum:"
   due_on_date_ffc98ebc: "Verschuldigd op datum"
   e_mail_only_2cc5e513: "Alleen e-mail "
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Elke bar is een opdracht. De groene laag vertegenwoordigt het percentage studenten dat de opdracht *op tijd* heeft ingeleverd. Opdrachten die **laat ** zijn, zijn geel, en ***ontbrekende*** opdrachten zijn rood."
+  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Elke bar is een opdracht. De groene laag vertegenwoordigt het percentage cursisten dat de opdracht *op tijd* heeft ingeleverd. Opdrachten die **laat** zijn, zijn geel, en ***ontbrekende*** opdrachten zijn rood."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Elke bar is één opdracht. De *dunne verticale lijn* strekt zich uit van de laagste score voor elke student in de cursus tot de hoogste score. De **dikkere bar** strekt zich uit van het 25e percentiel tot het 75e, met de ***mediaan gemarkeerd***."
-  each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Elke bar is één opdracht. De dunne verticale lijn strekt zich uit van de laagste score voor elke student in de cursus tot de hoogste score. De dikkere bar strekt zich uit van het 25e percentiel tot het 75e, met de mediaan gemarkeerd. De score van de student is met een stip gemarkeerd."
-  each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de student op die dag **actie heeft ondernomen** in de cursus."
-  each_bar_represents_the_number_of_page_views_on_th_442f8465: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de student op die dag **actie heeft ondernomen** in de cursus."
-  each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de student op die dag **actie heeft ondernomen** in de cursus."
+  each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Elke bar is één opdracht. De dunne verticale lijn strekt zich uit van de laagste score voor elke cursist in de cursus tot de hoogste score. De dikkere bar strekt zich uit van het 25e percentiel tot het 75e percentiel, met de mediaan gemarkeerd. De score van de cursist is met een stip gemarkeerd."
+  each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de cursist op die dag **actie heeft ondernomen** in de cursus."
+  each_bar_represents_the_number_of_page_views_on_th_442f8465: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de cursist op die dag **actie heeft ondernomen** in de cursus."
+  each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de cursist op die dag **actie heeft ondernomen** in de cursus."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Elke bar vertegenwoordigt het aantal paginabezichtigingen met betrekking tot die categorie."
-  each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Elke rij is een opdracht. De diamant is de vervaldatum en de bar strekt zich uit tot de datum van indiening. Groen geeft aan *op tijd ingediend*, geel een **late indiening** en rood een ***gemiste opdracht ***. Grijze diamanten zijn opdrachten zonder vervaldata, geplaatst op het moment van indiening."
+  each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Elke rij is een opdracht. De diamant is de vervaldatum en de bar strekt zich uit tot de datum van indiening. Groen geeft aan *op tijd ingediend*, geel een **late indiening** en rood een ***gemiste opdracht***. Grijze diamanten zijn opdrachten zonder vervaldata, geplaatst op het moment van indiening."
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Converter"
   edit_app_b0cc1c17: "App bewerken"
@@ -6043,7 +6045,7 @@ nl:
       settings_title: "Meldingsinstellingen voor Canvas"
       updating_preferences: "Bezig met updaten van voorkeuren..."
   fair_use_bee47d77: "Redelijk gebruik "
-  favicon_6e658914: Favicon
+  favicon_6e658914: Favpictogram
   feature_flags: 
     feature_flag: 
       allow: Toestaan
@@ -6804,7 +6806,7 @@ nl:
         media_comment: "Media opmerking"
         speech_recognition: Spraakherkenning
     speed_grader_disabled: "SpeedGrader is  voor deze cursus uitgeschakeld"
-    speedgrader_enabled_only_for_published_content: "SpeedGrader is alleen ingeschakeld voorgepubliceerde content."
+    speedgrader_enabled_only_for_published_content: "SpeedGrader is alleen ingeschakeld voor gepubliceerde content."
     student_attendance: 
       headers: 
         assignment: Opdracht
@@ -7342,7 +7344,7 @@ nl:
       create: "%{model} creëren"
       submit: "%{model} opslaan"
       update: "%{model} bijwerken"
-  here_are_your_assignments_listed_by_due_date_7d8e98e6: "Hier zijn uw opdrachten, vermeld op vervaldatum"
+  here_are_your_assignments_listed_by_due_date_7d8e98e6: "Hier zijn je opdrachten, vermeld op vervaldatum."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Hier heb je een goede kans om de kalender te leren kennen en ieder gebeurtenis zonder opdracht die je in de cursus misschien hebt toe te voegen. Maak je geen zorgen, wij zullen jou er mee helpen.  "
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Verborgen bestanden zullen met koppelingen beschikbaar zijn. "
   high_contrast_description: |-
@@ -7427,8 +7429,8 @@ nl:
   installed_by_admin_97c3a721: "Geïnstalleerd door beheerder"
   instructions: 
     authorize_google_docs: "Voordat je kunt samenwerken aan documenten, moet je eerst aan Canvas eerst toegang verlenen tot jouw Google Docs-account:"
-    authorize_google_drive: "Voordat je documenten kunt bewerken, moet je Canvas machtigen om toegang te krijgen tot je Google Drive-account:"
-  instructors_4b491a07: instructoren
+    authorize_google_drive: "Voordat je documenten kunt bewerken, moet je Canvas machtigen om toegang tot je Google Drive-account te krijgen:"
+  instructors_4b491a07: docenten
   instructure: 
     alerts: 
       file_previews_disabled: "Bestandsvoorbeelden zijn voor deze Canvas-site uitgeschakeld "
@@ -7493,7 +7495,7 @@ nl:
       enter_search_terms: "Zoektermen invoeren"
   invalid_authenticity_token_b753558c: "Ongeldig machtigingstoken"
   invalid_points_possible: "De waarde van mogelijke punten voor deze opdracht moet nul of groter zijn."
-  invalid_state_parameter_7a5aa108: "Ongeldige staat parameter"
+  invalid_state_parameter_7a5aa108: "Ongeldige provincie parameter"
   invalid_url_in_xml: "Ongeldige URL in XML. Ampersands moeten van een Escape-teken  voorzien worden."
   invalid_utf_8_13c76a6: "Ongeldige UTF-8 "
   invalid_xml_syntax: "ongeldige xml syntax"
@@ -7756,7 +7758,7 @@ nl:
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Importer"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Zorg ervoor dat je de meest toepasselijke optie kiest omdat de scores van cursisten beïnvloed kunnen worden."
-  make_this_course_publicly_visible_student_data_wil_3954d6c8: "Maak deze cursus publiekelijk zichtbaar (studentgegevens blijven privé)"
+  make_this_course_publicly_visible_student_data_wil_3954d6c8: "Maak deze cursus openbaar zichtbaar (gegevens van cursisten blijven privé)"
   malformed_csv_aaa4b7f2: "Ongeldige CSV "
   manage_avatars: 
     errors: 
@@ -7769,7 +7771,7 @@ nl:
   manage_group_group_name_ac8578c6: "%{group_name} groep beheren "
   manage_usage_rights_c5a8c216: "Gebruiksrechten beheren "
   manual_entry_e4a4f99a: "Handmatige invoer "
-  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Beheersingsscore geeft de meest recent beoordeelde opdracht of quiz weer."
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Beheersingsscore geeft de meest recent beoordeelde opdracht of toets weer."
   mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Beheersingsscore geeft de hoogste score van een beoordeelde opdracht of quiz weer."
   mathquill: 
     tabs: 
@@ -9984,7 +9986,7 @@ nl:
   next_steps_ce0f0d0c: "Volgende stappen "
   no_assignment_name_adbb215b: "Geen naam voor opdracht "
   no_content_has_been_added_f36bab43: "* Geen inhoud toegevoegd "
-  no_directory_is_selected_please_select_a_directory_46ded46: "Geen adressenbestand geselecteerd, selecteer een adressenbestand alvorens 'verplaatsen' aan te klikken"
+  no_directory_is_selected_please_select_a_directory_46ded46: "Geen adressenbestand geselecteerd, een adressenbestand selecteren alvorens op 'verplaatsen' te klikken"
   no_due_date_44271c53: "Geen inleverdatum "
   no_due_date_6e6a23c1: "(geen inleverdatum) "
   no_e16d9132: Nee
@@ -10226,7 +10228,7 @@ nl:
       other: Andere
       parent: "Bovenliggende E-mails"
       scheduling: Planning
-  now_click_the_agenda_button_607fb40e: "Klik nu op de toets *Agenda*"
+  now_click_the_agenda_button_607fb40e: "Nu op de toets *Agenda* klikken"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Nu je cursus opgesteld en beschikbaar is, zul je waarschijnlijk deze controlelijst niet meer nodig hebben. Maar wij zullen het bewaren voor het geval dat je later beseft dat je iets nieuws wilt proberen, of dat je gewoon een beetje extra hulp wilt tijdens het aanbrengen van veranderingen aan de inhoud van jouw cursus. "
   num_messages_c1949bbc: 
     one: "1 bericht  "
@@ -10279,7 +10281,7 @@ nl:
   on_time_percent_eebffe38: "Op tijd: %{percent} "
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Je zult een optie moeten kiezen als je eenmaal een antwoord gewijzigd hebt voordat je de vraag kunt bijwerken."
   one_per_line_format_name_value_79647700: "Een per regel. Formaat: naam=waarde "
-  ontime_on_time_late_late_missing_missing_145e9e5d: "{onTime} op tijd, %{late} laat, %{missing} gemist"
+  ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} op tijd, %{late} laat, %{missing} onbreekt"
   options: 
     ? "no"
     : Nee
@@ -10892,7 +10894,7 @@ nl:
     labels: 
       requirements_must_be_completed: "De volgende voorwaarden moeten voltooid zijn, voordat deze pagina ontgrendeld zal worden"
   presentation_2d9387ca: "Presentatie "
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "druk spatiebalk voor meer gegevens over dit resultaat"
+  press_spacebar_for_more_details_on_this_outcome_f6713a42: "spatiebalk drukken voor meer gegevens over dit resultaat"
   privacy_290109ea: "Privacy "
   product_name: Canvas
   profile: 
@@ -10976,6 +10978,7 @@ nl:
         save_yo_name: "Yo naam opslaan"
         select_image: "Afbeelding selecteren"
         update_settings: "Instellingen bijwerken"
+      confirm_email_instructions: "Voordat je jouw profiel kunt bewerken, moet je jouw e-mailadres (%{email}) verifiëren door op de koppeling te klikken in de e-mail die we je gestuurd hebben. *Hier klikken om de e-mail opnieuw te versturen* als je deze niet ziet, en zorg ervoor dat je jouw spambox controleert."
       delicious_description: "Delicious is een tool waarmee je jouw bladwijzers kunt opslaan en met anderen kunt delen. De Rich Content-editor van Canvas maakt het je mogelijk om jouw Delicious-tags te zoeken om vanuit Canvas makkelijk te kunnen koppelen  naar andere, voor jou, nuttige bronnen."
       diigo_description: "Diigo is een sociaal bladwijzer-tool specifiek aangepast voor onderzoek en onderwijs. De Rich Content-editor van Canvas maakt het je mogelijk om Diigo tags te zoeken om vanuit Canvas makkelijk te kunnen koppelen naar andere, voor jou, nuttige bronnen."
       error_loading_token_details: "Er is een fout opgetreden tijdens het laden van details over token"
@@ -10984,7 +10987,7 @@ nl:
       full_token_warning: "**Dit/deze token nu kopieëren**. Eens je deze pagina hebt verlaten, kun je de volledige token nooit meer opvragen. Je zult het opnieuw moeten genereren om een nieuwe waarde te krijgen."
       generate_access_token_description: "Met behulp van toegangstokens kun je aan externe toepassingen namens jou toegang tot Canvas geven. Deze tokens worden normaal automatisch gemaakt voor benodigde toepassingen, maar als [je zelf een nieuw of een beperkt project aan het ontwikkelen bent](%{documentation_url}) kun je gewoon vanuit hier de token genereren."
       google_docs_description: "Eens je ons toegang tot Google Docs geeft , zul je jouw opdrachten direct vanuit Google Docs kunnen inleveren en documenten kunnen maken en kunnen delen met klasgenoten."
-      google_drive_description: "Zodra je ons gemachtigd hebt je Google Drive te zien, kun je je opdrachten rechtstreeks van Google Drive indienen en documenten creëren en delen met klasgenoten"
+      google_drive_description: "Zodra je ons gemachtigd hebt om je Google Drive te zien, kun je je opdrachten rechtstreeks van Google Drive indienen en documenten creëren en delen met cursistgenoten."
       headers: 
         application_abbrev: App
         dates: Datums
@@ -11642,9 +11645,11 @@ nl:
       students_who_got_a_certain_score: 
         one: "Een cursist heeft een score van %{score}% behaalt."
         other: "%{count} cursisten hebben een score van %{score}% behaald."
+        zero: "Geen enkele cursist heeft een score van %{score}% behaalt."
       students_who_scored_in_a_range: 
         one: "Een cursist heeft een score tussen %{start}  en %{end}%."
         other: "%{count} cursisten hebben een score tussen %{start} en %{end}%."
+        zero: "Geen enkele cursist heeft een score tussen %{start} en %{end}%."
       table_description: "Samenvattingsstatistieken over alles wat is ingeleverd"
     title: Toetsstatistieken
     unknown_answer: "Iets anders"
@@ -12442,7 +12447,7 @@ nl:
           lock_survey: "Deze enquête nu vergrendelen"
           unlock_quiz: "Laat cursisten deze toets nu maken"
           unlock_survey: "Laat cursisten enquête nu invullen"
-        course_concluded_notice: "Deze quiz is niet langer beschikbaar omdat de cursus voltooid is."
+        course_concluded_notice: "Deze toets is niet langer beschikbaar omdat de cursus voltooid is."
         labels: 
           available_until: Tot
           no_time_limit: "Geen tijdslimiet"
@@ -14090,7 +14095,7 @@ nl:
       close: Sluiten
       forward: Doorsturen
   smartbanner: 
-    android_banner_author: "Instructure Inc"
+    android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "In Google Play"
     android_banner_price: GRATIS
     android_banner_title: "Canvas door Instructure"
@@ -14334,7 +14339,7 @@ nl:
       gathering_files: "Bezig met het verzamelen van bestanden..."
   submit_a3cc6859: "Inzenden "
   submitted_datetime_fa2e9287: "Ingezonden: %{dateTime} "
-  successfully_moved_model_to_newgroup_f7b7aa5a: "Succesvol %{model} naar %{newGroup} verplaatst"
+  successfully_moved_model_to_newgroup_f7b7aa5a: " %{model} succesvol naar %{newGroup} verplaatst"
   support: 
     array: 
       last_word_connector: ", en"
@@ -14457,9 +14462,9 @@ nl:
   the_material_is_licensed_under_creative_commons_3242cb5e: "Het materiaal is onder Creative Commons gelicentieerd "
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Het materiaal is onderworpen aan faire gebruikersuitzondering  "
   the_module_item_is_locked_27fe420b: "Het item van de module is vergrendeld. "
-  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "De snelkoppeling voor iOS/Android apparaten. 180 x 180 png of svg"
+  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Het pictogram voor de snelkoppeling voor iOS/Android apparaten. 180 x 180 png of svg"
   the_state_parameter_is_required_ffadf213: "De staat parameter is verplicht"
-  the_top_track_represents_days_on_which_the_student_2a347099: "De bovenste lijn vertegenwoordigt de dagen waarop de *cursist berichten verzond* aan de cursusinstructeurs. De onderste lijn is voor **berichten van de instructeurs** aan de cursist."
+  the_top_track_represents_days_on_which_the_student_2a347099: "De bovenste lijn vertegenwoordigt de dagen waarop de *cursist berichten verzond* aan de docenten van de cursus. De onderste lijn is voor **berichten van de docenten** aan de cursist."
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Er is 1 resultaat in de lijst"
     other: "Er zijn %{count} resultaten in de lijst"
@@ -14879,7 +14884,7 @@ nl:
       diigo: "Diigo is een samenwerkingshulpprogramma om koppelingen te delen. Op internet kun je elke pagina van een label voorzien om deze later te raadplegen. Je kunt deze ook koppelen aan de Diigo-accounts van andere gebruikers om koppelingen met vergelijkbare interesse te delen."
       facebook: "Door jouw Facebook-profiel op de lijst te zetten kun je makkelijk contact leggen met vrienden die je in jouw cursussen en groepen maakt."
       google_docs: "Cursisten kunnen Google Docs gebruiken om samen aan groepsprojecten te werken. Met Google Docs kun je real-time gezamenlijk wijzigingen aanbrengen in documenten, spreadsheets en presentaties."
-      google_drive: "Studenten kunnen Google Drive gebruiken om samen te werken aan groepsprojecten. Google Drives staat real-time samenwerkend bewerken van documenten, spreadsheets en presentaties toe."
+      google_drive: "Cursisten kunnen Google Drive gebruiken om aan groepsprojecten samen te werken. Google Drives staat real-time samenwerkend bewerken van documenten, spreadsheets en presentaties toe."
       linked_in: "LinkedIn is een bron voor zakelijke netwerken. Veel van de connecties die je op school legt, kunnen later nuttig zijn wanneer je aan het werk gaat."
       skype: "Skype is een gratis hulpprogramma voor online spraak- en video-oproepen."
       twitter: "Twitter is een zeer goed hulpprogramma voor communicatie buiten de cursus om."
@@ -15159,9 +15164,9 @@ nl:
       weekly_message: 
         one: "Deze Canvas instelling is alleen voor toetsing en zal iedere week opnieuw ingesteld worden."
         other: "Deze Canvas instelling is alleen voor toetsing en zal iedere %{count} weken opnieuw ingesteld worden."
-  we_were_unable_to_activate_the_app_578defe7: "We konden de app niet activeren"
+  we_were_unable_to_activate_the_app_578defe7: "We konden de app niet activeren."
   we_were_unable_to_add_the_app_418877ef: "Wij waren niet in staat om de app toe te voegen. "
-  we_were_unable_to_deactivate_the_app_5e2632f3: "We konden de app niet deactiveren"
+  we_were_unable_to_deactivate_the_app_5e2632f3: "We konden de app niet deactiveren."
   we_were_unable_to_update_the_app_659f5bc6: "Wij waren niet in staat om de app bij te werken. "
   web_conference: 
     default_name_for_courses: "Cursusvergadering (online)"
@@ -15324,7 +15329,7 @@ nl:
     next_label: "Volgende &#8594;"
     page_entries_info: 
       multi_page: "%{model} weergeven %{from} - %{to} van in totaal %{count} "
-      multi_page_html: "%{model} weergeven <b>%{from}&nbsp;-&nbsp;%{to}</b> van in totaal <b>%{count}</b>"
+      multi_page_html: "%{model} weergeven  <b>%{from}&nbsp;-&nbsp;%{to}</b> van in totaal <b>%{count}</b>"
       single_page: 
         one: "1 %{model} weergeven"
         other: "Alle %{count} %{model} weergeven"
@@ -15347,7 +15352,7 @@ nl:
   xml_configuration_5ea1b942: "XML Configuratie "
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Je bent aangemeld bij %{institution1} met jouw referenties van %{institution2} "
   you_are_the_group_leader_for_this_group_b8629b70: "jij bent de groepsleider van deze groep "
-  you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Je kunt de opdrachten van een cursus verbergen of tonen door ze aan of uit te zetten."
+  you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Je kunt de opdrachten van een cursus verbergen of tonen door ze in of uit te schakelen."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Je kunt nu de opties voor het herberekenen instellen voor cursisten die de toets al gemaakt hebben."
   you_have_changed_the_progression_requirements_for__6772bc89: "Je hebt de voortgangsvereisten voor een actieve cursus veranderd. Er kunnen cursisten zijn die al naar deze module door zijn gegaan en anderen die ervan afhankelijk zijn."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Je hebt wijzigingen aangebracht  in de vragen van deze toets .* Deze wijzigingen zullen voor cursisten pas verschijnen als je de toets hebt opgeslagen."
@@ -15361,8 +15366,8 @@ nl:
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Je moet het instellen op een cijfer gelijk aan of groter dan %{min} "
   you_must_specify_a_usage_right_5eb57f87: "Je  moet een gebruiksrecht aangeven. "
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Je kunt nu je Opdrachtenlijst vinden op de *Kalender* pagina."
-  your_assignments_list_has_improved_3eded80e: "Je *Opdrachten*lijst is verbeterd!"
-  your_assignments_will_show_here_listed_by_due_date_18dc880f: "Je Opdrachten worden hier weergegeven, op volgorde van verschuldigde datum."
+  your_assignments_list_has_improved_3eded80e: "Je *Opdrachten* lijst is verbeterd!"
+  your_assignments_will_show_here_listed_by_due_date_18dc880f: "Je opdrachten worden hier weergegeven, op volgorde van vervaldatum."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Jouw internetbrowser voldoet niet aan de minimumvereisten van Canvas. Bekijk de *Canvas handleidingen* voor een volledige lijst van ondersteunde browsers."
   your_content_has_been_exported_bbb57764: "Jouw inhoud is geëxporteerd. "
   your_message_has_been_sent_thank_you_e0284316: "Jouw bericht is verzonden. Dank je wel! "
