@@ -60,7 +60,7 @@ class GoogleDocsCollaboration < Collaboration
   end
 
   def user_can_access_document_type?(user)
-    return !!google_user_service(user) || !!google_user_service(user, GOOGLE_DRIVE_SERVICE) if self.user && user
+    return !!google_adapter_user_service(user) if self.user && user
     false
   end
 
@@ -115,6 +115,21 @@ class GoogleDocsCollaboration < Collaboration
   def self.config
     GoogleDocs::Connection.config
   end
+
+  # Internal: Update collaborators with the given groups.
+  #
+  # users - An array of users to add as collaborators.
+  #
+  # Returns nothing.
+  def add_users_to_collaborators(users)
+    if users.length > 0
+      existing_users = collaborators.where(:user_id => users).pluck(:user_id)
+      users.select { |u| !existing_users.include?(u.id) }.each do |u|
+        collaborators.create(:user => u, :authorized_service_user_id => google_adapter_user_service(u).service_user_id)
+      end
+    end
+  end
+  protected :add_users_to_collaborators
 
   private
 
