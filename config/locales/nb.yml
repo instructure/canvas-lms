@@ -3926,6 +3926,7 @@ nb:
     other_recipients: 
       one: "og 1 annen"
       other: "og %{count} andre"
+    result_status: "Den autofullfør har %{results} oppføringer oppført, kan du bruke opp og ned piltastene for å navigere til en oppføring, og trykk deretter på enter for å legge til personen i Til feltet."
     star: "Merk med stjerne"
     star_conversation: "Merk samtalen med stjerne"
     submission_comment_form_dialog: 
@@ -7418,6 +7419,7 @@ nb:
     errors: 
       import: 
         external_tool_url: "URL for oppgaven som benytter eksternt verktøy \"App\" \"%{assignment_name}\" var ikke gyldig."
+        grading_standard_not_found: "Oppdraget \"%{title}\" refererte til en gradering ordning som ikke ble funnet i målet kurs konto kjeden."
     imported_assignments_group: "Importerte oppgaver"
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "Sikkerhetsparameterne for det eksterne verktøyet \"%{tool_name}\" må vare i kursinnstillingene."
@@ -12729,6 +12731,7 @@ nb:
     move: Flytt
     move_question: 
       one: "Hvor ønsker du å flytte %{item}?"
+      other: "Hvor ønsker du å flytte disse %{count} elementer?"
     move_success: 
       one: "%{item} flyttet til %{destinationFolder}"
       other: "%{count} elementer flyttet til %{destinationFolder}"
@@ -15391,6 +15394,7 @@ nb:
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du må sette den til et tall som er større enn eller lik %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Du må spesifisere et bruk rett."
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din Oppgavelisten kan nå bli funnet på *Kalender* side."
+  your_assignments_list_has_improved_3eded80e: "*Oppdrag* lista ditt har blitt forbedret"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Dine Oppdrag vil vise her listet etter forfallsdato."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Nettleseren din imøtekommer ikke minstekravene for Canvas: Besøk *Canvas brukerhåndbøker* for en liste over støttede nettlesere."
   your_content_has_been_exported_bbb57764: "Innholdet ditt er eksportert."
