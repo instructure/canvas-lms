@@ -258,6 +258,13 @@ describe QuizzesHelper do
       expect(html).to eq 'some <select class="question_input" name="question_4"><option value="val" selected>val</option></select>'
       expect(html).to be_html_safe
     end
+
+    it "should not blow up if the user's answer isn't there" do
+      html = multiple_dropdowns_question(question: { question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'},
+                                         answer_list: ['val'])
+      expect(html).to eq 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
+      expect(html).to be_html_safe
+    end
   end
 
   describe "#quiz_edit_text" do
