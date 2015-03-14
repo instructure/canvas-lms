@@ -10900,6 +10900,7 @@ zh_Hant:
         save_yo_name: "儲存 Yo 名稱"
         select_image: 選擇影像
         update_settings: 更新設定
+      confirm_email_instructions: "*現在就複製此權杖*。一旦您離開這個頁面，將無法再抓取完整權杖，(%{email}) 您就必須重新生成一個以獲得一個新值。"
       delicious_description: "Delicious 是一種工具，可以讓您儲存並與他人共用您的書簽。Canvas 的多種格式的內容編輯器可以讓您搜尋您的 Delicious 標籤，以便很容易地從 Canvas 內部連結到您覺得有用的其他資源。"
       diigo_description: "Diigo 是专门针对科研和教育的社会书签工具。Canvas 的多種格式的內容編輯器可以讓您搜尋您的 Diigo 標籤，以便很容易地從 Canvas 內部連結到您覺得有用的其他資源。"
       error_loading_token_details: 載入權杖詳細資料時發生錯誤
@@ -13142,6 +13143,7 @@ zh_Hant:
         crosslist_this_section: 使此章節跨清單
         current_enrollments: 當前註冊
         decrosslist_section: 取消使此章節跨清單
+  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*查看一些 LTI 工具*，此類工具與 Canvas 配合很好。還可以查看 ** 有關 LTI 工具的 Canvas 社區話題**"
   select_content: 選擇內容
   select_content_checkbox: 
     select_content_error: 必須選擇內容選項
