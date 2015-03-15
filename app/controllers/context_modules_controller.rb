@@ -34,7 +34,9 @@ class ContextModulesController < ApplicationController
                                         :root_account => @domain_root_account, :current_user => @current_user).to_a
       placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
 
-      @modules_json = @modules.map{|mod| module_json(mod, @current_user, session, nil, ['content_details', 'items']) }
+      if @context.grants_right?(@current_user, session, :manage_content)
+        @modules_json = @modules.map{|mod| module_json(mod, @current_user, session, nil, ['content_details', 'items']) }
+      end
 
       js_env :course_id => @context.id,
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
