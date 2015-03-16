@@ -34,12 +34,12 @@ define([
 
       fields['name'] = {
         type: 'text',
-        value: this.props.app.attributes.name,
+        value: this.props.app.name,
         required: true,
         description: I18n.t('Name')
       };
 
-      if (this.props.app.attributes.requires_secret) {
+      if (this.props.app.requires_secret) {
         fields['consumer_key'] = {
           type: 'text',
           value: '',
@@ -54,7 +54,7 @@ define([
         };
       }
 
-      this.props.app.attributes.config_options.map(function(opt) {
+      this.props.app.config_options.map(function(opt) {
         fields[opt.name] = {
           type: opt.param_type,
           value: opt.default_value,
@@ -111,11 +111,15 @@ define([
     },
 
     configUrl() {
-      var url = this.props.app.attributes.config_xml_url;
+      var url = this.props.app.config_xml_url;
 
       var queryParams = {};
       _.map(this.state.fields, function(v, k) {
-        queryParams[k] = v.value;
+        if(v.type == "checkbox") {
+          if(!v.value) return;
+          queryParams[k] = '1';
+        } else
+          queryParams[k] = v.value;
       });
       delete queryParams['consumer_key'];
       delete queryParams['shared_secret'];
@@ -129,7 +133,7 @@ define([
       newTool.on('sync', this.onSaveSuccess, this);
       newTool.on('error', this.onSaveFail, this);
 
-      if (this.props.app.attributes.requires_secret) {
+      if (this.props.app.requires_secret) {
         newTool.set('consumer_key', this.state.fields.consumer_key.value);
         newTool.set('shared_secret', this.state.fields.shared_secret.value);
       } else {
@@ -139,6 +143,7 @@ define([
 
       newTool.set('config_url', this.configUrl());
       newTool.set('config_type', 'by_url');
+      newTool.set('name', this.state.fields.name.value);
 
       $(e.target).attr('disabled', 'disabled');
 
@@ -162,8 +167,11 @@ define([
     configOptions() {
       return _.map(this.state.fields, function(v, k) {
         return (
-          <ConfigOptionField name={k}
+          <ConfigOptionField
+            name={k}
             type={v.type}
+            ref={'option_' + k}
+            key={'option_' + k}
             value={v.value}
             require={v.required}
             description={v.description}
@@ -181,29 +189,42 @@ define([
     render() {
       return (
         <div className="AddApp">
-          <a href="#" ref="addTool" className="btn btn-primary btn-block add_app icon-add" onClick={this.openModal}>{I18n.t('Add Tool')}</a>
-          <Modal className="ReactModal__Content--external_tools modal-dialog" isOpen={this.state.modalIsOpen} onRequestClose={this.closeModal}>
-            <div className="modal-content">
-              <div className="modal-header">
-                <button type="button" className="close" onClick={this.closeModal}>
-                  <span aria-hidden="true">&times;</span>
-                  <span className="screenreader-only">{I18n.t('Close')}</span>
-                </button>
-                <h4 className="modal-title">{I18n.t('Add App')}</h4>
+          <a href="#" ref="addTool" className="btn btn-primary btn-block add_app icon-add" onClick={this.openModal}>{I18n.t('Add App')}</a>
+
+          <Modal className="ReactModal__Content--canvas"
+            overlayClassName="ReactModal__Overlay--canvas"
+            isOpen={this.state.modalIsOpen}
+            onRequestClose={this.closeModal}>
+
+            <div className="ReactModal__Layout">
+
+              <div className="ReactModal__InnerSection ReactModal__Header">
+                <div className="ReactModal__Header-Title">
+                  <h4>{I18n.t('Add App')}</h4>
+                </div>
+                <div className="ReactModal__Header-Actions">
+                  <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
+                    <i className="icon-x"></i>
+                    <span className="screenreader-only">Close</span>
+                  </button>
+                </div>
               </div>
-              <div className="modal-body">
+
+              <div className="ReactModal__InnerSection ReactModal__Body">
                 {this.errorMessage()}
                 <form role="form">
-                  <fieldset className="add-app-modal">
-                    {this.configOptions()}
-                  </fieldset>
+                  {this.configOptions()}
                 </form>
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
-                <button type="button" ref="addButton" className="btn btn-primary" disabled={!this.state.isValid} onClick={this.submit}>{I18n.t('Add App')}</button>
+
+              <div className="ReactModal__InnerSection ReactModal__Footer">
+                <div className="ReactModal__Footer-Actions">
+                  <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
+                  <button type="button" ref="addButton" className="btn btn-primary" disabled={!this.state.isValid} onClick={this.submit}>{I18n.t('Add App')}</button>
+                </div>
               </div>
             </div>
+
           </Modal>
         </div>
       )

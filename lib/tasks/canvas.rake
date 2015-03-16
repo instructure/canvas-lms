@@ -19,7 +19,7 @@ def check_syntax(files)
   Array(files).each do |js_file|
     js_file.strip!
     # only lint things in public/javascripts that are not in /vendor, /compiled, etc.
-    if js_file.match /public\/javascripts\/(?!vendor|compiled|i18n.js|translations)/
+    if js_file.match /public\/javascripts\/(?!vendor|compiled|i18n.js|translations|old_unsupported_dont_use_react)/
       file_path = File.join(Rails.root, js_file)
 
       unless quick
@@ -284,6 +284,17 @@ namespace :db do
   end
 end
 
-%w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman.shardify_task(task_name) }
+Switchman::Rake.filter_database_servers do |servers, block|
+  if ENV['REGION']
+    if ENV['REGION'] == 'self'
+      servers.select!(&:in_current_region?)
+    else
+      servers.select! { |server| server.in_region?(ENV['REGION']) }
+    end
+  end
+  block.call(servers)
+end
+
+%w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
 
 end

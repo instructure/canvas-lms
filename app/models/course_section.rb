@@ -51,7 +51,6 @@ class CourseSection < ActiveRecord::Base
 
   has_many :sis_post_grades_statuses
 
-  before_save :set_update_account_associations_if_changed
   before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
 
@@ -76,6 +75,15 @@ class CourseSection < ActiveRecord::Base
 
   def available?
     course.available?
+  end
+
+  def concluded?
+    now = Time.now
+    if self.end_at && self.restrict_enrollments_to_section_dates
+      self.end_at < now
+    else
+      self.course.concluded?
+    end
   end
 
   def touch_all_enrollments
@@ -117,13 +125,8 @@ class CourseSection < ActiveRecord::Base
     can :read_as_admin
   end
 
-  def set_update_account_associations_if_changed
-    @should_update_account_associations = self.course_id_changed? || self.nonxlist_course_id_changed?
-    true
-  end
-
   def update_account_associations_if_changed
-    if @should_update_account_associations && !Course.skip_updating_account_associations?
+    if (self.course_id_changed? || self.nonxlist_course_id_changed?) && !Course.skip_updating_account_associations?
       Course.send_later_if_production(:update_account_associations,
                                       [self.course_id, self.course_id_was, self.nonxlist_course_id, self.nonxlist_course_id_was].compact.uniq)
     end
@@ -135,8 +138,12 @@ class CourseSection < ActiveRecord::Base
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
-    existing_section = CourseSection.where(root_account_id: self.root_account_id, sis_source_id: self.sis_source_id).first
-    return true if !existing_section || existing_section.id == self.id
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
+    scope = root_account.course_sections.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
+
+    return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false

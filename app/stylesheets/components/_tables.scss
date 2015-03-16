@@ -1,7 +1,7 @@
 /*
 @styleguide Tables
 
-### Default table
+## Default table
 
 ```html
 <table class="ic-Table">
@@ -36,7 +36,7 @@
 </table>
 ```
 
-### Row-hover table
+## Row-hover table
 
 Adding **.ic-Table--hover-row** to the table element will produce a background color when the user hovers over each table row in the table body.
 
@@ -67,7 +67,7 @@ Adding **.ic-Table--hover-row** to the table element will produce a background c
 </table>
 ```
 
-### Striped table
+## Striped table
 
 Add **.ic-Table--striped** to the table element to produce a striped table among rows in the table body.
 
@@ -103,7 +103,7 @@ Add **.ic-Table--striped** to the table element to produce a striped table among
   </tbody>
 </table>
 ```
-### Row background color options
+## Row background color options
 
 We will reserve $canvas-primary (traditionally blue) for the hover state background color.
 
@@ -140,7 +140,7 @@ We will reserve $canvas-primary (traditionally blue) for the hover state backgro
 </table>
 ```
 
-### Condensed table
+## Condensed table
 
 Add **.ic-Table--condensed** to the table element to reduce the default cell padding.
 
@@ -177,7 +177,7 @@ Add **.ic-Table--condensed** to the table element to reduce the default cell pad
 </table>
 ```
 
-### Table with cog (admin link dropdown)
+## Table with cog (admin link dropdown)
 
 Enclose our standard Cog Dropdown within a **div class="ic-Table--actions** to right-align the button and make sure the cog dropdown appears in the right place.
 
@@ -242,20 +242,20 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
   }
 
   tr {
-    &.ic-Table__row--bg-neutral { background-color: $can-bg-light-neutral; }
-    &.ic-Table__row--bg-success { background-color: $can-bg-light-success; }
-    &.ic-Table__row--bg-alert { background-color: $can-bg-light-alert; }
-    &.ic-Table__row--bg-danger { background-color: $can-bg-light-danger; }
+    &.ic-Table__row--bg-neutral { background-color: $ic-bg-light-neutral; }
+    &.ic-Table__row--bg-success { background-color: $ic-bg-light-success; }
+    &.ic-Table__row--bg-alert { background-color: $ic-bg-light-alert; }
+    &.ic-Table__row--bg-danger { background-color: $ic-bg-light-danger; }
   }
   
   th {
-    border-bottom-color: $can-border-dark;
+    border-bottom-color: $ic-border-dark;
     padding-bottom: $sp-table/2;
     font-weight: bold;
   }
   
   td { 
-    border-bottom-color: $can-border-light;
+    border-bottom-color: $ic-border-light;
     // If you need to add admin links to the far-right cell, enclose them in .ic-Table--actions
     .ic-Table__actions {
       position: relative;
@@ -270,7 +270,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
   
   &.ic-Table--striped {
     tbody {
-      tr:nth-child(odd) { background-color: $can-bg-light-neutral; }
+      tr:nth-child(odd) { background-color: $ic-bg-light-neutral; }
     }
   }
   
@@ -294,7 +294,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
         tr.ic-Table__row--bg-success,
         tr.ic-Table__row--bg-alert,
         tr.ic-Table__row--bg-danger {
-          &:hover { background-color: $can-bg-light-primary; }
+          &:hover { background-color: $ic-bg-light-primary; }
         }
       }
     

@@ -4,7 +4,7 @@ define([
   'i18n!student_groups',
   'underscore',
   'jquery',
-  'react',
+  'old_unsupported_dont_use_react',
   'compiled/models/Group',
   'compiled/collections/UserCollection',
   'compiled/collections/ContextGroupCollection',
@@ -127,7 +127,7 @@ define([
       groupModel.set('users', _.reject(groupModel.get('users'), (u) => u.id === userId ));
       // If user was a leader, unset the leader attribute.
       var leader = groupModel.get("leader");
-      if (leader.id == userId) {
+      if (leader && leader.id == userId) {
         groupModel.set("leader", null);
       }
     },
@@ -191,8 +191,8 @@ define([
       var newGroupButton = null
       if (ENV.STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE) {
         newGroupButton = (
-          <button className="btn btn-primary add_group_link" onClick={this.openNewGroupDialog}>
-            <i className="icon-plus" aria-label={I18n.t('new')} />
+          <button aria-label={I18n.t('Add new group')} className="btn btn-primary add_group_link" onClick={this.openNewGroupDialog}>
+            <i className="icon-plus" />
             &nbsp;{I18n.t('Group')}
           </button>);
       }
@@ -208,7 +208,7 @@ define([
                 <a href={`/courses/${ENV.course_id}/users`}>{I18n.t('Everyone')}</a>
               </li>
               <li className="ui-state-default ui-corner-top ui-tabs-active ui-state-active">
-                <a href="#">{I18n.t('Groups')}</a>
+                <a href="#" tabIndex="-1">{I18n.t('Groups')}</a>
               </li>
             </ul>
             <div className="roster-tab tab-panel">

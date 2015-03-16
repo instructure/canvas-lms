@@ -95,6 +95,9 @@ describe NotificationPolicy do
         whenever { true }
         data { {:favorite_soda => 'mtn dew'} }
       end
+      def root_account
+        Account.default
+      end
     end
     dt = DataTest.new(account_id: Account.default.id,
                       root_account_id: Account.default.id,

@@ -285,7 +285,6 @@ class Notification < ActiveRecord::Base
     t 'names.group_membership_accepted', 'Group Membership Accepted'
     t 'names.group_membership_rejected', 'Group Membership Rejected'
     t 'names.merge_email_communication_channel', 'Merge Email Communication Channel'
-    t 'names.migration_export_ready', 'Migration Export Ready'
     t 'names.migration_import_failed', 'Migration Import Failed'
     t 'names.migration_import_finished', 'Migration Import Finished'
     t 'names.new_account_user', 'New Account User'

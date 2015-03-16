@@ -43,7 +43,7 @@
       <% if user_answer %>
         <div class="user_points" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
           <% if editable %>
-            <input type="text" class="question_input" name="question_score_<%= hash_get(question, :id) %>" value="<%= point_value_for_input(user_answer, question) %>"  autocomplete='off'/>
+            <input type="text" class="question_input" name="question_score_<%= hash_get(question, :id) %>" value="<%= number_with_precision(point_value_for_input(user_answer, question), precision: 2, strip_insignificant_zeros: true) %>" autocomplete='off'/>
           <% else %>
             <% if hash_get(user_answer, :correct) == "undefined" %>
               <%= t(:not_yet_graded, 'Not yet graded') %>

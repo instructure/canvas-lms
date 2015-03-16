@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
   include LocaleSelection
   include Api::V1::User
   include Api::V1::WikiPage
-  include Lti::MessageHelper
+  include LegalInformationHelper
   around_filter :set_locale
 
   helper :all
@@ -127,14 +127,17 @@ class ApplicationController < ActionController::Base
     @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
     @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
     @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
+    @js_env[:TOURS] = tours_to_run
     @js_env
   end
   helper_method :js_env
 
   def external_tools_display_hashes(type, context=@context, custom_settings=[])
+    return [] if context.is_a?(Group)
+
     context = context.account if context.is_a?(User)
-    tools = ContextExternalTool.all_tools_for(context, :type => type,
-      :root_account => @domain_root_account, :current_user => @current_user)
+    tools = ContextExternalTool.all_tools_for(context, {:type => type,
+      :root_account => @domain_root_account, :current_user => @current_user})
 
     extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
@@ -187,6 +190,25 @@ class ApplicationController < ActionController::Base
 
   def rescue_action_dispatch_exception
     rescue_action_in_public(request.env['action_dispatch.exception'])
+  end
+
+  # used to generate context-specific urls without having to
+  # check which type of context it is everywhere
+  def named_context_url(context, name, *opts)
+    if context.is_a?(UserProfile)
+      name = name.to_s.sub(/context/, "profile")
+    else
+      klass = context.class.base_class
+      name = name.to_s.sub(/context/, klass.name.underscore)
+      opts.unshift(context)
+    end
+    opts.push({}) unless opts[-1].is_a?(Hash)
+    include_host = opts[-1].delete(:include_host)
+    if !include_host
+      opts[-1][:host] = context.host_name rescue nil
+      opts[-1][:only_path] = true
+    end
+    self.send name, *opts
   end
 
   protected
@@ -270,25 +292,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # used to generate context-specific urls without having to
-  # check which type of context it is everywhere
-  def named_context_url(context, name, *opts)
-    if context.is_a?(UserProfile)
-      name = name.to_s.sub(/context/, "profile")
-    else
-      klass = context.class.base_class
-      name = name.to_s.sub(/context/, klass.name.underscore)
-      opts.unshift(context)
-    end
-    opts.push({}) unless opts[-1].is_a?(Hash)
-    include_host = opts[-1].delete(:include_host)
-    if !include_host
-      opts[-1][:host] = context.host_name rescue nil
-      opts[-1][:only_path] = true
-    end
-    self.send name, *opts
-  end
-
   def user_url(*opts)
     opts[0] == @current_user && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
       user_profile_url(@current_user) :
@@ -341,6 +344,10 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  def run_login_hooks
+    LoginHooks.run_hooks(request)
+  end
+
   # checks the authorization policy for the given object using
   # the vendor/plugins/adheres_to_policy plugin.  If authorized,
   # returns true, otherwise renders unauthorized messages and returns
@@ -348,32 +355,18 @@ class ApplicationController < ActionController::Base
   # if authorized_action(object, @current_user, session, :update)
   #   render
   # end
-  def authorized_action(object, *opts)
-    can_do = is_authorized_action?(object, *opts)
+  def authorized_action(object, actor, rights)
+    can_do = object.grants_any_right?(actor, session, *Array(rights))
     render_unauthorized_action unless can_do
     can_do
   end
   alias :authorized_action? :authorized_action
 
-  def is_authorized_action?(object, *opts)
-    return false unless object
-
-    user = opts.shift
-    action_session ||= session
-    action_session = opts.shift if !opts[0].is_a?(Symbol) && !opts[0].is_a?(Array)
-    actions = Array(opts.shift).flatten
-
-    begin
-      return object.grants_any_right?(user, action_session, *actions)
-    rescue => e
-      logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
-    end
-
-    false
-  end
-
   def render_unauthorized_action
     respond_to do |format|
+      @needs_login = (!@current_user && !@files_domain)
+      run_login_hooks if @needs_login
+
       @show_left_side = false
       clear_crumbs
       params = request.path_parameters
@@ -427,6 +420,10 @@ class ApplicationController < ActionController::Base
       end
     end
     return @context != nil
+  end
+
+  def require_context_and_read_access
+    return require_context && authorized_action(@context, @current_user, :read)
   end
 
   helper_method :clean_return_to
@@ -952,6 +949,7 @@ class ApplicationController < ActionController::Base
   # Custom error catching and message rendering.
   def rescue_action_in_public(exception)
     response_code = exception.response_status if exception.respond_to?(:response_status)
+    @show_left_side = exception.show_left_side if exception.respond_to?(:show_left_side)
     response_code ||= response_code_for_rescue(exception) || 500
     begin
       status_code = interpret_status(response_code)
@@ -1008,15 +1006,21 @@ class ApplicationController < ActionController::Base
     load_account unless @domain_root_account
     session[:last_error_id] = error.id rescue nil
     if request.xhr? || request.format == :text
-      render_xhr_exception(error, nil, status, status_code)
+      message = exception.xhr_message if exception.respond_to?(:xhr_message)
+      render_xhr_exception(error, message, status, status_code)
     else
       request.format = :html
-      erbfile = "#{status.to_s[0,3]}_message.html.erb"
-      erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
-      erbfile = "500_message.html.erb" unless File.exists?(erbpath)
+      template = exception.error_template if exception.respond_to?(:error_template)
+      unless template
+        erbfile = "#{status.to_s[0,3]}_message.html.erb"
+        erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
+        erbfile = "500_message.html.erb" unless File.exists?(erbpath)
+        template = "shared/errors/#{erbfile}"
+      end
+
       @status_code = status_code
       message = exception.is_a?(RequestError) ? exception.message : nil
-      render :template => "shared/errors/#{erbfile}",
+      render :template => template,
         :layout => 'application',
         :status => status,
         :locals => {
@@ -1227,23 +1231,18 @@ class ApplicationController < ActionController::Base
                  :redirect_return_cancel_url => success_url)
         end
 
-        substitutions = common_variable_substitutions
-        if tag.tag_type == 'context_module'
-          substitutions.merge!(
-              {
-                  '$Canvas.module.id' => tag.context_module_id,
-                  '$Canvas.moduleItem.id' => tag.id,
-              }
-          )
-        end
-
         opts = {
             launch_url: @resource_url,
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
-            custom_substitutions: substitutions
         }
-        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
+        variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
+                                                        current_user: @current_user,
+                                                        current_pseudonym: @current_pseudonym,
+                                                        content_tag: tag,
+                                                        assignment: @assignment,
+                                                        tool: @tool})
+        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)
 
         if tag.try(:context_module)
           add_crumb tag.context_module.name, context_url(@context, :context_context_modules_url)
@@ -1397,6 +1396,8 @@ class ApplicationController < ActionController::Base
         !!Diigo::Connection.config
       elsif feature == :google_docs
         !!GoogleDocs::Connection.config
+      elsif feature == :google_drive
+        Canvas::Plugin.find(:google_drive).try(:enabled?)
       elsif feature == :etherpad
         !!EtherpadCollaboration.config
       elsif feature == :kaltura
@@ -1664,7 +1665,7 @@ class ApplicationController < ActionController::Base
     @notices ||= begin
       notices = []
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
-        notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'}
+        notices << {:type => 'warning', :content => {html: unsupported_browser}, :classes => 'unsupported_browser'}
       end
       if error = flash[:error]
         flash.delete(:error)
@@ -1692,7 +1693,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("#application.warnings.unsupported_browser", "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
   end
 
   def browser_supported?
@@ -1815,6 +1816,46 @@ class ApplicationController < ActionController::Base
       google_docs = GoogleDocs::Connection.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
     end
     google_docs
+  end
+
+  def google_drive_connection
+    return unless Canvas::Plugin.find(:google_drive).try(:settings)
+    ## @real_current_user first ensures that a masquerading user never sees the
+    ## masqueradee's files, but in general you may want to block access to google
+    ## docs for masqueraders earlier in the request
+    if logged_in_user
+      refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.where(service: "google_drive").first
+        service && [service.token, service.secret]
+      end
+    else
+      refresh_token = session[:oauth_gdrive_refresh_token]
+      access_token = session[:oauth_gdrive_access_token]
+    end
+
+    GoogleDocs::DriveConnection.new(refresh_token, access_token) if refresh_token && access_token
+  end
+
+  def google_service_connection
+    google_drive_connection || google_docs_connection
+  end
+
+  def google_drive_user_client
+    if logged_in_user
+      refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.where(service: "google_drive").first
+        service && [service.token, service.access_token]
+      end
+    else
+      refresh_token = session[:oauth_gdrive_refresh_token]
+      access_token = session[:oauth_gdrive_access_token]
+    end
+    google_drive_client(refresh_token, access_token)
+  end
+
+  def google_drive_client(refresh_token=nil, access_token=nil)
+    client_secrets = Canvas::Plugin.find(:google_drive).try(:settings)
+    GoogleDrive::Client.create(client_secrets, refresh_token, access_token)
   end
 
 

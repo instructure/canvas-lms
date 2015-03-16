@@ -172,15 +172,57 @@ I18n.strftime = function(date, format) {
   return f;
 };
 
+I18n.pluralize = function(count, scope, options) {
+  var translation;
+
+  try {
+    translation = this.lookup(scope, options);
+  } catch (error) {}
+
+  if (!translation) {
+    return this.missingTranslation(scope);
+  }
+
+  var message;
+  options = this.prepareOptions(options, {precision: 0});
+  options.count = this.toNumber(count, options);
+
+  switch(Math.abs(count)) {
+    case 0:
+      message = this.isValidNode(translation, "zero") ? translation.zero :
+          this.isValidNode(translation, "none") ? translation.none :
+              this.isValidNode(translation, "other") ? translation.other :
+                  this.missingTranslation(scope, "zero");
+      break;
+    case 1:
+      message = this.isValidNode(translation, "one") ? translation.one : this.missingTranslation(scope, "one");
+      break;
+    default:
+      message = this.isValidNode(translation, "other") ? translation.other : this.missingTranslation(scope, "other");
+  }
+
+  return this.interpolate(message, options);
+};
+
 I18n.Utils.HtmlSafeString = htmlEscape.SafeString; // this is what we use elsewhere in canvas, so make i18nliner use it too
 I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
+
+// when inferring the key at runtime (i.e. js/coffee or inline hbs `t`
+// call), signal to normalizeKey that it shouldn't be scoped.
+// TODO: make i18nliner-js set i18n_inferred_key, which will DRY things up
+// slightly
+var origInferKey = I18n.CallHelpers.inferKey;
+I18n.CallHelpers.inferKey = function() {
+  return "#" + origInferKey.apply(this, arguments);
+};
+
 I18n.CallHelpers.normalizeKey = function(key, options) {
   if (key[0] === '#') {
     key = key.slice(1);
     delete options.scope;
   }
   return key;
-}
+};
 
 if (window.ENV && window.ENV.lolcalize) {
   I18n.CallHelpers.normalizeDefault = i18nLolcalize;

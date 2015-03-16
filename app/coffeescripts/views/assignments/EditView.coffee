@@ -50,7 +50,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
     EXTERNAL_TOOLS_CONTENT_TYPE = '#assignment_external_tool_tag_attributes_content_type'
     EXTERNAL_TOOLS_CONTENT_ID = '#assignment_external_tool_tag_attributes_content_id'
     EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
-    ASSIGNMENT_POINTS_POSSIBLE = '#point_change_warning'
+    ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
+    ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
+
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -75,6 +77,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
       els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
       els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
+      els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
       els
     )
 
@@ -117,8 +120,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
-      data = @getFormData()
-      @$assignmentPointsPossible.toggleAccessibly(data.points_possible != (@assignment.pointsPossible() + ""))
+      if @assignment.hasSubmittedSubmissions()
+        @$pointsChangeWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@assignment.pointsPossible()}")
 
     setDefaultsIfNew: =>
       if @assignment.isNew()

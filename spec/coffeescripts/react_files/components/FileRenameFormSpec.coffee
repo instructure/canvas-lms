@@ -1,5 +1,5 @@
 define [
-  'react'
+  'old_unsupported_dont_use_react'
   'jquery'
   'compiled/react_files/components/FileRenameForm'
   'compiled/models/Folder'
@@ -31,6 +31,12 @@ define [
     Simulate.click(@form.refs.renameBtn.getDOMNode())
     ok(@form.state.isEditing)
     equal(@form.refs.newName.getDOMNode().value, 'options_name.txt'  )
+
+  test 'clears out file name text field when "clear text field" X icon is pressed', ->
+    Simulate.click(@form.refs.renameBtn.getDOMNode())
+    Simulate.click(@form.refs.clearNameFieldButton.getDOMNode())
+    equal(@form.refs.newName.getDOMNode().value, '')
+    ok($(@form.refs.newName.getDOMNode()).is(':focus'))
 
   test 'isEditing displays file name when no options name exists', ->
     @form.setProps(fileOptions: {file: {name: 'file_name.md'}})

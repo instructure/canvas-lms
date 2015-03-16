@@ -1,3 +1,14 @@
+// section tabs variables
+$section_tabs_color: $canvas-dark
+$section_tabs_hover_background_color: $ic-bg-light-neutral
+$section_tabs_border_top_color: $ic-border-color
+$section_tabs_border_bottom_color: $ic-border-color
+$section_tabs_to_be_hidden_color: $ic-font-color--subdued
+
+// #TODO - looks like a lot of these styles are being overridden by the _same_ styles that were
+// possibly left in the <style> tag of this area in canvas. So a lot of these are being overridden.
+// Need to investigate and consolidate these to get the styles out of the head tag.
+
 #course_form .date_entry
   width: 165px
 
@@ -56,7 +67,7 @@ ul.user_list li.user
     position: relative
 
 ul.user_list li.user:hover
-  background-color: $hover-color
+  background-color: $ic-bg-light-primary
 
 ul.user_list li.user .email
   font-size: 0.8em
@@ -137,7 +148,7 @@ ul.user_list div.enrollment_type.pending
     opacity: 0.3
 
 #sections .section:hover
-  background-color: #eee
+  background-color: $ic-bg-light-neutral
 
 #sections .section:hover .section_links a
   opacity: 1

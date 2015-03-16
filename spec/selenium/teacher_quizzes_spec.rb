@@ -245,7 +245,6 @@ describe "quizzes" do
       expect(f('.attempts_left').text).to eq '3'
     end
 
-    
     it "should indicate when it was last saved" do
       take_quiz do
         indicator = f('#last_saved_indicator')
@@ -523,7 +522,7 @@ describe "quizzes" do
 
       click_quiz_statistics_button
 
-      expect(f('#content .question_name')).to include_text("Question 1")
+      expect(f('#content .question-statistics .question-text')).to include_text("Which book(s) are required for this course?")
     end
 
     it "should display a link to quiz statistics for a MOOC" do

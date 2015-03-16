@@ -1,6 +1,6 @@
 define [
   'i18n!file_rename_form'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react/shared/utils/withReactDOM'
   './DialogAdapter'
   './DialogContent'
@@ -22,6 +22,10 @@ define [
 
     componentWillReceiveProps: (newProps) ->
       @setState(fileOptions: newProps.fileOptions, isEditing: false)
+
+    clearNameField: ->
+      $nameTextField = $(@refs.newName.getDOMNode())
+      $nameTextField.val('').focus()
 
     handleRenameClick: ->
       @setState isEditing: true
@@ -60,10 +64,18 @@ define [
       else
         div {},
           p {}, I18n.t('prompt', 'Change "%{name}" to', {name: nameToUse})
-          form onSubmit: @handleFormSubmit,
+          form className: 'ef-edit-name-form', onSubmit: @handleFormSubmit,
             label className: 'file-rename-form__form-label',
               I18n.t('name', 'Name')
-            input type: 'text', defaultValue: nameToUse, ref: 'newName'
+            input(classNae: 'input-block-level', type: 'text', defaultValue: nameToUse, ref: 'newName'),
+            button {
+              type: 'button'
+              className: 'btn btn-link ef-edit-name-cancel form-control-feedback'
+              ref: 'clearNameFieldButton'
+              'aria-label': I18n.t('Clear file name text field')
+              onClick: @clearNameField
+            },
+              i className: 'icon-x'
 
     buildButtons: withReactDOM ->
       if !@state.isEditing

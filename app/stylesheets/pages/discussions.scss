@@ -420,7 +420,7 @@ body.with-right-side.with-left-side {
 }
 
 .showMore:hover {
-  background: $menu-background-color;
+  background: $canvas-light;
   cursor: pointer;
   a {
     text-decoration: underline;
@@ -647,7 +647,7 @@ body.with-right-side.with-left-side {
     height: 53px;
     min-width: 647px;
     max-width: 1100px;
-    border-color: $menu-border-color;
+    border-color: $ic-border-light;
   }
   [disabled] {
     display: none;

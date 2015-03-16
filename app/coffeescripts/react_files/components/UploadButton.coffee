@@ -1,6 +1,6 @@
 define [
   'i18n!upload_button'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react/shared/utils/withReactDOM'
   'underscore'
   './FileRenameForm'

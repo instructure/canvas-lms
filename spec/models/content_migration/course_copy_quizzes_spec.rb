@@ -264,6 +264,29 @@ describe ContentMigration do
       expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["foo", "tr00"]
     end
 
+    it "should escape html characters in text answers" do
+      q = @copy_from.quizzes.create!(:title => "test quiz")
+      fimb = q.quiz_questions.create!
+      fimb.write_attribute(:question_data, {
+                                               points_possible: 1,
+                                               question_type: "fill_in_multiple_blanks_question",
+                                               question_name: "tf",
+                                               name: "tf",
+                                               question_text: "this statement is false. [orisit]",
+                                               answers: [{ text: "<p>foo</p>", weight: 100, id: 9093, blank_id: "orisit" },
+                                                         { text: "<div/>tr00", weight: 100, id: 9608, blank_id: "orisit" }]
+                                           }.with_indifferent_access)
+      fimb.save!
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
+      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["<p>foo</p>", "<div/>tr00"]
+    end
+
     it "should copy quizzes as published if they were published before" do
       g = @copy_from.assignment_groups.create!(:name => "new group")
       asmnt_unpub = @copy_from.quizzes.create!(:title => "asmnt unpub", :quiz_type => "assignment", :assignment_group_id => g.id)
@@ -379,39 +402,36 @@ describe ContentMigration do
     end
 
     it "should copy all quiz attributes" do
-      q = @copy_from.quizzes.create!(
-              :title => 'quiz',
-              :description => "<p>description eh</p>",
-              :shuffle_answers => true,
-              :show_correct_answers => true,
-              :time_limit => 20,
-              :allowed_attempts => 4,
-              :scoring_policy => 'keep_highest',
-              :quiz_type => 'survey',
-              :access_code => 'code',
-              :anonymous_submissions => true,
-              :hide_results => 'until_after_last_attempt',
-              :ip_filter => '192.168.1.1',
-              :require_lockdown_browser => true,
-              :require_lockdown_browser_for_results => true,
-              :notify_of_update => true,
-              :one_question_at_a_time => true,
-              :cant_go_back => true,
-              :require_lockdown_browser_monitor => true,
-              :lockdown_browser_monitor_data => 'VGVzdCBEYXRhCg==',
-      )
+      attributes = {
+        :title => 'quiz',
+        :description => "<p>description eh</p>",
+        :shuffle_answers => true,
+        :show_correct_answers => true,
+        :time_limit => 20,
+        :allowed_attempts => 4,
+        :scoring_policy => 'keep_highest',
+        :quiz_type => 'survey',
+        :access_code => 'code',
+        :anonymous_submissions => true,
+        :hide_results => 'until_after_last_attempt',
+        :ip_filter => '192.168.1.1',
+        :require_lockdown_browser => true,
+        :require_lockdown_browser_for_results => true,
+        :one_question_at_a_time => true,
+        :cant_go_back => true,
+        :require_lockdown_browser_monitor => true,
+        :lockdown_browser_monitor_data => 'VGVzdCBEYXRhCg==',
+        :one_time_results => true,
+        :show_correct_answers_last_attempt => true
+      }
+      q = @copy_from.quizzes.create!(attributes)
 
       run_course_copy
 
       new_quiz = @copy_to.quizzes.first
 
-      [:title, :description, :points_possible, :shuffle_answers,
-       :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
-       :access_code, :anonymous_submissions,
-       :hide_results, :ip_filter, :require_lockdown_browser,
-       :require_lockdown_browser_for_results, :require_lockdown_browser_monitor,
-       :lockdown_browser_monitor_data].each do |prop|
-        expect(new_quiz.send(prop)).to eq q.send(prop)
+      attributes.keys.each do |prop|
+        expect(new_quiz.send(prop)).to eq(q.send(prop)), "#{prop.to_s}: expected #{q.send(prop).inspect}, got #{new_quiz.send(prop).inspect}"
       end
 
     end

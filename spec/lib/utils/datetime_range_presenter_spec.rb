@@ -70,11 +70,11 @@ module Utils
       end
 
       it "should include the year if the current year isn't the same" do
-        Timecop.travel(Time.utc(2014, 10, 1, 9, 30))
-        nextyear = Time.zone.now.advance(years: 1)
-        presenter = DatetimeRangePresenter.new(nextyear)
-        expect(presenter.as_string).to eq("Oct 1, 2015 at  9:30am")
-        Timecop.return
+        Timecop.travel(Time.utc(2014, 10, 1, 9, 30)) do
+          nextyear = Time.zone.now.advance(years: 1)
+          presenter = DatetimeRangePresenter.new(nextyear)
+          expect(presenter.as_string).to eq("Oct 1, 2015 at  9:30am")
+        end
       end
 
       it "accepts a timezone override" do
@@ -86,26 +86,32 @@ module Utils
       end
 
       it "uses the default timezone if none provided" do
-        datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
-        pre_zone = Time.zone
-        Time.zone = "Mountain Time (US & Canada)"
-        nilzone_presenter = DatetimeRangePresenter.new(datetime, nil, :event, nil)
-        expect(nilzone_presenter.as_string).to eq("Jan 1 at  5am")
-        Time.zone = pre_zone
+        begin
+          datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
+          pre_zone = Time.zone
+          Time.zone = "Mountain Time (US & Canada)"
+          nilzone_presenter = DatetimeRangePresenter.new(datetime, nil, :event, nil)
+          expect(nilzone_presenter.as_string).to eq("Jan 1 at  5am")
+        ensure
+          Time.zone = pre_zone
+        end
       end
 
       it "can deal with date boundaries in the override on time objects" do
-        pre_zone = Time.zone
-        Time.zone = "Alaska"
-        Timecop.freeze(Time.utc(2014,10,1,7,30))
-        datetime = Time.now
+        begin
+          pre_zone = Time.zone
+          Time.zone = "Alaska"
+          Timecop.freeze(Time.utc(2014,10,1,7,30)) do
+            datetime = Time.now
 
-        alaskan_presenter = DatetimeRangePresenter.new(datetime)
-        mountain_presenter = overridden_presenter(datetime, "America/Denver")
-        expect(alaskan_presenter.as_string).to eq("Sep 30 at 11:30pm")
-        expect(mountain_presenter.as_string).to eq("Oct 1 at  1:30am")
-        Timecop.return
-        Time.zone = pre_zone
+            alaskan_presenter = DatetimeRangePresenter.new(datetime)
+            mountain_presenter = overridden_presenter(datetime, "America/Denver")
+            expect(alaskan_presenter.as_string).to eq("Sep 30 at 11:30pm")
+            expect(mountain_presenter.as_string).to eq("Oct 1 at  1:30am")
+          end
+        ensure
+          Time.zone = pre_zone
+        end
       end
 
     end

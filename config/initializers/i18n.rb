@@ -160,7 +160,7 @@ ActiveRecord::Base.class_eval do
   end
 
   def self.i18nliner_scope
-    @i18nliner_scope ||= I18nliner::Scope.new(self.class.name.underscore)
+    @i18nliner_scope ||= I18nliner::Scope.new(name.underscore)
   end
 
   class << self

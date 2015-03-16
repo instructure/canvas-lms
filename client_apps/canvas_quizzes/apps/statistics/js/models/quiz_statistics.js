@@ -34,13 +34,15 @@ define(function(require) {
 
     // pick any answer set; they will all have the same response count, only
     // distributed differently:
-    if (question.answerSets) {
+    if (question.answerSets && question.answerSets.length > 0) {
       answerPool = question.answerSets[0].answers;
     }
     else {
       answerPool = question.answers;
     }
-
+    if (question.questionType === 'multiple_answers_question') {
+      return question.responses;  // This will not indicate a response for blank responses
+    }
     return wrap(answerPool).reduce(function(sum, answer) {
       return sum + (answer.responses || 0);
     }, 0);
@@ -55,7 +57,7 @@ define(function(require) {
         answer.text = I18n.t('no_answer', 'No Answer');
       }
       else if (answer.id === 'other') {
-        answer.text = I18n.t('unknown_answer', 'Something Else');
+        answer.text = I18n.t('unknown_answer', 'Something Else'); // This is where we need to handle the answer changed thing
       }
 
       if (participantCount > 0) {

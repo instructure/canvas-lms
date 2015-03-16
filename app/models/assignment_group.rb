@@ -206,8 +206,10 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   def self.visible_assignments(user, context, assignment_groups, includes = [])
-    if context.grants_any_right?(user, :manage_grades, :read_as_admin, :manage_assignments) || user.nil?
+    if context.grants_any_right?(user, :manage_grades, :read_as_admin, :manage_assignments)
       scope = context.active_assignments.where(:assignment_group_id => assignment_groups)
+    elsif user.nil?
+      scope = context.active_assignments.published.where(:assignment_group_id => assignment_groups)
     else
       scope = user.assignments_visibile_in_course(context).
               where(:assignment_group_id => assignment_groups).published

@@ -1,5 +1,5 @@
 define [
-  'react'
+  'old_unsupported_dont_use_react'
   'jquery'
   'compiled/react_files/components/Breadcrumbs'
   'compiled/models/Folder'

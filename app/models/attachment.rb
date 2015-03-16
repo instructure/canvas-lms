@@ -27,7 +27,7 @@ class Attachment < ActiveRecord::Base
     :id, :context_id, :context_type, :size, :folder_id, :content_type, :filename, :uuid, :display_name, :created_at, :updated_at,
     :workflow_state, :user_id, :local_filename, :locked, :file_state, :deleted_at,
     :position, :lock_at, :unlock_at, :last_lock_at, :last_unlock_at, :could_be_locked, :root_attachment_id, :cloned_item_id,
-    :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message, :last_inline_view
+    :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission]
@@ -600,16 +600,18 @@ class Attachment < ActiveRecord::Base
     method = method.to_sym
     deleted_attachments = []
     if method == :rename
-      self.save unless self.id
+      self.save! unless self.id
 
       valid_name = false
-      while !valid_name
-        existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
-        self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
+      self.shard.activate do
+        while !valid_name
+          existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
+          self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
 
-        if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
-                            self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
-          valid_name = true
+          if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
+                              self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
+            valid_name = true
+          end
         end
       end
     elsif method == :overwrite
@@ -1456,10 +1458,6 @@ class Attachment < ActiveRecord::Base
 
   def view_inline_ping_url
     "/#{context_url_prefix}/files/#{self.id}/inline_view"
-  end
-
-  def record_inline_view
-    (root_attachment || self).update_attribute(:last_inline_view, Time.now)
   end
 
   def canvadoc_url(user)

@@ -18,7 +18,7 @@
 
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
-  before_filter :require_context, :except => :public_feed
+  before_filter :require_context_and_read_access, :except => :public_feed
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap{|e| e.current_user = @current_user}
@@ -152,7 +152,7 @@ class DiscussionEntriesController < ApplicationController
       render :template => "shared/unauthorized_feed", :layout => "layouts/application", :status => :bad_request, :formats => [:html] # :template => "shared/unauthorized_feed", :status => :bad_request
       return
     end
-    if authorized_action(@topic, @current_user, :read)
+    if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
       @all_discussion_entries = @topic.discussion_entries.active
       @discussion_entries = @all_discussion_entries
       if request.format == :rss && !@topic.podcast_has_student_posts

@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 define(function(require) {
   var React = require('react');
+  var ReactRouter = require('canvas_packages/react-router');
   var K = require('../constants');
   var I18n = require('i18n!quiz_log_auditing.table_view');
   var Legend = require('jsx!./answer_matrix/legend');
@@ -8,6 +9,7 @@ define(function(require) {
   var Option = require('jsx!./answer_matrix/option');
   var Table = require('jsx!./answer_matrix/table');
   var InvertedTable = require('jsx!./answer_matrix/inverted_table');
+  var Link = ReactRouter.Link;
 
   var AnswerMatrix = React.createClass({
     getInitialState: function() {
@@ -63,9 +65,9 @@ define(function(require) {
                 label={I18n.t('options.invert', 'Invert')}
                 checked={this.state.invert} />
 
-              <a href="#/" className="btn btn-default">
+              <Link to="app" className="btn btn-default" query={this.props.query}>
                 {I18n.t('buttons.go_to_stream', 'View Stream')}
-              </a>
+              </Link>
             </div>
           </h1>
 

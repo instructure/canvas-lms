@@ -72,10 +72,10 @@ describe AssignmentGroup do
     end
 
     context "logged out users" do
-      it "should return assignments for logged out users so that invited users can see them before accepting a course invite" do
-        expect(@ag.visible_assignments(nil).count).to eq 3
-        expect(AssignmentGroup.visible_assignments(nil, @c, [@ag]).count).to eq 3
-
+      it "should return published assignments for logged out users so that invited users can see them before accepting a course invite" do
+        @c.active_assignments.first.unpublish
+        expect(@ag.visible_assignments(nil).count).to eq 2
+        expect(AssignmentGroup.visible_assignments(nil, @c, [@ag]).count).to eq 2
       end
     end
   end

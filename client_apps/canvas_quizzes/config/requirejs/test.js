@@ -7,6 +7,10 @@ requirejs.config({
 
     'canvas_quizzes/config': {
       'app': '../js'
+    },
+
+    '*': {
+      'old_unsupported_dont_use_react': 'canvas/old_unsupported_dont_use_react'
     }
   },
 

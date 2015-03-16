@@ -27,7 +27,7 @@ module Api::V1
     end
 
     def methods_to_send
-      methods = ['end_at', 'public_syllabus', 'storage_quota_mb']
+      methods = ['end_at', 'public_syllabus', 'storage_quota_mb', 'is_public_to_auth_users']
       methods << 'hide_final_grades' if @includes.include?(:hide_final_grades)
       methods << 'storage_quota_used_mb' if @includes.include?(:storage_quota_used_mb)
       methods

@@ -50,7 +50,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   # directly modifying the setting records in the database (note that you will
   # still have to restart your Canvas instance for the settings to take effect.)
   def self.large_quiz?(quiz)
-    (quiz.quiz_questions.size >
+    (quiz.active_quiz_questions.size >
       Setting.get('quiz_statistics_max_questions', DefaultMaxQuestions).to_i) ||
     (quiz.quiz_submissions.size >
       Setting.get('quiz_statistics_max_submissions', DefaultMaxSubmissions).to_i)

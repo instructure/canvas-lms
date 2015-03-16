@@ -42,6 +42,21 @@ describe "differentiated_assignments" do
     make_quiz({date: Time.now, ovto: nil})
   end
 
+  def student_in_course_with_adhoc_override(quiz, opts={})
+    @user = opts[:user] || user_model
+    StudentEnrollment.create!(:user => @user, :course => @course)
+    ao = AssignmentOverride.new()
+    ao.quiz = quiz
+    ao.title = "ADHOC OVERRIDE"
+    ao.workflow_state = "active"
+    ao.set_type = "ADHOC"
+    ao.save!
+    override_student = ao.assignment_override_students.build
+    override_student.user = @user
+    override_student.save!
+    @user
+  end
+
   def enroller_user_in_section(section, opts={})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course, :course_section => section)
@@ -130,6 +145,34 @@ describe "differentiated_assignments" do
       before do
         quiz_with_true_only_visible_to_overrides
         give_section_foo_due_date(@quiz)
+      end
+
+      context "ADHOC overrides" do
+        before { quiz_with_true_only_visible_to_overrides }
+
+        it "should return a visibility for a student with an ADHOC override" do
+          student_in_course_with_adhoc_override(@quiz)
+          ensure_user_sees_quiz
+        end
+
+        it "should work with course section and return a single visibility" do
+          student_in_course_with_adhoc_override(@quiz)
+          give_section_foo_due_date(@quiz)
+          enroller_user_in_section(@section_foo)
+          ensure_user_sees_quiz
+          expect(Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id, quiz_id: @quiz.id).count).to eq 1
+        end
+
+        it "should not return a visibility for a student without an ADHOC override" do
+          @user = user_model
+          ensure_user_does_not_see_quiz
+        end
+
+        it "should not return a visibility if ADHOC override is deleted" do
+          student_in_course_with_adhoc_override(@quiz)
+          @quiz.assignment_overrides.all.each(&:destroy)
+          ensure_user_does_not_see_quiz
+        end
       end
 
       context "user in section with override who then changes sections" do

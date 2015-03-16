@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -33,8 +33,6 @@ class Mailer < ActionMailer::Base
 
     reply_to = reply_to_mailbox(m)
     params[:reply_to] = reply_to if reply_to
-    params[:cc] = m.cc if m.cc
-    params[:bcc] = m.bcc if m.bcc
 
     mail(params) do |format|
       format.text{ render text: m.body }

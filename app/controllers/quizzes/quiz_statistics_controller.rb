@@ -261,13 +261,17 @@ class Quizzes::QuizStatisticsController < ApplicationController
       cache_key = ['quiz_statistics', @quiz.id, @quiz.updated_at, updated,
                    params[:all_versions]].cache_key
 
-      json = Rails.cache.fetch(cache_key) do
-        all_versions = value_to_boolean(params[:all_versions])
-        statistics = @service.generate_aggregate_statistics(all_versions)
-        serialize(statistics)
-      end
+      if Quizzes::QuizStatistics.large_quiz?(@quiz)
+        head :no_content  #operation not available for large quizzes
+      else
+        json = Rails.cache.fetch(cache_key) do
+          all_versions = value_to_boolean(params[:all_versions])
+          statistics = @service.generate_aggregate_statistics(all_versions)
+          serialize(statistics)
+        end
 
-      render json: json
+        render json: json
+      end
     end
   end
 

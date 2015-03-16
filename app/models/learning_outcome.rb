@@ -33,7 +33,12 @@ class LearningOutcome < ActiveRecord::Base
   before_validation :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults
 
-  CALCULATION_METHODS = %w[decaying_average n_mastery highest latest]
+  CALCULATION_METHODS = {
+    'decaying_average' => "Decaying Average",
+    'n_mastery'        => "n Number of Times",
+    'highest'          => "Highest Score",
+    'latest'           => "Most Recent Score",
+  }
   VALID_CALCULATION_INTS = {
     "decaying_average" => (1..99),
     "n_mastery" => (2..5),
@@ -43,7 +48,11 @@ class LearningOutcome < ActiveRecord::Base
 
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :short_description, :maximum => maximum_string_length
-  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS
+  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS.keys,
+    :message => t(
+      "calculation_method must be one of the following: %{calc_methods}",
+      :calc_methods => CALCULATION_METHODS.keys.to_s
+    )
   validates_presence_of :short_description, :workflow_state
   sanitize_field :description, CanvasSanitize::SANITIZE
   validate :calculation_changes_after_asessing, if: :assessed?
@@ -83,31 +92,36 @@ class LearningOutcome < ActiveRecord::Base
     # if we've been used to assess a student, refuse to accept any changes to our calculation options
     if calculation_method_changed?
       errors.add(:calculation_method, t(
-        "This outcome has been used to assess a student. Calculation method is fixed at %{old_value}",
-        :old_value => calculation_method_was
+        "This outcome has been used to assess a student. The calculation method is fixed",
       ))
     end
 
     if calculation_int_changed?
       errors.add(:calculation_int, t(
-        "This outcome has been used to assess a student. Calculation int is fixed at %{old_value}",
-        :old_value => calculation_int_was
+        "This outcome has been used to assess a student. The calculation value is fixed"
       ))
     end
   end
 
   def validate_calculation_int
     unless valid_calculation_int?(calculation_int, calculation_method)
-      errors.add(:calculation_int, t(
-        "'%{calculation_int}' is not a valid calculation_int for calculation_method of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'",
-        :calculation_int => calculation_int, :calculation_method => calculation_method,
-        :valid_calculation_ints => valid_calculation_ints
-      ))
+      if valid_calculation_ints.to_a.empty?
+        errors.add(:calculation_int, t(
+          "A calculation value is not used with this calculation method"
+        ))
+      else
+        errors.add(:calculation_int, t(
+          "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
+          :calculation_int => calculation_int,
+          :valid_calculation_ints_min => valid_calculation_ints.min,
+          :valid_calculation_ints_max => valid_calculation_ints.max
+        ))
+      end
     end
   end
 
   def valid_calculation_method?(method=self.calculation_method)
-    CALCULATION_METHODS.include?(method)
+    CALCULATION_METHODS.keys.include?(method)
   end
 
   def valid_calculation_ints(method=self.calculation_method)
@@ -182,8 +196,12 @@ class LearningOutcome < ActiveRecord::Base
     tags
   end
 
-  def remove_alignment(asset, context, opts={})
-    tag = self.alignments.where(content_id: asset, content_type: asset.class.to_s, tag_type: 'learning_outcome', context_id: context, context_type: context.class.to_s).first
+  def remove_alignment(alignment_id, context)
+    tag = self.alignments.where({
+      context_id: context,
+      context_type: context.class_name,
+      id: alignment_id
+    }).first
     tag.destroy if tag
     tag
   end

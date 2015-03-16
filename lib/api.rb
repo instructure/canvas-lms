@@ -412,10 +412,11 @@ module Api
                 end
       end
 
-      next unless obj && (is_public || obj.grants_right?(user, nil, :download))
+      next unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
-        opts = {:verifier => obj.uuid, :only_path => true}
+        opts = {:only_path => true}
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app?
         if match.rest.start_with?("/preview")
           url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, opts)
         else
@@ -424,7 +425,9 @@ module Api
           url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, opts)
         end
       else
-        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
+        opts = {:download => '1', :only_path => true}
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app?
+        url = file_download_url(obj.id, opts)
       end
       url
     end

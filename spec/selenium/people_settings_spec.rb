@@ -113,6 +113,34 @@ describe "course people" do
       add_user_to_second_section
     end
 
+    it "should add a user to a second (active) section in a concluded course" do
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      student_in_course(:user => user_with_pseudonym, :role => student_role)
+      section_name = 'Another Section'
+      add_section(section_name)
+
+      @course_section.end_at = 1.day.from_now
+      @course_section.restrict_enrollments_to_section_dates = true
+      @course_section.save!
+
+      # open tab
+      go_to_people_page
+      expect(f("#user_#{@student.id} .section")).not_to include_text(section_name)
+      # open dialog
+      use_edit_sections_dialog(@student) do
+        # choose section
+        select_from_auto_complete(section_name, 'section_input')
+      end
+      # expect
+      expect(f("#user_#{@student.id}")).to include_text(section_name)
+      expect(ff("#user_#{@student.id} .section").length).to eq 2
+      @student.reload
+      expect(@student.enrollments.detect{|e| e.course_section == @course_section}).to be_present
+    end
+
     it "should view the users enrollment details" do
       username = "user@example.com"
       # add_section 'foo'

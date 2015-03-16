@@ -60,6 +60,8 @@ class User < ActiveRecord::Base
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
   has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
+  has_many :notification_endpoints, :through => :access_tokens
+
   has_many :enrollments, :dependent => :destroy
 
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :multishard => true
@@ -205,10 +207,27 @@ class User < ActiveRecord::Base
     where(:quiz_student_visibilities => { :quiz_id => quiz_id, :course_id => course_id })
   }
 
-  def assignment_and_quiz_visibilities(opts = {})
-     opts = {user_id: self.id}.merge(opts)
-     {assignment_ids: AssignmentStudentVisibility.where(opts).order('assignment_id desc').pluck(:assignment_id),
-      quiz_ids: Quizzes::QuizStudentVisibility.where(opts).order('quiz_id desc').pluck(:quiz_id)}
+  scope :observing_students_in_course, lambda {|observee_ids, course_ids|
+    joins(:enrollments).where(enrollments: {type: 'ObserverEnrollment', associated_user_id: observee_ids, course_id: course_ids, workflow_state: 'active'})
+  }
+
+  # when an observer is added to a course they get an enrollment where associated_user_id is nil. when they are linked to
+  # a student, this first enrollment stays the same, but a new one with an associated_user_id is added. thusly to find
+  # course observers, you take the difference between all active observers and active observers with associated users
+  scope :observing_full_course, lambda {|course_ids|
+    active_observer_scope = joins(:enrollments).where(enrollments: {type: 'ObserverEnrollment', course_id: course_ids, workflow_state: 'active'})
+    users_observing_students = active_observer_scope.where("enrollments.associated_user_id IS NOT NULL").pluck(:id)
+
+    if users_observing_students == [] || users_observing_students == nil
+      active_observer_scope
+    else
+      active_observer_scope.where("users.id NOT IN (?)", users_observing_students)
+    end
+  }
+
+  def assignment_and_quiz_visibilities(context)
+     {assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
+      quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id)}
   end
 
   def self.order_by_sortable_name(options = {})
@@ -754,16 +773,22 @@ class User < ActiveRecord::Base
 
   def gmail
     res = gmail_channel.path rescue nil
-    res ||= self.user_services.
-        where(service_domain: "google.com").
-        limit(1).pluck(:service_user_id).first
+    res ||= google_drive_address
+    res ||= google_docs_address
     res || email
   end
 
   def google_docs_address
-    self.user_services.
-        where(service: 'google_docs').
-        limit(1).pluck(:service_user_id).first
+    google_service_address('google_docs')
+  end
+
+  def google_drive_address
+    google_service_address('google_drive')
+  end
+
+  def google_service_address(service_name)
+    self.user_services.where(service: service_name)
+      .limit(1).pluck(service_name == 'google_drive' ? :service_user_name : :service_user_id).first
   end
 
   def email=(e)
@@ -961,6 +986,7 @@ class User < ActiveRecord::Base
         result = if self.pseudonyms.loaded? && self.shard == Shard.current
             self.pseudonyms.detect { |p| p.active? && p.sis_user_id && trusted_ids.include?(p.account_id) }
           else
+            next unless associated_shards.include?(Shard.current)
             Pseudonym.where(account_id: trusted_ids).active.
                 where("sis_user_id IS NOT NULL AND user_id=?", self).first
           end
@@ -990,7 +1016,7 @@ class User < ActiveRecord::Base
     can :rename
 
     given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
-    can :read_profile and can :create_user_notes and can :read_user_notes
+    can :read_profile
 
     # by default this means that the user we are given is an administrator
     # of an account of one of the courses that this user is enrolled in, or
@@ -1000,9 +1026,6 @@ class User < ActiveRecord::Base
 
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
-
-    given { |user| self.check_courses_right?(user, :read_user_notes) }
-    can :read_user_notes
 
     given do |user|
       user && (
@@ -1429,7 +1452,7 @@ class User < ActiveRecord::Base
           result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
             courses = Course.find(shard_course_ids)
             courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
-            Assignment.for_course(shard_course_ids).
+            assignments = Assignment.for_course(shard_course_ids).
               filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
               published.
               due_between_with_overrides(due_after,1.week.from_now).
@@ -1437,6 +1460,7 @@ class User < ActiveRecord::Base
               expecting_submission.
               need_submitting_info(id, limit).
               not_locked
+            select_available_assignments(assignments)
           end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
@@ -1901,14 +1925,23 @@ class User < ActiveRecord::Base
     opts[:limit] ||= 20
 
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).limit(opts[:limit]).reject(&:hidden?)
-    events += select_upcoming_assignments(Assignment.
-        published.
+    events += select_available_assignments(
+      select_upcoming_assignments(
+        Assignment.published.
         for_context_codes(context_codes).
         due_between_with_overrides(now, opts[:end_at]).
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
-      first(opts[:limit])
+      first(opts[:limit]))
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
+  end
+
+  def select_available_assignments(assignments)
+    return [] if assignments.empty?
+    enrollments = self.enrollments.where(:course_id => assignments.select{|a| a.context_type == "Course"}.map(&:context_id))
+    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    enrollments.select!{|e| e.participating?}
+    assignments.select{|a| a.context_type != "Course" || enrollments.any?{|e| e.course_id == a.context_id}}
   end
 
   def select_upcoming_assignments(assignments,opts)
@@ -2155,9 +2188,12 @@ class User < ActiveRecord::Base
   def roles(root_account)
     return @roles if @roles
     @roles = ['user']
-    enrollment_types = root_account.enrollments.where(type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'], user_id: self, workflow_state: 'active').uniq.pluck(:type)
-    @roles << 'student' if enrollment_types.include?('StudentEnrollment')
-    @roles << 'teacher' unless (enrollment_types & ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).empty?
+    valid_types = %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]
+
+    # except where in order to include StudentViewEnrollment's
+    enrollment_types = root_account.all_enrollments.where(type: valid_types, user_id: self, workflow_state: 'active').uniq.pluck(:type)
+    @roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+    @roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     @roles << 'admin' unless root_account.all_account_users_for(self).empty?
     @roles
   end
@@ -2364,7 +2400,6 @@ class User < ActiveRecord::Base
       shards = self.associated_shards
       unless allow_implicit
         # only search the shards with trusted accounts
-
         trusted_shards = account.root_account.trusted_account_ids.map{|id| Shard.shard_for(id) }
         trusted_shards << account.root_account.shard
 

@@ -18,7 +18,7 @@
 
 module Api::V1::Account
   include Api::V1::Json
-
+  
   @@extensions = []
 
   # In order to register a module/class as an extension,
@@ -52,8 +52,8 @@ module Api::V1::Account
         hash['registration_settings'] = {:login_handle_name => account.login_handle_name}
         if account.root_account?
           hash['terms_required'] = account.terms_required?
-          hash['terms_of_use_url'] = account.terms_of_use_url
-          hash['privacy_policy_url'] = account.privacy_policy_url
+          hash['terms_of_use_url'] = terms_of_use_url
+          hash['privacy_policy_url'] = privacy_policy_url
         end
       end
       @@extensions.each do |extension|

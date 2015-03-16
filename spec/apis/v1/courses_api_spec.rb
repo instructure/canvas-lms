@@ -59,7 +59,6 @@ describe Api::V1::Course do
     end
 
     it 'should return storage_quota_used_mb if requested' do
-      pp @test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment])
       expect(@test_api.course_json(@course1, @me, {}, ['storage_quota_used_mb'], [teacher_enrollment]).has_key?("storage_quota_used_mb")).to be_truthy
     end
 
@@ -297,6 +296,7 @@ describe CoursesController, type: :request do
             'start_at'                             => '2011-01-01T00:00:00-0700',
             'end_at'                               => '2011-05-01T00:00:00-0700',
             'is_public'                            => true,
+            'is_public_to_auth_users'              => false,
             'public_syllabus'                      => true,
             'allow_wiki_comments'                  => true,
             'allow_student_forum_attachments'      => true,
@@ -357,6 +357,7 @@ describe CoursesController, type: :request do
             'start_at'                             => '2011-01-01T00:00:00-0700',
             'end_at'                               => '2011-05-01T00:00:00-0700',
             'is_public'                            => true,
+            'is_public_to_auth_users'              => false,
             'public_syllabus'                      => true,
             'allow_wiki_comments'                  => true,
             'allow_student_forum_attachments'      => true,
@@ -2071,6 +2072,7 @@ describe CoursesController, type: :request do
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
         'is_public' => @course1.is_public,
+        'is_public_to_auth_users' => @course1.is_public_to_auth_users,
         'workflow_state' => @course1.workflow_state,
         'storage_quota_mb' => @course1.storage_quota_mb,
         'apply_assignment_group_weights' => false,

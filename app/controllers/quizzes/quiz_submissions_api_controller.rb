@@ -160,12 +160,12 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #    "quiz_submissions": [QuizSubmission]
   #  }
   def index
-    quiz_submissions = if is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+    quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       # teachers have access to all student submissions
       Api.paginate @quiz.quiz_submissions.where(:user_id => visible_user_ids),
         self,
         api_v1_course_quiz_submissions_url(@context, @quiz)
-    elsif is_authorized_action?(@quiz, @current_user, :submit)
+    elsif @quiz.grants_right?(@current_user, session, :submit)
       # students have access only to their own
       @quiz.quiz_submissions.where(:user_id => @current_user)
     end

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>/submissions/<%= asset.user_id %>
+  <%= polymorphic_url([asset.assignment.context, asset.assignment, :submissions], id: asset.user_id) %>
 <% end %>
 
 <%= mt('user_resubmitted_sentence', '**%{user_name}** has just turned in a late submission for **%{assignment_name}** in the course %{course_name}', :user_name => asset.user.name, :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>

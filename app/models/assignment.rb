@@ -54,6 +54,10 @@ class Assignment < ActiveRecord::Base
     :rubric, :context, :grading_standard, :group_category
   ]
 
+  ALLOWED_GRADING_TYPES = %w(
+    pass_fail percent letter_grade gpa_scale points not_graded
+  )
+
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
   attr_reader :assignment_changed
@@ -181,6 +185,8 @@ class Assignment < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
+  validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES },
+    allow_nil: true, on: :create
 
   acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5
@@ -250,9 +256,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at
+    reviews_due_at = self.peer_reviews_assign_at || self.due_at
+    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && reviews_due_at
       self.send_later_enqueue_args(:do_auto_peer_review, {
-        :run_at => due_at,
+        :run_at => reviews_due_at,
         :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
       })
     end
@@ -291,6 +298,7 @@ class Assignment < ActiveRecord::Base
 
   def update_grades_if_details_changed
     if points_possible_changed? || muted_changed? || workflow_state_changed?
+      Rails.logger.info "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
       connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
@@ -487,7 +495,8 @@ class Assignment < ActiveRecord::Base
     p.to {
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
-      participants - participants_with_overridden_due_at
+      excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
+      participants(include_observers: true, excluded_user_ids: excluded_ids)
     }
     p.whenever { |assignment|
       policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
@@ -495,14 +504,14 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_changed
-    p.to { participants }
+    p.to { participants(include_observers: true) }
     p.whenever { |assignment|
       policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
       policy.should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
-    p.to { participants }
+    p.to { participants(include_observers: true) }
     p.whenever { |assignment|
       policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
       policy.should_dispatch_assignment_created?
@@ -512,9 +521,9 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_unmuted
-    p.to { participants }
+    p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      assignment.recently_unmuted
+      assignment.context.available? && assignment.recently_unmuted
     }
 
   end
@@ -855,14 +864,27 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def participants
-    return context.participants unless differentiated_assignments_applies?
-    participants_with_visibility
+  def participants(opts={})
+    return context.participants(opts[:include_observers], excluded_user_ids: opts[:excluded_user_ids]) unless differentiated_assignments_applies?
+    participants_with_visibility(opts)
   end
 
-  def participants_with_visibility
+  def participants_with_visibility(opts={})
     users = context.participating_admins
-    users += students_with_visibility
+
+    applicable_students = if opts[:excluded_user_ids]
+                            students_with_visibility.reject{|s| opts[:excluded_user_ids].include?(s.id)}
+                          else
+                            students_with_visibility
+                          end
+
+    users += applicable_students
+
+    if opts[:include_observers]
+      users += User.observing_students_in_course(applicable_students.map(&:id), self.context_id)
+      users += User.observing_full_course(context.id)
+    end
+
     users.uniq
   end
 
@@ -1144,7 +1166,7 @@ class Assignment < ActiveRecord::Base
         })
         homework.submitted_at = Time.now
 
-        homework.with_versioning(:explicit => true) do
+        homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             if student == original_student
               homework.broadcast_group_submission
@@ -1243,7 +1265,6 @@ class Assignment < ActiveRecord::Base
 
     submissions = self.submissions.where(:user_id => students)
                   .includes(:submission_comments,
-                            :attachments,
                             :versions,
                             :quiz_submission)
 
@@ -1258,14 +1279,15 @@ class Assignment < ActiveRecord::Base
           :submission_comments => {
             :methods => avatar_methods,
             :only => comment_fields
-          },
-          :attachments => {
-            :only => [:mime_class, :comment_id, :id, :submitter_id ]
-          },
+          }
         },
         :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
+      json['attachments'] = sub.attachments.map{|att| att.as_json(
+          :only => [:mime_class, :comment_id, :id, :submitter_id ]
+      )}
 
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
@@ -1740,8 +1762,7 @@ class Assignment < ActiveRecord::Base
 
   def allow_google_docs_submission?
     self.submission_types &&
-      self.submission_types.match(/online_upload/) &&
-      (self.allowed_extensions.blank? || self.allowed_extensions.grep(/doc|xls|ppt/).present?)
+      self.submission_types.match(/online_upload/)
   end
 
   def <=>(comparable)

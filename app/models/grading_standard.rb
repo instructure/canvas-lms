@@ -64,6 +64,11 @@ class GradingStandard < ActiveRecord::Base
 
   VERSION = 2
 
+  set_policy do
+    given { |user| self.context.grants_right?(user, :manage) }
+    can :manage
+  end
+
   def version
     read_attribute(:version).presence || 1
   end
@@ -152,6 +157,10 @@ class GradingStandard < ActiveRecord::Base
 
   def assessed_assignment?
     self.assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
+  end
+
+  def context_name
+    self.context.name
   end
 
   def update_data(params)

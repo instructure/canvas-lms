@@ -59,7 +59,21 @@ describe "courses" do
         validate_action_button(:first, 'Unpublished')
       end
 
-      it "should not show course status if graded submissions exist" do
+      it "should allow publishing even if graded submissions exist" do
+        course_with_student_submissions({submission_points: true, unpublished: true})
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        expect(f('.publish_course_in_wizard_link')).to be_displayed
+        expect(course_status_buttons.first).to have_class('disabled')
+        expect(course_status_buttons.first.text).to eq 'Unpublished'
+        expect(course_status_buttons.last).not_to have_class('disabled')
+        expect(course_status_buttons.last.text).to eq 'Publish'
+        expect_new_page_load { course_status_buttons.last.click }
+        @course.reload
+        expect(@course).to be_available
+      end
+
+      it "should not show course status if published and graded submissions exist" do
         course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
         expect(f('#course_status')).to be_nil
@@ -77,6 +91,9 @@ describe "courses" do
     end
 
     it "should properly hide the wizard and remember its hidden state" do
+      # For now we are not allowing the wizard to popup automatically
+      # so this spec doesn't apply, it may in the future though.
+      pending
       course_with_teacher_logged_in
 
       create_new_course
@@ -95,6 +112,9 @@ describe "courses" do
     end
 
     it "should open and close wizard after initial close" do
+      # For now we are not allowing the wizard to popup automatically
+      # so this spec doesn't apply, it may in the future though.
+      pending
       def find_wizard_box
         wizard_box = keep_trying_until do
           wizard_box = f(".ic-wizard-box")
@@ -129,8 +149,13 @@ describe "courses" do
       course_with_teacher_logged_in
       create_new_course
 
+      # Because of the specs about automatically opening are currently
+      # pending, we need to cause the wizard to open by way of click. When
+      # those specs are no longer pendings, the click line should be removed.
+      f(".wizard_popup_link").click()
       wizard_box = f(".ic-wizard-box")
       keep_trying_until { expect(wizard_box).to be_displayed }
+
 
       f("#wizard_home_page").click
       f(".ic-wizard-box__message-button a").click

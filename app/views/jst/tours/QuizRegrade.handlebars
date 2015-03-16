@@ -1,38 +1,41 @@
-<div
+<div  
   id="tour-quiz-regrade-step1"
   data-points-to=".regrade-options"
   class="popover tour top"
-  style="width: 500px; padding: 35px 30px 25px 30px;"
   data-position="top"
   data-offset-x="10"
-  data-offset-y="10">
-  <div class="arrow"></div>
-  <div class="popover-content">
-    <i class="usher-close icon-x"></i>
-    <h2 class="h4">{{#t "try_later"}}You can now set regrade options for students who have already taken the quiz.{{/t}}</h2>
-    <ul>
-      <li style="padding-bottom: .7em;">
-        {{#t "first_bullet"}}
-        Once you’ve changed an answer you’ll need to choose an option before updating the question.
-        {{/t}}
-      </li>
-      <li style="padding-bottom: .7em;">
-        {{#t "second_bullet"}}
-        Make sure you choose the most appropiate option as students' scores MAY be affected.
-        {{/t}}
-      </li>
-      <li style="padding-bottom: .7em;">
-        {{#t "third_bullet"}}
-        Canvas will regrade all your submissions after you save the quiz, this may take a few minutes.
-        {{/t}}
-      </li>
-    </ul>
-    </p>
-    <div class="controls clearfix" style="margin-top: 15px;">
-      <div class="pull-right">
-        <button class="btn btn-primary usher-close">{{#t "got_it"}}Ok, got it{{/t}}</button>
+  data-offset-y="10"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content"> 
+    <div class="grid-row">
+      <div class="tour-icon">
+        <i class="icon-tour-info" aria-hidden="true"></i>
       </div>
+      <div class="tour-content">        
+        <p>{{#t}}You can now set regrade options for students who have already taken the quiz.{{/t}}</p>
+        <ul class="tour-content__list">
+          <li class="tour-content__list-item">
+            {{#t}}
+            Once you’ve changed an answer you’ll need to choose an option before updating the question.
+            {{/t}}
+          </li>
+          <li class="tour-content__list-item">
+            {{#t}}
+            Make sure you choose the most appropiate option as students' scores MAY be affected.
+            {{/t}}
+          </li>
+          <li class="tour-content__list-item">
+            {{#t}}
+            Canvas will regrade all your submissions after you save the quiz, this may take a few minutes.
+            {{/t}}
+          </li>
+        </ul>
+        <div class="controls"> 
+          <button class="btn usher-close">{{#t "got_it"}}Ok, got it{{/t}}</button>      
+        </div>          
+      </div>      
     </div>
-  </div>
+  </div>  
 </div>
 

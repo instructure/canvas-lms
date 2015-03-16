@@ -52,6 +52,7 @@ class Account < ActiveRecord::Base
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
+  has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
   has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
   has_many :account_users, :dependent => :destroy
@@ -108,8 +109,11 @@ class Account < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
-  before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
+
+  before_save :setup_quota_cache_invalidation
+  after_save :invalidate_quota_caches_if_changed
+
   after_create :default_enrollment_term
 
   serialize :settings, Hash
@@ -218,6 +222,11 @@ class Account < ActiveRecord::Base
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: true
   add_setting :trusted_referers, root_only: true
 
+  BRANDING_SETTINGS = [:header_image, :favicon, :apple_touch_icon,
+    :msapplication_tile_color, :msapplication_tile_square, :msapplication_tile_wide
+  ]
+  BRANDING_SETTINGS.each { |setting| add_setting(setting, root_only: true) }
+
   def settings=(hash)
     if hash.is_a?(Hash)
       hash.each do |key, val|
@@ -243,6 +252,8 @@ class Account < ActiveRecord::Base
         end
       end
     end
+    # prune nil or "" hash values to save space in the DB.
+    settings.reject! { |_, value| value.nil? || value == "" }
     settings
   end
 
@@ -290,14 +301,6 @@ class Account < ActiveRecord::Base
     true
   end
 
-  def terms_of_use_url
-    Setting.get('terms_of_use_url', 'http://www.canvaslms.com/policies/terms-of-use')
-  end
-
-  def privacy_policy_url
-    Setting.get('privacy_policy_url', 'http://www.canvaslms.com/policies/privacy-policy')
-  end
-
   def terms_required?
     Setting.get('terms_required', 'true') == 'true'
   end
@@ -334,35 +337,33 @@ class Account < ActiveRecord::Base
   def ensure_defaults
     self.uuid ||= CanvasSlug.generate_securish_uuid
     self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if self.respond_to?(:lti_guid)
+    self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
+    self.root_account_id ||= self.parent_account_id
+    self.parent_account_id ||= self.root_account_id
+    Account.invalidate_cache(self.id) if self.id
+    true
   end
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
     if self.root_account?
       self.errors.add(:sis_source_id, t('#account.root_account_cant_have_sis_id', "SIS IDs cannot be set on root accounts"))
       return false
     end
 
-    root = self.root_account
-    existing_account = Account.where(root_account_id: root, sis_source_id: self.sis_source_id).first
+    scope = root_account.all_accounts.where(sis_source_id:  self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
 
-    return true if !existing_account || existing_account.id == self.id
+    return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
 
-  def set_update_account_associations_if_changed
-    self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
-    self.root_account_id ||= self.parent_account_id
-    self.parent_account_id ||= self.root_account_id
-    Account.invalidate_cache(self.id) if self.id
-    @should_update_account_associations = self.parent_account_id_changed? || self.root_account_id_changed?
-    true
-  end
-
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations
+    send_later_if_production(:update_account_associations) if self.parent_account_id_changed? || self.root_account_id_changed?
   end
 
   def equella_settings
@@ -497,6 +498,27 @@ class Account < ActiveRecord::Base
     nil
   end
 
+  def setup_quota_cache_invalidation
+    @quota_invalidations = []
+    unless self.new_record?
+      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
+      @quota_invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
+    end
+  end
+
+  def invalidate_quota_caches_if_changed
+    Account.send_later_if_production(:invalidate_quota_caches, self.id, @quota_invalidations) if @quota_invalidations.present?
+  end
+
+  def self.invalidate_quota_caches(account_id, keys)
+    account_ids = Account.sub_account_ids_recursive(account_id) + [account_id]
+    keys.each do |quota_key|
+      account_ids.each do |id|
+        Rails.cache.delete([quota_key, id].cache_key)
+      end
+    end
+  end
+
   def quota
     Rails.cache.fetch(['current_quota', self.id].cache_key) do
       read_attribute(:storage_quota) ||
@@ -529,8 +551,6 @@ class Account < ActiveRecord::Base
     if parent_account && parent_account.default_storage_quota == val
       val = nil
     end
-    clear_sub_account_quota_cache('default_storage_quota')
-    clear_sub_account_quota_cache('current_quota')
     write_attribute(:default_storage_quota, val)
   end
 
@@ -567,7 +587,6 @@ class Account < ActiveRecord::Base
         (self.parent_account && self.parent_account.default_group_storage_quota == val)
       val = nil
     end
-    clear_sub_account_quota_cache('default_group_storage_quota')
     write_attribute(:default_group_storage_quota, val)
   end
 
@@ -577,15 +596,6 @@ class Account < ActiveRecord::Base
 
   def default_group_storage_quota_mb=(val)
     self.default_group_storage_quota = val.try(:to_i).try(:megabytes)
-  end
-
-  def clear_sub_account_quota_cache(quota_key)
-    return unless self.id
-    account_ids = Account.sub_account_ids_recursive(self.id)
-    account_ids << self.id
-    account_ids.each do |account_id|
-      Rails.cache.delete([quota_key, account_id].cache_key)
-    end
   end
 
   def turnitin_shared_secret=(secret)
@@ -1288,6 +1298,11 @@ class Account < ActiveRecord::Base
         :name => t("account_settings.google_docs", "Google Docs"),
         :description => "",
         :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
+      },
+      :google_drive => {
+        :name => t("account_settings.google_drive", "Google Drive"),
+        :description => "",
+        :expose_to_ui => false
       },
       :google_docs_previews => {
         :name => t("account_settings.google_docs_preview", "Google Docs Preview"),

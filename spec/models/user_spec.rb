@@ -1685,7 +1685,7 @@ describe User do
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
         end.to_not raise_error
-
+        
         expect(events.first).to eq assignment2
         expect(events.second).to eq assignment
       end
@@ -2834,5 +2834,56 @@ describe User do
       @group.save!
       expect(student.visible_groups.size).to eq 1
     end
+  end
+
+  describe 'roles' do
+    before(:once) do
+      user(active_all: true)
+      course(active_course: true)
+      @account = Account.default
+    end
+
+    it "always includes 'user'" do
+      expect(@user.roles(@account)).to eq %w[user]
+    end
+
+    it "includes 'student' if the user has a student enrollment" do
+      @enrollment = @course.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user student]
+    end
+
+    it "includes 'student' if the user has a student view student enrollment" do
+      @user = @course.student_view_student
+      expect(@user.roles(@account)).to eq %w[user student]
+    end
+
+    it "includes 'teacher' if the user has a teacher enrollment" do
+      @enrollment = @course.enroll_user(@user, 'TeacherEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'teacher' if the user has a ta enrollment" do
+      @enrollment = @course.enroll_user(@user, 'TaEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'teacher' if the user has a designer enrollment" do
+      @enrollment = @course.enroll_user(@user, 'DesignerEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'admin' if the user has an admin user record" do
+      @account.account_users.create!(:user => @user, :role => admin_role)
+      expect(@user.roles(@account)).to eq %w[user admin]
+    end
+  end
+
+  it "should not grant user_notes rights to restricted users" do
+    course_with_ta(:active_all => true)
+    student_in_course(:course => @course, :active_all => true)
+    @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_user_notes)
+
+    expect(@student.grants_right?(@ta, :create_user_notes)).to be_falsey
+    expect(@student.grants_right?(@ta, :read_user_notes)).to be_falsey
   end
 end

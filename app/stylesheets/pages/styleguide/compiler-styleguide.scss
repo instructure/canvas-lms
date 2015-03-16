@@ -1,4 +1,11 @@
-@import "base/environment";
-@import "vendor/_xflex.scss";
-@import "pages/styleguide/styleguide.scss";
-@import "pages/styleguide/syntax.scss";
+@import "base/c-common.scss";
+
+//// Stylesheet compiler list
+////////
+@import "pages/styleguide/styleguide_setup.scss";
+@import "pages/styleguide/styleguide_syntax.scss";
+@import "pages/styleguide/styleguide_layout.scss";
+
+//// Specific App Styling
+////////
+@import "pages/styleguide/styleguide_app.scss";

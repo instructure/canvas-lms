@@ -910,6 +910,24 @@ describe Quizzes::QuizzesController do
       expect(overrides.length).to eq 1
       expect(overrides.first[:due_at].iso8601).to eq section_due_date
     end
+
+    it "does not dispatch assignment-created notifications for unpublished quizzes" do
+      notification = Notification.create(:name => "Assignment Created")
+      student_in_course active_all: true
+      user_session @teacher
+      ag = @course.assignment_groups.create! name: 'teh group'
+      post 'create', :course_id => @course.id,
+           :quiz => {
+              title: 'some quiz',
+              quiz_type: 'assignment',
+              assignment_group_id: ag.id
+           }
+      json = JSON.parse response.body
+      quiz = Quizzes::Quiz.find(json['quiz']['id'])
+      expect(quiz).to be_unpublished
+      expect(quiz.assignment).to be_unpublished
+      expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
+    end
   end
 
   describe "PUT 'update'" do
@@ -933,6 +951,24 @@ describe Quizzes::QuizzesController do
       expect(assigns[:quiz]).not_to be_nil
       expect(assigns[:quiz]).to eql(@quiz)
       expect(assigns[:quiz].title).to eql("some quiz")
+    end
+
+    context 'post_to_sis' do
+      before { @course.enable_feature!(:post_grades) }
+
+      it "should set post_to_sis quizzes" do
+        user_session(@teacher)
+        course_quiz
+        post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:title => "some quiz"}, :assignment => {post_to_sis: true}
+        expect(assigns[:quiz].assignment.post_to_sis).to eq true
+      end
+
+      it "doesn't blow up for surveys" do
+        user_session(@teacher)
+        survey = @course.quizzes.create! quiz_type: "survey", title: "survey"
+        post 'update', :course_id => @course.id, :id => survey.id, :quiz => {:title => "changed"}, :assignment => {post_to_sis: true}
+        expect(assigns[:quiz].title).to eq "changed"
+      end
     end
 
     it "should be able to change ungraded survey to quiz without error" do
@@ -1137,7 +1173,6 @@ describe Quizzes::QuizzesController do
 
         get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id, :all_versions => '1'
         expect(response).to be_success
-        expect(response.body).to match /Logged Out User/
         expect(response).to render_template('statistics')
       end
     end
@@ -1391,6 +1426,125 @@ describe Quizzes::QuizzesController do
         get 'show', :course_id => @course.id, :id => @quiz.id
         expect(response).not_to be_redirect
         expect(flash[:notice]).to match(/This quiz will no longer count towards your grade/)
+      end
+    end
+  end
+
+  describe '#can_take_quiz?' do
+    # These specs are test-after, and highly coupled to the existing
+    # implementation of the #can_take_quiz method, which is deeply entangled.
+    # When possible I recommend extracting this into a PORO or Quizzes::Quiz.
+    let(:return_value) { subject.send :can_take_quiz? }
+
+    before do
+      subject.stubs(:authorized_action).returns(true)
+
+      @quiz = subject.instance_variable_set(:@quiz, Quizzes::Quiz.new)
+      @quiz.stubs(:require_lockdown_browser?).returns(false)
+      @quiz.stubs(:ip_filter).returns(false)
+    end
+
+    it "returns false when locked" do
+      subject.instance_variable_set(:@locked, true)
+      expect(return_value).to eq false
+    end
+
+    it "returns false when unauthorized" do
+      subject.stubs(:authorized_action).returns(false)
+      expect(return_value).to eq false
+    end
+
+    it "returns false when a lockdown browser is required and the lockdown browser is false" do
+      @quiz.stubs(:require_lockdown_browser?).returns(true)
+
+      subject.stubs(:named_context_url).returns("some string")
+      subject.stubs(:check_lockdown_browser).returns(false)
+
+      expect(return_value).to eq false
+    end
+
+    context "when access code is required but does not match" do
+      before do
+        @quiz.stubs(:access_code).returns("trust me. *winks*")
+        subject.stubs(:params).returns({:access_code => "Don't trust me. *tips hat*"})
+      end
+
+      it "renders access_code template" do
+        # render returns a RunTimeError when the private method is called without
+        # the context of a controller action. When this method is extracted the
+        # contract will need to change to return a value to the controller letting
+        # it know which template to render.
+        expect {
+          subject.send(:can_take_quiz?)
+        }.to raise_error RuntimeError # triggered by render access_code
+      end
+
+      it "returns false" do
+        subject.stubs(:render)
+
+        expect(return_value).to eq false
+      end
+    end
+
+    context "when the ip address is invalid" do
+      before do
+        @quiz.stubs(:ip_filter).returns(true)
+        @quiz.stubs(:valid_ip?).returns(false)
+      end
+
+      it "renders invalid_ip" do
+        expect {
+          subject.send(:can_take_quiz?)
+        }.to raise_error RuntimeError # triggered by render invalid_ip
+      end
+
+      it "returns false" do
+        subject.stubs(:render)
+        expect(return_value).to eq false
+      end
+    end
+
+    it "returns false when the section enrollments are restricted and the present is before the end date" do
+      section = mock
+      section.stubs(:restrict_enrollments_to_section_dates).returns(true)
+      section.stubs(:end_at).returns(2.days.ago)
+      subject.instance_variable_set(:@section, section)
+
+      expect(return_value).to eq false
+    end
+
+    context "when course enrollments are restricted or unrestricted" do
+      before do
+        @context = mock
+        @context.stubs(:restrict_enrollments_to_course_dates).returns(false)
+        subject.instance_variable_set(:@context, @context)
+      end
+
+      it "returns false when the course enrollments are restricted and the course is concluded" do
+        @context.stubs(:restrict_enrollments_to_course_dates).returns(true)
+        @context.stubs(:soft_concluded?).returns(true)
+
+        expect(return_value).to eq false
+      end
+
+      context "when the current user is active or inactive" do
+        before do
+          @current_user = subject.instance_variable_set(:@current_user, User.new)
+          @current_user.stubs(:id).returns(123)
+        end
+
+        it "returns false for inactive users" do
+          @context.stubs(:enrollments).returns(stub(:where => stub(:all? => true)))
+          @context.stubs(:grants_right?).with(@current_user, :read_as_admin).returns false
+
+          expect(return_value).to eq false
+        end
+
+        it "returns true for active users " do
+          @context.stubs(:enrollments).returns(stub(:where => stub(:all? => false)))
+
+          expect(return_value).to eq true
+        end
       end
     end
   end

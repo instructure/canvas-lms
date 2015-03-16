@@ -81,6 +81,8 @@ class Group < ActiveRecord::Base
   before_save :maintain_category_attribute
   before_save :update_max_membership_from_group_category
 
+  after_create :refresh_group_discussion_topics
+
   delegate :time_zone, :to => :context
 
   include StickySisFields
@@ -99,6 +101,12 @@ class Group < ActiveRecord::Base
     record.errors.add attr, t(:greater_than_1, "Must be greater than 1") unless value.to_i > 1
   end
 
+  def refresh_group_discussion_topics
+    if self.group_category
+      self.group_category.discussion_topics.active.each(&:update_subtopics)
+    end
+  end
+
   alias_method :participating_users_association, :participating_users
 
   def participating_users(user_ids = nil)
@@ -108,7 +116,8 @@ class Group < ActiveRecord::Base
   end
 
   def all_real_students
-    self.context.all_real_students.where("users.id IN (?)", self.users.pluck(:id))
+    return self.context.all_real_students.where("users.id IN (?)", self.users.pluck(:id)) if self.context.respond_to? "all_real_students"
+    self.users
   end
 
   def wiki_with_create
@@ -510,10 +519,9 @@ class Group < ActiveRecord::Base
   end
   private :can_participate?
 
-  # courses lock this down a bit, but in a group, the fact that you are a
-  # member is good enough
   def user_can_manage_own_discussion_posts?(user)
-    true
+    return true unless self.context.is_a?(Course)
+    context.user_can_manage_own_discussion_posts?(user)
   end
 
   def is_a_context?

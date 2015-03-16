@@ -163,7 +163,7 @@ class Folder < ActiveRecord::Base
   def prevent_duplicate_name
     return unless self.parent_folder
 
-    existing_folders = self.parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(self.name)}(\\s\\d)?$", self.id.to_i).pluck(:name)
+    existing_folders = self.parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(self.name)}(\\s\\d+)?$", self.id.to_i).pluck(:name)
 
     return unless existing_folders.include?(self.name)
 
@@ -268,11 +268,11 @@ class Folder < ActiveRecord::Base
     end
     dup.context = context
     if options[:include_subcontent] != false
-      dup.save_without_broadcasting!
+      dup.save!
       self.subcontent.each do |item|
         if options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
           if item.is_a?(Attachment)
-            file = item.clone_for(context)
+            file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
             file.folder_id = dup.id
             file.save_without_broadcasting!
           elsif item.is_a?(Folder)

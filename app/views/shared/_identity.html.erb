@@ -19,8 +19,10 @@
         <a href="<%= conversations_path %>">
           <span><%= t 'links.inbox', "Inbox" %></span>
           <% unless @current_user.disabled_inbox? %>
-            <% unread = @current_user.unread_conversations_count %>
-            <b class="unread-messages-count"<% if unread == 0 %> style="display: none;"<% end %>><%= unread %></b>
+            <%- cache_if(!@real_current_user, [@current_user || 'nobody', 'identity-unread-messages-count-15m'], :expires_in => 15.minutes) do -%>
+              <% unread = @current_user.unread_conversations_count %>
+              <b class="unread-messages-count"<% if unread == 0 %> style="display: none;"<% end %>><%= unread %></b>
+            <% end %>
           <% end %>
         </a>
       </li>

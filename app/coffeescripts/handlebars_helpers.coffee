@@ -74,6 +74,11 @@ define [
       new Handlebars.SafeString "<time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{$.friendlyDatetime(fudged)}</time>"
 
 
+    fudge: (datetime) ->
+      $.fudgeDateForProfileTimezone(datetime)
+
+    unfudge: (datetime) ->
+      $.unfudgeDateForProfileTimezone(datetime)
 
     # expects: a Date object or an ISO string
     formattedDate : (datetime, format, {hash: {pubdate}}) ->

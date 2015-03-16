@@ -59,6 +59,8 @@ define [
 
     onSaveSuccess: ->
       @model.incrementStep()
+      # maintain focus in scope
+      @$('.createUsersStartOver').focus()
       if @model.get('step') is 3
         role = @rolesCollection.where({id: @model.get('role_id')})[0]
         role?.increment 'count', @model.get('users').length

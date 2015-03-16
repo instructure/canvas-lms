@@ -1,4 +1,4 @@
-define ['react'], (React) ->
+define ['old_unsupported_dont_use_react'], (React) ->
 
   reactDomIsInjected = false
 

@@ -7,6 +7,10 @@
 //      <a class="hide-till-hover"><i class="icon-delete standalone-icon"></a>
 //    <span>
 //  </div>
+
+@if $use_high_contrast { $dimmedOpacity: 0.9; }
+@else { $dimmedOpacity: 0.6; }
+
 .hide-till-hover {
   opacity: 0;
 

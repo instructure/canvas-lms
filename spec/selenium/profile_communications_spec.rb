@@ -82,7 +82,7 @@ describe "profile communication settings" do
   end
 
   let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
-  let(:sns_channel) { @user.communication_channels.create_push(sns_access_token, 'device_token') }
+  let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
 
   it "should display an sns channel" do
     sns_channel

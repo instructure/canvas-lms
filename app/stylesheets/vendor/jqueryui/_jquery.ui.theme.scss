@@ -79,8 +79,7 @@
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  color: $white;
-  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+  color: $canvas-danger;
 }
 .ui-state-success, .dialog-success .ui-dialog-titlebar {
   @include vertical-gradient($btnSuccessBackground, $btnSuccessBackgroundHighlight);

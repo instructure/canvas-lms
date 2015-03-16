@@ -2,7 +2,7 @@
 
 define([
   'underscore',
-  'react',
+  'old_unsupported_dont_use_react',
 ], (_, React) => {
   var PaginatedUserCheckList = React.createClass({
     getDefaultProps() {

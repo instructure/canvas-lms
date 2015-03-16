@@ -1,17 +1,19 @@
-<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %><% end %>
+<% define_content :link do %>
+  <%= course_url(asset) %>
+<% end %>
 <% define_content :subject do %>
   <%= t :subject, "New Course" %>
 <% end %>
 
 <%= t :title, "New Course for %{account}", :account => asset.root_account.name %>
-  
+
 <%= t :body, "A course, %{course}, has been added for the account %{account}", :course => asset.name, :account => asset.root_account.name %>
 <% if !asset.teachers.empty? %>
 <%= before_label :teachers, "Teachers" %>
 <% asset.teachers.each do |teacher| %>
   - <%= teacher.name %> (<%= teacher.email %>)
-    <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/users/<%= teacher.id %>
-    
+    <%= course_user_url(asset, teacher) %>
+
 <% end %><% end %>
 
 <%= content :link %>

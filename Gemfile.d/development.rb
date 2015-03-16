@@ -6,7 +6,7 @@ group :development do
   gem 'rb-fchange', :require => false
 
   gem "letter_opener"
-  gem 'spring', '1.1.3', :github => 'ccutrer/spring', :branch => 'reload_hang', :ref => 'a622f051501976cdbef452c9752c1af364c9ad26'
+  gem 'spring', '>= 1.3.0'
   gem 'spring-commands-rspec', '1.0.2'
 
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
@@ -16,7 +16,7 @@ group :development do
 
   unless ENV['DISABLE_RUBY_DEBUGGING']
     gem 'byebug', '3.5.1', :platforms => [:ruby_20, :ruby_21, :ruby_22]
-      gem 'columnize', '0.8.9', :platforms => [:ruby_20, :ruby_21, :ruby_22]
+    gem 'columnize', '0.9.0', :platforms => [:ruby_20, :ruby_21, :ruby_22]
     gem 'debugger', '1.6.6', :platforms => :ruby_19
   end
 end

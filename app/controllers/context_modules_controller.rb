@@ -17,6 +17,8 @@
 #
 
 class ContextModulesController < ApplicationController
+  include Api::V1::ContextModule
+
   before_filter :require_context  
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
   before_filter { |c| c.active_tab = "modules" }
@@ -31,6 +33,18 @@ class ContextModulesController < ApplicationController
         @menu_tools[type] = ContextExternalTool.all_tools_for(@context, :type => type,
           :root_account => @domain_root_account, :current_user => @current_user)
       end
+
+      if @context.grants_right?(@current_user, session, :manage_content)
+        @modules_json = @modules.map{|mod| module_json(mod, @current_user, session, nil, ['content_details', 'items']) }
+      end
+
+      js_env :course_id => @context.id,
+        :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
+        :MODULES => @modules_json,
+        :MODULE_FILE_PERMISSIONS => {
+           usage_rights_required: @context.feature_enabled?(:usage_rights_required),
+           manage_files: @context.grants_right?(@current_user, session, :manage_files)
+        }
     end
   end
   include ModuleIndexHelper
@@ -39,13 +53,13 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       log_asset_access("modules:#{@context.asset_string}", "modules", "other")
       load_modules
+
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
         ActiveRecord::Associations::Preloader.new(@modules, :content_tags).run
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
-      js_env :course_id => @context.id
     end
   end
 
@@ -344,7 +358,8 @@ class ContextModulesController < ApplicationController
           published: @tag.published?,
           publishable_id: module_item_publishable_id(@tag),
           unpublishable:  module_item_unpublishable?(@tag),
-          graded: @tag.graded?
+          graded: @tag.graded?,
+          content_details: content_details(@tag, @current_user)
         )
       render json: json
     end
@@ -413,7 +428,11 @@ class ContextModulesController < ApplicationController
       end
       respond_to do |format|
         if @module.update_attributes(params[:context_module])
-          format.json { render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session}) }
+          format.json do
+            json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
+            json['context_module']['relock_warning'] = true if @module.relock_warning?
+            render :json => json
+          end
         else
           format.json { render :json => @module.errors, :status => :bad_request }
         end

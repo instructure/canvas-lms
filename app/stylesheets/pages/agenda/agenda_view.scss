@@ -78,7 +78,11 @@ body {
   float: left;
   width: 90%;
 }
-
+span.agendaView--no-assignments {
+  display: block;
+  padding: 10px;
+  font-size: 13px;
+}
 #calendar-app .agenda-event {
   margin: 0;
   outline: none;

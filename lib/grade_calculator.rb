@@ -22,6 +22,10 @@ class GradeCalculator
   def initialize(user_ids, course, opts = {})
     opts = opts.reverse_merge(:ignore_muted => true)
 
+    Rails.logger.info("GRADES: calc args: user_ids=#{user_ids.inspect}")
+    Rails.logger.info("GRADES: calc args: course=#{course.inspect}")
+    Rails.logger.info("GRADES: calc args: opts=#{opts.inspect}")
+
     @course = course.is_a?(Course) ? course : Course.find(course)
     @groups = @course.assignment_groups.active
     @grading_period = opts[:grading_period]
@@ -108,6 +112,7 @@ class GradeCalculator
   def calculate_score(submissions, user_id, grade_updates, ignore_ungraded)
     group_sums = create_group_sums(submissions, user_id, ignore_ungraded)
     info = calculate_total_from_group_scores(group_sums)
+    Rails.logger.info "GRADES: calculated: #{info.inspect}"
     grade_updates[user_id] = info[:grade]
     [info, group_sums.index_by { |s| s[:id] }]
   end
@@ -151,6 +156,11 @@ class GradeCalculator
       group_submissions.reject! { |s| s[:score].nil? } if ignore_ungraded
       group_submissions.each { |s| s[:score] ||= 0 }
 
+      logged_submissions = group_submissions.map { |s| loggable_submission(s) }
+      Rails.logger.info "GRADES: calculating for assignment_group=#{group.global_id} user=#{user_id}"
+      Rails.logger.info "GRADES: calculating... ignore_ungraded=#{ignore_ungraded}"
+      Rails.logger.info "GRADES: calculating... submissions=#{logged_submissions.inspect}"
+
       kept = drop_assignments(group_submissions, group.rules_hash)
 
       score, possible = kept.reduce([0, 0]) { |(s_sum,p_sum),s|
@@ -163,6 +173,8 @@ class GradeCalculator
         :possible => possible,
         :weight   => group.group_weight,
         :grade    => ((score.to_f / possible * 100).round(2) if possible > 0),
+      }.tap { |group_grade_info|
+        Rails.logger.info "GRADES: calculated #{group_grade_info.inspect}"
       }
     end
   end
@@ -193,6 +205,8 @@ class GradeCalculator
     never_drop_ids = rules[:never_drop] || []
     return submissions if drop_lowest.zero? && drop_highest.zero?
 
+    Rails.logger.info "GRADES: dropping assignments! #{rules.inspect}"
+
     cant_drop = []
     if never_drop_ids.present?
       cant_drop, submissions = submissions.partition { |s|
@@ -217,7 +231,10 @@ class GradeCalculator
       drop_pointed(submissions, cant_drop, keep_highest, keep_lowest) :
       drop_unpointed(submissions, keep_highest, keep_lowest)
 
-    kept + cant_drop
+    (kept + cant_drop).tap do |all_kept|
+      loggable_kept = all_kept.map { |s| loggable_submission(s) }
+      Rails.logger.info "GRADES.calculating... kept=#{loggable_kept.inspect}"
+    end
   end
 
   def drop_unpointed(submissions, keep_highest, keep_lowest)
@@ -351,5 +368,14 @@ class GradeCalculator
         {:grade => nil, :total => total.to_f}
       end
     end
+  end
+
+  # this takes a wrapped submission (like from create_group_sums)
+  def loggable_submission(wrapped_submission)
+    {
+      assignment_id: wrapped_submission[:assignment].id,
+      score: wrapped_submission[:score],
+      total: wrapped_submission[:total],
+    }
   end
 end

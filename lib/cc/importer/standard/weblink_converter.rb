@@ -27,7 +27,7 @@ module CC::Importer::Standard
           xml = open(path).read
           # because of some sadness from certain vendors clear empty namespace declarations
           xml.gsub!(/xmlns=""/, '')
-          doc = ::Nokogiri::XML(xml)
+          doc = create_xml_doc(xml)
           doc.remove_namespaces! unless doc.namespaces['xmlns']
           title = get_node_val(doc, 'webLink title')
           url = get_node_att(doc, 'webLink url', 'href')

@@ -138,7 +138,6 @@ describe "common file behaviors" do
     end
 
     it "should ignore file name case when alphabetizing" do
-      sleep 5 # page does a weird load twice which is causing selenium failures so we sleep and wait for the page
       amazing_filename, amazing_fullpath, _, amazing_tempfile = get_file("amazing_file.txt")
       dog_filename, dog_fullpath, _, dog_tempfile = get_file("Dog_file.txt")
       file_paths = [dog_fullpath, amazing_fullpath]

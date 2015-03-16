@@ -1,8 +1,8 @@
 define [
   'underscore'
   'i18n!react_files'
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   '../mixins/BackboneMixin'
   'compiled/react/shared/utils/withReactDOM'
   './FriendlyDatetime'
@@ -184,6 +184,7 @@ define [
               model: @props.model
               userCanManageFilesForContext: @props.userCanManageFilesForContext
               usageRightsRequiredForContext: @props.usageRightsRequiredForContext
+              modalOptions: @props.modalOptions
             })
 
         div className: 'ef-links-col', role: 'gridcell',
@@ -202,4 +203,5 @@ define [
               userCanManageFilesForContext: @props.userCanManageFilesForContext
               usageRightsRequiredForContext: @props.usageRightsRequiredForContext
               externalToolsForContext: @props.externalToolsForContext
+              modalOptions: @props.modalOptions
             })

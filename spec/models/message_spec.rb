@@ -91,6 +91,14 @@ describe Message do
 
       expect(msg.subject).to include(@teacher.name)
     end
+
+    it "displays a custom logo when configured" do
+      account = account_model
+      account.settings[:email_logo] = 'awesomelogo.jpg'
+      @au = AccountUser.create(:account => account)
+      msg = generate_message(:account_user_notification, :email, @au)
+      expect(msg.html_body).to include('awesomelogo.jpg')
+    end
   end
 
   context "named scopes" do
@@ -178,6 +186,37 @@ describe Message do
       Mailer.expects(:create_message).raises("450 recipient address rejected")
       ErrorReport.expects(:log_exception).never
       expect(@message.deliver).to eq false
+    end
+
+    context 'push' do
+      before :once do
+        client = mock()
+        client.stubs(:create_platform_endpoint => stub(:successful? => true,
+                                                       :data => {:endpoint_arn => 'endpoint_arn'}),
+                     :delete_endpoint => mock(),
+                     :publish => mock())
+        DeveloperKey.stubs(:sns).returns(stub(:client => client))
+        dk = DeveloperKey.default
+        dk.update_attribute(:sns_arn, 'app_arn')
+        user_model
+        @access_token = @user.access_tokens.create!(developer_key: dk)
+      end
+
+      it "deletes unreachable push endpoints" do
+        @access_token.notification_endpoints.create!(user: @user, token: 'registration_token')
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        DeveloperKey.sns.client.publish.expects(:successful?).raises(AWS::SNS::Errors::EndpointDisabled)
+        DeveloperKey.sns.client.expects(:delete_endpoint).with(endpoint_arn: 'endpoint_arn')
+        @message.deliver
+      end
+
+      it "delivers to each of a user's push endpoints" do
+        @access_token.notification_endpoints.create!(user: @user, token: 'registration_token1')
+        @access_token.notification_endpoints.create!(user: @user, token: 'registration_token2')
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        DeveloperKey.sns.client.expects(:publish).twice.returns(stub(:successful? => true))
+        @message.deliver
+      end
     end
   end
 

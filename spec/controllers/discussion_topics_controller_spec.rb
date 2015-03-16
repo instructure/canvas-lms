@@ -51,11 +51,26 @@ describe DiscussionTopicsController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should require the course to be published for students" do
+      @course.claim
+      user_session(@student)
+      get 'index', :course_id => @course.id
+      assert_unauthorized
+    end
   end
 
   describe "GET 'show'" do
     it "should require authorization" do
       course_topic
+      get 'show', :course_id => @course.id, :id => @topic.id
+      assert_unauthorized
+    end
+
+    it "should require the course to be published for students" do
+      course_topic
+      @course.claim
+      user_session(@student)
       get 'show', :course_id => @course.id, :id => @topic.id
       assert_unauthorized
     end
@@ -197,6 +212,21 @@ describe DiscussionTopicsController do
 
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(assigns[:groups].size).to eql(2)
+    end
+
+    context 'publishing' do
+      render_views
+
+      it "hides the publish icon for announcements" do
+        user_session(@teacher)
+        @context = @course
+        @announcement = @course.announcements.create!(
+          :title => "some announcement",
+          :message => "some message"
+        )
+        get 'show', :course_id => @course.id, :id => @announcement.id
+        expect(response.body).not_to match "topic_publish_button"
+      end
     end
 
     context "posting first to view setting" do

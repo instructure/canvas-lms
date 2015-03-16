@@ -52,6 +52,8 @@ describe SisImportsApiController, type: :request do
     json.delete("updated_at")
     expect(json.has_key?("ended_at")).to be_truthy
     json.delete("ended_at")
+    expect(json.has_key?("started_at")).to eq true
+    json.delete("started_at")
     if opts[:batch_mode_term_id]
       expect(json["batch_mode_term_id"]).not_to be_nil
     end
@@ -65,7 +67,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode" => opts[:batch_mode] ? true : nil,
           "override_sis_stickiness" => opts[:override_sis_stickiness] ? true : nil,
           "add_sis_stickiness" => opts[:add_sis_stickiness] ? true : nil,
-          "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil})
+          "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+    })
     batch.process_without_send_later
     return batch
   end
@@ -87,6 +92,8 @@ describe SisImportsApiController, type: :request do
     json.delete("updated_at")
     expect(json.has_key?("ended_at")).to be_truthy
     json.delete("ended_at")
+    expect(json.has_key?("started_at")).to eq true
+    json.delete("started_at")
     batch = SisBatch.last
     expect(json).to eq({
           "data" => { "import_type"=>"instructure_csv"},
@@ -97,7 +104,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode_term_id" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
-          "clear_sis_stickiness" => nil })
+          "clear_sis_stickiness" => nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+    })
 
     expect(SisBatch.count).to eq @batch_count + 1
     expect(batch.batch_mode).to be_falsey
@@ -115,6 +125,8 @@ describe SisImportsApiController, type: :request do
     json.delete("updated_at")
     expect(json.has_key?("ended_at")).to be_truthy
     json.delete("ended_at")
+    expect(json.has_key?("started_at")).to eq true
+    json.delete("started_at")
     expect(json).to eq({
           "data" => { "import_type" => "instructure_csv",
                       "supplied_batches" => ["user"],
@@ -136,7 +148,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode_term_id" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
-          "clear_sis_stickiness" => nil })
+          "clear_sis_stickiness" => nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+    })
   end
 
   it "should skip the job for skip_sis_jobs_account_ids" do
@@ -181,6 +196,20 @@ describe SisImportsApiController, type: :request do
     expect(batch.options[:override_sis_stickiness]).to be_truthy
     expect(batch.options[:clear_sis_stickiness]).to be_truthy
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
+  end
+
+  it "should enable diffing mode" do
+    json = api_call(:post,
+      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      { controller: 'sis_imports_api', action: 'create',
+        format: 'json', account_id: @account.id.to_s },
+      { import_type: 'instructure_csv',
+        attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+        diffing_data_set_identifier: 'my-users-data',
+      })
+    batch = SisBatch.find(json["id"])
+    expect(batch.batch_mode).to be_falsey
+    expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
   end
 
   it "should error if batch mode and the term can't be found" do
@@ -499,6 +528,7 @@ describe SisImportsApiController, type: :request do
     json["sis_imports"].first.delete("created_at")
     json["sis_imports"].first.delete("updated_at")
     json["sis_imports"].first.delete("ended_at")
+    json["sis_imports"].first.delete("started_at")
 
     expect(json).to eq({"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
@@ -521,7 +551,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode_term_id" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
-          "clear_sis_stickiness" => nil }]
+          "clear_sis_stickiness" => nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+      }]
     })
   end
 

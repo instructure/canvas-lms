@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.discussion_topic_id %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -8,7 +8,7 @@
 
 <%= t :body, "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %>
 
-<%= html_to_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
+<%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
 <%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %>
 <%= content :link %>

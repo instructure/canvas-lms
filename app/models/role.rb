@@ -36,7 +36,7 @@ class Role < ActiveRecord::Base
     # this is an override to take advantage of built-in role caching since those are by far the most common
     def role
       self.association(:role).target ||= self.shard.activate do
-        Role.get_role_by_id(read_attribute(:role_id)) || (self.respond_to?(:default_role) && self.default_role)
+        Role.get_role_by_id(read_attribute(:role_id)) || (self.respond_to?(:default_role) ? self.default_role : nil)
       end
       super
     end
@@ -264,13 +264,12 @@ class Role < ActiveRecord::Base
   end
 
   def self.manageable_roles_by_user(user, course)
-    manageable = ['ObserverEnrollment', 'DesignerEnrollment']
+    manageable = []
     if course.grants_right?(user, :manage_students)
-      manageable << 'StudentEnrollment'
+      manageable += ['StudentEnrollment', 'ObserverEnrollment']
     end
     if course.grants_right?(user, :manage_admin_users)
-      manageable << 'TeacherEnrollment'
-      manageable << 'TaEnrollment'
+      manageable += ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
     elsif course.teacherless?
       manageable << 'TeacherEnrollment'
     end

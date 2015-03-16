@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'compiled/calendar/TimeBlockList'
   'compiled/calendar/TimeBlockRow'

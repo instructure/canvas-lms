@@ -3,17 +3,15 @@
 define([
   'underscore',
   'i18n!modules',
-  'react'
+  'old_unsupported_dont_use_react'
 ], (_, I18n, React) => {
 
   var PostGradesDialogNeedsGradingPage = React.createClass({
     onClickRow(assignment_id) {
-      console.log("onClickRow", assignment_id)
       window.location = "gradebook/speed_grader?assignment_id=" + assignment_id
     },
 
     render () {
-      console.log("PostGradesDialogNeedsGradingPage-render", this.props.needsGrading)
       return (
         <div>
           <small>

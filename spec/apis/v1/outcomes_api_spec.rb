@@ -49,13 +49,10 @@ describe "Outcomes API", type: :request do
 
     if criterion = outcome.data && outcome.data[:rubric_criterion]
       retval["calculation_method"] = presets[:calculation_method] || outcome.calculation_method
+      retval["calculation_int"]    = presets[:calculation_int]    || outcome.calculation_int
       retval["points_possible"]    = presets[:points_possible]    || criterion[:points_possible].to_i
       retval["mastery_points"]     = presets[:mastery_points]     || criterion[:mastery_points].to_i
       retval["ratings"]            = presets[:ratings]            || criterion[:ratings].map{ |d| d.stringify_keys }
-
-      if outcome.calculation_method == "decaying_average" || outcome.calculation_method == "n_mastery"
-        retval["calculation_int"] = presets[:calculation_int] || outcome.calculation_int
-      end
     end
 
     return retval
@@ -207,6 +204,8 @@ describe "Outcomes API", type: :request do
           "id" => @outcome.id,
           "context_id" => @account.id,
           "context_type" => "Account",
+          "calculation_method" => "highest",
+          "calculation_int" => nil,
           "title" => @outcome.title,
           "display_name" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
@@ -247,6 +246,7 @@ describe "Outcomes API", type: :request do
           "points_possible" => 5,
           "mastery_points" => 3,
           "calculation_method" => "highest",
+          "calculation_int" => nil,
           "ratings" => [
             { "points" => 5, "description" => "Exceeds Expectations" },
             { "points" => 3, "description" => "Meets Expectations" },
@@ -381,6 +381,8 @@ describe "Outcomes API", type: :request do
           "id" => @outcome.id,
           "context_id" => @account.id,
           "context_type" => "Account",
+          "calculation_method" => "highest",
+          "calculation_int" => nil,
           "vendor_guid" => "vendorguid9000",
           "title" => "New Title",
           "display_name" => nil,
@@ -544,7 +546,7 @@ describe "Outcomes API", type: :request do
           expect(json["errors"]["calculation_method"]).not_to be_nil
           # make sure there's no errors except on calculation_method
           expect(json["errors"].except("calculation_method")).to be_empty
-          expect(json["errors"]["calculation_method"][0]["message"]).to include("inclusion")
+          expect(json["errors"]["calculation_method"][0]["message"]).to include("calculation_method must be one of")
         end
 
         context "sensible error message for an incorrect calculation_int" do
@@ -554,7 +556,8 @@ describe "Outcomes API", type: :request do
             "highest" => nil,
             "latest" => nil,
           }
-          error_message = "not a valid calculation_int"
+          norm_error_message = "not a valid value for this calculation method"
+          no_calc_int_error_message = "A calculation value is not used with this calculation method"
           bad_calc_int = 1500
 
           method_to_int.each do |method, int|
@@ -588,7 +591,11 @@ describe "Outcomes API", type: :request do
               expect(json["errors"]["calculation_int"]).not_to be_nil
               # make sure there's no errors except on calculation_method
               expect(json["errors"].except("calculation_int")).to be_empty
-              expect(json["errors"]["calculation_int"][0]["message"]).to include(error_message)
+              if %w[highest latest].include?(method)
+                expect(json["errors"]["calculation_int"][0]["message"]).to include(no_calc_int_error_message)
+              else
+                expect(json["errors"]["calculation_int"][0]["message"]).to include(norm_error_message)
+              end
             end
           end
         end

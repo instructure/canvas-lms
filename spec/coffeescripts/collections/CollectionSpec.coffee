@@ -19,8 +19,10 @@ define [
 
   module 'Backbone.Collection',
     setup: ->
+      @xhr = sinon.useFakeXMLHttpRequest()
       @ajaxSpy = sinon.spy $, 'ajax'
     teardown: ->
+      @xhr.restore
       $.ajax.restore()
 
   test 'default options', ->

@@ -1,12 +1,13 @@
 <% define_content :link do -%>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/announcements/<%= asset.id %>
+  <%= polymorphic_url([asset.context, asset]) %>
 <% end %>
 <% define_content :subject do -%>
   <%= before_label asset.title %> <%= asset.context.name %>
 <% end %>
-<%= html_to_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
+<%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
 <% if asset.attachment %><%= before_label :file_included, "File Included" %> <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download<% end %>
+  <%= polymorphic_url([asset.context, :file_download], file_id: asset.attachment) %>
+<% end %>
 
 <%= content :link %>

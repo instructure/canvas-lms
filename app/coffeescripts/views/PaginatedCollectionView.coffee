@@ -125,11 +125,11 @@ define [
       return if @collection.fetchingPage or @collection.fetchingNextPage or not @$el.length
       elementBottom = (@$scrollableElement.position()?.top || 0) +
         @$scrollableElement.height() -
-        @heightContainer.position().top
+        @heightContainer.position()?.top
       distanceToBottom = elementBottom -
         @scrollContainer.scrollTop() -
         @scrollContainer.height()
-      if distanceToBottom < @options.buffer and @collection.canFetch('next')
+      if (@autoFetch || distanceToBottom < @options.buffer) and @collection.canFetch('next')
         @collection.fetch page: 'next'
       else
         @hideLoadingIndicator()

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2014 Instructure, Inc.
+# Copyright (C) 2012 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -387,7 +387,7 @@ module AccountReports
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
-          headers = ['course_id', 'user_id', 'role', 'section_id', 'status', 'associated_user_id']
+          headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id', 'status', 'associated_user_id']
         else
           headers = []
           headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -395,6 +395,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
           headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
           headers << I18n.t('#account_reports.report_header_role', 'role')
+          headers << I18n.t('#account_reports.report_header_role_id', 'role_id')
           headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
           headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
           headers << I18n.t('#account_reports.report_header_status', 'status')
@@ -458,6 +459,7 @@ module AccountReports
             row << e.user_id unless @sis_format
             row << e.pseudonym_sis_id
             row << e.sis_role
+            row << e.role_id
             row << e.course_section_id unless @sis_format
             row << e.course_section_sis_id
             row << e.enroll_state
@@ -593,11 +595,14 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
           headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
           headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('#account_reports.report_header_canvas_nonxlist_course_id', 'canvas_nonxlist_course_id')
+          headers << I18n.t('#account_reports.report_header_nonxlist_course_id', 'nonxlist_course_id')
         end
         csv << headers
         @domain_root_account = root_account
         xl = root_account.course_sections.
-          select("course_sections.*, courses.sis_source_id AS course_sis_id").
+          select("course_sections.*, courses.sis_source_id AS course_sis_id,
+                  nxc.sis_source_id AS nxc_sis_id").
           joins("INNER JOIN courses ON course_sections.course_id = courses.id
                  INNER JOIN courses nxc ON course_sections.nonxlist_course_id = nxc.id").
           where("course_sections.nonxlist_course_id IS NOT NULL")
@@ -629,6 +634,8 @@ module AccountReports
             row << x.id unless @sis_format
             row << x.sis_source_id
             row << x.workflow_state
+            row << x.nonxlist_course_id unless @sis_format
+            row << x.nxc_sis_id unless @sis_format
             csv << row
           end
         end

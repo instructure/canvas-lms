@@ -113,6 +113,9 @@ define [
       submissionTypes = @_submissionTypes()
       @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
 
+    hasSubmittedSubmissions: =>
+      @get('has_submitted_submissions')
+
     withoutGradedSubmission: =>
       sub = @get('submission')
       !sub? || sub.withoutGradedSubmission()

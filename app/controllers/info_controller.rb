@@ -19,10 +19,11 @@
 class InfoController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => :record_error
   skip_before_filter :load_account, :only => :health_check
-  skip_before_filter :load_user, :only => [:health_check]
+  skip_before_filter :load_user, :only => [:health_check, :browserconfig]
 
   def styleguide
     js_bundle :styleguide
+    render :layout => "layouts/styleguide"
   end
 
   def message_redirect
@@ -89,4 +90,11 @@ class InfoController < ApplicationController
       format.json { render :json => { :status => 'canvas ok', :revision => Canvas.revision } }
     end
   end
+
+  # for windows live tiles
+  def browserconfig
+    cancel_cache_buster
+    expires_in 10.minutes, public: true
+  end
+
 end

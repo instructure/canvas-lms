@@ -3,7 +3,7 @@
 }
 
 .FolderTree__folderItem--focused {
-  & > .folderLabel {
-    background-color: $base-list-item-background--hover;
+  & > .treeLabel {
+    background-color: $ic-list-item-background--hover;
   }
 }

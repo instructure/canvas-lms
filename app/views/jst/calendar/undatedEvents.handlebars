@@ -5,7 +5,7 @@
   {{#if events}}
     <ul id="undated_events_list">
       {{#each events}}
-        <li class="undated_event event group_{{contextCode}} {{id}}" data-event-id="{{id}}">
+        <li class="undated_event event group_{{contextCode}} {{id}}" data-event-id="{{id}}" tabindex="0" role="button">
           <i class='icon-{{icon}}' aria-hidden='true'></i>
           <a href="{{details_url}}" class='undated_event_title {{#if isCompleted}}calendar__event--completed{{/if}}'>
             {{#truncate title 35}}{{/truncate}}

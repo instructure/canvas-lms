@@ -41,7 +41,7 @@ define [
           baseData:
             type: 'section'
             context: "course_#{ENV.course.id}_sections"
-            exclude: _.map(@model.sectionEditableEnrollments(), (e) -> "section_#{e.course_section_id}")
+            exclude: _.map(@model.sectionEditableEnrollments(), (e) -> "section_#{e.course_section_id}").concat(ENV.CONCLUDED_SECTIONS)
           noExpand: true
           browser:
             data:

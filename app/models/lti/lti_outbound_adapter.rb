@@ -26,44 +26,18 @@ module Lti
     #   launch_url: a specific launch url for this launch
     #   link_code: the resource_link_id for this launch
     #   overrides
-    #   custom_substitutions: hash of translations values for custom variable
-    #      substitutions where the key is what we are translating from, and the value
-    #      is what we are translating to
-    def prepare_tool_launch(return_url, opts = {})
+    def prepare_tool_launch(return_url, variable_expander, opts = {})
       resource_type = opts[:resource_type]
       selected_html = opts[:selected_html]
       launch_url = opts[:launch_url] || default_launch_url(resource_type)
       link_code = opts[:link_code] || default_link_code
       @overrides = opts[:overrides] || {}
 
-      variable_substitutor = LtiOutbound::VariableSubstitutor.new
 
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
-      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context, variable_substitutor).convert if @user
+      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert if @user
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
-
-      #Account
-      variable_substitutor.add_substitution('$Canvas.account.id', lti_account.id)
-      variable_substitutor.add_substitution('$Canvas.account.name', lti_account.name)
-      variable_substitutor.add_substitution('$Canvas.account.sisSourceId', lti_account.sis_source_id)
-      #Consumer Instance
-      variable_substitutor.add_substitution('$Canvas.root_account.id', lti_context.consumer_instance.id)
-      variable_substitutor.add_substitution('$Canvas.root_account.sisSourceId', lti_context.consumer_instance.sis_source_id)
-      #Course
-      if lti_context.is_a? LtiOutbound::LTICourse
-        variable_substitutor.add_substitution('$Canvas.course.id', lti_context.id)
-        variable_substitutor.add_substitution('$Canvas.course.sisSourceId', lti_context.sis_source_id)
-      end
-      # temporary until lti 2 infrastructure is in place
-      lti_helper = Lti::SubstitutionsHelper.new(@context, @root_account, @user)
-      variable_substitutor.add_substitution('$Canvas.xuser.allRoles', lti_helper.all_roles)
-
-      if opts[:custom_substitutions]
-        opts[:custom_substitutions].each do |key, value|
-          variable_substitutor.add_substitution(key, value)
-        end
-      end
 
       @tool_launch = LtiOutbound::ToolLaunch.new(
           {
@@ -77,7 +51,7 @@ module Lti
               user: lti_user,
               tool: lti_tool,
               account: lti_account,
-              :variable_substitutor => variable_substitutor
+              variable_expander: variable_expander
           }
       )
       self

@@ -240,11 +240,13 @@ describe "course settings" do
     it "should show the count of custom role enrollments" do
       teacher_role = custom_teacher_role("teach")
       student_role = custom_student_role("weirdo")
+
       custom_ta_role("taaaa")
       course_with_student(:course => @course, :role => student_role)
+      student_role.deactivate!
       course_with_teacher(:course => @course, :role => teacher_role)
       get "/courses/#{@course.id}/settings"
-      expect(fj('.summary tr:nth(1)').text).to match /weirdo:\s*1/
+      expect(fj('.summary tr:nth(1)').text).to match /weirdo \(inactive\):\s*1/
       expect(fj('.summary tr:nth(3)').text).to match /teach:\s*1/
       expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
     end

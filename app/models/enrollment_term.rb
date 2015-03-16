@@ -35,11 +35,23 @@ class EnrollmentTerm < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:root_account, :enrollment_dates_overrides, :courses, :course_sections]
 
   validates_presence_of :root_account_id, :workflow_state
+  validate :check_if_deletable
+
   before_validation :verify_unique_sis_source_id
   before_save :update_courses_later_if_necessary
 
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at
+
+  def check_if_deletable
+    if self.workflow_state_changed? && self.workflow_state == "deleted"
+      if self.default_term?
+        self.errors.add(:workflow_state, t('errors.delete_default_term', "Cannot delete the default term"))
+      elsif self.courses.active.exists?
+        self.errors.add(:workflow_state, t('errors.delete_term_with_courses', "Cannot delete a term with active courses"))
+      end
+    end
+  end
 
   def update_courses_later_if_necessary
     self.update_courses_later if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
@@ -102,9 +114,13 @@ class EnrollmentTerm < ActiveRecord::Base
   
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
-    existing_term = self.root_account.enrollment_terms.where(sis_source_id: self.sis_source_id).first
-    return true if !existing_term || existing_term.id == self.id 
-    
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
+    scope = root_account.enrollment_terms.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
+
+    return true unless scope.exists?
+
     self.errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", :sis_source_id => self.sis_source_id))
     false
   end
@@ -143,6 +159,6 @@ class EnrollmentTerm < ActiveRecord::Base
     self.workflow_state = 'deleted'
     save!
   end
-  
+
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
 end

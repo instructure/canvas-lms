@@ -70,14 +70,14 @@ module Api::V1::ContextModule
         when 'ExternalUrl'
           if value_to_boolean(request.params[:frame_external_urls])
             # canvas UI wants external links hosted in iframe
-            course_context_modules_item_redirect_url(:id => content_tag.id)
+            course_context_modules_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
           else
             # API prefers to redirect to the external page, rather than host in an iframe
-            api_v1_course_context_module_item_redirect_url(:id => content_tag.id)
+            api_v1_course_context_module_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
           end
         else
           # otherwise we'll link to the same thing the web UI does
-          course_context_modules_item_redirect_url(:id => content_tag.id)
+          course_context_modules_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
       end
     end
     
@@ -147,7 +147,7 @@ module Api::V1::ContextModule
     item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
     item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
 
-    [:due_at, :unlock_at, :lock_at, :points_possible].each do |attr|
+    [:usage_rights, :thumbnail_url, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible].each do |attr|
       if item.respond_to?(attr) && val = item.try(attr)
         details[attr] = val
       end

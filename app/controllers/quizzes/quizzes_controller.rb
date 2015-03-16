@@ -58,7 +58,7 @@ class Quizzes::QuizzesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_QUIZZES)
 
-    can_manage = is_authorized_action?(@context, @current_user, :manage_assignments)
+    can_manage = @context.grants_right?(@current_user, session, :manage_assignments)
 
     scope = @context.quizzes.active.includes([ :assignment ])
 
@@ -211,8 +211,8 @@ class Quizzes::QuizzesController < ApplicationController
       js_env(hash)
 
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
+      if params[:take] && (@can_take = can_take_quiz?)
 
-      if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
           start_quiz!
@@ -317,13 +317,14 @@ class Quizzes::QuizzesController < ApplicationController
           @assignment = @context.assignments.build(:title => params[:quiz][:title], :due_at => params[:quiz][:lock_at], :submission_types => 'online_quiz')
           @assignment.assignment_group = @assignment_group
           @assignment.saved_by = :quiz
+          @assignment.workflow_state = 'unpublished'
           @assignment.save
           params[:quiz][:assignment_id] = @assignment.id
         end
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      if params[:assignment]
+      if params[:assignment].present? && @context.feature_enabled?(:post_grades) && @quiz.assignment
         @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
         @quiz.assignment.save
       end
@@ -378,11 +379,11 @@ class Quizzes::QuizzesController < ApplicationController
           if @quiz.assignment.present?
             old_assignment = @quiz.assignment.clone
             old_assignment.id = @quiz.assignment.id
-          end
 
-          if params[:assignment]
-            @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
-            @quiz.assignment.save
+            if params[:assignment] && @context.feature_enabled?(:post_grades)
+              @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
+              @quiz.assignment.save
+            end
           end
 
           auto_publish = @quiz.published?
@@ -866,7 +867,14 @@ class Quizzes::QuizzesController < ApplicationController
     elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       render :action => 'invalid_ip'
       false
-    elsif @context.soft_concluded?
+    elsif @section.present? && @section.restrict_enrollments_to_section_dates && @section.end_at < Time.now
+      false
+    elsif @context.restrict_enrollments_to_course_dates && @context.soft_concluded?
+      false
+    elsif @current_user.present? &&
+          @context.present? &&
+          @context.enrollments.where(user_id: @current_user.id).all? {|e| e.inactive? } &&
+          !@context.grants_right?(@current_user, :read_as_admin)
       false
     else
       true

@@ -1,4 +1,6 @@
-<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.account) %><% end %>
+<% define_content :link do %>
+  <%= dashboard_url %>
+<% end %>
 
 <%= t :subject, "New Account Admin for %{account}", :account => asset.account.name %>
   

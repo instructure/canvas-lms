@@ -67,6 +67,24 @@ describe Folder do
     expect(child2.full_name).to eql("course files/child 2")
   end
 
+  it "should allow the iterator to increase beyond 10 for duplicate folder names" do
+    f = Folder.root_folders(@course).first
+    expect(f.full_name).to eql("course files")
+    child = f.active_sub_folders.build(:name => "child")
+    child.context = @course
+    child.save!
+    expect(child.parent_folder).to eql(f)
+    expect(child.full_name).to eql("course files/child")
+
+    2.upto(11) do |i|
+      duplicate = f.active_sub_folders.build(:name => "child")
+      duplicate.context = @course
+      duplicate.save!
+      expect(duplicate.parent_folder).to eql(f)
+      expect(duplicate.full_name).to eql("course files/child #{i}")
+    end
+  end
+
   it "should not allow recursive folder structures" do
     f1 = @course.folders.create!(:name => "f1")
     f2 = f1.sub_folders.create!(:name => "f2", :context => @course)

@@ -129,22 +129,33 @@ var speakMessage = function ($this, message) {
   $.midnight = function(date) {
     return date != null && tz.format(date, '%R') == '00:00';
   };
-  $.dateString = function(date, otherZone) {
+  $.dateString = function(date, options) {
     if (date == null) return "";
-    var format = $.sameYear(date, new Date()) ? '%b %-d' : '%b %-d, %Y';
-    if(arguments.length > 1) return tz.format(date, format, otherZone) || '';
-    return tz.format(date, format) || '';
+    var timezone = options && options.timezone;
+    var format = options && options.format;
+    format = (format !== 'medium') && $.sameYear(date, new Date()) ? '%b %-d' : '%b %-d, %Y';
+    if (typeof timezone == 'string' || timezone instanceof String) {
+      return tz.format(date, format, timezone) || '';
+    } else {
+      return tz.format(date, format) || '';
+    }
   };
-  $.timeString = function(date, otherZone) {
+
+  $.timeString = function(date, options) {
     if (date == null) return "";
-    if(arguments.length > 1) return tz.format(date, '%l:%M%P', otherZone) || '';
-    return tz.format(date, '%l:%M%P') || '';
+    var timezone = options && options.timezone;
+    if (typeof timezone == 'string' || timezone instanceof String) {
+      return tz.format(date, '%-l:%M%P', timezone) || '';
+    } else {
+      return tz.format(date, '%-l:%M%P') || '';
+    }
   };
   $.datetimeString = function(datetime, options) {
-    var localized = options && options.localized;
-    var timezone = options && options.timezone;
     datetime = tz.parse(datetime);
     if (datetime == null) return "";
+    var localized = options && options.localized;
+    var timezone = options && options.timezone;
+    var format = options && options.format;
     if (localized == false) {
       // temporary unlocalized (which means avoiding tz.format)
       // expansion of the other branch. intent of being able to call
@@ -156,20 +167,12 @@ var speakMessage = function ($this, message) {
       //
       // TODO: implement that real solution and remove this
       var fudged = $.fudgeDateForProfileTimezone(datetime);
-      datePart = $.sameYear(datetime, new Date()) ? fudged.toString("MMM d") : fudged.toString("MMM d, yyyy");
+      datePart = (format !== 'medium') && $.sameYear(datetime, new Date()) ? fudged.toString("MMM d") : fudged.toString("MMM d, yyyy");
       timePart = fudged.toString("h:mmtt").toLowerCase();
       return datePart + " at " + timePart;
-    }
-    else {
-      var dateValue = null;
-      var timeValue = null;
-      if(typeof timezone == 'string' || timezone instanceof String){
-        dateValue = $.dateString(datetime, timezone);
-        timeValue = $.timeString(datetime, timezone);
-      }else{
-        dateValue = $.dateString(datetime);
-        timeValue = $.timeString(datetime);
-      }
+    } else {
+      var dateValue = $.dateString(datetime, options);
+      var timeValue = $.timeString(datetime, options);
       return I18n.t('#time.event', '%{date} at %{time}', { date: dateValue, time: timeValue });
     }
   };

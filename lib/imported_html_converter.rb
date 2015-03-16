@@ -21,7 +21,7 @@ class ImportedHtmlConverter
   include HtmlTextHelper
 
   CONTAINER_TYPES = ['div', 'p', 'body']
-  REFERENCE_KEYWORDS = %w{CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE}
+  REFERENCE_KEYWORDS = %w{CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE IMS-CC-FILEBASE}
   # yields warnings
   def self.convert(html, context, migration=nil, opts={})
     doc = Nokogiri::HTML(html || "")
@@ -87,7 +87,7 @@ class ImportedHtmlConverter
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
             section = $1
             new_url = "#{course_path}/#{section}"
-          elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
+          elsif val =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
             rel_path = URI.unescape($1)
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
               new_url = replace_media_comment_data(node, rel_path, context, opts) {|warning, data| yield warning, data if block_given?}
@@ -188,28 +188,35 @@ class ImportedHtmlConverter
   def self.replace_relative_file_url(rel_path, context)
     new_url = nil
     rel_path, qs = rel_path.split('?', 2)
-    if file = find_file_in_context(rel_path, context)
-      new_url = "/courses/#{context.id}/files/#{file.id}"
-      # support other params in the query string, that were exported from the
-      # original path components and query string. see
-      # CCHelper::file_query_string
-      params = Rack::Utils.parse_nested_query(qs.presence || "")
-      qs = []
-      new_action = ""
-      params.each do |k,v|
-        case k
-        when /canvas_qs_(.*)/
-          qs << "#{Rack::Utils.escape($1)}=#{Rack::Utils.escape(v)}"
-        when /canvas_(.*)/
-          new_action += "/#{$1}"
+    rel_path_parts = Pathname.new(rel_path).each_filename.to_a
+
+    # e.g. start with "a/b/c.txt" then try "b/c.txt" then try "c.txt"
+    while new_url.nil? && rel_path_parts.length > 0
+      sub_path = File.join(rel_path_parts)
+      if file = find_file_in_context(sub_path, context)
+        new_url = "/courses/#{context.id}/files/#{file.id}"
+        # support other params in the query string, that were exported from the
+        # original path components and query string. see
+        # CCHelper::file_query_string
+        params = Rack::Utils.parse_nested_query(qs.presence || "")
+        qs = []
+        new_action = ""
+        params.each do |k,v|
+          case k
+          when /canvas_qs_(.*)/
+            qs << "#{Rack::Utils.escape($1)}=#{Rack::Utils.escape(v)}"
+          when /canvas_(.*)/
+            new_action += "/#{$1}"
+          end
         end
+        if new_action.present?
+          new_url += new_action
+        else
+          new_url += "/preview"
+        end
+        new_url += "?#{qs.join("&")}" if qs.present?
       end
-      if new_action.present?
-        new_url += new_action
-      else
-        new_url += "/preview"
-      end
-      new_url += "?#{qs.join("&")}" if qs.present?
+      rel_path_parts.shift
     end
     new_url
   end

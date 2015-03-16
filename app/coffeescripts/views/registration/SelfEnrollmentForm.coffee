@@ -77,7 +77,7 @@ define [
       ret = switch @action
         when 'create' then registrationErrors(errors)
         when 'log_in' then @loginErrors(errors)
-        when 'enroll' then @enrollErrors(registrationErrors(errors))
+        when 'enroll' then @enrollErrors(errors)
       ret
 
     loginErrors: (errors) ->
@@ -86,13 +86,11 @@ define [
       {'pseudonym[password]': error}
 
     enrollErrors: (errors) =>
-      # move the "already enrolled" error to the username, since that's visible
-      if errors['user[self_enrollment_code]']
-        errors['pseudonym[unique_id]'] ?= []
-        errors['pseudonym[unique_id]'].push errors['user[self_enrollment_code]'][0]
-        delete errors['user[self_enrollment_code]']
-      # since we don't reload the form, we want a subsequent login or signup
-      # attempt to work
+      if errors.user?.errors.self_enrollment_code?[0].type == "already_enrolled"
+        # just reload if already enrolled
+        location.reload true
+        return []
+
       @action = @initialAction
       @logOut()
       errors

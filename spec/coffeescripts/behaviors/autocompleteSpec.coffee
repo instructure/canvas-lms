@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'underscore'
   'compiled/behaviors/autocomplete'

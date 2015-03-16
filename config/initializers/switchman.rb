@@ -1,4 +1,6 @@
 Rails.application.config.to_prepare do
+  Switchman.cache = MultiCache
+
   Switchman::Shard.class_eval do
     class << self
       alias :birth :default unless instance_methods.include?(:birth)
@@ -168,4 +170,8 @@ Rails.application.config.to_prepare do
   end
 
   Shard.default.delayed_jobs_shard.activate!(:delayed_jobs)
+
+  if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV['SKIP_FORCE_SHARDING']
+    raise 'Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore'
+  end
 end

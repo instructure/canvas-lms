@@ -458,6 +458,58 @@ describe "Users API", type: :request do
         Account.site_admin.account_users.create!(user: @site_admin)
       end
 
+      context 'using force_validations param' do
+        it "validates with force_validations set to true" do
+          raw_api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+            { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+            {
+              :user => {
+                :name => ""
+              },
+              :pseudonym => {
+                :unique_id  => "bademail@",
+              },
+              :force_validations => true
+            }
+          )
+
+          assert_status(400)
+          errors = JSON.parse(response.body)['errors']
+          expect(errors['user']['name']).to be_present
+          expect(errors['user']['terms_of_use']).to be_present
+          expect(errors['pseudonym']).to be_present
+          expect(errors['pseudonym']['unique_id']).to be_present
+        end
+
+        it "does not validate when force_validations is not set to true" do
+          # successful request even with oddball user params because we're making the request as an admin
+          json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+            { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+            {
+              :user => {
+                :name => ""
+              },
+              :pseudonym => {
+                :unique_id  => "bademail@",
+              }
+            }
+          )
+
+          users = User.where(name: "").to_a
+          expect(users.length).to eql 1
+          user = users.first
+
+          expect(json).to eq({
+            "id"            => user.id,
+            "name"          => "",
+            "sortable_name" => "",
+            "short_name"    => "",
+            "login_id"      => "bademail@",
+            "locale"        => nil
+          })
+        end
+      end
+
       it "should allow site admins to create users" do
         json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },

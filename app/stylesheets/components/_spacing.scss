@@ -1,5 +1,7 @@
 /*
-@styleguide Spacing: Content Box
+@styleguide Spacing
+
+## Spacing: Content Box
 
 Content boxes automatically clear their floated children and have default margins.
 
@@ -12,13 +14,24 @@ Content boxes automatically clear their floated children and have default margin
 </div>
 ```
 
-### Sizes
+## Sizes Content Box
 
 ```html
 <div class="content-box-mini border border-trbl">Half spacing</div>
 <div class="content-box-mini border border-trbl">Third spacing</div>
 ```
+## Spacing: Pad Box
 
+Use pad-box if you want to arbitrarily add some padding to an element.
+
+## Sizes Pad Box
+
+```html
+<div class="pad-box-mega border border-trbl">Mega</div>
+<div class="pad-box border border-trbl">Normal</div>
+<div class="pad-box-mini border border-trbl">mini</div>
+<div class="pad-box-micro border border-trbl">micro</div>
+```
 */
 
 [class*='content-box'] {
@@ -31,20 +44,8 @@ Content boxes automatically clear their floated children and have default margin
 .content-box-mini { margin: $spacing-width/2 0; }
 .content-box-micro { margin: $spacing-width/3 0; }
 
-/*
-@styleguide Spacing: Pad Box
 
-Use pad-box if you want to arbitrarily add some padding to an element.
 
-### Sizes
-
-```html
-<div class="pad-box-mega border border-trbl">Mega</div>
-<div class="pad-box border border-trbl">Normal</div>
-<div class="pad-box-mini border border-trbl">mini</div>
-<div class="pad-box-micro border border-trbl">micro</div>
-```
-*/
 
 .pad-box { padding: $spacing-width; }
 .pad-box-mega { padding: $spacing-width*2; }

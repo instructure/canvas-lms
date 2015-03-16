@@ -67,7 +67,7 @@ class Announcement < DiscussionTopic
     whenever { |record|
       record.context.available? and
         !record.context.concluded? and
-      ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
 
     dispatch :announcement_created_by_you
@@ -75,7 +75,7 @@ class Announcement < DiscussionTopic
     whenever { |record|
       record.context.available? and
         !record.context.concluded? and
-        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
   end
 
@@ -89,7 +89,7 @@ class Announcement < DiscussionTopic
     given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked?}
     can :reply
 
     given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :post_to_forum) }

@@ -122,7 +122,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
   #
   # @returns QuizAssignmentOverrideSetContainer
   def index
-    can_manage = is_authorized_action?(@course, @current_user, :manage_assignments)
+    can_manage = @course.grants_right?(@current_user, session, :manage_assignments)
 
     api_route = api_v1_course_quiz_assignment_overrides_url(@course)
     quiz_ids = (Array(params[:quiz_assignment_overrides])[0] || {})[:quiz_ids]

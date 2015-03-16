@@ -1,6 +1,6 @@
 define [
   'jquery'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/react/shared/utils/withReactDOM'
   'i18n!restrict_student_access'
   'compiled/models/Folder'
@@ -46,7 +46,7 @@ define [
 
     componentDidMount: ->
       $([@refs.unlock_at.getDOMNode(), @refs.lock_at.getDOMNode()]).datetime_field()
-      $(@getDOMNode()).find(':tabbable:first').focus()
+      $('.ui-dialog-titlebar-close').focus()
 
     # === Custom Functions === #
 
@@ -82,10 +82,6 @@ define [
         if (values.use_justification == 'choose')
           $(@refs.usageSelection.refs.usageRightSelection.getDOMNode()).errorBox(I18n.t('You must specify a usage right.'))
           return false
-        # No copyright specified
-        if (!values.copyright and @refs.usageSelection.refs.copyright?)
-          $(@refs.usageSelection.refs.copyright.getDOMNode()).errorBox(I18n.t('You must specify the copyright holder.'))
-          return false
 
         # We need to first set usage rights before handling the setting of
         # restricted access things.
@@ -99,8 +95,6 @@ define [
 
       else
         @setRestrictedAccess()
-
-
 
     setRestrictedAccess: ->
       attributes = @extractFormValues()
@@ -141,7 +135,7 @@ define [
       div {className: 'RestrictedDialogForm__banner col-xs-12'},
         span {className: 'alert'},
           i {className: 'icon-warning RestrictedDialogForm__warning'}
-          I18n.t('Before publishing you must set usage rights on your files. This is set by your account admin. If you have problems please contact them.')
+          I18n.t('Before publishing, you must set usage rights on your files.')
 
     ###
     # Renders out the restricted access form
@@ -245,7 +239,7 @@ define [
                     defaultValue: $.datetimeString(@state.unlock_at) if @state.unlock_at,
                     className: 'form-control dateSelectInput',
                     type: 'text',
-                    'aria-label': I18n.t('Available From')
+                    'aria-label': I18n.t('Available From Date')
               div className: 'control-group',
                 label className: 'control-label dialog-adapter-form-calendar-label', I18n.t('Available Until')
                   div className: 'controls dateSelectInputContainer',
@@ -254,7 +248,7 @@ define [
                     defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at,
                     className: 'form-control dateSelectInput',
                     type: 'text'
-                    'aria-label': I18n.t('Available Until')
+                    'aria-label': I18n.t('Available Until Date')
 
           div className:"form-controls",
             button {

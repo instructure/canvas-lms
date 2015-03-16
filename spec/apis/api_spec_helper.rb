@@ -72,6 +72,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     if body.respond_to?(:call)
       StringIO.new.tap { |sio| body.call(nil, sio); body = sio.string }
     end
+    body.sub!(%r{^while\(1\);}, '')
     # Check that the body doesn't have any duplicate keys. this can happen if
     # you add both a string and a symbol to the hash before calling to_json on
     # it.
@@ -115,15 +116,18 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
   enable_forgery_protection do
     params_from_with_nesting(method, path).each{|k, v| expect(params[k].to_s).to eq v.to_s}
 
-    headers['HTTP_AUTHORIZATION'] = headers['Authorization'] if headers.key?('Authorization')
-    if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('HTTP_AUTHORIZATION') && @user
-      token = access_token_for_user(@user)
-      headers['HTTP_AUTHORIZATION'] = "Bearer #{token}"
-      account = opts[:domain_root_account] || Account.default
-      Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
-      account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user) unless @user.all_active_pseudonyms(:reload) && @user.find_pseudonym_for_account(account, true)
+    if @use_basic_auth
+      user_session(@user)
+    else
+      headers['HTTP_AUTHORIZATION'] = headers['Authorization'] if headers.key?('Authorization')
+      if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('HTTP_AUTHORIZATION') && @user
+        token = access_token_for_user(@user)
+        headers['HTTP_AUTHORIZATION'] = "Bearer #{token}"
+        account = opts[:domain_root_account] || Account.default
+        Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+        account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user) unless @user.all_active_pseudonyms(:reload) && @user.find_pseudonym_for_account(account, true)
+      end
     end
-
     LoadAccount.stubs(:default_domain_root_account).returns(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)
 
     __send__(method, path, params.reject { |k,v| %w(controller action).include?(k.to_s) }.merge(body_params), headers)
@@ -149,20 +153,7 @@ def api_json_response(objects, opts = nil)
   JSON.parse(objects.to_json(opts.merge(:include_root => false)))
 end
 
-# passes the cb a piece of user content html text. the block should return the
-# response from the api for that field, which will be verified for correctness.
-def should_translate_user_content(course, include_verifiers=true)
-  attachment = attachment_model(:context => course)
-  content = %{
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
-      This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
-      Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
-      And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
-    </p>
-  }
-  html = yield content
+def check_document(html, course, attachment, include_verifiers)
   doc = Nokogiri::HTML::DocumentFragment.parse(html)
   img1 = doc.at_css('img#1')
   expect(img1).to be_present
@@ -178,6 +169,30 @@ def should_translate_user_content(course, include_verifiers=true)
   expect(video['src']).to match(%r{entryId=qwerty})
   expect(doc.css('a').last['data-api-endpoint']).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
   expect(doc.css('a').last['data-api-returntype']).to eq 'Page'
+end
+
+# passes the cb a piece of user content html text. the block should return the
+# response from the api for that field, which will be verified for correctness.
+def should_translate_user_content(course, include_verifiers=true)
+  attachment = attachment_model(:context => course)
+  content = %{
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
+      This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
+      Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
+      And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
+    </p>
+  }
+  html = yield content
+  check_document(html, course, attachment, include_verifiers)
+
+  if include_verifiers
+    # try again but with cookie auth; shouldn't have verifiers now
+    @use_basic_auth = true
+    html = yield content
+    check_document(html, course, attachment, false)
+  end
 end
 
 def should_process_incoming_user_content(context)

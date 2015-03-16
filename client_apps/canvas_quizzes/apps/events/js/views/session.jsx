@@ -18,11 +18,23 @@ define(function(require) {
       };
     },
 
+    getInitialState: function() {
+      return {accessibilityWarningFocused: false};
+    },
+
+    toggleViewable: function(e) {
+      this.setState({accessibilityWarningFocused: !this.state.A11yWarningFocused});
+    },
+
     render: function() {
+      var accessibilityWarningClasses = "ic-QuizInspector__accessibility-warning"
+      if (!this.state.accessibilityWarningFocused) {
+        accessibilityWarningClasses += " screenreader-only";
+      }
       return(
         <div id="ic-QuizInspector__Session">
-          <h1 className="ic-QuizInspector__Header">
-            {I18n.t('page_header', 'Session Information')}
+          <div className="ic-QuizInspector__Header">
+            <h1>{I18n.t('page_header', 'Session Information')}</h1>
 
             <div className="ic-QuizInspector__HeaderControls">
               <Button onClick={Actions.reloadEvents}>
@@ -33,23 +45,28 @@ define(function(require) {
               {' '}
 
               {Config.allowMatrixView &&
-                <a href="#/answer_matrix" className="btn btn-default">
-                  {I18n.t('buttons.table_view', 'View Table')}
-                </a>
+                <span>
+                  <span tabIndex="0" className={accessibilityWarningClasses} onFocus={this.toggleViewable} onBlur={this.toggleViewable}>
+                    {I18n.t("links.log_accessibility_warning", "Warning: The Table View is not accessible to screenreaders. Please use the current view instead.")}
+                  </span>
+                  <Link to="answer_matrix" className="btn btn-default" query={this.props.query}>
+                    {I18n.t('buttons.table_view', 'View Table')}
+                  </Link>
+                </span>
               }
             </div>
-          </h1>
+          </div>
 
           <table>
             <tr>
-              <th scope="col">
+              <th scope="row">
                 {I18n.t('session_table_headers.started_at', 'Started at')}
               </th>
               <td>{(new Date(this.props.submission.startedAt)).toString()}</td>
             </tr>
 
             <tr>
-              <th scope="col">
+              <th scope="row">
                 {I18n.t('session_table_headers.attempt', 'Attempt')}
               </th>
               <td>
@@ -65,21 +82,25 @@ define(function(require) {
 
     renderAttemptLink: function(attempt) {
       var className = 'ic-AttemptController__Attempt';
-      var href = "/";
       var query = { attempt: attempt };
 
       if (attempt === this.props.attempt) {
         className += ' ic-AttemptController__Attempt--is-active';
+        return (
+          <div className={className} key={"attempt-"+attempt}>
+            {attempt}
+          </div>
+        )
+      } else {
+        return (
+          <Link
+            to="app"
+            query={query}
+            key={"attempt-"+attempt}
+            className={className}
+            children={attempt} />
+        );
       }
-
-      return (
-        <Link
-          to={href}
-          query={query}
-          key={"attempt-"+attempt}
-          className={className}
-          children={attempt} />
-      );
     }
   });
 

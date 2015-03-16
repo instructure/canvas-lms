@@ -1,0 +1,158 @@
+//// 
+// Note: We share this file with other Instructure projects so we can
+// maintain a consistent look feel with our styleguides.
+// If you edit something in there please throw a reference in #ui so we
+// can make sure to update this file in other projects.
+////
+.Sg-Main code, .Sg-Main pre {
+  font-family: $sg-codefont;
+  font-size: 14px;
+  border: 1px solid $sg-example-border;
+  padding: 2px 5px;
+  border-radius: 2px;
+  background: #fff;
+  margin: 0;
+  word-break: keep-all;
+  word-wrap: normal;
+  white-space:pre;
+  color: $sg-example-tag-color;
+}
+// hologram class output
+.Sg-Main .exampleOutput,
+// dresscode class output
+.Sg-Main .code-rendered {
+  border: 1px solid $sg-example-border;
+  border-bottom: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  margin: 15px 0 0 0; 
+  padding: 50px 10px 10px 10px; 
+  position: relative;
+  &:after {
+    content: 'Example';
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-right: 1px solid $sg-example-border;
+    border-bottom: 1px solid $sg-example-border;
+    border-bottom-right-radius: 4px;
+    padding: 5px 8px;
+    display: inline-block;
+    font-family: $sg-font;
+    font-size: 12px;
+  }  
+}
+.Sg-Main .codeBlock,
+.Sg-Main .highlight {
+  padding: 50px 4%;
+  margin: 0 0 20px 0;
+  background: $sg-example-main-color;
+  color: $sg-example-tag-color;
+  font-size: 15px;
+  line-height: 1.6em;
+  overflow-x: auto;  
+  position: relative;
+  width: auto;
+  &:after {
+    content: 'HTML';
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: $sg-title-border;
+    border-right: 1px solid lighten($sg-example-main-color, 10);
+    border-bottom: 1px solid lighten($sg-example-main-color, 10);
+    border-bottom-right-radius: 4px;
+    padding: 5px 8px;
+    display: inline-block;
+    font-family: $sg-font;
+    font-size: 12px;
+  }  
+  &.jsExample:after {
+    content: 'JS';
+  }
+  .highlight {
+    background: $sg-example-main-color;
+  }
+  pre {
+    font-family: $sg-codefont;
+    width: auto;
+    background: $sg-example-main-color;
+    word-break: keep-all;
+    word-wrap: normal;
+    white-space:pre;
+    margin: 0px;
+    padding: 0px;
+    padding-left: 15px;
+    font-size: 14px;
+    position: relative;
+    line-height: 1.6em;
+    color: $sg-example-string-color;
+    border: 1px solid  $sg-example-main-color;
+    overflow: visible;
+  }
+  @media only screen and (max-width: 900px) {padding: 50px 10px;}
+}
+.Sg-Main .codeBlock,
+.Sg-Main .highlight {
+  hll { background-color: #ffffcc }
+  .c { color: #999988; font-style: italic } /* Comment */
+  .err { color: #a61717;} /* Error */
+  .k { color: #ffffff;} /* Keyword */
+  .o { color: #ffffff;} /* Operator */
+  .cm { color: #999988; font-style: italic } /* Comment.Multiline */
+  .cp { color: #999999; font-style: italic } /* Comment.Preproc */
+  .c1 { color: #999988; font-style: italic } /* Comment.Single */
+  .cs { color: #999999; font-style: italic } /* Comment.Special */
+  .gd { color: #ffffff; background-color: #ffdddd } /* Generic.Deleted */
+  .ge { color: #ffffff; font-style: italic } /* Generic.Emph */
+  .gr { color: #aa0000 } /* Generic.Error */
+  .gh { color: #999999 } /* Generic.Heading */
+  .gi { color: #ffffff; background-color: #ddffdd } /* Generic.Inserted */
+  .go { color: #888888 } /* Generic.Output */
+  .gp { color: #555555 } /* Generic.Prompt */
+  .gs {} /* Generic.Strong */
+  .gu { color: #aaaaaa } /* Generic.Subheading */
+  .gt { color: #aa0000 } /* Generic.Traceback */
+  .kc { color: #ffffff;} /* Keyword.Constant */
+  .kd { color: #ffffff;} /* Keyword.Declaration */
+  .kn { color: #ffffff;} /* Keyword.Namespace */
+  .kp { color: #ffffff;} /* Keyword.Pseudo */
+  .kr { color: #ffffff;} /* Keyword.Reserved */
+  .kt { color: #445588;} /* Keyword.Type */
+  .m { color: #009999 } /* Literal.Number */
+  .s { color: #E6DB74 } /* Literal.String */
+  .na { color: #A6E22E } /* Name.Attribute */
+  .nb { color: #66D9EF } /* Name.Builtin */
+  .nc { color: #445588;} /* Name.Class */
+  .no { color: #A6E22E } /* Name.Constant */
+  .nd { color: #3c5d5d;} /* Name.Decorator */
+  .ni { color: #AE81FF } /* Name.Entity */
+  .ne { color: #990000;} /* Name.Exception */
+  .nf { color: #990000;} /* Name.Function */
+  .nl { color: #990000;} /* Name.Label */
+  .nn { color: #555555 } /* Name.Namespace */
+  .nt { color: #0099E0 } /* Name.Tag */
+  .nv { color: #A6E22E } /* Name.Variable */
+  .ow { color: #ffffff;} /* Operator.Word */
+  .w { color: #bbbbbb } /* Text.Whitespace */
+  .mf { color: #009999 } /* Literal.Number.Float */
+  .mh { color: #009999 } /* Literal.Number.Hex */
+  .mi { color: #009999 } /* Literal.Number.Integer */
+  .mo { color: #009999 } /* Literal.Number.Oct */
+  .sb { color: #E6DB74 } /* Literal.String.Backtick */
+  .sc { color: #E6DB74 } /* Literal.String.Char */
+  .sd { color: #E6DB74 } /* Literal.String.Doc */
+  .s2 { color: #E6DB74 } /* Literal.String.Double */
+  .se { color: #E6DB74 } /* Literal.String.Escape */
+  .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+  .si { color: #E6DB74 } /* Literal.String.Interpol */
+  .sx { color: #E6DB74 } /* Literal.String.Other */
+  .sr { color: #009926 } /* Literal.String.Regex */
+  .s1 { color: #E6DB74 } /* Literal.String.Single */
+  .ss { color: #990073 } /* Literal.String.Symbol */
+  .bp { color: #999999 } /* Name.Builtin.Pseudo */
+  .vc { color: #A6E22E } /* Name.Variable.Class */
+  .vg { color: #A6E22E } /* Name.Variable.Global */
+  .vi { color: #A6E22E } /* Name.Variable.Instance */
+  .il { color: #009999 } /* Literal.Number.Integer.Long */
+}

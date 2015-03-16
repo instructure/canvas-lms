@@ -29,18 +29,16 @@ class GradingStandardsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_grades)
       js_env({
         :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
-        :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?
+        :GRADING_PERIODS_URL => context_url(@context, :api_v1_context_grading_periods_url),
+        :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
+        :DEFAULT_DATA => default_data
       })
       @standards = GradingStandard.standards_for(@context).sorted.limit(100)
       respond_to do |format|
         format.html { }
         format.json {
-          editable_ids = @standards.select{ |s| s.context_type == @context.class.name &&
-                         s.context_id == @context.id }.map(&:id)
           standards_json = @standards.map do |s|
-            standard = s.as_json(methods: [:display_name, :context_code, :assessed_assignment?])
-            standard[:can_edit_and_destroy] = editable_ids.include?(s.id)
-            standard
+            s.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user})
           end
           render :json => standards_json
         }
@@ -55,7 +53,7 @@ class GradingStandardsController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end
@@ -64,12 +62,12 @@ class GradingStandardsController < ApplicationController
   end
 
   def update
-    @standard = @context.grading_standards.find(params[:id])
-    if authorized_action(@context, @current_user, :manage_grades)
+    @standard = GradingStandard.standards_for(@context).find(params[:id])
+    if authorized_action(@standard, @current_user, :manage)
       @standard.user = @current_user
       respond_to do |format|
         if @standard.update_attributes(params[:grading_standard])
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end
@@ -78,11 +76,11 @@ class GradingStandardsController < ApplicationController
   end
 
   def destroy
-    @standard = @context.grading_standards.find(params[:id])
-    if authorized_action(@context, @current_user, :manage_grades)
+    @standard = GradingStandard.standards_for(@context).find(params[:id])
+    if authorized_action(@standard, @current_user, :manage)
       respond_to do |format|
         if @standard.destroy
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end

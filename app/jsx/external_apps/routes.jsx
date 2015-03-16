@@ -9,18 +9,16 @@ define([
 ], function({Routes, Route, Redirect}, Root, AppList, AppDetails, Configurations) {
 
   var currentPath = window.location.pathname
-    , re = new RegExp('\(.*\/settings)')
+    , re = /(.*\/settings|.*\/details)/
     , matches = re.exec(currentPath)
     , baseUrl = matches[0];
 
   return (
-    <Routes location="history">
-      <Route name='root' handler={Root}>
-        <Route name='appList' path={baseUrl + '/?'} handler={AppList} />
-        <Route name='appDetails' path={baseUrl + '/app/:shortName'} handler={AppDetails} />
-        <Route name='configurations' path={baseUrl + '/configurations'} handler={Configurations} />
-      </Route>
-    </Routes>
+    <Route name='root' handler={Root}>
+      <Route name='appList' path={baseUrl + '/?'} handler={AppList} />
+      <Route name='appDetails' path={baseUrl + '/app/:shortName'} handler={AppDetails} />
+      <Route name='configurations' path={baseUrl + '/configurations'} handler={Configurations} />
+    </Route>
   );
 
 });

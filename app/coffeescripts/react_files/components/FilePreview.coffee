@@ -1,9 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'react'
-  'react-router'
-  'react-modal'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
+  'old_unsupported_dont_use_react-modal'
   '../modules/customPropTypes'
   'i18n!file_preview'
   './FriendlyDatetime'
@@ -190,6 +190,7 @@ define [
             @renderArrowLink('left') if @state.otherItems?.length > 0
             if @state.displayedItem
               iframe {
+                title: I18n.t('File Preview')
                 src: @state.displayedItem.get 'preview_url'
                 className: 'ef-file-preview-frame'
               }

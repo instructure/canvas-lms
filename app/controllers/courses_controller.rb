@@ -200,6 +200,10 @@ require 'set'
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "is_public_to_auth_users": {
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "public_syllabus": {
 #           "example": true,
 #           "type": "boolean"
@@ -341,6 +345,7 @@ class CoursesController < ApplicationController
   #   - "storage_quota_used_mb": The amount of storage space used by the files in this course
   #   - "total_students": Optional information to include with each Course.
   #     Returns an integer for the total amount of active and invited students.
+  #   - "passback_status": Include the grade passback_status
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -358,7 +363,7 @@ class CoursesController < ApplicationController
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.each do |e|
           if [:completed, :rejected].include?(e.state_based_on_date)
-            @past_enrollments << e
+            @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
@@ -454,6 +459,9 @@ class CoursesController < ApplicationController
   #
   # @argument course[is_public] [Boolean]
   #   Set to true if course if public.
+  #
+  # @argument course[is_public_to_auth_users] [Boolean]
+  #   Set to true if course if public to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
@@ -574,7 +582,7 @@ class CoursesController < ApplicationController
             @current_user,
             session,
             [:start_at, course_end, :license,
-             :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
+             :is_public, :is_public_to_auth_users, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
              :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
@@ -988,9 +996,14 @@ class CoursesController < ApplicationController
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
-      js_env :APP_CENTER => {
-        enabled: Canvas::Plugin.find(:app_center).enabled?
-      }
+      js_env({
+        :APP_CENTER => {
+          enabled: Canvas::Plugin.find(:app_center).enabled?
+        },
+        ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
+        LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
+        CONTEXT_BASE_URL: "/courses/#{@context.id}"
+      })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :manage_content)
@@ -1348,6 +1361,7 @@ class CoursesController < ApplicationController
   end
   protected :check_for_xlist
 
+  include Api::V1::ContextModule
   include ContextModulesController::ModuleIndexHelper
 
   # @API Get a single course
@@ -1417,7 +1431,7 @@ class CoursesController < ApplicationController
     end
 
     @context_enrollment ||= @pending_enrollment
-    if is_authorized_action?(@context, @current_user, :read)
+    if @context.grants_right?(@current_user, session, :read)
       log_asset_access("home:#{@context.asset_string}", "home", "other")
 
       check_incomplete_registration
@@ -1764,7 +1778,7 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # @argument account_id [Required, Integer]
+  # @argument course[account_id] [Required, Integer]
   #   The unique ID of the account to create to course under.
   #
   # @argument course[name] [String]
@@ -2122,7 +2136,7 @@ class CoursesController < ApplicationController
       # destroy the exising student
       @fake_student = @context.student_view_student
       # but first, remove all existing quiz submissions / submissions
-      Submission.where(quiz_submission_id: @fake_student.quiz_submissions.select(:id)).destroy_all
+      @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.destroy_all
 
       @fake_student.destroy

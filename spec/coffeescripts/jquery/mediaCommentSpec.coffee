@@ -1,16 +1,16 @@
-require [
+define [
   'jquery'
   'compiled/jquery/mediaComment'
 ], ($)->
 
   module 'mediaComment',
-    setup: -> 
+    setup: ->
       @server = sinon.fakeServer.create()
       window.INST.kalturaSettings = "settings set" # pretend kalturaSettings are set.
       @$holder = $('<div id="media-holder">').appendTo('#fixtures')
 
-    teardown: -> 
-      window.INST.kalturaSettings = null 
+    teardown: ->
+      window.INST.kalturaSettings = null
       @server.restore()
       @$holder.remove()
 
@@ -28,7 +28,7 @@ require [
       JSON.stringify(resp)
     ]
 
-  test "video player is displayed inline", -> 
+  test "video player is displayed inline", ->
     id = 10 #ID doesn't matter since we mock out the server
     @$holder.mediaComment('show_inline', id)
     mockServerResponse(@server, id)
@@ -45,7 +45,7 @@ require [
     equal @$holder.find('video').length, 0, 'There should not be a video tag'
 
 
-  test "video player includes url sources provided by the server", -> 
+  test "video player includes url sources provided by the server", ->
     id = 10 #ID doesn't matter since we mock out the server
     @$holder.mediaComment('show_inline', id)
     mockServerResponse(@server, id)

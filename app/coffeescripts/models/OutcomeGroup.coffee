@@ -18,9 +18,14 @@
 
 define [
   'Backbone'
-], (Backbone) ->
+  'compiled/collections/OutcomeCollection'
+  'compiled/collections/PaginatedCollection'
+], (Backbone, OutcomeCollection, PaginatedCollection) ->
 
   class OutcomeGroup extends Backbone.Model
+    initialize: (options) ->
+      @setUpOutcomesAndGroupsIfNeeded()
+      super
 
     name: ->
       @get 'title'
@@ -34,5 +39,53 @@ define [
     setUrlTo: (action) ->
       @url =
         switch action
-          when 'add' then @get('parent_outcome_group').subgroups_url
+          when 'add', 'move' then @get('parent_outcome_group').subgroups_url
           when 'edit', 'delete' then @get 'url'
+
+    setUpOutcomesAndGroupsIfNeeded: ->
+      unless @outcomeGroups
+        @outcomeGroups = new OutcomeGroupCollection [], parentGroup: this
+      unless @outcomes
+        @outcomes = new OutcomeCollection []
+
+    getSubtrees: ->
+      @outcomeGroups
+
+    getItems: ->
+      @outcomes
+
+    expand: (force=false, options={}) ->
+      @isExpanded = true
+      @trigger 'expanded'
+      return $.when() if @expandDfd || force
+      @isExpanding = true
+      @trigger 'beginexpanding'
+      @expandDfd = $.Deferred().done =>
+        @isExpanding = false
+        @trigger 'endexpanding'
+
+      outcomeGroupDfd = @outcomeGroups?.fetch() unless @get('outcomeGroups_count') is 0
+      outcomesDfd = @outcomes?.fetch() if (@get('outcomes_count') isnt 0) and !options.onlyShowSubtrees
+      $.when(outcomeGroupDfd, outcomesDfd).done(@expandDfd.resolve)
+
+    collapse: ->
+      @isExpanded = false
+      @trigger 'collapsed'
+
+    toggle: (options) ->
+      if @isExpanded
+        @collapse()
+      else
+        @expand(false, options)
+
+  # OutcomeGroupCollection is redefined inside of this file instead of pointing
+  # towards collections/outcomeGroupCollection because RequireJS sucks at
+  # figuring out circular dependencies.
+  class OutcomeGroupCollection extends PaginatedCollection
+    @optionProperty 'parentGroup'
+    model: OutcomeGroup
+
+    url: ->
+      @parentGroup.attributes.subgroups_url
+
+  return OutcomeGroup

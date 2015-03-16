@@ -736,6 +736,7 @@ describe 'Submissions API', type: :request do
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser",
              "id" => sub1.attachments.first.id,
+             "folder_id" => sub1.attachments.first.folder_id,
              "size" => sub1.attachments.first.size,
              'unlock_at' => nil,
              'locked' => false,
@@ -804,6 +805,7 @@ describe 'Submissions API', type: :request do
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser",
                 "id" => sub1.attachments.first.id,
+                "folder_id" => sub1.attachments.first.folder_id,
                 "size" => sub1.attachments.first.size,
                 'unlock_at' => nil,
                 'locked' => false,
@@ -889,6 +891,7 @@ describe 'Submissions API', type: :request do
                "filename" => "snapshot.png",
                "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
                "id" => sub2a1.id,
+               "folder_id" => sub2a1.folder_id,
                "size" => sub2a1.size,
                'unlock_at' => nil,
                'locked' => false,
@@ -915,6 +918,7 @@ describe 'Submissions API', type: :request do
            "filename" => "snapshot.png",
            "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
            "id" => sub2a1.id,
+           "folder_id" => sub2a1.folder_id,
            "size" => sub2a1.size,
            'unlock_at' => nil,
            'locked' => false,
@@ -936,6 +940,23 @@ describe 'Submissions API', type: :request do
         "workflow_state"=>"graded",
         "late"=>false}]
     expect(json.sort_by { |h| h['user_id'] }).to eq res.sort_by { |h| h['user_id'] }
+  end
+
+  it "should paginate submissions" do
+    student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    @assignment = @course.assignments.create!({
+      :title => 'assignment1',
+      :grading_type => 'points',
+      :points_possible => 12
+    })
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json", {
+      :controller => 'submissions_api', :action => 'index',
+      :format => 'json', :course_id => @course.to_param,
+      :assignment_id => @assignment.id
+    })
+    expect(response.header.has_key?("Link")).to be_truthy
   end
 
   it "should return nothing if no assignments in the course" do

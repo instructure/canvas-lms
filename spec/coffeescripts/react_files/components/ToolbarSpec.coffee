@@ -1,7 +1,7 @@
 define [
   'jquery'
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   'compiled/react_files/components/Toolbar'
   'compiled/react_files/routes'
 ], ($, React, Router, Toolbar, routes) ->

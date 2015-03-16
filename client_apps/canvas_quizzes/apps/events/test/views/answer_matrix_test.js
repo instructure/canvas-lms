@@ -2,8 +2,7 @@ define(function(require) {
   var Subject = require('jsx!views/answer_matrix');
 
   describe('Views::AnswerMatrix', function() {
-    this.reactSuite({
-      type: Subject
+    reactRouterSuite(this, Subject, {
     });
 
     it('should render', function() {
@@ -12,7 +11,7 @@ define(function(require) {
 
     describe('inverted', function() {
       beforeEach(function() {
-        setState({ invert: true });
+        subject.setState({ invert: true });
       });
 
       it('should render', function() {

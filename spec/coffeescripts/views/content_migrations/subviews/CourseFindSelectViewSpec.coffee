@@ -7,8 +7,10 @@ define [
     courseFindSelectView = new CourseFindSelectView
                            model: new Backbone.Model
 
+
     course = {id: 42}
     courseFindSelectView.courses = [course]
+    courseFindSelectView.render()
 
     sinonSpy = sinon.spy(courseFindSelectView, 'trigger')
     courseFindSelectView.setSourceCourseId 42

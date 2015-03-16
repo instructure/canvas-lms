@@ -17,6 +17,12 @@ describe "calendar2" do
     end
 
     context "week view" do
+
+      it "should navigate to week view when week button is clicked", :priority => "2" do
+        load_week_view
+        expect(fj('.fc-view-agendaWeek:visible')).to be_present
+      end
+
       it "should render assignments due just before midnight" do
         skip("fails on event count validation")
         assignment_model(:course => @course,
@@ -27,10 +33,7 @@ describe "calendar2" do
         expect(calendar_events.title).to eq "super important"
         expect(@assignment.due_date).to eq (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
 
-        get "/calendar2"
-        wait_for_ajaximations
-
-        f('#week').click
+        load_week_view
         keep_trying_until do
           events = ff('.fc-event').select { |e| e.text =~ /due.*super important/ }
           # shows on monday night and tuesday morning
@@ -42,9 +45,7 @@ describe "calendar2" do
         noon = Time.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
 
-        get "/calendar2"
-        wait_for_ajax_requests
-        f('#week').click
+        load_week_view
 
         elt = fj('.fc-event:visible')
         expect(elt.size.height).to be >= 18
@@ -56,10 +57,7 @@ describe "calendar2" do
         second_start = first_event.start_at + 6.minutes
         second_event = @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
 
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         elts = ffj('.fc-event:visible')
         expect(elts.size).to eql(2)
@@ -72,10 +70,7 @@ describe "calendar2" do
         skip("dragging events doesn't seem to work")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         elt = fj('.fc-event:visible')
         driver.action.drag_and_drop_by(elt, 0, 50)
@@ -88,10 +83,7 @@ describe "calendar2" do
         skip("dragging events doesn't seem to work")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         resize_handle = fj('.fc-event:visible .ui-resizable-handle')
         driver.action.drag_and_drop_by(resize_handle, 0, 50).perform
@@ -104,10 +96,7 @@ describe "calendar2" do
       it "should show the right times in the tool tips for short events" do
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
-        get "/calendar2"
-        wait_for_ajaximations
-        f('#week').click
-        wait_for_ajaximations
+        load_week_view
 
         elt = fj('.fc-event:visible')
         expect(elt.attribute('title')).to match(/12:00.*12:05/)
@@ -126,6 +115,85 @@ describe "calendar2" do
       old_header_title = get_header_text
       change_calendar(:prev)
       expect(old_header_title).not_to eq get_header_text
+    end
+
+    it "should create event by clicking on week calendar" do
+      title = "from clicking week calendar"
+      load_week_view
+
+      #Clicking on the second row so it is not set as an all day event
+      ff('.fc-widget-content')[1].click #click on calendar
+
+      event_from_modal(title,false,false)
+      expect(f('.fc-event-time').text).to include title
+    end
+
+    it "should create all day event on week calendar" do
+      title = "all day event title"
+      load_week_view
+
+      #Clicking on the first instance of .fc-widget-content clicks in all day row
+      f('.fc-widget-content').click #click on calendar
+
+      event_from_modal(title,false,false)
+
+      # Only all day events have the .fc-event-title class
+      expect(f('.fc-event-title').text).to include title
+    end
+
+    it "should have a working today button" do
+      load_week_view
+
+      # Mini calendar on the right of page has this html element I am looking for so
+      #   when checking for "today", we need to look for the second instance of the class
+
+      # Check for highlight to be present on this week
+      expect(ff(".fc-today").size).to eq 2
+
+      # Get the month so we can check to see if the month changes
+      starting_month = f(".fc-header-title").text
+
+      # Change calendar week and make sure that the highlight is not there
+      # If the month does not change, it should still be on the mini calendar so we still expect 1
+      # If the month changes, we should expect 0
+      change_calendar
+      changed_month = f(".fc-header-title").text
+      if (starting_month == changed_month)
+        expect(ff(".fc-today").size).to eq 1
+      else
+        expect(ff(".fc-today").size).to eq 0
+      end
+
+      # Back to today. Make sure that the highlight is present
+      change_calendar(:today)
+      expect(ff(".fc-today").size).to eq 2
+    end
+
+    it "should show the location when clicking on a calendar event" do
+      location_name = "brighton"
+      location_address = "cottonwood"
+
+      # Make it an all day event so it will be visible on the screen/on top
+      make_event(:location_name => location_name, :all_day => true, :location_address => location_address)
+      load_week_view
+
+      #Click calendar item to bring up event summary
+      f(".fc-event-inner").click
+
+      #expect to find the location name and address
+      expect(f('.event-details-content').text).to include_text(location_name)
+      expect(f('.event-details-content').text).to include_text(location_address)
+    end
+
+    it "should bring up a calendar date picker when clicking on the week range" do
+      load_week_view
+      #Click on the week header
+      f('.navigation_title').click
+
+      # Expect that a the event picker is present
+      # Check various elements to verify that the calendar looks good
+      expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
+      expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
     end
   end
 end

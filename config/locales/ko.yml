@@ -71,7 +71,7 @@ ko:
     tab_courses: 과목
     tab_developer_keys: "개발자 키"
     tab_faculty_journal: "교원 일지"
-    tab_grading_standards: "평가 구성표"
+    tab_grading_standards: 평가
     tab_jobs: 작업
     tab_outcomes: 성과
     tab_permissions: 권한
@@ -1051,6 +1051,12 @@ ko:
         header: 
           one: "%{count}개의 오류가 발생하여 %{model}을 저장할 수 없음"
           other: "%{count}개의 오류가 발생하여 %{model}을 저장할 수 없음"
+  activity_13915493: 활동
+  add_app_baf540f: "앱 추가"
+  add_course_assignments_628ed6d0: "과목 과제 추가"
+  add_course_calendar_events_146154a5: "과목 행사 추가"
+  add_students_to_the_course_874be8fb: "과목에 학생 추가"
+  add_tas_to_the_course_2aac6e02: "과목에 조교 추가"
   after_date_981cd41b: "%{date} 이후"
   after_last_attempt_c9168da2: "마지막 시도 이후"
   ajax_errors: 
@@ -1104,6 +1110,7 @@ ko:
       criteria_required: "적어도 하나의 트리거가 필요함"
       recipients_required: "적어도 한 명의 수신인이 필요함"
       threshold_should_be_numeric: "양수이어야 함"
+  all_4321c3a1: 전부
   all_students_have_taken_the_quiz_b558f8b4: "모든 학생이 이 퀴즈를 치름"
   all_students_have_taken_the_survey_494f9f42: "모든 학생이 이 설문을 치름"
   always_3a59e701: 항상
@@ -1126,6 +1133,7 @@ ko:
     student_in_course: 
       analytics: 분석
       page_title: "분석: %{course} -- %{student}"
+  analytics_c94ba601: 분석
   ange_name: "Angel 변환기"
   angel: 
     file_copy_fail: "\"%{base_path}\" 폴더를 복사할 수 없음"
@@ -1135,6 +1143,7 @@ ko:
   angel_file_description: "Angel 내보내기 .zip 형식"
   announcement: 
     no_title: "제목 없음"
+  announcement_fb4cb645: "공지 사항"
   announcements: 
     announcements_crumb: 공지
     error_draft_state: "이 주제는 공지 사항이므로 초안 상태로 설정할 수 없습니다."
@@ -1154,7 +1163,6 @@ ko:
       podcast_title_course: "과목 공지 Podcast 피드"
       podcast_title_group: "그룹 공지 Podcast 피드"
     index_view: 
-      announcement_fb4cb645: "공지 사항"
       announcements_title: 공지
       delete: 삭제
       loading: "로드하는 중..."
@@ -1163,12 +1171,14 @@ ko:
       rss_feed: "RSS 피드"
       suggestions: "제안:"
       there_are_no_announcements_show: "표시할 공지가 없음"
+      title_add_announcement: "공지 사항 추가"
       try_different_more_general_or_fewer_keywords: "다른 키워드나 보다 일반적인 키워드나 더 적은 키워드로 다시 시도해 보십시오."
       try_disabling_the_unread_filters: "\"읽지 않음\" 필터를 사용하지 말아 보십시오."
       unread: "읽지 않은 메시지"
       your_search_did_not_match_any_announcements: "검색과 일치하는 공지가 없습니다."
     podcast_feed_description_course: "\"%{course}\" 과목에 속한 공지에서 링크하거나 포함된 모든 미디어 파일이 이 피드에 표시됩니다."
     podcast_feed_name: "%{course} 공지 Podcast 피드"
+  anonymous_e1b8ad27: 익명
   application: 
     errors: 
       feed_not_found: "피드를 찾을 수 없습니다."
@@ -1208,7 +1218,6 @@ ko:
       please_log_in: "보안을 위해 계속 진행하려면 암호를 입력하십시오."
       titles: 
         suspended: "기관 일시 중단됨"
-      unsupported_browser: "브라우저가 Canvas를 위한 최소 요구 사항에 미치지 못합니다. 지원하는 브라우저의 전체 목록을 보려면 *Canvas 설명서*를 방문하시기 바랍니다."
     wiki_front_page_default_content_course: "새 과목 위키에 오신 것을 환영합니다!"
     wiki_front_page_default_content_group: "새 그룹 위키에 오신 것을 환영합니다!"
   appointment_group: 
@@ -1221,11 +1230,15 @@ ko:
       invalid_course_section: "유효하지 않은 과목 섹션"
       invalid_group_category: "유효하지 않은 그룹 범주"
       missing_group_category: "그룹 약속은 그룹 범주를 가지고 있어야 함"
+  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "앱은 Canvas에 새 기능을 추가하는 쉬운 방법입니다. 개별 과목이나 계정에 있는 모든 과목에 추가할 수 있습니다. 구성을 마치면 과목 모듈을 통해 연결하거나고 평가 도구를 위한 과제를 만들 수 있습니다."
   appt_calendar_event_dialog: 
     invalid_participants: "한 명 이상의 참가자를 허용해야 함"
     title: "%{name} 편집"
     update: 업데이트
   archive_3f794d7e: 저장소
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "이 공지 사항을 삭제하시겠습니까?"
+  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "이 평가 구성표를 삭제하시겠습니까?"
+  are_you_sure_you_want_to_remove_this_tool_7363f90b: "이 도구를 제거하시겠습니까?"
   assessment_question: 
     default_question_name: 질문
   assessment_question_bank: 
@@ -1612,6 +1625,7 @@ ko:
         assign_peer_review: "%{student}에게 평가할 다른 제출물 주기"
         back_to_assignment: "과제로 돌아가기"
       messages: 
+        cancel_peer_review: "이 피어 리뷰를 취소하시겠습니까?"
         no_students_found: "학생을 찾을 수 없음"
       none_assigned: "할당 안 됨"
       not_yet_submitted: "아직 제출 안 됨"
@@ -1625,6 +1639,8 @@ ko:
       title: "%{assignment} 피어 리뷰"
       titles: 
         automatically_assign_reviews: "자동으로 리뷰 할당"
+        remind: "%{assessor}에게 평가에 대해서 알리기, %{time}에 마지막 알림"
+        reminder: "%{assessor}에게 평가에 대해서 알리기, %{time}에 마지막 알림"
     peer_reviews_selector: 
       labels: 
         automatically_assign_peer_reviews: "자동으로 피어 리뷰 할당"
@@ -1657,6 +1673,7 @@ ko:
         add_rubric: "루브릭 추가"
         assign_rubric: "루브릭 할당"
         edit: 편집
+      manage: 관리
       messages: 
         locked: "이 과제는 지금 잠겨있습니다."
       new_assignment: "새 과제"
@@ -1819,6 +1836,7 @@ ko:
         originality_report_visible_immediately: 즉시
     undated_assignments: "날짜 없는 과제"
     upcoming_assignments: "예정된 과제"
+  assignments_1e02582c: 과제
   attachment: 
     default_filename: 파일
     errors: 
@@ -1854,6 +1872,7 @@ ko:
     login: 로그인
     logout: 로그아웃
   available_from_587ce92f: "다음부터 사용 가능"
+  back_to_app_center_95420d83: "앱 센터로 돌아가기"
   bb_display: "Blackboard 학습"
   bb_file_description: "Blackboard 6/7/8/9 내보내기 .zip 파일"
   bb_name: "Blackboard 변환기"
@@ -1963,6 +1982,7 @@ ko:
     update: 업데이트
     view_account_roster: "계정 명부 보기"
     view_course_roster: "과목 명부 보기"
+  by_url_a163275e: URL로
   c_modal_form: 
     close: 닫기
   calculator: 
@@ -2054,7 +2074,6 @@ ko:
     agenda_view: 
       due: 기한
       loading: "로드 중"
-      no_events: "이 날짜 이후에 행사가 없습니다."
       starts_at: "시작 날짜"
     agenda_view_displaying_start_end: "이제 %{start}부터 %{end}까지 표시함"
     appointment_group_deletion_details: "이를 삭제하면 학생이 등록한 약속도 삭제됩니다."
@@ -2451,6 +2470,7 @@ ko:
   canvas_cartridge_file_description: "Canvas 과목 내보내기 패키지"
   canvas_cartridge_name: "Canvas Cartridge 가져오기"
   canvas_revision_unknown: "알 수 없음"
+  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "퀴즈를 저장한 후에 제출물을 다시 평가게 되며, 이 작업에는 수 분이 걸립니다."
   cc: 
     by: "CC 유형"
     by_nc: "CC 유형 비영리"
@@ -2465,6 +2485,8 @@ ko:
       update_assignment_points: "이 과제는 %{assignmentPoints}점이 가능하지만 이 루브릭과 일치하도록 %{rubricPoints}점이 가능하도록 바꾸시겠습니까?"
     titles: 
       update_assignment_points: "루브릭과 일치하도록 가능 점수 변경?"
+  choose_a_course_home_page_8059c7b: "과목 홈 페이지 선택"
+  close_d634289d: 닫기
   collaboration: 
     default_title: "이름 없는 협업"
   collaborations: 
@@ -2557,12 +2579,14 @@ ko:
         current: "현재 협업"
     titles: 
       delete: "협업을 삭제하시겠습니까?"
+  coming_up_4348b0bd: 예정
   comm_messages: 
     from_beginning: 시작
     to_now: 지금
   common_cartridge_description: "Common Cartridge 패키지를 가져올 중재 JSON 형식으로 변환"
   common_cartridge_display: "Common Cartridge"
   common_cartridge_name: "Common Cartridge 가져오기"
+  communication_5255723c: 통신
   communication_channel: 
     body: "Canvas 확인 코드 %{verification_code}"
     default_facebook_account: "페이스북 계정"
@@ -2693,11 +2717,13 @@ ko:
         new: "아직 시작하지 않음"
         started: "%{time}에 시작함"
     type_disabled_error: "이 Canvas 사이트에서 더 이상 이 유형의 회의를 사용하지 않음"
+  configuration_type_25a084a4: "구성 유형"
   confirm_dialog: 
     cancel: 취소
     submit: 제출
   confirm_dialog_component: 
     ok: 확인
+  consumer_key_6f94ba11: "소비자 키"
   content_exports: 
     buttons: 
       process: "자료 처리"
@@ -2946,13 +2972,8 @@ ko:
     media_objects_not_configured: "미디어 개체가 구성되지 않음"
     new_roster_user: 
       completed_enrollment: "*%{completed_at}*에 완료됨"
-      confirm: 
-        conclude_student: "이 학생의 등록을 종결하시겠습니까?"
-        delete_enrollment: "이 학생의 등록을 삭제하시겠습니까?"
       enrolled_as: "%{enrollment_type}로 등록됨"
       enrollment_linked_to: "*%{linked_user}*로 연결됨"
-      error: 
-        enrollment_change_failed: "등록 권한 변경 실패. 다시 시도하시기 바랍니다."
       labels: 
         user_privileges: 권한
       legends: 
@@ -3099,115 +3120,6 @@ ko:
     confirm: 
       delete: "이 모듈을 삭제하시겠습니까?"
       delete_item: "이 항목을 모듈에서 제거하시겠습니까?"
-    content: 
-      add_prerequisite: "*%{module}*에 필수 조건 추가"
-      assignment_points_possible: "/ %{points_possible}"
-      buttons: 
-        add_module: "모듈 추가"
-        add_prerequisite: "필수 조건 추가"
-      criterion_for_assignment: "%{assignment}에서 사용자는 %{select_criterion}해야 함"
-      headings: 
-        add_prerequisite: "%{name}에 필수 조건 추가"
-        course_modules: "과목 모듈"
-        student_progress: "학생별 모듈 진행률"
-        student_progress_for_module: "%{module}에 대한 학생의 진행률"
-        students_completed: "모듈을 완료한 학생"
-        students_in_progress: "모듈을 진행 중인 학생"
-        students_locked: "모듈의 잠금을 해제하지 않은 학생"
-        students_unlocked: "모듈의 잠금을 해제한 (시작하지는 않은) 학생"
-      help: 
-        create: |-
-            과목 모듈을 이용하면 과제, 페이지, 파일 등을 보다 작은 섹션이나 단위로 구성할 수 있습니다. 모듈은 테마를 중심으로 하거나 특정 주제에 촛점을 맞추거나 단순히 연대순으로 묶을 수도 있습니다.
-            
-            또한 각 모듈에 대한 기준과 선행 작업을 정의함으로써 일정한 순서로 배열할 수 있습니다. 학생은 모든 선행 작업의 잠금을 해제하기 전까지 모듈에 액세스할 수 없습니다. 이러한 방식으로 예컨대 학생이 복습 퀴즈에서 적어도 75% 이상 받을 때까지 어떤 내용이나 파일에 액세스하는 것을 막을 수 있습니다.
-            
-            코스를 모듈로 구성하려면 오른쪽의 "%{button}" 버튼을 클릭하십시오.
-        no_modules: "이 과목에 정의된 모듈이 없습니다."
-      images: 
-        alt: 
-          min_score: "최저 점수"
-          must_contribute: "기여해야 함"
-          must_submit: "제출해야 함"
-          must_view: "봐야 함"
-        title: 
-          min_score: "모듈을 마치려면 학생이 이 항목에서 적어도 %{min_score}점을 받아야 함"
-          must_contribute: "모듈을 마치려면 학생이 이 항목에 기여해야 함"
-          must_submit: "모듈을 마치려면 학생이 이 과제를 제출해야 함"
-          must_view: "모듈을 마치려면 학생이 이 항목을 봐야 함"
-      indent: 
-        ? "n"
-        : 
-          one: "한 수준 들여쓰기"
-          other: "%{count} 수준 들여쓰기"
-          zero: "들여쓰지 않음"
-      key: 
-        description: 
-          delete: "현재 모듈/항목 삭제"
-          edit: "모듈/항목 편집"
-          indent: "현재 항목 들여쓰기"
-          new: "새 모듈"
-          next: "다음 모듈/항목"
-          outdent: "현재 항목 내어쓰기"
-          previous: "이전 모듈/항목"
-      keycode_descriptions: 
-        next_module_item: "다음 모듈이나 모듈 항목 선택"
-        previous_module_item: "이전 모듈이나 모듈 항목 선택"
-        toggle_module_dragging: "끌기를 시작할 항목을 선택하거나 이전에 선택한 항목을 놓기"
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: 위로
-        outdent: o
-        previous: k
-        previous_module_item: 아래로
-        toggle_module_dragging: 공백
-      labels: 
-        indent: 들여쓰기
-        module_complete_when: "다음 경우에 모듈을 마침"
-        modules: 
-          before_students_view: "학생이 이 모듈을 보기 전에"
-        publish_final_grade: "이 모듈을 마치면 학생의 최종 평점을 게시함"
-        sort_by: "정렬 조건"
-        title: 제목
-        unlock_at: "잠금 해제 시각"
-        url: URL
-      links: 
-        add_prerequisite: "필수 조건 추가"
-        add_requirement: "요구 조건 추가"
-        reload_student: "학생의 진행률을 다시 로드"
-        sort_by_name: 이름
-        sort_by_progress: 진행률
-        student_progress: "진행 상황 보기"
-        title: 
-          remove_prerequisite: "필수 조건 제거"
-      module: 모듈
-      module_details: "모듈은 순서대로 표시되므로 %{name} 위에 있는 모듈만 필수 조건으로 추가할 수 있습니다."
-      module_name: "모듈 이름"
-      modules_keyboard_hint: "과목 모듈이나 모듈 항목의 순서를 바꾸려면 먼저 스크린 리더에서 커서를 끄십시오. JAWS에서 Insert-z 입니다. 첫 번째 모듈을 선택하려면 탭을 누르십시오. 모듈이나 모듈 항목을 선택하려면 업/다운을 누르십시오. 끌기를 시작할 모듈이나 모듈 항목을 선택하려면 스페이스를 누르십시오. 대상을 선택하려면 업/다운을 누르십시오. 그리고 나서 대상 뒤에 선택한 항목을 놓으려면 스페이스를 다시 누르십시오."
-      must_complete_prerequisites: "다음을 마쳐야 함"
-      no_preprequisites: "정의된 필수 조건 없음"
-      no_requirements: "정의된 요구 조건 없음"
-      prerequisites: 
-        another_module: "다른 모듈"
-      prerequisites_need_item: "사용자가 이 모듈을 마치는 방법을 지정하기 전에 항목을 추가해야 함"
-      requirements: 
-        must_contribute: "페이지에 참여"
-        must_score_at_least: "최저 점수를 얻기"
-        must_submit: "과제를 제출"
-        must_view: "항목을 보기"
-      select_module: 
-        instructions: "모듈 선택"
-        name: "%{module} 모듈"
-      select_prerequisite: "필수 조건의 유형을 선택하십시오. 모든 필수 조건이 만족될 때까지 학생은  모듈을 볼 수 없습니다."
-      student_name: "학생 이름"
-      table_headings: 
-        module: 모듈
-        state: 상태
-      titles: 
-        student_progression: "학생별 모듈 진행률"
     content_next: 
       add_prerequisite: "*%{module}*에 필수 조건 추가"
       assignment_points_possible: "/ %{points_possible}"
@@ -3218,12 +3130,6 @@ ko:
       headings: 
         add_prerequisite: "%{name}에 필수 조건 추가"
         course_modules: "과목 모듈"
-        student_progress: "학생별 모듈 진행률"
-        student_progress_for_module: "%{module}에 대한 학생의 진행률"
-        students_completed: "모듈을 완료한 학생"
-        students_in_progress: "모듈을 진행 중인 학생"
-        students_locked: "모듈의 잠금을 해제하지 않은 학생"
-        students_unlocked: "모듈의 잠금을 해제한 (시작하지는 않은) 학생"
       help: 
         create: |-
             과목 모듈을 이용하면 과제, 페이지, 파일 등을 보다 작은 섹션이나 단위로 구성할 수 있습니다. 모듈은 테마를 중심으로 하거나 특정 주제에 촛점을 맞추거나 단순히 연대순으로 묶을 수도 있습니다.
@@ -3276,16 +3182,12 @@ ko:
         module_complete_when: "다음 경우에 모듈을 마침"
         modules: 
           before_students_view: "학생이 이 모듈을 보기 전에"
-        sort_by: "정렬 조건"
         title: 제목
         unlock_at: "잠금 해제 시각"
         url: URL
       links: 
         add_prerequisite: "필수 조건 추가"
         add_requirement: "요구 조건 추가"
-        reload_student: "학생의 진행률을 다시 로드"
-        sort_by_name: 이름
-        sort_by_progress: 진행률
         student_progress: "진행 상황 보기"
         title: 
           remove_prerequisite: "필수 조건 제거"
@@ -3307,12 +3209,6 @@ ko:
         instructions: "모듈 선택"
         name: "%{module} 모듈"
       select_prerequisite: "필수 조건의 유형을 선택하십시오. 모든 필수 조건이 만족될 때까지 학생은  모듈을 볼 수 없습니다."
-      student_name: "학생 이름"
-      table_headings: 
-        module: 모듈
-        state: 상태
-      titles: 
-        student_progression: "학생별 모듈 진행률"
     context_module: 
       unpublish: "게시 취소"
     context_module_next: 
@@ -3391,7 +3287,6 @@ ko:
     module_locked: 잠김
     module_started: "진행 중"
     module_unlocked: "잠금 해제됨"
-    none_in_progress: "진행 중인 항목 없음"
     optgroup: 
       assignments: 과제
       discussion_topics: 토론
@@ -3401,7 +3296,7 @@ ko:
       quizzes: 퀴즈
       wiki_pages: "위키 페이지"
     points_possible_short: "%{points}점"
-    prerequisits_footer: 
+    prerequisites_footer: 
       default_module_name: 모듈
       labels: 
         prerequisites: "필수 조건"
@@ -3412,14 +3307,12 @@ ko:
       titles: 
         student_progress: "학생 진행률"
         student_progression: "학생별 모듈 진행률"
-    still_needs_completing: "완료해야 함"
     titles: 
       add: "모듈 추가"
       add_item: "%{module}에 항목 추가"
       add_prerequisite: "%{module}에 필수 조건 추가"
       edit: "모듈 설정 편집"
       edit_item: "항목 세부 정보 편집"
-      student_progress: "모듈의 학생 진행률"
   context_modules_api: 
     invalid_position: "유효하지 않은 위치"
   continue_ac067716: 계속
@@ -3487,7 +3380,6 @@ ko:
         unsubscribe: "구독 해제"
       inbox_actions_description: "메시지 동작 메뉴"
       read_more: "더 보기..."
-    course_name: "과목 이름"
     course_options: 
       course_options: 
         concluded: 종결됨
@@ -3512,7 +3404,6 @@ ko:
       page_title_header: 대화
       reply: "답변 작성..."
       reply_all: "전체 회신"
-      search_by_user: "사용자 검색"
       search_for_recipients: "수신인 검색"
       search_names_groups_courses: "이름이나 그룹이나 과목을 검색"
       sending: "전송 중..."
@@ -3828,36 +3719,6 @@ ko:
       start_at: "시작 날짜"
       titles: 
         copy_course: "과목 복사"
-    course_wizard_box: 
-      buttons: 
-        publish: "과목 게시"
-      details: 
-        available: "이제 과목을 설정하고 사용할 수 있게 되었으므로 이 체크리스트는 더 이상 필요하지 않을 지도 모릅니다. 하지만, 나중에 새로운 것을 시도하거나 과목 내용을 바꿀 때 약간의 도움이 필요한 경우를 대비해서 그대로 두겠습니다."
-        calendar: "달력을 익히고 - 과제가 아닌 행사를 과목에 추가할 수 있는 - 좋은 기회가 있습니다. 우리가 작업을 도와드릴테니 걱정 마십시오."
-        claimed: 
-          saved: "모두 마쳤습니다!  이제 %{course} 과목을 공식적으로 만들었습니다. 이 과목은 게시 전까지 여러분에게만 보입니다 -- 그러나 뛰어들기 전에 Canvas가 어떻게 동작하는지 감을 잡고 여러분이 가르칠 준비가 되었다는 것을 확인하기 위해 왼쪽에 있는 목록에 따라 점검해야 합니다."
-        files: "파일 탭은 강의 슬라이드, 사례 문서, 학습 도움말 등 - 학생이 다운로드하는 모든 것 - 을 공유하는 장소입니다. Canvas를 이용하면 파일을 업로드하고 구성하는 것이 쉽습니다. 어떻게 하는지 보여드리겠습니다."
-        import: "다른 과목 관리 시스템을 사용했다면 Canvas로 옮기고 싶은 자료가 있을 지도 모릅니다. 여러분의 자료를 Canvas로 손쉽게 이전할 수 있는 과정을 안내해 드리겠습니다."
-        navigation: "기본 값으로 과목에 대한 링크는 활성화되어 있습니다. 내용이 없는 섹션에 대한 링크는 학생들에게 표시되지 않습니다. 예를 들어, 퀴즈를 만들지 않았다면 퀴즈 링크가 표시되지 않습니다. 여러분은 이 링크를 정렬할 수 있고 학생이 접근하지 않기를 원하는 영역이 있다면 링크를 비활성화할 수도 있습니다."
-        publish: 
-          not_registered: "과목이 신청되고 준비되었지만 과목을 게시하기 전에 등록 과정을 마쳐야 합니다. Canvas에서 과정을 마치기 위한 링크를 포함한 이메일을 받았을 것입니다. 스팸 상자를 확인하는 것도 잊지 마십시오."
-        students: "여러분은 확실히 이 중 일부를 원할 것입니다. 만약 아무도 듣지 않는다면 과목을 가르치는 재미가 무엇이겠습니까?"
-        tas: "과목을 도와줄 조교를 할당할 수 있습니다. 조교는 학생의 제출물을 평가하고, 토론의 중재를 돕고, 과제 기한이나 세부 사항을 업데이트할 수도 있습니다."
-      headings: 
-        next_steps: "다음 단계"
-      links: 
-        assignments: "과목 과제 추가"
-        calendar: "과목 행사 추가"
-        files: "과목 파일 추가"
-        home: "과목 홈 페이지 선택"
-        import: "내용 가져오기"
-        navigation: "탐색 링크 선택"
-        publish: "과목 게시"
-        re_send_confirmation: "확인 이메일 다시 보내기"
-        students: "과목에 학생 추가"
-        tas: "과목에 조교 추가"
-        title: 
-          bookmark: "이 링크 복사 또는 북마크하기"
     description: 
       links: 
         join_course: "이 과목에 참여"
@@ -4064,7 +3925,6 @@ ko:
         sections: "과목 섹션"
       help: 
         edit_navigation: "과목 탐색에 순서를 다시 매기려면 항목을 끌어다 놓으십시오."
-        public_course: "(학생 데이터는 비공개로 유지)"
       images: 
         alt: 
           delete: 삭제
@@ -4097,7 +3957,6 @@ ko:
         hide_distribution_graphs: "학생에게 평점 분포 그래프 숨기기"
         hide_final_grades: "학생 평점 요약에서 총점 숨기기"
         indexed: "이 과목을 공개 과목 색인에 포함"
-        is_public: "이 과목을 공개적으로 표시"
         language: 언어
         license: 라이선스
         open_enrollment: "과목 홈 페이지에 \"이 과목에 참여\" 링크 추가"
@@ -4261,6 +4120,7 @@ ko:
       rss_feed: "%{course} 피드"
     unauthorized: 
       invalid_link: "사용한 등록 링크가 더 이상 유효하지 않은 것으로 보입니다. 과목 강사에게 문의하여 올바르게 등록되었는지 확인하시기 바랍니다."
+  courses_43204aae: 과목
   create_module_item: 
     assignment_name: "과제 이름"
   create_module_item_quiz: 
@@ -4279,6 +4139,7 @@ ko:
     announcements: 공지
     assignments: 과제
     calendar_events: 행사
+    collaborations: 협업
     conferences: 회의
     confirmation: 확인
     copy_course: "과목 복사"
@@ -4288,7 +4149,7 @@ ko:
     error_reports: "오류 보고서"
     files: 파일
     grades: 평점
-    grading_schemes: "평가 구성표"
+    grading_standards: 평가
     groups: 그룹
     jobs: 작업
     media: 미디어
@@ -4354,6 +4215,7 @@ ko:
       student: 
         count: "오답 학생 수"
         ratio: "오답 학생 비율"
+  current_score_6c81792: "현재 점수"
   curve_grades_dialog: 
     average_score: "평균 점수"
     buttons: 
@@ -4365,6 +4227,7 @@ ko:
       assign_blanks: "제출하지 않은 학생에게 0점 할당"
     out_of_points_possible: "/ %{assignment.points_possible}"
     this_is_permanent: "상대 평가를 실행 취소할 수 없습니다. 상대 평가 이전의 평점 이력은 사용할 수 있으나 상대 평가 동작은 되돌릴 수 없습니다."
+  custom_fields_fc3e55af: "사용자 정의 필드"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L 내보내기 .zip 형식"
   d2l_name: "D2L 변환기"
@@ -4506,6 +4369,8 @@ ko:
   default_conference_title: "%{course_name} 회의"
   default_question_name: 문제
   default_question_text: "질문 텍스트"
+  delete_a6efa79d: 삭제
+  delete_grading_scheme_6b308832: "평가 구성표 삭제"
   delete_quiz_142b8099: "퀴즈 삭제"
   delete_survey_56fddbbd: "설문 삭제"
   demos: 
@@ -4552,6 +4417,7 @@ ko:
       teacher_instructor: 교사/강사
       technologist: 기술자
       vp: VP
+  description_436c48d7: 설명
   developer_key: 
     api_key: "키: *%{api_key}*"
     created: "작성:"
@@ -4587,6 +4453,7 @@ ko:
     cancel: 취소
     save_settings: "설정 저장"
     saving: "저장 중..."
+  disable_a5c05db3: "사용 안 함"
   discussion_entries: 
     created_entry_notice: "항목을 성공적으로 만들었습니다."
     deleted_entry_notice: "해당 항목이 삭제됨"
@@ -4629,7 +4496,6 @@ ko:
       last_post_date: "마지막 게시 %{display_last_reply_at}"
       manage: 관리
       no_due_date: "기한 없음"
-      open_to_comments: "의견 열기"
       pin: 고정
       unpin: "고정 해제"
       user_subscribed: "이 주제를 구독하고 있습니다. 구독을 해제하려면 클릭합니다."
@@ -4662,7 +4528,6 @@ ko:
       page_header_title: "새 토론"
       points_possible: "가능한 점수"
       post_at: "게시 시각"
-      remove_attachment_ceae0973: "첨부 제거"
       save: 저장
       saving: "저장 중..."
       topic_title: "주제 제목"
@@ -4759,14 +4624,19 @@ ko:
       post_message: "메시지 게시"
     summary_view: 
       attached_file_name: "첨부: %{display_name}"
+      close_for_comments: "의견 닫기"
+      delete: 삭제
       drag_up_or_down_to_reorder: "다시 순서를 매기려면 끌어서 올리거나 내리기"
       locked: "이 주제는 의견이 닫힘"
+      manage: 관리
+      open_to_comments: "의견 열기"
       this_topic_is_used_for_grading: "이 주제는 평가에 사용됨"
       topic_podcast_feed: "주제 Podcast 피드"
     topic_deleted_notice: "%{topic_title}를 성공적으로 삭제함"
     user_settings_view: 
       manually_mark_as_read: "게시물을 읽은 것으로 표시"
       my_settings: "내 설정"
+  discussion_topics_b35ac745: "토론 주제"
   discussions: 
     are_your_sure_delete: "이 항목을 삭제하시겠습니까?"
     cant_subscribe_not_in_group: "구독하려면 이 그룹에 속해야 함"
@@ -4833,13 +4703,16 @@ ko:
     unsubscribe: "이 주제를 구독 해제"
     unsubscribed: "구독 해제함"
     unsubscribed_hint: "이 주제를 구독하고 있지 않습니다. 구독하려면 클릭합니다."
+  domain_3b54c511: 도메인
   due_date_822625d8: 기한
   due_dates: 
     due_at: "기한: %{assignment_due_date_time}"
     multiple_due_dates: "기한: 여러 기한"
     no_due_date: "기한: 기한 없음"
+  e_mail_only_2cc5e513: 이메일만
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 변환기"
+  edit_grading_scheme_53091236: "평가 구성표 편집"
   edit_quiz_ededddd8: "퀴즈 편집"
   edit_rubric: 
     buttons: 
@@ -4901,8 +4774,11 @@ ko:
     titles: 
       font_size: "글자 크기, 선택하려면 누름"
       formatting: "서식, 선택하려면 누름"
+  either_the_url_or_domain_should_be_set_c29cf8c1: "url이나 도메인을 설정해야 합니다."
   email: 
     default_from_name: "Instructure Canvas"
+  enable_6f5d1328: 사용
+  end_date_e0093ed7: "끝 날짜"
   enrollment: 
     default_course_name: 과목
     default_email: "이메일 없음"
@@ -5101,7 +4977,6 @@ ko:
         html_content: "HTML/포함된 내용"
         portfolio: "실제 ePortfolio로 가기"
         rich_content: "서식 있는 텍스트 내용"
-        share: "다른 사용자에게 비공개 ePortfolio에 대한 액세스를 부여하려면 이 링크를 복사해서 공유하십시오."
         view_original: "원본 파일 보기"
         wizard: "시작하기 마법사"
       login_required: "이 페이지에 설명을 추가하려면 *로그인*해야 합니다."
@@ -5237,6 +5112,8 @@ ko:
     required: "필수 사항"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
   everyone_854554dd: 모두
+  example_84698b7d: 예
+  external_apps_f5490181: "외부 앱"
   external_content: 
     cancel: 
       canceling: "취소 중..."
@@ -5431,6 +5308,7 @@ ko:
     file_preview_headerbutton_close: 닫기
     file_preview_infotable_name: 이름
     file_preview_infotable_status: 상태
+  file_preview_eedb43f2: "파일 미리 보기"
   file_previews: 
     lock_explanation: 
       messages: 
@@ -5599,6 +5477,7 @@ ko:
     upload_error: "파일 업로드 중 오류 발생"
     warnings: 
       file_uploaded_without_response: "파일을 업로드했으나 서버가 응답에 실패했습니다. 확인하려면 페이지를 다시 로드하십시오."
+  filter_by_name_34cbe139: "이름으로 필터링"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr에서 크리에이티브 커먼즈 이미지 찾기"
     search: 검색
@@ -5875,7 +5754,6 @@ ko:
         other: "의견 %{count}개"
       comment_count_screenreader: "의견 읽기"
       comments: 의견
-      faculty_journal: "%{user}의 교원 일지"
       for_course: "과목에 대해"
       grading_in_progress: "교사가 평가 작업 중임"
       headers: 
@@ -5921,7 +5799,6 @@ ko:
     gradebook2: 
       arrange_columns_by_due_date: "기한으로 열 정렬"
       arrange_columns_by_group: "과제 그룹으로 열 정렬"
-      download_scores: "점수 다운로드 (.csv)"
       filter_by_student: "학생 이름이나 보조 ID로 학생 필터링"
       grades: 평점
       hide_student_names: "학생 이름 숨기기"
@@ -5930,7 +5807,7 @@ ko:
       set_group_weights: "그룹 가중치 설정"
       show_attendance_columns: "출석 열 표시"
       show_concluded_enrollments: "종결된 등록 표시"
-      upload_scores: "점수 업로드 (.csv 에서)"
+      upload_scores: 가져오기
       view_grading_history: "평가 기록 보기"
     grades: 
       complete: 완료
@@ -6024,6 +5901,7 @@ ko:
       new_assessment_option: "[새 평가]"
       no_annotation: "이 문서에 주석을 사용할 수 없음"
       not_newest_notice: "참고: 이는 가장 최근 제출물이 아님"
+      page_header_title: SpeedGrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
         status: "제출물 상태로 (평가 필요, 제출 안 됨 등)"
@@ -6034,13 +5912,11 @@ ko:
         download_file: "이 파일 다운로드"
         not_newest: "살펴 볼 제출물을 바꾸려면 위의 드롭다운 사용"
         preview_file: "이 파일 미리 보기"
-        speedgrader_options: "Speedgrader 옵션"
       tooltips: 
         file_attachment: "파일 첨부"
         media_comment: "미디어 설명"
         speech_recognition: "음성 인식"
     speed_grader_disabled: "이 과목은 SpeedGrader를 사용 안 함"
-    speedgrader_enabled_only_for_published_content: "Speedgrader는 게시된 내용에 대해서만 사용할 수 있습니다."
     student_attendance: 
       headers: 
         assignment: 과제
@@ -6079,11 +5955,13 @@ ko:
       total: 합계
   graded_quiz_7fabdf1f: "평가된 퀴즈"
   graded_survey_c0f0c395: "평가된 설문"
+  grades_a61eba0a: 평점
   grading_box: 
     out_of_points_possible: "/ %{assignment.points_possible}"
   grading_cell: 
     grade_complete: 완료
     grade_incomplete: "완료 안 됨"
+  grading_schemes_1c3c3252: "평가 구성표"
   grading_standard: 
     unknown_grading_details: "알 수 없는 세부 정보"
   grading_standards: 
@@ -6100,9 +5978,6 @@ ko:
     grading_scheme_currently_set: 설정됨
     grading_scheme_not_set: "설정 안 됨"
     index: 
-      buttons: 
-        add: "평가 구성표 추가"
-      heading_grading_schemes: "평가 구성표"
       title: "평가 기준"
     no_grading_standards: "평가 기준을 찾을 수 없음"
     status: 
@@ -6321,7 +6196,6 @@ ko:
         too_short: "3자 이상으로 된 검색어를 입력하십시오."
       assign_to_group_menu: 
         add_to_group: "그룹에 추가"
-        all_groups_full: "모든 그룹이 꽉 찼습니다."
         all_groups_full_suggestion: "그룹 제한을 변경하거나 그룹을 추가하십시오."
         assign_user_to_group: "사용자를 이 그룹에 할당"
         assign_user_to_group_name: "사용자를 그룹 %{name}에 추가"
@@ -6397,7 +6271,6 @@ ko:
         save: 저장
         saving: "저장 중..."
       group_user: 
-        assign_to_group: "그룹에 할당"
         assign_user_to_group: "%{name}을(를) 그룹에 할당"
         move: "다음으로 이동..."
         move_to_new_group: "%{name}을(를) 새 그룹으로 이동"
@@ -6518,6 +6391,7 @@ ko:
     online_url_submission: "온라인 URL 제출물"
     quiz_submission: "퀴즈 제출물"
     text_entry_submission: "텍스트 항목 제출물"
+  if_you_ve_been_using_another_course_management_sys_67edfab1: "다른 과목 관리 시스템을 사용했다면 Canvas로 옮기고 싶은 자료가 있을 지도 모릅니다. 여러분의 자료를 Canvas로 손쉽게 이전할 수 있는 과정을 안내해 드리겠습니다."
   image_8ad06: 이미지
   images: 
     error_checking_color: "이미지 색상 확인 오류"
@@ -6527,6 +6401,7 @@ ko:
     invalid_file_type: "유효하지 않은 파일 유형 %{type}. 허용되는 유형 목록: %{type_list}"
     not_an_image: "선택한 파일은 이미지가 아닙니다."
   immediately_c128ede6: 즉시
+  import_content_b2fd6620: "내용 가져오기"
   importers/assignment_importer: 
     errors: 
       import: 
@@ -6555,6 +6430,7 @@ ko:
       start_a_group: "그룹 시작하기"
     styleguide: 
       manage: 관리
+  installed_7b284a91: 설치됨
   instructions: 
     authorize_google_docs: "문서에 대해 협업하기 전에 Canvas가 Google Docs 계정을 접근할 수 있도록 권한을 부여해야 합니다."
   instructure: 
@@ -6684,6 +6560,7 @@ ko:
       next: 다음
       previous: 이전
   latest_f604a75: 최신
+  latest_score_905aa87b: "최종 점수"
   layouts: 
     application: 
       keyboard_navigation: 
@@ -6710,6 +6587,8 @@ ko:
       view_all_groups: "모든 그룹 보기"
     mobile_auth: 
       log_in_to_canvas: "Canvas에 로그인"
+    styleguide: 
+      default_page_title: "Canvas LMS"
   learning_outcome: 
     no_comment: "의견 없음"
     no_description: "설명 없음"
@@ -6727,6 +6606,9 @@ ko:
         not_authenticated: "이 페이지에 액세스하려면 로그인해야 함"
         student_not_found: "학생을 찾을 수 없음"
         teacher_not_found: "교사를 찾을 수 없음"
+      lti: 
+        api: 
+          status_unauthorized: "권한이 없음"
       not_authorized: "사용자에게 이 동작을 수행할 권한이 없음"
       status_unauthenticated: "인증되지 않음"
       status_unauthorized: "권한이 없음"
@@ -6813,7 +6695,10 @@ ko:
   links_14b70841: 링크
   locales: 
     ko: "한국말 (crowd-sourced)"
+  lock_date_cannot_be_before_due_date_ac30f54: "잠금 해제 날짜는 기한 이전일 수 없음"
   logged_out_user: "사용자 %{user_counter} 로그 아웃"
+  logo_a040ae0e: 로고
+  lower_limit_of_range_6ddd4983: "범위의 하한"
   lti: 
     lti_message: 
       load_tool_new_tab_button: "새 창에 %{tool} 로드"
@@ -6821,6 +6706,7 @@ ko:
       new_tab_expired: "이 도구의 세션이 만료되었습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
       new_tab_loaded: "이 도구를 새 브라우저 창에 성공적으로 로드했습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
   m2c_name: "Moodle 가져오기"
+  make_sure_you_choose_the_most_appropiate_option_as_93079937: "학생의 점수에 영향을 미치므로 가장 적절한 옵션을 선택하십시오."
   manage_avatars: 
     errors: 
       update_failed: "업데이트 실패. 다시 시도하시기 바랍니다."
@@ -6829,6 +6715,7 @@ ko:
     prompts: 
       delete_avatar: "이 사용자 프로필 그림을 삭제하시겠습니까?"
       lock_avatar: "이 사진을 잠그면 그것을 승인하고 사용자가 업데이트하는 것을 방지합니다. 계속 진행하시겠습니까?"
+  manual_entry_e4a4f99a: "수동 항목"
   mathquill: 
     tabs: 
       arrows: 화살표
@@ -6890,6 +6777,7 @@ ko:
     send_message: "메시지 보내기"
   message_students_dialog: 
     recipients: "수신인:"
+  message_this_student_6d14043d: "이 학생에게 메시지 보내기"
   messages: 
     account_suspended: 
       email: 
@@ -8125,15 +8013,6 @@ ko:
     messages: 
       failure: "이메일을 보내는 데 오류가 발생했습니다. 페이지를 다시 로드하고 다시 시도하시기 바랍니다."
       success: "이메일을 배달 중입니다."
-    migration_export_ready: 
-      email: 
-        body: "내용을 과목으로 가져올 준비가 되었습니다."
-        html: 
-          body: "내용을 과목으로 가져올 준비가 되었습니다."
-          link_message2: "내용의 어떤 항목을 가져올 것인지 선택하려면 *이 링크*를 클릭"
-          subject: "\"%{course_name}\"의 내용을 가져올 준비가 됨"
-        link_message: "이 링크를 클릭해서 내용의 어떤 항목을 가져올 것인지 선택하십시오:"
-        subject: "\"%{course_name}\"의 내용을 가져올 준비가 됨"
     new_account_user: 
       email: 
         body: "%{account}에 대한 새 계정 관리자"
@@ -8158,7 +8037,6 @@ ko:
       email: 
         html: 
           attached_file: "첨부 파일"
-          download: 다운로드
           link: "공지 보기"
         labels: 
           file_included: "포함된 파일"
@@ -8787,6 +8665,7 @@ ko:
       Save: 저장
       cancel: 취소
       creating: "만드는 중..."
+    continue: 계속
     create: 
       assignment: 
         cancel: 취소
@@ -8859,6 +8738,7 @@ ko:
     must_view_complete: "페이지를 봄"
     must_view_incomplete: "페이지를 봐야 함"
   moodle_dropdown_warning_title: "다시 선다 문제를 올바르게 가져오지 못함"
+  more_courses_5ebbe998: "다른 과목"
   move_dialog: 
     cancel: 취소
     save: 저장
@@ -8878,11 +8758,19 @@ ko:
     sure_you_want_to_mute: "이 과제의 평점을 비공개하시겠습니까? 과제가 평점 비공개 상태인 동안에는 학생이 다음 경우에 대한 알림을 받거나 볼 수 없습니다:"
   n_a_d6f6c42f: "해당 없음"
   name: "Academic Benchmark 가져오기 도구"
+  name_1aed4a1b: 이름
+  name_3806192d: "이름:"
+  name_only_5f56718e: 이름만
   new_facebook_message: "Canvas에서 온 새로운 메시지가 있음"
+  new_outcome_7fba8c7d: "새 성과"
+  next_40e12421: 다음
+  next_steps_ce0f0d0c: "다음 단계"
+  no_due_date_44271c53: "기한 없음"
   no_e16d9132: 아니요
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   no_students_have_taken_the_quiz_yet_e667644b: "어떤 학생도 이 퀴즈를 치르지 않음"
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
+  not_installed_37a21a76: "설치 안 됨"
   notification: 
     added_to_conversation_description: "대화에 추가됨"
     added_to_conversation_display: "대화에 추가됨"
@@ -9008,7 +8896,6 @@ ko:
       group_membership_accepted: "그룹 멤버쉽 수락됨"
       group_membership_rejected: "그룹 멤버쉽 거부됨"
       merge_email_communication_channel: "이메일 통신 채널 병합"
-      migration_export_ready: "마이그레이션 내보내기 준비됨"
       migration_import_failed: "마이그레이션 가져오기 실패함"
       migration_import_finished: "마이그레이션 가져오기 마침"
       new_account_user: "새 계정 사용자"
@@ -9108,6 +8995,8 @@ ko:
     new_observee_password: 암호
     new_observee_username: "사용자 이름"
   ok_c47544a2: 확인
+  once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "답변을 변경하고 나면 문제를 업데이트하기 전에 옵션을 선택해야 합니다."
+  one_per_line_format_name_value_79647700: "한 줄에 한 개씩, 형식: 이름=값"
   options: 
     ? "no"
     : 아니오
@@ -9188,8 +9077,6 @@ ko:
         total: "%{points_possible}점"
       total_points: 총점
       use_for_scoring: "점수 매기기에 이 기준을 사용"
-    outcome_alignment: 
-      delete_title: "루브릭 연결을 바탕으로 한 과제를 삭제할 수 없습니다. 이 연결을 제거하려면 자산의 루브릭에서 행을 제거해야 합니다."
     outcome_criterion: "학습 성과 기준"
     outcome_form: 
       criterion: "기준 등급"
@@ -9197,7 +9084,6 @@ ko:
       criterion_info_link: "기준 등급에 대해서 알아보려면 클릭"
       description: "이 성과의 설명"
       mastery: "숙달 점수"
-      new_outcome_7fba8c7d: "새 성과"
       points: "%{points_possible}점"
       title: "성과 이름"
       total_points: 총점
@@ -9247,12 +9133,9 @@ ko:
   overrides: 
     everyone: 모두
     everyone_else: "다른 모든 사람"
-    lock_date_before_due_date: "잠금 해제 날짜는 기한 이전일 수 없음"
     overrides: 
       everyone: 모두
       everyone_else: "나머지 모든 사람"
-    unlock_date_after_due_date: "잠금 해제 날짜는 기한 이후일 수 없음"
-    unlock_date_after_lock_date: "잠금 해제 날짜는 잠금 날짜 이후일 수 없음"
   page_comment: 
     default_user_name: 익명
   page_comments: 
@@ -9267,6 +9150,7 @@ ko:
         time: 시간
         url: URL
         user_agent: "사용자 에이전트"
+  page_views_eb64cf53: "페이지 뷰"
   pages: 
     cancel_button: 취소
     cannot_unpublish_front_page: "첫 페이지를 게시 취소할 수 없음"
@@ -9297,6 +9181,7 @@ ko:
     view_more_link: "더 보기"
   paginated_view: 
     loading_more_results: "더 많은 결과 로드"
+  paste_xml_cda3a64e: "XML 붙여넣기"
   paypal: 
     exception: "죄송합니다. 오류가 발생했습니다. 나중에 다시 시도하시기 바랍니다."
   plugins: 
@@ -9594,12 +9479,14 @@ ko:
         domain: 도메인
         password: 암호
         username: "사용자 이름"
+  points_bb475533: 점
   practice_quiz_19a8505d: "퀴즈 연습"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "완료 필수 구성 요소"
     labels: 
       requirements_must_be_completed: "이 페이지를 잠금 해제하기 전에 다음 요구 사항이 완료되어야 합니다."
+  privacy_290109ea: "개인 정보"
   product_name: Canvas
   profile: 
     access_token: 
@@ -9784,14 +9671,6 @@ ko:
         register_skype: "Skype 등록"
         remove_account_from_profile: "이 프로필에서 계정 제거"
         unregister_service: "서비스 등록 해제"
-      twitter_description: |-
-          Twitter는 짧은 메시지를 게시하고 구독하는 서비스입니다.
-          Twitter 계정을 가지고 있으면 여기에서 등록할 수 있습니다.
-          그리고 나서 동료 과목/그룹 멤버들이 등록된 서비스를 볼 수 있도록 허용하면
-          여러분의 Twitter 계정과 손쉽게 연결할 수 있습니다.
-          
-          또한 알림이 Twitter 계정으로 전송되도록 등록할 수도 있습니다.
-          알림은 직접 메시지로 전달되므로 공개 스트림에는 표시되지 않습니다.
       unknown_service: "알 수 없음"
       web_services: "Canvas는 여러분이 이미 사용하고 있는 웹 도구 안에서 직접 입력하므로 매우 편리합니다. \"기타 서비스\" 중 하나를 클릭하면 그 의미를 알 수 있습니다."
     purpose_required: "목적이 필요함"
@@ -10003,6 +9882,7 @@ ko:
       email_sent: "확인 이메일을 %{email}로 전송했습니다. 스팸 상자를 확인하는 것을 잊지 마십시오."
       link_invalid: "사용한 링크가 더 이상 유효하지 않습니다. 로그인할 수 없는 경우에는 \"암호를 모릅니다\"를 클릭해서 암호를 다시 설정하십시오."
       password_changed: "암호 변경됨"
+  public_a749f507: 공개
   public_domain_112ed397: "공개 도메인"
   publish_btn_module: 
     buttons: 
@@ -10118,20 +9998,6 @@ ko:
       select_bank: "이 문제를 위한 대상 문제 은행을 선택하십시오:"
       show_details: "문제 세부 정보 표시"
   question_unanswered: "아직 답변하지 않음"
-  quick_start_bar: 
-    announcement: 
-      saving: "저장 중..."
-    assignment: 
-      assigning: "저장 중..."
-    discussion: 
-      saving: "저장 중..."
-    event: 
-      save: 저장
-      saving: "저장 중..."
-    message: 
-      Sending: "전송 중..."
-    quick_start_bar_view: 
-      new: "새 항목:"
   quiz: 
     regrade: 
       give_everyone_full_credit: "이 문제에 대해 모든 학생에게 만점을 줍니다."
@@ -10275,6 +10141,7 @@ ko:
       comments_on_answer: "사용자가 이 답변을 선택한 경우의 의견"
       comments_on_question: "이 문제에 대한 의견"
       comments_on_wrong_match: "사용자가 이 짝을 잘못 지은 경우의 의견"
+      correct_answer: 정답
       message_text: "메시지 내용"
       other_incorrect_matches: "기타 잘못된 짝짓기 옵션"
       possible_answer: "가능한 답변"
@@ -10773,15 +10640,12 @@ ko:
       quiz_details: 
         allowed_attempts: "허용된 시도"
         headers: 
-          available: "사용 가능"
           due: 기한
           points: 점
           questions: 문제
           time_limit: "시간 제한"
         multiple_due_dates: "여러 기한"
         none: 없음
-        quiz_available_after: "%{start_time} 이후"
-        quiz_available_until: "%{end_time}까지"
         requires_lockdown: "Respondus LockDown Browser 필요"
         unlimited: 무제한
       quiz_right_side: 
@@ -11157,7 +11021,9 @@ ko:
         email: 이메일
         name: 이름
     welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
+  remove_attachment_ceae0973: "첨부 제거"
   remove_f47dc62a: 제거
+  remove_row_c198da5a: "행 삭제"
   rename_45608f54: "이름 바꾸기"
   restrict_student_access: 
     button_text: 
@@ -11349,6 +11215,7 @@ ko:
         are_you_sure_remove: "목록에서 이 루브릭을 제거하시겠습니까?"
       remove_rubric: "목록에서 이 루브릭 제거"
   save_11a80ec3: 저장
+  saving_d55dd90e: "저장 중..."
   score_out_of_points_possible_88f370fd: "%{score} / %{points_possible}"
   screenreader_gradebook: 
     assignment_information: 
@@ -11407,6 +11274,7 @@ ko:
     enrollments_tas: 조교
     enrollments_teachers: 교사
     student_groups: "학생 그룹"
+  search_by_user_dd3ad189: "사용자 검색"
   search_entries_or_author_63fb0a86: "항목이나 작성자 검색"
   search_title_body_or_author_1d26711f: "제목, 내용, 작성자 검색"
   section: 
@@ -11500,11 +11368,14 @@ ko:
     titles: 
       add_item_to_module: "모듈에 항목 추가"
       find_links_using_service: "%{service}을(를) 이용해서 링크 찾기"
+  select_navigation_links_68e1e924: "탐색 링크 선택"
   selected_answer: "이 답변을 선택했습니다."
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "이미 **%{course}**에 등록했습니다."
-      switch_users: "현재 *%{user}*(으)로 로그인하고 있습니다. **다른 사용자로 로그인하십시오**."
+      buttons: 
+        go_to_course: "과목으로 가기"
+        go_to_dashboard: "대시보드로 가기"
     authenticate: 
       buttons: 
         enroll_in_course: "과목에 등록"
@@ -11531,7 +11402,6 @@ ko:
         enroll_in_course: "과목에 등록"
         next: 다음
       getting_started: "**%{course}**에 등록하는 중"
-      switch_users: "*%{user}*(으)로 로그인하고 있습니다. **다른 사용자로 로그인하십시오**."
     course_full: 
       class_full: "**%{course}**의 등록이 만원입니다. 불편을 끼쳐드려서 죄송합니다."
     enrollment_closed: 
@@ -11631,6 +11501,11 @@ ko:
       links: 
         add_rubric: "루브릭 추가"
         assign_rubric: "루브릭 할당"
+    available_dates: 
+      headers: 
+        available: "사용 가능"
+      quiz_available_after: "%{start_time} 이후"
+      quiz_available_until: "%{end_time}까지"
     components: 
       ic_submission-download-dialog: 
         click_to_download: "다운로드하려면 여기를 클릭"
@@ -12049,6 +11924,8 @@ ko:
         quiz_name: "퀴즈 이름"
         topic_name: "주제 이름"
         url: URL
+        wiki_page_name: "페이지 이름"
+        wiki_page_namem: "과제 이름"
       loading: "로드 중..."
       new_assignment_option: "[ 새 과제 ]"
       new_file_option: "[ 새 파일 ]"
@@ -12196,6 +12073,7 @@ ko:
         select_file: "업로드하려면 압축 파일을 선택하십시오."
       titles: 
         uploading: "업로드 중입니다. 잠시 기다려 주십시오."
+  shared_secret_892c88f2: "공유 시크릿"
   sis_batch: 
     errors: 
       too_many_errors: "오류 %{count}개가 더 있음"
@@ -12263,6 +12141,8 @@ ko:
       back: 뒤로
       close: 닫기
       forward: 앞으로
+  smartbanner: 
+    android_banner_view_button: 보기
   speed_grader: 
     submissions_dropdown: 
       loud_late: 지연
@@ -12272,6 +12152,7 @@ ko:
     no_assignment: "선택한 과제 없음"
     no_student: "선택한 학생 없음"
     none: 없음
+  start_date_e937be8a: "시작 날짜"
   statistics: 
     csv_columns: 
       attempt: 시도
@@ -12289,6 +12170,8 @@ ko:
     inexact_answer: "%{lower_bound} 부터 %{upper_bound} 까지"
     no_answer: "답 없음"
   step: 단계
+  student_5da6bfd1: 학생
+  students_1b8cd07b: 학생
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "이 퀴즈를 치른 학생 (%{count})"
     other: "이 퀴즈를 치른 학생 (%{count})"
@@ -12450,7 +12333,6 @@ ko:
       two_words_connector: " 와(과) "
       words_connector: ", "
     help_menu: 
-      community_support_description: "동료와 교류하고 도움을 받을 수 있습니다."
       community_support_forums: "커뮤니티 사용자 지원 포럼"
       contact_support: "지원팀에 문의"
       contact_support_sub_text: "시간이 중요한 이슈에 대해 지원을 받습니다."
@@ -12487,6 +12369,7 @@ ko:
   take_the_quiz_again_8ea51a6c: "퀴즈 다시 치르기"
   take_the_survey_ada59508: "설문 치르기"
   take_the_survey_again_24ce22c2: "설문 다시 치르기"
+  teachers_52e2423f: 교사
   terms: 
     index: 
       date: 
@@ -12543,6 +12426,8 @@ ko:
         term_start: "학기 시작"
         unspecified: 항상
       timespan: "%{start_at}*부터* %{end_at}까지"
+  there_was_an_error_in_processing_your_request_6513a49a: "요청을 처리하는 중 오류 발생"
+  this_field_is_required_fa58c4a: "이 필드가 필요함"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*이 퀴즈를 게시하지 않았습니다.* 게시하기 전까지 교사만 이 퀴즈를 볼 수 있습니다."
   time: 
     am: 오전
@@ -12599,6 +12484,7 @@ ko:
     outcome_artifacts: "성과 아티팩트"
     people: 사용자
     view_in_separate_window: "별도 창에 보기"
+  to_c4c44f4b: "다음 요일로"
   tooltips: 
     finished: 완료됨
     incomplete: "완료 안 됨"
@@ -12606,11 +12492,7 @@ ko:
       more_message: "%{count}개 더…"
   tours: 
     quiz_regrade: 
-      first_bullet: "답변을 변경하고 나면 문제를 업데이트하기 전에 옵션을 선택해야 합니다."
       got_it: 확인
-      second_bullet: "학생의 점수에 영향을 미치므로 가장 적절한 옵션을 선택하십시오."
-      third_bullet: "퀴즈를 저장한 후에 제출물을 다시 평가게 되며, 이 작업에는 수 분이 걸립니다."
-      try_later: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
   turnitin: 
     error_1007: "업로드한 파일이 너무 큽니다."
     error_1009: "유효하지 않은 파일 유형입니다. (유효한 파일 유형은 MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect, RTF 입니다.)"
@@ -12631,12 +12513,14 @@ ko:
   unknown_47a3b725: "알 수 없음"
   unknown_question_bank: "알 수 없는 문제 은행"
   unknown_quiz: "알 수 없는 퀴즈"
+  unlock_date_cannot_be_after_due_date_8829d9ca: "잠금 해제 날짜는 기한 이후일 수 없음"
+  unlock_date_cannot_be_after_lock_date_591f7fda: "잠금 해제 날짜는 잠금 날짜 이후일 수 없음"
   unsupported_package: "지원하지 않는 내용 묶음"
   until_date_949017c4: "%{date} 까지"
+  update_4d8ee62: 업데이트
   upload_button: 
     upload: 업로드
-  usage_rights_modal: 
-    saving: "저장 중..."
+  upper_limit_of_range_c454a8f2: "범위의 상한"
   user: 
     default_user_name: 사용자
     errors: 
@@ -13029,6 +12913,8 @@ ko:
       welcome_to_happiness: "Canvas에 오신 것을 환영합니다!"
   validate: 
     is_required: "이 필드가 필요함"
+  view_app_center_6c89a3fe: "앱 센터 보기"
+  view_app_configurations_52b52441: "앱 구성 보기"
   warnings: 
     test_install: 
       periodic_message: "이 Canvas 설치는 테스트를 위한 것이며 주기적으로 다시 설정됩니다."
@@ -13184,6 +13070,8 @@ ko:
     external_urls: 
       archive: 저장소
       archive_link: "저장소 보기"
+  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
+  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "브라우저가 Canvas를 위한 최소 요구 사항에 미치지 못합니다. 지원하는 브라우저의 전체 목록을 보려면 *Canvas 설명서*를 방문하시기 바랍니다."
   zip_argument_error: ".zip 업로드는 업로드할 대상 폴더가 필요합니다."
   zip_file_display: "파일 가져오기"
   zip_file_file_description: ".zip 파일을 폴더에 압축 해제"
