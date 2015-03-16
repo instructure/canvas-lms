@@ -404,7 +404,7 @@ class ExternalToolsController < ApplicationController
     message_type = tool.extension_setting(selection_type, 'message_type')
     case message_type
       when 'ContentItemSelectionResponse'
-        content_item_selection_response(tool, selection_type, content_item_response)
+        content_item_selection_response(tool, selection_type, create_content_item_response)
       else
         basic_lti_launch_request(tool, selection_type)
     end
@@ -430,7 +430,7 @@ class ExternalToolsController < ApplicationController
   end
   protected :basic_lti_launch_request
 
-  def content_item_selection_response(tool, placement, content_item_response, attachment = nil)
+  def content_item_selection_response(tool, placement, content_item_response)
     params = default_lti_params.merge(
       {
         #required params
@@ -442,7 +442,7 @@ class ExternalToolsController < ApplicationController
         context_title: @context.name,
         tool_consumer_instance_name: @domain_root_account.name,
         tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
-      }).merge(variable_expander(tool:tool, attachment:@file).expand_variables!(tool.set_custom_fields(placement)))
+      }).merge(variable_expander(tool: tool, attachment: content_item_response.file).expand_variables!(tool.set_custom_fields(placement)))
 
 
     lti_launch = Lti::Launch.new
@@ -455,105 +455,18 @@ class ExternalToolsController < ApplicationController
   end
   protected :content_item_selection_response
 
-  def content_item_response
-    content_items = []
-
-    if params[:files].present?
-      content_items << content_item_for_file
-    else
-      #construct query params for the export endpoint
-      export_type = params["export_type"] || "common_cartridge"
-      if export_type == "common_cartridge"
-        content_items << content_item_for_common_cartridge
-      end
+  def create_content_item_response
+    media_types = params.select { |param| Lti::ContentItemResponse::MEDIA_TYPES.include? param.to_sym }
+    begin
+      Lti::ContentItemResponse.new(@context, self, @current_user, media_types, params["export_type"])
+    rescue Lti::UnauthorizedError
+      render_unauthorized_action
+    rescue Lti::UnsupportedExportTypeError
+      #Legacy API behavior does nothing if the export type is unsupported
     end
-
-    {
-        "@context" => "http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement",
-        "@graph" => content_items
-    }
   end
-  protected :content_item_response
 
-  def content_item_for_file
-    #find the content title
-    @file = Attachment.where(:id => params[:files].first).first
-    if @context.is_a?(Account)
-      raise ActiveRecord::RecordNotFound unless @file.context == @current_user
-    elsif @file.context.is_a?(Course)
-      raise ActiveRecord::RecordNotFound unless @file.context == @context
-    elsif @file.context.is_a?(Group)
-      raise ActiveRecord::RecordNotFound unless @file.context.context == @context
-    end
-    render_unauthorized_action if @file.locked_for?(@current_user, check_policies: true)
-
-    {
-        "@type" => "ContentItemPlacement",
-        "placementOf" => {
-            "@type" => "FileItem",
-            "@id" => file_download_url(@file, { :verifier => @file.uuid, :download => '1', :download_frd => '1' }),
-            "mediaType" => @file.content_type,
-            "title" => @file.display_name
-        }
-    }
-  end
-  protected :content_item_for_file
-
-  def content_item_for_common_cartridge
-    query_params = {"export_type" => "common_cartridge"}
-
-    media_types = []
-    [:assignments, :discussion_topics, :modules, :module_items, :pages, :quizzes].each do |type|
-      if params[type]
-        query_params['select'] ||= {}
-        query_params['select'][type] = params[type]
-        media_types << (params[type].size == 1 ? type : :course)
-      end
-    end
-
-    #find the content title
-    media_type = media_types.size == 1 ? media_types.first.to_s.singularize : 'course'
-    case media_type
-      when 'assignment'
-        title = @context.assignments.where(id: params[:assignments].first).first.title
-      when 'discussion_topic'
-        title = @context.discussion_topics.where(id: params[:discussion_topics].first).first.title
-      when 'module'
-        title = @context.context_modules.where(id: params[:modules].first).first.name
-      when 'page'
-        title = @context.wiki.wiki_pages.where(id: params[:pages].first).first.title
-      when 'quiz'
-        title = @context.quizzes.where(id: params[:quizzes].first).first.title
-      when 'module_item'
-        tag = @context.context_module_tags.where(id: params[:module_items].first).first
-
-        case tag.content
-          when Assignment
-            media_type = 'assignment'
-          when DiscussionTopic
-            media_type = 'discussion_topic'
-          when Quizzes::Quiz
-            media_type = 'quiz'
-          when WikiPage
-            media_type = 'page'
-        end
-
-        title = tag.title
-      when 'course'
-        title = @context.name
-    end
-
-    {
-        "@type" => "ContentItemPlacement",
-        "placementOf" => {
-            "@type" => "FileItem",
-            "@id" => api_v1_course_content_exports_url(@context) + '?' + query_params.to_query,
-            "mediaType" => "application/vnd.instructure.api.content-exports.#{media_type}",
-            "title" => title
-        }
-    }
-  end
-  protected :content_item_for_common_cartridge
+  protected :create_content_item_response
 
   def tool_launch_template(tool, selection_type)
     TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] || TOOL_DISPLAY_TEMPLATES['default']
