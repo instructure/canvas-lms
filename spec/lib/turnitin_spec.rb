@@ -287,4 +287,14 @@ describe Turnitin::Client do
       expect(@turnitin_api.request_md5(doc_sample_params)).to eql(doc_sample_md5)
     end
   end
+
+  describe '#email' do
+    it "uses turnitin_id for courses" do
+      course
+      t = Turnitin::Client.new('blah', 'blah')
+      expect(@course.turnitin_id).to be_nil
+      expect(t.email(@course)).to eq "course_#{@course.global_id}@null.instructure.example.com"
+      expect(@course.turnitin_id).to eql @course.global_id
+    end
+  end
 end
