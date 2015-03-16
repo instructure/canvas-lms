@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conferences_common')
 
 describe "web conference" do
   include_examples "in-process server selenium tests"
+  let(:url) { "/courses/#{@course.id}/conferences" }
 
   before (:each) do
     course_with_teacher_logged_in
@@ -12,7 +13,7 @@ describe "web conference" do
 
   context "with no conferences" do
     before (:each) do
-      get "/courses/#{@course.id}/conferences"
+      get url
     end
 
     it "should display initial elements of the conference page", :priority => "1", :test_id => 118488 do
@@ -55,14 +56,29 @@ describe "web conference" do
   context "with conferences" do
     before (:each) do
       #Creates conferences before getting the page so they appear when it loads up
-      WimbaConference.create!(:title => "new conference", :user => @user, :context => @course)
-      get "/courses/#{@course.id}/conferences"
+      @cc = WimbaConference.create!(:title => "test conference", :user => @user, :context => @course)
     end
 
     it "should delete active conferences", :priority => "1", :test_id => 126912 do
+      get url
+
       f('.icon-settings').click
+      wait_for_ajaximations
       delete_conference
       expect(f'#new-conference-list').to include_text("There are no new conferences")
+    end
+
+    it "should delete concluded conferences", :priority => "2", :test_id => 163991 do
+      #closing will conclude the conference
+      @cc.close
+      @cc.save!
+
+      get url
+
+      f('.icon-settings').click
+      wait_for_ajaximations
+      delete_conference
+      expect(f'#concluded-conference-list').to include_text("There are no concluded conferences")
     end
   end
 end
