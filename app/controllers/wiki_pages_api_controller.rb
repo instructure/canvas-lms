@@ -311,7 +311,6 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def show
     if authorized_action(@page, @current_user, :read)
-      @page.increment_view_count(@current_user, @context)
       log_asset_access(@page, "wiki", @wiki)
       render :json => wiki_page_json(@page, @current_user, session)
     end

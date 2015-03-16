@@ -444,7 +444,7 @@ class DiscussionTopicsController < ApplicationController
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
       @unlock_at = @topic.available_from_for(@current_user)
-      @topic.change_read_state('read', @current_user)
+      @topic.change_read_state('read', @current_user) unless @locked
       if @topic.for_group_discussion?
         @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
         topics = @topic.child_topics.to_a
