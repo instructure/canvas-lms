@@ -9998,6 +9998,7 @@ tr:
   name_3806192d: "İsim:"
   name_app_has_been_deleted_fb2d9426: "%{name} uygulaması silindi"
   name_error_fee4236: "İsim Hatası"
+  name_is_currently_status_9065c996: "*isim* şu anda **durum**."
   name_only_5f56718e: "Sadece İsim"
   new_account_role_6e5c4964: "Yeni Hesap Rolü"
   new_course_role_6a7bb75f: "Yeni Kurs Rolü"
@@ -10013,9 +10014,12 @@ tr:
   next_steps_ce0f0d0c: "Sonraki Adımlar"
   no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_content_has_been_added_f36bab43: "* Hiçbir içerik eklenmedi"
+  no_directory_is_selected_please_select_a_directory_46ded46: "Seçili dizin yok, 'taşı' ya tıklamdan önce lütfen bir dizin seçin."
   no_due_date_44271c53: "Bitiş Tarihi Yok"
   no_due_date_6e6a23c1: "(bitiş tarihi yok)"
   no_e16d9132: Hayır
+  no_grading_periods_to_display_ad25c8f3: "Gösterilecek notlandırma peryodu yok"
+  no_grading_schemes_to_display_8b0e92e7: "Gösterilecek notlandırma şeması yok"
   no_migration_file: "İçerik taşıma için dosya gereklidir."
   no_score_yet_c94e919b: "Henüz puan yok"
   no_students_have_taken_the_quiz_yet_e667644b: "Henüz bu kısa sınavı alan öğrenci yok"
@@ -10248,6 +10252,7 @@ tr:
       other: Diğer
       parent: "Ana E-Posta"
       scheduling: Zamanlanıyor
+  now_click_the_agenda_button_607fb40e: "Şimdi *Gündem* butonuna tıklayın"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Dersiniz hazır olduğuna göre muhtemelen artık bu denetim listesine ihtiyacınız olmayacak. Fakat daha sonra yeni bir şeyler denemek istersiniz diye veya dersinizin içeriğinde değişiklikler yaparken biraz yardıma ihtiyacınız olabilir diye hazır tutacağız."
   num_messages_c1949bbc: 
     one: "1 mesaj"
@@ -10300,6 +10305,7 @@ tr:
   on_time_percent_eebffe38: "Zamanında: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
   one_per_line_format_name_value_79647700: "Her bir satır. Format: isim=değer"
+  ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} zamanında, %{late} geç, %{missing} gönderilmedi"
   options: 
     ? "no"
     : Hayır
@@ -10325,6 +10331,7 @@ tr:
   outcome_results: 
     outcomes_filename: "Öğrenme Çıktıları"
   outcome_results_title: "Öğrenme Çıktısı Sonuçları"
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Öğrenme çıktısı: %{title} nin durumu %{statusTooltip}"
   outcomes: 
     account_standards: "Hesap Standartları"
     account_standards_description: "Sol tarafta bu derste kullanmanız için kurumunuzun oluşturduğu standartları görebilirsiniz."
@@ -10514,6 +10521,7 @@ tr:
   pdf_d8236d9a: PDF
   percent_of_students_scored_score_53d2c4d5: "%{score} puan alan öğrenciler %{percent} "
   percentused_of_bytesavailable_used_894e2327: "Kullanılabilir %{bytesAvailable} %{percentUsed}% o"
+  permission_not_found_620b80d1: "İzin bulunamadı"
   permissions: 
     manage_webhooks: "Webhook'ları yönet"
   plain_text_e3ab33aa: "Düz metin"
@@ -10668,8 +10676,10 @@ tr:
         api_key: "OAuth Consumer Key"
         secret_key: "OAuth Consumer Secret"
     google_drive: 
+      description: "Google Drive dosya paylaşımı"
       name: "Google Drive"
     google_drive_settings: 
+      description: "Aşağıdaki client_secrets.json un içeriğini yapıştırın. Yukarıdaki metin kutuları, aşağıda verilen içeriğe göre otomatik olarak doldurulacaktır."
       labels: 
         auth_uri: "Auth URI"
         client_id: "Müşteri ID"
@@ -10914,6 +10924,7 @@ tr:
     labels: 
       requirements_must_be_completed: "Bu sayfa kilidini açmak için öncelikle şu gereksinimleri karşılamanız gerekmektedir"
   presentation_2d9387ca: Sunum
+  press_spacebar_for_more_details_on_this_outcome_f6713a42: "bu öğrenme çıktısı ile ilgili daha fazla detay için klavyede boşluk tuşuna basın"
   privacy_290109ea: Gizlilik
   product_name: Canvas
   profile: 
@@ -11013,6 +11024,7 @@ tr:
           için otomatik oluşturulurlar fakat [yeni ya da sınırlı bir proje 
           geliştiriyorsanız](%{documentation_url}) buradan token oluşturabilirsiniz.
       google_docs_description: "Google Drive'ınıza erişime izin verdikten sonra ödevlerinizi doğrudan Google Drive'dan gönderebilecek ve sınıfınızdaki katılımcılar ile belge oluşturup paylaşabileceksiniz."
+      google_drive_description: "Google Drive ınızı görmemize yetki verdiğinizde ödevlerinizi doğrudan Google Drive'dan gönderebilecek ve sınıflarınızdaki arkadaşlarınızla belgeler oluşturup paylaşabieceksiniz."
       headers: 
         application_abbrev: Uygulama
         dates: Tarihler
@@ -11116,6 +11128,15 @@ tr:
         register_skype: "Skype'a Üye Ol"
         remove_account_from_profile: "Bu hesabı profilimden sil"
         unregister_service: "Kayıtlı Olmayan Servisler"
+      twitter_description: |-
+          Twitter kısa mesaj gönderme ve bu mesajlara üye olma hizmedir.
+          Twitter hesabınız varsa hesabınızı buraya tanımlayın. Eğer ders/grup
+          arkadaşlarınızın kayıtlı olduğunuz hizmetleri görmelerine izin verirseniz
+          Twitter hesabınızdan size kolayca ulaşabilirler.
+          
+          Bildirimlerin Twitter hesabınıza gönderilmesi için hesap oluşturabilirsiniz.
+          Bu bildirimler size kendinizden doğrudan mesaj olarak gönderilecek ve
+          herkese açık haber akışınızda görünmeyecek.
       unknown_service: Bilinmiyor
       web_services: "Halihazırda kullandığınız web araçları bağlantıları ile Canvas yaşamınızı oldukça kolaylaştırabilir. Ne demek istediğimizi öğrenmek için \"Diğer Servisler\" altındaki servislerden herhangi birine tıklayın."
       yo_description: |-
@@ -11522,6 +11543,8 @@ tr:
     inverted_table_view: 
       headers: 
         question: Soru
+    links: 
+      log_accessibility_warning: "Uyarı: Tablo Görünümü ekran okuyucuları tarafından kullanılamaz. Lütfen güncel görünümü kullanın."
     loading: Yükleniyor...
     navigation: 
       links: 
@@ -11616,9 +11639,15 @@ tr:
       audible_bottom_bracket: "Dip grup:"
       audible_bracket_aced: "Bu gruptaki öğrencilerin tamamı doğru cevap verdi."
       audible_bracket_failed: "Bu gruptaki öğrencilerin biri bile doğru cevap veremedi."
+      audible_chart_description: "Bu tabloda sınıftaki her öğrenci grubunun bu soruyu nasıl yanıtladığı gösterilmektedir. Öğrenci grupları alınan puanlara göre oluşturulur. En üst grup en yüksek %27'liği, orta grup ortadaki %46'lığı ve en alt grup ise en düşük %27'liği temsil eder."
+      audible_discrimination_index: "Ayrışma Endeksi: %{number}."
       audible_middle_bracket: "Orta parantez:"
+      audible_response_ratio_distribution: "Bu gruptaki öğrencilerin %{correct_ratio}% o doğru cevap verdi."
       audible_top_bracket: "Üst parantez:"
+      discrimination_index: "Ayrışma Endeksi"
       discrimination_index_dialog_title: "Ayrışma Endeks Göstergesi"
+      discrimination_index_dialog_trigger: "Ayrışma Endeksi hakkında daha fazla bilgi edinin."
+    discrimination_index_help: "* Bu ölçüde  sınavda doğru yapan öğrenciler ile yapamayanlar arasındaki farkı (ya da ayrışmayı) tek bir sorunun nasıl başarılı bir şekilde ortaya koyduğu verilmektedir. * **Kısa sınavın tamamında öğrencileri puanlarına göre üç gruba ayırıyor ve bu grupları kimin doğru vevapladığına göre gösteriyor. ** *** **** Daha fazla bilgiye buradan ulaşabilirsiniz.**** ***"
     download_submissions: "Tüm Dosyaları İndir"
     duration_in_hours: 
       one: "1 saat"
@@ -11635,20 +11664,26 @@ tr:
     essay_score: "Puan: %{score}"
     loading_questions: "Soru istatistikleri yükleniyor. Lütfen bekleyiniz."
     no_answer: "Cevap Yok"
+    question_breakdown: "Soru Kırılma Noktası"
     question_header: "Soru %{position}"
+    quiz-stats-noshow-warning: "Mükemmelliğin bile sınırları vardır. Bu kısa sınav için istatistikleri raporlaştıramıyoruz fakat raporları indirebilrisiniz."
     response_student_count: 
       one: "1 öğrenci"
       other: "%{count} öğrenci"
       zero: Kimse
+    sad-panda-alttext: "Panda diyarında üzücü durum"
     speedgrader: "Hızlı Değerlendirmede Gör"
     summary: 
       avg_time: "Ortalama Süre"
+      chart_title: "Puan yüzdebirlik çizelgesi"
       high_score: "Yüksek Puan"
       low_score: "Düşük Puan"
       mean: "Ortalama Puan"
       not_available_abbrev: Yok
       quiz_summary: "Sınav Özeti"
       stdev: "Standart Sapma"
+      students_who_got_a_certain_score: 
+        one: "Bir öğrenci %{score}%. puan aldı."
       students_who_scored_in_a_range: 
         zero: "%{start}% ve %{end}% arası not olan öğrenci bulunamadı."
     title: "Kısa Sınav İstatistikleri"
