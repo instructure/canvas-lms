@@ -4098,14 +4098,3 @@ describe Course, 'touch_root_folder_if_necessary' do
   end
 
 end
-
-describe Course, "turnitin_id" do
-  before(:once) { course active_all: true }
-  it "writes the turnitin_id on first access" do
-    turnitin_id = @course.turnitin_id
-    expect(turnitin_id).to eql @course.global_id
-
-    @course.update_attribute(:id, @course.id + 1)
-    expect(@course.turnitin_id).to eql turnitin_id
-  end
-end
