@@ -45,6 +45,23 @@ describe "Navigating to wiki pages" do
 
 
     end
+
+    describe "Publish Cloud" do
+      it "should set focus back to the publish cloud after unpublish" do
+        get "/courses/#{@course.id}/pages"
+        f('.publish-icon').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.publish-icon'))
+      end
+
+      it "should set focus back to the publish cloud after publish" do
+        get "/courses/#{@course.id}/pages"
+        f('.publish-icon').click # unpublish it.
+        wait_for_ajaximations
+        f('.publish-icon').click # publish it.
+        check_element_has_focus(f('.publish-icon'))
+      end
+    end
   end
 
 
