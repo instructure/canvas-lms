@@ -946,7 +946,6 @@ nb:
         outgoing_email_default_name_option_default: "Standard Canvas-innstilling"
         prevent_course_renaming_by_teachers: "Ikke la forelesere endre navn på sine kurs"
         restrict_quiz_questions: "Forhindre studentene fra å se prøvespørsmålene etter at kurset er over"
-        restrict_student_future_view: "Forhindre studenter fra å se kursene før startdatoen"
         role_id: "Legg til flere"
         self_enrollment: "Tillat selv-påmelding"
         self_registration: Egenregistrering
@@ -2208,17 +2207,12 @@ nb:
   big_blue_button_conference: 
     conference_is_recorded: "Denne konferansen tas opp."
     recording_setting: "Spiller inn"
-    recording_setting_description: "Spill inn denne konferansen"
   blackboard: 
     no_manifest: "Denne Blackboard-zipfilen har ingen imsmanifest.xml-fil i rotmappen."
   bookmark_service: 
     default_title: "Ingen tittel"
   broccoli_cloud: 
     hidden_title: "Skjult. Tilgjengelig med en lenke"
-    label: 
-      hidden: "Skjult. Tilgjengelig med en lenke"
-      published: Publisert
-      unpublished: Upublisert
     published_title: Publisert
     title: 
       permissions: "Redigere tillatelser for: %{name}"
@@ -3082,15 +3076,6 @@ nb:
       buttons: 
         close: "Avslutt nå"
         join: "Koble deg til nå"
-        restart: "Start på nytt nå"
-        start: "Start nå"
-      minute: 
-        one: "1 minutt"
-        other: "%{count} minutter"
-      status: 
-        finished: "Avsluttet %{date_and_time} (%{duration})"
-        new: "Har ikke startet enda"
-        started: "Startet %{time}"
     type_disabled_error: "Denne type konferanse er ikke lenger mulig med denne Canvas-installasjonen"
   config_url_e96ceaf3: "Konfig URL"
   configurate_tool_app_5a721f2c: "Konfigurere %{tool} App?"
@@ -4422,7 +4407,6 @@ nb:
         student_invitation_unaccepted_available: "%{name} har ikke godtatt invitasjonen til kurset. Invitasjonen ble sendt %{time}"
         student_invitation_unaccepted_unavailable: "%{name} ble lagt til i kurset %{time}"
       link_to_students_view: 
-        link_student_action: "For å lenke kursobservatøren *%{name}* med en student, velg studentens navn fra listen nedenfor."
         link_student_desc: "Når en observatør er lenket til en student vil han/hun ha tilgang til den studentens karakterer og kursinteraksjoner."
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} invitasjoner har ikke blitt godkjent"
@@ -4635,7 +4619,6 @@ nb:
         join_course: "Bli med på dette kurset"
         new_announcement: "Ny beskjed"
         view_course_stream: "Se kursstrøm"
-      period_name: "siste 2 uker"
       re_sending: "Sender på nytt..."
       send_done: "Utført! Meldingen kan ta noen minutter."
       send_failed: "Forespørselen feilet. Forsøk igjen."
@@ -4811,7 +4794,6 @@ nb:
         count: "Feil studentantall"
         ratio: "Feil studentratio"
   current_3ce5414a: "Nåværende:"
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "Nåværende Mestring Poeng: %{score} ut av %{masteryPoints}"
   current_score_6c81792: "Gjeldende resultat"
   current_total_67bf5f72: "Nåværende Totalt:"
   curve_grades_dialog: 
@@ -5419,7 +5401,6 @@ nb:
   due_on_date_aa4725cd: "Frist Dato"
   due_on_date_ffc98ebc: "Frist Dato"
   e_mail_only_2cc5e513: "Kun epost"
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Hver bar er et oppdrag. Den grønne laget representerer andelen av elever som viste i oppdraget *på tide*. Oppdrag som er **sent** er gule, og ***mangler*** oppdrag er røde."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Hver linjen er ett oppdrag. Den *tynn vertikal værhår* utvider fra den laveste poengsummen for enhver student i kurset til den høyeste poengsummen. Den **tykkere bar** strekker seg fra den 25. persentilen til den 75., med ***median merket***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Hver linjen er ett oppdrag. Den tynne værhår strekker seg fra den laveste poengsummen for enhver student i kurset til den høyeste poengsummen. Tykkere linjen strekker seg fra den 25. persentilen til den 75., med median merket. Studentens poengsum er merket med en prikk."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Hver linjen representerer antall *sidevisninger* på den dagen. En oransje søyle viser at studenten **tok noen handling** innenfor kurset på den dagen."
@@ -5509,7 +5490,6 @@ nb:
     titles: 
       font_size: "Skriftstørrelse, trykk nedover for å velge"
       formatting: "Formatering, trykk nedover for å velge"
-      rte_help: "Riktekstområde. Trykk Alt F10 for verktøylinjen. Trykk Alt F8 for hjelp."
   either_the_url_or_domain_should_be_set_c29cf8c1: "Enten URL-en eller domenet må angis."
   element_option_missing_error_an_element_to_attach__be433478: "`element` alternativ manglende feil: Et element for å feste TreeBrowserView må oppgis når du setter den gjengi muligheten til å 'true' for BBTreeBrowserView"
   email: 
@@ -6487,20 +6467,13 @@ nb:
       sort: s
       tooltip: t
     learning_outcome: Læringsmål
-    mastery: mestrer
-    near_mastery: "mestrer nesten"
     no_assignments_have_points_warning: "Kan ikke regne ut resultat før en oppgave har oppnåelige poeng"
     notes: Merknader
     outcome_gradebook: 
       export_report: "eksporter rapport"
       toggle_sidebar: "Vis/skjul sidestolpe"
-    outcome_popover: 
-      mastery_set_at: "Mestring satt ved"
-      no_results: "(ingen resultater)"
-      view_more_details: "vis flere detaljer"
     percent_of_grade: "%{percentage} av karakter"
     points_out_of: "av %{points_possible}"
-    remedial: forbedringspotensial
     resubmitted: "Levert på nytt siden siste retting"
     row_student_name: 
       student_placeholder: Student
@@ -7282,7 +7255,6 @@ nb:
       edit_group: "Rediger gruppe"
       group_atom_feed: "Atom-strøm for gruppen"
       new_announcement: "Ny beskjed"
-      next_week: "den neste uken"
     status: 
       assigning_students: "Tildeler studenter..."
       creating_groups: "Oppretter kategori..."
@@ -7396,7 +7368,6 @@ nb:
     online_url_submission: "ONline URL-innlevering"
     quiz_submission: Prøveinnlevering
     text_entry_submission: "Innlevering med fritekstsvar"
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "Hvis aktivert, må innholds designere gi informasjon om opphavsrett og lisens for filer før de publiseres"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Hvis aktivert, vil brukerne kunne konfigurere LTI 2 verktøy."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Hvis du endrer oppdragets poeng mulig må du gi karakter oppdraget på nytt."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Hvis du ikke velger bruksrettigheter nå, vil denne filen være upublisert etter at den er lastet opp."
@@ -7600,7 +7571,6 @@ nb:
       gjelder noen stil endringer, men flere K-12 spesifikke ting kan legges i fremtiden.
   labels: 
     lock_module_until: "Lås modulen inntil en gitt dato"
-  last_assessment_latesttitle_22560cf3: "Siste Vurdering: %{latestTitle}"
   last_user_access_title: "Forrige brukertilgang"
   late_percent_b91d01b3: "Sent: %{percent}"
   latest_f604a75: Senest
@@ -8601,7 +8571,6 @@ nb:
         details: "For å fullføre registreringsprosessen, vennligst se følgende url:"
         html: 
           body: "Takk for at du registrerte deg på %{product_name}! Denne eposten er en bekreftelse på at brukeren %{user} registrerer en ny konto på %{website}."
-          details: "Klikk her for å fullføre registreringsprosessen"
           subject: "Bekreft følgende registrering: %{product_name}"
         subject: "Bekreft registrering: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10005,7 +9974,6 @@ nb:
       Vi jobber med en UI ansiktsløft til lerret. Snu dette videre til for å melde seg til å se den
       oppdatert, forenklet utseendet og føles av lerretet grensesnittet. Dette er en svært "Arbeid pågår"
       funksjonen og bør ikke slås på i produksjon for faktiske brukerne ennå.
-  new_title_cb9ceb2f: "Ny Tittel"
   next_40e12421: Neste
   next_steps_ce0f0d0c: "Neste steg"
   no_assignment_name_adbb215b: "Ingen Overdragelse Navn"
@@ -10391,17 +10359,14 @@ nb:
           manage: 
             description: "*Læringsmål er opprettet her for å spore mestring i et kurs. For å komme i gang, se menylinjen øverst. Klikk på knappen Ny for å opprette et nytt læringsmål, eller Ny gruppe for å opprette en ny gruppe for å organisere dine læringsmål i. Finn-knappen vil tillate deg å bruke mål som er opprettet av departementet, fylket eller din institusjon. Ettersom du oppretter og bruker læringsmål vil du være i stand til å bruke panelet til venstre for å navigere gjennom dine læringsmål. Du kan dra og slippe mål mellom de ulike nivåer for å skape struktur.* *Enda viktigere, Canvas lar deg legge resultatene til vurderingskriteriene slik at du kan vurdere mestring etterhvert som du retter oppgaver. Når du har satt opp læringsmål, klikk Behandle kriterier for å begynne å bruke dine mål for karaktersetting.*"
             title: "Setter opp resultater"
-    mastery: Mestrer
     mastery_error: "Må være større eller lik 0"
     missing_outcome: "Kunne ikke finne læringsmålet"
-    near: "Mestrer nesten"
     new_outcome_group: "Ny resultatgruppe"
     outcome: 
       links: 
         delete_outcome: "Slett resultat"
         edit_outcome: "Rediger resultat"
       mastery_at_label: "Sett mestring for resultat på eller over:"
-      point_mastery: "Mestring ved %{mastery_points} poeng"
       points: 
         rating: "%{points} poeng"
         total: "%{points_possible} points"
@@ -10430,7 +10395,6 @@ nb:
       attempt_info: "forsøk nr. %{attempt_number}, %{attempt_date}"
       outcome_mastered: mestret
       scoring: "%{points} av %{possible_points}"
-    remedial: Forbedringspotensial
     show: 
       no_aligned_items: "Ingen justerte elementer"
       no_artifacts: "Ingen artefakter"
@@ -10443,7 +10407,6 @@ nb:
     titles: 
       find_outcomes: "Finn resultater"
     top_level: "%{context} toppnivå"
-    undefined: "Ikke påbegynt"
     user_outcome_results: 
       artifacts: 
         one: "1 artefakt"
@@ -12724,8 +12687,6 @@ nb:
     folder: Mappe
     folder_browsing_tree: "Mappen Blar gjennom treet"
     folder_name: "Mappe Navn"
-    labels: 
-      select: "Velg denne varen"
     loading_more_results: "Laster inn flere resultater..."
     modified_by: "Modifisert av"
     move: Flytt
@@ -12745,7 +12706,6 @@ nb:
     search_for_files: "Søk etter filer"
     search_results_for: "søkeresultater for \"%{search_term}\""
     select_all: "Velg alle"
-    settings: Innstillinger
     size: Størrelse
     sorted_ascending: "Sortert Stigende"
     sorted_desending: "Sortert Stigende"
@@ -13286,11 +13246,9 @@ nb:
       buttons: 
         enroll_in_course: "Meld deg på kurset"
         next: Neste
-      enter_email: "Vennligst oppgi din epostadresse:"
       existing_user: "Jeg har allerede en %{institution_name} login"
       getting_started: "Du registrerer deg i **%{course}**."
       labels: 
-        email: Epost
         name: "Fullt navn"
         password: Passord
       new_user: "Jeg er en ny bruker"
@@ -13422,15 +13380,6 @@ nb:
         download_message: "Innleveringer vil bli komprimert i en zip filen for nedlasting. Dette kan ta litt tid, avhengig av størrelsen og antall innlevering filer."
         download_message_intro: "Ditt Student innleveringer blir samlet."
         download_submissions: "Laste ned alle innleveringer"
-    conference: 
-      buttons: 
-        delete: "Slett konferanse"
-        edit: "Endre konferansedetaljer"
-      course_conference: Kurskonferanse
-      group_conference: Gruppekonferanse
-      participant: 
-        one: "1 deltager"
-        other: "%{count} deltagere"
     current_enrollment: 
       enrolled_as_designer: "Påmeldt som designer"
       enrolled_as_observer: "Påmeldt som observatør"
@@ -13857,7 +13806,6 @@ nb:
       external_url_notice: "Skriv inn en URL og et sidenavn for å legge til en lenke til et nettsted til denne *modulen*."
       file_item: Fil
       file_notice: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til en fil ved å velge \"Ny fil\"."
-      file_select_label: "Velg filen du ønsker å assosiere, eller legge til en fil ved å velge \"Ny fil\"."
       indent_level: 
         one: "*rykk inn 1 nivå*"
         other: "*rykk inn %{count} nivåer*"
@@ -13877,7 +13825,6 @@ nb:
         wiki_page_namem: Oppgavenavn
       loading: Laster...
       new_assignment_option: "[ Ny oppgave ]"
-      new_file_option: "[ Ny fil ]"
       new_page_option: "[ Ny side ]"
       new_quiz_option: "[ Ny prøve ]"
       new_tab: "Last i ny fane"
@@ -14377,7 +14324,6 @@ nb:
       two_words_connector: og
       words_connector: ", "
     help_menu: 
-      community_support_description: "Ta kontakt med din ASC først for assistanse. Hvis de ikke klarer å hjelpe, kan du kontakte oss."
       community_support_forums: "Felles brukerstøtte-forum"
       contact_support: "Kontakt brukerstøtte"
       contact_support_sub_text: "Få hjelp med saker som haster."
@@ -14496,7 +14442,6 @@ nb:
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Det er en resultat i listen"
     other: "Det er %{count} resultater i listen"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: "Det ble et problem ved å legge gradering ordningen"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Det ble et problem ved sletting av gradering periode"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Det ble et problem ved å slette gradering ordningen"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det ble et problem ved lagring av gradering ordningen"
@@ -14513,8 +14458,6 @@ nb:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Denne mappen er låst og utilgjengelig for å vise."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er en kommaseparert liste over URL's til å stole på. Tillitsfulle noen URL's i denne listen vil hoppe over CSRF token ved pålogging til Canvas"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skjedd sannsynlig mest fordi du importerte kursinnhold uten de tilknyttede filene."
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "Dette utfallet har blitt brukt til å vurdere en student. Beregningsmetoden er fast"
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "Dette utfallet har blitt brukt til å vurdere en student. Beregningen verdien er fast"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne prøven er ikke publisert* Kun forelesere kan se prøven fram til den blir publisert."
   this_student_wrote_f1a3f22d: "Denne student skrev:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette tillate deg til å autentisere Canvas for innlegging karakterer til SIS"
@@ -14533,7 +14476,7 @@ nb:
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%H:%M"
-      tiny_on_the_hour: "%H"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "under et minutt siden"
     pm: pm
     ranges: 
