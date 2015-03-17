@@ -20,6 +20,7 @@ class GradebookUploadsController < ApplicationController
   include GradebooksHelper
 
   before_filter :require_context
+
   def new
     if authorized_action(@context, @current_user, :manage_grades)
       @gradebook_upload = @context.build_gradebook_upload
