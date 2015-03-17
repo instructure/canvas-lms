@@ -980,6 +980,7 @@ class Assignment < ActiveRecord::Base
     submissions = []
     find_or_create_submissions(students) do |submission|
       submission_updated = false
+      submission.skip_grade_calc = opts[:skip_grade_calc]
       student = submission.user
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?

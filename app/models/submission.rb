@@ -20,7 +20,8 @@ class Submission < ActiveRecord::Base
   include SendToStream
   attr_protected :submitted_at
   attr_readonly :assignment_id
-  attr_accessor :visible_to_user
+  attr_accessor :visible_to_user,
+                :skip_grade_calc
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
   belongs_to :user
@@ -244,9 +245,13 @@ class Submission < ActiveRecord::Base
 
   def update_final_score
     if score_changed?
-      Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
-      connection.after_transaction_commit do
-        Enrollment.send_later_if_production_enqueue_args(:recompute_final_score, { run_at: 3.seconds.from_now }, self.user_id, self.context.id)
+      if skip_grade_calc
+        Rails.logger.info "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
+      else
+        Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
+        connection.after_transaction_commit do
+          Enrollment.send_later_if_production_enqueue_args(:recompute_final_score, { run_at: 3.seconds.from_now }, self.user_id, self.context.id)
+        end
       end
       self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
     end
@@ -1209,80 +1214,95 @@ class Submission < ActiveRecord::Base
     !self.has_submission? && !self.graded?
   end
 
-  def self.queue_bulk_update(context, section, assignment, grader, grade_data)
-    progress = Progress.create!(:context => assignment, :tag => "submissions_update")
-    progress.process_job(self, :process_bulk_update, {}, context, section, assignment, grader, grade_data)
+  def self.queue_bulk_update(context, section, grader, grade_data)
+    progress = Progress.create!(:context => context, :tag => "submissions_update")
+    progress.process_job(self, :process_bulk_update, {}, context, section, grader, grade_data)
     progress
   end
 
-  def self.process_bulk_update(progress, context, section, assignment, grader, grade_data)
+  def self.process_bulk_update(progress, context, section, grader, grade_data)
     missing_ids = []
+    graded_user_ids = Set.new
+    preloaded_assignments = Assignment.find(grade_data.keys).index_by(&:id)
 
-    scope = assignment.students_with_visibility(context.students_visible_to(grader))
-    if section
-      scope = scope.where(:enrollments => { :course_section_id => section })
-    end
 
-    preloaded_users = scope.where(:id => grade_data.map{|id, data| id})
+    grade_data.each do |assignment_id, user_grades|
+      assignment = preloaded_assignments[assignment_id.to_i]
 
-    Delayed::Batch.serial_batch(:priority => Delayed::LOW_PRIORITY) do
-      grade_data.each do |user_id, user_data|
+      scope = assignment.students_with_visibility(context.students_visible_to(grader))
+      if section
+        scope = scope.where(:enrollments => { :course_section_id => section })
+      end
 
-        user = preloaded_users.detect{|u| u.global_id == Shard.global_id_for(user_id)}
-        if !user && (params = Api.sis_find_params_for_collection(scope, [user_id], context.root_account)) && params != :not_found
-          params[:limit] = 1
-          user = scope.all(params).first
-        end
-        unless user
-          missing_ids << user_id
-          next
-        end
+      preloaded_users = scope.where(:id => user_grades.map{|id, data| id})
 
-        if grade = user_data[:posted_grade]
-          submissions = assignment.grade_student(user, { :grader => grader, :grade => grade})
-          submission = submissions.first
-        else
-          submission = assignment.find_or_create_submission(user)
-        end
+      Delayed::Batch.serial_batch(:priority => Delayed::LOW_PRIORITY) do
+        user_grades.each do |user_id, user_data|
 
-        assessment = user_data[:rubric_assessment]
-        if assessment.is_a?(Hash) && assignment.rubric_association
-          # prepend each key with "criterion_", which is required by the current
-          # RubricAssociation#assess code.
-          assessment.keys.each do |crit_name|
-            assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
+          user = preloaded_users.detect{|u| u.global_id == Shard.global_id_for(user_id)}
+          if !user && (params = Api.sis_find_params_for_collection(scope, [user_id], context.root_account)) && params != :not_found
+            params[:limit] = 1
+            user = scope.all(params).first
           end
-          assignment.rubric_association.assess(
-            :assessor => grader, :user => user, :artifact => submission,
-            :assessment => assessment.merge(:assessment_type => 'grading'))
-        end
-
-        comment = user_data.slice(:text_comment, :file_ids, :media_comment_id, :media_comment_type, :group_comment)
-        if comment.present?
-          comment = {
-              :comment => comment[:text_comment],
-              :author => grader,
-              :hidden => assignment.muted?,
-          }.merge(
-              comment
-          ).with_indifferent_access
-
-          if file_ids = user_data[:file_ids]
-            attachments = Attachment.where(id: file_ids).to_a.select{ |a|
-              a.grants_right?(grader, :attach_to_submission_comment)
-            }
-            attachments.each { |a| a.ok_for_submission_comment = true }
-            comment[:attachments] = attachments if attachments.any?
+          unless user
+            missing_ids << user_id
+            next
           end
-          assignment.update_submission(user, comment)
-        end
 
+          if grade = user_data[:posted_grade]
+            submissions = assignment.grade_student(user, :grader => grader,
+                                                   :grade => grade,
+                                                   :skip_grade_calc => true)
+            submissions.each { |s| graded_user_ids << s.user_id }
+            submission = submissions.first
+          else
+            submission = assignment.find_or_create_submission(user)
+          end
+
+          assessment = user_data[:rubric_assessment]
+          if assessment.is_a?(Hash) && assignment.rubric_association
+            # prepend each key with "criterion_", which is required by the current
+            # RubricAssociation#assess code.
+            assessment.keys.each do |crit_name|
+              assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
+            end
+            assignment.rubric_association.assess(
+              :assessor => grader, :user => user, :artifact => submission,
+              :assessment => assessment.merge(:assessment_type => 'grading'))
+          end
+
+          comment = user_data.slice(:text_comment, :file_ids, :media_comment_id, :media_comment_type, :group_comment)
+          if comment.present?
+            comment = {
+                :comment => comment[:text_comment],
+                :author => grader,
+                :hidden => assignment.muted?,
+            }.merge(
+                comment
+            ).with_indifferent_access
+
+            if file_ids = user_data[:file_ids]
+              attachments = Attachment.where(id: file_ids).to_a.select{ |a|
+                a.grants_right?(grader, :attach_to_submission_comment)
+              }
+              attachments.each { |a| a.ok_for_submission_comment = true }
+              comment[:attachments] = attachments if attachments.any?
+            end
+            assignment.update_submission(user, comment)
+          end
+
+        end
       end
     end
+
     if missing_ids.any?
       progress.message = "Couldn't find User(s) with API ids #{missing_ids.map{|id| "'#{id}'"}.join(", ")}"
       progress.save
       progress.fail
     end
+  ensure
+    user_ids = graded_user_ids.to_a
+    Rails.logger.info "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
+    context.recompute_student_scores(user_ids)
   end
 end
