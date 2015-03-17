@@ -946,7 +946,6 @@ en-GB:
         outgoing_email_default_name_option_default: "Default Canvas setting"
         prevent_course_renaming_by_teachers: "Don't let teachers rename their courses"
         restrict_quiz_questions: "Restrict students from viewing quiz questions after course end date"
-        restrict_student_future_view: "Restrict students from viewing courses before start date"
         role_id: "Add more"
         self_enrollment: "Allow self-enrolment"
         self_registration: "Self registration"
@@ -2208,17 +2207,12 @@ en-GB:
   big_blue_button_conference: 
     conference_is_recorded: "This conference is being recorded."
     recording_setting: Recording
-    recording_setting_description: "Record this conference"
   blackboard: 
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
   bookmark_service: 
     default_title: "No title"
   broccoli_cloud: 
     hidden_title: "Hidden. Available with a link"
-    label: 
-      hidden: "Hidden. Available with a link"
-      published: Published
-      unpublished: Unpublished
     published_title: Published
     title: 
       permissions: "Editing permissions for: %{name}"
@@ -3083,15 +3077,6 @@ en-GB:
       buttons: 
         close: "End it now"
         join: "Join it now"
-        restart: "Restart it now"
-        start: "Start it now"
-      minute: 
-        one: "1 minute"
-        other: "%{count} minutes"
-      status: 
-        finished: "Finished %{date_and_time} (%{duration})"
-        new: "Hasn't started yet"
-        started: "Started %{time}"
     type_disabled_error: "This type of conference is no longer enabled for this Canvas site"
   config_url_e96ceaf3: "Config URL"
   configurate_tool_app_5a721f2c: "Configurate %{tool} App?"
@@ -4423,7 +4408,6 @@ en-GB:
         student_invitation_unaccepted_available: "%{name} hasn't yet accepted the invitation to join the course. The invitation was sent: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} was added to the course: %{time}"
       link_to_students_view: 
-        link_student_action: "To link the course observer *%{name}* to a student, select the student's name from the list below."
         link_student_desc: "When an observer is linked to a student, they have access to that student's grades and course interactions."
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} invitations haven't been accepted."
@@ -4636,7 +4620,6 @@ en-GB:
         join_course: "Join this course"
         new_announcement: "New announcement"
         view_course_stream: "View Course Stream"
-      period_name: "the last two weeks"
       re_sending: Resending...
       send_done: "Done! Message may take a few minutes."
       send_failed: "Request failed. Try again."
@@ -4812,7 +4795,6 @@ en-GB:
         count: "Wrong student count"
         ratio: "Wrong student ratio"
   current_3ce5414a: "Current:"
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "Current Mastery Score: %{score} out of %{masteryPoints}"
   current_score_6c81792: "Current score"
   current_total_67bf5f72: "Current total:"
   curve_grades_dialog: 
@@ -5420,7 +5402,6 @@ en-GB:
   due_on_date_aa4725cd: "Due on date:"
   due_on_date_ffc98ebc: "Due on date"
   e_mail_only_2cc5e513: "E-Mail only"
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Each bar is an assignment. The green layer represents the percentage of students that turned in the assignment *on time*. Assignments that are **late** are yellow, and ***missing*** assignments are red."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Each bar is one assignment. The *thin vertical whisker* extends from the lowest score for any student in the course to the highest score. The **thicker bar** extends from the 25th percentile to the 75th, with the ***median marked***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Each bar is one assignment. The thin whisker extends from the lowest score for any student in the course to the highest score. The thicker bar extends from the 25th percentile to the 75th, with the median marked. The student's score is marked with a dot."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Each bar represents the number of *page views* on that day. An orange bar indicates that the student **took some action** within the course on that day."
@@ -5510,7 +5491,6 @@ en-GB:
     titles: 
       font_size: "Font size. Press down to select"
       formatting: "Formatting. Press down to select"
-      rte_help: "Rich Text Area. Press ALT F10 for toolbar. Press ALT F8 for help."
   either_the_url_or_domain_should_be_set_c29cf8c1: "Either the url or domain should be set."
   element_option_missing_error_an_element_to_attach__be433478: "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
   email: 
@@ -6488,20 +6468,13 @@ en-GB:
       sort: s
       tooltip: t
     learning_outcome: "Learning outcome"
-    mastery: mastery
-    near_mastery: "near mastery"
     no_assignments_have_points_warning: "Can't compute score until an assignment has points possible"
     notes: Notes
     outcome_gradebook: 
       export_report: "export report"
       toggle_sidebar: "Toggle Sidebar"
-    outcome_popover: 
-      mastery_set_at: "Mastery set at"
-      no_results: "(no results)"
-      view_more_details: "view more details"
     percent_of_grade: "%{percentage} of grade"
     points_out_of: "out of %{points_possible}"
-    remedial: remedial
     resubmitted: "Resubmitted since last graded"
     row_student_name: 
       student_placeholder: Student
@@ -7283,7 +7256,6 @@ en-GB:
       edit_group: "Edit group"
       group_atom_feed: "Group Atom feed"
       new_announcement: "New announcement"
-      next_week: "the next week"
     status: 
       assigning_students: "Assigning students..."
       creating_groups: "Creating category..."
@@ -7397,7 +7369,6 @@ en-GB:
     online_url_submission: "Online URL submission"
     quiz_submission: "Quiz submission"
     text_entry_submission: "Text entry submission"
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "If enabled, content designers must provide copyright and license information for files before they are published"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "If enabled, users will be able to configure LTI 2 tools."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "If you change an assignment's points possible, you must regrade the assignment."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "If you do not select usage rights now, this file will be unpublished after it's uploaded."
@@ -7601,7 +7572,6 @@ en-GB:
       applies to some style changes, but more K-12 specific things may be added in the future.
   labels: 
     lock_module_until: "Lock module until a given date"
-  last_assessment_latesttitle_22560cf3: "Last assessment: %{latestTitle}"
   last_user_access_title: "Last User Access"
   late_percent_b91d01b3: "Late: %{percent}"
   latest_f604a75: Latest
@@ -8608,7 +8578,6 @@ en-GB:
         details: "To finish the registration process, please visit the following url:"
         html: 
           body: "Thank you for registering with %{product_name}! This email is confirmation that the user %{user} is registering for a new account at %{website}."
-          details: "Click here to finish the registration process"
           subject: "Confirm registration: %{product_name}"
         subject: "Confirm registration: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10012,7 +9981,6 @@ en-GB:
       We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
       updated, simplified look and feel of the Canvas interface. This is very much a "Work in progress"
       feature and should not be turned on in production for actual users yet.
-  new_title_cb9ceb2f: "New title"
   next_40e12421: Next
   next_steps_ce0f0d0c: "Next steps"
   no_assignment_name_adbb215b: "No assignment name"
@@ -10398,17 +10366,14 @@ en-GB:
           manage: 
             description: "*Outcomes are created here to track mastery in a course. To get started, check out the menu bar along the top. Click on the New button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.* *More importantly, Canvas allows you to add outcomes to your grading rubrics so that you can evaluate mastery as you grade assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for grading.*"
             title: "Setting up outcomes"
-    mastery: Mastery
     mastery_error: "Must be greater than or equal to 0"
     missing_outcome: "Couldn't find that learning outcome"
-    near: "Near mastery"
     new_outcome_group: "New outcome group"
     outcome: 
       links: 
         delete_outcome: "Delete outcome"
         edit_outcome: "Edit outcome"
       mastery_at_label: "Set mastery for any score at or above:"
-      point_mastery: "Mastery at %{mastery_points} points"
       points: 
         rating: "%{points} Points"
         total: "%{points_possible} Points"
@@ -10437,7 +10402,6 @@ en-GB:
       attempt_info: "attempt #%{attempt_number}, %{attempt_date}"
       outcome_mastered: mastered
       scoring: "%{points} out of %{possible_points}"
-    remedial: Remedial
     show: 
       no_aligned_items: "No aligned items"
       no_artifacts: "No artefacts"
@@ -10450,7 +10414,6 @@ en-GB:
     titles: 
       find_outcomes: "Find outcomes"
     top_level: "%{context} Top Level"
-    undefined: Unstarted
     user_outcome_results: 
       artifacts: 
         one: "1 artefact"
@@ -12744,8 +12707,6 @@ en-GB:
     folder: Folder
     folder_browsing_tree: "Folder browsing tree"
     folder_name: "Folder name"
-    labels: 
-      select: "Select this item"
     loading_more_results: "Loading more results..."
     modified_by: "Modified by"
     move: Move
@@ -12765,7 +12726,6 @@ en-GB:
     search_for_files: "Search for files"
     search_results_for: "search results for \"%{search_term}\""
     select_all: "Select all"
-    settings: Settings
     size: Size
     sorted_ascending: "Sorted ascending"
     sorted_desending: "Sorted descending"
@@ -13306,11 +13266,9 @@ en-GB:
       buttons: 
         enroll_in_course: "Enroll in course"
         next: Next
-      enter_email: "Please enter your email address:"
       existing_user: "I already have a %{institution_name} login"
       getting_started: "You are enrolling in **%{course}**."
       labels: 
-        email: Email
         name: "Full name"
         password: Password
       new_user: "I am a new user"
@@ -13442,15 +13400,6 @@ en-GB:
         download_message: "The submissions will be compressed into a zip file for download. This may take some time, depending on the size and number of submission files."
         download_message_intro: "Your student submissions are being gathered."
         download_submissions: "Download all submissions"
-    conference: 
-      buttons: 
-        delete: "Delete conference"
-        edit: "Edit conference details"
-      course_conference: "Course conference"
-      group_conference: "Group conference"
-      participant: 
-        one: "1 participant"
-        other: "%{count} participants"
     current_enrollment: 
       enrolled_as_designer: "Enrolled as a designer"
       enrolled_as_observer: "Enrolled as an observer"
@@ -13879,7 +13828,6 @@ en-GB:
       external_url_notice: "Enter a URL and page name to add a link to any website URL to this *module*."
       file_item: File
       file_notice: "Select the file you want to associate with this *module*, or add a file by selecting \"New File\"."
-      file_select_label: "Select the file you want to associate, or add a file by selecting \"New File\"."
       indent_level: 
         one: "*Indent 1 Level*"
         other: "*Indent %{count} levels*"
@@ -13899,7 +13847,6 @@ en-GB:
         wiki_page_namem: "Assignment name"
       loading: Loading...
       new_assignment_option: "[ New assignment ]"
-      new_file_option: "[ New file ]"
       new_page_option: "[ New page ]"
       new_quiz_option: "[ New quiz ]"
       new_tab: "Load in a new tab"
@@ -14399,7 +14346,6 @@ en-GB:
       two_words_connector: " and "
       words_connector: ", "
     help_menu: 
-      community_support_description: "Contact your ASC first for assistance. If they are unable to help, please contact us."
       community_support_forums: "Community Support Forums"
       contact_support: "Contact support"
       contact_support_sub_text: "Get assistance with time-sensitive issues."
@@ -14518,7 +14464,6 @@ en-GB:
   there_are_count_results_in_the_list_e74f6e36: 
     one: "There is 1 result in the list"
     other: "There are %{count} results in the list"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: "There was a problem adding the grading scheme"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "There was a problem deleting the grading period"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "There was a problem deleting the grading scheme"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "There was a problem saving the grading scheme"
@@ -14535,8 +14480,6 @@ en-GB:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "This folder is currently locked and unavailable to view."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "This is a comma separated list of URLs to trust. Trusting any URLs in this list will bypass the CSRF token when logging in to Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "This most likely happened because you imported course content without its associated files."
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "This outcome has been used to assess a student. The calculation method is fixed"
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "This outcome has been used to assess a student. The calculation value is fixed"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
   this_student_wrote_f1a3f22d: "This student wrote:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting grades to SIS"
@@ -14555,7 +14498,7 @@ en-GB:
       long: " %d %B, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "less than a minute ago"
     pm: pm
     ranges: 
