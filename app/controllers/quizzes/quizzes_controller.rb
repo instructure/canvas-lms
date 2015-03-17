@@ -127,7 +127,7 @@ class Quizzes::QuizzesController < ApplicationController
         @context)
     end
 
-    log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
+    log_asset_access([ "quizzes", @context ], "quizzes", 'other')
   end
 
   def show
