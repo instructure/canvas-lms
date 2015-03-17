@@ -946,7 +946,6 @@ nl:
         outgoing_email_default_name_option_default: "Standaard Canvas-instelling"
         prevent_course_renaming_by_teachers: "Laat docenten de namen van hun cursussen niet wijzigen"
         restrict_quiz_questions: "Het bekijken van toetsvragen door cursisten na de einddatum van de cursus beperken"
-        restrict_student_future_view: "Beperk cursisten om cursussen te bekijken voor de startdatum"
         role_id: "Meer toevoegen"
         self_enrollment: "Zelfinschrijving toestaan"
         self_registration: Zelfregistratie
@@ -2201,17 +2200,12 @@ nl:
   big_blue_button_conference: 
     conference_is_recorded: "Deze vergadering wordt opgenomen."
     recording_setting: "Bezig met opnemen"
-    recording_setting_description: "Deze vergadering opnemen"
   blackboard: 
     no_manifest: "Dit Blackboard zip-bestand heeft geen imsmanifest.xml in de hoofd directory."
   bookmark_service: 
     default_title: "Geen titel"
   broccoli_cloud: 
     hidden_title: "Verborgen. Beschikbaar door koppeling "
-    label: 
-      hidden: "Verborgen. Beschikbaar door koppeling "
-      published: Gepubliceerd
-      unpublished: "Publicatie ongedaan gemaakt"
     published_title: Gepubliceerd
     title: 
       permissions: "Editing/bewerkte permissies/machtigingen voor: %{name}"
@@ -3062,15 +3056,6 @@ nl:
       buttons: 
         close: "Nu beëindigen"
         join: "Nu deelnemen"
-        restart: "Nu opnieuw starten"
-        start: "Nu starten"
-      minute: 
-        one: "1 minuut"
-        other: "%{count} minuten"
-      status: 
-        finished: "Voltooid %{date_and_time} (%{duration})"
-        new: "Nog niet gestart"
-        started: "Gestart %{time}"
     type_disabled_error: "Dit type vergadering is niet langer voor deze Canvas-site ingeschakeld"
   config_url_e96ceaf3: "URL configureren "
   configurate_tool_app_5a721f2c: "%{tool} App configureren?"
@@ -4402,7 +4387,6 @@ nl:
         student_invitation_unaccepted_available: "%{name} heeft de uitnodiging om deel te nemen aan de cursus nog niet geaccepteerd. De uitnodiging is verzonden om %{time}"
         student_invitation_unaccepted_unavailable: "%{name} is toegevoegd aan de cursus om %{time}"
       link_to_students_view: 
-        link_student_action: "Om de waarnemer van de cursus *%{name}*) aan een cursist te koppelen, dan de naam van de cursist uit de onderstaande lijst selecteren."
         link_student_desc: "Wanneer een waarnemer aan een cursist is gekoppeld, hebben ze alle twee toegang tot de cijfers en cursusinteracties van die cursist."
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} uitnodigingen zijn niet geaccepteerd."
@@ -4615,7 +4599,6 @@ nl:
         join_course: "Deze cursus volgen"
         new_announcement: "Nieuwe aankondiging"
         view_course_stream: "Gegevensstroom over de cursus bekijken"
-      period_name: "de afgelopen 2 weken"
       re_sending: "Bezig met opnieuw verzenden..."
       send_done: "Klaar! Het bericht kan een paar minuten duren."
       send_failed: "Verzoek mislukt. Probeer het opnieuw."
@@ -4792,7 +4775,6 @@ nl:
         count: "Verkeerd aantal cursisten"
         ratio: "Verkeerde cursistratio"
   current_3ce5414a: "Huidig:"
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "Huidige beheersingsscore: %{score} van %{masteryPoints}"
   current_score_6c81792: "Huidige score"
   current_total_67bf5f72: "Huidig totaal:"
   curve_grades_dialog: 
@@ -5399,7 +5381,6 @@ nl:
   due_on_date_aa4725cd: "Verschuldigd op datum:"
   due_on_date_ffc98ebc: "Verschuldigd op datum"
   e_mail_only_2cc5e513: "Alleen e-mail "
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Elke bar is een opdracht. De groene laag vertegenwoordigt het percentage cursisten dat de opdracht *op tijd* heeft ingeleverd. Opdrachten die **laat** zijn, zijn geel, en ***ontbrekende*** opdrachten zijn rood."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Elke bar is één opdracht. De *dunne verticale lijn* strekt zich uit van de laagste score voor elke student in de cursus tot de hoogste score. De **dikkere bar** strekt zich uit van het 25e percentiel tot het 75e, met de ***mediaan gemarkeerd***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Elke bar is één opdracht. De dunne verticale lijn strekt zich uit van de laagste score voor elke cursist in de cursus tot de hoogste score. De dikkere bar strekt zich uit van het 25e percentiel tot het 75e percentiel, met de mediaan gemarkeerd. De score van de cursist is met een stip gemarkeerd."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de cursist op die dag **actie heeft ondernomen** in de cursus."
@@ -5489,7 +5470,6 @@ nl:
     titles: 
       font_size: "Tekengrootte, er op drukken om een optie te selecteren"
       formatting: "Opmaak, er op drukken om een optie te selecteren"
-      rte_help: "RTF-gebied. Druk op ALT F10 for the toolbalk. Druk op ALT F8 voor hulp."
   either_the_url_or_domain_should_be_set_c29cf8c1: "Ofwel de URL of het domein dient ingesteld te worden. "
   element_option_missing_error_an_element_to_attach__be433478: "ontbrekende fout `element` optie: Een element aan de TreeBrowserView toevoegen moet bepaald worden wanneer de weergave optie voor BBTreeBrowserView op 'true' (waar) wordt gezet  "
   email: 
@@ -6465,20 +6445,13 @@ nl:
       sort: s
       tooltip: t
     learning_outcome: Leerresultaat
-    mastery: bekwaam
-    near_mastery: "bijna bekwaam"
     no_assignments_have_points_warning: "Kan geen score berekenen totdat het maximale aantal punten voor deze opdracht ingesteld is"
     notes: Opmerkingen
     outcome_gradebook: 
       export_report: "rapport exporteren"
       toggle_sidebar: "Zijbalk in-/uitschakelen"
-    outcome_popover: 
-      mastery_set_at: "Bekwaam vastgesteld op"
-      no_results: "(geen resultaten)"
-      view_more_details: "meer details bekijken"
     percent_of_grade: "%{percentage} van cijfer"
     points_out_of: "van %{points_possible}"
-    remedial: verbetering
     resubmitted: "Opnieuw ingeleverd sinds laatste beoordeling"
     row_student_name: 
       student_placeholder: Cursist
@@ -7256,7 +7229,6 @@ nl:
       edit_group: "Groep bewerken"
       group_atom_feed: "Atom-feed groep"
       new_announcement: "Nieuwe aankondiging"
-      next_week: "de volgende week"
     status: 
       assigning_students: "Bezig met cursisten toe te wijzen..."
       creating_groups: "Bezig met categorie te maken..."
@@ -7368,7 +7340,6 @@ nl:
     online_url_submission: Online-URL-inzending
     quiz_submission: Toetsinzending
     text_entry_submission: Tekstinzending
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "Indien ingeschakeld moeten ontwerpers van inhoud informatie over auteursrecht en over licentie voor de bestanden beschikbaar stellen voordat die bestanden gepubliceerd worden "
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Indien ingeschakeld, kunnen gebruikers LT1 2 tools configureren"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Als je het aantal mogelijke punten voor een opdracht verandert dan moet je de opdracht opnieuw beoordelen. "
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Als jij nu niet de gebruiksrechten kiest dan zal de publicatie van dit bestand ongedaan gemaakt worden nadat het is geüpload "
@@ -7572,7 +7543,6 @@ nl:
       enkele stijlwijzigingen in, maar meer specifieke aanpassingen voor het basis onderwijs, het lager en hoger middelbaar onderwijs kunnen in de toekomst toegevoegd worden.
   labels: 
     lock_module_until: "Module tot een bepaalde datum vergrendelen"
-  last_assessment_latesttitle_22560cf3: "Laatste opdracht: %{latestTitle}"
   last_user_access_title: "Laatste gebruikerstoegang"
   late_percent_b91d01b3: "Laat: %{percent} "
   latest_f604a75: Laatste
@@ -8578,7 +8548,6 @@ nl:
         details: "Ga naar de volgende link om het registratieproces te voltooien :"
         html: 
           body: "Bedankt voor jouw registratie op %{product_name}! We sturen deze e-mail om te bevestigen dat gebruiker %{user} zich registreert voor een nieuw account op %{website}."
-          details: "Hier klikken om het registratieproces te voltooien"
           subject: "Registratie bevestigen: %{product_name}"
         subject: "Registratie bevestigen: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9981,7 +9950,6 @@ nl:
   new_outcome_7fba8c7d: "Nieuw leerresultaat "
   new_quiz_statistics_desc: "De nieuwe pagina met statistieken van de toets voor een cursus inschakelen."
   new_styles_description: "We zijn bezig met de Canvas gebruikersinterface een facelift te geven. Dit inschakelen om de bijgewerkte, simpeler vormgeving en stijl van de Canvas gebruikersinterface te kunnen zien. Dit is een \"Work in Progress\" functie en moet nog niet ingeschakeld worden voor huidige gebruikers. "
-  new_title_cb9ceb2f: "Nieuwe titel "
   next_40e12421: Volgende
   next_steps_ce0f0d0c: "Volgende stappen "
   no_assignment_name_adbb215b: "Geen naam voor opdracht "
@@ -10362,17 +10330,14 @@ nl:
           manage: 
             description: "*Leerresultaten worden gemaakt om kennis in een cursus bij te houden. Controleer het menu aan de bovenkant om aan de slag te gaan. Op de \"Nieuw\" knop klikken om een nieuw leerresultaat te maken of op de \"Nieuwe Groep\" knop drukken om een nieuwe groep te maken om jouw leerresultaten in te delen. Door de \"Zoeken\" knop te drukken kun je leeerresultaten gebruiken die gemaakt zijn door jouw status of instelling. Met het linkerpaneel kun je door de door jou gemaakte en gebruikte leerresultaten navigeren. Je kunt leerresultaten tussen de verschillende niveaus verslepen en verplaatsen om structuur te creëren/maken.* *Belangrijker: Canvas maakt het jou mogelijk om leerresultaten toe te voegen aan te beoordelen rubrics. Zo is het mogelijk om de kennis van een cursist te evalueren als je opdrachten beoordeelt. Eens je de leerresultaten ingesteld hebt , klik dan op \"Rubrics beheren\" om jouw leerresultaten voor de beoordeling te gebruiken.*"
             title: "Leerresultaten instellen"
-    mastery: Bekwaam
     mastery_error: "Moet groter zijn dan of gelijk zijn aan 0"
     missing_outcome: "Kan dit leerresultaat niet vinden"
-    near: "Bijna bekwaam"
     new_outcome_group: "Nieuwe leerresultatengroep"
     outcome: 
       links: 
         delete_outcome: "Leerresultaat verwijderen"
         edit_outcome: "Leerresultaat bewerken"
       mastery_at_label: "Beoordelingsniveau instellen voor elke score van of hoger dan:"
-      point_mastery: "Beoordelings- %{mastery_points} punten"
       points: 
         rating: "%{points} punten"
         total: "%{points_possible} punten"
@@ -10401,7 +10366,6 @@ nl:
       attempt_info: "poging #%{attempt_number}, %{attempt_date}"
       outcome_mastered: gehaald
       scoring: "%{points} van %{possible_points}"
-    remedial: Verbetering
     show: 
       no_aligned_items: "Geen afgestemde items"
       no_artifacts: "Geen artefacten"
@@ -10414,7 +10378,6 @@ nl:
     titles: 
       find_outcomes: "Leerresultaten zoeken"
     top_level: "%{context} bovenste niveau"
-    undefined: "Nog niet begonnen"
     user_outcome_results: 
       artifacts: 
         one: "1 artefacten"
@@ -12703,8 +12666,6 @@ nl:
     folder: Map
     folder_browsing_tree: "Structuur voor bladeren door mappen"
     folder_name: Mapnaam
-    labels: 
-      select: "Dit item selecteren"
     loading_more_results: "Bezig met het laden van meer resultaten..."
     modified_by: "Gewijzigd door"
     move: Verplaatsen
@@ -12725,7 +12686,6 @@ nl:
     search_for_files: "Naar bestanden zoeken"
     search_results_for: "zoekresultaten voor \"%{search_term}\""
     select_all: "Alles selecteren"
-    settings: Instellingen
     size: Grootte
     sorted_ascending: "Oplopend gesorteerd"
     sorted_desending: "Aflopend gesorteerd"
@@ -13266,11 +13226,9 @@ nl:
       buttons: 
         enroll_in_course: "Inschrijven voor cursus"
         next: Volgende
-      enter_email: "Voer jouw e-mailadres in:"
       existing_user: "Ik heb al aanmeldinggegevens voor %{institution_name}"
       getting_started: "Je schrijft je in voor **%{course}**."
       labels: 
-        email: E-mail
         name: "Volledige naam"
         password: Wachtwoord
       new_user: "Ik ben een nieuwe gebruiker"
@@ -13399,15 +13357,6 @@ nl:
         download_message: "Om te downloaden zullen de inzendingen in een zip bestand gecomprimeerd worden. Dit kan eventjes duren, en hangt af van de grootte en het aantal ingezonden bestanden. "
         download_message_intro: "Jouw inzendingen als cursist worden verzameld."
         download_submissions: "Alle inzendingen downloaden"
-    conference: 
-      buttons: 
-        delete: "Vergadering verwijderen"
-        edit: "Details van  vergadering bewerken"
-      course_conference: "Vergadering over cursus"
-      group_conference: "Vergadering over groep"
-      participant: 
-        one: "1 deelnemer"
-        other: "%{count} deelnemers"
     current_enrollment: 
       enrolled_as_designer: "ingeschreven als ontwerper"
       enrolled_as_observer: "ingeschreven als waarnemer"
@@ -13832,7 +13781,6 @@ nl:
       external_url_notice: "Een URL en paginanaam invoeren om een koppeling van welke dan URL website aan deze *module* toe te voegen."
       file_item: Bestand
       file_notice: "Het bestand selecteren dat je  aan deze *module* wilt koppelen of een bestand toevoegen door \"Nieuw bestand\" te selecteren."
-      file_select_label: "Het bestand selecteren die je wilt koppelen, of een bestand toevoegen door \"Nieuw bestand\" te selecteren."
       indent_level: 
         one: "*1 niveau inspringen*"
         other: "*%{count} niveaus inspringen*"
@@ -13852,7 +13800,6 @@ nl:
         wiki_page_namem: "Naam van de opdracht "
       loading: "Bezig met laden..."
       new_assignment_option: "[ Nieuwe opdracht ]"
-      new_file_option: "[ Nieuw bestand ]"
       new_page_option: "[ Nieuwe pagina ]"
       new_quiz_option: "[ Nieuwe toets ]"
       new_tab: "In een nieuw tabblad laden"
@@ -14349,7 +14296,6 @@ nl:
       two_words_connector: en
       words_connector: ", "
     help_menu: 
-      community_support_description: "Neem eerst contact op met je ASC voor assistentie. Als zij niet kunnen helpen, neem dan contact op met ons."
       community_support_forums: "Community Support Forums"
       contact_support: "Contact opnemen met ondersteuning"
       contact_support_sub_text: "Hulp krijgen bij urgente zaken."
@@ -14468,7 +14414,6 @@ nl:
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Er is 1 resultaat in de lijst"
     other: "Er zijn %{count} resultaten in de lijst"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: "Er is een probleem met het toevoegen van het beoordelingsschema "
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Er was een probleem bij het verwijderen van de beoordelingsperiode"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Er is een probleem met het verwijderen van het beoordelingsschema "
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Er is een probleem met het opslaan van het beoordelingsschema "
@@ -14485,8 +14430,6 @@ nl:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Deze map is momenteel vergrendeld en kan niet bekeken worden. "
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dit is een door komma's gescheiden lijst van URL's die vertrouwd kunnen worden. Iedere vertrouwde URL in deze lijst  zal de code voor CSRF overslaan wanneer je je op Canvas aanmeldt."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dit gebeurde zeer waarschijnlijk omdat je de inhoud van de cursus zonder gekoppelde bestanden hebt geïmporteerd. "
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "Dit resultaat is gebruikt om een cursist te beoordelen. De berekeningsmethode is vastgesteld"
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "Dit resultaat is gebruikt om een cursist te beoordelen. De berekeningsmethode is vastgesteld"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Deze toets is niet gepubliceerd* Alleen docenten kunnen de toets zien totdat deze gepubliceerd wordt."
   this_student_wrote_f1a3f22d: "Deze cursist schreef: "
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dit zal het je toestaan om Canvas te verifiëren om eindcijfers in SIS te posten "
@@ -14505,7 +14448,7 @@ nl:
       long: "%d %B, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "minder dan een minuut geleden"
     pm: "s middags"
     ranges: 
