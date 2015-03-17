@@ -37,6 +37,9 @@ describe "gradebook uploads" do
     @upload_element.send_keys(fullpath)
     @upload_form.submit
     submit_form('#gradebook_grid_form')
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    run_jobs
     expect(assignment.submissions.last.grade).to eq "B-"
   end
 
@@ -93,6 +96,16 @@ describe "gradebook uploads" do
 
     expect(ff('.slick-header-column.assignment').length).to eq 1
     expect(f('#assignments_without_changes_alert')).not_to be_displayed
+
+    assignment_count = @course.assignments.count
+    submit_form('#gradebook_grid_form')
+    wait_for_ajaximations
+    run_jobs
+    expect(@course.assignments.count).to eql (assignment_count + 1)
+    assignment = @course.assignments.order(:created_at).last
+    submission = assignment.submissions.last
+    expect(submission.score).to eq 0
+
   end
 
   it "should say no changes if no changes after matching assignment" do

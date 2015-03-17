@@ -20,12 +20,13 @@ define([
   'jquery',
   'underscore',
   'str/htmlEscape',
+  'jsx/gradebook/uploads/process_gradebook_upload',
   'vendor/slickgrid',
   'vendor/slickgrid/slick.editors',
   'jquery.instructure_forms' /* errorBox */,
   'jquery.instructure_misc_helpers' /* /\.detect/ */,
   'jquery.templateData' /* fillTemplateData */
-], function(I18n, $, _, htmlEscape, Slick) {
+], function(I18n, $, _, htmlEscape, processGradebookUpload, SlickGrid) {
 
   var uploadedGradebook = ENV.uploaded_gradebook;
 
@@ -143,8 +144,12 @@ define([
         if (uploadedGradebook.unchanged_assignments) {
           $("#assignments_without_changes_alert").show();
         }
-        $("#gradebook_grid_form").submit(function(e){
-          $(this).find("input[name='json_data_to_submit']").val(JSON.stringify(uploadedGradebook));
+        var $gradebookGridForm = $("#gradebook_grid_form");
+        $gradebookGridForm.submit(function(e){
+          e.preventDefault();
+          $gradebookGridForm.disableWhileLoading(
+            processGradebookUpload(uploadedGradebook)
+          );
         }).show();
 
         $(window).resize(function(){
@@ -177,15 +182,6 @@ define([
       else {
         $("#no_changes_detected").show();
       }
-
-      // Only allow the submit button to be clicked once.
-      $('#gradebook_grid_form button[type=submit]').click(function() {
-        $(this).prop("disabled", true);
-        $(this).parents('form').submit()
-        window.setTimeout(function(that) {
-                            that.prop("disabled", false);
-                          }, 500, $(this));
-      })
     },
 
     handleThingsNeedingToBeResolved: function(){
