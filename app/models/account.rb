@@ -1533,14 +1533,6 @@ class Account < ActiveRecord::Base
     false
   end
 
-  def calendar2_only?
-    true
-  end
-
-  def enable_scheduler?
-    true
-  end
-
   def change_root_account_setting!(setting_name, new_value)
     root_account.settings[setting_name] = new_value
     root_account.save!

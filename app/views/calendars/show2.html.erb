@@ -6,7 +6,7 @@
     :SELECTED_CONTEXTS => @selected_contexts,
     :ACTIVE_EVENT => @active_event_id,
     :VIEW_START => @view_start,
-    :CAL2_ONLY => @domain_root_account.calendar2_only?,
+    :CAL2_ONLY => true,
     :SHOW_SCHEDULER => @domain_root_account.show_scheduler?
   }
   js_bundle :calendar2
