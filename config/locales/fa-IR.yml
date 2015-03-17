@@ -921,7 +921,6 @@ fa-IR:
         outgoing_email_default_name_option_default: "تنظیمات پیش فرض کانواس"
         prevent_course_renaming_by_teachers: "عدم اجازه دادن به اساتید برای تغییر نام درس های خود"
         restrict_quiz_questions: "محدود کردن دانشجویان از دیدن پرسش های آزمون بعد از تاریخ پایان درس"
-        restrict_student_future_view: "محدود کردن دانشجویان برای مشاهده درس ها قبل از تاریخ شروع"
         role_id: "افزودن موارد دیگر"
         self_enrollment: "اجازه دادن برای ثبت نام شخصی"
         self_registration: "ثبت نام شخصی"
@@ -2170,17 +2169,12 @@ fa-IR:
   big_blue_button_conference: 
     conference_is_recorded: "این کنفرانس در حال ضبط است."
     recording_setting: "در حال ضبط"
-    recording_setting_description: "ضبظ این کنفرانس"
   blackboard: 
     no_manifest: "این Blackboard .zip هیچ فایل imsmanifest.xml در دایرکتوری ریشه ندارد."
   bookmark_service: 
     default_title: "عنوان موجود نیست"
   broccoli_cloud: 
     hidden_title: "مخفی. از طریق یک پیوند قابل دسترسی است"
-    label: 
-      hidden: "مخفی. از طریق یک پیوند فایل دسترسی است"
-      published: "منتشر شده"
-      unpublished: "منتشر نشده"
     published_title: "منتشر شده"
     title: 
       permissions: "مجوزهای ویرایش برای: %{name}"
@@ -3028,15 +3022,6 @@ fa-IR:
       buttons: 
         close: "اکنون به آن پایان داده شود"
         join: "اکنون به آن بپیوندید"
-        restart: "اکنون از نو راه اندازی شود"
-        start: "اکنون راه اندازی شود"
-      minute: 
-        one: "%{count} دقیقه"
-        other: "%{count} دقیقه"
-      status: 
-        finished: "پایان یافت %{date_and_time} (%{duration})"
-        new: "هنوز شروع نشده است"
-        started: "شروع شد در %{time}"
     type_disabled_error: "این نوع کنفرانس دیگر برای این تارنمای کانواس فعال نیست"
   config_url_e96ceaf3: "نشانی اینترنتی پیکربندی"
   configuration_type_25a084a4: "نوع پیکربندی"
@@ -4353,7 +4338,6 @@ fa-IR:
         student_invitation_unaccepted_available: "%{name} هنوز دعوت برای پیوستن به درس را قبول نکرده است. دعوت نامه در %{time} فرستاده شد"
         student_invitation_unaccepted_unavailable: "%{name} به درس افزوده شد: %{time}"
       link_to_students_view: 
-        link_student_action: "برای پیوند دادن بییننده درس *%{name}* به یک دانشجو، نام دانشجو را از فهرست زیر انتخاب کنید."
         link_student_desc: "زمانی که یک بیننده به یک دانشجو پیوند داده می شود، به نمره ها و تعامل های درسی این دانشجو دسترسی دارد."
       resend_invitations: 
         pending_invitations: "دعوت نامه های %{pendingInvitationsCount} پذیرفته نشده اند."
@@ -4563,7 +4547,6 @@ fa-IR:
         join_course: "پیوستن به این درس"
         new_announcement: "اطلاعیه جدید"
         view_course_stream: "مشاهده جریان درس"
-      period_name: "2 هفته اخیر"
       re_sending: "در حال ارسال دوباره..."
       send_done: " انجام شد. ارسال پیام ممکن است چند دقیقه طول بکشد."
       send_failed: "درخواست انجام نشد. دوباره سعی کنید."
@@ -5415,7 +5398,6 @@ fa-IR:
     titles: 
       font_size: "اندازه قلم، کلید down را برای انتخاب فشار دهید"
       formatting: "در حال قالب بندی، کلید down را برای انتخاب فشار دهید"
-      rte_help: "قسمت دارای متن غنی. ALT F10 را برای نوار ابزار فشار دهید. ALT F8 را برای راهنمایی فشار دهید."
   either_the_url_or_domain_should_be_set_c29cf8c1: "نشانی اینترنتی یا دامنه باید تعیین شود."
   email: 
     default_from_name: "نرم افزار کانواس شرکت Instructure"
@@ -6377,20 +6359,13 @@ fa-IR:
       sort: s
       tooltip: t
     learning_outcome: "نتیجه یادگیری"
-    mastery: تسلط
-    near_mastery: "نزدیک به تسلط"
     no_assignments_have_points_warning: "تا زمانی که یک تکلیف نمره های ممکن نداشته باشد، نمره قابل محاسبه نیست"
     notes: "یادداشت ها"
     outcome_gradebook: 
       export_report: "گزارش صدور"
       toggle_sidebar: "تغییر نوار کناری"
-    outcome_popover: 
-      mastery_set_at: "تسلط تعیین شده در"
-      no_results: "(نتیجه موجود نیست)"
-      view_more_details: "مشاهده اطلاعات بیشتر"
     percent_of_grade: "%{percentage} از نمره"
     points_out_of: "از %{points_possible}"
-    remedial: جبرانی
     resubmitted: "از زمان آخرین نمره گذاری دوباره ارسال شد"
     row_student_name: 
       student_placeholder: دانشجو
@@ -7163,7 +7138,6 @@ fa-IR:
       edit_group: "ویرایش گروه"
       group_atom_feed: "تک خوراک خبری گروه"
       new_announcement: "اطلاعیه جدید"
-      next_week: "هفته بعدی"
     status: 
       assigning_students: "درحال تخصیص دانشجویان..."
       creating_groups: "درحال ایجاد گروه..."
@@ -7277,7 +7251,6 @@ fa-IR:
     online_url_submission: "ارسال نشانی اینترنتی آنلاین"
     quiz_submission: "ارسال آزمون"
     text_entry_submission: "ارسال ورودی متن"
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "در صورتی که فعال شود، طراح های محتوا باید قبل از اینکه فایل ها منتشر شوند، اطلاعات مجوز و حق نشر را ارائه دهند"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "اگر امتیازهای ممکن تکلیف را تغییر دهید، باید تکلیف را دوباره نمره گذاری کنید."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "اگر اکنون حقوق استفاده را انتخاب نکنید، انتشار این فایل بعد از بارگذاری لغو خواهد شد."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "اگر اینجا را ترک کنید، بارگیری فایل زیپ که اکنون در حال آماده سازی است، لغو خواهد شد."
@@ -8467,7 +8440,6 @@ fa-IR:
         details: "برای پایان دادن به فرایند ثبت نام، لطفا از نشانی اینترنتی زیر بازدید نمایید:"
         html: 
           body: "به خاطر ثبت نام در %{product_name} از شما سپاسگزاریم! این نامه الکترونیکی مؤید آن است که کاربر %{user} برای یک حساب جدید در %{website} در حال ثبت نام است."
-          details: "برای پایان دادن به فرایند ثبت نام، اینجا کلیک کنید"
           subject: "تأیید ثبت نام: %{product_name}"
         subject: "تأیید ثبت نام: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9862,7 +9834,6 @@ fa-IR:
       ظاهر و حس ساده سازی شده و بهنگام سازی شده واسط کاربر کانواس فعال کنید. این ویژگی،
       یک ویژگی
       «در حال پیشرفت» است و هنوز نباید در تولید برای کاربران واقعی فعال شود.
-  new_title_cb9ceb2f: "عنوان جدید"
   next_40e12421: بعدی
   next_steps_ce0f0d0c: "مراحل بعدی"
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
@@ -10239,17 +10210,14 @@ fa-IR:
           manage: 
             description: "*نتایج در اینجا برای پیگیری تسلط در یک درس ایجاد شده اند. برای شروع به کار، نوار منو در طول قسمت بالا را بررسی کنید. برای ایجاد یک نتیجه جدید، روی دکمه جدید کلیک کنید، یا برای ایجاد یک گروه جدید برای سازماندهی نتایج خود در آن، روی دکمه گروه جدید کلیک کنید. دکمه پیدا کردن به شما امکان می دهد از نتایجی که توسط استان یا دانشگاه شما ایجاد شده اند استفاده کنید. به محض ایجاد و استفاده از نتایج می توانید از صفحه سمت چپ برای پیمایش در نتایج خود استفاده کنید. می توانید نتایج را برای ایجاد ساختار بین سطوح مختلف بکشید و رها کنید.* *از همه مهم تر، کانواس به شما امکان می دهد نتایج را به دستورالعمل های ارزیابی نمره گذاری خود بیفزایید تا بتوانید تسلط را در هنگام نمره گذاری تکلیف ها ارزیابی کنید. هنگامی که نتایج را راه اندازی کردید، روی مدیریت دستورالعمل های ارزیابی کلیک کنید تا از نتایج خود برای نمره گذاری استفاده کنید.*"
             title: "راه اندازی نتایج"
-    mastery: تسلط
     mastery_error: "باید بزرگتر از 0 یا مساوی با آن باشد"
     missing_outcome: "این نتیجه یادگیری یافت نشد"
-    near: "نزدیک به مسلط"
     new_outcome_group: "گروه جدید نتیجه"
     outcome: 
       links: 
         delete_outcome: "حذف نتیجه"
         edit_outcome: "ویرایش نتیجه"
       mastery_at_label: "تعیین تسلط برای هر نمره از این نمره یا بالاتر:"
-      point_mastery: "تسلط در %{mastery_points} امتیاز"
       points: 
         rating: "%{points} نتیجه"
         total: "%{points_possible} امتیاز"
@@ -10278,7 +10246,6 @@ fa-IR:
       attempt_info: "تلاش #%{attempt_number}، %{attempt_date}"
       outcome_mastered: مسلط
       scoring: "%{points} از %{possible_points}"
-    remedial: جبرانی
     show: 
       no_aligned_items: "هیچ مورد تطبیق داده شده ای موجود نیست"
       no_artifacts: "هیچ اثری موجود نیست"
@@ -10291,7 +10258,6 @@ fa-IR:
     titles: 
       find_outcomes: "یافتن نتایج"
     top_level: "رده بالای %{context}"
-    undefined: "شروع نشده"
     user_outcome_results: 
       artifacts: 
         one: "%{count} اثر"
@@ -12558,8 +12524,6 @@ fa-IR:
     folder: پوشه
     folder_browsing_tree: "درخت مرور پوشه"
     folder_name: "نام پوشه"
-    labels: 
-      select: "انتخاب این مورد"
     loading_more_results: "در حال بارگذاری نتایج بیشتر..."
     modified_by: "تغییر یافته بر اساس"
     move: انتقال
@@ -12579,7 +12543,6 @@ fa-IR:
     search_for_files: "جستجوی فایل ها"
     search_results_for: "جستجوی نتایج برای \"%{search_term}\""
     select_all: "انتخاب همه"
-    settings: تنظیمات
     size: اندازه
     sorted_ascending: "به صورت صعودی مرتب سازی شد"
     sorted_desending: "به صورت نزولی مرتب سازی شد"
@@ -13112,11 +13075,9 @@ fa-IR:
       buttons: 
         enroll_in_course: "ثبت نام در درس"
         next: بعدی
-      enter_email: "لطفا نشانی پست الکترونیکی خود را وارد کنید:"
       existing_user: "اکنون به %{institution_name} وارد شده ام"
       getting_started: "در حال ثبت نام در **%{course}** هستید."
       labels: 
-        email: "پست الکترونیکی"
         name: "نام کامل"
         password: "رمز عبور"
       new_user: "یک کاربر جدید هستم"
@@ -13247,15 +13208,6 @@ fa-IR:
         download_message: "موردهای ارسالی در یک فایل zip برای بارگیری فشرده سازی خواهند شد. این کار ممکن است بسته به اندازه و تعداد فایل های ارسالی مدتی طول بکشد."
         download_message_intro: "موردهای ارسالی دانشجوی شما در حال گردآوری است."
         download_submissions: "بارگیری همه موردهای ارسالی"
-    conference: 
-      buttons: 
-        delete: "حذف کنفرانس"
-        edit: "ویرایش اطلاعات کنفرانس"
-      course_conference: "کنفرانس درس"
-      group_conference: "کنفرانس گروه"
-      participant: 
-        one: "%{count} شرکت کننده"
-        other: "%{count} شرکت کننده"
     current_enrollment: 
       enrolled_as_designer: "به عنوان طراح ثبت نام شد"
       enrolled_as_observer: "به عنوان بیننده ثبت نام شد"
@@ -13681,7 +13633,6 @@ fa-IR:
       external_url_notice: "یک نشانی اینترنتی و نام صفحه را وارد کنید تا یک پیوند به نشانی اینترنتی هر تارنمایی برای این *ماژول* افزوده شود."
       file_item: فایل
       file_notice: "فایلی که می خواهید به این *ماژول* ارتباط دهید را انتخاب کنید یا از طریق انتخاب «فایل جدید»، یک فایل اضافه کنید."
-      file_select_label: "فایلی که می خواهید با آن مرتبط شوید را انتخاب کنید، یا با انتخاب «فایل جدید»، یک فایل را بیفزایید."
       indent_level: 
         one: "*افزایش تورفتگی به میزان 1 سطح*"
         other: "*افزایش تورفتگی به میزان %{count} سطح*"
@@ -13701,7 +13652,6 @@ fa-IR:
         wiki_page_namem: "نام تکلیف"
       loading: "در حال بارگذاری..."
       new_assignment_option: "[تکلیف جدید]"
-      new_file_option: "[ فایل جدید ]"
       new_page_option: "[ صفحه جدید ]"
       new_quiz_option: "[ آزمون جدید ]"
       new_tab: "بارگذاری در یک زبانه جدید"
@@ -14299,7 +14249,6 @@ fa-IR:
   the_material_is_licensed_under_creative_commons_3242cb5e: "مطلب تحت مجوز کریتیو کامنز است"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "مطلب مشمول استثناء استفاده منصفانه است"
   the_module_item_is_locked_27fe420b: "مورد ماژول قفل شده است."
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: "در هنگام افزودن طرح نمره گذاری، اشکالی رخ داد"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "در هنگام حذف طرح نمره گذاری، اشکالی رخ داد"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "در هنگام ذخیره سازی طرح نمره گذاری، اشکالی رخ داد"
   there_was_an_error_in_processing_your_request_6513a49a: "در هنگام پردازش درخواست شما خطایی رخ داد"
