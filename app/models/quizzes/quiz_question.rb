@@ -162,7 +162,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def update_assessment_question! aq
     if assessment_question_version.blank? || assessment_question_version < aq.version_number
       self.assessment_question = aq
-      self.question_data = aq.question_data
+      self.write_attribute(:question_data, aq.question_data)
       save!
     end
 
