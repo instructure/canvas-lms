@@ -271,6 +271,14 @@ describe "assignments" do
         expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
         expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
       end
+
+      it "should revert to [ New Group Category ] if original group is deleted with no submissions" do
+        @assignment2.group_category.destroy
+        get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
+      end
     end
 
     context "frozen assignment", :priority => "2" do

@@ -125,6 +125,16 @@ describe "discussions" do
           expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
         end
 
+        it "should revert to [ New Group Category ] if original group is deleted with no submissions" do
+          topic.group_category = @gc
+          topic.save!
+          @gc.destroy
+          get url
+          wait_for_ajaximations
+
+          expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
+        end
+
         context "graded" do
           let(:topic) { assignment_topic }
           it "graded group discussions with submissions should lock and display the group name" do
