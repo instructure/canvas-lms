@@ -199,9 +199,6 @@ define([
 
       return (
         <div>
-          <div className="pull-right group-categories-actions">
-            {newGroupButton}
-          </div>
           <div id="group_categories_tabs" className="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all">
             <ul className="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
               <li className="ui-state-default ui-corner-top">
@@ -211,6 +208,9 @@ define([
                 <a href="#" tabIndex="-1">{I18n.t('Groups')}</a>
               </li>
             </ul>
+            <div className="pull-right group-categories-actions">
+              {newGroupButton}
+            </div>
             <div className="roster-tab tab-panel">
               <Filter onChange={(e) => this.setState({filter: e.target.value})} />
               <PaginatedGroupList loading={this.state.groupCollection.fetchingNextPage}

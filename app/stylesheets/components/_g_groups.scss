@@ -129,10 +129,18 @@
   }
 }
 
+.empty-groupset-instructions {
+  .group-categories-actions {
+    top: 55px;
+  }
+}
+
 .group-categories-actions {
   height: 36px;
   z-index: 1;
-  position: relative;
+  position: absolute;
+  top: 0;
+  right: 14px;
 }
 
 #group_categories_tabs {
