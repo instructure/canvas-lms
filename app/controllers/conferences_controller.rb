@@ -178,7 +178,7 @@ class ConferencesController < ApplicationController
     @new_conferences, @concluded_conferences = conferences.partition { |conference|
       conference.ended_at.nil?
     }
-    log_asset_access("conferences:#{@context.asset_string}", "conferences", "other")
+    log_asset_access([ "conferences", @context ], "conferences", "other")
     scope = @context.users
     if @context.respond_to?(:participating_typical_users)
       scope = @context.participating_typical_users

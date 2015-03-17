@@ -681,7 +681,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_course(course)
-    log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
+    log_asset_access([ "assignments", course ], "assignments", "other")
   end
 
   def requesting_main_assignments_page?
@@ -855,19 +855,43 @@ class ApplicationController < ActionController::Base
   # viewed this wiki page".  We can then after-the-fact build statistics
   # and reports from these accesses.  This is currently being used
   # to generate access reports per student per course.
+  #
+  # If asset is an AR model, then its asset_string will be used. If it's an array,
+  # it should look like [ "subtype", context ], like [ "pages", course ].
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
     user = @current_user
     user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
     return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
+
+    code = if asset.is_a?(Array)
+             "#{asset[0]}:#{asset[1].asset_string}"
+           else
+             asset.asset_string
+           end
+
+    membership_type ||= @context_membership && @context_membership.class.to_s
+
+    group_code = if asset_group.is_a?(String)
+                   asset_group
+                 elsif asset_group.respond_to?(:asset_string)
+                   asset_group.asset_string
+                 else
+                   'unknown'
+                 end
+
     @accessed_asset = {
       :user => user,
-      :code => asset.is_a?(String) ? asset : asset.asset_string,
-      :group_code => asset_group.is_a?(String) ? asset_group : (asset_group.asset_string rescue 'unknown'),
+      :code => code,
+      :group_code => group_code,
       :category => asset_category,
-      :membership_type => membership_type || (@context_membership && @context_membership.class.to_s rescue nil),
+      :membership_type => membership_type,
       :level => level
     }
+
+    Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
+
+    @accessed_asset
   end
 
   def log_page_view

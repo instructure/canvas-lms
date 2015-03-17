@@ -124,4 +124,23 @@ module Canvas::LiveEvents
       student_id: submission.global_user_id
     })
   end
+
+  def self.asset_access(asset, category, role, level)
+    asset_subtype = nil
+    if asset.is_a?(Array)
+      asset_subtype = asset[0]
+      asset_obj = asset[1]
+    else
+      asset_obj = asset
+    end
+
+    LiveEvents.post_event('asset_accessed', {
+      asset_type: asset_obj.class.reflection_type_name,
+      asset_id: asset_obj.global_id,
+      asset_subtype: asset_subtype,
+      category: category,
+      role: role,
+      level: level
+    })
+  end
 end

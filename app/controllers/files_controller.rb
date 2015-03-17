@@ -376,10 +376,13 @@ class FilesController < ApplicationController
     end
 
     return unless tab_enabled?(@context.class::TAB_FILES)
-    log_asset_access("files:#{@context.asset_string}", "files", 'other') if @context
+    log_asset_access([ "files", @context ], "files", 'other') if @context
     respond_to do |format|
       if @contexts.empty?
-        format.html { redirect_to !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
+        format.html do
+          url = !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url)
+          redirect_to url
+        end
       else
         js_env(:contexts =>
            @contexts.to_json(:permissions =>

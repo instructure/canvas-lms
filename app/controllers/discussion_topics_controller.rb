@@ -316,7 +316,7 @@ class DiscussionTopicsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        log_asset_access("topics:#{@context.asset_string}", 'topics', 'other')
+        log_asset_access([ "topics", @context ], 'topics', 'other')
 
         @active_tab = 'discussions'
         add_crumb(t('#crumbs.discussions', 'Discussions'),

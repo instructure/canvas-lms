@@ -1109,7 +1109,7 @@ class CoursesController < ApplicationController
 
   def roster
     if authorized_action(@context, @current_user, :read_roster)
-      log_asset_access("roster:#{@context.asset_string}", "roster", "other")
+      log_asset_access([ "roster", @context ], "roster", "other")
       @students = @context.participating_students.order_by_sortable_name
       @teachers = @context.instructors.order_by_sortable_name
       @groups = @context.groups.active
@@ -1460,7 +1460,7 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if @context.grants_right?(@current_user, session, :read)
-      log_asset_access("home:#{@context.asset_string}", "home", "other")
+      log_asset_access([ "home", @context ], "home", "other")
 
       check_incomplete_registration
 

@@ -28,7 +28,7 @@ class AnnouncementsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
 
-    log_asset_access("announcements:#{@context.asset_string}", "announcements", "other")
+    log_asset_access([ "announcements", @context ], "announcements", "other")
     respond_to do |format|
       format.html do
         add_crumb(t(:announcements_crumb, "Announcements"))

@@ -44,7 +44,7 @@ class GradebooksController < ApplicationController
     end
 
     if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
-      log_asset_access("grades:#{@context.asset_string}", "grades", "other")
+      log_asset_access([ "grades", @context ], "grades", "other")
       if @presenter.student
         add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
 
@@ -392,7 +392,7 @@ class GradebooksController < ApplicationController
       format.html do
         @headers = false
         @outer_frame = true
-        log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
+        log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           :CONTEXT_ACTION_SOURCE => :speed_grader,
           :settings_url => speed_grader_settings_course_gradebook_path,
