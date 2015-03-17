@@ -438,7 +438,8 @@ describe "Common Cartridge exporting" do
     end
 
     it "should export CC 1.3 assignments" do
-      @course.assignments.create! name: 'test assignment', description: '<em>what?</em>', points_possible: 11,
+      @file = Attachment.create!(:filename => 'test.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @course.assignments.create! name: 'test assignment', description: %Q{<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>}, points_possible: 11,
                                   submission_types: 'online_text_entry,online_upload,online_url'
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
@@ -453,7 +454,7 @@ describe "Common Cartridge exporting" do
 
       # validate cc1.3 assignment xml document
       assignment_xml_doc = Nokogiri::XML(@zip_file.read(assignment_xml_file))
-      expect(assignment_xml_doc.at_css('text').text).to eq '<em>what?</em>'
+      expect(assignment_xml_doc.at_css('text').text).to eq '<a href="%24IMS-CC-FILEBASE%24/unfiled/test.txt">what?</a>'
       expect(assignment_xml_doc.at_css('text').attribute('texttype').value).to eq 'text/html'
       expect(assignment_xml_doc.at_css('gradable').text).to eq 'true'
       expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11'
@@ -470,7 +471,7 @@ describe "Common Cartridge exporting" do
       expect(variant_tag.attribute('identifierref').value).to eql assignment_id
       expect(variant_tag.next_element.name).to eq 'file'
       html_file = variant_tag.next_element.attribute('href').value
-      expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "<em>what?</em>"
+      expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
     end
 
     it "should export unpublished modules and items" do
