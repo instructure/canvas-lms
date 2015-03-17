@@ -1,6 +1,7 @@
 <% content_for :page_title do %><%= join_title t(:page_title, "Gradebook"), @context.name %><% end %>
 
 <%
+  jammit_css :slickgrid
   jammit_css :gradebook_uploads
   js_bundle :gradebook_uploads
 %>
@@ -70,7 +71,13 @@
 </div>
 
 <%= form_tag({}, {:method => "put", :id => "gradebook_grid_form", :style => "display:none;"}) do %>
-  <div id="gradebook_grid"></div>
+  <div id="gradebook_uploader_container">
+    <div id="grid">
+      <div id="gradebook_grid_header"></div>
+      <div id="gradebook_grid"></div>
+    </div>
+  </div>
+
   <input type="hidden" name="json_data_to_submit" value="" />
   <div class="button-container" style="padding-left:7px;">
     <button type="submit" class="btn"><%= t('buttons.save_changes', "Save Changes") %></button>
