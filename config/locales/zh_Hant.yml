@@ -937,7 +937,6 @@ zh_Hant:
         outgoing_email_default_name_option_default: "預設 Canvas 設定"
         prevent_course_renaming_by_teachers: 請勿讓教師重新命名他們的課程
         restrict_quiz_questions: 限制學生在課程結束日期之後查看測驗問題
-        restrict_student_future_view: 限制學生在開始日期之前查看課程
         role_id: 新增更多
         self_enrollment: 允許自行註冊
         self_registration: 自行登記
@@ -2191,17 +2190,12 @@ zh_Hant:
   big_blue_button_conference: 
     conference_is_recorded: 這次會議被記錄。
     recording_setting: 記錄
-    recording_setting_description: 記錄這次會議
   blackboard: 
     no_manifest: "此 Blackboard .zip 在根目錄中沒有 imsmanifest.xml 檔案。"
   bookmark_service: 
     default_title: 無標題
   broccoli_cloud: 
     hidden_title: 已隱藏。可使用連結
-    label: 
-      hidden: 已隱藏。可使用連結
-      published: 已發佈
-      unpublished: 已取消發佈
     published_title: 已發佈
     title: 
       permissions: "編輯權限：%{name}"
@@ -3052,15 +3046,6 @@ zh_Hant:
       buttons: 
         close: 現在就編輯
         join: 現在就加入
-        restart: 現在重新開始
-        start: 現在就開始
-      minute: 
-        one: "%{count} 分鐘"
-        other: "%{count} 分鐘"
-      status: 
-        finished: "完成於 %{date_and_time}  (%{duration})"
-        new: 尚未開始
-        started: "開始於 %{time}"
     type_disabled_error: "不再為此 Canvas 網站啟用這種類型的會議"
   config_url_e96ceaf3: "配置 URL"
   configurate_tool_app_5a721f2c: "要配置 %{tool} 應用程式？"
@@ -4392,7 +4377,6 @@ zh_Hant:
         student_invitation_unaccepted_available: "%{name} 尚未接受參加課程的邀請。邀請傳送於：%{time}"
         student_invitation_unaccepted_unavailable: "%{name} 被新增至課程：%{time}"
       link_to_students_view: 
-        link_student_action: "要將該課程的觀察者 *%{name}* 連結至學生，請從以下清單中選擇學生的姓名。"
         link_student_desc: 當觀察者連結到學生時，則其就有機會存取該學生的成績和課程互動。
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} 個邀請尚未被接受。"
@@ -4605,7 +4589,6 @@ zh_Hant:
         join_course: 加入本課程
         new_announcement: 新宣告
         view_course_stream: 檢視課程流
-      period_name: "最後 2 週"
       re_sending: 正在重新傳送...
       send_done: 已完成！通知可能需要幾分鐘。
       send_failed: 請求失敗。再試一次。
@@ -4781,7 +4764,6 @@ zh_Hant:
         count: 錯誤的學生數
         ratio: 錯誤的學生比例
   current_3ce5414a: 目前：
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "目前精通分數：總分 %{masteryPoints} 中得分 %{score}   "
   current_score_6c81792: 當前分數
   current_total_67bf5f72: 目前總分：
   curve_grades_dialog: 
@@ -5386,7 +5368,6 @@ zh_Hant:
   due_on_date_aa4725cd: 截止日期
   due_on_date_ffc98ebc: 截止日期
   e_mail_only_2cc5e513: 僅電子郵件
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "每一條為一項任務。綠色層表示 *按時* 上交任務的學生的百分比。**遲交** 的任務為黃色，***未交*** 的任務為紅色。"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "每一條為一項任務。*垂直細條* 表示該課程中任一學生的最低分一直到最高分。**粗條** 表示第 25 個百分位一直到第 75 個百分位，其中標記了 ***中值分數***。"
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "每一條爲一項任務。垂直細條表示該課程中任一學生的最低分一直到最高分。粗條表示第 25 個百分位一直到第 75 個百分位，其中標記了中值分數。該學生的分數標有圓點。"
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "每一條表示該天的 *頁面檢視* 數。橙色條表示該天學生在課程內 **進行了一些操作**。"
@@ -5476,7 +5457,6 @@ zh_Hant:
     titles: 
       font_size: 字型大小，按下以選擇
       formatting: 格式化，按下以選擇
-      rte_help: "RTF 區域。按 Alt F10 以彈出工具列。按 ALT F8 以查看說明。"
   either_the_url_or_domain_should_be_set_c29cf8c1: "應該設定 URL 或網域。"
   email: 
     default_from_name: "Instructure Canvas"
@@ -6442,20 +6422,13 @@ zh_Hant:
       sort: s
       tooltip: t
     learning_outcome: 學習成果
-    mastery: 精通
-    near_mastery: 接近精通
     no_assignments_have_points_warning: 在任務有可能的點之前，無法計算分數
     notes: 注釋
     outcome_gradebook: 
       export_report: 匯出報告
       toggle_sidebar: 切換側邊欄
-    outcome_popover: 
-      mastery_set_at: 精通設定於
-      no_results: （沒有結果）
-      view_more_details: 檢視更多詳細資料
     percent_of_grade: "成績的 %{percentage}"
     points_out_of: "超出 %{points_possible}"
-    remedial: 補救動作
     resubmitted: 自上次評分重新提交
     row_student_name: 
       student_placeholder: 學生
@@ -7231,7 +7204,6 @@ zh_Hant:
       edit_group: 編輯群組
       group_atom_feed: "群組 Atom 摘要"
       new_announcement: 新宣告
-      next_week: 下一週
     status: 
       assigning_students: 正在指派學生...
       creating_groups: 正在建立類別...
@@ -7338,7 +7310,6 @@ zh_Hant:
     online_url_submission: "線上 URL 提交"
     quiz_submission: 測驗提交
     text_entry_submission: 文字輸入提交
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: 如果啟用，則內容設計師必須在文件發佈之前提供它們的版權和授權資訊
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如啟用，用戶將能夠對 LTI 2工具進行配置。"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您更改一項任務的分數，有可能您必須對該任務重新進行評分。
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 如果您現在不選擇使用權，那麼該檔案在其上傳之後將被撤銷發佈。
@@ -7540,7 +7511,6 @@ zh_Hant:
   k12_description: "發揮更多作用的功能、設定和樣式，尤其是在 K-12 環境中。目前，這僅適用於某些樣式更改，但在未來可能會新增更多的 K-12 具體事項。"
   labels: 
     lock_module_until: 鎖定模組，直到某一特定日期
-  last_assessment_latesttitle_22560cf3: 上次評估：
   last_user_access_title: 上次使用者存取
   late_percent_b91d01b3: "逾期：%{percent}"
   latest_f604a75: 最新
@@ -8518,7 +8488,6 @@ zh_Hant:
         details: "要完成註冊程序，請瀏覽以下 URL："
         html: 
           body: "感謝您使用 %{product_name} 註冊！此電子郵件是確認使用者 %{user} 在 %{website} 上註冊新帳戶。"
-          details: 按一下此處完成註冊過程
           subject: "確認註冊：%{product_name}"
         subject: "確認註冊：%{product_name}"
     confirm_sms_communication_channel: 
@@ -9910,7 +9879,6 @@ zh_Hant:
   new_outcome_7fba8c7d: 新成果
   new_quiz_statistics_desc: 為一門課程啟用新測驗統計資料頁面。
   new_styles_description: "我們正在致力於一個至 Canvas 的 UI 改建。啟用該選項來選擇查看已更新、簡化的 Canvas 介面的外觀和感覺。這是一個正好在『進行中的工作』功能，尚不應該在生產中為實際使用者開啟。"
-  new_title_cb9ceb2f: 新標題
   next_40e12421: 下一個
   next_steps_ce0f0d0c: 接下來的步驟
   no_assignment_name_adbb215b: 無任務名稱
@@ -10297,17 +10265,14 @@ zh_Hant:
           manage: 
             description: "*在此處建立成果以跟蹤對課程的掌握情況。要開始，核取頂部的功能表列。按一下「新建」按鈕建立一個新成果，或者「新群組」按鈕來創建一個新群組，以將您的成果納入。「尋找」按鈕將允許您使用您的國家或機構建立的成果。當您建立和使用成果時，您就可以使用左側的面板來流覽成果。您可以透過在不同的級別之間拖放成果建立結構。* *更重要的是，Canvas 允許您新增成果至您的評分準則，以便在您評分任務時即可評估掌握情況。一旦設定了成果，按一下「管理準則」以開始使用您的成果進行評分。*"
             title: 設定成果
-    mastery: 精通
     mastery_error: "必須大於或等於 0"
     missing_outcome: 找不到該學習成果
-    near: 接近精通
     new_outcome_group: 新成果群組
     outcome: 
       links: 
         delete_outcome: 刪除成果
         edit_outcome: 編輯成果
       mastery_at_label: 為達到或超過以下所述的任何分數設定精通：
-      point_mastery: "精通于 %{mastery_points} 點"
       points: 
         rating: "%{points} 點"
         total: "%{points_possible} 點"
@@ -10336,7 +10301,6 @@ zh_Hant:
       attempt_info: "嘗試#%{attempt_number}，%{attempt_date}"
       outcome_mastered: 精通的
       scoring: "%{points}，超出 %{possible_points}"
-    remedial: 補救動作
     show: 
       no_aligned_items: 沒有對齊的項目
       no_artifacts: 沒有項目
@@ -10349,7 +10313,6 @@ zh_Hant:
     titles: 
       find_outcomes: 尋找成果
     top_level: "%{context} 頂層"
-    undefined: 未開始
     user_outcome_results: 
       artifacts: 
         one: "%{count} 個項目"
@@ -12620,8 +12583,6 @@ zh_Hant:
     folder: 資料夾
     folder_browsing_tree: 資料夾瀏覽樹
     folder_name: 資料夾名稱
-    labels: 
-      select: 選擇此項目
     loading_more_results: 正在載入更多結果...
     modified_by: 修改人
     move: 移動
@@ -12641,7 +12602,6 @@ zh_Hant:
     search_for_files: 搜尋檔案
     search_results_for: "「%{search_term}」的搜尋結果"
     select_all: 全選
-    settings: 設定
     size: 大小
     sorted_ascending: 升序排列
     sorted_desending: 降序排列
@@ -13182,11 +13142,9 @@ zh_Hant:
       buttons: 
         enroll_in_course: 報讀課程
         next: 下一個
-      enter_email: 請輸入您的電子郵件地址：
       existing_user: "我已經有一個 %{institution_name} 登入"
       getting_started: "您正在報讀**%{course}**。"
       labels: 
-        email: 電子郵件
         name: 全名
         password: 密碼
       new_user: 我是一個新使用者
@@ -13314,15 +13272,6 @@ zh_Hant:
         download_message: 提交件將被壓縮為壓縮檔案，以供下載。這可能需要一些時間，取決於提交檔案的大小和數目。
         download_message_intro: 正在收集您學生的提交件。
         download_submissions: 下載所有提交件
-    conference: 
-      buttons: 
-        delete: 刪除會議
-        edit: 編輯會議詳細資料
-      course_conference: 課程會議
-      group_conference: 群組會議
-      participant: 
-        one: "%{count} 個參與者"
-        other: "%{count} 個參與者"
     current_enrollment: 
       enrolled_as_designer: 註冊為設計師
       enrolled_as_observer: 註冊為觀察者
@@ -13749,7 +13698,6 @@ zh_Hant:
       external_url_notice: "輸入一個 URL 和頁面名稱，以新增一個至此*模組*的任何網站 URL 的連結。"
       file_item: 檔案
       file_notice: 選擇您想要關聯至此*模組*的檔案，或者透過選擇『新檔案』新增檔案。
-      file_select_label: 選擇您要關聯的檔案，或選擇『新檔案』新增檔案。
       indent_level: 
         one: "*縮排 1 級*"
         other: "*縮排 %{count} 級*"
@@ -13769,7 +13717,6 @@ zh_Hant:
         wiki_page_namem: 任務名稱
       loading: 正在載入…
       new_assignment_option: "[新任務]"
-      new_file_option: "[新檔案]"
       new_page_option: "[新頁面]"
       new_quiz_option: "[新測驗]"
       new_tab: 載入新標籤
@@ -14263,7 +14210,6 @@ zh_Hant:
       two_words_connector: 以及
       words_connector: ，
     help_menu: 
-      community_support_description: "請先聯系您的 ASC 獲得幫助。如果他們無法提供幫助，請聯系我們。"
       community_support_forums: 社區支援論壇
       contact_support: 連絡支援
       contact_support_sub_text: 獲取有關時間敏感問題的援助。
@@ -14382,7 +14328,6 @@ zh_Hant:
   there_are_count_results_in_the_list_e74f6e36: 
     one: "列表中有 %{count} 個結果"
     other: "列表中有 %{count} 個結果"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: 在添加評分配置時發生了一個問題
   there_was_a_problem_deleting_the_grading_period_50ce07c5: 刪除評分時段時遇到問題
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: 在刪除評分配置時發生了一個問題
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 在儲存評分配置時發生了一個問題
@@ -14399,8 +14344,6 @@ zh_Hant:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此資料夾目前已鎖定，無法檢視。
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "這是一個可信任的 URL 的清單，以逗號分開。信任此清單中的任何 URL 將讓您在登入 Canvas  時略過 CSRF 權杖。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: 這很有可能發生，因為您匯入的課程內容未包含任何相關檔案。
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: 此成果已用於評估學生。計算方法是固定的
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: 此成果以用於評估學生。計算值是固定的
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*此測驗未發佈*在此測驗發佈之前，只有教師可以看到。"
   this_student_wrote_f1a3f22d: 這位學生寫到：
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "這將讓您對 Canvas 進行驗證，以便將分數發佈到 SIS上"
@@ -14419,7 +14362,7 @@ zh_Hant:
       long: "%Y %B %d %H:%M"
       short: "%b %d %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: 不到一分鐘以前
     pm: " 下午"
     ranges: 
