@@ -959,7 +959,6 @@ ar:
         outgoing_email_default_name_option_default: "إعداد Canvas الافتراضي\n"
         prevent_course_renaming_by_teachers: "عدم السماح للمعلمين بإعادة تسمية المساقات الخاصة بهم"
         restrict_quiz_questions: "تقييد الطلاب من عرض أسئلة الاختبار بعد تاريخ انتهاء المساق"
-        restrict_student_future_view: "تقييد الطلاب من عرض المساقات قبل تاريخ البدء"
         role_id: "إضافة المزيد"
         self_enrollment: "السماح بالتسجيل الذاتي"
         self_registration: "التسجيل الذاتي"
@@ -2277,17 +2276,12 @@ ar:
   big_blue_button_conference: 
     conference_is_recorded: "يتم تسجيل هذا المؤتمر."
     recording_setting: تسجيل
-    recording_setting_description: "تسجيل هذا المؤتمر"
   blackboard: 
     no_manifest: "لا يوجد أي ملف imsmanifest.xml في imsmanifest.xml في الدليل الجذر."
   bookmark_service: 
     default_title: "بلا عنوان"
   broccoli_cloud: 
     hidden_title: "تم الإخفاء. متوفر مع ارتباط"
-    label: 
-      hidden: "تم الإخفاء. متوفر مع ارتباط"
-      published: منشور
-      unpublished: "غير منشور"
     published_title: منشور
     title: 
       permissions: "أذونات التحرير لصالح: %{name}"
@@ -3158,19 +3152,6 @@ ar:
       buttons: 
         close: "إنهاؤه الآن"
         join: "الانضمام إليه الآن"
-        restart: "إعادة تشغيله الآن"
-        start: "تشغيله الآن"
-      minute: 
-        few: "%{count} دقائق"
-        many: "%{count} دقائق"
-        one: "دقيقة واحدة"
-        other: "%{count} دقائق"
-        two: "%{count} دقائق"
-        zero: "%{count} دقائق"
-      status: 
-        finished: "انتهى %{date_and_time} (%{duration})"
-        new: "لم يبدأ بعد"
-        started: "بدأ %{time}"
     type_disabled_error: "لم يعد هذا النوع من المؤتمرات ممكّنًا لموقع Canvas هذا"
   config_url_e96ceaf3: "تكوين URL"
   configurate_tool_app_5a721f2c: "تكوين تطبيق %{tool}؟"
@@ -4554,7 +4535,6 @@ ar:
         student_invitation_unaccepted_available: "لم يقم %{name} بعد بقبول الدعوة للانضمام إلى المساق. تم إرسال الدعوة: %{time}"
         student_invitation_unaccepted_unavailable: "تمت إضافة %{name} إلى المساق %{time}"
       link_to_students_view: 
-        link_student_action: "لربط مراقب المساق *%{name}* بطالب، حدد اسم الطالب من القائمة أدناه."
         link_student_desc: "عندما يتم ربط مراقب بطالب، فإنه يستطيع الوصول إلى درجات الطالب وتفاعلات المساق."
       resend_invitations: 
         pending_invitations: "لم يتم قبول دعوات %{pendingInvitationsCount}."
@@ -4771,7 +4751,6 @@ ar:
         join_course: "الانضمام لهذا المساق"
         new_announcement: "إعلان جديد"
         view_course_stream: "عرض تدفق المساق"
-      period_name: "الأسبوعان الأخيران"
       re_sending: "جارٍ إعادة الإرسال..."
       send_done: "تم! قد تستغرق الرسالة بضع دقائق."
       send_failed: "فشل الطلب. حاول مرة أخرى."
@@ -4951,7 +4930,6 @@ ar:
         count: "عدد الطلاب خاطئ"
         ratio: "نسبة الطلاب خاطئة"
   current_3ce5414a: الحالي
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "درجة الإتقان الحالية: %{score} من %{masteryPoints}"
   current_score_6c81792: "الدرجة الحالية"
   current_total_67bf5f72: "الإجمالي الحالي:"
   curve_grades_dialog: 
@@ -5659,7 +5637,6 @@ ar:
   due_on_date_aa4725cd: "تاريخ الاستحقاق:"
   due_on_date_ffc98ebc: "تاريخ الاستحقاق"
   e_mail_only_2cc5e513: "البريد الإلكتروني فقط"
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "يمثل كل شريط مهمة واحدة. وتمثل الطبقة الخضراء النسبة المئوية للطلاب الذين سلموا المهمة *في الموعد المحدد*. بينما المهام **المتأخرة** باللون الأصفر والمهام ***المفقودة*** باللون الأحمر."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "يمثل كل شريط مهمة واحدة. تمتد *الخطوط العمودية الرفيعة* من أقل درجة لأي طالب في المساق إلى أعلى درجة. بينما يمتد **الشريط الأكثر سمكًا** من القيمة المئوية 25 إلى 75، مع تمييز ***المتوسط***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "يمثل كل شريط مهمة واحدة. يمتد الخط العمودي الرفيع من أقل درجة لأي طالب في المساق إلى أعلى درجة. بينما يمتد الشريط الأكثر سمكًا من القيمة المئوية 25 إلى 75، مع تمييز المتوسط. يتم تمييز درجة الطالب بنقطة."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "يمثل كل شريط عدد *مشاهدات الصفحة* في ذلك اليوم. يشير الشريط البرتقالي إلى أن الطالب **اتخذ إجراءً ما** داخل المساق في ذلك اليوم."
@@ -5757,7 +5734,6 @@ ar:
     titles: 
       font_size: "حجم الخط، اضغط لأسفل للتحديد"
       formatting: "التنسيق، اضغط لأسفل للتحديد"
-      rte_help: "منطقة نص منسق. اضغط على مفتاحي ALT وF10 لإظهار شريط الأدوات. واضغط ALT وF8 لإظهار التعليمات."
   either_the_url_or_domain_should_be_set_c29cf8c1: "يجب تعيين إما url أو المجال."
   element_option_missing_error_an_element_to_attach__be433478: " خطأ عدم تحديد خيار `العنصر`: يجب تحديد العنصر الذي تريد إقرانه بطريقة العرض TreeBrowserView عند ضبط خيار العرض على \"true\" لطريقة العرض BBTreeBrowserView"
   email: 
@@ -6757,20 +6733,13 @@ ar:
       sort: s
       tooltip: t
     learning_outcome: "ناتج التعلم"
-    mastery: إتقان
-    near_mastery: "قريب من الإتقان"
     no_assignments_have_points_warning: "لا يمكن حساب مجموع الدرجات إلا أن تكون للمهمة نقاط ممكنة"
     notes: ملاحظات
     outcome_gradebook: 
       export_report: "تصدير التقرير"
       toggle_sidebar: "تبديل الشريط الجانبي"
-    outcome_popover: 
-      mastery_set_at: "الإتقان عند"
-      no_results: "(بلا نتائج)"
-      view_more_details: "عرض مزيد من التفاصيل"
     percent_of_grade: " %{percentage} من الدرجة"
     points_out_of: "من %{points_possible}"
-    remedial: "بحاجة إلى تحسين"
     resubmitted: "تمت إعادة إرساله منذ آخر تصحيح"
     row_student_name: 
       student_placeholder: الطالب
@@ -7583,7 +7552,6 @@ ar:
       edit_group: "تحرير المجموعة"
       group_atom_feed: "موجز Atom للمجموعة"
       new_announcement: "إعلان جديد"
-      next_week: "الأسبوع التالي"
     status: 
       assigning_students: "جارٍ تعيين الطلاب..."
       creating_groups: "جارٍ إنشاء الفئة..."
@@ -7716,7 +7684,6 @@ ar:
     online_url_submission: "إرسال عنوان URL عبر الإنترنت"
     quiz_submission: "إرسال الاختبار"
     text_entry_submission: "إرسال إدخال النص"
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "عند التمكين، يتعين على مصممي المحتوى توفير المعلومات الخاصة بحقوق النشر والتراخيص للملفات قبل نشرها"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "في حالة التمكين، سيستطيع المستخدمون تكوين أدوات LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "عند تغيير النقاط الممكنة للمهمة، يتعين عليك إعادة تقييم المهمة."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "إن لم تحدد الآن حقوق الاستخدام، لن يتم نشر هذا الملف بعد تحميله."
@@ -7920,7 +7887,6 @@ ar:
       بعض تغييرات الأنماط فقط، ولكن ستتم إضافة المزيد من الميزات الخاصة بالتعليم الأساسي والثانوي في المستقبل.
   labels: 
     lock_module_until: "تأمين الوحدة حتى تاريخ محدد"
-  last_assessment_latesttitle_22560cf3: "آخر تقييم: %{latestTitle}"
   last_user_access_title: "أخر وصول للمستخدم"
   late_percent_b91d01b3: "متأخر: %{percent}"
   latest_f604a75: الأدنى
@@ -8992,7 +8958,6 @@ ar:
         details: "لإنهاء عملية التسجيل هذه، تفضل بزيارة عنوان url التالي:"
         html: 
           body: "شكرًا لك على التسجيل في %{product_name}! هذا البريد الإلكتروني مرسل لتأكيد تسجيل المستخدم %{user} حسابًا جديدًا على %{website}."
-          details: "انقر هنا لإنهاء عملية التسجيل"
           subject: "تأكيد التسجيل: %{product_name}"
         subject: "تأكيد التسجيل: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10402,7 +10367,6 @@ ar:
       نطور شكلاً معدلاً من واجهة مستخدم Canvas. قم بتشغيل هذا لاختيار مشاهدة
        شكل وأداء واجهة Canvas المحدثة والمبسطة. وهذه ميزة خاصة "بالعمل قيد التقدم" 
       ويجب تشغيلها في بيئة الإنتاج للمستخدمين الفعليين.
-  new_title_cb9ceb2f: "عنوان جديد"
   next_40e12421: التالي
   next_steps_ce0f0d0c: "الخطوات التالية"
   no_assignment_name_adbb215b: "لا يوجد اسم مهة"
@@ -10803,17 +10767,14 @@ ar:
           manage: 
             description: "*يتم إنشاء النتائج هنا لتتبع درجة الإتقان في الدورة التدريبية. للبدء، افحص شريط القائمة على طول الجزء العلوي. انقر على الزر \"جديد\" لإنشاء نتيجة جديدة، أو على الزر \"مجموعة جديدة\" لإنشاء مجموعة جديدة لتنظيم النتائج الخاصة بك. سيتيح لك الزر \"عثور\" استخدام النتائج التي تم إنشاؤها من قبل الولاية أو المؤسسة. ولأنه يمكنك إنشاء واستخدام النتائج، ستتمكن من استخدام اللوحة على اليسار للتنقل خلال النتائج الخاصة بك. يمكنك سحب النتائج وإسقاطها بين المستويات المختلفة لإنشاء بنية.* *الأهم من ذلك، تتيح Canvas إضافة نتائج لعناوين التصنيف بحيث يمكنك تقييم درجة الإتقان كما كنت تقوم بتصنيف المهام. بمجرد إعداد النتائج، انقر فوق \"إدارة العناوين\" لبدء استخدام النتائج للتصنيف.*"
             title: "إعداد النتائج"
-    mastery: إتقان
     mastery_error: "يجب أن تكون أكبر من أو تساوي 0"
     missing_outcome: "تعذر العثور على ناتج التعلم ذلك"
-    near: "قريب من الإتقان"
     new_outcome_group: "مجموعة نتيجة جديدة"
     outcome: 
       links: 
         delete_outcome: "حذف نتيجة"
         edit_outcome: "تعديل نتيجة"
       mastery_at_label: "تعيين درجة إتقان لأي درجات:"
-      point_mastery: "درجة الإتقان وفقًا للنسبة المئوية %{mastery_points} بالنقاط"
       points: 
         rating: "%{points} نقاط"
         total: "%{points_possible} من النقاط"
@@ -10842,7 +10803,6 @@ ar:
       attempt_info: "رقم المحاولة %{attempt_number}, %{attempt_date}"
       outcome_mastered: "تم إتقان"
       scoring: "%{points} من  %{possible_points}"
-    remedial: "بجاجة إلى تحسين"
     show: 
       no_aligned_items: "لا توجد عناصر تمت محاذاتها"
       no_artifacts: "لا توجد أدوات"
@@ -10855,7 +10815,6 @@ ar:
     titles: 
       find_outcomes: "العثور على نتائج"
     top_level: "%{context} مستوى أعلى"
-    undefined: "لم تبدأ"
     user_outcome_results: 
       artifacts: 
         few: "%{count} من الأدوات"
@@ -13303,8 +13262,6 @@ ar:
     folder: المجلد
     folder_browsing_tree: "شجرة استعراض المجلدات"
     folder_name: "اسم المجلد"
-    labels: 
-      select: "تحديد هذا العنصر"
     loading_more_results: "جارٍ تحميل المزيد من النتائج..."
     modified_by: "تم التعديل بواسطة"
     move: نقل
@@ -13332,7 +13289,6 @@ ar:
     search_for_files: "البحث عن الملفات"
     search_results_for: "نتائج البحث عن \"%{search_term}\""
     select_all: "تحديد الكل"
-    settings: الإعدادات
     size: الحجم
     sorted_ascending: "تم الفرز تصاعديًا"
     sorted_desending: "تم الفرز تنازليًا"
@@ -13905,11 +13861,9 @@ ar:
       buttons: 
         enroll_in_course: "تسجيل في المساق"
         next: التالي
-      enter_email: "الرجاء إدخال عنوان البريد الإلكتروني:"
       existing_user: "لدي بالفعل معرّف تسجيل الدخول لـ %{institution_name}"
       getting_started: "أنت تقوم الآن بالتسجيل في **%{course}**."
       labels: 
-        email: "البريد الإلكتروني"
         name: "الاسم الكامل"
         password: "كلمة المرور"
       new_user: "مستخدم جديد"
@@ -14041,19 +13995,6 @@ ar:
         download_message: "سيتم ضغط المساقات في ملف zip لتنزيلها. قد يستغرق ذلك بعض الوقت، تبعًا لحجم ملفات عمليات الإرسال وعددها."
         download_message_intro: "يتم الآن تجميع عمليات الإرسال الخاصة بالطالب."
         download_submissions: "تنزيل كل عمليات الإرسال"
-    conference: 
-      buttons: 
-        delete: "حذف المؤتمر"
-        edit: "تحرير تفاصيل المؤتمر"
-      course_conference: "مؤتمر المساق"
-      group_conference: "مؤتمر المجموعة"
-      participant: 
-        few: "%{count} من المشاركين"
-        many: "%{count} من المشاركين"
-        one: "مشارك واحد"
-        other: "%{count} من المشاركين"
-        two: "%{count} من المشاركين"
-        zero: "%{count} من المشاركين"
     current_enrollment: 
       enrolled_as_designer: "تم التسجيل كمصمم"
       enrolled_as_observer: "تم التسجيل كمراقب"
@@ -14494,7 +14435,6 @@ ar:
       external_url_notice: "أدخل عنوان URL واسم صفحة لإضافة ارتباط يؤدي إلى عنوان URL لموقع الويب إلى هذه *الوحدة*."
       file_item: ملف
       file_notice: "حدد الملف الذي تريد إقرانه بهذه *الوحدة*، أو أضف ملفًا عن طريق تحديد \"ملف جديد\"."
-      file_select_label: "حدد الملف الذي تريد إقرانه، أو أضف ملفًا باختيار \"ملف جديد\"."
       indent_level: 
         one: "*مسافة بادئة لمستوى واحد*"
         other: "*تعيين مسافة بادئة لعدد %{count} من المستويات*"
@@ -14514,7 +14454,6 @@ ar:
         wiki_page_namem: "اسم المهمة"
       loading: "جارٍ التحميل..."
       new_assignment_option: "[ تعيين جديد ]"
-      new_file_option: "[ ملف جديد ]"
       new_page_option: "[صفحة جديدة]"
       new_quiz_option: "[ الاختبار الجديد ]"
       new_tab: "تحميل في علامة تبويب جديدة"
@@ -15034,7 +14973,6 @@ ar:
       two_words_connector: " و "
       words_connector: ", "
     help_menu: 
-      community_support_description: "اتصل بـ ASC أولاً للحصول على المساعدة. إذا لم يتمكنوا من مساعدتك، فالرجاء الاتصال بنا."
       community_support_forums: "منتديات دعم المجتمع"
       contact_support: "دعم الاتصال"
       contact_support_sub_text: "الحصول على مساعدة للمشكلات حسب الوقت."
@@ -15165,7 +15103,6 @@ ar:
     other: "توجد %{count} من النتائج في القائمة"
     two: "توجد %{count} من النتائج في القائمة"
     zero: "توجد %{count} من النتائج في القائمة"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: "كانت هناك مشكلة في إضافة نظام التقييم"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "حدثت مشكلة أثناء حذف فترة تقييم الدرجات"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "كانت هناك مشكلة في حذف نظام التقييم"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "كانت هناك مشكلة في حفظ نظام التقييم"
@@ -15182,8 +15119,6 @@ ar:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "هذا المجلد مؤمن حاليًا وغير متاح للعرض."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "هذه قائمة تضم عناوين URL المفصولة بفاصلة للوثوق بها. تؤدي الثقة بأي عنوان URL في هذه القائمة إلى تخطي رمز CSRF المميز عند تسجيل الدخول إلى Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "السبب الأرجح في حدوث ذلك هو أنك قمت باستيراد محتوى المساق دون الملفات المرتبطة به."
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "تم استخدام هذه النتيجة لتقييم أحد الطلاب. طريقة الحساب ثابتة"
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "تم استخدام هذه النتيجة لتقييم أحد الطلاب. قيمة الحساب ثابتة"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*هذا الاختبار غير منشور* يمكن للمعلمين فقط مشاهدة هذا الاختبار حتى يتم نشره."
   this_student_wrote_f1a3f22d: "كتب هذا الطالب:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "يتيح لك ذلك مصادقة Canvas لنشر الدرجات في SIS"
@@ -15210,7 +15145,7 @@ ar:
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "منذ أقل من دقيقة"
     pm: مساءً
     ranges: 
