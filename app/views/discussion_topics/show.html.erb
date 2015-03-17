@@ -41,9 +41,9 @@
          <h1 class="discussion-title"><%= @topic.title %></h1>
          <div class="discussion-fyi">
            <% if @topic.is_a?(Announcement) %>
-             <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
+             <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: datetime_string(@unlock_at)) %>
            <% else %>
-             <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:topic_time_locked, "This topic is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
+             <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:topic_time_locked, "This topic is locked until %{time}", time: datetime_string(@unlock_at)) %>
            <% end %>
          </div>
         </div>
