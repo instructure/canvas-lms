@@ -1,4 +1,4 @@
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1285,6 +1285,13 @@ describe Course, "update_account_associations" do
     c = account1.courses.create!
     c.course_account_associations.scoped.delete_all
     expect(c.associated_accounts).to eq [account1, Account.default]
+  end
+
+  it "should be reentrant" do
+    Course.skip_updating_account_associations do
+      Course.skip_updating_account_associations {}
+      expect(Course.skip_updating_account_associations?).to be_truthy
+    end
   end
 end
 
