@@ -8,27 +8,33 @@
   </select>
 
   <div class="date_field_container">
-    <span class="screenreader-only" id="overrides_due_date_accessible_label_{{uniqid}}">
-      {{#t "overrides.due_date"}}Due Date{{/t}}
-    </span>
+    <label class="screenreader-only" id="overrides_due_date_accessible_label_{{uniqid}}">
+      {{#t}}Due Date:{{/t}}
+      {{datepickerScreenreaderPrompt}}
+    </label>
     <input value="{{datetimeFormatted due_at false}}" name="due_at" type="text"
-    class="input-small date_field" aria-labelledby="overrides_due_date_accessible_label_{{uniqid}}">
+    class="input-small date_field" aria-labelledby="overrides_due_date_accessible_label_{{uniqid}}"
+    data-tooltip title="{{accessibleDateFormat}}">
   </div>
 
   <div class="date_field_container">
-    <span class="screenreader-only" id="overrides_unlock_at_accessible_label_{{uniqid}}">
-      {{#t}}Available From Date{{/t}}
-    </span>
+    <label class="screenreader-only" id="overrides_unlock_at_accessible_label_{{uniqid}}">
+      {{#t}}Available From Date:{{/t}}
+      {{datepickerScreenreaderPrompt}}
+    </label>
     <input name="unlock_at" value="{{datetimeFormatted unlock_at false}}" type="text"
-    class="date_field" aria-labelledby="overrides_unlock_at_accessible_label_{{uniqid}}">
+    class="date_field" aria-labelledby="overrides_unlock_at_accessible_label_{{uniqid}}"
+    data-tooltip title="{{accessibleDateFormat}}">
   </div>
 
   <div class="date_field_container to">
     <span class="screenreader-only" id="overrides_lock_at_accessible_label_{{uniqid}}">
-      {{#t}}Available Until Date{{/t}}
+      {{#t}}Available Until Date:{{/t}}
+      {{datepickerScreenreaderPrompt}}
     </span>
     <input name="lock_at" value="{{datetimeFormatted lock_at false}}" type="text"
-    class="date_field" aria-labelledby="overrides_lock_at_accessible_label_{{uniqid}}">
+    class="date_field" aria-labelledby="overrides_lock_at_accessible_label_{{uniqid}}"
+    data-tooltip title="{{accessibleDateFormat}}">
   </div>
 
   <div>

@@ -223,3 +223,12 @@ define [
       }
       helpers.ifSettingIs('key', 'value', funcs)
       equal semaphore, true
+
+   module 'accessible date pickers',
+     test 'it provides a format', ->
+       equal(typeof(helpers.accessibleDateFormat()), "string")
+
+     test 'it provides a common format prompt wrapped around the format', ->
+       formatPrompt = helpers.datepickerScreenreaderPrompt()
+       ok(formatPrompt.toString().indexOf(helpers.accessibleDateFormat()) > -1)
+

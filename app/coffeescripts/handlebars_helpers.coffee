@@ -145,6 +145,29 @@ define [
     strftime : (date = '', fmtstr) ->
       I18n.strftime date, fmtstr
 
+    ##
+    # outputs the format preferred for date inputs to prompt KB and SR
+    # users with for interacting with datepickers
+    #
+    # @public
+    #
+    # @returns {String} the format to include for all datepickers
+    accessibleDateFormat: ()->
+      I18n.t "#helpers.accessible_date_format", "YYYY-MM-DD hh:mm"
+
+    ##
+    # outputs the prompt to include in labels attached to date pickers for
+    # screenreader consumption
+    #
+    # @public
+    #
+    # @returns {String} the prompt for telling SRs about how to
+    #   input a date
+    datepickerScreenreaderPrompt: ()->
+      promptText = I18n.t "#helpers.accessible_date_prompt", "Format Like"
+      format = Handlebars.helpers.accessibleDateFormat()
+      "#{promptText} #{format}"
+
     mimeClass: mimeClass
 
     # use this method to process any user content fields returned in api responses
