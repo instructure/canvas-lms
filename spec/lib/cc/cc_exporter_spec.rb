@@ -419,7 +419,8 @@ describe "Common Cartridge exporting" do
     it "should export media tracks" do
       stub_kaltura
       CanvasKaltura::ClientV3.any_instance.stubs(:startSession)
-      CanvasKaltura::ClientV3.any_instance.stubs(:flavorAssetGetPlaylistUrl).returns(Tempfile.new('blah.flv'))
+      CanvasKaltura::ClientV3.any_instance.stubs(:flavorAssetGetPlaylistUrl).returns('http://www.example.com/blah.flv')
+      stub_request(:get, 'http://www.example.com/blah.flv').to_return(body: Tempfile.new('blah.flv'), status: 200)
       CC::CCHelper.stubs(:media_object_info).returns({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
