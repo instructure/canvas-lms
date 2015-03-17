@@ -144,10 +144,13 @@ var speakMessage = function ($this, message) {
   $.timeString = function(date, options) {
     if (date == null) return "";
     var timezone = options && options.timezone;
+    // lookup format according to locale, and then turn %l or %k into %-l or
+    // %-k, respectively, to avoid extra unnecessary space characters
+    var fmt = I18n.t("#time.formats.tiny").replace(/^%([kl])/, "%-$1");
     if (typeof timezone == 'string' || timezone instanceof String) {
-      return tz.format(date, '%-l:%M%P', timezone) || '';
+      return tz.format(date, fmt, timezone) || '';
     } else {
-      return tz.format(date, '%-l:%M%P') || '';
+      return tz.format(date, fmt) || '';
     }
   };
   $.datetimeString = function(datetime, options) {

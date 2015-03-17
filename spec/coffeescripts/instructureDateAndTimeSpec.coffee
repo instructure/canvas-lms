@@ -145,19 +145,34 @@ define [
     equal $.dateString(new Date(0)), 'Dec 31, 1969'
 
   module 'timeString',
-    setup: -> @snapshot = tz.snapshot()
-    teardown: -> tz.restore(@snapshot)
+    setup: ->
+      @snapshot = tz.snapshot()
+      @localeWas = I18n.locale
+      @translationsWas = I18n.translations
+      I18n.translations =
+        'en': {'time': {'formats': {'tiny': "%l:%M%P"}}}
+        'en-GB': {'time': {'formats': {'tiny': "%k:%M"}}}
+    teardown: ->
+      tz.restore(@snapshot)
+      I18n.locale = @localeWas
+      I18n.translations = @translationsWas
 
   test 'should format in profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
     equal $.timeString(new Date(0)), '7:00pm'
+
+  test 'should format according to profile locale', ->
+    I18n.locale = 'en-GB'
+    equal $.timeString(new Date(46800000)), '13:00'
 
   module 'datetimeString',
     setup: ->
       @snapshot = tz.snapshot()
       @localeWas = I18n.locale
       @translationsWas = I18n.translations
-      I18n.translations = {'pt': {'time': {'event': "%{date} em %{time}"}}}
+      I18n.translations =
+        'en': {'time': {'formats': {'tiny': "%l:%M%P"}}}
+        'pt': {'time': {'event': "%{date} em %{time}"}}
     teardown: ->
       tz.restore(@snapshot)
       I18n.locale = @localeWas
