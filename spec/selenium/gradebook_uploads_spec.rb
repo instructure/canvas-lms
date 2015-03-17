@@ -17,6 +17,16 @@ describe "gradebook uploads" do
     get_file(filename, rows.join("\n"))
   end
 
+  def assert_assignment_is_highlighted
+    expect(ff('.left-highlight').length).to eq 1
+    expect(ff('.right-highlight').length).to eq 1
+  end
+
+  def assert_assignment_is_not_highlighted
+    expect(ff('.left-highlight').length).to be 0
+    expect(ff('.right-highlight').length).to be 0
+  end
+
   it "should correctly update grades for assignments with GPA Scale grading type" do
     assignment = @course.assignments.create!(:title => "GPA Scale Assignment",
       :grading_type => "gpa_scale", :points_possible => 5)
@@ -59,7 +69,7 @@ describe "gradebook uploads" do
     expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
     expect(f('#no_changes_detected')).not_to be_displayed
 
-    expect(ff('.grid-header div.h').length).to eq 2
+    expect(ff('.slick-header-column.assignment').length).to eq 1
     expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
@@ -81,7 +91,7 @@ describe "gradebook uploads" do
 
     expect(f('#no_changes_detected')).not_to be_displayed
 
-    expect(ff('.grid-header div.h').length).to eq 2
+    expect(ff('.slick-header-column.assignment').length).to eq 1
     expect(f('#assignments_without_changes_alert')).not_to be_displayed
   end
 
@@ -130,7 +140,7 @@ describe "gradebook uploads" do
 
     expect(f('#no_changes_detected')).not_to be_displayed
 
-    expect(ff('.grid-header div.h').length).to eq 2
+    expect(ff('.slick-header-column.assignment').length).to eq 1
     expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
@@ -179,7 +189,55 @@ describe "gradebook uploads" do
 
     expect(f('#no_changes_detected')).not_to be_displayed
 
-    expect(ff('.grid-header div.h').length).to eq 2
+    expect(ff('.slick-header-column.assignment').length).to eq 1
     expect(f('#assignments_without_changes_alert')).to be_displayed
+  end
+
+  it "should highlight scores if the original grade is more than the new grade" do
+    assignment1 = @course.assignments.create!(:title => "Assignment 1")
+    assignment1.grade_student(@student, :grade => 10)
+
+    filename, fullpath, data = gradebook_file("gradebook2.csv",
+          "Student Name,ID,Section,Assignment 1",
+          "User,#{@student.id},,9")
+
+    @upload_element.send_keys(fullpath)
+    @upload_form.submit
+
+    wait_for_js
+
+    assert_assignment_is_highlighted
+  end
+
+  it "should highlight scores if the original grade is replaced by empty grade" do
+    assignment1 = @course.assignments.create!(:title => "Assignment 1")
+    assignment1.grade_student(@student, :grade => 10)
+
+    filename, fullpath, data = gradebook_file("gradebook2.csv",
+          "Student Name,ID,Section,Assignment 1",
+          "User,#{@student.id},,")
+
+    @upload_element.send_keys(fullpath)
+    @upload_form.submit
+
+    wait_for_js
+
+    assert_assignment_is_highlighted
+  end
+
+  it "should not highlight scores if the original grade is less than the new grade" do
+    assignment1 = @course.assignments.create!(:title => "Assignment 1")
+    assignment1.grade_student(@student, :grade => 10)
+
+    filename, fullpath, data = gradebook_file("gradebook2.csv",
+          "Student Name,ID,Section,Assignment 1",
+          "User,#{@student.id},,100")
+
+    @upload_element.send_keys(fullpath)
+    @upload_form.submit
+
+    wait_for_js
+
+    assert_assignment_is_not_highlighted
   end
 end
