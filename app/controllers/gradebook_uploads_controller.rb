@@ -45,6 +45,7 @@ class GradebookUploadsController < ApplicationController
             flash[:error] = t('errors.invalid_file', "Invalid csv file, grades could not be updated")
             format.html { redirect_to polymorphic_url([@context, 'gradebook']) }
           else
+            js_env uploaded_gradebook: @uploaded_gradebook
             format.html { render :action => "show" }
           end
         end

@@ -27,6 +27,8 @@ define([
   'jquery.templateData' /* fillTemplateData */
 ], function(I18n, $, _, htmlEscape, SlickGrid) {
 
+  var uploadedGradebook = ENV.uploaded_gradebook;
+
   var GradebookUploader = {
     init:function(){
       var gradebookGrid,

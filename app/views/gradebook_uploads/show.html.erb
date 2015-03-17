@@ -81,9 +81,3 @@
 <style>
   /*keep this here because jquery.rule needs it to stick in dynamic styles for the slick.grid to keep all of the columns the same width*/
 </style>
-
-<% js_block do %>
-  <script type="text/javascript">
-    window.uploadedGradebook = <%= raw @uploaded_gradebook.to_json %>
-  </script>
-<% end %>
