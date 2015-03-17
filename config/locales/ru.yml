@@ -941,7 +941,6 @@ ru:
         outgoing_email_default_name_option_default: "Настройки Canvas по умолчанию"
         prevent_course_renaming_by_teachers: "Не разрешать преподавателям переименовывать курсы"
         restrict_quiz_questions: "Ограничить просмотр вопросов контрольной работы для студентов после даты завершения курса"
-        restrict_student_future_view: "Ограничить просмотр курсов для студентов до даты начала"
         role_id: Добавить
         self_enrollment: "Разрешить самостоятельную регистрацию"
         self_registration: "Самостоятельная регистрация"
@@ -2219,17 +2218,12 @@ ru:
   big_blue_button_conference: 
     conference_is_recorded: "Эта конференция записывается."
     recording_setting: Запись
-    recording_setting_description: "Записать эту конференцию"
   blackboard: 
     no_manifest: "Этот zip-архив системы Blackboard не содержит файла imsmanifest.xml в корневом каталоге."
   bookmark_service: 
     default_title: "Без названия"
   broccoli_cloud: 
     hidden_title: "Скрыто. Доступно по ссылке "
-    label: 
-      hidden: "Скрыто. Доступно по ссылке "
-      published: Опубликовано
-      unpublished: "Не опубликовано"
     published_title: Опубликовано
     title: 
       permissions: "Редактирование разрешений для: %{name}"
@@ -3091,16 +3085,6 @@ ru:
       buttons: 
         close: "Завершить сейчас"
         join: "Присоединиться сейчас"
-        restart: "Перезапустить сейчас"
-        start: "Запустить сейчас"
-      minute: 
-        few: "%{count} минут"
-        one: "1 минута"
-        other: "%{count} минут"
-      status: 
-        finished: "Завершено %{date_and_time} (%{duration})"
-        new: "Еще не начата"
-        started: "Начато %{time}"
     type_disabled_error: "Этот тип конференции больше не включен для этого сайта Canvas"
   config_url_e96ceaf3: "Настройка URL-адреса"
   configurate_tool_app_5a721f2c: "Настроить приложение %{tool}?"
@@ -4446,7 +4430,6 @@ ru:
         student_invitation_unaccepted_available: "%{name} еще не принял(а) приглашение присоединиться к курсу. Приглашение было отправлено: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} был добавлен (была добавлена) на курс: %{time}"
       link_to_students_view: 
-        link_student_action: "Чтобы связать наблюдателя на курсе *%{name}* со студентом, выберите имя студента из списка ниже. "
         link_student_desc: "Когда наблюдатель связан со студентом, у них есть доступ к оценкам студента и формам взаимодействия на курсе. "
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} приглашений не было принято."
@@ -4660,7 +4643,6 @@ ru:
         join_course: "Присоединиться к этому курсу"
         new_announcement: "Новое объявление"
         view_course_stream: "Просмотреть поток курса"
-      period_name: "последние 2 недели"
       re_sending: "Повторная отправка..."
       send_done: "Готово. Сообщение может занять несколько минут."
       send_failed: "Ошибка запроса. Повторите попытку."
@@ -4837,7 +4819,6 @@ ru:
         count: "Количество неверно ответивших студентов"
         ratio: "Коэффициент неверно ответивших студентов"
   current_3ce5414a: "Текущий:"
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "Текущая оценка усвоения: %{score} из %{masteryPoints}"
   current_score_6c81792: "Текущая оценка"
   current_total_67bf5f72: "Текущий общий балл:"
   curve_grades_dialog: 
@@ -5470,7 +5451,6 @@ ru:
   due_on_date_aa4725cd: "Выполнить до даты:"
   due_on_date_ffc98ebc: "Выполнить до даты"
   e_mail_only_2cc5e513: "Только электронная почта"
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Каждая полоска представляет собой задание. Слой зеленого цвета отображает процент студентов, которые включили  задание *вовремя*. Задания, к которым приступили с **опозданием**, отмечены желтым цветом, а ***отсутствующие*** задания – красным цветом."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Каждая полоска представляет собой одно задание. *Тонкие вертикальные усы* простираются от самой низкой оценки любого из студентов курса до самой высокой оценки. **Более толстая линия** простирается от 25 до 75 процентилей, с ***отмеченной медианой***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Каждая полоска представляет собой одно задание. Тонкие усы простираются от самой низкой оценки любого из студентов курса до самой высокой оценки. Более толстая линия простирается от 25 до 75 процентилей с отмеченной медианой. Оценка студента помечена точкой."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Каждая полоска представляет собой количество *просмотров страницы* за этот день. Оранжевой линией отмечены студенты, **выполнявшие какие-то действия** на курсе за этот день."
@@ -5562,7 +5542,6 @@ ru:
     titles: 
       font_size: "Размер шрифта, нажмите стрелку вниз, чтобы выбрать"
       formatting: "Форматирование, нажмите стрелку вниз, чтобы выбрать"
-      rte_help: "Форматированный текст. Нажмите клавиши ALT F10, чтобы вызвать панель инструментов. Нажмите клавиши ALT F8, чтобы вызвать справку."
   either_the_url_or_domain_should_be_set_c29cf8c1: "Должен быть установлен либо URL-адрес, либо домен."
   element_option_missing_error_an_element_to_attach__be433478: "Ошибка отсутствующего параметра `элемент`: элемент, прикрепляемый к TreeBrowserView, необходимо установить как `истинный` для BBTreeBrowserView при определении настроек параметра рендера"
   email: 
@@ -6548,20 +6527,13 @@ ru:
       sort: s
       tooltip: t
     learning_outcome: "Результат обучения"
-    mastery: усвоено
-    near_mastery: "почти усвоено"
     no_assignments_have_points_warning: "Невозможно рассчитать оценку, пока у задания есть возможные баллы"
     notes: Заметки
     outcome_gradebook: 
       export_report: "экспортировать отчет"
       toggle_sidebar: "Переключить боковую панель"
-    outcome_popover: 
-      mastery_set_at: "Усвоение установлено на"
-      no_results: "(без результата)"
-      view_more_details: "просмотреть дополнительные сведения"
     percent_of_grade: "%{percentage} оценки"
     points_out_of: "из %{points_possible}"
-    remedial: коррекция
     resubmitted: "Отправлено заново после последней оценки"
     row_student_name: 
       student_placeholder: Студент
@@ -7344,7 +7316,6 @@ ru:
       edit_group: "Редактировать группу"
       group_atom_feed: "Канал Atom группы"
       new_announcement: "Новое объявление"
-      next_week: "следующая неделя"
     status: 
       assigning_students: "Назначение студентов..."
       creating_groups: "Создание категории..."
@@ -7463,7 +7434,6 @@ ru:
     online_url_submission: "Отправка Url-адреса через Интернет"
     quiz_submission: "Отправка контрольной работы"
     text_entry_submission: "Отправка текстовой записи"
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "Если этот пункт включен, разработчики содержимого должны будут предоставлять информацию об авторском праве и лицензии до публикации этих файлов"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Если включено, пользователи смогут настраивать инструменты LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "В случае изменения возможных баллов за задание, вы должны повторно оценить это задание."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Если вы не указали права на использование сейчас, данный файл будет снят с публикации после загрузки."
@@ -7667,7 +7637,6 @@ ru:
       к некоторым изменениям в стиле, однако в будущем, вполне возможно, у K-12 появятся и другие особенности.
   labels: 
     lock_module_until: "Заблокировать модуль до указанной даты"
-  last_assessment_latesttitle_22560cf3: "Последняя проверка знаний: %{latestTitle}"
   last_user_access_title: "Последний доступ пользователя"
   late_percent_b91d01b3: "Опоздавшие: %{percent}"
   latest_f604a75: Последняя
@@ -8691,7 +8660,6 @@ ru:
         details: "Для завершения процесса регистрации перейдите по следующему url-адресу:"
         html: 
           body: "Благодарим вас за регистрацию в %{product_name}! Данное электронное сообщение подтверждает, что пользователь %{user} зарегистрирован с новой учетной записью на %{website}."
-          details: "Щелкните здесь для завершения процесса регистрации"
           subject: "Подтвердить регистрацию: %{product_name}"
         subject: "Подтвердить регистрацию: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10097,7 +10065,6 @@ ru:
       Мы работаем над внешним обновлением пользовательского интерфейса для Canvas. Включите его, чтобы согласиться на просмотр 
       обновленного упрощенного внешнего вида и функций интерфейса Canvas. Это одна из "разрабатываемых"
       функций, и ее еще нельзя включать для реальных пользователей.
-  new_title_cb9ceb2f: "Новый заголовок"
   next_40e12421: Далее
   next_steps_ce0f0d0c: "Дальнейшие действия"
   no_assignment_name_adbb215b: "Отсутствует имя задания"
@@ -10487,17 +10454,14 @@ ru:
           manage: 
             description: "*Результаты созданы здесь для того, чтобы отслеживать усвоение курса. Чтобы начать, ознакомьтесь с панелью меню в верхней части страницы. Щелкните по кнопке ''Новый'', чтобы создать новый результат, или по кнопке ''Новая группа'', чтобы создать новую группу, в которую можно будет объединить ваши результаты. Кнопка ''Найти'' позволит вам использовать результаты, созданные вашим штатом или организацией. Как только вы создадите и начнете использовать результаты, вы сможете использовать панель слева для перемещения между вашими результатами. Вы можете перетаскивать с помощью мыши результаты между различными уровнями, чтобы создать структуру.* *Более того, Canvas позволяет вам добавлять результаты в ваши оценочные рубрики, чтобы, таким образом, вы могли оценивать уровень усвоения при оценке выполнения задания. Как только вы установили результаты, нажмите кнопку ''Управлять рубриками'', чтобы начать использовать ваши результаты для оценки.*"
             title: "Установка результатов"
-    mastery: Усвоено
     mastery_error: "Должно быть больше или равно 0"
     missing_outcome: "Невозможно найти этот результат обучения"
-    near: "Почти усвоено"
     new_outcome_group: "Новая группа результатов"
     outcome: 
       links: 
         delete_outcome: "Удалить результат"
         edit_outcome: "Редактировать результат"
       mastery_at_label: "Установите усвоение для какой-либо оценки на (или выше):"
-      point_mastery: "Усвоено на %{mastery_points} баллов"
       points: 
         rating: "%{points} баллов"
         total: "%{points_possible} баллов"
@@ -10526,7 +10490,6 @@ ru:
       attempt_info: "попытка #%{attempt_number}, %{attempt_date}"
       outcome_mastered: усвоено
       scoring: "%{points} из %{possible_points}"
-    remedial: Коррекция
     show: 
       no_aligned_items: "Нет согласованных элементов"
       no_artifacts: "Нет искажений"
@@ -10539,7 +10502,6 @@ ru:
     titles: 
       find_outcomes: "Найти результаты"
     top_level: "%{context} Верхний уровень"
-    undefined: "Не начато"
     user_outcome_results: 
       artifacts: 
         few: "%{count} дефектов изображения"
@@ -12883,8 +12845,6 @@ ru:
     folder: Папка
     folder_browsing_tree: "Просмотр дерева папки"
     folder_name: "Имя папки"
-    labels: 
-      select: "Выбрать этот элемент"
     loading_more_results: "Загрузка большего количества результатов..."
     modified_by: "Кем изменен "
     move: Переместить
@@ -12906,7 +12866,6 @@ ru:
     search_for_files: "Поиск файлов"
     search_results_for: "результаты поиска для \"%{search_term}\""
     select_all: "Выбрать все"
-    settings: Настройки
     size: Размер
     sorted_ascending: "Сортировать по возрастанию"
     sorted_desending: "Сортировать по убыванию"
@@ -13455,11 +13414,9 @@ ru:
       buttons: 
         enroll_in_course: "Регистрация в курсе"
         next: Далее
-      enter_email: "Пожалуйста, введите адрес электронной почты:"
       existing_user: "У меня уже есть логин в %{institution_name}"
       getting_started: "Вы регистрируетесь на **%{course}**."
       labels: 
-        email: "Электронная почта"
         name: "Полное имя"
         password: Пароль
       new_user: "Я – новый пользователь"
@@ -13591,16 +13548,6 @@ ru:
         download_message: "Перед скачиванием отправки будут сжаты в zip-архив. На это может потребоваться некоторое время, в зависимости от размера и количества файлов отправки."
         download_message_intro: "Отправки студента собираются вместе."
         download_submissions: "Скачать все отправки"
-    conference: 
-      buttons: 
-        delete: "Удалить конференцию"
-        edit: "Редактировать сведения о конференции"
-      course_conference: "Конференция курса"
-      group_conference: "Конференция группы"
-      participant: 
-        few: "%{count} участника(ов)"
-        one: "1 участник"
-        other: "%{count} участника(ов)"
     current_enrollment: 
       enrolled_as_designer: "Зарегистрирован как дизайнер"
       enrolled_as_observer: "Зарегистрирован как наблюдатель"
@@ -14032,7 +13979,6 @@ ru:
       external_url_notice: "Введите URL-адрес и название страницы для добавления ссылки на URL-адрес любого веб-сайта к этому *модулю*."
       file_item: Файл
       file_notice: "Выберите файл для связи с этим *модулем* или добавьте файл, выбрав \"Новый файл\"."
-      file_select_label: "Выберите файл, который вы хотите связать, или добавьте файл, выбрав пункт \"Новый файл\"."
       indent_level: 
         one: "*1 уровень отступа*"
         other: "*%{count} уровней отступа*"
@@ -14052,7 +13998,6 @@ ru:
         wiki_page_namem: "Имя задания"
       loading: Загрузка...
       new_assignment_option: "[ Новое значение ]"
-      new_file_option: "[ Новый файл ]"
       new_page_option: "[ Новая страница ]"
       new_quiz_option: "[ Новая контрольная работа ]"
       new_tab: "Загрузить в новой вкладке"
@@ -14557,7 +14502,6 @@ ru:
       two_words_connector: " и "
       words_connector: ", "
     help_menu: 
-      community_support_description: "Для получения помощи сначала свяжитесь с центром ASC. Если они не смогут помочь вам, пожалуйста, свяжитесь с нами."
       community_support_forums: "Форумы поддержки сообщества"
       contact_support: "Связаться со службой поддержки"
       contact_support_sub_text: "Получить помощь по срочным вопросам."
@@ -14679,7 +14623,6 @@ ru:
     few: "В списке представлены %{count} результата"
     one: "В списке представлен 1 результат"
     other: "В списке представлены %{count} результатов"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: "Возникла проблема при добавлении схемы оценок."
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Возникла проблема при удалении схемы оценок"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Возникла проблема при удалении схемы оценок."
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Возникла проблема при сохранении схемы оценок."
@@ -14696,8 +14639,6 @@ ru:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Эта папка в данный момент заблокирована и недоступна для просмотра."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Это список надежных URL-адресов, перечисленных через запятую. Если URL-адрес находится в списке надежных, при входе с него в систему Canvas будет пропускаться использование маркера CSRF."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Скорее всего, это произошло потому, что вы импортировали содержимое курса без связанных с ним файлов."
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "Этот результат был использован для проверки знаний студента. Метод расчета исправлен"
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "Этот результат был использован для проверки знаний студента. Вычисляемое значение исправлено"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Данная контрольная работа не опубликована* Только учителя могут просматривать эту контрольную работу до публикации."
   this_student_wrote_f1a3f22d: "Этот студент написал:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Это позволит вам входить в систему Canvas, чтобы размещать оценки в SIS"
@@ -14718,7 +14659,7 @@ ru:
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "меньше минуты назад"
     pm: pm
     ranges: 
