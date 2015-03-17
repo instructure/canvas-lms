@@ -41,8 +41,14 @@ module Canvas::Migration
       if @settings[:export_archive_path]
         File.open(@settings[:export_archive_path], 'rb')
       elsif @settings[:course_archive_download_url].present?
-        # open-uri downloads the http response to a tempfile
-        open(@settings[:course_archive_download_url])
+        _, uri = CanvasHttp.validate_url(@settings[:course_archive_download_url])
+        CanvasHttp.get(@settings[:course_archive_download_url]) do |http_response|
+          raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+          tmpfile = CanvasHttp.tempfile_for_uri(uri)
+          http_response.read_body(tmpfile)
+          tmpfile.rewind
+          return tmpfile
+        end
       elsif @settings[:attachment_id]
         att = Attachment.find(@settings[:attachment_id])
         att.open(:temp_folder => config[:data_folder], :need_local_file => true)
