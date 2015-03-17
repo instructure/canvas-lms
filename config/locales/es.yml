@@ -938,7 +938,6 @@ es:
         outgoing_email_default_name_option_default: "Configuración predeterminada de Canvas"
         prevent_course_renaming_by_teachers: "No permita que los profesores vuelvan a nombrar sus cursos"
         restrict_quiz_questions: "Limitar que los alumnos vean las preguntas del cuestionario después de la fecha de fin del curso"
-        restrict_student_future_view: "Restringir que los alumnos vean los cursos antes de la fecha de inicio"
         role_id: "Añadir más"
         self_enrollment: "Permitir la Auto-Inscripción"
         self_registration: Autorregistro
@@ -2201,17 +2200,12 @@ es:
   big_blue_button_conference: 
     conference_is_recorded: "Esta conferencia se está grabando."
     recording_setting: Grabación
-    recording_setting_description: "Grabar esta conferencia"
   blackboard: 
     no_manifest: "Este .zip de Blackboard no contiene el archivo imsmanifest.xml en el directorio raíz."
   bookmark_service: 
     default_title: "Sín Título"
   broccoli_cloud: 
     hidden_title: "Oculto. Disponible con un enlace"
-    label: 
-      hidden: "Oculto. Disponible con un enlace"
-      published: Publicado
-      unpublished: "No publicado"
     published_title: Publicado
     title: 
       permissions: "Editando permisos para: %{name}"
@@ -3063,15 +3057,6 @@ es:
       buttons: 
         close: "Finalicelo ahora"
         join: "Únase ahora"
-        restart: "Reinícielo ahora"
-        start: "Comience ahora"
-      minute: 
-        one: "1 minuto"
-        other: "%{count} minutos"
-      status: 
-        finished: "Finalizado %{date_and_time} (%{duration})"
-        new: "No ha comenzado aun"
-        started: "Iniciado %{time}"
     type_disabled_error: "Este tipo de conferencia ya no esta activada para este sitio de Canvas"
   config_url_e96ceaf3: "Configurar URL"
   configurate_tool_app_5a721f2c: "¿Configurar la aplicación %{tool}?"
@@ -4400,7 +4385,6 @@ es:
         student_invitation_unaccepted_available: "%{name} aún no ha aceptado la invitación para unirse al curso. La invitación se envió: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} se ha añadido al curso: %{time}"
       link_to_students_view: 
-        link_student_action: "Para vincular al observador *%{name}* del curso a un alumno, seleccione el nombre del alumno de la lista que aparece a continuación."
         link_student_desc: "Cuando un observador está vinculado a un alumno, tiene acceso a las calificaciones del alumno y a sus interacciones de curso."
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} invitaciones no se han aceptado."
@@ -4613,7 +4597,6 @@ es:
         join_course: "Unirse al Curso"
         new_announcement: "Nuevo Anuncio"
         view_course_stream: "Ver flujo de información del curso"
-      period_name: "Las últimas 2 semanas"
       re_sending: Re-Enviando...
       send_done: "¡Hecho! El mensaje puede tomar unos pocos minutos."
       send_failed: "La solicitud falló. Intente de nuevo."
@@ -4789,7 +4772,6 @@ es:
         count: "Recuento erróneo de alumnos"
         ratio: "Relación errónea de alumnos"
   current_3ce5414a: "Actual:"
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "Puntuación de dominio actual: %{score} de %{masteryPoints}"
   current_score_6c81792: "Calificación actual"
   current_total_67bf5f72: "Total actual:"
   curve_grades_dialog: 
@@ -5395,7 +5377,6 @@ es:
   due_on_date_aa4725cd: "Fecha de vencimiento:"
   due_on_date_ffc98ebc: "Fecha de vencimiento:"
   e_mail_only_2cc5e513: "Solo correo electrónico"
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Cada barra corresponde a una tarea. El nivel verde representa el porcentaje de alumnos que devolvieron la tarea *a tiempo*. Las tareas que se entregaron **tarde** están en amarillo, y las que ***no se entregaron***, en rojo."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Cada barra corresponde a una tarea. El *valor vertical fino* se extiende desde la calificación más baja de cualquier alumno del curso a la calificación más alta. La **barra más gruesa** se extiende desde el 25 por ciento al 75 por ciento, con el ***valor medio marcado***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Cada barra corresponde con una tarea. El valor fino se extiende desde la calificación más baja de cualquier alumno del curso a la calificación más alta. La barra más gruesa se extiende desde el 25 por ciento al 75 por ciento, con el valor medio marcado. La calificación del alumno se marca con un punto."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Cada barra representa el número de *vistas de página* durante un día. La barra naranja indica que el alumno *realizó alguna acción* dentro del curso durante ese día."
@@ -5485,7 +5466,6 @@ es:
     titles: 
       font_size: "Tamaño del texto, pulse abajo para seleccionar"
       formatting: "Formato, pulse abajo para seleccionar"
-      rte_help: "Area de texto enriquecido. Pulse ALT F10 para acceder a la barra de herramientas. Pulse ALT F8 para acceder a la ayuda. "
   either_the_url_or_domain_should_be_set_c29cf8c1: "Deben establecerse la URL o el dominio."
   element_option_missing_error_an_element_to_attach__be433478: "Error por falta de la opción `element`. Para poder adjuntar un elemento a la vista de árbol del explorador, este debe especificarse al configurar la opción de representación a 'true' para BBTreeBrowserView"
   email: 
@@ -6454,20 +6434,13 @@ es:
       sort: s
       tooltip: t
     learning_outcome: "Resultado de aprendizaje"
-    mastery: Dominio
-    near_mastery: "Casi dominio"
     no_assignments_have_points_warning: "No se puede calcular la puntuación hasta que una tarea esté evaluada"
     notes: Notas
     outcome_gradebook: 
       export_report: "exportar informe"
       toggle_sidebar: "Mostrar/ocultar barra lateral"
-    outcome_popover: 
-      mastery_set_at: "Dominio establecido en"
-      no_results: "(sin resultados)"
-      view_more_details: "ver más detalles"
     percent_of_grade: "%{percentage} de la calificación"
     points_out_of: "de %{points_possible}"
-    remedial: "medidas correctoras"
     resubmitted: "Renviado desde la última calificación"
     row_student_name: 
       student_placeholder: Estudiante
@@ -7246,7 +7219,6 @@ es:
       edit_group: "Editar grupo"
       group_atom_feed: "Canal Atom del Grupo"
       new_announcement: "Nuevo Anuncio"
-      next_week: "la próxima semana"
     status: 
       assigning_students: "Asignando alumnos..."
       creating_groups: "Creando la Categoría..."
@@ -7358,7 +7330,6 @@ es:
     online_url_submission: "Envío de URL online"
     quiz_submission: "Envío de evaluaciones"
     text_entry_submission: "Envío de Respuestas de Texto"
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "Si está habilitado, los diseñadores de contenido deben proporcionar los derechos de autor y la información sobre la licencia de los archivos antes de publicarlos."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "En caso de estar habilitados, los usuarios podrán configurar las herramientas LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si modifica el número de puntos posibles de la tarea, deberá calificarla de nuevo."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Si no selecciona los derechos de uso en este momento, se cancelará la publicación de este archivo después de cargarlo."
@@ -7560,7 +7531,6 @@ es:
   k12_description: "Funciones, configuración y estilos que tienen más sentido específicamente en un entorno K-12. Por el momento, esto solo se aplica a algunas modificaciones de estilo, pero es posible que se incorporen más cosas específicas de K-12 en el futuro."
   labels: 
     lock_module_until: "Bloquear módulo hasta una fecha determinada"
-  last_assessment_latesttitle_22560cf3: "Última evaluación: %{latestTitle}"
   last_user_access_title: "Acceso del último usuario"
   late_percent_b91d01b3: "Atrasado: %{percent}"
   latest_f604a75: "Más reciente"
@@ -8554,7 +8524,6 @@ es:
         details: "Para completar el proceso de inscripción, por favor visite el siguiente url:"
         html: 
           body: "¡Gracias por inscribirse en %{product_name}! Este correo es una confirmación de que el usuario %{user} ha registrado una cuenta nueva en %{website}."
-          details: "Haga clic aquí para finalizar el proceso de registro"
           subject: "Confirmar registro: %{product_name}"
         subject: "Confirmar registro: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9952,7 +9921,6 @@ es:
   new_outcome_7fba8c7d: "Nuevo resultado"
   new_quiz_statistics_desc: "Habilitar la nueva página de estadísticas de evaluaciones para un curso,"
   new_styles_description: "Estamos trabajando en un lavado total de cara en Canvas. Habilite esta opción si desea participar en la visualización del aspecto actualizado y simplificado de la interfaz de Canvas. Esta función hace referencia a un trabajo muy \"en progreso\" y no se debería habilitar todavía para producción con los usuarios reales."
-  new_title_cb9ceb2f: "Nuevo título"
   next_40e12421: Siguiente
   next_steps_ce0f0d0c: "Siguientes pasos"
   no_assignment_name_adbb215b: "La tarea no tiene nombre"
@@ -10338,17 +10306,14 @@ es:
           manage: 
             description: "*Los resultados se crean aquí para hacer un seguimiento del dominio en un curso. Para empezar, compruebe la barra del menú que se encuentra en la parte superior. Haga clic en el botón New (Nuevo) para crear un nuevo resultado o en el botón New Group (Nuevo grupo) para crear un nuevo grupo en el que organizar sus resultados. El botón Find (Buscar) le permitirá utilizar los resultados que ha creado su estado o institución. A medida que crea y utiliza resultados podrá utilizar el panel izquierdo para navegar por los resultados. Puede arastrar y soltar resultados entre los diferentes niveles para crear una estructura.* *Y, lo que es más importante, Canvas le permite añadir resultados a su epígrafe de evaluación de modo que puede valorar el dominio a medida que evalúa las asignaciones. Una vez que haya fijado los resultados, haga clic en Manage Rubrics (Gestionar epígrafes) para empezar a utilizar sus resultados para evaluar.*"
             title: "Fijando resultados"
-    mastery: Dominio
     mastery_error: "Debe ser mayor o igual que 0"
     missing_outcome: "No se pudo encontrar ese resultado de aprendizaje"
-    near: "Casi dominio"
     new_outcome_group: "Nuevo grupo de resultados"
     outcome: 
       links: 
         delete_outcome: "Eliminar resultado"
         edit_outcome: "Editar resultado"
       mastery_at_label: "Fijar dominio en cualquier puntuación igual o superior a:"
-      point_mastery: "Dominio en %{mastery_points} puntos"
       points: 
         rating: "%{points} Puntos"
         total: "%{points_possible} Puntos"
@@ -10377,7 +10342,6 @@ es:
       attempt_info: "intento #%{attempt_number}, %{attempt_date}"
       outcome_mastered: dominado
       scoring: "%{points} de %{possible_points}"
-    remedial: "Medidas correctoras"
     show: 
       no_aligned_items: "No hay elementos asignados"
       no_artifacts: "No hay artefactos"
@@ -10390,7 +10354,6 @@ es:
     titles: 
       find_outcomes: "Buscar resultados"
     top_level: "%{context} Nivel superior"
-    undefined: "Sin comenzar"
     user_outcome_results: 
       artifacts: 
         one: "1 artefacto"
@@ -12674,8 +12637,6 @@ es:
     folder: Carpeta
     folder_browsing_tree: "Árbol de navegación de carpetas"
     folder_name: "Nombre de carpeta"
-    labels: 
-      select: "Seleccionar este elemento"
     loading_more_results: "Cargando más resultados..."
     modified_by: "Modificada por"
     move: Mover
@@ -12695,7 +12656,6 @@ es:
     search_for_files: "Buscar archivos"
     search_results_for: "resultados de búsqueda para \"%{search_term}\""
     select_all: "Seleccionar todo"
-    settings: Configuración
     size: Tamaño
     sorted_ascending: "Orden ascendente"
     sorted_desending: "Orden descendente"
@@ -13236,11 +13196,9 @@ es:
       buttons: 
         enroll_in_course: "Matricularse en el curso"
         next: Siguiente
-      enter_email: "Introduzca su dirección de correo electrónico:"
       existing_user: "Ya tengo una ID de inicio de sesión de %{institution_name} "
       getting_started: "Se está matriculando en **%{course}**."
       labels: 
-        email: "Dirección de correo electrónico "
         name: "Nombre completo"
         password: Contraseña
       new_user: "Soy un usuario nuevo"
@@ -13369,15 +13327,6 @@ es:
         download_message: "Los envíos se comprimirán en un archivo zip para descarga. Esto puede tardar un poco, en función del tamaño y cantidad de los archivos que se envíen."
         download_message_intro: "Se están recopilando sus envíos de alumno."
         download_submissions: "Descargar todos los envíos"
-    conference: 
-      buttons: 
-        delete: "Borrar Conferencia"
-        edit: "Editar los Detalles de la Conferencia"
-      course_conference: "Conferencia del Curso"
-      group_conference: "Conferencia del Grupo"
-      participant: 
-        one: "1 participante"
-        other: "%{count} participantes"
     current_enrollment: 
       enrolled_as_designer: "Inscrito como un diseñador"
       enrolled_as_observer: "Inscrito como un observador"
@@ -13802,7 +13751,6 @@ es:
       external_url_notice: "Ingrese un URL y un nombre de página para agregar un enlace a cualquier URL a este *módulo*."
       file_item: Archivo
       file_notice: "Seleccione el archivo que quiere asociar con este *módulo*, o agregue un archivo seleccionando \"Archivo Nuevo\"."
-      file_select_label: "Seleccione el archivo que desea asociar o agregue un archivo seleccionando \"Nuevo archivo\"."
       indent_level: 
         one: "*Colocar Sangría en 1 Nivel*"
         other: "*Colocar Sangría en %{count} niveles*"
@@ -13822,7 +13770,6 @@ es:
         wiki_page_namem: "Nombre de la tarea"
       loading: Cargando...
       new_assignment_option: "[ Tarea Nueva ]"
-      new_file_option: "[ Archivo Nuevo ]"
       new_page_option: "[ Página Nueva ]"
       new_quiz_option: "[ Evaluación Nueva ]"
       new_tab: "Cargar en una pestaña nueva"
@@ -14318,7 +14265,6 @@ es:
       two_words_connector: " y "
       words_connector: ", "
     help_menu: 
-      community_support_description: "Si necesita ayuda, póngase en contacto con su ASC en primer lugar. Si no pueden ayudarle, póngase en contacto con nosotros."
       community_support_forums: "Foros de asistencia de la comunidad"
       contact_support: "Póngase en contacto con Asistencia técnica"
       contact_support_sub_text: "Obtenga asistencia para cuestiones urgentes"
@@ -14437,7 +14383,6 @@ es:
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Hay 1 resultado en la lista"
     other: "Hay %{count} resultados en la lista"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: "Se ha producido un problema al agregar el esquema de calificaciones"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Se produjo un problema al eliminar el período de calificaciones"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Se ha producido un problema al eliminar el esquema de calificaciones"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Se ha producido un problema al guardar el esquema de calificaciones"
@@ -14454,8 +14399,6 @@ es:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Esta carpeta está bloqueada actualmente y no se puede ver."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Esta es una lista separada por comas de URL de confianza. Confiar en cualquier URL de confianza de las que aparecen en esta lista hará que se derive el token CSRF cuando inicien sesión en Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Esto ha sucedido probablemente porque ha importado contenido de un curso sin sus filas asociadas."
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "Se ha utilizado este resultado para evaluar a un alumno. El método de cálculo es fijo"
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "Se ha utilizado este resultado para evaluar a un alumno. El valor del cálculo es fijo"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Este cuestionario no está publicado* Solo los profesores pueden ver el cuestionario hasta que esté publicado."
   this_student_wrote_f1a3f22d: "El alumno ha escrito:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Esto le permitirá autenticar a Canvas para que publique puntuaciones en SIS"
@@ -14474,7 +14417,7 @@ es:
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "hace menos de un minuto"
     pm: pm
     ranges: 
