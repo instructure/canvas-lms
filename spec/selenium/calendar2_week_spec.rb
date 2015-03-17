@@ -117,7 +117,7 @@ describe "calendar2" do
       expect(old_header_title).not_to eq get_header_text
     end
 
-    it "should create event by clicking on week calendar" do
+    it "should create event by clicking on week calendar", :priority => "1", :test_id => 138862 do
       title = "from clicking week calendar"
       load_week_view
 
@@ -128,7 +128,7 @@ describe "calendar2" do
       expect(f('.fc-event-time').text).to include title
     end
 
-    it "should create all day event on week calendar" do
+    it "should create all day event on week calendar", :priority => "1", :test_id => 138865 do
       title = "all day event title"
       load_week_view
 
@@ -141,7 +141,7 @@ describe "calendar2" do
       expect(f('.fc-event-title').text).to include title
     end
 
-    it "should have a working today button" do
+    it "should have a working today button", :priority => "1", :test_id => 142042 do
       load_week_view
 
       # Mini calendar on the right of page has this html element I am looking for so

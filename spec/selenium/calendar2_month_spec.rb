@@ -28,7 +28,7 @@ describe "calendar2" do
         expect(f('#agenda')).to have_class('active')
       end
 
-      it "should create an event through clicking on a calendar day" do
+      it "should create an event through clicking on a calendar day", :priority => "1", :test_id => 138638 do
         create_middle_day_event
       end
 
@@ -188,7 +188,7 @@ describe "calendar2" do
         expect(details.find_element(:css, '.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
 
-      it "should have a working today button" do
+      it "should have a working today button", :priority => "1", :test_id => 142041 do
         load_month_view
         date = Time.now.strftime("%-d")
 
