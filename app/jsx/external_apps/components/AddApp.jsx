@@ -91,7 +91,7 @@ define([
           }
         })
       );
-
+      this.setState({invalidFields: invalidFields});
       this.setState({ isValid: _.isEmpty(invalidFields) });
     },
 
@@ -132,8 +132,19 @@ define([
       var newTool = new ExternalTool();
       newTool.on('sync', this.onSaveSuccess, this);
       newTool.on('error', this.onSaveFail, this);
+      if (!_.isEmpty(this.state.invalidFields)){
+        var fields = this.state.fields
+        var invalidFieldNames = _.map(this.state.invalidFields, function(k){
+          return fields[k].description
+        }).join(', ');
+        this.setState({
+          errorMessage: I18n.t('The following fields are invalid: %{fields}', {fields: invalidFieldNames})
+        });
+        return
+      }
 
       if (this.props.app.requires_secret) {
+        if(_.isEmpty(this.state.fields.shared_secret.value) || _.isEmpty(this.state.fields.consumer_key.value))
         newTool.set('consumer_key', this.state.fields.consumer_key.value);
         newTool.set('shared_secret', this.state.fields.shared_secret.value);
       } else {
@@ -173,7 +184,8 @@ define([
             ref={'option_' + k}
             key={'option_' + k}
             value={v.value}
-            require={v.required}
+            required={v.required}
+            aria-required={v.required}
             description={v.description}
             handleChange={this.handleChange} />
         );
@@ -220,7 +232,7 @@ define([
               <div className="ReactModal__InnerSection ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
                   <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
-                  <button type="button" ref="addButton" className="btn btn-primary" disabled={!this.state.isValid} onClick={this.submit}>{I18n.t('Add App')}</button>
+                  <button type="button" ref="addButton" className="btn btn-primary" onClick={this.submit}>{I18n.t('Add App')}</button>
                 </div>
               </div>
             </div>
