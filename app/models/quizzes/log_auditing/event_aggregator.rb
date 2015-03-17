@@ -57,22 +57,26 @@ module Quizzes::LogAuditing
         ],
         time: timestamp
       }).order("created_at ASC")
-      filtered_events = pick_latest_distinct_events(events)
-      build_submission_data_from_events(filtered_events)
+      filtered_events, final_answers = pick_latest_distinct_events_and_answers(events)
+      build_submission_data_from_events_and_answers(filtered_events, final_answers)
     end
 
     private
     # constructs submission data from events, including the parsing of flagged
     # to indicate that they are 'marked' or 'flagged'
-    def build_submission_data_from_events(events)
+    def build_submission_data_from_events_and_answers(events, answers)
       events.reduce({}) do |submission_data, event|
-        response = case event.event_type
+        response = {}
+        case event.event_type
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
-          {"question_#{event.event_data['quiz_question_id']}_marked"=> event.event_data['flagged'] }
+          response = {"question_#{event.event_data['quiz_question_id']}_marked"=> event.event_data['flagged'] }
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
-          question = Quizzes::QuizQuestion.where(id: event.event_data['quiz_question_id']).first
-          serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
-          serializer.serialize(event.event_data['answer']).answer
+          answers.each do |question_id, answer|
+            question = Quizzes::QuizQuestion.where(id: question_id).first
+            serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
+            thing = serializer.serialize(answer).answer
+            response.merge! thing
+          end
         end
         submission_data.merge! response if response
         submission_data
@@ -81,12 +85,21 @@ module Quizzes::LogAuditing
 
     # Filter out the redundant or overwritten events, creating a minimal set
     # of events which only contain the results of the series of events
-    def pick_latest_distinct_events(events)
+    def pick_latest_distinct_events_and_answers(events)
       kept_events = {}
+      kept_answers = {}
       events.each do |event|
-        kept_events["#{event.event_type}_#{event.event_data['quiz_question_id']}"] = event
+        case event.event_type
+        when Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
+          kept_events["#{event.event_type}_#{event.event_data.first['quiz_question_id']}"] = event
+          event.event_data.each do |answer|
+            kept_answers[answer['quiz_question_id']] = answer["answer"]
+          end
+        else
+          kept_events["#{event.event_type}_#{event.event_data['quiz_question_id']}"] = event
+        end
       end
-      kept_events.values
+      [kept_events.values, kept_answers]
     end
   end
 end
