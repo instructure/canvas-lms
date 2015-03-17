@@ -945,7 +945,6 @@ tr:
         outgoing_email_default_name_option_default: "Varsayılan Canvas Ayarları"
         prevent_course_renaming_by_teachers: "Öğretmenlerin derslerin isimlerini değiştirmelerine izin verme"
         restrict_quiz_questions: "Ders bitim tarihinden sonra öğrencilerin kısa sınav sorularını görmelerini engelle"
-        restrict_student_future_view: "Başlangıç zamanından önce öğrencilerin dersi görmesini engelle"
         role_id: "Daha Fazla Ekle"
         self_enrollment: "Kendi kendine Kayda İzin Ver"
         self_registration: "Kendi Kendine Kayıt"
@@ -2211,17 +2210,12 @@ tr:
   big_blue_button_conference: 
     conference_is_recorded: "Bu konferans kaydedilmektedir."
     recording_setting: Kaydediliyor
-    recording_setting_description: "Bu konferansı kaydet"
   blackboard: 
     no_manifest: "Bu Blackboard .zip uzantılı dosyasının içeriği ana dizininde imsmanifest.xml dosyası bulunamadı."
   bookmark_service: 
     default_title: "Başlık Yok"
   broccoli_cloud: 
     hidden_title: "Gizli. Bir bağlantı ile kullanılabilir"
-    label: 
-      hidden: "Gizli. Bir bağlantı ile kullanılabilir"
-      published: Yayınlandı
-      unpublished: Yayınlanmadı
     published_title: Yayınlandı
     title: 
       permissions: "%{name} için izinler düzenleniyor"
@@ -3086,15 +3080,6 @@ tr:
       buttons: 
         close: "Şimdi bitir."
         join: "Şimdi katıl"
-        restart: "Şimdi yeniden başlat"
-        start: "Şimdi başlat"
-      minute: 
-        one: "1 dakika"
-        other: "%{count} dakika"
-      status: 
-        finished: "Tamamlandı %{date_and_time} (%{duration})"
-        new: "Henüz başlamadı."
-        started: "%{time} saatinde başladı"
     type_disabled_error: "Bu Canvas sitesinde bu türde bir konferans artık bulunmamakta"
   config_url_e96ceaf3: "Ayar URL'si"
   configurate_tool_app_5a721f2c: "%{tool} Uygulaması Yapılandırılsın mı?"
@@ -4426,7 +4411,6 @@ tr:
         student_invitation_unaccepted_available: "%{name} derse katılım davetinizi henüz onaylamadı. Davetiniz şu zaman yollandı: %{time}"
         student_invitation_unaccepted_unavailable: "Ders için %{name} eklendi: %{time}"
       link_to_students_view: 
-        link_student_action: "*%{name}* ders gözlemcisi atamak istediğiniz öğrenci için listeden bir öğrencinin adını seçiniz."
         link_student_desc: "Bir gözlemci olarak bir öğrenciye bağlandığınızda, o öğrencinin notlarına ve ders etkileşimleri erişebilirsiniz."
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} davet henüz onaylanmadı."
@@ -4639,7 +4623,6 @@ tr:
         join_course: "Bu Derse Katıl"
         new_announcement: "Yeni Duyuru"
         view_course_stream: "Ders Akışını Gör"
-      period_name: "son 2 hafta"
       re_sending: "Yeniden Gönderiliyor..."
       send_done: "Tamamlandı! Mesaj biraz zaman alabilir."
       send_failed: "İstek başarısız oldu. Tekrar deneyin."
@@ -4816,7 +4799,6 @@ tr:
         count: "Yanlış Öğrenci Sayısı"
         ratio: "Yanlış Öğrenci Oranı"
   current_3ce5414a: "Geçerli:"
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "Current Mastery Score: %{masteryPoints} üzerinden %{score}"
   current_score_6c81792: "Güncel Puan"
   current_total_67bf5f72: "Geçerli Toplam:"
   curve_grades_dialog: 
@@ -5423,7 +5405,6 @@ tr:
   due_on_date_aa4725cd: "Şu tarihte bitiyor:"
   due_on_date_ffc98ebc: "Şu tarihte bitiyor:"
   e_mail_only_2cc5e513: "Sadece E-Posta"
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Her bir çubuk br ödevdir. Yeşil tabaka ödevini *zamanında* teslim eden öğrencilerin yüzdesini göstermektedir. **Geç** teslim edilen ödevler sarı ve ***teslim edilmeyen*** ödevler kırmızıdır."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Her çubuk bir ödevdir. *İnce dikey diyagram* dersteki herhangi bir öğrenci için en düşük puandan en yükseğe doğru yayılır. **Kalın çubuk**, ***belirlenmiş medyanlı*** 25. yüzdeden 75. yüzdeye doğru yayılır."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Her çubuk bir ödevdir. İnce dikey diyagram dersteki herhangi bir öğrenci için en düşük puandan en yükseğe doğru yayılır. Daha kalın olan çubuk ise, belirlenmiş medyanlı 25. yüzdeden 75. yüzdeye doğru yayılır. Öğrencilerin puanları bir nokta ile işaretlenmiştir."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Her çubuk o günkü *sayfa görüntüleme* sayısını gösterir. Turuncu çubuk öğrencinin o gün ders içinde **bir şeyler yaptığını** gösterir."
@@ -6491,20 +6472,13 @@ tr:
       sort: s
       tooltip: t
     learning_outcome: "Öğrenme Çıktısı"
-    mastery: yeterlik
-    near_mastery: "yeterliğe yakın"
     no_assignments_have_points_warning: "Bir ödevde olası puanlar olmadıkça not hesaplanamaz"
     notes: Notlar
     outcome_gradebook: 
       export_report: "raporu dışa aktar"
       toggle_sidebar: "Kenar Çubuğa Geçiş"
-    outcome_popover: 
-      mastery_set_at: "Yeterlik düzeyi şuna ayarlı"
-      no_results: "(sonuç yok)"
-      view_more_details: "daha fazla ayrıntı göster"
     percent_of_grade: "Notun %{percentage}"
     points_out_of: "%{points_possible} üzerinden"
-    remedial: telafi
     resubmitted: "Son notlandırmadan sonra yeniden gönderildi"
     row_student_name: 
       student_placeholder: Öğrenci
@@ -7286,7 +7260,6 @@ tr:
       edit_group: "Grubu Düzenle"
       group_atom_feed: "Grup Atom Beslemesi"
       new_announcement: "Yeni Duyuru"
-      next_week: "sonraki hafta"
     status: 
       assigning_students: "Öğrenciler Atanıyor..."
       creating_groups: "Kategori Oluşturuluyor..."
@@ -7398,7 +7371,6 @@ tr:
     online_url_submission: "Çevrimiçi URL Gönderimi"
     quiz_submission: "Kısa Sınav Gönderimi"
     text_entry_submission: "Metin Yazma Şeklinde Gönderim"
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: "Etkinleştirilirse yayınlanmadan önce içerik tasarımcıları dosyalar için telif ve lisans bilgisini vermelidir"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Etkinleştirilirse kullanıcılar LTI 2 araçlarını yapılandırabilir."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Bir ödevin olası puanlarını değiştirirseniz ödevi yeniden notlandırmalısınız."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Kullanım haklarını şimdi seçmezseniz, yüklendikten sonra bu dosya yayınlanmayacak."
@@ -7602,7 +7574,6 @@ tr:
       uygulanabilir, fakat gelecekte daha fazla K-12'ye mahsus özellikler eklenebilir.
   labels: 
     lock_module_until: "Belirli bir tarihe kadar modülü kilitle"
-  last_assessment_latesttitle_22560cf3: "Son değerlendirme: %{latestTitle}"
   last_user_access_title: "Son Kullanıcı Erişimi"
   late_percent_b91d01b3: "Geç : %{percent}"
   latest_f604a75: "En Son"
@@ -8610,7 +8581,6 @@ tr:
         details: "Kayıt sürecinizin tamamlanması için, lütfen bağlantıyı ziyaret edin: "
         html: 
           body: "%{product_name}'e kayıt olduğunuz için teşekkür ederiz! Bu eposta mesajı, %{user} kullanıcısının %{website} adresinde yeni hesap kaydı için başvurduğunu göstermektedir."
-          details: "Kayıt işleminizi tamamlamak için tıklayınız"
           subject: "Kaydı Onaylayın: %{product_name}"
         subject: "Kaydı Onaylayın : %{product_name}"
     confirm_sms_communication_channel: 
@@ -10009,7 +9979,6 @@ tr:
       Canvas Ara Birimi üzerinde iyileştirme yapıyoruz. Canvas ara biriminin basit ve
       güncellenmiş görünümüne katılmak için bu özelliği etkinleştirin. Bu özellik
       "Devam Eden bir süreç" ve gerçek kullanıcılı eğitim veren sitelerde henüz etkinleştirilmemeli.
-  new_title_cb9ceb2f: "Yeni Başlık"
   next_40e12421: Sonraki
   next_steps_ce0f0d0c: "Sonraki Adımlar"
   no_assignment_name_adbb215b: "Ödev Adı Yok"
@@ -10385,17 +10354,14 @@ tr:
           manage: 
             description: "*Öğrenme çıktıları bir dersteki yeterlilikleri izlemek için oluşturulur. İlk olarak üst sıradaki menü çubuğuna göz gezidirin. Yeni bir öğrenme çıktısı oluşturmak için Yeni Öğrenme Çıktısı butonuna tıklayın ya da öğrenme çıktılarınızı düzenleyeceğiniz bir grup oluşturmak için Yeni Grup butonuna tıklayın. Ara butonu sayesinde bölgeniz ya da kurumunuz tarafından oluşturulmuş öğrenme çıktılarını kullanabilirsiniz. Öğrenme çıktılarını oluşturup kullandıkça bu çıktılar arasında gezinmek için soldaki paneli kullanabileceksiniz. Farklı seviyelerdeki öğrenme çıktılarını sürükle bırak yaparak kendi yapınızı oluşturabilirsiniz.* *Daha da önemlisi, Canvas'ta notlandırma listelerine öğrenme çıktıları ekleyerek ödevleri notlandırırken yeterliliği değerlendirebilirsiniz. Öğrenme çıktılarını oluşturduktan sonra bunları notlandırmada kullanmaya başlamak için Değerlendirme Listelerini Yönet'e tıklayın.*"
             title: "Öğrenme Çıktılarını Ayarlama"
-    mastery: Ustalık
     mastery_error: "Daha büyük ceya 0'a eşit olmalıdır"
     missing_outcome: "Bu öğrenme çıktısı bulunamadı"
-    near: Kalfalık
     new_outcome_group: "Yeni Öğrenme Çıktısı Grubu"
     outcome: 
       links: 
         delete_outcome: "Öğrenme Çıktısını Sil"
         edit_outcome: "Öğrenme Çıktısını Düzenle"
       mastery_at_label: "Şu düzeyde ya da üstünde bir yeterlilik puanı belirle:"
-      point_mastery: "Yeterlilik düzeyi %{mastery_points} puan"
       points: 
         rating: "%{points} Puan"
         total: "%{points_possible} Puan"
@@ -10424,7 +10390,6 @@ tr:
       attempt_info: "#%{attempt_number}. giriş , %{attempt_date}"
       outcome_mastered: "yeterlilik sağlandı"
       scoring: "%{possible_points} üzerinden %{points}"
-    remedial: " Telafi"
     show: 
       no_aligned_items: "Öğeler düzenlenmedi"
       no_artifacts: "Çalışma yok"
@@ -10437,7 +10402,6 @@ tr:
     titles: 
       find_outcomes: "Öğrenme Çıktısı Ara"
     top_level: "%{context} Üst Seviye"
-    undefined: Başlamadı
     user_outcome_results: 
       artifacts: 
         one: "1 eser"
@@ -12732,8 +12696,6 @@ tr:
     folder: Dizin
     folder_browsing_tree: "Dizin Görüntüleme Ağacı"
     folder_name: "Dizin İsmi"
-    labels: 
-      select: "Bu Öğeyi Seç"
     loading_more_results: "Daha fazla sonuç yükleniyor..."
     modified_by: "Tarafından Değiştirildi"
     move: Taşı
@@ -12752,7 +12714,6 @@ tr:
     search_for_files: "Dosyaları ara"
     search_results_for: "\"%{search_term}\" için arama sonuçları"
     select_all: "Tümünü Seç"
-    settings: Ayarlar
     size: Büyüklük
     sorted_ascending: "Artan Sırala"
     sorted_desending: "Azalan Sırala"
@@ -13257,11 +13218,9 @@ tr:
       buttons: 
         enroll_in_course: "Derse Kayıt Ol"
         next: Sonraki
-      enter_email: "Lütfen eposta adresinizi girin:"
       existing_user: "Zaten %{institution_name} hesabına sahibim"
       getting_started: "**%{course}** dersine kayıt oluyorsunuz."
       labels: 
-        email: Eposta
         name: "Tam Ad"
         password: Şifre
       new_user: "Yeni bir kullanıcıyım"
@@ -13382,15 +13341,6 @@ tr:
       ic_submission-download-dialog: 
         click_to_download: "İndirmek için buraya tıklayın"
         download_submissions: "Tüm gönderimleri indir"
-    conference: 
-      buttons: 
-        delete: "Konferansı Sil"
-        edit: "Konferans Ayrıntılarını Düzenle"
-      course_conference: "Ders Konferansı"
-      group_conference: "Grup Konferansı"
-      participant: 
-        one: "1 katılımcı"
-        other: "%{count} katılımcı"
     current_enrollment: 
       enrolled_as_designer: "Tasarımcı olarak kayıtlı"
       enrolled_as_observer: "Gözlemci olarak kayıtlı"
@@ -13829,7 +13779,6 @@ tr:
         wiki_page_namem: "Ödev Adı"
       loading: Yükleniyor...
       new_assignment_option: "[ Yeni Ödev ]"
-      new_file_option: "[ Yeni Dosya ]"
       new_page_option: "[ Yeni Sayfa ]"
       new_quiz_option: "[ Yeni Kısa Sınav ]"
       new_tab: "Yeni sekmede yükle"
