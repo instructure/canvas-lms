@@ -42,8 +42,27 @@ describe "Navigating to wiki pages" do
       check_header_focus('title')
       check_header_focus('created_at')
       check_header_focus('updated_at')
+    end
 
+    describe "Add Course Button" do
+      before :each do
+        get "/courses/#{@course.id}/pages"
 
+        driver.execute_script("$('.new_page').focus()")
+        @active_element = driver.execute_script('return document.activeElement')
+      end
+
+      it "navigates to the add course view when enter is pressed" do
+        @active_element.send_keys(:enter)
+        wait_for_ajaximations
+        check_element_has_focus(f('.edit-header #title'))
+      end
+
+      it "navigates to the add course view when spacebar is pressed" do
+        @active_element.send_keys(:space)
+        wait_for_ajaximations
+        check_element_has_focus(f('.edit-header #title'))
+      end
     end
 
     describe "Publish Cloud" do

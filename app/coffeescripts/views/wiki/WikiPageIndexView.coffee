@@ -17,6 +17,7 @@ define [
     @mixin
       events:
         'click .new_page': 'createNewPage'
+        'keyclick .new_page': 'createNewPage'
         'click .header-row a[data-sort-field]': 'sort'
 
       els:
