@@ -208,6 +208,10 @@ module Api::V1::Assignment
       hash['submission'] = submission_json(submission,assignment,user,session)
     end
 
+    if opts[:bucket]
+      hash['bucket'] = opts[:bucket]
+    end
+
     locked_json(hash, assignment, user, 'assignment')
 
     hash

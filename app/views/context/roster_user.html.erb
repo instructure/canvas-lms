@@ -157,7 +157,7 @@
     <% if can_do(@user, @current_user, :remove_avatar) %>
       <a href="#" class="remove_avatar_picture_link"><%= t('links.remove_avatar', %{Remove avatar picture}) %></a>
     <% else %>
-      <a href="#" class="report_avatar_picture_link"><%= t('links.report_avatar', %{Report inappropriate picture}) %></a>
+      <a href="<%= report_avatar_image_url(@user.id) %>" class="report_avatar_picture_link"><%= t('links.report_avatar', %{Report inappropriate picture}) %></a>
     <% end %>
   </div>
 <% end %>

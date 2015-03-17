@@ -281,7 +281,6 @@ describe "scheduler" do
     it "should allow me to override the participant limit on a slot-by-slot basis" do
       create_appointment_group :participants_per_appointment => 2
       get "/calendar2"
-      wait_for_ajaximations
       click_scheduler_link
       wait_for_ajaximations
       click_appointment_link

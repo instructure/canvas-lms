@@ -4,10 +4,12 @@
   <label for="option_{{asset_string}}">{{name}}</label>
   <ul class="ag_sections hidden">
     {{#each course_sections}}
-      <li>
-        <input type="checkbox" name="sections[]" value="{{asset_string}}" id="option_{{asset_string}}">
-        <label for="option_{{asset_string}}">{{name}}</label>
-      </li>
+      {{#if can_create_ag}}
+        <li>
+          <input type="checkbox" name="sections[]" value="{{asset_string}}" id="option_{{asset_string}}">
+          <label for="option_{{asset_string}}">{{name}}</label>
+        </li>
+      {{/if}}
     {{/each}}
   </ul>
 </li>

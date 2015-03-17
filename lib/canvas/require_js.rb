@@ -157,6 +157,13 @@ module Canvas
             'vendor/react-infinite-scroll.min' : {
               deps: ['react'],
               exports: 'InfiniteScroll'
+            },
+            'bower/tinymce/tinymce' : {
+              exports: 'tinymce'
+            },
+            'bower/tinymce/themes/modern/theme' : {
+              deps: ['bower/tinymce/tinymce'],
+              exports: 'tinymce'
             }
           }
         JS

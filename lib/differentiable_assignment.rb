@@ -37,12 +37,15 @@ module DifferentiableAssignment
   # will not filter the collection for teachers, will for non-observer students
   # will filter for observers with observed students but not for observers without observed students
   def self.filter(collection, user, context, opts={}, &filter_block)
-    return collection if !user || (opts[:is_teacher] != false && context.grants_any_right?(user, :manage_content, :read_as_admin, :manage_grades, :manage_assignments))
-    return filter_block.call(collection, [user.id]) if opts[:ignore_observer_logic] || !context.user_has_been_observer?(user)
+    return collection if teacher_or_public_user?(user, context, opts)
 
+    return filter_block.call(collection, [user.id]) if user_not_observer?(user, context, opts)
+
+    # observer following no students -> dont filter
+    # observer following students -> filter based on own enrollments and observee enrollments
     observed_student_ids = opts[:observed_student_ids] || ObserverEnrollment.observed_student_ids(context, user)
     user_ids = [user.id].concat(observed_student_ids)
-    # if observer is following no students, do not filter based on differentiated assignments
+
     observed_student_ids.any? ? filter_block.call(collection, user_ids) : collection
   end
 
@@ -51,5 +54,15 @@ module DifferentiableAssignment
     self.filter(scope, user, context, opts) do |scope, user_ids|
       scope.visible_to_students_in_course_with_da(user_ids, context.id)
     end
+  end
+
+  def self.teacher_or_public_user?(user, context, opts)
+    return true if opts[:is_teacher] == true
+    return true if !context.includes_user?(user)
+    context.grants_any_right?(user, :manage_content, :read_as_admin, :manage_grades, :manage_assignments)
+  end
+
+  def self.user_not_observer?(user, context, opts)
+    opts[:ignore_observer_logic] || !context.user_has_been_observer?(user)
   end
 end

@@ -1,8 +1,13 @@
 define [
   'underscore'
   'Backbone'
-], (_, {Model, Collection}) ->
+  'compiled/models/grade_summary/CalculationMethodContent'
+], (_, {Model, Collection}, CalculationMethodContent) ->
+
   class Outcome extends Model
+    defaults:
+      calculation_method: "highest"
+
     initialize: ->
       super
       @set 'friendly_name', @get('display_name') || @get('title')
@@ -12,7 +17,9 @@ define [
       if @scoreDefined()
         score = @get('score')
         mastery = @get('mastery_points')
-        if score >= mastery
+        if score >= mastery + (mastery / 2)
+          'exceeds'
+        else if score >= mastery
           'mastery'
         else if score >= mastery / 2
           'near'
@@ -39,6 +46,9 @@ define [
 
     masteryPercent: ->
       @get('mastery_points')/@get('points_possible') * 100
+
+    present: ->
+      _.extend({}, @toJSON(), new CalculationMethodContent(@).present())
 
     toJSON: ->
       _.extend super,

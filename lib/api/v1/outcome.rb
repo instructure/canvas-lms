@@ -23,15 +23,17 @@ module Api::V1::Outcome
   # abbreviated includes only id, title, url, subgroups_url, outcomes_url, and can_edit. full expands on
   # that by adding import_url, parent_outcome_group (if any),
   # context id and type, and description.
-  def outcomes_json(outcomes, user, session, style=:full)
-    outcomes.map { |o| outcome_json(o, user, session, style) }
+  def outcomes_json(outcomes, user, session, opts = {})
+    outcome_ids = outcomes.map(&:id)
+    opts[:assessed_outcomes] = LearningOutcomeResult.uniq.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+    outcomes.map { |o| outcome_json(o, user, session, opts) }
   end
 
   # style can be :full or :abbrev; anything unrecognized defaults to :full.
   # abbreviated includes only id, title, context id and type, url, and
   # can_edit. full expands on that by adding description and criterion values
   # (if any).
-  def outcome_json(outcome, user, session, style=:full)
+  def outcome_json(outcome, user, session, opts = {})
     can_edit = lambda do
       outcome.context_id ?
           outcome.context.grants_right?(user, session, :manage_outcomes) :
@@ -42,21 +44,26 @@ module Api::V1::Outcome
     api_json(outcome, user, session, :only => json_attributes, :methods => [:title]).tap do |hash|
       hash['url'] = api_v1_outcome_path :id => outcome.id
       hash['can_edit'] = can_edit.call
-      unless style == :abbrev
+      unless opts[:outcome_style] == :abbrev
         hash['description'] = outcome.description
-        hash['calculation_method'] = outcome.calculation_method
-        hash['calculation_int'] = outcome.calculation_int
+
+        # existing outcomes that have a nil calculation method should be handled as highest
+        hash['calculation_method'] = outcome.calculation_method || 'highest'
+
+        if ["decaying_average", "n_mastery"].include? outcome.calculation_method
+          hash['calculation_int'] = outcome.calculation_int
+        end
+
         if criterion = outcome.data && outcome.data[:rubric_criterion]
           hash['points_possible'] = criterion[:points_possible]
           hash['mastery_points'] = criterion[:mastery_points]
           hash['ratings'] = criterion[:ratings]
+        end
 
-          # existing outcomes that have a nil calculation method should be handled as highest
-          hash['calculation_method'] = outcome.calculation_method || 'highest'
-
-          if ["decaying_average", "n_mastery"].include? outcome.calculation_method
-            hash['calculation_int'] = outcome.calculation_int
-          end
+        if opts[:assessed_outcomes]
+          hash['assessed'] = opts[:assessed_outcomes].include?(outcome.id)
+        else
+          hash['assessed'] = outcome.assessed?
         end
       end
     end
@@ -99,7 +106,7 @@ module Api::V1::Outcome
       # use learning_outcome_content vs. content in case
       # learning_outcome_content has been preloaded (e.g. by
       # ContentTag.order_by_outcome_title)
-      hash['outcome'] = outcome_json(outcome_link.learning_outcome_content, user, session, opts[:outcome_style])
+      hash['outcome'] = outcome_json(outcome_link.learning_outcome_content, user, session, opts.slice(:outcome_style, :assessed_outcomes))
     end
   end
 end

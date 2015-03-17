@@ -23,8 +23,10 @@ define([
       return (
         <div className="Header">
           <h2 className="page-header" ref="pageHeader">
-            {I18n.t('External Apps')}
-            {this.props.children}
+            <span className="externalApps_label_text">{I18n.t('External Apps')}</span>
+            <div className="externalApps_buttons_container">
+              {this.props.children}
+            </div>
           </h2>
 
           <div className="well well-sm">

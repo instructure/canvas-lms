@@ -1,13 +1,15 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'i18n!file_preview'
   './FriendlyDatetime'
   'compiled/util/friendlyBytes'
-  'compiled/react/shared/utils/withReactDOM'
+  'compiled/react/shared/utils/withReactElement'
   '../modules/customPropTypes',
   '../utils/getFileStatus'
   'compiled/util/mimeClass'
- ], (React, I18n, FriendlyDatetime, friendlyBytes, withReactDOM, customPropTypes, getFileStatus, mimeClass) ->
+ ], (React, I18n, FriendlyDatetimeComponent, friendlyBytes, withReactElement, customPropTypes, getFileStatus, mimeClass) ->
+
+  FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
 
   FilePreviewInfoPanel = React.createClass
 
@@ -16,7 +18,7 @@ define [
     propTypes:
       displayedItem: customPropTypes.filesystemObject.isRequired
 
-    render: withReactDOM ->
+    render: withReactElement ->
       div {className: 'ef-file-preview-information-container'},
         table {className: 'ef-file-preview-infotable'},
           tbody {},

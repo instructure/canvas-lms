@@ -21,7 +21,6 @@ require 'csv'
 require 'net/http'
 require 'uri'
 require 'nokogiri'
-require 'libxml'
 require 'multipart'
 
 
@@ -195,6 +194,7 @@ module CanvasKaltura
       result = getRequest(:media, :get,
                             :ks => @ks,
                             :entryId => entryId)
+      return nil unless result
       item = {}
       result.children.each do |child|
         item[child.name.to_sym] = child.content
@@ -211,6 +211,7 @@ module CanvasKaltura
         hash["mediaEntry:#{key}"] = val
       end
       result = getRequest(:media, :update, hash)
+      return nil unless result
       item = {}
       result.children.each do |child|
         item[child.name.to_sym] = child.content
@@ -244,6 +245,7 @@ module CanvasKaltura
                            :ks => @ks,
                            :id => id
                           )
+      return nil unless result
       parseBulkUpload(result)
     end
 
@@ -302,6 +304,7 @@ module CanvasKaltura
       result = getRequest(:flavorAsset, :getByEntryId,
                            :ks => @ks,
                            :entryId => entryId)
+      return nil unless result
       items = []
       result.css('item').each do |node|
         item = {}

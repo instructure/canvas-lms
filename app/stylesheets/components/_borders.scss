@@ -3,7 +3,7 @@
 
 <br/>
 
-The `.border` class defines the border style and color with no width. 
+The `.border` class defines the border style and color with no width.
 
 Additional variations of this define the side(s) and radius(s) of the element. Examples are combined with `.content-box` and `.pad-box-mini`.
 
@@ -109,6 +109,9 @@ Combines with `.border` and `.border-trbl`
   border-top-width: 1px;
 }
 
+.border-r {
+  border-right-width: 1px;
+}
 
 .border-round-b {
   border-bottom-left-radius: $borderRadius;

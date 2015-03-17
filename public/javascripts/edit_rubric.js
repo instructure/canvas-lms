@@ -817,13 +817,23 @@ define([
       rubricEditing.editCriterion($criterion);
       return false;
     }).delegate('.delete_criterion_link', 'click', function(event) {
-      var $criterion = $(this).parents(".criterion");
+      var $criterion = $(this).parents('.criterion');
+
+      // this is annoying, but the current code doesn't care where in the list
+      // of rows the "blank" template element is, so we have to account for the
+      // fact that it could be the previous row
+      var $prevCriterion = $criterion.prevAll('.criterion:not(.blank)').first();
+      var $target = $prevCriterion.find('.long_description_link');
+      if ($prevCriterion.length == 0) {
+        $target = $criterion.parents('.rubric_container').find('.rubric_title input');
+      }
       $criterion.fadeOut(function() {
         var $rubric = $criterion.parents(".rubric");
         $criterion.remove();
         rubricEditing.updateCriteria($rubric);
         rubricEditing.updateRubricPoints($rubric);
       });
+      $target.focus();
       return false;
     }).delegate('.rating_description_value,.edit_rating_link', 'click', function(event) {
       rubricEditing.editRating($(this).parents(".rating"));

@@ -1336,6 +1336,12 @@ describe Course, "tabs_available" do
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_falsey
     end
+
+    it "should not hide tabs for completed teacher enrollments" do
+      @user.enrollments.where(:course_id => @course).first.complete!
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
+    end
   end
 
   context "students" do

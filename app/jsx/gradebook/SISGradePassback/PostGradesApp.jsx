@@ -2,7 +2,7 @@
 
 define([
   'i18n!modules',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/gradebook/SISGradePassback/PostGradesDialog'
 ], (I18n, React, PostGradesDialog) => {
 

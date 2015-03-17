@@ -163,6 +163,33 @@ describe "collaborations" do
           }
         end
 
+        it 'should select from all course groups' do
+          group_model(:context => @course, :name => "grup grup")
+
+          create_collaboration!(type, title)
+          validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
+
+          f('.edit_collaboration_link').click
+          wait_for_ajaximations
+          fj("#groups-filter-btn-#{@collaboration.id}:visible").click
+          wait_for_ajaximations
+
+          groups = ffj('.available-groups:visible a')
+          expect(groups.count).to eq 1
+          groups.first.click
+          wait_for_ajaximations
+
+          keep_trying_until {
+            expect(ffj('.members-list li').length).to eq 1
+          }
+          expect_new_page_load do
+            submit_form('.edit_collaboration')
+          end
+          @collaboration.reload
+          collaborator = @collaboration.collaborators.where(:group_id => @group).first
+          expect(collaborator).to_not be_blank
+        end
+
         it 'should deselect collaborators' do
           PluginSetting.create!(:name => type, :settings => {})
 
@@ -199,6 +226,22 @@ describe "collaborations" do
       get "/courses/#{@course.id}/collaborations"
 
       ff('#collaborations .collaboration').length == 1
+    end
+
+    it 'should not show groups the student does not belong to' do
+      PluginSetting.create!(:name => 'etherpad', :settings => {})
+
+      group_model(:context => @course, :name => "grup grup")
+      @group.add_user(@student)
+      group_model(:context => @course, :name => "other grup")
+
+      user_session(@student)
+      get "/courses/#{@course.id}/collaborations"
+
+      fj("#groups-filter-btn-new:visible").click
+      wait_for_ajaximations
+
+      expect(ffj('.available-groups:visible a').count).to eq 1
     end
   end
 end

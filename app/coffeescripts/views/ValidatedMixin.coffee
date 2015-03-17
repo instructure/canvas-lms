@@ -31,11 +31,21 @@ define [
     #     first_name: '[name=user[first_name]]'
     fieldSelectors: null
 
+    ##
+    # For a given dom element, retrieve the sibling tinymce wrapper.
+    #
+    # @param {jQuery Object} the textarea for whom we wish to get the
+    #   related tinymce editor area
+    # @return {jQuery Object} the relevant div that wraps the tinymce
+    #   iframe related to this textarea
+    findSiblingTinymce: ($el)->
+      $el.siblings('.mce-tinymce').find(".mce-edit-area")
+
     findField: (field) ->
       selector = @fieldSelectors?[field] or "[name='#{field}']"
       $el = @$(selector)
       if $el.data('rich_text')
-        $el = $el.next('.mceEditor').find(".mceIframeContainer")
+        $el = @findSiblingTinymce($el)
       $el
 
     ##
@@ -60,7 +70,6 @@ define [
     #       }
     #     ]
     #   }
-
     showErrors: (errors) ->
       for fieldName, field of errors
         $input = @findField fieldName

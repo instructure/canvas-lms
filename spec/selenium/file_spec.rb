@@ -124,7 +124,7 @@ describe "shared files tests" do
         click_edit_link
         wait_for_ajaximations
         switch_html_edit_views
-        f('.mce_bold').click
+        f('.mce-i-bold').click
         type_in_tiny('#edit_content_textarea', 'this is bold')
         fj('.switch_views:visible').click
         expect(driver.execute_script("return $('#edit_content_textarea')[0].value;")).to match /<strong>this is bold<\/strong>/

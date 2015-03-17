@@ -10,11 +10,10 @@
              :object  => @upcoming_assignments, 
              :locals  => {
                :title         => t('titles.upcoming_assignments', "Upcoming Assignments"),
-               :display_count => 3, 
-               :period        => "the next week", 
                :show_context  => true, 
                :upcoming      => true,
-               :show_more     => false
+               :show_more     => false,
+               :period        => :next_week,
              } %>
   
   <% unless @just_viewing_one_course %>

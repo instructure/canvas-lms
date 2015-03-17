@@ -17,6 +17,8 @@ define [
       if $trigger = $('.rubric_dialog_trigger')
         @noRubricExists = $trigger.data('noRubricExists')
         @url = $trigger.data('url')
+        @$focusReturnsTo = $ $trigger.data('focusReturnsTo')
+
         $trigger.click (event) ->
           event.preventDefault()
           assignmentRubricDialog.openDialog()
@@ -30,6 +32,7 @@ define [
         modal: false
         resizable: true
         autoOpen: false
+        close: => @$focusReturnsTo.focus()
 
       $.get @url, (html) ->
         # weird hackery because the server returns a <div id="rubrics" style="display:none">

@@ -139,9 +139,9 @@ The SCSS above would give you the toggle below.
 */
 
 @mixin ic-Toggle-branding (
-  $ic-Toggle-off-color: lighten($canvas-dark, 15%),
-  $ic-Toggle-on-color: $canvas-primary,
-  $ic-Toggle-inactive-text: rgba($canvas-light, 0.6),
+  $ic-Toggle-off-color: lighten($ic-color-dark, 15%),
+  $ic-Toggle-on-color: $ic-brand-primary,
+  $ic-Toggle-inactive-text: rgba($ic-color-light, 0.6),
   $ic-Toggle-transition: cubic-bezier(0,1,0.5,1)
 ) {
 
@@ -382,12 +382,12 @@ The SCSS above would give you the toggle below.
     );
   }
 
-  // Standard toggle with on-state in $canvas-success (green)
+  // Standard toggle with on-state in $ic-color-success (green)
   &.ic-Toggle--success {
     @include ic-Toggle-branding (
-      lighten($canvas-dark, 15%), // off state color
-      $canvas-success, // on state color
-      $canvas-light, // inactive text color
+      lighten($ic-color-dark, 15%), // off state color
+      $ic-color-success, // on state color
+      $ic-color-light, // inactive text color
       cubic-bezier(0,1,0.5,1) // transition timing function
     )
   }

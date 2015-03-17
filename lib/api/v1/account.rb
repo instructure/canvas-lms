@@ -48,6 +48,7 @@ module Api::V1::Account
       hash['sis_account_id'] = account.sis_source_id if !account.root_account? && account.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       hash['sis_import_id'] = account.sis_batch_id if !account.root_account? && account.root_account.grants_right?(user, session, :manage_sis)
       hash['integration_id'] = account.integration_id if !account.root_account? && account.root_account.grants_any_right?(user, :read_sis, :manage_sis)
+      hash['lti_guid'] = account.lti_guid if includes.include?('lti_guid')
       if includes.include?('registration_settings')
         hash['registration_settings'] = {:login_handle_name => account.login_handle_name}
         if account.root_account?

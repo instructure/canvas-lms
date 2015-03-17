@@ -1,7 +1,20 @@
 {{#ifAll atLeastOnePageFetched length}}
   <h1 class="screenreader-only">{{#t "announcements_title"}}Announcements{{/t}}</h1>
   <div class="headerBar clearfix">
-    <div class="headerBar-right form-inline">
+    <div class="pull-left form-inline index_view_filter_form">
+      <input id="searchTerm"
+             placeholder="{{t "Search title, body, or author"}}"
+             aria-label="{{t "Search title, body, or author"}}"
+             value="{{searchTerm}}"
+             type="search">
+      <span id="discussionsFilter">
+        <input type="checkbox"
+               id="onlyUnread"
+               aria-label="{{t "filter announcements by unread"}}"
+               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+      </span>
+    </div>
+    <div class="pull-right form-inline">
       {{#if options.atom_feed_url}}
         <a class="btn"
            href="{{options.atom_feed_url}}"
@@ -13,8 +26,14 @@
       {{/if}}
       <span id="actionsForSelectedDiscussions" class="screenreader-only">
         <input type="checkbox" id="lock" disabled="disabled"/>
-        <label for="lock" data-tooltip>{{#t "lock_for_comments"}}Lock for comments{{/t}}</label>
-        <button id="delete" data-tooltip disabled="disabled">{{#t "delete"}}Delete{{/t}}</button>
+        <label for="lock" data-tooltip title="{{#t "lock_for_comments"}}Lock for comments{{/t}}">
+          <i class="icon-lock"></i>
+          <span class="screenreader-only">{{#t "lock_for_comments"}}Lock for comments{{/t}}</span>
+        </label>
+        <button id="delete" data-tooltip data-tooltip title="{{#t "delete"}}Delete{{/t}}" disabled="disabled">
+          <i class="icon-trash"></i>
+          <span class="screenreader-only">{{#t "delete"}}Delete{{/t}}</span>
+        </button>
       </span>
 
       {{#if options.permissions.create}}
@@ -27,19 +46,6 @@
           aria-label='{{#t "title_add_announcement"}}Add Announcement{{/t}}'
         >{{#t}}Announcement{{/t}}</a>
       {{/if}}
-    </div>
-    <div class="headerBar-left form-inline index_view_filter_form">
-      <input id="searchTerm"
-             placeholder="{{t "Search title, body, or author"}}"
-             aria-label="{{t "Search title, body, or author"}}"
-             value="{{searchTerm}}"
-             type="search">
-      <span id="discussionsFilter">
-        <input type="checkbox"
-               id="onlyUnread"
-               aria-label="{{t "filter announcements by unread"}}"
-               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
-      </span>
     </div>
   </div>
   <div class="nothingMatchedFilter" style="display:none;">

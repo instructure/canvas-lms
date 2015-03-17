@@ -1,0 +1,407 @@
+@import "base/environment";
+
+$eportfolio-name--disabled: #777;
+
+@if $use_high_contrast {
+  $eportfolio-name--disabled: #686868;
+}
+
+a {
+  display: inline;
+}
+
+#page_sidebar {
+  #edit_page_sidebar {
+    display: none;
+  }
+  .preview_content {
+    display: none;
+  }
+  .failed {
+    display: none;
+  }
+  &.editing {
+    .edit_content_link {
+      display: none;
+    }
+    .failed {
+      display: block;
+    }
+    #section_pages {
+      display: none;
+    }
+    #edit_page_sidebar {
+      display: block;
+    }
+    &.previewing {
+      .form_content {
+        display: none;
+      }
+      .preview_content {
+        display: block;
+      }
+      .failed {
+        display: none;
+      }
+    }
+  }
+}
+
+#edit_page_sidebar {
+  .header {
+    font-size: 1.2em;
+    font-weight: bold;
+    border-bottom: 1px solid #888;
+  }
+  ul {
+    margin-top: 0;
+  }
+}
+
+#page_content {
+  .section {
+    position: relative;
+    .links, .section_type_name, .move_link {
+      display: none;
+    }
+  }
+  &.editing {
+    .section {
+      border: 1px dashed #888;
+      padding: 5px;
+      margin: 10px 0;
+      background-color: #fff;
+    }
+    .section .section_type_name {
+      display: block;
+      font-weight: bold;
+      font-size: 1.2em;
+      position: absolute;
+      top: 2px;
+      left: 25px;
+    }
+    .section:hover .links {
+      display: block;
+      position: absolute;
+      top: 2px;
+      right: 2px;
+    }
+    .section .section_content {
+      display: none;
+    }
+    .section:hover .move_link {
+      display: block;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      background-color: #fff;
+      padding: 2px;
+      cursor: move;
+    }
+    .section {
+      padding-top: 25px;
+      text-align: center;
+    }
+    textarea.edit_section {
+      width: 95%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    table.mceLayout {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
+#edit_page_form {
+  div.disabled {
+    display: none;
+  }
+  div.form_content {
+    display: none;
+  }
+  div.preview_content {
+    display: none;
+  }
+  &.editing {
+    div.form_content {
+      display: block;
+      margin: 5px 2px;
+    }
+    &.previewing {
+      div.preview_content {
+        display: block;
+      }
+      div.form_content {
+        display: none;
+      }
+      div.section {
+        border-width: 0;
+        background-color: transparent;
+        padding: 0;
+        text-align: left;
+      }
+      .section:hover .move_link, .section:hover .links, .section_type_name {
+        display: none;
+      }
+    }
+  }
+}
+
+#page_section_blank {
+  display: none;
+}
+
+.submission_list, .submission_list.instTree {
+  padding-left: 0px;
+  max-height: 150px;
+  overflow: auto;
+  width: auto;
+  margin: 5px 50px;
+  text-align: left;
+}
+
+.submission_list .already_used {
+  font-style: italic;
+  color: #aaa;
+}
+
+#recent_submissions {
+  max-height: none;
+  overflow: none;
+}
+
+ul.submission_list.instTree li.submission.leaf {
+  padding: 3px 30px;
+  background-position: 9px center;
+}
+
+#page_content {
+  .section {
+    .attachment {
+      font-size: 1.1em;
+      .filename {
+        font-weight: bold;
+        text-decoration: underline;
+      }
+      img {
+        max-width: 100%;
+      }
+    }
+    .file_list {
+      text-align: left;
+    }
+    .file_list .instTree .leaf.active {
+      background-color: #ddd;
+      border-radius: 3px;
+    }
+    &.read_only {
+      div.section_content {
+        display: block;
+      }
+      div.form_content {
+        display: none;
+      }
+    }
+  }
+}
+
+#section_pages {
+  .section_header {
+    border-bottom: 1px solid #888;
+    font-size: 1.3em;
+    font-weight: bold;
+    position: relative;
+    .links {
+      position: absolute;
+      right: 0;
+      bottom: 2px;
+      font-size: 0.6em;
+      font-weight: normal;
+    }
+  }
+  #page_list {
+    padding-left: 0;
+    margin-top: 5px;
+    list-style-type: none;
+    .page.current a {
+      font-weight: bold;
+    }
+    .page a:hover {
+      text-decoration: underline;
+    }
+    .page .remove_page_link {
+      display: none;
+    }
+    .page .edit_page_link {
+      display: none;
+    }
+    &.editing {
+      .page .remove_page_link {
+        display: inline;
+        float: right;
+        font-weight: normal;
+      }
+      .page .edit_page_link {
+        display: inline;
+      }
+    }
+  }
+  .editing_image {
+    display: none;
+  }
+  .editing_box {
+    display: none;
+  }
+  .add_page_link {
+    display: none;
+  }
+  &.editing {
+    .editing_image {
+      display: inline;
+      opacity: 0.3;
+    }
+    li:hover .editing_image {
+      opacity: 1;
+    }
+    li.page .name {
+      cursor: move;
+    }
+    .editing_box {
+      display: block;
+    }
+    .displaying_box {
+      display: none;
+    }
+    .add_page_link {
+      display: block;
+    }
+  }
+}
+
+#section_list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid #C6C6C6;
+  li {
+    .section_url {
+      color: #4b7092;
+      display: block;
+      font-size: 14px;
+      padding: 5px 0 5px 25px;
+      border-bottom: 1px solid lighten(#C6C6C6, 4%);
+      &:hover, &:focus {
+        background-color: darken(#e4e7e9, 2%);
+        // color: #fff
+        z-index: 0;
+        position: static;
+        text-decoration: none;
+      }
+      a.name {
+        display: block;
+      }
+    }
+  }
+  li.active {
+    .section_url {
+      position: relative;
+      background-color: $bodyBackground;
+      margin-right: -1px;
+      position: relative;
+      z-index: 11;
+      padding: 7px 0 7px 23px;
+      // color: #2C4C5E
+   
+    }
+  }
+  li.hidden {
+    .section_url {
+      color: #AAAAAA;
+    }
+  }
+}
+
+.eportfolio-name {
+  padding: 10px;
+  h3, .h3 {
+    font-size: 14px;
+    margin: 0;
+    line-height: normal;
+    padding: 0;
+  }
+  a {
+    // in order for the .ellipsis to work
+    // we need to make the span a block
+    display: block;
+  }
+  span {
+    color: $eportfolio-name--disabled;
+    // in order for the .ellipsis to work
+    // we need to make the span a block
+    display: block;
+  }
+}
+
+#section_list {
+  .remove_section_link {
+    float: right;
+    padding-right: 5px;
+    display: none;
+  }
+  .edit_section_link {
+    display: none;
+  }
+  &.editing {
+    li.active {
+      .section_url {
+        padding-left: 5px;
+      }
+    }
+    li {
+      cursor: pointer;
+      font-size: 0.9em;
+      a.name {
+        display: inline;
+      }
+    }
+    .section_url {
+      padding-left: 5px;
+    }
+    .remove_section_link {
+      display: inline;
+      margin-left: 3px;
+      cursor: pointer;
+    }
+    .edit_section_link {
+      display: inline;
+      opacity: 0.3;
+    }
+    li.section:hover .edit_section_link {
+      opacity: 1;
+    }
+    li.section .name {
+      cursor: move;
+    }
+  }
+}
+
+#section_list_manage {
+  .editing_item {
+    display: none;
+  }
+  &.editing {
+    .editing_item {
+      display: inline;
+    }
+    .displaying_item {
+      display: none;
+    }
+  }
+}
+
+.message-eportfolios {
+  clear: both;
+  padding: 10px 30px;
+}

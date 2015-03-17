@@ -34,12 +34,22 @@ require [
     events:
       'click [data-event]': 'handleDeclarativeClick'
       'submit #edit_profile_form': 'validateForm'
+      'click .report_avatar_link': 'reportAvatarLink'
 
     attemptedDependencyLoads: 0
 
     initialize: ->
       super
       new AvatarWidget('.profile-link')
+
+    reportAvatarLink: (e) ->
+      e.preventDefault()
+      return if !confirm(I18n.t("Are you sure you want to report this profile picture?"))
+      link = $(e.currentTarget)
+      $('.avatar').hide()
+      $.ajaxJSON(link.attr('href'), "POST", {}, (data) =>
+        $.flashMessage I18n.t("The profile picture has been reported")
+      )
 
     handleDeclarativeClick: (event) ->
       event.preventDefault()

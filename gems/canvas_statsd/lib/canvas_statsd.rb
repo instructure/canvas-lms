@@ -3,6 +3,7 @@ require 'statsd'
 module CanvasStatsd
   require "canvas_statsd/statsd"
   require "canvas_statsd/request_stat"
+  require "canvas_statsd/counter"
 
   def self.settings
     @settings || {}

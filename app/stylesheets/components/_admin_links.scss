@@ -101,7 +101,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 
 .al-options {
   box-sizing: border-box;
-  background-color: $canvas-light;
+  background-color: $ic-color-light;
   box-shadow: 0px 0px 6px rgba(black, 0.1);
   position: absolute;
   padding: 8px 0;
@@ -120,7 +120,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
   .ui-menu-item {
     a {
       background-color: transparent;
-      color: $canvas-dark;
+      color: $ic-color-dark;
       white-space: nowrap;
       min-width: 180px;
       padding: 6px 12px;
@@ -144,10 +144,10 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
   .ui-menu-item a.disabled.ui-state-focus {
     background: none;
     cursor: not-allowed;
-    @if $use_new_styles { color: darken($canvas-neutral, 20%); }
-    @else { color: darken($canvas-neutral, 15%); }
+    @if $use_new_styles { color: darken($ic-color-neutral, 20%); }
+    @else { color: darken($ic-color-neutral, 15%); }
   }
-  .ui-menu-carat span { border-color: $canvas-light transparent; }
+  .ui-menu-carat span { border-color: $ic-color-light transparent; }
   .ui-state-focus{
     margin: 0 !important;
     border: none;
@@ -156,9 +156,9 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 }
 
 .al-trigger-gray {
-  @if $use_new_styles { color: lighten($canvas-dark, 10%); }
-  @else { color: lighten($canvas-dark, 20%); }
-  &:hover, &:focus { color: $canvas-dark; }
+  @if $use_new_styles { color: lighten($ic-color-dark, 10%); }
+  @else { color: lighten($ic-color-dark, 20%); }
+  &:hover, &:focus { color: $ic-color-dark; }
 }
 
 .admin-link-hover-area:hover .al-trigger,

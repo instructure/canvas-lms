@@ -80,12 +80,22 @@ module Importers
       references << quiz_question if quiz_question['question_type'] == 'question_reference'
     end
 
+    QUIZ_QUESTION_KEYS = ['position', 'points_possible']
+    IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + ['answers', 'assessment_question_migration_id', 'migration_id', 'question_bank_migration_id',
+                                              'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
+
+    def self.check_question_equality(question1, question2)
+      stripped_q1 = question1.reject{|k, v| IGNORABLE_QUESTION_KEYS.include?(k)}
+      stripped_q2 = question2.reject{|k, v| IGNORABLE_QUESTION_KEYS.include?(k)}
+      stripped_q1_answers = (question1['answers'] || []).map{|ans| ans.reject{|k, v| k == 'id'}}
+      stripped_q2_answers = (question2['answers'] || []).map{|ans| ans.reject{|k, v| k == 'id'}}
+
+      stripped_q1 == stripped_q2 && stripped_q1_answers == stripped_q2_answers
+    end
+
     def self.dedup_assessment_questions(questions, references)
       # it used to skip these in the importer, instead let's remove them outright
       aq_dups = []
-      qq_keys = ['position', 'points_possible']
-      keys_to_ignore = qq_keys + ['assessment_question_migration_id', 'migration_id', 'question_bank_migration_id',
-                                  'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
 
       questions.each_with_index do |quiz_question, qq_index|
         aq_mig_id = quiz_question['assessment_question_migration_id']
@@ -96,22 +106,23 @@ module Importers
 
           if aq_mig_id == matching_question['migration_id']
             # make sure that the match's core question data is identical
-            if quiz_question.reject{|k, v| keys_to_ignore.include?(k)} == matching_question.reject{|k, v| keys_to_ignore.include?(k)}
+            if check_question_equality(quiz_question, matching_question)
               aq_dups << [quiz_question, matching_question['migration_id']]
             end
           end
         end
       end
+
       aq_dups.each do |aq_dup, new_mig_id|
         references.each do |ref|
-
           if ref['migration_id'] == aq_dup['migration_id']
+            ref['quiz_question_migration_id'] = ref['migration_id']
             ref['migration_id'] = new_mig_id
-            qq_keys.each{|k| ref[k] ||= aq_dup[k]}
+            QUIZ_QUESTION_KEYS.each{|k| ref[k] ||= aq_dup[k]}
           end
           if ref['assessment_question_migration_id'] == aq_dup['migration_id']
             ref['assessment_question_migration_id'] = new_mig_id
-            qq_keys.each{|k| ref[k] ||= aq_dup[k]}
+            QUIZ_QUESTION_KEYS.each{|k| ref[k] ||= aq_dup[k]}
           end
         end
         questions.delete(aq_dup)

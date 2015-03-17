@@ -99,6 +99,11 @@ module SearchHelper
         end
         add_sections.call sections
         add_groups.call context.groups.active, context
+      elsif context.is_a?(Group)
+        if context.grants_right?(@current_user, session, :read)
+          add_groups.call [context]
+          add_courses.call [context.context], :current if context.context.is_a?(Course)
+        end
       elsif context.is_a?(CourseSection)
         visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), true)
         sections = (visibility == :restricted) ? [] : [context]

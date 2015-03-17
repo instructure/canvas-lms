@@ -1,10 +1,12 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   './FilesystemObjectThumbnail'
   '../modules/customPropTypes'
-], (React, FilesystemObjectThumbnail, customPropTypes) ->
+  'compiled/react/shared/utils/withReactElement'
+], (React, FilesystemObjectThumbnailComponent, customPropTypes, withReactElement) ->
 
   MAX_THUMBNAILS_TO_SHOW = 10
+  FilesystemObjectThumbnail = React.createFactory FilesystemObjectThumbnailComponent
 
   DragFeedback = React.createClass
     displayName: 'DragFeedback'
@@ -14,8 +16,8 @@ define [
       pageX: React.PropTypes.number.isRequired
       pageY: React.PropTypes.number.isRequired
 
-    render:  ->
-      React.DOM.div {
+    render:  withReactElement ->
+      div {
         className: 'DragFeedback'
         style:
           # this'll cause less jank than setting css 'top' and 'left'
@@ -29,5 +31,5 @@ define [
             style:
               left: 10 + index * 5 - index
               top: 10 + index * 5 - index
-        React.DOM.span className: 'badge badge-important',
+        span className: 'badge badge-important',
           @props.itemsToDrag.length

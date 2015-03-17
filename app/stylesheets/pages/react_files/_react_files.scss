@@ -112,13 +112,13 @@ $ef-thumbnail-size: 36px;
   // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
   &:hover {
     @if $use_high_contrast { 
-      border-color: $canvas-dark;
+      border-color: $ic-color-dark;
       border-style: dotted;
     }
     @else { background-color: $ic-bg-light-primary; }
   }
   &.ef-item-selected { 
-    @if $use_high_contrast { border-color: $canvas-primary; }
+    @if $use_high_contrast { border-color: $ic-brand-primary; }
     @else { background-color: darken($ic-bg-light-primary, 4%); } 
   }
 
@@ -133,8 +133,8 @@ $ef-thumbnail-size: 36px;
   .btn-link {
     border-width: 0;
     padding-right: 15px;
-    &.restricted { color: $canvas-alert; }
-    &.hiddenState { color: $canvas-alert; }
+    &.restricted { color: $ic-color-alert; }
+    &.hiddenState { color: $ic-color-alert; }
   }
 }
 
@@ -233,28 +233,28 @@ $ef-thumbnail-size: 36px;
 .progress-bar__bar-container {
   height: 9px;
   margin-bottom: 12px;
-  border: solid $canvas-primary 1px;
+  border: solid $ic-brand-primary 1px;
   border-radius: 20px;
   margin-top: 10px;
 
   &.almost-done {
-    border: solid $canvas-success 1px;
+    border: solid $ic-color-success 1px;
   }
 }
 .progress-bar__bar {
   position: relative;
-  background: $canvas-primary;
+  background: $ic-brand-primary;
   border: none;
   height: 9px;
   border-radius: 20px;
 
   &.almost-done {
-    background: $canvas-success;
+    background: $ic-color-success;
   }
 }
 .current_uploads {
   border-radius: 10px;
-  border: dashed $canvas-neutral 2px;
+  border: dashed $ic-color-neutral 2px;
   padding: 10px 10px 10px 10px;
 }
 
@@ -281,7 +281,7 @@ $ef-thumbnail-size: 36px;
 
 .activeDragTarget {
   background-color: $ic-list-item-background--selected !important;
-  box-shadow: inset 0 0 0px 2px $canvas-primary;
+  box-shadow: inset 0 0 0px 2px $ic-brand-primary;
 }
 
 .DragFeedback {

@@ -1,0 +1,30 @@
+a.youtube_link_to_box, link.youbute_link_to_box {
+  width: 425px !important;
+  border: 1px solid #aaa;
+  display: block;
+  background: transparent url(/images/youtube_embed.png) no-repeat top left;
+  padding: 60px 5px 5px;
+}
+
+.iframe_placeholder {
+  border: 1px solid #aaa;
+  text-decoration: none;
+  display: block;
+  background: transparent url(/images/cancel.png) no-repeat top left;
+}
+
+a.instructure_inline_media_comment {
+  display: block;
+  width: 270px !important;
+  border: 1px solid #aaa;
+  background: transparent url(/images/media_comment_embed.png) no-repeat top left;
+  padding: 60px 5px 5px;
+}
+
+.equation_image {
+  vertical-align: middle;
+}
+
+img {
+  padding: 5px;
+}

@@ -101,6 +101,11 @@
 #           "description": "whether the current user can update the outcome",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "assessed": {
+#           "description": "whether this outcome has been used to assess a student",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }

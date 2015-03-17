@@ -380,6 +380,30 @@ describe "context_modules" do
       @assignment.context_module_tags.each { |tag| expect(tag.title).to eq 'again' }
     end
 
+    it "should not create a duplicate page if you publish after renaming" do
+      mod = @course.context_modules.create! name: 'TestModule'
+      page = @course.wiki.wiki_pages.create title: 'A Page'
+      page.workflow_state = 'unpublished'
+      page.save!
+      page_count = @course.wiki.wiki_pages.count
+      tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
+
+      get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
+
+      item = f("#context_module_item_#{tag.id}")
+      edit_module_item(item) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
+      end
+
+      item = f("#context_module_item_#{tag.id}")
+      item.find_element(:css, '.publish-icon').click
+      wait_for_ajax_requests
+
+      expect(@course.wiki.wiki_pages.count).to eq page_count
+      expect(page.reload).to be_published
+    end
+
     it "should add the 'with-completion-requirements' class to rows that have requirements" do
       mod = @course.context_modules.create! name: 'TestModule'
       tag = mod.add_item({:id => @assignment.id, :type => 'assignment'})
@@ -618,6 +642,69 @@ describe "context_modules" do
       expect(tag.indent).to eq 1
     end
 
+    context "module item cog focus management" do
+
+      before :each do
+        get "/courses/#{@course.id}/modules"
+        add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+        @tag = ContentTag.last
+        f("#context_module_item_#{@tag.id} .al-trigger").click
+      end
+
+      it "should return focus to the cog menu when closing the edit dialog for an item" do
+        hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
+        keep_trying_until { fj('.cancel_button:visible') }.click
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when indenting" do
+        hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
+        wait_for_ajaximations
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when outdenting" do
+        hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
+        f("#context_module_item_#{@tag.id} .al-trigger").click
+        hover_and_click("#context_module_item_#{@tag.id} .outdent_item_link")
+        wait_for_ajaximations
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when closing the move dialog" do
+        hover_and_click("#context_module_item_#{@tag.id} .move_module_item_link")
+        f('#move_module_item_cancel_btn').click
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the module item cog when cancelling a delete" do
+        hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.dismiss
+        wait_for_ajaximations
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the previous module item cog when deleting a module item." do
+        add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+        @tag2 = ContentTag.last
+        hover_and_click("#context_module_item_#{@tag2.id} .delete_item_link")
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+      end
+
+      it "should return focus to the parent module's cog when deleting the last module item." do
+        hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        check_element_has_focus(f("#context_module_#{@tag.context_module_id} .al-trigger"))
+      end
+    end
+
+
     it "should still display due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
 
@@ -644,6 +731,22 @@ describe "context_modules" do
       module_item = f("#context_module_item_#{tag.id}")
       expect(module_item.find_element(:css, ".due_date_display").text).not_to be_blank
       expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
+    end
+
+    context "Keyboard Accessibility" do
+      it "should set focus to the first drag handle after the + Module button" do
+        # Add two modules, so the drag handles show up.
+        course_module
+        course_module
+        get "/courses/#{@course.id}/modules"
+
+        driver.execute_script("$('.add_module_link').focus()")
+        add_module_link = f('.add_module_link')
+        add_module_link.send_keys("\t")
+        first_handle = f('.icon-drag-handle')
+        check_element_has_focus(first_handle)
+
+      end
     end
 
     context "multiple overridden due dates" do

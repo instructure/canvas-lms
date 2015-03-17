@@ -173,7 +173,7 @@ module CanvasRails
     Dir.glob("#{Rails.root}/lib/ext/**/*.rb").each { |file| require file }
 
     # tell Rails to use the native XML parser instead of REXML
-    ActiveSupport::XmlMini.backend = 'LibXML'
+    ActiveSupport::XmlMini.backend = 'Nokogiri'
 
     class NotImplemented < StandardError; end
 

@@ -89,6 +89,7 @@ module Importers
 
       item.posted_at            = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:posted_at])
       item.delayed_post_at      = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
+      item.lock_at              = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
       item.last_reply_at        = item.posted_at if item.new_record?
 
       if options[:workflow_state].present?

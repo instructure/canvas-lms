@@ -24,7 +24,7 @@ describe "external tool buttons" do
       add_button
     end
     expect_new_page_load { add_button.click }
-    external_tool_button = f(".instructure_external_tool_button")
+    external_tool_button = f(".mce-instructure_external_tool_button")
     expect(external_tool_button).to be_displayed
     external_tool_button.click
     wait_for_ajax_requests

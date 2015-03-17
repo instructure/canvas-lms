@@ -96,7 +96,6 @@ CanvasRails::Application.routes.draw do
 
   concern :media do
     get 'media_download' => 'users#media_download'
-    get 'media_download.:type' => 'users#media_download', as: :typed_media_download
   end
 
   concern :users do
@@ -119,7 +118,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :pages do
-    resources :wiki_pages, path: :pages, except: [:update, :destroy] do
+    resources :wiki_pages, path: :pages, except: [:update, :destroy], constraints: { id: %r{[^\/]+} } do
       get 'revisions' => 'wiki_pages#revisions', as: :revisions
     end
 
@@ -716,14 +715,6 @@ CanvasRails::Application.routes.draw do
   get 'facebook/settings' => 'facebook#settings'
   post 'facebook/notification_preferences' => 'facebook#notification_preferences'
 
-  resources :interaction_tests do
-    collection do
-      get :next
-      get :register
-      post :groups
-    end
-  end
-
   post 'object_snippet' => 'context#object_snippet'
   post 'saml_consume' => 'pseudonym_sessions#saml_consume'
   match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]
@@ -1043,6 +1034,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/users', action: :create
       get 'accounts/:account_id/users', action: :index, as: 'account_users'
 
+      get 'users/:id', action: :api_show
       put 'users/:id', action: :update
       post 'users/:user_id/files', action: :create_file
 

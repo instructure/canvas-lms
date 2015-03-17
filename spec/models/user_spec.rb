@@ -1770,10 +1770,6 @@ describe User do
           expect(@student2.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
           expect(@student1.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_falsey
         end
-
-        it "should not return students outside the class" do
-          expect(@student3.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
-        end
       end
 
       context "differentiated_assignments off" do
@@ -2885,5 +2881,12 @@ describe User do
 
     expect(@student.grants_right?(@ta, :create_user_notes)).to be_falsey
     expect(@student.grants_right?(@ta, :read_user_notes)).to be_falsey
+  end
+
+  it "should change avatar state on reporting" do
+    user
+    @user.report_avatar_image!
+    @user.reload
+    expect(@user.avatar_state).to eq :reported
   end
 end

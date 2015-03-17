@@ -73,6 +73,7 @@ class CollaborationsController < ApplicationController
     @google_docs_authorized = !@google_drive_upgrade && google_service_connection.verify_access_token rescue false
 
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
+           :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
            :collaboration_types => Collaboration.collaboration_types
   end
 

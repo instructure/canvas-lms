@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'compiled/react_files/components/ColumnHeaders'
 ], (React, ColumnHeaders) ->
 

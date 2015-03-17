@@ -79,7 +79,7 @@
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  color: $canvas-danger;
+  color: $ic-color-danger;
 }
 .ui-state-success, .dialog-success .ui-dialog-titlebar {
   @include vertical-gradient($btnSuccessBackground, $btnSuccessBackgroundHighlight);
@@ -307,7 +307,7 @@
 
 /* Overlays */
 .ui-widget-overlay { 
-  background: rgba($canvas-secondary, 0.75);
+  background: rgba($ic-brand-secondary, 0.75);
 }
 .ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: $bgColorShadow; opacity: $opacityShadow; border-radius: $cornerRadiusShadow; }
 

@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/CurrentUploads'
   'compiled/react_files/modules/FileUploader'
@@ -20,7 +20,7 @@ define [
 
   module 'CurrentUploads',
     setup: ->
-      @uploads = React.renderComponent(CurrentUploads(), $('<div>').appendTo('body')[0])
+      @uploads = React.render(CurrentUploads(), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@uploads.getDOMNode().parentNode)

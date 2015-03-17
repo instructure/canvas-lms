@@ -1,7 +1,6 @@
 <%= render :partial => 'courses/assignments_needing_grading', :locals => {:contexts => nil} %>
 <% locals = {
     :title => t('coming_up', "Coming Up"),
-    :display_count => 3,
     :period => :one_week,
     :show_context => true,
     :upcoming => true
@@ -9,7 +8,7 @@
 %>
 <%= render :partial => "shared/event_list", :object => @upcoming_events, :locals => locals %>
 <% if @show_recent_feedback %>
-<%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :display_count => 3, :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
+<%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
 <% end %>
 <% if show_user_create_course_button(@current_user) %>
 <div class="rs-margin-lr">

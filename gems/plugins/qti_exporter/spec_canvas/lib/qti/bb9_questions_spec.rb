@@ -18,6 +18,21 @@ describe "Converting Blackboard 9 qti" do
     expect(hash).to eq BB9Expected::MATCHING
   end
 
+  it "should convert matching questions if the divs precede the choice Interactions" do
+    manifest_node=get_manifest_node('matching3', :interaction_type => 'choiceInteraction', :bb_question_type => 'Matching')
+    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb9_question_dir)
+    # make sure the ids are correctly referencing each other
+    matches = []
+    hash[:matches].each {|m| matches << m[:match_id]}
+    hash[:answers].each do |a|
+      expect(matches.include?(a[:match_id])).to be_truthy
+    end
+    # compare everything else without the ids
+    hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
+    hash[:matches].each {|m|m.delete(:match_id)}
+    expect(hash).to eq BB9Expected::MATCHING
+  end
+
   it "should find question references in selection_metadata" do
     hash = get_quiz_data(BB9_FIXTURE_DIR, 'group_with_selection_references')[1][0]
     expect(hash[:questions].first[:questions].first).to eq({:question_type=>"question_reference", :migration_id=>"_428569_1"})

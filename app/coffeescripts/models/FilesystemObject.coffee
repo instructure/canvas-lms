@@ -13,11 +13,21 @@ define [
     displayName: ->
       @get('display_name') or @get('name')
 
-    moveTo: (newFolder) ->
-      # only update the new parent_folder_id property
-      @save({}, {attrs: {parent_folder_id: newFolder.id} }).then =>
+    moveTo: (newFolder, options = {}) ->
+      attrs = {parent_folder_id: newFolder.id}
+      if options.dup == 'overwrite'
+        $.extend(attrs, {on_duplicate: 'overwrite'})
+      else if options.dup == 'rename'
+        if options.name
+          $.extend(attrs, {name: options.name})
+        else
+          $.extend(attrs, {on_duplicate: 'rename'})
+      @save({}, {attrs: attrs}).then =>
         @collection.remove(this)
 
         # add it to newFolder's children
         myType = if @saveFrd then 'file' else 'folder' #TODO find a better way to infer type
-        newFolder[myType+'s'].add(this, {merge:true})
+        collection = newFolder[myType+'s']
+        if options.dup == 'overwrite' # remove the overwriten object from the collection
+          collection.remove(collection.where({display_name: this.get('display_name')}))
+        collection.add(this, {merge:true})

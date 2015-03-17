@@ -33,8 +33,7 @@ module Delicious
     response = http.request(request)
     case response
       when Net::HTTPSuccess
-        require 'libxml'
-        updated = LibXML::XML::Parser.string(response.body).parse.child["time"]
+        updated = Nokogiri::XML(response.body).root["time"]
         return Time.parse(updated)
       else
         response.error!
@@ -47,8 +46,7 @@ module Delicious
     response = http.request(request)
     case response
       when Net::HTTPSuccess
-        require 'libxml'
-        code = LibXML::XML::Parser.string(response.body).parse.child["code"]
+        code = Nokogiri::XML(response.body).root["code"]
         return code == 'done'
       else
         response.error!

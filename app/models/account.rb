@@ -177,7 +177,7 @@ class Account < ActiveRecord::Base
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, :root_only => true
-  add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
+  add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false # NO LONGER VISIBLE - MOVED TO COURSE SETTING
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
@@ -306,11 +306,16 @@ class Account < ActiveRecord::Base
   end
 
   def require_acceptance_of_terms?(user)
+    soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 5, 0, 0, 0).utc)
+
     return false if !terms_required?
     return true if user.nil? || user.new_record?
     terms_changed_at = settings[:terms_changed_at]
     last_accepted = user.preferences[:accepted_terms]
-    return false if terms_changed_at.nil? && user.registered? # make sure existing users are grandfathered in
+
+    # make sure existing users are grandfathered in
+    return false if terms_changed_at.nil? && user.registered? && user.created_at < soc2_start_date
+
     return false if last_accepted && (terms_changed_at.nil? || last_accepted > terms_changed_at)
     true
   end

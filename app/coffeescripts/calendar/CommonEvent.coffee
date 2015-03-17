@@ -96,7 +96,9 @@ define [
         @start.setMinutes(30)
         @start.setSeconds(0)
         @end = new Date(@start.getTime()) unless @end
-      @forceMinimumDuration()
+      else
+        # minimum duration should only be enforced if not due at midnight
+        @forceMinimumDuration()
 
     forceMinimumDuration: () ->
       minimumDuration = 30 * 60 * 1000 # 30 minutes

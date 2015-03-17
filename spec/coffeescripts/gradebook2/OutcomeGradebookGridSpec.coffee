@@ -29,8 +29,9 @@ define [
 
   test 'Grid.View.masteryClassName', ->
     outcome = { mastery_points: 5 }
-    ok Grid.View.masteryClassName(5, outcome) == 'mastery', 'returns "mastery" if equal to mastery score"'
-    ok Grid.View.masteryClassName(7, outcome) == 'mastery', 'returns "mastery" if above mastery score"'
+    ok Grid.View.masteryClassName(8, outcome) == 'exceeds', 'returns "exceeds" if 150% or more of mastery score'
+    ok Grid.View.masteryClassName(5, outcome) == 'mastery', 'returns "mastery" if equal to mastery score'
+    ok Grid.View.masteryClassName(7, outcome) == 'mastery', 'returns "mastery" if above mastery score'
     ok Grid.View.masteryClassName(3, outcome) == 'near-mastery', 'returns "near-mastery" if half of mastery score or greater'
     ok Grid.View.masteryClassName(1, outcome) == 'remedial', 'returns "remedial" if less than half of mastery score'
 

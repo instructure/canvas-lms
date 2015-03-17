@@ -212,6 +212,11 @@ describe "discussions" do
         expect(@last_entry.find_element(:css, '.author').text).to eq somebody.name
       end
 
+      it "should not show discussion creation time" do
+        get url
+        expect(f("#discussion_topic time")).to be_nil
+      end
+
       it "should show attachments after showing hidden replies" do
         entry = topic.discussion_entries.create!(:user => somebody, :message => 'blah')
         replies = []

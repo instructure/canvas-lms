@@ -49,8 +49,63 @@
     </tbody>
   </table>
   <div>
-    <label for="mastery_points" style="display:inline">{{#t "mastery"}}Mastery at{{/t}}:</label>
+    <label for="mastery_points" style="display: inline">{{#t "mastery"}}Mastery at{{/t}}:</label>
     <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" id="mastery_points" value="{{mastery_points}}">
+  </div>
+  <div>
+    <label for="calculation_method" style="display: inline">{{#t "calculation_method"}}Calculation Method{{/t}}:</label>
+    <select name="calculation_method" class="calculation_method" id="calculation_method" data-calculation-method="{{calculation_method}}" value="{{calculation_method}}">
+      {{#each calculationMethods}}
+        <option value="{{@key}}" {{#ifEqual @key ../calculation_method}} selected="selected" {{/ifEqual}}>{{friendlyString}}</option>
+      {{/each}}
+    </select>
+  </div>
+  <div class="content-box">
+    <div class="grid-row">
+      <div class="col-xs-2"></div>
+      <div class="col-xs-10">
+        <div class="content-box border border-trbl border-round" id="calculation_int_container">
+          <div class="grid-row" style="padding: 10px">
+            <div class="col-xs-4 border border-r" id="calculation_int_left_side">
+              <div id="calculation_int_left_side_top">
+                <label for="calculation_int" id="calculation_int_label" style="display:inline"></label>
+                <input type="text" name="calculation_int" class="outcomes_narrow_text_input" id="calculation_int" value="{{calculation_int}}" />
+              </div>
+              <div id="calculation_int_left_side_bottom">
+                <span id="calculation_int_range_info" class="outcomes-calculation-int-italics"></span>
+              </div>
+            </div>
+            <div class="col-xs-8" id="calculation_int_right_side">
+              <div class="content-box" style="margin:0px">
+                <div class="grid-row">
+                  <div class="col-xs-2">
+                    <span class="outcomes-calculation-int-italics">{{#t "example"}}Example:{{/t}}</span>
+                  </div>
+                  <div class="col-xs-10">
+                    <span id="calculation_int_example" class="outcomes-calculation-int-italics"></span>
+                  </div>
+                </div>
+                <div class="grid-row">
+                  <div class="col-xs-12">
+                    <span id="calculation_int_example_line_1" class="outcomes-calculation-int-italics"></span>
+                  </div>
+                </div>
+                <div class="grid-row">
+                  <div class="col-xs-12">
+                    <span id="calculation_int_example_line_2" class="outcomes-calculation-int-italics"></span>
+                  </div>
+                </div>
+                <div class="grid-row">
+                  <div class="col-xs-12">
+                    <span id="calculation_int_example_line_3" class="outcomes-calculation-int-italics"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="align-right">
     <button type="button" class="btn cancel_button">{{#t "#buttons.cancel"}}Cancel{{/t}}</button>
