@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'compiled/behaviors/elementToggler'
 ], ($, elementToggler)->

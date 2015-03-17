@@ -156,11 +156,21 @@ The SCSS above would give you the toggle below.
       }
     }
 
+    &:focus ~ label .ic-Toggle__switch:after {
+      @if $use_high_contrast {
+        outline: 1px dotted $ic-Toggle-off-color;
+        outline-offset: -3px;
+      }
+      @else {
+        outline: 2px solid rgba($ic-Toggle-on-color, 0.25);
+        outline-offset: -2px;  
+      }
+    }
+
     &:hover ~label { color: darken($ic-Toggle-off-color, 5%); }
 
     &:checked {
       ~ label {
-        &:hover { color: darken($ic-Toggle-on-color, 3%); }
 
         .ic-Toggle__switch {
           background-color: $ic-Toggle-on-color;
@@ -181,7 +191,6 @@ The SCSS above would give you the toggle below.
   }
 
   label {
-    .ic-Toggle__label-text { flex: 1; }
 
     .ic-Toggle__switch {
       transition: background-color 0.3s $ic-Toggle-transition;
@@ -199,14 +208,14 @@ The SCSS above would give you the toggle below.
 }
 
 @mixin ic-Toggle-appearance (
-  $ic-Toggle-width: 134px,
-  $ic-Toggle-height: 36px,
+  $ic-Toggle-width: 112px,
+  $ic-Toggle-height: 30px,
   $ic-Toggle-border-radius: 4px,
   $ic-Toggle-offset: 2px,
   $ic-Toggle-label-font-size: 14px,
   $ic-Toggle-switch-font-size: 12px,
-  $ic-Toggle-shadow: 0 2px 4px rgba(black, 0.4),
-  $ic-Toggle-bottom-padding: 6px
+  $ic-Toggle-shadow: 0 2px 6px rgba(black, 0.4),
+  $ic-Toggle-bottom-padding: 0
 ){
 
   $ic-Toggle-switch-width: $ic-Toggle-width/2;
@@ -267,6 +276,8 @@ The SCSS above would give you the toggle below.
 
 .ic-Toggle {
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 
   *, *:before, *:after { box-sizing: border-box; }
 
@@ -305,10 +316,12 @@ The SCSS above would give you the toggle below.
     padding: 0 !important;
     vertical-align: baseline !important;
     line-height: normal !important;
+    font-weight: 500;
 
     .ic-Toggle__label-text {
       flex: 1;
-      padding-left: 32px;
+      padding-right: $ic-sp;
+      line-height: $ic-label-line-height;
     }
 
     .ic-Toggle__switch {

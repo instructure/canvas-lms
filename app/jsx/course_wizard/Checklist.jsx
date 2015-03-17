@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'react',
+  'old_unsupported_dont_use_react',
   './ChecklistItem',
   './ListItems'
 ], function(React, ChecklistItem, ListItems) {

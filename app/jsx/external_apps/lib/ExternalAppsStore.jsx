@@ -208,7 +208,7 @@ define([
       isLoading: false,
       isLoaded: false,
       externalTools: [],
-      hasMore: true
+      hasMore: false
     });
   };
 

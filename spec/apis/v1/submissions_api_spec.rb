@@ -736,6 +736,7 @@ describe 'Submissions API', type: :request do
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser",
              "id" => sub1.attachments.first.id,
+             "folder_id" => sub1.attachments.first.folder_id,
              "size" => sub1.attachments.first.size,
              'unlock_at' => nil,
              'locked' => false,
@@ -804,6 +805,7 @@ describe 'Submissions API', type: :request do
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser",
                 "id" => sub1.attachments.first.id,
+                "folder_id" => sub1.attachments.first.folder_id,
                 "size" => sub1.attachments.first.size,
                 'unlock_at' => nil,
                 'locked' => false,
@@ -889,6 +891,7 @@ describe 'Submissions API', type: :request do
                "filename" => "snapshot.png",
                "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
                "id" => sub2a1.id,
+               "folder_id" => sub2a1.folder_id,
                "size" => sub2a1.size,
                'unlock_at' => nil,
                'locked' => false,
@@ -915,6 +918,7 @@ describe 'Submissions API', type: :request do
            "filename" => "snapshot.png",
            "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
            "id" => sub2a1.id,
+           "folder_id" => sub2a1.folder_id,
            "size" => sub2a1.size,
            'unlock_at' => nil,
            'locked' => false,
@@ -936,6 +940,23 @@ describe 'Submissions API', type: :request do
         "workflow_state"=>"graded",
         "late"=>false}]
     expect(json.sort_by { |h| h['user_id'] }).to eq res.sort_by { |h| h['user_id'] }
+  end
+
+  it "should paginate submissions" do
+    student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    @assignment = @course.assignments.create!({
+      :title => 'assignment1',
+      :grading_type => 'points',
+      :points_possible => 12
+    })
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json", {
+      :controller => 'submissions_api', :action => 'index',
+      :format => 'json', :course_id => @course.to_param,
+      :assignment_id => @assignment.id
+    })
+    expect(response.header.has_key?("Link")).to be_truthy
   end
 
   it "should return nothing if no assignments in the course" do
@@ -2849,47 +2870,6 @@ describe 'Submissions API', type: :request do
       progress = Progress.find(json["id"])
       expect(progress.failed?).to be_truthy
       expect(progress.message).to eq "Couldn't find User(s) with API ids '#{@student2.id}'"
-    end
-
-    it "should also process submission comments" do
-      @attachment = Attachment.create! context: @a1, user: @user,
-                                       filename: "cats.jpg", uploaded_data: StringIO.new("meow?")
-
-      grade_data = {
-        :grade_data => {
-          @student1.id => {
-            :posted_grade => '75%',
-            :file_ids => [@attachment.id]
-          },
-          @student2.id => {
-            :posted_grade => '95%',
-            :text_comment => 'witty remark'
-          }
-        }
-      }
-
-      json = api_call(:post,
-                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
-
-      run_jobs
-      progress = Progress.find(json["id"])
-      expect(progress.completed?).to be_truthy
-
-      expect(Submission.count).to eq 2
-      s1 = @student1.submissions.first
-      expect(s1.grade).to eq "75%"
-      comment1 = s1.submission_comments.first
-      expect(comment1).to be_present
-      expect(comment1.attachment_ids).to eq @attachment.id.to_s
-
-      s2 = @student2.submissions.first
-      expect(s2.grade).to eq "95%"
-      comment2 = s2.submission_comments.first
-      expect(comment2).to be_present
-      expect(comment2.comment).to eq "witty remark"
     end
   end
 end

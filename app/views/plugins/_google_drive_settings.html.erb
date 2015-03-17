@@ -1,0 +1,65 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        Get correct information from your <a href="https://console.developers.google.com/project">Google Developer Console</a>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :client_id, :en => "Client ID" %></td>
+      <td>
+        <%= f.text_field :client_id %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :client_secret, :en => "Client Secret" %></td>
+      <td>
+        <%= f.text_field :client_secret %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :redirect_uri, :en => "Redirect URI" %></td>
+      <td>
+        <%= f.text_field :redirect_uri %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :auth_uri, :en => "Auth URI" %></td>
+      <td>
+        <%= f.text_field :auth_uri %>
+      </td>
+    </tr>
+
+
+    <tr>
+      <td><%= f.blabel :token_uri, :en => "Token URI" %></td>
+      <td>
+        <%= f.text_field :token_uri %>
+      </td>
+    </tr>
+
+    <!-- a lot of work goes in to that bold 'OR' -->
+    <tr>
+      <td>
+        <strong>OR</strong>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2"><%= mt(:description, <<-TEXT, :google_url => 'https://console.developers.google.com/project')
+Paste the contents of client_secrets.json below. The text boxes above will be automatically filled in based on the content given below.
+TEXT
+      %></td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :client_secret_json, :en => "Client secrets json" %></td>
+      <td>
+        <%= f.text_area :client_secret_json, :rows => '4' %>
+      </td>
+    </tr>
+  </table>
+<% end %>

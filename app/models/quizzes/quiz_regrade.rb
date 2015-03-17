@@ -14,5 +14,5 @@ class Quizzes::QuizRegrade < ActiveRecord::Base
   validates_presence_of :quiz_id
   validates_presence_of :user_id
 
-  delegate :teachers, to: :quiz
+  delegate :teachers, :context, to: :quiz
 end

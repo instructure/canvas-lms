@@ -80,6 +80,39 @@ describe "announcements" do
         @context = @course
       end
 
+      it "should have a lock that appears and disappears when the cog menu is used to lock/unlock the announcement for comments" do
+        title = "My announcement"
+        announcement_model(:title => title, :user => @user)
+        get url
+
+        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+        f('.discussion-actions .al-trigger').click
+        wait_for_ajaximations
+        f('.al-options li a.icon-lock').click
+        wait_for_ajaximations
+        expect(f('.discussion-info-icons .icon-lock')).not_to be_nil
+        f('.discussion-actions .al-trigger').click
+        wait_for_ajaximations
+        f('.al-options li a.icon-lock').click
+        wait_for_ajaximations
+        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+      end
+
+      it "should remove an announcement when it is deleted from the delete option in the cog menu" do
+        title = "My announcement"
+        announcement_model(:title => title, :user => @user)
+        get url
+
+        expect(f('.discussion-topic')).not_to be_nil
+        f('.discussion-actions .al-trigger').click
+        f('.al-options li a.icon-trash').click
+        alert_present?
+        alert = driver.switch_to.alert
+        expect(alert.text).to match "Are you sure you want to delete this announcement?"
+        alert.accept
+        expect(f('.discussion-topic')).to be_nil
+      end
+
       it "should start a new topic" do
         get url
 
@@ -95,6 +128,20 @@ describe "announcements" do
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
+      end
+
+      it "should perform front-end validation for message" do
+        topic_title = 'new topic with file'
+        get url
+
+        expect_new_page_load { f('.btn-primary').click }
+        replace_content(f('input[name=title]'), topic_title)
+        filename, fullpath, data = get_file("testfile5.zip")
+        f('input[name=attachment]').send_keys(fullpath)
+        submit_form('.form-actions')
+        wait_for_ajaximations
+
+        expect(ff('.error_box').any?{|box| box.text.include?("A message is required")}).to be_truthy
       end
 
       it "should add an attachment to a graded topic" do
@@ -146,14 +193,25 @@ describe "announcements" do
     end
 
     it "should create a delayed announcement" do
-      skip("193")
       get course_announcements_path(@course)
       create_announcement_option('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
       datepicker_next
       f('.ui-datepicker-time .ui-datepicker-ok').click
       expect_new_page_load { submit_form('.form-actions') }
-      expect(f('.discussion-fyi')).to include_text('This topic will not be visible')
+      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
+    end
+
+    it "allows creating a delayed announcement with an attachment" do
+      get course_announcements_path(@course)
+      create_announcement_option('input[type=checkbox][name=delay_posting]')
+      f('.ui-datepicker-trigger').click
+      datepicker_next
+      f('.ui-datepicker-time .ui-datepicker-ok').click
+      name, path, data = get_file('testfile1.txt')
+      f('#discussion_attachment_uploaded_data').send_keys(path)
+      expect_new_page_load { submit_form('.form-actions') }
+      expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
     end
 
     it "should add and remove an external feed to announcements" do

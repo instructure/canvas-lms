@@ -5,6 +5,295 @@ To see discussion around these API changes, please refer to the
 [changelog](/CHANGELOG.md) and visit the commits and issues they
 reference.
 
+0.10.x -> 0.11.x
+----------------
+
+The router changed **a lot** in this release. While you won't have to
+change too much of your app, you will have to change it in a lot of
+places. The fundamental change is that you, rather than the router, get
+to have control of your view instances.
+
+If you find anything is missing from this list, please open an issue and
+we will get it added here ASAP.
+
+### React 0.12
+
+You must upgrade to `0.12.x` before you can use version `0.11.x` of the
+router.
+
+### `<Routes/>` and starting the router
+
+`<Routes/>` is gone, there is a new API that gives you complete control
+of your views.
+
+```js
+// 0.10.x
+var routes = (
+  <Routes location="history">
+    <Route handler={App}>
+      <Route name="dashboard" handler={Dashboard}/>
+    </Route>
+  </Routes>
+);
+
+React.render(routes, el);
+
+// 0.11.x
+var routes = (
+  <Route handler={App}>
+    <Route name="dashboard" handler={Dashboard}/>
+  </Route>
+);
+
+Router.run(routes, Router.HistoryLocation, function (Handler) {
+  React.render(<Handler/>, el);
+});
+
+// or default to hash location
+Router.run(routes, function (Handler) {
+  React.render(<Handler/>, el);
+});
+```
+
+### `this.props.activeRouteHandler()` -> `<RouteHandler/>`
+
+```js
+// 0.10.x
+var Something = React.createClass({
+  render: function () {
+    return (
+      <div>
+        <this.props.activeRouteHandler />
+      </div>
+    );
+  }
+});
+
+// 0.11.x
+var RouteHandler = Router.RouteHandler;
+
+var Something = React.createClass({
+  render: function () {
+    return (
+      <div>
+        <RouteHandler />
+      </div>
+    );
+  }
+});
+```
+
+### `this.props.params` and `this.props.query`
+
+They are no longer available on props, use the `State` mixin.
+
+```js
+// 0.10.x
+var Something = React.createClass({
+  render: function () {
+    var name = this.props.params.name;
+    var something = this.props.query.something;
+    // ...
+  }
+});
+
+// 0.11.x
+
+// pass it down the view hierarchy to get the same lifecycle hooks to
+// trigger as before
+Router.run(routes, function (Handler, state) {
+  React.render(<Handler params={state.params} query={state.query} />, el);
+  // make sure to `<RouteHandler {...this.props}/>` to continue
+  // passing it down the hierarchy
+});
+
+// or use the `State` mixin
+var Something = React.createClass({
+  mixins: [ Router.State ],
+  render: function () {
+    var name = this.getParams().name;
+    var something = this.getQuery().something;
+    // ...
+  }
+});
+
+// Also, if you're using a flux-style app, you can trigger a "transition"
+// action in the `run` callback with the params/query in the payload, then
+// subscribe in your handlers to the store that grabs the data.
+```
+
+### `ActiveState` -> `State`, and methods too
+
+This mixin's name has changed, and all of its methods that had the word
+`active` in it, too. For example, `getActiveParams()` becomes `getParams()`.
+
+```js
+// v0.10.x
+var Something = React.createClass({
+  mixins: [ Router.ActiveState ],
+  render: function () {
+    var name = this.getActiveParams().name;
+    // ...
+  }
+});
+
+// v0.11.x
+var Something = React.createClass({
+  mixins: [ Router.State ]
+  render: function () {
+    var name = this.getParams().name;
+    // ...
+  }
+});
+```
+
+### `CurrentPath` -> `State`
+
+You can find `this.getPath()` on the `Router.State` mixin.
+
+```js
+// v0.10.x
+var Something = React.createClass({
+  mixins: [ Router.CurrentPath ],
+  render: function () {
+    var path = this.getCurrentPath();
+    // ...
+  }
+});
+
+// v0.11.x
+var Something = React.createClass({
+  mixins: [ Router.State ],
+  render: function () {
+    var path = this.getPath();
+    // ...
+  }
+});
+```
+
+### Route `addHandlerKey` prop
+
+This option has been removed, you will need to add handler keys
+yourself:
+
+```js
+// 0.10.x
+<Route handler={App}>
+  <Route addHandlerKey={true}/>
+</Route>
+
+// 0.11.x
+var App = React.createClass({
+  mixins: [ Router.State ],
+
+  getHandlerKey: function () {
+    // this will all depend on your needs, but here's a typical
+    // scenario that's pretty much what the old prop did
+    var childDepth = 1; // have to know your depth
+    var childName = this.getRoutes()[childDepth].name;
+    var id = this.getParams().id;
+    var key = childName+id;
+    return key;
+  },
+
+  render: function () {
+    return (
+      <div>
+        <RouteHandler key={this.getHandlerKey()} />
+      </div>
+    );
+  }
+});
+```
+
+### `<Routes onError={fn}/>`
+
+`<Routes/>` is gone, instead create a router with your error handler as
+an option:
+
+```js
+// 0.10.x
+<Routes onError={fn}>
+  // ...
+</Routes>
+
+// 0.11.x
+var router = Router.create({
+  onError: fn,
+  // ...
+});
+router.run(callback);
+```
+
+### `Router.renderRoutesTo*`
+
+These methods have been removed because you, not the router, are in
+control of rendering.
+
+```js
+// v0.10.x
+Router.renderRoutesToString(routes, path, function (html) {
+ // do something with `html`
+});
+
+// v0.11.x
+Router.run(routes, path, function (Handler) {
+  var html = React.renderToString(<Handler/>);
+});
+```
+
+### Route Props Passed to Handlers
+
+In `0.10.x` you could add props to your route that would make their way
+down to your handlers. While convenient, conflating routes with their
+handlers was confusing to a lot of folks.
+
+To get the same effect, you can either create your handlers with a
+function and close over the information you need, or simply define those
+properties on your handlers.
+
+```js
+// 0.10.x
+<Route name="users" foo="bar" handler={Something}/>
+
+var Something = React.createClass({
+  render () {
+    return <div>{this.props.name} {this.props.foo}</div>
+  }
+});
+
+// 0.11.x
+
+// close over technique
+<Route name="users" handler={makeSomething("users", "bar")}/>
+
+function makeSomething(name, foo) {
+  return React.createClass({
+    render () {
+      return <div>{name} {foo}</div>
+    }
+  });
+}
+
+// handler definition technique
+<Route name="users" handler={Something}/>
+
+var Something = React.createClass({
+  foo: "bar",
+  name: "users",
+  render () {
+    return <div>{this.name} {this.foo}</div>
+  }
+});
+```
+
+0.9.x -> 0.10.x
+---------------
+
+Nothing changed, this was simply React `0.12.0` compatibility. Note,
+your code needs to use the React `0.11.x` API for things to work, there
+will be lots of warnings in the console.
+
 0.7.x -> 0.9.x
 --------------
 
@@ -67,7 +356,7 @@ entry, it now uses `replaceWith`.
 ```js
 // 0.7.x
 React.createClass({
-  login: function() {
+  login: function () {
     // ...
     transition.retry();
   }
@@ -76,7 +365,7 @@ React.createClass({
 // 0.9.x
 React.createClass({
   mixins: [Navigation],
-  login: function() {
+  login: function () {
     // ...
     this.transitionTo(transition.path);
   }
@@ -92,7 +381,7 @@ Transition hooks are now sync, unless you opt-in to async with
 // 0.7.x
 React.createClass({
   statics: {
-    willTransitionTo: function(transition) {
+    willTransitionTo: function (transition) {
       return somePromise();
     }
   }
@@ -101,7 +390,7 @@ React.createClass({
 // 0.9.x
 React.createClass({
   statics: {
-    willTransitionTo: function(transition) {
+    willTransitionTo: function (transition) {
       transition.wait(somePromise());
     }
   }
@@ -144,7 +433,7 @@ var Router = require('react-router');
 
 // 0.7.x
 React.createClass({
-  whenever: function() {
+  whenever: function () {
     Router.transitionTo('something');
     Router.replaceWith('something');
     Router.goBack();
@@ -156,7 +445,7 @@ var Navigation = Router.Navigation;
 
 React.createClass({
   mixins: [Navigation],
-  whenever: function() {
+  whenever: function () {
     this.transitionTo('something');
     this.replaceWith('something');
     this.goBack();
@@ -296,7 +585,7 @@ options:
 
 // 0.5.x
 var User = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       user: getUser(this.props.params.userId);
     }
@@ -305,15 +594,15 @@ var User = React.createClass({
 
 // 0.6.x
 var User = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return this.getState();
   },
 
-  componentWillReceiveProps: function(newProps) {
+  componentWillReceiveProps: function (newProps) {
     this.setState(this.getState(newProps));
   },
 
-  getState: function(props) {
+  getState: function (props) {
     props = props || this.props;
     return {
       user: getUser(props.params.userId)
@@ -361,7 +650,7 @@ NPM users should point their apps to `react-router` instead of
 // 0.2.x
 
 var App = React.createClass({
-  render: function() {
+  render: function () {
     return (
       <div>
         {this.props.activeRoute}
@@ -372,7 +661,7 @@ var App = React.createClass({
 
 // 0.3.x
 var App = React.createClass({
-  render: function() {
+  render: function () {
     // now you can send extra props to the active route handler
     // and use the new jsx syntax
     // <this.props.activeRouteHandler extraProp={something}/>

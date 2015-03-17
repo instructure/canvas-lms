@@ -84,7 +84,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
     margin-top: 0;
     margin-bottom: 0;
     top: 0;
-    border-color: $menu-border-color;
+    border-color: $ic-border-color;
     &.ui-accordion-content-active {
       border-bottom-left-radius: $ic-border-radius;
       border-bottom-right-radius: $ic-border-radius;  
@@ -100,8 +100,8 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
     &.ui-state-default {
       background: lighten($canvas-neutral, 5%);
       box-shadow: none;
-      border-color: $can-border-light;
-      border-bottom: 1px solid $can-border-light !important;
+      border-color: $ic-border-light;
+      border-bottom: 1px solid $ic-border-light !important;
       &.ui-state-hover, &.ui-state-focus {
         background: $canvas-neutral;
       }

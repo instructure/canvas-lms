@@ -44,6 +44,8 @@ module Api::V1::Outcome
       hash['can_edit'] = can_edit.call
       unless style == :abbrev
         hash['description'] = outcome.description
+        hash['calculation_method'] = outcome.calculation_method
+        hash['calculation_int'] = outcome.calculation_int
         if criterion = outcome.data && outcome.data[:rubric_criterion]
           hash['points_possible'] = criterion[:points_possible]
           hash['mastery_points'] = criterion[:mastery_points]

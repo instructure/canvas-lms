@@ -50,7 +50,7 @@
     font-size: 0.75em
   &:hover
     @if $use_high_contrast == false
-      background: $hover-color
+      background: $ic-bg-light-primary
     .toggle-details
       text-indent: 0
       text-align: right
@@ -85,7 +85,7 @@ $ignore-col-width: 50px
     // remove hover color on high contrast and use link underlines on hover instead (a11y)
     @if $use_high_contrast == false
       &:hover
-        background: $hover-color
+        background: $ic-bg-light-primary
 
   .date
     font-size: 11px

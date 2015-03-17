@@ -1,5 +1,5 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.underscore.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
+  <%= polymorphic_url([asset.context, asset]) %>
 <% end -%>
 <%= t('subject', 'Canvas Alert - Event: %{event_title}, %{course_name}', :event_title => asset.title, :course_name => asset.context.name) %>
 

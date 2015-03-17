@@ -1620,5 +1620,17 @@ describe CoursesController do
       test_student.reload
       expect(test_student.quiz_submissions.size).to be_zero
     end
+
+    it "removes submissions created by the test student" do
+      user_session(@teacher)
+      post 'student_view', course_id: @course.id
+      test_student = @course.student_view_student
+      assignment = @course.assignments.create!(:workflow_state => 'published')
+      sub = assignment.grade_student test_student, { :grade => 1, :grader => @teacher }
+      expect(test_student.submissions.size).not_to be_zero
+      delete 'reset_test_student', course_id: @course.id
+      test_student.reload
+      expect(test_student.submissions.size).to be_zero
+    end
   end
 end

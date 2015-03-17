@@ -107,6 +107,7 @@ class SubmissionComment < ActiveRecord::Base
     p.whenever {|record|
       record.just_created &&
       record.submission.assignment &&
+      record.submission.assignment.context.available? &&
       !record.submission.assignment.muted? &&
       (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }

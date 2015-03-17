@@ -204,7 +204,7 @@
       </tr><tr>
         <td><%= before_label :due, "Due" %></td>
         <td>
-          <%= f.text_field :due_at, :style => "width: 150px;", :class => "datetime_field" %>
+          <%= f.text_field :due_at, :style => "width: 150px;", :class => "datetime_field", :"aria-label" => t("Due on Date") %>
         </td>
       </tr><tr class="context_select" style="<%= hidden unless @contexts.length > 1 %>">
         <td><%= before_label :calendar, "Calendar" %></td>

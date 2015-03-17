@@ -1,8 +1,8 @@
 define [
   'i18n!react_files'
   'underscore'
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
 ], (I18n, _, React, ReactRouter, withReactDOM, preventDefault) ->
@@ -74,9 +74,10 @@ define [
 
       header className:'ef-directory-header', role: 'row',
         div className: selectAllCheckboxClass, role: 'columnheader',
-          span {className: selectAllLabelClass },
+          label {htmlFor: "selectAllCheckbox", className: selectAllLabelClass },
             I18n.t('select_all', 'Select All')
           input {
+            id: "selectAllCheckbox"
             className: selectAllCheckboxClass
             type: 'checkbox'
             onFocus: (event) => @setState({hideToggleAll: false})

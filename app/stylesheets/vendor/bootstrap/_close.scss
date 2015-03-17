@@ -13,7 +13,7 @@
   opacity: 0.8;
   @if $use_high_contrast { text-decoration: none; }
   &:hover, &:focus {
-    color: $ic-text-color;
+    color: $ic-font-color-dark;
     text-decoration: none;
     cursor: pointer;
     opacity: 1;

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.quiz.context) %>/<%= course_quiz_history_path(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
+  <%= course_quiz_history_url(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
 <% end %>
 
 <p><%= t :body, "%{user_name} has completed the quiz %{quiz_title}, and it requires manual grading.", :user_name => asset.user.name, :quiz_title => asset.quiz.title %></p>

@@ -897,7 +897,7 @@ ul#question_list
         @include bg-image(flagged_question_hc, png, no-repeat, 3px, 7px, transparent, 10px, 8px)
 
     &.current_question
-      :color $right_side_text_color !important
+      :color $ic-font-color-dark !important
       :font-weight bold
     &.correct
       :color #080
@@ -1478,6 +1478,12 @@ ul#quiz_versions
     .blank_id_select
       width: auto
       min-width: 220px
+  .essay_question
+    .answers
+      .question_input
+        width: 100%
+    .tinymce-keyboard-shortcuts-toggle
+      float: right
 
 #left-side
   position: absolute

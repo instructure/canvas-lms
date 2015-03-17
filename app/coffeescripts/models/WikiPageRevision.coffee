@@ -7,6 +7,7 @@ define [
   'compiled/str/splitAssetString'
   'compiled/util/PandaPubPoller'
   'compiled/jquery.rails_flash_notifications'
+  'jquery.disableWhileLoading'
 ], ($, _, Backbone, I18n, DefaultUrlMixin, splitAssetString, PandaPubPoller) ->
 
   pageRevisionOptions = ['contextAssetString', 'page', 'pageUrl', 'latest', 'summary']

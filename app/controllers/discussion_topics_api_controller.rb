@@ -17,8 +17,6 @@
 #
 
 # @API Discussion Topics
-#
-# API for accessing and participating in discussion topics in groups and courses.
 class DiscussionTopicsApiController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::User

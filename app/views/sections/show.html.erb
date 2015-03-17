@@ -13,7 +13,7 @@
         <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.crosslist_section', 'Cross-List this Section') %></a>
       <% end %>
     <% end %>
-    <a href="<%= context_url(@context, :context_details_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
+    <a href="<%= context_url(@context, :context_settings_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
   </div>
 <% end %>
 
@@ -127,11 +127,11 @@ h3 .tally {
   <% end %>
   <tr>
     <td><%= f.blabel :start_at, :en => "Starts" %></td>
-    <td><%= f.text_field :start_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.start_at), :style => 'width: 120px;' %></td>
+    <td><%= f.text_field :start_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.start_at), :style => 'width: 120px;', :"aria-label" => t("Starts on Date") %></td>
   </tr>
   <tr>
     <td><%= f.blabel :end_at, :en => "Ends" %></td>
-    <td><%= f.text_field :end_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.end_at), :style => 'width: 120px;' %></td>
+    <td><%= f.text_field :end_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.end_at), :style => 'width: 120px;', :"aria-label" => t("Ends on Date") %></td>
   </tr>
   <tr>
     <td colspan="2">

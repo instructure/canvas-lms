@@ -129,11 +129,17 @@ class AssignmentsController < ApplicationController
       end
 
       begin
-        google_docs = google_docs_connection
-        @google_docs_token = google_docs.retrieve_access_token
+        google_docs = google_service_connection
+        @google_service = google_docs.service_type
+        @google_docs_token = google_service_connection.verify_access_token && google_docs.retrieve_access_token rescue false
       rescue GoogleDocs::NoTokenError
-        #do nothing
+        # Just fail I guess.
       end
+
+      @google_drive_upgrade = !!(logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
+          (!logged_in_user.user_services.where(service: 'google_drive').first || !(google_docs.verify_access_token rescue false)))
+      @google_authed = @google_docs_token and not @google_drive_upgrade
+
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
@@ -164,9 +170,10 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        google_docs = google_docs_connection
-        docs = google_docs.list_with_extension_filter(assignment.allowed_extensions)
+        docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
       rescue GoogleDocs::NoTokenError
+        #do nothing
+      rescue ArgumentError
         #do nothing
       rescue => e
         ErrorReport.log_exception(:oauth, e)

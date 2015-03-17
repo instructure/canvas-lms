@@ -208,7 +208,7 @@ describe SubmissionsController do
         flag.state = 'on'
         flag.save!
         mock_user_service = mock()
-        @user.expects(:user_services).returns(mock_user_service)
+        @user.stubs(:user_services).returns(mock_user_service)
         mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
       end
 

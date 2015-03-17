@@ -96,6 +96,12 @@
     <div class="last_batch" style="margin-top: 20px;">
       <h2><%= t(:last_batch_title, "Last Batch") %></h3>
       <p><%= t(:started_at_message, "Started: %{started_at}", :started_at => datetime_string(@last_batch.created_at)) %><br/>
+      <% if @last_batch.diffing_data_set_identifier %>
+        <p><%= t("Data Set Identifier: %{data_set_id}", data_set_id: @last_batch.diffing_data_set_identifier) %></p>
+        <% if @last_batch.data[:diffed_against_sis_batch_id] %>
+          <p><%= t("Incremental update successfully generated against a previous SIS Import.") %></p>
+        <% end %>
+      <% end %>
         <% if @last_batch.workflow_state == 'imported' %>
           <%= t(:imported_message, "All SIS data was successfully imported.") %>
           <%= print_counts @last_batch %>

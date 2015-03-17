@@ -104,7 +104,7 @@ ul.outcome-level
 
     &.selected
       a
-        background-color: $toolbarBackgroundLight
+        background-color: $ic-bg-light-primary
         &:hover
           background-color: $activeBG
       &.droppable
@@ -150,7 +150,7 @@ h5, .h5
   &.total
     font-weight: bold
     @if $use_high_contrast
-      color: $ic-text-color
+      color: $ic-font-color-dark
 
 table.criterion .edit
   display: none
@@ -175,7 +175,7 @@ table.criterion .insert
   cursor: pointer
   a
     @if $use_high_contrast
-      color: $ic-text-color
+      color: $ic-font-color-dark
     @else
       color: $grayLight
 
@@ -197,7 +197,7 @@ table.criterion .insert
   border-top-style: solid
   display: block
   @if $use_high_contrast
-    border-top-color: $ic-text-color
+    border-top-color: $ic-font-color-dark
   @else
     border-top-color: $grayLight
 

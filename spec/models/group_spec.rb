@@ -399,6 +399,21 @@ describe Group do
     end
   end
 
+  context "user_can_manage_own_discussion_posts" do
+    it "returns true if the context is an account" do
+      account = Account.default
+      group = account.groups.create
+      expect( group.user_can_manage_own_discussion_posts?(nil) ).to be_truthy
+    end
+
+    it "defers to the context if that context is a course" do
+      course_with_student
+      group = @course.groups.create
+      group.context.stubs(:user_can_manage_own_discussion_posts?).returns(false)
+      expect( group.user_can_manage_own_discussion_posts?(nil) ).to be_falsey
+    end
+  end
+
   context "invite_user" do
     it "should auto accept invitations" do
       course_with_student(:active_all => true)

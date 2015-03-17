@@ -255,6 +255,50 @@ describe EnrollmentsApiController, type: :request do
         expect(JSON.parse(response.body)['message']).to eql 'Can\'t add an enrollment to a concluded course.'
       end
 
+      it "should allow enrollments to be added to an active section of a concluded course if the user is already enrolled" do
+        other_section = @course.course_sections.create!
+        @course.enroll_user(@unenrolled_user, "StudentEnrollment", :section => other_section)
+
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @section.end_at = 1.day.from_now
+        @section.restrict_enrollments_to_section_dates = true
+        @section.save!
+        expect(@section).to_not be_concluded
+        api_call :post, @path, @path_options, {
+            :enrollment => {
+                :user_id                            => @unenrolled_user.id,
+                :type                               => 'StudentEnrollment',
+                :enrollment_state                   => 'active',
+                :course_section_id                  => @section.id,
+                :limit_privileges_to_course_section => true
+            }
+        }
+      end
+
+      it "should not allow enrollments to be added to an active section of a concluded course if the user is not already enrolled" do
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @section.end_at = 1.day.from_now
+        @section.restrict_enrollments_to_section_dates = true
+        @section.save!
+        raw_api_call :post, @path, @path_options, {
+                              :enrollment => {
+                                  :user_id                            => @unenrolled_user.id,
+                                  :type                               => 'StudentEnrollment',
+                                  :enrollment_state                   => 'active',
+                                  :course_section_id                  => @section.id,
+                                  :limit_privileges_to_course_section => true
+                              }
+                          }
+
+        expect(JSON.parse(response.body)['message']).to eql 'Can\'t add an enrollment to a concluded course.'
+      end
+
       it "should not enroll a user lacking a pseudonym on the course's account" do
         foreign_user = user
         api_call_as_user @admin, :post, @path, @path_options, { :enrollment => { :user_id => foreign_user.id } }, {},

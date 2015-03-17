@@ -44,6 +44,7 @@ module AttachmentHelper
   def media_preview_attributes(attachment, attrs={})
     attrs[:type] = attachment.content_type.match(/video/) ? 'video' : 'audio'
     attrs[:download_url] = context_url(attachment.context, :context_file_download_url, attachment.id)
+    attrs[:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
     attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
   end
 

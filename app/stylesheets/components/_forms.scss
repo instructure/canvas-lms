@@ -1,7 +1,7 @@
 @import "base/environment";
 
 /*
-@styleguide Forms
+Old Forms
 
 ## Inline
 
@@ -67,7 +67,7 @@ input[type=text].loading {
 
 .hint-text {
   font-size: 10px;
-  color: $hintTextColor;
+  color: $ic-hint-text;
 }
 
 input + .hint-text {
@@ -96,7 +96,7 @@ input + .hint-text {
     padding: 10px;
     margin: 0;
     background-color: lighten($canvas-neutral, 5%);
-    border-top: 1px solid $can-border-light;
+    border-top: 1px solid $ic-border-light;
     text-align: right;
     position: absolute;
     left: 0px;

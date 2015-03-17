@@ -21,7 +21,7 @@ class ImportedHtmlConverter
   include HtmlTextHelper
 
   CONTAINER_TYPES = ['div', 'p', 'body']
-  REFERENCE_KEYWORDS = %w{CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE}
+  REFERENCE_KEYWORDS = %w{CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE IMS-CC-FILEBASE}
   # yields warnings
   def self.convert(html, context, migration=nil, opts={})
     doc = Nokogiri::HTML(html || "")
@@ -87,7 +87,7 @@ class ImportedHtmlConverter
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
             section = $1
             new_url = "#{course_path}/#{section}"
-          elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
+          elsif val =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
             rel_path = URI.unescape($1)
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
               new_url = replace_media_comment_data(node, rel_path, context, opts) {|warning, data| yield warning, data if block_given?}

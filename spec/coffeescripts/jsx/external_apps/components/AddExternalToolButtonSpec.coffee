@@ -35,18 +35,3 @@ define [
     nodes = getDOMNodes()
     ok nodes.component.isMounted()
     ok TestUtils.isCompositeComponentWithType(nodes.component, AddExternalToolButton)
-
-  test 'renderForm', ->
-    nodes = getDOMNodes()
-
-    nodes.component.setState({ isLti2: true, tool: { app_id: 1 }})
-    form = nodes.component.renderForm()
-    equal form.props.ref, 'lti2Permissions'
-
-    nodes.component.setState({ isLti2: true, tool: { app_id: null }})
-    form = nodes.component.renderForm()
-    equal form.props.ref, 'lti2Iframe'
-
-    nodes.component.setState({ isLti2: false, tool: {}})
-    form = nodes.component.renderForm()
-    equal form.props.ref, 'configurationForm'

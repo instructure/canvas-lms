@@ -74,7 +74,8 @@
      data-event="addReply"
      href="#">
     <i class="icon-replied"></i>
-    {{#t "write_a_reply"}}Reply{{/t}}
+    <span aria-hidden="true">{{#t "write_a_reply"}}Reply{{/t}}</span>
+    <span class="screenreader-only">{{#t}}Reply to Comment{{/t}}</span>
   </a>
 </div>
 {{/if}}

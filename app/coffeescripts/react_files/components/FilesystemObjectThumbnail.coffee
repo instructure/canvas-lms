@@ -1,5 +1,5 @@
 define [
-  'react'
+  'old_unsupported_dont_use_react'
   '../mixins/BackboneMixin'
   'compiled/models/Folder'
   '../modules/customPropTypes'

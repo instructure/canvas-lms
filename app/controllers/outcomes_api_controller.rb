@@ -51,7 +51,7 @@
 #         },
 #         "display_name": {
 #           "description": "Optional friendly name for reporting",
-#           "example": "My Favorite Outocome",
+#           "example": "My Favorite Outcome",
 #           "type": "string"
 #         },
 #         "description": {

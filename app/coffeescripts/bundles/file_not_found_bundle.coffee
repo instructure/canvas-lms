@@ -1,6 +1,6 @@
 require [
   'jquery'
-  'react'
+  'old_unsupported_dont_use_react'
   'i18n!file_not_found'
   'compiled/fn/preventDefault'
   'compiled/react/shared/utils/withReactDOM'

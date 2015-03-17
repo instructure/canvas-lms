@@ -3,7 +3,7 @@
 define([
   'underscore',
   'i18n!modules',
-  'react'
+  'old_unsupported_dont_use_react'
 ], (_, I18n, React) => {
 
   var PostGradesDialogNeedsGradingPage = React.createClass({

@@ -1,5 +1,6 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
+  'old_unsupported_dont_use_react'
   'slickgrid.long_text_editor'
   'compiled/views/KeyboardNavDialog'
   'jst/KeyboardNavDialog'
@@ -31,6 +32,7 @@ define [
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
   'compiled/views/gradebook/SectionMenuView'
+  'compiled/views/gradebook/GradingPeriodMenuView'
   'compiled/gradebook2/GradebookKeyboardNav'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
@@ -44,7 +46,10 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesStore, PostGradesApp, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradebookKeyboardNav) ->
+], (React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
+  $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog,
+  SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesStore, PostGradesApp, columnHeaderTemplate,
+  groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav) ->
 
   class Gradebook
     columnWidths =
@@ -80,11 +85,15 @@ define [
       @show_concluded_enrollments = true if @options.course_is_concluded
       @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
+      @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
+      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.grading_periods
+      @gradingPeriodToShow = userSettings.contextGet('gradebook_current_grading_period') || ENV.GRADEBOOK_OPTIONS.current_grading_period_id
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
       $.subscribe 'currentSection/change',            @updateCurrentSection
+      $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
       enrollmentsUrl = if @show_concluded_enrollments
         'students_url_with_concluded_enrollments'
@@ -96,9 +105,13 @@ define [
       # this method should be removed after a month in production
       @alignCoursePreferencesWithLocalStorage()
 
+      assignmentGroupsParams = {}
+      if @mgpEnabled && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+        assignmentGroupsParams = {grading_period_id: @gradingPeriodToShow}
+
       ajax_calls = [
         $.ajaxJSON(@options[enrollmentsUrl], "GET")
-      , $.ajaxJSON(@options.assignment_groups_url, "GET", {}, @gotAssignmentGroups)
+      , $.ajaxJSON(@options.assignment_groups_url, "GET", assignmentGroupsParams, @gotAssignmentGroups)
       , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
       ]
 
@@ -453,6 +466,7 @@ define [
     getSubmissionsChunks: =>
       @withAllStudents (allStudentsObj) =>
         allStudents = (s for k, s of allStudentsObj)
+          .sort (a, b) => @localeSort(a.sortable_name, b.sortable_name)
         loop
           students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
           unless students.length
@@ -461,6 +475,7 @@ define [
           params =
             student_ids: (student.id for student in students)
             response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state']
+          params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
           $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
           @chunk_start += @options.chunk_size
 
@@ -820,6 +835,21 @@ define [
       else
         false
 
+    gradingPeriodList: ->
+      _.map @gradingPeriods, (period) =>
+        { title: period.title, id: period.id, checked: @gradingPeriodToShow == period.id }
+
+    drawGradingPeriodSelectButton: () ->
+      @gradingPeriodMenu = new GradingPeriodMenuView(
+        el: $('.multiple-grading-periods-selector-placeholder'),
+        periods: @gradingPeriodList(),
+        currentGradingPeriod: @gradingPeriodToShow)
+      @gradingPeriodMenu.render()
+
+    updateCurrentGradingPeriod: (period) =>
+      userSettings.contextSet 'gradebook_current_grading_period', period
+      window.location.reload()
+
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
         course:
@@ -837,6 +867,7 @@ define [
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled || @course
+      @drawGradingPeriodSelectButton() if @mgpEnabled
 
       $settingsMenu = $('#gradebook_settings').next()
       $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (i, setting) =>
@@ -874,6 +905,22 @@ define [
 
       @setDownloadCsvUrl()
       @renderTotalHeader()
+
+      if !!window.chrome
+        $('.ui-menu-item').on('mouseout', @fix_chrome_render_bug)
+        $('.grading-period-select-button').click(@fix_chrome_render_bug)
+        $('#gradebook_settings').click(@fix_chrome_render_bug)
+        $(document.body).click(@fix_chrome_render_bug)
+
+    # CNVS-18276 - chrome 40 rendering issue
+    # is fixed in chrome 42. in the meantime, force repaint
+    # when a dropdown or dropdown item is clicked, when a dropdown
+    # menu item hover occurs
+    fix_chrome_render_bug: (e) ->
+      gradebook_grid = document.getElementById('gradebook_grid')
+      gradebook_grid.style.display = 'none'
+      gradebook_grid.offsetHeight
+      gradebook_grid.style.display = 'block'
 
     setDownloadCsvUrl: ->
       if @show_concluded_enrollments

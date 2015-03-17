@@ -59,7 +59,21 @@ describe "courses" do
         validate_action_button(:first, 'Unpublished')
       end
 
-      it "should not show course status if graded submissions exist" do
+      it "should allow publishing even if graded submissions exist" do
+        course_with_student_submissions({submission_points: true, unpublished: true})
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        expect(f('.publish_course_in_wizard_link')).to be_displayed
+        expect(course_status_buttons.first).to have_class('disabled')
+        expect(course_status_buttons.first.text).to eq 'Unpublished'
+        expect(course_status_buttons.last).not_to have_class('disabled')
+        expect(course_status_buttons.last.text).to eq 'Publish'
+        expect_new_page_load { course_status_buttons.last.click }
+        @course.reload
+        expect(@course).to be_available
+      end
+
+      it "should not show course status if published and graded submissions exist" do
         course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
         expect(f('#course_status')).to be_nil

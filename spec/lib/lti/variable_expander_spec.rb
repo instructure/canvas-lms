@@ -362,6 +362,94 @@ module Lti
           end
         end
 
+        context 'attachment' do
+          let (:attachment) do
+            attachment = attachment_obj_with_context(course)
+            attachment.media_object = media_object
+            attachment.usage_rights = usage_rights
+            attachment
+          end
+          let(:media_object) do
+            mo = MediaObject.new
+            mo.media_id = '1234'
+            mo.media_type = 'video'
+            mo.duration = 555
+            mo.total_size = 444
+            mo.title = 'some title'
+            mo
+          end
+          let(:usage_rights) do
+            ur = UsageRights.new
+            ur.legal_copyright = 'legit'
+            ur
+          end
+          subject { described_class.new(root_account, account, controller, current_user: user, tool: tool, attachment: attachment) }
+
+          it 'has substitution for $Canvas.file.media.id when a media object is present' do
+            exp_hash = {test: '$Canvas.file.media.id'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq '1234'
+          end
+
+          it 'has substitution for $Canvas.file.media.id when a media object is present' do
+            exp_hash = {test: '$Canvas.file.media.id'}
+            attachment.media_object = nil
+            attachment.media_entry_id = '4567'
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq '4567'
+          end
+
+          it 'has substitution for $Canvas.file.media.type' do
+            exp_hash = {test: '$Canvas.file.media.type'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'video'
+          end
+
+          it 'has substitution for $Canvas.file.media.duration' do
+            exp_hash = {test: '$Canvas.file.media.duration'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 555
+          end
+
+          it 'has substitution for $Canvas.file.media.size' do
+            exp_hash = {test: '$Canvas.file.media.size'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 444
+          end
+
+          it 'has substitution for $Canvas.file.media.title' do
+            exp_hash = {test: '$Canvas.file.media.title'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'some title'
+          end
+
+          it 'uses user_entered_title for $Canvas.file.media.title if present' do
+            media_object.user_entered_title = 'user title'
+            exp_hash = {test: '$Canvas.file.media.title'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'user title'
+          end
+
+          it 'has substitution for $Canvas.file.usageRights.name' do
+            exp_hash = {test: '$Canvas.file.usageRights.name'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'Private (Copyrighted)'
+          end
+
+          it 'has substitution for $Canvas.file.usageRights.url' do
+            exp_hash = {test: '$Canvas.file.usageRights.url'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'http://en.wikipedia.org/wiki/Copyright'
+          end
+
+          it 'has substitution for $Canvas.file.usageRights.copyright_text' do
+            exp_hash = {test: '$Canvas.file.usageRights.copyrightText'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'legit'
+          end
+
+        end
+
         it 'has substitution for $Canvas.masqueradingUser.id' do
           logged_in_user = User.new
           logged_in_user.stubs(:id).returns(7878)

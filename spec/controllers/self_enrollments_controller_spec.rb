@@ -51,5 +51,18 @@ describe SelfEnrollmentsController do
       get 'new', :self_enrollment_code => code
       expect(response).to be_success
     end
+
+    it "should default assign login_label_name to 'email'" do
+      get 'new', :self_enrollment_code => @course.self_enrollment_code
+      expect(assigns(:login_label_name)).to eq("Email")
+    end
+
+    it "should change login_label_name when set on domain_root_account" do
+      custom_label = "batman is the best"
+      Account.any_instance.stubs(:login_handle_name).returns(custom_label)
+
+      get 'new', :self_enrollment_code => @course.self_enrollment_code
+      expect(assigns(:login_label_name)).to eq(custom_label)
+    end
   end
 end

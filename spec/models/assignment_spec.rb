@@ -1644,6 +1644,25 @@ describe Assignment do
       end
     end
 
+    context "assignment unmuted" do
+      before :once do
+        Notification.create(:name => 'Assignment Unmuted')
+      end
+
+      it "should create a message when an assigment is unmuted" do
+        assignment_model(:course => @course)
+        @assignment.broadcast_unmute_event
+        expect(@assignment.messages_sent).to be_include('Assignment Unmuted')
+      end
+
+      it "should not create a message in an unpublished course" do
+        course
+        assignment_model(:course => @course)
+        @assignment.broadcast_unmute_event
+        expect(@assignment.messages_sent).not_to be_include('Assignment Unmuted')
+      end
+    end
+
     context "varied due date notifications" do
       before :once do
         @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!

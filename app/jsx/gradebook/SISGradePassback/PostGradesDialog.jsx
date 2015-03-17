@@ -2,7 +2,7 @@
 
 define([
   'underscore',
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/gradebook/SISGradePassback/assignmentUtils',
   'jsx/gradebook/SISGradePassback/PostGradesDialogCorrectionsPage',
   'jsx/gradebook/SISGradePassback/PostGradesDialogNeedsGradingPage',

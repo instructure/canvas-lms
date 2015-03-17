@@ -56,7 +56,8 @@ define [
               'compiled/views/RootFoldersFinder'
             ], (TreeBrowserView, RootFoldersFinder) =>
               rootFoldersFinder = new RootFoldersFinder({
-                contentTypes: 'image'
+                contentTypes: 'image',
+                useVerifiers: true
               })
               new TreeBrowserView(rootModelsFinder: rootFoldersFinder).render().$el.appendTo(ui.panel)
               done()

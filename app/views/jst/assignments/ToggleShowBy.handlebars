@@ -7,16 +7,18 @@
     id="show_by_date"
     name="show_by"
     type="radio"
+    aria-label="{{#t}}Show by Date{{/t}}"
     {{checkedIf showByDate}}
   >
-  <label for="show_by_date">{{#t "date"}}Date{{/t}}</label>
+  <label aria-hidden="true" for="show_by_date">{{#t "date"}}Date{{/t}}</label>
 
   <input
     id="show_by_type"
     name="show_by"
     type="radio"
+    aria-label="{{#t}}Show by Type{{/t}}"
     {{checkedUnless showByDate}}
   >
-  <label for="show_by_type">{{#t "type"}}Type{{/t}}</label>
+  <label aria-hidden="true" for="show_by_type">{{#t "type"}}Type{{/t}}</label>
 </div>
 {{/if}}

@@ -46,6 +46,7 @@ define [
         $link.empty()
 
       $a
+        .data('download', $a.attr('href'))
         .prop('href', '#')
         .addClass('instructure_inline_media_comment')
         .append($thumbnail)

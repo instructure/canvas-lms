@@ -1,8 +1,9 @@
 /** @jsx React.DOM */
 
 define([
-  'react'
-], function(React) {
+  'react',
+  'react-router'
+], function(React, { RouteHandler }) {
 
   return React.createClass({
     displayName: 'Root',
@@ -10,7 +11,7 @@ define([
     render() {
       return (
         <div className="ExternalAppsRoot">
-          <this.props.activeRouteHandler />
+          <RouteHandler/>
         </div>
       );
     }

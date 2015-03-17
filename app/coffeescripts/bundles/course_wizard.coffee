@@ -1,6 +1,6 @@
 require [
   'jquery'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/userSettings'
   'jsx/course_wizard/CourseWizard'
 ], ($, React, userSettings, CourseWizard) ->

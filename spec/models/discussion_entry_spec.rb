@@ -519,5 +519,14 @@ describe DiscussionEntry do
       student_in_course(:course => @course)
       expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
+
+    it "should not allow replies from students to topics locked based on date" do
+      @entry = @topic.reply_from(:user => @teacher, :text => "topic")
+      @topic.unlock_at = 1.day.from_now
+      @topic.save!
+      @entry.reply_from(:user => @teacher, :text => "reply") # should not raise error
+      student_in_course(:course => @course)
+      expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+    end
   end
 end

@@ -25,13 +25,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def new_module_form
+    add_form = f('#add_context_module_form')
     keep_trying_until do
       driver.execute_script("$('.add_module_link').trigger('click')")
       wait_for_ajaximations
-      expect(f('.ui-dialog')).to be_displayed
+      expect(add_form).to be_displayed
     end
 
-    add_form = f('#add_context_module_form')
     add_form
   end
 

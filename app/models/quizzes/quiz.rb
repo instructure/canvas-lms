@@ -323,11 +323,15 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def survey?
-    self.quiz_type == 'survey' || self.quiz_type == 'graded_survey'
+    self.quiz_type == 'survey' || graded_survey?
   end
 
   def graded?
-    self.quiz_type == 'assignment' || self.quiz_type == 'graded_survey'
+    self.quiz_type == 'assignment' || graded_survey?
+  end
+
+  def graded_survey?
+    self.quiz_type == 'graded_survey'
   end
 
   def ungraded?
@@ -349,7 +353,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     return false unless self.show_correct_answers
 
     if user.present? && self.show_correct_answers_last_attempt && quiz_submission = user.quiz_submissions.where(quiz_id: self.id).first
-      return quiz_submission.attempts_left == 0
+      return quiz_submission.attempts_left == 0 && quiz_submission.complete?
     end
 
     # If we're showing the results only one time, and are letting students

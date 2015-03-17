@@ -190,6 +190,7 @@ describe CommunicationChannel do
       @cc = @user.communication_channels.create!(:path => 'user1@example.com')
       account = Account.create!
       HostUrl.stubs(:context_host).with(account).returns('someserver.com')
+      HostUrl.stubs(:context_host).with(@cc).returns('someserver.com')
       HostUrl.stubs(:context_host).with(nil).returns('default')
       @cc.send_confirmation!(account)
       message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first

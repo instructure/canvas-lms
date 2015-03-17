@@ -664,6 +664,7 @@ RSpec.configure do |config|
   def course_with_student_submissions(opts={})
     course_with_teacher_logged_in(opts)
     student_in_course
+    @course.claim! if opts[:unpublished]
     submission_count = opts[:submissions] || 1
     submission_count.times do |s|
       assignment = @course.assignments.create!(:title => "test #{s} assignment")

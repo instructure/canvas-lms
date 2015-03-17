@@ -24,6 +24,10 @@ module SIS
         row.include?('account_id') && row.include?('parent_account_id')
       end
 
+      def self.identifying_fields
+        %w[account_id].freeze
+      end
+
       # expected columns
       # account_id,parent_account_id
       def process(csv)

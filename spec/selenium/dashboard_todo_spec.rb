@@ -38,6 +38,26 @@ describe "dashboard" do
       expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')
       #verify assignment is in to do list
       expect(f('.to-do-list > li')).to include_text(assignment.submission_action_string)
+      expect(f('.coming_up')).to include_text(assignment.title)
+    end
+
+    it "should not display assignments for soft-concluded courses in to do list for a student" do
+      notification_model(:name => 'Assignment Due Date Changed')
+      notification_policy_model(:notification_id => @notification.id)
+      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
+      assignment.due_at = Time.now + 60
+      assignment.created_at = 1.month.ago
+      assignment.save!
+
+      Timecop.freeze(1.hour.ago) do
+        @course.soft_conclude!
+        @course.save!
+      end
+
+      get "/"
+
+      expect(f('.to-do-list')).to be_nil
+      expect(f('.coming_up')).to_not include_text(assignment.title)
     end
   end
 end

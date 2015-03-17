@@ -294,6 +294,11 @@ define([
       $('#self_registration_type_radios').toggle(this.checked);
     }).trigger('change');
 
+
+    $('.branding_section_toggler').on('change', function(){
+      $(this).prevAll('.branding_section').last().toggle(!this.checked)
+    })
+
   });
 
 });

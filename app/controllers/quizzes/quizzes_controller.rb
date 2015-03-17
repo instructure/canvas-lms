@@ -58,7 +58,7 @@ class Quizzes::QuizzesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_QUIZZES)
 
-    can_manage = is_authorized_action?(@context, @current_user, :manage_assignments)
+    can_manage = @context.grants_right?(@current_user, session, :manage_assignments)
 
     scope = @context.quizzes.active.includes([ :assignment ])
 
@@ -317,13 +317,14 @@ class Quizzes::QuizzesController < ApplicationController
           @assignment = @context.assignments.build(:title => params[:quiz][:title], :due_at => params[:quiz][:lock_at], :submission_types => 'online_quiz')
           @assignment.assignment_group = @assignment_group
           @assignment.saved_by = :quiz
+          @assignment.workflow_state = 'unpublished'
           @assignment.save
           params[:quiz][:assignment_id] = @assignment.id
         end
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      if params[:assignment] && @context.feature_enabled?(:post_grades)
+      if params[:assignment].present? && @context.feature_enabled?(:post_grades) && @quiz.assignment
         @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
         @quiz.assignment.save
       end
@@ -870,8 +871,10 @@ class Quizzes::QuizzesController < ApplicationController
       false
     elsif @context.restrict_enrollments_to_course_dates && @context.soft_concluded?
       false
-    elsif @current_user.present? && @context.present? &&
-          @context.enrollments.where(user_id: @current_user.id).all? {|e| e.inactive? }
+    elsif @current_user.present? &&
+          @context.present? &&
+          @context.enrollments.where(user_id: @current_user.id).all? {|e| e.inactive? } &&
+          !@context.grants_right?(@current_user, :read_as_admin)
       false
     else
       true

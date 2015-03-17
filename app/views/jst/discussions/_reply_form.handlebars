@@ -3,7 +3,12 @@
     <div class="notification" data-bind="notification"></div>
     <a class="discussion-reply-action discussion-reply-box" data-event="addReply" href="#">
       <i class="icon-replied"></i>
-      {{#t "write_a_reply"}}Reply{{/t}}
+      <span aria-hidden="true">{{#t "write_a_reply"}}Reply{{/t}}</span>
+      {{#if isForMainDiscussion}}
+        <span class="screenreader-only">{{#t}}Reply to Main Discussion{{/t}}</span>
+      {{else}}
+        <span class="screenreader-only">{{#t}}Reply to Comment{{/t}}</span>
+      {{/if}}
     </a>
   </div>
 {{/if}}
