@@ -228,7 +228,16 @@ define [
      test 'it provides a format', ->
        equal(typeof(helpers.accessibleDateFormat()), "string")
 
+     test 'it can shorten the format for dateonly purposes',->
+       shortForm = helpers.accessibleDateFormat('date')
+       equal(shortForm.indexOf("hh:mm"), -1)
+       ok(shortForm.indexOf("YYYY") > -1)
+
      test 'it provides a common format prompt wrapped around the format', ->
        formatPrompt = helpers.datepickerScreenreaderPrompt()
-       ok(formatPrompt.toString().indexOf(helpers.accessibleDateFormat()) > -1)
+       ok(formatPrompt.indexOf(helpers.accessibleDateFormat()) > -1)
 
+     test 'it passes format info through to date format', ->
+       shortFormatPrompt = helpers.datepickerScreenreaderPrompt('date')
+       equal(shortFormatPrompt.indexOf(helpers.accessibleDateFormat()), -1)
+       ok(shortFormatPrompt.indexOf(helpers.accessibleDateFormat('date')) > -1)

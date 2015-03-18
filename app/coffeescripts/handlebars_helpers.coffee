@@ -151,9 +151,15 @@ define [
     #
     # @public
     #
+    # @param {string} format defaults to 'datetime', if 'date' only returns
+    #   the date portion of the format
+    #
     # @returns {String} the format to include for all datepickers
-    accessibleDateFormat: ()->
-      I18n.t "#helpers.accessible_date_format", "YYYY-MM-DD hh:mm"
+    accessibleDateFormat: (format='datetime')->
+      if format is 'date'
+        I18n.t "#helpers.accessible_date_only_format", "YYYY-MM-DD"
+      else
+        I18n.t "#helpers.accessible_date_format", "YYYY-MM-DD hh:mm"
 
     ##
     # outputs the prompt to include in labels attached to date pickers for
@@ -161,11 +167,14 @@ define [
     #
     # @public
     #
+    # @param {string} format defaults to 'datetime', if 'date' only returns
+    #   the date portion of the format
+    #
     # @returns {String} the prompt for telling SRs about how to
     #   input a date
-    datepickerScreenreaderPrompt: ()->
+    datepickerScreenreaderPrompt: (format='datetime')->
       promptText = I18n.t "#helpers.accessible_date_prompt", "Format Like"
-      format = Handlebars.helpers.accessibleDateFormat()
+      format = Handlebars.helpers.accessibleDateFormat(format)
       "#{promptText} #{format}"
 
     mimeClass: mimeClass
