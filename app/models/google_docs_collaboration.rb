@@ -69,12 +69,17 @@ class GoogleDocsCollaboration < Collaboration
     service_user_id = google_adapter_user_service(user).service_user_id rescue nil
     collaborator = self.collaborators.where(user_id: user).first
 
-    if collaborator && collaborator.authorized_service_user_id != service_user_id
-      google_adapter_for_user.acl_remove(self.document_id, [collaborator.authorized_service_user_id]) if collaborator.authorized_service_user_id
+    if collaborator
+      if collaborator.authorized_service_user_id != service_user_id
+        google_adapter_for_user.acl_remove(self.document_id, [collaborator.authorized_service_user_id]) if collaborator.authorized_service_user_id
 
-      user_param = is_google_drive ? service_user_id : user
-      google_adapter_for_user.acl_add(self.document_id, [user_param])
-      collaborator.update_attributes(:authorized_service_user_id => service_user_id)
+        user_param = is_google_drive ? service_user_id : user
+        google_adapter_for_user.acl_add(self.document_id, [user_param])
+        collaborator.update_attributes(:authorized_service_user_id => service_user_id)
+      end
+    else
+      # no collaboration for this user, lets create it
+      add_users_to_collaborators([user])
     end
   end
 
@@ -98,7 +103,7 @@ class GoogleDocsCollaboration < Collaboration
 
       if is_google_drive
         user_ids = new_users.map do |user|
-          google_adapter_user_service(user).service_user_id rescue nil
+          google_user_service(user, GOOGLE_DRIVE_SERVICE).service_user_id rescue nil
         end.compact
       else
         user_ids = new_users
@@ -125,7 +130,9 @@ class GoogleDocsCollaboration < Collaboration
     if users.length > 0
       existing_users = collaborators.where(:user_id => users).pluck(:user_id)
       users.select { |u| !existing_users.include?(u.id) }.each do |u|
-        collaborators.create(:user => u, :authorized_service_user_id => google_adapter_user_service(u).service_user_id)
+        service = google_adapter_user_service(u)
+        service_user_id = service ? service.service_user_id : nil
+        collaborators.create(:user => u, :authorized_service_user_id => service_user_id)
       end
     end
   end
