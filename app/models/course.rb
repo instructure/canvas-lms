@@ -1566,7 +1566,9 @@ class Course < ActiveRecord::Base
               "N/A"
             else
               submission = submissions[[student.id, a.id]]
-              submission.try(:score)
+              a.grading_type == "gpa_scale" && submission.try(:score) ?
+                a.score_to_grade(submission.score) :
+                submission.try(:score)
             end
           end
           #Last Row

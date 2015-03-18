@@ -95,10 +95,6 @@ class GradebookUploadsController < ApplicationController
                 :grade => submission_record['grade']
               }
               assignment = assignment_map[assignment_id]
-              if assignment.grading_type == 'gpa_scale'
-                new_submission[:grade] = assignment.score_to_grade(submission_record['grade'])
-                new_submission[:score] = submission_record['grade'].to_f
-              end
               if da_enabled
                 if visible_assignments[user_id].include?(assignment_id)
                   list << new_submission
@@ -130,7 +126,7 @@ class GradebookUploadsController < ApplicationController
           submission ||= Submission.new(:assignment => assignment) { |s| s.user_id = sub[:user_id] }
           # grade_to_score expects a string so call to_s here, otherwise things that have a score of zero will return nil
           # we should really be using Assignment#grade_student here
-          score = assignment.grading_type == 'gpa_scale' ? sub[:score] : assignment.grade_to_score(sub[:grade].to_s)
+          score = assignment.grade_to_score(sub[:grade].to_s)
           unless score == submission.score
             old_score = submission.score
             submission.grade = sub[:grade].to_s

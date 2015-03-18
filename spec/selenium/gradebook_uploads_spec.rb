@@ -23,12 +23,11 @@ describe "gradebook uploads" do
     assignment.grade_student(@student, :grade => "D")
     filename, fullpath, data = gradebook_file("gradebook0.csv",
       "Student Name,ID,Section,GPA Scale Assignment",
-      "User,#{@student.id},,4")
+      "User,#{@student.id},,B-")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
     submit_form('#gradebook_grid_form')
     expect(assignment.submissions.last.grade).to eq "B-"
-    expect(assignment.submissions.last.score).to eq 4
   end
 
   it "should say no changes if no changes" do

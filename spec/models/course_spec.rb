@@ -1223,6 +1223,17 @@ describe Course, "gradebook_to_csv" do
     expect(rows[2][1]).to eq @user2.id.to_s
   end
 
+  it "shows gpa_scale grades instead of points" do
+    student_in_course(active_all: true)
+    a = @course.assignments.create! grading_type: "gpa_scale",
+      points_possible: 10,
+      title: "blah"
+    a.publish
+    a.grade_student(@student, grade: "C")
+    rows = CSV.parse(@course.gradebook_to_csv)
+    expect(rows[2][3]).to eql "C"
+  end
+
   context "differentiated assignments" do
     def setup_DA
       @course_section = @course.course_sections.create
