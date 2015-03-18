@@ -308,6 +308,15 @@ END
         applies_to: 'RootAccount',
         state: 'hidden',
         beta: true
+      },
+    'quizzes_lti' =>
+      {
+        display_name: -> { I18n.t('Quiz LTI plugin') },
+        description: -> { I18n.t('Use the new quiz LTI tool in place of regular canvas quizzes') },
+        applies_to: 'Course',
+        state: 'hidden',
+        beta: true,
+        root_opt_in: true
       }
   )
 
