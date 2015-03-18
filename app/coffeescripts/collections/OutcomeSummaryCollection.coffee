@@ -31,11 +31,11 @@ define [
     url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}"
 
     scoresFor: (outcome) ->
-      _.compact(@map((result) ->
+      @chain().map((result) ->
         if result.get('links').learning_outcome == outcome.id
-          assessed_at: result.get('assessed_at')
+          assessed_at: result.get('submitted_or_assessed_at')
           score: result.get('score')
-      ))
+      ).compact().value()
 
 
   class OutcomeSummaryCollection extends Collection

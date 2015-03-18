@@ -36,8 +36,8 @@
 #           "type": "integer",
 #           "description": "The student's score"
 #         },
-#         "assessed_at": {
-#           "description": "The datetime the resulting OutcomeResult was assessed.",
+#         "submitted_or_assessed_at": {
+#           "description": "The datetime the resulting OutcomeResult was submitted at, or absent that, when it was assessed.",
 #           "example": "2013-02-01T00:00:00-06:00",
 #           "type": "datetime"
 #         },
