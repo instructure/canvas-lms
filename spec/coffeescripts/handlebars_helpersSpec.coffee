@@ -233,6 +233,11 @@ define [
        equal(shortForm.indexOf("hh:mm"), -1)
        ok(shortForm.indexOf("YYYY") > -1)
 
+     test 'it can shorten the format for time-only purposes',->
+       shortForm = helpers.accessibleDateFormat('time')
+       ok(shortForm.indexOf("hh:mm") > -1)
+       equal(shortForm.indexOf("YYYY"), -1)
+
      test 'it provides a common format prompt wrapped around the format', ->
        formatPrompt = helpers.datepickerScreenreaderPrompt()
        ok(formatPrompt.indexOf(helpers.accessibleDateFormat()) > -1)
