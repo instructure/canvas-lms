@@ -91,6 +91,14 @@ describe Message do
 
       expect(msg.subject).to include(@teacher.name)
     end
+
+    it "displays a custom logo when configured" do
+      account = account_model
+      account.settings[:email_logo] = 'awesomelogo.jpg'
+      @au = AccountUser.create(:account => account)
+      msg = generate_message(:account_user_notification, :email, @au)
+      expect(msg.html_body).to include('awesomelogo.jpg')
+    end
   end
 
   context "named scopes" do

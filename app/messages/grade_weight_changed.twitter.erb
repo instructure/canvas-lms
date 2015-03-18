@@ -1,5 +1,5 @@
 <% course = asset.is_a?(Course) ? asset : asset.context -%>
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/<%= course.class.to_s.downcase.pluralize %>/<%= course.id %>/assignments
+  <%= course_assignments_url(course) %>
 <% end -%>
 <%= t('grade_changed', "Canvas Alert - Grading Policy Changed: %{course_name}", :course_name => course.name) %>

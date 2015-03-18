@@ -174,7 +174,7 @@ class SubmissionsApiController < ApplicationController
       if includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments)
         json = bulk_process_submissions_for_visibility(submissions, includes)
       else
-        submissions = submissions.all
+        submissions = Api.paginate(submissions, self, api_v1_course_assignment_submissions_url(@context))
         bulk_load_attachments_and_previews(submissions)
         json = submissions.map { |s|
           s.visible_to_user = true
@@ -258,7 +258,7 @@ class SubmissionsApiController < ApplicationController
       student_ids << @current_user.id if student_ids.empty?
     end
 
-    can_view_all = is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+    can_view_all = @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     if all && can_view_all
       opts = { include_priors: true }
       if @section
@@ -275,7 +275,7 @@ class SubmissionsApiController < ApplicationController
       # can view observees
       allowed_student_ids = @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
       # can view self, if a student
-      allowed_student_ids << @current_user.id if is_authorized_action?(@context, @current_user, :participate_as_student)
+      allowed_student_ids << @current_user.id if @context.grants_right?(@current_user, session, :participate_as_student)
       return render_unauthorized_action if allowed_student_ids.empty?
       if all
         student_ids = allowed_student_ids
@@ -299,7 +299,7 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
 
-    if params[:grading_period_id] && multiple_grading_periods?
+    if params[:grading_period_id].presence && multiple_grading_periods?
       assignments = GradingPeriod.find(params[:grading_period_id]).assignments(assignment_scope)
     else
       assignments = assignment_scope.all

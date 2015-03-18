@@ -27,7 +27,6 @@ require [
   'compiled/behaviors/tooltip'
   'compiled/behaviors/instructure_inline_media_comment'
   'compiled/behaviors/ping'
-  'compiled/behaviors/favicon'
 
   # other stuff several bundles use
   'media_comments'

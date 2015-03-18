@@ -20,17 +20,31 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'conversation_message.email' do
-  it "should render" do
-    teacher_enrollment = course_with_teacher
+  before do
+    @teacher_enrollment = course_with_teacher
     user_enrollment = student_in_course
     conversation = @teacher.initiate_conversation([@user])
-    message = conversation.add_message("this
+    @message = conversation.add_message("this
 is
 a
 message")
     account = User.find(user_enrollment.user_id).account
-    message.context_type = account.class.to_s
-    message.context_id = account.id
-    generate_message(:conversation_message, :email, message)
+    @message.context_type = account.class.to_s
+    @message.context_id = account.id
   end
+
+  it "should render" do
+    generate_message(:conversation_message, :email, @message)
+  end
+
+  it "doesnt have trailing erb closures" do
+    @message.stubs(:attachments).returns([
+      stub("attachment",
+       display_name: "FileName", readable_size: "1MB", id: 42,
+       context: @teacher_enrollment.course, uuid: "abcdef123456")
+    ])
+    msg = generate_message(:conversation_message, :email, @message)
+    expect(msg.html_body).to_not match(/%>/)
+  end
+
 end

@@ -1,4 +1,4 @@
-require ['compiled/util/secondsToTime'], (secondsToTime) ->
+define ['compiled/util/secondsToTime'], (secondsToTime) ->
 
   module "secondsToTime"
 

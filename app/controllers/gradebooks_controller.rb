@@ -40,7 +40,7 @@ class GradebooksController < ApplicationController
     end
 
     if !@presenter.student || !@presenter.student_enrollment
-      return authorized_action(nil, @current_user, :permission_fail)
+      return render_unauthorized_action
     end
 
     if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
@@ -48,9 +48,16 @@ class GradebooksController < ApplicationController
       if @presenter.student
         add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
 
+        gp_id = nil
+        if multiple_grading_periods?
+          set_current_grading_period
+          @grading_periods = get_grading_periods
+          gp_id = @current_grading_period_id unless view_all_grading_periods?
+        end
+
         Shackles.activate(:slave) do
           #run these queries on the slave database for speed
-          @presenter.assignments
+          @presenter.assignments(gp_id)
           @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
           @presenter.submissions
           @presenter.submission_counts
@@ -141,6 +148,7 @@ class GradebooksController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       respond_to do |format|
         format.html {
+          set_current_grading_period if multiple_grading_periods?
           set_js_env
           case @current_user.preferred_gradebook_version
           when "2"
@@ -174,8 +182,24 @@ class GradebooksController < ApplicationController
     redirect_to action: :show
   end
 
+  def set_current_grading_period
+    unless @current_grading_period_id = params[:grading_period_id].presence
+      return if view_all_grading_periods?
+      return unless current = @context.grading_periods.active.current
+      @current_grading_period_id = current.first.try(:id).to_s
+    end
+  end
+
+  def view_all_grading_periods?
+    @current_grading_period_id == "0"
+  end
+
+  def get_grading_periods
+    @context.grading_periods.active.map { |gp| {id: gp.id, title: gp.title} }
+  end
+
   def set_js_env
-    @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
+    @gradebook_is_editable = !@context.unpublished? && @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
     ag_includes = [:assignments]
@@ -207,6 +231,9 @@ class GradebooksController < ApplicationController
       :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
+      :multiple_grading_periods_enabled => multiple_grading_periods?,
+      :grading_periods => get_grading_periods,
+      :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
       :custom_column_url => api_v1_course_custom_gradebook_column_url(@context, ":id"),
@@ -346,7 +373,7 @@ class GradebooksController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
-                         'Speedgrader is enabled only for published content.')
+                         'SpeedGrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
     end
 

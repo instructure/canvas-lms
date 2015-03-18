@@ -174,6 +174,8 @@ module Api::V1::OutcomeResults
   def serialize_rollup_score(score)
     {
       score: score.score,
+      title: score.title,
+      submitted_at: score.submitted_at,
       count: score.count,
       links: {outcome: score.outcome.id.to_s},
     }

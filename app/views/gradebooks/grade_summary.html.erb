@@ -52,9 +52,32 @@
   </div>
 <% end %>
 
-<a class="btn btn-small print-grades icon-printer" href="javascript:window.print()">
-  <%= t :print_grades, "Print grades" %>
-</a>
+<div class="grid-row middle-xs between-xs">
+  <div class="col-xs-6" >
+    <% if multiple_grading_periods? %>
+      <select id="grading_periods_selector">
+        <option
+          value="0"
+          <%= "selected=selected" if @current_grading_period_id == "0" %> >
+          <%= t :all_grading_periods, "All Grading Periods" %>
+        </option>
+        <% @grading_periods.each do |gp| %>
+          <option
+            value="<%= gp[:id] %>"
+            <%= "selected=selected" if @current_grading_period_id == gp[:id].to_s %> >
+            <%= gp[:title] %>
+          </option>
+        <% end %>
+      </select>
+    <% end %>
+  </div>
+
+  <div class="col-md-6 col-lg-3" >
+    <a class="btn print-grades icon-printer" href="javascript:window.print()">
+      <%= t :print_grades, "Print grades" %>
+    </a>
+  </div>
+</div>
 
 <h2>
 <% ot('headers.grades', "Grades For %{student}", :student => capture { %>

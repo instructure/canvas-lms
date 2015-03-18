@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.default_host %>/users/<%= asset.id %>
+  <%= user_url(asset) %>
 <% end -%>
 <%= t :body, "Canvas Alert - New User: %{user}, %{account}", :user => asset.name, :account => asset.account.name %>

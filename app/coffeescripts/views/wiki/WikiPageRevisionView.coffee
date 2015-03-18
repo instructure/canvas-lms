@@ -34,10 +34,13 @@ define [
       json.edited_by = json.edited_by?.display_name
       json
 
+    windowLocation: ->
+      return window.location;
+
     restore: (ev) ->
       ev?.preventDefault()
       @model.restore().done (attrs) =>
         if @pages_path
-          window.location.href = "#{@pages_path}/#{attrs.url}/revisions"
+          @windowLocation().href = "#{@pages_path}/#{attrs.url}/revisions"
         else
-          window.location.reload()
+          @windowLocation().reload()

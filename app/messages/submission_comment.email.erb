@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.user_id %>
+  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -21,7 +21,7 @@
 <% unless asset.attachments.empty? %>
 <%= t "#messages.conversation_message.email.attached_files", "Attached Files:" %>
 <% asset.attachments.each do |attachment| %>
-<%= attachment.display_name %> - <%= attachment.readable_size %> 
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download
+<%= attachment.display_name %> - <%= attachment.readable_size %>
+<%= file_download_url(attachment) %>
 <% end %>
 <% end %>

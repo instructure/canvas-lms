@@ -76,7 +76,8 @@ define [
       }, {
         step: =>
           #reposition vertically to reflect current height
-          @$dialog.dialog('option', 'position', 'center')
+          @initDialog() unless @dialogInited
+          @$dialog?.dialog('option', 'position', 'center')
         duration: 100
         complete: ->
           newPanel.find(':input').not(':disabled').first().focus()

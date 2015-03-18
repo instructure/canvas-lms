@@ -65,7 +65,7 @@
     <div id="tab-settings">
       <h2 class="screenreader-only"><%= t('headings.settings', "Account Settings") %></h2>
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
-        <fieldset id="account_settings" class="">
+        <fieldset id="account_settings">
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
           <table class="formtable">
             <tr>
@@ -207,6 +207,134 @@ TEXT
         <% end %>
 
         <% unless @account.site_admin? %>
+          <% if @account == @domain_root_account && (use_new_styles? || k12?) %>
+            <%= f.fields_for :settings do |settings| %>
+              <fieldset>
+                <legend>Branding</legend>
+                <table class="formtable Settings__Branding" style="100%">
+                  <tr>
+                    <td>
+                      <%= settings.label :header_image, t('Logo') %>
+                    </td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :header_image, accept: 'image/png,image/gif,image/jpeg,image/svg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("The logo image in the top right Canvas header. 200x200 svg or png") %>
+                        </p>
+                        <% if @account.settings[:header_image] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:header_image] %>" width="200" height="200" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:header_image] %>
+                        <%= settings.check_box :header_image_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :header_image_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <%= settings.label :favicon, t('Favicon') %>
+                    </td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :favicon, accept: 'image/vnd.microsoft.icon,image/x-icon,image/png,image/gif' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t do %>
+                            Use a <a href="http://realfavicongenerator.net/" target="_blank">single 16x16, 32x32, 48x48 ico file</a>.
+                          <% end %>
+                        </p>
+                        <% if @account.settings[:favicon] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:favicon] %>" width="16" height="16" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:favicon] %>
+                        <%= settings.check_box :favicon_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :favicon_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <%= settings.label :apple_touch_icon, t('Apple Touch Icon') %>
+                    </td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :apple_touch_icon, accept: 'image/png,image/svg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("The shortcut icon for iOS/Android devices. 180x180 png or svg") %>
+                        </p>
+                        <% if @account.settings[:apple_touch_icon] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:apple_touch_icon] %>" width="57" height="57" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:apple_touch_icon] %>
+                        <%= settings.check_box :apple_touch_icon_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :apple_touch_icon_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= settings.label :msapplication_tile_square, t('Windows Square Tile') %></td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :msapplication_tile_square, accept: 'image/png,image/gif,image/jpeg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("558x558 png (1.8x the standard tile size, so it can be scaled up or down
+as needed)") %>
+                        </p>
+                        <% if @account.settings[:msapplication_tile_square] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:msapplication_tile_square] %>" width="150" height="150" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:msapplication_tile_square] %>
+                        <%= settings.check_box :msapplication_tile_square_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :msapplication_tile_square_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= settings.label :msapplication_tile_wide, t('Windows Wide Tile') %></td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :msapplication_tile_wide, accept: 'image/png,image/gif,image/jpeg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("558x270 png") %>
+                        </p>
+                        <% if @account.settings[:msapplication_tile_wide] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:msapplication_tile_wide] %>" width="150" height="150" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:msapplication_tile_wide] %>
+                        <%= settings.check_box :msapplication_tile_wide_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :msapplication_tile_wide_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <%= settings.label :msapplication_tile_color, t('Windows Tile Color') %>
+                    </td>
+                    <td>
+                      <%= settings.text_field :msapplication_tile_color, value: @account.settings[:msapplication_tile_color], placeholder: '#0099e0'
+                        # #0099e0 is $canvas-primary from sass. If you change this, make sure to change it in app/views/info/browserconfig.xml.builder too.
+                      %>
+                      <p style="font-size:0.9em">
+                        <a href="http://msdn.microsoft.com/en-us/library/ie/dn455106.aspx" target="_blank">
+                          <%= t("Read more about windows tiles") %>
+                        </a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </fieldset>
+            <% end %>
+          <% end %>
           <fieldset>
             <legend><%= t(:quiz_ip_filters_title, "Quiz IP Address Filters")%>
               <%= link_to("<i class='icon-question standalone-icon'></i>".html_safe, '#', :class => 'ip_help_link no-hover', :title => t(:quiz_ip_filters_help_tooltip, "What are Quiz IP Filters?")) %></legend>

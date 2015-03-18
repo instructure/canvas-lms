@@ -1,10 +1,11 @@
 <%
+  currently_peer_reviewing = @assessment_request.try(:assigned?)
   js_bundle :rubric_assessment, :submissions
   js_env({
     :RUBRIC_ASSESSMENT => {
       :assessment_user_id => @submission.user_id,
       :assessor_id => @current_user ? @current_user.id : "null",
-      :assessment_type => can_do(@submission, @current_user, :grade) ? "grading" : "peer_review"
+      :assessment_type => (!currently_peer_reviewing && can_do(@submission, @current_user, :grade)) ? "grading" : "peer_review"
     },
 
     :SUBMISSION => {
@@ -133,7 +134,7 @@
   <% end %>
 
   <div style="display: none;">
-    <% if can_do(@context, @current_user, :manage_grades) %>
+    <% if !currently_peer_reviewing && can_do(@context, @current_user, :manage_grades) %>
       <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_url">&nbsp;</a>
     <% else %>
       <a style="display: none;" title="PUT" href="<%= context_url(@context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id) %>" class="update_submission_url">&nbsp;</a>

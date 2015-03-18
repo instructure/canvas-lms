@@ -78,6 +78,7 @@ describe "Files API", type: :request do
       @attachment.reload
       expect(json).to eq({
         'id' => @attachment.id,
+        'folder_id' => @attachment.folder_id,
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
         'display_name' => 'test.txt',
@@ -108,6 +109,7 @@ describe "Files API", type: :request do
       @attachment.reload
       expect(json).to eq({
         'id' => @attachment.id,
+        'folder_id' => @attachment.folder_id,
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
         'display_name' => 'test.txt',
@@ -207,6 +209,14 @@ describe "Files API", type: :request do
       expect(response).to be_success
       json = json_parse
       json.map{|f|f['url']}.each { |url| expect(url).not_to include 'verifier=' }
+    end
+
+    it "should not omit verifiers using session auth if params[:use_verifiers] is given" do
+      user_session(@user)
+      get @files_path + "?use_verifiers=1"
+      expect(response).to be_success
+      json = json_parse
+      json.map{|f|f['url']}.each { |url| expect(url).to include 'verifier=' }
     end
 
     it "should list files in saved order if flag set" do
@@ -520,6 +530,7 @@ describe "Files API", type: :request do
       json = api_call(:get, @file_path, @file_path_options, {})
       expect(json).to eq({
               'id' => @att.id,
+              'folder_id' => @att.folder_id,
               'url' => file_download_url(@att, :verifier => @att.uuid, :download => '1', :download_frd => '1'),
               'content-type' => "image/png",
               'display_name' => 'test-frd.png',
@@ -544,7 +555,15 @@ describe "Files API", type: :request do
       json = json_parse
       expect(json['url']).to eq file_download_url(@att, :download => '1', :download_frd => '1')
     end
-    
+
+    it "should not omit verifiers when using session auth and params[:use_verifiers] is given" do
+      user_session(@user)
+      get @file_path + "?use_verifiers=1"
+      expect(response).to be_success
+      json = json_parse
+      expect(json['url']).to eq file_download_url(@att, :download => '1', :download_frd => '1', :verifier => @att.uuid)
+    end
+
     it "should return lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
       att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
@@ -708,6 +727,62 @@ describe "Files API", type: :request do
       api_call(:put, @file_path, @file_path_options, {:parent_folder_id => @sub.id.to_param}, {}, :expected_status => 200)
       @att.reload
       expect(@att.folder_id).to eq @sub.id
+    end
+
+    describe "rename where file already exists" do
+      before :once do
+        @existing_file = Attachment.create! filename: 'newname.txt', display_name: 'newname.txt', uploaded_data: StringIO.new('blah'), folder: @root, context: @course
+      end
+
+      it "should fail if on_duplicate isn't provided" do
+        api_call(:put, @file_path, @file_path_options, {name: 'newname.txt'}, {}, {expected_status: 409})
+        expect(@att.reload.display_name).to eq 'test.txt'
+        expect(@existing_file.reload).not_to be_deleted
+      end
+
+      it "should overwrite if asked" do
+        api_call(:put, @file_path, @file_path_options, {name: 'newname.txt', on_duplicate: 'overwrite'})
+        expect(@att.reload.display_name).to eq 'newname.txt'
+        expect(@existing_file.reload).to be_deleted
+        expect(@existing_file.replacement_attachment).to eq @att
+      end
+
+      it "should rename if asked" do
+        api_call(:put, @file_path, @file_path_options, {name: 'newname.txt', on_duplicate: 'rename'})
+        expect(@existing_file.reload).not_to be_deleted
+        expect(@existing_file.name).to eq 'newname.txt'
+        expect(@att.reload.display_name).not_to eq 'test.txt'
+        expect(@att.display_name).not_to eq 'newname.txt'
+        expect(@att.display_name).to start_with 'newname'
+        expect(@att.display_name).to end_with '.txt'
+      end
+    end
+
+    describe "move where file already exists" do
+      before :once do
+        @sub = @root.sub_folders.create! name: 'sub', context: @course
+        @existing_file = Attachment.create! filename: 'test.txt', display_name: 'test.txt', uploaded_data: StringIO.new('existing'), folder: @sub, context: @course
+      end
+
+      it "should fail if on_duplicate isn't provided" do
+        api_call(:put, @file_path, @file_path_options, {parent_folder_id: @sub.to_param}, {}, {expected_status: 409})
+        expect(@existing_file.reload).not_to be_deleted
+        expect(@att.reload.folder).to eq @root
+      end
+
+      it "should overwrite if asked" do
+        api_call(:put, @file_path, @file_path_options, {parent_folder_id: @sub.to_param, on_duplicate: 'overwrite'})
+        expect(@existing_file.reload).to be_deleted
+        expect(@att.reload.folder).to eq @sub
+        expect(@att.display_name).to eq @existing_file.display_name
+      end
+
+      it "should rename if asked" do
+        api_call(:put, @file_path, @file_path_options, {parent_folder_id: @sub.to_param, on_duplicate: 'rename'})
+        expect(@existing_file.reload).not_to be_deleted
+        expect(@att.reload.folder).to eq @sub
+        expect(@att.display_name).not_to eq @existing_file.display_name
+      end
     end
 
     it "should return unauthorized error" do

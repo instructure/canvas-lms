@@ -1,6 +1,6 @@
 {
   "name": "react-router",
-  "version": "0.9.5",
+  "version": "0.11.6",
   "homepage": "https://github.com/rackt/react-router",
   "authors": [
     "Ryan Florence",
@@ -26,13 +26,13 @@
     "package.json",
     "webpack.config.js"
   ],
-  "_release": "0.9.5",
+  "_release": "0.11.6",
   "_resolution": {
     "type": "version",
-    "tag": "v0.9.5",
-    "commit": "37eebf5f156ee24ba636a79e6e89c3e0012d6233"
+    "tag": "v0.11.6",
+    "commit": "6996451e70e8c89e6f339e66b6164a3c948e2922"
   },
-  "_source": "git://github.com/rpflorence/react-nested-router.git",
-  "_target": "0.9.5",
+  "_source": "git://github.com/rackt/react-router.git",
+  "_target": "0.11.6",
   "_originalSource": "react-router"
 }

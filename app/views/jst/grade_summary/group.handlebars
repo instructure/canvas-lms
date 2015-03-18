@@ -1,22 +1,14 @@
 <div class="group-description" role='button' tabindex='0' aria-controls="group_detail-{{id}}" aria-expanded='false'>
-  <div class="outcome-icon {{status}}" data-tooltip title="{{statusTooltip}}" aria-label="Outcome Group: {{title}} status is {{statusTooltip}}">
-    {{#if started}}
-      {{#ifEqual status 'mastery'}}
-        <i class="icon-complete"></i>
-      {{else}}
-        {{#ifEqual status 'near'}}
-          <i class="icon-partial"></i>
-        {{else}}
-          <i class="icon-trouble"></i>
-        {{/ifEqual}}
-      {{/ifEqual}}
-    {{else}}
-      <i class="icon-empty"></i>
-    {{/if}}
+  <div class="outcome-icon" aria-label="{{#t}}expand/collapse {{title}} Outcome Group{{/t}}">
+    <i class="icon-mini-arrow-down collapsed-arrow"></i>
+    <i class="icon-mini-arrow-up expanded-arrow"></i>
   </div>
   <h3 class="group-title"><span role='button' tabindex='0'>{{title}}</span></h3>
-  <div class="group-status" aria-label="{{mastery_count}} out of {{count}} outcomes mastered">
-    <strong>{{mastery_count}}</strong>/{{count}} <span>Outcomes</span>
+  <div class="group-status">
+    <ul class="pill">
+      <li>{{mastery_count}}</li>
+      <li>{{count}}</li>
+    </ul>
   </div>
 </div>
 <div id="group_detail-{{id}}" class="outcomes">

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-    <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context.id %>/pages/<%= asset.url %>
+  <%= polymorphic_url([asset.context, :wiki_page], id: asset.url) %>
 <% end %>
 
 <%= t :body, "A page has been updated on the wiki for %{title}.", :title => asset.context.name %>

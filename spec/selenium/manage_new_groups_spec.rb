@@ -234,4 +234,25 @@ describe "manage groups" do
       expect(fj([actions_button, randomly_assign_users].join(" + "))).to be_nil
     end
   end
+
+  it "should let students create groups and invite other users" do
+    course_with_student_logged_in(:active_all => true)
+    student_in_course(:course => @course, :active_all => true, :name => "other student")
+    other_student = @student
+
+    get "/courses/#{@course.id}/groups"
+    f('.add_group_link').click
+    wait_for_ajaximations
+    f('#groupName').send_keys("group name")
+    click_option('#joinLevelSelect', 'invitation_only', :value)
+    ff('#add_group_form input[type=checkbox]').each(&:click)
+    wait_for_ajaximations
+
+    submit_form(f('#add_group_form'))
+    wait_for_ajaximations
+    new_group = @course.groups.first
+    expect(new_group.name).to eq "group name"
+    expect(new_group.join_level).to eq "invitation_only"
+    expect(new_group.users).to include(other_student)
+  end
 end

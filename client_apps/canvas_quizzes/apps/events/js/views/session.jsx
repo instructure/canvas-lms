@@ -86,16 +86,21 @@ define(function(require) {
 
       if (attempt === this.props.attempt) {
         className += ' ic-AttemptController__Attempt--is-active';
+        return (
+          <div className={className} key={"attempt-"+attempt}>
+            {attempt}
+          </div>
+        )
+      } else {
+        return (
+          <Link
+            to="app"
+            query={query}
+            key={"attempt-"+attempt}
+            className={className}
+            children={attempt} />
+        );
       }
-
-      return (
-        <Link
-          to="app"
-          query={query}
-          key={"attempt-"+attempt}
-          className={className}
-          children={attempt} />
-      );
     }
   });
 

@@ -1,8 +1,78 @@
+v0.11.6 - Wed, 17 Dec 2014 19:29:53 GMT
+---------------------------------------
+
+- [90cd750](../../commit/90cd750) [fixed] Call all transition hooks on query changes
+
+
+v0.11.5 - Mon, 15 Dec 2014 22:32:38 GMT
+---------------------------------------
+
+- [31e1eb2](../../commit/31e1eb2) [fixed] supportsHistory false negatives on WP 8.1
+- [6417285](../../commit/6417285) [fixed] tearing down location listeners
+- [457d944](../../commit/457d944) [added] Router.History
+- [a07003e](../../commit/a07003e) [fixed] URL hash consistency across browsers
+- [c6aa4d3](../../commit/c6aa4d3) [fixed] Now execute willTransition* hooks even if only query part was changed
+
+
+v0.11.4 - Fri, 28 Nov 2014 16:10:06 GMT
+---------------------------------------
+
+- [b9079c9](../../commit/b9079c9) [added] getPathname to Router.State
+- [91d4380](../../commit/91d4380) [fixed] Abort pending transition on user navigation
+- [5fe6c08](../../commit/5fe6c08) [changed] Don't update scroll if only query has changed
+
+
+v0.11.3 - Thu, 27 Nov 2014 05:29:48 GMT
+---------------------------------------
+
+- [91d4380](../../commit/91d4380) [fixed] Abort pending transition on user navigation
+- [5fe6c08](../../commit/5fe6c08) [changed] Don't update scroll if only query has changed
+
+
+v0.11.2 - Mon, 24 Nov 2014 16:56:52 GMT
+---------------------------------------
+
+- [017363d](../../commit/017363d) [fixed] default redirect path to '*'
+- [187eb0e](../../commit/187eb0e) [fixed] Added missing require statement
+- [5a1ed33](../../commit/5a1ed33) [fixed] Path.decode/encode with query string
+
+
+v0.11.1 - Sat, 22 Nov 2014 15:00:37 GMT
+---------------------------------------
+
+- [b75f648](../../commit/b75f648) [fixed] rendering current handlers before rendering root
+
+
+v0.11.0 - Sat, 22 Nov 2014 06:03:21 GMT
+---------------------------------------
+
+- Everything ... seriously. Please review the [upgrade
+  guide](./UPGRADE_GUIDE.md#010x---011x).
+
+
+v0.10.2 - Fri, 31 Oct 2014 16:23:27 GMT
+---------------------------------------
+
+- [940a0d0](../../commit/940a0d0) [changed] use `Object.assign` instead of `copyProperties`
+- [f8cb7f9](../../commit/f8cb7f9) [changed] use `Object.assign` instead of `merge`
+- [70b442a](../../commit/70b442a) [added] React 0.12 compatibility
+
+
+v0.10.1 - Fri, 31 Oct 2014 15:46:20 GMT
+---------------------------------------
+
+- [70b442a](../../commit/70b442a) [added] React 0.12 compatibility
+
+
+v0.10.0 - Thu, 30 Oct 2014 05:09:44 GMT
+---------------------------------------
+
+- [70b442a](../../commit/70b442a) [added] React 0.12 compatibility
+
+
 v0.9.5 - Thu, 30 Oct 2014 04:50:09 GMT
 --------------------------------------
 
-- [fb87b23](../../commit/fb87b23) Revert "Revert "Revert "[removed] "static" <Route> props"""
-- [53bc0fb](../../commit/53bc0fb) Revert "Revert "[removed] "static" <Route> props""
 - [6192285](../../commit/6192285) [added] <Route ignoreScrollBehavior /> to opt out of scroll behavior for itself and descendants
 
 

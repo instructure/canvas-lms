@@ -1,11 +1,11 @@
 <% if can_do @account, @current_user, :read_roster %>
   <h2><%= t 'titles.find_user', "Find A User" %></h2>
   <div class="rs-margin-lr">
-    <%= form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :class => "form-inline", :method => :get} do |f| -%>
-      <fieldset class="input-append">
-        <input type="text" id="user_name" name="user[name]" value="<%= @user_query %>" />
-        <button class='btn'><%= t 'buttons.go', "Go" %></button>
-      </fieldset>
+    <%= form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :class => "ic-Form-control", :method => :get} do |f| -%>
+      <div class="ic-Input-group">
+        <input class="ic-Input" type="text" id="user_name" name="user[name]" value="<%= @user_query %>" />
+        <button class='Button'><%= t 'buttons.go', "Go" %></button>
+      </div>
     <% end -%>
   </div>
 <% end %>

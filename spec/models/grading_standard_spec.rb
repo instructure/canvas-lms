@@ -263,4 +263,134 @@ describe GradingStandard do
       end
     end
   end
+
+  describe "permissions:" do
+    context "course belonging to root account" do
+      before(:once) do
+        @root_account = Account.default
+        @sub_account = @root_account.sub_accounts.create!
+        course_with_teacher_logged_in(account: @root_account)
+        @enrollment.update_attributes(workflow_state: "active")
+        @root_account_standard = grading_standard_for(@root_account)
+        @sub_account_standard = grading_standard_for(@sub_account)
+        @course_standard = grading_standard_for(@course)
+
+      end
+
+      context "root-account admin" do
+        before(:once) do
+          account_admin_user(account: @root_account)
+        end
+
+        it "should be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+      end
+
+      context "sub-account admin" do
+        before(:once) do
+          account_admin_user(account: @sub_account)
+        end
+
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(false)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should NOT be able to manage course level grading standards, when the course is under the root-account" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(false)
+        end
+      end
+
+      context "teacher" do
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should NOT be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@teacher, :manage)).to eq(true)
+        end
+      end
+    end
+    context "course belonging to sub-account" do
+      before(:once) do
+        @root_account = Account.default
+        @sub_account = @root_account.sub_accounts.create!
+        course_with_teacher_logged_in(account: @sub_account)
+        @enrollment.update_attributes(workflow_state: "active")
+        @root_account_standard = grading_standard_for(@root_account)
+        @sub_account_standard = grading_standard_for(@sub_account)
+        @course_standard = grading_standard_for(@course)
+      end
+
+      context "root-account admin" do
+        before(:once) do
+          account_admin_user(account: @root_account)
+        end
+
+        it "should be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+      end
+
+      context "sub-account admin" do
+        before(:once) do
+          account_admin_user(account: @sub_account)
+        end
+
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(false)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should be able to manage course level grading standards, when the course is under the sub-account" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+      end
+
+      context "teacher" do
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should NOT be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@teacher, :manage)).to eq(true)
+        end
+      end
+    end
+  end
 end

@@ -25,10 +25,58 @@ def download_from_cog
   ff('.al-options .ui-menu-item')[0].click
 end
 
+def edit_name_from_cog(file_name_new)
+  ff('.al-trigger')[0].click
+  fln("Rename").click
+  expect(f(".ef-edit-name-cancel")).to be_displayed
+  file_name_textbox_el = f('.input-block-level')
+  replace_content(file_name_textbox_el, file_name_new)
+  file_name_textbox_el.send_keys(:return)
+end
+
 # This method downloads the file from the file preview
 def download_from_preview
   fln("example.pdf").click
   f('.icon-download').click
+end
+
+def delete_from_cog
+  ff('.al-trigger')[0].click
+  fln("Delete").click
+  confirm_delete_on_dialog
+end
+
+def delete_from_toolbar
+  ff('.ef-item-row')[0].click
+  f('.btn-delete').click
+  confirm_delete_on_dialog
+end
+
+#This method sets permissions on files/folders
+# Params:
+# - rgba_color: background color of the cloud icon
+# - permission_flag: can take three values 0,1,2. 0-Publish, 1-Unpublish, 2-Restricted Access
+# - restricted_access_option: can take two values 0,1. 0-available to student with link, 1-available within given timeframe
+def permissions(rgba_color, permission_flag=0, restricted_access_option=0)
+  icon_background_color = rgba_color
+  f('.btn-link.published-status').click
+  wait_for_ajaximations
+  if permission_flag == 0 or permission_flag == 1 then
+     driver.find_elements(:name, 'permissions')[permission_flag].click
+  else
+     driver.find_elements(:name, 'permissions')[permission_flag].click
+     if restricted_access_option == 1 then
+        driver.find_elements(:name, 'restrict_options')[restricted_access_option].click
+        ff('.ui-datepicker-trigger.btn')[0].click
+        fln("15").click
+        ff('.ui-datepicker-trigger.btn')[1].click
+        fln("25").click
+     end
+  end
+  ff('.btn.btn-primary')[1].click
+  wait_for_ajaximations
+  icon_publish_color = f('.btn-link.published-status').css_value('color')
+  expect(icon_publish_color).to eq icon_background_color
 end
 
 def should_make_folders_in_the_menu_droppable
@@ -128,20 +176,37 @@ def unzip_into_folder_drag_and_drop
 end
 
 def confirm_delete_on_dialog
-    driver.switch_to.alert.accept
+  driver.switch_to.alert.accept
+  wait_for_ajaximations
 end
 
 def cancel_delete_on_dialog
-    driver.switch_to.alert.dismiss
+  driver.switch_to.alert.dismiss
+  wait_for_ajaximations
+end
+
+def add_folder(name = 'new folder')
+  click_new_folder_button
+  new_folder = f("input.input-block-level")
+  new_folder.send_keys(name)
+  new_folder.send_keys(:return)
+  wait_for_ajaximations
+end
+
+def click_new_folder_button
+  keep_trying_until do
+    f(".btn-add-folder").click
+    wait_for_ajaximations
+  end
 end
 
 def create_new_folder
   f('.btn-add-folder').click
   f('.ef-edit-name-form').submit
   wait_for_ajaximations
-  get_all_folders.first
+  get_all_files_folders.first
 end
 
-def get_all_folders
+def get_all_files_folders
   new_folder = driver.find_elements(:class, 'ef-item-row')
 end

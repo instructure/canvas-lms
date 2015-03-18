@@ -1,9 +1,7 @@
 <form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
   <input type="hidden" name="initial_action" value="enroll">
   <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**", :course => @course.name)) %>
-  <% if params[:login_warning] %>
-    <p><%= t :switch_users, "You are currently signed in as *%{user}*. **Sign in as another user**.", :user => @current_user.name, :wrapper => {'*' => '<b>\1</b>', '**' => link_to('\1', "/logout", :method => :delete, :id => 'logout_link')} %></p>
-  <% end %>
+
   <div class="control-group embedded-footer">
     <a href="<%= privacy_policy_url %>" target="_blank" class="footer-info"><%= t '#site.view_privacy_policy', 'View Privacy Policy' %></a>
     <div class="controls">

@@ -28,5 +28,31 @@ describe "assignments" do
       expect(fj('.student_reviews:first .peer_reviews').text()).to match /None Assigned/
       expect(@assignment.submissions.map(&:assessment_requests).flatten.length).to eq 1
     end
+
+    it "allows an account admin who is also a student to submit a peer review" do
+      course(active_course: true)
+      admin_logged_in(account: @course.root_account)
+      student_in_course(user: @admin)
+      @student = student_in_course.user
+
+      @assignment = assignment_model({
+        course: @course,
+        peer_reviews: true,
+        automatic_peer_reviews: false,
+      })
+      rubric_association_model(purpose: 'grading', association_object: @assignment)
+      @assignment.assign_peer_review(@admin, @student)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+
+      f('.assess_submission_link').click
+      wait_for_animations
+      f('.rubric_table .criterion .rating').click
+      f('.save_rubric_button').click
+      wait_for_ajaximations
+
+      assessment = @assignment.submissions.where(user_id: @student).first.rubric_assessments.first
+      expect(assessment.assessment_type).to eq 'peer_review'
+    end
   end
 end

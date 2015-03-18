@@ -1,6 +1,6 @@
 <% course = asset.is_a?(Course) ? asset : asset.context %>
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/<%= course.class.to_s.downcase.pluralize %>/<%= course.id %>/assignments
+  <%= course_assignments_url(course) %>
 <% end %>
 
 <%= mt('grading_policy_changed', 'The grading policy for **[%{course_name}](%{course_url})** has changed.', :course_name => course.name, :course_url => content(:link)) %>

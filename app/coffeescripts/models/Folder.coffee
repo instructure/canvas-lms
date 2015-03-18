@@ -5,7 +5,8 @@ define [
   'vendor/backbone-identity-map'
   'compiled/collections/PaginatedCollection'
   'compiled/collections/FilesCollection'
-], (require, FilesystemObject, _, identityMapMixin, PaginatedCollection, FilesCollection) ->
+  'compiled/util/natcompare'
+], (require, FilesystemObject, _, identityMapMixin, PaginatedCollection, FilesCollection, natcompare) ->
 
 
   Folder = identityMapMixin class __Folder extends FilesystemObject
@@ -15,6 +16,7 @@ define [
 
     initialize: (options) ->
       @contentTypes ||= options?.contentTypes
+      @useVerifiers ||= options?.useVerifiers
       @setUpFilesAndFoldersIfNeeded()
       @on 'change:sort change:order', @setQueryStringParams
       super
@@ -28,6 +30,7 @@ define [
     parse: (response) ->
       json = super
       @contentTypes ||= response.contentTypes
+      @useVerifiers ||= response.useVerifiers
       @setUpFilesAndFoldersIfNeeded()
 
       @folders.url = response.folders_url
@@ -115,17 +118,29 @@ define [
       else
         model.get(sortProp)
 
+    ##
+    # Special sorter for handling sorting with special properties
+    # It's been enhanced to sort naturally when certain sortProps
+    # are used.
     childrenSorter: (sortProp='name', sortOrder='asc', a, b) ->
+      # Only use natural mode for instances we expect strings in.
+      naturalMode = sortProp in ['name', 'user', 'usage_rights']
+
+      # Get actual values for the properties we are sorting by.
       a = getSortProp(a, sortProp)
       b = getSortProp(b, sortProp)
-      res = if a is b
-              0
-            else if a > b or a is undefined
-              1
-            else if a < b or b is undefined
-              -1
-            else
-              throw new Error("wat? error sorting")
+
+      if naturalMode
+        res = natcompare.strings(a, b)
+      else
+        res = if a is b
+                0
+              else if a > b or a is undefined
+                1
+              else if a < b or b is undefined
+                -1
+              else
+                throw new Error("wat? error sorting")
 
       res = 0 - res if sortOrder is 'desc'
       res
@@ -152,6 +167,7 @@ define [
       if response
         _.each response, (folder) =>
           folder.contentTypes = @parentFolder.contentTypes
+          folder.useVerifiers = @parentFolder.useVerifiers
       super
 
 

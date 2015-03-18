@@ -1,10 +1,16 @@
 @import "base/environment";
 @import "pages/shared/move_dialog";
 
+$announcements_disscussion-summary-color: $canvas-dark;
+
 // min width to ensure toolbar doesn't stagger
 #main { min-width: 700px; }
 
 .discussionTopicIndexList {
+  .discussion-actions {
+    float: right;
+    padding: 11px 10px 0px 0px;
+  }
   .discussion-topic {
     cursor: pointer;
     display: table;
@@ -159,7 +165,7 @@
   }
 
   &:hover {
-    background: $base-list-item-background--hover;
+    background: $ic-list-item-background--hover;
   }
 
   a {
@@ -225,7 +231,7 @@
   }
 
   .discussion-status {
-    color: $ic-base-color-icon-disabled;
+    color: $ic-color-icon-disabled;
     width: 60px;
 
     .publish-icon {

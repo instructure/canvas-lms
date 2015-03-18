@@ -89,7 +89,7 @@ class Announcement < DiscussionTopic
     given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked?}
     can :reply
 
     given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :post_to_forum) }

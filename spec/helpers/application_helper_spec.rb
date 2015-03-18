@@ -120,9 +120,10 @@ describe ApplicationHelper do
       end
 
       it 'crosses date boundaries appropriately' do
-        Timecop.freeze(Time.utc(2013,3,13,7,12))
-        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
+        Timecop.freeze(Time.utc(2013,3,13,7,12)) do
+          context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+          expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
+        end
       end
     end
 
@@ -543,6 +544,22 @@ describe ApplicationHelper do
       @context = @course
 
       expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :width=>800, :height=>400}])
+    end
+
+    it "should not include tools from the domain_root_account for users" do
+      @domain_root_account = Account.default
+      account_admin_user
+      tool = @domain_root_account.context_external_tools.new(
+        :name => "bob",
+        :consumer_key => "test",
+        :shared_secret => "secret",
+        :url => "http://example.com"
+      )
+      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.save!
+      @context = @admin
+
+      expect(editor_buttons).to be_empty
     end
   end
 end

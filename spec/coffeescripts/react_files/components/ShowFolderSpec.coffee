@@ -1,7 +1,7 @@
 define [
   'underscore'
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   'compiled/react_files/components/ShowFolder'
   'compiled/models/Folder'
   'compiled/react_files/components/FolderChild'

@@ -68,7 +68,9 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
 
-      expect(ffj('.formtable input[name="submission[group_comment]"]').size).to eq 3
+      acceptable_tabs = ffj('#submit_online_upload_form,#submit_online_text_entry_form,#submit_online_url_form')
+      expect(acceptable_tabs.size).to be 3
+      acceptable_tabs.each { |tabby| expect(ffj('.formtable input[name="submission[group_comment]"]', tabby).size).to be 1 }
     end
 
     it "should not show assignments in an unpublished course" do

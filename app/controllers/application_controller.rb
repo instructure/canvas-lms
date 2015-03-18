@@ -355,29 +355,12 @@ class ApplicationController < ActionController::Base
   # if authorized_action(object, @current_user, session, :update)
   #   render
   # end
-  def authorized_action(object, *opts)
-    can_do = is_authorized_action?(object, *opts)
+  def authorized_action(object, actor, rights)
+    can_do = object.grants_any_right?(actor, session, *Array(rights))
     render_unauthorized_action unless can_do
     can_do
   end
   alias :authorized_action? :authorized_action
-
-  def is_authorized_action?(object, *opts)
-    return false unless object
-
-    user = opts.shift
-    action_session ||= session
-    action_session = opts.shift if !opts[0].is_a?(Symbol) && !opts[0].is_a?(Array)
-    actions = Array(opts.shift).flatten
-
-    begin
-      return object.grants_any_right?(user, action_session, *actions)
-    rescue => e
-      logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
-    end
-
-    false
-  end
 
   def render_unauthorized_action
     respond_to do |format|
@@ -1413,6 +1396,8 @@ class ApplicationController < ActionController::Base
         !!Diigo::Connection.config
       elsif feature == :google_docs
         !!GoogleDocs::Connection.config
+      elsif feature == :google_drive
+        Canvas::Plugin.find(:google_drive).try(:enabled?)
       elsif feature == :etherpad
         !!EtherpadCollaboration.config
       elsif feature == :kaltura
@@ -1680,7 +1665,7 @@ class ApplicationController < ActionController::Base
     @notices ||= begin
       notices = []
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
-        notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'}
+        notices << {:type => 'warning', :content => {html: unsupported_browser}, :classes => 'unsupported_browser'}
       end
       if error = flash[:error]
         flash.delete(:error)
@@ -1708,7 +1693,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("#application.warnings.unsupported_browser", "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
   end
 
   def browser_supported?
@@ -1831,6 +1816,46 @@ class ApplicationController < ActionController::Base
       google_docs = GoogleDocs::Connection.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
     end
     google_docs
+  end
+
+  def google_drive_connection
+    return unless Canvas::Plugin.find(:google_drive).try(:settings)
+    ## @real_current_user first ensures that a masquerading user never sees the
+    ## masqueradee's files, but in general you may want to block access to google
+    ## docs for masqueraders earlier in the request
+    if logged_in_user
+      refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.where(service: "google_drive").first
+        service && [service.token, service.secret]
+      end
+    else
+      refresh_token = session[:oauth_gdrive_refresh_token]
+      access_token = session[:oauth_gdrive_access_token]
+    end
+
+    GoogleDocs::DriveConnection.new(refresh_token, access_token) if refresh_token && access_token
+  end
+
+  def google_service_connection
+    google_drive_connection || google_docs_connection
+  end
+
+  def google_drive_user_client
+    if logged_in_user
+      refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.where(service: "google_drive").first
+        service && [service.token, service.access_token]
+      end
+    else
+      refresh_token = session[:oauth_gdrive_refresh_token]
+      access_token = session[:oauth_gdrive_access_token]
+    end
+    google_drive_client(refresh_token, access_token)
+  end
+
+  def google_drive_client(refresh_token=nil, access_token=nil)
+    client_secrets = Canvas::Plugin.find(:google_drive).try(:settings)
+    GoogleDrive::Client.create(client_secrets, refresh_token, access_token)
   end
 
 

@@ -247,6 +247,7 @@ describe 'Canvas::RequestThrottle' do
               Timecop.freeze(Time.now + 6.seconds)
               5
             end
+            Timecop.return
           end
           expect(@bucket.count).to eq 0
           expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to eq 0

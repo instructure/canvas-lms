@@ -330,7 +330,6 @@ describe FilesController do
         expect(json_parse).to eq({'ok' => true})
         @module.reload
         expect(@module.evaluate_for(@student).state).to eql(:completed)
-        expect(@file.reload.last_inline_view).to be > 1.minute.ago
       end
 
       it "should mark files as viewed for module progressions if the file is downloaded" do
@@ -338,7 +337,6 @@ describe FilesController do
         get 'show', :course_id => @course.id, :id => @file.id, :download => 1
         @module.reload
         expect(@module.evaluate_for(@student).state).to eql(:completed)
-        expect(@file.reload.last_inline_view).to be_nil
       end
 
       it "should mark files as viewed for module progressions if the file is previewed inline" do
@@ -347,7 +345,6 @@ describe FilesController do
         expect(json_parse).to eq({'ok' => true})
         @module.reload
         expect(@module.evaluate_for(@student).state).to eql(:completed)
-        expect(@file.reload.last_inline_view).to be > 1.minute.ago
       end
 
       it "should mark files as viewed for module progressions if the file data is requested and is canvadocable" do
@@ -356,7 +353,6 @@ describe FilesController do
         get 'show', :course_id => @course.id, :id => @file.id, :format => :json
         @module.reload
         expect(@module.evaluate_for(@student).state).to eql(:completed)
-        expect(@file.reload.last_inline_view).to be > 1.minute.ago
       end
 
       it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
@@ -412,7 +408,6 @@ describe FilesController do
         @assignment.submit_homework @student, :attachments => [@attachment]
         get 'show', :user_id => @student.id, :id => @attachment.id, :inline => 1
         expect(response).to be_success
-        expect(@attachment.reload.last_inline_view).to be > 1.minute.ago
       end
     end
 

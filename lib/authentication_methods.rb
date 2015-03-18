@@ -122,20 +122,20 @@ module AuthenticationMethods
             raise LoggedOutError
           end
         end
-      end
 
-      if @current_pseudonym &&
-         session[:cas_session] &&
-         @current_pseudonym.cas_ticket_expired?(session[:cas_session]) &&
-         @domain_root_account.cas_authentication?
+        if @current_pseudonym &&
+           session[:cas_session] &&
+           @current_pseudonym.cas_ticket_expired?(session[:cas_session]) &&
+           @domain_root_account.cas_authentication?
 
-        logger.info "Invalidating session: CAS ticket expired - #{session[:cas_session]}."
-        destroy_session
-        @current_pseudonym = nil
+          logger.info "Invalidating session: CAS ticket expired - #{session[:cas_session]}."
+          destroy_session
+          @current_pseudonym = nil
 
-        raise LoggedOutError if api_request? || request.format.json?
+          raise LoggedOutError if api_request? || request.format.json?
 
-        redirect_to_login
+          redirect_to_login
+        end
       end
 
       if params[:login_success] == '1' && !@current_pseudonym

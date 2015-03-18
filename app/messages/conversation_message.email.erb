@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/conversations/<%= asset.conversation_id %>
+  <%= conversation_url(asset.conversation_id) %>
 <% end %>
 
 <% define_content :user_name do %>
@@ -35,6 +35,6 @@
   <%= t :attached_files, "Attached Files:" %>
   <% asset.attachments.each do |attachment| %>
     <%= attachment.display_name %> - <%= attachment.readable_size %>
-    <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download?verifier=<%= attachment.uuid %>
+    <%= file_download_url(attachment, verifier: attachment.uuid) %>
   <% end %>
 <% end %>

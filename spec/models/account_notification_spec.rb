@@ -172,5 +172,32 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
       end
     end
+
+    it "should properly adjust for built in roles across shards" do
+      @announcement.destroy
+
+      @shard2.activate do
+        @my_frd_account = Account.create!
+      end
+
+      Account.site_admin.shard.activate do
+        @site_admin_announcement = account_notification(account: Account.site_admin, role_ids: [Role.get_built_in_role("TeacherEnrollment").id])
+      end
+
+      @my_frd_account.shard.activate do
+        @local_announcement = account_notification(account: @my_frd_account, role_ids: [Role.get_built_in_role("TeacherEnrollment").id])
+        course_with_teacher(account: @my_frd_account)
+      end
+
+      # announcements should show to teachers, regardless of combination of
+      # current shard, association shard, and notification shard
+      [Account.site_admin.shard, @my_frd_account.shard, @shard1].each do |shard|
+        shard.activate do
+          expect(AccountNotification.for_user_and_account(@teacher, Account.site_admin)).to include(@site_admin_announcement)
+          expect(AccountNotification.for_user_and_account(@teacher, @my_frd_account)).to include(@site_admin_announcement)
+          expect(AccountNotification.for_user_and_account(@teacher, @my_frd_account)).to include(@local_announcement)
+        end
+      end
+    end
   end
 end

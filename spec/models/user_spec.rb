@@ -1685,7 +1685,7 @@ describe User do
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
         end.to_not raise_error
-
+        
         expect(events.first).to eq assignment2
         expect(events.second).to eq assignment
       end

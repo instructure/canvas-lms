@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>
+  <%= course_url(asset.course) %>
 <% end -%>
 <%= t :body, "Canvas Alert - Enrolled: course as %{enrollment_type}", :enrollment_type => asset.readable_type %>

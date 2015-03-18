@@ -172,6 +172,38 @@ I18n.strftime = function(date, format) {
   return f;
 };
 
+I18n.pluralize = function(count, scope, options) {
+  var translation;
+
+  try {
+    translation = this.lookup(scope, options);
+  } catch (error) {}
+
+  if (!translation) {
+    return this.missingTranslation(scope);
+  }
+
+  var message;
+  options = this.prepareOptions(options, {precision: 0});
+  options.count = this.toNumber(count, options);
+
+  switch(Math.abs(count)) {
+    case 0:
+      message = this.isValidNode(translation, "zero") ? translation.zero :
+          this.isValidNode(translation, "none") ? translation.none :
+              this.isValidNode(translation, "other") ? translation.other :
+                  this.missingTranslation(scope, "zero");
+      break;
+    case 1:
+      message = this.isValidNode(translation, "one") ? translation.one : this.missingTranslation(scope, "one");
+      break;
+    default:
+      message = this.isValidNode(translation, "other") ? translation.other : this.missingTranslation(scope, "other");
+  }
+
+  return this.interpolate(message, options);
+};
+
 I18n.Utils.HtmlSafeString = htmlEscape.SafeString; // this is what we use elsewhere in canvas, so make i18nliner use it too
 I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
 

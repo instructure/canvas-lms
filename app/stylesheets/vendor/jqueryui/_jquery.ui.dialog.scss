@@ -53,7 +53,7 @@
   &.ui-widget-header {
     background: $canvas-light;
     padding: 16px 12px;
-    border-bottom: 1px solid $can-border-light;
+    border-bottom: 1px solid $ic-border-light;
   }
 }
 
@@ -67,7 +67,7 @@
 .ui-datepicker .ui-datepicker-time,
 .ui-dialog .ui-dialog-buttonpane {
   background-color: lighten($canvas-neutral, 5%);
-  border-top: 1px solid $can-border-light;
+  border-top: 1px solid $ic-border-light;
 }
 
 .ui-dialog .ui-dialog-buttonpane {

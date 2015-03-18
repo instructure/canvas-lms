@@ -1319,6 +1319,23 @@ describe Course, "tabs_available" do
       expect(tab_ids.length).to be > 0
       expect(@course.tabs_available(@user).map{|t| t[:label] }.compact.length).to eql(tab_ids.length)
     end
+
+    it "should handle hidden_unused correctly for discussions" do
+      tabs = @course.uncached_tabs_available(@teacher)
+      dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
+      expect(dtab[:hidden_unused]).to be_falsey
+
+      @course.allow_student_discussion_topics = false
+      tabs = @course.uncached_tabs_available(@teacher)
+      dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
+      expect(dtab[:hidden_unused]).to be_truthy
+
+      @course.allow_student_discussion_topics = true
+      discussion_topic_model
+      tabs = @course.uncached_tabs_available(@teacher)
+      dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
+      expect(dtab[:hidden_unused]).to be_falsey
+    end
   end
 
   context "students" do
@@ -4067,4 +4084,15 @@ describe Course, 'touch_root_folder_if_necessary' do
     end
   end
 
+end
+
+describe Course, "turnitin_id" do
+  before(:once) { course active_all: true }
+  it "writes the turnitin_id on first access" do
+    turnitin_id = @course.turnitin_id
+    expect(turnitin_id).to eql @course.global_id
+
+    @course.update_attribute(:id, @course.id + 1)
+    expect(@course.turnitin_id).to eql turnitin_id
+  end
 end

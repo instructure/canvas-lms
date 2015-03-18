@@ -234,3 +234,8 @@ define [
     errors = view.validateBeforeSave(data, [])
     ok errors["points_possible"]
     equal errors['points_possible'][0]['message'], 'Points possible must be a number'
+
+  test 'passes explicit submission_type for Assignment option', ->
+    view = createView(@group)
+    data = view.getFormData()
+    equal data.submission_types, 'none'

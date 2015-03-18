@@ -21,6 +21,7 @@ ul.instTree
     position: relative
     border-radius: 3px
     background: 13px top no-repeat
+    background-size: 16px 16px
 
     &.separator
       min-height: 2px
@@ -28,17 +29,18 @@ ul.instTree
       font-size: 2px
 
     &.node
-      background-image: url(/images/inst_tree/folder.png)
+      background-image: image-url("mimeClassIcons/folder.svg")
 
       &.collaborations
-        background-image: url(/images/collaboration_folder.png)
+        background-image: image-url('collaboration_folder.png')
 
       &.groups
-        background-image: url(/images/groups_folder.png)
+        background-image: image-url('groups_folder.png')
 
       // &.open
     &.leaf
-      background-image: url(/images/inst_tree/file_types/page_white.png)
+      background-image: image-url('mimeClassIcons/file.svg')
+
 
       &:hover
         background-color: #eee
@@ -73,10 +75,10 @@ ul.instTree
         top: 0
 
         &.plus
-          background: url(/images/inst_tree/plus.gif) 5px 50% no-repeat
+          background: image-url('inst_tree/plus.gif') 5px 50% no-repeat
 
         &.minus
-          background: url(/images/inst_tree/minus.gif) 5px 50% no-repeat
+          background: image-url('inst_tree/minus.gif') 5px 50% no-repeat
 
   input
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif
@@ -87,57 +89,57 @@ ul.instTree
 
 
 #instTree-drag
-  padding: 3px
-  padding-left: 30px
+  padding: 3px 3px 3px 30px
   z-index: 1000
   position: absolute
 
   &.node
-    background: #C3E1FF url(/images/inst_tree/node-drag.gif) left 3px no-repeat
+    background: #C3E1FF image-url('inst_tree/node-drag.gif') left 3px no-repeat
 
   &.leaf
-    background: #C3E1FF url(/images/inst_tree/leaf-drag.gif) left 3px no-repeat
+    background: #C3E1FF image-url('inst_tree/leaf-drag.gif') left 3px no-repeat
 
 
 ul.instTree
   li.separator.dd-hover
-    background: transparent url(/images/inst_tree/separator-drag.gif) 3px 1px no-repeat
+    background: transparent image-url('inst_tree/separator-drag.gif') 3px 1px no-repeat
 
-  .dd-hover
-    background-color: yellow
+  li.leaf
+    &.dd-hover
+      background-color: yellow
 
-  .pdf
-    background-image: url('/images/inst_tree/file_types/page_white_acrobat.png') !important
+    &.pdf
+      background-image: image-url('mimeClassIcons/pdf.svg')
 
-  .image
-    background-image: url('/images/inst_tree/file_types/page_white_picture.png') !important
+    &.image, &.jpeg, &.jpg, &.png, &.svg
+      background-image: image-url('mimeClassIcons/image.svg')
 
-  .xls
-    background-image: url('/images/inst_tree/file_types/page_white_excel.png') !important
+    &.xls, &.xlsx, &.spreadsheet
+      background-image: image-url('mimeClassIcons/xls.svg')
 
-  .word, .doc
-    background-image: url('/images/inst_tree/file_types/page_white_word.png') !important
+    &.word, &.doc, &.docx
+      background-image: image-url('mimeClassIcons/doc.svg')
 
-  .ppt
-    background-image: url('/images/inst_tree/file_types/page_white_powerpoint.png') !important
+    &.ppt, &.pptx
+      background-image: image-url('mimeClassIcons/ppt.svg')
 
-  .zip
-    background-image: url('/images/inst_tree/file_types/page_white_zip.png') !important
+    &.audio
+      background-image: image-url('mimeClassIcons/audio.svg')
 
-  .video
-    background-image: url('/images/inst_tree/file_types/page_white_camera.png') !important
+    &.zip
+      background-image: image-url('mimeClassIcons/zip.svg')
 
-  .html
-    background-image: url('/images/inst_tree/file_types/page_white_world.png') !important
+    &.video
+      background-image: image-url('mimeClassIcons/video.svg')
 
-  .spreadsheet
-    background-image: url('/images/inst_tree/file_types/page_white_excel.png') !important
+    &.html
+      background-image: image-url('mimeClassIcons/html.svg')
 
-  .google_docs
-    background-image: url('/images/google_docs_icon.ico') !important
+    &.google_docs
+      background-image: image-url('google_docs_icon.ico')
 
-  .etherpad
-    background-image: url('/images/etherpad_icon.ico') !important
+    &.etherpad
+      background-image: image-url('etherpad_icon.ico')
 
-  .loading
-    background-image: url('/images/ajax-loader-small.gif') !important
+    &.loading
+      background-image: image-url('ajax-loader-small.gif')

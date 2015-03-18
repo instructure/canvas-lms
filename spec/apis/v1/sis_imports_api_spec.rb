@@ -67,7 +67,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode" => opts[:batch_mode] ? true : nil,
           "override_sis_stickiness" => opts[:override_sis_stickiness] ? true : nil,
           "add_sis_stickiness" => opts[:add_sis_stickiness] ? true : nil,
-          "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil})
+          "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+    })
     batch.process_without_send_later
     return batch
   end
@@ -101,7 +104,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode_term_id" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
-          "clear_sis_stickiness" => nil })
+          "clear_sis_stickiness" => nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+    })
 
     expect(SisBatch.count).to eq @batch_count + 1
     expect(batch.batch_mode).to be_falsey
@@ -142,7 +148,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode_term_id" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
-          "clear_sis_stickiness" => nil })
+          "clear_sis_stickiness" => nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+    })
   end
 
   it "should skip the job for skip_sis_jobs_account_ids" do
@@ -187,6 +196,20 @@ describe SisImportsApiController, type: :request do
     expect(batch.options[:override_sis_stickiness]).to be_truthy
     expect(batch.options[:clear_sis_stickiness]).to be_truthy
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
+  end
+
+  it "should enable diffing mode" do
+    json = api_call(:post,
+      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      { controller: 'sis_imports_api', action: 'create',
+        format: 'json', account_id: @account.id.to_s },
+      { import_type: 'instructure_csv',
+        attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+        diffing_data_set_identifier: 'my-users-data',
+      })
+    batch = SisBatch.find(json["id"])
+    expect(batch.batch_mode).to be_falsey
+    expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
   end
 
   it "should error if batch mode and the term can't be found" do
@@ -528,7 +551,10 @@ describe SisImportsApiController, type: :request do
           "batch_mode_term_id" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
-          "clear_sis_stickiness" => nil }]
+          "clear_sis_stickiness" => nil,
+          "diffing_data_set_identifier" => nil,
+          "diffed_against_import_id" => nil,
+      }]
     })
   end
 

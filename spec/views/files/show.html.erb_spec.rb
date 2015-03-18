@@ -24,8 +24,19 @@ describe "/files/index" do
     course_with_student
     view_context
     assigns[:attachment] = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-#    render "files/show"
-#    response.should_not be_nil
+    render "files/show"
+    expect(response).not_to be_nil
+  end
+
+  it "should display a message that the file is locked if user is a student and the file is locked/unpublished" do
+    course_with_student
+    view_context
+    attachment = @course.attachments.create!(:uploaded_data => default_uploaded_data)
+    attachment.locked = true
+    attachment.save!
+    assigns[:attachment] = attachment
+    render "files/show"
+    expect(rendered).to match /This file is currently locked/
   end
 end
 

@@ -523,7 +523,7 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_unmuted
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      assignment.recently_unmuted
+      assignment.context.available? && assignment.recently_unmuted
     }
 
   end
@@ -1762,8 +1762,7 @@ class Assignment < ActiveRecord::Base
 
   def allow_google_docs_submission?
     self.submission_types &&
-      self.submission_types.match(/online_upload/) &&
-      (self.allowed_extensions.blank? || self.allowed_extensions.grep(/doc|xls|ppt/).present?)
+      self.submission_types.match(/online_upload/)
   end
 
   def <=>(comparable)

@@ -165,6 +165,8 @@ Because it is, and you can use flexbox.
 
 */
 
+@import "base/environment";
+
 $c-grid-sp: 16px;
 $c-grid-columns: 12;
 
@@ -237,14 +239,14 @@ $c-grid-columns: 12;
 
 @include grid-for-size('xs');
 
-@media only screen and (min-width: 48em) {
+@include breakpoint(mini-tablet) {
   @include grid-for-size('sm');
 }
 
-@media only screen and (min-width: 62em) {
+@include breakpoint(tablet) {
   @include grid-for-size('md');
 }
 
-@media only screen and (min-width: 75em) {
+@include breakpoint(desktop) {
   @include grid-for-size('lg');
 }

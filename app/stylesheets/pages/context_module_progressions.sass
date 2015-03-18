@@ -1,7 +1,7 @@
 @import "base/environment"
 
 #breadcrumbs
-  border-bottom: solid 1px $listBorderColor
+  border-bottom: solid 1px $ic-border-light
 #content
   padding: 0
 
@@ -21,14 +21,14 @@
           padding-right: 16px
           text-align: right
           .subtitle
-            color: $hintTextColor
+            color: $ic-hint-text
             font-size: 12px
             font-weight: normal
         .completed
           color: $successText
         hr
           margin: 0
-          border-top-color: $listBorderColor
+          border-top-color: $ic-border-light
         .items
           ul
             list-style-type: none
@@ -38,12 +38,12 @@
 
 #progression_students
   background-color: $tableBackgroundAccent
-  border-left: solid 1px $listBorderColor
+  border-left: solid 1px $ic-border-light
   height: 450px
   p
     padding: 8px
   .header
-    border-bottom: solid 1px $listBorderColor
+    border-bottom: solid 1px $ic-border-light
     h3
       display: inline
       font-size: inherit
@@ -62,13 +62,13 @@
       cursor: pointer
       border-top: solid 1px transparent
       a
-        color: $ic-text-color
+        color: $ic-font-color-dark
       &.active
         background-color: $btnBackground
-        border-bottom: solid 1px $listBorderColor
+        border-bottom: solid 1px $ic-border-light
         font-weight: bold
         margin-left: -1px
         a
           color: $ic-link-color
     .student + .student.active
-      border-top-color: $listBorderColor
+      border-top-color: $ic-border-light

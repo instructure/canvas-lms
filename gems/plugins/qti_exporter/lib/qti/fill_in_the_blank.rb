@@ -69,7 +69,7 @@ class FillInTheBlank < AssessmentItemConverter
         answer[:weight] = @type == 'multiple_dropdowns_question' ? 0 : 100
         answer[:id] = unique_local_id
         answer[:migration_id] = choice['identifier']
-        answer[:text] = clear_html(choice.text).strip.gsub(/\s+/, " ")
+        answer[:text] = choice.text.strip
         answer[:blank_id] = blank_id
         @question[:answers] << answer
         answer_hash[choice['identifier']] = answer

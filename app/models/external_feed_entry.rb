@@ -25,7 +25,7 @@ class ExternalFeedEntry < ActiveRecord::Base
   validates_inclusion_of :asset_type, :allow_nil => true, :in => ['DiscussionTopic']
 
   before_save :infer_defaults
-  validates_presence_of :user_id, :external_feed_id, :workflow_state
+  validates_presence_of :external_feed_id, :workflow_state
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   sanitize_field :message, CanvasSanitize::SANITIZE
 

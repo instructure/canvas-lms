@@ -63,3 +63,6 @@ define [
     # manually concatenate it into your wrapper
     equal t('bar', 'you need to *log in*', {wrapper: '<a href="%{url}">$1</a>', url: 'http://foo.bar'}),
       'you need to <a href="http://foo.bar">log in</a>'
+
+  test "pluralize: should format the number", ->
+    equal t({one: "1 thing", other: "%{count} things"}, {count: 1500}), '1,500 things'

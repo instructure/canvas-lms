@@ -19,7 +19,7 @@ module Quizzes
         tally += (user_answer[:points] || 0) if user_answer[:correct]
       end
       @submission.score = tally
-      @submission.score = @submission.quiz.points_possible if @submission.quiz && @submission.quiz.quiz_type == 'graded_survey'
+      @submission.score = @submission.quiz.points_possible if @submission.quiz && @submission.quiz.graded_survey?
       @submission.submission_data = user_answers
       @submission.workflow_state = "complete"
       user_answers.each do |answer|

@@ -68,6 +68,12 @@ class OutcomesController < ApplicationController
     @alignments = @outcome.alignments.active.for_context(@context)
     add_crumb(@outcome.short_description, named_context_url(@context, :context_outcome_url, @outcome.id))
     @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
+
+    js_env({
+     :PERMISSIONS => {
+       :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes)
+      }
+    })
   end
 
   def details
@@ -171,8 +177,7 @@ class OutcomesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_outcomes)
 
     @outcome = @context.available_outcome(params[:outcome_id].to_i)
-    @alignment = @outcome.alignments.find(params[:id])
-    @outcome.remove_alignment(@alignment.content, @context)
+    @outcome.remove_alignment(params[:id], @context)
     render :json => @alignment.as_json(:include => :learning_outcome)
   end
 

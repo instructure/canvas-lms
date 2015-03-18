@@ -27,7 +27,7 @@ class Attachment < ActiveRecord::Base
     :id, :context_id, :context_type, :size, :folder_id, :content_type, :filename, :uuid, :display_name, :created_at, :updated_at,
     :workflow_state, :user_id, :local_filename, :locked, :file_state, :deleted_at,
     :position, :lock_at, :unlock_at, :last_lock_at, :last_unlock_at, :could_be_locked, :root_attachment_id, :cloned_item_id,
-    :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message, :last_inline_view
+    :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission]
@@ -1458,10 +1458,6 @@ class Attachment < ActiveRecord::Base
 
   def view_inline_ping_url
     "/#{context_url_prefix}/files/#{self.id}/inline_view"
-  end
-
-  def record_inline_view
-    (root_attachment || self).update_attribute(:last_inline_view, Time.now)
   end
 
   def canvadoc_url(user)

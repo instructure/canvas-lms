@@ -42,9 +42,8 @@ module BasicLTI
         raise InvalidSourceId, 'Assignment is invalid' unless assignment
 
         tag = assignment.external_tool_tag if assignment
-        if !tag || tool != ContextExternalTool.find_external_tool(tag.url, course)
-          raise InvalidSourceId, 'Assignment is no longer associated with this tool'
-        end
+        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
+
         return course, assignment, user
       end
     end

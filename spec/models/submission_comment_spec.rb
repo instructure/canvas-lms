@@ -70,6 +70,21 @@ describe SubmissionComment do
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
     expect(@comment.messages_sent).to be_include('Submission Comment')
   end
+
+  it "should not dispatch notification on create if course is unpublished" do
+    assignment_model
+    @assignment.workflow_state = 'published'
+    @assignment.save
+    @course.enroll_teacher(user)
+    se = @course.enroll_student(user)
+    @assignment.reload
+    @submission = @assignment.submit_homework(se.user, :body => 'some message')
+    @submission.created_at = Time.now - 60
+    @submission.save
+    Notification.create(:name => 'Submission Comment')
+    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
+    expect(@comment.messages_sent).to_not be_include('Submission Comment')
+  end
   
   it "should dispatch notification on create to teachers even if submission not submitted yet" do
     assignment_model

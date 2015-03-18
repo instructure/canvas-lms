@@ -1,5 +1,7 @@
 @import 'base/environment';
 
+$modules-highlight-color: $canvas-primary; 
+
 ic-lazy-list {
   display: block;
 }
@@ -238,7 +240,7 @@ ic-lazy-list {
   right: 0;
   bottom: -3px;
   height: 5px;
-  background: $highlight-color;
+  background: $modules-highlight-color;
 }
 
 .item-group-condensed.accepts-drag.text-ic-module.drop-above:before {
@@ -248,7 +250,7 @@ ic-lazy-list {
   left: 0;
   right: 0;
   top: -3px;
-  background: $highlight-color;
+  background: $modules-highlight-color;
 }
 
 .item-group-condensed.accepts-drag.text-ic-module-item {

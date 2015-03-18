@@ -379,6 +379,29 @@ describe "speed grader" do
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 
+  it "should allow commenting using rubric" do
+    student_submission
+    @association.use_for_grading = true
+    @association.save!
+
+    @rubric.data.detect{ |row| row[:learning_outcome_id] == @outcome.id }[:ignore_for_scoring] = true
+    @rubric.save!
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+    to_comment = 'special rubric comment'
+    keep_trying_until do
+      f('.toggle_full_rubric').click
+      expect(f('#rubric_full')).to be_displayed
+    end
+    f('#rubric_full tr.learning_outcome_criterion .criterion_comments img').click
+    f('textarea.criterion_comments').send_keys(to_comment)
+    f('#rubric_criterion_comments_dialog .save_button').click
+    f('#rubric_full .save_rubric_button').click
+    saved_comment = f('#rubric_summary_container .rubric_table tr.learning_outcome_criterion .rating_comments_dialog_link')
+    expect(saved_comment.text).to eq to_comment
+  end
+
   it "should create a comment on assignment" do
     #pending("failing because it is dependant on an external kaltura system")
 

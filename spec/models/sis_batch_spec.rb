@@ -50,7 +50,7 @@ describe SisBatch do
 
   def process_csv_data(data, opts = {})
     create_csv_data(data) do |batch|
-      batch.update_attributes(opts) if opts.present?
+      batch.update_attributes(opts, without_protection: true) if opts.present?
       batch.process_without_send_later
       batch
     end
@@ -423,5 +423,72 @@ s2,test_1,section2,active},
     expect(batch.processing_warnings.last).to eq ['', 'There were 3 more warnings']
     expect(batch.processing_errors.size).to eq 3
     expect(batch.processing_errors.last).to eq ['', 'There were 3 more errors']
+  end
+
+  context "csv diffing" do
+    it "should skip diffing if previous diff not available" do
+      SIS::CSV::DiffGenerator.any_instance.expects(:generate).never
+      batch = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+      }], diffing_data_set_identifier: 'default')
+      # but still starts the chain
+      expect(batch.diffing_data_set_identifier).to eq 'default'
+    end
+
+    it "joins the chain but doesn't apply the diff when baseline is set" do
+      b1 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+}], diffing_data_set_identifier: 'default')
+
+      batch = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+test_4,TC 104,Test Course 104,,term1,active
+}], diffing_data_set_identifier: 'default', diffing_remaster: true)
+      expect(batch.diffing_data_set_identifier).to eq 'default'
+      expect(batch.data[:diffed_against_sis_batch_id]).to eq nil
+      expect(batch.generated_diff).to eq nil
+    end
+
+    it "should diff against the most previous successful batch in the same chain" do
+      b1 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+}], diffing_data_set_identifier: 'default')
+
+      b2 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_2,TC 102,Test Course 102,,term1,active
+}], diffing_data_set_identifier: 'other')
+
+      # doesn't diff against failed imports on the chain
+      b3 = process_csv_data([
+%{short_name,long_name,account_id,term_id,status
+TC 103,Test Course 103,,term1,active
+}], diffing_data_set_identifier: 'default')
+      expect(b3.workflow_state).to eq 'failed_with_messages'
+
+      batch = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+test_4,TC 104,Test Course 104,,term1,active
+}], diffing_data_set_identifier: 'default')
+
+      expect(batch.data[:diffed_against_sis_batch_id]).to eq b1.id
+      # test_1 should not have been toched by this last batch, since it was diff'd out
+      expect(@account.courses.find_by_sis_source_id('test_1').sis_batch_id).to eq b1.id
+      expect(@account.courses.find_by_sis_source_id('test_4').sis_batch_id).to eq batch.id
+
+      # check the generated csv file, inside the new attached zip
+      zip = Zip::File.open(batch.generated_diff.open.path)
+      csvs = zip.glob('*.csv')
+      expect(csvs.size).to eq 1
+      expect(csvs.first.get_input_stream.read).to eq(
+%{course_id,short_name,long_name,account_id,term_id,status
+test_4,TC 104,Test Course 104,,term1,active
+})
+    end
   end
 end

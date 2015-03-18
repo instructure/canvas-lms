@@ -11,7 +11,7 @@ window.addEventListener("DOMContentLoaded",function() {
   if(!document.getElementById('fixtures')) {
     var fixturesDiv = document.createElement('div');
     fixturesDiv.id = 'fixtures';
-    document.body.appendChild(fixturesDiv);  
+    document.body.appendChild(fixturesDiv);
   }
 },false);
 

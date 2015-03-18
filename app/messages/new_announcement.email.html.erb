@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/announcements/<%= asset.id %>
+  <%= polymorphic_url([asset.context, asset]) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -12,14 +12,14 @@
   </a>
 <% end %>
 
-<%= html_to_simple_html(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
+<%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
 
 <% if asset.attachment %>
 <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
   <p style="margin: 0px;"><%= t :attached_file, "Attached File" %></p>
   <ul style="padding-left: 20px;">
     <li><%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
-        <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download">[<%= t :download, "download" %>]</a></li>
+      <%= polymorphic_url([asset.context, :file_download], file_id: asset.attachment) %>
   </ul>
 </div>
 <% end %>

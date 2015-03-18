@@ -6,7 +6,7 @@
 }
 
 .ic-wizard-box {
-  transition: all 1s $can-transition;
+  transition: all 1s $ic-transition;
   width: 100%;
   height: 100%;
   background: $canvas-secondary;
@@ -48,7 +48,7 @@
 }
 
 .ic-wizard-box__logo-link {
-  background: url("/images/canvas-logo.svg") no-repeat $can-sp+4 50%;
+  background: url("/images/canvas-logo.svg") no-repeat $ic-sp+4 50%;
   background-size: 114px 27px;
   border-left: 4px solid transparent;
   flex: 0 0 36px;
@@ -64,9 +64,9 @@
     background-size: 144px 34px;  
   }
   @include breakpoint(desktop) {
-    flex: 0 0 $can-sp*9;
+    flex: 0 0 $ic-sp*9;
     @include breakpoint(short) {
-      flex: 0 0 $can-sp*6;
+      flex: 0 0 $ic-sp*6;
       background-size: 114px 27px;
     }  
   }
@@ -88,9 +88,9 @@
   display: flex;
   align-items: center;
   user-select: none;
-  padding: 0 $can-sp 0 $can-sp*4;
+  padding: 0 $ic-sp 0 $ic-sp*4;
   border-left: 4px solid transparent;
-  background: url("/images/wizard-todo-unchecked.svg") no-repeat $can-sp 50%;
+  background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
   background-size: 18px 18px;
   font-weight: 300;
 
@@ -144,21 +144,21 @@
 
 .ic-wizard-box__headline {
   line-height: 0.85;
-  font-size: $can-sp*3;
+  font-size: $ic-sp*3;
   text-align: center;
   color: $canvas-light;
   font-weight: 700;
   margin: 0;
   @include breakpoint(mini-tablet) {
-    font-size: $can-sp*4;
-    padding: $can-sp 0;
+    font-size: $ic-sp*4;
+    padding: $ic-sp 0;
   }
   @include breakpoint(tablet) {
-    font-size: $can-sp*5;
+    font-size: $ic-sp*5;
   }
   @include breakpoint(desktop) {
-    font-size: $can-sp*6;
-    padding: $can-sp*2 0;
+    font-size: $ic-sp*6;
+    padding: $ic-sp*2 0;
   }
 }
 
@@ -174,10 +174,10 @@
   perspective: 500px;
 
   @include breakpoint(mini-tablet) {
-    margin: 0 $can-sp;
+    margin: 0 $ic-sp;
   }
   @include breakpoint(tablet) {
-    margin: 0 $can-sp*2;
+    margin: 0 $ic-sp*2;
   }
   @include breakpoint(desktop) {
     max-width: 600px;
@@ -189,7 +189,7 @@
   display: none;
   
   @include breakpoint(mini-tablet) {
-    transition: all 1s $can-transition;
+    transition: all 1s $ic-transition;
     opacity: 0;
     transform: scale(0) translate3d(0,50%,0);
 
@@ -215,7 +215,7 @@
       color: $canvas-light;
       line-height: 1;
       &:before {
-        font-size: $can-sp*3;
+        font-size: $ic-sp*3;
         top: 0;
       }
     }
@@ -224,7 +224,7 @@
 
   @include breakpoint(tablet) {
     i[class*=icon-], i[class^=icon-] {
-      &:before { font-size: $can-sp*3; }
+      &:before { font-size: $ic-sp*3; }
     }
   }
 
@@ -233,18 +233,18 @@
     top: -60px; left: 50%;
     margin-left: -60px;
     i[class*=icon-], i[class^=icon-] {
-      &:before { font-size: $can-sp*5; }
+      &:before { font-size: $ic-sp*5; }
     }
   }
 
 }
 
 .ic-wizard-box__message-inner {
-  transition: all 1s $can-transition;
+  transition: all 1s $ic-transition;
   opacity: 0;
   transform: translate3d(0,50%,0);
   background: rgba($canvas-light, 0.9);
-  padding: $can-sp*4 $can-sp*2 $can-sp*2 $can-sp*2;
+  padding: $ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2;
   box-shadow: 0 1px 4px 1px rgba(black, 0.3);
   text-align: center;
 
@@ -259,12 +259,12 @@
   @include breakpoint(mini-tablet) {
     border-radius: $baseBorderRadius;
   }
-  @include breakpoint(desktop) { padding: $can-sp*7 $can-sp*2 $can-sp*2 $can-sp*2; }
+  @include breakpoint(desktop) { padding: $ic-sp*7 $ic-sp*2 $ic-sp*2 $ic-sp*2; }
 
 }
 
 .ic-wizard-box__message-button {
-  margin-top: $can-sp*2;
+  margin-top: $ic-sp*2;
 }
 
 .ic-wizard-box__message-text {

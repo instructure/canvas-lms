@@ -184,12 +184,20 @@ class ContextController < ApplicationController
     log_asset_access("roster:#{@context.asset_string}", 'roster', 'other')
 
     if @context.is_a?(Course)
-      sections = @context.course_sections.active.select([:id, :name])
+      if @context.concluded?
+        sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
+        concluded_sections = sections.select{|s| s.concluded?}.map{|s| "section_#{s.id}"}
+      else
+        sections = @context.course_sections.active.select([:id, :name])
+        concluded_sections = []
+      end
+
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
       js_env({
         :ALL_ROLES => all_roles,
-        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name } },
+        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name} },
+        :CONCLUDED_SECTIONS => concluded_sections,
         :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
         :ENROLL_USERS_URL => course_enroll_users_url(@context),
         :SEARCH_URL => search_recipients_url,

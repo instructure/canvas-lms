@@ -1,6 +1,6 @@
 define [
   'i18n!react_files'
-  'react'
+  'old_unsupported_dont_use_react'
 ], (I18n, React) ->
 
   LoadingIndicator = React.createClass

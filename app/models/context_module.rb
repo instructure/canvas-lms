@@ -38,20 +38,56 @@ class ContextModule < ActiveRecord::Base
   before_save :infer_position
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
+
   after_save :touch_context
   after_save :invalidate_progressions
+  after_save :relock_warning_check
   validates_presence_of :workflow_state, :context_id, :context_type
 
-  def invalidate_progressions(invalidated_modules=[])
-    return if invalidated_modules.include?(self)
+  def relock_warning_check
+    # if the course is already active and we're adding more stringent requirements
+    # then we're going to give the user an option to re-lock students out of the modules
+    # otherwise they will be able to continue as before
+    @relock_warning = false
+    return if self.new_record?
+
+    if self.context.available? && self.active?
+      if self.workflow_state_changed? && self.workflow_state_was == "unpublished"
+        # should trigger when publishing a prerequisite for an already active module
+        @relock_warning = true if self.context.context_modules.active.any?{|mod| self.is_prerequisite_for?(mod)}
+      end
+      if self.completion_requirements_changed?
+        # removing a requirement shouldn't trigger
+        @relock_warning = true if (self.completion_requirements.to_a - self.completion_requirements_was.to_a).present?
+      end
+      if self.prerequisites_changed?
+        # ditto with removing a prerequisite
+        @relock_warning = true if (self.prerequisites.to_a - self.prerequisites_was.to_a).present?
+      end
+    end
+  end
+
+  def relock_warning?
+    @relock_warning
+  end
+
+  def relock_progressions(relocked_modules=[])
+    return if relocked_modules.include?(self)
     connection.after_transaction_commit do
-      invalidated_modules << self
+      relocked_modules << self
+      self.context_module_progressions.update_all(:workflow_state => "locked")
+      self.invalidate_progressions
+
+      self.context.context_modules.each do |mod|
+        mod.relock_progressions(relocked_modules) if self.is_prerequisite_for?(mod)
+      end
+    end
+  end
+
+  def invalidate_progressions
+    connection.after_transaction_commit do
       context_module_progressions.update_all(current: false)
       send_later_if_production(:evaluate_all_progressions)
-
-      context.context_modules.each do |mod|
-        mod.invalidate_progressions(invalidated_modules) if self.is_prerequisite_for?(mod)
-      end
     end
   end
 
@@ -172,14 +208,17 @@ class ContextModule < ActiveRecord::Base
 
   set_policy do
     given {|user, session| self.context.grants_right?(user, session, :manage_content) }
-    can :read and can :create and can :update and can :delete
+    can :read and can :create and can :update and can :delete and can :read_as_admin
+
+    given {|user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
 
     given {|user, session| self.context.grants_right?(user, session, :read) }
     can :read
   end
 
   def locked_for?(user, opts={})
-    return false if self.grants_right?(user, :update)
+    return false if self.grants_right?(user, :read_as_admin)
     available = self.available_for?(user, opts)
     return {:asset_string => self.asset_string, :context_module => self.attributes} unless available
     return {:asset_string => self.asset_string, :context_module => self.attributes, :unlock_at => self.unlock_at} if self.to_be_unlocked
@@ -188,7 +227,7 @@ class ContextModule < ActiveRecord::Base
 
   def available_for?(user, opts={})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
-    if self.grants_right?(user, :update)
+    if self.grants_right?(user, :read_as_admin)
       return true
     elsif !self.active?
       return false
@@ -306,7 +345,7 @@ class ContextModule < ActiveRecord::Base
   def content_tags_visible_to(user, opts={})
     @content_tags_visible_to ||= {}
     @content_tags_visible_to[user.try(:id)] ||= begin
-      is_teacher = opts[:is_teacher] != false && self.grants_right?(user, :update)
+      is_teacher = opts[:is_teacher] != false && self.grants_right?(user, :read_as_admin)
       tags = is_teacher ? cached_not_deleted_tags : cached_active_tags
 
       if !is_teacher && differentiated_assignments_enabled? && user

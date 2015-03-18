@@ -1,7 +1,7 @@
 define [
   'jquery'
-  'react'
-  'react-router'
+  'old_unsupported_dont_use_react'
+  'old_unsupported_dont_use_react-router'
   'compiled/react/shared/utils/withReactDOM'
   '../modules/customPropTypes'
 ], ($, React, {Link}, withReactDOM, customPropTypes) ->
