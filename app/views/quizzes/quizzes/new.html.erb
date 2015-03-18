@@ -268,10 +268,17 @@
                         </label>
 
                         <div class="date_field_container inline">
+                          <label class="screenreader-only" id="show_correct_answers_accessible_label">
+                            <%= t("Show Correct Answers At") %>
+                            <%= datepicker_screenreader_prompt %>
+                          </label>
                           <%= text_field :quiz, :show_correct_answers_at,
                             :class => "input-medium date_field",
                             :type => "text",
-                            :value => @quiz.show_correct_answers_at.as_json %>
+                            :value => @quiz.show_correct_answers_at.as_json,
+                            "aria-labelledby" => "show_correct_answers_accessible_label",
+                            "data-tooltip" =>"",
+                            :title => accessible_date_format %>
                         </div>
                       </div>
                       <div>
@@ -280,10 +287,17 @@
                         </label>
 
                         <div class="date_field_container inline">
+                          <label class="screenreader-only" id="hide_correct_answers_accessible_label">
+                            <%= t("Hide Correct Answers At") %>
+                            <%= datepicker_screenreader_prompt %>
+                          </label>
                           <%= text_field :quiz, :hide_correct_answers_at,
                             :class => "input-medium date_field",
                             :type => "text",
-                            :value => @quiz.hide_correct_answers_at.as_json %>
+                            :value => @quiz.hide_correct_answers_at.as_json,
+                            "aria-labelledby" => "hide_correct_answers_accessible_label",
+                            "data-tooltip" =>"",
+                            :title => accessible_date_format %>
                         </div>
                       </div>
                     </div>

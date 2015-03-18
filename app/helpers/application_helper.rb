@@ -778,6 +778,22 @@ module ApplicationHelper
     "data-tooltip data-html-tooltip-title=\"#{text}\"".html_safe
   end
 
+  # used for generating a
+  # prompt for use with date pickers
+  # so it doesn't need to be declared all over the place
+  def datepicker_screenreader_prompt
+    prompt_text = I18n.t("#helpers.accessible_date_prompt", "Format Like")
+    format = accessible_date_format
+    "#{prompt_text} #{format}"
+  end
+
+  # useful for presenting a consistent
+  # date format to screenreader users across the app
+  # when telling them how to fill in a datetime field
+  def accessible_date_format
+    I18n.t("#helpers.accessible_date_format", "YYYY-MM-DD hh:mm")
+  end
+
   # render a link with a tooltip containing a summary of due dates
   def multiple_due_date_tooltip(assignment, user, opts={})
     user ||= @current_user
