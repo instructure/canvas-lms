@@ -60,5 +60,4 @@ class GradebookUploadsController < ApplicationController
       end
     end
   end
-
 end
