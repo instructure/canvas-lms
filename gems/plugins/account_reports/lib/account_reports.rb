@@ -117,8 +117,6 @@ module AccountReports
         :user => account_report.user
       )
     end
-    attachment.uploaded_data = Rack::Test::UploadedFile.new(filepath, filetype, true)
-    attachment.save
     attachment
   end
 
