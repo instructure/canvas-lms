@@ -264,7 +264,7 @@ describe Attachment do
         @attachment.uploaded_data = default_uploaded_data
         @attachment.connection.expects(:after_transaction_commit).once
         @attachment.expects(:touch_context_if_appropriate).never
-        @attachment.expects(:build_media_object).never
+        @attachment.expects(:ensure_media_object).never
         @attachment.save
       end
 
@@ -273,14 +273,14 @@ describe Attachment do
           @attachment.uploaded_data = default_uploaded_data
           Attachment.connection.expects(:after_transaction_commit).never
           @attachment.expects(:touch_context_if_appropriate)
-          @attachment.expects(:build_media_object)
+          @attachment.expects(:ensure_media_object)
           @attachment.save
         end
       end
     end
   end
 
-  context "build_media_object" do
+  context "ensure_media_object" do
     before :once do
       @course = course
       @attachment = @course.attachments.build(:filename => 'foo.mp4')
@@ -288,12 +288,13 @@ describe Attachment do
     end
 
     it "should be called automatically upon creation" do
-      @attachment.expects(:build_media_object).once
+      @attachment.expects(:ensure_media_object).once
       @attachment.save!
     end
 
     it "should create a media object for videos" do
-      MediaObject.expects(:send_later_enqueue_args).once
+      @attachment.update_attribute(:media_entry_id, 'maybe')
+      @attachment.expects(:build_media_object).once.returns(true)
       @attachment.save!
     end
 
@@ -314,7 +315,7 @@ describe Attachment do
 
     it "should not create a media object in a skip_media_object_creation block" do
       Attachment.skip_media_object_creation do
-        MediaObject.expects(:send_later_enqueue_args).times(0)
+        @attachment.expects(:build_media_object).times(0)
         @attachment.save!
       end
     end
@@ -322,17 +323,17 @@ describe Attachment do
     it "should not create a media object for images" do
       @attachment.filename = 'foo.png'
       @attachment.content_type = 'image/png'
-      @attachment.expects(:build_media_object).once
-      MediaObject.expects(:send_later_enqueue_args).times(0)
+      @attachment.expects(:ensure_media_object).once
+      @attachment.expects(:build_media_object).times(0)
       @attachment.save!
     end
 
     it "should create a media object *after* a direct-to-s3 upload" do
-      MediaObject.expects(:send_later_enqueue_args).never
+      @attachment.expects(:build_media_object).never
       @attachment.workflow_state = 'unattached'
       @attachment.file_state = 'deleted'
       @attachment.save!
-      MediaObject.expects(:send_later_enqueue_args).once
+      @attachment.expects(:build_media_object).once
       @attachment.workflow_state = nil
       @attachment.file_state = 'available'
       @attachment.save!

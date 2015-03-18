@@ -125,7 +125,7 @@ class Attachment < ActiveRecord::Base
   # immediately after save if no data is being uploading during this save cycle.
   # That means you can't rely on these happening in the same transaction as the save.
   after_save_and_attachment_processing :touch_context_if_appropriate
-  after_save_and_attachment_processing :build_media_object
+  after_save_and_attachment_processing :ensure_media_object
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment fond
@@ -278,13 +278,26 @@ class Attachment < ActiveRecord::Base
     dup
   end
 
-  def build_media_object
+  def ensure_media_object
     return true if self.class.skip_media_object_creation?
     in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/
-    transitioned_to_this_state = self.id_was == nil || self.file_state_changed? && self.workflow_state_was =~ /^unattached/
-    if in_the_right_state && transitioned_to_this_state && self.previewable_media?
-      delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
-      MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
+    if in_the_right_state && self.media_entry_id == 'maybe' &&
+        self.content_type && self.content_type.match(/\A(video|audio)/)
+      build_media_object
+    end
+  end
+
+  def build_media_object
+    tag = 'add_media_files'
+    delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
+    progress = Progress.where(context_type: 'Attachment', context_id: self, tag: tag).last
+    progress ||= Progress.new context: self, tag: tag
+
+    if progress.new_record?
+      progress.reset!
+      progress.process_job(MediaObject, :add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY, :preserve_method_args => true, :max_attempts => 5 }, self, false) && true
+    else
+      progress.completed? && !progress.failed?
     end
   end
 

@@ -25,7 +25,7 @@ define [
       contextType: 'courses'
 
 
-    location = new TestLocation([ '/courses/1/files/folder/test_folder_name' ]);
+    location = new TestLocation([ '/courses/1/files/folder/test_folder_name' ])
     routes = [
       Route path: "#{filesEnv.baseUrl}/folder/*", name: "folder", handler: BreadcrumbsComponent
       Route path: "#{filesEnv.baseUrl}/?", name: "rootFolder", handler: BreadcrumbsComponent

@@ -2,110 +2,114 @@ define [
   'react'
   'react-router'
   'react-modal'
+  'compiled/react_files/components/FilesApp'
+  'compiled/react_files/modules/filesEnv'
   'compiled/react_files/components/FilePreview'
   'compiled/models/Folder'
   'compiled/models/File'
   'compiled/collections/FilesCollection'
-  'compiled/react_files/components/FolderChild'
-], (React, Router, Modal, FilePreview, Folder, File, FilesCollection, FolderChild) ->
+  '../mockFilesENV'
+  '../TestLocation'
+  '../../helpers/stubRouterContext'
+], (React, Router, Modal, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, mockFilesENV, TestLocation, stubRouterContext) ->
 
   Simulate = React.addons.TestUtils.Simulate
+  FilePreview = stubRouterContext FilePreviewComponent
 
-  # TODO: These tests should be re-implemented after we have figured out testing with react-router
+  module 'File Preview Rendering',
+    setup: ->
+      # Initialize a few things to view in the preview.
+      @filesCollection = new FilesCollection()
+      @file1 = new File({
+       id: '1'
+       cid: 'c1'
+       name:'Test File.file1'
+       'content-type': 'unknown/unknown'
+       size: 1000000
+       created_at: +new Date()
+       updated_at: +new Date()
+       }, {preflightUrl: ''})
+      @file2 = new File({
+       id: '2'
+       cid: 'c2'
+       name:'Test File.file2'
+       'content-type': 'unknown/unknown'
+       size: 1000000
+       created_at: +new Date()
+       updated_at: +new Date()
+       }, {preflightUrl: ''})
+      @file3 = new File({
+       id: '3'
+       cid: 'c3'
+       name:'Test File.file3'
+       'content-type': 'image/png'
+       'url': 'test/test/test.png'
+       size: 1000000
+       created_at: +new Date()
+       updated_at: +new Date()
+       }, {preflightUrl: ''})
 
-  # module 'File Preview Rendering',
-  #   setup: ->
+      @filesCollection.add(@file1)
+      @filesCollection.add(@file2)
+      @filesCollection.add(@file3)
+      @currentFolder = new Folder()
+      @currentFolder.files = @filesCollection
+      @div = $('<div>').appendTo('body')[0]
 
-  #     #window.React = React
+      Modal.setAppElement(@div)
 
-  #     sinon.stub(Router, 'Link').returns('some link')
-  #     sinon.stub(Folder, 'resolvePath').returns($.Deferred())
+      properties =
+        currentFolder: @currentFolder
+        collection: @filesCollection
+        query: {}
+        params:
+          splat: '/courses/1/files'
 
+      location = (path = '/courses/1/files?preview=2') ->
+        new TestLocation([ path ])
 
+      routes = [
+        Router.Route path: filesEnv.baseUrl, handler: FilePreviewComponent, name: 'rootFolder'
+      ]
 
-  #     # Initialize a few things to view in the preview.
-  #     @filesCollection = new FilesCollection()
-  #     @file1 = new File({
-  #       id: '1'
-  #       cid: 'c1'
-  #       name:'Test File.file1'
-  #       'content-type': 'unknown/unknown'
-  #       }, {preflightUrl: ''})
-  #     @file2 = new File({
-  #       id: '2'
-  #       cid: 'c2'
-  #       name:'Test File.file2'
-  #       'content-type': 'unknown/unknown'
-  #       }, {preflightUrl: ''})
-  #     @file3 = new File({
-  #       id: '3'
-  #       cid: 'c3'
-  #       name:'Test File.file3'
-  #       'content-type': 'image/png',
-  #       'url': 'test/test/test.png'
-  #       }, {preflightUrl: ''})
+      @runRouter = () ->
+        if arguments.length > 1
+          path = arguments[0]
+          callback = arguments[1]
+        else
+          callback = arguments[0]
 
-  #     @filesCollection.add(@file1)
-  #     @filesCollection.add(@file2)
-  #     @filesCollection.add(@file3)
-  #     @currentFolder = new Folder(files: @filesCollection)
-
-  #     Modal.setAppElement($('#fixtures').get(0))
-
-  #     properties =
-  #       currentFolder: @currentFolder
-  #       params: {splat: "test/test/test/"}
-  #       appElement: $('#fixtures').get(0)
-  #       query: {preview: "1"}
-
-
-  #     @filePreview = React.renderComponent(FilePreview(properties), $('#fixtures')[0])
-
-
-  #   teardown: ->
-  #     Router.Link.restore()
-  #     Folder.resolvePath.restore()
-  #     React.unmountComponentAtNode($('#fixtures')[0])
-
-
-  ########
-  # TODO: Consider This - All of these tests are fairly pointless... do we need them?
-  ########
-
-  # test 'clicking the info button should render out the info panel', ->
-  #   infoButton = $('.ef-file-preview-header-info').get(0)
-  #   Simulate.click(infoButton)
-  #   ok $('.ef-file-preview-information').length, 'The info panel did not show'
-
-  # test 'clicking the Show button should render out the footer', ->
-  #   showButton = $('.ef-file-preview-toggle').get(0)
-  #   Simulate.click(showButton)
-  #   ok $('.ef-file-preview-footer').length, 'The footer did not show'
-
-  # test 'clicking the Show button should change the text to Hide', ->
-  #   showButton = $('.ef-file-preview-toggle').get(0)
-  #   Simulate.click(showButton)
-  #   ok $('.ef-file-preview-toggle').text().trim() is "Hide", 'The button text did not become Hide'
+        Router.run routes, location(path), (Handler) =>
+          React.render Handler(properties), @div, ->
+            callback.call(null)
 
 
-  #####
-  ## The next tests should be fixed once Simulate.keyDown is working properly.
-  #####
 
-  # test 'pressing the left arrow should navigate to the previous item', ->
-  #   modal = $('.ReactModal__Overlay').get(0)
-  #   Simulate.keyDown(modal, {keyCode: 37})
-  #   expected = @file1.get 'name'
-  #   actual = $('.ef-file-preview-header-filename').text()
-  #   ok actual is expected, 'The previous item did not load'
+     teardown: ->
+       React.unmountComponentAtNode(@div)
 
 
-  # test 'pressing the left arrow should navigate to the last item if you are at the beginning', ->
-  #   ok false
 
-  # test 'pressing the right arrow should navigate to the next item', ->
-  #   ok false
+  test 'clicking the info button should render out the info panel', ->
+    @runRouter ->
+      $('.ef-file-preview-header-info').click()
+      ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
 
-  # test 'pressing the right arrow should navigate to the first item if you are at the end.', ->
-  #   ok false
+  test 'clicking the info button after the panel has been opened should hide the info panel', ->
+    @runRouter ->
+      $('.ef-file-preview-header-info').click()
+      ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
+      $('.ef-file-preview-header-info').click()
+      ok !$('.ef-file-preview-information-container').length, 'The info panel did not close'
 
+  test 'opening the preview for one file should show navigation buttons for the previous and next files in the current folder', ->
+    @runRouter ->
+      ok $('.icon-arrow-open-left').length, 'The left arrow link was not shown'
+      ok $('.icon-arrow-open-left').closest('a').attr('href').match("preview=1"), 'The left arrow link has an incorrect href (`preview` query string does not exist or points to the wrong id)'
+      ok $('.icon-arrow-open-right').length, 'The right arrow link was not shown'
+      ok $('.icon-arrow-open-right').closest('a').attr('href').match("preview=3"), 'The right arrow link has an incorrect href (`preview` query string does not exist or points to the wrong id)'
+
+  test 'download button should be rendered on the file preview', ->
+    @runRouter '/courses/1/files?preview=3',  =>
+      ok $('.ef-file-preview-header-download').length, 'The download button was not shown'
+      ok $('.ef-file-preview-header-download').attr('href').match(@file3.get('url')), 'The download button url is incorrect'

@@ -511,6 +511,9 @@ class FilesController < ApplicationController
     if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read)) ||
         @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } ||
         authorized_action(@attachment, @current_user, :read)
+
+      @attachment.ensure_media_object
+
       if params[:download]
         if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download)) ||
             (@attachment.grants_right?(@current_user, session, :download))
@@ -575,7 +578,16 @@ class FilesController < ApplicationController
           if url = service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
             json[:attachment][:authenticated_s3_url] = url
           end
-          json[:attachment].merge! doc_preview_json(attachment, @current_user)
+
+          json_include = if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)
+                           { include: %w(enhanced_preview_url) }
+                         else
+                           {}
+                         end
+
+          [json[:attachment],
+           doc_preview_json(attachment, @current_user),
+           attachment_json(attachment, @current_user, {}, json_include)].reduce &:merge!
 
           log_asset_access(attachment, "files", "files")
         end
@@ -842,7 +854,14 @@ class FilesController < ApplicationController
       @attachment.context.file_upload_success_callback(@attachment)
     end
 
-    json = attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
+    json_params = { omit_verifier_in_app: true }
+
+    if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)
+      json_params.merge!({ include: %w(enhanced_preview_url) })
+    end
+
+    json = attachment_json(@attachment, @current_user, {}, json_params)
+
     # render as_text for IE, otherwise it'll prompt
     # to download the JSON response
     render :json => json, :as_text => in_app?
