@@ -332,16 +332,42 @@ describe DiscussionTopicsController do
       Setting.set('enable_page_views', 'db')
     end
     before(:each) do
-      user_session(@student)
       controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
-      post 'create', :course_id => @course.id, :title => 'Topic Title', :is_announcement => false,
-                     :discussion_type => 'side_comment', :require_initial_post => true, :format => 'json',
-                     :podcast_has_student_posts => false, :delayed_post_at => '', :lock_at => '',
-                     :message => 'Message', :delay_posting => false, :threaded => false
+    end
+
+    def topic_params(course, opts={})
+      {
+        :course_id => course.id,
+        :title => 'Topic Title',
+        :is_announcement => false,
+        :discussion_type => 'side_comment',
+        :require_initial_post => true,
+        :podcast_has_student_posts => false,
+        :delayed_post_at => '',
+        :lock_at => '',
+        :message => 'Message',
+        :delay_posting => false,
+        :threaded => false
+      }.merge(opts)
+    end
+
+    def assignment_params(course, opts={})
+      course.require_assignment_group
+      {
+        assignment: {
+          points_possible: 1,
+          grading_type: 'points',
+          assignment_group_id: @course.assignment_groups.first.id,
+        }.merge(opts)
+      }
     end
 
     describe 'the new topic' do
       let(:topic) { assigns[:topic] }
+      before(:each) do
+        user_session(@student)
+        post 'create', { :format => :json }.merge(topic_params(@course))
+      end
 
       specify { expect(topic).to be_a DiscussionTopic }
       specify { expect(topic.user).to eq @user }
@@ -358,17 +384,33 @@ describe DiscussionTopicsController do
     end
 
     it 'logs an asset access record for the discussion topic' do
+      user_session(@student)
+      post 'create', { :format => :json }.merge(topic_params(@course))
       accessed_asset = assigns[:accessed_asset]
       expect(accessed_asset[:category]).to eq 'topics'
       expect(accessed_asset[:level]).to eq 'participate'
     end
 
     it 'registers a page view' do
+      user_session(@student)
+      post 'create', { :format => :json }.merge(topic_params(@course))
       page_view = assigns[:page_view]
       expect(page_view).not_to be_nil
       expect(page_view.http_method).to eq 'post'
       expect(page_view.url).to match %r{^http://test\.host/api/v1/courses/\d+/discussion_topics}
       expect(page_view.participated).to be_truthy
+    end
+
+    it 'does not dispatch assignment created notification for unpublished graded topics' do
+      notification = Notification.create(:name => "Assignment Created")
+      obj_params = topic_params(@course).merge(assignment_params(@course))
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      json = JSON.parse response.body
+      topic = DiscussionTopic.find(json['id'])
+      expect(topic).to be_unpublished
+      expect(topic.assignment).to be_unpublished
+      expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
     end
 
   end
