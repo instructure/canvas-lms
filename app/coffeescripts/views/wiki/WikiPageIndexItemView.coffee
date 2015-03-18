@@ -78,12 +78,25 @@ define [
 
         collection.fetch page: 'current'
 
-    deletePage: (ev) ->
-      ev?.preventDefault()
+    deletePage: (ev = {}) ->
+      ev.preventDefault()
+
       return unless @model.get('deletable')
+
+      $curCog = $(ev.target).parents('td').children().find('.al-trigger')
+      $allCogs =  $('.collectionViewItems').children().find('.al-trigger')
+      curIndex = $allCogs.index($curCog)
+      newIndex = curIndex - 1
+      if (newIndex < 0)
+        # We were at the top, or there wasn't another page item cog
+        $focusOnDelete = $('.new_page')
+      else
+        $focusOnDelete = $allCogs[newIndex]
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model
+        focusOnCancel: $curCog
+        focusOnDelete: $focusOnDelete
       deleteDialog.open()
 
     useAsFrontPage: (ev) ->

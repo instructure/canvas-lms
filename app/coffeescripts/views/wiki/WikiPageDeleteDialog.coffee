@@ -18,6 +18,8 @@ define [
     template: -> I18n.t 'delete_confirmation', 'Are you sure you wish to delete this wiki page?'
 
     @optionProperty 'wiki_pages_path'
+    @optionProperty 'focusOnCancel'
+    @optionProperty 'focusOnDelete'
 
     initialize: (options) ->
       super _.extend {}, dialogDefaults, options
@@ -56,11 +58,15 @@ define [
       buttons = [
         class: 'btn'
         text: I18n.t 'cancel_button', 'Cancel'
-        click: -> form.$el.dialog 'close'
+        click: =>
+          form.$el.dialog 'close'
+          $(@focusOnCancel).focus() if @focusOnCancel
       ,
         class: 'btn btn-danger'
         text: I18n.t 'delete_button', 'Delete'
         'data-text-while-loading': I18n.t 'deleting_button', 'Deleting...'
-        click: -> form.submit()
+        click: =>
+          form.submit()
+          @focusOnDelete.focus()
       ]
       @$el.dialog 'option', 'buttons', buttons

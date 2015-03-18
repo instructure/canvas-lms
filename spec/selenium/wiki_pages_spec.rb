@@ -28,7 +28,7 @@ describe "Navigating to wiki pages" do
       check_element_has_focus(f("[data-sort-field='#{attribute}']"))
     end
 
-    before do
+    before :each do
       account_model
       course_with_teacher_logged_in :account => @account
       @course.wiki.wiki_pages.create!(:title => "Foo")
@@ -79,6 +79,38 @@ describe "Navigating to wiki pages" do
         wait_for_ajaximations
         f('.publish-icon').click # publish it.
         check_element_has_focus(f('.publish-icon'))
+      end
+    end
+
+    describe "Delete Page" do
+
+      before do
+        get "/courses/#{@course.id}/pages"
+      end
+
+      it "returns focus back to the item cog if the item was not deleted" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-buttonset .btn').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "returns focus to the previous item cog if it was deleted" do
+        triggers = ff('.al-trigger')
+        triggers.last.click
+        ff('.delete-menu-item').last.click
+        f('.ui-dialog-buttonset .btn-danger').click
+        wait_for_ajaximations
+        check_element_has_focus(triggers[-2])
+      end
+
+      it "returns focus to the + Page button if there are no previous item cogs" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-buttonset .btn-danger').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.new_page'))
       end
     end
   end
