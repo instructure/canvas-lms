@@ -69,8 +69,17 @@ define [
         @$sequenceFooter?.msfAnimation(false)
       @$sequenceFooter.appendTo(@$el) if @$sequenceFooter
 
+    navigateToLinkAnchor: ->
+      anchor_name = window.location.hash.replace(/^#/, "")
+      if anchor_name.length
+        $anchor = $("#wiki_page_show .user_content ##{anchor_name}")
+        $anchor = $("#wiki_page_show .user_content a[name='#{anchor_name}']") unless $anchor.length
+        if $anchor.length
+          $('html, body').scrollTo($anchor)
+
     afterRender: ->
       super
+      @navigateToLinkAnchor()
       @reloadView = new WikiPageReloadView
         el: @$pageChangedAlert
         model: @model
