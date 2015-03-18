@@ -65,14 +65,22 @@
           <label for="assignment_peer_reviews_assign_at">
             {{#t "locked_until"}}Assign Reviews{{/t}}
           </label>
-          <input id="assignment_peer_reviews_assign_at"
-            name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
-            class="date_field datetime_field hasDatePicker"
-            value="{{datetimeFormatted peerReviewsAssignAt false}}"
-            type="text"
-            aria-label="{{#t}}Assign Reviews on Date{{/t}}"
-            aria-describedby="peer_reviews_assign_at_explanation"
-            {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
+          <div class='date_field_container'>
+            <label class='screenreader-only' id='assign_peer_review_at_accessible_label'>
+              {{#t}}Assign Reviews on Date{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input id="assignment_peer_reviews_assign_at"
+              name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
+              class="date_field datetime_field hasDatePicker"
+              value="{{datetimeFormatted peerReviewsAssignAt false}}"
+              type="text"
+              aria-labelledby="assign_peer_review_at_accessible_label"
+              aria-describedby="peer_reviews_assign_at_explanation"
+              data-tooltip
+              title="{{accessibleDateFormat}}"
+              {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
+          </div>
           <div id="peer_reviews_assign_at_explanation" class="explanation nest">
             {{#t "peer_reviews_assign_at_explanation"}}
               Must come after due date. If blank, uses due date.
