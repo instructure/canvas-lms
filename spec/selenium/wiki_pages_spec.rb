@@ -113,6 +113,17 @@ describe "Navigating to wiki pages" do
         check_element_has_focus(f('.new_page'))
       end
     end
+
+    describe "Use as Front Page Link" do
+      it "should set focus back to the cog after setting" do
+        get "/courses/#{@course.id}/pages"
+        f('.al-trigger').click
+        f('.use-as-front-page-menu-item').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.al-trigger'))
+      end
+    end
+
   end
 
 

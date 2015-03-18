@@ -102,5 +102,16 @@ define [
     useAsFrontPage: (ev) ->
       ev?.preventDefault()
       return unless @model.get('published')
+      # This bit of magic has to happen this way because the $curCog
+      # isn't valid after the re-render occurs... so we use the index and
+      # re-collect the cogs afterwards.
+      if (ev?.target)
+        $curCog = $(ev.target).parents('td').children().find('.al-trigger')
+        $allCogs =  $('.collectionViewItems').children().find('.al-trigger')
+        curIndex = $allCogs.index($curCog)
 
-      @model.setFrontPage()
+      @model.setFrontPage ->
+        # Here's the aforementioned magic and index stuff
+        if (curIndex?)
+          cogs = $('.collectionViewItems').children().find('.al-trigger')
+          $(cogs[curIndex]).focus()
