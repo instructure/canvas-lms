@@ -8,7 +8,30 @@
         <h3 class="outcome_selection">
           {{selectedOutcome.title}}
         </h3>
-
+        {{#if calculationDetails}}
+          {{#with calculationDetails }}
+            <div class="method-details content-box pad-box-mini border border-trbl border-round">
+              <div>
+                {{#t}}Calculation Method{{/t}}:
+                <span class="right-content">{{calculation_method}}</span>
+              </div>
+              <div class="example">
+                <span class="left-content">{{#t}}Example{{/t}}: </span>
+                <span class="right-content method-description">{{exampleText}}</span>
+              </div>
+              <div class="example">
+                <span aria-hidden="true">{{#t}}1- Item scores{{/t}}: </span>
+                <span class="screenreader-only">{{#t}}Example item scores{{/t}}: </span>
+                <span class="right-content">{{exScores}}</span>
+              </div>
+              <div class="example">
+                <span aria-hidden="true">{{#t}}2- Final score{{/t}}: </span>
+                <span class="screenreader-only">{{#t}}Example final score]]{{/t}}</span>
+                <span class="right-content">{{exResult}}</span>
+              </div>
+            </div>
+          {{/with}}
+        {{/if}}
         <div class="pad-box no-sides">
           <p><strong>
             {{#t 'result_sub_count'}}Total results: {{/t}} {{outcomeDetails.cnt}}
