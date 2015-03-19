@@ -616,12 +616,30 @@ if defined? ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
 end
 
 ActiveRecord::Relation.class_eval do
+
+  def select_values_necessitate_temp_table?
+    return false unless select_values.present?
+    selects = select_values.flat_map{|sel| sel.to_s.split(",").map(&:strip) }
+    id_keys = [primary_key, "*", "#{table_name}.#{primary_key}", "#{table_name}.*"]
+    id_keys.all?{|k| !selects.include?(k) }
+  end
+  private :select_values_necessitate_temp_table?
+
+  def find_in_batches_needs_temp_table?
+    order_values.any? ||
+      group_values.any? ||
+      select_values.to_s =~ /DISTINCT/i ||
+      uniq_value ||
+      select_values_necessitate_temp_table?
+  end
+  private :find_in_batches_needs_temp_table?
+
   def find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
     if (connection.adapter_name == 'PostgreSQL' && (connection.readonly? || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
       self.activate { find_in_batches_with_cursor(options, &block) }
-    elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i || uniq_value || select_values.present? && !select_values.map(&:to_s).include?(primary_key)
-      raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
+    elsif find_in_batches_needs_temp_table?
+      raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
       self.activate { find_in_batches_with_temp_table(options, &block) }
     else
       find_in_batches_without_usefulness(options) do |batch|
