@@ -517,7 +517,8 @@ describe "context_modules" do
     it "should add an external tool item to a module" do
       get "/courses/#{@course.id}/modules"
 
-      add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
+      tag = add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
+      expect(driver.execute_script("return $('#context_module_item_#{tag.id} .type').text()")).to eq "context_external_tool"
     end
 
     it "should not save an invalid external tool" do
