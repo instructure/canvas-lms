@@ -219,25 +219,29 @@ class Message < ActiveRecord::Base
   # Returns a JSON string
   def sns_json
     @sns_json ||= begin
-      urls = {html_url: self.url}
-      urls[:api_url] = content(:api_url) if content(:api_url) # no templates define this right now
+      custom_data = {
+        html_url: self.url,
+        user_id: self.user.global_id
+      }
+      custom_data[:api_url] = content(:api_url) if content(:api_url) # no templates define this right now
+
       {
         default: self.subject,
         GCM: {
           data: {
             alert: self.subject,
-          }.merge(urls)
+          }.merge(custom_data)
         }.to_json,
         APNS_SANDBOX: {
           aps: {
             alert: self.subject
           }
-        }.merge(urls).to_json,
+        }.merge(custom_data).to_json,
         APNS: {
           aps: {
             alert: self.subject
           }
-        }.merge(urls).to_json
+        }.merge(custom_data).to_json
       }.to_json
     end
   end
