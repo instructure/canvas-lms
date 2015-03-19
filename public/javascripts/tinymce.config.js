@@ -49,7 +49,7 @@ define([], function(){
       theme : "modern",
       skin : "light",
       skin_url : "/vendor/tinymce_themes/light",
-      plugins: "autolink,media,paste,table,textcolor,link",
+      plugins: "autolink,media,paste,table,textcolor,link,directionality",
       external_plugins: {
         "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
         "instructure_links": "/javascripts/tinymce_plugins/instructure_links/plugin.js",
@@ -120,7 +120,7 @@ define([], function(){
    */
   EditorConfig.prototype.formatBtnGroup = 'bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright';
   EditorConfig.prototype.positionBtnGroup = 'outdent,indent,superscript,subscript,bullist,numlist';
-  EditorConfig.prototype.fontBtnGroup = 'fontsizeselect,formatselect';
+  EditorConfig.prototype.fontBtnGroup = 'ltr,rtl,fontsizeselect,formatselect';
 
 
   /**

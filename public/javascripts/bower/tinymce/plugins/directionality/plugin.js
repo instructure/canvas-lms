@@ -9,7 +9,7 @@
  */
 
 /*global tinymce:true */
-
+define(['bower/tinymce/tinymce'], function(tinymce){
 tinymce.PluginManager.add('directionality', function(editor) {
 	function setDir(dir) {
 		var dom = editor.dom, curDir, blocks = editor.selection.getSelectedBlocks();
@@ -61,4 +61,5 @@ tinymce.PluginManager.add('directionality', function(editor) {
 		cmd: 'mceDirectionRTL',
 		stateSelector: generateSelector('rtl')
 	});
+});
 });

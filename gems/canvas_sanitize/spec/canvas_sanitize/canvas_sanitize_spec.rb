@@ -23,4 +23,9 @@ describe CanvasSanitize do
     cleaned = Sanitize.clean("<p lang='es'>Hola</p>", CanvasSanitize::SANITIZE)
     expect(cleaned).to eq("<p lang=\"es\">Hola</p>")
   end
+
+  it "doesnt strip dir attributes by default" do
+    cleaned = Sanitize.clean("<p dir='rtl'>RightToLeft</p>", CanvasSanitize::SANITIZE)
+    expect(cleaned).to eq("<p dir=\"rtl\">RightToLeft</p>")
+  end
 end
