@@ -4,6 +4,9 @@ define ['tinymce.config'], (EditorConfig)->
   largeScreenWidth = 1300
   dom_id = "some_textarea"
   tinymce = { baseURL: "/base/url" }
+  toolbar1 = "bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright"
+  toolbar2 = "outdent,indent,superscript,subscript,bullist,numlist,table,instructure_links,unlink,instructure_image,instructure_equation"
+  toolbar3 = "ltr,rtl,fontsizeselect,formatselect"
 
   module "EditorConfig",
 
@@ -19,14 +22,14 @@ define ['tinymce.config'], (EditorConfig)->
     width = 100
     config = new EditorConfig(tinymce, INST, width, dom_id)
     toolbar = config.toolbar()
-    ok(toolbar[0] is "bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright")
-    ok(toolbar[1] is "outdent,indent,superscript,subscript,bullist,numlist,table,instructure_links,unlink,instructure_image,instructure_equation")
-    ok(toolbar[2] is "fontsizeselect,formatselect")
+    ok(toolbar[0] is toolbar1)
+    ok(toolbar[1] is toolbar2)
+    ok(toolbar[2] is toolbar3)
 
   test 'buttons go on the first row for large windowing', ->
     config = new EditorConfig(tinymce, INST, largeScreenWidth, dom_id)
     toolbar = config.toolbar()
-    equal(toolbar[0], "bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright,outdent,indent,superscript,subscript,bullist,numlist,table,instructure_links,unlink,instructure_image,instructure_equation,fontsizeselect,formatselect")
+    equal(toolbar[0], "#{toolbar1},#{toolbar2},#{toolbar3}")
     ok(toolbar[1] is "")
     ok(toolbar[2] is "")
 
