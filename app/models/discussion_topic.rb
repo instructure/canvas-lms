@@ -1017,6 +1017,17 @@ class DiscussionTopic < ActiveRecord::Base
     Rails.cache.delete(root_topic.locked_cache_key(user)) if root_topic
   end
 
+  def entries_for_feed(user, podcast_feed=false)
+    return [] if !user_can_see_posts?(user)
+    return [] if locked_for?(user, check_policies: true)
+
+    entries = discussion_entries.active
+    if podcast_feed && !podcast_has_student_posts && context.is_a?(Course)
+      entries = entries.where(user_id: context.admins)
+    end
+    entries
+  end
+
   def self.podcast_elements(messages, context)
     attachment_ids = []
     media_object_ids = []
