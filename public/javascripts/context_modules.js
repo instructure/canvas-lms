@@ -611,6 +611,7 @@ define([
         .removeClass('min_score_requirement')
         .removeClass('max_score_requirement')
         .removeClass('must_view_requirement')
+        .removeClass('must_mark_done_requirement')
         .removeClass('must_submit_requirement')
         .removeClass('must_contribute_requirement')
         .find('.criterion').removeClass('defined');

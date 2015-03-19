@@ -58,6 +58,9 @@
     <h1 class="title">
       <%= @assignment.title %>
     </h1>
+
+    <%= render "shared/mark_as_done" %>
+
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>

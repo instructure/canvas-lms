@@ -386,6 +386,32 @@ describe "context_modules" do
         nxt = f('.module-sequence-footer a.pull-right')
         expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i3.id}"
       end
+
+      context 'mark as done' do
+
+        def setup
+          the_module = create_context_module('Mark Done Module')
+          page = @course.wiki.wiki_pages.create!(:title => "The page", :body => 'hi')
+          tag = the_module.add_item({:id => page.id, :type => 'wiki_page'})
+          the_module.completion_requirements = {tag.id => {:type => 'must_mark_done'}}
+          the_module.save!
+        end
+
+        def navigate_to_wikipage title
+          els = ff('.context_module_item')
+          el = els.find {|e| e.text =~ /#{title}/}
+          el.find_element(:css, 'a').click
+        end
+
+        it "should have a 'mark as done' checkbox" do
+          setup
+          go_to_modules
+          # test 'must mark done' text exists
+          navigate_to_wikipage 'The page'
+          wait_for_ajaximations
+          expect(f '#mark-as-done-checkbox').to_not be_nil
+        end
+      end
     end
   end
 end

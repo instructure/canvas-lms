@@ -1,0 +1,10 @@
+<% if @mark_done.has_requirement? %>
+  <div id="mark-as-done-container">
+    <input id="mark-as-done-checkbox" type="checkbox" 
+       <%= @mark_done.checked? ? 'checked="true"' : '' %>
+       onchange="var url = '<%= @mark_done.api_url %>'; if (this.checked) {$.ajaxJSON(url, 'PUT')} else {$.ajaxJSON(url, 'DELETE')}">
+    <label for="mark-as-done-checkbox">
+      <%= t(:mark_as_done_checkbox, 'Mark as done') %>
+    </label>
+  </div>
+<% end %>
