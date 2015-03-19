@@ -17,6 +17,17 @@
 }
 .Sg-Section {
   padding-bottom: 100px; // adds some padding between our sections and headers
+  
+}
+$sg-Header-height: 85px;
+.Sg-Header {
+  height: $sg-Header-height;
+}
+.Sg-Anchor {
+  display: block;
+  height: $sg-Header-height; 
+  margin-top: -$sg-Header-height; 
+  visibility: hidden;
 }
 .Sg-header__Subnavigation-item {
   // to account for our added "section" for canvas sg nav
