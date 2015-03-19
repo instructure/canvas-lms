@@ -42,7 +42,7 @@
 // These are the new colors that we would like to start rebranding
 // all the canvas pages in. All of the app variables that denote a
 // color should use or be based off of one of these variables
-$ic-brand-primary:                  #0099e0 !default; // light blue
+$ic-brand-primary:                  #0096db !default; // light blue
 @if $use_high_contrast { $ic-brand-primary: #0073ac; }
 
 $ic-brand-secondary:                #5b6c79 !default; // dark blue
@@ -95,12 +95,11 @@ $ic-list-item-background--selected:   #d9edf9;
 //================================
 // Global light background colors
 //================================
-// These background color variables can be used on hover states or focuse states
+// These background color variables can be used on hover states or focus states
 // and meet our contrast needs when used with our main color variables
 
-
 $ic-bg-light-neutral:     lighten($ic-color-neutral, 6%);
-$ic-bg-light-primary:     lighten($ic-brand-primary, 52%);
+$ic-bg-light-primary:     lighten($ic-brand-primary, 54%);
 @if $use_high_contrast { 
 $ic-bg-light-primary:     lighten($ic-brand-primary, 64%); 
 }
