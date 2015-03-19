@@ -33,9 +33,9 @@
     <%= render partial: "quizzes/quizzes/move_handle" %>
 
     <% if assessing && @quiz_presenter.can_go_back? %>
-      <div class="flag_question" role="checkbox" aria-checked="<%= marked ? "true" : "false" %>">
+      <a href="#" class="flag_question" role="checkbox" aria-checked="<%= marked ? "true" : "false" %>">
         <span class="screenreader-only"><%= t(:flag_this_question, "Flag this Question") %></span>
-      </div>
+      </a>
     <% end %>
     <div class="header" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
       <span class="name question_name" tabindex="0" role="heading"><%= hash_get(question, :question_name) %></span>
