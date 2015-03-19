@@ -204,6 +204,7 @@ class GradebooksController < ApplicationController
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
     ag_includes = [:assignments]
     ag_includes << :assignment_visibility if @context.feature_enabled?(:differentiated_assignments)
+    ag_includes << 'overrides' if @context.feature_enabled?(:differentiated_assignments)
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => Setting.get('gradebook2.submissions_chunk_size', '35').to_i,
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),

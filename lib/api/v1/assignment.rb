@@ -84,7 +84,7 @@ module Api::V1::Assignment
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
-    if !opts[:overrides].nil?
+    if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides])
     end
 
