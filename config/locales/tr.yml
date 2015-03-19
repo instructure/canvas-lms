@@ -1292,10 +1292,10 @@ tr:
   activity_by_category_9c2033d1: "Kategoriye göre Etkinlik"
   activity_by_date_878c5b49: "Güne göre Etkinlik"
   add_app_baf540f: "Uygulama Ekle"
-  add_attachment_93868828: "Ek Ekle"
+  add_attachment_93868828: "Dosya Ekle"
   add_course_assignments_628ed6d0: "Ödev Ekle"
   add_course_calendar_events_146154a5: "Ders Takvim Olay Ekle"
-  add_files_to_the_course_da6ffd32: "Kursa Yeni Dosya Ekle"
+  add_files_to_the_course_da6ffd32: "Derse Dosya Ekle"
   add_grading_scheme_81e23c05: "Notlandırma şeması ekle"
   add_module_item: 
     add_assignment_to: "%{module} modülüne sınav ekle"
@@ -1308,7 +1308,7 @@ tr:
   add_tas_to_the_course_2aac6e02: "Derse Öğretim Elemanı Yardımcıları Ekle"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
   after_date_981cd41b: "%{date}'dan sonra"
-  after_last_attempt_c9168da2: "Son Girişten Sonra"
+  after_last_attempt_c9168da2: "Son Teşebbüsten Sonra"
   ajax_errors: 
     error_heading: "Ajax Hatası: %{status_code}"
     errors: 
@@ -1391,7 +1391,7 @@ tr:
       analytics: Analiz
       page_title: "Analiz: %{course} -- %{student}"
   analytics_account_name_filter_name_c0fb1a7b: "Analitikler: %{account_name} -- %{filter_name}"
-  analytics_c94ba601: Analiz
+  analytics_c94ba601: Analitikler
   analytics_course_code_student_name_d63bab4c: "Analitikler: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "ve %{count} fazlası... "
   ange_name: "Açı Dönüştürücü"
@@ -1507,7 +1507,7 @@ tr:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Bu duyuru silmek istediğinizden emin misiniz?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Bu notlandırma şemasını silmek istediğinize emin misiniz?"
-  are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı silmek istediğinize emin misiniz?"
+  are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı kaldırmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Bu profil resmini rapor etmek istediğnize emin misiniz?"
   aria_labels: 
     unlock_at_date: "Şu tarihte kilitle"
@@ -2208,7 +2208,7 @@ tr:
     logout: "OTURUMU KAPAT"
   available_after_unlock_at_b5682224: "%{unlock_at} tarihinden sonra geçerli"
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} tarihinden sonra %{lock_at} tarihine kadar geçerli"
-  available_from_587ce92f: Kullanılabilen
+  available_from_587ce92f: "Etkin Olduğu Tarih"
   available_from_date_43b5e11d: "Etkin Olduğu Tarih"
   available_until_date_cd125c62: "Son Geçerlilik Tarihi"
   available_until_f3b9c4ed: "Şu tarihe kadar geçerli"
@@ -2525,7 +2525,7 @@ tr:
       group: "Grup:"
       links: 
         more_options: "Daha fazla seçenek"
-      publish: "Yayın : "
+      publish: "Yayınlama : "
       title: "Başlık:"
     edit_assignment_override: 
       calendar: "Takvim:"
@@ -15420,6 +15420,8 @@ tr:
       create_non_existent_page: "\"%{title}\" sayfası bulunamadı ama siz oluşturabilirsiniz"
       page_deleted: "\"%{title}\" sayfası silindi."
       page_does_not_exist: "\"%{title}\" sayfası bulunamadı."
+    revisions: 
+      page_revisions_title: "%{title} gözden geçirme: %{context_name}"
   wiki_pages_api: 
     cannot_delete_front_page: "Ön sayfa silinemiyor"
     cannot_have_unpublished_front_page: "Ön sayfa yayınlanamıyor"
@@ -15428,14 +15430,21 @@ tr:
     cannot_update_published: "Wiki sayfasının yayınlama durumunun güncellenmesine izin verilmiyor"
     cannot_update_title: "Wiki sayfasının başlığını güncellemenize izin verilmiyor"
     invalid_editing_roles: "Verilen düzenleme rolleri geçersiz"
+  will_keep_the_average_of_all_your_scores_d7e6b733: "Tüm puanlarınızın ortlaması saklanacak"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Tüm puanlardan yüksek olanını ata"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Tüm puanlardan sonuncusunu ata"
   will_paginate: 
     next_label: "İleri &#8594;"
     page_entries_info: 
+      multi_page: "Toplamda %{count} ın %{model} %{from} - %{to} ı gösteriliyor"
+      multi_page_html: "Toplamda <b>%{count}</b> ın %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> ı gösteriliyor"
       single_page: 
+        one: "1 %{model} gösteriliyor"
+        other: "Tüm %{count} %{model} ler gösteriliyor"
         zero: "%{model} bulunamadı"
       single_page_html: 
+        one: "<b>1</b> %{model} gösteriliyor"
+        other: "<b>all&nbsp;%{count}</b> %{model} gösteriliyor"
         zero: "%{model} bulunamadı"
     page_gap: "&hellip;"
     previous_label: "&#8592; Önceki"
@@ -15443,12 +15452,37 @@ tr:
     external_urls: 
       archive: Arşiv
       archive_link: "Arşiv(leri) görüntüle"
+  windows_square_tile_4c00879e: "Pencereleri Kare Döşeme"
+  windows_tile_color_2b786bd9: "Pencere Döşeme Rengi"
+  windows_wide_tile_a3302508: "Pencereler Geniş Döşeme"
+  would_you_like_to_enable_this_app_ccdf735d: "Bu uygulamayı etkinleştirmek ister misiniz?"
+  would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Öğrenciler derse devam etsinler mi yoksa yeni gereksinimler tamamlanana kadar bu modülleri yeniden kilitlemek mi istersiniz?"
   xml_configuration_5ea1b942: "XML Ayarları"
+  you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution1} 'a %{institution2} daki bilgilerinizi kullanarak giriş yaptınız"
+  you_are_the_group_leader_for_this_group_b8629b70: "bu grubun liderisiniz"
+  you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Aç ya da Kapat ı seçerek ders ödevlerini gizleyip gösterebilirsiniz."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Kısa sınavı zaten almış öğrenciler için tekrardan değerlendirme seçeneğini ayarladınız."
+  you_have_changed_the_progression_requirements_for__6772bc89: "Etkin bir derste ilerleme gereksinimlerini değiştirdiniz. Bu modüle ya da bu modüle bağlı diğer modüllere kadar ilerlemiş öğrenciler olabilir."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Bu kısa sınavdaki sorularda değişiklikler yaptınız.* Siz kısa sınavı kaydedene kadar bu değişiklikler öğrenciler tarafından görülemeyecek."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Hiç öğrenme çıktınız yok. Oluşturmak için *buraya tıklayın*."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Hiç öğrenme çıktınız yok. Öğrenme çıktıları sayfasına gitmek için buraya tıklayın."
+  you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Her bir hesap için maksimum webhook limitine (%{max}) ulaştınız"
+  you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Her bir kullanıcı için maksimum webhook limitine (%{max}) ulaştınız"
+  you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Bunlardan bazılarını kesinlikle istersiniz. Kimse dinlemiyorsa bir dersi vermenin eğlencesi nerede?"
+  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Derste size yardımcı olması için asistan öğretmenler atamak isteyebilirsiniz. Asistan Öğretmenler öğrenci ödevlerini notlandırabilir, tartışmaları yönetmeye yardımcı olabilir ve hatta ödev ayrıntılarını ve teslim tarihlerini sizin için güncelleyebilirler."
+  you_must_select_a_course_to_copy_content_from_e7bd9e09: "İçeriğini kopyalacağınız bir ders seçmelisiniz"
+  you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "%{min} a eşit ya da büyük bir sayıya ayarlamalısınız"
+  you_must_specify_a_usage_right_5eb57f87: "Bir kullanım hakkı belirtmelisiniz."
+  your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Ödev listeniz şimdi *Takvim* sayfasında bulunabilir."
+  your_assignments_list_has_improved_3eded80e: "*Ödevler* listeniz iyileştirildi!"
+  your_assignments_will_show_here_listed_by_due_date_18dc880f: "Ödevleriniz teslim tarhilerine göre burada listelenecek."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Tarayıcınız henüz Canvas'ın gerekli gördüğü minimum gereksinimleri karşılamıyor. Lütfen destekli tarayıcıların tam listesine ulaşmak için *Canvas Rehberini* ziyaret ediniz."
   your_content_has_been_exported_bbb57764: "İçeriğiniz dışarı aktarıldı."
   your_message_has_been_sent_thank_you_e0284316: "Mesajınız başarıyla gönderildi. Teşekkürler!"
+  your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Profil resminiz yüklenemedi. Doys yükleme limitinizi aşmış olabilirsiniz."
+  your_search_encountered_the_following_errors_fc3e5e7f: 
+    one: "Aramanızda hata oluştu:"
+    other: "Aramanızda hatalar oluştu:"
   zero_activity_title: "Sıfır Aktivite"
   zip_argument_error: ".zip uzantılı dosyayı yüklemeniz için klasör gerekmektedir."
   zip_file_description: ".zip dosyalarını bir dersin, grubun veya kullanıcı dosyalarının içinde açmak için aktarma eklentisi"
@@ -15466,6 +15500,7 @@ tr:
   zip_file_name: ".zip dosyası"
   zip_file_options_form: 
     expand: "Bunu Genişlet"
+    message: "\"%{fileName}\" nın içeriğini mevcut klasörde açmak mı istersiniz yoksa zip li dosyayı olduğu gibi yüklemek mi?"
     upload: "Bunu Yükle"
     zip_options: "Zip dosyası ayarları"
   zip_no_folder_error: "Belirtmiş olduğunuz klasör bu derste bulunamadı."
