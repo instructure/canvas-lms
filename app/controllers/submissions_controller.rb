@@ -283,6 +283,7 @@ class SubmissionsController < ApplicationController
 
     @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
 
+    return unless valid_text_entry?
     return unless process_api_submission_params if api_request?
 
     lookup_existing_attachments
@@ -468,6 +469,17 @@ class SubmissionsController < ApplicationController
     return true
   end
   private :extensions_allowed?
+
+  def valid_text_entry?
+    sub_params = params[:submission]
+    if sub_params[:submission_type] == 'online_text_entry' && sub_params[:body].blank?
+      flash[:error] = t('Text entry submission cannot be empty')
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      return false
+    end
+    return true
+  end
+  private :valid_text_entry?
 
   def is_google_doc?
     return params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
