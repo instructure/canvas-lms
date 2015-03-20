@@ -1883,7 +1883,7 @@ class User < ActiveRecord::Base
           si = sii.stream_item
           next unless si.present?
           next if si.asset_type == 'Submission'
-          next if si.context_type == "Course" && si.context.concluded?
+          next if si.context_type == "Course" && (si.context.concluded? || si.context.enrollments.for_user(self).active.none?(&:participating?))
           si.unread = sii.unread?
           si
         end.compact
