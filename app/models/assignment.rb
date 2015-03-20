@@ -985,6 +985,7 @@ class Assignment < ActiveRecord::Base
       :graded_at => Time.now.utc
     }) unless submissions_to_save.empty?
 
+    Rails.logger.info "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
     self.context.recompute_student_scores
     student_ids = context.student_ids
     send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
