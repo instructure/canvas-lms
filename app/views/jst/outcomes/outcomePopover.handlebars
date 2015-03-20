@@ -22,7 +22,7 @@
     </div>
     {{else}}
     <div class="mastery-details pull-right" aria-hidden="true">
-      {{#if roundedScore}}
+      {{#if scoreDefined}}
         <span>{{roundedScore}} / {{mastery_points}}</span>
         {{#ifEqual status 'exceeds'}}
             <i class="icon-check-plus exceeds"></i>
