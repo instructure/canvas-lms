@@ -68,11 +68,10 @@ define [
       else
         @$sequenceFooter?.msfAnimation(false)
       @$sequenceFooter.appendTo(@$el) if @$sequenceFooter
-      
-      $("body").triggerHandler "wiki-page-rendered"
 
     afterRender: ->
       super
+      $(".header-bar-outer-container .header-bar-right").append($("#mark-as-done-checkbox"))
       @reloadView = new WikiPageReloadView
         el: @$pageChangedAlert
         model: @model
