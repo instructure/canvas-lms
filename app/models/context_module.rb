@@ -213,7 +213,7 @@ class ContextModule < ActiveRecord::Base
     given {|user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
 
-    given {|user, session| self.context.grants_right?(user, session, :read) }
+    given {|user, session| self.context.grants_right?(user, session, :read) && self.active? }
     can :read
   end
 

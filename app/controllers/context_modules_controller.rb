@@ -268,10 +268,12 @@ class ContextModulesController < ApplicationController
   end
   
   def show
-    @module = @context.modules_visible_to(@current_user).find(params[:id])
-    respond_to do |format|
-      format.html { redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{params[:id]}") }
-      format.json { render :json => @module.content_tags_visible_to(@current_user) }
+    @module = @context.context_modules.not_deleted.find(params[:id])
+    if authorized_action @module, @current_user, :read
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{params[:id]}") }
+        format.json { render :json => @module.content_tags_visible_to(@current_user) }
+      end
     end
   end
   
