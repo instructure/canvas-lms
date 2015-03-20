@@ -32,6 +32,7 @@ define [
           focusStyleClass: @focusStyleClass
           selectedStyleClass: @selectedStyleClass
           autoFetch: true
+          fetchItAll: "to heck"
         },
         {
           render: true
