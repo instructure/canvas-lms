@@ -45,11 +45,9 @@
                   <% if content(:footer_link) %>
                     <td width="375" align="right">
                     <%= content(:footer_link).html_safe %></td>
-                  <% else %>
-                    <td width="375"></td>
+                    <td width="50" align="center"> | </td>
                   <% end %>
-                  <td width="50" align="center"> | </td>
-                  <td width="375" align="left"><a href="<%= communication_profile_url %>">
+                  <td width="375" align="center"><a href="<%= communication_profile_url %>">
                     <%= t 'click_to_preferences', "Update your notification settings" %></a></td>
                 </tr>
               </table>
