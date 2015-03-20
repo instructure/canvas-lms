@@ -1037,6 +1037,12 @@ class CoursesController < ApplicationController
   # @argument lock_all_announcements [Boolean]
   #   Disable comments on announcements
   #
+  # @argument restrict_student_past_view [Boolean]
+  #   Restrict students from preventing courses after end date
+  #
+  # @argument restrict_student_future_view [Boolean]
+  #   Restrict students from viewing courses before start date
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \

@@ -2286,7 +2286,9 @@ describe CoursesController, type: :request do
         'allow_student_organized_groups' => true,
         'hide_distribution_graphs' => false,
         'hide_final_grades' => false,
-        'lock_all_announcements' => false
+        'lock_all_announcements' => false,
+        'restrict_student_past_view' => false,
+        'restrict_student_future_view' => false
       })
     end
 
@@ -2305,7 +2307,9 @@ describe CoursesController, type: :request do
         :allow_student_organized_groups => false,
         :hide_distribution_graphs => true,
         :hide_final_grades => true,
-        :lock_all_announcements => true
+        :lock_all_announcements => true,
+        :restrict_student_past_view => true,
+        :restrict_student_future_view => true
       })
       expect(json).to eq({
         'allow_student_discussion_topics' => false,
@@ -2316,7 +2320,9 @@ describe CoursesController, type: :request do
         'allow_student_organized_groups' => false,
         'hide_distribution_graphs' => true,
         'hide_final_grades' => true,
-        'lock_all_announcements' => true
+        'lock_all_announcements' => true,
+        'restrict_student_past_view' => true,
+        'restrict_student_future_view' => true
       })
       @course.reload
       expect(@course.allow_student_discussion_topics).to eq false
