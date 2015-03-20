@@ -64,13 +64,22 @@
         </div>
 
       {{else}}
-        <input
-          id="{{uniqLabel}}_assignment_due_at"
-          class="datetime_field input-medium"
-          type="text"
-          name="due_at"
-          value="{{datetimeFormatted dueAt false}}"
-          {{disabledIfIncludes frozenAttributes "due_at"}}/>
+        <div class="date_field_container">
+          <label class="screenreader-only" id="due_at_label_{{uniqLabel}}">
+            {{#t}}Due At: {{/t}}
+            {{datepickerScreenreaderPrompt}}
+          </label>
+          <input
+            id="{{uniqLabel}}_assignment_due_at"
+            class="datetime_field input-medium"
+            type="text"
+            name="due_at"
+            value="{{datetimeFormatted dueAt false}}"
+            aria-labelledby="due_at_label_{{uniqLabel}}"
+            data-tooltip
+            title="{{accessibleDateFormat}}"
+            {{disabledIfIncludes frozenAttributes "due_at"}}/>
+          </div>
       {{/ifAny}}
       </div>
     </div>

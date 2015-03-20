@@ -6,11 +6,9 @@
   <%= t :subject, "Course Invitation" %>
 <% end %>
 
-<% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t :link, "Click here to get started" %>
-  </a>
-<% end %>
+<a href="<%= content(:link) %>">
+  <%= t :link, "Click here to get started" %>
+</a>
 
 <% website = HostUrl.context_host(asset.course) %>
 <p><%= t :participate_in_class, "You've been invited to participate in a class at %{website}", :website => website %></p>

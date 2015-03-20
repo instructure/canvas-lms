@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -64,6 +64,8 @@ class Course < ActiveRecord::Base
                   :storage_quota,
                   :storage_quota_mb,
                   :restrict_enrollments_to_course_dates,
+                  :restrict_student_past_view,
+                  :restrict_student_future_view,
                   :grading_standard,
                   :grading_standard_enabled,
                   :locale,
@@ -275,7 +277,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.skip_updating_account_associations(&block)
-    if @skip_updating_account_assocations
+    if @skip_updating_account_associations
       block.call
     else
       begin
@@ -1073,7 +1075,7 @@ class Course < ActiveRecord::Base
     # Prior users
     given do |user|
       (available? || completed?) && user &&
-        prior_enrollments.for_user(user).count > 0
+        prior_enrollments.for_user(user).any?{|e| !e.inactive?}
     end
     can :read, :read_outcomes
 
@@ -1112,7 +1114,7 @@ class Course < ActiveRecord::Base
     # Student of a concluded course
     given do |user|
       (self.available? || self.completed?) && user &&
-        (prior_enrollments.for_user(user).any?{|e| e.student? || e.assigned_observer? } ||
+        (prior_enrollments.for_user(user).any?{|e| !e.inactive? && (e.student? || e.assigned_observer?) } ||
          user.cached_not_ended_enrollments.any? do |e|
           e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed
          end
@@ -1860,13 +1862,12 @@ class Course < ActiveRecord::Base
     !!self.turnitin_settings
   end
 
-  def turnitin_id
-    if self[:turnitin_id].blank?
-      # the reason we don't just use the global_id all the time is so that the
-      # turnitin_id is preserved when shard splits/etc. occur
+  def generate_turnitin_id!
+    # the reason we don't just use the global_id all the time is so that the
+    # turnitin_id is preserved when shard splits/etc. occur
+    unless turnitin_id
       update_attribute(:turnitin_id, global_id)
     end
-    self[:turnitin_id]
   end
 
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
@@ -2042,7 +2043,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.clonable_attributes
-    [ :group_weighting_scheme, :grading_standard_id, :is_public,
+    [ :group_weighting_scheme, :grading_standard_id, :is_public, :public_syllabus,
       :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
@@ -2390,7 +2391,7 @@ class Course < ActiveRecord::Base
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
           end
 
-          unless discussion_topics.new.grants_right?(user, :read)
+          unless discussion_topics.scoped.new.grants_right?(user, :read)
             tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 
@@ -2499,6 +2500,9 @@ class Course < ActiveRecord::Base
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :course_format
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
+
+  add_setting :restrict_student_future_view, :boolean => true, :default => lambda {|c| !!c.root_account.restrict_student_future_view?}
+  add_setting :restrict_student_past_view, :boolean => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -2723,7 +2727,8 @@ class Course < ActiveRecord::Base
 
   def serialize_permissions(permissions_hash, user, session)
     permissions_hash.merge(
-      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
+      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session),
+      create_announcement: Announcement.context_allows_user_to_create?(self, user, session)
     )
   end
 

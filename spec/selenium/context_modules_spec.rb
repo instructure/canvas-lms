@@ -881,6 +881,19 @@ describe "context_modules" do
       expect(tooltip).to include_text 'New Section'
       expect(tooltip).to include_text 'Everyone else'
     end
+
+    it "should show the file publish button on course home" do
+      @course.default_view = 'modules'
+      @course.save!
+
+      @module = @course.context_modules.create!(:name => "some module")
+      @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data)
+      @tag = @module.add_item({:id => @file.id, :type => 'attachment'})
+
+      get "/courses/#{@course.id}"
+      wait_for_ajaximations
+      expect(f(".context_module_item.attachment .icon-publish")).to be_displayed
+    end
   end
 
   context "logged out" do

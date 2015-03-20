@@ -1,14 +1,13 @@
 define [
-  'i18n!overrides'
   'Backbone'
   'underscore'
-  'timezone'
   'jst/assignments/DueDateView'
+  'compiled/util/DateValidator'
   'jquery'
   'jquery.toJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], (I18n,Backbone, _, tz, template, $) ->
+], (Backbone, _, template, DateValidator, $) ->
   class DueDateView extends Backbone.View
     template: template
     tagName: 'li'
@@ -53,132 +52,15 @@ define [
       json
 
     validateBeforeSave: (data, errors) =>
-      return unless data
-      errs = {}
-      datesToValidate = []
+      return errors unless data
 
-      lockAt = data.lock_at
-      unlockAt = data.unlock_at
-      dueAt = data.due_at
-      @section = _.find(ENV.SECTION_LIST, {id: data.course_section_id})
+      dateRange = $.extend({},ENV.VALID_DATE_RANGE)
 
-      dateRange = @getDateRange()
+      dateValidator = new DateValidator({date_range: dateRange, data: data})
 
-      if dateRange
-        if dateRange.start
-          datesToValidate.push {
-            date: dateRange.start.date,
-            validationDates: {"due_at": dueAt, "unlock_at": unlockAt},
-            range: "start_range",
-            type: dateRange.start.appliedBy
-          }
-        if dateRange.end
-          datesToValidate.push {
-            date: dateRange.end.date,
-            validationDates: {"due_at": dueAt, "lock_at": lockAt},
-            range: "end_range",
-            type: dateRange.end.appliedBy
-          }
-      if dueAt
-        datesToValidate.push {
-          date: dueAt,
-          validationDates: {"lock_at": lockAt},
-          range: "start_range",
-          type: "due"
-        }
-        datesToValidate.push {
-          date: dueAt,
-          validationDates: {"unlock_at": unlockAt},
-          range: "end_range",
-          type: "due"
-        }
-      if lockAt
-        datesToValidate.push {
-          date: lockAt,
-          validationDates: {"unlock_at": unlockAt},
-          range: "end_range",
-          type: "lock"
-        }
-      @_validateDateSequences(datesToValidate, errs)
-      errors['assignmentOverrides'] = errs if _.keys(errs).length > 0
+      errs = dateValidator.validateDates()
+      errors['assignmentOverrides'] = errs if !_.isEmpty(errs)
       errors
-
-    _validateDateSequences: (datesToValidate, errs) =>
-      for dateSet in datesToValidate
-        if dateSet.date
-          switch dateSet.range
-            when "start_range"
-              _.each dateSet.validationDates, (validationDate, dateType) =>
-                if validationDate && @_calendarDate(dateSet.date) > @_calendarDate(validationDate)
-                  errs[dateType] = DATE_RANGE_ERRORS[dateType][dateSet.range][dateSet.type]
-            when "end_range"
-              _.each dateSet.validationDates, (validationDate, dateType) =>
-                if validationDate && @_calendarDate(dateSet.date) < @_calendarDate(validationDate)
-                  errs[dateType] = DATE_RANGE_ERRORS[dateType][dateSet.range][dateSet.type]
-
-    getDateRange: =>
-
-      course = ENV.COURSE_DATE_RANGE
-      term = ENV.TERM_DATE_RANGE
-
-      return unless @section || course || term
-
-      range = {}
-
-      range["start"] = @_findApplicableDate("start_at", @section, course, term)
-      range["end"] = @_findApplicableDate("end_at", @section, course, term)
-
-      range
-
-    _findApplicableDate: (dateType, section, course, term) =>
-      if section?.override_course_dates && section?[dateType]
-        {appliedBy: "section", date: section[dateType]}
-      else if course.override_term_dates && course[dateType]
-        {appliedBy: "course", date: course[dateType]}
-      else if term[dateType]
-        {appliedBy: "term", date: term[dateType]}
-      else
-        null
-
-    _calendarDate: (date) ->
-      tz.format(tz.parse(date), "%F")
 
     updateOverride: =>
       @model.set @getFormValues()
-
-
-    DATE_RANGE_ERRORS = {
-      "due_at": {
-        "start_range": {
-          "section": I18n.t('Due date cannot be before section start')
-          "course": I18n.t('Due date cannot be before course start')
-          "term": I18n.t('Due date cannot be before term start')
-        },
-        "end_range": {
-          "section": I18n.t('Due date cannot be after section end')
-          "course": I18n.t('Due date cannot be after course end')
-          "term": I18n.t('Due date cannot be after term end')
-        }
-      },
-      "unlock_at": {
-        "start_range": {
-          "section": I18n.t('Unlock date cannot be before section start')
-          "course": I18n.t('Unlock date cannot be before course start')
-          "term": I18n.t('Unlock date cannot be before term start')
-        },
-        "end_range" : {
-          "due": I18n.t('Unlock date cannot be after due date'),
-          "lock": I18n.t('Unlock date cannot be after lock date')
-        }
-      },
-      "lock_at": {
-        "start_range": {
-          "due": I18n.t('Lock date cannot be before due date')
-        },
-        "end_range": {
-          "section": I18n.t('Lock date cannot be after section end')
-          "course": I18n.t('Lock date cannot be after course end')
-          "term": I18n.t('Lock date cannot be after term end')
-        }
-      }
-    }

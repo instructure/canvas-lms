@@ -945,7 +945,6 @@ ja:
         outgoing_email_default_name_option_default: "Canvas のデフォルト設定"
         prevent_course_renaming_by_teachers: 講師によるコース名の変更を許可しない
         restrict_quiz_questions: コースの終了日以降はクイズ問題を受講生に表示しない
-        restrict_student_future_view: 開始日前のコースは受講生に表示しない
         role_id: さらに追加
         self_enrollment: セルフ登録を許可する
         self_registration: 自己登録
@@ -2209,17 +2208,12 @@ ja:
   big_blue_button_conference: 
     conference_is_recorded: この会議は記録されています。
     recording_setting: 記録
-    recording_setting_description: この会議を記録
   blackboard: 
     no_manifest: "この Blackboard .zip のルート ディレクトリには imsmanifest.xml ファイルがありません。"
   bookmark_service: 
     default_title: タイトルなし
   broccoli_cloud: 
     hidden_title: 非表示です。リンクで利用できます
-    label: 
-      hidden: 非表示です。リンクで利用できます
-      published: 公開済み
-      unpublished: 未公開
     published_title: 公開済み
     title: 
       permissions: "編集権限: %{name}"
@@ -3084,15 +3078,6 @@ ja:
       buttons: 
         close: 今すぐ終了する
         join: 今すぐ参加する
-        restart: 今すぐ再開する
-        start: 今すぐ開始する
-      minute: 
-        one: "%{count} 分"
-        other: "%{count} 分"
-      status: 
-        finished: "終了日時 %{date_and_time} (%{duration})"
-        new: まだ始まっていません
-        started: "開始時刻 %{time}"
     type_disabled_error: "このタイプの会議は、この Canvas サイトではもう使用できません"
   config_url_e96ceaf3: "URL 設定"
   configurate_tool_app_5a721f2c: "%{tool} アプリを設定しますか?"
@@ -4424,7 +4409,6 @@ ja:
         student_invitation_unaccepted_available: "%{name} はまだコースへの招待を受諾していません。招待が送信された時刻: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} が次のコースに追加されました: %{time}"
       link_to_students_view: 
-        link_student_action: "コース オブザーバ *%{name}* を受講生にリンクするには、下のリストから受講生の名前を選択します。"
         link_student_desc: 受講生にリンクされたオブザーバは、その受講生の成績およびコースの交流にアクセスできます。
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} 件の招待が受諾されていません。"
@@ -4637,7 +4621,6 @@ ja:
         join_course: このコースに参加
         new_announcement: 新しいアナウンス
         view_course_stream: "コース ストリームを表示"
-      period_name: "過去 2 週間"
       re_sending: 再送信しています...
       send_done: 完了です!メッセージが送信されるまで数分かかる場合があります。
       send_failed: 要求が失敗しました。もう一度、試してください。
@@ -4813,7 +4796,6 @@ ja:
         count: 不正解の受講生数
         ratio: 受講生の不正解率
   current_3ce5414a: "現在:"
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "現在の熟達スコア: %{score} / %{masteryPoints}"
   current_score_6c81792: 現在のスコア
   current_total_67bf5f72: "現在の合計:"
   curve_grades_dialog: 
@@ -5421,7 +5403,6 @@ ja:
   due_on_date_aa4725cd: "期日:"
   due_on_date_ffc98ebc: 期日
   e_mail_only_2cc5e513: 電子メールのみ
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "各バーは課題を表します。緑色のレイヤーは、*期日までに* 課題を提出した受講生の割合を表しています。**期日を過ぎて提出された** 課題は黄色、***未提出の*** 課題は赤で表示されます。"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "各バーは 1 つの課題を表します。*細い垂直のヒゲ* は、コース内のすべての受講生の最低スコアから最高スコアまでひかれています。**厚いバー** は、第 1 四分位から第 3 四分位までを表しており、***中央値にマークが付けられて*** います。"
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "各バーは 1 つの課題を表します。細いヒゲは、コース内のすべての受講生の最低スコアから最高スコアまでひかれています。厚いバーは、第 1 四分位から第 3 四分位までを表しており、中央値にマークが付けられています。受講生のスコアは点で表されています。"
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "各バーは、その日の *ページ ビュー* の数を表しています。オレンジ色のバーは、その日にその受講生がコース内で **何らかの操作を行った** ことを示しています。"
@@ -6489,20 +6470,13 @@ ja:
       sort: s
       tooltip: t
     learning_outcome: 学習成果
-    mastery: 達成
-    near_mastery: ほぼ達成
     no_assignments_have_points_warning: 課題に配点を設定するまで、スコアは計算できません
     notes: メモ
     outcome_gradebook: 
       export_report: レポートのエクスポート
       toggle_sidebar: サイドバーの切り替え
-    outcome_popover: 
-      mastery_set_at: "達成の設定:"
-      no_results: (結果なし)
-      view_more_details: 詳細を表示
     percent_of_grade: "成績の %{percentage}"
     points_out_of: "配点: %{points_possible}"
-    remedial: 補習
     resubmitted: 前回の採点後に再提出されました
     row_student_name: 
       student_placeholder: 受講生
@@ -7278,7 +7252,6 @@ ja:
       edit_group: グループを編集
       group_atom_feed: "グループの Atom フィード"
       new_announcement: 新しいアナウンス
-      next_week: 次週
     status: 
       assigning_students: 受講生を割り当てています...
       creating_groups: カテゴリを作成しています...
@@ -7392,7 +7365,6 @@ ja:
     online_url_submission: "オンライン URL の提出"
     quiz_submission: クイズの提出
     text_entry_submission: テキスト入力での提出
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: 有効化する場合、コンテンツの設計者は、ファイルの公開前にファイルの著作権とライセンス情報を指定する必要があります。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "有効な場合、ユーザは LTI 2 ツールを設定できます。"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 課題の配点を変更する場合は、課題を再評価する必要があります。
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 今すぐ使用権を選択しない場合、このファイルはアップロード後に未公開になります。
@@ -7596,7 +7568,6 @@ ja:
       将来的に K-12 固有の項目が追加される可能性があります。
   labels: 
     lock_module_until: 特定の日付までモジュールをロック
-  last_assessment_latesttitle_22560cf3: "最後のアセスメント: %{latestTitle}"
   last_user_access_title: "最終ユーザ アクセス"
   late_percent_b91d01b3: "遅延: %{percent}"
   latest_f604a75: 前回
@@ -8599,7 +8570,6 @@ ja:
         details: "登録のプロセスを完了するには、次の URL にアクセスしてください:"
         html: 
           body: "%{product_name} にご登録いただき誠にありがとうございます! この電子メールは、「%{user}」さんが %{website} で新しいアカウントを登録中であることの確認です。"
-          details: 登録プロセスを完了するにはここをクリック
           subject: "登録の確認: %{product_name}"
         subject: "登録の確認: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10003,7 +9973,6 @@ ja:
       現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい Canvas インターフェイス
       をご覧になりたい場合は、これをオンにしてください。新しいインターフェイスはまだ開発中であるため、
       実際のユーザが使用する運用環境ではオンにしないでください。
-  new_title_cb9ceb2f: 新しいタイトル
   next_40e12421: 次へ
   next_steps_ce0f0d0c: 次の手順
   no_assignment_name_adbb215b: 課題名なし
@@ -10389,17 +10358,14 @@ ja:
           manage: 
             description: "*コースの熟達度を追跡するための成果がここで作成されます。まず、上部のメニュー バーを見てください。[新規] ボタンをクリックして新しい成果を作成するか、または [新しいグループ] ボタンをクリックして新しいグループを作成し、成果の情報を整理します。[検索] ボタンを使用すると、状態または組織によって作成された成果を使用できます。成果を作成および使用するときは、左側のパネルを使用して、成果の間を移動できます。成果をドラッグして異なるレベルにドロップして、構造を作成できます。* *さらに重要なことは、Canvas では、採点の注釈に成果を追加して、課題を採点するときに熟達を評価できることです。成果を設定した後、採点への成果の使用を開始するには、[注釈の管理] をクリックします。*"
             title: 成果の設定
-    mastery: 達成
     mastery_error: "0 以上にする必要があります"
     missing_outcome: その学習成果は見つかりませんでした
-    near: ほぼ達成
     new_outcome_group: 新しい成果グループ
     outcome: 
       links: 
         delete_outcome: 成果の削除
         edit_outcome: 成果の編集
       mastery_at_label: "次のスコア以上の場合に熟達を設定:"
-      point_mastery: "%{mastery_points} 点で熟達"
       points: 
         rating: "%{points} 点"
         total: "%{points_possible} 点"
@@ -10428,7 +10394,6 @@ ja:
       attempt_info: "試行 #%{attempt_number}、%{attempt_date}"
       outcome_mastered: 熟達
       scoring: "%{points} / 配点: %{possible_points}"
-    remedial: 補習
     show: 
       no_aligned_items: 整列されたアイテムがありません
       no_artifacts: 成果物がありません
@@ -10441,7 +10406,6 @@ ja:
     titles: 
       find_outcomes: 成果の検索
     top_level: "%{context} のトップ レベル"
-    undefined: 開始前
     user_outcome_results: 
       artifacts: 
         one: "%{count} 件の成果物"
@@ -12721,8 +12685,6 @@ ja:
     folder: フォルダ
     folder_browsing_tree: フォルダ参照ツリー
     folder_name: フォルダ名
-    labels: 
-      select: このアイテムを選択
     loading_more_results: より多くの結果を読み込んでいます...
     modified_by: 変更者
     move: 移動
@@ -12742,7 +12704,6 @@ ja:
     search_for_files: ファイルの検索
     search_results_for: "\"%{search_term}\" の検索結果"
     select_all: すべて選択
-    settings: 設定
     size: サイズ
     sorted_ascending: 昇順に並べ替え
     sorted_desending: 降順に並べ替え
@@ -13283,11 +13244,9 @@ ja:
       buttons: 
         enroll_in_course: コースへの登録
         next: 次へ
-      enter_email: "電子メール アドレスを入力してください:"
       existing_user: "%{institution_name} のログインが既にあります"
       getting_started: "**%{course}** に登録しています。"
       labels: 
-        email: "電子メール アドレス"
         name: "フル ネーム"
         password: パスワード
       new_user: 新しいユーザです
@@ -13417,15 +13376,6 @@ ja:
         download_message: "提出物は、zip ファイルに圧縮されてダウンロードされます。提出物ファイルのサイズと数によっては、この処理に少し時間がかかることがあります。"
         download_message_intro: 受講生の提出物を収集しています。
         download_submissions: すべての提出物のダウンロード
-    conference: 
-      buttons: 
-        delete: 会議の削除
-        edit: 会議の詳細の編集
-      course_conference: コースの会議
-      group_conference: グループの会議
-      participant: 
-        one: "%{count} 人の参加者"
-        other: "%{count} 人の参加者"
     current_enrollment: 
       enrolled_as_designer: 設計者として参加登録済み
       enrolled_as_observer: オブザーバとして参加登録済み
@@ -13854,7 +13804,6 @@ ja:
       external_url_notice: "Web サイトの URL へのリンクをこの *モジュール* に追加するには、URL とページ名を入力します。"
       file_item: ファイル
       file_notice: "この *モジュール* に関連付けるファイルを選択するか、\"新しいファイル\" を選択してファイルを追加します。"
-      file_select_label: "関連付けるファイルを選択するか、または [新しいファイル] を選択してファイルを追加します。"
       indent_level: 
         one: "*1 段階インデント*"
         other: "*%{count} 段階インデント*"
@@ -13874,7 +13823,6 @@ ja:
         wiki_page_namem: 課題名
       loading: 読み込んでいます...
       new_assignment_option: "[ 新しい課題 ]"
-      new_file_option: "[ 新しいファイル ]"
       new_page_option: "[ 新しいページ ]"
       new_quiz_option: "[ 新しいクイズ ]"
       new_tab: 新しいタブに読み込み
@@ -14373,7 +14321,6 @@ ja:
       two_words_connector: " および "
       words_connector: ", "
     help_menu: 
-      community_support_description: "まず ASC に連絡してサポートを依頼してください。ASC でサポートを受けられない場合は、当社に連絡してください。"
       community_support_forums: "コミュニティ サポート フォーラム"
       contact_support: サポートに問い合わせ
       contact_support_sub_text: 緊急の問題について問い合わせます。
@@ -14492,7 +14439,6 @@ ja:
   there_are_count_results_in_the_list_e74f6e36: 
     one: "リストには、%{count} 件の結果があります"
     other: "リストには、%{count} 件の結果があります"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: 採点スキームを追加する際に問題が発生しました
   there_was_a_problem_deleting_the_grading_period_50ce07c5: 採点期間を削除する際に問題が発生しました
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: 採点スキームを削除する際に問題が発生しました
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 採点スキームを保存する際に問題が発生しました
@@ -14509,8 +14455,6 @@ ja:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: このフォルダは現在ロックされており、表示できません。
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "これは、信頼する URL のカンマ区切りリストです。このリストの URL を信頼すると、Canvas へのログインの際に CSRF トークンがパイパスされます。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: これは、関連ファイルがない状態でコースのコンテンツをインポートしたことが原因で発生したと考えられます。
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: この成果は、受講生を査定するために使用されています。計算メソッドは固定されています
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: この成果は、受講生を査定するために使用されています。計算値は固定されています
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*このクイズは未公開です* 公開されるまでは、講師のみがこのクイズを表示できます。"
   this_student_wrote_f1a3f22d: "この受講生の記述:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "これによって、Canvas が SIS に成績を投稿することを認証できます"
@@ -14529,7 +14473,7 @@ ja:
       long: "%Y %B %d %H:%M"
       short: "%b %d %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "1 分前未満"
     pm: 午後
     ranges: 

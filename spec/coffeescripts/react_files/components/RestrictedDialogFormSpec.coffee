@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/RestrictedDialogForm'
   'compiled/models/Folder'
@@ -12,7 +12,7 @@ define [
       props =
         models: [new Folder(id: 999)]
 
-      @restrictedDialogForm = React.renderComponent(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
+      @restrictedDialogForm = React.render(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@restrictedDialogForm.getDOMNode().parentNode)
@@ -36,7 +36,7 @@ define [
       props =
         models: [new Folder(id: 1000, hidden: false), new Folder(id: 999, hidden: true)]
 
-      @restrictedDialogForm = React.renderComponent(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
+      @restrictedDialogForm = React.render(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@restrictedDialogForm.getDOMNode().parentNode)
@@ -65,7 +65,7 @@ define [
       props =
         models: [new Folder(id: 999)]
 
-      @restrictedDialogForm = React.renderComponent(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
+      @restrictedDialogForm = React.render(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@restrictedDialogForm.getDOMNode().parentNode)
@@ -131,7 +131,7 @@ define [
       props =
         models: [new Folder(id: 999, hidden: true, lock_at: undefined, unlock_at: undefined)]
 
-      @restrictedDialogForm = React.renderComponent(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
+      @restrictedDialogForm = React.render(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
     teardown: ->
       React.unmountComponentAtNode(@restrictedDialogForm.getDOMNode().parentNode)
 
@@ -161,7 +161,7 @@ define [
       props =
         models: [new Folder(id: 999, hidden: true, lock_at: undefined, unlock_at: undefined), new Folder(id: 1000, hidden: true, lock_at: undefined, unlock_at: undefined)]
 
-      @restrictedDialogForm = React.renderComponent(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
+      @restrictedDialogForm = React.render(RestrictedDialogForm(props), $('<div>').appendTo('body')[0])
     teardown: ->
       React.unmountComponentAtNode(@restrictedDialogForm.getDOMNode().parentNode)
 

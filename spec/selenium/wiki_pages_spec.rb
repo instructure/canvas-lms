@@ -20,6 +20,102 @@ describe "Navigating to wiki pages" do
     end
   end
 
+  describe "Accessibility" do
+
+    def check_header_focus(attribute)
+      f("[data-sort-field='#{attribute}']").click()
+      wait_for_ajaximations
+      check_element_has_focus(f("[data-sort-field='#{attribute}']"))
+    end
+
+    before :each do
+      account_model
+      course_with_teacher_logged_in :account => @account
+      @course.wiki.wiki_pages.create!(:title => "Foo")
+      @course.wiki.wiki_pages.create!(:title => "Bar")
+      @course.wiki.wiki_pages.create!(:title => "Baz")
+    end
+
+    it "returns focus to the header item clicked while sorting" do
+      get "/courses/#{@course.id}/pages"
+
+      check_header_focus('title')
+      check_header_focus('created_at')
+      check_header_focus('updated_at')
+    end
+
+    describe "Add Course Button" do
+      before :each do
+        get "/courses/#{@course.id}/pages"
+
+        driver.execute_script("$('.new_page').focus()")
+        @active_element = driver.execute_script('return document.activeElement')
+      end
+
+      it "navigates to the add course view when enter is pressed" do
+        @active_element.send_keys(:enter)
+        wait_for_ajaximations
+        check_element_has_focus(f('.edit-header #title'))
+      end
+
+      it "navigates to the add course view when spacebar is pressed" do
+        @active_element.send_keys(:space)
+        wait_for_ajaximations
+        check_element_has_focus(f('.edit-header #title'))
+      end
+    end
+
+    describe "Publish Cloud" do
+      it "should set focus back to the publish cloud after unpublish" do
+        get "/courses/#{@course.id}/pages"
+        f('.publish-icon').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.publish-icon'))
+      end
+
+      it "should set focus back to the publish cloud after publish" do
+        get "/courses/#{@course.id}/pages"
+        f('.publish-icon').click # unpublish it.
+        wait_for_ajaximations
+        f('.publish-icon').click # publish it.
+        check_element_has_focus(f('.publish-icon'))
+      end
+    end
+
+    describe "Delete Page" do
+
+      before do
+        get "/courses/#{@course.id}/pages"
+      end
+
+      it "returns focus back to the item cog if the item was not deleted" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-buttonset .btn').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "returns focus to the previous item cog if it was deleted" do
+        triggers = ff('.al-trigger')
+        triggers.last.click
+        ff('.delete-menu-item').last.click
+        f('.ui-dialog-buttonset .btn-danger').click
+        wait_for_ajaximations
+        check_element_has_focus(triggers[-2])
+      end
+
+      it "returns focus to the + Page button if there are no previous item cogs" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-buttonset .btn-danger').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.new_page'))
+      end
+    end
+  end
+
+
   describe "Permissions" do
     before do
       course_with_teacher

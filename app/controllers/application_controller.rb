@@ -106,9 +106,11 @@ class ApplicationController < ActionController::Base
         :current_user_roles => @current_user.try(:roles, @domain_root_account),
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
+        :use_new_styles => use_new_styles?,
+        :k12 => k12?,
+        :use_high_contrast => @current_user.try(:prefers_high_contrast?),
         :SETTINGS => {
-          open_registration: @domain_root_account.try(:open_registration?),
-          use_high_contrast: @current_user.try(:prefers_high_contrast?)
+          open_registration: @domain_root_account.try(:open_registration?)
         }
       }
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']

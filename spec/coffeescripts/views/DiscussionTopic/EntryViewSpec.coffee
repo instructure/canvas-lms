@@ -52,3 +52,18 @@ define [
     equal view2.$('.tinymce-keyboard-shortcuts-toggle').length, 1
 
     clock.restore()
+
+  test 'should listen on model change:replies', ->
+    entry = new Entry(id: 1, message: 'a comment, wooper')
+    spy = sinon.stub(EntryView.prototype, 'renderTree')
+    view = new EntryView(model: entry)
+
+    entry.set('replies', [new Entry(id: 2, message: 'a reply', parent_id: 1)])
+    ok spy.called, 'should renderTree when value is not empty'
+
+    spy.reset()
+    entry.set('replies', [])
+    ok !spy.called, 'should not renderTree when value is empty'
+
+    EntryView.prototype.renderTree.restore()
+

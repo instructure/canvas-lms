@@ -48,6 +48,10 @@ module GoogleDocs
       get_file_data[:url]
     end
 
+    def in_trash?
+      @entry['labels']['trashed']
+    end
+
     def to_hash
       {
         :name => display_name,

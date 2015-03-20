@@ -9,7 +9,7 @@
  */
 
 /*global tinymce:true */
-
+define(['bower/tinymce/tinymce'], function(tinymce){
 tinymce.PluginManager.add('link', function(editor) {
 	function createLinkList(callback) {
 		return function() {
@@ -397,4 +397,5 @@ tinymce.PluginManager.add('link', function(editor) {
 		context: 'insert',
 		prependToContext: true
 	});
+});
 });

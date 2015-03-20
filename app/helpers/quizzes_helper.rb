@@ -456,8 +456,11 @@ module QuizzesHelper
         question_id = s["name"]
         a = hash_get(answers, question_id)
       end
-      opt_tag = s.children.css("option[value='#{a}']").first
-      opt_tag["selected"] = "selected"
+
+      # If existing answer is one of the options, select it
+      if opt_tag = s.children.css("option[value='#{a}']").first
+        opt_tag["selected"] = "selected"
+      end
     end
     doc.to_s.html_safe
   end

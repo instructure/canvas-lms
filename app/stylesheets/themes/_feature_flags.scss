@@ -35,8 +35,10 @@ $left-offset:  16px;
   text-decoration: none;
 }
 
-.feature-flag .element_toggler:focus {
-  @if $use_high_contrast { @include button-focus; }
+.feature-flag .element_toggler {
+  transition: outline-offset 0.2s ease-out;
+  @include ic-focus-base;
+  &:focus { @include ic-focus-variant; }
 }
 
 .feature-flag .btn {

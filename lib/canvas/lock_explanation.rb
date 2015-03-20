@@ -98,6 +98,10 @@ module Canvas
           end
         end
         if context && (obj.workflow_state != 'unpublished')
+
+          context = context.context if context.is_a? Group
+          raise "Either Context or Group context must be a Course" unless context.is_a? Course
+
           html << "<br/>".html_safe
           html << I18n.t('messages.visit_modules_page', "*Visit the course modules page for information on how to unlock this content.*",
             :wrapper => "<a href='#{course_context_modules_url((context || obj.context), anchor: "module_#{obj.id}")}'>\\1</a>")

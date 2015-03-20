@@ -21,6 +21,7 @@ module Api::V1::Assignment
   include ApplicationHelper
   include Api::V1::ExternalTools::UrlHelpers
   include Api::V1::Locked
+  include Api::V1::AssignmentOverride
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
@@ -62,18 +63,23 @@ module Api::V1::Assignment
       include_discussion_topic: true,
       include_all_dates: false,
       override_dates: true,
-      needs_grading_count_by_section: false
+      needs_grading_count_by_section: false,
     )
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
     end
+
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
+
+    if !opts[:overrides].nil?
+      hash['overrides'] = assignment_overrides_json(opts[:overrides])
+    end
 
     if !assignment.user_submitted.nil?
       hash['user_submitted'] = assignment.user_submitted

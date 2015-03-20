@@ -280,7 +280,7 @@ describe ApplicationController do
     end
 
     it 'gets appropriate settings from the root account' do
-      root_account = stub(global_id: 1, open_registration?: true)
+      root_account = stub(global_id: 1, feature_enabled?: false, open_registration?: true)
       HostUrl.stubs(file_host: 'files.example.com')
       controller.instance_variable_set(:@domain_root_account, root_account)
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy

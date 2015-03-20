@@ -9,7 +9,7 @@
  */
 
 /*global tinymce:true */
-
+define(['bower/tinymce/tinymce'], function(tinymce){
 tinymce.PluginManager.add('autolink', function(editor) {
 	var AutoUrlDetectState;
 
@@ -191,4 +191,5 @@ tinymce.PluginManager.add('autolink', function(editor) {
 			editor.nodeChanged();
 		}
 	}
+});
 });

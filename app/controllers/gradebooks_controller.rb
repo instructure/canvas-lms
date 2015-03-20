@@ -199,7 +199,7 @@ class GradebooksController < ApplicationController
   end
 
   def set_js_env
-    @gradebook_is_editable = !@context.unpublished? && @context.grants_right?(@current_user, session, :manage_grades)
+    @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
     ag_includes = [:assignments]
@@ -315,7 +315,8 @@ class GradebooksController < ApplicationController
 
           submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
           @submissions += @assignment.grade_student(@user, submission)
-        rescue => e
+        rescue Assignment::GradeError => e
+          logger.info "GRADES: grade_student failed because '#{e.message}'"
           @error_message = e.to_s
         end
       end

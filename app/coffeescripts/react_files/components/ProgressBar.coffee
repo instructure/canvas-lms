@@ -1,7 +1,7 @@
 define [
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
-], (React, withReactDOM) ->
+  'react'
+  'compiled/react/shared/utils/withReactElement'
+], (React, withReactElement) ->
 
   ProgressBar = React.createClass
     displayName: 'ProgressBar'
@@ -11,7 +11,7 @@ define [
       'aria-label': React.PropTypes.string #Used as an override if needed.
 
 
-    render: withReactDOM ->
+    render: withReactElement ->
       almostDone = ''
       almostDone = ' almost-done' if @props.progress == 100
       div ref: 'container', className: 'progress-bar__bar-container' + almostDone,

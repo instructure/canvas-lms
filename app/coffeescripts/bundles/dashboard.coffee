@@ -24,6 +24,7 @@ require [
       'click .stream_header': 'toggleDetails'
       'click .stream_header .links a': 'stopPropagation'
       'click .stream-details': 'handleDetailsClick'
+      'click .close_conference_link': 'closeConference'
       'beforeremove': 'updateCategoryCounts' # ujsLinks event
 
     initialize: ->
@@ -111,5 +112,12 @@ require [
         parent.remove()
       @setShowMoreLink $(event.target).closest('.stream-category')
 
+    closeConference: (e) ->
+      e.preventDefault()
+      return if !confirm(I18n.t('confirm.close', "Are you sure you want to end this conference?\n\nYou will not be able to reopen it."))
+      link = $(e.currentTarget)
+      $.ajaxJSON(link.attr('href'), "POST", {}, (data) =>
+        link.parents('.conference.global-message').hide()
+      )
   new DashboardView
 

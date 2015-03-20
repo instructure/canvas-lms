@@ -90,9 +90,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     end
   end
 
+  def activate_editor_embed_image(el)
+    el.find_element(:css, "div[aria-label='Embed Image'] button").click
+    ff('.ui-dialog').reverse.detect(&:displayed?)
+  end
+
   def add_canvas_image(el, folder, filename)
-    el.find_element(:css, '.mce_instructure_image').click
-    dialog = ff('.ui-dialog').reverse.detect(&:displayed?)
+    dialog = activate_editor_embed_image(el)
     f('a[href="#tabUploaded"]', dialog).click
     keep_trying_until { expect(f('.treeLabel', dialog)).to be_displayed }
     folder_el = ff('.treeLabel', dialog).detect { |el| el.text == folder }
@@ -108,8 +112,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def add_url_image(el, url, alt_text)
-    el.find_element(:css, '.mce_instructure_image').click
-    dialog = ff('.ui-dialog').reverse.detect(&:displayed?)
+    dialog = activate_editor_embed_image(el)
     f('a[href="#tabUrl"]', dialog).click
     f('[name="image[src]"]', dialog).send_keys(url)
     f('[name="image[alt]"]', dialog).send_keys(alt_text)
@@ -157,7 +160,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def wiki_page_body_ifr_id
-    f('.mceIframeContainer iframe')['id']
+    f('.mce-container iframe')['id']
   end
 
   def wiki_page_editor_id

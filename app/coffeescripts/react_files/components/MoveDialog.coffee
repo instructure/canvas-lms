@@ -1,14 +1,14 @@
 define [
   'i18n!react_files'
   'jquery'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   'compiled/fn/preventDefault'
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
   '../utils/moveStuff'
-], (I18n, $, React, withReactDOM, preventDefault, BBTreeBrowserView, RootFoldersFinder, customPropTypes, moveStuff) ->
+], (I18n, $, React, withReactElement, preventDefault, BBTreeBrowserView, RootFoldersFinder, customPropTypes, moveStuff) ->
 
   MoveDialog = React.createClass
     displayName: 'MoveDialog'
@@ -63,7 +63,7 @@ define [
       $(@refs.form.getDOMNode()).disableWhileLoading(promise)
 
 
-    render: withReactDOM ->
+    render: withReactElement ->
       form { ref: 'form', className: 'form-dialog', onSubmit: preventDefault(@submit)},
         div {className: 'form-dialog-content'},
           aside {

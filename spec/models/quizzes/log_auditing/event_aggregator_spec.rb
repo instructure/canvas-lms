@@ -52,10 +52,10 @@ describe Quizzes::LogAuditing::EventAggregator do
         {"quiz_question_id" => @questions[1].id, 'flagged' => false},
       ],
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED => [
-        { 'quiz_question_id'=> @questions[0].id, "answer"=> "hello" },
-        { 'quiz_question_id'=> @questions[0].id, 'answer'=> "goodbye" },
-        { 'quiz_question_id'=> @questions[1].id, "answer"=> "hello" },
-        { 'quiz_question_id'=> @questions[1].id, "answer"=> "goodbye" },
+        [{'quiz_question_id'=> @questions[0].id, "answer"=> "hello"}],
+        [{'quiz_question_id'=> @questions[0].id, 'answer'=> "goodbye"}],
+        [{'quiz_question_id'=> @questions[1].id, "answer"=> "hello"}],
+        [{'quiz_question_id'=> @questions[1].id, "answer"=> "goodbye"}],
       ]
     }
     # Build out each event in pairs to test that we are aggregating correctly

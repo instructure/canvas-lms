@@ -186,7 +186,9 @@
 }
 
 .accessible-toggler {
+  @include ic-focus-base;
   color: #333;
+  &:focus { @include ic-focus-variant; }
   &:hover, &:focus {
     color: #333;
     text-decoration: none;

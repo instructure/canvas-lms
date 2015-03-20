@@ -767,7 +767,6 @@ ko:
         outgoing_email_default_name_option_custom: "사용자 정의 \"보낸 사람\" 이름"
         outgoing_email_default_name_option_default: "기본 Canvas 설정"
         prevent_course_renaming_by_teachers: "교사가 과목 이름을 변경하지 못하도록 함"
-        restrict_student_future_view: "학생이 시작일 이전의 과목을 볼 수 없도록 제한"
         role_id: 추가
         self_enrollment: "직접 등록 허용"
         self_registration: "자동 등록"
@@ -1878,15 +1877,11 @@ ko:
   bb_name: "Blackboard 변환기"
   big_blue_button_conference: 
     recording_setting: 녹음/녹화
-    recording_setting_description: "이 회의를 녹음/녹화"
   blackboard: 
     no_manifest: "이 Blackboard .zip은 루트 디렉토리에 imsmanifest.xml 파일이 없습니다."
   bookmark_service: 
     default_title: "제목 없음"
   broccoli_cloud: 
-    label: 
-      published: 게시됨
-      unpublished: "게시 안 됨"
     published_title: 게시됨
     unpublished_title: "게시 안 됨"
   bulk_course_migration: 
@@ -2707,15 +2702,6 @@ ko:
       buttons: 
         close: "지금 마침"
         join: "지금 참여"
-        restart: "지금 다시 시작"
-        start: "지금 시작"
-      minute: 
-        one: "%{count}분"
-        other: "%{count}분"
-      status: 
-        finished: "%{date_and_time}에 마침 (%{duration})"
-        new: "아직 시작하지 않음"
-        started: "%{time}에 시작함"
     type_disabled_error: "이 Canvas 사이트에서 더 이상 이 유형의 회의를 사용하지 않음"
   configuration_type_25a084a4: "구성 유형"
   confirm_dialog: 
@@ -3865,7 +3851,6 @@ ko:
         student_invitation_unaccepted_available: "%{name}이(가) 아직 과목 참여 초대를 수락하지 않았습니다. 초대 발송 시각: %{time}"
         student_invitation_unaccepted_unavailable: "%{name}을(를) 과목에 추가했습니다: %{time}"
       link_to_students_view: 
-        link_student_action: "*%{name}* 과목 감독자를 학생에게 연결하려면 아래 목록에서 학생 이름을 선택하십시오."
         link_student_desc: "감독자를 학생에게 연결하면 학생의 평점과 과목 상호 작용을 액세스할 수 있습니다."
       resend_invitations: 
         pending_invitations: "초대 %{pendingInvitationsCount}건이 수락되지 않음"
@@ -4048,7 +4033,6 @@ ko:
         join_course: "이 과목에 참여"
         new_announcement: "새 공지"
         view_course_stream: "과목 스트림 보기"
-      period_name: "마지막 2주"
       re_sending: "다시 보내는 중..."
       send_done: "마쳤습니다. 메시지는 수 분이 걸릴 수 있습니다."
       send_failed: "요청이 실패했습니다. 다시 시도하십시오."
@@ -6316,7 +6300,6 @@ ko:
       edit_group: "그룹 편집"
       group_atom_feed: "그룹 Atom 피드"
       new_announcement: "새 공지"
-      next_week: "다음 주"
     status: 
       assigning_students: "학생 할당 중..."
       creating_groups: "범주 만드는 중..."
@@ -7480,8 +7463,6 @@ ko:
     confirm_registration: 
       email: 
         details: "등록 과정을 마치려면 다음 URL을 방문하십시오:"
-        html: 
-          details: "등록 과정을 마치려면 여기를 클릭"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -9071,7 +9052,6 @@ ko:
         delete_outcome: "성과 삭제"
         edit_outcome: "성과 편집"
       mastery_at_label: "다음 이상 점수에 대해 숙달 설정:"
-      point_mastery: "%{mastery_points}점에서 숙달"
       points: 
         rating: "%{points}점"
         total: "%{points_possible}점"
@@ -11389,11 +11369,9 @@ ko:
       buttons: 
         enroll_in_course: "과목에 등록"
         next: 다음
-      enter_email: "이메일 주소를 입력하시기 바랍니다:"
       existing_user: "%{institution_name} 로그인을 가지고 있음"
       getting_started: "**%{course}**에 등록하는 중입니다."
       labels: 
-        email: 이메일
         name: "전체 이름"
         password: 암호
       new_user: "새 사용자입니다."
@@ -11509,15 +11487,6 @@ ko:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "다운로드하려면 여기를 클릭"
-    conference: 
-      buttons: 
-        delete: "회의 삭제"
-        edit: "회의 세부 정보 편집"
-      course_conference: "과목 회의"
-      group_conference: "그룹 회의"
-      participant: 
-        one: "참여자 %{count}명"
-        other: "참여자 %{count}명"
     current_enrollment: 
       enrolled_as_designer: "디자이너로 등록"
       enrolled_as_observer: "감독자로 등록"
@@ -11928,7 +11897,6 @@ ko:
         wiki_page_namem: "과제 이름"
       loading: "로드 중..."
       new_assignment_option: "[ 새 과제 ]"
-      new_file_option: "[ 새 파일 ]"
       new_page_option: "[ 새 페이지 ]"
       new_quiz_option: "[ 새 퀴즈 ]"
       new_topic_option: "[ 새 주제 ]"

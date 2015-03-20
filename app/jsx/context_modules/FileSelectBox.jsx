@@ -2,7 +2,7 @@
 
 define([
   'underscore',
-  'old_unsupported_dont_use_react',
+  'react',
   'i18n!context_modules',
   './stores/FileStore',
   './stores/FolderStore',

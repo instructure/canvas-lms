@@ -224,7 +224,7 @@ module Api
         it 'returns the permissions when its configured for inclusion' do
           includes << :permissions
           expect(course_json.include_permissions).to be_truthy
-          expect(course_json.permissions_to_include).to eq [ :create_discussion_topic ]
+          expect(course_json.permissions_to_include).to eq [ :create_discussion_topic, :create_announcement ]
         end
 
         it 'is nil when configured not to be included' do

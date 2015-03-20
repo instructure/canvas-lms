@@ -945,7 +945,6 @@ zh:
         outgoing_email_default_name_option_default: "默认 Canvas 设置"
         prevent_course_renaming_by_teachers: 不要让教师重命名其课程
         restrict_quiz_questions: 限制学生在课程结束日期后查看测验题
-        restrict_student_future_view: 限制学生在开始日期之前查看课程
         role_id: 添加更多
         self_enrollment: 允许自我注册
         self_registration: 自行注册
@@ -2209,17 +2208,12 @@ zh:
   big_blue_button_conference: 
     conference_is_recorded: 正在对此会议进行录制。
     recording_setting: 录制
-    recording_setting_description: 录制此会议
   blackboard: 
     no_manifest: "该 Blackboard .zip 在根目录下没有 imsmanifest.xml 文件。"
   bookmark_service: 
     default_title: 无标题
   broccoli_cloud: 
     hidden_title: 已隐藏。可通过链接提供
-    label: 
-      hidden: 已隐藏。可通过链接提供
-      published: 已发布
-      unpublished: 已取消发布
     published_title: 已发布
     title: 
       permissions: "此人员的编辑权限：%{name}"
@@ -3083,15 +3077,6 @@ zh:
       buttons: 
         close: 立即结束
         join: 立即加入
-        restart: 立即重新开始
-        start: 立即开始
-      minute: 
-        one: "%{count} 分钟"
-        other: "%{count} 分钟"
-      status: 
-        finished: "已完成 %{date_and_time} (%{duration})"
-        new: 尚未开始
-        started: "开始于 %{time}"
     type_disabled_error: "此类会议不再为此 Canvas 网站启用"
   config_url_e96ceaf3: "配置 URL"
   configurate_tool_app_5a721f2c: "配置 %{tool} 应用程序？"
@@ -4423,7 +4408,6 @@ zh:
         student_invitation_unaccepted_available: "%{name} 尚未接受参与课程的邀请。邀请发送时间: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} 被添加到课程的时间: %{time}"
       link_to_students_view: 
-        link_student_action: "要将课程观察员 *%{name}* 链接至某个学生，可从以下列表中选择该学生的姓名。"
         link_student_desc: 观察员在链接至某个学生后，就可访问该学生的评分和课程交互。
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} 个邀请尚未接受。"
@@ -4636,7 +4620,6 @@ zh:
         join_course: 参与此课程
         new_announcement: 新通告
         view_course_stream: 查看课程流
-      period_name: 最近两周
       re_sending: 正在重新发送...
       send_done: 完成！收到消息可能需要几分钟。
       send_failed: 请求失败。请重试。
@@ -4812,7 +4795,6 @@ zh:
         count: 出错的学生人数
         ratio: 出错的学生比率
   current_3ce5414a: 当前：
-  current_mastery_score_score_out_of_masterypoints_80addfb7: "当前掌握分数：%{score} 分，共 %{masteryPoints} 分"
   current_score_6c81792: 当前分数
   current_total_67bf5f72: 当前总分：
   curve_grades_dialog: 
@@ -5420,7 +5402,6 @@ zh:
   due_on_date_aa4725cd: 到期日期：
   due_on_date_ffc98ebc: 到期日期
   e_mail_only_2cc5e513: 仅限电子邮件
-  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "每一条为一项作业。绿色层表示 *按时* 上交作业的学生的百分比。**迟交** 的作业为黄色，***未交*** 的作业为红色。"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "每一条为一项作业。*垂直细条* 表示该课程中任意学生的最低分一直到最高分。**粗条** 表示第 25 个百分位一直到第 75 个百分位，其中标记了 ***中值分数***。"
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "每一条为一项作业。垂直细条表示该课程中任意学生的最低分一直到最高分。粗条表示第 25 个百分位一直到第 75 个百分位，其中标记了中值分数。该学生的分数标有圆点。"
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "每一条表示该天的 *页面查看* 数。橙色条表示该天学生在课程内 **进行了一些操作**。"
@@ -5510,7 +5491,6 @@ zh:
     titles: 
       font_size: 字体大小，按下即可选择
       formatting: 格式，按下即可选择
-      rte_help: "富文本区域。按 ALT F10 显示工具栏。按 ALT F8 显示帮助。"
   either_the_url_or_domain_should_be_set_c29cf8c1: "应设置 URL 或域名。"
   element_option_missing_error_an_element_to_attach__be433478: "`element` 选项缺失错误：针对 BBTreeBrowserView 将渲染选项设置为 'true' 时，必须指定 TreeBrowserView 附加到的一个元素"
   email: 
@@ -6490,20 +6470,13 @@ zh:
       sort: s
       tooltip: t
     learning_outcome: 学习成果
-    mastery: 掌握
-    near_mastery: 接近掌握
     no_assignments_have_points_warning: 无法计算得分，直到作业有最高得分
     notes: 备注
     outcome_gradebook: 
       export_report: 导出报告
       toggle_sidebar: 切换侧栏
-    outcome_popover: 
-      mastery_set_at: 掌握程度设置为
-      no_results: (无结果)
-      view_more_details: 查看更多详细信息
     percent_of_grade: "%{percentage} 的评分 "
     points_out_of: "满分 %{points_possible} 分"
-    remedial: 补课
     resubmitted: 自上次计分后已重新提交
     row_student_name: 
       student_placeholder: 学生
@@ -7278,7 +7251,6 @@ zh:
       edit_group: 编辑组
       group_atom_feed: "小组 Atom 馈送"
       new_announcement: 新通告
-      next_week: 下周
     status: 
       assigning_students: 正在分配学生...
       creating_groups: 正在创建类别...
@@ -7392,7 +7364,6 @@ zh:
     online_url_submission: "在线 URL 提交项"
     quiz_submission: 测验提交项
     text_entry_submission: 文本条目提交项
-  if_enabled_content_designers_must_provide_copyrigh_e90eb2a: 如果启用，内容设计者必须在文件发布前提供文件的版权和许可信息
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如果启用，用户将能够配置 LTI 2 工具。"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您更改作业的可能分数，则必须对作业进行重新评分。
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 如果您现在不选择使用权限，此文件在上传后将不会发布
@@ -7596,7 +7567,6 @@ zh:
       适用某些样式更改，但将来可能会添加更多特定于 K-12 的内容。
   labels: 
     lock_module_until: 锁定单元至指定日期
-  last_assessment_latesttitle_22560cf3: "上次评估：%{latestTitle}"
   last_user_access_title: 上次用户访问
   late_percent_b91d01b3: "延迟：%{percent}"
   latest_f604a75: 最新
@@ -8601,7 +8571,6 @@ zh:
         details: "要完成注册过程，请访问以下 url:"
         html: 
           body: "感谢您注册 %{product_name}！此电子邮件用于确认用户 %{user} 正在 %{website} 上注册一个新帐户。"
-          details: 单击此处完成注册过程
           subject: "确认注册：%{product_name}"
         subject: "确认注册：%{product_name}"
     confirm_sms_communication_channel: 
@@ -10003,7 +9972,6 @@ zh:
       我们正在改进 Canvas 的 UI 界面。启用此项可选择查看
       更新的简化外观并感受 Canvas 界面。这是一项“正在进行中”的功能，
       在生产中还不应该为实际用户启用此功能。
-  new_title_cb9ceb2f: 新建标题
   next_40e12421: 下一页
   next_steps_ce0f0d0c: 后续步骤
   no_assignment_name_adbb215b: 无作业名称
@@ -10388,17 +10356,14 @@ zh:
           manage: 
             description: "*成果是在此处创建的，以跟踪课程的掌握程度。要开始创建，请查看顶部的菜单栏。单击”新建“按钮，创建一个新的成果，或单击”新建组“按钮创建一个新的组，将您的成果放在其中。”查找“按钮将允许您使用您所在的州或学校创建的成果。在您创建和使用成果时，您将可以使用左侧的面板在成果中导航。您可以在不同的级别之间拖放成果以创建结构。* *更重要的是，Canvas 允许您将成果添加到您的评分标准，这样您就可以在对作业评分时评估自己的掌握程度。在您设置成果后，单击”管理评分标准“开始使用成果继续评分。*"
             title: 设置成果
-    mastery: 掌握
     mastery_error: "必须大于或等于 0"
     missing_outcome: 无法找到该学习成果
-    near: 接近掌握
     new_outcome_group: 新建成果组
     outcome: 
       links: 
         delete_outcome: 删除成果
         edit_outcome: 编辑成果
       mastery_at_label: "为等于或高于此值的任何分数设置掌握程度:"
-      point_mastery: "掌握程度为 %{mastery_points} 分"
       points: 
         rating: "%{points} 分"
         total: "%{points_possible} 分"
@@ -10427,7 +10392,6 @@ zh:
       attempt_info: "尝试 #%{attempt_number}，%{attempt_date}"
       outcome_mastered: 已掌握
       scoring: "%{points}，满分 %{possible_points}"
-    remedial: 补课
     show: 
       no_aligned_items: 没有调整的项目
       no_artifacts: 没有任何产物
@@ -10440,7 +10404,6 @@ zh:
     titles: 
       find_outcomes: 查找成果
     top_level: "%{context} 最高级"
-    undefined: 未开始
     user_outcome_results: 
       artifacts: 
         one: "%{count} 个产物"
@@ -12756,8 +12719,6 @@ zh:
     folder: 文件夹
     folder_browsing_tree: 文件夹浏览树
     folder_name: 文件夹名称
-    labels: 
-      select: 选择此项目
     loading_more_results: 正在加载更多结果...
     modified_by: 修改者
     move: 移动
@@ -12777,7 +12738,6 @@ zh:
     search_for_files: 搜索文件
     search_results_for: "\"%{search_term}\" 的搜索结果"
     select_all: 全选
-    settings: 设置
     size: 大小
     sorted_ascending: 按升序排序
     sorted_desending: 按降序排序
@@ -13318,11 +13278,9 @@ zh:
       buttons: 
         enroll_in_course: 注册课程
         next: 下一页
-      enter_email: "请输入您的电子邮件地址:"
       existing_user: "我已经拥有 %{institution_name} 登录名"
       getting_started: "您正在登记 **%{course}**。"
       labels: 
-        email: 电子邮件
         name: 全名
         password: 密码
       new_user: 我是新用户
@@ -13454,15 +13412,6 @@ zh:
         download_message: "提交项将压缩成 zip 文件以供下载。这可能需要一些时间，具体取决于提交文件的大小和数量。"
         download_message_intro: 正在收集您的学生提交项。
         download_submissions: 下载所有提交项
-    conference: 
-      buttons: 
-        delete: 删除会议
-        edit: 编辑会议详细信息
-      course_conference: 课程会议
-      group_conference: 小组会议
-      participant: 
-        one: "%{count} 个参加者"
-        other: "%{count} 个参加者"
     current_enrollment: 
       enrolled_as_designer: 注册为设计者
       enrolled_as_observer: 注册为观察员
@@ -13891,7 +13840,6 @@ zh:
       external_url_notice: "输入一个 URL 和页面名称以将指向任何网站 URL 的链接添加到此*单元*。"
       file_item: 文件
       file_notice: 选择您要与此*单元*关联的文件，或通过选择"新文件"添加一个文件。
-      file_select_label: 选择您要关联的文件，或者通过选择“新文件”来添加文件。
       indent_level: 
         one: "*缩进 1 级*"
         other: "*缩进 %{count} 级*"
@@ -13911,7 +13859,6 @@ zh:
         wiki_page_namem: 作业名称
       loading: 正在加载...
       new_assignment_option: "[新作业]"
-      new_file_option: "[新文件]"
       new_page_option: "[新页面]"
       new_quiz_option: "[新测验]"
       new_tab: 在新选项卡中加载
@@ -14413,7 +14360,6 @@ zh:
       two_words_connector: " and "
       words_connector: ", "
     help_menu: 
-      community_support_description: "请先联系您的 ASC 获得帮助。如果他们无法提供帮助，请联系我们。"
       community_support_forums: 社区支持论坛
       contact_support: 联系支持
       contact_support_sub_text: 针对时间敏感的问题获得帮助。
@@ -14532,7 +14478,6 @@ zh:
   there_are_count_results_in_the_list_e74f6e36: 
     one: "列表中有 %{count} 个结果"
     other: "列表中有 %{count} 个结果"
-  there_was_a_problem_adding_the_grading_scheme_92d6d907: 添加评分方案时遇到问题
   there_was_a_problem_deleting_the_grading_period_50ce07c5: 删除评分时段时遇到问题
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: 删除评分方案时遇到问题
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 保存评分方案时遇到问题
@@ -14549,8 +14494,6 @@ zh:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此文件夹目前已锁定并且无法查看。
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "这是一个受信任 URL的逗号分隔列表。登录 Canvas 时，信任此列表中的任何 URL 将绕过 CSRF 令牌。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: 这很可能发生，因为您导入了不带关联文件的课程内容。
-  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: 此结果已用于评估学生。计算方法是固定的
-  this_outcome_has_been_used_to_assess_a_student_the_ac470670: 此结果已用于评估学生。计算值是固定的
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
   this_student_wrote_f1a3f22d: 该学生写道：
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "这将允许您在 Canvas 中进行身份验证，以便将分数发布至 SIS"
@@ -14569,7 +14512,7 @@ zh:
       long: "%Y %B %d %H:%M"
       short: "%b %d %H:%M"
       tiny: "%H:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: 不到一分钟前
     pm: 下午
     ranges: 

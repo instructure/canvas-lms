@@ -34,26 +34,27 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       end
 
       it "should unpublish and publish a file from cog menu" do
-        permissions('rgba(128, 128, 128, 1)', 1, 0)
+        set_item_permissions(:unpublish)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        permissions('rgba(0, 173, 24, 1)', 0, 0)
+        expect(driver.find_element(:class => 'unpublished')).to be_displayed
+        set_item_permissions(:publish)
         expect(f('.btn-link.published-status.published')).to be_displayed
+        expect(driver.find_element(:class => 'published')).to be_displayed
       end
 
       it "should make file available to student with link" do
-        tooltip_text = "Hidden. Available with a link"
-        permissions('rgba(196, 133, 6, 1)', 2, 0)
+        set_item_permissions(:restricted_access, :available_with_link)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
+        expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
 
       it "should make file available to student within given timeframe" do
-        tooltip_text = "Hidden. Available with a link"
-        permissions('rgba(196, 133, 6, 1)', 2, 1)
+        set_item_permissions(:restricted_access, :available_with_timeline)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
+        expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
 
       it "should delete file from toolbar" do
-        file_name = "example.pdf"
         delete_from_toolbar
         expect(get_all_files_folders.count).to eq 0
       end
@@ -91,8 +92,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
           check_element_has_focus(f('.btn-view'))
         end
       end
-
-
    end
 
    context "File Downloads", :priority => "2" do
@@ -112,7 +111,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       end
    end
 
-   context "Publish Cloud Dialog", :priority => '3' do
+   context "Publish Cloud Dialog", :priority => '2' do
     before (:each) do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:better_file_browsing)
@@ -122,10 +121,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
     end
 
     it "should validate that file is published by default" do
-        publish_background_color = 'rgba(0, 173, 24, 1)'
         icon_publish_color = ff('.icon-publish')[0].css_value('color')
         expect(f('.btn-link.published-status.published')).to be_displayed
-        expect(icon_publish_color).to eq publish_background_color
     end
 
     it "should set focus to the close button when opening the dialog" do
@@ -137,16 +134,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
     end
    end
 
-   context "Usage Rights Dialog", :priority => '3' do
-    before :each do
-      course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
-      Account.default.enable_feature!(:usage_rights_required)
-      add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
-               @course, "a_file.txt")
-      get "/courses/#{@course.id}/files"
-    end
-
+   context "Usage Rights Dialog", :priority => '2' do
     def set_usage_rights_in_modal(rights = 'creative_commons')
       set_value f('.UsageRightsSelectBox__select'), rights
       if rights == 'creative_commons'
@@ -165,44 +153,70 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       expect(f('.ReactModal__Content')).to eq(nil)
     end
 
-    it "should set usage rights on a file via the modal by clicking the indicator" do
-      f('.UsageRightsIndicator__openModal').click
-      wait_for_ajaximations
-      set_usage_rights_in_modal
-      react_modal_hidden
-      # a11y: focus should go back to the element that was clicked.
-      check_element_has_focus(f('.UsageRightsIndicator__openModal'))
-      verify_usage_rights_ui_updates
+    before :each do
+      course_with_teacher_logged_in
+      Account.default.enable_feature!(:better_file_browsing)
+      Account.default.enable_feature!(:usage_rights_required)
+      add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
+               @course, "a_file.txt")
     end
 
-    it "should set usage rights on a file via the cog menu" do
-      f('.ef-links-col .al-trigger').click
-      f('.ItemCog__OpenUsageRights a').click
-      wait_for_ajaximations
-      set_usage_rights_in_modal
-      react_modal_hidden
-      # a11y: focus should go back to the element that was clicked.
-      check_element_has_focus(f('.ef-links-col .al-trigger'))
-      verify_usage_rights_ui_updates
+    context "course files" do
+      before :each do
+        get "/courses/#{@course.id}/files"
+      end
+
+      it "should set usage rights on a file via the modal by clicking the indicator" do
+        f('.UsageRightsIndicator__openModal').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.UsageRightsIndicator__openModal'))
+        verify_usage_rights_ui_updates
+      end
+
+      it "should set usage rights on a file via the cog menu" do
+        f('.ef-links-col .al-trigger').click
+        f('.ItemCog__OpenUsageRights a').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.ef-links-col .al-trigger'))
+        verify_usage_rights_ui_updates
+      end
+
+      it "should set usage rights on a file via the toolbar" do
+        f('.ef-item-row').click
+        f('.Toolbar__ManageUsageRights').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.Toolbar__ManageUsageRights'))
+        verify_usage_rights_ui_updates
+      end
+
+      it "should not show the creative commons selection if creative commons isn't selected" do
+        f('.UsageRightsIndicator__openModal').click
+        wait_for_ajaximations
+        set_value f('.UsageRightsSelectBox__select'), 'fair_use'
+        expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
+      end
     end
 
-    it "should set usage rights on a file via the toolbar" do
-      f('.ef-item-row').click
-      f('.Toolbar__ManageUsageRights').click
-      wait_for_ajaximations
-      set_usage_rights_in_modal
-      react_modal_hidden
-      # a11y: focus should go back to the element that was clicked.
-      check_element_has_focus(f('.Toolbar__ManageUsageRights'))
-      verify_usage_rights_ui_updates
+    context "user files" do
+      it "should update course files from user files page" do
+        get "/files/folder/courses_#{@course.id}/"
+        f('.UsageRightsIndicator__openModal').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.UsageRightsIndicator__openModal'))
+        verify_usage_rights_ui_updates
+      end
     end
-
-    it "should not show the creative commons selection if creative commons isn't selected" do
-      f('.UsageRightsIndicator__openModal').click
-      wait_for_ajaximations
-      set_value f('.UsageRightsSelectBox__select'), 'fair_use'
-      expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
-    end
-
   end
 end

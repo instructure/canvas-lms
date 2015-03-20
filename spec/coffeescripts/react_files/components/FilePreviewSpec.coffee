@@ -1,7 +1,7 @@
 define [
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
-  'old_unsupported_dont_use_react-modal'
+  'react'
+  'react-router'
+  'react-modal'
   'compiled/react_files/components/FilePreview'
   'compiled/models/Folder'
   'compiled/models/File'
@@ -11,7 +11,7 @@ define [
 
   Simulate = React.addons.TestUtils.Simulate
 
-  # TODO: These tests should be re-implemented after we have figured out testing with old_unsupported_dont_use_react-router
+  # TODO: These tests should be re-implemented after we have figured out testing with react-router
 
   # module 'File Preview Rendering',
   #   setup: ->

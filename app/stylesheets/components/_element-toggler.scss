@@ -36,5 +36,7 @@ See `app/coffeescripts/behaviors/elementToggler.coffee`for implementation
 */
 
 .element_toggler {
+  @include ic-focus-base;
   cursor: pointer;
+  &:focus { @include ic-focus-variant; }
 }

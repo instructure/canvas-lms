@@ -207,8 +207,10 @@ class UserMerge
       end
 
       unless Shard.current != target_user.shard
-        # delete duplicate observers/observees, move the rest
+        # delete duplicate or invalid observers/observees, move the rest
         from_user.user_observees.where(:user_id => target_user.user_observees.map(&:user_id)).delete_all
+        from_user.user_observees.where(user_id: target_user).delete_all
+        target_user.user_observees.where(user_id: from_user).delete_all
         from_user.user_observees.update_all(:observer_id => target_user)
         xor_observer_ids = (Set.new(from_user.user_observers.map(&:observer_id)) ^ target_user.user_observers.map(&:observer_id)).to_a
         from_user.user_observers.where(:observer_id => target_user.user_observers.map(&:observer_id)).delete_all
@@ -305,6 +307,13 @@ class UserMerge
             # mark all conflicts on from_user as deleted so they will be left
             scope.active.where("id<>?", keeper).where(column => from_user).destroy_all
           end
+
+          # prevent observing self by marking them as deleted
+          Enrollment.active.where("type = 'ObserverEnrollment' AND
+                                  (associated_user_id = :target_user AND user_id = :from_user OR
+                                  associated_user_id = :from_user AND user_id = :target_user)",
+                                  {target_user: target_user, from_user: from_user}).destroy_all
+
           # move all the enrollments that are not marked as deleted to the target user
           Enrollment.active.where(column => from_user).update_all(column => target_user)
         end

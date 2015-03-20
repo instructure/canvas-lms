@@ -102,23 +102,22 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       box-shadow: none;
       border-color: $ic-border-light;
       border-bottom: 1px solid $ic-border-light !important;
-      &.ui-state-hover, &.ui-state-focus {
-        background: $ic-color-neutral;
+      &.ui-state-focus {
+        a { @include button-focus-light; }
       }
-  
+      &.ui-state-hover { background: $ic-color-neutral; }
       &.ui-state-active {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         border-color: darken($ic-brand-primary, 5%);
         border-bottom: 1px solid darken($ic-brand-primary, 5%) !important;
         background: $ic-brand-primary;
-        &.ui-state-focus { 
-          background: darken($ic-brand-primary, 5%); 
+        &.ui-state-focus {
           border-color: darken($ic-brand-primary, 10%);
           border-bottom: 1px solid darken($ic-brand-primary, 10%) !important;
+          a { @include button-focus-dark; }
         }
       }
-  
     }
 
     a {
@@ -128,6 +127,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       font-size: 16px;
       text-shadow: none;
       line-height: 1;
+      outline: none;
     }
 
     .ui-icon { left: $ic-sp - 2; }

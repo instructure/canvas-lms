@@ -76,7 +76,7 @@ module Api::V1
     end
 
     def permissions_to_include
-      [ :create_discussion_topic ] if include_permissions
+      [ :create_discussion_topic, :create_announcement ] if include_permissions
     end
 
     def extract_enrollments( enrollments )

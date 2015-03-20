@@ -11,7 +11,7 @@
 /*jshint maxlen:255 */
 /*eslint max-len:0 */
 /*global tinymce:true */
-
+define(['bower/tinymce/tinymce'], function(tinymce){
 tinymce.PluginManager.add('media', function(editor, url) {
 	var urlPatterns = [
 		{regex: /youtu\.be\/([\w\-.]+)/, type: 'iframe', w: 425, h: 350, url: '//www.youtube.com/embed/$1'},
@@ -771,4 +771,5 @@ tinymce.PluginManager.add('media', function(editor, url) {
 		context: 'insert',
 		prependToContext: true
 	});
+});
 });

@@ -60,6 +60,9 @@ define [
       $label.text label
       @$el.attr 'aria-label', label
 
+    setFocusToElement: ->
+      @$el.focus()
+
     # calling publish/unpublish on the model expects a deferred object
 
     publish: (event) ->
@@ -68,6 +71,7 @@ define [
         @trigger("publish")
         @enable()
         @render()
+        @setFocusToElement()
 
     unpublish: (event) ->
       @renderUnpublishing()
@@ -76,12 +80,14 @@ define [
         @trigger("unpublish")
         @disable()
         @render()
+        @setFocusToElement()
       .fail (error) =>
         errors = JSON.parse(error.responseText)['errors']
         $.flashError errors.published[0].message
         @model.set 'unpublishable', true
         @disable()
         @renderPublished()
+        @setFocusToElement()
 
     # state
 

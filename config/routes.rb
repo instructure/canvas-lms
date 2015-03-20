@@ -209,7 +209,7 @@ CanvasRails::Application.routes.draw do
     get 'grading_rubrics' => 'gradebooks#grading_rubrics'
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades
     concerns :announcements
-    get 'calendar' => 'calendars#show', as: :old_calendar
+    get 'calendar' => 'calendars#show2', as: :old_calendar
     get :locks
     concerns :discussions
     resources :assignments do
@@ -460,7 +460,7 @@ CanvasRails::Application.routes.draw do
     concerns :media
 
     resources :collaborations
-    get 'calendar' => 'calendars#show', as: :old_calendar
+    get 'calendar' => 'calendars#show2', as: :old_calendar
   end
 
   resources :accounts do
@@ -683,10 +683,9 @@ CanvasRails::Application.routes.draw do
 
   resources :plugins, only: [:index, :show, :update]
 
-  get 'calendar' => 'calendars#show'
+  get 'calendar' => 'calendars#show2'
   get 'calendar2' => 'calendars#show2'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
-  post 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', as: :switch_calendar
   get 'files' => 'files#index'
   get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
   get "files/search", controller: 'files', action: 'react_files', format: false

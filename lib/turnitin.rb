@@ -64,7 +64,9 @@ module Turnitin
       email = if item.is_a?(User)
                 item.email
               elsif item.respond_to?(:turnitin_id)
-                "#{item.turnitin_id}@null.instructure.example.com"
+                item.generate_turnitin_id!
+                item_type = item.class.reflection_type_name
+                "#{item_type}_#{item.turnitin_id}@null.instructure.example.com"
               end
       email ||= "#{item.asset_string}@null.instructure.example.com"
     end

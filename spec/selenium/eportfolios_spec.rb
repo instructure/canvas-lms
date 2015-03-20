@@ -49,7 +49,10 @@ describe "eportfolios" do
       fj('.done_editing_button:visible').click
       wait_for_ajaximations
       f('#content').click
-      expect(f('#page_list')).to include_text(page_title)
+      keep_trying_until{
+        f("#page_sidebar").click
+        f("#page_list").text.include?(page_title)
+      }
       get "/eportfolios/#{@eportfolio.id}/category/I_made_this_page"
       wait_for_ajaximations
       expect(f('#section_pages')).to include_text(page_title)
@@ -89,9 +92,9 @@ describe "eportfolios" do
       f('.add_content_link.add_rich_content_link').click
       wait_for_tiny(f('textarea.edit_section'))
       keep_trying_until {
-        expect(f('a.mce_instructure_image')).to be_displayed
+        expect(f('.mce-container')).to be_displayed
       }
-      f('a.mce_instructure_image').click
+      f("div[aria-label='Embed Image'] button").click
       keep_trying_until {
         expect(f('a[href="#tabFlickr"]')).to be_displayed
       }
@@ -117,6 +120,9 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click
+      keep_trying_until {
+        f("#delete_eportfolio_form").displayed?
+      }
       submit_form("#delete_eportfolio_form")
       fj("#wrapper-container .eportfolios").click
       keep_trying_until {

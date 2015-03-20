@@ -98,17 +98,22 @@ define [
       @_removeFromGroup(model)
       @_addToGroup(model)
 
+    # must explicitly update @empty attribute from CollectionView class so view
+    # will properly recognize if it does/doesn't have items on subsequent
+    # re-renders, since drag & drop doesn't trigger a render
     _removeFromGroup: (model) ->
       old_group_id = model.get(@groupKey)
       old_group = @parentCollection.findWhere id: old_group_id
       old_children = old_group.get(@childKey)
       old_children.remove(model, {silent: true})
+      @empty = _.isEmpty(old_children.models)
 
     _addToGroup: (model) ->
       model.set(@groupKey, @groupId)
       new_group = @parentCollection.findWhere id: @groupId
       new_children = new_group.get(@childKey)
       new_children.add(model, {silent: true})
+      @empty = false if @empty
 
     # Internal: On a user's sort action, update the sort order on the server.
     #

@@ -1,14 +1,19 @@
 define [
   'jquery'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   'i18n!restrict_student_access'
   './DialogContent'
   './DialogButtons'
   'jqueryui/dialog'
-], ($, React, withReactDOM, I18n, DialogContent, DialogButtons) ->
+], ($, React, withReactElement, I18n, DialogContentComponent, DialogButtonsComponent) ->
+
+  DialogContent = React.createFactory DialogContentComponent
+  DialogButtons = React.createFactory DialogButtonsComponent
 
   DialogAdapter = React.createClass
+    displayName: 'DialogAdapter'
+
     propTypes:
       open: React.PropTypes.bool.isRequired
       title: React.PropTypes.string
@@ -62,13 +67,13 @@ define [
       {content: content, buttons: buttons}
 
     addContent: (content) ->
-      React.renderComponent(content, @node)
+      React.render(content, @node)
 
     addButtons: (buttons) ->
       # hack to get buttons to render to buttonset ui
       if buttons?
         buttonSet = $(@node).parent().find('.ui-dialog-buttonset').html('').get(0)
-        React.renderComponent(buttons, buttonSet)
+        React.render(buttons, buttonSet)
       else
         $(@node).parent().find('.ui-dialog-buttonpane').hide()
 
@@ -92,5 +97,5 @@ define [
     close: ->
       @dialog.close()
 
-    render: withReactDOM ->
+    render: withReactElement ->
       div {}

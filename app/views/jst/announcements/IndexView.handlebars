@@ -26,8 +26,14 @@
       {{/if}}
       <span id="actionsForSelectedDiscussions" class="screenreader-only">
         <input type="checkbox" id="lock" disabled="disabled"/>
-        <label for="lock" data-tooltip>{{#t "lock_for_comments"}}Lock for comments{{/t}}</label>
-        <button id="delete" data-tooltip disabled="disabled">{{#t "delete"}}Delete{{/t}}</button>
+        <label for="lock" data-tooltip title="{{#t "lock_for_comments"}}Lock for comments{{/t}}">
+          <i class="icon-lock"></i>
+          <span class="screenreader-only">{{#t "lock_for_comments"}}Lock for comments{{/t}}</span>
+        </label>
+        <button id="delete" data-tooltip data-tooltip title="{{#t "delete"}}Delete{{/t}}" disabled="disabled">
+          <i class="icon-trash"></i>
+          <span class="screenreader-only">{{#t "delete"}}Delete{{/t}}</span>
+        </button>
       </span>
 
       {{#if options.permissions.create}}

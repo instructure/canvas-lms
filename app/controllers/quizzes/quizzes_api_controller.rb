@@ -218,6 +218,11 @@
 #         "all_dates": {
 #           "$ref": "AssignmentDate",
 #           "description": "list of due dates for the quiz"
+#         },
+#         "version_number": {
+#           "description": "Current version number of the quiz",
+#           "example": 3,
+#           "type": "integer"
 #         }
 #       }
 #     }

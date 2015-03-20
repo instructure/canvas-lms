@@ -20,7 +20,7 @@ define([
   'INST' /* INST */,
   'i18n!select_content_dialog',
   'jquery' /* $ */,
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/context_modules/FileSelectBox',
   'compiled/legacy/add_assignment' /* attachAddAssignment */,
   'jquery.instructure_date_and_time' /* datetime_field */,
@@ -339,7 +339,7 @@ $(document).ready(function() {
     $("#select_context_content_dialog .module_item_option").hide();
     $("#" + $(this).val() + "s_select").show().find(".module_item_select").change();
     if ($(this).val() === 'attachment') {
-      React.renderComponent(FileSelectBox({contextString: ENV.context_asset_string}), $('#module_item_select_file')[0]);
+      React.render(React.createFactory(FileSelectBox)({contextString: ENV.context_asset_string}), $('#module_item_select_file')[0]);
     }
     if($(this).val() == 'context_external_tool') {
       var $select = $("#context_external_tools_select");

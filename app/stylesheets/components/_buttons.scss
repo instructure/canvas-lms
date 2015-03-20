@@ -140,16 +140,15 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   text-decoration: none;
   overflow: hidden;
   text-shadow: none;
-
-  // Hover state
-  &:hover { text-decoration: none; }
-
-  // Focus state for keyboard and accessibility ONLY IN HIGH CONTRAST MODE
-  @if $use_high_contrast { 
-    &:focus { @include button-focus; } 
+  user-select: none;
+  
+  &:focus { 
+    text-decoration: none;
+    outline: none;
+    @if $use_high_contrast == false { outline: none; }
   }
-  // If not high-contrast, the "canvas-button" mixin has the :focus state share the same styles as :hover
-  @else { &:focus { outline: none; } }
+
+  &:hover { text-decoration: none; }
 
   &.disabled, &[disabled] {
     cursor: not-allowed;
@@ -225,14 +224,12 @@ $ic-brand-button--primary-text: $ic-color-light !default;
 $ic-brand-button--secondary-bgd: $ic-brand-secondary !default;
 $ic-brand-button--secondary-text: $ic-color-light !default;
 
+// Primary appears as blue
 .btn-primary, // <-- deprecated- do not use
 .Button--primary {
   @include canvas-button($ic-brand-button--primary-bgd, $ic-brand-button--primary-text);
-  @if $use_high_contrast {
-    &:focus { @include button-focus($ic-color-action); }
-  }
 }
-// Warning appears are orange
+// Warning appears as orange
 .btn-warning, // <-- deprecated- do not use
 .Button--warning {
   @include canvas-button($ic-color-alert, $ic-color-light);
@@ -254,9 +251,7 @@ $ic-brand-button--secondary-text: $ic-color-light !default;
 }
 
 // Inverse appears as dark gray <-- deprecated- do not use
-.btn-inverse {
-  @include buttonBackground($btnInverseBackground, $btnInverseBackgroundHighlight);
-}
+.btn-inverse { @include buttonBackground($btnInverseBackground, $btnInverseBackgroundHighlight); }
 
 
 // Link buttons

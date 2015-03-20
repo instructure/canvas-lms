@@ -239,10 +239,10 @@ $announcements_disscussion-summary-color: $ic-color-dark;
     }
 
     .subscription-toggler {
-      padding: 5px;
-      &:before {
-      margin: 0;
-      }
+      @include ic-focus-base;
+      padding: 4px;
+      &:focus { @include ic-focus-variant; }
+      &:before { margin: 0; }
     }
 
     a[class*=icon-] {

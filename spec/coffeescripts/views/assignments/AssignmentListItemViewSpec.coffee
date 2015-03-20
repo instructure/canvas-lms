@@ -105,9 +105,12 @@ define [
     $.extend base, options
 
   createView = (model, options) ->
-    options = $.extend {canManage: true}, options
+    options = $.extend {canManage: true, canReadGrades: false}, options
 
-    ENV.PERMISSIONS = { manage: options.canManage }
+    ENV.PERMISSIONS = {
+      manage: options.canManage
+      read_grades: options.canReadGrades
+    }
 
     view = new AssignmentListItemView(model: model)
     view.$el.appendTo $('#fixtures')
@@ -294,6 +297,18 @@ define [
     ok view.$(".modules").text().search("Multiple Modules") != -1
     ok view.$("#module_tooltip_#{@model.id}").text().search("#{mods[0]}") != -1
     ok view.$("#module_tooltip_#{@model.id}").text().search("#{mods[1]}") != -1
+
+  test 'render score template with permission', ->
+    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    createView(@model, canManage: false, canReadGrades: true)
+    ok spy.called
+    AssignmentListItemView.prototype.updateScore.restore()
+
+  test 'does not render score template without permission', ->
+    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    createView(@model, canManage: false, canReadGrades: false)
+    equal spy.callCount, 0
+    AssignmentListItemView.prototype.updateScore.restore()
 
   module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->
