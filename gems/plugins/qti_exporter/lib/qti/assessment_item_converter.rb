@@ -52,7 +52,7 @@ class AssessmentItemConverter
 
   def create_xml_doc
     if @manifest_node
-      @doc = Nokogiri::XML(open(@href))
+      @doc = Nokogiri::XML(File.open(@href))
     else
       @doc = Nokogiri::XML(@qti_data)
     end

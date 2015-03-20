@@ -222,9 +222,11 @@ module CC
 
           path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
 
-          remote_stream = open(url)
-          @zip_file.get_output_stream(path) do |stream|
-            FileUtils.copy_stream(remote_stream, stream)
+          CanvasHttp.get(url) do |http_response|
+            raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+            @zip_file.get_output_stream(path) do |stream|
+              http_response.read_body(stream)
+            end
           end
 
           @resources.resource(

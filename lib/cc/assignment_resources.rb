@@ -73,7 +73,7 @@ module CC
                             "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                             "xsi:schemaLocation"=> "#{CCHelper::ASSIGNMENT_NAMESPACE} #{CCHelper::ASSIGNMENT_XSD_URI}"
         ) do |a|
-          AssignmentResources.create_cc_assignment(a, assignment, migration_id, @manifest)
+          AssignmentResources.create_cc_assignment(a, assignment, migration_id, @html_exporter, @manifest)
         end
       end
 
@@ -128,9 +128,9 @@ module CC
         "online_upload" => "file"
     }.freeze
 
-    def self.create_cc_assignment(node, assignment, migration_id, manifest = nil)
+    def self.create_cc_assignment(node, assignment, migration_id, html_exporter, manifest = nil)
       node.title(assignment.title)
-      node.text(assignment.description, texttype: 'text/html')
+      node.text(html_exporter.html_content(assignment.description), texttype: 'text/html')
       if assignment.points_possible
         node.gradable(assignment.graded?, points_possible: assignment.points_possible)
       else
