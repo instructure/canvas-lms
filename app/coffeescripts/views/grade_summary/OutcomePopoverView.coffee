@@ -3,20 +3,18 @@ define [
   'underscore'
   'Backbone'
   'compiled/util/Popover'
-], (I18n, _, Backbone, Popover) ->
-
+  'jst/outcomes/outcomePopover'
+], (I18n, _, Backbone, Popover, template) ->
   class OutcomePopoverView extends Backbone.View
     TIMEOUT_LENGTH: 50
 
     @optionProperty 'el'
     @optionProperty 'model'
-    @optionProperty 'template'
 
     events:
-      'keydown' : 'togglePopover'
-      'mouseenter': 'mouseenter'
-      'mouseleave': 'mouseleave'
-
+      'click i': 'mouseleave'
+      'mouseenter i': 'mouseenter'
+      'mouseleave i': 'mouseleave'
     inside: false
 
     initialize: ->
@@ -24,7 +22,7 @@ define [
 
     # Overrides
     render: ->
-      @template(@toJSON())
+      template(@toJSON())
 
     # Instance methods
     closePopover: (e) ->
@@ -50,18 +48,3 @@ define [
           verticalSide: 'bottom'
           manualOffset: 14
         })
-
-    togglePopover: (e) =>
-      keyPressed = @_getKey(e.keyCode)
-      if keyPressed == "spacebar"
-        @openPopover(e)
-      else if keyPressed == "escape"
-        @closePopover(e)
-
-    # Private
-    _getKey: (keycode) =>
-      keys = {
-        32 : "spacebar"
-        27 : "escape"
-      }
-      keys[keycode]

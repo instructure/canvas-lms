@@ -485,7 +485,7 @@ define [
         'mastery': 'check'
         'near': 'plus'
       }[status] or 'x'
-      Handlebars.helpers.addIcon(iconType)
+      new Handlebars.SafeString "<i aria-hidden='true' class='icon-#{htmlEscape iconType}'></i>"
 
   }
 
