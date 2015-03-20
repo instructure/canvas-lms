@@ -256,18 +256,25 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
+    return unless needs_auto_peer_reviews_scheduled?
+
     reviews_due_at = self.peer_reviews_assign_at || self.due_at
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && reviews_due_at
-      self.send_later_enqueue_args(:do_auto_peer_review, {
-        :run_at => reviews_due_at,
-        :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
-      })
-    end
-    true
+    return if reviews_due_at.blank?
+
+    self.send_later_enqueue_args(:do_auto_peer_review, {
+      :run_at => reviews_due_at,
+      :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
+    })
+  end
+
+  attr_accessor :skip_schedule_peer_reviews
+  alias_method :skip_schedule_peer_reviews?, :skip_schedule_peer_reviews
+  def needs_auto_peer_reviews_scheduled?
+    !skip_schedule_peer_reviews? && peer_reviews? && automatic_peer_reviews? && !peer_reviews_assigned?
   end
 
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && overdue?
+    assign_peer_reviews if needs_auto_peer_reviews_scheduled? && overdue?
   end
 
   def touch_assignment_group

@@ -169,7 +169,19 @@ module Importers
       end
 
       migration.add_imported_item(item) if migration
+
+      if migration && migration.date_shift_options
+        # Unfortunately, we save the assignment here, and then shift dates and
+        # save the assignment again later in the course migration. Saving here
+        # would normally schedule the auto peer reviews job with the
+        # pre-shifted due date, which is probably in the past. After shifting
+        # dates, it is saved again, but because the job is stranded, and
+        # because the new date is probably later than the old date, the new job
+        # is not scheduled, even though that's the date we want.
+        item.skip_schedule_peer_reviews = true
+      end
       item.save_without_broadcasting!
+      item.skip_schedule_peer_reviews = nil
 
       if migration
         missing_links.each do |field, missing_links|
