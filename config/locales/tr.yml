@@ -79,8 +79,8 @@ tr:
       delicious: Delicious
       diigo: Diigo
       facebook: Facebook
-      google_docs: "Google Drive"
-      google_docs_preview: "Google Drive Önizlemesi"
+      google_docs: "Google Docs"
+      google_docs_preview: "Google Docs Önizlemesi"
       google_drive: "Google Drive"
       linked_in: LinkedIn
       skype: Skype
@@ -833,7 +833,7 @@ tr:
             field: "Bölüm Numarası"
     settings: 
       about_google_docs: |-
-          Google Drive Önizleme kullanıcıların dosyaları indirip ilgili 
+          Google Docs Önizleme kullanıcıların dosyaları indirip ilgili 
           programlarda (Word veya Excel gibi) açmaları yerine Canvas
           içinde bu belgelerin izlenmesini sağlar.
           
@@ -841,10 +841,10 @@ tr:
           bunu kullanmaya çalılşacaktır. Belgenin Scribd'de önizlemesi
           yapılamazsa veya kullanıcının cihazında Flash oynatıcı yoksa
           (Ipad/Iphone gibi), etkinleştirilmiş olması şartıyla Canvas Google
-          Drive Önizlemesini kullanacaktır. Bu hizmeti kullanarak buradaki
-          [Google Drive Viewer Terms of Service](%{terms_url}) kullanım
+          Docs Önizlemesini kullanacaktır. Bu hizmeti kullanarak buradaki
+          [Google Docs Viewer Terms of Service](%{terms_url}) kullanım
           sözleşmesini okuyup kabul etmiş sayılırsınız.
-      about_google_docs_tooltip: "Google Drive Önizlemeleri Hakkında"
+      about_google_docs_tooltip: "Google Docs Önizlemeleri Hakkında"
       account_admins_title: "Hesap Yöneticileri"
       account_quotas: 
         file_quota: "Dosya Limiti"
@@ -1774,7 +1774,7 @@ tr:
     errors: 
       add_group_failed: "Grup Eklemede Hata"
       delete_reminder_failed: "Silme işlemi başarısız"
-      google_docs_masquerade_rejected: "Google Drive'a gizli kullanıcı olarak bağlanılamadı."
+      google_docs_masquerade_rejected: "Google Docs'a gizli kullanıcı olarak bağlanılamadı."
       reminder_failed: "Hatırlatıcı başarısız oldu"
     everyone_else: "Geri kalan herkes"
     external_content_homework_file_submission_view: 
@@ -2070,7 +2070,7 @@ tr:
       comments_placeholder: Yorumlar...
       errors: 
         unacceptable_file_type: "Bu dosya türüne izin verilmez. Kabul edilen dosya türleri: %{allowed_extensions_list}"
-      gmail_restriction_description: "Hesabınız Goole Doc gönderilerini %{domain} alan adındaki Google hesaplarıyla sınırladı. Bu ödevi Google doc üzerinden göndermek için kendi ayarlar sayfanızdaki Google entegrasyonunu yeniden yapılandırmanız gerekecek."
+      gmail_restriction_description: "Hesabınız Goole Doc gönderilerini %{domain} alan adındaki Google hesaplarıyla sınırladı. Bu ödevi Google Doc üzerinden göndermek için kendi ayarlar sayfanızdaki Google entegrasyonunu yeniden yapılandırmanız gerekecek."
       instructions: 
         from_external_tool: "Bu araç tarafından sağlanan bir kaynak yüklemek ve göndermek için aşağıdaki listeden bir araç seçin."
         google_docs: "Aşağıdaki listeden dosya seçin."
@@ -2083,7 +2083,7 @@ tr:
         url: "Web Sayfası URL"
       links: 
         add_another_file: "Başka Bir Dosya Ekle"
-        authorize_google_docs: "Google Drive Erişimine İzin ver"
+        authorize_google_docs: "Google Docs Erişimine İzin ver"
         authorize_google_drive: "Google Drive Erişimine İzin Ver"
         find_file: "Önceden yüklenmiş olan bir dosyayı bulmak için buraya tıklayın"
         submit: 
@@ -2095,7 +2095,7 @@ tr:
           website: "Web Sayfası URL"
       loading_tools: "Araçlar yükleniyor..."
       messages: 
-        google_docs_auth_required: "Google Drive dan ödev göndermeden önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
+        google_docs_auth_required: "Google Drive dan ödev göndermeden önce Canvas'ın Google Docs hesabınıza erişimine izin vermelisiniz:"
         google_drives_auth_required: "Google Drive'dan doğrudan ödev göndermeden önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
         media_recording_ready: "Gönderime Hazır! Tamamlamak için  'Ödevi Gönder' düğmesine tıklayınız."
         media_recordings_disabled: "Bu Canvas sitesinde ortam dosyası kaydı etkinleştirilmediği için bu tür ödev dosyalarını gönderemezseniz. Bu ödev ayarlarının değiştirilip ortam dosyalarının kaydının etkinleştirilmesi için lütfen öğretim elemanı ya da sistem yönetici ile iletişime geçin."
@@ -2307,7 +2307,7 @@ tr:
   buttons: 
     add_item: "Öğe Ekle"
     apply: Uygula
-    authorize_google_docs: "Google Drive Erişimine İzin Ver"
+    authorize_google_docs: "Google Docs Erişimine İzin Ver"
     authorize_google_drive: "Google Drive Erişimine İzin Verin"
     back_to_outcomes: "Çıktılara Geri Dön"
     cancel: İptal
@@ -2918,39 +2918,39 @@ tr:
             Canvas'tan Sil
         delete_from_google_docs: |-
             Ayrıca Google  
-            Drive'dan da Sil
+            Docs'dan da Sil
         start_collaborating: "İşbirliğini Başlat"
         update: "İşbirliğini Güncelle"
       collaboration_name: "%{course_or_group_name} İşbirliği"
       descriptions: 
         etherpad: |-
-            EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Drive'a göre daha uygun olabilir.  
+            EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Docs'a göre daha uygun olabilir.  
               
             **Uyarı**: çalışmanızın kaydedilmiş olarak saklandığına emin olmak için [EtherPad silme politikası](%{etherpad_deletion_policy_url}) ile ilgili bilginiz olmalı.
-        google_docs: "Google Drive grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz. \n\n\n\
-            **Uyarı**: Google Drive da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
+        google_docs: "Google Docs grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz. \n\n\n\
+            **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
       labels: 
         collaboration_type: "Şunu kullanarak işbirliği yap:"
         description: Açıklama
         document_name: "Belge Adı:"
       messages: 
-        delete_google_doc_as_well: "Bu işbirliği çalışması Google Drive belgesi olarak kaydediliyor. Bu belgenin sadece Canvas'tan mı yoksa Google Drive'dan da mı silinmesini istediniz?"
+        delete_google_doc_as_well: "Bu işbirliği çalışması Google Doc belgesi olarak kaydediliyor. Bu belgenin sadece Canvas'tan mı yoksa Google Docs'dan da mı silinmesini istediniz?"
       titles: 
         new: "Yeni Bir İşbirliği Başlat"
     index: 
       description_rs: |-
-          [Google Drive](%{google_url}) ve [EtherPad](%{etherpad_url}) gibi çevrimiçi ücretsiz araçlar, grup projeleri veya ödevler ve ortak notlar oluşturmak ve benzeri etkinlikler için uygun ortamlardır.
+          [Google Docs](%{google_url}) ve [EtherPad](%{etherpad_url}) gibi çevrimiçi ücretsiz araçlar, grup projeleri veya ödevler ve ortak notlar oluşturmak ve benzeri etkinlikler için uygun ortamlardır.
           Öğretmen *veya* öğrenciler gruplar için işbirliği ortamları oluşturabilirler.
       description_student: |-
           **İşbirliği ile neyi kastediyoruz?**  Paylaşılan bir belge üzerinde birlikte çalışmak
           için Web tabanlı araçları kastediyoruz. Grup yayınları veya not tutma gibi
-          etkinliklerde işbirliği halinde çalışmak için [Google Drive](%{google_url}) ve
+          etkinliklerde işbirliği halinde çalışmak için [Google Docs](%{google_url}) ve
           [EtherPad](%{etherpad_url}) gibi kaynakları kullanabilirsiniz. Bu sayfada
           bu işbirliklerinin takibini kolayca yapabilir ve eposta adreslerini alma ile
           uğraşmadan bu kaynakları oluşturabilirsiniz.
       description_teacher: |-
           **İşbirliği ile neyi kastediyoruz?**  Öğrencilerinizin büyük ihtimalle zaten bildiği
-           Web tabanlı araçları kastediyoruz. Öğrenciler, [Google Drive](%{google_url})
+           Web tabanlı araçları kastediyoruz. Öğrenciler, [Google Docs](%{google_url})
           ve [EtherPad](%{etherpad_url}) gibi kaynakları grup yayınları
           veya not tutma gibi etkinliklerde işbirliği halinde çalışmak için kullanabilirler. 
           Bu sayfada öğrenciler (ve siz) bu işbirliklerinin takibini kolayca yapabilir ve eposta 
@@ -7482,7 +7482,7 @@ tr:
   installed_7b284a91: Yüklü
   installed_by_admin_97c3a721: "Yönetici Tarafından Yüklendi"
   instructions: 
-    authorize_google_docs: "Belgeler üzerinde işbirliği içinde çalışmadan önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
+    authorize_google_docs: "Belgeler üzerinde işbirliği içinde çalışmadan önce Canvas'ın Google Docs hesabınıza erişimine izin vermelisiniz:"
     authorize_google_drive: "Belgeler üzerinde işbirliği halinde çalışmadan önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
   instructors_4b491a07: eğitmenler
   instructure: 
@@ -10708,8 +10708,8 @@ tr:
         disable_ssl: "SSL Devre Dışı"
         secret: "App Secret"
     google_docs: 
-      description: "Google Drive belge paylaşımı"
-      name: "Goolgle Drive"
+      description: "Google Docs belge paylaşımı"
+      name: "Goolgle Docs"
     google_docs_settings: 
       description: |-
           [Google üzerine alan adınızı kayıt ettirmeniz](%{google_url}) gerekmektedir.
@@ -11037,7 +11037,7 @@ tr:
       approved_integrations: "Bunlar, Canvas'ın sizin adınıza erişimine izin verdiğiniz üçüncü şahıs uygulamalardır:"
       buttons: 
         add_picture_file: "Dosya Ekle"
-        authorize_google_docs: "Google Drive Erişimine İzin Ver"
+        authorize_google_docs: "Google Docs Erişimine İzin Ver"
         authorize_google_drive: "Google Drive Erişimine İzin Ver"
         authorize_twitter: "Twitter Erişimine İzin ver"
         generate_token: "Token Üret"
@@ -11065,7 +11065,7 @@ tr:
           uygulamalara izin verirler. Bu token'lar normalde ihtiyaç oldukça uygulamalar
           için otomatik oluşturulurlar fakat [yeni ya da sınırlı bir proje 
           geliştiriyorsanız](%{documentation_url}) buradan token oluşturabilirsiniz.
-      google_docs_description: "Google Drive'ınıza erişime izin verdikten sonra ödevlerinizi doğrudan Google Drive'dan gönderebilecek ve sınıfınızdaki katılımcılar ile belge oluşturup paylaşabileceksiniz."
+      google_docs_description: "Google Docs'ınıza erişime izin verdikten sonra ödevlerinizi doğrudan Google Docs'dan gönderebilecek ve sınıfınızdaki katılımcılar ile belge oluşturup paylaşabileceksiniz."
       google_drive_description: "Google Drive ınızı görmemize yetki verdiğinizde ödevlerinizi doğrudan Google Drive'dan gönderebilecek ve sınıflarınızdaki arkadaşlarınızla belgeler oluşturup paylaşabieceksiniz."
       headers: 
         application_abbrev: Uygulama
@@ -11074,7 +11074,7 @@ tr:
         diigo_login: "Diigo Girişi"
         facebook_access: "Facebook Erişimi"
         generate_access_token: "Erişim Token'ı Üret"
-        google_docs_access: "Google Drive Erişimi"
+        google_docs_access: "Google Docs Erişimi"
         google_drive_access: "Google Drive Erişimi"
         inbox_opt_out: "Sohbet Gelen Kutusundan Ayrıl"
         linkedin_access: "LinkedIn Erişimi"
@@ -11135,7 +11135,7 @@ tr:
         disable_mfa: "Çoklu Kimlik Doğrulamayı Pasifleştir"
         edit_settings: "Ayarları Düzenle"
         facebook: Facebook
-        google_docs: "Google Drive"
+        google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "daha fazla seçenek"
@@ -11158,7 +11158,7 @@ tr:
       titles: 
         access_token_details: "Token Erişim Ayrıntıları"
         authorize_facebook: "Facebook'a İzin Ver"
-        authorize_google_docs: "Google Drive'a İzin Ver"
+        authorize_google_docs: "Google Docs'a İzin Ver"
         authorize_google_drive: "Google Drive'a İzin Ver"
         authorize_linkedin: "LinkedIn'e İzin Ver"
         authorize_twitter: "Twitter'a İzin Ver"
@@ -14983,7 +14983,7 @@ tr:
       delicious: "Delicious işbirlikli bağlantı paylaşım aracıdır. Daha sonra başvurmak üzere İnternette herhangi bir sayfayı etiketleyebilirsiniz. Ayrıca benzer ilgi alanlarını paylaşmak için diğer kullanıcıların Delicious hesaplarına bağlayabilirsiniz."
       diigo: "Diigo bir işbirliği linki paylaşım aracıdır. Sonradan referans olarak Internette herhangi bir sayfayı etiketleyebilirsiniz. Benzer ilgi alanlarındali linkleri paylaşmak için diğer kullanıcıların Diigo hesaplarına da linkler verebilirsiniz."
       facebook: "Facebook profilinizi listeleyerek sınıf ve gruplarda edindiğiniz arkadaşlarınızla daha kolay iletişim kurabilirsiniz."
-      google_docs: "Öğrenciler Google Drive'ı grup projelerinde işbirliği halinde çalışmak için kullanabilir. Google Drive sayesinde belgelerin, hesap tabloları ve sunuların gerçek zamanlı düzenlemesi yapılabilir."
+      google_docs: "Öğrenciler Google Docs'u grup projelerinde işbirliği halinde çalışmak için kullanabilir. Google Docs sayesinde belgelerin, hesap tabloları ve sunuların gerçek zamanlı düzenlemesi yapılabilir."
       google_drive: "Grup projelerinde işbirliği halinde çalışmak için öğrenciler Google Drive'ı kullanabilirler. Google Drive, belgelerin, elektronik tabloları ve sunumların gerçek zamanlı işbirliği ile düzenlenmesini sağlamaktadır."
       linked_in: "LinkedIn iş hayatı ağı için bir kaynaktır. Okulda kurmuş olduğunuz ilişkilerin çoğunun ilerde iş hayatında faydası olabilir."
       skype: "Skype çevrimiçi ses ve video aramaları yapabileceğiniz ücretsiz bir araçtır."
@@ -15058,8 +15058,8 @@ tr:
       user_not_teacher: "Bu kullanıcı bu dersin eğitmeni değildir"
     facebook_added: "Facebook hesabı başarıyla eklendi!"
     facebook_fail: "Facebook'a izin verme başarısız oldu."
-    google_docs_added: "Google Drive'a erişime izin verildi!"
-    google_docs_fail: "Google Drive'a izin verme başarısız oldu. Lütfen tekrar deneyin"
+    google_docs_added: "Google Docs'a erişime izin verildi!"
+    google_docs_fail: "Google Docs'a izin verme başarısız oldu. Lütfen tekrar deneyin"
     google_drive_added: "Google Drive hesabı başarılı bir şekilde eklendi!"
     google_drive_fail: "Google Drive yetkilendirmesi başarısız oldu. Lütfen tekrar deneyin"
     grades: 
