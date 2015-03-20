@@ -1,19 +1,37 @@
-<div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}" aria-label="{{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}">
+<div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}">
+  <span class="screenreader-only">
+    {{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}
+  </span>
   {{#if scoreDefined}}
     {{addMasteryIcon status}}
   {{else}}
-    <i class="icon-empty"></i>
+    <i aria-hidden="true" class="icon-empty"></i>
   {{/if}}
 </div>
 <div class="outcome-properties">
   <div class="title" data-tooltip title="{{#if hover_name}}{{hover_name}}{{/if}}">
-    <h4>{{friendly_name}}</h4>
+    <h4>
+      {{friendly_name}}
+      {{#if hover_name}}
+        <span class="screenreader-only">
+          {{ hover_name }}
+        </span>
+      {{/if}}
+    </h4>
   </div>
   <div class="description">{{{description}}}</div>
 </div>
 <div class="alignment-info">
-  <a href="#tab-outcomes/{{id}}" aria-haspopup='true' aria-owns='outcome_detail'>
+  <a href="#tab-outcomes/{{id}}" role="button" aria-haspopup='true' aria-owns='outcome_detail'>
     {{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}
   </a>
-  <i class="icon-more" aria-label="{{#t}}press spacebar for more details on this outcome{{/t}}" tabindex="0"></i>
+  <a class="more-details"
+    href="#"
+    role="button"
+    tabindex="0">
+    <i class="icon-more" role="presentation"></i>
+    <span class="screenreader-only">
+      {{#t}}click for more details on this outcome{{/t}}
+    </span>
+  </a>
 </div>

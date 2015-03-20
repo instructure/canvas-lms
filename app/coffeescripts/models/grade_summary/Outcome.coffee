@@ -1,8 +1,9 @@
 define [
+  'i18n!outcomes'
   'underscore'
   'Backbone'
   'compiled/models/grade_summary/CalculationMethodContent'
-], (_, {Model, Collection}, CalculationMethodContent) ->
+], (I18n, _, {Model, Collection}, CalculationMethodContent) ->
 
   class Outcome extends Model
     defaults:
@@ -27,6 +28,15 @@ define [
           'remedial'
       else
         'undefined'
+
+    statusTooltip: ->
+      {
+        'undefined': I18n.t('Unstarted')
+        'remedial': I18n.t('Well Below Mastery')
+        'near': I18n.t('Near Mastery')
+        'mastery': I18n.t('Meets Mastery')
+        'exceeds': I18n.t('Exceeds Mastery')
+      }[@status()]
 
     roundedScore: ->
       score = @get('score')
@@ -53,6 +63,7 @@ define [
     toJSON: ->
       _.extend super,
         status: @status()
+        statusTooltip: @statusTooltip()
         roundedScore: @roundedScore()
         scoreDefined: @scoreDefined()
         percentProgress: @percentProgress()

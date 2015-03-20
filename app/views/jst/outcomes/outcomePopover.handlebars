@@ -1,6 +1,5 @@
-<div class="outcome-details">
-  <div class="line-graph">
-  </div>
+<div class="outcome-details{{#if dialog}}-dialog{{/if}}">
+  <div class="line-graph"></div>
   <div class="head-content" tabindex="0">
     {{#if path}}
     <div class="title">{{path}}</div>
@@ -25,6 +24,9 @@
     <div class="mastery-details pull-right" aria-hidden="true">
       {{#if scoreDefined}}
         <span>{{roundedScore}} / {{mastery_points}}</span>
+        <span class="screenreader-only">
+          {{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}
+        </span>
         {{ addMasteryIcon status }}
       {{else}}
         <span>{{#t}}No score yet{{/t}}</span>

@@ -3,24 +3,30 @@ define [
   'underscore'
   'Backbone'
   'compiled/util/Popover'
-], (I18n, _, Backbone, Popover) ->
-
+  'compiled/views/grade_summary/OutcomeLineGraphView'
+  'jst/outcomes/outcomePopover'
+], (I18n, _, Backbone, Popover, OutcomeLineGraphView, template) ->
   class OutcomePopoverView extends Backbone.View
     TIMEOUT_LENGTH: 50
 
     @optionProperty 'el'
     @optionProperty 'model'
-    @optionProperty 'template'
 
     events:
-      'keydown' : 'togglePopover'
-      'mouseenter': 'mouseenter'
-      'mouseleave': 'mouseleave'
+      'click i': 'mouseleave'
+      'mouseenter i': 'mouseenter'
+      'mouseleave i': 'mouseleave'
     inside: false
+
+    initialize: ->
+      super
+      @outcomeLineGraphView = new OutcomeLineGraphView({
+        model: @model
+      })
 
     # Overrides
     render: ->
-      @template(@toJSON())
+      template(@toJSON())
 
     # Instance methods
     closePopover: (e) ->
@@ -46,19 +52,6 @@ define [
           verticalSide: 'bottom'
           manualOffset: 14
         })
-      @trigger('outcomes:popover:open')
+      @outcomeLineGraphView.setElement(@popover.el.find("div.line-graph"))
+      @outcomeLineGraphView.render()
 
-    togglePopover: (e) =>
-      keyPressed = @_getKey(e.keyCode)
-      if keyPressed == "spacebar"
-        @openPopover(e)
-      else if keyPressed == "escape"
-        @closePopover(e)
-
-    # Private
-    _getKey: (keycode) =>
-      keys = {
-        32 : "spacebar"
-        27 : "escape"
-      }
-      keys[keycode]
