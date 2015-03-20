@@ -66,6 +66,7 @@ define([
   // ex: $.isPreviewable("application/mspowerpoint")  -> true
   //     $.isPreviewable("application/rtf", 'google') -> false
   $.isPreviewable = function(mimeType, service){
+    mimeType = mimeType.replace(/; charset=[^;]+/g, ''); // google drive returns the charset
     return $.filePreviewsEnabled() && previewableMimeTypes[mimeType] && (
       !service ||
       (!INST['disable' + $.capitalize(service) + 'Previews'] && previewableMimeTypes[mimeType][{scribd: 0, google: 1}[service]])
