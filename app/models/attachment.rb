@@ -462,14 +462,12 @@ class Attachment < ActiveRecord::Base
           s3object.delete rescue nil
           self.root_attachment = existing_attachment
           write_attribute(:filename, nil)
-          clear_cached_urls
         else
           # it looks like we had a duplicate, but the existing attachment doesn't
           # actually have an s3object (probably from an earlier bug). update it
           # and all its inheritors to inherit instead from this attachment.
           existing_attachment.root_attachment = self
           existing_attachment.write_attribute(:filename, nil)
-          existing_attachment.clear_cached_urls
           existing_attachment.save!
           Attachment.where(root_attachment_id: existing_attachment).update_all(
             root_attachment_id: self,
@@ -868,42 +866,33 @@ class Attachment < ActiveRecord::Base
     h.number_to_human_size(self.size) rescue "size unknown"
   end
 
-  def clear_cached_urls
-    Rails.cache.delete(['cacheable_s3_urls', self].cache_key)
+  def download_url
+    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "attachment; " + disposition_filename)
   end
 
-  def cacheable_s3_download_url
-    cacheable_s3_urls['attachment']
+  def inline_url
+    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "inline; " + disposition_filename)
   end
 
-  def cacheable_s3_inline_url
-    cacheable_s3_urls['inline']
+  def url_ttl
+    Setting.get('attachment_url_ttl', 1.day.to_s).to_i
   end
+  protected :url_ttl
 
-  def cacheable_s3_urls
-    self.shard.activate do
-      Rails.cache.fetch(['cacheable_s3_urls', self].cache_key, :expires_in => 24.hours) do
-        ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
+  def disposition_filename
+    ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
 
-        # response-content-disposition will be url encoded in the depths of
-        # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
-        # quote the filename string, though.
-        quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
+    # response-content-disposition will be url encoded in the depths of
+    # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
+    # quote the filename string, though.
+    quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
 
-        # awesome browsers will use the filename* and get the proper unicode filename,
-        # everyone else will get the sanitized ascii version of the filename
-        quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
-        filename = %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
-
-        # we need to have versions of the url for each content-disposition
-        {
-          'inline' => authenticated_s3_url(:expires => 6.days, :response_content_disposition => "inline; " + filename),
-          'attachment' => authenticated_s3_url(:expires => 6.days, :response_content_disposition => "attachment; " + filename)
-        }
-      end
-    end
+    # awesome browsers will use the filename* and get the proper unicode filename,
+    # everyone else will get the sanitized ascii version of the filename
+    quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
+    %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
   end
-  protected :cacheable_s3_urls
+  protected :disposition_filename
 
   def attachment_path_id
     a = (self.respond_to?(:root_attachment) && self.root_attachment) || self
