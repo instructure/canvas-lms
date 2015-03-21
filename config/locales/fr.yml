@@ -1258,6 +1258,7 @@ fr:
           zero_activity: 
             text: "Ce rapport montre tous les étudiants inscrits à un cours d’un trimestre donné. Le fichier CSV résultant contient une ligne par inscription d’utilisateurs qui n’ont pas consulté le cours depuis la date indiquée."
   achieve_mastery_count_times_8c9bbcec: "Parvenir à la maîtrise %{count} fois "
+  actions_efcde10d: Actions
   activerecord: 
     errors: 
       messages: 
@@ -4817,6 +4818,11 @@ fr:
     assignments_expand: 
       one: "Développer %{count} notification de travail"
       other: "Développer %{count} notifications de travail"
+    confirm: 
+      close: |-
+          Voulez-vous vraiment mettre fin à cette conférence ?
+          
+          Vous ne pourrez plus la rouvrir.
     conversations_collapse: 
       one: "Réduire %{count} message de conversation"
       other: "Réduire %{count} messages de conversation"
@@ -4950,6 +4956,7 @@ fr:
   delete_a6efa79d: Supprimer
   delete_grading_period_dba36e59: "Supprimer la période de notation"
   delete_grading_scheme_6b308832: "Supprimer le système de notation"
+  delete_my_account_41060aad: "Supprimer mon compte"
   delete_quiz_142b8099: "Supprimer le questionnaire"
   delete_survey_56fddbbd: "Supprimer l’enquête"
   delete_tool_app_9c9f6d35: "Supprimer l’application %{tool} ?"
@@ -5487,6 +5494,7 @@ fr:
   element_option_missing_error_an_element_to_attach__be433478: "Erreur – option `élément` manquante : un élément auquel associer TreeBrowserView doit être spécifié lorsque l’option de rendu a la valeur « true » pour BBTreeBrowserView."
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: E-mail
   email_is_invalid_e0d982eb: "E-mail non valide !"
   ember_modules_description: "Modules réécrits dans Ember. L’API glisser-déposer native est utilisée, ce qui permet de faire glisser des éléments depuis des emplacements externes."
   enable_6f5d1328: Activer
@@ -7709,6 +7717,7 @@ fr:
     help: Aide
     show_me_where: "Me montrer où"
   links_14b70841: Liens
+  loading_25990131: Chargement...
   locales: 
     fr: Français
   lock_after_date_92f9149: "Verrouiller après la date"
@@ -8554,6 +8563,7 @@ fr:
         details: "Pour terminer le processus d’enregistrement, consultez l’URL suivante :"
         html: 
           body: "Merci de vous être enregistré pour %{product_name} ! Cet e-mail confirme que l’utilisateur %{user} crée un nouveau compte sur %{website}. "
+          link: "Cliquez ici pour terminer l’enregistrement"
           subject: "Confirmer l’enregistrement : %{product_name}"
         subject: "Confirmer l’enregistrement : %{product_name}"
     confirm_sms_communication_channel: 
@@ -9945,6 +9955,7 @@ fr:
   new_account_role_6e5c4964: "Nouveau rôle de compte"
   new_course_role_6a7bb75f: "Nouveau rôle de cours"
   new_facebook_message: "Vous avez un nouveau message de Canvas"
+  new_file_135ae520: "[ Nouveau fichier ]"
   new_outcome_7fba8c7d: "Nouveau résultat"
   new_quiz_statistics_desc: "Activez la nouvelle page de statistiques de questionnaire pour un cours."
   new_styles_description: |-
@@ -10340,6 +10351,7 @@ fr:
     missing_outcome: "Impossible de trouver ce résultat d’apprentissage"
     new_outcome_group: "Nouveau groupe de résultats"
     outcome: 
+      example: "Exemple :"
       links: 
         delete_outcome: "Supprimer le résultat"
         edit_outcome: "Modifier le résultat"
@@ -10351,11 +10363,13 @@ fr:
       use_for_scoring: "Utiliser ce critère pour la notation"
     outcome_criterion: "Critère de résultat d’apprentissage"
     outcome_form: 
+      calculation_method: "Méthode de calcul"
       criterion: "Notes du critère"
       criterion_dialog: "Les résultats de l’apprentissage peuvent être ajoutés aux barèmes des tâches afin d’évaluer aisément la maîtrise des résultats basée sur des tâches spécifiques. Lorsque vous définissez un résultat d’apprentissage, vous devez également spécifier un critère à utiliser lors de la création des barèmes des tâches. Définissez autant de colonnes de barème que nécessaires, puis spécifiez un niveau qui permettra de définir la maîtrise de ce résultat."
       criterion_info_link: "Cliquez pour en savoir plus sur les notations des critères"
       description: "Décrire ce résultat"
       display_name: "Pseudonyme (facultatif)"
+      example: "Exemple :"
       mastery: "Progression à"
       points: "%{points_possible} points"
       title: "Attribuer un nom à ce résultat"
@@ -10367,6 +10381,9 @@ fr:
     outcome_group_form: 
       group_description: "Décrire ce groupe"
       title: "Attribuer un nom à ce groupe"
+    outcome_popover: 
+      mastery_set_at: "Niveau de maîtrise"
+      no_results: "(pas de résultats)"
     outcome_result: 
       all_outcomes: "tous les résultats de cet étudiant"
       attempt_info: "tentative #%{attempt_number}, %{attempt_date}"
@@ -13237,6 +13254,7 @@ fr:
       add_item_to_module: "Ajouter un élément au module"
       find_links_using_service: "Chercher des liens à l’aide de %{service}"
   select_navigation_links_68e1e924: "Sélectionner des liens de navigation"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Sélectionnez le fichier que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau fichier »."
   selected_answer: "Vous avez sélectionné cette réponse."
   selected_subtree_a7693937: "%{subtree} sélectionné"
   self_enrollments: 
@@ -13474,12 +13492,16 @@ fr:
     event_list: 
       at_least_more_events: "au moins %{count_of_events} supplémentaires"
       at_least_more_events_one_week: "au moins %{count_of_events} en plus la semaine dernière "
+      at_least_more_events_one_week_future: "au moins %{count_of_events} supplémentaires dans la semaine à venir"
       at_least_more_events_two_weeks: "au moins %{count_of_events} en plus la dernière quinzaine"
+      at_least_more_events_two_weeks_future: "au moins %{count_of_events} supplémentaires dans les deux semaines à venir"
       links: 
         view_calendar: "Afficher le calendrier"
       more_events: "%{count_of_events} supplémentaires"
       more_events_one_week: "%{count_of_events} en plus la semaine passée"
+      more_events_one_week_future: "%{count_of_events} supplémentaires dans la semaine à venir"
       more_events_two_weeks: "%{count_of_events} en plus la dernière quinzaine"
+      more_events_two_weeks_future: "%{count_of_events} supplémentaires dans les deux semaines à venir"
       nothing_for_now: "Rien pour l’instant"
       nothing_one_week: "Rien pour la semaine prochaine"
       nothing_two_weeks: "Rien pour les deux semaines prochaines"
@@ -14325,6 +14347,7 @@ fr:
     submission_download: 
       download_message: "**Les envois de l’étudiant sont réunis** et compressés dans un fichier zip. L’opération peut prendre plus ou moins de temps en fonction de la taille et du nombre d’envois."
       gathering_files: "Collecte des fichiers..."
+  submissions_11e96106: Devoirs
   submit_a3cc6859: Envoyer
   submitted_datetime_fa2e9287: "Envoyé : %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Déplacement réussi de %{model} dans %{newGroup}"
@@ -14337,6 +14360,7 @@ fr:
       two_words_connector: " et "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Interagissez avec les autres et demandez-leur de l’aide."
       community_support_forums: "Forums d’assistance de la communauté"
       contact_support: "Contacter l’assistance technique"
       contact_support_sub_text: "Obtenir de l’aide pour les problèmes urgents"
@@ -14720,6 +14744,7 @@ fr:
   unlock_date_cannot_be_before_section_start_793ddc66: "La date du déverrouillage ne peut pas se situer avant le début de la section"
   unlock_date_cannot_be_before_term_start_d3c01813: "La date du déverrouillage ne peut pas se situer avant le début du trimestre"
   unpublished_courses_title: "Cours non publiés"
+  unstarted_932f2990: "Non commencé"
   unsupported_package: "Package de contenu non pris en charge"
   until_date_949017c4: "Jusqu’au %{date}"
   untitled_assignment_59354b34: "travail sans titre"
