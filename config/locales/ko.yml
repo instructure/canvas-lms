@@ -1040,6 +1040,7 @@ ko:
         default: 
           zero_activity: 
             text: "이 보고서는 주어진 학기의 과목에 등록된 사용자를 모두 표시합니다. 결과 CSV 파일은 해당 날짜 이후에 과목을 방문하지 않은 사용자 등록 당 하나의 행을 가지고 있습니다."
+  actions_efcde10d: 작업
   activerecord: 
     errors: 
       messages: 
@@ -4228,6 +4229,11 @@ ko:
     assignments_expand: 
       one: "과제 공지 %{count}개 확장"
       other: "과제 공지 %{count}개 확장"
+    confirm: 
+      close: |-
+          이 회의를 마치시겠습니까?
+          
+          다시 열 수 없습니다.
     conversations_collapse: 
       one: "대화 메시지 %{count}개 축소"
       other: "대화 메시지 %{count}개 축소"
@@ -4355,6 +4361,7 @@ ko:
   default_question_text: "질문 텍스트"
   delete_a6efa79d: 삭제
   delete_grading_scheme_6b308832: "평가 구성표 삭제"
+  delete_my_account_41060aad: "내 계정 삭제"
   delete_quiz_142b8099: "퀴즈 삭제"
   delete_survey_56fddbbd: "설문 삭제"
   demos: 
@@ -4761,6 +4768,7 @@ ko:
   either_the_url_or_domain_should_be_set_c29cf8c1: "url이나 도메인을 설정해야 합니다."
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: 이메일
   enable_6f5d1328: 사용
   end_date_e0093ed7: "끝 날짜"
   enrollment: 
@@ -6676,6 +6684,7 @@ ko:
     help: 도움말
     show_me_where: "위치 표시"
   links_14b70841: 링크
+  loading_25990131: "로드하는 중..."
   locales: 
     ko: "한국말 (crowd-sourced)"
   lock_date_cannot_be_before_due_date_ac30f54: "잠금 해제 날짜는 기한 이전일 수 없음"
@@ -7463,6 +7472,8 @@ ko:
     confirm_registration: 
       email: 
         details: "등록 과정을 마치려면 다음 URL을 방문하십시오:"
+        html: 
+          link: "등록 과정을 마치려면 여기를 클릭"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -8743,6 +8754,7 @@ ko:
   name_3806192d: "이름:"
   name_only_5f56718e: 이름만
   new_facebook_message: "Canvas에서 온 새로운 메시지가 있음"
+  new_file_135ae520: "[ 새 파일 ]"
   new_outcome_7fba8c7d: "새 성과"
   next_40e12421: 다음
   next_steps_ce0f0d0c: "다음 단계"
@@ -9048,6 +9060,7 @@ ko:
     missing_outcome: "해당 학습 성과를 찾을 수 없음"
     new_outcome_group: "새 성과 그룹"
     outcome: 
+      example: "예:"
       links: 
         delete_outcome: "성과 삭제"
         edit_outcome: "성과 편집"
@@ -9063,6 +9076,7 @@ ko:
       criterion_dialog: "특정 과제에 정렬된 성과 숙달도를 평가하는 손쉬운 방법으로 학습 성과를 과제 루브릭에 포함할 수 있습니다. 학습 성과를 정의할 때 과제 루브릭을 작성할 때 사용하는 기준도 정의해야 합니다. 필요한 만큼의 루브릭 열을 정의하고 이 성과의 숙달도를 정의하는 데 사용하는 점수 임계값을 지정하십시오."
       criterion_info_link: "기준 등급에 대해서 알아보려면 클릭"
       description: "이 성과의 설명"
+      example: "예:"
       mastery: "숙달 점수"
       points: "%{points_possible}점"
       title: "성과 이름"
@@ -11553,9 +11567,13 @@ ko:
           email: "이메일 (선택 사항)"
     event_list: 
       at_least_more_events: "최소 %{count_of_events}건 이상"
+      at_least_more_events_one_week_future: "다음 주에 최소 %{count_of_events}건 이상"
+      at_least_more_events_two_weeks_future: "다음 두 주에 최소 %{count_of_events}건 이상"
       links: 
         view_calendar: "달력 보기"
       more_events: "%{count_of_events}건 이상"
+      more_events_one_week_future: "다음 주에 %{count_of_events}건 이상"
+      more_events_two_weeks_future: "다음 두 주에 %{count_of_events}건 이상"
       nothing_for_now: "현재 없음"
       nothing_one_week: "다음 주까지 없음"
       nothing_two_weeks: "다음 두 주까지 없음"
@@ -12291,6 +12309,7 @@ ko:
     submission_download: 
       download_message: "**학생 제출물을 수집해서** ZIP 파일로 압축합니다. 이 작업은 제출물 파일의 크기와 수에 따라 다소 시간이 걸릴 수도 있습니다."
       gathering_files: "파일 수집 중..."
+  submissions_11e96106: 제출물
   submit_a3cc6859: 제출
   support: 
     array: 
@@ -12301,6 +12320,7 @@ ko:
       two_words_connector: " 와(과) "
       words_connector: ", "
     help_menu: 
+      community_support_description: "동료와 교류하고 도움을 받을 수 있습니다."
       community_support_forums: "커뮤니티 사용자 지원 포럼"
       contact_support: "지원팀에 문의"
       contact_support_sub_text: "시간이 중요한 이슈에 대해 지원을 받습니다."
