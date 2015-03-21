@@ -1260,6 +1260,7 @@ en-AU:
           zero_activity: 
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
   achieve_mastery_count_times_8c9bbcec: "Achieve mastery %{count} times"
+  actions_efcde10d: Actions
   activerecord: 
     errors: 
       messages: 
@@ -4827,6 +4828,11 @@ en-AU:
     assignments_expand: 
       one: "Expand %{count} assignment notifications"
       other: "Expand %{count} assignment notifications"
+    confirm: 
+      close: |-
+          Are you sure you want to end this conference?
+          
+          You will not be able to reopen it.
     conversations_collapse: 
       one: "Collapse %{count} conversation messages"
       other: "Collapse %{count} conversation messages"
@@ -4960,6 +4966,7 @@ en-AU:
   delete_a6efa79d: Delete
   delete_grading_period_dba36e59: "Delete grading period"
   delete_grading_scheme_6b308832: "Delete Grading Scheme"
+  delete_my_account_41060aad: "Delete My Account"
   delete_quiz_142b8099: "Delete Quiz"
   delete_survey_56fddbbd: "Delete Survey"
   delete_tool_app_9c9f6d35: "Delete %{tool} App?"
@@ -5497,6 +5504,7 @@ en-AU:
   element_option_missing_error_an_element_to_attach__be433478: "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: email
   email_is_invalid_e0d982eb: "Email is invalid!"
   ember_modules_description: "Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations."
   enable_6f5d1328: Enable
@@ -7737,6 +7745,7 @@ en-AU:
     help: Help
     show_me_where: "Show Me Where"
   links_14b70841: Links
+  loading_25990131: Loading...
   locales: 
     en-AU: "English (Australia)"
   lock_after_date_92f9149: "Lock After Date"
@@ -8582,6 +8591,7 @@ en-AU:
         details: "To finish the registration process, please visit the following url:"
         html: 
           body: "Thank you for registering with %{product_name}! This email is confirmation that the user %{user} is registering for a new account at %{website}."
+          link: "Click here to finish the registration process"
           subject: "Confirm Registration: %{product_name}"
         subject: "Confirm Registration: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9979,6 +9989,7 @@ en-AU:
   new_account_role_6e5c4964: "New Account Role"
   new_course_role_6a7bb75f: "New Course Role"
   new_facebook_message: "You have a new message from Canvas"
+  new_file_135ae520: "[ New File ]"
   new_outcome_7fba8c7d: "New Outcome"
   new_quiz_statistics_desc: "Enable the new quiz statistics page for a course."
   new_styles_description: |-
@@ -10374,6 +10385,7 @@ en-AU:
     missing_outcome: "Couldn't find that learning outcome"
     new_outcome_group: "New Outcome Group"
     outcome: 
+      example: "Example:"
       links: 
         delete_outcome: "Delete Outcome"
         edit_outcome: "Edit Outcome"
@@ -10385,11 +10397,13 @@ en-AU:
       use_for_scoring: "Use this criterion for scoring"
     outcome_criterion: "Learning Outcome Criterion"
     outcome_form: 
+      calculation_method: "Calculation Method"
       criterion: "Criterion ratings"
       criterion_dialog: "Learning outcomes can be included in assignment rubrics as an easy way to assess mastery of outcomes aligned to specific assignments. When you define a learning outcome, you should also define a criterion that can be used when building assignment rubrics. Define as many rubric columns as you need, and specify a point threshold that will be used to define mastery of this outcome."
       criterion_info_link: "Click to learn about criterion ratings"
       description: "Describe this outcome"
       display_name: "Friendly name (optional)"
+      example: "Example:"
       mastery: "Mastery at"
       points: "%{points_possible} Points"
       title: "Name this outcome"
@@ -10401,6 +10415,9 @@ en-AU:
     outcome_group_form: 
       group_description: "Describe this group"
       title: "Name this group"
+    outcome_popover: 
+      mastery_set_at: "Mastery set at"
+      no_results: "(no results)"
     outcome_result: 
       all_outcomes: "all outcome results for this student"
       attempt_info: "attempt #%{attempt_number}, %{attempt_date}"
@@ -13258,6 +13275,7 @@ en-AU:
       add_item_to_module: "Add Item to Module"
       find_links_using_service: "Find links using %{service}"
   select_navigation_links_68e1e924: "Select Navigation Links"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Select the file you want to associate, or add a file by selecting \"New File\"."
   selected_answer: "You selected this answer."
   selected_subtree_a7693937: "Selected %{subtree}"
   self_enrollments: 
@@ -13495,12 +13513,16 @@ en-AU:
     event_list: 
       at_least_more_events: "at least %{count_of_events} more"
       at_least_more_events_one_week: "at least %{count_of_events} more in the past week"
+      at_least_more_events_one_week_future: "at least %{count_of_events} more in the next week"
       at_least_more_events_two_weeks: "at least %{count_of_events} more in the past two weeks"
+      at_least_more_events_two_weeks_future: "at least %{count_of_events} more in the next two weeks"
       links: 
         view_calendar: "View Calendar"
       more_events: "%{count_of_events} more"
       more_events_one_week: "%{count_of_events} more in the past week"
+      more_events_one_week_future: "%{count_of_events} more in the next week"
       more_events_two_weeks: "%{count_of_events} more in the past two weeks"
+      more_events_two_weeks_future: "%{count_of_events} more in the next two weeks"
       nothing_for_now: "Nothing for now"
       nothing_one_week: "Nothing for the next week"
       nothing_two_weeks: "Nothing for the next two weeks"
@@ -14347,6 +14369,7 @@ en-AU:
     submission_download: 
       download_message: "**Your student submissions are being gathered** and compressed into a zip file. This may take some time, depending on the size and number of submission files."
       gathering_files: "Gathering Files..."
+  submissions_11e96106: Submissions
   submit_a3cc6859: Submit
   submitted_datetime_fa2e9287: "Submitted: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Successfully moved %{model} to %{newGroup}"
@@ -14359,6 +14382,7 @@ en-AU:
       two_words_connector: " and "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Interact with and get assistance from your peers."
       community_support_forums: "Community Support Forums"
       contact_support: "Contact Support"
       contact_support_sub_text: "Get assistance with time-sensitive issues."
@@ -14742,6 +14766,7 @@ en-AU:
   unlock_date_cannot_be_before_section_start_793ddc66: "Unlock date cannot be before section start"
   unlock_date_cannot_be_before_term_start_d3c01813: "Unlock date cannot be before term start"
   unpublished_courses_title: "Unpublished Courses"
+  unstarted_932f2990: Unstarted
   unsupported_package: "Unsupported content package"
   until_date_949017c4: "Until %{date}"
   untitled_assignment_59354b34: "untitled assignment"
