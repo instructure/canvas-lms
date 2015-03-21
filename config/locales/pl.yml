@@ -1257,6 +1257,7 @@ pl:
           zero_activity: 
             text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do jakiegokolwiek kursu w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis użytkownika, który nie odwiedził kursu od określonej daty."
   achieve_mastery_count_times_8c9bbcec: "Osiągnij biegłość %{count} razy"
+  actions_efcde10d: Akcje
   activerecord: 
     errors: 
       messages: 
@@ -4849,6 +4850,11 @@ pl:
       few: "Rozwiń %{count} powiadomienia o zadaniu"
       one: "Rozwiń %{count} powiadomienie o zadaniu"
       other: "Rozwiń %{count} powiadomień o zadaniu"
+    confirm: 
+      close: |-
+          Czy na pewno chcesz zakończyć tę konferencję?⏎
+          ⏎
+          Ponowne otworzenie konferencji nie będzie możliwe.
     conversations_collapse: 
       few: "Zwiń %{count} wiadomości w rozmowie"
       one: "Zwiń %{count} wiadomość w rozmowie"
@@ -4997,6 +5003,7 @@ pl:
   delete_a6efa79d: Usuń
   delete_grading_period_dba36e59: "Usunąć okres oceniania"
   delete_grading_scheme_6b308832: "Usuń schemat oceniania"
+  delete_my_account_41060aad: "Usuń Moje konto"
   delete_quiz_142b8099: "Usuń test"
   delete_survey_56fddbbd: "Usuń ankietę"
   delete_tool_app_9c9f6d35: "Usunąć aplikację %{tool}?"
@@ -5540,6 +5547,7 @@ pl:
   element_option_missing_error_an_element_to_attach__be433478: "Błąd braku opcji `element`: element, do którego ma być dołączony widok TreeBrowserView musi zostać określony podczas ustawiania opcji renderowania na wartość 'true' dla widoku BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: e-mail
   email_is_invalid_e0d982eb: "Adres e-mail jest nieprawidłowy!"
   ember_modules_description: "Moduły ponownie zapisane w systemie Ember. Użyto macierzystej opcji Przeciągnij i upuść API w celu przeciągania elementów z lokalizacji zewnętrznych."
   enable_6f5d1328: Uaktywnij
@@ -7793,6 +7801,7 @@ pl:
     help: Pomoc
     show_me_where: "Pokaż, gdzie"
   links_14b70841: Łącza
+  loading_25990131: "Trwa ładowanie..."
   locales: 
     pl: Polski
   lock_after_date_92f9149: "Zablokuj po dacie"
@@ -8660,6 +8669,7 @@ pl:
         details: "Aby zakończyć rejestrację, przejdź pod następujący adres URL:"
         html: 
           body: "Dziękujemy za rejestrację w %{product_name}! Ta wiadomość jest potwierdzeniem utworzenia nowego konta w witrynie %{website} przez użytkownika %{user}."
+          link: "Kliknij tutaj, aby zakończyć proces rejestracji"
           subject: "Potwierdź rejestrację: %{product_name}"
         subject: "Potwierdź rejestrację: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10061,6 +10071,7 @@ pl:
   new_account_role_6e5c4964: "Nowa rola konta"
   new_course_role_6a7bb75f: "Nowa rola kursu"
   new_facebook_message: "Masz nową wiadomość z programu Canvas"
+  new_file_135ae520: "[ Nowy plik ]"
   new_outcome_7fba8c7d: "Nowy wynik"
   new_quiz_statistics_desc: "Włącz nową stronę statystyki testu na koncie."
   new_styles_description: |-
@@ -10459,6 +10470,7 @@ pl:
     missing_outcome: "Nie można było odnaleźć wyniku nauczania"
     new_outcome_group: "Nowa grupa wyników"
     outcome: 
+      example: "Przykład:"
       links: 
         delete_outcome: "Usuń wynik"
         edit_outcome: "Edytuj wynik"
@@ -10470,11 +10482,13 @@ pl:
       use_for_scoring: "Użyj tego kryterium do przydzielania punktów"
     outcome_criterion: "Kryterium wynikowe nauczania"
     outcome_form: 
+      calculation_method: "Metoda obliczenia"
       criterion: "Punktacja dla danego kryterium"
       criterion_dialog: "W kryteriach ocen zadania można uwzględnić wyniki nauczania, dzięki czemu w łatwy sposób można ocenić wyniki dominujące dla określonych zadań. Jeśli określany jest wynik nauczania, powinno zostać również określone kryterium, które zostanie użyte do tworzenia kryteriów ocen zadania. Należy określić tyle kryteriów ocen, ile jest potrzebne oraz podać próg punktowy, który zostanie wykorzystany do określenia, czy dany wynik jest dominujący."
       criterion_info_link: "Kliknij, aby dowiedzieć się więcej o punktacji dla danego kryterium"
       description: "Opisz ten wynik"
       display_name: "Łatwa do zapamiętania nazwa (opcjonalnie)"
+      example: "Przykład:"
       mastery: "Biegłość wynosi"
       points: "%{points_possible} punkty"
       title: "Nazwij ten wynik"
@@ -10486,6 +10500,9 @@ pl:
     outcome_group_form: 
       group_description: "Opisz tę grupę"
       title: "Nazwij tę grupę"
+    outcome_popover: 
+      mastery_set_at: "Biegłość ustawiono na"
+      no_results: "(brak wyników)"
     outcome_result: 
       all_outcomes: "wszystkie wyniki dla tego uczestnika"
       attempt_info: "próba #%{attempt_number}, %{attempt_date}"
@@ -13399,6 +13416,7 @@ pl:
       add_item_to_module: "Dodaj element do modułu"
       find_links_using_service: "Znajdź łącza za pomocą %{service}"
   select_navigation_links_68e1e924: "Wybierz łącza nawigacyjne"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Wybierz plik, który chcesz powiązać lub dodaj plik, wybierając „Nowy plik”."
   selected_answer: "Zaznaczono tę odpowiedź."
   selected_subtree_a7693937: "Wybrane %{subtree}"
   self_enrollments: 
@@ -13629,12 +13647,16 @@ pl:
     event_list: 
       at_least_more_events: "jeszcze co najmniej %{count_of_events}"
       at_least_more_events_one_week: "co najmniej o %{count_of_events} więcej w ubiegłym tygodniu"
+      at_least_more_events_one_week_future: "jeszcze co najmniej %{count_of_events} w przyszłym tygodniu"
       at_least_more_events_two_weeks: "co najmniej o %{count_of_events} więcej w ubiegłych dwóch tygodniach"
+      at_least_more_events_two_weeks_future: "jeszcze co najmniej %{count_of_events} w ciągu kolejnych dwóch tygodni"
       links: 
         view_calendar: "Pokaż kalendarz"
       more_events: "jeszcze %{count_of_events}"
       more_events_one_week: "%{count_of_events} więcej w ubiegłym tygodniu"
+      more_events_one_week_future: "jeszcze %{count_of_events} w przyszłym tygodniu"
       more_events_two_weeks: "%{count_of_events} więcej w ubiegłym tygodniu"
+      more_events_two_weeks_future: "jeszcze %{count_of_events} w ciągu kolejnych dwóch tygodni"
       nothing_for_now: "Brak bieżących elementów"
       nothing_one_week: "Brak elementów w przyszłym tygodniu"
       nothing_two_weeks: "Brak elementów w ciągu kolejnych dwóch tygodni"
@@ -14489,6 +14511,7 @@ pl:
     submission_download: 
       download_message: "**Trwa zbieranie przesłanych przez użytkownika zadań**i kompresowanie ich do formatu .zip. Zależnie od wielkości i liczby przesyłanych plików może to chwilę potrwać."
       gathering_files: "Trwa zbieranie plików..."
+  submissions_11e96106: "Przesłane zadania"
   submit_a3cc6859: Prześlij
   submitted_datetime_fa2e9287: "Przesłano: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Pomyślnie przeniesiono %{model} do %{newGroup}"
@@ -14501,6 +14524,7 @@ pl:
       two_words_connector: " i "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Komunikuj się z innymi uczestnikami i pytaj ich o pomoc."
       community_support_forums: "Forum wsparcia"
       contact_support: "Skontaktuj się z działem pomocy"
       contact_support_sub_text: "Zdobądź pomoc w sprawach uwarunkowanych czasowo."
@@ -14889,6 +14913,7 @@ pl:
   unlock_date_cannot_be_before_section_start_793ddc66: "Data odblokowania nie może przypadać przed rozpoczęciem sekcji"
   unlock_date_cannot_be_before_term_start_d3c01813: "Data odblokowania nie może przypadać przed rozpoczęciem semestru"
   unpublished_courses_title: "Nieopublikowane kursy"
+  unstarted_932f2990: Nierozpoczęto
   unsupported_package: "Nieobsługiwany pakiet zawartości"
   until_date_949017c4: "Do %{date} "
   untitled_assignment_59354b34: "Zadanie bez tytułu"
