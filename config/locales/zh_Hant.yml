@@ -4794,6 +4794,11 @@ zh_Hant:
     assignments_expand: 
       one: "擴展 %{count} 個任務通知"
       other: "擴展 %{count} 個任務通知"
+    confirm: 
+      close: |-
+          是否確定要結束此次會議？
+          
+          您將無法重新將其打開。
     conversations_collapse: 
       one: "摺疊 %{count} 個交談郵件"
       other: "摺疊 %{count} 個交談郵件"
@@ -4927,6 +4932,7 @@ zh_Hant:
   delete_a6efa79d: " 刪除"
   delete_grading_period_dba36e59: 刪除評分時段
   delete_grading_scheme_6b308832: 刪除評分配置
+  delete_my_account_41060aad: 刪除我的帳戶
   delete_quiz_142b8099: 刪除測驗
   delete_survey_56fddbbd: 刪除調查
   delete_tool_app_9c9f6d35: "要刪除 %{tool} 應用程式？"
@@ -5460,6 +5466,7 @@ zh_Hant:
   either_the_url_or_domain_should_be_set_c29cf8c1: "應該設定 URL 或網域。"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: 電子郵件
   email_is_invalid_e0d982eb: 電子郵件地址無效！
   ember_modules_description: "在 Ember 中重寫的模組。使用本機拖放 API，允許從外部位置拖曳。"
   enable_6f5d1328: 啟用
@@ -7666,6 +7673,7 @@ zh_Hant:
     help: 說明
     show_me_where: 顯示在何處
   links_14b70841: 連結
+  loading_25990131: 正在載入…
   locales: 
     zh_Hant: 繁體中文
   lock_after_date_92f9149: 鎖定起始日期
@@ -8488,6 +8496,7 @@ zh_Hant:
         details: "要完成註冊程序，請瀏覽以下 URL："
         html: 
           body: "感謝您使用 %{product_name} 註冊！此電子郵件是確認使用者 %{user} 在 %{website} 上註冊新帳戶。"
+          link: 按一下此處完成註冊過程
           subject: "確認註冊：%{product_name}"
         subject: "確認註冊：%{product_name}"
     confirm_sms_communication_channel: 
@@ -9876,6 +9885,7 @@ zh_Hant:
   new_account_role_6e5c4964: 新帳戶角色
   new_course_role_6a7bb75f: 新課程角色
   new_facebook_message: "您有一個來自 Canvas 的新郵件"
+  new_file_135ae520: "[新檔案]"
   new_outcome_7fba8c7d: 新成果
   new_quiz_statistics_desc: 為一門課程啟用新測驗統計資料頁面。
   new_styles_description: "我們正在致力於一個至 Canvas 的 UI 改建。啟用該選項來選擇查看已更新、簡化的 Canvas 介面的外觀和感覺。這是一個正好在『進行中的工作』功能，尚不應該在生產中為實際使用者開啟。"
@@ -10269,6 +10279,7 @@ zh_Hant:
     missing_outcome: 找不到該學習成果
     new_outcome_group: 新成果群組
     outcome: 
+      example: 範例：
       links: 
         delete_outcome: 刪除成果
         edit_outcome: 編輯成果
@@ -10280,11 +10291,13 @@ zh_Hant:
       use_for_scoring: 使用此標準進行打分
     outcome_criterion: 學習成果標準
     outcome_form: 
+      calculation_method: 計算方法
       criterion: 標準評級
       criterion_dialog: 學習成果可以包括在任務評估準則中，以作為一種簡單的方法來評估針對特定任務的成果的掌握情況。當您定義學習成果時，您也應該定義可以在創建任務評估準則時使用的標準。根據需要定義評估準則，並指定將被用於定義此成果的掌握情況的臨界點。
       criterion_info_link: 按一下以了解標準評級
       description: 描述此成果
       display_name: 友好的名稱（可選）
+      example: 範例：
       mastery: 精通於
       points: "%{points_possible} 點"
       title: 命名此成果
@@ -10296,6 +10309,9 @@ zh_Hant:
     outcome_group_form: 
       group_description: 描述此群組
       title: 命名此群組
+    outcome_popover: 
+      mastery_set_at: 精通設定於
+      no_results: （沒有結果）
     outcome_result: 
       all_outcomes: 此學生的所有成果結果
       attempt_info: "嘗試#%{attempt_number}，%{attempt_date}"
@@ -13121,6 +13137,7 @@ zh_Hant:
       add_item_to_module: 新增項目至模組
       find_links_using_service: "尋找使用 %{service} 的連結"
   select_navigation_links_68e1e924: 選擇瀏覽連結
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: 選擇您要關聯的檔案，或選擇『新檔案』新增檔案。
   selected_answer: 您選擇了此答案。
   selected_subtree_a7693937: "已選定 %{subtree}"
   self_enrollments: 
@@ -14210,6 +14227,7 @@ zh_Hant:
       two_words_connector: 以及
       words_connector: ，
     help_menu: 
+      community_support_description: 與您的同行互動並獲得援助。
       community_support_forums: 社區支援論壇
       contact_support: 連絡支援
       contact_support_sub_text: 獲取有關時間敏感問題的援助。
@@ -14593,6 +14611,7 @@ zh_Hant:
   unlock_date_cannot_be_before_section_start_793ddc66: 解鎖日期不得早於章節開始日期
   unlock_date_cannot_be_before_term_start_d3c01813: 解鎖日期不得早於學期開始日期
   unpublished_courses_title: 未發佈的課程
+  unstarted_932f2990: 未開始
   unsupported_package: 不支援的內容封裝
   until_date_949017c4: "直到 %{date}"
   untitled_assignment_59354b34: 無標題的任務
