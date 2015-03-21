@@ -4827,6 +4827,11 @@ pt-BR:
     assignments_expand: 
       one: "Expandir %{count} notificação de tarefa"
       other: "Expandir %{count} notificações de tarefa"
+    confirm: 
+      close: |-
+          Tem certeza de que deseja encerrar esta conferência?
+          
+          Você não poderá reabri-la.
     conversations_collapse: 
       one: "Recolher %{count} mensagem de conversa"
       other: "Recolher %{count} mensagens de conversa"
@@ -4960,6 +4965,7 @@ pt-BR:
   delete_a6efa79d: Excluir
   delete_grading_period_dba36e59: "Excluir período de classificação"
   delete_grading_scheme_6b308832: "Excluir esquema de avaliação"
+  delete_my_account_41060aad: "Excluir minha conta"
   delete_quiz_142b8099: "Excluir teste"
   delete_survey_56fddbbd: "Excluir questionário"
   delete_tool_app_9c9f6d35: "Excluir %{tool} App?"
@@ -5495,6 +5501,7 @@ pt-BR:
   element_option_missing_error_an_element_to_attach__be433478: "Erro de opção `element` ausente: Um elemento para anexar o TreeBrowserView deve ser especificado ao definir a opção de renderização como 'true' para BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: email
   email_is_invalid_e0d982eb: "O email é inválido!"
   ember_modules_description: "Módulos regravados em Ember. Usa a API nativa de arrastar e soltar para permitir arrastar de locais externos."
   enable_6f5d1328: Ativar
@@ -7728,6 +7735,7 @@ pt-BR:
     help: Ajuda
     show_me_where: "Mostre-me onde"
   links_14b70841: Links
+  loading_25990131: Carregando...
   locales: 
     pt-BR: "Português do Brasil"
   lock_after_date_92f9149: "Bloquear após a data"
@@ -8579,6 +8587,7 @@ pt-BR:
         details: "Para concluir o processo de registro, acesse o seguinte url:"
         html: 
           body: "Obrigado por seu registro no %{product_name}! Esse email é uma confirmação de que o %{user} está se registrando para uma nova conta em %{website}."
+          link: "Clique aqui para finalizar o processo de registro"
           subject: "Confirmar registro: %{product_name}"
         subject: "Confirmar registro: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9978,6 +9987,7 @@ pt-BR:
   new_account_role_6e5c4964: "Função da nova conta"
   new_course_role_6a7bb75f: "Função do novo curso"
   new_facebook_message: "Você tem uma nova mensagem do Canvas"
+  new_file_135ae520: "[ Novo arquivo ]"
   new_outcome_7fba8c7d: "Novo resultado"
   new_quiz_statistics_desc: "Ativar a nova página de estatísticas do teste para um curso."
   new_styles_description: |-
@@ -10373,6 +10383,7 @@ pt-BR:
     missing_outcome: "Não foi possível localizar este resultado de aprendizado"
     new_outcome_group: "Novo grupo de resultados"
     outcome: 
+      example: "Exemplo:"
       links: 
         delete_outcome: "Excluir resultado"
         edit_outcome: "Editar resultado"
@@ -10384,11 +10395,13 @@ pt-BR:
       use_for_scoring: "Utilizar este critério para a pontuação"
     outcome_criterion: "Critério de resultado de aprendizado"
     outcome_form: 
+      calculation_method: "Método de cálculo"
       criterion: "Classificações do critério"
       criterion_dialog: "Os resultados de aprendizado podem ser incluídos em protocolos de tarefa como uma forma fácil de avaliar o domínio dos resultados alinhados a tarefas específicas. Ao definir um resultado de aprendizado, é necessário também definir um critério que possa ser usado ao criar protocolos de tarefa. Defina quantos protocolos forem necessários e especifique um limite que será usado para definir o domínio deste resultado."
       criterion_info_link: "Clicar para aprender sobre as classificações de critério"
       description: "Descrever este resultado"
       display_name: "Nome amigável (opcional)"
+      example: "Exemplo:"
       mastery: "Domínio em"
       points: "%{points_possible} pontos"
       title: "Nomear este resultado"
@@ -10400,6 +10413,9 @@ pt-BR:
     outcome_group_form: 
       group_description: "Descrever este grupo"
       title: "Nomear este grupo"
+    outcome_popover: 
+      mastery_set_at: "Domínio definido em"
+      no_results: "(sem resultados)"
     outcome_result: 
       all_outcomes: "todos resultados deste aluno"
       attempt_info: "tentativa nº %{attempt_number}, %{attempt_date}"
@@ -13273,6 +13289,7 @@ pt-BR:
       add_item_to_module: "Adicionar item ao módulo"
       find_links_using_service: "Localizar link usando %{service}"
   select_navigation_links_68e1e924: "Selecionar links de navegação"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Selecione o arquivo que você deseja associar, ou adicione um arquivo, selecionando \"Novo Arquivo\"."
   selected_answer: "Você escolheu esta resposta."
   selected_subtree_a7693937: "%{subtree} selecionada"
   self_enrollments: 
@@ -13507,12 +13524,16 @@ pt-BR:
     event_list: 
       at_least_more_events: "pelo menos mais %{count_of_events}"
       at_least_more_events_one_week: "pelo menos %{count_of_events} mais na semana passada"
+      at_least_more_events_one_week_future: "pelo menos mais %{count_of_events} na próxima semana"
       at_least_more_events_two_weeks: "pelo menos %{count_of_events} mais nas últimas duas semanas"
+      at_least_more_events_two_weeks_future: "pelo menos mais %{count_of_events} nas próximas duas semanas"
       links: 
         view_calendar: "Exibir calendário"
       more_events: "%{count_of_events} mais"
       more_events_one_week: "%{count_of_events} mais na última semana"
+      more_events_one_week_future: "%{count_of_events} mais na próxima semana"
       more_events_two_weeks: "%{count_of_events} mais nas últimas duas semanas"
+      more_events_two_weeks_future: "%{count_of_events} mais nas próximas duas semanas"
       nothing_for_now: "Nada no momento"
       nothing_one_week: "Nada na próxima semana"
       nothing_two_weeks: "Nada nas próximas duas semanas"
@@ -14357,6 +14378,7 @@ pt-BR:
     submission_download: 
       download_message: "**Os envios dos seus alunos estão sendo reunidos** e comprimidos em um arquivo zip. Isso pode levar algum tempo, dependendo do tamanho e número de arquivos enviados."
       gathering_files: "Reunindo arquivos..."
+  submissions_11e96106: Envios
   submit_a3cc6859: Enviar
   submitted_datetime_fa2e9287: "Enviado: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} movido com sucesso para %{newGroup}"
@@ -14369,6 +14391,7 @@ pt-BR:
       two_words_connector: " e "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Interaja e obtenha assistência de seus colegas."
       community_support_forums: "Fóruns de Suporte à Comunidade"
       contact_support: "Entrar em contato com o Suporte"
       contact_support_sub_text: "Obter assistência com problemas de entrega urgente"
@@ -14752,6 +14775,7 @@ pt-BR:
   unlock_date_cannot_be_before_section_start_793ddc66: "A data do desbloqueio não pode ser antes do início da sessão"
   unlock_date_cannot_be_before_term_start_d3c01813: "A data do desbloqueio não pode ser antes do inicio do período"
   unpublished_courses_title: "Cursos não publicados"
+  unstarted_932f2990: "Não iniciado"
   unsupported_package: "Pacote de conteúdo não suportado"
   until_date_949017c4: "Até %{date}"
   untitled_assignment_59354b34: "tarefa sem título"
