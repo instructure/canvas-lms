@@ -4751,6 +4751,11 @@ fa-IR:
     assignments_expand: 
       one: "باز کردن %{count} اطلاعیه تکلیف"
       other: "باز کردن %{count} اطلاعیه تکلیف"
+    confirm: 
+      close: |-
+          مطمئنید که می خواهید این کنفرانس خاتمه یابد؟
+          
+          نمی توانید آن را دوباره باز کنید.
     conversations_collapse: 
       one: "جمع کردن %{count} پیام گفتگو"
       other: "جمع کردن %{count} پیام گفتگو"
@@ -4883,6 +4888,7 @@ fa-IR:
   default_question_text: "متن پرسش"
   delete_a6efa79d: حذف
   delete_grading_scheme_6b308832: "حذف طرح نمره گذاری"
+  delete_my_account_41060aad: "حذف حساب من"
   delete_quiz_142b8099: "حذف آزمون"
   delete_survey_56fddbbd: "حذف نظرسنجی"
   delete_tool_app_9c9f6d35: "برنامه %{tool} حذف شود؟"
@@ -5401,6 +5407,7 @@ fa-IR:
   either_the_url_or_domain_should_be_set_c29cf8c1: "نشانی اینترنتی یا دامنه باید تعیین شود."
   email: 
     default_from_name: "نرم افزار کانواس شرکت Instructure"
+  email_e366fa29: "پست الکترونیکی"
   email_is_invalid_e0d982eb: "پست اکترونیکی معتبر نیست!"
   ember_modules_description: "ماژول هایی که در Ember بازنویسی شده اند. از API کشیدن و رها کردن اصلی برای فراهم کردن امکان کشیدن از محل های بیرونی استفاده می کند."
   enable_6f5d1328: "فعال سازی"
@@ -7606,6 +7613,7 @@ fa-IR:
     help: راهنما
     show_me_where: "جای آن را به من نمایش بده"
   links_14b70841: پیوندها
+  loading_25990131: "در حال بارگذاری..."
   locales: 
     fa-IR: "فارسی (crowd-sourced)"
   lock_date_cannot_be_after_course_end_a473158b: "تاریخ قفل کردن نمی تواند بعد از خاتمه درس باشد"
@@ -8440,6 +8448,7 @@ fa-IR:
         details: "برای پایان دادن به فرایند ثبت نام، لطفا از نشانی اینترنتی زیر بازدید نمایید:"
         html: 
           body: "به خاطر ثبت نام در %{product_name} از شما سپاسگزاریم! این نامه الکترونیکی مؤید آن است که کاربر %{user} برای یک حساب جدید در %{website} در حال ثبت نام است."
+          link: "برای پایان دادن به فرآیند ثبت نام، اینجا کلیک کنید"
           subject: "تأیید ثبت نام: %{product_name}"
         subject: "تأیید ثبت نام: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9827,6 +9836,7 @@ fa-IR:
   new_account_role_6e5c4964: "نقش حساب جدید"
   new_course_role_6a7bb75f: "نقش درس جدید"
   new_facebook_message: "یک پیام جدید از طرف کانواس  دارید"
+  new_file_135ae520: "[ فایل جدید ]"
   new_outcome_7fba8c7d: "نتیجه جدید"
   new_quiz_statistics_desc: "صفحه آمار آزمون جدید را برای یک درس فعال سازید."
   new_styles_description: |-
@@ -10214,6 +10224,7 @@ fa-IR:
     missing_outcome: "این نتیجه یادگیری یافت نشد"
     new_outcome_group: "گروه جدید نتیجه"
     outcome: 
+      example: "مثال:"
       links: 
         delete_outcome: "حذف نتیجه"
         edit_outcome: "ویرایش نتیجه"
@@ -10230,6 +10241,7 @@ fa-IR:
       criterion_info_link: "برای آشنایی با رتبه بندی های معیار کلیک کنید"
       description: "این نتیجه را شرح دهید"
       display_name: "نام دوستانه (انتخابی)"
+      example: "مثال:"
       mastery: "تسلط در"
       points: "%{points_possible} امتیاز"
       title: "این نتیجه را نام گذاری کنید"
@@ -10241,6 +10253,9 @@ fa-IR:
     outcome_group_form: 
       group_description: "این گروه را شرح دهید"
       title: "این گروه را نام گذاری کنید"
+    outcome_popover: 
+      mastery_set_at: "تسلط تعیین شده در"
+      no_results: "(نتیجه موجود نیست)"
     outcome_result: 
       all_outcomes: "کل حاصل نتایج مربوط به این دانشجو"
       attempt_info: "تلاش #%{attempt_number}، %{attempt_date}"
@@ -13055,6 +13070,7 @@ fa-IR:
       add_item_to_module: "افزودن مورد به ماژول"
       find_links_using_service: "یافتن پیوندها با استفاده از %{service}"
   select_navigation_links_68e1e924: "انتخاب پیوندهای پیمایش"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "فایلی که می خواهید با آن مرتبط شوید را انتخاب کنید، یا با انتخاب «فایل جدید»، یک فایل را بیفزایید."
   selected_answer: "این پاسخ را انتخاب کرده اید."
   self_enrollments: 
     already_enrolled: 
@@ -13290,12 +13306,16 @@ fa-IR:
     event_list: 
       at_least_more_events: "حداقل %{count_of_events} رویداد دیگر"
       at_least_more_events_one_week: "حداقل %{count_of_events} رویداد بیشتر در هفته گذشته"
+      at_least_more_events_one_week_future: "حداقل  %{count_of_events} رویداد دیگر در هفته بعد"
       at_least_more_events_two_weeks: "حداقل %{count_of_events} رویداد بیشتر در دو هفته گذشته"
+      at_least_more_events_two_weeks_future: "حداقل %{count_of_events} رویداد دیگر در دو هفته بعد"
       links: 
         view_calendar: "مشاهده تقویم"
       more_events: "%{count_of_events} رویداد دیگر"
       more_events_one_week: "%{count_of_events} رویداد بیشتر در هفته گذشته"
+      more_events_one_week_future: "%{count_of_events} رویداد دیگر در هفته بعد"
       more_events_two_weeks: "%{count_of_events} رویداد بیشتر در دو هفته گذشته"
+      more_events_two_weeks_future: "%{count_of_events} رویداد دیگر در دو هفته بعد"
       nothing_for_now: "چیزی در حال حاضر موجود نیست"
       nothing_one_week: "چیزی برای هفته آینده موجود نیست"
       nothing_two_weeks: "چیز برای دو هفته بعد موجود نیست"
@@ -14141,6 +14161,7 @@ fa-IR:
       two_words_connector: و
       words_connector: "، "
     help_menu: 
+      community_support_description: "با همکلاسی های خود تعامل داشته باشید و از آنها کمک بگیرید."
       community_support_forums: "نشست های پشتیبانی انجمن"
       contact_support: "تماس با پشتیبانی"
       contact_support_sub_text: "درباره مسائل حساس به زمان کمک بگیرید."
@@ -14512,6 +14533,7 @@ fa-IR:
   unlock_date_cannot_be_before_section_start_793ddc66: "تاریخ قفل گشایی نمی تواند قبل از شروع بخش باشد"
   unlock_date_cannot_be_before_term_start_d3c01813: "تاریخ قفل گشایی نمی تواند قبل از شروع نیمسال باشد"
   unpublished_courses_title: "درس های منتشر نشده"
+  unstarted_932f2990: "شروع نشده"
   unsupported_package: "بسته محتوای پشتیبانی نشده"
   until_date_949017c4: "تا %{date}"
   untitled_assignment_59354b34: "تکلیف بدون عنوان"
