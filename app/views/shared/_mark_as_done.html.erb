@@ -1,0 +1,8 @@
+<% if @mark_done.has_requirement? %>
+  <div id="mark-as-done-container">
+    <div id="mark-as-done-checkbox" class="btn <%= @mark_done.checked? ? "btn-success" : '' %>"
+       onclick="var url = '<%= @mark_done.api_url %>'; if (!$(this).hasClass('btn-success')) {$.ajaxJSON(url, 'PUT'); $(this).addClass('btn-success')} else {$.ajaxJSON(url, 'DELETE'); $(this).removeClass('btn-success')}">
+      <%= t(:mark_as_done_checkbox, 'Mark as done') %>
+    </div>
+  </div>
+<% end %>
