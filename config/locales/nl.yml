@@ -1257,6 +1257,7 @@ nl:
           zero_activity: 
             text: "Dit rapport toont alle cursisten die voor iedere cursus in een bepaalde periode staan ingeschreven. Het daaruitvoortvloeiende CSV-bestand zal een rij per ingeschreven gebruiker hebben die de cursus sinds die datum nog niet heeft bezocht."
   achieve_mastery_count_times_8c9bbcec: "Meesterschap %{count} keer bereiken "
+  actions_efcde10d: Acties
   activerecord: 
     errors: 
       messages: 
@@ -1866,7 +1867,7 @@ nl:
       overdue: "De inleverdatum voor deze opdracht is verstreken. Wil je de opdracht toch inleveren?"
       record_before_submitting: "Registreren voor inleveren"
       submit_failed: "Inleveren mislukt. Probeer het opnieuw"
-      submitting: "Bezig met inleveren..."
+      submitting: "In te leveren..."
     multiple_due_dates: "Meerdere inleverdata"
     name_is_required: "Naam is vereist!"
     name_too_long: "Naam is te lang"
@@ -1961,7 +1962,7 @@ nl:
       due_at: Tot
       for: Voor
       links: 
-        add_rubric: "Commentaar toevoegen"
+        add_rubric: "Rubric toevoegen"
         assign_rubric: "Commentaar toewijzen"
         edit: Bewerken
       manage: Beheren
@@ -1973,7 +1974,7 @@ nl:
       no_submission: Niets
       points: Punten
       submission_types: Bestandstypen
-      submitting: "Bezig met inleveren"
+      submitting: "In te leveren"
       turnitin: Turnitin
       turnitin_enabled: "Turnitin is  voor deze opdracht geactiveerd."
       turnitin_enabled_short: "(Turnitin geactiveerd)"
@@ -2071,7 +2072,7 @@ nl:
         google_drives_auth_required: "Voordat je opdrachten rechtstreeks kunt indienen van Google Drive moet je Canvas machtigen om toegang te krijgen tot je Google Drive-account:"
         media_recording_ready: "Klaar om in te leveren! Klikken op de knop 'Opdracht insturen' om de procedure te voltooien."
         media_recordings_disabled: "Mediaopnames zijn niet ingeschakeld voor deze Canvas-site en je kunt deze typen opdrachten niet inleveren. Neem contact op met jouw docent om de instellingen voor deze opdracht te wijzigen, of neem contact op met jouw systeembeheerder om mediaopnames in te schakelen."
-        submitting: "Bezig met inleveren..."
+        submitting: "In te leveren..."
         uploading: "Er wordt een kopie van jouw Google Doc opgehaald om in te sturen voor deze opdracht. Dit kan eventjes duren, afhankelijk van de bestandsgrootte..."
       no_files: "Geen bestanden"
       no_submission: "Geen inzending geselecteerd"
@@ -4805,6 +4806,11 @@ nl:
     assignments_expand: 
       one: "%{count} opdrachtmelding uitvouwen"
       other: "%{count} opdracht kennisgeving uitvouwen"
+    confirm: 
+      close: |-
+          Weet je zeker dat je deze vergadering wilt beëindigen?
+          
+          Je kunt deze dan niet meer openen.
     conversations_collapse: 
       one: "%{count} gespreksbericht samenvouwen"
       other: " %{count} gespreksberichten samenvouwen"
@@ -4938,6 +4944,7 @@ nl:
   delete_a6efa79d: "Verwijderen "
   delete_grading_period_dba36e59: "Beoordelingsperiode verwijderen"
   delete_grading_scheme_6b308832: "Beoordelingsschema verwijderen "
+  delete_my_account_41060aad: "Mijn account verwijderen"
   delete_quiz_142b8099: "Toets verwijderen"
   delete_survey_56fddbbd: "Enquête verwijderen"
   delete_tool_app_9c9f6d35: "%{tool} App verwijderen? "
@@ -5474,6 +5481,7 @@ nl:
   element_option_missing_error_an_element_to_attach__be433478: "ontbrekende fout `element` optie: Een element aan de TreeBrowserView toevoegen moet bepaald worden wanneer de weergave optie voor BBTreeBrowserView op 'true' (waar) wordt gezet  "
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: e-mail
   email_is_invalid_e0d982eb: "e-mail is ongeldig! "
   ember_modules_description: "Modules opnieuw geschreven in Ember. Gebruik de eigen API slepen en neerzetten om het slepen van externe locaties toe te laten."
   enable_6f5d1328: Inschakelen
@@ -6380,7 +6388,7 @@ nl:
     turnitin: 
       error_message: "Er is een fout opgetreden tijdens het inleveren naar turnitin. Probeer het bestand opnieuw in te zenden voordat je contact gaat opnemen met de ondersteuning"
       info_message: "Het bestand wordt nog steeds verwerkt door turnitin. Controleer later om de score te zien"
-      resubmitting: "Bezig met opnieuw inleveren..."
+      resubmitting: "In te opnieuw inleveren..."
       tooltip: 
         error: "Turnitin-vergelijkbaarheidsscore - Details van fout bij inzending zien"
         pending: "Turnitin-vergelijkbaarheidsscore - Inzending in behandeling"
@@ -6652,7 +6660,7 @@ nl:
       arrange_columns_by_due_date: "Kolommen sorteren op inleverdatum"
       arrange_columns_by_group: "Kolommen sorteren op opdrachtgroep"
       download_scores: Exporteren
-      filter_by_student: "Filter op naam cusrsit of secundaire ID"
+      filter_by_student: "Filter op naam cursist of secundaire ID"
       grades: Cijfers
       hide_student_names: "Verberg namen van cursisten"
       include_ungraded: "Behandel opdrachten die niet beoordeeld zijn als een 0"
@@ -7703,6 +7711,7 @@ nl:
     help: Help
     show_me_where: "Aan mij tonen waar"
   links_14b70841: "Koppelingen "
+  loading_25990131: "Bezig met Laden... "
   locales: 
     nl: Nederlands
   lock_after_date_92f9149: "Blokkeren na datum"
@@ -8548,6 +8557,7 @@ nl:
         details: "Ga naar de volgende link om het registratieproces te voltooien :"
         html: 
           body: "Bedankt voor jouw registratie op %{product_name}! We sturen deze e-mail om te bevestigen dat gebruiker %{user} zich registreert voor een nieuw account op %{website}."
+          link: "Hier klikken om het registratieproces te voltooien"
           subject: "Registratie bevestigen: %{product_name}"
         subject: "Registratie bevestigen: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9947,6 +9957,7 @@ nl:
   new_account_role_6e5c4964: "Nieuwe account functie"
   new_course_role_6a7bb75f: "Nieuwe cursus functie"
   new_facebook_message: "Er is een nieuw bericht van Canvas"
+  new_file_135ae520: "[ Nieuw bestand ]"
   new_outcome_7fba8c7d: "Nieuw leerresultaat "
   new_quiz_statistics_desc: "De nieuwe pagina met statistieken van de toets voor een cursus inschakelen."
   new_styles_description: "We zijn bezig met de Canvas gebruikersinterface een facelift te geven. Dit inschakelen om de bijgewerkte, simpeler vormgeving en stijl van de Canvas gebruikersinterface te kunnen zien. Dit is een \"Work in Progress\" functie en moet nog niet ingeschakeld worden voor huidige gebruikers. "
@@ -10334,6 +10345,7 @@ nl:
     missing_outcome: "Kan dit leerresultaat niet vinden"
     new_outcome_group: "Nieuwe leerresultatengroep"
     outcome: 
+      example: "Voorbeeld:"
       links: 
         delete_outcome: "Leerresultaat verwijderen"
         edit_outcome: "Leerresultaat bewerken"
@@ -10345,11 +10357,13 @@ nl:
       use_for_scoring: "Deze standaard voor beoordelen gebruiken"
     outcome_criterion: "Standaard voor leerresultaat"
     outcome_form: 
+      calculation_method: Berekeningsmethode
       criterion: "Standaard voor beoordelen"
       criterion_dialog: "Leerdoelen kunnen toegevoegd worden aan opdrachtrubrieken. Als u een studieresultaat definieert, dient u ook een criterium te definiëren om te gebruiken bij het maken van opdrachtrubrieken. Definieer zoveel rubriekkolommen als u nodig hebt en geef het aantal punten op dat minimaal behaald moet worden om dit leerdoelen te behalen."
       criterion_info_link: "Hier klikken om meer te weten te komen over standaards voor beoordelingen"
       description: "Dit leerresulaat bschrijven"
       display_name: "Gebruiksvriendelijke naam (optioneel)"
+      example: "Voorbeeld:"
       mastery: "Bekwaamheid bij"
       points: "%{points_possible} punten"
       title: "Dit leerresultaat een naam geven"
@@ -10361,6 +10375,9 @@ nl:
     outcome_group_form: 
       group_description: "Deze groep beschrijven"
       title: "Aan deze groep een naam geven"
+    outcome_popover: 
+      mastery_set_at: "Bekwaam vastgesteld op"
+      no_results: "(geen resultaten)"
     outcome_result: 
       all_outcomes: "alle leerresultaten voor deze cursist"
       attempt_info: "poging #%{attempt_number}, %{attempt_date}"
@@ -12132,7 +12149,7 @@ nl:
           one: "*%{student_name}* **krijgt 1 minuut extra per poging**"
           other: "*%{student_name}* **krijgt %{count} extra minuten per poging**"
         student_n: "Cursist %{n}"
-        submitting: "Bezig met inleveren/inzenden..."
+        submitting: "In te leveren..."
         titles: 
           change_user_extensions: "Verlengingen voor gebruiker wijzigen"
           extra_attempts: "bijkomende extra pogingen"
@@ -13205,6 +13222,7 @@ nl:
       add_item_to_module: "Item aan module toevoegen"
       find_links_using_service: "Koppelingen zoeken met %{service}"
   select_navigation_links_68e1e924: "Navigatiekoppelingen selecteren "
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Het bestand selecteren die je wilt koppelen, of een bestand toevoegen door \"Nieuw bestand\" te selecteren."
   selected_answer: "Je hebt dit antwoord geselecteerd."
   selected_subtree_a7693937: "Geselecteerd %{subtree}"
   self_enrollments: 
@@ -13439,12 +13457,16 @@ nl:
     event_list: 
       at_least_more_events: "minimaal %{count_of_events} meer"
       at_least_more_events_one_week: "tenminste %{count_of_events} meer in de afgelopen week"
+      at_least_more_events_one_week_future: "minimaal %{count_of_events} meer in de volgende week"
       at_least_more_events_two_weeks: "tenminste %{count_of_events} meer in de afgelopen twee weken"
+      at_least_more_events_two_weeks_future: "minimaal %{count_of_events} meer in de volgende twee weken"
       links: 
         view_calendar: "Kalender bekijken"
       more_events: "%{count_of_events} meer"
       more_events_one_week: "%{count_of_events} meer in de afgelopen week"
+      more_events_one_week_future: "%{count_of_events} meer in de volgende week"
       more_events_two_weeks: "%{count_of_events} meer in de afgelopen twee weken"
+      more_events_two_weeks_future: "%{count_of_events} meer in de volgende twee weken"
       nothing_for_now: "Momenteel niets"
       nothing_one_week: "Niets voor de volgende week"
       nothing_two_weeks: "Niets voor de volgende twee weken"
@@ -14284,6 +14306,7 @@ nl:
     submission_download: 
       download_message: "**Jouw inzendingen worden verzameld** en in een zip-bestand gecomprimeerd. Dit kan enige tijd duren, afhankelijk van de bestandsgrootte en het aantal ingezonden bestanden."
       gathering_files: "Bezig met het verzamelen van bestanden..."
+  submissions_11e96106: Inzendingen
   submit_a3cc6859: "Inzenden "
   submitted_datetime_fa2e9287: "Ingezonden: %{dateTime} "
   successfully_moved_model_to_newgroup_f7b7aa5a: " %{model} succesvol naar %{newGroup} verplaatst"
@@ -14296,6 +14319,7 @@ nl:
       two_words_connector: en
       words_connector: ", "
     help_menu: 
+      community_support_description: "Communiceren met en hulp krijgen van mede cursisten."
       community_support_forums: "Community Support Forums"
       contact_support: "Contact opnemen met ondersteuning"
       contact_support_sub_text: "Hulp krijgen bij urgente zaken."
@@ -14352,7 +14376,7 @@ nl:
         add_new_term: "Nieuwe periode toevoegen"
       messages: 
         classes_in_term: "Je kunt een periode waarin nog curcussen worden gegeven niet verwijderen."
-        submitting: "Bezig met inleveren..."
+        submitting: "In te leveren..."
       page_title: "%{account}-periodes"
       prompts: 
         delete: "Weet je zeker dat je deze periode wilt verwijderen?"
@@ -14679,6 +14703,7 @@ nl:
   unlock_date_cannot_be_before_section_start_793ddc66: "Datum ontgrendelen  kan niet voor start van sectie plaatsvinden "
   unlock_date_cannot_be_before_term_start_d3c01813: "Datum ontgrendelen kan niet voor start van termijn plaatsvinden  "
   unpublished_courses_title: "Cursussen die niet gepubliceerd zijn"
+  unstarted_932f2990: "Nog niet begonnen"
   unsupported_package: "Niet ondersteund inhoud pakket"
   until_date_949017c4: "Tot %{date}"
   untitled_assignment_59354b34: "Naamloze opdracht"
