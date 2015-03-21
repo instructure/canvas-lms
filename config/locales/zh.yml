@@ -1259,6 +1259,7 @@ zh:
           zero_activity: 
             text: "此报告显示某个给定学期中注册了任意课程的所有学生。在生成的 csv 文件中，自该日期起尚未访问课程的每项用户注册将具有一行。"
   achieve_mastery_count_times_8c9bbcec: "达到掌握程度 %{count} 次"
+  actions_efcde10d: 动作
   activerecord: 
     errors: 
       messages: 
@@ -4825,6 +4826,11 @@ zh:
     assignments_expand: 
       one: "展开 %{count} 个作业通知"
       other: "展开 %{count} 个作业通知"
+    confirm: 
+      close: |-
+          是否确定要结束此会议？⏎
+          ⏎
+          您无法将其重新打开。
     conversations_collapse: 
       one: "折叠 %{count} 个会话消息"
       other: "折叠 %{count} 个会话消息"
@@ -4958,6 +4964,7 @@ zh:
   delete_a6efa79d: 删除
   delete_grading_period_dba36e59: 删除评分时段
   delete_grading_scheme_6b308832: 删除评分方案
+  delete_my_account_41060aad: 删除我的帐户
   delete_quiz_142b8099: 删除测验
   delete_survey_56fddbbd: 删除调查
   delete_tool_app_9c9f6d35: "删除 %{tool} 应用程序？"
@@ -5495,6 +5502,7 @@ zh:
   element_option_missing_error_an_element_to_attach__be433478: "`element` 选项缺失错误：针对 BBTreeBrowserView 将渲染选项设置为 'true' 时，必须指定 TreeBrowserView 附加到的一个元素"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: 电子邮件
   email_is_invalid_e0d982eb: 电子邮件无效！
   ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
   enable_6f5d1328: 启用
@@ -7726,6 +7734,7 @@ zh:
     help: 帮助
     show_me_where: 显示我的位置
   links_14b70841: 链接
+  loading_25990131: 正在加载...
   locales: 
     zh: 简体中文
   lock_after_date_92f9149: 锁定起始日期
@@ -8571,6 +8580,7 @@ zh:
         details: "要完成注册过程，请访问以下 url:"
         html: 
           body: "感谢您注册 %{product_name}！此电子邮件用于确认用户 %{user} 正在 %{website} 上注册一个新帐户。"
+          link: 单击此处完成注册过程
           subject: "确认注册：%{product_name}"
         subject: "确认注册：%{product_name}"
     confirm_sms_communication_channel: 
@@ -9966,6 +9976,7 @@ zh:
   new_account_role_6e5c4964: 新建帐户角色
   new_course_role_6a7bb75f: 新建课程角色
   new_facebook_message: "您有来自 Canvas 的新消息"
+  new_file_135ae520: "[新文件]"
   new_outcome_7fba8c7d: 新建结果
   new_quiz_statistics_desc: 启用某课程的新测验统计页面。
   new_styles_description: |-
@@ -10360,6 +10371,7 @@ zh:
     missing_outcome: 无法找到该学习成果
     new_outcome_group: 新建成果组
     outcome: 
+      example: "示例:"
       links: 
         delete_outcome: 删除成果
         edit_outcome: 编辑成果
@@ -10371,11 +10383,13 @@ zh:
       use_for_scoring: 使用此标准打分
     outcome_criterion: 学习成果标准
     outcome_form: 
+      calculation_method: 计算方法
       criterion: 标准等级
       criterion_dialog: 学习成果可包括在作业评分标准中作为评估是否掌握所分配特定作业成果的简单方式。当您定义学习成果时，还应定义构建作业评分标准时可使用的标准。根据需要定义尽可能多的评分标准列，并指定将用于定义是否掌握此成果的分数阈值。
       criterion_info_link: 单击以了解标准等级
       description: 说明此成果
       display_name: 友好名称（可选）
+      example: "示例:"
       mastery: 掌握程度为
       points: "%{points_possible} 分"
       title: 命名此成果
@@ -10387,6 +10401,9 @@ zh:
     outcome_group_form: 
       group_description: 说明此小组
       title: 命名此小组
+    outcome_popover: 
+      mastery_set_at: 掌握程度设置为
+      no_results: (无结果)
     outcome_result: 
       all_outcomes: 此学生的所有成果
       attempt_info: "尝试 #%{attempt_number}，%{attempt_date}"
@@ -13257,6 +13274,7 @@ zh:
       add_item_to_module: 添加项目到单元
       find_links_using_service: "使用 %{service} 查找链接"
   select_navigation_links_68e1e924: 选择导航链接
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: 选择您要关联的文件，或者通过选择“新文件”来添加文件。
   selected_answer: 您已选择此答案。
   selected_subtree_a7693937: "已选定 %{subtree}"
   self_enrollments: 
@@ -13494,12 +13512,16 @@ zh:
     event_list: 
       at_least_more_events: "至少还有 %{count_of_events} 个"
       at_least_more_events_one_week: "上周至少有 %{count_of_events} 个以上的事件"
+      at_least_more_events_one_week_future: "下周至少还有 %{count_of_events} 个"
       at_least_more_events_two_weeks: "上两周至少有 %{count_of_events} 个以上的事件"
+      at_least_more_events_two_weeks_future: "接下来的两周至少还有 %{count_of_events} 个"
       links: 
         view_calendar: 查看日历
       more_events: "还有 %{count_of_events} 个"
       more_events_one_week: "上周有 %{count_of_events} 个以上的事件"
+      more_events_one_week_future: "下周还有 %{count_of_events} 个"
       more_events_two_weeks: "上两周有 %{count_of_events} 个以上的事件"
+      more_events_two_weeks_future: "接下来的两周还有 %{count_of_events} 个"
       nothing_for_now: 目前没有任何内容
       nothing_one_week: 下周没有任何内容
       nothing_two_weeks: 接下来的两周没有任何内容
@@ -14348,6 +14370,7 @@ zh:
     submission_download: 
       download_message: "**正在收集学生的提交文件**并将其压缩成 zip 文件。这可能需要一些时间，具体视提交文件的大小和数量而定。"
       gathering_files: 正在收集文件...
+  submissions_11e96106: 提交文件
   submit_a3cc6859: 提交
   submitted_datetime_fa2e9287: "已提交：%{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "成功将 %{model} 移动到 %{newGroup}"
@@ -14360,6 +14383,7 @@ zh:
       two_words_connector: " and "
       words_connector: ", "
     help_menu: 
+      community_support_description: 与您的同伴进行交互并得到帮助。
       community_support_forums: 社区支持论坛
       contact_support: 联系支持
       contact_support_sub_text: 针对时间敏感的问题获得帮助。
@@ -14743,6 +14767,7 @@ zh:
   unlock_date_cannot_be_before_section_start_793ddc66: 解锁日期不能早于章节开始日期
   unlock_date_cannot_be_before_term_start_d3c01813: 解锁日期不能早于学期开始日期
   unpublished_courses_title: 未发布的课程
+  unstarted_932f2990: 未开始
   unsupported_package: 不受支持的内容包
   until_date_949017c4: "直到 %{date}"
   untitled_assignment_59354b34: 无标题作业
