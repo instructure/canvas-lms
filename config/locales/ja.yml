@@ -1259,6 +1259,7 @@ ja:
           zero_activity: 
             text: "このレポートでは、指定した期間のすべてのコースに登録しているすべての受講生が示されます。生成される csv ファイルでは、日付以降にコースを訪問していない登録ユーザがそれぞれ 1 行で示されます。"
   achieve_mastery_count_times_8c9bbcec: "熟達達成 (%{count} 回)"
+  actions_efcde10d: 操作
   activerecord: 
     errors: 
       messages: 
@@ -4826,6 +4827,11 @@ ja:
     assignments_expand: 
       one: "%{count} 個の課題のお知らせを展開"
       other: "%{count} 個の課題のお知らせを展開"
+    confirm: 
+      close: |-
+          この会議を終了してもよろしいですか?⏎
+          ⏎
+          もう一度開くことはできません。
     conversations_collapse: 
       one: "%{count} 個の会話メッセージを折りたたむ"
       other: "%{count} 個の会話メッセージを折りたたむ"
@@ -4959,6 +4965,7 @@ ja:
   delete_a6efa79d: 削除
   delete_grading_period_dba36e59: 採点期間の削除
   delete_grading_scheme_6b308832: 採点スキームの削除
+  delete_my_account_41060aad: "マイ アカウントの削除"
   delete_quiz_142b8099: クイズの削除
   delete_survey_56fddbbd: サーベイの削除
   delete_tool_app_9c9f6d35: "%{tool} アプリを削除しますか?"
@@ -5496,6 +5503,7 @@ ja:
   element_option_missing_error_an_element_to_attach__be433478: "`element` オプションの欠落エラー: BBTreeBrowserView で render オプションを true に設定するときは、TreeBrowserView に添付する要素を指定する必要があります"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: 電子メール
   email_is_invalid_e0d982eb: 電子メールが無効です!
   ember_modules_description: "モジュールが Ember で書き直されています。外部の場所からのドラッグを許可するには、ネイティブのドラッグ アンド ドロップ API を使用します。"
   enable_6f5d1328: 有効
@@ -7725,6 +7733,7 @@ ja:
     help: ヘルプ
     show_me_where: どこに表示するか
   links_14b70841: リンク
+  loading_25990131: 読み込んでいます...
   locales: 
     ja: 日本語
   lock_after_date_92f9149: ロック開始日付
@@ -8570,6 +8579,7 @@ ja:
         details: "登録のプロセスを完了するには、次の URL にアクセスしてください:"
         html: 
           body: "%{product_name} にご登録いただき誠にありがとうございます! この電子メールは、「%{user}」さんが %{website} で新しいアカウントを登録中であることの確認です。"
+          link: 登録プロセスを完了するにはここをクリック
           subject: "登録の確認: %{product_name}"
         subject: "登録の確認: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9967,6 +9977,7 @@ ja:
   new_account_role_6e5c4964: 新しいアカウントの役割
   new_course_role_6a7bb75f: 新しいコースの役割
   new_facebook_message: "Canvas からの新しいメッセージがあります"
+  new_file_135ae520: "[ 新しいファイル ]"
   new_outcome_7fba8c7d: 新しい成果
   new_quiz_statistics_desc: コースの新しいクイズ統計ページを有効にします。
   new_styles_description: |-
@@ -10362,6 +10373,7 @@ ja:
     missing_outcome: その学習成果は見つかりませんでした
     new_outcome_group: 新しい成果グループ
     outcome: 
+      example: "例:"
       links: 
         delete_outcome: 成果の削除
         edit_outcome: 成果の編集
@@ -10373,11 +10385,13 @@ ja:
       use_for_scoring: 採点にこの基準を使用
     outcome_criterion: 学習成果の基準
     outcome_form: 
+      calculation_method: 計算メソッド
       criterion: 基準の評価
       criterion_dialog: 特定の課題に照らして成果の熟達度のアセスメントを実施する手軽な一手法として、学習成果を課題の注釈に含めることができます。学習成果を定義する際は、課題の注釈を組み立てる際に使用できる基準もあわせて定義してください。注釈列を必要なだけ定義し、この成果の熟達度を定義する際に使用する点数のしきい値を指定します。
       criterion_info_link: クリックして基準の評価について学習する
       description: この成果を説明する
       display_name: "わかりやすい名前 (任意)"
+      example: "例:"
       mastery: 熟達日時
       points: "%{points_possible} 点"
       title: この成果の名前を指定
@@ -10389,6 +10403,9 @@ ja:
     outcome_group_form: 
       group_description: このグループを説明する
       title: このグループの名前を指定する
+    outcome_popover: 
+      mastery_set_at: "達成の設定:"
+      no_results: (結果なし)
     outcome_result: 
       all_outcomes: この受講生に対する、すべての成果の評価結果
       attempt_info: "試行 #%{attempt_number}、%{attempt_date}"
@@ -13223,6 +13240,7 @@ ja:
       add_item_to_module: モジュールにアイテムを追加
       find_links_using_service: "%{service} を使用してリンクを検索"
   select_navigation_links_68e1e924: "ナビゲーション リンクの選択"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "関連付けるファイルを選択するか、または [新しいファイル] を選択してファイルを追加します。"
   selected_answer: この解答が選択されました。
   selected_subtree_a7693937: "選択された %{subtree}"
   self_enrollments: 
@@ -13458,12 +13476,16 @@ ja:
     event_list: 
       at_least_more_events: "少なくともさらに %{count_of_events} 回"
       at_least_more_events_one_week: "過去 1 週間にあと %{count_of_events} 件以上"
+      at_least_more_events_one_week_future: "次の 1 週間、少なくともさらに %{count_of_events} 回"
       at_least_more_events_two_weeks: "過去 2 週間にあと %{count_of_events} 件以上"
+      at_least_more_events_two_weeks_future: "次の 2 週間、少なくともさらに %{count_of_events} 回"
       links: 
         view_calendar: カレンダーの表示
       more_events: "さらに %{count_of_events} 回"
       more_events_one_week: "過去 1 週間にあと %{count_of_events} 件"
+      more_events_one_week_future: "次の 1 週間、さらに %{count_of_events} 回"
       more_events_two_weeks: "過去 2 週間にあと %{count_of_events} 件"
+      more_events_two_weeks_future: "次の 2 週間、さらに %{count_of_events} 回"
       nothing_for_now: 今のところ何もなし
       nothing_one_week: "次の 1 週間、何もなし"
       nothing_two_weeks: "次の 2 週間、何もなし"
@@ -14309,6 +14331,7 @@ ja:
     submission_download: 
       download_message: "**受講生の提出物を収集** し、zip ファイルに圧縮しています。提出ファイルのサイズと数により、しばらく時間がかかる場合があります。"
       gathering_files: ファイルを収集しています...
+  submissions_11e96106: 提出物
   submit_a3cc6859: 提出
   submitted_datetime_fa2e9287: "提出済み: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} を %{newGroup} に正常に移動しました"
@@ -14321,6 +14344,7 @@ ja:
       two_words_connector: " および "
       words_connector: ", "
     help_menu: 
+      community_support_description: ピアと交流し、支援を得ます。
       community_support_forums: "コミュニティ サポート フォーラム"
       contact_support: サポートに問い合わせ
       contact_support_sub_text: 緊急の問題について問い合わせます。
@@ -14704,6 +14728,7 @@ ja:
   unlock_date_cannot_be_before_section_start_793ddc66: ロック解除日をセクション開始日より前にすることはできません
   unlock_date_cannot_be_before_term_start_d3c01813: ロック解除日を期間の開始日より前にすることはできません
   unpublished_courses_title: 未公開のコース
+  unstarted_932f2990: 開始前
   unsupported_package: "サポートされていないコンテンツ パッケージ"
   until_date_949017c4: "%{date} まで"
   untitled_assignment_59354b34: 無題の課題
