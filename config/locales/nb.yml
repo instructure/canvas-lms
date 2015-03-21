@@ -4824,6 +4824,11 @@ nb:
     assignments_expand: 
       one: "Vis %{count} oppgavevarsel"
       other: "Vis %{count} oppgavevarsler"
+    confirm: 
+      close: |-
+          Er du sikker på at du vil avslutte denne konferansen?
+          
+          Du kan ikke åpne den igjen.
     conversations_collapse: 
       one: "Skjul %{count} samtalebeskjeder"
       other: "Skjul %{count} samtalebeskjeder"
@@ -4957,6 +4962,7 @@ nb:
   delete_a6efa79d: Slette
   delete_grading_period_dba36e59: "Slett gradering periode"
   delete_grading_scheme_6b308832: "Slett karaktersettingsplan"
+  delete_my_account_41060aad: "Slett kontoen min"
   delete_quiz_142b8099: "Slett prøve"
   delete_survey_56fddbbd: "Slett undersøkelse"
   delete_tool_app_9c9f6d35: "Slett %{tool} App?"
@@ -5494,6 +5500,7 @@ nb:
   element_option_missing_error_an_element_to_attach__be433478: "`element` alternativ manglende feil: Et element for å feste TreeBrowserView må oppgis når du setter den gjengi muligheten til å 'true' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: epost
   email_is_invalid_e0d982eb: "Epost er ugyldig!"
   ember_modules_description: "Moduler omskrevet i Ember. Bruker den innfødte dra og slipp API for å tillate å dra fra eksterne steder."
   enable_6f5d1328: "Slå på"
@@ -7730,6 +7737,7 @@ nb:
     help: Hjelp
     show_me_where: "Vis meg hvor"
   links_14b70841: Lenker
+  loading_25990131: Laster…
   locales: 
     nb: "Norwegian (Bokmål)"
   lock_after_date_92f9149: "Lås Etter Dato"
@@ -8571,6 +8579,7 @@ nb:
         details: "For å fullføre registreringsprosessen, vennligst se følgende url:"
         html: 
           body: "Takk for at du registrerte deg på %{product_name}! Denne eposten er en bekreftelse på at brukeren %{user} registrerer en ny konto på %{website}."
+          link: "Klikk her for å fullføre registreringsprosessen"
           subject: "Bekreft følgende registrering: %{product_name}"
         subject: "Bekreft registrering: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9968,6 +9977,7 @@ nb:
   new_account_role_6e5c4964: "Ny konto Rolle"
   new_course_role_6a7bb75f: "Ny Kurset Rolle"
   new_facebook_message: "Du har en ny beskjed fra Canvas"
+  new_file_135ae520: "[ Ny fil ]"
   new_outcome_7fba8c7d: "Nytt resultat"
   new_quiz_statistics_desc: "Aktivere den nye quizstatistikkside for et kurs."
   new_styles_description: |-
@@ -10363,6 +10373,7 @@ nb:
     missing_outcome: "Kunne ikke finne læringsmålet"
     new_outcome_group: "Ny resultatgruppe"
     outcome: 
+      example: "Eksempel:"
       links: 
         delete_outcome: "Slett resultat"
         edit_outcome: "Rediger resultat"
@@ -10374,11 +10385,13 @@ nb:
       use_for_scoring: "Bruk dette kriteriet ved setting av resultat"
     outcome_criterion: "Kriterium for læringsmål"
     outcome_form: 
+      calculation_method: "Beregnings Metode"
       criterion: Kriterievurderinger
       criterion_dialog: "Læringsmål kan inkluderes i oppgavekriteriene som en enkel måte å vurdere mestring av det enkelte mål justert ift konkrete oppgaver. Når du definerer et læringsutbytte, bør du også definere et kriterium som kan brukes når du etablerer vurderingskriteriene. Definer så mange kolonner som du trenger for kriteriene, og angi en terskel som skal brukes til å definere mestring av dette utbyttet."
       criterion_info_link: "Klikk for å lære om kriterievurderinger"
       description: "Beskriv dette resultatet"
       display_name: "Kallenavn (valgfritt)"
+      example: "Eksempel:"
       mastery: "Mestring ved "
       points: "%{points_possible} points"
       title: "Gi navn til dette resultatet"
@@ -10390,6 +10403,9 @@ nb:
     outcome_group_form: 
       group_description: "Beskriv denne gruppen"
       title: "Navngi gruppen"
+    outcome_popover: 
+      mastery_set_at: "Mestring satt ved"
+      no_results: "(ingen resultater)"
     outcome_result: 
       all_outcomes: "alle resultater for denne studenten"
       attempt_info: "forsøk nr. %{attempt_number}, %{attempt_date}"
@@ -13225,6 +13241,7 @@ nb:
       add_item_to_module: "Legg til element i modul"
       find_links_using_service: "Finner lenker med %{service}"
   select_navigation_links_68e1e924: "Velg navigasjonslenker"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Velg filen du ønsker å assosiere, eller legge til en fil ved å velge \"Ny fil\"."
   selected_answer: "Du valgte dette svaret."
   selected_subtree_a7693937: "Valgt %{subtree}"
   self_enrollments: 
@@ -13462,12 +13479,16 @@ nb:
     event_list: 
       at_least_more_events: "minst %{count_of_events} til"
       at_least_more_events_one_week: "minst %{count_of_events} mer i den siste uken"
+      at_least_more_events_one_week_future: "minst %{count_of_events} til i kommende uke"
       at_least_more_events_two_weeks: "minst %{count_of_events} mer de siste to uker"
+      at_least_more_events_two_weeks_future: "minst %{count_of_events} til i de neste to ukene"
       links: 
         view_calendar: "Se kalender"
       more_events: "%{count_of_events} til"
       more_events_one_week: "%{count_of_events} mer i den siste uken"
+      more_events_one_week_future: "%{count_of_events} til i kommende uke"
       more_events_two_weeks: "%{count_of_events} mer de siste to uker"
+      more_events_two_weeks_future: "%{count_of_events} til i de neste to ukene"
       nothing_for_now: "Ingenting for øyeblikket"
       nothing_one_week: "Ingenting i kommende uke"
       nothing_two_weeks: "Ingenting i de neste to ukene"
@@ -14324,6 +14345,7 @@ nb:
       two_words_connector: og
       words_connector: ", "
     help_menu: 
+      community_support_description: "Samhandle med og få hjelp fra dine medstudenter."
       community_support_forums: "Felles brukerstøtte-forum"
       contact_support: "Kontakt brukerstøtte"
       contact_support_sub_text: "Få hjelp med saker som haster."
@@ -14707,6 +14729,7 @@ nb:
   unlock_date_cannot_be_before_section_start_793ddc66: "Lås opp dato kan ikke være før seksjonsstart"
   unlock_date_cannot_be_before_term_start_d3c01813: "Lås opp dato kan ikke være før semesterstart"
   unpublished_courses_title: "Ikke publiserte kurs"
+  unstarted_932f2990: "Ikke påbegynt"
   unsupported_package: "Ustøttet innholdspakke"
   until_date_949017c4: "Til %{date}"
   untitled_assignment_59354b34: "Uten tittel oppdrag"
