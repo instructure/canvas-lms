@@ -1285,6 +1285,7 @@ ar:
           zero_activity: 
             text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لالتحاق كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ."
   achieve_mastery_count_times_8c9bbcec: "تحقيق مستوى الإتقان %{count} مرة/مرات"
+  actions_efcde10d: إجراءات
   activerecord: 
     errors: 
       messages: 
@@ -4976,6 +4977,11 @@ ar:
       other: "توسيع %{count} إخطارات مهام"
       two: "توسيع %{count} إخطارات مهام"
       zero: "توسيع %{count} إخطارات مهام"
+    confirm: 
+      close: |-
+          هل ترغب بالتأكيد في إنهاء هذا المؤتمر؟
+          
+          لن تتمكن من إعادة فتحه مرة أخرى.
     conversations_collapse: 
       few: "طي %{count} رسائل محادثة"
       many: "طي %{count} رسائل محادثة"
@@ -5169,6 +5175,7 @@ ar:
   delete_a6efa79d: حذف
   delete_grading_period_dba36e59: "حذف فترة تقييم الدرجات"
   delete_grading_scheme_6b308832: "حذف نظام التقييم"
+  delete_my_account_41060aad: "حذف حسابي"
   delete_quiz_142b8099: "حذف الاختبار"
   delete_survey_56fddbbd: "حذف الاستطلاع"
   delete_tool_app_9c9f6d35: "أتريد حذف تطبيق %{tool}؟"
@@ -5738,6 +5745,7 @@ ar:
   element_option_missing_error_an_element_to_attach__be433478: " خطأ عدم تحديد خيار `العنصر`: يجب تحديد العنصر الذي تريد إقرانه بطريقة العرض TreeBrowserView عند ضبط خيار العرض على \"true\" لطريقة العرض BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: "البريد الإلكتروني"
   email_is_invalid_e0d982eb: "البريد الإلكتروني غير صالح!"
   ember_modules_description: "تم كتابة الوحدات في Ember. استخدم واجهة برمجة التطبيقات الأصلية للسحب والإفلات للسماح بالسحب من المواقع الخارجية."
   enable_6f5d1328: تمكين
@@ -8050,6 +8058,7 @@ ar:
     help: تعليمات
     show_me_where: "إظهاري حيث"
   links_14b70841: ارتباطات
+  loading_25990131: "جارٍ التحميل..."
   locales: 
     ar: العربية
   lock_after_date_92f9149: "قفل بعد تاريخ"
@@ -8958,6 +8967,7 @@ ar:
         details: "لإنهاء عملية التسجيل هذه، تفضل بزيارة عنوان url التالي:"
         html: 
           body: "شكرًا لك على التسجيل في %{product_name}! هذا البريد الإلكتروني مرسل لتأكيد تسجيل المستخدم %{user} حسابًا جديدًا على %{website}."
+          link: "انقر هنا لإنهاء عملية التسجيل"
           subject: "تأكيد التسجيل: %{product_name}"
         subject: "تأكيد التسجيل: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10361,6 +10371,7 @@ ar:
   new_account_role_6e5c4964: "دور حساب جديد"
   new_course_role_6a7bb75f: "دور مساق جديد"
   new_facebook_message: "لديك رسالة جديدة من Canvas"
+  new_file_135ae520: "[ ملف جديد ]"
   new_outcome_7fba8c7d: "نتيجة جديدة"
   new_quiz_statistics_desc: "تمكين صفحة إحصائيات الاختبار الجديد لمساق."
   new_styles_description: |-
@@ -10771,6 +10782,7 @@ ar:
     missing_outcome: "تعذر العثور على ناتج التعلم ذلك"
     new_outcome_group: "مجموعة نتيجة جديدة"
     outcome: 
+      example: "مثال:"
       links: 
         delete_outcome: "حذف نتيجة"
         edit_outcome: "تعديل نتيجة"
@@ -10782,11 +10794,13 @@ ar:
       use_for_scoring: "استخدم هذا المعيار لتوزيع الدرجات"
     outcome_criterion: "معيار ناتج التعلم"
     outcome_form: 
+      calculation_method: "طريقة الحساب"
       criterion: "تصنيفات المعيار"
       criterion_dialog: "يمكن تضمين نتائج التعلم في عناوين المهمة كطريقة سهلة لتقييم إتقان النتائج التي تمت محاذاتها إلى المهام الخاصة.  وعند تعريف ناتج تعلم، يجب عليك تعريف معيار يمكن استخدامه عند إنشاء عناوين المهمة. فقم بتعريف العديد من أعمدة العناوين بقدر ما تحتاج، وحدد عتبة نقطة سيتم استخدامها لتعريف إتقان هذا الناتج. "
       criterion_info_link: "انقر للتعرف على تصنيفات المعيار"
       description: "وصف هذه النتيجة"
       display_name: "الاسم المألوف (اختياري)"
+      example: "مثال:"
       mastery: "الإتقان عند"
       points: "%{points_possible} نقاط"
       title: "تسمية هذه النتيجة"
@@ -10798,6 +10812,9 @@ ar:
     outcome_group_form: 
       group_description: "وصف هذه المجموعة"
       title: "تسمية هذه المجموعة"
+    outcome_popover: 
+      mastery_set_at: "الإتقان عند"
+      no_results: "(بلا نتائج)"
     outcome_result: 
       all_outcomes: "كافة نتائج الناتج لهذا الطالب"
       attempt_info: "رقم المحاولة %{attempt_number}, %{attempt_date}"
@@ -13840,6 +13857,7 @@ ar:
       add_item_to_module: "إضافة العنصر إلى الوحدة"
       find_links_using_service: "بحث عن ارتبطات باستخدام %{service}"
   select_navigation_links_68e1e924: "تحديد ارتباطات الانتقال"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "حدد الملف الذي تريد إقرانه، أو أضف ملفًا باختيار \"ملف جديد\"."
   selected_answer: "لقد حددت هذه الإجابة."
   selected_subtree_a7693937: "%{subtree} محددة"
   self_enrollments: 
@@ -14077,12 +14095,16 @@ ar:
     event_list: 
       at_least_more_events: "على الأقل %{count_of_events} آخر (أخرى)"
       at_least_more_events_one_week: "%{count_of_events} زيادة على الأقل في الأسبوع الماضي"
+      at_least_more_events_one_week_future: "على الأقل %{count_of_events} آخر (أخرى) في الأسبوع القادم"
       at_least_more_events_two_weeks: "%{count_of_events} زيادة في الأسبوعين الماضيين"
+      at_least_more_events_two_weeks_future: "على الأقل %{count_of_events} آخر (أخرى) في الأسبوعين القادمين"
       links: 
         view_calendar: "عرض التقويم"
       more_events: "%{count_of_events} آخر (أخرى)"
       more_events_one_week: "%{count_of_events} زيادة في الأسبوع الماضي"
+      more_events_one_week_future: "%{count_of_events} آخر (أخرى) في الأسبوع القادم"
       more_events_two_weeks: "%{count_of_events} زيادة في الأسبوعين الماضيين"
+      more_events_two_weeks_future: "%{count_of_events} آخر (أخرى) في الأسبوعين القادمين"
       nothing_for_now: "لا شيء موجود الآن"
       nothing_one_week: "لا شيء موجود للأسبوع القادم"
       nothing_two_weeks: "لا شيء موجود للأسبوعين القادمين"
@@ -14961,6 +14983,7 @@ ar:
     submission_download: 
       download_message: "**يتم حاليًا تجميع إرسالات الطلاب** وضغطها في ملف مضغوط. قد تستغرق هذه العملية بعض الوقت، وفقًا لحجم ملفات الإرسال وعددها."
       gathering_files: "جارٍ تجميع الملفات..."
+  submissions_11e96106: إرسالات
   submit_a3cc6859: إرسال
   submitted_datetime_fa2e9287: "تم الإرسال: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "تم نقل %{model} إلى %{newGroup} بنجاح"
@@ -14973,6 +14996,7 @@ ar:
       two_words_connector: " و "
       words_connector: ", "
     help_menu: 
+      community_support_description: "تفاعل واحصل على المساعدة من أقرانك."
       community_support_forums: "منتديات دعم المجتمع"
       contact_support: "دعم الاتصال"
       contact_support_sub_text: "الحصول على مساعدة للمشكلات حسب الوقت."
@@ -15376,6 +15400,7 @@ ar:
   unlock_date_cannot_be_before_section_start_793ddc66: "لا يمكن أن يكون تاريخ إلغاء التأمين قبل بدء الجلسة"
   unlock_date_cannot_be_before_term_start_d3c01813: "لا يمكن أن يكون تاريخ إلغاء التأمين قبل بدء الفصل الدراسي"
   unpublished_courses_title: "مساقات لم يتم نشرها"
+  unstarted_932f2990: "لم تبدأ"
   unsupported_package: "حزمة محتوى غير مدعومة"
   until_date_949017c4: "حتى %{date}"
   untitled_assignment_59354b34: "مهمة بدون عنوان"
