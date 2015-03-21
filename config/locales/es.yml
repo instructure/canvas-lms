@@ -1254,6 +1254,7 @@ es:
           zero_activity: 
             text: "En este informe aparecen todos los alumnos inscritos en cualquier curso en un periodo en concreto.  El archivo csv que se genera incluirá una línea por inscripción de usuario que no haya visitado el curso desde la fecha."
   achieve_mastery_count_times_8c9bbcec: "Alcanza el dominio %{count} veces"
+  actions_efcde10d: Acciones
   activerecord: 
     errors: 
       messages: 
@@ -4802,6 +4803,11 @@ es:
     assignments_expand: 
       one: "Expandir %{count} notificación de tarea"
       other: "Expandir %{count} notificaciones de tareas"
+    confirm: 
+      close: |-
+          ¿Está seguro de que desea finalizar esta conferencia?⏎
+          ⏎
+          No podrá volver a abrirla más tarde.
     conversations_collapse: 
       one: "Contraer %{count} mensaje de conversación"
       other: "Contraer %{count} mensajes de conversaciones"
@@ -4935,6 +4941,7 @@ es:
   delete_a6efa79d: Eliminar
   delete_grading_period_dba36e59: "Borrar período de calificación"
   delete_grading_scheme_6b308832: "Borrar el esquema de calificaciones"
+  delete_my_account_41060aad: "Borrar mi cuenta"
   delete_quiz_142b8099: "Eliminar la evaluación"
   delete_survey_56fddbbd: "Borrar la encuesta"
   delete_tool_app_9c9f6d35: "¿Eliminar la aplicación %{tool}?"
@@ -5470,6 +5477,7 @@ es:
   element_option_missing_error_an_element_to_attach__be433478: "Error por falta de la opción `element`. Para poder adjuntar un elemento a la vista de árbol del explorador, este debe especificarse al configurar la opción de representación a 'true' para BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: "correo electrónico"
   email_is_invalid_e0d982eb: "El correo electrónico no es válido"
   ember_modules_description: "Módulos reescritos en Ember. Utiliza la API de arrastrar y soltar nativa para permitir arrastrar desde ubicaciones externas."
   enable_6f5d1328: Habilitar
@@ -7684,6 +7692,7 @@ es:
     help: Ayuda
     show_me_where: "Mostrarme Todo"
   links_14b70841: Vínculos
+  loading_25990131: Cargando...
   locales: 
     es: Español
   lock_after_date_92f9149: "Bloquear a partir de la fecha"
@@ -8524,6 +8533,7 @@ es:
         details: "Para completar el proceso de inscripción, por favor visite el siguiente url:"
         html: 
           body: "¡Gracias por inscribirse en %{product_name}! Este correo es una confirmación de que el usuario %{user} ha registrado una cuenta nueva en %{website}."
+          link: "Haga clic aquí para finalizar el proceso de registro"
           subject: "Confirmar registro: %{product_name}"
         subject: "Confirmar registro: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9918,6 +9928,7 @@ es:
   new_account_role_6e5c4964: "Nueva función de cuenta"
   new_course_role_6a7bb75f: "Nueva función de curso"
   new_facebook_message: "Tiene un mensaje nuevo de Canvas"
+  new_file_135ae520: "[ Archivo Nuevo ]"
   new_outcome_7fba8c7d: "Nuevo resultado"
   new_quiz_statistics_desc: "Habilitar la nueva página de estadísticas de evaluaciones para un curso,"
   new_styles_description: "Estamos trabajando en un lavado total de cara en Canvas. Habilite esta opción si desea participar en la visualización del aspecto actualizado y simplificado de la interfaz de Canvas. Esta función hace referencia a un trabajo muy \"en progreso\" y no se debería habilitar todavía para producción con los usuarios reales."
@@ -10310,6 +10321,7 @@ es:
     missing_outcome: "No se pudo encontrar ese resultado de aprendizaje"
     new_outcome_group: "Nuevo grupo de resultados"
     outcome: 
+      example: "Ejemplo:"
       links: 
         delete_outcome: "Eliminar resultado"
         edit_outcome: "Editar resultado"
@@ -10321,11 +10333,13 @@ es:
       use_for_scoring: "Utilice este criterio para puntuar"
     outcome_criterion: "Criterio de Resultados de Aprendizaje"
     outcome_form: 
+      calculation_method: "Método de cálculo"
       criterion: "Clasificación del Criterio"
       criterion_dialog: "Resultados de aprendizaje pueden incluirse in las rúbricas de tareas como una forma fácil para evaluar el dominio de resultados de tareas específicas. Cuando se define un resultado de aprendizaje, debería definir el criterio que puede usarse al construir las rúbricas de tareas. Defina cuantas columnas de rúbricas sean necesarias, y especifique un punto límite que será usado para definir el dominio de este resultado."
       criterion_info_link: "Haga clic para saber más sobre la evaluación de los criterios"
       description: "Describa este resultado"
       display_name: "Nombre descriptivo (optativo)"
+      example: "Ejemplo:"
       mastery: "Dominio en"
       points: "%{points_possible} Puntos"
       title: "Nombre este resultado"
@@ -10337,6 +10351,9 @@ es:
     outcome_group_form: 
       group_description: "Describa este grupo"
       title: "Nombre este grupo"
+    outcome_popover: 
+      mastery_set_at: "Dominio establecido en"
+      no_results: "(sin resultados)"
     outcome_result: 
       all_outcomes: "todos los resultados para este estudiante"
       attempt_info: "intento #%{attempt_number}, %{attempt_date}"
@@ -13175,6 +13192,7 @@ es:
       add_item_to_module: "Agregar Elemento al Módulo"
       find_links_using_service: "Encontrar enlaces usando %{service}"
   select_navigation_links_68e1e924: "Seleccione Enlaces de navegación"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Seleccione el archivo que desea asociar o agregue un archivo seleccionando \"Nuevo archivo\"."
   selected_answer: "Seleccionó esta respuesta."
   selected_subtree_a7693937: "%{subtree} seleccionado"
   self_enrollments: 
@@ -13409,12 +13427,16 @@ es:
     event_list: 
       at_least_more_events: "al menos %{count_of_events} más"
       at_least_more_events_one_week: "al menos %{count_of_events} más durante la semana pasada"
+      at_least_more_events_one_week_future: "al menos %{count_of_events} más en la siguiente semana"
       at_least_more_events_two_weeks: "al menos %{count_of_events} más en las últimas dos semanas"
+      at_least_more_events_two_weeks_future: "al menos %{count_of_events} más en las siguientes dos semanas"
       links: 
         view_calendar: "Ver el Calendario"
       more_events: "%{count_of_events} más"
       more_events_one_week: "%{count_of_events} más durante la semana pasada"
+      more_events_one_week_future: "%{count_of_events} más en la siguiente semana"
       more_events_two_weeks: "%{count_of_events} más en las últimas dos semanas"
+      more_events_two_weeks_future: "%{count_of_events} más en las siguientes dos semanas"
       nothing_for_now: "Nada por ahora"
       nothing_one_week: "Nada para la siguiente semana"
       nothing_two_weeks: "Nada para las siguientes dos semanas"
@@ -14253,6 +14275,7 @@ es:
     submission_download: 
       download_message: "**Sus envíos de los estudiantes están siendo recolectados** y comprimidos en un archivo zip. Esto puede tomar un poco de tiempo, dependiendo del tamaño y el número de archivos."
       gathering_files: "Recolectando Archivos..."
+  submissions_11e96106: Envíos
   submit_a3cc6859: Enviar
   submitted_datetime_fa2e9287: "Entregado: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} movido correctamente a %{newGroup}"
@@ -14265,6 +14288,7 @@ es:
       two_words_connector: " y "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Interactuar y obtener ayuda de sus compañeros."
       community_support_forums: "Foros de asistencia de la comunidad"
       contact_support: "Póngase en contacto con Asistencia técnica"
       contact_support_sub_text: "Obtenga asistencia para cuestiones urgentes"
@@ -14648,6 +14672,7 @@ es:
   unlock_date_cannot_be_before_section_start_793ddc66: "La fecha del bloqueo no puede ser anterior a la fecha de comienzo de la sección"
   unlock_date_cannot_be_before_term_start_d3c01813: "La fecha de bloqueo no puede ser anterior al comienzo del período"
   unpublished_courses_title: "Cursos no publicados"
+  unstarted_932f2990: "Sin comenzar"
   unsupported_package: "Paquete de contenido no compatible"
   until_date_949017c4: "Hasta el %{date}"
   untitled_assignment_59354b34: "tarea sin título"
