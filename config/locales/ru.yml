@@ -1258,6 +1258,7 @@ ru:
           zero_activity: 
             text: "Данный отчет отображает всех студентов, зарегистрированных на любом курсе в данном семестре. Полученный файл .csv содержит по одной строке на каждого зарегистрированного пользователя, который не посещал курс, начиная с даты."
   achieve_mastery_count_times_8c9bbcec: "Усвоение достигнуто %{count} раз(а)"
+  actions_efcde10d: "Действия "
   activerecord: 
     errors: 
       messages: 
@@ -4853,6 +4854,11 @@ ru:
       few: "Развернуть %{count} уведомления о задании"
       one: "Развернуть %{count} уведомление о задании"
       other: "Развернуть %{count} уведомлений о задании"
+    confirm: 
+      close: |-
+          Вы уверены, что хотите завершить эту конференцию?
+          
+          Вы не сможете снова ее открыть.
     conversations_collapse: 
       few: "Свернуть %{count} сообщения разговора"
       one: "Свернуть %{count} сообщение разговора"
@@ -5001,6 +5007,7 @@ ru:
   delete_a6efa79d: Удалить
   delete_grading_period_dba36e59: "Удалить период выставления оценок"
   delete_grading_scheme_6b308832: "Удалить схему оценок"
+  delete_my_account_41060aad: "Удалить мою учетную запись"
   delete_quiz_142b8099: "Удалить контрольную работу"
   delete_survey_56fddbbd: "Удалить опрос"
   delete_tool_app_9c9f6d35: "Удалить приложение %{tool}?"
@@ -5546,6 +5553,7 @@ ru:
   element_option_missing_error_an_element_to_attach__be433478: "Ошибка отсутствующего параметра `элемент`: элемент, прикрепляемый к TreeBrowserView, необходимо установить как `истинный` для BBTreeBrowserView при определении настроек параметра рендера"
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: "электронная почта"
   email_is_invalid_e0d982eb: "Недопустимый адрес электронной почты!"
   ember_modules_description: "Модули переписаны в Ember. Используйте собственный API перетаскивания, чтобы позволить перетаскивание из внешних источников."
   enable_6f5d1328: Включить
@@ -7799,6 +7807,7 @@ ru:
     help: Помощь
     show_me_where: "Показать местоположение"
   links_14b70841: Ссылки
+  loading_25990131: Загрузка...
   locales: 
     ru: pу́сский
   lock_after_date_92f9149: "Заблокировать после даты"
@@ -8660,6 +8669,7 @@ ru:
         details: "Для завершения процесса регистрации перейдите по следующему url-адресу:"
         html: 
           body: "Благодарим вас за регистрацию в %{product_name}! Данное электронное сообщение подтверждает, что пользователь %{user} зарегистрирован с новой учетной записью на %{website}."
+          link: "Щелкните здесь для завершения процесса регистрации"
           subject: "Подтвердить регистрацию: %{product_name}"
         subject: "Подтвердить регистрацию: %{product_name}"
     confirm_sms_communication_channel: 
@@ -10059,6 +10069,7 @@ ru:
   new_account_role_6e5c4964: "Новая роль учетной записи"
   new_course_role_6a7bb75f: "Новая роль курса"
   new_facebook_message: "У вас есть новое сообщение от Canvas"
+  new_file_135ae520: "[ Новый файл ]"
   new_outcome_7fba8c7d: "Новый результат"
   new_quiz_statistics_desc: "Включить страницу статистики новой контрольной работы для курса."
   new_styles_description: |-
@@ -10458,6 +10469,7 @@ ru:
     missing_outcome: "Невозможно найти этот результат обучения"
     new_outcome_group: "Новая группа результатов"
     outcome: 
+      example: "Пример:"
       links: 
         delete_outcome: "Удалить результат"
         edit_outcome: "Редактировать результат"
@@ -10469,11 +10481,13 @@ ru:
       use_for_scoring: "Используйте данный критерий для оценки"
     outcome_criterion: "Критерии результата обучения"
     outcome_form: 
+      calculation_method: "Метод вычисления"
       criterion: "Рейтинги критерия"
       criterion_dialog: "Результаты обучения могут быть включены в рубрики заданий для простой проверки усвоения результатов в соответствии с определенными заданиями. При определении результата обучения также необходимо определить критерий для использования при создании рубрик заданий. Определите необходимое число столбцов рубрик и укажите пороговое значения для использования при определении усвоения этого результата."
       criterion_info_link: "Щелкните, чтобы узнать больше о рейтингах критерия"
       description: "Описать этот результат"
       display_name: "Понятное имя (необязательно)"
+      example: "Пример:"
       mastery: "Усвоено на"
       points: "%{points_possible} баллов"
       title: "Дать название этому результату"
@@ -10485,6 +10499,9 @@ ru:
     outcome_group_form: 
       group_description: "Описать эту группу"
       title: "Дать название этой группе"
+    outcome_popover: 
+      mastery_set_at: "Усвоение установлено на"
+      no_results: "(без результата)"
     outcome_result: 
       all_outcomes: "все результаты для этого студента"
       attempt_info: "попытка #%{attempt_number}, %{attempt_date}"
@@ -13393,6 +13410,7 @@ ru:
       add_item_to_module: "Добавить элемент в модуль"
       find_links_using_service: "Поиск ссылок с помощью %{service}"
   select_navigation_links_68e1e924: "Выбор навигационных ссылок"
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Выберите файл, который вы хотите связать, или добавьте файл, выбрав пункт \"Новый файл\"."
   selected_answer: "Вы выбрали этот ответ."
   selected_subtree_a7693937: "Выбранное %{subtree}"
   self_enrollments: 
@@ -13630,12 +13648,16 @@ ru:
     event_list: 
       at_least_more_events: "не менее %{count_of_events}"
       at_least_more_events_one_week: "как минимум, еще %{count_of_events} на прошлой неделе"
+      at_least_more_events_one_week_future: "не менее %{count_of_events} на следующей неделе"
       at_least_more_events_two_weeks: "как минимум, еще %{count_of_events} за последние две недели"
+      at_least_more_events_two_weeks_future: "не менее %{count_of_events} на следующих двух неделях"
       links: 
         view_calendar: "Просмотр календаря"
       more_events: "Другие %{count_of_events}"
       more_events_one_week: "еще %{count_of_events} на прошлой неделе"
+      more_events_one_week_future: "Другие %{count_of_events} на следующей неделе"
       more_events_two_weeks: "еще %{count_of_events} за последние две недели"
+      more_events_two_weeks_future: "Другие %{count_of_events} на следующих двух неделях"
       nothing_for_now: "Сейчас ничего"
       nothing_one_week: "Ничего для следующей недели"
       nothing_two_weeks: "Ничего для следующих двух недель"
@@ -14490,6 +14512,7 @@ ru:
     submission_download: 
       download_message: "**Отправки студентов оцениваются** и сжимаются в архивный файл. Это может занять некоторое время в зависимости от размера и числа файлов отправки."
       gathering_files: "Сбор файлов..."
+  submissions_11e96106: Отправки
   submit_a3cc6859: Отправить
   submitted_datetime_fa2e9287: "Отправлено: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} успешно перемещена в %{newGroup}"
@@ -14502,6 +14525,7 @@ ru:
       two_words_connector: " и "
       words_connector: ", "
     help_menu: 
+      community_support_description: "Взаимодействовать с коллегами и получить помощь от них."
       community_support_forums: "Форумы поддержки сообщества"
       contact_support: "Связаться со службой поддержки"
       contact_support_sub_text: "Получить помощь по срочным вопросам."
@@ -14890,6 +14914,7 @@ ru:
   unlock_date_cannot_be_before_section_start_793ddc66: "Дата разблокировки не может быть раньше начала раздела"
   unlock_date_cannot_be_before_term_start_d3c01813: "Дата разблокировки не может быть раньше начала семестра"
   unpublished_courses_title: "Неопубликованные курсы"
+  unstarted_932f2990: "Не начато"
   unsupported_package: "Неподдерживаемый пакет содержимого"
   until_date_949017c4: "До %{date}"
   untitled_assignment_59354b34: "задание без названия"
