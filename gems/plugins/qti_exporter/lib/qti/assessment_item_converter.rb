@@ -131,7 +131,8 @@ class AssessmentItemConverter
 
   QUESTION_TYPE_MAPPING = {
     /matching/i => 'matching_question',
-    'textInformation' => 'text_only_question',
+    /text\s?information/i => 'text_only_question',
+    /image/i => 'text_only_question',
     'trueFalse' => 'true_false_question',
     'multiple_dropdowns' => 'multiple_dropdowns_question'
   }
