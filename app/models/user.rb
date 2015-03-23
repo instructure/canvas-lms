@@ -2181,10 +2181,6 @@ class User < ActiveRecord::Base
   TAB_EPORTFOLIOS = 3
   TAB_HOME = 4
 
-  def highest_role
-    roles.last
-  end
-
   def roles(root_account)
     return @roles if @roles
     @roles = ['user']
