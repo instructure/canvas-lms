@@ -330,8 +330,8 @@
                     <%= t('labels.require_access_code', "Require an access code") %>
                   </label>
 
-                  <div class="options control-group">
-                    <input type="text" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>" placeholder="ex: Password85" />
+                  <div class="options control-group screenreader-only">
+                    <input type="text" tabindex="-1" aria-label="<%=t('quiz_access_code', "Required access code")%>" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>" placeholder="ex: Password85"  />
                   </div>
                 </div>
                 <div class="option-group">
@@ -339,9 +339,9 @@
                     <input type="checkbox" <%= 'checked' if !@quiz.ip_filter.blank? %> id="enable_quiz_ip_filter">
                     <%= t('labels.ip_filter', "Filter IP Addresses") %>
                   </label>
-                  <div class="options control-group">
-                    <input type="text" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255" placeholder="ex: 192.168.217.1" />
-                    <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => t('titles.find_ip_address_filter', 'Find IP Address Filter')) %>
+                  <div class="options control-group screenreader-only" aria-hidden="<%= !@quiz.ip_filter.blank? %>">
+                    <input type="text" tabindex="-1" aria-label="<%=t('labels.ip_addresses', "Filter by IP address")%>" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255" placeholder="ex: 192.168.217.1"  />
+                    <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => t('titles.find_ip_address_filter', 'Find IP Address Filter'), 'aria-label' => t('titles.find_ip_address_filter', 'Find IP Address Filter'), :tabindex => -1) %>
                   </div>
                 </div>
                 <% if feature_enabled?(:lockdown_browser) && !@quiz.lockdown_browser_use_lti_tool? %>

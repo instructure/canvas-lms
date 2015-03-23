@@ -1455,7 +1455,26 @@ define([
       var $optionGroup = $checkbox.closest('.option-group');
       var checked = $checkbox.prop('checked');
 
-      $optionGroup.find('> .options').toggle(checked);
+      // All of this magic here is so that VoiceOver will properly navigate to
+      // the inputs after they are shown.
+      var $foundOptions = $optionGroup.find('> .options');
+      if (checked) {
+        $foundOptions.removeClass('screenreader-only');
+        // We have to do this bit so keyboard only users aren't confused
+        // when their focus goes to something shown offscreen.
+        $foundOptions.find('[tabindex="-1"]').each(function (k,v) {
+          $(v).attr('tabindex', 0);
+        });
+      } else {
+        $foundOptions.addClass('screenreader-only');
+        // Same as above
+        $foundOptions.find('[tabindex="0"]').each(function (k,v) {
+          $(v).attr('tabindex', -1);
+        });
+      }
+
+
+
 
       if (!checked) {
         $optionGroup
