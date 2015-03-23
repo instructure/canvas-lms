@@ -1,7 +1,6 @@
 <% answer = multi_answer %>
 <% question ||= {} %>
 <% answer_text = (hash_get(answer, :html).present? ? hash_get(answer, :html).html_safe : hash_get(answer, :text)) || '' %>
-<% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
 <div class="answer">
   <% if question_type.entry_type == "radio" || question_type.entry_type == "select" || question_type.entry_type == "checkbox" %>
     <table>
@@ -12,9 +11,9 @@
             <%= "+" if hash_get(answer, :weight) == 100 %>
           <% elsif question_type.entry_type == "checkbox" %>
             <input type="hidden" name="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" value="0"/>
-            <input type="checkbox" <%= "checked" if @stored_params["question_#{hash_get(question, :id)}_answer_#{hash_get(answer, :id)}"].to_s == "1" %> class="question_input" name="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" value="1" id="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" aria-label="<%= answer_label %>" />
+            <input type="checkbox" <%= "checked" if @stored_params["question_#{hash_get(question, :id)}_answer_#{hash_get(answer, :id)}"].to_s == "1" %> class="question_input" name="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" value="1" id="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" />
           <% else %>
-            <input type="radio" <%= "checked" if @stored_params["question_#{hash_get(question, :id)}"].to_s == hash_get(answer, :id).to_s %> class="question_input" name="question_<%= hash_get(question, :id) %>" value="<%= hash_get(answer, :id) %>" id="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" aria-label="<%= answer_label %>" />
+            <input type="radio" <%= "checked" if @stored_params["question_#{hash_get(question, :id)}"].to_s == hash_get(answer, :id).to_s %> class="question_input" name="question_<%= hash_get(question, :id) %>" value="<%= hash_get(answer, :id) %>" id="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" />
           <% end %>
         </td>
         <td class="answer_label">
