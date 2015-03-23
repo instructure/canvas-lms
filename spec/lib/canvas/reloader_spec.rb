@@ -1,4 +1,5 @@
-# Copyright (C) 2013 Instructure, Inc.
+#
+# Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,28 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Traps SIGHUP to clear the Setting cache and other associated caches, without requiring a full restart of
-# Canvas
-module Canvas::Reloader
-  def self.reload!
-    Setting.reset_cache!
-    Canvas::RequestThrottle.reload!
-    to_reload.each(&:call)
-  end
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-  def self.on_reload(&block)
-    to_reload << block
-  end
-
-  def self.trap_signal
-    trap("HUP") do
-      Rails.logger.info("Canvas::Reloader fired")
-      Canvas::Reloader.reload!
-    end
-  end
-
-  private
-  def self.to_reload
-    @to_reload ||= []
+describe Canvas::Reloader do
+  it "should call registered callbacks" do
+    callback_count = 0
+    Canvas::Reloader.on_reload { callback_count += 1 }
+    Canvas::Reloader.reload!
+    expect(callback_count).to eq 1
   end
 end
