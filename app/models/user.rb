@@ -2361,11 +2361,14 @@ class User < ActiveRecord::Base
   end
 
   def can_create_enrollment_for?(course, session, type)
-    can_add = %w{StudentEnrollment ObserverEnrollment}.include?(type) && course.grants_right?(self, session, :manage_students)
-    can_add ||= type == 'TeacherEnrollment' && course.teacherless? && course.grants_right?(self, session, :manage_students)
-    can_add ||= course.grants_right?(self, session, :manage_admin_users)
-
-    can_add
+    if type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
+      return true
+    end
+    if course.grants_right?(self, session, :manage_students)
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
+        return true
+      end
+    end
   end
 
   def can_be_enrolled_in_course?(course)
