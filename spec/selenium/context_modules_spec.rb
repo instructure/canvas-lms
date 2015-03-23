@@ -883,6 +883,20 @@ describe "context_modules" do
       expect(tooltip).to include_text 'Everyone else'
     end
 
+    it "should publish a file from the modules page" do
+      @module = @course.context_modules.create!(:name => "some module")
+      @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
+      @tag = @module.add_item({:id => @file.id, :type => 'attachment'})
+      expect(@file.reload).not_to be_published
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      f("[data-id='#{@file.id}'] > button.published-status").click
+      ff(".permissions-dialog-form input[name='permissions']")[0].click
+      f(".permissions-dialog-form [type='submit']").click
+      wait_for_ajaximations
+      expect(@file.reload).to be_published
+    end
+
     it "should show the file publish button on course home" do
       @course.default_view = 'modules'
       @course.save!

@@ -24,6 +24,17 @@ class ContextModulesController < ApplicationController
   before_filter { |c| c.active_tab = "modules" }
 
   module ModuleIndexHelper
+    def load_module_file_details
+      @context.module_items_visible_to(@current_user).where(content_type: 'Attachment').inject({}) do |items, file_tag|
+        items[file_tag.id] = {
+            id: file_tag.id,
+            content_id: file_tag.content_id,
+            content_details: content_details(file_tag, @current_user)
+        }
+        items
+      end
+    end
+
     def load_modules
       @modules = @context.modules_visible_to(@current_user)
       @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
@@ -34,13 +45,10 @@ class ContextModulesController < ApplicationController
                                         :root_account => @domain_root_account, :current_user => @current_user).to_a
       placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
 
-      if @context.grants_right?(@current_user, session, :manage_content)
-        @modules_json = @modules.map{|mod| module_json(mod, @current_user, session, nil, ['content_details', 'items']) }
-      end
-
+      module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env :course_id => @context.id,
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
-        :MODULES => @modules_json,
+        :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.feature_enabled?(:usage_rights_required),
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
