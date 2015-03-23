@@ -24,12 +24,47 @@ describe AlignmentsHelper do
   include Rails.application.routes.url_helpers
 
   before(:once) do
+    account_model
     assignment_model
   end
 
-  let(:outcome) {
-    @course.created_learning_outcomes.create!(:title => 'outcome')
+  let_once(:outcome) {
+    @course.created_learning_outcomes.create!(title: 'outcome')
   }
+
+  let_once(:account_outcome) {
+    @account.created_learning_outcomes.create!(title: 'account outcome!')
+  }
+
+  let_once(:alignment) {
+    (outcome.alignments << ContentTag.create({
+      content: outcome,
+      context: outcome.context,
+      tag_type: 'learning_outcome'
+    })).first
+  }
+
+  let_once(:graded_alignment) {
+    (outcome.alignments << ContentTag.create({
+      content: @assignment,
+      context: outcome.context,
+      tag_type: 'learning_outcome'
+    })).first
+  }
+
+  describe "outcome_alignment_url" do
+    context "without an alignment" do
+      it "should return nil if context is an account" do
+        expect(outcome_alignment_url(@account, account_outcome)).to be_nil
+      end
+    end
+
+    context "with an alignment" do
+      it "should return a url path" do
+        expect(outcome_alignment_url(@account, account_outcome, alignment)).to be_truthy
+      end
+    end
+  end
 
   describe "link_to_outcome_alignment" do
     context "without an alignment" do
@@ -46,13 +81,6 @@ describe AlignmentsHelper do
     end
 
     context "with an alignment" do
-      let(:alignment) {
-        (outcome.alignments << ContentTag.create({
-          content: outcome,
-          context: outcome.context,
-          tag_type: 'learning_outcome'
-        })).first
-      }
       let(:string) {
         link_to_outcome_alignment(@course, outcome, alignment)
       }
@@ -93,13 +121,6 @@ describe AlignmentsHelper do
     end
 
     context "with an alignment" do
-      let(:alignment) {
-        (outcome.alignments << ContentTag.create({
-          content: outcome,
-          context: outcome.context,
-          tag_type: 'learning_outcome'
-        })).first
-      }
       let(:string) { outcome_alignment_tag(@course, outcome, alignment) {} }
       let(:html) { Nokogiri::HTML.fragment(string).children[0] }
 
@@ -124,14 +145,7 @@ describe AlignmentsHelper do
     end
 
     context "with a graded alignment" do
-      let(:alignment) {
-        (outcome.alignments << ContentTag.create({
-          content: @assignment,
-          context: outcome.context,
-          tag_type: 'learning_outcome'
-        })).first
-      }
-      let(:string) { outcome_alignment_tag(@course, outcome, alignment) {} }
+      let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) {} }
       let(:html) { Nokogiri::HTML.fragment(string).children[0] }
 
       it "should include html class 'also_assignment'" do
@@ -146,14 +160,7 @@ describe AlignmentsHelper do
           purpose: "grading"
         })
       }
-      let(:alignment) {
-        (outcome.alignments << ContentTag.create({
-          content: @assignment,
-          context: outcome.context,
-          tag_type: 'learning_outcome'
-        })).first
-      }
-      let(:string) { outcome_alignment_tag(@course, outcome, alignment) {} }
+      let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) {} }
       let(:html) { Nokogiri::HTML.fragment(string).children[0] }
 
       it "should have html 'data-has-rubric-association' data attritbute" do
