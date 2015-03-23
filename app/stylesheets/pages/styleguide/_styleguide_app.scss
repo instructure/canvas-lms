@@ -110,3 +110,26 @@ $sg-Header-height: 85px;
   .Colorguide-color--dark       {@include colorguide(#333333);}  
 }
 
+.sg-bg-color-example {
+  background: $ic-bg-light-primary;
+  font-size: 14px;
+  color: $ic-brand-primary;
+  padding: $ic-sp;
+  &--neutral {
+    color: $ic-color-dark;
+    background: $ic-bg-light-neutral;
+  }
+  &--success {
+    color: $ic-color-success;
+    background: $ic-bg-light-success;
+  }
+  &--alert {
+    color: $ic-color-alert;
+    background: $ic-bg-light-alert;
+  }
+  &--danger {
+    color: $ic-color-danger;
+    background: $ic-bg-light-danger;
+  }
+}
+
