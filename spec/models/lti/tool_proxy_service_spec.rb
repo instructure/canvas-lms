@@ -104,6 +104,19 @@ module Lti
         expect(binding.context).to eq account
       end
 
+      it 'creates a tool setting for the tool proxy if custom is defined' do
+        tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
+        expect(tool_proxy.tool_settings.count).to eq 1
+        expect(tool_proxy.tool_settings.first.custom).to eq({"customerId"=>"394892759526"})
+      end
+
+      it 'does not create a tool setting for the tool proxy if custom is not defined' do
+        tool_proxy = JSON.parse(tool_proxy_fixture)
+        tool_proxy.delete('custom')
+        tool_proxy = subject.process_tool_proxy_json(tool_proxy.to_json, account, tool_proxy_guid)
+        expect(tool_proxy.tool_settings.count).to eq 0
+      end
+
       it 'creates a tool_proxy' do
         SecureRandom.stubs(:uuid).returns('my_uuid')
         tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
