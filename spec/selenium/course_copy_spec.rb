@@ -138,7 +138,11 @@ describe "course copy" do
       @course.syllabus_body = "<p>haha</p>"
       @course.save!
 
-      get "/courses/#{@course.id}/copy"
+      get "/courses/#{@course.id}/settings"
+      link = f('.copy_course_link')
+      expect(link).to be_displayed
+
+      expect_new_page_load { link.click }
 
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
