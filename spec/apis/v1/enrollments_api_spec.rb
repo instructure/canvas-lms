@@ -88,6 +88,22 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
       end
 
+      it "should be unauthorized for users without manage_students permission" do
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
+        json = api_call :post, @path, @path_options,
+                        {
+                            :enrollment => {
+                                :user_id                            => @unenrolled_user.id,
+                                :type                               => 'StudentEnrollment',
+                                :enrollment_state                   => 'active',
+                                :course_section_id                  => @section.id,
+                                :limit_privileges_to_course_section => true,
+                                :start_at                           => nil,
+                                :end_at                             => nil
+                            }
+                        }, {}, {:expected_status => 401}
+      end
+
       it "should create a new teacher enrollment" do
         json = api_call :post, @path, @path_options,
           {
