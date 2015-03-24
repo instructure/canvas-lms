@@ -468,16 +468,16 @@ class DiscussionTopicsController < ApplicationController
               :TOPIC => {
                 :ID => @topic.id,
                 :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
-                :IS_PUBLISHED => @topic.published?,
+                :IS_PUBLISHED  => @topic.published?,
                 :CAN_UNPUBLISH => @topic.can_unpublish?,
-
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @topic.grants_right?(@current_user, session, :reply),     # Can reply
-                :CAN_ATTACH     => @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
-                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                                    !@topic.locked_for?(@current_user, :check_policies => true),           # Can moderate their own topics
-                :MODERATE       => user_can_moderate                                                        # Can moderate any topic
+                :CAN_REPLY        => @topic.grants_right?(@current_user, session, :reply),       # Can reply
+                :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),      # Can attach files on replies
+                :CAN_READ_REPLIES => @topic.grants_right?(@current_user, :read_replies),
+                :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
+                                    !@topic.locked_for?(@current_user, :check_policies => true), # Can moderate their own topics
+                :MODERATE         => user_can_moderate                                           # Can moderate any topic
               },
               :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
               :ENTRY_ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_entry_list_url, @topic),

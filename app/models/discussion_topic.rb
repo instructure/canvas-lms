@@ -757,6 +757,9 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
+    given { |user| self.grants_right?(user, :read) }
+    can :read_replies
+
     given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) }
     can :reply
 

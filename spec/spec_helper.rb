@@ -466,7 +466,7 @@ RSpec.configure do |config|
   def course(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
-      @course = Course.create!(:name => opts[:course_name], :account => account)
+      @course = Course.create!(:name => opts[:course_name], :account => account, :is_public => !!opts[:is_public])
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
         u = User.create!

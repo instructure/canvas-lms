@@ -97,6 +97,8 @@ class DiscussionTopicsApiController < ApplicationController
   #     ]
   #   }
   def view
+    return unless authorized_action(@topic, @current_user, :read_replies)
+
     structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
 
     if structure
