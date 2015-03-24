@@ -1,7 +1,8 @@
 define([
   'jquery',
+  'old_unsupported_dont_use_react',
   '../jsx/sfu_copyright_compliance_notice/SFUCopyrightComplianceNoticeModalDialog'
-], function($, SFUCopyrightComplianceModalDialog) {
+], function($, React, SFUCopyrightComplianceModalDialog) {
 
     var render = function(formId) {
         React.renderComponent(SFUCopyrightComplianceModalDialog({
@@ -9,7 +10,6 @@ define([
             formId: formId
         }), document.getElementById('wizard_box'));
     };
-
 
     var attachClickHandler = function(formId) {
         var $button = $('#' + formId + ' button.btn-publish');
