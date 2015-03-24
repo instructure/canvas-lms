@@ -1,9 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 200 200" enable-background="new 0 0 200 200" xml:space="preserve">
-<g id="check_plus">
-	<path fill="#767676" d="M75,125L37.5,75L0,137.5c22.2,7.5,48,18.4,75,50c19.1-33.1,87.5-100,125-100V0C125,25,75,125,75,125z
-		 M175,125h-25v25h-25v25h25v25h25v-25h25v-25h-25V125z"/>
-</g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2 (9964) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="check_plus" sketch:type="MSLayerGroup" fill="#767676">
+            <path d="M6.75,11.25 L3.375,6.75 L0,12.375 C1.998,13.05 4.32,14.031 6.75,16.875 C8.469,13.896 14.625,7.875 18,7.875 L18,0 C11.25,2.25 6.75,11.25 6.75,11.25 L6.75,11.25 Z M15.75,11.25 L13.5,11.25 L13.5,13.5 L11.25,13.5 L11.25,15.75 L13.5,15.75 L13.5,18 L15.75,18 L15.75,15.75 L18,15.75 L18,13.5 L15.75,13.5 L15.75,11.25 L15.75,11.25 Z" id="Shape" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
 </svg>
