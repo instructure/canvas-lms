@@ -33,14 +33,18 @@ class GradingPeriod < ActiveRecord::Base
     "GradingPeriod::#{context.class}GradingPeriodFinder".constantize.new(context).grading_periods
   end
 
-  # the keyword arguemnts version of this method is as follow:
+  # the keyword arguments version of this method is as follow:
   # def self.context_find(context: context, id: id)
-  def self.context_find(options = {}) # in preperation for keyword arguments
+  def self.context_find(options = {}) # in preparation for keyword arguments
     fail ArgumentCountError unless options.count == 2
     fail ArgumentError unless context = options.fetch(:context)
     fail ArgumentError unless id = options.fetch(:id)
 
     self.for(context).detect { |grading_period| grading_period.id == id.to_i }
+  end
+
+  def current?
+    start_date <= Time.now && end_date >= Time.now
   end
 
   # save the previous definition of `destroy` and alias it to `destroy!`

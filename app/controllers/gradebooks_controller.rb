@@ -184,8 +184,8 @@ class GradebooksController < ApplicationController
   def set_current_grading_period
     unless @current_grading_period_id = params[:grading_period_id].presence
       return if view_all_grading_periods?
-      return unless current = @context.grading_periods.active.current.first
-      @current_grading_period_id = current.try(:id).to_s
+      return unless current = GradingPeriod.for(@context).find(&:current?)
+      @current_grading_period_id = current.id.to_s
     end
   end
 
@@ -194,7 +194,7 @@ class GradebooksController < ApplicationController
   end
 
   def get_active_grading_periods
-    @context.grading_periods.active.map { |gp| {id: gp.id, title: gp.title} }
+    GradingPeriod.for(@context).map { |gp| {id: gp.id, title: gp.title} }
   end
 
   def set_js_env

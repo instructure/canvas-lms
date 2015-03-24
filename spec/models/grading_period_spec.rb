@@ -115,5 +115,27 @@ describe GradingPeriod do
       expect(gp2.assignments(@course.assignments)).to eq [a2, a3]
     end
   end
+
+  describe "#current" do
+    let(:grading_period) { create_grading_periods_for(Account.default, grading_periods: [:current]).first }
+
+    it "returns false for a grading period in the past" do
+      grading_period.start_date = 2.months.ago
+      grading_period.end_date = 1.month.ago
+      expect(grading_period.current?).to be false
+    end
+
+    it "returns true if the current time falls between the start date and end date (inclusive)" do
+      grading_period.start_date = 1.month.ago
+      grading_period.end_date = 1.month.from_now
+      expect(grading_period.current?).to be true
+    end
+
+    it "returns false for a grading period in the future" do
+      grading_period.start_date = 1.month.from_now
+      grading_period.end_date = 2.months.from_now
+      expect(grading_period.current?).to be false
+    end
+  end
 end
 

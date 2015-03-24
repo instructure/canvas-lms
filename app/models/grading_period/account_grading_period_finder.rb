@@ -25,10 +25,11 @@ class GradingPeriod
 
     def grading_periods
       gps = GradingPeriod.active.grading_periods_by(account_id: account.id)
-      if gps.present?
+      parent_account = account.parent_account
+      if gps.present? || !parent_account
         gps
       else
-        AccountGradingPeriodFinder.new(account.parent_account).grading_periods
+        AccountGradingPeriodFinder.new(parent_account).grading_periods
       end
     end
 
