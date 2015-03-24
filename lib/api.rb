@@ -412,7 +412,14 @@ module Api
                 end
       end
 
-      next unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
+      unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
+        if obj && obj.previewable_media? && (uri = URI.parse(match.url) rescue nil)
+          uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
+          next uri.to_s
+        else
+          next
+        end
+      end
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         opts = {:only_path => true}

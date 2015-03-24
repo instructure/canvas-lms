@@ -282,8 +282,7 @@ class Attachment < ActiveRecord::Base
     return true if self.class.skip_media_object_creation?
     in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/
     transitioned_to_this_state = self.id_was == nil || self.file_state_changed? && self.workflow_state_was =~ /^unattached/
-    if in_the_right_state && transitioned_to_this_state &&
-        self.content_type && self.content_type.match(/\A(video|audio)/)
+    if in_the_right_state && transitioned_to_this_state && self.previewable_media?
       delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
       MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
     end
@@ -392,7 +391,7 @@ class Attachment < ActiveRecord::Base
       self.namespace = infer_namespace
     end
 
-    self.media_entry_id ||= 'maybe' if self.new_record? && self.content_type && self.content_type.match(/(video|audio)/)
+    self.media_entry_id ||= 'maybe' if self.new_record? && self.previewable_media?
   end
   protected :default_values
 
@@ -1456,6 +1455,10 @@ class Attachment < ActiveRecord::Base
   def crocodoc_url(user)
     return unless crocodoc_available?
     "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
+  end
+
+  def previewable_media?
+    self.content_type && self.content_type.match(/\A(video|audio)/)
   end
 
   def preview_params(user, type)
