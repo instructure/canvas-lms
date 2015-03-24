@@ -1484,7 +1484,7 @@ pt-BR:
     update: Atualizar
   archive_3f794d7e: Arquivar
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
-    one: "Tem certeza de que deseja excluir esses %{count} itens?"
+    one: "Tem certeza de que deseja excluir esses %{name} itens?"
     other: "Tem certeza de que deseja excluir esses %{count} itens?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Tem certeza de que deseja excluir este anúncio?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Tem certeza de que deseja excluir este período de avaliação?"
