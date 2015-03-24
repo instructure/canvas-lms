@@ -1038,7 +1038,7 @@ class CoursesController < ApplicationController
   #   Disable comments on announcements
   #
   # @argument restrict_student_past_view [Boolean]
-  #   Restrict students from preventing courses after end date
+  #   Restrict students from viewing courses after end date
   #
   # @argument restrict_student_future_view [Boolean]
   #   Restrict students from viewing courses before start date
