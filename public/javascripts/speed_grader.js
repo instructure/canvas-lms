@@ -30,7 +30,6 @@ define([
   'rubric_assessment',
   'jst/_turnitinInfo',
   'jst/_turnitinScore',
-  'ajax_errors' /* INST.log_error */,
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* getJSON, ajaxJSON */,
   'jquery.instructure_forms' /* ajaxJSONFiles */,
@@ -1129,105 +1128,97 @@ define([
 
     handleSubmissionSelectionChange: function(){
       clearInterval(crocodocSessionTimer);
-      try {
-        var $submission_to_view = $("#submission_to_view");
-        var submissionToViewVal = $submission_to_view.val(),
-            currentSelectedIndex = Number(submissionToViewVal) ||
-                                  ( this.currentStudent &&
-                                    this.currentStudent.submission &&
-                                    this.currentStudent.submission.currentSelectedIndex )
-                                  || 0,
-            isMostRecent = this.currentStudent &&
-                           this.currentStudent.submission &&
-                           this.currentStudent.submission.submission_history &&
-                           this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
-            submission  = this.currentStudent &&
-                          this.currentStudent.submission &&
-                          this.currentStudent.submission.submission_history &&
-                          this.currentStudent.submission.submission_history[currentSelectedIndex] &&
-                          this.currentStudent.submission.submission_history[currentSelectedIndex].submission
-                          || {},
-            inlineableAttachments = [],
-            browserableAttachments = [];
+      var $submission_to_view = $("#submission_to_view");
+      var submissionToViewVal = $submission_to_view.val(),
+          currentSelectedIndex = Number(submissionToViewVal) ||
+                                ( this.currentStudent &&
+                                  this.currentStudent.submission &&
+                                  this.currentStudent.submission.currentSelectedIndex )
+                                || 0,
+          isMostRecent = this.currentStudent &&
+                         this.currentStudent.submission &&
+                         this.currentStudent.submission.submission_history &&
+                         this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
+          submission  = this.currentStudent &&
+                        this.currentStudent.submission &&
+                        this.currentStudent.submission.submission_history &&
+                        this.currentStudent.submission.submission_history[currentSelectedIndex] &&
+                        this.currentStudent.submission.submission_history[currentSelectedIndex].submission
+                        || {},
+          inlineableAttachments = [],
+          browserableAttachments = [];
 
-        var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
-            $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
-            assetString = 'submission_' + submission.id,
-            turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
-        // There might be a previous submission that was text_entry, but the
-        // current submission is an upload. The turnitin asset for the text
-        // entry would still exist
-        if (turnitinAsset && submission.submission_type == 'online_text_entry') {
+      var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
+          $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
+          assetString = 'submission_' + submission.id,
+          turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
+      // There might be a previous submission that was text_entry, but the
+      // current submission is an upload. The turnitin asset for the text
+      // entry would still exist
+      if (turnitinAsset && submission.submission_type == 'online_text_entry') {
+        EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
+      }
+
+      //handle the files
+      $submission_files_list.empty();
+      $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
+      $.each(submission.versioned_attachments || [], function(i,a){
+        var attachment = a.attachment;
+        if (attachment.crocodoc_url ||
+            attachment.canvadoc_url ||
+            $.isPreviewable(attachment.content_type, 'google')) {
+          inlineableAttachments.push(attachment);
+        }
+        if (browserableCssClasses.test(attachment.mime_class)) {
+          browserableAttachments.push(attachment);
+        }
+        $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
+          data: {
+            submissionId: submission.user_id,
+            attachmentId: attachment.id,
+            display_name: attachment.display_name
+          },
+          hrefValues: ['submissionId', 'attachmentId']
+        }).appendTo($submission_files_list)
+          .find('a.display_name')
+            .addClass(attachment.mime_class)
+            .data('attachment', attachment)
+            .click(function(event){
+              event.preventDefault();
+              EG.loadAttachmentInline($(this).data('attachment'));
+            })
+          .end()
+          .find('a.submission-file-download')
+            .bind('dragstart', function(event){
+              // check that event dataTransfer exists
+              event.originalEvent.dataTransfer &&
+              // handle dragging out of the browser window only if it is supported.
+              event.originalEvent.dataTransfer.setData('DownloadURL', attachment.content_type + ':' + attachment.filename + ':' + this.href);
+            })
+          .end()
+          .show();
+        $turnitinScoreContainer = $submission_file.find(".turnitin_score_container");
+        assetString = 'attachment_' + attachment.id;
+        turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
+        if (turnitinAsset) {
           EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
         }
+      });
 
-        //handle the files
-        $submission_files_list.empty();
-        $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
-        $.each(submission.versioned_attachments || [], function(i,a){
-          var attachment = a.attachment;
-          if (attachment.crocodoc_url ||
-              attachment.canvadoc_url ||
-              $.isPreviewable(attachment.content_type, 'google')) {
-            inlineableAttachments.push(attachment);
-          }
-          if (browserableCssClasses.test(attachment.mime_class)) {
-            browserableAttachments.push(attachment);
-          }
-          $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
-            data: {
-              submissionId: submission.user_id,
-              attachmentId: attachment.id,
-              display_name: attachment.display_name
-            },
-            hrefValues: ['submissionId', 'attachmentId']
-          }).appendTo($submission_files_list)
-            .find('a.display_name')
-              .addClass(attachment.mime_class)
-              .data('attachment', attachment)
-              .click(function(event){
-                event.preventDefault();
-                EG.loadAttachmentInline($(this).data('attachment'));
-              })
-            .end()
-            .find('a.submission-file-download')
-              .bind('dragstart', function(event){
-                // check that event dataTransfer exists
-                event.originalEvent.dataTransfer &&
-                // handle dragging out of the browser window only if it is supported.
-                event.originalEvent.dataTransfer.setData('DownloadURL', attachment.content_type + ':' + attachment.filename + ':' + this.href);
-              })
-            .end()
-            .show();
-          $turnitinScoreContainer = $submission_file.find(".turnitin_score_container");
-          assetString = 'attachment_' + attachment.id;
-          turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
-          if (turnitinAsset) {
-            EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
-          }
-        });
+      $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
 
-        $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
+      // load up a preview of one of the attachments if we can.
+      // do it in this order:
+      // show the first scridbable doc if there is one
+      // then show the first image if there is one,
+      // if not load the generic thing for the current submission (by not passing a value)
+      this.loadAttachmentInline(inlineableAttachments[0] || browserableAttachments[0]);
 
-        // load up a preview of one of the attachments if we can.
-        // do it in this order:
-        // show the first scridbable doc if there is one
-        // then show the first image if there is one,
-        // if not load the generic thing for the current submission (by not passing a value)
-        this.loadAttachmentInline(inlineableAttachments[0] || browserableAttachments[0]);
+      // if there is any submissions after this one, show a notice that they are not looking at the newest
+      $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
-        // if there is any submissions after this one, show a notice that they are not looking at the newest
-        $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
-
-        // if the submission was after the due date, mark it as late
-        $submission_late_notice.showIf(submission['late']);
-      } catch(e) {
-        INST.log_error({
-          'message': "SG_submissions_" + (e.message || e.description || ""),
-          'line': e.lineNumber || ''
-        });
-        throw e;
-      }
+      // if the submission was after the due date, mark it as late
+      $submission_late_notice.showIf(submission['late']);
     },
 
     refreshSubmissionsToView: function(){
