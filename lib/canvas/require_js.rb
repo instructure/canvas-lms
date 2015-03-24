@@ -116,6 +116,9 @@ module Canvas
             'bower/react-modal/dist/react-modal': {
               deps: ['react']
             },
+            'bower/react-tokeninput/dist/react-tokeninput': {
+              deps: ['react'],
+            },
             'bower/ember/ember': {
               deps: ['jquery', 'handlebars'],
               exports: 'Ember'
