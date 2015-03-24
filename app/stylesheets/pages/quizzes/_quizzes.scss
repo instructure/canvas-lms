@@ -455,6 +455,13 @@ div#content {
         cursor: pointer;
       }
     }
+    .group_display.name {
+      font-weight: bold;
+      padding-right: 20px;
+      line-height: 20px;
+      font-size: 14px;
+      display: inline;
+    }
     .group_display.hidden {
       display: none;
     }
@@ -533,7 +540,7 @@ div#content {
   .move {
     display: none;
     // Don't display the "move"  icon since the the new order change isn't persisted for a bank. #10148
- 
+
   }
 }
 
