@@ -21,6 +21,6 @@
     "react-router": "0.11.6",
     "react-modal": "0.1.1",
     "tinymce": "4.1.9",
-    "react-tokeninput": "https://github.com/instructure-react/react-tokeninput.git#696676cec773f2eede6e2563cce8336bc7675940"
+    "react-tokeninput": "https://github.com/instructure-react/react-tokeninput.git#916809b9e6ba45a496cdabda2a94f976f6ada1b2"
   }
 }

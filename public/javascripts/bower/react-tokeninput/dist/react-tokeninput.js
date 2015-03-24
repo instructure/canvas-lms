@@ -77,7 +77,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    onSelect: React.PropTypes.func.isRequired,
 	    onRemove: React.PropTypes.func.isRequired,
 	    selected: React.PropTypes.array.isRequired,
-	    menuContent: React.PropTypes.any
+	    menuContent: React.PropTypes.any,
+	    showListOnFocus: React.PropTypes.bool
 	  },
 	
 	  getInitialState: function() {
@@ -129,6 +130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          id: this.props.id,
 	          ariaLabel: this.props['combobox-aria-label'],
 	          onInput: this.handleInput,
+	          showListOnFocus: this.props.showListOnFocus,
 	          onSelect: this.handleSelect,
 	          onRemoveLast: this.handleRemoveLast,
 	          value: this.state.selectedToken
@@ -240,7 +242,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      autocomplete: 'both',
 	      onInput: k,
 	      onSelect: k,
-	      value: null
+	      value: null,
+	      showListOnFocus: false
 	    };
 	  },
 	
@@ -345,6 +348,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }.bind(this));
 	  },
 	
+	  handleInputFocus: function() {
+	    if (this.props.showListOnFocus){
+	      this.showList()
+	    }
+	  },
+	
 	  handleInputBlur: function() {
 	    var focusedAnOption = this.state.focusedIndex != null;
 	    if (focusedAnOption)
@@ -357,6 +366,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // don't want to hide the list if we focused another option
 	    this.blurTimer = setTimeout(this.hideList, 0);
 	  },
+	
 	
 	  handleOptionFocus: function() {
 	    // see `handleOptionBlur`
@@ -567,6 +577,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        'aria-owns': this.state.listId,
 	        id: this.props.id,
 	        className: 'ic-tokeninput-input',
+	        onFocus: this.handleInputFocus,
 	        onChange: this.handleInputChange,
 	        onBlur: this.handleInputBlur,
 	        onKeyDown: this.handleKeydown,

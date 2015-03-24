@@ -28,7 +28,6 @@ define([
   'str/htmlEscape',
   'str/pluralize',
   'wikiSidebar',
-  'compiled/views/assignments/DueDateList',
   'compiled/views/assignments/DueDateOverride',
   'compiled/models/Quiz',
   'compiled/models/DueDateList',
@@ -58,7 +57,7 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(regradeTemplate, I18n,_,$,calcCmd, htmlEscape, pluralize,
-            wikiSidebar, DueDateListView, DueDateOverrideView, Quiz,
+            wikiSidebar, DueDateOverrideView, Quiz,
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
             RCEKeyboardShortcuts, INST, QuizFormulaSolution){
@@ -78,7 +77,9 @@ define([
         var _date = dates[date];
         if (!dates.hasOwnProperty(date)) continue;
         if (_override[_date]) {
-          _override[_date] = _override[_date].toUTCString();
+          if(_override[_date].toUTCString){
+            _override[_date] = _override[_date].toUTCString();
+          }
         } else {
           _override[_date] = "";
         }
@@ -116,11 +117,7 @@ define([
     overrideView = window.overrideView = new DueDateOverrideView({
       el: '.js-assignment-overrides',
       model: dueDateList,
-      views: {
-        'due-date-overrides': new DueDateListView({
-          model: dueDateList
-        })
-      }
+      views: {}
     });
 
     overrideView.render();
@@ -1616,19 +1613,12 @@ define([
         }
         data.allowed_attempts = attempts;
         data['quiz[allowed_attempts]'] = attempts;
-        overrideView.updateOverrides();
         var overrides = overrideView.getOverrides();
         if (ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED) {
           data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
         }
-        var quizData = overrideView.getDefaultDueDate();
-        if (quizData) {
-          quizData = quizData.toJSON().assignment_override;
-        } else {
-          quizData = {};
-        }
         var validationData = {
-          assignment_overrides: overrideView.getAllDates(quizData)
+          assignment_overrides: overrideView.getAllDates()
         };
         var errs = overrideView.validateBeforeSave(validationData,{});
         if (_.keys(errs).length > 0) {

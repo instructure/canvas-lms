@@ -6,7 +6,6 @@ define [
   'compiled/models/DueDateList'
   'compiled/models/Section'
   'compiled/views/assignments/AssignmentGroupSelector'
-  'compiled/views/assignments/DueDateList'
   'compiled/views/assignments/DueDateOverride'
   'compiled/views/assignments/EditView'
   'compiled/views/assignments/GradingTypeSelector'
@@ -16,7 +15,7 @@ define [
   'compiled/userSettings'
   'helpers/jquery.simulate'
 ], ($, _, SectionCollection, Assignment, DueDateList, Section,
-  AssignmentGroupSelector, DueDateListView, DueDateOverrideView, EditView,
+  AssignmentGroupSelector, DueDateOverrideView, EditView,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV, userSettings) ->
 
   defaultAssignmentOpts =
@@ -50,8 +49,7 @@ define [
       views:
         'js-assignment-overrides': new DueDateOverrideView
           model: dueDateList
-          views:
-            'due-date-overrides': new DueDateListView(model: dueDateList)
+          views: {}
 
     sinon.stub(app, "_initializeWikiSidebar")
     app.render()
@@ -59,6 +57,7 @@ define [
   module 'EditView',
     setup: ->
       fakeENV.setup()
+      ENV.VALID_DATE_RANGE = {}
     teardown: ->
       fakeENV.teardown()
 

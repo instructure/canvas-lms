@@ -79,13 +79,16 @@ describe "assignments" do
       ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
         f(element).click
       end
-      driver.find_element(:name, 'due_at').send_keys(due_at)
+
+      fj(".datePickerDateField[data-date-type='due_at']").send_keys(due_at)
+
       submit_assignment_form
       #confirm all our settings were saved and are now displayed
       wait_for_ajaximations
       expect(f('h1.title')).to include_text(assignment_name)
       expect(fj('#assignment_show .points_possible')).to include_text('10')
       expect(f('#assignment_show fieldset')).to include_text('a text entry box, a website url, or a file upload')
+
       expect(f('.assignment_dates')).to include_text(due_at)
       # unfreeze time
       Timecop.return
@@ -143,7 +146,8 @@ describe "assignments" do
         expect_new_page_load { f('.more_options').click }
         expect(f('#assignment_name').attribute(:value)).to include_text(expected_text)
         expect(f('#assignment_points_possible').attribute(:value)).to include_text(points)
-        expect(driver.find_element(:name, 'due_at').attribute(:value)).to eq due_at
+        due_at_field = fj(".date_field:first[data-date-type='due_at']")
+        expect(due_at_field.attribute(:value)).to eq due_at
         click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         expect(@course.assignments.count).to eq 1
@@ -155,7 +159,6 @@ describe "assignments" do
         Timecop.return
       end
     end
-
 
     it "should keep erased field on more options click" do
       enable_cache do
@@ -183,8 +186,11 @@ describe "assignments" do
         expect_new_page_load { fj('.more_options:eq(1)').click }
         expect(f("#assignment_name").text).to match ""
         expect(f("#assignment_points_possible").text).to match ""
-        expect(fj('.due-date-row:first div').text).to match ""
-        expect(fj('.due-date-row:last div').text).to match expected_date
+
+        first_input_val = driver.execute_script("return $('.DueDateInput__Container:first input').val();")
+        expect(first_input_val).to match expected_date
+        second_input_val = driver.execute_script("return $('.DueDateInput__Container:last input').val();")
+        expect(second_input_val).to match ""
       end
     end
 
@@ -305,7 +311,7 @@ describe "assignments" do
       it "should allow editing the due date even if completely frozen" do
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
-          replace_content(fj('.due-date-overrides form:first input[name=due_at]'), 'Sep 20, 2012')
+          replace_content(fj(".datePickerDateField[data-date-type='due_at']"), 'Sep 20, 2012')
         end
 
         expect(f('.assignment_dates').text).to match /Sep 20, 2012/

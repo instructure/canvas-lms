@@ -1,54 +1,97 @@
 @import "base/environment";
+@import "components/token_input";
 
-.js-assignment-overrides {
-  overflow: auto;
+$assign-border-color: #ccc;
 
-  .remove-link .icon-end {
-    color: $ic-icon-link-color;
-    vertical-align: middle;
-    &:hover, &:focus {
-      color: $ic-icon-link-color-hover;  
-    }
+// Overrides for New Assign section
+// Note: a lot of these are overrides due to
+// legacy code.
+.overrides-column-right.overrideFormFlex {
+  width: 500px; // only needed for legacy layout support
+  select, .subtitle {
+    margin-left: 0;
   }
-
-  .due-date-override-headers {
-    min-width: 812px;
-
-    div {
-      width: 183px;
-      float: left;
-      margin-right: 10px;
-    }
-  }
-
-  .due-date-overrides {
+  label:not(.ic-Label) {
+    padding: 0;
     margin: 0;
-
-    li.due-date-row {
-      list-style-type: none;
-      overflow: hidden;
-      min-width: 812px;
-      margin-bottom: 6px;
-      select {
-        float: left;
-        margin: 0px 10px 0px 0px;
-        width: 183px;
-      }
-      .date_field_container {
-        float: left;
-        position: relative;
-        margin-right: 10px;
-        input {
-          width: 120px;
-        }
-        .datetime_suggest {
-          height: 20px;
-        }
-      }
-    }
+    &:hover {background: none;}
   }
 }
 
-#unassigned_warning {
-  max-width: 600px;
+.Button.Button--add-row {
+  text-align: center;
+  border: 1px dashed $assign-border-color; // color matching legacy code
+  border-top: 0;
+  border-radius: 0;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  width: 100%;
+}
+.Date__label{
+  font-weight: 500;
+}
+.ContainerDueDate {
+  max-width: 500px;
+  margin: 20px 0; // matches legacy margins
+}
+
+.Container__DueDateRow {
+  border: 1px solid $assign-border-color; // matching color to legacy code
+  border-radius: 5px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+.Container__DueDateRow-item {
+  border-bottom: 1px solid #ccc;
+  padding: 15px;
+}
+
+.DueDateRow__RemoveRow {
+  text-align: right;
+  margin: 0;
+  padding: 0;
+  > .Button.Button--link {
+    padding: 0;
+    color: $ic-color-dark;
+  }
+}
+
+.UnlockLockInput {
+  display: inline;
+  width: 160px;
+}
+
+.DueDateInput {
+  width: 407px;
+  display: inline;
+}
+
+.DueDateInput__Container {
+  display: inline;
+}
+
+
+.Available-from-to {
+  display: flex;
+  .Available-from-to__prompt {
+    flex: 1;
+    text-align: center;
+    line-height: 38px;
+    padding: 0 $ic-sp/2;
+  }
+}
+
+.tokenInputThrobber{
+  z-index: 9999;
+  text-align: center;
+  color:#e9e9e9;
+  font-size: 10px;
+  background: url("/images/load.gif") no-repeat 50% 80%;
+  background-size: 16px;
+  margin-bottom: -3px;
+  min-width: 25px;
+  min-height: 20px;
+  display: inline-block;
 }

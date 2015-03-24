@@ -362,19 +362,14 @@
             </div>
           </fieldset>
 
-          <hr>
-
-          <% if @context.feature_enabled?(:differentiated_assignments) %>
-            <div class="text-center pad-box-mini" style="margin-bottom:10px">
-              <span>
-                <em>
-                <%= mt(:only_visible_to_overrides_note, "Note: This quiz is **only** visible to the section(s) specified below:") %>
-                </em>
-              </span>
+          <div id="overrides-wrapper">
+            <div class="control-label">
+              <%= t("Assign") %>
             </div>
-          <% end %>
-
-          <div class="js-assignment-overrides"></div>
+            <div class="overrides-column-right controls">
+              <div class='js-assignment-overrides'></div>
+            </div>
+          </div>
 
         </div>
       <% end %>
