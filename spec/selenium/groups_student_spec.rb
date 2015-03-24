@@ -1,10 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "groups" do
+describe "student groups" do
   include_examples "in-process server selenium tests"
 
-  it "should allow student group leaders to edit the group name" do
+  before (:each) do
     course_with_student_logged_in(:active_all => true)
+  end
+
+  it "should allow student group leaders to edit the group name" do
     category1 = @course.group_categories.create!(:name => "category 1")
     category1.configure_self_signup(true, false)
     category1.save!
@@ -27,7 +30,6 @@ describe "groups" do
   end
 
   it "should not show student organized, invite only groups" do
-    course_with_student_logged_in(:active_all => true)
     g1 = @course.groups.create!(:name => "my group")
 
     get "/courses/#{@course.id}/groups"
@@ -38,7 +40,6 @@ describe "groups" do
   describe "new groups page" do
     it "should allow a student to create a group" do
       skip
-      course_with_student_logged_in(:active_all => true)
       @course.root_account.enable_feature!(:student_groups_next)
       student_in_course
       student_in_course
