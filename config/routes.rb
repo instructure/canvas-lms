@@ -702,7 +702,6 @@ CanvasRails::Application.routes.draw do
   resources :appointment_groups, only: [:index, :show]
 
   post 'errors' => 'info#record_error'
-  get 'record_js_error' => 'info#record_js_error'
   resources :errors, only: [:show, :index], path: :error_reports
 
   get 'health_check' => 'info#health_check'
