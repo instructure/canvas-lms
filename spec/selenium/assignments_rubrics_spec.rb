@@ -263,6 +263,17 @@ describe "assignment rubrics" do
       expect(ee.first).to be_displayed
       expect(ee.last).not_to be_displayed
     end
+
+    it "shouldn't show 'update description' button in long description dialog" do
+      @assignment = @course.assignments.create(:name => 'assignment with rubric')
+      rubric_for_course
+      @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f(".criterion_description .long_description_link").click
+      expect(fj('.ui-dialog .save_button:visible')).to be_nil
+    end
   end
 
   context "assignment rubrics as an designer" do
