@@ -131,12 +131,20 @@ describe "Navigating to wiki pages" do
     end
 
     describe "Use as Front Page Link" do
-      it "should set focus back to the cog after setting" do
+      before :each do
         get "/courses/#{@course.id}/pages"
         f('.al-trigger').click
+      end
+
+      it "should set focus back to the cog after setting" do
         f('.use-as-front-page-menu-item').click
         wait_for_ajaximations
         check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "should set focus to the next focusable item if you press Tab" do
+        f('.use-as-front-page-menu-item').send_keys(:tab)
+        check_element_has_focus(ff('.wiki-page-link')[1])
       end
     end
 
