@@ -70,9 +70,7 @@
         <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\">#{hash_get(question, :points_possible, "0")}</span>")) %>
       <% end %>
     </span>
-      <% if question && hash_get(question, :question_type) != "missing_word_question" && hash_get(question, :question_text) && hash_get(question, :question_text).length < 255 %>
-        <span class='ui-helper-hidden-accessible'><%= hash_get(question, :question_text) %></span>
-      <% else %>
+      <% unless question && hash_get(question, :question_type) != "missing_word_question" && hash_get(question, :question_text) && hash_get(question, :question_text).length < 255 %>
         <a class='ui-helper-hidden-accessible' href="#question_<%= hash_get(question, :id, "new") %>_question_text"><%= t(:skip_question_text, "Skip to question text.") %></a>
       <% end %>
     </div>
