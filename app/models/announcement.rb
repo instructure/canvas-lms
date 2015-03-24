@@ -86,6 +86,16 @@ class Announcement < DiscussionTopic
     given { |user| self.user.present? && self.user == user && self.discussion_entries.active.empty? }
     can :delete
 
+    given do |user|
+      self.grants_right?(user, :read) &&
+       (self.context.is_a?(Group) ||
+        (user &&
+         (self.context.grants_right?(user, :read_as_admin) ||
+          (self.context.is_a?(Course) &&
+           self.context.includes_user?(user)))))
+    end
+    can :read_replies
+
     given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
 

@@ -1,4 +1,5 @@
 require [
+  'i18n!discussions'
   'compiled/views/DiscussionTopic/EntryView'
   'compiled/models/DiscussionFilterState'
   'compiled/views/DiscussionTopic/DiscussionToolbarView'
@@ -15,7 +16,7 @@ require [
   'compiled/views/DiscussionTopic/EntriesView'
   'compiled/jquery/sticky'
   'compiled/jquery/ModuleSequenceFooter'
-], (EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
+], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
 
   descendants = 5
   children    = 10
@@ -136,6 +137,8 @@ require [
 
   filterModel.on 'reset', -> EntryView.expandRootEntries()
 
+  canReadReplies = ->
+    ENV.DISCUSSION.PERMISSIONS.CAN_READ_REPLIES
 
   ##
   # routes
@@ -151,21 +154,24 @@ require [
     # TODO: can get a little bouncy when the page isn't as tall as the previous
     scrollToTop()
   initEntries = (initial_entry) ->
-    data.fetch success: ->
-      entriesView.render()
-      Backbone.history.start
-        pushState: yes
-        root: ENV.DISCUSSION.APP_URL + '/'
-      if initial_entry
-        fetched_model = entries.get(initial_entry.id)
-        entries.remove(fetched_model) if fetched_model
-        entries.add(initial_entry)
+    if canReadReplies()
+      data.fetch success: ->
         entriesView.render()
-        router.navigate "entry-#{initial_entry.get 'id'}", yes
-    topicView.on 'addReply', (entry) ->
-      entries.add entry
-      router.navigate "entry-#{entry.get 'id'}", yes
-    MarkAsReadWatcher.init() unless ENV.DISCUSSION.MANUAL_MARK_AS_READ
+        Backbone.history.start
+          pushState: yes
+          root: ENV.DISCUSSION.APP_URL + '/'
+        if initial_entry
+          fetched_model = entries.get(initial_entry.id)
+          entries.remove(fetched_model) if fetched_model
+          entries.add(initial_entry)
+          entriesView.render()
+          router.navigate "entry-#{initial_entry.get 'id'}", yes
+      topicView.on 'addReply', (entry) ->
+        entries.add entry
+        router.navigate "entry-#{entry.get 'id'}", yes
+      MarkAsReadWatcher.init() unless ENV.DISCUSSION.MANUAL_MARK_AS_READ
+    else
+      $('#discussion_subentries span').text(I18n.t("You must log in to view replies"))
 
   topicView.render()
   toolbarView.render()
