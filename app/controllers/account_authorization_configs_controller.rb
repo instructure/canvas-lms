@@ -145,9 +145,9 @@ class AccountAuthorizationConfigsController < ApplicationController
       render :json => aacs_json(@account.account_authorization_configs)
     else
       @account_configs = @account.account_authorization_configs.to_a
-      if AccountAuthorizationConfig.saml_enabled
+      if AccountAuthorizationConfig::SAML.enabled?
         @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
-        @saml_login_attributes = AccountAuthorizationConfig.saml_login_attributes
+        @saml_login_attributes = AccountAuthorizationConfig::SAML.login_attributes
         @saml_authn_contexts = [["No Value", nil]] + Onelogin::Saml::AuthnContexts::ALL_CONTEXTS.sort
       end
     end
@@ -383,10 +383,11 @@ class AccountAuthorizationConfigsController < ApplicationController
       data = filter_data(aac_data)
 
       position = data.delete :position
-      account_config = @account.account_authorization_configs.create!(data)
+      account_config = @account.account_authorization_configs.build(data)
 
       if position.present?
         account_config.insert_at(position.to_i)
+      else
         account_config.save!
       end
 
@@ -652,10 +653,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   protected
   def filter_data(data)
     data ||= {}
-    data = data.slice(*AccountAuthorizationConfig.recognized_params(data[:auth_type]))
+    data = data.slice(*AccountAuthorizationConfig.find_sti_class(data[:auth_type]).recognized_params)
     if data[:auth_type] == 'ldap'
       data[:auth_over_tls] = 'start_tls' unless data.has_key?(:auth_over_tls)
-      data[:auth_over_tls] = AccountAuthorizationConfig.auth_over_tls_setting(data[:auth_over_tls])
+      data[:auth_over_tls] = AccountAuthorizationConfig::LDAP.auth_over_tls_setting(data[:auth_over_tls])
     end
     data
   end

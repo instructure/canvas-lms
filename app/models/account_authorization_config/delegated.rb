@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,22 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::AccountAuthorizationConfig
-  include Api::V1::Json
+class AccountAuthorizationConfig::Delegated < AccountAuthorizationConfig
+  after_create :disable_open_registration
 
-  def aacs_json(aacs)
-    aacs.map do |aac|
-      aac_json(aac)
+  def disable_open_registration
+    if self.account.open_registration?
+      self.account.settings = { :open_registration => false, :self_registration => false }
+      self.account.save!
     end
-  end
-
-  def aac_json(aac)
-    result = api_json(aac, nil, nil, :only => [:id, :position])
-    allowed_params = aac.class.recognized_params
-    allowed_params.delete(:auth_password)
-    allowed_params.each do |param|
-      result[param] = aac.send(param)
-    end
-    result
   end
 end

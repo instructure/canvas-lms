@@ -1,8 +1,8 @@
 <%
-   @saml_configs = @account_configs.clone
-   @saml_configs << @account.account_authorization_configs.scoped.new
+   @saml_configs = @account_configs.select { |aac| aac.is_a?(AccountAuthorizationConfig::SAML) }
+   @saml_configs << @account.account_authorization_configs.scoped.new(auth_type: 'saml')
    @account_config = @saml_configs.first
-   active = @account_config.saml_authentication? ? 'class="active"' : ''
+   active = @account_config.new_record? ? '' : 'class="active"'
    position_options = []
    (@saml_configs.length - 1).times {|i|position_options << [i + 1,i + 1]}
    debugging = @account_config && @account_config.debugging?

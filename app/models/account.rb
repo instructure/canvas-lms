@@ -961,11 +961,11 @@ class Account < ActiveRecord::Base
   end
 
   def password_authentication?
-    !!(!self.account_authorization_config || self.account_authorization_config.password_authentication?)
+    !self.account_authorization_config
   end
 
   def delegated_authentication?
-    !canvas_authentication? || !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
+    !canvas_authentication? || !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::Delegated))
   end
 
   def forgot_password_external_url
@@ -973,15 +973,15 @@ class Account < ActiveRecord::Base
   end
 
   def cas_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.cas_authentication?)
+    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::CAS))
   end
 
   def ldap_authentication?
-    self.account_authorization_configs.any? { |aac| aac.ldap_authentication? }
+    self.account_authorization_configs.any? { |aac| aac.is_a?(AccountAuthorizationConfig::LDAP) }
   end
 
   def saml_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?) && AccountAuthorizationConfig.saml_enabled
+    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::SAML)) && AccountAuthorizationConfig::SAML.enabled?
   end
 
   def multi_auth?

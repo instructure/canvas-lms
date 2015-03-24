@@ -582,18 +582,18 @@ describe Account do
     account = Account.default
     expect(account.login_handle_name).to eq "Email"
 
-    config = account.account_authorization_configs.create(:auth_type => 'cas')
+    config = account.account_authorization_configs.create!(:auth_type => 'cas')
     expect(account.login_handle_name).to eq "Login"
 
-    config.auth_type = 'saml'
-    config.save
+    config.destroy
+    config = account.account_authorization_configs.create!(:auth_type => 'saml')
     expect(account.reload.login_handle_name).to eq "Login"
 
-    config.auth_type = 'ldap'
-    config.save
+    config.destroy
+    config = account.account_authorization_configs.create!(:auth_type => 'ldap')
     expect(account.reload.login_handle_name).to eq "Email"
     config.login_handle_name = "LDAP Login"
-    config.save
+    config.save!
     expect(account.reload.login_handle_name).to eq "LDAP Login"
   end
 

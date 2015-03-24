@@ -185,11 +185,11 @@ class PseudonymSessionsController < ApplicationController
     # look for LDAP pseudonyms where we get the unique_id back from LDAP
     if !found && !@pseudonym_session.attempted_record
       @domain_root_account.account_authorization_configs.each do |aac|
-        next unless aac.ldap_authentication?
+        next unless aac.is_a?(AccountAuthorizationConfig::LDAP)
         next unless aac.identifier_format.present?
         res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
         unique_id = res.first[aac.identifier_format].first if res
-        if unique_id && pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+        if unique_id && (pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first)
           pseudonym.instance_variable_set(:@ldap_result, res.first)
           @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
           found = @pseudonym_session.save
@@ -536,7 +536,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_configured?
-    @saml_configured ||= @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? }
+    @saml_configured ||= @domain_root_account.account_authorization_configs.any? { |aac| aac.is_a?(AccountAuthorizationConfig::SAML) }
   end
 
   def saml_response?
@@ -678,7 +678,7 @@ class PseudonymSessionsController < ApplicationController
         institution2: pseudonym.account.name)
     end
 
-    if pseudonym.account_id == Account.site_admin.id && Account.site_admin.account_authorization_config.try(:delegated_authentication?)
+    if pseudonym.account_id == Account.site_admin.id && Account.site_admin.delegated_authentication?
       cookies['canvas_sa_delegated'] = {
         :value => '1',
         :domain => otp_remember_me_cookie_domain,

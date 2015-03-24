@@ -68,7 +68,11 @@ class ActiveRecord::Base
       "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
       "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
     ].sort.collect { |file|
-      model = file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
+      model = begin
+          file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
+        rescue NameError
+          next
+        end
       next unless model < ActiveRecord::Base
       model
     }

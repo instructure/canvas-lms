@@ -199,7 +199,7 @@ describe "API Authentication", type: :request do
       end
 
       it "should execute for saml login" do
-        skip("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+        skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
         account = account_with_saml(:account => Account.default)
         flow do
           Onelogin::Saml::Response.any_instance.stubs(:settings=)

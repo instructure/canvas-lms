@@ -236,7 +236,7 @@ describe PseudonymSessionsController do
 
   context "saml" do
     before do
-      skip("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+      skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
     end
 
     it "should scope logins to the correct domain root account" do
@@ -322,14 +322,12 @@ describe PseudonymSessionsController do
         @account = Account.create!
         @unique_id = 'foo@example.com'
         @user1 = user_with_pseudonym(:active_all => true, :username => @unique_id, :account => @account)
-        aac1 = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
-        @account.account_authorization_configs << aac1
+        @account.account_authorization_configs.create!(:auth_type => 'saml', :identifier_format => 'uid')
 
-        aac2 = AccountAuthorizationConfig.new
-        aac2.auth_type = "saml"
+        aac2 = @account.account_authorization_configs.build(auth_type: 'saml')
         aac2.idp_entity_id = "https://example.com/idp1"
         aac2.log_out_url = "https://example.com/idp1/slo"
-        @account.account_authorization_configs << aac2
+        aac2.save!
 
         @stub_hash = {
           :issuer => aac2.idp_entity_id,
@@ -359,7 +357,7 @@ describe PseudonymSessionsController do
         controller.request.env['canvas.domain_root_account'] = @account
         get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
 
-        expect(response).to redirect_to(login_url)
+        expect(response).to redirect_to(login_url(no_auto: true))
       end
     end
 

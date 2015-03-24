@@ -1,14 +1,17 @@
 <%
-   @ldap_configs = @account_configs.clone
+   @ldap_configs = @account_configs.select { |aac| aac.is_a?(AccountAuthorizationConfig::LDAP) }
    while @ldap_configs.length < 2
-    @ldap_configs << @account.account_authorization_configs.scoped.new
+    @ldap_configs << @account.account_authorization_configs.scoped.new(auth_type: 'ldap')
     @ldap_configs.last.auth_over_tls = :start_tls
   end
-   @account_config = @ldap_configs.first
-
+  @account_config = @ldap_configs.first
+  unless @account_config.new_record?
+    form_id = 'auth_form'
+    active = 'class="active"'
+  else
+    form_id = 'ldap_form'
+  end
 %>
-<% form_id = @account_config.ldap_authentication? ? 'auth_form' : 'ldap_form' %>
-<% active = @account_config.ldap_authentication? ? 'class="active"' : '' %>
 <div id="ldap_div" <%= raw active %>>
 <%= form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class=>"auth_type ldap_form" ) do %>
   <table class="formtable" style="margin-left: 20px;">
@@ -44,11 +47,11 @@
 
   <div>
     <div class="auth_form" style="margin: 15px;">
-      <a href="#" class="add_secondary_ldap_link" style="<%= "display: none;" if @ldap_configs[1].ldap_authentication? %>"><%= t(:add_secondary_ldap_server_link, "Add Secondary LDAP Server") %></a>
+      <a href="#" class="add_secondary_ldap_link" style="<%= "display: none;" unless @ldap_configs[1].new_record? %>"><%= t(:add_secondary_ldap_server_link, "Add Secondary LDAP Server") %></a>
     </div>
   </div>
 
-  <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px; <%= "display: none;" unless @ldap_configs[1].ldap_authentication? %>">
+  <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px; <%= "display: none;" if @ldap_configs[1].new_record? %>">
     <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @ldap_configs[1] } %>
     <tr>
       <th><%= before_label(t(:auth_type_label, "Type")) %></th>
@@ -60,14 +63,13 @@
       </th>
     </tr>
     <%= fields_for :account_authorization_config, @ldap_configs[1], :index => 1 do |f| %>
-      <%= f.hidden_field :disabled, :value => @ldap_configs[1].ldap_authentication? ? '0' : '1', :id => 'secondary_ldap_config_disabled' %>
+      <%= f.hidden_field :disabled, :value => @ldap_configs[1].new_record? ? '1' : '0', :id => 'secondary_ldap_config_disabled' %>
       <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @ldap_configs[1] } %>
     <% end %>
   </table>
 
   <% if @ldap_configs.length > 2 %>
     <% @ldap_configs[2..-1].each_with_index do |aac, i| %>
-      <% next unless aac.ldap_authentication? %>
       <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px;">
         <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => aac } %>
         <tr>

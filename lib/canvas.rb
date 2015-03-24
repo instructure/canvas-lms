@@ -153,6 +153,10 @@ module Canvas
     end
   end
 
+  def self.timeout_protection_error_ttl(service_name)
+    (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
+  end
+
   # protection against calling external services that could timeout or misbehave.
   # we keep track of timeouts in redis, and if a given service times out more
   # than X times before the redis key expires in Y seconds (reset on each
@@ -169,7 +173,7 @@ module Canvas
     if Canvas.redis_enabled?
       redis_key = "service:timeouts:#{service_name}"
       cutoff = (Setting.get("service_#{service_name}_cutoff", nil) || Setting.get("service_generic_cutoff", 3.to_s)).to_i
-      error_ttl = (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
+      error_ttl = timeout_protection_error_ttl(service_name)
       short_circuit_timeout(Canvas.redis, redis_key, timeout, cutoff, error_ttl, &block)
     else
       Timeout.timeout(timeout, &block)

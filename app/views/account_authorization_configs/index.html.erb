@@ -6,12 +6,12 @@
     <div class="rs-margin-lr rs-margin-top">
         <%  has_auth = @account_configs.any? %>
         <a href="#" class="edit_auth_link btn button-sidebar-wide" style="<%= hidden if !has_auth || @account.saml_authentication? %>"><%= image_tag "edit.png" %><%= t(:edit_auth_link, "Edit Details")%></a>
-        <a href="#" class="test_ldap_link btn button-sidebar-wide" style="<%= hidden unless @account_configs.map {|c| c.auth_type}.include?("ldap") %>"><%= image_tag "pending_review.png" %><%= t(:test_ldap_link, "Test Authentication")%></a>
+        <a href="#" class="test_ldap_link btn button-sidebar-wide" style="<%= hidden unless @account_configs.any? { |aac| aac.is_a?(AccountAuthorizationConfig::LDAP) } %>"><%= image_tag "pending_review.png" %><%= t(:test_ldap_link, "Test Authentication")%></a>
         <%= link_to image_tag("delete.png") + t(:delete_auth_link, "Remove Authentication"), context_url(@account, :context_remove_all_authorization_configs_url), :confirm => t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."), :method => :delete, :class=>"delete_auth_link btn button-sidebar-wide", :style => "#{ hidden unless has_auth}" %>
         <div class="add_auth_div" style="<%= hidden if has_auth %>">
           <span class="add"><%= t(:add_auth_desc, "Add an identity provider to this account:")%></span><br/>
           <% options = [[:CAS, 'cas'], [:LDAP, 'ldap']] %>
-          <% options << [:SAML, 'saml'] if AccountAuthorizationConfig.saml_enabled %>
+          <% options << [:SAML, 'saml'] if AccountAuthorizationConfig::SAML.enabled? %>
           <%= select("", "", options, {:include_blank=>t(:choose_auth_type_option, "Choose an authentication service")}, :id => "add_auth_select") %>
         </div>
     </div>
@@ -52,8 +52,8 @@ using the normal Canvas login procedure. For this account the url would be %{url
 <%= render :partial => "cas_settings" %>
 <%= render :partial => "ldap_settings" %>
 <%= render :partial => "ldap_settings_test" %>
-<%= render :partial => "saml_settings" if AccountAuthorizationConfig.saml_enabled %>
-<% unless @account_configs.any? %>
+<%= render :partial => "saml_settings" if AccountAuthorizationConfig::SAML.enabled? %>
+<% if @account_configs.empty? %>
     <div id="no_auth"><%= t(:no_auth_type_description, "This account does not currently integrate with an identity provider.") %></div>
 <% end %>
 

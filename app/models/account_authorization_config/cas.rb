@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,22 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::AccountAuthorizationConfig
-  include Api::V1::Json
-
-  def aacs_json(aacs)
-    aacs.map do |aac|
-      aac_json(aac)
-    end
+class AccountAuthorizationConfig::CAS < AccountAuthorizationConfig::Delegated
+  def self.sti_name
+    'cas'
   end
 
-  def aac_json(aac)
-    result = api_json(aac, nil, nil, :only => [:id, :position])
-    allowed_params = aac.class.recognized_params
-    allowed_params.delete(:auth_password)
-    allowed_params.each do |param|
-      result[param] = aac.send(param)
+  def self.recognized_params
+    [ :auth_type, :auth_base, :log_in_url, :login_handle_name, :unknown_user_url ]
+  end
+
+  def validate_multiple_auth_configs
+    return true unless account
+    other_configs = account.account_authorization_configs - [self]
+    unless other_configs.empty?
+      return errors.add(:auth_type, :multiple_cas_configs)
     end
-    result
+    super
   end
 end

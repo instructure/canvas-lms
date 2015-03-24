@@ -109,7 +109,7 @@ describe AuthenticationMethods do
       let(:saml_request) { stub(:generate_request => 'saml_login_url') }
 
       before do
-        skip('requires SAML extension') unless AccountAuthorizationConfig.saml_enabled
+        skip('requires SAML extension') unless AccountAuthorizationConfig::SAML.enabled?
         Onelogin::Saml::AuthRequest.stubs(:new => saml_request)
       end
 

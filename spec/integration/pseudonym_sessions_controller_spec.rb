@@ -234,7 +234,7 @@ describe PseudonymSessionsController do
 
   context "SAML" do
     before do
-      skip("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+      skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
     end
 
     it 'redirects to the discovery page when hitting a deep link while unauthenticated' do

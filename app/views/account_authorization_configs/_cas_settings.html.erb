@@ -1,7 +1,12 @@
-<% @account_config = @account_configs.first %>
-<% @account_config ||= @account.account_authorization_configs.scoped.new %>
-<% form_id = @account_config.cas_authentication? ? 'auth_form' : 'cas_form' %>
-<% active = @account_config.cas_authentication? ? 'class="active"' : '' %>
+<% @account_config = @account_configs.find { |aac| aac.is_a?(AccountAuthorizationConfig::CAS) } %>
+<% @account_config ||= @account.account_authorization_configs.scoped.new(auth_type: 'cas') %>
+<% unless @account_config.new_record?
+     form_id = 'auth_form'
+     active = 'class="active"'
+   else
+     form_id = 'cas_form'
+   end
+%>
 <div id="cas_div" <%= raw active %>>
 <%= form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class => "auth_type cas_form") do %>
   <%= fields_for :account_authorization_config, @account_config, :index => 0 do |f| %>

@@ -6,7 +6,7 @@ ldap_tests << OpenStruct.new(
   :help_header => t(:test_ldap_connection_help_header, "Canvas can't connect to your LDAP server"),
   :help_body => t(:test_ldap_connection_help_body, "The connection either timed out or was refused. Things to consider:"),
   :help => [
-    t(:test_ldap_connection_help_fixes_1, "Canvas is connecting to %{ips}", :ips => @account.account_authorization_configs.map {|a| a.ldap_ip}.to_sentence),
+    t(:test_ldap_connection_help_fixes_1, "Canvas is connecting to %{ips}", :ips => @account.account_authorization_configs.select { |a| a.is_a?(AccountAuthorizationConfig::LDAP) }.map {|a| a.ldap_ip}.to_sentence),
     t(:test_ldap_connection_help_fixes_2, "This was only a connection test. SSL certificates were not validated."),
     t(:test_ldap_connection_help_fixes_3, "Check your firewall settings. Are all Canvas IP address allowed to access your server?")
   ],
