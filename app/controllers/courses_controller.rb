@@ -719,6 +719,11 @@ class CoursesController < ApplicationController
   #   users set, the page parameter will be modified so that the page
   #   containing user_id will be returned.
   #
+  # @argument user_ids[] [Integer]
+  #   If included, the course users set will only include users with IDs
+  #   specified by the param. Note: this will not work in conjunction
+  #   with the "user_id" argument but multiple user_ids can be included.
+  #
   # @argument enrollment_state[] [String, "active"|"invited"|"rejected"|"completed"|"inactive"]
   #  When set, only return users where the enrollment workflow state is of one of the given types.
   #  "active" and "invited" enrollments are returned by default.
@@ -746,6 +751,11 @@ class CoursesController < ApplicationController
         position = position_scope.count(:select => "users.id", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
+      end
+
+      user_ids = params[:user_ids]
+      if user_ids.present?
+        users = users.where(id: user_ids)
       end
 
       users = Api.paginate(users, self, api_v1_course_users_url)

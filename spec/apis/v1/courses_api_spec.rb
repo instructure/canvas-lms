@@ -1661,15 +1661,30 @@ describe CoursesController, type: :request do
                                                               :only => USER_API_FIELDS).sort_by{|x| x["id"]}
       end
 
+      it "returns a list of users filtered by id if user_ids is given" do
+        expected_users = [@course1.users.first, @course1.users.last]
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", {
+          :controller => 'courses',
+          :action => 'users',
+          :course_id => @course1.id.to_s,
+          :user_ids => expected_users.map(&:id),
+          :format => 'json'
+        })
+        expect(json.sort_by{|x| x["id"]}).to eq api_json_response(
+          expected_users,
+          :only => USER_API_FIELDS
+        ).sort_by{|x| x["id"]}
+      end
+
       it "excludes the test student by default" do
-        test_student = @course1.student_view_student
+        @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
         expect(json.map{ |s| s["name"] }).not_to include("Test Student")
       end
 
       it "includes the test student if told to do so" do
-        test_student = @course1.student_view_student
+        @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json'},
                           :include => ['test_student'] )
