@@ -46,7 +46,18 @@
          <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>"
        id="answer_<%= hash_get(answer, :id, "template") %>"
        style="<%= hidden unless answer %>"
-       <%= answer_title(hash_get(answer, :text), selected_answer, correct_answer, show_correct_answers) %>>
+      <%=
+        if answer_type == 'matching_answer'
+          user_answer_choice = hash_get(user_answer, "answer_#{answer_id}".to_sym).to_i
+          display_choice = hash_get(question, :matches).find {|m| hash_get(m, :match_id) == user_answer_choice } || {}
+          matching_correct_answer = (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, :match_id).to_i}[:text] rescue ''))
+
+          matching_answer_title(hash_get(answer, :text), selected_answer, display_choice[:text] || '', correct_answer, matching_correct_answer, show_correct_answers)
+        else
+          answer_title(hash_get(answer, :text), selected_answer, correct_answer, show_correct_answers)
+        end
+      %>>
+
 
       <span class='hidden id'><%= answer_id %></span>
 
@@ -69,12 +80,9 @@
       <div class="answer_match_middle">&nbsp;</div>
       <div class="answer_match_right">
         <% if user_answer %>
-          <% if answer_type == 'matching_answer'
-               user_answer_choice = hash_get(user_answer, "answer_#{answer_id}".to_sym).to_i
-               display_choice = hash_get(question, :matches).find {|m| hash_get(m, :match_id) == user_answer_choice }
-          %>
+          <% if answer_type == 'matching_answer' %>
             <select class="question_input" readonly='readonly' style="max-width: 90%;">
-              <option value="" selected><%= display_choice[:text] rescue '' %></option>
+              <option value="" selected><%= display_choice[:text] || '' %></option>
             </select>
             <% show_comment = wrong_answer %>
           <% else %>
@@ -156,7 +164,7 @@
           <div class="answer_match_right">
             <div class='answer correct_answer'>
               <div class='answer_text'>
-                <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, :match_id).to_i}[:text] rescue '')) %>
+                <%= matching_correct_answer %>
               </div>
             </div>
           </div>

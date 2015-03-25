@@ -609,6 +609,31 @@ module QuizzesHelper
     title = "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0
   end
 
+  def matching_answer_title(item_text, did_select_answer, selected_answer_text, is_correct_answer, correct_answer_text, show_correct_answers)
+    titles = []
+
+    if did_select_answer || is_correct_answer || show_correct_answers
+      titles << h("#{item_text}.")
+    end
+
+
+    if did_select_answer
+      titles << I18n.t(:user_selected_answer, "You selected")
+    end
+
+    titles << h("#{selected_answer_text}.")
+
+    if is_correct_answer && show_correct_answers
+      titles << I18n.t(:correct_answer, "This was the correct answer.")
+    end
+
+    if !is_correct_answer && show_correct_answers
+      titles << I18n.t(:user_selected_wrong, "The correct answer was #{correct_answer_text}.")
+    end
+
+    title = "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0
+  end
+
   def show_correct_answers?(quiz=@quiz, user=@current_user, submission=@submission)
     @quiz && @quiz.try_rescue(:show_correct_answers?, @current_user, @submission)
   end
