@@ -21,7 +21,7 @@
     </div>
     {{else}}
     <div class="mastery-details pull-right" aria-hidden="true">
-      {{#if score}}
+      {{#if scoreDefined}}
         <span>{{score}} / {{mastery_points}}</span>
         {{#ifEqual status 'exceeds'}}
             <i class="icon-check-plus exceeds"></i>
