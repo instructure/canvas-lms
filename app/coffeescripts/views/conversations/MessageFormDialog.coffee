@@ -175,7 +175,9 @@ define [
         disabled: @model?.get('private')
       ).render()
       @recipientView.on('changeToken', @recipientIdsChanged)
-      @recipientView.disable(true) unless _.include(ENV.current_user_roles, 'admin')
+      unless _.include(ENV.current_user_roles, 'admin')
+        @$messageCourse.attr('aria-required', true)
+        @recipientView.disable(true)
 
       @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
