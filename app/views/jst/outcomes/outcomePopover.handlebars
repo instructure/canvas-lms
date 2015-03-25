@@ -1,5 +1,6 @@
 <div class="outcome-details">
-  <div class="line-graph"></div>
+  <div class="line-graph">
+  </div>
   <div class="head-content" tabindex="0">
     {{#if path}}
     <div class="title">{{path}}</div>
@@ -24,19 +25,7 @@
     <div class="mastery-details pull-right" aria-hidden="true">
       {{#if scoreDefined}}
         <span>{{roundedScore}} / {{mastery_points}}</span>
-        {{#ifEqual status 'exceeds'}}
-            <i class="icon-check-plus exceeds"></i>
-        {{else}}
-          {{#ifEqual status 'mastery'}}
-            <i class="icon-check mastery"></i>
-          {{else}}
-            {{#ifEqual status 'near'}}
-            <i class="icon-plus near-mastery"></i>
-            {{else}}
-            <i class="icon-x remedial"></i>
-            {{/ifEqual}}
-          {{/ifEqual}}
-        {{/ifEqual}}
+        {{ addMasteryIcon status }}
       {{else}}
         <span>{{#t}}No score yet{{/t}}</span>
       {{/if}}

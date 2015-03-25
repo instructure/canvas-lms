@@ -94,16 +94,16 @@
   .mastery-details i:before {
     font-size: 1.5em;
   }
-  .exceeds:before {
+  .icon-check-plus:before {
     color: $exceeds-color;
   }
-  .mastery:before {
+  .icon-check:before {
     color: $mastery-color;
   }
-  .near-mastery {
+  .icon-plus {
     color: $near-color;
   }
-  .remedial:before {
+  .icon-x:before {
     color: $remedial-color;
   }
   .method-details {
