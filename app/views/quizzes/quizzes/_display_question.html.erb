@@ -97,7 +97,7 @@
         <textarea style="display: none;" name="text_after_answers" class="textarea_text_after_answers"><%= h(hash_get(question, :text_after_answers)) %></textarea>
         <textarea style="display: none;" name="question_text" class="textarea_question_text"><%= h(hash_get(question, :question_text)) %></textarea>
       </div>
-      <div id="question_<%= hash_get(question, :id, "new") %>_question_text" class="question_text user_content">
+      <div tabindex=0 id="question_<%= hash_get(question, :id, "new") %>_question_text" class="question_text user_content">
         <% if user_answer && user_answer[:regrade_option] %>
           <p class="ui-widget">
             <div class="ui-state-warning ui-corner-all pad-box-micro text-center">
