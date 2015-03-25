@@ -62,13 +62,18 @@ module Api::V1::Assignment
       include_discussion_topic: true,
       include_all_dates: false,
       override_dates: true,
-      needs_grading_count_by_section: false
+      exclude_description: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
     end
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
+    if opts[:exclude_description]
+      fields = fields.dup
+      fields[:only].delete("description")
+    end
+
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
@@ -94,10 +99,13 @@ module Api::V1::Assignment
 
     # use already generated hash['description'] because it is filtered by
     # Assignment#filter_attributes_for_user when the assignment is locked
-    hash['description'] = api_user_content(hash['description'],
-                                           @context || assignment.context,
-                                           user,
-                                           opts[:preloaded_user_content_attachments] || {})
+    unless opts[:exclude_description]
+      hash['description'] = api_user_content(hash['description'],
+                                             @context || assignment.context,
+                                             user,
+                                             opts[:preloaded_user_content_attachments] || {})
+    end
+
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
     hash['has_overrides'] = assignment.has_overrides?

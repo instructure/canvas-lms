@@ -105,9 +105,9 @@ define [
       # this method should be removed after a month in production
       @alignCoursePreferencesWithLocalStorage()
 
-      assignmentGroupsParams = {}
+      assignmentGroupsParams = {exclude_descriptions: true}
       if @mgpEnabled && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
-        assignmentGroupsParams = {grading_period_id: @gradingPeriodToShow}
+        $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
       ajax_calls = [
         $.ajaxJSON(@options[enrollmentsUrl], "GET")
