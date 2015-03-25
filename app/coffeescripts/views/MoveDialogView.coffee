@@ -109,6 +109,7 @@ define [
       @listView?.remove()
       @parentListView = @listView = null
       @dialog.option "close", null
+      @close()
       @closeTarget?.focus()
 
     #lookup new collection, and set it on
