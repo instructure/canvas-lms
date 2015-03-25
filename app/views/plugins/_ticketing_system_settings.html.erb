@@ -7,7 +7,7 @@
     </tr>
     <tr>
       <td><%= f.blabel :type, :en => "Ticketing System type" %></td>
-      <td><%= f.select :type, Canvas::Plugin.all_for_tag(:byots).map { |p| [p.name, p.id] } %>
+      <td><%= f.select :type, Canvas::Plugins::TicketingSystem.registered_extensions.map { |p| [p.name, p.id] } %>
     </tr>
   </table>
 <% end %>
