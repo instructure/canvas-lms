@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.assignment.context, asset.assignment, :submissions], id: asset.user_id) %>
+  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
 <% end %>
 
 <%= mt('user_resubmitted_sentence', '**%{user_name}** has just turned in a late submission for **%{assignment_name}** in the course %{course_name}', :user_name => asset.user.name, :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>
