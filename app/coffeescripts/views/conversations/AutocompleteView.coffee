@@ -645,9 +645,7 @@ define [
       @$tokenList.find('li.ac-token').remove()
 
     disable: (value = true) ->
-      @$input.prop('disabled', value)
-      @$searchBtn.prop('disabled', value)
-      @$inputBox.toggleClass('disabled', value)
+      $("#recipient-row").toggle(!value)
 
     # Public: Put the given tokens in the token list.
     #
