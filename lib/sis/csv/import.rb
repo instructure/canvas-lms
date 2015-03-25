@@ -58,6 +58,7 @@ module SIS
 
         @total_rows = 1
         @current_row = 0
+        @current_row_for_pause_vars = 0
     
         @progress_multiplier = opts[:progress_multiplier] || 1
         @progress_offset = opts[:progress_offset] || 0
@@ -88,7 +89,7 @@ module SIS
         importer
       end
 
-      def process
+      def prepare
         @tmp_dirs = []
         @files.each do |file|
           if File.file?(file)
@@ -122,6 +123,13 @@ module SIS
             end
           end
         end
+
+        @csvs
+      end
+
+      def process
+        prepare
+
         @parallelism = 1 if @total_rows <= @minimum_rows_for_parallel
 
         # calculate how often we should update progress to get 1% resolution
@@ -206,12 +214,12 @@ module SIS
         @warnings << [ csv ? csv[:file] : "", message ]
       end
     
-      def update_progress(count = 1)
-        @current_row += count
+      def update_progress
+        @current_row += 1
+        @current_row_for_pause_vars += 1
         return unless @batch
 
         if update_progress?
-          @last_progress_update = Time.now
           if @parallelism > 1
             SisBatch.transaction do
               lock_type = true
@@ -226,9 +234,10 @@ module SIS
           else
             @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100)
           end
+          @last_progress_update = Time.now
         end
 
-        if @current_row.to_i % @pause_every == 0
+        if @current_row_for_pause_vars % @pause_every == 0
           sleep(@pause_duration)
           update_pause_vars
         end

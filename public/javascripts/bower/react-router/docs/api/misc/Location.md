@@ -7,14 +7,9 @@ following methods must be implemented:
 Methods
 -------
 
-### `setup(onChange)`
+### `addChangeListener(listener)`
 
-Called when the router is first setup. The `onChange` function should be
-called without any arguments when the location changes.
-
-### `teardown`
-
-Called when the router is torn down.
+Adds a function to the location that should be called when it changes.
 
 ### `push`
 
@@ -43,3 +38,16 @@ Example
 
 For examples of how to implement your own location, please see the locations
 included in this repository.
+
+
+```js
+var MyLocation = {
+  addChangeListener: function (listener) {},
+  push: function (path) {},
+  replace: function (path) {},
+  pop: function () {},
+  getCurrentPath: function () {}
+};
+
+Router.run(routes, MyLocation, callback);
+```

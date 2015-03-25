@@ -61,12 +61,14 @@ module Turnitin
 
     def email(item)
       # emails @example.com are, guaranteed by RFCs, to be like /dev/null :)
-      null_email = "#{item.asset_string}@null.instructure.example.com"
-      if item.is_a?(User)
-        item.email || null_email
-      else
-        null_email
-      end
+      email = if item.is_a?(User)
+                item.email
+              elsif item.respond_to?(:turnitin_id)
+                item.generate_turnitin_id!
+                item_type = item.class.reflection_type_name
+                "#{item_type}_#{item.turnitin_id}@null.instructure.example.com"
+              end
+      email ||= "#{item.asset_string}@null.instructure.example.com"
     end
 
     TurnitinUser = Struct.new(:asset_string,:first_name,:last_name,:name)

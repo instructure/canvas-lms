@@ -163,6 +163,7 @@ class UserList
   def resolve
     all_account_ids = [@root_account.id] + @root_account.trusted_account_ids
     associated_shards = @addresses.map {|x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
+    associated_shards << @root_account.shard
     # Search for matching pseudonyms
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
@@ -202,6 +203,7 @@ class UserList
     # create temporary users)
     emails = @addresses.select { |a| a[:type] == :email } if @search_method != :open
     associated_shards = @addresses.map {|x| CommunicationChannel.associated_shards(x[:address].downcase) }.flatten.to_set
+    associated_shards << @root_account.shard
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       Pseudonym.active.

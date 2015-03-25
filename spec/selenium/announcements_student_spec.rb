@@ -74,6 +74,16 @@ describe "announcements" do
       expect(f(".discussion-topic")).to include_text(announcement_title)
     end
 
+    it "should not allow a student to close/open announcement for comments or delete an announcement" do
+      announcement_title = "Announcement 1"
+      announcement = @course.announcements.create!(:title => announcement_title, :message => "Hey")
+      get "/courses/#{@course.id}/announcements"
+      wait_for_ajaximations
+
+      expect(f('.discussion_actions a.al-trigger')).to be_nil
+      expect(f('.discussion_actions ul.al-options')).to be_nil
+    end
+
     it "should allow a group member to create an announcement" do
       gc = group_category
       group = gc.groups.create!(:context => @course)

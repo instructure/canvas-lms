@@ -126,6 +126,13 @@ module Importers
       if hash[:grading_standard_migration_id]
         gs = context.grading_standards.where(migration_id: hash[:grading_standard_migration_id]).first
         item.grading_standard = gs if gs
+      elsif hash[:grading_standard_id] && migration
+        gs = GradingStandard.standards_for(context).where(id: hash[:grading_standard_id]).first unless migration.cross_institution?
+        if gs
+          item.grading_standard = gs if gs
+        else
+          migration.add_warning(t('errors.import.grading_standard_not_found', %{The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.}, :title => hash[:title]))
+        end
       end
       if quiz
         item.quiz = quiz
@@ -174,6 +181,13 @@ module Importers
 
       if item.submission_types == 'external_tool'
         tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+        if hash[:external_tool_id] && migration && !migration.cross_institution?
+          tool_id = hash[:external_tool_id].to_i
+          tag.content_id = tool_id if ContextExternalTool.all_tools_for(context).where(id: tool_id).exists?
+        elsif hash[:external_tool_migration_id]
+          tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
+          tag.content_id = tool.id if tool
+        end
         tag.content_type = 'ContextExternalTool'
         if !tag.save
           migration.add_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title)) if migration && tag.errors["url"]

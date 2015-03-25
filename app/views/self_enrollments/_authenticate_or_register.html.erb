@@ -1,11 +1,11 @@
 <form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
   <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
-  <p><%= t(:enter_email, "Please enter your email address:") %></p>
+  <p><%= t("Please enter your %{label_name}:", :label_name => @login_label_name) %></p>
   <input type="hidden" name="user[initial_enrollment_type]" value="student">
   <div class="control-group" id="email_info">
-    <label class="control-label" for="student_email"><%= t "labels.email", "Email" %></label>
+      <label class="control-label" for="student_email"><%= @login_label_name %></label>
     <div class="controls">
-      <input type="text" id="student_email" name="pseudonym[unique_id]">
+      <input type="text" id="student_email" name="pseudonym[unique_id]" placeholder="<%= @login_label_name %>">
     </div>
   </div>
   <div class="control-group" id="initial_action">

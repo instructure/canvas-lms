@@ -8,12 +8,12 @@ define([
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/AddApp',
   'compiled/jquery.rails_flash_notifications'
-], function(I18n, React, {Navigation, Link}, store, Header, AddApp) {
+], function(I18n, React, {Navigation, Link, State}, store, Header, AddApp) {
 
   return React.createClass({
     displayName: 'AppDetails',
 
-    mixins: [Navigation],
+    mixins: [Navigation, State],
 
     propTypes: {
       params: React.PropTypes.object.isRequired
@@ -26,7 +26,7 @@ define([
     },
 
     componentDidMount() {
-      var app = store.findAppByShortName(this.props.params.shortName);
+      var app = store.findAppByShortName(this.getParams().shortName);
       if (app) {
         this.setState({ app: app });
       } else {

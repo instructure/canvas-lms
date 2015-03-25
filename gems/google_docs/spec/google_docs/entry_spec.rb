@@ -50,6 +50,13 @@ describe GoogleDocs::Entry do
       entry = GoogleDocs::Entry.new(entry_feed)
       entry.extension.should == "doc"
     end
+
+    it "can be reset/forced to 'xlsx'" do
+      entry = GoogleDocs::Entry.new(entry_feed)
+      entry.extension.should == "doc"
+      entry.reset_extension_as_xlsx
+      entry.extension.should == "xlsx"
+    end
   end
 
   describe '#download_url' do

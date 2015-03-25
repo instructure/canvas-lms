@@ -1,12 +1,12 @@
-<div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}" aria-label="Outcome: {{title}} has a status of {{statusTooltip}}">
+<div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}" aria-label="{{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}">
   {{#if scoreDefined}}
     {{#ifEqual status 'mastery'}}
-      {{addIcon 'complete'}}
+      {{addIcon 'check'}}
     {{else}}
       {{#ifEqual status 'near'}}
-        {{addIcon 'partial'}}
+        {{addIcon 'plus'}}
       {{else}}
-        {{addIcon 'trouble'}}
+        {{addIcon 'x'}}
       {{/ifEqual}}
     {{/ifEqual}}
   {{else}}
@@ -14,17 +14,14 @@
   {{/if}}
 </div>
 <div class="outcome-properties">
-  <div class="title" data-tooltip title="{{#if hover_name}}{{hover_name}}: {{/if}}{{description}}">
+  <div class="title" data-tooltip title="{{#if hover_name}}{{hover_name}}{{/if}}">
     <h4>{{friendly_name}}</h4>
   </div>
   <div class="description">{{{description}}}</div>
 </div>
-<div class="outcome-score outcome-bar-wrapper">
-  {{view progress}}
-  <span class="score" aria-label="Score: {{roundedScore}} out of {{points_possible}} points with mastery at {{mastery_points}}">
-    <strong>{{#if scoreDefined}}{{roundedScore}}{{else}}-{{/if}}</strong>/{{mastery_points}}
-  </span>
+<div class="alignment-info">
   <a href="#tab-outcomes/{{id}}" aria-haspopup='true' aria-owns='outcome_detail'>
     {{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}
   </a>
+  <i class="icon-more" aria-label="{{#t}}press spacebar for more details on this outcome{{/t}}" tabindex="0"></i>
 </div>

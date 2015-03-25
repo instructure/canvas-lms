@@ -1,4 +1,6 @@
-<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
+<% define_content :link do %>
+  <%= user_url(asset) %>
+<% end %>
 
 <%= t :title, "New User for %{account}", :account => asset.account.name %>
 

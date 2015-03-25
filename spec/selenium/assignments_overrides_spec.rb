@@ -93,6 +93,54 @@ describe "assignment groups" do
         to eq other_section_due.to_date.strftime('%b %-d, %y')
     end
 
+    it "should validate override dates against proper section" do
+      default_section = @course.course_sections.first
+      date = Time.zone.now
+      date2 = Time.zone.now - 10.days
+      due_date = Time.zone.now + 5.days
+      section1 = @course.course_sections.create!(:name => "Section 9", :restrict_enrollments_to_section_dates => true, :start_at => date)
+      section2 = @course.course_sections.create!(:name => "Section 31", :restrict_enrollments_to_section_dates => true, :end_at => date2)
+
+      assign = create_assignment!
+      visit_assignment_edit_page(assign)
+      wait_for_ajaximations
+      click_option('.due-date-row:first select', section2.name)
+      add_override
+      select_last_override_section(section1.name)
+      first_due_at_element.clear
+      first_unlock_at_element.clear
+      first_lock_at_element.clear
+      last_due_at_element.
+        send_keys(due_date.strftime('%b %-d, %y'))
+      submit_form('#edit_assignment_form')
+      ffj(".btn-primary:last").last.click
+      wait_for_ajaximations
+      overrides = assign.reload.assignment_overrides
+      section_override = overrides.detect{ |o| o.set_id == section1.id }
+      expect(section_override.due_at.strftime('%b %-d, %y')).
+        to eq due_date.strftime('%b %-d, %y')
+    end
+
+    it "properly validates identical calendar dates when saving and editing" do
+      shared_date = "October 12 2014"
+      default_section = @course.course_sections.first
+      other_section = @course.course_sections.create!(:name => "Section 31", :restrict_enrollments_to_section_dates => true, :end_at => shared_date)
+      visit_new_assignment_page
+      wait_for_ajaximations
+
+      fill_assignment_title 'validation assignment'
+      fill_assignment_overrides
+      add_override
+      select_last_override_section(other_section.name)
+      last_due_at_element.send_keys(shared_date)
+      click_option('#assignment_submission_type', 'No Submission')
+      update_assignment!
+      f(".edit_assignment_link").click
+      wait_for_ajaximations
+
+      update_assignment!
+    end
+
     it "should show a vdd tooltip summary on the course assignments page" do
       assignment = create_assignment!
       get "/courses/#{@course.id}/assignments"

@@ -89,6 +89,26 @@ module Assignments
           })
         end
       end
+
+      it "should not count submissions multiple times" do
+        @section1 = @course.course_sections.create!(:name => 'section 1')
+        @section2 = @course.course_sections.create!(:name => 'section 2')
+        @user = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @section1.enroll_user(@user, 'StudentEnrollment', 'active')
+        @section2.enroll_user(@user, 'StudentEnrollment', 'active')
+
+        @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
+        @assignment.submit_homework @user, :submission_type => "online_text_entry", :body => "o hai"
+        @assignment.reload
+
+        querier = NeedsGradingCountQuery.new(@assignment, @teacher)
+
+        expect(querier.count).to eql(1)
+        expect(querier.manual_count).to eql(1)
+        querier.count_by_section.each do |count|
+          expect(count[:needs_grading_count]).to eql(1)
+        end
+      end
     end
   end
 end

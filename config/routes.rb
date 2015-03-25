@@ -9,6 +9,7 @@ CanvasRails::Application.routes.draw do
   resources :submission_comments, only: :destroy
 
   get 'inbox' => 'context#inbox'
+  get 'oauth/redirect_proxy' => 'oauth_proxy#redirect_proxy'
 
   get 'conversations/unread' => 'conversations#index', as: :conversations_unread, redirect_scope: 'unread'
   get 'conversations/starred' => 'conversations#index', as: :conversations_starred, redirect_scope: 'starred'
@@ -708,6 +709,8 @@ CanvasRails::Application.routes.draw do
 
   get 'health_check' => 'info#health_check'
 
+  get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
+
   get 'facebook' => 'facebook#index'
   post 'facebook/message/:id' => 'facebook#hide_message', as: :facebook_hide_message
   get 'facebook/settings' => 'facebook#settings'
@@ -722,7 +725,7 @@ CanvasRails::Application.routes.draw do
   end
 
   post 'object_snippet' => 'context#object_snippet'
-  match 'saml_consume' => 'pseudonym_sessions#saml_consume', via: [:get, :post]
+  post 'saml_consume' => 'pseudonym_sessions#saml_consume'
   match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
@@ -791,6 +794,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/course_copy/:id', controller: :content_imports, action: :copy_course_status, as: :course_copy_status
       get  'courses/:course_id/files', controller: :files, action: :api_index, as: 'course_files'
       post 'courses/:course_id/files', action: :create_file, as: 'course_create_file'
+      get 'courses/:course_id/folders', controller: :folders, action: :list_all_folders, as: 'course_folders'
       post 'courses/:course_id/folders', controller: :folders, action: :create
       get 'courses/:course_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'courses/:course_id/folders/by_path', controller: :folders, action: :resolve_path
@@ -1043,6 +1047,7 @@ CanvasRails::Application.routes.draw do
       post 'users/:user_id/files', action: :create_file
 
       get  'users/:user_id/files', controller: :files, action: :api_index, as: 'user_files'
+      get 'users/:user_id/folders', controller: :folders, action: :list_all_folders, as: 'user_folders'
       post 'users/:user_id/folders', controller: :folders, action: :create
       get 'users/:user_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'users/:user_id/folders/by_path', controller: :folders, action: :resolve_path
@@ -1221,6 +1226,7 @@ CanvasRails::Application.routes.draw do
       end
 
       get  'groups/:group_id/files', controller: :files, action: :api_index, as: 'group_files'
+      get 'groups/:group_id/folders', controller: :folders, action: :list_all_folders, as: 'group_folders'
       post 'groups/:group_id/folders', controller: :folders, action: :create
       get 'groups/:group_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'groups/:group_id/folders/by_path', controller: :folders, action: :resolve_path
@@ -1266,6 +1272,8 @@ CanvasRails::Application.routes.draw do
       put 'folders/:id', action: :update
       post 'folders/:folder_id/folders', action: :create, as: 'create_folder'
       post 'folders/:folder_id/files', action: :create_file
+      post 'folders/:dest_folder_id/copy_file', action: :copy_file
+      post 'folders/:dest_folder_id/copy_folder', action: :copy_folder
     end
 
     scope(controller: :favorites) do
@@ -1308,6 +1316,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/modules", action: :create, as: 'course_context_module_create'
       put "courses/:course_id/modules/:id", action: :update, as: 'course_context_module_update'
       delete "courses/:course_id/modules/:id", action: :destroy
+      put "courses/:course_id/modules/:id/relock", action: :relock
     end
 
     scope(controller: :context_module_items_api) do
@@ -1614,6 +1623,7 @@ CanvasRails::Application.routes.draw do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", controller: :lti_api, action: :legacy_grade_passback, as: "blti_legacy_grade_passback_api"
     post "xapi/:token", controller: :lti_api, action: :xapi_service, as: "lti_xapi"
+    post "caliper/:token", controller: :lti_api, action: :caliper_service, as: "lti_caliper"
     post "logout_service/:token", controller: :lti_api, action: :logout_service, as: "lti_logout_service"
   end
 

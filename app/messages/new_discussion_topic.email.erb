@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.id %>
+  <%= polymorphic_url([asset.context, asset]) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -10,9 +10,10 @@
 
 <%= asset.title %>
 
-<%= html_to_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
+<%= html_to_text(asset.message, :base_url => dashboard_url) %>
 <% if asset.attachment %><%= before_label :file_included, "File Included" %> <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download<% end %>
+  <%= polymorphic_url([asset.context, :file_download], file_id: asset.attachment) %>
+<% end %>
 
 <%= t :details, "Join the conversation here:" %>
 <%= content :link %>

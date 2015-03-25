@@ -597,9 +597,12 @@ class ContextModulesApiController < ApplicationController
           @module.unpublish
         end
       end
+      relock_warning = @module.relock_warning?
 
       if @module.update_attributes(module_parameters) && set_position
-        render :json => module_json(@module, @current_user, session, nil)
+        json = module_json(@module, @current_user, session, nil)
+        json['relock_warning'] = true if relock_warning || @module.relock_warning?
+        render :json => json
       else
         render :json => @module.errors, :status => :bad_request
       end
@@ -621,6 +624,29 @@ class ContextModulesApiController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :delete)
       @module.destroy
+      render :json => module_json(@module, @current_user, session, nil)
+    end
+  end
+
+  # @API Re-lock module progressions
+  #
+  # Resets module progressions to their default locked state and
+  # recalculates them based on the current requirements.
+  #
+  # Adding progression requirements to an active course will not lock students
+  # out of modules they have already unlocked unless this action is called.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/relock \
+  #       -X PUT \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @returns Module
+  def relock
+    @module = @context.context_modules.not_deleted.find(params[:id])
+    if authorized_action(@module, @current_user, :update)
+      @module.relock_progressions
       render :json => module_json(@module, @current_user, session, nil)
     end
   end

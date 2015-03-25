@@ -544,6 +544,14 @@ describe SIS::CSV::EnrollmentImporter do
         )
         expect(@user1.enrollments.sort_by(&:id).map(&:role).map(&:name)).to eq ['cheater', 'insufferable know-it-all']
       end
+
+      it "should find by role_id" do
+        process_csv_data_cleanly(
+            "course_id,user_id,section_id,status,associated_user_id,role_id",
+            "TehCourse,user1,,active,,#{@role.id}"
+        )
+        expect(@user1.enrollments.first.role).to eq @role
+      end
     end
 
     context "in a sub-account" do

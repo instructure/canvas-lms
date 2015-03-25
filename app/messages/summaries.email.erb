@@ -1,5 +1,5 @@
 <% define_content :link do -%>
-  <%= HostUrl.protocol %>://<%= primary_host %>
+  <%= dashboard_url %>
 <% end -%>
 <% define_content :subject do -%>
   <%= t :subject, "Recent Canvas Notifications" %>
@@ -23,4 +23,4 @@
 
 
 <%= t :notifications_link, "You can change your notification settings by visiting the following page:" %>
-<%= content(:link)  %>/profile/communication
+<%= communication_profile_url %>

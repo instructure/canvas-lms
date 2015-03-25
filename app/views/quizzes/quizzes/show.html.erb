@@ -157,7 +157,7 @@
                     <label id="how_long_to_unlock_wrapper" style="float: left; margin-left: 30px;" for="until">
                       <%= f.radio_button('do_lock_at', true, :checked => false) %>
                       <%= f.label('do_lock_at', :available_until, :en => 'Until', :value => true) %>
-                      <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 150px;", :value => unlocalized_datetime_string(@quiz.lock_at) %>
+                      <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 150px;", :value => unlocalized_datetime_string(@quiz.lock_at), :"aria-label" => t("Available Until Date") %>
                     </label>
                   </div>
                 <% end %>

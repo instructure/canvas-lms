@@ -24,6 +24,10 @@ module SIS
         (row.include?('section_id') || row.include?('course_id')) && row.include?('user_id')
       end
 
+      def self.identifying_fields
+        %w[course_id section_id user_id role associated_user_id].freeze
+      end
+
       # expected columns
       # course_id,user_id,role,section_id,status
       def process(csv)
@@ -42,7 +46,7 @@ module SIS
             end
 
             begin
-              importer.add_enrollment(row['course_id'], row['section_id'], row['user_id'], row['role'], row['status'], start_date, end_date, row['associated_user_id'], row['root_account'])
+              importer.add_enrollment(row['course_id'], row['section_id'], row['user_id'], row['role'], row['status'], start_date, end_date, row['associated_user_id'], row['root_account'], row['role_id'])
             rescue ImportError => e
               messages << "#{e}"
               next

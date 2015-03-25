@@ -1361,6 +1361,7 @@ class CoursesController < ApplicationController
   end
   protected :check_for_xlist
 
+  include Api::V1::ContextModule
   include ContextModulesController::ModuleIndexHelper
 
   # @API Get a single course
@@ -1430,7 +1431,7 @@ class CoursesController < ApplicationController
     end
 
     @context_enrollment ||= @pending_enrollment
-    if is_authorized_action?(@context, @current_user, :read)
+    if @context.grants_right?(@current_user, session, :read)
       log_asset_access("home:#{@context.asset_string}", "home", "other")
 
       check_incomplete_registration
@@ -1777,7 +1778,7 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # @argument account_id [Required, Integer]
+  # @argument course[account_id] [Required, Integer]
   #   The unique ID of the account to create to course under.
   #
   # @argument course[name] [String]
@@ -2135,7 +2136,7 @@ class CoursesController < ApplicationController
       # destroy the exising student
       @fake_student = @context.student_view_student
       # but first, remove all existing quiz submissions / submissions
-      Submission.where(quiz_submission_id: @fake_student.quiz_submissions.select(:id)).destroy_all
+      @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.destroy_all
 
       @fake_student.destroy

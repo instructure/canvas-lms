@@ -65,6 +65,26 @@ define(function(require) {
 
         expect(subject.get('questionStatistics')[0].participantCount).toEqual(5);
       });
+
+      it("should work with multiple_answers_questions", function() {
+        var subject = new Subject({
+          question_statistics: [
+            {
+              question_type:"multiple_answers_question",
+              responses:2,
+              correct:1,
+              answers:[
+                {id:"6122",text:"a",correct:true,responses:2},
+                {id:"6863",text:"b",correct:true,responses:2},
+                {id:"3938",text:"c",correct:true,responses:2},
+                {id:"938",text:"d",correct:false,responses:1}
+              ]
+            }
+          ]
+        }, {parse: true});
+
+        expect(subject.get("questionStatistics")[0].participantCount).toEqual(2);
+      });
     });
   });
 });

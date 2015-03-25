@@ -26,7 +26,7 @@
     font-size: 11px;
   }
 
-  i[class*=icon-], i[class^=icon-] { color: $base-font-color-dark }
+  i[class*=icon-], i[class^=icon-] { color: $ic-font-color-dark }
 
   .icon-mini-arrow-right { transition: transform 0.2s }
   .expanded .icon-mini-arrow-right { transform: rotate(90deg) }

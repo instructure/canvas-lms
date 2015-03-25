@@ -264,6 +264,29 @@ describe ContentMigration do
       expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["foo", "tr00"]
     end
 
+    it "should escape html characters in text answers" do
+      q = @copy_from.quizzes.create!(:title => "test quiz")
+      fimb = q.quiz_questions.create!
+      fimb.write_attribute(:question_data, {
+                                               points_possible: 1,
+                                               question_type: "fill_in_multiple_blanks_question",
+                                               question_name: "tf",
+                                               name: "tf",
+                                               question_text: "this statement is false. [orisit]",
+                                               answers: [{ text: "<p>foo</p>", weight: 100, id: 9093, blank_id: "orisit" },
+                                                         { text: "<div/>tr00", weight: 100, id: 9608, blank_id: "orisit" }]
+                                           }.with_indifferent_access)
+      fimb.save!
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
+      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["<p>foo</p>", "<div/>tr00"]
+    end
+
     it "should copy quizzes as published if they were published before" do
       g = @copy_from.assignment_groups.create!(:name => "new group")
       asmnt_unpub = @copy_from.quizzes.create!(:title => "asmnt unpub", :quiz_type => "assignment", :assignment_group_id => g.id)

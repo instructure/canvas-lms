@@ -1,11 +1,7 @@
 <% p = asset.is_a?(Pseudonym) ? asset : asset.pseudonym %>
 <% cc = asset.is_a?(CommunicationChannel) ? asset : (p.communication_channel || p.user.communication_channel) %>
 <% define_content :link do %>
-  <% if p.user.registered? %>
-    <%= HostUrl.protocol %>://<%= HostUrl.context_host((p.account rescue nil)) %>/pseudonyms/<%= p.id %>/change_password/<%= cc.confirmation_code %>
-  <% else %>
-    <%= HostUrl.protocol %>://<%= HostUrl.context_host((p.account rescue nil)) %>/register/<%= cc.confirmation_code %>
-  <% end %>
+  <%= p.user.registered? ? confirm_change_password_url(p, cc.confirmation_code) : registration_confirmation_url(cc.confirmation_code) %>
 <% end %>
 
 <% define_content :subject do %>

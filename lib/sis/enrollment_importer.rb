@@ -86,12 +86,12 @@ module SIS
         @success_count = 0
       end
 
-      def add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil)
+      def add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil, role_id=nil)
         raise ImportError, "No course_id or section_id given for an enrollment" if course_id.blank? && section_id.blank?
         raise ImportError, "No user_id given for an enrollment" if user_id.blank?
         raise ImportError, "Improper status \"#{status}\" for an enrollment" unless status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
 
-        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, status, start_date, end_date, associated_user_id, root_account_id]
+        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, role_id, status, start_date, end_date, associated_user_id, root_account_id]
         process_batch if @enrollment_batch.size >= @updates_every
       end
 
@@ -109,7 +109,7 @@ module SIS
           while !@enrollment_batch.empty? && tx_end_time > Time.now
             enrollment = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment.inspect}")
-            course_id, section_id, user_id, role_name, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment
+            course_id, section_id, user_id, role_name, role_id, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment
 
             last_section = @section
             # reset the cached course/section if they don't match this row
@@ -171,6 +171,7 @@ module SIS
             # preload the course object to avoid later queries for it
             @section.course = @course
 
+
             # cache available course roles for this account
             @course_roles_by_account_id[@course.account_id] ||= @course.account.available_course_roles
 
@@ -178,7 +179,11 @@ module SIS
             incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
 
             associated_user_id = nil
-            role = @course_roles_by_account_id[@course.account_id].detect{|r| r.name == role_name}
+
+            role = nil
+            role = @course_roles_by_account_id[@course.account_id].detect{|r| r.global_id == Shard.global_id_for(role_id, @course.shard)} if role_id
+            role ||= @course_roles_by_account_id[@course.account_id].detect{|r| r.name == role_name}
+
             type = if role
               role.base_role_type
             else

@@ -52,11 +52,11 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
 
 .ui-tabs {
   .ui-tabs-panel {
-    border-color: $can-border-light;
+    border-color: $ic-border-light;
     padding: 14px;
   }
   .ui-tabs-nav {
-    border-bottom-color: $can-border-light;
+    border-bottom-color: $ic-border-light;
     li { 
       background: transparent;
       border-color: transparent;
@@ -74,7 +74,7 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
       &.ui-state-hover,
       &:hover {
         background: $canvas-light;
-        border-color: $can-border-light;
+        border-color: $ic-border-light;
         a {
           color: $canvas-dark;
           @if $use_high_contrast { text-decoration: none; }
@@ -88,14 +88,14 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         @if $use_high_contrast { @include button-focus; }
         @else {
           outline: none;
-          border-color: $can-border-light;
+          border-color: $ic-border-light;
           background: $canvas-light;
         }
       }
       &.ui-tabs-active,
       &.ui-tabs-active.ui-state-hover,
       &.ui-tabs-active:hover {
-        border-color: $can-border-light;
+        border-color: $ic-border-light;
         background: $canvas-light;
         a {
           @if $use_high_contrast { text-decoration: none; }

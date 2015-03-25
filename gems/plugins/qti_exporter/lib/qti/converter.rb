@@ -139,7 +139,7 @@ class Converter < Canvas::Migration::Migrator
   def apply_respondus_settings
     settings_path = File.join(@unzipped_file_path, 'settings.xml')
     if File.file?(settings_path)
-      doc = Nokogiri::XML(open(settings_path))
+      doc = Nokogiri::XML(File.open(settings_path))
     end
     if doc
       respondus_settings = Qti::RespondusSettings.new(doc)

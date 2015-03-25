@@ -39,8 +39,6 @@ A generic, accessible autocomplete widget.
 
 */
 
-$border-color: #999;
-$highlight-color: #0875be;
 
 ul[class*=ac-] {
   list-style: none;
@@ -216,7 +214,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
   }
 
   &:before {
-    border-bottom: 10px solid $border-color;
+    border-bottom: 10px solid $ic-border-light;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     top: 26px;
@@ -232,7 +230,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
 
 .ac-result-container {
   background: #fff;
-  border: 1px solid $border-color;
+  border: 1px solid $ic-border-light;
   border-radius: 10px;
   box-sizing: border-box;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
@@ -261,7 +259,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
   }
 
   &.selected, &:hover {
-    background: $highlight-color;
+    background: $ic-bg-light-primary;
     color: #fff;
 		text-shadow: -1px -1px 0 rgba(0, 0, 0, .2);
   }
@@ -269,8 +267,8 @@ i[class*=icon-].icon-messageRecipient--cancel {
 
 .ac-result-list {
   .context, .everyone {
-    border-bottom: 1px solid $border-color;
-    color: $highlight-color;
+    border-bottom: 1px solid $ic-border-light;
+    color: $canvas-primary;
 
     &.selected, &:hover {
       color: #fff;

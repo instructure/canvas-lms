@@ -96,7 +96,7 @@ $kyle-menu-border-radius: 4px;
     margin: 0;
     height: 0;
     border: 0;
-    border-top: 1px solid $can-border-light;
+    border-top: 1px solid $ic-border-light;
   }
   // have to use first-of-type instead of :first-child because the carat that gets inserted becomes
   // :first-child but the carat is not an <li>, so this gets the first <li> which is what we want.

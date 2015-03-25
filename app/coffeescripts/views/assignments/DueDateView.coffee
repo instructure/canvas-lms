@@ -54,26 +54,27 @@ define [
 
     validateBeforeSave: (data, errors) =>
       return unless data
-
       errs = {}
       datesToValidate = []
 
       lockAt = data.lock_at
       unlockAt = data.unlock_at
       dueAt = data.due_at
+      @section = _.find(ENV.SECTION_LIST, {id: data.course_section_id})
+
       dateRange = @getDateRange()
 
       if dateRange
         if dateRange.start
           datesToValidate.push {
-            date: tz.parse(dateRange.start.date),
+            date: dateRange.start.date,
             validationDates: {"due_at": dueAt, "unlock_at": unlockAt},
             range: "start_range",
             type: dateRange.start.appliedBy
           }
         if dateRange.end
           datesToValidate.push {
-            date: tz.parse(dateRange.end.date),
+            date: dateRange.end.date,
             validationDates: {"due_at": dueAt, "lock_at": lockAt},
             range: "end_range",
             type: dateRange.end.appliedBy
@@ -108,25 +109,24 @@ define [
           switch dateSet.range
             when "start_range"
               _.each dateSet.validationDates, (validationDate, dateType) =>
-                if validationDate && dateSet.date > validationDate
+                if validationDate && @_calendarDate(dateSet.date) > @_calendarDate(validationDate)
                   errs[dateType] = DATE_RANGE_ERRORS[dateType][dateSet.range][dateSet.type]
             when "end_range"
               _.each dateSet.validationDates, (validationDate, dateType) =>
-                if validationDate && dateSet.date < validationDate
+                if validationDate && @_calendarDate(dateSet.date) < @_calendarDate(validationDate)
                   errs[dateType] = DATE_RANGE_ERRORS[dateType][dateSet.range][dateSet.type]
 
     getDateRange: =>
-      sectionID = @model.getCourseSectionID()
-      section = _.find(ENV.SECTION_LIST, {id: sectionID}) if sectionID != 0
+
       course = ENV.COURSE_DATE_RANGE
       term = ENV.TERM_DATE_RANGE
 
-      return unless section || course || term
+      return unless @section || course || term
 
       range = {}
 
-      range["start"] = @_findApplicableDate("start_at", section, course, term)
-      range["end"] = @_findApplicableDate("end_at", section, course, term)
+      range["start"] = @_findApplicableDate("start_at", @section, course, term)
+      range["end"] = @_findApplicableDate("end_at", @section, course, term)
 
       range
 
@@ -139,6 +139,9 @@ define [
         {appliedBy: "term", date: term[dateType]}
       else
         null
+
+    _calendarDate: (date) ->
+      tz.format(tz.parse(date), "%F")
 
     updateOverride: =>
       @model.set @getFormValues()

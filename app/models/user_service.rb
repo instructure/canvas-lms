@@ -170,6 +170,8 @@ class UserService < ActiveRecord::Base
     case type
     when 'google_docs'
       1
+    when 'google_drive'
+      2
     when 'skype'
       3
     when CommunicationChannel::TYPE_TWITTER
@@ -193,6 +195,8 @@ class UserService < ActiveRecord::Base
     case type
     when 'google_docs'
       t '#user_service.descriptions.google_docs', 'Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations.'
+    when 'google_drive'
+      t '#user_service.descriptions.google_drive', 'Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations.'
     when 'google_calendar'
       ''
     when CommunicationChannel::TYPE_TWITTER
@@ -218,6 +222,8 @@ class UserService < ActiveRecord::Base
     case type
     when 'google_docs'
       'http://docs.google.com'
+    when 'google_drive'
+      'https://www.google.com/drive/'
     when 'google_calendar'
       'http://calendar.google.com'
     when CommunicationChannel::TYPE_TWITTER
@@ -251,6 +257,8 @@ class UserService < ActiveRecord::Base
     case service
       when 'google_docs'
         'http://docs.google.com'
+      when 'google_drive'
+        'https://myaccount.google.com/?pli=1'
       when 'google_calendar'
         'http://calendar.google.com'
       when CommunicationChannel::TYPE_TWITTER
@@ -273,7 +281,7 @@ class UserService < ActiveRecord::Base
   end
   
   def self.configured_services
-    [:facebook, :google_docs, :twitter, :yo, :linked_in, :diigo]
+    [:facebook, :google_docs, :google_drive, :twitter, :yo, :linked_in, :diigo]
   end
   
   def self.configured_service?(service)
@@ -281,7 +289,7 @@ class UserService < ActiveRecord::Base
   end
   
   def self.service_type(type)
-    if type == 'google_docs'
+    if type == 'google_docs' || type == 'google_drive'
       'DocumentService'
     elsif type == 'delicious' || type == 'diigo'
       'BookmarkService'

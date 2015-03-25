@@ -134,7 +134,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       display: flex;
       align-items: center;
       background: $canvas-light;
-      border-bottom: 1px solid $can-border-light;
+      border-bottom: 1px solid $ic-border-light;
       // Adding this class for cases where header is called in separately from InnerSection
       &.ReactModal__Header--force-no-corners {
         border-bottom-left-radius: 0; border-bottom-right-radius: 0;  
@@ -166,7 +166,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
     .ReactModal__Footer {
       @include ReactModalPadding;
       background: lighten($canvas-neutral, 5%);
-      border-top: 1px solid $can-border-light;
+      border-top: 1px solid $ic-border-light;
       
       @include breakpoint(mini-tablet) {
         display: flex;

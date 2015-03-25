@@ -54,7 +54,9 @@ describe "Modules API", type: :request do
     @wiki_page = @course.wiki.wiki_pages.create!(:title => "Front Page", :body => "")
     @wiki_page.workflow_state = 'active'; @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
-    @attachment = attachment_model(:context => @course)
+
+    @attachment = attachment_model(:context => @course, :usage_rights => @course.usage_rights.create!(legal_copyright: '(C) 2012 Initrode', use_justification: 'creative_commons', license: 'cc_by_sa'), :uploaded_data => stub_file_data("test_image.jpg", File.read(Rails.root+"spec/fixtures/test_image.jpg"), "image/jpeg"))
+
     @attachment_tag = @module2.add_item(:id => @attachment.id, :type => 'attachment')
     @module2.save!
 
@@ -128,6 +130,7 @@ describe "Modules API", type: :request do
         end
         let(:assignment_details) { json.find{|mod| mod['id'] == @module1.id}['items'].find{|item| item['id'] == @assignment_tag.id}['content_details'] }
         let(:wiki_page_details) { json.find{|mod| mod['id'] == @module2.id}['items'].find{|item| item['id'] == @wiki_page_tag.id}['content_details'] }
+        let(:attachment_details) { json.find{|mod| mod['id'] == @module2.id}['items'].find{|item| item['id'] == @attachment_tag.id}['content_details'] }
 
         it 'should include user specific details' do
           expect(assignment_details).to include(
@@ -135,7 +138,19 @@ describe "Modules API", type: :request do
           )
         end
 
-        it 'sould include lock information' do
+        it 'should include thumbnail_url' do
+          expect(attachment_details).to include(
+            'thumbnail_url' => @attachment.thumbnail_url
+          )
+        end
+
+        it 'should include usage_rights information' do
+          expect(attachment_details).to include(
+            'usage_rights' => @attachment.usage_rights.as_json
+          )
+        end
+
+        it 'should include lock information' do
           expect(assignment_details).to include(
             'locked_for_user' => false,
           )

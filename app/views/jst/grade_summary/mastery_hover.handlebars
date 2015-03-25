@@ -1,0 +1,49 @@
+<div class="outcome-details carat-right">
+  <div class="head-content" tabindex="0">
+    <div class="mastery-details pull-right" aria-hidden="true">
+      {{#if scoreDefined}}
+        <span>{{score}} / {{masteryPoints}}</span>
+        {{#ifEqual masteryLevel 'mastery'}}
+          <i class="icon-check mastery"></i>
+        {{else}}
+          {{#ifEqual masteryLevel 'near'}}
+          <i class="icon-plus near-mastery"></i>
+          {{else}}
+          <i class="icon-x remedial"></i>
+          {{/ifEqual}}
+        {{/ifEqual}}
+      {{else}}
+        <span>{{#t}}No score yet{{/t}}</span>
+      {{/if}}
+    </div>
+    <div class="recent-details">
+      <div class="last-assessment">{{#t}}Last Assessment: {{latestTitle}}{{/t}}</div>
+      <div class="submission-time">{{datetimeFormatted submissionTime}}</div>
+    </div>
+    <div class="screenreader-only">
+      {{#if scoreDefined}}
+        {{#t}}Current Mastery Score: {{score}} out of {{masteryPoints}}{{/t}}
+      {{else}}
+        {{#t}}No score yet{{/t}}
+      {{/if}}
+    </div>
+  </div>
+  <div class="method-details content-box pad-box-mini border border-trbl border-round">
+    <div>
+      {{#t}}Calculation Method{{/t}}: <span class="right-content">{{method}}</span>
+    </div>
+    <div class="example">
+      <span class="left-content">{{#t}}Example{{/t}}: </span><span class="right-content method-description">{{exampleText}}</span>
+    </div>
+    <div class="example">
+      <span aria-hidden="true">{{#t}}1- Item scores{{/t}}: </span>
+      <span class="screenreader-only">{{#t}}Example item scores{{/t}}: </span>
+      <span class="right-content">{{exScores}}</span>
+    </div>
+    <div class="example">
+      <span aria-hidden="true">{{#t}}2- Final score{{/t}}: </span>
+      <span class="screenreader-only">{{#t}}Example final score]]{{/t}}</span>
+      <span class="right-content">{{exResult}}</span>
+    </div>
+  </div>
+</div>

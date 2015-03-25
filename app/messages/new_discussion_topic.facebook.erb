@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.id %>
+  <%= polymorphic_url([asset.context, asset]) %>
 <% end %>
 
 <%= t :body, "New Forum Topic: %{discussion_topic}, %{course}", :discussion_topic => %{<b><a href="#{content :link }">#{h asset.title }</a></b>}.html_safe, :course => asset.context.name %>

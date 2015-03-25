@@ -2,7 +2,7 @@
 
 define([
   'i18n!student_groups',
-  'react',
+  'old_unsupported_dont_use_react',
   'jsx/groups/mixins/InfiniteScroll',
   'jsx/groups/components/Group'
 
@@ -21,7 +21,7 @@ define([
                                                      onJoin={() => this.props.onJoin(g)}
                                                      onManage={() => this.props.onManage(g)} />);
       return (
-        <div>
+        <div role="list" aria-label={I18n.t("Groups")}>
           {groups}
         </div>);
     }

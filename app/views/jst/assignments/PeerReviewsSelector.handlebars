@@ -70,8 +70,10 @@
             class="date_field datetime_field hasDatePicker"
             value="{{datetimeFormatted peerReviewsAssignAt false}}"
             type="text"
+            aria-label="{{#t}}Assign Reviews on Date{{/t}}"
+            aria-describedby="peer_reviews_assign_at_explanation"
             {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
-          <div class="explanation nest">
+          <div id="peer_reviews_assign_at_explanation" class="explanation nest">
             {{#t "peer_reviews_assign_at_explanation"}}
               Must come after due date. If blank, uses due date.
             {{/t}}

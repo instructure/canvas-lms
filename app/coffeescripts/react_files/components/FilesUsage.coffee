@@ -1,6 +1,6 @@
 define [
   'i18n!react_files'
-  'react'
+  'old_unsupported_dont_use_react'
   'compiled/util/friendlyBytes'
   'compiled/react/shared/utils/withReactDOM'
   './ProgressBar'
@@ -10,13 +10,15 @@ define [
 
   FilesUsage = React.createClass
     displayName: 'FilesUsage'
+    url: ->
+      "/api/v1/#{@props.contextType}/#{@props.contextId}/files/quota"
 
     propTypes:
       contextType: customPropTypes.contextType.isRequired
       contextId: customPropTypes.contextId.isRequired
 
     update: ->
-      $.get "/api/v1/#{@props.contextType}/#{@props.contextId}/files/quota", (data) =>
+      $.get @url(), (data) =>
         @setState(data)
 
     componentDidMount: ->

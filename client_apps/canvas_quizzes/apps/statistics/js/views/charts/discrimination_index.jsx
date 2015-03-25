@@ -36,11 +36,12 @@ define(function(require) {
 
     render: function() {
       var di = this.props.discriminationIndex;
-      var sign = di > K.DISCRIMINATION_INDEX_THRESHOLD ? '+' : '-';
+      var passing = di > K.DISCRIMINATION_INDEX_THRESHOLD ? '+' : '-';
+      var sign = di > 0 ? '+' : '-';
       var className = {
         'index': true,
-        'positive': sign === '+',
-        'negative': sign !== '+'
+        'positive': passing === '+',
+        'negative': passing !== '+'
       };
 
       // TODO: it would be nice if we move this to the model layer so we don't

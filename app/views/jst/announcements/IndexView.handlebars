@@ -18,10 +18,14 @@
       </span>
 
       {{#if options.permissions.create}}
-        <a href="{{new_topic_url}}" class="btn btn-primary" id="new-discussion-btn">
-          <i class="icon-plus"></i> 
-          {{#t}}Announcement{{/t}}
-        </a>
+        <a
+          href="{{new_topic_url}}"
+          class="btn btn-primary icon-plus"
+          id="new-discussion-btn"
+          role="button"
+          title='{{#t "title_add_announcement"}}Add Announcement{{/t}}'
+          aria-label='{{#t "title_add_announcement"}}Add Announcement{{/t}}'
+        >{{#t}}Announcement{{/t}}</a>
       {{/if}}
     </div>
     <div class="headerBar-left form-inline index_view_filter_form">

@@ -128,7 +128,16 @@ define([
 
   var clickSetCorrect = I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"),
       isSetCorrect = I18n.t('titles.set_as_correct', "This answer is set as correct"),
-      clickUnsetCorrect = I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct");
+      clickUnsetCorrect = I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct"),
+      correctAnswerLabel = I18n.t('labels.correct_answer', "Correct Answer"),
+      possibleAnswerLabel = I18n.t('labels.possible_answer', "Possible Answer");
+
+  function togglePossibleCorrectAnswerLabel($answers) {
+    $answers.find('.select_answer label').text(possibleAnswerLabel);
+    $answers.find('.select_answer input[name=answer_text]').attr("aria-label", possibleAnswerLabel);
+    $answers.filter('.correct_answer').find(".select_answer label").text(correctAnswerLabel);
+    $answers.filter('.correct_answer').find(".select_answer  input[name=answer_text]").attr("aria-label", correctAnswerLabel);
+  }
 
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
@@ -193,12 +202,12 @@ define([
       }
       answer.answer_selection_type = answer.answer_selection_type || quiz.answerSelectionType(answer.question_type);
 
+      var $answers = $answer.parent().find(".answer");
       if (answer.answer_selection_type == "any_answer") {
         $answer.addClass('correct_answer');
       } else if (answer.answer_selection_type == "matching") {
         $answer.removeClass('correct_answer');
       } else if (answer.answer_selection_type != "multiple_answer") {
-        var $answers = $answer.parent().find(".answer");
         $answers.find(".answer").filter(".correct_answer").not(":first").removeClass('correct_answer');
         if ($answers.filter(".correct_answer").length === 0) {
           $answers.filter(":first").addClass('correct_answer');
@@ -209,6 +218,7 @@ define([
         $answers.filter('.correct_answer').find('.select_answer_link')
           .attr('title', isSetCorrect)
           .find('img').attr('alt', isSetCorrect);
+        togglePossibleCorrectAnswerLabel($answers);
       } else {
         $answer.filter(".correct_answer").find('.select_answer_link')
           .attr('title', clickUnsetCorrect)
@@ -216,6 +226,7 @@ define([
         $answer.filter(":not(.correct_answer)").find('.select_answer_link')
           .attr('title', clickSetCorrect)
           .find('img').attr('alt', clickSetCorrect);
+        togglePossibleCorrectAnswerLabel($answers);
       }
 
       $answer.find(".numerical_answer_type").change();
@@ -1911,6 +1922,7 @@ define([
       if (REGRADE_OPTIONS[idValue]) {
         showRegradeOptions($question,questionID);
       }
+      togglePossibleCorrectAnswerLabel($(".form_answers .answer"));
     });
 
     $(".question_form :input[name='question_type']").change(function() {
@@ -2007,6 +2019,7 @@ define([
       if (!REGRADE_DATA[questionID]){
         REGRADE_DATA[questionID] = correctAnswerIDs($question)
       }
+      var $answers = $answer.parent().find(".answer");
       if ($question.find(":input[name='question_type']").val() != "multiple_answers_question") {
         $question.find(".answer:visible").removeClass('correct_answer')
           .find('.select_answer_link').attr('title', clickSetCorrect)
@@ -2015,6 +2028,7 @@ define([
           .attr('title', isSetCorrect)
           .find('img').attr('alt', isSetCorrect);
         $answer.addClass('correct_answer');
+        togglePossibleCorrectAnswerLabel($answers);
       } else {
         $answer.toggleClass('correct_answer');
         if ($answer.hasClass('correct_answer')) {
@@ -2026,6 +2040,7 @@ define([
             .attr('title', clickSetCorrect)
             .find('img').attr('alt', clickSetCorrect);
         }
+        togglePossibleCorrectAnswerLabel($answers);
       }
 
       $answer.addClass('hover').siblings().removeClass('hover');

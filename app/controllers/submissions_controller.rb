@@ -131,7 +131,7 @@ class SubmissionsController < ApplicationController
       @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_right?(@current_user, session, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
-    @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first rescue nil
+    @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
     if authorized_action(@submission, @current_user, :read)
       respond_to do |format|
         json_handled = false
@@ -476,17 +476,19 @@ class SubmissionsController < ApplicationController
 
   def submit_google_doc(document_id)
     # fetch document from google
-    google_docs = google_docs_connection
-    document_response, display_name, file_extension = google_docs.download(document_id)
+    google_docs = google_service_connection
+
+    # since google drive can have many different export types, we need to send along our preferred extensions
+    document_response, display_name, file_extension = google_docs.download(document_id, @assignment.allowed_extensions)
 
     # error handling
-    unless document_response.try(:is_a?, Net::HTTPOK)
+    unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
       flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
     end
 
     restriction_enabled           = @domain_root_account.feature_enabled?(:google_docs_domain_restriction)
     restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
-    if restriction_enabled && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
+    if restriction_enabled && !restricted_google_docs_domain.blank? && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
       flash[:error] = t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
     end
 

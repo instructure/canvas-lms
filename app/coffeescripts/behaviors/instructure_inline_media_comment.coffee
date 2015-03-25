@@ -23,7 +23,7 @@ define [
     mediaType = 'audio' if $link.data('media_comment_type') is 'audio' ||
                            $link.is('.audio_playback, .audio_comment, .instructure_audio_link')
 
-    $div.children("span").mediaComment('show_inline', id, mediaType, $link.attr('href'))
+    $div.children("span").mediaComment('show_inline', id, mediaType, $link.data('download') || $link.attr('href'))
     $minimizer = $ "<a href='#' style='font-size: 0.8em;'>
                      #{htmlEscape I18n.t 'links.minimize_embedded_kaltura_content', 'Minimize embedded content'}
                    </a>"

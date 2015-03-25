@@ -94,14 +94,14 @@ The publish button has two states on click (publish and published) and a hover s
 
 .publish-icon {
   display: inline-block;  
-  color: $ic-base-color-icon-disabled;
+  color: $ic-color-icon-disabled;
   cursor: pointer;
   &:focus {
     @if $use_high_contrast { @include button-focus; }
   }
 
   &.publish-icon-unpublish {
-    color: $ic-base-color-icon-disabled;
+    color: $ic-color-icon-disabled;
   }
 
   &.publish-icon-published {
@@ -122,6 +122,6 @@ The publish button has two states on click (publish and published) and a hover s
 
   &.unpublished {
     font-weight: normal;
-    color: $ic-base-color-icon-disabled;
+    color: $ic-color-icon-disabled;
   }
 }

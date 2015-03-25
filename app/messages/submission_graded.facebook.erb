@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>
+  <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end %>
 
 <%= t :body, "Your assignment, *%{title}*, has been graded.", :title => asset.assignment.title, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>" %>

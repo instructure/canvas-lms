@@ -232,10 +232,10 @@
   border: 1px solid #c1c7cf;
   border-radius: 3px;
   box-shadow: 0 1px 0 #dde0e4;
-  color: $base-font-color--subdued;
+  color: $ic-font-color--subdued;
 
   a.ig-title {
-    color: $base-font-color--subdued;
+    color: $ic-font-color--subdued;
     text-decoration: none;
   }
 
@@ -246,11 +246,11 @@
   }
 
   &:hover {
-    background-color: $base-list-item-background--hover;
+    background-color: $ic-list-item-background--hover;
   }
 
   &:focus {
-    background-color: $base-list-item-background--hover;
+    background-color: $ic-list-item-background--hover;
   }
 
   &:before {

@@ -42,7 +42,7 @@ function update_plugins {
   # Loop through each plugin dir, and if it's a git repo, update it
   # This needs to be done first so that db:migrate can pull in any plugin-
   # precipitated changes to the database.
-  for PLUGIN in vendor/plugins/*; do
+  for PLUGIN in {gems,vendor}/plugins/*; do
     (
       cd "$PLUGIN"
       if is_git_dir; then

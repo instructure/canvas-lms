@@ -107,7 +107,7 @@ class FoldersController < ApplicationController
   include Api::V1::Attachment
   include AttachmentHelper
 
-  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file]
+  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file, :copy_folder, :copy_file]
 
   def index
     if authorized_action(@context, @current_user, :read)
@@ -122,7 +122,7 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns [Folder]
@@ -142,6 +142,38 @@ class FoldersController < ApplicationController
       end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
+    end
+  end
+
+  # @API List all folders
+  # @subtopic Folders
+  # Returns the paginated list of all folders for the given context. This will
+  # be returned as a flat list containing all subfolders as well.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/folders' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Folder]
+  def list_all_folders
+    if authorized_action(@context, @current_user, :read)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+
+      url = named_context_url(@context, :api_v1_context_folders_url, include_host: true)
+
+      scope = @context.active_folders
+      unless can_manage_files
+        scope = scope.not_hidden.not_locked
+      end
+      if params[:sort_by] == 'position'
+        scope = scope.by_position
+      else
+        scope = scope.by_name
+      end
+
+      folders = Api.paginate(scope, self, url)
+      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
 
@@ -177,11 +209,11 @@ class FoldersController < ApplicationController
   # For example, you could get the root folder for a course like:
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
@@ -242,7 +274,7 @@ class FoldersController < ApplicationController
       @folder = @context.folders.find(params[:folder_id])
       user_id = @current_user && @current_user.id
 
-      # Destroy any previous zip downloads that might exist for this folder, 
+      # Destroy any previous zip downloads that might exist for this folder,
       # except the last one (cause we might be able to use it)
       folder_filename = "#{t :folder_filename, "folder"}.zip"
 
@@ -320,9 +352,9 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \ 
-  #        -F 'name=<new_name>' \ 
-  #        -F 'locked=true' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \
+  #        -F 'name=<new_name>' \
+  #        -F 'locked=true' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
@@ -491,7 +523,7 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \
   #        -H 'Authorization: Bearer <token>'
   def api_destroy
     @folder = Folder.find(params[:id])
@@ -525,6 +557,107 @@ class FoldersController < ApplicationController
     @attachment = Attachment.new(:context => @context)
     if authorized_action(@attachment, @current_user, :create)
       api_attachment_preflight(@context, request, :check_quota => true)
+    end
+  end
+
+  # @API Copy a file
+  #
+  # Copy a file from elsewhere in Canvas into a folder.
+  #
+  # Copying a file across contexts (between courses and users) is permitted,
+  # but the source and destination must belong to the same institution.
+  #
+  # @argument source_file_id [Required, String]
+  #   The id of the source file
+  #
+  # @argument on_duplicate [Optional, String, "overwrite"|"rename"]
+  #   What to do if a file with the same name already exists at the destination.
+  #   If such a file exists and this parameter is not given, the call will fail.
+  #
+  #   "overwrite":: Replace an existing file with the same name
+  #   "rename":: Add a qualifier to make the new filename unique
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/folders/123/copy_file' \
+  #        -H 'Authorization: Bearer <token>'
+  #        -F 'source_file_id=456'
+  #
+  # @returns File
+  def copy_file
+    unless params[:source_file_id].present?
+      return render :json => {:message => "source_file_id must be provided"}, :status => :bad_request
+    end
+    @dest_folder = Folder.find(params[:dest_folder_id])
+    @context = @dest_folder.context
+    @source_file = Attachment.find(params[:source_file_id])
+    unless @source_file.shard == @dest_folder.shard
+      return render :json => {:message => "cannot copy across institutions"}, :status => :bad_request
+    end
+    if authorized_action(@source_file, @current_user, :download)
+      @attachment = @context.attachments.build(folder: @dest_folder)
+      if authorized_action(@attachment, @current_user, :create)
+        on_duplicate = params[:on_duplicate].presence
+        return render :json => {:message => "on_duplicate must be 'overwrite' or 'rename'"}, :status => :bad_request if on_duplicate && %w(overwrite rename).exclude?(on_duplicate)
+        if on_duplicate.nil? && @dest_folder.active_file_attachments.where(display_name: @source_file.display_name).exists?
+          return render :json => {:message => "file already exists; set on_duplicate to 'rename' or 'overwrite'"}, :status => :conflict
+        end
+        @attachment = @source_file.clone_for(@context, @attachment, force_copy: true)
+        if @attachment.save
+          # default to rename on race condition (if a file happened to be created after the check above, and on_duplicate was not given)
+          @attachment.handle_duplicates(on_duplicate == 'overwrite' ? :overwrite : :rename)
+          render :json => attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
+        else
+          render :json => @attachment.errors
+        end
+      end
+    end
+  end
+
+  # @API Copy a folder
+  #
+  # Copy a folder (and its contents) from elsewhere in Canvas into a folder.
+  #
+  # Copying a folder across contexts (between courses and users) is permitted,
+  # but the source and destination must belong to the same institution.
+  # If the source and destination folders are in the same context, the
+  # source folder may not contain the destination folder. A folder will be
+  # renamed at its destination if another folder with the same name already
+  # exists.
+  #
+  # @argument source_folder_id [Required, String]
+  #   The id of the source folder
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/folders/123/copy_folder' \
+  #        -H 'Authorization: Bearer <token>'
+  #        -F 'source_file_id=789'
+  #
+  # @returns Folder
+  def copy_folder
+    unless params[:source_folder_id].present?
+      return render :json => {:message => "source_folder_id must be provided"}, :status => :bad_request
+    end
+    @dest_folder = Folder.find(params[:dest_folder_id])
+    @context = @dest_folder.context
+    @source_folder = Folder.find(params[:source_folder_id])
+    unless @source_folder.shard == @dest_folder.shard
+      return render :json => {:message => "cannot copy across institutions"}, :status => :bad_request
+    end
+    if @source_folder.context == @context && (@dest_folder.full_name + '/').start_with?(@source_folder.full_name + '/')
+      return render :json => {:message => "source folder may not contain destination folder"}, :status => :bad_request
+    end
+    if authorized_action(@source_folder.context, @current_user, :manage_files)
+      @folder = @context.folders.build(parent_folder: @dest_folder)
+      if authorized_action(@folder, @current_user, :create)
+        @folder = @source_folder.clone_for(@context, @folder, everything: true, force_copy: true)
+        if @folder.save
+          render :json => folder_json(@folder, @current_user, session)
+        else
+          render :json => @folder.errors
+        end
+      end
     end
   end
 end

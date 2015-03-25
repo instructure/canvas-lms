@@ -16,7 +16,7 @@
 <h4 id="speed_grader_loading">
   <%= t(:loading, "loading...") %>
 </h4>
-<h1 class="screenreader-only"><%= t('page_header_title', "Speedgrader") %></h1>
+<h1 class="screenreader-only"><%= t('page_header_title', "SpeedGrader") %></h1>
 <div id=gradebook_header_container><div id="gradebook_header" style="display:none;">
   <%= form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
     <div class="left">
@@ -269,7 +269,7 @@
 <a style="display:none;" id="assignment_submission_url" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submission_id}}") %>"></a>
 <a style="display:none;" id="assignment_submission_turnitin_report_url" href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
 <a style="display:none;" id="assignment_submission_resubmit_to_turnitin_url" href="<%= context_url(@context, :context_assignment_submission_resubmit_to_turnitin_url, @assignment.id, "{{ user_id }}") %>"></a>
-<form id="settings_form" style="display:none; width:400px;" title="<%= t('titles.speedgrader_options', "Speedgrader Options") %>">
+<form id="settings_form" style="display:none; width:400px;" title="<%= t('titles.speedgrader_options', "SpeedGrader Options") %>">
   <p>
     <label for="eg_sort_by"><%= t('labels.sort_by', "Sort student list") %></label>
     <%= select_tag 'eg_sort_by', options_for_select([

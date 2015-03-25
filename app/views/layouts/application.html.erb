@@ -52,7 +52,7 @@
       <div class="canvas-logo-area">
         <a class="canvas-logo-area__logo-link" href="<%= dashboard_url %>">
           <span class="screenreader-only"><%= t 'links.dashboard', "My Dashboard" %></span>
-          <%= render(:partial => 'shared/svg/svg_canvas_logo') %>
+            <%= render(:partial => 'shared/svg/svg_canvas_logo') %>
         </a>
       </div>
       <div class="canvas-customer-area">
@@ -70,7 +70,11 @@
         <%= render(:partial => "shared/primary_header_navigation") %>
       </div>
       <div class="canvas-customer-logo">
-        <img class="canvas-customer-logo__placeholder" src="/images/k-12-logo-placeholder.png" />
+        <% if @domain_root_account.settings[:header_image].present? %>
+          <img src="<%= @domain_root_account.settings[:header_image] %>" alt="" />
+        <% else %>
+          <%= image_tag("k-12-logo-placeholder.png", class: "canvas-customer-logo__placeholder", alt:"") %>
+        <% end %>
       </div>
     </div>
   </header>

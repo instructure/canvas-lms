@@ -159,6 +159,11 @@ class UsersController < ApplicationController
         :original_host_with_port => request.host_with_port
       )
       redirect_to request_token.authorize_url
+    elsif params[:service] == "google_drive"
+      redirect_uri = oauth_success_url(:service => 'google_drive')
+      session[:oauth_gdrive_nonce] = SecureRandom.hex
+      state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
+      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
@@ -210,6 +215,44 @@ class UsersController < ApplicationController
       request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
 
       oauth_request = OauthRequest.where(id: request_id).first
+    elsif params[:code] &&  params[:state] && params[:service] == 'google_drive'
+
+      begin
+
+        client = google_drive_client
+        client.authorization.code = params[:code]
+        client.authorization.fetch_access_token!
+        drive = client.discovered_api('drive', 'v2')
+        result = client.execute!(:api_method => drive.about.get)
+
+        if result.status == 200
+          user_info = result.data
+        else
+          raise "Error getting user info from Google"
+        end
+
+        json = Canvas::Security.decode_jwt(params[:state])
+        render_unauthorized_action and return unless json['nonce'] && json['nonce'] == session[:oauth_gdrive_nonce]
+        session.delete(:oauth_gdrive_nonce)
+
+        if logged_in_user
+          service = UserService.where(user_id: @current_user, service: 'google_drive', service_domain: 'drive.google.com').first_or_initialize
+          service.service_user_id = user_info['permissionId']
+          service.service_user_name = user_info['user']['emailAddress']
+          service.token = client.authorization.refresh_token
+          service.secret = client.authorization.access_token
+          service.save
+        else
+          session[:oauth_gdrive_access_token] = client.authorization.access_token
+          session[:oauth_gdrive_refresh_token] = client.authorization.refresh_token
+        end
+
+        flash[:notice] = t('google_drive_added', "Google Drive account successfully added!")
+        redirect_to json['return_to_url'] and return
+      rescue => e
+        ErrorReport.log_exception(:oauth, e)
+        flash[:error] = t('google_drive_fail', "Google Drive authorization failed. Please try again")
+      end
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
@@ -1054,6 +1097,15 @@ class UsersController < ApplicationController
   #   Otherwise, the user must respond to a confirmation message to confirm the
   #   channel.
   #
+  # @argument force_validations [Boolean]
+  #   If true, validations are performed on the newly created user (and their associated pseudonym)
+  #   even if the request is made by a privileged user like an admin. When set to false,
+  #   or not included in the request parameters, any newly created users are subject to
+  #   validations unless the request is made by a user with a 'manage_user_logins' right.
+  #   In which case, certain validations such as 'require_acceptance_of_terms' and
+  #   'require_presence_of_name' are not enforced. Use this parameter to return helpful json
+  #   errors while building users with an admin request.
+  #
   # @returns User
   def create
     run_login_hooks
@@ -1062,9 +1114,10 @@ class UsersController < ApplicationController
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
     @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
+    force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
-    allow_non_email_pseudonyms = manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
+    allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
     require_password = self_enrollment && allow_non_email_pseudonyms
     allow_password = require_password || manage_user_logins
 
@@ -1125,7 +1178,7 @@ class UsersController < ApplicationController
         'pre_registered'
       end
     end
-    if !manage_user_logins # i.e. a new user signing up
+    if force_validations || !manage_user_logins
       @user.require_acceptance_of_terms = @domain_root_account.terms_required?
       @user.require_presence_of_name = true
       @user.require_self_enrollment_code = self_enrollment

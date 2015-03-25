@@ -17,6 +17,35 @@
     {{>avatar author}}
   </div>
   <div class="image-block-content">
+    <div class="discussion-actions">
+      {{#if permissions.delete}}
+        <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link" aria-haspopup="true">
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">{{#t "manage"}}Manage{{/t}} announcement with title {{title}}</span>
+        </a>
+
+        <ul class="al-options">
+          {{#if locked}}
+            <li>
+              <a href="#" class="icon-lock">
+                {{#t "open_to_comments"}}Open to comments{{/t}}
+              </a>
+            </li>
+          {{else}}
+            {{#if can_lock}}
+              <li>
+                <a href="#" class="icon-lock">
+                  {{#t "close_for_comments"}}Close for comments{{/t}}
+                </a>
+              </li>
+            {{/if}}
+          {{/if}}
+          <li>
+            <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
+          </li>
+        </ul>
+      {{/if}}
+    </div>
     <div class="discussion-unread-container">
       <div class="new-and-total-badge">
         <span class="new-items"
@@ -34,7 +63,8 @@
       {{#if locked}}
         <i data-tooltip
            title="{{#t "locked"}}This topic is closed for comments{{/t}}"
-           class="icon-lock"></i>
+           class="icon-lock"
+           tabindex="0"><span class="screenreader-only">{{#t "locked"}}This topic is closed for comments{{/t}}</span></i>
       {{/if}}
 
       {{#if podcast_url}}

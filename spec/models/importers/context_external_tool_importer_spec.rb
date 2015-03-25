@@ -120,8 +120,8 @@ describe Importers::ContextExternalToolImporter do
 
     it "should combine external tools with the same settings" do
       data = [
-          {:migration_id => '1', :title => 'tool', :domain => 'example.com', :settings => {:not_null => :same}},
-          {:migration_id => '2', :title => 'tool', :url => 'http://example.com/otherpage', :settings => {:not_null => :same}},
+          {:migration_id => '1', :title => 'tool', :domain => 'example.com', :settings => {:not_null => :same, :vendor_extensions => {'oi' => 'hoyt'}}},
+          {:migration_id => '2', :title => 'tool', :url => 'http://example.com/otherpage', :settings => {:not_null => :same, :vendor_extensions => {'oi' => 'heyhey'}}},
       ]
 
       data.each do |hash|

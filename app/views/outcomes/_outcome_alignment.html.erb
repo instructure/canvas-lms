@@ -1,24 +1,9 @@
-<li id="alignment_<%= outcome_alignment ? outcome_alignment.id : "blank" %>" style="<%= hidden unless outcome_alignment %>" class="alignment <%= outcome_alignment.content_type_class if outcome_alignment %> <%= 'also_assignment' if outcome_alignment && outcome_alignment.graded? %>">
+<%= outcome_alignment_tag(@context, @outcome, outcome_alignment) do -%>
   <div class="header">
     <a href="#" class="move_alignment_link no-hover"><%= image_tag "move.png" %></a>
     <%= image_tag "blank.png", :class => "type_icon", :alt => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize), :title => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize) %>
-    <% url = context_url(@context, :context_outcome_alignment_redirect_url, @outcome.id, outcome_alignment ? outcome_alignment.id : "{{ id }}") rescue nil %>
-    <% url = "#{context_prefix(outcome_alignment.context_code)}/outcomes/#{@outcome.id}/alignments/#{outcome_alignment.id}" if outcome_alignment %>
-    <% class_name = "title" %>
-    <% class_name = "#{class_name} icon-#{outcome_alignment.content_type.to_s.downcase}" if outcome_alignment %>
-    <a href="<%= url %>" class="<%= class_name %>">
-      <%= outcome_alignment.try_rescue(:title) || nbsp %>
-    </a>
+    <%= link_to_outcome_alignment(@context, @outcome, outcome_alignment) %>
   </div>
-  <div class="links">
-    <% if outcome_alignment && outcome_alignment.has_rubric_association? %>
-      <span><%= image_tag "delete_circle_gray.png", :title => t(:delete_title, "Can't delete alignments based on rubric associations.  To remove these associations you need to remove the row from the asset's rubric") %></span>
-    <% else %>
-      <a href="<%= url %>" class="delete_alignment_link no-hover"><%= image_tag "delete_circle.png" %></a>
-    <% end %>
-  </div>
+  <div class="links"></div>
   <div class="clear"></div>
-  <div style="display: none;">
-    <span class="id"><%= outcome_alignment.try_rescue(:id) %></span>
-  </div>
-</li>
+<% end -%>

@@ -49,6 +49,16 @@
   color: darken($canvas-neutral, 15%);
 }
 /////
+////// React Modal
+/////
+.ReactModal__Content.ReactModal__Content--canvas.ReactModal__Content--demo-styleguide .ReactModal__Layout {
+  transform: none;
+  opacity: 1;
+  width: 100%;
+  max-width: 697px;
+}
+
+/////
 ////// Styles for Colors
 /////
 .Colorguide-color {    
@@ -88,3 +98,4 @@
   .Colorguide-color--light      {@include colorguide(#ffffff);}
   .Colorguide-color--dark       {@include colorguide(#333333);}  
 }
+

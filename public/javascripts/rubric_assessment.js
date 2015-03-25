@@ -64,7 +64,7 @@ window.rubricAssessment = {
         var $rubric_criterion_comments_link = $(this);
         var $criterion = $(this).parents(".criterion");
         var comments = $criterion.getTemplateData({textValues: ['custom_rating']}).custom_rating;
-        var editing = $(this).closest('td').children('.editing').is(':visible');
+        var editing = $(this).parents('.rubric.assessing').length > 0;
         var data = {
           criterion_comments: comments,
           criterion_description: $criterion.find(".description:first").text()

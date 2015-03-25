@@ -1,10 +1,14 @@
 --- 
 en: 
+  1_item_scores_5512cd03: "1- Item scores"
+  2_final_score_7b0fd15e: "2- Final score"
   451_message: 
     description: "You are not authorized to access this site because you are located in a country subject to U.S. trade restrictions."
     headings: 
       page: "Not Authorized"
     title: "Not Authorized"
+  558x270_png_a5e13e53: "558x270 png"
+  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png (1.8x the standard tile size, so it can be scaled up or down as needed)"
   EditAppointmentGroupDetails: 
     affect_reservations: "How will this affect reservations?"
     and_n_contexts: "and %{n} others"
@@ -35,6 +39,8 @@ en:
     cancel: Cancel
     save: Save
   _section_not_synced_yet_cd07d0dd: "-- Section not synced yet"
+  a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "A calculation value is not used with this calculation method"
+  a_message_is_required_129e1814: "A message is required"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "A table containing the name of the grading scheme and icons for editing or deleting the scheme."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains an icon to add a new row below, and an icon to delete the current row."
   academic_benchmark: 
@@ -63,6 +69,7 @@ en:
       facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs Preview"
+      google_drive: "Google Drive"
       linked_in: LinkedIn
       skype: Skype
       twitter: Twitter
@@ -273,7 +280,6 @@ en:
       logout_request_to_idp: "LogoutRequest sent to IdP"
       logout_response_from_idp: "LogoutResponse from IdP"
       saml_required: "A SAML configuration is required to test SAML"
-  account_level_8c2c1cdc: "(account level)"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Account notification end time precedes start time"
@@ -350,6 +356,7 @@ en:
     report_header_outcome_score: "outcome score"
     report_header_parent_account_id: parent_account_id
     report_header_role: role
+    report_header_role_id: role_id
     report_header_section: section
     report_header_section__id: section_id
     report_header_section_id: "section id"
@@ -900,6 +907,7 @@ en:
         allow_invitation_previews: "Invitation Previews"
         allow_sending_scores_in_emails: "Students can opt-in to receiving scores in email notifications"
         allow_sis_import: "SIS imports"
+        apple_touch_icon_remove: "Revert to default"
         author_email_in_notifications: "Show the email address of sender for user interaction Notifications"
         canvas_authentication: "Canvas Authentication"
         default_language: "Default Language"
@@ -914,9 +922,11 @@ en:
         equella: Equella
         equella_endpoint: "Equella Endpoint"
         equella_teaser: "Equella Comments"
+        favicon_remove: "Revert to default"
         global_includes: "Global CSS/JavaScript includes"
         global_javascript: "Global JavaScript URL"
         global_stylesheet: "Global CSS URL"
+        header_image_remove: "Revert to default"
         help_link_available_to: "Available to"
         help_link_subtext: Sub-text
         help_link_text: "Text to display for link"
@@ -925,6 +935,8 @@ en:
         login_handle_name: "Login Label"
         message: Message
         mfa_settings: "Multi-Factor Authentication"
+        msapplication_tile_square_remove: "Revert to default"
+        msapplication_tile_wide_remove: "Revert to default"
         name: "Account Name"
         no_enrollments_can_create_courses: "Users with no enrollments"
         open_registration: "Open Registration"
@@ -1246,6 +1258,7 @@ en:
         default: 
           zero_activity: 
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
+  achieve_mastery_count_times_8c9bbcec: "Achieve mastery %{count} times"
   activerecord: 
     errors: 
       messages: 
@@ -1256,6 +1269,9 @@ en:
         header: 
           one: "1 error prohibited this %{model} from being saved"
           other: "%{count} errors prohibited this %{model} from being saved"
+  activity_13915493: Activity
+  activity_by_category_9c2033d1: "Activity by Category"
+  activity_by_date_878c5b49: "Activity by Date"
   add_app_baf540f: "Add App"
   add_attachment_93868828: "Add Attachment"
   add_course_assignments_628ed6d0: "Add Course Assignments"
@@ -1268,6 +1284,7 @@ en:
     add_page_to: "Add a pages to %{module}"
     add_quiz_to: "Add a quizzes to %{module}"
     add_topic_to: "Add discussion topics to %{module}"
+  add_new_group_7ac49f31: "Add new group"
   add_students_to_the_course_874be8fb: "Add Students to the Course"
   add_tas_to_the_course_2aac6e02: "Add TAs to the Course"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Add your assignments.  You can just make a long list, or break them up into groups - and even specify weights for each assignment group."
@@ -1327,6 +1344,7 @@ en:
       threshold_should_be_numeric: "This should be a positive number"
   all_4321c3a1: All
   all_finished_time_to_publish_your_course_click_the_b6f07217: "All finished?  Time to publish your course!  Click the button below to make it official! Publishing will allow the users to begin participating in the course."
+  all_grading_periods_77974940: "All Grading Periods"
   all_students_have_taken_the_quiz_b558f8b4: "All Students have taken the quiz"
   all_students_have_taken_the_survey_494f9f42: "All Students have taken the survey"
   allow_lor_tools: "Allow users to view and use external tools configured for LOR."
@@ -1353,6 +1371,9 @@ en:
     student_in_course: 
       analytics: Analytics
       page_title: "Analytics: %{course} -- %{student}"
+  analytics_account_name_filter_name_c0fb1a7b: "Analytics: %{account_name} -- %{filter_name}"
+  analytics_c94ba601: Analytics
+  analytics_course_code_student_name_d63bab4c: "Analytics: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "and %{count} more…"
   ange_name: "Angel Converter"
   angel: 
@@ -1391,6 +1412,7 @@ en:
       rss_feed: "RSS feed"
       suggestions: "Suggestions:"
       there_are_no_announcements_show: "There are no announcements to show"
+      title_add_announcement: "Add Announcement"
       try_different_more_general_or_fewer_keywords: "Try different, more general, or fewer keywords."
       try_disabling_the_unread_filters: "Try disabling the \"Unread\" filter."
       unread: Unread
@@ -1401,6 +1423,7 @@ en:
   anonymous_e1b8ad27: Anonymous
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Answers will be shown after your last attempt"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center will appear in the \"Apps\" tab on the settings page of either a course or account. The URL provided below should point to a valid App Center endpoint (for example, %{url} -- be sure to omit the trailing slash"
+  apple_touch_icon_2c258bb3: "Apple Touch Icon"
   application: 
     errors: 
       feed_not_found: "Could not find feed."
@@ -1441,7 +1464,6 @@ en:
       please_log_in: "For security purposes, please enter your password to continue"
       titles: 
         suspended: "Institution Suspended"
-      unsupported_browser: "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers."
     wiki_front_page_default_content_course: "Welcome to your new course wiki!"
     wiki_front_page_default_content_group: "Welcome to your new group wiki!"
   appointment_group: 
@@ -1463,10 +1485,12 @@ en:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Are you sure you want to delete %{name}?"
     other: "Are you sure you want to delete these %{count} items?"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Are you sure you want to delete this announcement?"
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Are you sure you want to delete this grading period?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Are you sure you want to delete this grading scheme?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Are you sure you want to remove this tool?"
   aria_labels: 
-    unlock_at_date: "Unlock at date"
+    unlock_at_date: "Unlock on Date"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
   assessment_question: 
     default_question_name: Question
@@ -1474,6 +1498,7 @@ en:
     default_imported_title: "Imported Questions"
     default_title: "No Name - %{course}"
     default_unfiled_title: "Unfiled Questions"
+  assign_reviews_on_date_7e48ec50: "Assign Reviews on Date"
   assignment: 
     assignment_group_must_have_group: "Please select an assignment group for this assignment"
     at_least_one_file_type: "Please specify at least one allowed file type"
@@ -2038,6 +2063,7 @@ en:
       links: 
         add_another_file: "Add Another File"
         authorize_google_docs: "Authorize Google Docs Access"
+        authorize_google_drive: "Authorize Google Drive Access"
         find_file: "Click here to find a file you've already uploaded"
         submit: 
           external_tool: More
@@ -2049,6 +2075,7 @@ en:
       loading_tools: "Loading tools..."
       messages: 
         google_docs_auth_required: "Before you can submit assignments directly from Google Docs you need to authorize Canvas to access your Google Docs account:"
+        google_drives_auth_required: "Before you can submit assignments directly from Google Drive you need to authorize Canvas to access your Google Drive account:"
         media_recording_ready: "Ready to Submit! Click 'Submit Assignment' button to finish."
         media_recordings_disabled: "Media recordings are not enabled for this Canvas site, and you will not be able to submit these types of assignments. Please contact your instructor about changing the settings for this assignment, or your system administrator about enabling media recordings."
         submitting: Submitting...
@@ -2161,8 +2188,11 @@ en:
   available_after_unlock_at_b5682224: "Available after %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Available after %{unlock_at} until %{lock_at}"
   available_from_587ce92f: "Available From"
+  available_from_date_43b5e11d: "Available From Date"
+  available_until_date_cd125c62: "Available Until Date"
   available_until_f3b9c4ed: "Available Until"
   available_until_lock_at_ab022445: "Available until %{lock_at}"
+  average_49c63f9b: Average
   back_to_app_center_95420d83: "Back to App Center"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
@@ -2258,6 +2288,7 @@ en:
     add_item: "Add Item"
     apply: Apply
     authorize_google_docs: "Authorize Google Docs Access"
+    authorize_google_drive: "Authorize Google Drive Access"
     back_to_outcomes: "Back to Outcomes"
     cancel: Cancel
     choose_a_file: "Choose a File"
@@ -2295,8 +2326,8 @@ en:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: close
-  calculation_int_is_not_a_valid_calculation_int_for_561f72fa: "'%{calculation_int}' is not a valid calculation_int for calculation_method of '%{calculation_method}'. Valid range is '%{valid_calculation_ints}'"
-  calculation_int_is_not_used_with_calculation_metho_aa559d15: "'calculation_int' is not used with calculation_method '%{calculation_method}'"
+  calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'"
+  calculation_method_fe281f9: "Calculation Method"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method must be one of the following: %{calc_methods}"
   calculator: 
     buttons: 
@@ -2779,6 +2810,7 @@ en:
         create_assignment: "Create a New Assignment"
         delete: "Delete an Event/Assignment"
         new: "Create a New Event"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Can't delete alignments based on rubric associations.  To remove these associations you need to remove the row from the asset's rubric"
   cancel_caeb1e68: Cancel
   canvas: 
     migration: 
@@ -2904,6 +2936,10 @@ en:
           to work collaboratively on tasks like group papers or note-taking.  This page gives them
           (and you) an easy place to keep track of those collaborations, and also to set them
           up without having to swap emails.
+      google: 
+        drive: 
+          upgrade: 
+            description: "To access this collaboration you must authorize Canvas to access your Google Drive account"
       how_to_start_a_new_collaboration: "To find out more about a particular type of collaboration, click \"Start a New Collaboration\" and then choose that type in the dropdown list."
       links: 
         delete: "Delete this Collaboration"
@@ -2915,6 +2951,7 @@ en:
         current: "Current Collaborations"
     titles: 
       delete: "Delete collaboration?"
+  collapse_list_of_group_members_for_groupname_d6c66fa0: "Collapse list of group members for %{groupName}"
   coming_up_4348b0bd: "Coming Up"
   comm_messages: 
     from_beginning: "the beginning"
@@ -2923,6 +2960,7 @@ en:
   common_cartridge_display: "Common Cartridge"
   common_cartridge_file_description: "Common Cartridge 1.x Package"
   common_cartridge_name: "Common Cartridge Importer"
+  communication_5255723c: Communication
   communication_channel: 
     body: "Your Canvas verification code is %{verification_code}"
     default_facebook_account: "Facebook Account"
@@ -3227,6 +3265,7 @@ en:
       choose_migration_file: 
         migration_text: Source
       course_find_select: 
+        copy_into_self_warning: "You have selected to copy this course into itself. Note that this will duplicate all selected content."
         course_name: "Course name"
         include_completed_courses: "Include completed courses"
         or: or
@@ -3467,8 +3506,10 @@ en:
         restore_items: "Keep in mind that some items may have lost some of their associated data when they were deleted. Make sure you confirm the results of any restores you perform."
       restore_failed: "restore failed"
       restoring: restoring...
+  context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
     url_or_domain_required: "Either the url or domain should be set."
+  context_level_56d88f5b: "(%{context} level)"
   context_module: 
     requirements: 
       max_score: "must score no more than a %{score}"
@@ -3503,12 +3544,6 @@ en:
       headings: 
         add_prerequisite: "Add Prerequisite to %{name}"
         course_modules: "Course Modules"
-        student_progress: "Module Progress by Student"
-        student_progress_for_module: "Student Progress for %{module}"
-        students_completed: "Students who have Completed the Module"
-        students_in_progress: "Students who are Working on the Module"
-        students_locked: "Students who haven't Unlocked the Module"
-        students_unlocked: "Students who have Unlocked (but not started) the Module"
       help: 
         create: |-
             Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
@@ -3566,16 +3601,12 @@ en:
         new_tab: "Load in a new tab"
         publish_final_grade: "Publish final grade for the student when this module is completed"
         require_sequential_progress: "Students must move through requirements in this module in sequential order"
-        sort_by: "Sort By"
         title: Title
         unlock_at: "Unlock At"
         url: URL
       links: 
         add_prerequisite: "Add prerequisite"
         add_requirement: "Add requirement"
-        reload_student: "Reload Student's Progress"
-        sort_by_name: Name
-        sort_by_progress: Progress
         student_progress: "View Progress"
         title: 
           remove_prerequisite: "Remove this prerequisite"
@@ -3607,12 +3638,6 @@ en:
         instructions: "Select Module"
         name: "the module, %{module}"
       select_prerequisite: "Select the type of prerequisite. Students cannot see a module until all prerequisites are satisfied."
-      student_name: "Student Name"
-      table_headings: 
-        module: Module
-        state: State
-      titles: 
-        student_progression: "Module Progression by Student"
     context_module: 
       unpublish: Unpublish
     context_module_next: 
@@ -3938,6 +3963,12 @@ en:
     one: "1 minute"
     other: "%{count} minutes"
     zero: "less than 1 minute"
+  count_page_views_b40102b3: 
+    one: "1 page view"
+    other: "%{count} page views"
+  count_participations_ac8f82b7: 
+    one: "1 participation"
+    other: "%{count} participations"
   count_students_30e46120: 
     one: "1 student"
     other: "%{count} students"
@@ -4566,6 +4597,8 @@ en:
         reset: "Reset Course Content"
         stats: "Course Statistics"
         student_view: "Student View"
+      role: 
+        inactive: inactive
     show: 
       change_home_page: Change
       details: 
@@ -4674,6 +4707,7 @@ en:
       rss_feed: "%{course} Feed"
     unauthorized: 
       invalid_link: "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled."
+  courses_43204aae: Courses
   create_item_base: 
     there_was_an_error: "There was an error saving \"%{title}\", please try again."
   create_module_item: 
@@ -4776,6 +4810,10 @@ en:
       student: 
         count: "Wrong Student Count"
         ratio: "Wrong Student Ratio"
+  current_3ce5414a: "Current:"
+  current_mastery_score_score_out_of_masterypoints_80addfb7: "Current Mastery Score: %{score} out of %{masteryPoints}"
+  current_score_6c81792: "Current Score"
+  current_total_67bf5f72: "Current Total:"
   curve_grades_dialog: 
     average_score: "Average Score"
     buttons: 
@@ -5112,7 +5150,7 @@ en:
       manage: Manage
       move: "Move To…"
       no_due_date: "No Due Date"
-      open_to_comments: "Open to comments"
+      open_for_comments: "Open for comments"
       pin: Pin
       unpin: Unpin
       user_subscribed: "You are subscribed to this topic. Click to unsubscribe."
@@ -5270,8 +5308,12 @@ en:
       post_message: "Post Message"
     summary_view: 
       attached_file_name: "Attached: %{display_name}"
+      close_for_comments: "Close for comments"
+      delete: Delete
       drag_up_or_down_to_reorder: "Drag up or down to reorder"
       locked: "This topic is closed for comments"
+      manage: Manage
+      open_to_comments: "Open to comments"
       this_topic_is_used_for_grading: "This topic is used for grading"
       topic_podcast_feed: "Topic Podcast Feed"
     this_is_a_group_discussion: "This is a Group Discussion"
@@ -5283,6 +5325,7 @@ en:
     user_settings_view: 
       manually_mark_as_read: "Manually mark posts as read"
       my_settings: "My Settings"
+  discussion_topics_b35ac745: "Discussion Topics"
   discussions: 
     are_your_sure_delete: "Are you sure you want to delete this entry?"
     cant_subscribe_not_in_group: "You must be in this group to subscribe"
@@ -5356,6 +5399,9 @@ en:
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
   display_course_catalog: "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled."
+  distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
+      Distribution of current grades in courses across all students enrolled
+              in department courses.
   domain_3b54c511: Domain
   don_t_show_again_15d8253e: "don't show again"
   due_by_c263dc10: "due by"
@@ -5373,7 +5419,17 @@ en:
     no_due_date: "due: No Due Date"
   due_datetime_f5a81b81: "Due: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "Due: Multiple Dates"
+  due_on_date_aa4725cd: "Due on Date:"
+  due_on_date_ffc98ebc: "Due on Date"
   e_mail_only_2cc5e513: "E-Mail Only"
+  each_bar_is_an_assignment_the_green_layer_represen_ceb299b0: "Each bar is an assignment. The green layer represents the percentage of students that turned in the assignment *on time*. Assignments that are **late** are yellow, and ***missing*** assignments are red."
+  each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Each bar is one assignment. The *thin vertical whisker* extends from the lowest score for any student in the course to the highest score. The **thicker bar** extends from the 25th percentile to the 75th, with the ***median marked***."
+  each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Each bar is one assignment. The thin whisker extends from the lowest score for any student in the course to the highest score. The thicker bar extends from the 25th percentile to the 75th, with the median marked. The student's score is marked with a dot."
+  each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Each bar represents the number of *page views* on that day. An orange bar indicates that the student **took some action** within the course on that day."
+  each_bar_represents_the_number_of_page_views_on_th_442f8465: "Each bar represents the number of *page views* on that day. An orange bar indicates that some user **took an action** within a course on that day."
+  each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Each bar represents the number of *page views* on that day. An orange bar indicates that some user **took an action** within the course on that day."
+  each_bar_represents_the_number_of_page_views_relat_29d1e341: "Each bar represents the number of page views related to that category."
+  each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Each row is one assignment. The diamond is the due date and the bar extends to the submission date. Green indicates an *on time submission*, yellow a **late submission**, and red a ***missed assignment***. Gray diamonds are assignments without due dates, placed at the time of submission."
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Converter"
   edit_app_b0cc1c17: "Edit App"
@@ -5467,6 +5523,7 @@ en:
   enable_gradebook_list_students_by_sortable_name: "List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings."
   enable_multiple_grading_periods: "Enable multiple grading periods management in the account admin, and use in the Gradebook."
   end_date_e0093ed7: "End Date"
+  ends_on_date_320e0c26: "Ends on Date"
   enrollment: 
     default_course_name: Course
     default_email: "No Email"
@@ -5809,10 +5866,16 @@ en:
     unsaved_changes: "You have unsaved changes."
     wrong_file_extension: "The file you selected with extension \"%{extension}\", is not authorized for submission"
   everyone_854554dd: Everyone
+  example_84698b7d: Example
+  example_final_score_a92b30b9: "Example final score]]"
   example_https_example_com_config_xml_be5f36ac: "Example: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Example: https://lti-tool-provider-example.herokuapp.com/register"
+  example_item_scores_6726c689: "Example item scores"
+  expand_collapse_title_outcome_group_239f0a9d: "expand/collapse %{title} Outcome Group"
+  expand_list_of_group_members_for_groupname_9ce9d2f7: "Expand list of group members for %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Expand or Collapse Calendars"
   expand_or_collapse_undated_items_b901de09: "Expand or collapse Undated items"
+  expires_on_date_18efe4e2: "Expires on Date"
   external_apps_f5490181: "External Apps"
   external_content: 
     cancel: 
@@ -6005,6 +6068,7 @@ en:
       settings_title: "Canvas Notification Settings"
       updating_preferences: "Updating Preferences..."
   fair_use_bee47d77: "Fair Use"
+  favicon_6e658914: Favicon
   feature_flags: 
     feature_flag: 
       allow: Allow
@@ -6058,6 +6122,7 @@ en:
     file_preview_infotable_name: Name
     file_preview_infotable_size: Size
     file_preview_infotable_status: Status
+  file_preview_eedb43f2: "File Preview"
   file_previews: 
     lock_explanation: 
       messages: 
@@ -6243,6 +6308,7 @@ en:
     warnings: 
       file_uploaded_without_response: "File may have uploaded, but the server failed to respond.  Reload the page to confirm."
   files_and_folder_contents_only_available_to_studen_944f9166: "Files and folder contents only available to students with link. Not visible in student files."
+  files_uploaded_519844ed: "Files Uploaded"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Fill in the blank, read surrounding text"
   filter_announcements_by_unread_495eeeb3: "filter announcements by unread"
   filter_by_name_34cbe139: "Filter by name"
@@ -6297,6 +6363,7 @@ en:
     grade_display_warning: 
       checkbox: "Don't show for this course again."
       warning: Warning
+  grade_distribution_e52c9256: "Grade Distribution"
   grade_export_title: "Grade Export"
   grade_summary: 
     graph_title: "Mean %{mean}, High %{high}, Low %{low}"
@@ -6567,6 +6634,7 @@ en:
     grade: 
       muted: Muted
     grade_summary: 
+      all_grading_periods: "All Grading Periods"
       assessment_by: "Assessment by %{name}"
       assignments: Assignments
       buttons: 
@@ -6748,7 +6816,7 @@ en:
       new_assessment_option: "[New Assessment]"
       no_annotation: "Annotations are not available for this document"
       not_newest_notice: "Note: This is not the most recent submission"
-      page_header_title: Speedgrader
+      page_header_title: SpeedGrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
         status: "by submission status (needs grading, not submitted, etc)"
@@ -6759,13 +6827,13 @@ en:
         download_file: "Download this file"
         not_newest: "use the dropdown above to change which submission to look at"
         preview_file: "Preview this File"
-        speedgrader_options: "Speedgrader Options"
+        speedgrader_options: "SpeedGrader Options"
       tooltips: 
         file_attachment: "File Attachment"
         media_comment: "Media Comment"
         speech_recognition: "Speech Recognition"
     speed_grader_disabled: "SpeedGrader is disabled for this course"
-    speedgrader_enabled_only_for_published_content: "Speedgrader is enabled only for published content."
+    speedgrader_enabled_only_for_published_content: "SpeedGrader is enabled only for published content."
     student_attendance: 
       headers: 
         assignment: Assignment
@@ -6804,6 +6872,7 @@ en:
       total: Total
   graded_quiz_7fabdf1f: "Graded Quiz"
   graded_survey_c0f0c395: "Graded Survey"
+  grades_a61eba0a: Grades
   grading_box: 
     out_of_points_possible: "out of %{assignment.points_possible}"
   grading_cell: 
@@ -7317,6 +7386,7 @@ en:
       This might be useful for people with impaired vision or difficulty reading.
   high_score_47924c1a: "High: %{score}"
   highest_28ad71e6: Highest
+  highest_score_e080551e: "Highest Score"
   html5_first_videos_description: |-
       By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
       then fall back to Flash.
@@ -7355,6 +7425,7 @@ en:
     errors: 
       import: 
         external_tool_url: "The url for the external tool assignment \"%{assignment_name}\" wasn't valid."
+        grading_standard_not_found: "The assignment \"%{title}\" referenced a grading scheme that was not found in the target course's account chain."
     imported_assignments_group: "Imported Assignments"
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "The security parameters for the external tool \"%{tool_name}\" need to be set in Course Settings."
@@ -7392,6 +7463,8 @@ en:
   installed_by_admin_97c3a721: "Installed by Admin"
   instructions: 
     authorize_google_docs: "Before you can collaborate on documents, you need to authorize Canvas to access your Google Docs account:"
+    authorize_google_drive: "Before you can collaborate on documents, you need to authorize Canvas to access your Google Drive account:"
+  instructors_4b491a07: instructors
   instructure: 
     alerts: 
       file_previews_disabled: "File previews have been disabled for this Canvas site"
@@ -7456,6 +7529,7 @@ en:
       enter_search_terms: "enter search terms"
   invalid_authenticity_token_b753558c: "Invalid Authenticity Token"
   invalid_points_possible: "The value of possible points for this assigment must be zero or greater."
+  invalid_state_parameter_7a5aa108: "Invalid state parameter"
   invalid_url_in_xml: "Invalid url in xml. Ampersands must be escaped."
   invalid_utf_8_13c76a6: "Invalid UTF-8"
   invalid_xml_syntax: "Invalid xml syntax"
@@ -7532,9 +7606,11 @@ en:
       applies some style changes, but more K-12 specific things may be added in the future.
   labels: 
     lock_module_until: "Lock module until a given date"
+  last_assessment_latesttitle_22560cf3: "Last Assessment: %{latestTitle}"
   last_user_access_title: "Last User Access"
   late_percent_b91d01b3: "Late: %{percent}"
   latest_f604a75: Latest
+  latest_score_905aa87b: "Latest Score"
   launch_registration_tool_38d4781: "Launch Registration Tool"
   launch_url_e150bd41: "Launch URL"
   layouts: 
@@ -7692,11 +7768,14 @@ en:
     help: Help
     show_me_where: "Show Me Where"
   links_14b70841: Links
+  lock_after_date_92f9149: "Lock After Date"
   lock_date_cannot_be_after_course_end_a473158b: "Lock date cannot be after course end"
   lock_date_cannot_be_after_section_end_d37da70c: "Lock date cannot be after section end"
   lock_date_cannot_be_after_term_end_cf1a188f: "Lock date cannot be after term end"
   lock_date_cannot_be_before_due_date_ac30f54: "Lock date cannot be before due date"
+  lock_until_date_62ce1b5c: "Lock Until Date"
   logged_out_user: "Logged Out User %{user_counter}"
+  logo_a040ae0e: Logo
   low_score_4eeb95b2: "Low: %{score}"
   lower_limit_of_range_6ddd4983: "Lower limit of range"
   lti: 
@@ -7725,6 +7804,8 @@ en:
   manage_group_group_name_ac8578c6: "Manage group %{group_name}"
   manage_usage_rights_c5a8c216: "Manage Usage Rights"
   manual_entry_e4a4f99a: "Manual Entry"
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mastery score reflects the most recent graded assigment or quiz."
+  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Mastery scrore reflects the highest score of a graded assignment or quiz."
   mathquill: 
     tabs: 
       arrows: Arrows
@@ -7771,6 +7852,7 @@ en:
     track_uploaded_successfully: "Track uploaded successfully; please refresh your browser."
     upload: Upload
     uploading: Uploading...
+  media_recordings_749aef6d: "Media Recordings"
   median_score_4657e907: "Median: %{score}"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} members out of maximum of %{max_membership}"
   members_af25c21d: Members
@@ -7791,6 +7873,7 @@ en:
     send_message: "Send Message"
   message_students_dialog: 
     recipients: "Recipients:"
+  message_this_student_6d14043d: "Message this student"
   messages: 
     account_suspended: 
       email: 
@@ -9097,15 +9180,6 @@ en:
     messages: 
       failure: "There was an error sending your email. Please reload the page and try again."
       success: "Your email is being delivered."
-    migration_export_ready: 
-      email: 
-        body: "Your content is ready to be imported into your course."
-        html: 
-          body: "Your content is ready to be imported into your course."
-          link_message2: "Click *this link* to choose which items of your content to import"
-          subject: "Your content for \"%{course_name}\" is ready to be imported"
-        link_message: "Click this link to choose which items of your content to import:"
-        subject: "Your content for \"%{course_name}\" is ready to be imported"
     new_account_user: 
       email: 
         body: "New Account Admin for %{account}"
@@ -9130,7 +9204,6 @@ en:
       email: 
         html: 
           attached_file: "Attached File"
-          download: download
           link: "View announcement"
         labels: 
           file_included: "File Included"
@@ -9804,6 +9877,7 @@ en:
     assignments_to_post: 
       one: "You are ready to post 1 assignment."
       other: "You are ready to post %{count} assignments."
+    continue: Continue
     create: 
       assignment: 
         cancel: Cancel
@@ -9881,6 +9955,8 @@ en:
       no_students_found: "No students were found"
       progression_header: "Module Progression"
       student_progress: "Student Progress"
+    relock_modules: "Re-Lock Modules"
+    requirements_changed: "Requirements Changed"
   modules_item_controller: 
     max_score_complete: "scored no more than a *score*"
     max_score_incomplete: "must score no more than a *score*"
@@ -9897,6 +9973,7 @@ en:
   moodle_formula_many_warning_title: "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated"
   moodle_formula_warning_title: "Possible answers will need to be regenerated for Formula question"
   more_courses_5ebbe998: "More Courses"
+  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Most recent score counts as 75% of mastery weight, average of all other scores count as 25% of weight."
   move_dialog: 
     cancel: Cancel
     save: Save
@@ -9906,6 +9983,7 @@ en:
     move_to_end: "-- At the bottom --"
   move_outcome_ce497e6c: "Move Outcome"
   move_outcome_group_cfa1a505: "Move Outcome Group"
+  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Must achieve mastery at least 2 times. Scores above mastery will be averaged to calculate final score."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Must supply 'file_ids' and/or 'folder_ids' parameter"
   mute_dialog: 
     curving_assignments: "Curving assignments"
@@ -9928,7 +10006,6 @@ en:
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*name* has been successfully installed but has not yet been enabled."
   name_is_currently_status_9065c996: "*name* is currently **status**."
   name_only_5f56718e: "Name Only"
-  new_2b97b0d9: new
   new_account_role_6e5c4964: "New Account Role"
   new_course_role_6a7bb75f: "New Course Role"
   new_facebook_message: "You have a new message from Canvas"
@@ -9948,8 +10025,9 @@ en:
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: "No"
   no_grading_periods_to_display_ad25c8f3: "No grading periods to display"
-  no_grading_standards_to_display_537e45cd: "No grading standards to display"
+  no_grading_schemes_to_display_8b0e92e7: "No grading schemes to display"
   no_migration_file: "File required for content migration."
+  no_score_yet_c94e919b: "No score yet"
   no_students_have_taken_the_quiz_yet_e667644b: "No Students have taken the quiz yet"
   no_students_have_taken_the_survey_yet_d378cd35: "No Students have taken the survey yet"
   no_usage_rights_object_supplied_304b8d40: "No 'usage_rights' object supplied"
@@ -10104,7 +10182,6 @@ en:
       group_membership_accepted: "Group Membership Accepted"
       group_membership_rejected: "Group Membership Rejected"
       merge_email_communication_channel: "Merge Email Communication Channel"
-      migration_export_ready: "Migration Export Ready"
       migration_import_failed: "Migration Import Failed"
       migration_import_finished: "Migration Import Finished"
       new_account_user: "New Account User"
@@ -10259,6 +10336,7 @@ en:
   on_time_percent_eebffe38: "On Time: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Once you’ve changed an answer you’ll need to choose an option before updating the question."
   one_per_line_format_name_value_79647700: "One per line. Format: name=value"
+  ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} on time, %{late} late, %{missing} missing"
   options: 
     ? "no"
     : "No"
@@ -10284,6 +10362,7 @@ en:
   outcome_results: 
     outcomes_filename: Outcomes
   outcome_results_title: "Outcome Results"
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Outcome: %{title} has a status of %{statusTooltip}"
   outcomes: 
     account_standards: "Account Standards"
     account_standards_description: "To the left you'll notice the standards your institution has created for you to use in your courses."
@@ -10354,8 +10433,6 @@ en:
         total: "%{points_possible} Points"
       total_points: "Total Points"
       use_for_scoring: "Use this criterion for scoring"
-    outcome_alignment: 
-      delete_title: "Can't delete alignments based on rubric associations. To remove these associations you need to remove the row from the asset's rubric"
     outcome_criterion: "Learning Outcome Criterion"
     outcome_form: 
       criterion: "Criterion ratings"
@@ -10469,12 +10546,14 @@ en:
     view_more_link: "View More"
   paginated_view: 
     loading_more_results: "Loading more results"
+  participations_1823832d: Participations
   paste_xml_cda3a64e: "Paste XML"
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
   pdf_d8236d9a: PDF
   percent_of_students_scored_score_53d2c4d5: "%{percent} of students scored %{score}"
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% of %{bytesAvailable} used"
+  permission_not_found_620b80d1: "Permission not found"
   permissions: 
     manage_webhooks: "Manage webhooks"
   plain_text_e3ab33aa: "Plain text"
@@ -10627,6 +10706,18 @@ en:
       labels: 
         api_key: "OAuth Consumer Key"
         secret_key: "OAuth Consumer Secret"
+    google_drive: 
+      description: "Google Drive file sharing"
+      name: "Google Drive"
+    google_drive_settings: 
+      description: "Paste the contents of client_secrets.json below. The text boxes above will be automatically filled in based on the content given below."
+      labels: 
+        auth_uri: "Auth URI"
+        client_id: "Client ID"
+        client_secret: "Client Secret"
+        client_secret_json: "Client secrets json"
+        redirect_uri: "Redirect URI"
+        token_uri: "Token URI"
     grade_export: 
       description: "Grade Export for SIS"
       name: "Grade Export"
@@ -10860,6 +10951,7 @@ en:
     labels: 
       requirements_must_be_completed: "The following requirements need to be completed before this page will be unlocked"
   presentation_2d9387ca: Presentation
+  press_spacebar_for_more_details_on_this_outcome_f6713a42: "press spacebar for more details on this outcome"
   privacy_290109ea: Privacy
   product_name: Canvas
   profile: 
@@ -10931,6 +11023,7 @@ en:
       buttons: 
         add_picture_file: "Add File"
         authorize_google_docs: "Authorize Google Docs Access"
+        authorize_google_drive: "Authorize Google Drive Access"
         authorize_twitter: "Authorize Twitter Access"
         generate_token: "Generate Token"
         new_access_token: "New Access Token"
@@ -10958,6 +11051,7 @@ en:
           applications as needed, but if [you're developing a new or limited
           project](%{documentation_url}) you can just generate the token from here.
       google_docs_description: "Once you authorize us to see your Google Docs you'll be able to submit your assignments directly from Google Docs, and create and share documents with members of your classes."
+      google_drive_description: "Once you authorize us to see your Google Drive you'll be able to submit your assignments directly from Google Drive, and create and share documents with members of your classes."
       headers: 
         application_abbrev: App
         dates: Dates
@@ -10966,6 +11060,7 @@ en:
         facebook_access: "Facebook Access"
         generate_access_token: "Generate an Access Token"
         google_docs_access: "Google Docs Access"
+        google_drive_access: "Google Drive Access"
         inbox_opt_out: "Conversations Inbox Opt-out"
         linkedin_access: "LinkedIn Access"
         loading_images: "Loading Images..."
@@ -11026,6 +11121,7 @@ en:
         edit_settings: "Edit Settings"
         facebook: Facebook
         google_docs: "Google Docs"
+        google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "more options"
         reconfigure_mfa: "Reconfigure Multi-Factor Authentication"
@@ -11048,6 +11144,7 @@ en:
         access_token_details: "Access Token Details"
         authorize_facebook: "Authorize Facebook"
         authorize_google_docs: "Authorize Google Docs"
+        authorize_google_drive: "Authorize Google Drive"
         authorize_linkedin: "Authorize LinkedIn"
         authorize_twitter: "Authorize Twitter"
         authorize_yo: "Yo Login"
@@ -11061,7 +11158,7 @@ en:
       twitter_description: |-
           Twitter is a service for posting and subscribing to short messages.
           If you have a Twitter account, you can register it here.  Then if you allow
-          fellow course/group members to see your registered services, they can 
+          fellow course/group members to see your registered services, they can
           easily connect with your Twitter account.
           
           You can also sign up to have notifications sent to your Twitter account.
@@ -11469,6 +11566,8 @@ en:
     inverted_table_view: 
       headers: 
         question: Question
+    links: 
+      log_accessibility_warning: "Warning: The Table View is not accessible to screenreaders. Please use the current view instead."
     loading: Loading...
     navigation: 
       links: 
@@ -11720,6 +11819,7 @@ en:
       comments_on_answer: "Comments, if the user chooses this answer"
       comments_on_question: "Comments for this question"
       comments_on_wrong_match: "Comments if the user gets this match wrong"
+      correct_answer: "Correct Answer"
       message_text: "Message Text"
       other_incorrect_matches: "Other Incorrect Match Options"
       possible_answer: "Possible Answer"
@@ -12414,7 +12514,7 @@ en:
           lock_survey: "Lock this Survey Now"
           unlock_quiz: "Let Students Take this Quiz Now"
           unlock_survey: "Let Students Take this Survey Now"
-        course_concluded_notice: "This quiz is no longer available as the course had been concluded."
+        course_concluded_notice: "This quiz is no longer available as the course has been concluded."
         labels: 
           available_until: Until
           no_time_limit: "No time limit"
@@ -12699,9 +12799,11 @@ en:
     updated_at: "Date Modified"
     updated_at_short: Modified
     view: View
+  read_more_about_windows_tiles_ac4ae6f5: "Read more about windows tiles"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha not configured"
   recent_student: 
     last_logged_in: "last logged in %{last_login}"
+  recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Decaying Average"
   recently_deleted_courses_title: "Recently Deleted Courses"
   recipient_input: 
     context_search_placeholder: "Enter a name, course, or group"
@@ -12758,6 +12860,8 @@ en:
   remove_row_f9d59cba: "Remove Row"
   rename_45608f54: Rename
   reply_from_name: "%{name} via Canvas Notifications"
+  reply_to_comment_72d96728: "Reply to Comment"
+  reply_to_main_discussion_29823888: "Reply to Main Discussion"
   require_usage_rights_for_uploaded_files_4507865b: "Require Usage Rights for Uploaded Files"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -12804,6 +12908,7 @@ en:
       manage_assignments: "Manage (add / edit / delete) assignments and quizzes"
       manage_calendar: "Add, edit and delete events on the course calendar"
       manage_canvasnet_courses: "Manage Canvas Network courses"
+      manage_catalog: "Manage catalog"
       manage_content: "Manage all other course content"
       manage_courses: "Manage ( add / edit / delete ) courses"
       manage_demos: "Manage demos"
@@ -13211,7 +13316,9 @@ en:
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "You are already enrolled in **%{course}**."
-      switch_users: "You are currently signed in as *%{user}*. **Sign in as another user**."
+      buttons: 
+        go_to_course: "Go to the Course"
+        go_to_dashboard: "Go to your Dashboard"
     authenticate: 
       buttons: 
         enroll_in_course: "Enroll in Course"
@@ -13238,7 +13345,6 @@ en:
         enroll_in_course: "Enroll in Course"
         next: Next
       getting_started: "You are enrolling in **%{course}**"
-      switch_users: "You are currently signed in as *%{user}*. **Sign in as another user**."
     course_full: 
       class_full: "Enrollment has filled up for **%{course}**. We apologize for the inconvenience."
     enrollment_closed: 
@@ -13980,6 +14086,8 @@ en:
       titles: 
         uploading: "Uploading, Please Wait."
   shared_secret_892c88f2: "Shared Secret"
+  show_by_date_e3967761: "Show by Date"
+  show_by_type_c5d61732: "Show by Type"
   show_lti_2_configuration_ui_94ce35a9: "Show LTI 2 Configuration UI"
   show_me_76823679: "Show me"
   sis_agent_token_authentication_2a0b29e3: "SIS Agent Token Authentication"
@@ -14059,6 +14167,12 @@ en:
       back: Back
       close: Close
       forward: Forward
+  smartbanner: 
+    android_banner_author: "Instructure Inc."
+    android_banner_in_google_play: "In Google Play"
+    android_banner_price: FREE
+    android_banner_title: "Canvas by Instructure"
+    android_banner_view_button: VIEW
   source_code_2395ca74: "Source code"
   speed_grader: 
     submissions_dropdown: 
@@ -14096,6 +14210,7 @@ en:
     previous_object: "Previous %{type}"
     student_hidden_name: "Student %{position}"
   start_date_e937be8a: "Start Date"
+  starts_on_date_a777f505: "Starts on Date"
   statistics: 
     csv_columns: 
       attempt: attempt
@@ -14116,6 +14231,8 @@ en:
   step: Step
   stream_items_api: 
     assessment_request_title: "Peer Review for %{title}"
+  student_5da6bfd1: Student
+  student_921b864d: student
   student_assignment_outcome_map_title: "Student Competency"
   student_groups_desc: |-
       This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
@@ -14130,6 +14247,7 @@ en:
   student_summary: 
     student_summary_table_ascending: "Student Summary Table sorted ascending by %{sortText}"
     student_summary_table_descending: "Student Summary Table sorted descending by %{sortText}"
+  students_1b8cd07b: Students
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Students who have taken the quiz (%{count})"
     other: "Students who have taken the quiz (%{count})"
@@ -14351,6 +14469,7 @@ en:
   take_the_quiz_again_8ea51a6c: "Take the Quiz Again"
   take_the_survey_ada59508: "Take the Survey"
   take_the_survey_again_24ce22c2: "Take the Survey Again"
+  teachers_52e2423f: Teachers
   terms: 
     index: 
       date: 
@@ -14414,14 +14533,19 @@ en:
   the_app_was_deactivated_573520ab: "The app was deactivated"
   the_app_was_updated_successfully_3d71cd1b: "The app was updated successfully"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download.  Uploading and organizing your files is easy with Canvas.  We'll show you how."
+  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "The logo image in the top right Canvas header. 200x200 svg or png"
   the_material_is_in_the_public_domain_279c39a3: "The material is in the public domain"
   the_material_is_licensed_under_creative_commons_3242cb5e: "The material is licensed under Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "The material is subject to fair use exception"
   the_module_item_is_locked_27fe420b: "The module item is locked."
+  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "The shortcut icon for iOS/Android devices. 180x180 png or svg"
+  the_state_parameter_is_required_ffadf213: "The state parameter is required"
+  the_top_track_represents_days_on_which_the_student_2a347099: "The top track represents days on which the *student sent messages* to course instructors. The bottom track is for **messages from the instructors** to the student."
   there_are_count_results_in_the_list_e74f6e36: 
     one: "There is 1 result in the list"
     other: "There are %{count} results in the list"
   there_was_a_problem_adding_the_grading_scheme_92d6d907: "There was a problem adding the grading scheme"
+  there_was_a_problem_deleting_the_grading_period_50ce07c5: "There was a problem deleting the grading period"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "There was a problem deleting the grading scheme"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "There was a problem saving the grading scheme"
   there_was_an_error_in_processing_your_request_6513a49a: "There was an error in processing your request"
@@ -14437,8 +14561,8 @@ en:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "This folder is currently locked and unavailable to view."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "This is a comma separated list of URL's to trust. Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "This most likely happened because you imported course content without its associated files."
-  this_outcome_has_been_used_to_assess_a_student_cal_16409bda: "This outcome has been used to assess a student. Calculation method is fixed at %{old_value}"
-  this_outcome_has_been_used_to_assess_a_student_cal_99ee55f0: "This outcome has been used to assess a student. Calculation integer is fixed at %{old_value}"
+  this_outcome_has_been_used_to_assess_a_student_the_1ca44b79: "This outcome has been used to assess a student. The calculation method is fixed"
+  this_outcome_has_been_used_to_assess_a_student_the_ac470670: "This outcome has been used to assess a student. The calculation value is fixed"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
   this_student_wrote_f1a3f22d: "This student wrote:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting grades to SIS"
@@ -14702,9 +14826,8 @@ en:
   usage_right_ff96f3e2: "Usage Right:"
   usage_rights_f0960ad6: "Usage Rights"
   usage_rights_have_been_set_d1b433c7: "Usage rights have been set."
-  usage_rights_modal: 
-    saving: Saving...
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Usage rights will be set for all of the files contained in:"
+  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Use a *single 16x16, 32x32, 48x48 ico file*."
   used_by_permission_314a78dd: "Used by Permission"
   user: 
     default_user_name: User
@@ -14837,6 +14960,7 @@ en:
       diigo: "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
       facebook: "Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups."
       google_docs: "Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations."
+      google_drive: "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
       linked_in: "LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace."
       skype: "Skype is a free tool for online voice and video calls."
       twitter: "Twitter is a great resource for out-of-class communication."
@@ -14912,6 +15036,8 @@ en:
     facebook_fail: "Facebook authorization failed."
     google_docs_added: "Google Docs access authorized!"
     google_docs_fail: "Google Docs authorization failed. Please try again"
+    google_drive_added: "Google Drive account successfully added!"
+    google_drive_fail: "Google Drive authorization failed. Please try again"
     grades: 
       average_grades: 
         one: "average for 1 student"
@@ -15108,7 +15234,9 @@ en:
   view_analytics_91a3b7a: "View Analytics"
   view_app_center_6c89a3fe: "View App Center"
   view_app_configurations_52b52441: "View App Configurations"
+  view_course_analytics_eefe6b2: "View Course Analytics"
   view_name_app_62a2ad8e: "View %{name} app"
+  view_student_analytics_6b8ccd42: "View Student Analytics"
   visit_864b4060: Visit
   visit_group_group_name_7a816081: "Visit group %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu."
@@ -15277,6 +15405,7 @@ en:
     cannot_update_published: "You are not allowed to update the published state of this wiki page"
     cannot_update_title: "You are not allowed to update the title of this wiki page"
     invalid_editing_roles: "The provided editing roles are invalid"
+  will_keep_the_average_of_all_your_scores_d7e6b733: "Will keep the average of all your scores"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Will keep the highest of all your scores"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Will keep the latest of all your scores"
   will_paginate: 
@@ -15298,12 +15427,17 @@ en:
     external_urls: 
       archive: Archive
       archive_link: "View archive(s)"
+  windows_square_tile_4c00879e: "Windows Square Tile"
+  windows_tile_color_2b786bd9: "Windows Tile Color"
+  windows_wide_tile_a3302508: "Windows Wide Tile"
   would_you_like_to_enable_this_app_ccdf735d: "Would you like to enable this app?"
+  would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?"
   xml_configuration_5ea1b942: "XML Configuration"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "You are logged in at %{institution1} using your credentials from %{institution2}"
   you_are_the_group_leader_for_this_group_b8629b70: "you are the group leader for this group"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "You can hide or show a course’s assignments by toggling them on or off."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "You can now set regrade options for students who have already taken the quiz."
+  you_have_changed_the_progression_requirements_for__6772bc89: "You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*You have made changes to the questions in this quiz.* These changes will not appear for students until you save the quiz."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "You have no outcomes. *Click here* to create one."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "You have no outcomes. Click here to go to the outcomes page."
@@ -15311,11 +15445,13 @@ en:
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "You have reached the maximum webhooks per user limit (%{max})"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you."
+  you_must_select_a_course_to_copy_content_from_e7bd9e09: "You must select a course to copy content from"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "You must set it to a number greater than or equal to %{min}"
   you_must_specify_a_usage_right_5eb57f87: "You must specify a usage right."
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Your Assignment list can now be found on the *Calendar* page."
   your_assignments_list_has_improved_3eded80e: "Your *Assignments* list has improved!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Your Assignments will show here listed by due date."
+  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers."
   your_content_has_been_exported_bbb57764: "Your content has been exported."
   your_message_has_been_sent_thank_you_e0284316: "Your message has been sent. Thank you!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Your profile photo could not be uploaded. You may have exceeded your upload limit."

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.underscore.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
+  <%= polymorphic_url([asset.context, asset]) %>
 <% end %>
 
 <%= t('subject', "The event [%{event_title}](%{link_to_event}) for  %{course_name} has changed times. It's now:", :event_title => asset.title, :link_to_event => content(:link), :course_name => asset.context.name) %>

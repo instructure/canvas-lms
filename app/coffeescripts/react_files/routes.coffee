@@ -1,5 +1,5 @@
 define [
-  'react-router'
+  'old_unsupported_dont_use_react-router'
   'compiled/react_files/modules/filesEnv'
   'compiled/react_files/components/FilesApp'
   'compiled/react_files/components/ShowFolder'

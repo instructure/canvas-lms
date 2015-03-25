@@ -14,15 +14,15 @@ def simple_grading_standard(context)
   })
 end
 
-def should_add_a_grading_scheme
-  new_standard_name = 'new grading standard'
+def should_add_a_grading_scheme(options = {name: "new grading standard"})
+  new_standard_name = options[:name]
   f('.add_standard_link').click
   replace_content(f('.scheme_name'), new_standard_name)
   f('.save_button').click
   wait_for_ajax_requests
-  new_grading_standard = GradingStandard.last
-  expect(new_grading_standard.title).to eq new_standard_name
-  expect(f("#grading_standard_#{new_grading_standard.id}")).to be_displayed
+  @new_grading_standard = GradingStandard.last
+  expect(@new_grading_standard.title).to eq new_standard_name
+  expect(f("#grading_standard_#{@new_grading_standard.id}")).to be_displayed
 end
 
 def should_edit_a_grading_scheme(context, url)

@@ -29,38 +29,40 @@ define [
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
-      @dialog = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
-      @dialog.html(submissionDetailsDialog(@submission))
-        .dialog
-          title: @student.name
-          width: 600
-          resizable: false
-          open: @scrollCommentsToBottom
 
-        .delegate 'select', 'change', (event) =>
-          @dialog.find('.submission_detail').each (index) ->
-            $(this).showIf(index == event.currentTarget.selectedIndex)
-        .delegate '.submission_details_grade_form', 'submit', (event) =>
-          event.preventDefault()
-          $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
-            @update(data)
-            $.publish 'submissions_updated', [@submission.all_submissions]
-            setTimeout =>
-              @dialog.dialog('close')
-            , 500
-        .delegate '.submission_details_add_comment_form', 'submit', (event) =>
-          event.preventDefault()
-          $(event.currentTarget).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
-            @update(data)
-            setTimeout =>
-              @dialog.dialog('close')
-            , 500
+      @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
+      @$el.html(submissionDetailsDialog(@submission))
+
+      @dialog = @$el.dialog
+        title: @student.name
+        width: 600
+        resizable: false
+
+      @dialog.delegate 'select', 'change', (event) =>
+        @dialog.find('.submission_detail').each (index) ->
+          $(this).showIf(index == event.currentTarget.selectedIndex)
+      .delegate '.submission_details_grade_form', 'submit', (event) =>
+        event.preventDefault()
+        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+          @update(data)
+          $.publish 'submissions_updated', [@submission.all_submissions]
+          setTimeout =>
+            @dialog.dialog('close')
+          , 500
+      .delegate '.submission_details_add_comment_form', 'submit', (event) =>
+        event.preventDefault()
+        $(event.currentTarget).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+          @update(data)
+          setTimeout =>
+            @dialog.dialog('close')
+          , 500
 
       deferred = $.ajaxJSON @url+'&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment', 'GET', {}, @update
       @dialog.find('.submission_details_comments').disableWhileLoading deferred
 
     open: =>
       @dialog.dialog('open')
+      @scrollCommentsToBottom()
       $('.submission_details_dialog .assignment-name').focus()
 
     scrollCommentsToBottom: =>
