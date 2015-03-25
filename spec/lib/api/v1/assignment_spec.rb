@@ -49,5 +49,12 @@ describe "Api::V1::Assignment" do
       expect(json).to be_a(Hash)
       expect(json["overrides"].first.keys.sort).to eq ["assignment_id","id", "title", "student_ids"].sort
     end
+
+    it "excludes descriptions when exclude_description flag is passed" do
+      json = api.assignment_json(@assignment, @user, @session,
+               {override_dates: false, exclude_description: true})
+      expect(json).to be_a(Hash)
+      expect(json).to_not have_key "description"
+    end
   end
 end
