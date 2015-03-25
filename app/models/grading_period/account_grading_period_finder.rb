@@ -24,8 +24,12 @@ class GradingPeriod
     end
 
     def grading_periods
-      account_ids = Account.all_accounts_for(account).map(&:id).uniq
-      GradingPeriod.active.grading_periods_by(account_id: account_ids)
+      gps = GradingPeriod.active.grading_periods_by(account_id: account.id)
+      if gps.present?
+        gps
+      else
+        AccountGradingPeriodFinder.new(account.parent_account).grading_periods
+      end
     end
 
     private

@@ -65,7 +65,7 @@ class GradingPeriod < ActiveRecord::Base
   private
 
   def last?
-    grading_period_group.grading_periods.last == self
+    grading_period_group.grading_periods.sort_by(&:end_date).last == self
   end
 
   def validate_dates

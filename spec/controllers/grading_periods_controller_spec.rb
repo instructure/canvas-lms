@@ -52,8 +52,8 @@ describe GradingPeriodsController do
         @json = JSON.parse(remove_while.call(response.body))
       end
 
-      it "contains two grading periods" do
-        expect(@json['grading_periods'].count).to eql 2
+      it "contains one grading periods" do
+        expect(@json['grading_periods'].count).to eql 1
       end
 
       it "paginates" do
@@ -78,7 +78,7 @@ describe GradingPeriodsController do
       end
 
       it "contains three grading periods" do
-        expect(@json['grading_periods'].count).to eql 3
+        expect(@json['grading_periods'].count).to eql 1
       end
     end
   end

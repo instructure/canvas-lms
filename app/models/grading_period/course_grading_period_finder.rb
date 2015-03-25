@@ -24,10 +24,10 @@ class GradingPeriod
     end
 
     def grading_periods
-      account_ids = Account.all_accounts_for(course.account).map(&:id).uniq
-
-      GradingPeriod.active.grading_periods_by(course_id: course.id) +
-      GradingPeriod.active.grading_periods_by(account_id: account_ids)
+      course_gps = GradingPeriod.active.grading_periods_by(course_id: course.id)
+      course_gps.present? ?
+        course_gps :
+        AccountGradingPeriodFinder.new(course.account).grading_periods
     end
 
     private

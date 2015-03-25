@@ -32,9 +32,15 @@ describe GradingPeriod::CourseGradingPeriodFinder do
     let!(:sub_account_grading_period) { sub_account.grading_period_groups.create!
                                                   .grading_periods.create!(grading_period_params) }
 
-    it "finds grading periods for the course, and all associated accounts" do
+    it "finds grading periods for the course" do
       grading_periods = GradingPeriod::CourseGradingPeriodFinder.new(course).grading_periods
-      expect(grading_periods).to eq [course_grading_period, root_account_grading_period, sub_account_grading_period]
+      expect(grading_periods).to eq [course_grading_period]
+    end
+
+    it "finds grading periods for the account if the course doesn't have any" do
+      c2 = Course.create! account: sub_account
+      grading_periods = GradingPeriod::CourseGradingPeriodFinder.new(c2).grading_periods
+      expect(grading_periods).to eq [sub_account_grading_period]
     end
   end
 end

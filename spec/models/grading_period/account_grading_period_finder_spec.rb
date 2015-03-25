@@ -30,9 +30,13 @@ describe GradingPeriod::AccountGradingPeriodFinder do
 
     context "when context is an account" do
       subject { GradingPeriod::AccountGradingPeriodFinder.new(sub_account).grading_periods }
-      it "finds grading periods for the account, and all associated accounts" do
+      it "finds grading periods for the account" do
+        is_expected.to eq [sub_account_grading_period]
+      end
 
-        is_expected.to eq [root_account_grading_period, sub_account_grading_period]
+      it "finds from ancestors if the account doesn't have any" do
+        sub_account_grading_period.destroy
+        is_expected.to eq [root_account_grading_period]
       end
     end
   end
