@@ -318,12 +318,5 @@ Canvas::Plugin.register('pandapub', nil, {
   :settings_partial => 'plugins/panda_pub_settings',
   :validator => 'PandaPubValidator'
 })
-Canvas::Plugin.register('byots', nil, {
-  :name => lambda{ t :name, 'Ticketing System' },
-  :description => lambda{ t :description, 'Ticketing system configurations' },
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/ticketing_system_settings',
-  :validator => 'TicketingSystemValidator'
-})
+
+Canvas::Plugins::TicketingSystem.register!
