@@ -98,9 +98,10 @@
                 <% if @presenter.can_grade?(@current_user) && @presenter.allows_speed_grader? %>
                   <li><a href="<%= context_url(@topic.assignment.context,
                                                :speed_grader_context_gradebook_url,
-                                               :assignment_id => @topic.assignment.id) %>">
+                                               :assignment_id => @topic.assignment.id) %>"
+                         target="_blank">
                     <i class="icon-speed-grader" aria-hidden="hidden"></i>
-                    <%= t :speed_grader, "Speed Grader" %>
+                    <%= t :speed_grader, "SpeedGrader™" %>
                   </a></li>
                 <% end %>
 
