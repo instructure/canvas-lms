@@ -1367,7 +1367,7 @@ describe DiscussionTopicsController, type: :request do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       entry_json = json.first
       expect(entry_json['attachment']).not_to be_nil
-      expect(entry_json['attachment']['url']).to eq "http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+      expect(entry_json['attachment']['url']).to eq "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     end
 
     it "should include replies on top level entries" do
@@ -2135,7 +2135,7 @@ describe DiscussionTopicsController, type: :request do
 
         reply_reply1_attachment_json = {
           "content-type"=>"application/loser",
-          "url"=>"http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
+          "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
           "filename"=>"unknown.loser",
           "display_name"=>"unknown.loser",
           "id" => @attachment.id,
@@ -2182,19 +2182,19 @@ describe DiscussionTopicsController, type: :request do
         message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
 
         a_tag = message.css("p a").first
-        expect(a_tag["href"]).to eq "http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
-        expect(a_tag["data-api-endpoint"]).to eq "http://#{Account.default.domain}/api/v1/files/#{@reply2_attachment.id}"
+        expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
+        expect(a_tag["data-api-endpoint"]).to eq "http://www.example.com/api/v1/files/#{@reply2_attachment.id}"
         expect(a_tag["data-api-returntype"]).to eq "File"
         expect(a_tag.inner_text).to eq "This is a file link"
 
         video_tag = message.css("p video").first
-        expect(video_tag["poster"]).to eq "http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
+        expect(video_tag["poster"]).to eq "http://www.example.com/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
         expect(video_tag["data-media_comment_type"]).to eq "video"
         expect(video_tag["preload"]).to eq "none"
         expect(video_tag["class"]).to eq "instructure_inline_media_comment"
         expect(video_tag["data-media_comment_id"]).to eq "0_abcde"
         expect(video_tag["controls"]).to eq "controls"
-        expect(video_tag["src"]).to eq "http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+        expect(video_tag["src"]).to eq "http://www.example.com/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
         expect(video_tag.inner_text).to eq "link"
 
         expect(v0_r1['parent_id']).to  eq @root1.id

@@ -388,14 +388,30 @@ module Api
     end
   end
 
+  PLACEHOLDER_PROTOCOL = 'https'
+  PLACEHOLDER_HOST = 'placeholder.invalid'
+
+  def get_host_and_protocol_from_request
+    [ request.host_with_port, request.ssl? ? 'https' : 'http' ]
+  end
+
+  def resolve_placeholders(content)
+    host, protocol = get_host_and_protocol_from_request
+    # content is a json-encoded string; slashes are escaped
+    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}")
+  end
+
   def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
     return html if html.blank?
 
-    # if we're a controller, use the host of the request, otherwise let HostUrl
-    # figure out what host is appropriate
-    if self.is_a?(ApplicationController)
-      host = request.host_with_port
-      protocol = request.ssl? ? 'https' : 'http'
+    # use the host of the request if available;
+    # use a placeholder host for pre-generated content, which we will replace with the request host when available;
+    # otherwise let HostUrl figure out what host is appropriate
+    if self.respond_to?(:request)
+      host, protocol = get_host_and_protocol_from_request
+    elsif self.respond_to?(:use_placeholder_host?) && use_placeholder_host?
+      host = PLACEHOLDER_HOST
+      protocol = PLACEHOLDER_PROTOCOL
     else
       host = HostUrl.context_host(context, @account_domain.try(:host))
       protocol = HostUrl.protocol
