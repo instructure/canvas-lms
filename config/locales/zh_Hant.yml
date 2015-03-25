@@ -2899,6 +2899,13 @@ zh_Hant:
           件。您可以使用如 [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url}) 的資源協同工作於
           某些任務，如群組文件或做筆記。此頁面是跟蹤這些協作以及對其進行設定而無需互發電子郵件的
           簡單的工具。
+      description_teacher: |-
+          **我們所說的協作是什麼意思呢？** 我們正在談論的是您的學生可能已經熟悉的基於 
+          Web 的工具。學生可以使用如 
+          [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url}) 
+          的資源協同工作於某些任務，如群組文件或做筆記。此頁面為其提供
+          了跟蹤這些協作以及對
+          其進行設定而無需互發電子郵件的簡單的工具。
       google: 
         drive: 
           upgrade: 
@@ -5464,6 +5471,7 @@ zh_Hant:
       font_size: 字型大小，按下以選擇
       formatting: 格式化，按下以選擇
   either_the_url_or_domain_should_be_set_c29cf8c1: "應該設定 URL 或網域。"
+  element_option_missing_error_an_element_to_attach__be433478: "`因素` 選項缺失錯誤：在將 TreeBrowserView 的呈現選項設定為「正確」時，必須指定 TreeBrowserView 將附加在其之上的一個因素"
   email: 
     default_from_name: "Instructure Canvas"
   email_e366fa29: 電子郵件
@@ -12423,6 +12431,7 @@ zh_Hant:
         score: 分數
         time: 時間
       take_quiz: 
+        audible_quiz_timer_shortcut_description: "注：這是一次定時測驗。請注意時間，答題過程中，您可以按鍵盤組合鍵 SHIFT, ALT, T, 查看剩餘時間。再重複一遍：SHIFT, ALT, T..."
         buttons: 
           next: 下一個
           out_of_time_submit: 好吧
@@ -13308,6 +13317,7 @@ zh_Hant:
       buttons: 
         accept: 接受
         decline: 拒絕
+      invitation_text: "您已被邀請作為 %{enrollment_type_with_indefinite_article} 加入 [%{course}](%{link_to_course}) 課程"
     enrollment: 
       enrolled_as_designer: 註冊為設計師
       enrolled_as_limited_designer: 註冊為設計師，具有僅章節存取
