@@ -2,8 +2,9 @@ define [
   'underscore'
   'Backbone'
   'vendor/d3.v3'
+  'jst/outcomes/accessibleLineGraph'
   'compiled/underscore-ext/sum'
-], (_, Backbone, d3) ->
+], (_, Backbone, d3, accessibleTemplate) ->
   # Trend class based on formulae found here:
   # http://classroom.synonym.com/calculate-trendline-2709.html
   class Trend
@@ -82,19 +83,27 @@ define [
         .append("svg")
           .attr("width", @width() + @margin.left + @margin.right)
           .attr("height", @height + @margin.top + @margin.bottom)
+          .attr("aria-hidden", true)
         .append("g")
           .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
 
       @_appendAxes()
       @_appendLines()
 
+      @$('.screenreader-only').append(accessibleTemplate(@toJSON()))
+
       @
+
+    toJSON: ->
+      current_user_name: ENV.current_user.display_name
+      data: @data()
+      outcome_name: @model.get('friendly_name')
 
     # Data helpers
     data: ->
       @_data ?= _.chain(@model.get('scores'))
         .sortBy((score) =>
-          @parseDate(score.assessed_at)
+          score.assessed_at
         ).last(@limit)
         .map((score, i) =>
           x: i
@@ -104,9 +113,6 @@ define [
 
     masteryPercentage: ->
       (@model.get('mastery_points') / @model.get('points_possible')) * 100
-
-    parseDate: (date) ->
-      d3.time.format(@timeFormat).parse(date)
 
     percentageFor: (score) ->
       ((score / @model.get('points_possible')) * 100)
@@ -181,8 +187,8 @@ define [
       @dateGuides = d3.svg.axis()
         .scale(@xTimeScale)
         .tickValues([
-          @parseDate(_.first(@data()).date)
-          @parseDate(_.last(@data()).date)
+          _.first(@data()).date
+          _.last(@data()).date
         ])
         .tickFormat((d) -> d3.time.format("%m/%d")(d))
       @yAxis = d3.svg.axis()
@@ -219,8 +225,8 @@ define [
       @xTimeScale = d3.time.scale()
         .range([0, @xTimeScaleWidth()])
         .domain([
-          @parseDate(_.first(@data()).date)
-          @parseDate(_.last(@data()).date)
+          _.first(@data()).date
+          _.last(@data()).date
         ])
       @y = d3.scale.linear()
         .range([@height, @margin.bottom])
