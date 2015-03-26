@@ -205,7 +205,7 @@ define [
 
     updateAssignmentVisibilities: (assignment, userId) ->
       visibilities = get(assignment, 'assignment_visibility')
-      filteredVisibilities = visibilities.filter (id) ->
+      filteredVisibilities = visibilities?.filter (id) ->
         id != userId
       set(assignment, 'assignment_visibility', filteredVisibilities)
 

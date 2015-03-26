@@ -63,7 +63,7 @@ define [
     open: =>
       @dialog.dialog('open')
       @scrollCommentsToBottom()
-      $('.submission_details_dialog .assignment-name').focus()
+      $('.ui-dialog-titlebar-close').focus()
 
     scrollCommentsToBottom: =>
       @dialog.find('.submission_details_comments').scrollTop(999999)
