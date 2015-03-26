@@ -3,121 +3,119 @@
   class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}}"
   data-item-id="{{labelId}}"
 >
-  {{#if ENV.use_new_styles}}
+  <div class="ig-row__layout">
+    <a href="{{htmlUrl}}" class="ig-title">
+      {{#if canManage}}
+        <span class="draggable-handle">
+          <i class="icon-drag-handle"></i>
+        </span>
+      {{/if}}
+      <i class='icon-{{iconType}}'></i>
+      {{name}}
+    </a>
     <div class="ig-details">
-  {{else}}
-    <div class="ig-details row-fluid">
-  {{/if}}
-    {{#if canManage}}
-      <div class="{{spanWidth}} ellipses modules">
-        {{#if has_modules}}
-          {{#ifEqual module_count 1}}
-            {{module_name}} {{#t "module"}}Module{{/t}}
+      {{#if canManage}}
+        <div class="ellipses modules">
+          {{#if has_modules}}
+            {{#ifEqual module_count 1}}
+              {{module_name}} {{#t "module"}}Module{{/t}}
+            {{else}}
+              <a
+                href='#'
+                title='{{joined_names}}'
+                class="tooltip_link"
+                data-tooltip-selector="#module_tooltip_{{labelId}}"
+              >{{#t "multiple_modules"}}Multiple Modules{{/t}}</a>
+            {{/ifEqual}}
+            <div id="module_tooltip_{{labelId}}" style="display:none;">
+              {{#each modules}}
+                <span>{{this}}</span><br/>
+              {{/each}}
+            </div>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      <div class="assignment-date-available ellipses" data-view="date-available"></div>
+      <div class="assignment-date-due ellipses" data-view="date-due"></div>
+
+      <div class="ellipses js-score {{alignTextClass}}">
+        <span class="screenreader-only">
+          {{#if pointsPossible}}
+            {{#t "points_possible_screen_reader"}}{{pointsPossible}} Points Possible{{/t}}
           {{else}}
-            <a
-              href='#'
-              title='{{joined_names}}'
-              class="tooltip_link"
-              data-tooltip-selector="#module_tooltip_{{labelId}}"
-            >{{#t "multiple_modules"}}Multiple Modules{{/t}}</a>
-          {{/ifEqual}}
-          <div id="module_tooltip_{{labelId}}" style="display:none;">
-            {{#each modules}}
-              <span>{{this}}</span><br/>
-            {{/each}}
-          </div>
-        {{/if}}
+            {{#t "no_points_possible"}}No Points Possible{{/t}}
+          {{/if}}
+        </span>
+        <span class="non-screenreader" aria-hidden="true">
+          {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+        </span>
       </div>
-    {{/if}}
 
-    <div class="{{spanWidth}} assignment-date-available ellipses" data-view="date-available"></div>
-    <div class="{{spanWidth}} assignment-date-due ellipses" data-view="date-due"></div>
-
-    <div class="{{spanWidth}} ellipses js-score {{alignTextClass}}">
-      <span class="screenreader-only">
-        {{#if pointsPossible}}
-          {{#t "points_possible_screen_reader"}}{{pointsPossible}} Points Possible{{/t}}
-        {{else}}
-          {{#t "no_points_possible"}}No Points Possible{{/t}}
-        {{/if}}
-      </span>
-      <span class="non-screenreader" aria-hidden="true">
-        {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
-      </span>
     </div>
 
-  </div>
-  <a href="{{htmlUrl}}" class="ig-title ellipses">
     {{#if canManage}}
-      <span class="draggable-handle">
-        <i class="icon-drag-handle"></i>
-      </span>
-    {{/if}}
-    <i class='icon-{{iconType}}'></i>
-    {{name}}
-  </a>
+      <div class="ig-admin">
+        <span class="publish-icon" data-view="publish-icon"></span>
 
-  {{#if canManage}}
-    <div class="ig-admin">
-      <span class="publish-icon" data-view="publish-icon"></span>
+        <div class="inline-block">
+          <a
+            class="al-trigger al-trigger-gray"
+            id="assign_{{id}}_manage_link"
+            role="button"
+            tabindex="0"
+            href="#"
+          >
+            <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          </a>
 
-      <div class="inline-block">
-        <a
-          class="al-trigger al-trigger-gray"
-          id="assign_{{id}}_manage_link"
-          role="button"
-          tabindex="0"
-          href="#"
-        >
-          <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
-          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        </a>
-
-        <ul
-          id="assignment_{{id}}_settings_list"
-          class="al-options"
-          role="menu"
-        >
-          <li>
-            <a
-              href="#"
-              class="edit_assignment icon-edit"
-              id="assignment_{{id}}_settings_edit_item"
-              aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
-              data-focus-returns-to="assign_{{id}}_manage_link"
-            >{{#t "edit"}}Edit{{/t}}</a>
-          </li>
-          {{#unless frozen }}
-          <li>
-            <a
-              href="#"
-              class="delete_assignment icon-trash"
-              id="assignment_{{id}}_settings_delete_item"
-              aria-label="{{#t 'assignment_delete'}}Delete Assignment{{/t}}"
-              data-focus-returns-to="assign_{{id}}_manage_link"
-            >{{#t "delete"}}Delete{{/t}}</a>
-          </li>
-          {{/unless}}
-          {{#if canMove}}
-          <li>
-            <a
-              href="#"
-              class="move_assignment icon-updown"
-              id="assignment_{{id}}_settings_move_item"
-              aria-label='{{#t 'assignment_move'}}Move Assignment{{/t}}'
-              data-focus-returns-to="assign_{{id}}_manage_link"
-            >{{#t "move"}}Move To…{{/t}}</a>
-          </li>
-          {{/if}}
-          {{#each menu_tools}}
-          <li role="presentation">
-            <a class="menu_tool_link" href="{{url}}">
-              {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
-              {{title}}
-            </a>
-          </li>
-          {{/each}}
-        </ul>
+          <ul
+            id="assignment_{{id}}_settings_list"
+            class="al-options"
+            role="menu"
+          >
+            <li>
+              <a
+                href="#"
+                class="edit_assignment icon-edit"
+                id="assignment_{{id}}_settings_edit_item"
+                aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
+                data-focus-returns-to="assign_{{id}}_manage_link"
+              >{{#t "edit"}}Edit{{/t}}</a>
+            </li>
+            {{#unless frozen }}
+            <li>
+              <a
+                href="#"
+                class="delete_assignment icon-trash"
+                id="assignment_{{id}}_settings_delete_item"
+                aria-label="{{#t 'assignment_delete'}}Delete Assignment{{/t}}"
+                data-focus-returns-to="assign_{{id}}_manage_link"
+              >{{#t "delete"}}Delete{{/t}}</a>
+            </li>
+            {{/unless}}
+            {{#if canMove}}
+            <li>
+              <a
+                href="#"
+                class="move_assignment icon-updown"
+                id="assignment_{{id}}_settings_move_item"
+                aria-label='{{#t 'assignment_move'}}Move Assignment{{/t}}'
+                data-focus-returns-to="assign_{{id}}_manage_link"
+              >{{#t "move"}}Move To…{{/t}}</a>
+            </li>
+            {{/if}}
+            {{#each menu_tools}}
+            <li role="presentation">
+              <a class="menu_tool_link" href="{{url}}">
+                {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+                {{title}}
+              </a>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
       </div>
     </div>
 

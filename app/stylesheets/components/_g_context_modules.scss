@@ -39,20 +39,11 @@ $context_module_bg_color: #f2f3f4;
       float: right;
     }
   }
-  .due_date_display, .points_possible_display {
-    width: 95px;
-    margin-right: 5px;
+  .ig-row {
+    display: flex;
+    align-items: center;
   }
-  .ig-details {
-    width: 210px;
-  }
-  .ig-row.with-completion-requirements {
-    height: 55px;
-  }
-  .module-item-title {
-    min-width: 300px;
-    right: 250px;
-  }
+  .ig-details { flex: 0.5; }
   h2 .name {
     display: inline;
     position: absolute;
@@ -68,27 +59,13 @@ $context_module_bg_color: #f2f3f4;
       left: 20px;
     }
   }
-  .student-view {
-    .module-item-title {
-      right: 150px;
-    }
-    .ig-details {
-      width: 125px;
-      right: 0px;
-    }
-    .due_date_display {
-      width: 65px;
-    }
-    .points_possible_display {
-      width: 33px;
-      right: 125px;
-    }
-  }
   .requirement-description {
-    position: absolute;
-    bottom: 5px;
-    left: 36px;
     font-size: 11px;
+    line-height: 1.3;
+    flex: 0.34;
+    @include breakpoint(desktop) {
+      flex: 0.5;
+    }
   }
   .completion_status .complete_icon,
   .locked_icon,
@@ -226,18 +203,12 @@ $context_module_bg_color: #f2f3f4;
     .type_icon {
       padding-left: 20px;
     }
-    .requirement-description {
-      padding-left: 20px;
-    }
   }
   &.indent_2 {
     td .type_icon {
       padding-right: 15px;
     }
     .type_icon {
-      padding-left: 40px;
-    }
-    .requirement-description {
       padding-left: 40px;
     }
   }
@@ -248,9 +219,6 @@ $context_module_bg_color: #f2f3f4;
     .type_icon {
       padding-left: 60px;
     }
-    .requirement-description {
-      padding-left: 60px;
-    }
   }
   &.indent_4 {
     td .type_icon {
@@ -259,18 +227,12 @@ $context_module_bg_color: #f2f3f4;
     .type_icon {
       padding-left: 80px;
     }
-    .requirement-description {
-      padding-left: 80px;
-    }
   }
   &.indent_5 {
     td .type_icon {
       padding-right: 15px;
     }
     .type_icon {
-      padding-left: 100px;
-    }
-    .requirement-description {
       padding-left: 100px;
     }
     .indent_item_link {
@@ -425,9 +387,6 @@ $context_module_bg_color: #f2f3f4;
 }
 
 #context_modules.editable {
-  .requirement-description {
-    left: 55px;
-  }
   .context_module_item {
     &.after_current_position {
       opacity: 1;
@@ -613,9 +572,6 @@ body.ie {
     }
     .due_date_display {
       display: none;
-    }
-    .ig-details {
-      width: 115px;
     }
   }
 }

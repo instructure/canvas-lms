@@ -1,4 +1,5 @@
-@import 'pages/agenda/agenda_view_minical';
+@import "base/environment";
+@import "pages/agenda/agenda_view_minical";
 
 body {
   background: #E8ECEF;
@@ -44,12 +45,8 @@ body {
 .agenda-day {
   border-bottom: 1px dashed #D9DBDC;
   padding: 8px;
-
-  &:after {
-    clear: both;
-    content: "";
-    display: table;
-  }
+  display: flex;
+  align-items: center;
 
   .item-group-condensed {
     padding: 0;
@@ -65,19 +62,16 @@ body {
 }
 
 .agenda-date {
-  float: left;
   font-size: 12px;
   font-weight: bold;
-  line-height: 30px;
+  line-height: 1.5;
   margin: 0;
-  max-width: 125px;
-  width: 10%;
+  flex: 0 0 90px;
+  @include breakpoint(desktop) { flex: 0 0 125px; }
 }
 
-.agenda-events {
-  float: left;
-  width: 90%;
-}
+.agenda-events { flex: 1; }
+
 span.agendaView--no-assignments {
   display: block;
   padding: 10px;
@@ -90,25 +84,32 @@ span.agendaView--no-assignments {
   .ig-row {
     border: none;
     box-shadow: none;
-    height: 30px;
     background: none;
     border-radius: 3px;
+    padding: $ic-sp/2;
 
     &:hover, &:focus {
       background-color: #F2F4F6;
       outline: none;
     }
   }
-
+  @include breakpoint(desktop) {
+    .ig-details {
+      justify-content: flex-start;
+      > * { 
+        flex: 0 1 auto;
+        padding: 0;
+        margin-right: $ic-sp/3;
+      }
+    }
+  }
   .ig-title {
     background: none;
     font-weight: normal;
-    top: 4px;
+    // override standard width for .ig-title or it looks too scrunched up
+    @include breakpoint(desktop) { flex: 1.34; }
   }
 
-  .ig-details {
-    top: 4px;
-  }
 }
 
 .agenda-actions {

@@ -24,34 +24,36 @@
   <ul class="ig-list" id="group_1">
     <li>
       <div class="ig-row">
-        <a href="#" class="ig-title ellipses">
-          <i class="icon-assignment"></i> Some Assignment
-        </a>
-        <div class="ig-details row-fluid">
-          <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
-          <div class="span4 ellipses"><b>Available</b> Nov 1</div>
-          <div class="span4 ellipses">10 pts</div>
-        </div>
-        <div class="ig-admin">
-          <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
-            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
-          </span>
+        <div class="ig-row__layout">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details">
+            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="ellipses"><b>Available</b> Nov 1</div>
+            <div class="ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
-          <div class="inline-block">
-            <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
-              <i class="icon-settings"></i>
-              <i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only">Settings</span>
-            </a>
+            <div class="inline-block">
+              <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only">Settings</span>
+              </a>
 
-            <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
-              <li role="presentation">
-                <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
-              </li>
-              <li role="presentation">
-                <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
-              </li>
-            </ul>
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                  <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -59,34 +61,36 @@
 
     <li>
       <div class="ig-row ig-published ig-indent1">
-        <a href="#" class="ig-title ellipses">
-          <i class="icon-assignment"></i> Some Assignment
-        </a>
-        <div class="ig-details row-fluid">
-          <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
-          <div class="span4 ellipses"><b>Available</b> Nov 1</div>
-          <div class="span4 ellipses">10 pts</div>
-        </div>
-        <div class="ig-admin">
-          <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
-            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
-          </span>
+        <div class="ig-row__layout">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details">
+            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="ellipses"><b>Available</b> Nov 1</div>
+            <div class="ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
-          <div class="inline-block">
-            <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
-              <i class="icon-settings"></i>
-              <i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only">Settings</span>
-            </a>
+            <div class="inline-block">
+              <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only">Settings</span>
+              </a>
 
-            <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
-              <li role="presentation">
-                <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
-              </li>
-              <li role="presentation">
-                <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
-              </li>
-            </ul>
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                  <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -100,34 +104,36 @@
 
     <li>
       <div class="ig-row">
-        <a href="#" class="ig-title ellipses">
-          <i class="icon-assignment"></i> Some Assignment
-        </a>
-        <div class="ig-details row-fluid">
-          <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
-          <div class="span4 ellipses"><b>Available</b> Nov 1</div>
-          <div class="span4 ellipses">10 pts</div>
-        </div>
-        <div class="ig-admin">
-          <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
-            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
-          </span>
+        <div class="ig-row__layout">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details">
+            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="ellipses"><b>Available</b> Nov 1</div>
+            <div class="ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
-          <div class="inline-block">
-            <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
-              <i class="icon-settings"></i>
-              <i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only">Settings</span>
-            </a>
+            <div class="inline-block">
+              <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only">Settings</span>
+              </a>
 
-            <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
-              <li role="presentation">
-                <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
-              </li>
-              <li role="presentation">
-                <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
-              </li>
-            </ul>
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                  <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -237,21 +243,28 @@
   @else { margin: 4px 0; }
 }
 
+.ig-row__layout {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
 .ig-list .ig-row {
   position: relative;
   display: block;
-  border-radius: 3px;
+  padding: $ic-sp;
+  box-sizing: border-box;
+  border-radius: $baseBorderRadius;
   color: $ic-font-color--subdued;
   @if $use_new_styles {
     border: 1px solid $ic-border-light;
-    min-height: 40px;
     background: $ic-color-light;
   }
   @else {
     border: 1px solid #c1c7cf; 
     box-shadow: 0 1px 0 #dde0e4;
     background: #fff;
-    height: 40px;
   }
 
   a.ig-title {
@@ -304,36 +317,45 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-weight: bold;
-  position: absolute;
-  left: 30px;
-  top: 9px;
-  right: 430px;
+  display: block;
+  flex: 1;
+  box-sizing: border-box;
+  padding-right: $ic-sp;
+  @include breakpoint(desktop) { flex: 0 0 34%; }
+  @include breakpoint(wide) { flex: 0 0 40%; }
+  @if $use_new_styles { font-weight: 500; }
+  @else { font-weight: bold; }
 }
 
 .ig-details {
-  position: absolute;
-  right: 30px;
   font-size: 11px;
-  width: 370px;
-  top: 10px;
+  flex: 0.66;
+  line-height: 1.5;
+  box-sizing: border-box;
+  @include breakpoint(desktop) {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    > * {
+      box-sizing: border-box;
+      padding: 0 $ic-sp/2;
+      flex: 1;
+    }
+  }
 }
 
 .ig-admin {
+  box-sizing: border-box;
   white-space: nowrap;
-  right: 3px;
-  top: 10px;
-  position: absolute;
-  right: 3px;
-  top: 10px;
+  padding-left: $ic-sp;
+  @include breakpoint(desktop) { padding-left: 0; }
 
   .publish-icon {
-    margin-right: 22px;
-
+    margin-right: $ic-sp/2;
+    @include breakpoint(desktop) { margin-right: $ic-sp; }
     i[class*=icon-]:before,
-    i[class^=icon-]:before {
-      font-size: 18px;
-    }
+    i[class^=icon-]:before { font-size: 18px; }
   }
 }
 

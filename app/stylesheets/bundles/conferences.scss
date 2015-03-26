@@ -1,3 +1,5 @@
+@import "base/environment";
+
 /* Helper classes */
 .align-center { text-align: center; }
 .align-right  { text-align: right; }
@@ -12,8 +14,8 @@
 }
 
 /* Page styles */
-body.conferences {
-  min-width: 960px;
+@if $use_new_styles == false {
+  body.conferences { min-width: 960px; }
 }
 
 #main {
@@ -52,15 +54,6 @@ header {
 
 }
 
-.ig-details {
-  right: 170px
-}
-
-.ig-title {
-  right: auto;
-  max-width: 200px;
-}
-
 .ig-header-title a {
   color: #434343;
 }
@@ -88,4 +81,10 @@ header {
   padding: 10px;
   margin: 0;
   border-radius: 3px;
+}
+
+.ig-title {
+  flex: 0 0 200px;
+  @include breakpoint(desktop) { flex: 0 0 34%; }
+  @include breakpoint(wide) { flex: 0 0 40%; }
 }

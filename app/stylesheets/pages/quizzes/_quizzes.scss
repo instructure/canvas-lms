@@ -40,11 +40,9 @@ li.quiz {
     color: darken($ic-color-neutral, 40);
   }
   .ig-title {
-    right: 554px;
-  }
-  .ig-details {
-    right: 110px;
-    width: 425px;
+    flex: 0 0 $ic-sp*17;
+    @include breakpoint(desktop) { flex: 0 0 25%; }
+    @include breakpoint(wide) { flex: 0 0 30%; }
   }
   .default-dates .status-description {
     font-weight: bold;

@@ -62,8 +62,6 @@
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
     </span>
 
-
-
     <div class="ig-header-admin">
       <span class="completion_status" style="<%= "visibility: hidden;" if !context_module || (context_module.completion_requirements || []).empty? %>">
         <i class="icon-check complete_icon"><span class="screenreader-only"><%= t('images.title.complete', "Module Completed") %></span></i>
