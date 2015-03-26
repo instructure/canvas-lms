@@ -54,7 +54,10 @@
 
       <div class='message-header-row'>
         <div class='message-header-label'>
-          <label for="compose-message-recipients">{{#t "labels.to"}}To{{/t}}</label>
+          <label for="compose-message-recipients">
+            {{#t "labels.to"}}To{{/t}}
+            <span id="recipient-label" class="screenreader-only"></span>
+          </label>
         </div>
         <div class='message-header-input'>
           <div class="ac">

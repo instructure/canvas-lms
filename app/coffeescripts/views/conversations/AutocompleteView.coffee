@@ -577,6 +577,7 @@ define [
         @$searchBtn.prop('disabled', true)
         @trigger('disabled')
       @trigger('changeToken', @tokenParams())
+      @_refreshRecipientList()
 
     # Internal: Prepares a given model's name for display.
     #
@@ -599,13 +600,21 @@ define [
     _removeToken: (id, silent = false) ->
       return if @disabled
       @$tokenList.find("input[value=#{id}]").parent().remove()
-      @tokens.splice(_.indexOf(id), 1)
+      @tokens.splice(_.indexOf(@tokens, id), 1)
       @$clearBtn.hide() unless @tokens.length
       if @options.single and !@tokens.length
         @$input.prop('disabled', false)
         @$searchBtn.prop('disabled', false)
         @trigger('enabled')
       @trigger('changeToken', @tokenParams()) unless silent
+      @_refreshRecipientList()
+
+    _refreshRecipientList: () ->
+      recipientNames = []
+      _.each @tokenModels(), (model) =>
+        recipientNames.push(model.get('name'))
+      $('#recipient-label').text(recipientNames.join(', '))
+
 
     # Public: Return the current tokens as an array of params.
     #
