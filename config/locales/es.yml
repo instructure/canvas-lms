@@ -1221,7 +1221,7 @@ es:
       account_reports: 
         unused_courses: 
           main: 
-            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, foros, archivos, módulos, páginas o cuestionarios."
+            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, foros, archivos, módulos, páginas o evaluaciones."
     update_failed_notice: "Configuraciones de actualización de cuenta falló"
     user_access_csv_parameters: 
       account_reports: 
@@ -4717,7 +4717,7 @@ es:
     plugins: Complementos
     prior_users: "Usuarios Anteriores"
     question_banks: "Grupos de preguntas"
-    quizzes: Cuestionarios
+    quizzes: Evaluaciones
     registered_services: "Servicios Registrados"
     revisions: Revisiones
     rubrics: Rúbricas
@@ -12168,7 +12168,7 @@ es:
           allow_multiple_attempts: "Permitir varios intentos"
           hide_results_only_after_last: "Solo después del último intento"
           ip_filter: "Filtrar Direcciones IP"
-          never_hide_results: "Permitir que los alumnos vean sus respuestas a los cuestionarios"
+          never_hide_results: "Permitir que los alumnos vean sus respuestas a los evaluaciones"
           quiz_instructions: "Instrucciones de la evaluación"
           quiz_notify: "Informar a los usuarios de que esta evaluación ha cambiado"
           quiz_score: Calificación
