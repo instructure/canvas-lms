@@ -41,7 +41,7 @@ module Api::V1::DiscussionTopics
   # Returns an array of hashes.
   def discussion_topics_api_json(topics, context, user, session, opts={})
     topics.inject([]) do |result, topic|
-      if topic.visible_for?(user, check_policies: true)
+      if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context, user, session, opts)
       end
 

@@ -968,10 +968,9 @@ class DiscussionTopic < ActiveRecord::Base
   # Public: Determine if the given user can view this discussion topic.
   #
   # user - The user attempting to view the topic (default: nil).
-  # options - Options passed to the locked_for? call (default: {}).
   #
   # Returns a boolean.
-  def visible_for?(user = nil, options = {})
+  def visible_for?(user = nil)
     # user is the topic's author
     return true if user == self.user
 

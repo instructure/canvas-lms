@@ -23,11 +23,11 @@ describe AnnouncementsController do
     course_with_student(:active_all => true)
   end
 
-  def course_announcement
-    @announcement = @course.announcements.create!(
+  def course_announcement(opts = {})
+    @announcement = @course.announcements.create!({
       :title => "some announcement", 
       :message => "some message"
-    )
+    }.merge(opts))
   end
 
   describe "GET 'index'" do
@@ -73,13 +73,40 @@ describe AnnouncementsController do
     end
 
     it "shows the 15 most recent announcements" do
-      announcements = []
-      16.times { announcements << course_announcement.id }
-      announcements.shift # Drop first announcement so we have the 15 most recent
+      announcement_ids = []
+      16.times { announcement_ids << course_announcement.id }
+      announcement_ids.shift # Drop first announcement so we have the 15 most recent
+
       get 'public_feed', :format => 'atom', :feed_code => @enrollment.feed_code
+
       feed_entries = Atom::Feed.load_feed(response.body).entries
-      feed_entries.map!{ |e| e.id.gsub(/.*topic_/, "").to_i }
-      expect(feed_entries).to match_array(announcements)
+      feed_entry_ids = feed_entries.map{ |e| e.id.gsub(/.*topic_/, "").to_i }
+      expect(feed_entry_ids).to match_array(announcement_ids)
+    end
+
+    it "only shows announcements that are visible to the caller" do
+      normal_ann = @a # from the announcement_model in the before block
+      closed_for_comments_ann = course_announcement(locked: true)
+      post_delayed_ann = @course.announcements.build({
+        title: 'hi',
+        message: 'blah',
+        delayed_post_at: 1.day.from_now
+      })
+      post_delayed_ann.workflow_state = 'post_delayed'
+      post_delayed_ann.save!
+      deleted_ann = course_announcement
+      deleted_ann.destroy
+
+      expect(closed_for_comments_ann).to be_locked
+      expect(post_delayed_ann).to be_post_delayed
+      expect(deleted_ann).to be_deleted
+      visible_announcements = [normal_ann, closed_for_comments_ann]
+
+      get 'public_feed', :format => 'atom', :feed_code => @enrollment.feed_code
+
+      feed_entries = Atom::Feed.load_feed(response.body).entries
+      feed_entry_ids = feed_entries.map{ |e| e.id.gsub(/.*topic_/, "").to_i }
+      expect(feed_entry_ids).to match_array(visible_announcements.map(&:id))
     end
   end
 end

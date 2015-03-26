@@ -49,7 +49,8 @@ class AnnouncementsController < ApplicationController
 
   def public_feed
     return unless get_feed_context
-    announcements = @context.announcements.active.order('posted_at DESC').limit(15).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    announcements = @context.announcements.active.order('posted_at DESC').limit(15).
+      select{|a| a.visible_for?(@current_user) }
 
     respond_to do |format|
       format.atom {
