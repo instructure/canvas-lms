@@ -8,7 +8,8 @@ define [
   'compiled/collections/PaginatedCollection'
   'compiled/collections/WrappedCollection'
   'compiled/util/natcompare'
-], ($, _, {Collection}, Section, Group, Outcome, PaginatedCollection, WrappedCollection, natcompare) ->
+  'timezone'
+], ($, _, {Collection}, Section, Group, Outcome, PaginatedCollection, WrappedCollection, natcompare, tz) ->
   class GroupCollection extends PaginatedCollection
     @optionProperty 'course_id'
     model: Group
@@ -33,7 +34,7 @@ define [
     scoresFor: (outcome) ->
       @chain().map((result) ->
         if result.get('links').learning_outcome == outcome.id
-          assessed_at: result.get('submitted_or_assessed_at')
+          assessed_at: tz.parse(result.get('submitted_or_assessed_at'))
           score: result.get('score')
       ).compact().value()
 
