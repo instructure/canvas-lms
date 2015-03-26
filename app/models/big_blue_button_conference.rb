@@ -131,34 +131,25 @@ class BigBlueButtonConference < WebConference
   end
 
   def send_request(action, options)
-    uri = URI.parse(generate_request(action, options))
-    res = nil
+    url_str = generate_request(action, options)
 
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      http.read_timeout = 10
-      5.times do # follow redirects, but not forever
-        logger.debug "big blue button api call: #{uri.path}?#{uri.query}"
-        res = http.request_get("#{uri.path}?#{uri.query}")
-        break unless res.is_a?(Net::HTTPRedirection)
-        url = res['location']
-        uri = URI.parse(url)
-      end
+    http_response = nil
+    Canvas.timeout_protection("big_blue_button") do
+      logger.debug "big blue button api call: #{url_str}"
+      http_response = CanvasHttp.get(url_str, {}, 5)
     end
 
-    case res
+    case http_response
       when Net::HTTPSuccess
-        response = xml_to_hash(res.body)
+        response = xml_to_hash(http_response.body)
         if response[:returncode] == 'SUCCESS'
           return response
         else
           logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
         end
       else
-        logger.error "big blue button http error #{res}"
+        logger.error "big blue button http error #{http_response}"
     end
-    nil
-  rescue Timeout::Error
-    logger.error "big blue button timeout error"
     nil
   rescue
     logger.error "big blue button unhandled exception #{$!}"
