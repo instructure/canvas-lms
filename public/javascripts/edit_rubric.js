@@ -751,10 +751,16 @@ define([
               $("#edit_rubric_form").submit();
             };
             $confirmDialog.dialog({
-              buttons: {
-                "Change" : closeDialog,
-                "Leave different" : function(){ closeDialog(true); }
-              },
+              buttons: [
+                {
+                  text: I18n.t('change', 'Change'),
+                  click: closeDialog
+                },
+                {
+                  text: I18n.t('leave_different', "Leave different"),
+                  click: function() { closeDialog(true); }
+                }
+              ],
               width: 320,
               resizable: false,
               close: $confirmDialog.remove
