@@ -645,8 +645,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @students = @all_students
+      @students = @context.students_visible_to(@current_user).uniq.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
       respond_to do |format|
