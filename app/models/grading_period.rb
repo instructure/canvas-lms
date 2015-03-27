@@ -10,10 +10,11 @@ class GradingPeriod < ActiveRecord::Base
   validate :validate_dates
 
   set_policy do
-    [:read, :manage].each do |action|
-      given { |user| grading_period_group.grants_right?(user, action) }
-      can action
-    end
+    given { |user| self.grading_period_group.grants_right?(user, :read) }
+    can :read
+
+    given { |user| self.grading_period_group.grants_right?(user, :manage) }
+    can :manage
   end
 
   workflow do

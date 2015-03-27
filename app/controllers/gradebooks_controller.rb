@@ -185,8 +185,8 @@ class GradebooksController < ApplicationController
   def set_current_grading_period
     unless @current_grading_period_id = params[:grading_period_id].presence
       return if view_all_grading_periods?
-      return unless current = @context.grading_periods.active.current
-      @current_grading_period_id = current.first.try(:id).to_s
+      return unless current = @context.grading_periods.active.current.first
+      @current_grading_period_id = current.try(:id).to_s
     end
   end
 
