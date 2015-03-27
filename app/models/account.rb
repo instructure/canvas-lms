@@ -152,8 +152,12 @@ class Account < ActiveRecord::Base
   self.account_settings_options = {}
 
   def self.add_setting(setting, opts=nil)
-    self.account_settings_options[setting.to_sym] = opts || {}
-    if (opts && opts[:boolean] && opts.has_key?(:default))
+    if opts && opts[:inheritable]
+      opts[:hash] = true
+      opts[:values] = [:value, :locked]
+
+      self.class_eval "def #{setting}; calculate_inherited_setting(:#{setting}); end"
+    elsif (opts && opts[:boolean] && opts.has_key?(:default))
       if opts[:default]
         # if the default is true, we want a nil result to evaluate to true.
         # this prevents us from having to backfill true values into a
@@ -164,6 +168,29 @@ class Account < ActiveRecord::Base
         self.class_eval "def #{setting}?; !!settings[:#{setting}]; end"
       end
     end
+    self.account_settings_options[setting.to_sym] = opts || {}
+  end
+
+  # should continue down the account chain until it reaches a locked value
+  # otherwise use the last explicitly set value
+  def calculate_inherited_setting(setting)
+    inherited_hash = {:locked => false, :value => self.class.account_settings_options[setting][:default]}
+    self.account_chain.reverse.each do |acc|
+      current_hash = acc.settings[setting]
+      next if current_hash.nil?
+
+      if !current_hash.is_a?(Hash)
+        current_hash = {:locked => false, :value => current_hash}
+      end
+      current_hash[:inherited] = true if (self != acc)
+
+      if current_hash[:locked]
+        return current_hash
+      else
+        inherited_hash = current_hash
+      end
+    end
+    return inherited_hash
   end
 
   # these settings either are or could be easily added to
@@ -177,7 +204,10 @@ class Account < ActiveRecord::Base
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, :root_only => true
-  add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false # NO LONGER VISIBLE - MOVED TO COURSE SETTING
+
+  add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
+  add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
+
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
@@ -234,18 +264,23 @@ class Account < ActiveRecord::Base
           opts = account_settings_options[key.to_sym]
           if (opts[:root_only] && !self.root_account?) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
             settings.delete key.to_sym
-          elsif opts[:boolean]
-            settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
           elsif opts[:hash]
             new_hash = {}
             if val.is_a?(Hash)
               val.each do |inner_key, inner_val|
-                if opts[:values].include?(inner_key.to_sym)
-                  new_hash[inner_key.to_sym] = inner_val.to_s
+                inner_key = inner_key.to_sym
+                if opts[:values].include?(inner_key)
+                  if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
+                    new_hash[inner_key] = Canvas::Plugin.value_to_boolean(inner_val)
+                  else
+                    new_hash[inner_key] = inner_val.to_s
+                  end
                 end
               end
             end
             settings[key.to_sym] = new_hash.empty? ? nil : new_hash
+          elsif opts[:boolean]
+            settings[key.to_sym] = Canvas::Plugin.value_to_boolean(val)
           else
             settings[key.to_sym] = val.to_s
           end
