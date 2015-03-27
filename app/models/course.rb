@@ -2470,7 +2470,14 @@ class Course < ActiveRecord::Base
     end
     class_eval <<-CODE
       def #{setting}
-        if settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
+        if Course.settings_options[#{setting.inspect}][:inherited]
+          inherited = self.account.send(#{setting.inspect})
+          if inherited[:locked] || settings_frd[#{setting.inspect}].nil?
+            inherited[:value]
+          else
+            settings_frd[#{setting.inspect}]
+          end
+        elsif settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
           default = Course.settings_options[#{setting.inspect}][:default]
           default.respond_to?(:call) ? default.call(self) : default
         else
@@ -2503,8 +2510,8 @@ class Course < ActiveRecord::Base
   add_setting :course_format
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
-  add_setting :restrict_student_future_view, :boolean => true, :default => lambda {|c| !!c.root_account.restrict_student_future_view?}
-  add_setting :restrict_student_past_view, :boolean => true
+  add_setting :restrict_student_future_view, :boolean => true, :inherited => true
+  add_setting :restrict_student_past_view, :boolean => true, :inherited => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?

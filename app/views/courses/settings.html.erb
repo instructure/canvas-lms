@@ -257,11 +257,11 @@ TEXT
           </div>
           <br/>
           <div>
-            <%= f.check_box :restrict_student_past_view %>
+            <%= f.check_box :restrict_student_past_view, :disabled => @context.account.restrict_student_past_view[:locked] %>
             <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing course after end date" %>
           </div>
           <div>
-            <%= f.check_box :restrict_student_future_view %>
+            <%= f.check_box :restrict_student_future_view, :disabled => @context.account.restrict_student_future_view[:locked] %>
             <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing course before start date" %>
           </div>
         </td>

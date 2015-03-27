@@ -4108,4 +4108,37 @@ describe Course, 'touch_root_folder_if_necessary' do
     end
   end
 
+  context "inheritable settings" do
+    before :each do
+      account_model
+      course(:account => @account)
+    end
+
+    it "should inherit account values by default" do
+      expect(@course.restrict_student_future_view?).to be_falsey
+
+      @account.settings[:restrict_student_future_view] = {:locked => false, :value => true}
+      @account.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      expect(@course.restrict_student_future_view?).to be_falsey
+    end
+
+    it "should be overridden by locked values from the account" do
+      @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+      @account.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+
+      # explicitly setting shouldn't change anything
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+    end
+  end
 end
