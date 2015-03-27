@@ -2,16 +2,6 @@ Dir.glob('lib/canvas/plugins/validators/*').each do |file|
   require_dependency file
 end
 
-Canvas::Plugin.register('facebook', nil, {
-  :name => lambda{ t :name, 'Facebook' },
-  :description => lambda{ t :description, 'Canvas Facebook application' },
-  :website => 'http://www.facebook.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/facebook_settings',
-  :validator => 'FacebookValidator'
-})
 Canvas::Plugin.register('linked_in', nil, {
   :name => lambda{ t :name, 'LinkedIn' },
   :description => lambda{ t :description, 'LinkedIn integration' },

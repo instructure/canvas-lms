@@ -18,8 +18,8 @@
 
 # @API Communication Channels
 #
-# API for accessing users' email addresses, SMS phone numbers, Twitter, Yo,
-# and Facebook communication channels.
+# API for accessing users' email addresses, SMS phone numbers, Twitter, and Yo
+# communication channels.
 #
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
@@ -40,7 +40,7 @@
 #           "type": "string"
 #         },
 #         "type": {
-#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'facebook', 'twitter' or 'yo'. This field determines the type of value seen in 'address'.",
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'twitter' or 'yo'. This field determines the type of value seen in 'address'.",
 #           "example": "email",
 #           "type": "string",
 #           "allowableValues": {
@@ -48,7 +48,6 @@
 #               "email",
 #               "sms",
 #               "chat",
-#               "facebook",
 #               "twitter",
 #               "yo"
 #             ]

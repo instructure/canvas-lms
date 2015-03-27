@@ -59,7 +59,7 @@
     <% end %>
     <% if @current_user && @current_user == @user && @current_user.user_services.empty? %>
       <p>
-        <%= t 'help.services', %{You haven't linked your user profile to any external services. You can link your Canvas account to services like Facebook and Twitter. This will make it easier for fellow course and group members to link up with you outside of class.} %>
+        <%= t 'help.services', %{You haven't linked your user profile to any external services. You can link your Canvas account to services like Twitter. This will make it easier for fellow course and group members to link up with you outside of class.} %>
       </p>
       <p>
         <a href="<%= user_profile_path(@current_user) %>#registered_web_services" class="btn btn-primary"><i class="icon-link"></i> <%= t('links.link_services', %{Link web services to my account}) %></a>

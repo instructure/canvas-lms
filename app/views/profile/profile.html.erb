@@ -210,7 +210,7 @@ TEXT
       <% @user.user_services.select{|s| !UserService.configured_service?(s.service) || feature_and_service_enabled?(s.service) }.each do |service| %>
         <li class="service clearfix" id="service_<%= service.service %>">
           <a href="<%= profile_user_service_url(service.id) %>" class="delete_service_link no-hover" style="float: right; padding-top: 0.5em; padding-right: 10px;" title="<%= t('titles.unregister_service', "Unregister Service") %>"><%= image_tag "delete_circle.png" %></a>
-          <a href="<%= service.service_access_link %>">
+          <a href="<%= service.service_user_link %>">
             <%= image_tag "#{service.service}.png", :style => "vertical-align: middle; float: left;" %>
           </a>
           <div style="float: left; padding-left: 5px;">
@@ -222,11 +222,6 @@ TEXT
                 </a>
               <% elsif service.has_readable_user_name? %>
                 <span><%= service.service_user_name %></span>
-              <% end %>
-              <% if service.service == 'facebook' && feature_and_service_enabled?(:facebook) && Facebook::Connection.config['canvas_name'] %>
-                <div style="line-height: 2.0em;">
-                  <a href="<%= service.service_access_link %>"><%= t('links.view_facebook_app', "view the Facebook app") %></a>
-                </div>
               <% end %>
             </div>
           </div>
@@ -314,25 +309,6 @@ TEXT
               </tr>
             </table>
             <% end %>
-          </div>
-        </div>
-      </li>
-      <li id="unregistered_service_facebook" class="service" style="<%= hidden if !feature_and_service_enabled?(:facebook) || services.include?("facebook") %>">
-        <a href="#" class="btn btn-small"><%= image_tag "facebook_icon.png" %> <%= t('links.facebook', "Facebook") %></a>
-        <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_facebook', "Authorize Facebook") %>" id="unregistered_service_facebook_dialog">
-          <div>
-            <%= image_tag "facebook.png", :style => "float: left; padding-right: 5px;" %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.facebook_access', "Facebook Access") %></div>
-            <%= t(:facebook_description, <<-TEXT)
-            If you have a Facebook account, you can install the Canvas app and receive
-            course notifications on your profile.  You can specify which types of
-            notifications you want and how often you'd like them sent.
-            TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <a class="btn btn-primary" href="<%= oauth_url(:service => "facebook", :return_to => settings_profile_url) %>"><%= t('buttons.register_facebook_account', "Register Your Facebook Account") %></a>
           </div>
         </div>
       </li>

@@ -55,7 +55,6 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_EMAIL    = 'email'
   TYPE_SMS      = 'sms'
   TYPE_TWITTER  = 'twitter'
-  TYPE_FACEBOOK = 'facebook'
   TYPE_PUSH     = 'push'
   TYPE_YO       = 'yo'
 
@@ -163,13 +162,9 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   # Return the 'path' for simple communication channel types like email and sms. For
-  # Facebook and Twitter, return the user's configured user_name for the service.
+  # Yo and Twitter, return the user's configured user_name for the service.
   def path_description
-    if self.path_type == TYPE_FACEBOOK
-      res = self.user.user_services.for_service(TYPE_FACEBOOK).first.service_user_name rescue nil
-      res ||= t :default_facebook_account, 'Facebook Account'
-      res
-    elsif self.path_type == TYPE_TWITTER
+    if self.path_type == TYPE_TWITTER
       res = self.user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
       res ||= t :default_twitter_handle, 'Twitter Handle'
       res
@@ -267,8 +262,7 @@ class CommunicationChannel < ActiveRecord::Base
     twitter_service.assert_communication_channel if twitter_service
 
     rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
-    # Add facebook and twitter (in that order) if the user's account is setup for them.
-    rank_order << TYPE_FACEBOOK unless user.user_services.for_service(CommunicationChannel::TYPE_FACEBOOK).empty?
+    # Add twitter and yo (in that order) if the user's account is setup for them.
     rank_order << TYPE_TWITTER if twitter_service
     rank_order << TYPE_YO unless user.user_services.for_service(CommunicationChannel::TYPE_YO).empty?
     self.unretired.where('communication_channels.path_type IN (?)', rank_order).
@@ -339,7 +333,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   # This is setup as a default in the database, but this overcomes misspellings.
   def assert_path_type
-    valid_types = [TYPE_EMAIL, TYPE_SMS, TYPE_FACEBOOK, TYPE_TWITTER, TYPE_PUSH, TYPE_YO]
+    valid_types = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH, TYPE_YO]
     self.path_type = TYPE_EMAIL unless valid_types.include?(path_type)
     true
   end

@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
-<% end %>
-
-<%= t :body, "*%{author}* just made a new comment on the submission for **%{user} for %{assignment}**.", :author => (asset.author.name || t(:someone, "Someone")), :user => asset.submission.user.name, :assignment => asset.submission.assignment.title, :wrapper => { "*" => '<b>\1</b>', "**" => "<b><a href=\"#{content :link}\">\\1</a></b>" } %>

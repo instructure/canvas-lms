@@ -708,11 +708,6 @@ CanvasRails::Application.routes.draw do
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
-  get 'facebook' => 'facebook#index'
-  post 'facebook/message/:id' => 'facebook#hide_message', as: :facebook_hide_message
-  get 'facebook/settings' => 'facebook#settings'
-  post 'facebook/notification_preferences' => 'facebook#notification_preferences'
-
   post 'object_snippet' => 'context#object_snippet'
   post 'saml_consume' => 'pseudonym_sessions#saml_consume'
   match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]

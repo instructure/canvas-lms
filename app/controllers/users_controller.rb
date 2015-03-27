@@ -193,16 +193,6 @@ class UsersController < ApplicationController
       )
 
       redirect_to request_token.authorize_url
-    elsif params[:service] == "facebook"
-      oauth_request = OauthRequest.create(
-        :service => 'facebook',
-        :secret => CanvasSlug.generate("fb", 10),
-        :return_url => return_to_url,
-        :user => @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-      state = Canvas::Security.encrypt_password(oauth_request.global_id.to_s, 'facebook_oauth_request').join('.')
-      redirect_to Facebook::Connection.authorize_url(state)
     end
   end
 
@@ -210,11 +200,6 @@ class UsersController < ApplicationController
     oauth_request = nil
     if params[:oauth_token]
       oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
-    elsif params[:state] && params[:service] == 'facebook'
-      key,salt = params[:state].split('.', 2)
-      request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
-
-      oauth_request = OauthRequest.where(id: request_id).first
     elsif params[:code] &&  params[:state] && params[:service] == 'google_drive'
 
       begin
@@ -262,23 +247,7 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-      if params[:service] == "facebook"
-        service = UserService.where(user_id: @current_user, service: 'facebook').first_or_initialize
-        service.token = params[:access_token]
-        data = Facebook::Connection.get_service_user_info(service.token)
-
-        if data
-          service.service_user_id = data['id']
-          service.service_user_name = data['name']
-          service.service_user_url = data['link']
-          service.save
-          service
-
-          flash[:notice] = t('facebook_added', "Facebook account successfully added!")
-        else
-          flash[:error] = t('facebook_fail', "Facebook authorization failed.")
-        end
-      elsif params[:service] == "google_docs"
+      if params[:service] == "google_docs"
         begin
           access_token = GoogleDocs::Connection.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
           google_docs = GoogleDocs::Connection.new(oauth_request.token, oauth_request.secret)

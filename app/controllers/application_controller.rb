@@ -1390,8 +1390,6 @@ class ApplicationController < ActionController::Base
         Canvas::Plugin.find(:yo).try(:enabled?)
       elsif feature == :twitter
         !!Twitter::Connection.config
-      elsif feature == :facebook
-        !!Facebook::Connection.config
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
       elsif feature == :diigo

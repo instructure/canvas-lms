@@ -1,7 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, :wiki_page], id: asset.url) %>
-<% end %>
-
-<%= t :body, "A page has been updated on the wiki for %{title}.", :title => asset.context.name %>
-<br/>
-<b><a href="<%= content :link %>"><%= asset.title.titleize %></a></b>

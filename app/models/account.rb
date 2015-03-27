@@ -1352,11 +1352,6 @@ class Account < ActiveRecord::Base
         :description => "",
         :expose_to_ui => :service
       },
-      :facebook => {
-        :name => t("account_settings.facebook", "Facebook"),
-        :description => "",
-        :expose_to_ui => (Facebook::Connection.config ? :service : false)
-      },
       :skype => {
         :name => t("account_settings.skype", "Skype"),
         :description => "",
