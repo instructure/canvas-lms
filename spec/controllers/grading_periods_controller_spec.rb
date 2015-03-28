@@ -98,11 +98,11 @@ describe GradingPeriodsController do
       let(:grading_period) { create_grading_periods.call(course, 5.days.ago) }
       let(:root_grading_period) { root_account.grading_periods.first }
 
-      it "matches ids" do
-        get :show, { course_id: course.id, id: root_grading_period.id }
+      it "doesn't match ids" do
+        get :show, { course_id: course.id, id: grading_period.id }
         json = JSON.parse(remove_while.call(response.body))
         period = json['grading_periods'].first
-        expect(period['id']).to eq root_grading_period.id.to_s
+        expect(period['id']).not_to eq root_grading_period.id.to_s
       end
     end
   end
