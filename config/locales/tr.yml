@@ -4219,7 +4219,7 @@ tr:
       move_course: "Dersi Taşı"
       reset_course_content_dialog_help: "Ders İçeriğini Sıfırla"
       section_enrollments: "Seçilenleri Dahil Et"
-  course_setup_wizard_is_showing_a7c087c1: "Kurs Kurulum Sihirbazı görünüyor."
+  course_setup_wizard_is_showing_a7c087c1: "Ders Kurulum Sihirbazı gösteriliyor."
   course_statistics: 
     unknown: bilinmeyen
   course_users: 
@@ -4350,7 +4350,7 @@ tr:
         status_link: "İçeri Aktarma Durumu"
         text: "Şu anda bir veya daha fazla öğe içe aktarılıyor. Hazır olduklarında aşağıdaki dersin içinde görünecekler."
     index: 
-      browse_more_courses: "Daha fazla kurs görüntüle"
+      browse_more_courses: "Daha fazla ders görüntüle"
       headings: 
         future_enrollments: "Gelecek KAyıtlar"
         my_courses: Derslerim
@@ -5004,7 +5004,7 @@ tr:
   delete_quiz_142b8099: "Kısa Sınavı Sil"
   delete_survey_56fddbbd: "Anket Sil"
   delete_tool_app_9c9f6d35: "%{tool} Uygulaması Silinsin mi?"
-  delete_toolname_app_85f9d4ee: "%{toolName} Uygulaması Silindi"
+  delete_toolname_app_85f9d4ee: "%{toolName} Uygulamasını Sil"
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo siteler için Recaptcha ayarları yapılmış olmalıdır. Canvas'ın bu uygulaması için lütfen site yöneticiniz ile görüşün."
   demos: 
     _register: 
