@@ -260,7 +260,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def update_topic
     if self.discussion_topic
-      last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].max
+      last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].compact.max
       DiscussionTopic.where(:id => self.discussion_topic_id).update_all(:last_reply_at => last_reply_at, :updated_at => Time.now.utc)
     end
   end

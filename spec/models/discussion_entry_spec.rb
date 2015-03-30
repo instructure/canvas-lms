@@ -241,6 +241,15 @@ describe DiscussionEntry do
       @topic.reload
       expect(@topic.last_reply_at).to eq @original_last_reply_at
     end
+
+    it "should still work with no last_reply_at" do
+      @topic.saved_by = :migration
+      @topic.last_reply_at = nil
+      @topic.save!
+
+      @entry.reload
+      @entry.update_topic
+    end
   end
 
   context "deleting entry" do

@@ -32,7 +32,7 @@ class DiscussionTopic < ActiveRecord::Base
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
     :group_category
-  attr_accessor :user_has_posted
+  attr_accessor :user_has_posted, :saved_by
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -750,7 +750,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def initialize_last_reply_at
     self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc
+    self.last_reply_at ||= Time.now.utc unless self.saved_by == :migration
   end
 
   set_policy do
