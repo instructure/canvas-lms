@@ -186,6 +186,21 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
     end
 
+    it "should deny student access when quiz is OQAAT" do
+      @quiz = @course.quizzes.create!({
+        title: "oqaat quiz",
+        one_question_at_a_time: true
+      })
+      @quiz_submission = @quiz.generate_submission(@student)
+      api_index({}, {raw: true})
+      assert_status(401)
+    end
+
+    it "should allow teacher access even if quiz is OQAAT" do
+      api_index({}, {raw:true})
+      assert_status(200)
+    end
+
     it "should deny access to another student" do
       student_in_course
       api_index({}, {raw: true})
