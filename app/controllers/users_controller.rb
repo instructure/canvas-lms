@@ -221,12 +221,15 @@ class UsersController < ApplicationController
         session.delete(:oauth_gdrive_nonce)
 
         if logged_in_user
-          service = UserService.where(user_id: @current_user, service: 'google_drive', service_domain: 'drive.google.com').first_or_initialize
-          service.service_user_id = user_info['permissionId']
-          service.service_user_name = user_info['user']['emailAddress']
-          service.token = client.authorization.refresh_token
-          service.secret = client.authorization.access_token
-          service.save
+          UserService.register(
+            :service => "google_drive",
+            :service_domain => "drive.google.com",
+            :token => client.authorization.refresh_token,
+            :secret => client.authorization.access_token,
+            :user => logged_in_user,
+            :service_user_id => user_info['permissionId'],
+            :service_user_name => user_info['user']['emailAddress']
+          )
         else
           session[:oauth_gdrive_access_token] = client.authorization.access_token
           session[:oauth_gdrive_refresh_token] = client.authorization.refresh_token
