@@ -401,8 +401,9 @@ class ExternalToolsController < ApplicationController
     @return_url ||= url_for(@context)
     message_type = tool.extension_setting(selection_type, 'message_type')
     case message_type
-      when 'ContentItemSelectionResponse'
-        content_item_selection_response(tool, selection_type, create_content_item_response)
+      when 'ContentItemSelectionResponse', 'ContentItemSelection'
+        #ContentItemSelectionResponse is deprecated, use ContentItemSelection instead
+        content_item_selection(tool, selection_type, create_content_item_response, message_type)
       when 'ContentItemSelectionRequest'
         content_item_selection_request(tool, selection_type)
       else
@@ -430,20 +431,19 @@ class ExternalToolsController < ApplicationController
   end
   protected :basic_lti_launch_request
 
-  def content_item_selection_response(tool, placement, content_item_response)
+  def content_item_selection(tool, placement, content_item_response, message_type)
     params = default_lti_params.merge(
       {
         #required params
-        lti_message_type: 'ContentItemSelectionResponse', #todo - final spec is changing this to ContentItemSelection
+        lti_message_type: message_type,
         lti_version: 'LTI-1p0',
         resource_link_id: Lti::Asset.opaque_identifier_for(@context),
-        content_items: content_item_response.to_json,
+        content_items: content_item_response.to_json(lti_message_type: message_type),
         launch_presentation_return_url: @return_url,
         context_title: @context.name,
         tool_consumer_instance_name: @domain_root_account.name,
         tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
       }).merge(variable_expander(tool: tool, attachment: content_item_response.file).expand_variables!(tool.set_custom_fields(placement)))
-
 
     lti_launch = Lti::Launch.new
     lti_launch.resource_url = tool.extension_setting(placement, :url)
@@ -453,7 +453,7 @@ class ExternalToolsController < ApplicationController
 
     lti_launch
   end
-  protected :content_item_selection_response
+  protected :content_item_selection
 
   def create_content_item_response
     media_types = params.select { |param| Lti::ContentItemResponse::MEDIA_TYPES.include? param.to_sym }
