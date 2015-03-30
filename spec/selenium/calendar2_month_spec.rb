@@ -198,7 +198,7 @@ describe "calendar2" do
         expect(ff(".fc-state-highlight").size).to eq 2
 
         # Switch the month and verify that there is no highlighted day
-        change_calendar
+        2.times { change_calendar }
         expect(ff(".fc-state-highlight").size).to eq 0
 
         # Go back to the present month. Verify that there is a highlighted day

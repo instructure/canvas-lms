@@ -46,9 +46,12 @@ describe "calendar2" do
       end
 
       it "should show the event in the mini calendar", :priority => "1", :test_id => 138849 do
+        # lock to a particular day (the 13th because why not)
+        # otherwise it turns out this spec will break on almost every 31st
+        date = Date.new(Time.now.year, Time.now.month, 13) - 1.month
         assignment_model(:course => @course,
                          :title => "ricochet",
-                         :due_at => Time.zone.now - 1.month)
+                         :due_at => date.to_time)
         get "/calendar2"
         wait_for_ajax_requests
 
@@ -59,7 +62,7 @@ describe "calendar2" do
         f(".fc-button-prev").click
 
         #look for the event on the mini calendar
-        expect(f(".event").text).to include_text(Time.now.utc.strftime("%-d"))
+        expect(f(".event").text).to include("13")
       end
 
       describe "contexts list" do

@@ -150,21 +150,15 @@ describe "calendar2" do
       # Check for highlight to be present on this week
       expect(ff(".fc-today").size).to eq 2
 
-      # Get the month so we can check to see if the month changes
-      starting_month = f(".fc-header-title").text
-
-      # Change calendar week and make sure that the highlight is not there
-      # If the month does not change, it should still be on the mini calendar so we still expect 1
-      # If the month changes, we should expect 0
-      change_calendar
-      changed_month = f(".fc-header-title").text
-      if (starting_month == changed_month)
-        expect(ff(".fc-today").size).to eq 1
-      else
-        expect(ff(".fc-today").size).to eq 0
+      # Change calendar week until the highlight is not there (it should eventually)
+      count = 0
+      while ff(".fc-today").size > 0
+        change_calendar
+        count += 1
+        raise if count > 10
       end
 
-      # Back to today. Make sure that the highlight is present
+      # Back to today. Make sure that the highlight is present again
       change_calendar(:today)
       expect(ff(".fc-today").size).to eq 2
     end
