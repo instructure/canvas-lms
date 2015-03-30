@@ -237,6 +237,27 @@ describe Folder do
       expect(Folder.resolve_path(@course, ['foo', 'bar'])).to eql [@root_folder, foo, bar]
     end
   end
+
+  describe "file_attachments_visible_to" do
+    before(:once) do
+      @root_folder = Folder.root_folders(@course).first
+      attachment_model context: @course, display_name: 'normal.txt', folder: @root_folder, uploaded_data: default_uploaded_data
+      attachment_model context: @course, display_name: 'hidden.txt', folder: @root_folder, uploaded_data: default_uploaded_data, hidden: true
+      attachment_model context: @course, display_name: 'locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, locked: true
+      attachment_model context: @course, display_name: 'date_restricted_unlocked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, unlock_at: 1.day.ago, lock_at: 1.year.from_now
+      attachment_model context: @course, display_name: 'date_restricted_locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, lock_at: 1.day.ago, unlock_at: 1.year.from_now
+    end
+
+    it "should include all files for teachers" do
+      teacher_in_course active_all: true
+      expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w(normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt)
+    end
+
+    it "should exclude locked and hidden files for students" do
+      student_in_course active_all: true
+      expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w(normal.txt date_restricted_unlocked.txt)
+    end
+  end
 end
 
 
