@@ -911,11 +911,6 @@ class Assignment < ActiveRecord::Base
     send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
   end
 
-  def update_user_from_rubric(user, assessment)
-    score = self.points_possible * (assessment.score / assessment.rubric.points_possible)
-    self.grade_student(user, :grade => self.score_to_grade(score), :grader => assessment.assessor)
-  end
-
   def title_with_id
     "#{title} (#{id})"
   end
@@ -975,6 +970,7 @@ class Assignment < ActiveRecord::Base
       :author => grader,
       :media_comment_id => (opts.delete :media_comment_id),
       :media_comment_type => (opts.delete :media_comment_type),
+      :hidden => muted?,
     }
     comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []

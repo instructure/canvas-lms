@@ -163,6 +163,15 @@ describe Assignment do
     expect(@submission.graded_at).not_to eql original_graded_at
   end
 
+  it "should hide grading comments if assignment is muted" do
+    setup_assignment_with_homework
+    @assignment.mute!
+    @assignment.grade_student(@user, :comment => 'hi')
+    submission = @assignment.submissions.first
+    comment = submission.submission_comments.first
+    expect(comment).to be_hidden
+  end
+
   context "needs_grading_count" do
     before :once do
       setup_assignment_with_homework
