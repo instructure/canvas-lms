@@ -21,7 +21,7 @@ describe GradingPeriodsController do
   let(:root_account) { Account.default }
   let(:sub_account) { root_account.sub_accounts.create! }
 
-  let(:create_grading_periods) { -> (context, start) {
+  let(:create_grading_periods) { ->(context, start) {
       context.grading_period_groups.create!
              .grading_periods.create!(weight: 1,
                                       start_date: start,
@@ -29,7 +29,7 @@ describe GradingPeriodsController do
     }
   }
 
-  let(:remove_while) { -> (string) {
+  let(:remove_while) { ->(string) {
       string.sub(%r{^while\(1\);}, '')
     }
   }
