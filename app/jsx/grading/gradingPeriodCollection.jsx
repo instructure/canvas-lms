@@ -11,6 +11,7 @@ define([
 ],
 function(React, GradingPeriod, $, I18n, _, ConvertCase) {
 
+  var update = React.addons.update;
   var GradingPeriodCollection = React.createClass({
 
     getInitialState: function() {
@@ -18,6 +19,10 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     componentWillMount: function() {
+      this.getPeriods();
+    },
+
+    getPeriods: function() {
       $.getJSON(ENV.GRADING_PERIODS_URL)
       .done(this.gotPeriods)
     },
@@ -25,6 +30,13 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     gotPeriods: function(periods) {
       var camelizedPeriods = _.map(periods.grading_periods, function (gradingPeriod) {return ConvertCase.camelize(gradingPeriod)});
       this.setState({periods: camelizedPeriods});
+    },
+
+    componentDidUpdate: function(prevProps, prevState) {
+      if (prevState.periods) {
+        var removedAGradingPeriod = this.state.periods.length < prevState.periods.length;
+        if (removedAGradingPeriod) this.refs.addPeriodButton.getDOMNode().focus();
+      }
     },
 
     deleteGradingPeriod: function(event, id) {
@@ -41,7 +53,11 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
         message: I18n.t("Are you sure you want to delete this grading period?"),
         success: function () {
           $.flashMessage(I18n.t("The grading period was deleted"));
-          self.removeDeletedGradingPeriod(this, id);
+          if (self.lastRemainingPeriod()) {
+            self.getPeriods();
+          } else {
+            self.removeDeletedGradingPeriod(this, id);
+          }
         },
         error: function() {
           $.flashError(I18n.t("There was a problem deleting the grading period"));
@@ -49,12 +65,13 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       });
     },
 
+    lastRemainingPeriod: function() {
+      return this.state.periods.length === 1;
+    },
+
     removeDeletedGradingPeriod: function(gradingPeriodElement, id) {
       var newPeriods = _.reject(this.state.periods, function(period){ return period.id === id });
-
-      this.setState({periods: newPeriods}, function(){
-        this.refs.addPeriodButton.getDOMNode().focus();
-      });
+      this.setState({periods: newPeriods});
     },
 
     getCreateGradingPeriodCSS: function() {
@@ -68,8 +85,8 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     createNewGradingPeriod: function() {
-      var periods = $.extend(true, [], this.state.periods);
-      periods.push({title: '', startDate: '', endDate: '', id: _.uniqueId('new')});
+      var newPeriod = {title: '', startDate: '', endDate: '', id: _.uniqueId('new'), permissions: { read: true, manage: true }};
+      var periods = update(this.state.periods, {$push: [newPeriod]});
       this.setState({periods: periods});
     },
 
@@ -77,25 +94,29 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       return _.find(this.state.periods, function(period){ return period.id === id });
     },
 
-    updateGradingPeriodCollection: function(updatedGradingPeriod, previousStateId) {
-      var id = previousStateId || updatedGradingPeriod.id;
-      var existingGradingPeriod = this.getPeriodById(id);
-      var indexToUpdate = this.state.periods.indexOf(existingGradingPeriod);
-      var updatedPeriods = $.extend(true, [], this.state.periods);
-      updatedPeriods[indexToUpdate] = updatedGradingPeriod;
-      this.setState({ periods: updatedPeriods });
+    updateGradingPeriodCollection: function(updatedGradingPeriod, permissions, previousStateId) {
+      if (previousStateId) {
+        this.getPeriods();
+      } else {
+        updatedGradingPeriod.permissions = permissions;
+        var id = updatedGradingPeriod.id;
+        var existingGradingPeriod = this.getPeriodById(id);
+        var indexToUpdate = this.state.periods.indexOf(existingGradingPeriod);
+        var updatedPeriods = update(this.state.periods, {$splice: [[indexToUpdate, 1, updatedGradingPeriod]]});
+        this.setState({ periods: updatedPeriods });
+      }
     },
 
     renderGradingPeriods: function() {
-      if(!this.state.periods){
+      if (!this.state.periods) {
         return null;
-      } else if(this.state.periods.length === 0){
+      } else if(this.state.periods.length === 0) {
         return <h3>{I18n.t("No grading periods to display")}</h3>;
       }
       var self = this;
       return this.state.periods.map(function(period){
         return (<GradingPeriod id={period.id} key={period.id} title={period.title} startDate={period.startDate}
-                               endDate={period.endDate} weight={period.weight}
+                               endDate={period.endDate} weight={period.weight} permissions={period.permissions}
                                onDeleteGradingPeriod={self.deleteGradingPeriod}
                                updateGradingPeriodCollection={self.updateGradingPeriodCollection}/>);
       });

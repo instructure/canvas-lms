@@ -48,7 +48,7 @@ function(React, $, I18n, _) {
       this.setState(updatedState, function() {
         this.replaceInputWithDate(this.refs[event.target.name]);
         this.checkFormForUpdates();
-        this.props.updateGradingPeriodCollection(this.state);
+        this.props.updateGradingPeriodCollection(this.state, this.props.permissions);
       });
     },
 
@@ -78,7 +78,6 @@ function(React, $, I18n, _) {
         })
           .success(function (gradingPeriod) {
             $.flashMessage(I18n.t('The grading period was saved'));
-
             if (requestType === 'POST') {
               var oldId = self.state.id,
                 updatedGradingPeriod = gradingPeriod.grading_periods[0],
@@ -91,11 +90,11 @@ function(React, $, I18n, _) {
                 };
 
               self.setState(newState, function () {
-                 self.props.updateGradingPeriodCollection(self.state, oldId);
+                 self.props.updateGradingPeriodCollection(self.state, self.props.permissions, oldId);
               });
             } else {
               self.setState({shouldUpdateBeDisabled: true}, function () {
-                self.props.updateGradingPeriodCollection(this.state);
+                self.props.updateGradingPeriodCollection(self.state, self.props.permissions);
               });
             }
             $('#add-grading-period-button').focus();
@@ -149,7 +148,7 @@ function(React, $, I18n, _) {
     handleTitleChange: function(event) {
       this.setState({title: event.target.value}, function () {
         this.checkFormForUpdates();
-        this.props.updateGradingPeriodCollection(this.state);
+        this.props.updateGradingPeriodCollection(this.state, this.props.permissions);
       });
     },
 
@@ -236,10 +235,12 @@ function(React, $, I18n, _) {
                     {this.renderSaveUpdateButton()}
                   </div>
                   <div className="col-xs">
-                    <div className="icon-delete-container" role="button" tabIndex="0" onClick={this.triggerDeleteGradingPeriod}>
-                    <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
-                      <i title={I18n.t("Delete grading period")} className="icon-delete-grading-period hover icon-x"></i>
-                    </div>
+                    <a role="button"
+                       href="#"
+                       className="Button Button--icon-action icon-x icon-delete-grading-period"
+                       onClick={this.triggerDeleteGradingPeriod}>
+                      <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
+                    </a>
                   </div>
                 </div>
               </div>
