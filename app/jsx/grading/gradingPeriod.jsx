@@ -63,10 +63,9 @@ function(React, $, I18n, _) {
     saveGradingPeriod: function () {
       if (this.isStartDateBeforeEndDate()) {
         var isNewGradingPeriod = this.isNewGradingPeriod();
-        var requestType = (!isNewGradingPeriod) ? 'PUT' : 'POST';
-        var url = ENV.GRADING_PERIODS_URL + ((!isNewGradingPeriod) ? ('/' + this.state.id) : '');
+        var requestType = (!isNewGradingPeriod && this.props.permissions.manage) ? 'PUT' : 'POST';
+        var url = ENV.GRADING_PERIODS_URL + ((!isNewGradingPeriod && this.props.permissions.manage) ? ('/' + this.state.id) : '');
         var self = this;
-
         $('#period_start_date_' + this.state.id).hideErrors();
 
         $.ajax({
@@ -90,14 +89,14 @@ function(React, $, I18n, _) {
                 };
 
               self.setState(newState, function () {
-                 self.props.updateGradingPeriodCollection(self.state, self.props.permissions, oldId);
+                 self.props.updateGradingPeriodCollection(self.state, updatedGradingPeriod.permissions, oldId);
               });
             } else {
               self.setState({shouldUpdateBeDisabled: true}, function () {
                 self.props.updateGradingPeriodCollection(self.state, self.props.permissions);
               });
             }
-            $('#add-grading-period-button').focus();
+            $('#add-period-button').focus();
           })
           .error(function (error) {
             $.flashError(I18n.t('There was a problem saving the grading period'));
@@ -183,11 +182,28 @@ function(React, $, I18n, _) {
 
       return (
         <button className={className}
-                disabled={this.state.shouldUpdateBeDisabled}
+                disabled={this.state.shouldUpdateBeDisabled || this.props.disabled}
                 onClick={this.saveGradingPeriod}>
           {buttonText}
         </button>
       );
+    },
+
+    renderDeleteButton: function() {
+      if (this.props.cannotDelete()) {
+        return null;
+      } else {
+        var cssClasses = "Button Button--icon-action icon-x icon-delete-grading-period";
+        if (this.props.disabled) cssClasses += " disabled";
+        return (
+          <a role="button"
+             href="#"
+             className={cssClasses}
+             onClick={this.triggerDeleteGradingPeriod}>
+            <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
+          </a>
+        );
+      }
     },
 
     render: function () {
@@ -202,7 +218,8 @@ function(React, $, I18n, _) {
                      type="text"
                      ref="title"
                      onChange={this.handleTitleChange}
-                     value={this.state.title}/>
+                     value={this.state.title}
+                     disabled={this.props.disabled}/>
 
             </div>
             <div className="col-xs-12 col-sm-6 col-lg-3">
@@ -214,7 +231,8 @@ function(React, $, I18n, _) {
                      ref="startDate"
                      name="startDate"
                      className="input-grading-period-date date_field"
-                     defaultValue={this.formatDateForDisplay(this.state.startDate)}/>
+                     defaultValue={this.formatDateForDisplay(this.state.startDate)}
+                     disabled={this.props.disabled}/>
 
             </div>
             <div className="col-xs-12 col-sm-6 col-lg-3">
@@ -225,7 +243,8 @@ function(React, $, I18n, _) {
                      className="input-grading-period-date date_field"
                      ref="endDate"
                      name="endDate"
-                     defaultValue={this.formatDateForDisplay(this.state.endDate)}/>
+                     defaultValue={this.formatDateForDisplay(this.state.endDate)}
+                     disabled={this.props.disabled}/>
 
             </div>
             <div className="col-xs-12 col-sm-6 col-lg-3 manage-buttons-container">
@@ -235,12 +254,7 @@ function(React, $, I18n, _) {
                     {this.renderSaveUpdateButton()}
                   </div>
                   <div className="col-xs">
-                    <a role="button"
-                       href="#"
-                       className="Button Button--icon-action icon-x icon-delete-grading-period"
-                       onClick={this.triggerDeleteGradingPeriod}>
-                      <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
-                    </a>
+                    {this.renderDeleteButton()}
                   </div>
                 </div>
               </div>

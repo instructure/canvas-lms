@@ -267,11 +267,13 @@ END
     {
       display_name: -> { I18n.t('features.multiple_grading_periods', 'Multiple Grading Periods') },
       description: -> { I18n.t('enable_multiple_grading_periods', <<-END) },
-Enable multiple grading periods management in the account admin, and use in the Gradebook.
+      Multiple Grading Periods allows teachers and admins to create grading periods with set
+      cutoff dates. Assignments can be filtered by these grading periods in the gradebook.
 END
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      development: true
+      applies_to: 'Course',
+      state: 'hidden_in_prod',
+      development: true,
+      root_opt_in: true
     },
     'course_catalog' =>
     {

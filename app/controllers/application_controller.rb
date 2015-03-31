@@ -171,7 +171,10 @@ class ApplicationController < ActionController::Base
   helper_method 'use_new_styles?'
 
   def multiple_grading_periods?
-    @domain_root_account && @domain_root_account.feature_enabled?(:multiple_grading_periods)
+    is_account_and_mgp_is_allowed = !!(@context &&
+                                       @context.is_a?(Account) &&
+                                       @context.feature_allowed?(:multiple_grading_periods))
+    (@context && @context.feature_enabled?(:multiple_grading_periods)) || is_account_and_mgp_is_allowed
   end
   helper_method 'multiple_grading_periods?'
 
