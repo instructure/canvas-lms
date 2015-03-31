@@ -581,7 +581,6 @@ CanvasRails::Application.routes.draw do
   get 'login' => 'pseudonym_sessions#new'
   post 'login' => 'pseudonym_sessions#create'
   delete 'logout' => 'pseudonym_sessions#destroy'
-  post 'logout' => 'pseudonym_sessions#saml_logout'
   get 'logout' => 'pseudonym_sessions#logout_confirm'
   get 'login/cas' => 'pseudonym_sessions#new', as: :cas_login
   post 'login/cas' => 'pseudonym_sessions#cas_logout', as: :cas_logout
@@ -710,7 +709,7 @@ CanvasRails::Application.routes.draw do
 
   post 'object_snippet' => 'context#object_snippet'
   post 'saml_consume' => 'pseudonym_sessions#saml_consume'
-  match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]
+  get 'saml_logout' => 'pseudonym_sessions#saml_logout'
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
   # Routes for course exports
