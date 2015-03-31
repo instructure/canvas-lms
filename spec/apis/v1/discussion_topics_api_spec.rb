@@ -2322,11 +2322,9 @@ describe DiscussionTopicsController, type: :request do
   context "public courses" do
     let(:announcements_view_api) {
       ->(user, course_id, announcement_id, status = 200) do
-        args = []
-        m = user ? method(:api_call_as_user) : method(:api_call)
-        args.push(user) if user
-        @user = nil unless user # this is required because of api_call :-(
-        args.push(
+        old_at_user = @user
+        @user = user # this is required because of api_call :-(
+        json = api_call(
           :get,
           "/api/v1/courses/#{course_id}/discussion_topics/#{announcement_id}/view?include_new_entries=1",
           {
@@ -2343,8 +2341,7 @@ describe DiscussionTopicsController, type: :request do
             expected_status: status
           }
         )
-        json = m.call(*args)
-        @user = user unless @user # this is required because of api_call :-(
+        @user = old_at_user
         json
       end
     }
@@ -2363,7 +2360,7 @@ describe DiscussionTopicsController, type: :request do
       @announcement.discussion_entries.create!(:user => @student2, :parent_entry => s1e, :message => "Hello I'm student 2!")
     end
 
-    context "does show" do
+    context "should be shown" do
       let(:check_access) {
         ->(json) do
           expect(json["new_entries"]).not_to be_nil
@@ -2373,20 +2370,20 @@ describe DiscussionTopicsController, type: :request do
         end
       }
 
-      it "does show student comments to students" do
+      it "shows student comments to students" do
         check_access.call(announcements_view_api.call(@student1, @course.id, @announcement.id))
       end
 
-      it "does show student comments to teachers" do
+      it "shows student comments to teachers" do
         check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id))
       end
 
-      it "does show student comments to admins" do
+      it "shows student comments to admins" do
         check_access.call(announcements_view_api.call(@admin, @course.id, @announcement.id))
       end
     end
 
-    context "doesn't show" do
+    context "should not be shown" do
       let(:check_access) {
         ->(json) do
           expect(json["new_entries"]).to be_nil
@@ -2401,15 +2398,15 @@ describe DiscussionTopicsController, type: :request do
         @course = prev_course
       end
 
-      it "doesn't show student comments to unauthenticated users" do
+      it "does not show student comments to unauthenticated users" do
         check_access.call(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
       end
 
-      it "doesn't show student comments to other students not in the course" do
+      it "does not show student comments to other students not in the course" do
         check_access.call(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
       end
 
-      it "doesn't show student comments to other teachers not in the course" do
+      it "does not show student comments to other teachers not in the course" do
         check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
       end
     end
