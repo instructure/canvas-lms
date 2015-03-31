@@ -24,6 +24,10 @@ define [
 
     keybindings: [
       {
+        key: 'ALT+F9',
+        description: I18n.t('keybindings.open_menubar', 'Open the editor\'s menubar')
+      },
+      {
         key: 'ALT+F10',
         description: I18n.t('keybindings.open_toolbar', 'Open the editor\'s toolbar')
       },
