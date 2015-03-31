@@ -1247,6 +1247,7 @@ CanvasRails::Application.routes.draw do
       get 'files/:id/public_url', action: :public_url
       %w(course group user).each do |context|
         get "#{context}s/:#{context}_id/files/quota", action: :api_quota
+        get "#{context}s/:#{context}_id/files/:id", action: :api_show, as: "#{context}_attachment"
       end
     end
 

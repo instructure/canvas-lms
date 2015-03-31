@@ -548,6 +548,20 @@ describe "Files API", type: :request do
       })
     end
 
+    it "should work with a context path" do
+      user_session(@user)
+      opts = @file_path_options.merge(:course_id => @course.id.to_param)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}", opts, {})
+      expect(json['id']).to eq @att.id
+    end
+
+    it "should 404 with wrong context" do
+      course
+      user_session(@user)
+      opts = @file_path_options.merge(:course_id => @course.id.to_param)
+      api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}", opts, {}, {}, :expected_status => 404)
+    end
+
     it "should omit verifiers when using session auth" do
       user_session(@user)
       get @file_path

@@ -287,7 +287,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
           "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",
-          "http://www.example.com/api/v1/files/789",
+          "http://www.example.com/api/v1/courses/#{@course.id}/files/789",
           "http://www.example.com/api/v1/files/789",
           "http://www.example.com/api/v1/courses/#{@course.id}/quizzes",
           "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/999",
@@ -330,7 +330,7 @@ describe UserContent, type: :request do
             "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics",
             "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics/1~123",
             "http://www.example.com/api/v1/groups/#{@group.id}/folders/root",
-            "http://www.example.com/api/v1/files/789"
+            "http://www.example.com/api/v1/groups/#{@group.id}/files/789"
         ]
         expect(doc.css('a').collect{ |att| att['data-api-returntype'] }).to eq(
             %w([Page] Page [Page] Page [Discussion] Discussion Folder File)
@@ -351,7 +351,7 @@ describe UserContent, type: :request do
         doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/users/#{@teacher.id}/folders/root",
-          "http://www.example.com/api/v1/files/789"
+          "http://www.example.com/api/v1/users/#{@teacher.id}/files/789"
         ]
         expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
             %w(Folder File)

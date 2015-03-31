@@ -457,9 +457,13 @@ class FilesController < ApplicationController
   #   curl 'https://<canvas>/api/v1/files/<file_id>' \
   #         -H 'Authorization: Bearer <token>'
   #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/files/<file_id>' \
+  #         -H 'Authorization: Bearer <token>'
+  #
   # @returns File
   def api_show
-    @attachment = Attachment.find(params[:id])
+    get_context
+    @attachment = @context ? @context.attachments.find(params[:id]) : Attachment.find(params[:id])
     raise ActiveRecord::RecordNotFound if @attachment.deleted?
     params[:include] = Array(params[:include])
     if authorized_action(@attachment,@current_user,:read)
