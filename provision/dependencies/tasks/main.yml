@@ -10,6 +10,7 @@
     - libxml2-dev
     - libmysqlclient-dev
     - libxslt1-dev
+    - libsqlite3-dev
     - imagemagick
     - libpq-dev
     - libxmlsec1-dev
