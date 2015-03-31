@@ -1,5 +1,13 @@
 @import "base/environment";
 
+#grading-periods-tab {
+  #disable-feature-message {
+    float: right;
+  }
+  #admin-periods-message {
+    float: left;
+  }
+}
 #grading_periods {
   margin-bottom: 0;
 
@@ -36,15 +44,16 @@
   border-left-style: dashed;
   border-top-style: none;
   border-width: 2px;
-
   font-size: 16px;
 
-  #add-grading-period-button {
-    text-decoration: none;
+  #add-period-button {
+    font-size: 16px;
+    &:hover {
+      text-decoration: none;
+    }
   }
-
   .grading-period-add-icon {
-    margin-right: 2px;
+    margin-right: 4px;
   }
 }
 

@@ -27,7 +27,8 @@ class GradingStandardsController < ApplicationController
         :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
         :GRADING_PERIODS_URL => context_url(@context, :api_v1_context_grading_periods_url),
         :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
-        :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard
+        :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard,
+        :CONTEXT_SETTINGS_URL => context_url(@context, :context_settings_url)
       })
       @standards = GradingStandard.for(@context).sorted.limit(100)
       respond_to do |format|

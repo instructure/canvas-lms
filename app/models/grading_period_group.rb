@@ -28,15 +28,15 @@ class GradingPeriodGroup < ActiveRecord::Base
   scope :active, -> { where workflow_state: "active" }
 
   def multiple_grading_periods_enabled?
-    (course || account).root_account.feature_enabled?(:multiple_grading_periods)
+    (course || account).feature_enabled?(:multiple_grading_periods) || account_grading_period_allowed?
   end
 
- alias_method :destroy!, :destroy
- def destroy
-   self.workflow_state = 'deleted'
-   save!
-   run_callbacks :destroy
- end
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    save!
+    run_callbacks :destroy
+  end
 
   private
   def belongs_to_course_or_account_exclusive
@@ -49,5 +49,9 @@ class GradingPeriodGroup < ActiveRecord::Base
       errors.add(:course_id, t("cannot be present when account_id is present"))
       errors.add(:account_id, t("cannot be present when course_id is present"))
     end
+  end
+
+  def account_grading_period_allowed?
+    !!(account && account.feature_allowed?(:multiple_grading_periods))
   end
 end
