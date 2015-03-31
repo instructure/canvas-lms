@@ -49,7 +49,7 @@ module GoogleDocs
 
         # hack to make it seem like the old object
         result.define_singleton_method(:content_type) do
-          result.headers['Content-Type']
+          result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
         end
 
         # TODO: get extension from response header
