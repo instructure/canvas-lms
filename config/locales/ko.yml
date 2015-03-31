@@ -8387,6 +8387,7 @@ ko:
         someone: 아무개
         subject: "제출물 의견: %{user}, %{assignment}, %{context}"
       facebook: 
+        body: "%{author}이(가) **%{assignment}에 대한 %{user}**의 제출물에 관한 새 의견을 제출함"
         someone: 아무개
       sms: 
         body: "%{assignment}, %{user}, %{context}에 대한 %{author}의 새 의견입니다."
@@ -8407,6 +8408,7 @@ ko:
         someone: 아무개
         subject: "제출물 의견: %{user}, %{assignment}, %{context}"
       facebook: 
+        body: "%{author}이(가) **%{assignment}에 대한 %{user}**의 제출물에 관한 새 의견을 제출했습니다."
         someone: 아무개
       sms: 
         more_info: "자세한 정보는 %{url} 참고"
