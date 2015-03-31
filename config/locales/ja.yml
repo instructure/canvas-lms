@@ -10620,6 +10620,14 @@ ja:
       description: "Canvas Facebook 申請"
       name: Facebook
     facebook_settings: 
+      description: |-
+          [facebook.com 上の新しいアプリ] (%{facebook_url}) を作成し、'App on Facebook' をプラットフォームとして追加する必要があります。
+          Facebook アプリが正しく動作するように、 次の構成オプションを
+          設定します。
+          
+          * **設定 -- App on Facebook -- Canvas ページ:** 選択した内容 (apps.facebook.com の後の部分) をメモし、下のフォームに入力します。
+          * **設定 -- App on Facebook -- Canvas URL:** %{canvas_url} に設定します。
+          * アプリを保存した後、アプリ ID、クライアント トークン、およびアプリ シークレットをメモします。
       domain_name: ドメイン
       headers: 
         domain_settings: ドメイン設定
