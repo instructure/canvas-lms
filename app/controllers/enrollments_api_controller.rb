@@ -178,13 +178,14 @@ class EnrollmentsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
 
   @@errors = {
-    :missing_parameters => 'No parameters given',
-    :missing_user_id    => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
-    :bad_type           => 'Invalid type',
-    :bad_role           => 'Invalid role',
-    :inactive_role      => 'Cannot create an enrollment with this role because it is inactive.',
-    :base_type_mismatch => 'The specified type must match the base type for the role',
-    :concluded_course   => 'Can\'t add an enrollment to a concluded course.'
+    :missing_parameters                => 'No parameters given',
+    :missing_user_id                   => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
+    :bad_type                          => 'Invalid type',
+    :bad_role                          => 'Invalid role',
+    :inactive_role                     => 'Cannot create an enrollment with this role because it is inactive.',
+    :base_type_mismatch                => 'The specified type must match the base type for the role',
+    :concluded_course                  => 'Can\'t add an enrollment to a concluded course.',
+    :multiple_grading_periods_disabled => 'Multiple Grading Periods feature is disabled. Cannot filter by grading_period_id with this feature disabled'
 
   }
 
@@ -225,6 +226,10 @@ class EnrollmentsApiController < ApplicationController
   #   independent of whether the user has permission to view other people
   #   on the roster.
   #
+  # @argument grading_period_id [Integer]
+  #   Return grades for the given grading_period.  If this parameter is not
+  #   specified, the returned grades will be for the whole course.
+  #
   # @returns [Enrollment]
   def index
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
@@ -239,6 +244,27 @@ class EnrollmentsApiController < ApplicationController
     has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
     enrollments = enrollments.joins(:course) if has_courses
     enrollments = enrollments.shard(@shard_scope) if @shard_scope
+    if params[:grading_period_id].present?
+      if !multiple_grading_periods?
+        render_create_errors([@@errors[:multiple_grading_periods_disabled]])
+        return false
+      end
+
+      if @context.is_a? User
+        render(
+          json: {message: "grading_period_id can't be specified for users"},
+          status: 403
+        )
+        return false
+      end
+
+      grading_period = GradingPeriod.context_find(context: @context,
+                                                  id: params[:grading_period_id])
+      unless grading_period
+        render(:json => {error: "invalid grading_period_id"}, :status => :bad_request)
+        return
+      end
+    end
 
     enrollments = Api.paginate(
       enrollments,
@@ -248,7 +274,10 @@ class EnrollmentsApiController < ApplicationController
     includes = [:user] + Array(params[:include])
 
     user_json_preloads(enrollments.map(&:user))
-    render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, includes) }
+    render :json => enrollments.map { |e|
+      enrollment_json(e, @current_user, session, includes,
+                      grading_period: grading_period)
+    }
   end
 
   # @API Enrollment by ID

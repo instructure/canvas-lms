@@ -168,7 +168,7 @@ module Api::V1::User
                               :end_at,
                               :type]
 
-  def enrollment_json(enrollment, user, session, includes = [])
+  def enrollment_json(enrollment, user, session, includes = [], opts = {})
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role.name
@@ -184,8 +184,19 @@ module Api::V1::User
         }
 
         if has_grade_permissions?(user, enrollment)
-          %w{current_score final_score current_grade final_grade}.each do |method|
-            json[:grades][method.to_sym] = enrollment.send("computed_#{method}")
+          if opts[:grading_period]
+            course = enrollment.course
+            gc = GradeCalculator.new(user.id, course,
+                                     grading_period: opts[:grading_period])
+            ((current, _), (final, _)) = gc.compute_scores.first
+            json[:grades][:current_score] = current[:grade]
+            json[:grades][:current_grade] = course.score_to_grade(current[:grade])
+            json[:grades][:final_score] = final[:grade]
+            json[:grades][:final_grade] = course.score_to_grade(final[:grade])
+          else
+            %w{current_score final_score current_grade final_grade}.each do |method|
+              json[:grades][method.to_sym] = enrollment.send("computed_#{method}")
+            end
           end
         end
       end

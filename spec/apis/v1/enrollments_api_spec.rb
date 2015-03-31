@@ -644,6 +644,63 @@ describe EnrollmentsApiController, type: :request do
       @section = @course.course_sections.create!
     end
 
+    context "grading periods" do
+      before :once do
+        grading_period_group = @course.grading_period_groups.create!
+        @grading_period1 = grading_period_group.grading_periods.create!(start_date: 2.months.ago, end_date: Time.now - 1)
+        @grading_period2 = grading_period_group.grading_periods.create!(start_date: Time.now, end_date: 2.months.from_now)
+
+        @assignment1 = @course.assignments.create! due_at: Time.now - 2.day, points_possible: 10
+        @assignment2 = @course.assignments.create! due_at: Time.now + 1.day, points_possible: 10
+      end
+
+      context "multiple grading periods feature flag enabled" do
+        before :once do
+          @course.root_account.enable_feature!(:multiple_grading_periods)
+        end
+
+        it "doesn't work for users" do
+          @user_params[:grading_period_id] = @grading_period1.id
+          raw_api_call(:get, @user_path, @user_params)
+          expect(response.status).to eq 403
+        end
+
+        it "returns grades for the requested grading period for courses" do
+          @assignment1.grade_student(@student, grade: 10)
+          @assignment2.grade_student(@student, grade: 0)
+
+          student_grade = lambda do |json|
+            student_json = json.find { |e|
+              e["type"] == "StudentEnrollment"
+            }
+            if student_json
+              student_json["grades"]["final_score"]
+            end
+          end
+
+          json = api_call(:get, @path, @params)
+          expect(student_grade.(json)).to eq 50
+
+          @params[:grading_period_id] = @grading_period1.id
+          json = api_call(:get, @path, @params)
+          expect(student_grade.(json)).to eq 100
+
+          @params[:grading_period_id] = @grading_period2.id
+          json =  api_call(:get, @path, @params)
+          expect(student_grade.(json)).to eq 0
+        end
+      end
+
+      context "multiple grading periods feature flag disabled" do
+        it "should return an error message if the multiple grading periods flag is disabled" do
+          @user_params[:grading_period_id] = @grading_period1.id
+
+          json = api_call(:get, @user_path, @user_params, {}, {}, { expected_status: 403 })
+          expect(json['message']).to eq 'Multiple Grading Periods feature is disabled. Cannot filter by grading_period_id with this feature disabled'
+        end
+      end
+    end
+
     context "an account admin" do
       before :once do
         @user = user_with_pseudonym(:username => 'admin@example.com')

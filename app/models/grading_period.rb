@@ -40,7 +40,7 @@ class GradingPeriod < ActiveRecord::Base
     fail ArgumentError unless context = options.fetch(:context)
     fail ArgumentError unless id = options.fetch(:id)
 
-    self.for(context).detect { |grading_period| grading_period.id == id }
+    self.for(context).detect { |grading_period| grading_period.id == id.to_i }
   end
 
   # save the previous definition of `destroy` and alias it to `destroy!`
