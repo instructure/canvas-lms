@@ -132,22 +132,25 @@ define [
       $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
       $holder.text I18n.t('loading', 'Loading media...')
 
-      showInline = (id) ->
-        width = Math.min ($holder.closest("div,p,table").width() || VIDEO_WIDTH), VIDEO_WIDTH
+      showInline = (id, holder) ->
+        width = Math.min (holder.closest("div,p,table").width() || VIDEO_WIDTH), VIDEO_WIDTH
         height = Math.round width / 336 * 240
         getSourcesAndTracks(id).done (sourcesAndTracks) ->
           if sourcesAndTracks.sources.length
             mediaPlayerOptions =
-               can_add_captions: sourcesAndTracks.can_add_captions
-               mediaCommentId: id
-               googleAnalyticsTitle: id
+              can_add_captions: sourcesAndTracks.can_add_captions
+              mediaCommentId: id
+              googleAnalyticsTitle: id
+              success: (media)->
+                holder.focus()
+                media.play()
 
             $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height, width})
-            $mediaTag.appendTo($holder.html(''))
+            $mediaTag.appendTo(holder.html(''))
             player = new MediaElementPlayer $mediaTag, mediaPlayerOptions
             $mediaTag.data('mediaelementplayer', player)
           else
-            $holder.text I18n.t('media_still_converting', 'Media is currently being converted, please try again in a little bit.')
+            holder.text I18n.t('media_still_converting', 'Media is currently being converted, please try again in a little bit.')
 
       if id is 'maybe'
         detailsUrl = downloadUrl.replace /\/download.*/, ""
@@ -156,12 +159,12 @@ define [
         onSuccess = (data) ->
           if data.attachment?.media_entry_id isnt 'maybe'
             $holder.text ''
-            showInline data.attachment.media_entry_id
+            showInline(data.attachment.media_entry_id, $holder)
           else
             onError()
         $.ajaxJSON detailsUrl, 'GET', {}, onSuccess, onError
       else
-        showInline(id)
+        showInline(id, $holder)
 
     show: (id, mediaType) ->
       # if a media comment is still open, close it.
