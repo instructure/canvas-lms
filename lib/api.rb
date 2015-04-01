@@ -439,7 +439,7 @@ module Api
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         opts = {:only_path => true}
-        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app?
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
         if match.rest.start_with?("/preview")
           url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, opts)
         else
@@ -449,7 +449,7 @@ module Api
         end
       else
         opts = {:download => '1', :only_path => true}
-        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app?
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
         url = file_download_url(obj.id, opts)
       end
       url
