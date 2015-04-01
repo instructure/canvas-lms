@@ -2413,6 +2413,37 @@ describe DiscussionTopicsController, type: :request do
       end
     end
   end
+
+  it "should order Announcement items by posted_at rather than by position" do
+    course_with_teacher(:active_all => true)
+    account_admin_user(account: @course.account) # sets @admin
+
+    ann_ids_ordered_by_posted_at  = 10.times.map do |i|
+      ann = Announcement.create!({
+        context: @course,
+        message: "Test Message",
+      })
+      ann.posted_at = i.days.ago
+      ann.position = 1
+      ann.save!
+      ann.id
+    end
+
+    json = api_call(
+      :get,
+      "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+      {
+        controller: "discussion_topics",
+        action: "index",
+        format: "json",
+        course_id: @course.id.to_s,
+        only_announcements: 1,
+      },
+      {}
+    )
+
+    expect(json.map{ |j| j["id"] }).to eq(ann_ids_ordered_by_posted_at)
+  end
 end
 
 def create_attachment(context, opts={})

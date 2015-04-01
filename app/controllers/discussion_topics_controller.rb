@@ -262,7 +262,13 @@ class DiscussionTopicsController < ApplicationController
               @context.active_discussion_topics.only_discussion_topics
             end
 
-    scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position_legacy
+    scope = if params[:order_by] == 'recent_activity'
+              scope.by_last_reply_at
+            elsif params[:only_announcements]
+              scope.by_posted_at
+            else
+              scope.by_position_legacy
+            end
 
     scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
 
