@@ -258,6 +258,20 @@ describe Folder do
       expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w(normal.txt date_restricted_unlocked.txt)
     end
   end
+
+  describe "all_visible_folder_ids" do
+    before(:once) do
+      @root_folder = Folder.root_folders(@course).first
+      @normal_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "normal")
+      @normal_sub1 = @normal_folder.active_sub_folders.create!(:context => @course, :name => "normal_sub1")
+      @normal_sub2 = @normal_sub1.active_sub_folders.create!(:context => @course, :name => "normal_sub2")
+      @locked_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "locked", :lock_at => 1.week.ago)
+      @locked_sub1 = @locked_folder.active_sub_folders.create!(:context => @course, :name => "locked_sub1")
+      @locked_sub2 = @locked_sub1.active_sub_folders.create!(:context => @course, :name => "locked_sub2")
+    end
+
+    it "should exclude all descendants of locked folders" do
+      expect(Folder.all_visible_folder_ids(@course)).to match_array([@root_folder, @normal_folder, @normal_sub1, @normal_sub2].map(&:id))
+    end
+  end
 end
-
-

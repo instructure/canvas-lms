@@ -260,7 +260,7 @@ class FilesController < ApplicationController
           scope = @context.attachments.not_deleted
         else
           scope = @context.attachments.visible.not_hidden.not_locked.where(
-              :folder_id => @context.active_folders.not_hidden.not_locked)
+              :folder_id => Folder.all_visible_folder_ids(@context))
         end
       else
         if can_manage_files
