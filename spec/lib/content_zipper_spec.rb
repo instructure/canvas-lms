@@ -233,6 +233,32 @@ describe ContentZipper do
       expect(attachment.workflow_state).to eq 'zipped'
     end
 
+    describe "error handling" do
+      before :once do
+        course_with_student(:active_all => true)
+        @root = Folder.root_folders(@course).first
+        @bad_file = @course.attachments.create!(:folder => @root, :uploaded_data => StringIO.new("bad"), :filename => "bad")
+        @bad_file.update_attribute(:filename, "not the real filename try and open this now sucka")
+        @attachment = Attachment.new(:display_name => 'my_download.zip')
+        @attachment.user_id = @user.id
+        @attachment.workflow_state = 'to_be_zipped'
+        @attachment.context = @root
+        @attachment.save!
+      end
+
+      it "should error if no files could be added" do
+        ContentZipper.process_attachment(@attachment, @user)
+        expect(@attachment.workflow_state).to eq 'errored'
+      end
+
+      it "should skip files that couldn't be opened, without failing the download" do
+        good_file = @course.attachments.create!(:folder => @root, :uploaded_data => StringIO.new("good"), :filename => "good")
+        ContentZipper.process_attachment(@attachment, @user)
+        expect(@attachment.workflow_state).to eq 'zipped'
+        expect(Zip::File.new(@attachment.full_filename).entries.map(&:name)).to eq ['good']
+      end
+    end
+
     it "should use the display name" do
       course_with_student(:active_all => true)
       folder = Folder.root_folders(@course).first

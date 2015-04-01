@@ -282,7 +282,7 @@ class FoldersController < ApplicationController
                                       context_type: @folder.class.to_s,
                                       display_name: folder_filename,
                                       user_id: user_id,
-                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached']).
+                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached', 'errored']).
           where("file_state<>'deleted'").
           order(:created_at).to_a
       @attachment = @attachments.pop
