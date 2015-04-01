@@ -499,6 +499,34 @@ describe "Files API", type: :request do
       json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(:search_term => 'fir'), {})
       expect(json.map{|h| h['id']}.sort).to eq atts.map(&:id).sort
     end
+
+    describe "hidden folders" do
+      before :once do
+        hidden_subfolder = @f1.active_sub_folders.build(:name => "hidden", :context => @course)
+        hidden_subfolder.workflow_state = 'hidden'
+        hidden_subfolder.save!
+        hidden_subsub = hidden_subfolder.active_sub_folders.create!(:name => "hsub", :context => @course)
+        @teh_file = Attachment.create!(:filename => "implicitly hidden", :uploaded_data => default_uploaded_data, :folder => hidden_subsub, :context => @course)
+      end
+
+      context "as teacher" do
+        it "should include files in subfolders of hidden folders" do
+          json = api_call(:get, @files_path, @files_path_options)
+          expect(json.map{|entry| entry['id']}).to include @teh_file.id
+        end
+      end
+
+      context "as student" do
+        before :once do
+          student_in_course active_all: true
+        end
+
+        it "should exclude files in subfolders of hidden folders" do
+          json = api_call(:get, @files_path, @files_path_options)
+          expect(json.map{|entry| entry['id']}).not_to include @teh_file.id
+        end
+      end
+    end
   end
 
   describe "#index other contexts" do
