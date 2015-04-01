@@ -227,7 +227,7 @@ class ConferencesController < ApplicationController
           format.json { render :json => WebConference.find(@conference).as_json(:permissions => {:user => @current_user, :session => session},
                                                                                 :url => named_context_url(@context, :context_conference_url, @conference)) }
         else
-          format.html { render :action => 'index' }
+          format.html { render :index }
           format.json { render :json => @conference.errors, :status => :bad_request }
         end
       end
@@ -251,7 +251,7 @@ class ConferencesController < ApplicationController
           format.json { render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
                                                             :url => named_context_url(@context, :context_conference_url, @conference)) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @conference.errors, :status => :bad_request }
         end
       end

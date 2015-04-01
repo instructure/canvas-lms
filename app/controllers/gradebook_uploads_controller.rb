@@ -47,7 +47,7 @@ class GradebookUploadsController < ApplicationController
             format.html { redirect_to polymorphic_url([@context, 'gradebook']) }
           else
             js_env uploaded_gradebook: @uploaded_gradebook
-            format.html { render :action => "show" }
+            format.html { render :show }
           end
         end
       else

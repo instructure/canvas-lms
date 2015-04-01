@@ -160,7 +160,7 @@ class SubmissionsController < ApplicationController
                                             @assignment.quiz.id, quiz_params)
             }
           else
-            format.html { render :action => "show_preview" }
+            format.html { render :show_preview }
           end
         elsif params[:download]
           if params[:comment_id]
@@ -346,7 +346,7 @@ class SubmissionsController < ApplicationController
       else
         format.html do
           flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
-          render :action => "show", :id => @submission.assignment.context.id
+          render :show, id: @submission.assignment.context.id
         end
         format.json { render :json => @submission.errors, :status => :bad_request }
       end
@@ -622,7 +622,7 @@ class SubmissionsController < ApplicationController
         else
           @error_message = t('errors_update_failed', "Update Failed")
           flash[:error] = @error_message
-          format.html { render :action => "show", :id => @assignment.context.id }
+          format.html { render :show, id: @assignment.context.id }
           format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
           format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
         end

@@ -63,7 +63,7 @@ class CalendarEventsController < ApplicationController
           format.html { redirect_to calendar_url_for(@context) }
           format.json { render :json => @event.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @event.errors, :status => :bad_request }
         end
       end
@@ -77,7 +77,7 @@ class CalendarEventsController < ApplicationController
     end
     js_env(:DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments))
     if authorized_action(@event, @current_user, :update_content)
-      render :action => 'new'
+      render :new
     end
   end
 
@@ -93,7 +93,7 @@ class CalendarEventsController < ApplicationController
           format.html { redirect_to calendar_url_for(@context) }
           format.json { render :json => @event.as_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @event.errors, :status => :bad_request }
         end
       end

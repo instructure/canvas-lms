@@ -78,9 +78,8 @@ class GradebooksController < ApplicationController
                grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard,
                student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
                student_id: @presenter.student_id
-        render :action => 'grade_summary'
       else
-        render :action => 'grade_summary_list'
+        render :grade_summary_list
       end
     end
   end
@@ -135,7 +134,7 @@ class GradebooksController < ApplicationController
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @context.submissions.where(user_id: @enrollment.user_id).to_a
       @user = @enrollment.user
-      render :action => "student_attendance"
+      render :student_attendance
       # render student_attendance, optional params[:assignment_id] to highlight and scroll to that particular assignment
     else
       flash[:notice] = t('notices.unauthorized', "You are not authorized to view attendance for this course")
@@ -152,10 +151,10 @@ class GradebooksController < ApplicationController
           set_js_env
           case @current_user.preferred_gradebook_version
           when "2"
-            render :action => "gradebook2"
+            render :gradebook2
             return
           when "srgb"
-            render :action => "screenreader"
+            render :screenreader
             return
           end
         }
@@ -337,7 +336,7 @@ class GradebooksController < ApplicationController
           }
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
-          format.html { render :action => "show", :course_id => @assignment.context.id }
+          format.html { render :show, course_id: @assignment.context.id }
           format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
           format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
         end
@@ -395,7 +394,7 @@ class GradebooksController < ApplicationController
         end
         append_sis_data(env)
         js_env(env)
-        render :action => "speed_grader"
+        render
       end
 
       format.json do
@@ -413,7 +412,6 @@ class GradebooksController < ApplicationController
 
   def blank_submission
     @headers = false
-    render :action => "blank_submission"
   end
 
   def change_gradebook_version

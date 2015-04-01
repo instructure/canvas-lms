@@ -389,7 +389,7 @@ class FilesController < ApplicationController
                                  },
                              :methods => :asset_string,
                              :include_root => false))
-        format.html { render :action => 'full_index' }
+        format.html { render :full_index }
       end
       format.json { render :json => @file_structures }
     end
@@ -521,7 +521,7 @@ class FilesController < ApplicationController
             @headers = false if params[:ts] && params[:verifier]
             @not_found_message = t 'errors.not_found', "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
             logger.error "Error downloading a file: #{e} - #{e.backtrace}"
-            render :template => 'shared/errors/404_message', :status => :bad_request
+            render 'shared/errors/404_message', status: :bad_request
           end
           return
         elsif authorized_action(@attachment, @current_user, :read)
@@ -549,7 +549,7 @@ class FilesController < ApplicationController
           @headers = false
           @show_left_side = false
         end
-        format.html { render :action => 'show' }
+        format.html { render :show }
       end
       format.json do
         json = {
@@ -600,7 +600,7 @@ class FilesController < ApplicationController
     @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
 
     unless @attachment
-      return render :template => 'shared/errors/file_not_found', :status => :bad_request
+      return render 'shared/errors/file_not_found', status: :bad_request
     end
 
     params[:id] = @attachment.id
@@ -922,7 +922,7 @@ class FilesController < ApplicationController
             render_attachment_json(@attachment, deleted_attachments, @folder)
           end
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @attachment.errors }
           format.text { render :json => @attachment.errors }
         end
@@ -960,7 +960,7 @@ class FilesController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_files_url) }
           format.json { render :json => @attachment.as_json(:methods => [:readable_size, :mime_class, :currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @attachment.errors, :status => :bad_request }
         end
       end

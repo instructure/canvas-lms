@@ -326,7 +326,7 @@ class CommunicationChannelsController < ApplicationController
         @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.by_unique_id(@pseudonym.unique_id).first
 
         # Have to either have a pseudonym to register with, or be looking at merge opportunities
-        return render :action => 'confirm_failed', :status => :bad_request if !@pseudonym && @merge_opportunities.empty?
+        return render :confirm_failed, status: :bad_request if !@pseudonym && @merge_opportunities.empty?
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
@@ -386,7 +386,7 @@ class CommunicationChannelsController < ApplicationController
     end
     if failed
       respond_to do |format|
-        format.html { render :action => "confirm_failed", :status => :bad_request }
+        format.html { render :confirm_failed, status: :bad_request }
         format.json { render :json => {}, :status => :bad_request }
       end
     else

@@ -403,7 +403,7 @@ class DiscussionTopicsController < ApplicationController
 
       append_sis_data(js_hash)
       js_env(js_hash)
-      render :action => "edit"
+      render :edit
     end
   end
 

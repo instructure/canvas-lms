@@ -390,7 +390,7 @@ class ApplicationController < ActionController::Base
         end
 
         @is_delegated = delegated_authentication_url?
-        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
+        render "shared/unauthorized", status: :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
       format.json { render_json_unauthorized }
@@ -803,7 +803,7 @@ class ApplicationController < ActionController::Base
 
   def require_reacceptance_of_terms
     if session[:require_terms] && !api_request? && request.get?
-      render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
+      render "shared/terms_required", status: :unauthorized
       false
     end
   end
@@ -1192,7 +1192,7 @@ class ApplicationController < ActionController::Base
       @module = tag.context_module
       log_asset_access(@tag, "external_urls", "external_urls")
       tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
-      render :template => 'context_modules/url_show'
+      render 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
       if @tag.context.is_a?(Assignment)
@@ -1473,7 +1473,7 @@ class ApplicationController < ActionController::Base
     return false if require_user == false
     unless @current_user.registered?
       respond_to do |format|
-        format.html { render :template => "shared/registration_incomplete", :layout => "application", :status => :unauthorized }
+        format.html { render "shared/registration_incomplete", status: :unauthorized }
         format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
       end
       return false
@@ -1576,7 +1576,7 @@ class ApplicationController < ActionController::Base
 
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
-    if options && options.key?(:json)
+    if options.is_a?(Hash) && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
         json_cast(json)

@@ -270,13 +270,13 @@ class GroupsController < ApplicationController
             # since there are generally lots of users in an account, always do large roster view
             @js_env[:IS_LARGE_ROSTER] ||= @context.is_a?(Account)
           end
-          render :action => 'context_manage_groups'
+          render :context_manage_groups
         else
           @groups = @user_groups = @groups & (@user_groups || [])
           @available_groups = (all_groups - @user_groups).select do |group|
             group.grants_right?(@current_user, :join)
           end
-          render :action => 'context_groups'
+          render :context_groups
         end
       end
 
@@ -336,7 +336,7 @@ class GroupsController < ApplicationController
           end
           @group.request_user(@current_user)
           if !@group.grants_right?(@current_user, session, :read)
-            render :action => 'membership_pending'
+            render :membership_pending
             return
           else
             flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
@@ -437,7 +437,7 @@ class GroupsController < ApplicationController
           format.html { redirect_to group_url(@group) }
           format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @group.errors, :status => :bad_request }
         end
       end
@@ -528,7 +528,7 @@ class GroupsController < ApplicationController
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
           format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @group.errors, :status => :bad_request }
         end
       end
@@ -673,9 +673,7 @@ class GroupsController < ApplicationController
     folder ||= @group.folders.active.create! :name => 'Group Pictures'
     js_env :GROUP_ID => @group.id, :FOLDER_ID => folder.id
 
-    if authorized_action(@group, @current_user, :update)
-      render :action => :edit
-    end
+    authorized_action(@group, @current_user, :update)
   end
 
   def public_feed

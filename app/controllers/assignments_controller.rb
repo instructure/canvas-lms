@@ -70,7 +70,7 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         format.html do
           @padless = true
-          render :action => :new_index
+          render :new_index
         end
       end
     end
@@ -159,7 +159,7 @@ class AssignmentsController < ApplicationController
           tag_type = params[:module_item_id].present? ? :modules : :assignments
           format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
         else
-          format.html { render :action => 'show' }
+          format.html { render }
         end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
@@ -339,7 +339,7 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end
@@ -417,7 +417,7 @@ class AssignmentsController < ApplicationController
       append_sis_data(hash)
       js_env(hash)
       @padless = true
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -460,7 +460,7 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
           format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end

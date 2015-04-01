@@ -32,7 +32,7 @@ class PseudonymSessionsController < ApplicationController
 
     if params[:needs_cookies] == '1'
       @needs_cookies = true
-      return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
+      return render 'shared/unauthorized', :layout => 'application', :status => :unauthorized
     end
 
     session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
@@ -132,10 +132,10 @@ class PseudonymSessionsController < ApplicationController
         :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
         :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
       )
-      render :template => 'pseudonym_sessions/mobile_login', :layout => 'mobile_auth', :status => status
+      render :mobile_login, :layout => 'mobile_auth', :status => status
     else
       @request = request
-      render :action => 'new', :status => status
+      render :new, :status => status
     end
   end
 
@@ -516,7 +516,7 @@ class PseudonymSessionsController < ApplicationController
     else
       @message = 'SAML Logout request requires a SAMLResponse parameter on a SAML enabled account.'
       respond_to do |format|
-        format.html { render :template => 'shared/errors/400_message', :status => :bad_request }
+        format.html { render 'shared/errors/400_message', :status => :bad_request }
         format.json { render :json => { message: @message }, :status => :bad_request }
       end
     end
@@ -572,7 +572,7 @@ class PseudonymSessionsController < ApplicationController
       @cc.try(:send_later_if_production_enqueue_args, :send_otp!, { :priority => Delayed::HIGH_PRIORITY, :max_attempts => 1 }, ROTP::TOTP.new(secret_key).now)
     end
 
-    return render :action => 'otp_login' unless params[:otp_login].try(:[], :verification_code)
+    return render :otp_login unless params[:otp_login].try(:[], :verification_code)
 
     verification_code = params[:otp_login][:verification_code]
     if Canvas.redis_enabled?

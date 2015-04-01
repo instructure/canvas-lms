@@ -1539,7 +1539,7 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
     elsif @context.indexed
-      render :template => "courses/description"
+      render :description
     else
       # clear notices that would have been displayed as a result of processing
       # an enrollment invitation, since we're giving an error
@@ -2010,7 +2010,7 @@ class CoursesController < ApplicationController
         render_update_success
       else
         respond_to do |format|
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @course.errors, :status => :bad_request }
         end
       end

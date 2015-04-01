@@ -1407,7 +1407,7 @@ class UsersController < ApplicationController
             render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
               @current_user.pseudonym.account) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @user.errors, :status => :bad_request }
         end
       end
@@ -1487,7 +1487,7 @@ class UsersController < ApplicationController
         end
       end
 
-      render action: 'admin_merge'
+      render :admin_merge
     end
   end
 

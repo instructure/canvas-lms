@@ -390,7 +390,7 @@ class FoldersController < ApplicationController
             format.json { render :json => @folder.as_json(:methods => [:currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
           end
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @folder.errors, :status => :bad_request }
         end
       end
@@ -487,7 +487,7 @@ class FoldersController < ApplicationController
             format.json { render :json => @folder.as_json(:permissions => {:user => @current_user, :session => session}) }
           end
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @folder.errors }
         end
       end

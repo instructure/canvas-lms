@@ -149,7 +149,7 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
     if !@topic.podcast_enabled && request.format == :rss
       @problem = t :disabled_podcasts_notice, "Podcasts have not been enabled for this topic."
-      render :template => "shared/unauthorized_feed", :layout => "layouts/application", :status => :bad_request, :formats => [:html] # :template => "shared/unauthorized_feed", :status => :bad_request
+      render "shared/unauthorized_feed", status: :bad_request, :formats => [:html]
       return
     end
     if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
