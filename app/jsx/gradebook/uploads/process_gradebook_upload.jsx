@@ -14,7 +14,7 @@ define(['underscore', 'i18n!gradebok_upload'], function(_, I18n) {
     var createAssignmentDfds = newAssignments.map(assignment => {
       return $.ajaxJSON(ENV.create_assignment_path, "POST", {
         assignment: {
-          name: assignment.tile,
+          name: assignment.title,
           points_possible: assignment.points_possible,
           published: true
         }
