@@ -245,6 +245,13 @@
 
     });
 
+    // On course pages, activate accordion and tab components, if they exist.
+    utils.onPage(/^\/courses\/\d+\/pages\/[A-Za-z0-9_\-+~<>]+$/, function() {
+        $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
+            $("div.accordion").accordion({header: "h3"});
+            $(".sfu-tabs").tabs();
+        });
+    });
 })(jQuery);
 
 // google analytics
