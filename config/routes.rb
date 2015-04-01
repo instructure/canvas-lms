@@ -1609,12 +1609,12 @@ CanvasRails::Application.routes.draw do
   # system, so we can't put it in the api uri namespace.
   post 'files_api' => 'files#api_create', as: :api_v1_files_create
 
-  get 'login/oauth2/auth' => 'pseudonym_sessions#oauth2_auth', as: :oauth2_auth
-  post 'login/oauth2/token' => 'pseudonym_sessions#oauth2_token', as: :oauth2_token
-  get 'login/oauth2/confirm' => 'pseudonym_sessions#oauth2_confirm', as: :oauth2_auth_confirm
-  post 'login/oauth2/accept' => 'pseudonym_sessions#oauth2_accept', as: :oauth2_auth_accept
-  get 'login/oauth2/deny' => 'pseudonym_sessions#oauth2_deny', as: :oauth2_auth_deny
-  delete 'login/oauth2/token' => 'pseudonym_sessions#oauth2_logout', as: :oauth2_logout
+  get 'login/oauth2/auth' => 'oauth2_provider#auth', as: :oauth2_auth
+  post 'login/oauth2/token' => 'oauth2_provider#token', as: :oauth2_token
+  get 'login/oauth2/confirm' => 'oauth2_provider#confirm', as: :oauth2_auth_confirm
+  post 'login/oauth2/accept' => 'oauth2_provider#accept', as: :oauth2_auth_accept
+  get 'login/oauth2/deny' => 'oauth2_provider#deny', as: :oauth2_auth_deny
+  delete 'login/oauth2/token' => 'oauth2_provider#destroy', as: :oauth2_logout
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"

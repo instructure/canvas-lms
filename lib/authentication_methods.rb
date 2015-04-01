@@ -67,7 +67,7 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_access_token
-    return unless api_request? || params[:action] == 'oauth2_logout'
+    return unless api_request? || (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy')
 
     token_string = AuthenticationMethods.access_token(request)
 
