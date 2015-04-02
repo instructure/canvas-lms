@@ -1,1 +1,0 @@
-GC::Profiler.enable
