@@ -44,6 +44,9 @@ define(['underscore', 'i18n!gradebok_upload'], function(_, I18n) {
       student.submissions.forEach(submission => {
         var assignmentId = newAssignmentIds[submission.assignment_id] ||
                            submission.assignment_id;
+
+        if (assignmentId <= 0) return; // unrecognized and ignored assignments
+
         bulkGradeData[assignmentId] = bulkGradeData[assignmentId] || {};
         bulkGradeData[assignmentId][userId] = {posted_grade: submission.grade};
       });
