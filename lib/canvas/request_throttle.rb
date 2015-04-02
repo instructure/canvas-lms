@@ -48,11 +48,13 @@ class RequestThrottle
     # up when using certain servers until fullpath is called once to set env['REQUEST_URI']
     request.fullpath
 
-    result = nil
+    status, headers, response = nil
+    throttled = false
     bucket = LeakyBucket.new(client_identifier(request))
 
-    bucket.reserve_capacity do
-      result = if !allowed?(request, bucket)
+    cost = bucket.reserve_capacity do
+      status, headers, response = if !allowed?(request, bucket)
+        throttled = true
         rate_limit_exceeded
       else
         @app.call(env)
@@ -72,12 +74,18 @@ class RequestThrottle
       cost = user_cpu + db_runtime
       cost
     end
+    headers['X-Request-Cost'] = cost.to_s unless throttled
+    headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s if subject_to_throttling?(request)
 
-    result
+    [status, headers, response]
+  end
+
+  def subject_to_throttling?(request)
+    self.class.enabled? && Canvas.redis_enabled? && !whitelisted?(request) && !blacklisted?(request)
   end
 
   def allowed?(request, bucket)
-    if Setting.get("request_throttle.skip", "false") == "true"
+    unless self.class.enabled?
       return true
     end
 
@@ -145,6 +153,10 @@ class RequestThrottle
 
   def self.reload!
     @whitelist = @blacklist = nil
+  end
+
+  def self.enabled?
+    Setting.get("request_throttle.skip", "false") != 'true'
   end
 
   def self.list_from_setting(key)
@@ -242,6 +254,10 @@ class RequestThrottle
 
     def full?
       count >= hwm
+    end
+
+    def remaining
+      hwm - count
     end
 
     # This is where we both leak and then increment by the given cost amount,
