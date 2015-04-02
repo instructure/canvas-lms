@@ -59,6 +59,7 @@ Get your database set up and assets built:
 
 ```
 $ docker-compose run --rm web bundle exec rake db:create
+$ docker-compose run --rm web bundle exec rake db:initial_setup
 $ docker-compose run --rm web bundle exec rake canvas:compile_assets
 $ docker-compose up
 ```
