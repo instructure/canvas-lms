@@ -22,6 +22,7 @@ describe GradingPeriodsController, type: :request do
   context "A grading period is associated with an account." do
     before :once do
       @account = Account.default
+      @account.enable_feature!(:multiple_grading_periods)
       account_admin_user(account: @account)
       user_session(@admin)
       grading_periods count: 3, context: @account
