@@ -68,6 +68,10 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
+  def is_closed?
+    Time.now > end_date
+  end
+
   private
 
   def last?

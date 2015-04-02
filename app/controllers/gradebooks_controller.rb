@@ -194,7 +194,10 @@ class GradebooksController < ApplicationController
   end
 
   def get_active_grading_periods
-    GradingPeriod.for(@context).map { |gp| {id: gp.id, title: gp.title} }
+    GradingPeriod.for(@context).map do |gp|
+      json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: @current_user})
+      json[:grading_period]
+    end
   end
 
   def set_js_env

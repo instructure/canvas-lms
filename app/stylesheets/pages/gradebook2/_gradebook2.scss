@@ -419,6 +419,10 @@ $cell_height: 33px;
     width: 25px;
     height: 25px;
   }
+
+  .slick-cell.cannot_edit & {
+    display: none;
+  }
 }
 
 .gradebook-cell-comment-label {
