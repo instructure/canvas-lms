@@ -22,10 +22,13 @@ require 'csv'
 
 describe GradebookImporter do
   context "construction" do
-
     it "should require a context, usually a course" do
+      course = course_model
+      user = user_model
+      progress = Progress.create!(tag: "test", context: @user)
+
       expect{GradebookImporter.new(1)}.to raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
-      expect{GradebookImporter.new(course_model, valid_gradebook_contents)}.not_to raise_error
+      expect{GradebookImporter.new(course, valid_gradebook_contents, user, progress)}.not_to raise_error
     end
 
     it "should store the context and make it available" do
@@ -67,6 +70,12 @@ describe GradebookImporter do
       expect(@gi.assignments.length).to eq 1
       expect(@gi.assignments.first.points_possible).to eq 10
       expect(@gi.students.length).to eq 2
+    end
+
+    it "creates a GradebookUpload" do
+      course_model
+      new_gradebook_importer
+      expect(GradebookUpload.where(course_id: @course, user_id: @user)).not_to be_empty
     end
   end
 
@@ -376,7 +385,10 @@ describe GradebookImporter do
 end
 
 def new_gradebook_importer(contents = valid_gradebook_contents)
-  @gi = GradebookImporter.new(@course, contents)
+  @user = user_model
+  @progress = Progress.create!(tag: "test", context: @user)
+
+  @gi = GradebookImporter.new(@course, contents, @user, @progress)
   @gi.parse!
   @gi
 end

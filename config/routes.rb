@@ -204,7 +204,9 @@ CanvasRails::Application.routes.draw do
     get 'imports/list' => 'content_imports#index', as: :import_list
     # DEPRECATED
     get 'imports' => 'content_imports#intro'
-    resource :gradebook_upload
+    resource :gradebook_upload do
+      get 'data' => 'gradebook_uploads#data'
+    end
     get 'grades' => 'gradebooks#grade_summary', id: nil
     get 'grading_rubrics' => 'gradebooks#grading_rubrics'
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades

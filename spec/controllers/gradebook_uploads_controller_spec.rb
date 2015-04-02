@@ -32,15 +32,18 @@ describe GradebookUploadsController do
     @course.reload
   end
 
-  def check_create_response(include_sis_id=false)
+  def generate_file(include_sis_id)
     file = Tempfile.new("csv.csv")
     file.puts(@course.gradebook_to_csv(:include_sis_id => include_sis_id))
     file.close
+    file
+  end
+
+  def check_create_response(include_sis_id=false)
+    file = generate_file(include_sis_id)
     data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
     post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
     expect(response).to be_success
-    upload = assigns[:uploaded_gradebook]
-    expect(upload).not_to be_nil
   end
 
   def setup_DA
@@ -74,16 +77,6 @@ describe GradebookUploadsController do
       assert_unauthorized
     end
 
-    it "should redirect on failed csvs" do
-      user_session(@teacher)
-      file = Tempfile.new("csv.csv")
-      file.puts("not a good csv")
-      file.close
-      data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
-      post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
-      expect(response).to be_redirect
-    end
-
     it "should accept a valid csv upload" do
       user_session(@teacher)
       check_create_response
@@ -101,6 +94,35 @@ describe GradebookUploadsController do
       @course.grading_standard_id = 0
       @course.save!
       check_create_response(true)
+    end
+  end
+
+  describe "GET 'data'" do
+    it "requires authorization" do
+      get 'data', course_id: @course.id
+      assert_unauthorized
+    end
+
+    it "retrieves an uploaded gradebook" do
+      user_session(@teacher)
+      progress = Progress.create!(tag: "test", context: @teacher)
+
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: {foo: 'bar'}
+      @gb_upload.save
+
+      get 'data', course_id: @course.id
+      expect(response).to be_success
+      expect(response.body).to eq("while(1);{\"foo\":\"bar\"}")
+    end
+
+    it "destroys an uploaded gradebook after retrieval" do
+      user_session(@teacher)
+      progress = Progress.create!(tag: "test", context: @teacher)
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: {foo: 'bar'}
+      @gb_upload.save
+      get 'data', course_id: @course.id
+      expect { GradebookUpload.find(@gb_upload.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(response).to be_success
     end
   end
 end

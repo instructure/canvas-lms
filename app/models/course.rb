@@ -193,7 +193,6 @@ class Course < ActiveRecord::Base
   has_many :external_feeds, :as => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
-  has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy

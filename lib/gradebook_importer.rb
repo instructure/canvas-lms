@@ -36,11 +36,21 @@ class GradebookImporter
   end
 
   attr_reader :context, :contents, :assignments, :students, :submissions, :missing_assignments, :missing_students
-  def initialize(context=nil, contents=nil)
+
+  def self.create_from(progress, course, user, attachment)
+    uploaded_gradebook = new(course, attachment, user, progress)
+    uploaded_gradebook.parse!
+  end
+
+  def initialize(context=nil, csv=nil, user=nil, progress=nil)
     raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(context)
-    raise ArgumentError, "Must provide CSV contents." unless contents
+    raise ArgumentError, "Must provide CSV contents." unless csv
     @context = context
-    @contents = contents
+    @user = user
+    @contents = csv
+    @progress = progress
+
+    @upload = GradebookUpload.new course: @context, user: @user, progress: @progress
 
     if @context.feature_enabled?(:differentiated_assignments)
       @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: @context.all_students.pluck(:id))
@@ -133,6 +143,9 @@ class GradebookImporter
     @students.delete_if { |s| prior_enrollment_ids.include? s.id }
 
     @original_submissions = [] unless @missing_student || @missing_assignment
+
+    @upload.gradebook = self.as_json
+    @upload.save!
   end
 
   def process_header(row)

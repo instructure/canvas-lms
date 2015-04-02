@@ -2,9 +2,8 @@ define [
   'ember'
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
-  'compiled/gradebook2/UploadDialog'
   'compiled/SubmissionDetailsDialog'
-], (Ember, GradebookHeaderMenu, AssignmentGroupWeightsDialog,  UploadDialog, SubmissionDetailsDialog) ->
+], (Ember, GradebookHeaderMenu, AssignmentGroupWeightsDialog, SubmissionDetailsDialog) ->
 
   AssignmentsView = Ember.View.extend
     templateName: 'assignments'
@@ -34,7 +33,6 @@ define [
           change_grade_url: ENV.GRADEBOOK_OPTIONS.change_grade_url
 
         dialogs =
-          'upload': UploadDialog::init
           'assignment_details': GradebookHeaderMenu::showAssignmentDetails
           'message_students': GradebookHeaderMenu::messageStudentsWho
           'set_default_grade': GradebookHeaderMenu::setDefaultGrade
