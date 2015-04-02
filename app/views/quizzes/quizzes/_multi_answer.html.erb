@@ -1,6 +1,7 @@
 <% answer = multi_answer %>
 <% question ||= {} %>
 <% answer_text = (hash_get(answer, :html).present? ? hash_get(answer, :html).html_safe : hash_get(answer, :text)) || '' %>
+<% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
 <div class="answer">
   <% if question_type.entry_type == "radio" || question_type.entry_type == "select" || question_type.entry_type == "checkbox" %>
     <table>
