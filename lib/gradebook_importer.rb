@@ -52,7 +52,7 @@ class GradebookImporter
   def parse!
     @student_columns = 3 # name, user id, section
     # preload a ton of data that presumably we'll be querying
-    @all_assignments = @context.assignments.active.gradeable.select([:id, :title, :points_possible, :grading_type]).index_by(&:id)
+    @all_assignments = @context.assignments.published.gradeable.select([:id, :title, :points_possible, :grading_type]).index_by(&:id)
     @all_students = @context.all_students.select(['users.id', :name, :sortable_name]).index_by(&:id)
 
     csv = CSV.new(self.contents, :converters => :nil)
