@@ -20,15 +20,14 @@ define([
   'jquery',
   'underscore',
   'str/htmlEscape',
+  'jsx/gradebook/uploads/wait_for_processing',
   'jsx/gradebook/uploads/process_gradebook_upload',
   'vendor/slickgrid',
   'vendor/slickgrid/slick.editors',
   'jquery.instructure_forms' /* errorBox */,
   'jquery.instructure_misc_helpers' /* /\.detect/ */,
   'jquery.templateData' /* fillTemplateData */
-], function(I18n, $, _, htmlEscape, processGradebookUpload, SlickGrid) {
-
-  var uploadedGradebook = ENV.uploaded_gradebook;
+], function(I18n, $, _, htmlEscape, waitForProcessing, processGradebookUpload, SlickGrid) {
 
   var GradebookUploader = {
     createGeneralFormatter: function (attribute) {
@@ -37,7 +36,7 @@ define([
       }
     },
 
-    init:function(){
+    init:function(uploadedGradebook){
       var gradebookGrid,
           $gradebook_grid = $("#gradebook_grid"),
           $gradebook_grid_header = $("#gradebook_grid_header"),
@@ -185,167 +184,175 @@ define([
     },
 
     handleThingsNeedingToBeResolved: function(){
-      var needingReview = {},
-          possibilitiesToMergeWith = {};
-
-      // first, figure out if there is anything that needs to be resolved
-      $.each(["student", "assignment"], function(i, thing){
-        var $template = $("#" + thing + "_resolution_template").remove(),
-            $select   = $template.find("select");
-
-        needingReview[thing] = [];
-
-        $.each(uploadedGradebook[thing+"s"], function(){
-          if (!this.previous_id) {
-            needingReview[thing].push(this);
-          }
-        });
-
-        if (needingReview[thing].length) {
-          $select.change(function(){
-            $(this).next(".points_possible_section").css({opacity: 0});
-            if($(this).val() > 0) {  //if the thing that was selected is an id( not ignore or add )
-              $("#" + thing + "_resolution_template select option").removeAttr("disabled");
-              $("#" + thing + "_resolution_template select").each(function(){
-                 if($(this).val() != "ignore" ) {
-                 	$("#" + thing + "_resolution_template select").not(this).find("option[value='" + $(this).val() + "']").attr("disabled", true);
-                 }
-              });
-            }
-            else if ( $(this).val() === "new" ) {
-              $(this).next(".points_possible_section").css({opacity: 1});
-            }
-          });
-
-          $.each(uploadedGradebook.missing_objects[thing + 's'], function() {
-            $('<option value="' + this.id + '" >' + htmlEscape(this.name || this.title) + '</option>').appendTo($select);
-          });
-
-          $.each(needingReview[thing], function(i, record){
-            $template
-              .clone(true)
-              .fillTemplateData({
-                iterator: record.id,
-                data: {
-                  name: record.name,
-                  title: record.title,
-                  points_possible: record.points_possible
-                }
-              })
-              .appendTo("#gradebook_importer_resolution_section ." + thing + "_section table tbody")
-              .show()
-              .find("input.points_possible")
-              .change(function(){
-                record.points_possible = $(this).val();
-              });
-          });
-          $("#gradebook_importer_resolution_section, #gradebook_importer_resolution_section ." + thing + "_section").show();
-        }
-
+      var processingDfd = waitForProcessing(ENV.progress);
+      processingDfd.fail(function(msg) {
+        alert(msg);
+        window.location = ENV.new_gradebook_upload_path;
       });
-  // end figuring out if thigs need to be resolved
+      processingDfd.done(function(uploadedGradebook) {
+        var needingReview = {},
+            possibilitiesToMergeWith = {};
 
-      if ( needingReview.student.length || needingReview.assignment.length ) {
-        // if there are things that need to be resolved, set up stuff for that form
-        $("#gradebook_importer_resolution_section").submit(function(e){
-          var returnFalse = false;
-          e.preventDefault();
+        // first, figure out if there is anything that needs to be resolved
+        $.each(["student", "assignment"], function(i, thing){
+          var $template = $("#" + thing + "_resolution_template").remove(),
+              $select   = $template.find("select");
 
-          $(this).find("select").each(function(){
-            if( !$(this).val() ) {
-              returnFalse = true;
-              $(this).errorBox(I18n.t('errors.select_an_option', "Please select an option"));
-              return false;
+          needingReview[thing] = [];
+
+          $.each(uploadedGradebook[thing+"s"], function(){
+            if (!this.previous_id) {
+              needingReview[thing].push(this);
             }
           });
-          if(returnFalse) return false;
 
-          $(this).find("select").each(function(){
-            var $select = $(this),
-                parts = $select.attr("name").split("_"),
-                thing = parts[0],
-                id = parts[1],
-                val = $select.val();
-
-            switch(val){
-            case "new":
-              //do nothing
-              break;
-            case "ignore":
-              //remove the entry from the uploaded gradebook
-              for (var i in uploadedGradebook[thing+"s"]) {
-                if (id == uploadedGradebook[thing+"s"][i].id) {
-                  uploadedGradebook[thing+"s"].splice(i, 1);
-                  break;
-                }
-              }
-              break;
-            default:
-              //merge
-              var obj = _.detect(uploadedGradebook[thing+"s"], function(thng){
-                return id == thng.id;
-              });
-              obj.id = obj.previous_id = val;
-              if (thing === 'assignment') {
-                // find the original grade for this assignment for each student
-                $.each(uploadedGradebook['students'], function() {
-                  var student = this;
-                  var submission = _.detect(student.submissions, function(thng) {
-                    return thng.assignment_id == id;
-                  });
-                  submission.assignment_id = val;
-                  var original_submission = _.detect(uploadedGradebook.original_submissions, function(sub) {
-                    return sub.user_id == student.id && sub.assignment_id == val;
-                  });
-                  if (original_submission) {
-                    submission.original_grade = original_submission.score;
-                  }
-                });
-              } else if (thing === 'student') {
-                // find the original grade for each assignment for this student
-                $.each(obj.submissions, function() {
-                  var submission = this;
-                  var original_submission = _.detect(uploadedGradebook.original_submissions, function(sub) {
-                    return sub.user_id == obj.id && sub.assignment_id == submission.assignment_id;
-                  });
-                  if (original_submission) {
-                    submission.original_grade = original_submission.score;
-                  }
+          if (needingReview[thing].length) {
+            $select.change(function(){
+              $(this).next(".points_possible_section").css({opacity: 0});
+              if($(this).val() > 0) {  //if the thing that was selected is an id( not ignore or add )
+                $("#" + thing + "_resolution_template select option").removeAttr("disabled");
+                $("#" + thing + "_resolution_template select").each(function(){
+                   if($(this).val() != "ignore" ) {
+                    $("#" + thing + "_resolution_template select").not(this).find("option[value='" + $(this).val() + "']").attr("disabled", true);
+                   }
                 });
               }
-            }
-          });
-
-          // remove assignments that have no changes
-          var indexes_to_delete = [];
-          $.each(uploadedGradebook.assignments, function(index){
-            if(uploadedGradebook.assignments[index].previous_id && _.all(uploadedGradebook.students, function(student){
-              var submission = student.submissions[index];
-              return submission.original_grade == submission.grade || (!submission.original_grade && !submission.grade);
-            })) {
-              indexes_to_delete.push(index);
-            }
-          });
-          _.each(indexes_to_delete.reverse(), function(index) {
-            uploadedGradebook.assignments.splice(index, 1);
-            $.each(uploadedGradebook.students, function() {
-              this.submissions.splice(index, 1);
+              else if ( $(this).val() === "new" ) {
+                $(this).next(".points_possible_section").css({opacity: 1});
+              }
             });
-          });
-          if (indexes_to_delete.length != 0) {
-            uploadedGradebook.unchanged_assignments = true;
+
+            $.each(uploadedGradebook.missing_objects[thing + 's'], function() {
+              $('<option value="' + this.id + '" >' + htmlEscape(this.name || this.title) + '</option>').appendTo($select);
+            });
+
+            $.each(needingReview[thing], function(i, record){
+              $template
+                .clone(true)
+                .fillTemplateData({
+                  iterator: record.id,
+                  data: {
+                    name: record.name,
+                    title: record.title,
+                    points_possible: record.points_possible
+                  }
+                })
+                .appendTo("#gradebook_importer_resolution_section ." + thing + "_section table tbody")
+                .show()
+                .find("input.points_possible")
+                .change(function(){
+                  record.points_possible = $(this).val();
+                });
+            });
+            $("#gradebook_importer_resolution_section, #gradebook_importer_resolution_section ." + thing + "_section").show();
           }
 
-          $(this).hide();
-          GradebookUploader.init();
-
         });
-      }
-      else {
-        // if there is nothing that needs to resolved, just skip to initialize slick grid.
-        GradebookUploader.init();
-      }
+    // end figuring out if thigs need to be resolved
+
+        if ( needingReview.student.length || needingReview.assignment.length ) {
+          // if there are things that need to be resolved, set up stuff for that form
+          $("#gradebook_importer_resolution_section").submit(function(e){
+            var returnFalse = false;
+            e.preventDefault();
+
+            $(this).find("select").each(function(){
+              if( !$(this).val() ) {
+                returnFalse = true;
+                $(this).errorBox(I18n.t('errors.select_an_option', "Please select an option"));
+                return false;
+              }
+            });
+            if(returnFalse) return false;
+
+            $(this).find("select").each(function(){
+              var $select = $(this),
+                  parts = $select.attr("name").split("_"),
+                  thing = parts[0],
+                  id = parts[1],
+                  val = $select.val();
+
+              switch(val){
+              case "new":
+                //do nothing
+                break;
+              case "ignore":
+                //remove the entry from the uploaded gradebook
+                for (var i in uploadedGradebook[thing+"s"]) {
+                  if (id == uploadedGradebook[thing+"s"][i].id) {
+                    uploadedGradebook[thing+"s"].splice(i, 1);
+                    break;
+                  }
+                }
+                break;
+              default:
+                //merge
+                var obj = _.detect(uploadedGradebook[thing+"s"], function(thng){
+                  return id == thng.id;
+                });
+                obj.id = obj.previous_id = val;
+                if (thing === 'assignment') {
+                  // find the original grade for this assignment for each student
+                  $.each(uploadedGradebook['students'], function() {
+                    var student = this;
+                    var submission = _.detect(student.submissions, function(thng) {
+                      return thng.assignment_id == id;
+                    });
+                    submission.assignment_id = val;
+                    var original_submission = _.detect(uploadedGradebook.original_submissions, function(sub) {
+                      return sub.user_id == student.id && sub.assignment_id == val;
+                    });
+                    if (original_submission) {
+                      submission.original_grade = original_submission.score;
+                    }
+                  });
+                } else if (thing === 'student') {
+                  // find the original grade for each assignment for this student
+                  $.each(obj.submissions, function() {
+                    var submission = this;
+                    var original_submission = _.detect(uploadedGradebook.original_submissions, function(sub) {
+                      return sub.user_id == obj.id && sub.assignment_id == submission.assignment_id;
+                    });
+                    if (original_submission) {
+                      submission.original_grade = original_submission.score;
+                    }
+                  });
+                }
+              }
+            });
+
+            // remove assignments that have no changes
+            var indexes_to_delete = [];
+            $.each(uploadedGradebook.assignments, function(index){
+              if(uploadedGradebook.assignments[index].previous_id && _.all(uploadedGradebook.students, function(student){
+                var submission = student.submissions[index];
+                return submission.original_grade == submission.grade || (!submission.original_grade && !submission.grade);
+              })) {
+                indexes_to_delete.push(index);
+              }
+            });
+            _.each(indexes_to_delete.reverse(), function(index) {
+              uploadedGradebook.assignments.splice(index, 1);
+              $.each(uploadedGradebook.students, function() {
+                this.submissions.splice(index, 1);
+              });
+            });
+            if (indexes_to_delete.length != 0) {
+              uploadedGradebook.unchanged_assignments = true;
+            }
+
+            $(this).hide();
+            GradebookUploader.init(uploadedGradebook);
+
+          });
+        }
+        else {
+          // if there is nothing that needs to resolved, just skip to initialize slick grid.
+          GradebookUploader.init(uploadedGradebook);
+        }
+      });
     }
   };
+
   return GradebookUploader;
 });

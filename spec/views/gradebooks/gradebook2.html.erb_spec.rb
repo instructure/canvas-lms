@@ -28,7 +28,7 @@ describe "/gradebooks/gradebook2" do
     assigns[:assignments] = [a]
     assigns[:students] = [@user]
     assigns[:submissions] = []
-    assigns[:gradebook_upload] = @course.build_gradebook_upload
+    assigns[:gradebook_upload] = ''
     assigns[:body_classes] = []
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
     @course.expects(:grants_any_right?).returns(permissions_allow) if course_allows
@@ -61,7 +61,7 @@ describe "/gradebooks/gradebook2" do
       assigns[:assignments] = []
       assigns[:students] = []
       assigns[:submissions] = []
-      assigns[:gradebook_upload] = @course.build_gradebook_upload
+      assigns[:gradebook_upload] = ''
       assigns[:body_classes] = []
     end
 

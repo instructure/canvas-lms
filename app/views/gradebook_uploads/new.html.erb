@@ -1,2 +1,17 @@
 <% content_for :page_title do %><%= join_title t('titles.new_upload', "Upload Gradebook"), @context.name %><% end %>
-<%= render :partial => 'form' %>
+
+<%= form_for [@context, GradebookUpload.new], html: {multipart: true, title: t("Choose a CSV file to upload:")} do |f| %>
+  <p aria-hidden="true">
+    <a class="icon-question"
+      target="_blank"
+      href="http://guides.instructure.com/m/4152/l/55013-how-do-i-upload-changes-to-the-gradebook">
+      <%= t "What should the CSV file look like?" %>
+    </a>
+  </p>
+  <p style="font-size: 1.2em;">
+    <%= f.label :uploaded_data, t("Choose a CSV file to upload:") %>
+    <%= f.file_field :uploaded_data %>
+  </p>
+
+  <%= f.submit t("Upload Data"), class: "btn btn-primary" %>
+<% end %>

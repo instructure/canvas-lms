@@ -1,5 +1,0 @@
-<%= form_for(@gradebook_upload || @context.build_gradebook_upload, :url => context_url(@context, :context_gradebook_uploads_url), :html => {:multipart => true, :id => "upload_modal", :title => t('titles.upload_form', "Choose a CSV file to upload")}) do |f| %>
-  <%= f.error_messages %>
-  <%= f.label :uploaded_data, t('labels.upload', "Choose a CSV file to upload") %>
-  <%= f.file_field :uploaded_data %>
-<% end %>

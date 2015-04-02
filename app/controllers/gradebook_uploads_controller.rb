@@ -18,47 +18,75 @@
 
 class GradebookUploadsController < ApplicationController
   include GradebooksHelper
+  include Api::V1::Progress
 
   before_filter :require_context
 
+  def gradebook_upload
+    GradebookUpload.where(
+      course_id: @context,
+      user_id: @current_user
+    ).first
+  end
+
   def new
     if authorized_action(@context, @current_user, :manage_grades)
-      @gradebook_upload = @context.build_gradebook_upload
+
+      # GradebookUpload is a singleton.  If there is
+      # already an instance we'll redirect to it or kill it
+      if previous_upload = gradebook_upload
+        if previous_upload.stale?
+          previous_upload.destroy
+        elsif previous_upload
+          # let them continue on with their old upload
+          redirect_to course_gradebook_upload_path(@context)
+          return
+        end
+      end
+    end
+  end
+
+  def show
+    if authorized_action(@context, @current_user, :manage_grades)
+
+      upload = gradebook_upload
+      unless upload
+        redirect_to new_course_gradebook_upload_path(@context)
+        return
+      end
+
+      @progress = upload.progress
+      js_env gradebook_env(@progress)
     end
   end
 
   def create
     if authorized_action(@context, @current_user, :manage_grades)
-      if params[:gradebook_upload] &&
-       (@attachment = params[:gradebook_upload][:uploaded_data]) &&
-       (@attachment_contents = @attachment.read)
-
-        @uploaded_gradebook = GradebookImporter.new(@context, @attachment_contents)
-        errored_csv = false
-        begin
-          @uploaded_gradebook.parse!
-        rescue => e
-          logger.warn "Error importing gradebook: #{e.inspect}"
-          errored_csv = true
-        end
-        respond_to do |format|
-          if errored_csv
-            flash[:error] = t('errors.invalid_file', "Invalid csv file, grades could not be updated")
-            format.html { redirect_to polymorphic_url([@context, 'gradebook']) }
-          else
-            js_env uploaded_gradebook: @uploaded_gradebook,
-              gradebook_path: course_gradebook_path(@context),
-              bulk_update_path: "/api/v1/courses/#{@context.id}/submissions/update_grades",
-              create_assignment_path: api_v1_course_assignments_path(@context)
-            format.html { render :show }
-          end
-        end
-      else
-        respond_to do |format|
-          flash[:error] = t('errors.upload_failed', 'File could not be uploaded.')
-          format.html { redirect_to polymorphic_url([@context, 'gradebook']) }
-        end
-      end
+      attachment = params[:gradebook_upload][:uploaded_data]
+      @progress = GradebookUpload.queue_from(@context, @current_user, attachment.read)
+      js_env gradebook_env(@progress)
+      render :show
     end
+  end
+
+  def data
+    if authorized_action(@context, @current_user, :manage_grades)
+      upload = gradebook_upload
+      raise ActiveRecord::RecordNotFound unless upload
+
+      render json: upload.gradebook
+      upload.destroy
+    end
+  end
+
+  def gradebook_env(progress)
+    {
+      progress: progress_json(progress, @current_user, session),
+      uploaded_gradebook_data_path: "/courses/#{@context.id}/gradebook_upload/data",
+      gradebook_path: course_gradebook_path(@context),
+      bulk_update_path: "/api/v1/courses/#{@context.id}/submissions/update_grades",
+      create_assignment_path: api_v1_course_assignments_path(@context),
+      new_gradebook_upload_path: new_course_gradebook_upload_path(@context),
+    }
   end
 end

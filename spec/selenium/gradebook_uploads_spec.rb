@@ -10,7 +10,7 @@ describe "gradebook uploads" do
 
     get "/courses/#{@course.id}/gradebook_uploads/new"
     @upload_element = f('#gradebook_upload_uploaded_data')
-    @upload_form = f('#upload_modal')
+    @upload_form = f('#new_gradebook_upload')
   end
 
   def gradebook_file(filename, *rows)
@@ -36,6 +36,9 @@ describe "gradebook uploads" do
       "User,#{@student.id},,B-")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    run_jobs
+    wait_for_ajaximations
+    keep_trying_until { !f("#spinner").displayed? }
     submit_form('#gradebook_grid_form')
     driver.switch_to.alert.accept
     wait_for_ajaximations
@@ -52,9 +55,10 @@ describe "gradebook uploads" do
           "User,#{@student.id},,10")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
 
-    expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
-    expect(f('#no_changes_detected')).to be_displayed
+  expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
   end
 
   it "should show only changed assignment" do
@@ -68,6 +72,8 @@ describe "gradebook uploads" do
           "User,#{@student.id},,10,9")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
 
     expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
     expect(f('#no_changes_detected')).not_to be_displayed
@@ -82,7 +88,10 @@ describe "gradebook uploads" do
       "User,#{@student.id},,0")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
 
+    keep_trying_until { !f("#spinner").displayed? }
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -117,7 +126,10 @@ describe "gradebook uploads" do
           "User,#{@student.id},,10")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
 
+    keep_trying_until { !f("#spinner").displayed? }
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -141,7 +153,10 @@ describe "gradebook uploads" do
           "User,#{@student.id},,10,9")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
 
+    keep_trying_until { !f("#spinner").displayed? }
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -151,6 +166,7 @@ describe "gradebook uploads" do
 
     submit_form('#gradebook_importer_resolution_section')
 
+    keep_trying_until { !f("#spinner").displayed? }
     expect(f('#no_changes_detected')).not_to be_displayed
 
     expect(ff('.slick-header-column.assignment').length).to eq 1
@@ -166,7 +182,10 @@ describe "gradebook uploads" do
           "Student,,,10")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
 
+    keep_trying_until { !f("#spinner").displayed? }
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.student_section #student_resolution_template').length).to eq 1
@@ -190,7 +209,10 @@ describe "gradebook uploads" do
           "Student,,,10,9")
     @upload_element.send_keys(fullpath)
     @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
 
+    keep_trying_until { !f("#spinner").displayed? }
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.student_section #student_resolution_template').length).to eq 1
@@ -216,8 +238,9 @@ describe "gradebook uploads" do
 
     @upload_element.send_keys(fullpath)
     @upload_form.submit
-
-    wait_for_js
+    wait_for_ajaximations
+    run_jobs
+    keep_trying_until { !f("#spinner").displayed? }
 
     assert_assignment_is_highlighted
   end
@@ -232,8 +255,9 @@ describe "gradebook uploads" do
 
     @upload_element.send_keys(fullpath)
     @upload_form.submit
-
-    wait_for_js
+    wait_for_ajaximations
+    run_jobs
+    keep_trying_until { !f("#spinner").displayed? }
 
     assert_assignment_is_highlighted
   end
@@ -248,8 +272,9 @@ describe "gradebook uploads" do
 
     @upload_element.send_keys(fullpath)
     @upload_form.submit
-
-    wait_for_js
+    wait_for_ajaximations
+    run_jobs
+    keep_trying_until { !f("#spinner").displayed? }
 
     assert_assignment_is_not_highlighted
   end
