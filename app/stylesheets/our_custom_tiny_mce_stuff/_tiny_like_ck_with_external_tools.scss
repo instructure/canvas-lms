@@ -2,4 +2,8 @@
   .mce-container-body {
     overflow: auto;
   }
+
+  :focus {
+    outline: dotted 1px;
+  }
 }
