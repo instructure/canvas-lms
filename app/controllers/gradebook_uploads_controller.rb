@@ -49,7 +49,7 @@ class GradebookUploadsController < ApplicationController
               gradebook_path: course_gradebook_path(@context),
               bulk_update_path: "/api/v1/courses/#{@context.id}/submissions/update_grades",
               create_assignment_path: api_v1_course_assignments_path(@context)
-            format.html { render :show }
+            format.html { render :action => "show" }
           end
         end
       else
