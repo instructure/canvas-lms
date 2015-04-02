@@ -51,6 +51,7 @@ define [
             submissions = (datum.submission for datum in data)
             $.publish 'submissions_updated', [submissions]
             alert I18n.t("alerts.scores_updated", { one: "1 Student score updated", other: "%{count} Student scores updated"}, count: data.length)
+            $("#set_default_grade").focus()
         .dialog
           width: 350
           modal: true
