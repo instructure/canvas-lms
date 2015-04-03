@@ -453,6 +453,9 @@ class Folder < ActiveRecord::Base
     given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
+    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :read_contents
+
     given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
     can :read_contents
 

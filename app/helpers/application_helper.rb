@@ -155,7 +155,7 @@ module ApplicationHelper
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
     @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).limit(150) if @context.respond_to?(:wiki)
     @wiki_sidebar_data[:wiki_pages] ||= []
-    if can_do(@context, @current_user, :manage_files)
+    if can_do(@context, @current_user, :manage_files, :read_as_admin)
       @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
     elsif @context.is_a?(Course) && !@context.tab_hidden?(Course::TAB_FILES)
       @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context).reject{|folder| folder.locked? || folder.hidden}
