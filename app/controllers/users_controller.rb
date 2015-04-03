@@ -1065,6 +1065,14 @@ class UsersController < ApplicationController
   #   Send user notification of account creation if true.
   #   Automatically set to true during self-registration.
   #
+  # @argument pseudonym[force_self_registration] [Boolean]
+  #   Send user a self-registration style email if true.
+  #   Setting it means the users will get a notification asking them
+  #   to "complete the registration process" by clicking it, setting
+  #   a password, and letting them in.  Will only be executed on
+  #   if the user does not need admin approval.
+  #   Defaults to false unless explicitly provided.
+  #
   # @argument communication_channel[type] [String]
   #   The communication channel type, e.g. 'email' or 'sms'.
   #
@@ -1105,8 +1113,7 @@ class UsersController < ApplicationController
     require_password = self_enrollment && allow_non_email_pseudonyms
     allow_password = require_password || manage_user_logins
 
-    notify = value_to_boolean(params[:pseudonym].delete(:send_confirmation))
-    notify = :self_registration unless manage_user_logins
+    notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
 
     includes = %w{locale}
 
@@ -1156,7 +1163,7 @@ class UsersController < ApplicationController
         # no email confirmation required (self_enrollment_code and password
         # validations will ensure everything is legit)
         'registered'
-      elsif notify == :self_registration && @user.registration_approval_required?
+      elsif notify_policy.is_self_registration? && @user.registration_approval_required?
         'pending_approval'
       else
         'pre_registered'
@@ -1221,19 +1228,11 @@ class UsersController < ApplicationController
         @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
       end
 
-      message_sent = false
-      if notify == :self_registration
-        unless @user.pending_approval? || @user.registered?
-          message_sent = true
-          @pseudonym.send_confirmation!
-        end
-        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip, :cookies => cookies}))
-      elsif notify && !@user.registered?
-        message_sent = true
-        @pseudonym.send_registration_notification!
-      else
-        @cc.send_merge_notification! if @cc.has_merge_candidates?
+      if notify_policy.is_self_registration?
+        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
+        @user.new_registration(registration_params)
       end
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc)
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?

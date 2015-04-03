@@ -590,6 +590,19 @@ describe UsersController do
           expect(u.pseudonym).not_to be_password_auto_generated
         end
 
+        it "allows admins to force the self-registration workflow for a given user" do
+          Pseudonym.any_instance.expects(:send_confirmation!)
+          post 'create', account_id: account.id, 
+            pseudonym: {
+              unique_id: 'jacob@instructure.com', password: 'asdfasdf',
+              password_confirmation: 'asdfasdf', force_self_registration: "1",
+            }, user: { name: 'Jacob Fugal' }
+          expect(response).to be_success
+          u = User.where(name: 'Jacob Fugal').first
+          expect(u).to be_present
+          expect(u.pseudonym).not_to be_password_auto_generated
+        end
+
       end
 
       it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
