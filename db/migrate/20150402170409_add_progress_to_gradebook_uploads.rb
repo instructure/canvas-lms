@@ -2,9 +2,6 @@ class AddProgressToGradebookUploads < ActiveRecord::Migration
   tag :predeploy
 
   def change
-    remove_column :gradebook_uploads, :context_type
-    remove_column :gradebook_uploads, :context_id
-
     add_column :gradebook_uploads, :course_id, :integer, limit: 8, null: false
     add_column :gradebook_uploads, :user_id, :integer, limit: 8, null: false
     add_column :gradebook_uploads, :progress_id, :integer, limit: 8, null: false
