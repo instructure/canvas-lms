@@ -64,7 +64,7 @@ class GradebookUploadsController < ApplicationController
       attachment = params[:gradebook_upload][:uploaded_data]
       @progress = GradebookUpload.queue_from(@context, @current_user, attachment.read)
       js_env gradebook_env(@progress)
-      render :show
+      render :action => :show
     end
   end
 
