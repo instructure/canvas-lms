@@ -504,7 +504,7 @@ class WikiPagesApiController < ApplicationController
         @set_front_page = true
         @set_as_front_page = true
       else
-        @page.workflow_state = 'unpublished'
+        @page.workflow_state = @wiki.grants_right?(@current_user, session, :manage) ? 'unpublished' : 'active'
       end
     end
   end

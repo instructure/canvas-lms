@@ -58,13 +58,11 @@ gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 gem 'jwt', '1.2.1'
 
-# native xml parsing, diigo
-gem 'libxml-ruby', '2.7.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
   gem 'treetop', '1.4.15'
     gem 'polyglot', '0.3.5'
-gem 'instructure-marginalia', '1.1.6', :require => false
+gem 'marginalia', '1.3.0', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
@@ -78,7 +76,7 @@ gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false
 gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
-gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
+gem 'ratom', '0.9.0', :require => "atom"
 gem 'rdiscount', '1.6.8'
 gem 'ritex', '1.0.1'
 
@@ -86,7 +84,7 @@ gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
 gem 'net-ldap', '0.10.1'
 gem 'ruby-duration', '3.2.0'
-gem 'ruby-saml-mod', '0.2.3'
+gem 'ruby-saml-mod', '0.2.4'
 gem 'rubycas-client', '2.3.9'
 gem 'rubyzip', '1.1.1', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
@@ -103,6 +101,7 @@ gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
 gem 'hey', '1.3.0'
+gem 'aroi', '0.0.2'
 
 gem 'active_polymorph', :path => 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'

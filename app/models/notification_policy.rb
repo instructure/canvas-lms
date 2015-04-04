@@ -20,7 +20,7 @@ class NotificationPolicy < ActiveRecord::Base
 
   include NotificationPreloader
   belongs_to :communication_channel
-  has_many :delayed_messages
+  has_many :delayed_messages, :dependent => :destroy
 
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 

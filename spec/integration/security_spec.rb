@@ -934,7 +934,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/assignments"
         expect(response).to be_success
-        expect(response.body).not_to match /People/
+        expect(response.body).to match /People/ # still has read_as_admin rights
 
         get "/courses/#{@course.id}/assignments/syllabus"
         expect(response).to be_success

@@ -56,5 +56,15 @@ describe "/eportfolios/show" do
     doc = Nokogiri::HTML.parse(response.body)
     expect(doc.at_css('#eportfolio_share_link').text).to match %r{https?://.*/eportfolios/#{@portfolio.id}\?verifier=.*}
   end
-end
 
+  it "shows the right submission preview link" do
+    course_with_student(user: @user)
+    submission_model(course: @course, user: @user)
+    assigns[:owner_view] = true
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url").attributes['href'].value).to match(
+      %r{/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}}
+    )
+  end
+end

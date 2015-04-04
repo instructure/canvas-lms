@@ -181,18 +181,11 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
       end
 
-      it "should not allow editing grades" do
+      it "should allow editing grades" do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
         expect(cell.text).to eq '10'
         cell.click
-        expect(ff('.grade', cell)).to be_blank
-      end
-
-      it "should hide mutable actions from the menu" do
-        open_gradebook_settings do |menu|
-          expect(ff("a.gradebook_upload_link", menu)).to be_blank
-          expect(ff("a.set_group_weights", menu)).to be_blank
-        end
+        expect(ff('.grade', cell)).to_not be_blank
       end
     end
 

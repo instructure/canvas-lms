@@ -22,7 +22,9 @@
         {{/if}}
         <a href="{{html_url}}" class="title">{{title}}</a>
       </h3>
-      <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+      {{#if display_last_reply_at}}
+        <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+      {{/if}}
     </div>
 
     <div class="discussion-date-available">

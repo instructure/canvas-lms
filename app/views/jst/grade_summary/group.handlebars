@@ -6,7 +6,13 @@
   <h3 class="group-title"><span role='button' tabindex='0'>{{title}}</span></h3>
   <div class="group-status">
     <ul class="pill">
-      <li>{{mastery_count}}</li>
+      <li
+      {{#if mastery_count}}
+        class="has-mastery"
+      {{else}}
+        class="no-mastery"
+      {{/if}}
+        >{{mastery_count}}</li>
       <li>{{count}}</li>
     </ul>
   </div>

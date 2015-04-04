@@ -2,21 +2,25 @@ define [
   'i18n!react_files'
   'jquery'
   'underscore'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
+  'react'
+  'react-router'
   './BreadcrumbCollapsedContainer'
-  'compiled/react/shared/utils/withReactDOM'
+  'compiled/react/shared/utils/withReactElement'
   '../modules/customPropTypes'
-], (I18n, $, _, React, {Link}, BreadcrumbCollapsedContainer, withReactDOM, customPropTypes) ->
+], (I18n, $, _, React, ReactRouter, BreadcrumbCollapsedContainerComponent, withReactElement, customPropTypes) ->
 
   MAX_CRUMB_WIDTH = 500
   MIN_CRUMB_WIDTH = 40
+  Link = React.createFactory ReactRouter.Link
+  BreadcrumbCollapsedContainer = React.createFactory BreadcrumbCollapsedContainerComponent
 
   Breadcrumbs = React.createClass
     displayName: 'Breadcrumbs'
 
     propTypes:
-      rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
+      rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
+
+    mixins: [ReactRouter.State]
 
     getInitialState: ->
       {
@@ -73,7 +77,7 @@ define [
       li {},
         Link {
           to: (if isRootCrumb then 'rootFolder' else 'folder')
-          params: ({splat: folder.urlPath()} unless isRootCrumb)
+          params: ({splat: folder.urlPath() unless isRootCrumb})
           # only add title tooltips if there's a chance they could be ellipsized
           title: (name if @state.maxCrumbWidth < 500)
         },
@@ -91,14 +95,14 @@ define [
           li {},
             Link {
               to: 'search'
-              query: @props.query
+              query: @getQuery()
               params: {splat: ''}
             },
               span {
                 className: 'ellipsis'
               },
-                if @props.query.search_term
-                  I18n.t('search_results_for', 'search results for "%{search_term}"', {search_term: @props.query.search_term})
+                if @getQuery().search_term
+                  I18n.t('search_results_for', 'search results for "%{search_term}"', {search_term: @getQuery().search_term})
         ]
       else
         return [] unless @props.rootTillCurrentFolder?.length
@@ -112,7 +116,7 @@ define [
             @renderSingleCrumb(lastFolder, true)
           ]
 
-    render: withReactDOM ->
+    render: withReactElement ->
       nav {
         'aria-label':'breadcrumbs'
         role: 'navigation'

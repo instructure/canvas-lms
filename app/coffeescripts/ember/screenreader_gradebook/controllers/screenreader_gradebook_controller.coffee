@@ -14,7 +14,8 @@ define [
   'compiled/gradebook2/OutcomeGradebookGrid'
   '../../shared/components/ic_submission_download_dialog_component'
   'str/htmlEscape'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape) ->
+  'compiled/models/grade_summary/CalculationMethodContent'
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape, CalculationMethodContent) ->
 
   {get, set, setProperties} = Ember
 
@@ -601,6 +602,7 @@ define [
       outcome = @get 'selectedOutcome'
       result = @get('outcome_rollups').find (x) ->
         x.user_id == student.id && x.outcome_id == outcome.id
+      result.mastery_points = outcome.mastery_points if result
       result or {
         user_id: student.id
         outcome_id: outcome.id
@@ -642,6 +644,15 @@ define [
         min: outcomeGrid.Math.min(scores)
         cnt: outcomeGrid.Math.cnt(scores)
     ).property('selectedOutcome', 'outcome_rollups')
+
+    calculationDetails: (->
+      return null unless @get('selectedOutcome')?
+      outcome = @get('selectedOutcome')
+      _.extend({
+        calculation_method: outcome.calculation_method
+        calculation_int: outcome.calculation_int
+      }, new CalculationMethodContent(outcome).present())
+    ).property('selectedOutcome')
 
     assignmentSubmissionTypes: (->
       types = @get('selectedAssignment.submission_types')

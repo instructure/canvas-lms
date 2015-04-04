@@ -6,12 +6,9 @@ require [
 ], ($, React, Router, routes) ->
   alreadyRendered = false
 
-  $('#account_settings_tabs, #course_details_tabs').on 'tabscreate tabsactivate', (event, ui) =>
+  render_react_apps = (tabId) ->
     targetNode = document.getElementById('external_tools')
-    selectedTab = ui.tab || ui.newTab
-    tabId = $(selectedTab).find('a').attr('id')
     if tabId == 'tab-tools-link'
-
       Router.run routes, Router.HistoryLocation, (Handler) ->
         React.render React.createElement(Handler, null), targetNode
 
@@ -19,3 +16,11 @@ require [
     else if alreadyRendered
       React.unmountComponentAtNode(targetNode)
       alreadyRendered = false
+
+  activeTabId = $('li.ui-state-active > a').prop('id')
+  render_react_apps(activeTabId) if activeTabId
+
+  $('#account_settings_tabs, #course_details_tabs').on 'tabscreate tabsactivate', (event, ui) =>
+    selectedTab = ui.tab || ui.newTab
+    tabId = $(selectedTab).find('a').attr('id')
+    render_react_apps(tabId)

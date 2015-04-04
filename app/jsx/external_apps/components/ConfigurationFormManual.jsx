@@ -113,6 +113,7 @@ define([
                 ref="sharedSecret"
                 id="sharedSecret"
                 defaultValue={this.props.sharedSecret}
+                placeholder={this.props.consumerKey ? I18n.t('[Unchanged]') : null} // Assume that if we have a consumer key, we have a secret
                 label={I18n.t('Shared Secret')}
                 errors={this.state.errors} />
             </div>
@@ -131,7 +132,7 @@ define([
               <TextInput
                 ref="domain"
                 id="domain"
-                name={this.props.domain}
+                defaultValue={this.props.domain}
                 label={I18n.t('Domain')}
                 errors={this.state.errors} />
             </div>

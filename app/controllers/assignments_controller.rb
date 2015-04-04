@@ -44,7 +44,8 @@ class AssignmentsController < ApplicationController
       # because of course import/copy.
       @context.require_assignment_group
 
-      permissions = @context.rights_status(@current_user, :manage_assignments, :manage_grades)
+      rights = [:manage_assignments, :manage_grades, :read_grades]
+      permissions = @context.rights_status(@current_user, *rights)
       permissions[:manage] = permissions[:manage_assignments]
       js_env({
         :URLS => {

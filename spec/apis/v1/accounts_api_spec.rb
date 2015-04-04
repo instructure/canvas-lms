@@ -203,6 +203,22 @@ describe "Accounts API", type: :request do
           }
       )
     end
+
+    it "should return the lti_guid" do
+      @a1.lti_guid = 'hey'
+      @a1.save!
+      json = api_call(:get, "/api/v1/accounts?include[]=lti_guid",
+                      { :controller => 'accounts', :action => 'index', :format => 'json', :include => ['lti_guid'] }, {})
+      expect(json[0]["lti_guid"]).to eq 'hey'
+    end
+
+    it "should honor deprecated includes parameter" do
+      @a1.lti_guid = 'hey'
+      @a1.save!
+      json = api_call(:get, "/api/v1/accounts?includes[]=lti_guid",
+                      { :controller => 'accounts', :action => 'index', :format => 'json', :includes => ['lti_guid'] }, {})
+      expect(json[0]["lti_guid"]).to eq 'hey'
+    end
   end
 
   describe 'update' do

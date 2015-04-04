@@ -238,7 +238,26 @@ describe DiscussionEntriesController do
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(0)
     end
-    
+
+    it "should leave out media objects if the attachment is already included" do
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+
+      @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
+      @a.content_type = "video/mp4"
+      @a.media_entry_id = @mo1.media_id
+      @a.save!
+      @topic.discussion_entries.create!(:user => @student, :message => " /courses/#{@course.id}/files/#{@a.id}/download ")
+
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      expect(rss).not_to be_nil
+      expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
+      expect(rss.items.length).to eql(1)
+      expect(rss.items.first.enclosure.url).to end_with("courses/#{@course.id}/files/#{@a.id}/download?verifier=#{@a.uuid}")
+    end
+
     it "should include student entries if enabled" do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
@@ -250,6 +269,7 @@ describe DiscussionEntriesController do
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(1)
+      expect(rss.items.first.enclosure.url).to end_with("courses/#{@course.id}/media_download?type=mp4&entryId=#{@mo1.media_id}&redirect=1")
       expect(assigns[:discussion_entries]).not_to be_empty
       expect(assigns[:discussion_entries][0]).to eql(@entry)
     end
@@ -309,6 +329,27 @@ describe DiscussionEntriesController do
 
     it "should not include student entries if disabled" do
       topic_with_media_reply
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      expect(assigns[:entries]).not_to be_nil
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      expect(rss).not_to be_nil
+      expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
+      expect(rss.items.length).to eql(0)
+    end
+
+    it "should not error if data is missing and kaltura is unresponsive" do
+      mock_client = mock
+      mock_client.stubs(:startSession)
+      mock_client.stubs(:mediaGet).returns(nil)
+      mock_client.stubs(:flavorAssetGetByEntryId).returns(nil)
+      CanvasKaltura::ClientV3.stubs(:new).returns(mock_client)
+
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      @mo1.data = nil
+      @mo1.save!
+
       get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
       expect(assigns[:entries]).not_to be_nil
       require 'rss/2.0'

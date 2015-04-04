@@ -6,9 +6,9 @@
 }
 
 .ic-QuizInspector__accessibility-warning {
-  color: $canvas-light;
-  background-color: $canvas-danger;
-  border: 1px dashed $canvas-light;
+  color: $ic-color-light;
+  background-color: $ic-color-danger;
+  border: 1px dashed $ic-color-light;
   font-size: 14px;
   position: absolute;
   left: -20px;
@@ -19,7 +19,7 @@
   box-shadow: 0 0 0 1px $borderColor;
   display: inline-block;
   border-radius: 2px;
-  background: $canvas-neutral;
+  background: $ic-color-neutral;
 }
 
 .ic-AttemptController__Attempt {
@@ -42,7 +42,7 @@
 }
 
 .ic-AttemptController__Attempt--is-active {
-  $bg: $canvas-secondary;
+  $bg: $ic-brand-secondary;
   background: $bg;
   box-shadow: 0 0 0 1px $bg;
   margin-right: 1px;

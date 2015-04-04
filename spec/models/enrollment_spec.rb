@@ -1449,6 +1449,19 @@ describe Enrollment do
     end
   end
 
+  describe 'unconclude' do
+    it 'should add the enrollment to User#cached_current_enrollments' do
+      enable_cache do
+        course_with_student active_course: true, enrollment_state: 'completed'
+        User.where(:id => @student).update_all(:updated_at => 1.day.ago)
+        @student.reload
+        expect(@student.cached_current_enrollments).to eq []
+        @enrollment.unconclude
+        expect(@student.cached_current_enrollments).to eq [@enrollment]
+      end
+    end
+  end
+
   describe 'observing users' do
     before :once do
       @student = user(:active_all => true)

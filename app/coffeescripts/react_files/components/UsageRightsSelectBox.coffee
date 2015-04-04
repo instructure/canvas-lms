@@ -2,13 +2,12 @@ define [
   'jquery'
   'underscore'
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
+  'react'
   '../modules/customPropTypes'
   '../modules/filesEnv'
   '../utils/omitEmptyValues'
-  ], ($, _, I18n, React, customPropTypes, filesEnv, omitEmptyValues) ->
-
-  {select, option, div, input, label, span, i} = React.DOM
+  'compiled/react/shared/utils/withReactElement'
+  ], ($, _, I18n, React, customPropTypes, filesEnv, omitEmptyValues, withReactElement) ->
 
   contentOptions = [{
       display:  I18n.t("Choose usage rights..."),
@@ -101,7 +100,7 @@ define [
         option {value: license.id},
           license.name
 
-    render: ->
+    render: withReactElement ->
       div {className: 'UsageRightsSelectBox__container'},
         div {className: 'control-group'},
           label {

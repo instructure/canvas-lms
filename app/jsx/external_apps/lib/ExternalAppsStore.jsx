@@ -68,6 +68,11 @@ define([
 
     var params = this._generateParams(configurationType, data);
 
+    // Don't send shared secret if it hasn't changed //
+    if(params['shared_secret'] == "N/A") {
+      delete params['shared_secret'];
+    }
+
     var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools';
     var method = 'POST';
     if (data.app_id) {

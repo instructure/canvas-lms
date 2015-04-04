@@ -472,4 +472,16 @@ define [
       @srgb.set('selectedStudent', student)
       equal @srgb.get('selectedSubmissionHidden'), true
 
+  module 'screenreader_gradebook_controller: selectedOutcomeResult',
+    setup: -> setup.call @
+    teardown: -> teardown.call @
+
+  test 'should return object including mastery_points if result is found', ->
+    student = @srgb.get('students.firstObject')
+    outcome = @srgb.get('outcomes.firstObject')
+
+    Ember.run =>
+      @srgb.set('selectedOutcome', outcome)
+      @srgb.set('selectedStudent', student)
+      equal @srgb.get('selectedOutcomeResult').mastery_points, outcome.mastery_points
 

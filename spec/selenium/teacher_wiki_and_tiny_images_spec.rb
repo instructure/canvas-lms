@@ -195,13 +195,15 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       get "/courses/#{@course.id}/quizzes"
       wait_for_ajaximations
       f(".new-quiz-link").click
-      keep_trying_until { expect(f(".mce_instructure_image")).to be_displayed }
+      keep_trying_until { expect(f("div[aria-label='Embed Image']")).to be_displayed }
       add_canvas_image(driver, 'Course files', 'course2.jpg')
 
       click_questions_tab
       click_new_question_button
       wait_for_ajaximations
-      add_canvas_image(f("#question_content_0_parent"), 'Course files', 'course.jpg')
+
+      container = ff(".mce-container").detect(&:displayed?)
+      add_canvas_image(container, 'Course files', 'course.jpg')
 
       in_frame "question_content_0_ifr" do
         keep_trying_until {

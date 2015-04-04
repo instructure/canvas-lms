@@ -64,6 +64,8 @@ class Course < ActiveRecord::Base
                   :storage_quota,
                   :storage_quota_mb,
                   :restrict_enrollments_to_course_dates,
+                  :restrict_student_past_view,
+                  :restrict_student_future_view,
                   :grading_standard,
                   :grading_standard_enabled,
                   :locale,
@@ -191,7 +193,6 @@ class Course < ActiveRecord::Base
   has_many :external_feeds, :as => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
-  has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
@@ -227,6 +228,7 @@ class Course < ActiveRecord::Base
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :set_self_enrollment_code
+
   before_save :touch_root_folder_if_necessary
   before_validation :verify_unique_sis_source_id
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
@@ -1030,7 +1032,7 @@ class Course < ActiveRecord::Base
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
-      given {|user| (self.enrollment_allows(user, permission) || self.account_membership_allows(user, permission)) && (!details[:if] || send(details[:if])) }
+      given {|user| (self.active_enrollment_allows(user, permission) || self.account_membership_allows(user, permission)) && (!details[:if] || send(details[:if])) }
       can permission
     end
 
@@ -1072,7 +1074,7 @@ class Course < ActiveRecord::Base
     # Prior users
     given do |user|
       (available? || completed?) && user &&
-        prior_enrollments.for_user(user).count > 0
+        prior_enrollments.for_user(user).any?{|e| !e.inactive?}
     end
     can :read, :read_outcomes
 
@@ -1111,7 +1113,7 @@ class Course < ActiveRecord::Base
     # Student of a concluded course
     given do |user|
       (self.available? || self.completed?) && user &&
-        (prior_enrollments.for_user(user).any?{|e| e.student? || e.assigned_observer? } ||
+        (prior_enrollments.for_user(user).any?{|e| !e.inactive? && (e.student? || e.assigned_observer?) } ||
          user.cached_not_ended_enrollments.any? do |e|
           e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed
          end
@@ -1149,7 +1151,7 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def enrollment_allows(user, permission)
+  def active_enrollment_allows(user, permission)
     return false unless user && permission
 
     @enrollment_lookup ||= {}
@@ -1563,7 +1565,9 @@ class Course < ActiveRecord::Base
               "N/A"
             else
               submission = submissions[[student.id, a.id]]
-              submission.try(:score)
+              a.grading_type == "gpa_scale" && submission.try(:score) ?
+                a.score_to_grade(submission.score) :
+                submission.try(:score)
             end
           end
           #Last Row
@@ -2040,7 +2044,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.clonable_attributes
-    [ :group_weighting_scheme, :grading_standard_id, :is_public,
+    [ :group_weighting_scheme, :grading_standard_id, :is_public, :public_syllabus,
       :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
@@ -2355,7 +2359,7 @@ class Course < ActiveRecord::Base
           tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
           tabs.delete_if { |t| t[:id] == TAB_MODULES }
         end
-        unless self.grants_any_right?(user, opts[:session], :participate_as_student, :manage_content)
+        unless self.grants_any_right?(user, opts[:session], :participate_as_student, :read_as_admin)
           tabs.delete_if{ |t| t[:visibility] == 'members' }
         end
         unless self.grants_any_right?(user, opts[:session], :read, :manage_content, :manage_assignments)
@@ -2365,13 +2369,13 @@ class Course < ActiveRecord::Base
         unless self.grants_any_right?(user, opts[:session], :read, :read_syllabus, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         end
-        tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :manage_content)
+        tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :read_as_admin)
         if self.grants_any_right?(user, opts[:session], :manage_content, :manage_assignments)
           tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
         end
-        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_right?(user, :manage_content)
+        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_right?(user,  :read_as_admin)
         tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_any_right?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades)
         tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_any_right?(user, opts[:session], :view_all_grades, :manage_grades)
         tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_any_right?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users)
@@ -2393,7 +2397,9 @@ class Course < ActiveRecord::Base
           end
 
           # remove hidden tabs from students
-          tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
+          unless self.grants_right?(user, opts[:session], :read_as_admin)
+            tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
+          end
         end
       end
       # Uncommenting these lines will always put hidden links after visible links
@@ -2463,7 +2469,14 @@ class Course < ActiveRecord::Base
     end
     class_eval <<-CODE
       def #{setting}
-        if settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
+        if Course.settings_options[#{setting.inspect}][:inherited]
+          inherited = self.account.send(#{setting.inspect})
+          if inherited[:locked] || settings_frd[#{setting.inspect}].nil?
+            inherited[:value]
+          else
+            settings_frd[#{setting.inspect}]
+          end
+        elsif settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
           default = Course.settings_options[#{setting.inspect}][:default]
           default.respond_to?(:call) ? default.call(self) : default
         else
@@ -2495,6 +2508,9 @@ class Course < ActiveRecord::Base
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :course_format
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
+
+  add_setting :restrict_student_future_view, :boolean => true, :inherited => true
+  add_setting :restrict_student_past_view, :boolean => true, :inherited => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -2639,8 +2655,12 @@ class Course < ActiveRecord::Base
   end
 
   def includes_student?(user)
+    includes_user?(user, student_enrollments)
+  end
+
+  def includes_user?(user, enrollment_scope=enrollments)
     return false if user.nil? || user.new_record?
-    student_enrollments.where(user_id: user).exists?
+    enrollment_scope.where(user_id: user).exists?
   end
 
   def update_one(update_params, user, update_source = :manual)
@@ -2737,5 +2757,19 @@ class Course < ActiveRecord::Base
         read_attribute(:#{method}) || @#{method}
       end
     RUBY
+  end
+
+  def touch_content_if_public_visibility_changed(changes)
+    if changes[:is_public] || changes[:is_public_to_auth_users]
+      self.assignments.update_all(:updated_at => Time.now.utc)
+      self.attachments.update_all(:updated_at => Time.now.utc)
+      self.calendar_events.update_all(:updated_at => Time.now.utc)
+      self.context_modules.update_all(:updated_at => Time.now.utc)
+      self.discussion_topics.update_all(:updated_at => Time.now.utc)
+      self.quizzes.update_all(:updated_at => Time.now.utc)
+      self.quizzes.update_all(:updated_at => Time.now.utc)
+      self.wiki.touch
+      self.wiki.wiki_pages.update_all(:updated_at => Time.now.utc)
+    end
   end
 end

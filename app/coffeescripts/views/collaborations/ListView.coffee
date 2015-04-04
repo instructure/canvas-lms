@@ -47,7 +47,9 @@ define [
       if type is 'user'
         new UserCollection(comparator: (user) -> user.get('sortable_name'))
       else
-        new GroupCollection
+        collection = new GroupCollection()
+        collection.forCourse = true
+        collection
 
     # Internal: Attach events to the collection.
     #

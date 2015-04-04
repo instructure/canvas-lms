@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/UploadProgress'
   'compiled/react_files/modules/FileUploader'
@@ -20,7 +20,7 @@ define [
   module 'UploadProgress',
     setup: ->
       @uploader = mockUploader('filename', 35)
-      @prog = React.renderComponent(UploadProgress(uploader: @uploader), $('<div>').appendTo('body')[0])
+      @prog = React.render(UploadProgress(uploader: @uploader), $('<div>').appendTo('body')[0])
 
     teardown: ->
       resetUploader(@uploader)

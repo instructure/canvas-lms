@@ -62,21 +62,29 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
       border-color: transparent;
       box-shadow: none;
       a {
+        @include ic-focus-base;
         color: $ic-link-color;
         font-weight: normal;
         padding: 8px 14px;
         text-shadow: none;
         @if $use_high_contrast { text-decoration: underline; }
+        &:focus { 
+          @if $use_high_contrast { @include ic-focus-variant($ic-link-color, -4px); }
+          @else { 
+            text-decoration: underline; 
+            outline: none;
+          }
+        }
 
         // special handling for Calendar tabs with solid-color header backgrounds
-        #edit_event & { color: $canvas-light; }
+        #edit_event & { color: $ic-color-light; }
       }
       &.ui-state-hover,
       &:hover {
-        background: $canvas-light;
+        background: $ic-color-light;
         border-color: $ic-border-light;
         a {
-          color: $canvas-dark;
+          color: $ic-color-dark;
           @if $use_high_contrast { text-decoration: none; }
           
           // special handling for Calendar tabs with solid-color header backgrounds
@@ -85,23 +93,27 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
       }
       &.ui-state-focus,
       &.ui-state-focus.ui-tabs-active {
-        @if $use_high_contrast { @include button-focus; }
-        @else {
-          outline: none;
-          border-color: $ic-border-light;
-          background: $canvas-light;
+        outline: none;
+        border-color: $ic-border-light;
+        background: $ic-color-light;
+        a {
+          @if $use_high_contrast { @include ic-focus-variant($ic-link-color, -4px); }
+          @else { 
+            text-decoration: underline;
+            outline: none; 
+          }  
         }
       }
       &.ui-tabs-active,
       &.ui-tabs-active.ui-state-hover,
       &.ui-tabs-active:hover {
         border-color: $ic-border-light;
-        background: $canvas-light;
+        background: $ic-color-light;
         a {
           @if $use_high_contrast { text-decoration: none; }
 
           // special handling for Calendar tabs with solid-color header backgrounds
-          #edit_event & { color: $canvas-dark; }
+          #edit_event & { color: $ic-color-dark; }
         }
       }
     }

@@ -162,13 +162,13 @@
   .list-header {
     background: #f3f3f3;
     border-bottom: 1px solid #bfbfbf;
-    color: darken($canvas-neutral, 50);;
+    color: darken($ic-color-neutral, 50);;
     padding: 3px 12px;
   }
 
   .current-context-code {
     color: #f3f3f3;
-    background-color: $canvas-neutral;
+    background-color: $ic-color-neutral;
     padding: 0 10px;
   }
 
@@ -209,7 +209,7 @@
   }
 
   .date {
-    color: $canvas-primary;
+    color: $ic-brand-primary;
   }
 
   .summary {
@@ -263,7 +263,7 @@ h2.subject {
   position: absolute;
   right: 13px;
   top: 43%;
-  background-color: $canvas-secondary;
+  background-color: $ic-brand-secondary;
   text-shadow: none;
 }
 
@@ -281,7 +281,7 @@ h2.subject {
   }
 
   .read-state {
-    background: $canvas-secondary;
+    background: $ic-brand-secondary;
     border-radius: 5px;
     box-sizing: border-box;
     display: inline-block;
@@ -290,23 +290,23 @@ h2.subject {
     width: 10px;
 
     &.read {
-      background: $canvas-primary;
-      border: 1px solid darken($canvas-primary, 10);
+      background: $ic-brand-primary;
+      border: 1px solid darken($ic-brand-primary, 10);
       @if $use_high_contrast {
-        background: $canvas-light;
-        border: 1px solid $canvas-dark;
+        background: $ic-color-light;
+        border: 1px solid $ic-color-dark;
       }
       left: -9999px;
     }
 
     &:focus {
-      border: 1px solid $canvas-dark;
+      border: 1px solid $ic-color-dark;
       box-shadow: none;
     }
   }
 
   .star-btn {
-    color: $canvas-secondary;
+    color: $ic-brand-secondary;
     display: inline-block;
     font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
     font-size: 16px;
@@ -330,7 +330,7 @@ h2.subject {
         position: absolute;
       }
       &:before {
-        color: $canvas-alert;
+        color: $ic-color-alert;
         content: "\2605";
       }
       &:focus {
@@ -443,7 +443,7 @@ h2.subject {
     }
 
     .context {
-      color: darken($canvas-neutral, 50);
+      color: darken($ic-color-neutral, 50);
       display: block;
     }
 
@@ -457,7 +457,7 @@ h2.subject {
   }
 
   .date {
-    color: darken($canvas-neutral, 50);
+    color: darken($ic-color-neutral, 50);
     position: absolute;
     right: 10px;
     top: 0;
@@ -479,7 +479,7 @@ h2.subject {
 
   .message-detail-actions li a,
   .actions li a {
-    color: darken($canvas-neutral, 50);;
+    color: darken($ic-color-neutral, 50);;
 
     &:hover, &:focus {
       color: #333;

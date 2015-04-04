@@ -961,7 +961,7 @@ Reduce the width of your screen to see how the example components below both sca
 
 */
 
-@mixin ic-input-variant($border-color: $ic-border-light, $color: $canvas-primary) {
+@mixin ic-input-variant($border-color: $ic-border-light, $color: $ic-brand-primary) {
   border-color: $border-color;
   &:focus {
     border-color: lighten($color, 10%);
@@ -972,7 +972,7 @@ Reduce the width of your screen to see how the example components below both sca
 
 @mixin high-contrast-focus {
   @if $use_high_contrast { 
-    outline: 1px dotted $canvas-dark;
+    outline: 1px dotted $ic-color-dark;
     outline-offset: -1px;
   }
 }
@@ -1002,7 +1002,7 @@ input[type="tel"], input[type="color"], .uneditable-input {
     border-style: solid;
     outline-color: transparent;
     outline-offset: -$ic-sp;
-    background: $canvas-light;
+    background: $ic-color-light;
     padding: 8px 12px;
     -webkit-appearance: none;
     
@@ -1022,7 +1022,7 @@ input[type="tel"], input[type="color"], .uneditable-input {
       @if $use_high_contrast {
         outline-width: 1px;
         outline-offset: -3px;
-        outline-color: $canvas-dark;
+        outline-color: $ic-color-dark;
       }
       @else {
         outline-width: 2px;
@@ -1041,14 +1041,14 @@ input[type="tel"], input[type="color"], .uneditable-input {
     // Disabled state
     &[disabled], &[readonly] {
       cursor: not-allowed;
-      background-color: lighten($canvas-neutral, 5%);
+      background-color: lighten($ic-color-neutral, 5%);
       opacity: 0.8;
     }
 
     // Input variants
-    &.ic-Input--has-error, .ic-Form-control--has-error & { @include ic-input-variant($canvas-danger, $canvas-danger); }
-    &.ic-Input--has-warning, .ic-Form-control--has-warning & { @include ic-input-variant($canvas-alert, $canvas-alert); }
-    &.ic-Input--has-success, .ic-Form-control--has-success & { @include ic-input-variant($canvas-success, $canvas-success); }
+    &.ic-Input--has-error, .ic-Form-control--has-error & { @include ic-input-variant($ic-color-danger, $ic-color-danger); }
+    &.ic-Input--has-warning, .ic-Form-control--has-warning & { @include ic-input-variant($ic-color-alert, $ic-color-alert); }
+    &.ic-Input--has-success, .ic-Form-control--has-success & { @include ic-input-variant($ic-color-success, $ic-color-success); }
 
   }
 
@@ -1064,7 +1064,7 @@ select.ic-Input {
   // Webkit-only hack because we have removed -webkit-appearance from the
   // selects and need to add an arrow and remove padding
   &:not(*:root) {
-    background: url("/images/forms/ic-icon-arrow-down.svg") no-repeat calc(100% - #{$ic-sp - 4}) 50% $canvas-light;
+    background: url("/images/forms/ic-icon-arrow-down.svg") no-repeat calc(100% - #{$ic-sp - 4}) 50% $ic-color-light;
     background-size: 10px 5.667px;
   }
 }
@@ -1175,9 +1175,9 @@ select.ic-Input {
   z-index: 1;
   transition: all 0.2s $ic-transition;  
   box-sizing: border-box;
-  &.ic-Form-message--error { @include form-message-variant($canvas-danger); }
-  &.ic-Form-message--success { @include form-message-variant($canvas-success); }
-  &.ic-Form-message--warning { @include form-message-variant($canvas-alert); }
+  &.ic-Form-message--error { @include form-message-variant($ic-color-danger); }
+  &.ic-Form-message--success { @include form-message-variant($ic-color-success); }
+  &.ic-Form-message--warning { @include form-message-variant($ic-color-alert); }
 }
 
 .ic-Toggle + .ic-Form-message,
@@ -1190,7 +1190,7 @@ select.ic-Input {
   padding: ($ic-sp - 4) ($ic-sp - 4) ($ic-sp - 4) 0;
   font-size: $baseFontSize - 2;
   line-height: 1.2;
-  color: $canvas-light;
+  color: $ic-color-light;
   box-shadow: 0 2px 2px rgba(black, 0.2);
   box-sizing: border-box;
 
@@ -1218,10 +1218,10 @@ select.ic-Input {
 
   // specifying link color here, just in case we need a link inside a form message
   a {
-    color: $canvas-light;
+    color: $ic-color-light;
     text-decoration: underline;
     &:hover, &:focus { 
-      color: $canvas-light;
+      color: $ic-color-light;
       text-decoration: none;
     }
   }
@@ -1260,19 +1260,19 @@ form.ic-Form-group { margin: 0; }
   &.ic-Form-control--has-error {
     .ic-Label,
     .ic-Input-group__add-on,
-    .ic-Toggle__label-text { color: $canvas-danger; }
+    .ic-Toggle__label-text { color: $ic-color-danger; }
   }
 
   &.ic-Form-control--has-warning {
     .ic-Label,
     .ic-Input-group__add-on,
-    .ic-Toggle__label-text { color: $canvas-alert; }
+    .ic-Toggle__label-text { color: $ic-color-alert; }
   }
 
   &.ic-Form-control--has-success {
     .ic-Label,
     .ic-Input-group__add-on,
-    .ic-Toggle__label-text { color: $canvas-success; }
+    .ic-Toggle__label-text { color: $ic-color-success; }
   }
 
   .ic-Form-control__Multi-input {
@@ -1307,7 +1307,7 @@ form.ic-Form-group { margin: 0; }
   border: 1px solid $ic-border-light;
   padding: $ic-sp;
   text-align: right;
-  background: darken($canvas-light, 3%);
+  background: darken($ic-color-light, 3%);
   white-space: nowrap;
 }
 
@@ -1334,7 +1334,7 @@ form.ic-Form-group { margin: 0; }
       position: absolute;
       top: 50%; left: 0;
       margin-top: -8px;
-      background: $canvas-light;
+      background: $ic-color-light;
     }
 
   }
@@ -1350,14 +1350,14 @@ form.ic-Form-group { margin: 0; }
     ~ .ic-Label { vertical-align: baseline; }
 
     &:not([disabled]):hover {
-      ~ .ic-Label:before { border-color: $canvas-primary; }
+      ~ .ic-Label:before { border-color: $ic-brand-primary; }
     }
 
     &:checked {
       ~ .ic-Label:before {
-        border-color: $canvas-primary;
-        box-shadow: inset 0 0 0 3px $canvas-light;
-        background: $canvas-primary;
+        border-color: $ic-brand-primary;
+        box-shadow: inset 0 0 0 3px $ic-color-light;
+        background: $ic-brand-primary;
       }
     }
 
@@ -1365,8 +1365,8 @@ form.ic-Form-group { margin: 0; }
       ~ .ic-Label {
         @include high-contrast-focus;
         &:before {
-          box-shadow: inset 0 0 0 2px rgba($canvas-primary, 0.3), inset 0 0 0 4px $canvas-light;
-          background: $canvas-primary;  
+          box-shadow: inset 0 0 0 2px rgba($ic-brand-primary, 0.3), inset 0 0 0 4px $ic-color-light;
+          background: $ic-brand-primary;  
         }  
       }
     }
@@ -1425,7 +1425,7 @@ form.ic-Form-group { margin: 0; }
       margin-top: -8px;
       width: 16px; height: 16px;
       border-radius: $baseBorderRadius;
-      background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $canvas-light;
+      background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $ic-color-light;
       background-size: 16px 48px;
       border: 1px solid darken($ic-border-light, 3%);
       outline: 2px solid transparent;
@@ -1445,16 +1445,16 @@ form.ic-Form-group { margin: 0; }
     top: 0; left: 0;
 
     &:not([disabled]):hover {
-      ~ .ic-Label:before { border-color: $canvas-primary; }
+      ~ .ic-Label:before { border-color: $ic-brand-primary; }
     }
 
     &:focus {
       ~ .ic-Label {
         @include high-contrast-focus;
         &:before {
-          border-color: $canvas-primary;
+          border-color: $ic-brand-primary;
           outline-offset: -3px;
-          outline-color: rgba($canvas-primary, 0.2);
+          outline-color: rgba($ic-brand-primary, 0.2);
         }
         
       }  
@@ -1463,14 +1463,14 @@ form.ic-Form-group { margin: 0; }
     &:checked {
       ~ .ic-Label {
         &:before {
-          background-color: $canvas-primary;
+          background-color: $ic-brand-primary;
           background-position: center -1px;
-          border-color: $canvas-primary;
+          border-color: $ic-brand-primary;
         }
       }
       &:focus {
         ~ .ic-Label:before {
-          outline-color: rgba($canvas-light, 0.35);
+          outline-color: rgba($ic-color-light, 0.35);
         }  
       }
     }
@@ -1524,7 +1524,7 @@ form.ic-Form-group { margin: 0; }
   .ic-Input-group__add-on,
   .ic-Label {
     height: 38px;
-    background: $canvas-light;
+    background: $ic-color-light;
     border: 1px solid $ic-border-light;
     display: flex;
     align-items: center;

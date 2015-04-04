@@ -61,7 +61,7 @@ class GroupMembership < ActiveRecord::Base
       record.just_created &&
         record.accepted? &&
         record.group &&
-        record.group.context &&
+        record.group.context_available? &&
         record.sis_batch_id.blank?
     }
 
@@ -71,7 +71,7 @@ class GroupMembership < ActiveRecord::Base
       record.just_created &&
         record.invited? &&
         record.group &&
-        record.group.context &&
+        record.group.context_available? &&
         record.sis_batch_id.blank?
     }
 

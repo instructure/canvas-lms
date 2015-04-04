@@ -1,0 +1,345 @@
+@import "base/environment";
+
+#wrapper-container {
+  min-width: 1150px;
+}
+
+.scheduler-mode {
+  .fc-event {
+    opacity: 0.7;
+  }
+  .fc-event.current-appointment-group {
+    opacity: 1;
+  }
+}
+
+.scheduler-content {
+  padding: 1em;
+  background-color: $bodyBackground;
+  border: 1px solid $ic-border-light;
+  margin-left: 0px;
+  h3, .h3 {
+    margin-top: 0px;
+  }
+}
+
+.scheduler-wrapper {
+  /* extra padding stops final dropdown from getting cut off */
+  padding-bottom: 25px;
+}
+
+.showing-single {
+  .appointment-group-item {
+    display: none;
+  }
+  .appointment-group-item.active {
+    display: block;
+  }
+  .appointment-group-item {
+    border-top: none;
+  }
+}
+
+#scheduler-loading {
+  position: relative;
+  min-height: 400px;
+}
+
+#appointment-group-list {
+  list-style: none;
+}
+
+.appointment-group-item {
+  border-top: 1px solid #ccc;
+  min-height: 68px;
+  padding: 6px 0 26px;
+  clear: both;
+  h3, .h3 {
+    margin-bottom: 0;
+  }
+  .alert {
+    float: right;
+    width: auto;
+    padding: 4px 10px;
+    margin-right: 5px;
+    a {
+      text-decoration: underline;
+    }
+  }
+  &:first-child {
+    border-top: none;
+  }
+}
+
+.unpublished-ag {
+  background-color: #f2f2f2;
+}
+
+.ag-context {
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.ag-context a {
+  color: #666;
+}
+
+.ag-x-of-x-signed-up {
+  font-size: 11px;
+}
+
+.time-block-list-body-wrapper {
+  overflow: auto;
+  max-height: 150px;
+  overflow-x: hidden;
+  margin-bottom: 10px;
+  padding-top: 10px;
+}
+
+.time-block-list-header, .time-block-list-body-wrapper {
+  width: 100%;
+  border-bottom: 1px solid #DDD;
+  padding-bottom: 10px;
+}
+
+.time-block-list-header {
+  td {
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.time-block-list-body {
+  width: 100%;
+}
+
+.time-block-list {
+  td {
+    vertical-align: top;
+  }
+  .time-range-column {
+    width: 130px;
+  }
+  $date_column_width: 200px;
+  $time_column_width: 95px;
+  .date-column {
+    width: $date_column_width;
+  }
+  .start-time-column {
+    width: $time_column_width;
+    text-align: center;
+  }
+  .separator-column {
+    width: 6px;
+    text-align: center;
+    line-height: 28px;
+  }
+  .end-time-column {
+    width: $time_column_width;
+    text-align: center;
+  }
+  .date_field {
+    width: $date_column_width - 80;
+  }
+  .time_field {
+    text-align: right;
+    width: $time_column_width - 30;
+  }
+  .error {
+    border: 1px solid #EE5F5B;
+    padding: 2px;
+    box-shadow: 0 0 4px #f8b9b7;
+  }
+  .invalid_datetime, .error {
+    color: #B94A48;
+  }
+  .datetime_suggest {
+    display: none;
+  }
+  .ui-datepicker-trigger {
+    display: inline;
+  }
+  tr.focused {
+    .datetime_suggest {
+      display: block;
+      min-height: 15px;
+    }
+  }
+}
+
+#edit_appointment_form {
+  td {
+    vertical-align: top;
+  }
+  .context_id, .group_select select {
+    width: 150px;
+  }
+  .section_select ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  .section_select li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  .right-column-wrapper {
+    width: 380px;
+  }
+}
+
+.ag_contexts_selector {
+  width: 225px;
+}
+
+.ag-menu-container {
+  position: relative;
+}
+
+.ag_contexts_menu {
+  position: absolute;
+  width: 223px;
+  background: white;
+  border: 1px solid #b6b6b6;
+  margin-top: -3px;
+  padding-bottom: 5px;
+}
+
+.ag-contexts {
+  @include reset_list;
+  max-height: 150px;
+  overflow-y: auto;
+  label {
+    margin-bottom: 0;
+  }
+}
+
+.ag_sections {
+  @include reset_list;
+  padding-left: 35px;
+}
+
+.ag_sections_toggle {
+  display: block;
+  width: 16px;
+  height: 16px;
+  float: left;
+  background-image: url(/images/jqueryui/icon_sprite.png);
+  background-position: (-16px) -80px;
+}
+
+.ag-sections-expanded {
+  background-position: 0px -64px;
+}
+
+.ag_contexts_done {
+  float: right;
+  margin: 5px 5px 0 0;
+}
+
+.delete-block-link {
+  display: block;
+  float: right;
+  color: black;
+  line-height: 28px;
+}
+
+.left-column-wrapper {
+  width: 250px;
+  float: left;
+}
+
+.right-column-wrapper {
+  width: 325px;
+  float: left;
+}
+
+.details-wrapper {
+  clear: both;
+}
+
+.splitter {
+  input[type="number"], .split-link.btn {
+    vertical-align: baseline;
+  }
+  .split-link {
+    margin-right: 3px;
+  }
+}
+
+.ag-options {
+  margin: 0;
+  padding: 0;
+  input[type="checkbox"] {
+    vertical-align: 1px;
+  }
+  input[type="checkbox"] + label, input[type="number"] {
+    vertical-align: baseline;
+  }
+}
+
+.ag-options li {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 0.5em;
+}
+
+.context_id {
+  max-width: 200px;
+}
+
+.select-calendar-container {
+  margin: 0 0 1.5em;
+}
+
+.group-signup {
+  margin: 0 0 1.5em;
+}
+
+#message_participants_form {
+  padding: 10px;
+  textarea {
+    width: 98%;
+    height: 100px;
+  }
+  label {
+    font-weight: bold;
+  }
+  .error {
+    font-weight: bold;
+    color: #a00;
+  }
+  ul {
+    font-size: 0.8em;
+    list-style: none;
+    padding: 5px 0;
+    margin: 0;
+    min-height: 60px;
+    max-height: 100px;
+    overflow: auto;
+    li {
+      overflow: hidden;
+      white-space: nowrap;
+      float: left;
+      margin: 1px 2px 1px 4px;
+      padding: 0 14px 0 11px;
+      color: #000;
+      background-color: #dee7fa;
+      border: 1px solid #a5bcf0;
+      border-radius: 10px;
+      cursor: default;
+      &.status {
+        text-align: center;
+        float: none;
+        padding: 0;
+        margin: 0;
+        height: 50px;
+        position: relative;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+      }
+    }
+  }
+}

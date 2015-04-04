@@ -1,6 +1,9 @@
 require [
-  'old_unsupported_dont_use_react'
+  'react'
+  'react-router'
   'compiled/react_files/routes'
-], (React, routes) ->
+], (React, ReactRouter, routes) ->
 
-  React.renderComponent(routes, document.getElementById('content'))
+  ReactRouter.run routes, ReactRouter.HistoryLocation, (HandlerComponent) ->
+    Handler = React.createFactory HandlerComponent
+    React.render(Handler(), document.getElementById('content'))

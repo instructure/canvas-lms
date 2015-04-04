@@ -1223,6 +1223,17 @@ describe Course, "gradebook_to_csv" do
     expect(rows[2][1]).to eq @user2.id.to_s
   end
 
+  it "shows gpa_scale grades instead of points" do
+    student_in_course(active_all: true)
+    a = @course.assignments.create! grading_type: "gpa_scale",
+      points_possible: 10,
+      title: "blah"
+    a.publish
+    a.grade_student(@student, grade: "C")
+    rows = CSV.parse(@course.gradebook_to_csv)
+    expect(rows[2][3]).to eql "C"
+  end
+
   context "differentiated assignments" do
     def setup_DA
       @course_section = @course.course_sections.create
@@ -1335,6 +1346,12 @@ describe Course, "tabs_available" do
       tabs = @course.uncached_tabs_available(@teacher)
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_falsey
+    end
+
+    it "should not hide tabs for completed teacher enrollments" do
+      @user.enrollments.where(:course_id => @course).first.complete!
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
     end
   end
 
@@ -4084,4 +4101,37 @@ describe Course, 'touch_root_folder_if_necessary' do
     end
   end
 
+  context "inheritable settings" do
+    before :each do
+      account_model
+      course(:account => @account)
+    end
+
+    it "should inherit account values by default" do
+      expect(@course.restrict_student_future_view?).to be_falsey
+
+      @account.settings[:restrict_student_future_view] = {:locked => false, :value => true}
+      @account.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      expect(@course.restrict_student_future_view?).to be_falsey
+    end
+
+    it "should be overridden by locked values from the account" do
+      @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+      @account.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+
+      # explicitly setting shouldn't change anything
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+    end
+  end
 end

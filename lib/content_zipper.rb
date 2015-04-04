@@ -197,10 +197,6 @@ class ContentZipper
           add_attachment_to_zip(a.attachment, zipfile)
           update_progress(zip_attachment, idx, count)
         end
-        if css = File.open(Rails.root.join('public', 'stylesheets', 'static', 'eportfolio_static.css')) rescue nil
-          content = css.read
-          zipfile.get_output_stream("eportfolio.css") {|f| f.puts content } if content
-        end
         content = File.open(Rails.root.join('public', 'images', 'logo.png'), 'rb').read rescue nil
         zipfile.get_output_stream("logo.png") {|f| f.write content } if content
       end

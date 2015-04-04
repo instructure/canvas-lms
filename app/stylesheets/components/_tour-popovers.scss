@@ -89,7 +89,7 @@ i.usher-close {
 }
 .tour-content .btn-link {
   padding: 0; // takes off button padding on btn-link styles to keep flush with side
-  color: $canvas-primary;
+  color: $ic-brand-primary;
 }
 // Tour Popup Style: Notification box
 // ===================================
@@ -138,7 +138,7 @@ i.usher-close {
   margin-top: 0;
 }
 .step-counter_item {  
-  color: $canvas-neutral;
+  color: $ic-color-neutral;
   margin: 0 5px;      
   font-size: 6px !important;
 }
@@ -152,7 +152,7 @@ i.icon-tour-step-counter {
     font-size: 6px !important;
   }
   &.step-counter_item--current {
-    color: $canvas-primary;
+    color: $ic-brand-primary;
   }
 }
 

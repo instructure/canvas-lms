@@ -527,13 +527,13 @@ define [
   ]
 
   outcomesRaw = [
-    { outcome: { id: '1', title: 'Eating' } }
-    { outcome: { id: '2', title: 'Drinking' } }
+    { outcome: { id: '1', title: 'Eating' , mastery_points: 3} }
+    { outcome: { id: '2', title: 'Drinking', mastery_points: 5 } }
   ]
 
   outcomes = [
-    { id: '1', title: 'Eating' }
-    { id: '2', title: 'Drinking' }
+    { id: '1', title: 'Eating', mastery_points: 3 }
+    { id: '2', title: 'Drinking', mastery_points: 5 }
   ]
 
   outcomeRollupsRaw = {

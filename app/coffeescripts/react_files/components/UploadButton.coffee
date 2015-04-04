@@ -1,22 +1,24 @@
 define [
   'i18n!upload_button'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   'underscore'
   './FileRenameForm'
   '../modules/customPropTypes'
   './ZipFileOptionsForm'
   '../modules/FileOptionsCollection'
-], (I18n, React, withReactDOM, _, FileRenameForm, customPropTypes, ZipFileOptionsForm, FileOptionsCollection) ->
+], (I18n, React, withReactElement, _, FileRenameFormComponent, customPropTypes, ZipFileOptionsFormComponent, FileOptionsCollection) ->
 
   resolvedUserAction = false
+  FileRenameForm = React.createFactory FileRenameFormComponent
+  ZipFileOptionsForm = React.createFactory ZipFileOptionsFormComponent
 
   UploadButton = React.createClass
     displayName: 'UploadButton'
 
     propTypes:
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
-      contextId: React.PropTypes.string
+      contextId: React.PropTypes.oneOfType [React.PropTypes.string, React.PropTypes.number]
       contextType: React.PropTypes.string
 
     getInitialState: ->
@@ -56,7 +58,7 @@ define [
       resolvedUserAction = false
 
     componentDidUpdate: (prevState) ->
-      
+
       if @state.zipOptions.length == 0 && @state.nameCollisions.length == 0 && @state.resolvedNames.length > 0 && FileOptionsCollection.hasNewOptions()
         @queueUploads()
       else
@@ -84,7 +86,7 @@ define [
           onClose: @onClose
 
 
-    render: withReactDOM ->
+    render: withReactElement ->
       span {},
         form
           ref: 'form'

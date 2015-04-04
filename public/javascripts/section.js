@@ -27,7 +27,7 @@ define([
         }),
         completedEnrollmentList = new PaginatedList($('#completed-enrollment-list'), {
           presenter: sectionEnrollmentPresenter,
-          requestParams: { state: 'completed' },
+          requestParams: { state: 'completed', page: 1, per_page: 25 },
           template: enrollmentTemplate,
           url: '/api/v1/sections/' + section_id + '/enrollments'
         });

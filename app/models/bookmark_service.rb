@@ -71,9 +71,8 @@ class BookmarkService < UserService
       response = http.request(request)
       case response
       when Net::HTTPSuccess
-        require 'libxml'
-        document = LibXML::XML::Parser.string(response.body).parse
-        document.find('/posts/post').each do |post|
+        document = Nokogiri::XML(response.body)
+        document.search('/posts/post').each do |post|
           bookmarks << {
             :title => post['description'],
             :url => post['href'],

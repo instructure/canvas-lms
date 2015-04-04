@@ -20,22 +20,26 @@
         TEXT
         %></p>
         <div class="admin-links">
-          <button class="al-trigger btn btn-mini">
+          <button class="Button al-trigger">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
             <span class="screenreader-only">Manage</span>
           </button>
           <ul class="al-options">
             <li>
-              <a href="#" class="element_toggler" aria-controls="discovery_url_form"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+              <a href="#" class="element_toggler" aria-controls="discovery_url_form">
+                <i class="icon-edit"></i> Edit
+              </a>
             </li>
             <li>
               <a href="#" data-url="<%= api_v1_account_destroy_discovery_url_path(@account) %>"
                  rel="nofollow"
-                 class="delete_url"><span class="ui-icon ui-icon-trash"></span>Delete</a>
+                 class="delete_url">
+                 <i class="icon-trash"></i> Delete
+              </a>
             </li>
           </ul>
         </div>
-        <table class="formtable" style="margin-left: 20px;">
+        <table class="formtable">
           <tr>
             <td><%= t :discovery_url, "Discovery URL:" %></td>
             <td><span id="discovery_url_display"><%= @account.auth_discovery_url || t(:no_discovery_url, "None set" ) %></span></td>
@@ -60,22 +64,28 @@
              data-hide-while-target-shown=true
              <%= hidden(true) if config.new_record? %>>
           <div class="admin-links">
-            <button class="al-trigger btn btn-mini">
+            <button class="Button al-trigger">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
               <span class="screenreader-only">Manage</span>
             </button>
             <ul class="al-options">
-              <li><a href="#" class="element_toggler" aria-controls="<%= form_id %>"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+              <li>
+                <a href="#" class="element_toggler" aria-controls="<%= form_id %>">
+                  <i class="icon-edit"></i> Edit
+                </a>
               </li>
               <li>
                 <a href="#" data-url="<%= delete_url %>"
                    data-remove=".auth_config"
                    rel="nofollow"
-                   data-confirm="Are you sure?"><span class="ui-icon ui-icon-trash"></span>Delete</a></li>
+                   data-confirm="Are you sure?">
+                   <i class="icon-trash"></i> Delete
+                </a>
+              </li>
             </ul>
 
           </div>
-          <table class="formtable" style="margin-left: 20px;">
+          <table class="formtable">
             <tr>
               <td><%= t :auth_type, "Type" %></td>
               <td><%= config.auth_type || 'SAML' %></td>

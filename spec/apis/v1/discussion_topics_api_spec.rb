@@ -2062,6 +2062,8 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should set and return editor_id if editing another user's post" do
+        pending "WIP: Not implemented"
+        fail
       end
 
       it "should fail if the max entry depth is reached" do
@@ -2315,6 +2317,102 @@ describe DiscussionTopicsController, type: :request do
               { :controller => "discussion_topics_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
     expect(json['assignment']).not_to be_nil
     expect(json['assignment']['due_at']).to eq override.due_at.iso8601.to_s
+  end
+
+  context "public courses" do
+    let(:announcements_view_api) {
+      ->(user, course_id, announcement_id, status = 200) do
+        args = []
+        m = user ? method(:api_call_as_user) : method(:api_call)
+        args.push(user) if user
+        @user = nil unless user # this is required because of api_call :-(
+        args.push(
+          :get,
+          "/api/v1/courses/#{course_id}/discussion_topics/#{announcement_id}/view?include_new_entries=1",
+          {
+            controller: "discussion_topics_api",
+            action: "view",
+            format: "json",
+            course_id: course_id.to_s,
+            topic_id: announcement_id.to_s,
+            include_new_entries: 1
+          },
+          {},
+          {},
+          {
+            expected_status: status
+          }
+        )
+        json = m.call(*args)
+        @user = user unless @user # this is required because of api_call :-(
+        json
+      end
+    }
+
+    before :each do
+      course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
+      expect(@course.is_public).to be_truthy
+      account_admin_user(account: @course.account) # sets @admin
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+
+      @context = @course
+      @announcement = announcement_model(user: @teacher) # sets @a
+
+      s1e = @announcement.discussion_entries.create!(:user => @student1, :message => "Hello I'm student 1!")
+      @announcement.discussion_entries.create!(:user => @student2, :parent_entry => s1e, :message => "Hello I'm student 2!")
+    end
+
+    context "does show" do
+      let(:check_access) {
+        ->(json) do
+          expect(json["new_entries"]).not_to be_nil
+          expect(json["new_entries"].count).to eq(2)
+          expect(json["new_entries"].first["user_id"]).to  eq(@student1.id)
+          expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
+        end
+      }
+
+      it "does show student comments to students" do
+        check_access.call(announcements_view_api.call(@student1, @course.id, @announcement.id))
+      end
+
+      it "does show student comments to teachers" do
+        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id))
+      end
+
+      it "does show student comments to admins" do
+        check_access.call(announcements_view_api.call(@admin, @course.id, @announcement.id))
+      end
+    end
+
+    context "doesn't show" do
+      let(:check_access) {
+        ->(json) do
+          expect(json["new_entries"]).to be_nil
+          expect(%w[unauthorized unauthenticated]).to include(json["status"])
+        end
+      }
+
+      before :each do
+        prev_course = @course
+        course_with_teacher
+        @student = student_in_course.user
+        @course = prev_course
+      end
+
+      it "doesn't show student comments to unauthenticated users" do
+        check_access.call(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
+      end
+
+      it "doesn't show student comments to other students not in the course" do
+        check_access.call(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
+      end
+
+      it "doesn't show student comments to other teachers not in the course" do
+        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
+      end
+    end
   end
 end
 

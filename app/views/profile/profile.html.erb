@@ -15,6 +15,9 @@
     <% if mfa_settings == :optional && @user.otp_secret_key %>
       <a href="<%= disable_mfa_path('self') %>" class="btn button-sidebar-wide" id="disable_mfa_link"><%= image_tag "unlock.png" %> <%= t('links.disable_mfa', "Disable Multi-Factor Authentication") %></a>
     <% end %>
+    <% if show_request_delete_account %>
+       <a href="<%= request_delete_account_link %>" class="btn button-sidebar-wide"> <%= t('Delete My Account') %></a>
+    <% end %>
   </div>
   <% end %>
 <% end %>

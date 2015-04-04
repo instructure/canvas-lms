@@ -1,0 +1,63 @@
+#assignment-details-dialog {
+  .distribution {
+    margin: 15px 0;
+    height: 30px;
+    position: relative;
+    div {
+      position: absolute;
+      top: 0;
+      border-style: solid;
+      border-color: #aaa;
+      overflow: hidden;
+    }
+    .bar-left, .bar-right {
+      height: 10px;
+      width: 0px;
+      margin: 5px 0px;
+    }
+    .bar-left {
+      left: 0;
+      border-width: 2px 0 2px 2px;
+    }
+    .none-left, .none-right {
+      height: 11px;
+      border-bottom-width: 2px;
+    }
+    .some-left {
+      height: 20px;
+      border-width: 2px 0pt 2px 2px;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+      background: #fff;
+      z-index: 2;
+    }
+    .some-right {
+      height: 20px;
+      border-width: 2px;
+      overflow: hidden;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      background: #fff;
+      z-index: 2;
+    }
+    .bar-right {
+      width: 0;
+      height: 10px;
+      margin: 5px 0;
+      right: 0;
+      border-width: 2px 2px 2px 0;
+    }
+  }
+}
+
+#assignment-details-dialog-stats-table {
+  font-size: 1.2em;
+  th, td {
+    padding: 2px 5px;
+    white-space: nowrap;
+  }
+  td {
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+}

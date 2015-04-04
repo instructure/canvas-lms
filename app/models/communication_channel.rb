@@ -27,7 +27,7 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :pseudonyms
   belongs_to :user
   has_many :notification_policies, :dependent => :destroy
-  has_many :delayed_messages
+  has_many :delayed_messages, :dependent => :destroy
   has_many :messages
 
   EXPORTABLE_ATTRIBUTES = [

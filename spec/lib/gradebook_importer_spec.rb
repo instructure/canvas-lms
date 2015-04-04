@@ -22,10 +22,13 @@ require 'csv'
 
 describe GradebookImporter do
   context "construction" do
-
     it "should require a context, usually a course" do
+      course = course_model
+      user = user_model
+      progress = Progress.create!(tag: "test", context: @user)
+
       expect{GradebookImporter.new(1)}.to raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
-      expect{GradebookImporter.new(course_model, valid_gradebook_contents)}.not_to raise_error
+      expect{GradebookImporter.new(course, valid_gradebook_contents, user, progress)}.not_to raise_error
     end
 
     it "should store the context and make it available" do
@@ -67,6 +70,12 @@ describe GradebookImporter do
       expect(@gi.assignments.length).to eq 1
       expect(@gi.assignments.first.points_possible).to eq 10
       expect(@gi.students.length).to eq 2
+    end
+
+    it "creates a GradebookUpload" do
+      course_model
+      new_gradebook_importer
+      expect(GradebookUpload.where(course_id: @course, user_id: @user)).not_to be_empty
     end
   end
 
@@ -343,11 +352,11 @@ describe GradebookImporter do
 
     before :once do
       setup_DA
-      @assignment_one.grade_student(@student_one, :grade => "3")
-      @assignment_two.grade_student(@student_two, :grade => "3")
     end
 
     it "should ignore submissions for students without visibility" do
+      @assignment_one.grade_student(@student_one, :grade => "3")
+      @assignment_two.grade_student(@student_two, :grade => "3")
       importer_with_rows(
         "Student,ID,Section,a1,a2",
         ",#{@student_one.id},#{@section_one.id},7,9",
@@ -359,11 +368,27 @@ describe GradebookImporter do
       expect(json[:students][1][:submissions][0]["grade"]).to eq ""
       expect(json[:students][1][:submissions][1]["grade"]).to eq "9"
     end
+
+    it "should not break the creation of new assignments" do
+      importer_with_rows(
+          "Student,ID,Section,a1,a2,a3",
+          "#{@student_one.name},#{@student_one.id},,1,2,3"
+      )
+      expect(@gi.assignments.last.title).to eq 'a3'
+      expect(@gi.assignments.last).to be_new_record
+      expect(@gi.assignments.last.id).to be < 0
+      json = @gi.as_json
+      expect(json[:students][0][:submissions].first["grade"]).to eq "1"
+      expect(json[:students][0][:submissions].last["grade"]).to eq "3"
+    end
   end
 end
 
 def new_gradebook_importer(contents = valid_gradebook_contents)
-  @gi = GradebookImporter.new(@course, contents)
+  @user = user_model
+  @progress = Progress.create!(tag: "test", context: @user)
+
+  @gi = GradebookImporter.new(@course, contents, @user, @progress)
   @gi.parse!
   @gi
 end

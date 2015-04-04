@@ -38,11 +38,14 @@ module Api::V1::AssignmentGroup
       assignments = opts[:assignments] || group.visible_assignments(user)
 
       user_content_attachments   = opts[:preloaded_user_content_attachments]
-      user_content_attachments ||= api_bulk_load_user_content_attachments(
-        assignments.map(&:description),
-        group.context,
-        user
-      )
+      unless opts[:exclude_descriptions]
+        user_content_attachments ||= api_bulk_load_user_content_attachments(
+          assignments.map(&:description),
+          group.context,
+          user
+        )
+      end
+
       hash['assignments'] = assignments.map { |a|
         a.context = group.context
         assignment_json(a, user, session,
@@ -53,7 +56,8 @@ module Api::V1::AssignmentGroup
           preloaded_user_content_attachments: user_content_attachments,
           include_visibility: includes.include?('assignment_visibility'),
           assignment_visibilities: opts[:assignment_visibilities].try(:[], a.id),
-          differentiated_assignments_enabled: opts[:differentiated_assignments_enabled]
+          differentiated_assignments_enabled: opts[:differentiated_assignments_enabled],
+          exclude_description: opts[:exclude_descriptions]
           )
       }
     end

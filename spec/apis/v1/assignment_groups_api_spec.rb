@@ -28,10 +28,10 @@ def set_up_groups
 end
 
 def set_up_four_assignments(assignment_opts = {})
-  @a1 = @course.assignments.create!({:title => "test1", :assignment_group => @group1, :points_possible => 10}.merge(assignment_opts))
-  @a2 = @course.assignments.create!({:title => "test2", :assignment_group => @group1, :points_possible => 12}.merge(assignment_opts))
-  @a3 = @course.assignments.create!({:title => "test3", :assignment_group => @group2, :points_possible => 8}.merge(assignment_opts))
-  @a4 = @course.assignments.create!({:title => "test4", :assignment_group => @group2, :points_possible => 9}.merge(assignment_opts))
+  @a1 = @course.assignments.create!({:title => "test1", :assignment_group => @group1, :points_possible => 10, :description => 'Assignment 1'}.merge(assignment_opts))
+  @a2 = @course.assignments.create!({:title => "test2", :assignment_group => @group1, :points_possible => 12, :description => 'Assignment 2'}.merge(assignment_opts))
+  @a3 = @course.assignments.create!({:title => "test3", :assignment_group => @group2, :points_possible => 8, :description => 'Assignment 3'}.merge(assignment_opts))
+  @a4 = @course.assignments.create!({:title => "test4", :assignment_group => @group2, :points_possible => 9, :description => 'Assignment 4'}.merge(assignment_opts))
 end
 
 def set_up_multiple_grading_periods
@@ -139,7 +139,32 @@ describe AssignmentGroupsController, type: :request do
       }
     ]
 
+    json.each do |group|
+      group["assignments"].each do |assignment|
+        expect(assignment).to have_key "description"
+      end
+    end
+
     compare_json(json, expected)
+  end
+
+  context "excluded descriptions" do
+    it "excludes the descriptions of assignments if the excluded_descriptions param is passed" do
+      set_up_groups
+      set_up_four_assignments
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&exclude_descriptions=1",
+                      { controller: 'assignment_groups', action: 'index',
+                        format: 'json', course_id: @course.id.to_s,
+                        include: ['assignments'],
+                        exclude_descriptions: 1
+      })
+
+      json.each do |group|
+        group["assignments"].each { |a| expect(a).to_not have_key "description" }
+      end
+    end
   end
 
   context "differentiated assignments" do

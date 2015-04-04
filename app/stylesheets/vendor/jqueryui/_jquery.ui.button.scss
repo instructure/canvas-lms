@@ -31,10 +31,15 @@ We use jQuery UI button set
   .ui-button {
     margin-left: 0;
     margin-right: -5px;
-
-    // get rid of rounded borders except on left-most and right-most edges
-    &:not(:first-of-type){ @include border-left-radius(0) }
-    &:not(:last-of-type){ @include border-right-radius(0) }
+    border-radius: 0;
+    &.ui-corner-right { 
+      border-top-right-radius: $baseBorderRadius;
+      border-bottom-right-radius: $baseBorderRadius;
+    }
+    &.ui-corner-left { 
+      border-top-left-radius: $baseBorderRadius;
+      border-bottom-left-radius: $baseBorderRadius;
+    }
   }
 }
 

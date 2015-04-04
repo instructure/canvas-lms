@@ -1,6 +1,6 @@
 
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/FilesUsage'
 ], (React, $, FilesUsage) ->

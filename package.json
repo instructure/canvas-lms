@@ -2,17 +2,17 @@
   "name": "canvas-lms",
   "version": "0.0.0",
   "dependencies": {
-    "requirejs": "~2.1.10",
-    "uglify-js": "~2.4.12",
-    "glob": "~3.2.9",
-    "compute-cluster": "0.0.9",
     "autoprefixer": "^2.2.0",
+    "coffee-script": "1.6.2",
+    "compute-cluster": "0.0.9",
+    "glob": "~3.2.9",
     "js-yaml": "^3.1.0",
     "lodash": "^2.4.1",
     "mkdirp": "^0.5.0",
     "node-sass": "0.9.3",
-    "coffee-script": "1.6.2",
-    "react-tools": "0.11.2"
+    "react-tools": "0.11.2",
+    "requirejs": "~2.1.10",
+    "uglify-js": "~2.4.12"
   },
   "devDependencies": {
     "fleck": "~0.5.1",
@@ -20,14 +20,14 @@
     "karma": "~0.10.9",
     "karma-coffee-preprocessor": "0.1.3",
     "karma-coverage": "~0.1.4",
-    "karma-firework-reporter": "~0.2.3",
+    "karma-firework-reporter": "~0.2.4",
     "karma-ie-launcher": "~0.1.1",
     "karma-opera-launcher": "~0.1.0",
     "karma-osx-reporter": "0.0.4",
     "karma-qunit": "~0.1.1",
+    "karma-requirejs": "^0.2.2",
     "karma-safari-launcher": "~0.1.1",
-    "loom": "~2.0.0",
-    "testem": "~0.3.30",
+    "testem": "~0.7.1",
     "xsslint": "0.1.0"
   },
   "repository": {

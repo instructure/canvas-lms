@@ -166,7 +166,7 @@ ul[class*=ac-] {
   &:hover {
     background: #bccef4;
     @if $use-high-contrast {
-      background: $canvas-light;  
+      background: $ic-color-light;  
     }
     border-color: #6f94e6;
   }
@@ -192,7 +192,7 @@ ul[class*=ac-] {
 // to a new conversation
 i[class*=icon-].icon-messageRecipient--cancel {
   &:before {
-    background: $canvas-primary;
+    background: $ic-brand-primary;
     border-radius: 10px;
     padding: 2px;
     font-size: 9px;
@@ -260,25 +260,19 @@ i[class*=icon-].icon-messageRecipient--cancel {
 
   &.selected, &:hover {
     background: $ic-bg-light-primary;
-    color: #fff;
-		text-shadow: -1px -1px 0 rgba(0, 0, 0, .2);
+    color: $ic-brand-primary;
   }
 }
 
 .ac-result-list {
   .context, .everyone {
     border-bottom: 1px solid $ic-border-light;
-    color: $canvas-primary;
-
-    &.selected, &:hover {
-      color: #fff;
-    }
+    color: $ic-brand-primary;
   }
 
   .back {
     color: #333;
   }
-
   li:last-child {
     border-bottom: none;
   }
@@ -292,6 +286,6 @@ i[class*=icon-].icon-messageRecipient--cancel {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 80%;
+    width: 80%;    
   }
 }

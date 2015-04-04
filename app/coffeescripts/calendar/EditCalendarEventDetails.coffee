@@ -46,7 +46,8 @@ define [
       data = @$form.getFormData(object_name: 'calendar_event')
       data = _.omit(data, 'date', 'start_time', 'end_time')
 
-      date = @$form.find('input[name=date]').data('date')
+      # check if input box was cleared for explicitly undated
+      date = @$form.find('input[name=date]').data('date') if @$form.find('input[name=date]').val()
       if date
         start_time = @$form.find('input[name=start_time]').data('date')
         start_at = date.toString('yyyy-MM-dd')

@@ -111,7 +111,7 @@ class EportfolioEntriesController < ApplicationController
       @attachment = @portfolio.user.all_attachments.where(uuid: params[:attachment_id]).first
       # @entry.check_for_matching_attachment_id
       begin
-        redirect_to verified_file_download_url(@attachment)
+        redirect_to verified_file_download_url(@attachment, @portfolio)
       rescue
         raise t('errors.not_found', "Not Found")
       end

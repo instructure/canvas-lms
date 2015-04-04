@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/ItemCog'
   'compiled/models/Folder'
@@ -11,16 +11,18 @@ define [
     setup: ->
 
       @sampleProps = (canManageFiles = false) ->
-        return {
-          model: new Folder(id: 999)
-          startEditingName: -> debugger
-          userCanManageFilesForContext: canManageFiles
-        }
+        model: new Folder(id: 999)
+        modalOptions:
+          closeModal: ->
+          openModal: ->
+        startEditingName: ->
+        userCanManageFilesForContext: canManageFiles
+
 
       @buttonsEnabled = (itemCog, config) ->
         valid = true
         for prop of config
-          button = if typeof itemCog.refs[prop] isnt 'undefined' then $(itemCog.refs[prop].getDOMNode()).length else false
+          button = if typeof itemCog.refs?[prop] isnt 'undefined' then $(itemCog.refs?[prop].getDOMNode()).length else false
           if (config[prop] is true and !!button) or (config[prop] is false and !button)
             continue
           else
@@ -41,7 +43,7 @@ define [
         'move': true
         'deleteLink': true
 
-      @itemCog = React.renderComponent(ItemCog(@sampleProps(true)), $('<div>').appendTo('body')[0])
+      @itemCog = React.render(ItemCog(@sampleProps(true)), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@itemCog.getDOMNode().parentNode)
@@ -59,7 +61,7 @@ define [
     ajaxSpy.restore()
 
   test 'only shows download button for limited users', ->
-    readOnlyItemCog = React.renderComponent(ItemCog(@sampleProps(false)), $('<div>').appendTo('body')[0])
+    readOnlyItemCog = React.render(ItemCog(@sampleProps(false)), $('<div>').appendTo('body')[0])
     ok @buttonsEnabled(readOnlyItemCog, @readOnlyConfig), 'only download button is shown'
 
   test 'shows all buttons for users with manage_files permissions', ->

@@ -5,14 +5,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     edit_form = f('#edit_appointment_form')
     keep_trying_until { expect(edit_form).to be_displayed }
     replace_content(fj('input[name="title"]'), new_appointment_text)
-    f('.ag_contexts_selector').click
-    f('.ag_sections_toggle').click
-    if opts[:section_codes]
-      opts[:section_codes].each { |code| f("[name='sections[]'][value='#{code}']").click }
-    else
-      f('[name="context_codes[]"]').click
+    unless opts[:skip_contexts]
+      f('.ag_contexts_selector').click
+      f('.ag_sections_toggle').click
+      if opts[:section_codes]
+        opts[:section_codes].each { |code| f("[name='sections[]'][value='#{code}']").click }
+      else
+        f('[name="context_codes[]"]').click
+      end
+      f('.ag_contexts_done').click
     end
-    f('.ag_contexts_done').click
     if opts[:checkable_options]
       if opts[:checkable_options].has_key?(:per_slot_option)
         set_value f('[type=checkbox][name="per_slot_option"]'), true

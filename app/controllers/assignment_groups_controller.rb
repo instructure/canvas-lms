@@ -138,11 +138,14 @@ class AssignmentGroupsController < ApplicationController
           ActiveRecord::Associations::Preloader.new(all_visible_assignments, module_includes).run
         end
 
-        assignment_descriptions = all_visible_assignments.map(&:description)
         assignments_by_group = all_visible_assignments.group_by(&:assignment_group_id)
-        user_content_attachments = api_bulk_load_user_content_attachments(
-          assignment_descriptions, @context, @current_user
-        )
+
+        unless params[:exclude_descriptions]
+          assignment_descriptions = all_visible_assignments.map(&:description)
+          user_content_attachments = api_bulk_load_user_content_attachments(
+            assignment_descriptions, @context, @current_user
+          )
+        end
 
         override_param = params[:override_assignment_dates] || true
         override_dates = value_to_boolean(override_param)
@@ -167,7 +170,8 @@ class AssignmentGroupsController < ApplicationController
                                   preloaded_user_content_attachments: user_content_attachments,
                                   assignments: assignments,
                                   assignment_visibilities: assignment_visibilities,
-                                  differentiated_assignments_enabled: da_enabled
+                                  differentiated_assignments_enabled: da_enabled,
+                                  exclude_descriptions: !!params[:exclude_descriptions]
                                   )
           }
           render :json => json

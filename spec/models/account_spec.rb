@@ -1211,4 +1211,50 @@ describe Account do
       end
     end
   end
+
+  context "inheritable settings" do
+    before :each do
+      account_model
+      @sub1 = @account.sub_accounts.create!
+      @sub2 = @sub1.sub_accounts.create!
+    end
+
+    it "should use the default value if nothing is set anywhere" do
+      expected = {:locked => false, :value => false}
+      [@account, @sub1, @sub2].each do |a|
+        expect(a.restrict_student_future_view).to eq expected
+      end
+    end
+
+    it "should be able to lock values for sub-accounts" do
+      @sub1.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+      @sub1.save!
+      # should ignore the subaccount's wishes
+      @sub2.settings[:restrict_student_future_view] = {:locked => true, :value => false}
+      @sub2.save!
+
+      expect(@account.restrict_student_future_view).to eq({:locked => false, :value => false})
+      expect(@sub1.restrict_student_future_view).to eq({:locked => true, :value => true})
+      expect(@sub2.restrict_student_future_view).to eq({:locked => true, :value => true, :inherited => true})
+    end
+
+    it "should grandfather old pre-hash values in" do
+      @account.settings[:restrict_student_future_view] = true
+      @account.save!
+      @sub2.settings[:restrict_student_future_view] = false
+      @sub2.save!
+
+      expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
+      expect(@sub1.restrict_student_future_view).to eq({:locked => false, :value => true, :inherited => true})
+      expect(@sub2.restrict_student_future_view).to eq({:locked => false, :value => false})
+    end
+
+    it "should translate string values in mass-assignment" do
+      settings = @account.settings
+      settings[:restrict_student_future_view] = {"value" => "1", "locked" => "0"}
+      @account.settings = settings
+      @account.save!
+      expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
+    end
+  end
 end

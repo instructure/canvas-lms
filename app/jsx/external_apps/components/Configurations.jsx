@@ -16,14 +16,14 @@ define([
         if (!ENV.APP_CENTER['enabled']) {
           return '';
         }
-        return <Link ref="appCenterLink" to="appList" className="btn view_tools_link lm pull-right">{I18n.t('View App Center')}</Link>;
+        return <Link ref="appCenterLink" to="appList" className="btn view_tools_link lm">{I18n.t('View App Center')}</Link>;
       }.bind(this);
 
       return (
         <div className="Configurations">
           <Header>
-            {appCenterLink()}
             <AddExternalToolButton />
+            {appCenterLink()}
           </Header>
           <ExternalToolsTable />
         </div>

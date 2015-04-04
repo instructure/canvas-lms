@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/UploadButton'
   'compiled/react_files/modules/FileOptionsCollection'
@@ -14,7 +14,7 @@ define [
           files:
             models: []
 
-      @button = React.renderComponent(UploadButton(props), $('<div>').appendTo('body')[0])
+      @button = React.render(UploadButton(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@button.getDOMNode().parentNode)

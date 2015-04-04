@@ -316,5 +316,35 @@ describe UsersController do
       expect(@admin.pseudonyms.count).to eq 2
     end
   end
+
+  context "media_download url" do
+    let(:kaltura_client) do
+      kaltura_client = mock('CanvasKaltura::ClientV3').responds_like_instance_of(CanvasKaltura::ClientV3)
+      CanvasKaltura::ClientV3.stubs(:new).returns(kaltura_client)
+      kaltura_client
+    end
+
+    let(:media_source_fetcher) {
+      media_source_fetcher = mock('MediaSourceFetcher').responds_like_instance_of(MediaSourceFetcher)
+      MediaSourceFetcher.expects(:new).with(kaltura_client).returns(media_source_fetcher)
+      media_source_fetcher
+    }
+
+    before do
+      account = Account.create!
+      course_with_student(:active_all => true, :account => account)
+      user_session(@student)
+    end
+
+    it 'should pass the type down to the media fetcher even with a malformed url' do
+      media_source_fetcher.expects(:fetch_preferred_source_url).
+          with(media_id: 'someMediaId', file_extension: 'mp4', media_type: nil).
+          returns('http://example.com/media.mp4')
+
+      # this url actually passes "mp4" into params[:format] instead of params[:type] now
+      # but we're going to handle it anyway because we're so nice
+      get "/courses/#{@course.id}/media_download.mp4?entryId=someMediaId"
+    end
+  end
 end
 

@@ -27,7 +27,7 @@ class KalturaMediaFileHandler
     attachments.select{|a| !a.media_object }.each do |attachment|
       files << {
                   :name       => attachment.display_name,
-                  :url        => attachment.cacheable_s3_download_url,
+                  :url        => attachment.download_url,
                   :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
                   :partner_data  => build_partner_data(attachment)
                }
