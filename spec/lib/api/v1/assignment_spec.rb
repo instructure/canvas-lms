@@ -3,7 +3,7 @@ require_relative '../../../spec_helper.rb'
 class AssignmentApiHarness
   include Api::V1::Assignment
   def api_user_content(description, course, user, opts)
-    return "api_user_content(#{description}, #{course.id}, #{user.id})"
+    "api_user_content(#{description}, #{course.id}, #{user.id})"
   end
 
   def course_assignment_url(context_id, assignment)
@@ -51,10 +51,24 @@ describe "Api::V1::Assignment" do
     end
 
     it "excludes descriptions when exclude_description flag is passed" do
+      @assignment.description = "Foobers"
+      json = api.assignment_json(@assignment, @user, @session,
+               {override_dates: false})
+      expect(json).to be_a(Hash)
+      expect(json).to have_key "description"
+      expect(json['description']).to eq(api.api_user_content("Foobers", @course, @user, {}))
+
+
       json = api.assignment_json(@assignment, @user, @session,
                {override_dates: false, exclude_description: true})
       expect(json).to be_a(Hash)
       expect(json).to_not have_key "description"
+
+      json = api.assignment_json(@assignment, @user, @session,
+               {override_dates: false})
+      expect(json).to be_a(Hash)
+      expect(json).to have_key "description"
+      expect(json['description']).to eq(api.api_user_content("Foobers", @course, @user, {}))
     end
   end
 end

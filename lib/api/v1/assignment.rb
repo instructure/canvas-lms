@@ -44,7 +44,7 @@ module Api::V1::Assignment
       group_category_id
       grading_standard_id
     )
-  }
+  }.freeze
 
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
     :only => %w(
@@ -53,7 +53,7 @@ module Api::V1::Assignment
       assignment_group_id
       post_to_sis
     )
-  }
+  }.freeze
 
   def assignments_json(assignments, user, session, opts = {})
     assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
@@ -70,12 +70,14 @@ module Api::V1::Assignment
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
+
     end
 
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
     if opts[:exclude_description]
-      fields = fields.dup
-      fields[:only].delete("description")
+      fields_copy = fields[:only].dup
+      fields_copy.delete("description")
+      fields = {only: fields_copy}
     end
 
     hash = api_json(assignment, user, session, fields)
