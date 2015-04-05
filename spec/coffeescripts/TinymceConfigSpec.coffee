@@ -67,3 +67,8 @@ define ['tinymce.config'], (EditorConfig)->
     config = new EditorConfig(tinymce, INST, largeScreenWidth, dom_id)
     schema = config.defaultConfig()
     equal(schema.skin_url, "/vendor/tinymce_themes/light")
+
+  test "browser spellcheck enabled by default", ->
+    config = new EditorConfig(tinymce, INST, largeScreenWidth, dom_id)
+    schema = config.defaultConfig()
+    equal(schema.browser_spellcheck, true)
