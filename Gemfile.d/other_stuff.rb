@@ -35,7 +35,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.7'
   gem 'adobe_connect', '1.0.2', require: false
 gem 'canvas_webex', '0.15'
-gem 'canvas-jobs', '0.9.11'
+gem 'canvas-jobs', '0.9.12'
 
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.12'
@@ -97,6 +97,7 @@ gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'aroi', '0.0.2'
+gem 'sentry-raven', '0.12.3', require: false
 
 gem 'active_polymorph', path: 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'

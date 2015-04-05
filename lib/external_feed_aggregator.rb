@@ -100,11 +100,11 @@ class ExternalFeedAggregator
       feed.increment(:consecutive_failures)
       feed.increment(:failures)
       feed.update_attribute(:refresh_at, Time.now.utc + (FAILURE_WAIT_SECONDS))
-      ErrorReport.log_exception(:default, e, {
-        :message => "External Feed aggregation failed",
-        :feed_url => feed.url,
-        :feed_id => feed.id,
-        :user_id => feed.user_id,
+      Canvas::Errors.capture(e, {
+        message: "External Feed aggregation failed",
+        feed_url: feed.url,
+        feed_id: feed.id,
+        user_id: feed.user_id,
       })
     end
   end

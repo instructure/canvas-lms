@@ -179,7 +179,7 @@ module Canvas
     raise if options[:raise_on_timeout]
     return nil
   rescue Timeout::Error => e
-    ErrorReport.log_exception(:service_timeout, e)
+    Canvas::Errors.capture_exception(:service_timeout, e)
     raise if options[:raise_on_timeout]
     return nil
   end

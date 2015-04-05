@@ -19,11 +19,12 @@ module Importers
     def self.process_migration(data, migration)
       wikis = data['wikis'] ? data['wikis']: []
       wikis.each do |wiki|
-        if !wiki
-          ErrorReport.log_error(:content_migration, :message => "There was a nil wiki page imported for ContentMigration:#{migration.id}")
+        unless wiki
+          message = "There was a nil wiki page imported for ContentMigration:#{migration.id}"
+          Canvas::Errors.capture(:content_migration, message: message)
           next
         end
-        next unless migration.import_object?("wiki_pages", wiki['migration_id']) || migration.import_object?("wikis", wiki['migration_id'])
+        next unless wiki_page_migration?(migration, wiki)
         begin
           self.import_from_migration(wiki, migration.context, migration) if wiki
         rescue
@@ -31,6 +32,12 @@ module Importers
         end
       end
     end
+
+    def self.wiki_page_migration?(migration, wiki)
+      migration.import_object?("wiki_pages", wiki['migration_id']) ||
+        migration.import_object?("wikis", wiki['migration_id'])
+    end
+    private_class_method :wiki_page_migration?
 
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access

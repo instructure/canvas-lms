@@ -97,8 +97,8 @@ class Progress < ActiveRecord::Base
     end
 
     def on_permanent_failure(error)
-      error_report = ErrorReport.log_exception("Progress::Work", error)
-      @progress.message = "Unexpected error, ID: #{error_report.id rescue "unknown"}"
+      er_id = Canvas::Errors.capture_exception("Progress::Work", error)[:error_report]
+      @progress.message = "Unexpected error, ID: #{er_id || 'unknown'}"
       @progress.save
       @progress.fail
     end

@@ -932,7 +932,7 @@ class ApplicationController < ActionController::Base
       logger.fatal("#{message}\n\n")
     end
 
-    if config.consider_all_requests_local || local_request?
+    if config.consider_all_requests_local
       rescue_action_locally(exception)
     else
       rescue_action_in_public(exception)
@@ -971,23 +971,11 @@ class ApplicationController < ActionController::Base
       type = '404' if status == '404 Not Found'
 
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
-        error_info = {
-          :url => request.url,
-          :user => @current_user,
-          :user_agent => request.headers['User-Agent'],
-          :request_context_id => RequestContextGenerator.request_id,
-          :account => @domain_root_account,
-          :request_method => request.request_method_symbol,
-          :format => request.format,
-        }.merge(ErrorReport.useful_http_env_stuff_from_request(request))
-
-        error = if @domain_root_account
-          @domain_root_account.shard.activate do
-            ErrorReport.log_exception(type, exception, error_info)
-          end
-        else
-          ErrorReport.log_exception(type, exception, error_info)
-        end
+        opts = {type: type}
+        info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
+        error_info = info.to_h
+        capture_outputs = Canvas::Errors.capture(exception, error_info)
+        error = ErrorReport.find(capture_outputs[:error_report])
       end
 
       if api_request?
@@ -997,8 +985,8 @@ class ApplicationController < ActionController::Base
       end
     rescue => e
       # error generating the error page? failsafe.
+      Canvas::Errors.capture(e)
       render_optional_error_file response_code_for_rescue(exception)
-      ErrorReport.log_exception(:default, e)
     end
   end
 
@@ -1094,10 +1082,6 @@ class ApplicationController < ActionController::Base
     else
       super
     end
-  end
-
-  def local_request?
-    false
   end
 
   def claim_session_course(course, user, state=nil)

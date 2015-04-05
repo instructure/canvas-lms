@@ -173,12 +173,12 @@ class AssignmentsController < ApplicationController
       docs = {}
       begin
         docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDocs::NoTokenError
-        #do nothing
-      rescue ArgumentError
-        #do nothing
+      rescue GoogleDocs::NoTokenError => e
+        CanvasErrors.capture_exception(:oauth, e)
+      rescue ArgumentError => e
+        CanvasErrors.capture_exception(:oauth, e)
       rescue => e
-        ErrorReport.log_exception(:oauth, e)
+        CanvasErrors.capture_exception(:oauth, e)
         raise e
       end
       respond_to do |format|

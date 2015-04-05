@@ -175,11 +175,17 @@ module SIS
         end
       rescue => e
         if @batch
-          error_report = ErrorReport.log_exception(:sis_import, e,
-            :message => "Importing CSV for account: #{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e.to_s}",
-            :during_tests => false
-          )
-          add_error(nil, I18n.t("Error while importing CSV. Please contact support. (Error report %{number})", number: error_report.id))
+          message = "Importing CSV for account"\
+            ": #{@root_account.id} (#{@root_account.name}) "\
+            "sis_batch_id: #{@batch.id}: #{e}"
+          err_id = Canvas::Errors.capture(e,{
+            type: :sis_import,
+            message: message,
+            during_tests: false
+          })[:error_report]
+          error_message = I18n.t("Error while importing CSV. Please contact support."\
+                                 " (Error report %{number})", number: err_id)
+          add_error(nil, error_message)
         else
           add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}")
           raise e
@@ -259,11 +265,16 @@ module SIS
           importerObject.process(csv)
           run_next_importer(IMPORTERS[IMPORTERS.index(importer) + 1]) if complete_importer(importer)
         rescue => e
-          error_report = ErrorReport.log_exception(:sis_import, e,
-            :message => "Importing CSV for account: #{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e.to_s}",
-            :during_tests => false
-          )
-          add_error(nil, I18n.t("Error while importing CSV. Please contact support. (Error report %{number})", number: error_report.id))
+          message = "Importing CSV for account: "\
+            "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
+          err_id = Canvas::Errors.capture(e, {
+            type: :sis_import,
+            message: message,
+            during_tests: false
+          })[:error_report]
+          error_message = I18n.t("Error while importing CSV. Please contact support. "\
+                                 "(Error report %{number})", number: err_id)
+          add_error(nil, error_message)
           @batch.processing_errors ||= []
           @batch.processing_warnings ||= []
           @batch.processing_errors.concat(@errors)
@@ -274,7 +285,7 @@ module SIS
           file.close if file
         end
       end
-    
+
       private
 
       def run_next_importer(importer)

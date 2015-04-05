@@ -52,19 +52,23 @@ class InfoController < ApplicationController
       @report.account ||= @domain_root_account
       backtrace = params[:error].delete(:backtrace) rescue nil
       backtrace ||= ""
-      backtrace += "\n\n-----------------------------------------\n\n" + @report.backtrace if @report.backtrace
+      if @report.backtrace
+        backtrace += "\n\n-----------------------------------------\n\n"
+        backtrace += @report.backtrace
+      end
       @report.backtrace = backtrace
-      @report.http_env ||= ErrorReport.useful_http_env_stuff_from_request(request)
+      @report.http_env ||= Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
       @report.request_context_id = RequestContextGenerator.request_id
       @report.assign_data(error)
       @report.save
       @report.send_later(:send_to_external)
     rescue => e
       @exception = e
-      ErrorReport.log_exception(:default, e,
-        :message => "Error Report Creation failed",
-        :user_email => (error[:email] rescue ''),
-        :user_id => @current_user.try(:id)
+      Canvas::Errors.capture(
+        e,
+        message: "Error Report Creation failed",
+        user_email: error[:email],
+        user_id: @current_user.try(:id)
       )
     end
     respond_to do |format|

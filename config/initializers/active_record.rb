@@ -206,10 +206,10 @@ class ActiveRecord::Base
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      self.context_type.constantize.update_all({ :updated_at => Time.now.utc }, { :id => self.context_id })
+      self.context_type.constantize.update_all({ updated_at: Time.now.utc }, { id: self.context_id })
     end
   rescue
-    ErrorReport.log_exception(:touch_context, $!)
+    Canvas::Errors.capture_exception(:touch_context, $ERROR_INFO)
   end
 
   def touch_user
@@ -225,7 +225,7 @@ class ActiveRecord::Base
     end
     true
   rescue
-    ErrorReport.log_exception(:touch_user, $!)
+    Canvas::Errors.capture_exception(:touch_user, $ERROR_INFO)
     false
   end
 

@@ -60,9 +60,7 @@ class DelayedNotification < ActiveRecord::Base
     self.do_process unless self.new_record?
     res
   rescue => e
-    ErrorReport.log_exception(:default, e, {
-      :message => "Delayed Notification processing failed",
-    })
+    Canvas::Errors.capture(e, message: "Delayed Notification processing failed")
     logger.error "delayed notification processing failed: #{e.message}\n#{e.backtrace.join "\n"}"
     self.workflow_state = 'errored'
     self.save

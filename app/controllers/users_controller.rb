@@ -238,9 +238,9 @@ class UsersController < ApplicationController
         end
 
         flash[:notice] = t('google_drive_added', "Google Drive account successfully added!")
-        redirect_to json['return_to_url'] and return
+        return redirect_to(json['return_to_url'])
       rescue => e
-        ErrorReport.log_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
         flash[:error] = t('google_drive_fail', "Google Drive authorization failed. Please try again")
       end
     end
@@ -274,7 +274,7 @@ class UsersController < ApplicationController
 
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
-          ErrorReport.log_exception(:oauth, e)
+          Canvas::Errors.capture_exception(:oauth, e)
           flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
         end
       elsif params[:service] == "linked_in"
@@ -302,7 +302,7 @@ class UsersController < ApplicationController
 
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
-          ErrorReport.log_exception(:oauth, e)
+          Canvas::Errors.capture_exception(:oauth, e)
           flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
         end
       else
@@ -327,7 +327,7 @@ class UsersController < ApplicationController
 
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
-          ErrorReport.log_exception(:oauth, e)
+          Canvas::Errors.capture_exception(:oauth, e)
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
       end

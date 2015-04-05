@@ -146,7 +146,7 @@ class CrocodocDocument < ActiveRecord::Base
             if status['status'] == 'ERROR'
               error = status['error'] || 'No explanation given'
               error_uuids << status['uuid']
-              ErrorReport.log_error 'crocodoc', :message => error
+              Canvas::Errors.capture 'crocodoc', message: error
             end
           end
 

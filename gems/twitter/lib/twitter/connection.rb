@@ -77,14 +77,14 @@ module Twitter
             @service.destroy if @service
             @twitter_service.destroy if @twitter_service
           end
-          ErrorReport.log_error(:processing, {
-            :backtrace => "Retrieving twitter list for #{@twitter_service.inspect}",
-            :response => response.inspect,
-            :body => response.body,
-            :message => response['X-RateLimit-Reset'],
-            :url => url
+          Canvas::Errors.capture(:processing, {
+            backtrace: "Retrieving twitter list for #{@twitter_service.inspect}",
+            response: response.inspect,
+            body: response.body,
+            message: response['X-RateLimit-Reset'],
+            url: url
           })
-          retry_after = (response['X-RateLimit-Reset'].to_i - Time.now.utc.to_i) rescue 0 #response['Retry-After'].to_i rescue 0
+          retry_after = (response['X-RateLimit-Reset'].to_i - Time.now.utc.to_i) rescue 0
           raise "Retry After #{retry_after}"
       end
       res

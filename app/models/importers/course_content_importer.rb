@@ -92,8 +92,9 @@ module Importers
           begin
             self.import_media_objects(mo_attachments, migration)
           rescue => e
-            er = ErrorReport.log_exception(:import_media_objects, e)
-            migration.add_error(t(:failed_import_media_objects, %{Failed to import media objects}), error_report_id: er.id)
+            er = Canvas::Errors.capture_exception(:import_media_objects, e)[:error_report]
+            error_message = t('Failed to import media objects')
+            migration.add_error(error_message, error_report_id: er)
           end
         end
         if migration.canvas_import?

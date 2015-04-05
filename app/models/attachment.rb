@@ -1199,7 +1199,7 @@ class Attachment < ActiveRecord::Base
     end
   rescue => e
     update_attribute(:workflow_state, 'errored')
-    ErrorReport.log_exception(:canvadocs, e, :attachment_id => id)
+    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
 
     if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
       send_later_enqueue_args :submit_to_canvadocs, {
@@ -1219,7 +1219,7 @@ class Attachment < ActiveRecord::Base
     end
   rescue => e
     update_attribute(:workflow_state, 'errored')
-    ErrorReport.log_exception(:crocodoc, e, :attachment_id => id)
+    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
 
     if attempt <= Setting.get('max_crocodoc_attempts', '5').to_i
       send_later_enqueue_args :submit_to_crocodoc, {

@@ -25,9 +25,9 @@ class CourseLinkValidator
     validator.check_course(progress)
     progress.set_results({:issues => validator.issues, :completed_at => Time.now.utc})
   rescue
-    report = ErrorReport.log_exception(:course_link_validation, $!)
+    report_id = Canvas::Errors.capture_exception(:course_link_validation, $ERROR_INFO)[:error_report]
     progress.workflow_state = 'failed'
-    progress.set_results({:error_report_id => report.id, :completed_at => Time.now.utc})
+    progress.set_results({error_report_id: report_id, completed_at: Time.now.utc})
   end
 
   attr_accessor :course, :issues, :visited_urls
