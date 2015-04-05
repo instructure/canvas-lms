@@ -1,0 +1,22 @@
+Lint/FreezeConstants:
+  enabled: true
+
+Migration/ConcurrentIndex: &Migration
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
+Migration/SendLater:
+  <<: *Migration
+
+Migration/PrimaryKey:
+  <<: *Migration
+
+Migration/RemoveColumn:
+  <<: *Migration
+
+Datafixup/FindIds:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+    - "**/lib/data_fixup/*.rb"

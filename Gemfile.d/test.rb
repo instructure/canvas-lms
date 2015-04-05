@@ -17,6 +17,11 @@ group :test do
   gem 'rspec-rails', '3.2.0'
   gem 'rspec-legacy_formatters', '1.0.0'
   gem 'rspec-collection_matchers', '1.1.2'
+
+  gem 'rubocop', require: false
+  gem 'rubocop-rspec', require: false
+  gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
+
   gem 'once-ler', '0.0.15'
 
   gem 'sequel', '4.5.0', require: false

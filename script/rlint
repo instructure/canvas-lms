@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+$:.push File.expand_path("../../gems/rubocop-canvas/lib", __FILE__)
+
+def git_changes(include_untracked=false)
+  if include_untracked
+    `git status --porcelain`
+  else
+    `git status --porcelain -uno`
+  end
+end
+
+def git_is_dirty?
+  !git_changes.strip.empty?
+end
+
+def head_sha
+  `git log --oneline -n 1 | cut -d " " -f 1`
+end
+
+def pick_ruby_files(env_sha)
+  sha = env_sha
+  if sha.nil?
+    if git_is_dirty?
+      return git_changes(true).split("\n").map{|f| f.strip.split(/\s/).last }.select{|f| f =~ /\.rb$/}
+    else
+      # no changes, no sha specified, use the HEAD commit
+      sha = head_sha
+    end
+  end
+  files = `git diff-tree --no-commit-id --name-only -r #{sha}`
+  return files.split("\n").select{|f| f =~ /\.rb$/}
+end
+
+def git_diff(env_sha)
+  sha = env_sha
+  if sha.nil?
+    return `git diff` if git_is_dirty?
+    sha = head_sha
+  end
+  `git show #{sha}`
+end
+
+require 'rubocop_canvas'
+
+env_sha = ENV['SHA']
+ruby_files = pick_ruby_files(env_sha)
+cli = RuboCop::CLI.new
+if ENV['GERRIT_REPO']
+  # we're on a jenkins box, lets send diff info via gergich
+  require 'rubocop_canvas/helpers/comments'
+  require 'shellwords'
+  cli.run(ruby_files + ["--format", "json", "--out", "rubocop.json"])
+  results_json = JSON.parse(File.read("rubocop.json"))
+  diff = git_diff(env_sha)
+  comments = RuboCop::Canvas::Comments.build(diff, results_json)
+  comments.each do |comment|
+    `gergich comment #{Shellwords.escape(comment.to_json)}`
+  end
+else
+  #local run, just spit out everything wrong with these files to output
+  cli.run(ruby_files)
+end

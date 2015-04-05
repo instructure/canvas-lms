@@ -1,0 +1,68 @@
+require:
+  - rubocop-rspec
+  # this odd relative path is so that rubocop works when run without "bundle
+  # exec", such as from most editors/IDEs.
+  - ./gems/rubocop-canvas/lib/rubocop_canvas
+
+AllCops:
+  RunRailsCops: true
+
+# our style changes: disabling style rules we aren't interested in
+Style/StringLiterals:
+  Enabled: false
+Style/SignalException:
+  Enabled: false
+Style/SpaceBeforeBlockBraces:
+  Enabled: false
+Style/SpaceInsideBlockBraces:
+  Enabled: false
+Style/NumericLiterals:
+  Enabled: false
+Style/BracesAroundHashParameters:
+  Enabled: false
+Style/SpaceInsideBrackets:
+  Enabled: false
+Style/SpaceInsideHashLiteralBraces:
+  Enabled: false
+Style/PercentLiteralDelimiters:
+  Enabled: false
+Style/SpaceAroundOperators:
+  Enabled: false
+Style/SpaceAfterColon:
+  Enabled: false
+Style/SpaceAfterComma:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: false
+Style/EmptyLines:
+  Enabled: false
+Style/EmptyLinesAroundMethodBody:
+  Enabled: false
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+Style/EmptyLinesAroundModuleBody:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+Style/SpaceAroundEqualsInParameterDefault:
+  Enabled: false
+Style/SingleSpaceBeforeFirstArg:
+  Enabled: false
+Style/HashSyntax:
+  Enabled: false
+Style/EmptyLinesAroundAccessModifier:
+  Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
+Style/PercentQLiterals:
+  Enabled: false
+Style/IndentHash:
+  Enabled: false
