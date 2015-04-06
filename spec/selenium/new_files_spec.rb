@@ -5,13 +5,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
    include_examples "in-process server selenium tests"
 
    context "As a teacher", :priority => "1" do
-      before (:each) do
+       before(:each) do
         course_with_teacher_logged_in
         Account.default.enable_feature!(:better_file_browsing)
         add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
          @course, "example.pdf")
         get "/courses/#{@course.id}/files"
-      end
+       end
 
       it "should display new files UI" do
         expect(f('.btn-upload')).to be_displayed
@@ -94,6 +94,59 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       end
    end
 
+   context "Search textbox" do
+     before(:each) do
+      course_with_teacher_logged_in
+      Account.default.enable_feature!(:better_file_browsing)
+      txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
+      txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'),
+               @course, text_file) }
+      get "/courses/#{@course.id}/files"
+     end
+
+    it "should search for a file", :priority => '2', :test_id => 121924 do
+      edit_name_from_cog("b_file1.txt")
+      wait_for_ajaximations
+      f("input[type='search']").send_keys "b_fi"
+      driver.action.send_keys(:return).perform
+      # Unable to find matching line from backtrace error is encountered if refresh_page is not used
+      refresh_page
+      expect(get_all_files_folders.count).to eq 2
+    end
+   end
+
+   context "Move dialog" do
+     before(:each) do
+      course_with_teacher_logged_in
+      Account.default.enable_feature!(:better_file_browsing)
+      txt_files = ["a_file.txt", "b_file.txt"]
+      txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file) }
+      get "/courses/#{@course.id}/files"
+     end
+
+    it "should set focus to the folder tree when opening the dialog", :priority => '1', :test_id =>180641 do
+      ff('.al-trigger')[0].click
+      fln("Move").click
+      wait_for_ajaximations
+      check_element_has_focus(ff('.tree')[1])
+    end
+
+    it "should move a file", :priority => '1', :test_id => 129453 do
+      file_name = "a_file.txt"
+      add_folder("destination_folder")
+      move_using_cog(file_name)
+      wait_for_ajaximations
+      expect(f("#flash_message_holder").text).to eq "#{file_name} moved to destination_folder\nClose"
+      wait_for_ajaximations
+      expect(ff('.media-body')[0].text).not_to eq file_name
+      ff('.media-body')[1].click
+      wait_for_ajaximations
+      expect(fln(file_name)).to be_displayed
+    end
+   end
+
+
+
    context "File Downloads", :priority => "2" do
       it "should download a file from top toolbar successfully" do
         skip("Skipped until issue with firefox on OSX is resolved")
@@ -112,17 +165,16 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
    end
 
    context "Publish Cloud Dialog", :priority => '2' do
-    before (:each) do
+     before(:each) do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:better_file_browsing)
       add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
                @course, "a_file.txt")
       get "/courses/#{@course.id}/files"
-    end
+     end
 
     it "should validate that file is published by default" do
-        icon_publish_color = ff('.icon-publish')[0].css_value('color')
-        expect(f('.btn-link.published-status.published')).to be_displayed
+      expect(f('.btn-link.published-status.published')).to be_displayed
     end
 
     it "should set focus to the close button when opening the dialog" do
