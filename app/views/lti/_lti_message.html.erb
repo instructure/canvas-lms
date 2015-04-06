@@ -7,7 +7,7 @@
 
 <% if @lti_launch.resource_url.start_with?('http://') %>
     <div class="alert alert-error" id="insecure_content_msg">
-        <p><%= t('You are trying to launch insecure content from within a secure site (canvas).  Some internet browsers may prevent this content from loading.') %></p>
+        <p><%= t('You are trying to launch insecure content from within a secure site (canvas).  Some web browsers may prevent this content from loading.') %></p>
         <p id="load_failure" class="hide"><%= t('It looks like your content might not load.  You can use this button to try launching it in a new tab.') %></p>
     </div>
 <% end %>
