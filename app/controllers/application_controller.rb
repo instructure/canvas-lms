@@ -41,7 +41,11 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
-  before_filter :load_account, :load_user
+  prepend_before_filter :load_user, :load_account
+  # make sure authlogic is before load_user
+  skip_before_filter :activate_authlogic
+  prepend_before_filter :activate_authlogic
+
   before_filter ::Filters::AllowAppProfiling
   before_filter :check_pending_otp
   before_filter :set_user_id_header
