@@ -228,6 +228,10 @@ class AssessmentItemConverter
   # returns a tuple of [text, html]
   # html is null if it's not an html blob
   def detect_html(node)
+    if text_node = node.at_css('div.text')
+      return [text_node.text.strip, nil]
+    end
+
     text = clear_html(node.text.gsub(/\s+/, " ")).strip
     html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/)
     is_html = false
