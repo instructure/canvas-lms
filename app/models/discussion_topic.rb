@@ -467,24 +467,24 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-     without_assignment_in_course(course_ids).union(joins_assignment_student_visibilities(user_ids, course_ids))
-   }
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    without_assignment_in_course(course_ids).union(joins_assignment_student_visibilities(user_ids, course_ids))
+  }
 
-   scope :without_assignment_in_course, lambda { |course_ids|
-     where(context_id: course_ids, context_type: "Course").where("discussion_topics.assignment_id IS NULL")
-   }
+  scope :without_assignment_in_course, lambda { |course_ids|
+    where(context_id: course_ids, context_type: "Course").where("discussion_topics.assignment_id IS NULL")
+  }
 
-   scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
-     user_ids = Array.wrap(user_ids).join(',')
-     course_ids = Array.wrap(course_ids).join(',')
-     joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
+  scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
+    user_ids = Array.wrap(user_ids).join(',')
+    course_ids = Array.wrap(course_ids).join(',')
+    joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
       JOIN assignment_student_visibilities
         ON (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
-            AND assignment_student_visibilities.user_id IN (%s)
-            AND assignment_student_visibilities.course_id IN (%s)
+          AND assignment_student_visibilities.user_id IN (%s)
+          AND assignment_student_visibilities.course_id IN (%s)
         )
-      SQL
+    SQL
   }
 
   alias_attribute :available_from, :delayed_post_at

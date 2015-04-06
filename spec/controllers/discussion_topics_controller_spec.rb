@@ -72,6 +72,63 @@ describe DiscussionTopicsController do
       get 'index', :group_id => @group.id
       expect(response).to be_success
     end
+
+    context "graded group discussion" do
+      before do
+        @course.account.role_overrides.create!(
+          role: student_role,
+          permission: 'view_group_pages',
+          enabled: true
+        )
+        @course.enable_feature!(:differentiated_assignments)
+
+        group_discussion_assignment
+        @child_topic = @topic.child_topics.first
+        @group = @child_topic.context
+        @group.add_user(@student)
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+      end
+      it "should return graded and visible group discussions properly" do
+        cs = @student.enrollments.first.course_section
+        create_section_override_for_assignment(@assignment, {course_section: cs})
+
+        user_session(@student)
+
+        get 'index', :group_id => @group.id
+        expect(response).to be_success
+        expect(assigns["topics"]).to include(@child_topic)
+      end
+
+      it "should not return graded group discussions if a student has no visibility" do
+        user_session(@student)
+
+        get 'index', :group_id => @group.id
+        expect(response).to be_success
+        expect(assigns["topics"]).not_to include(@child_topic)
+      end
+    end
+
+    it "should return non-graded group discussions properly" do
+      @course.account.role_overrides.create!(
+        role: student_role,
+        permission: 'view_group_pages',
+        enabled: true
+      )
+      @course.enable_feature!(:differentiated_assignments)
+
+      group_category(context: @course)
+      membership = group_with_user(group_category: @group_category, user: @student, context: @course)
+      @topic = @group.discussion_topics.create(:title => "group topic")
+      @topic.context = @group
+      @topic.save!
+
+      user_session(@student)
+
+      get 'index', :group_id => @group.id
+      expect(response).to be_success
+      expect(assigns["topics"]).to include(@topic)
+    end
   end
 
   describe "GET 'show'" do
