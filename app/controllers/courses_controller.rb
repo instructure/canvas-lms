@@ -365,16 +365,15 @@ class CoursesController < ApplicationController
           state = e.state_based_on_date
           if [:completed, :rejected].include?(state)
             @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
-          elsif state != :inactive
+          else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
-              @future_enrollments << e
-            else
+              @future_enrollments << e unless e.restrict_future_view?
+            elsif state != :inactive
               @current_enrollments << e
             end
           end
         end
-
         @visible_groups = @current_user.visible_groups
 
         @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
