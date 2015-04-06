@@ -115,6 +115,7 @@ class UsersController < ApplicationController
   include Delicious
   include SearchHelper
   include I18nUtilities
+  include CustomColorHelper
 
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
@@ -1289,6 +1290,113 @@ class UsersController < ApplicationController
             render(json: user.errors, status: :bad_request)
           end
         }
+      end
+    end
+  end
+
+  # @API Get custom colors
+  # Returns all custom colors that have been saved for a user.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/colors/ \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "custom_colors": {
+  #       "course_42": "#abc123",
+  #       "course_88": "#123abc"
+  #     }
+  #   }
+  #
+  def get_custom_colors
+    user = api_find(User, params[:id])
+    return unless authorized_action(user, @current_user, :read)
+    render(json: {custom_colors: user.custom_colors})
+  end
+
+  # @API Get custom color
+  # Returns the custom colors that have been saved for a user for a given context.
+  #
+  # The asset_string parameter should be in the format 'context_id', for example
+  # 'course_42'.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/colors/<asset_string> \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "hexcode": "#abc123"
+  #   }
+  def get_custom_color
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, :read)
+
+    if user.custom_colors[params[:asset_string]].nil?
+      raise(ActiveRecord::RecordNotFound, "Asset does not have an associated color.")
+    end
+    render(json: { hexcode: user.custom_colors[params[:asset_string]]})
+  end
+
+
+
+  # @API Update custom color
+  # Updates a custom color for a user for a given context.  This allows
+  # colors for the calendar and elsewhere to be customized on a user basis.
+  #
+  # The asset string parameter should be in the format 'context_id', for example
+  # 'course_42'
+  #
+  # @argument hexcode [String]
+  #   The hexcode of the color to set for the context.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/colors/<asset_string> \
+  #     -X PUT \
+  #     -F 'hexcode=fffeee'
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "hexcode": "#abc123"
+  #   }
+  def set_custom_color
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+
+    # Make sure the user has rights to the actual context used.
+    context = Context.find_by_asset_string(params[:asset_string])
+
+    if context.nil?
+      raise(ActiveRecord::RecordNotFound, "Asset does not exist")
+    end
+
+    return unless authorized_action(context, @current_user, :read)
+
+    # Check if the hexcode is valid
+    unless valid_hexcode?(params[:hexcode])
+      return render(json: { :message => "Invalid Hexcode Provided" }, status: :bad_request)
+    end
+
+    unless params[:hexcode].nil?
+      user.custom_colors[params[:asset_string]] = normalize_hexcode(params[:hexcode])
+    end
+
+    respond_to do |format|
+      format.json do
+        if user.save
+          render(json: { hexcode: user.custom_colors[params[:asset_string]]})
+        else
+          render(json: user.errors, status: :bad_request)
+        end
       end
     end
   end

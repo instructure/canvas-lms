@@ -669,20 +669,30 @@ define [
 
     # we use a <div> (with a <style> inside it) because you cant set .innerHTML directly on a
     # <style> node in ie8
-    $styleContainer = $('<div />').appendTo('body')
+    $styleContainer = $('<div id="calendar_color_style_overrides" />').appendTo('body')
 
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
-      html = (for contextCode, index in @contextCodes
-        color = colors[index]
-        ".group_#{contextCode}{
-           color: #{color};
-           border-color: #{color};
-           background-color: #{color};
-        }"
-      ).join('')
+      # Get any custom colors that have been set
+      $.getJSON(
+          '/api/v1/users/' + @options.userId + '/colors/'
+          (data) =>
+            customColors = data.custom_colors
 
-      $styleContainer.html "<style>#{html}</style>"
+            colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
+            html = (for contextCode, index in @contextCodes
+              # Use a custom color if found.
+              color = if customColors[contextCode] then customColors[contextCode] else colors[index]
+              color = htmlEscape(color)
+              contextCode = htmlEscape(contextCode)
+              ".group_#{contextCode}{
+                 color: #{color};
+                 border-color: #{color};
+                 background-color: #{color};
+              }"
+            ).join('')
+
+            $styleContainer.html "<style>#{html}</style>"
+      )
 
     dataFromDocumentHash: () =>
       data = {}

@@ -1369,6 +1369,10 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
 
+  def custom_colors
+    preferences[:custom_colors] ||= {}
+  end
+
   def watched_conversations_intro?
     preferences[:watched_conversations_intro] == true
   end

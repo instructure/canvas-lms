@@ -1202,4 +1202,137 @@ describe "Users API", type: :request do
       assert_status(401)
     end
   end
+
+  describe 'Custom Colors' do
+    before :each do
+      @a = Account.default
+      @u = user(:active_all => true)
+      @a.account_users.create!(user: @u)
+    end
+
+    describe 'GET custom colors' do
+      before :each do
+        @user.preferences[:custom_colors] = {
+          "user_#{@user.id}" => "efefef",
+          "course_3" => "ababab"
+        }
+        @user.save!
+      end
+
+      it "should return an empty object if nothing is stored" do
+        @user.preferences.delete(:custom_colors)
+        @user.save!
+
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/colors",
+          { controller: 'users', action: 'get_custom_colors', format: 'json',
+            id: @user.to_param
+          },
+          {:expected_status => 200}
+        )
+        expect(json['custom_colors'].size).to eq 0
+      end
+
+      it "should return all custom colors for the user" do
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/colors",
+          { controller: 'users', action: 'get_custom_colors', format: 'json',
+            id: @user.to_param
+          },
+          {:expected_status => 200}
+        )
+        expect(json['custom_colors'].size).to eq 2
+      end
+
+      it "should return the color for a context when requested" do
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/colors/user_#{@user.id}",
+          { controller: 'users', action: 'get_custom_color', format: 'json',
+            id: @user.to_param, asset_string: "user_#{@user.id}"
+          },
+          {:expected_status => 200}
+        )
+        expect(json['hexcode']).to eq "efefef"
+      end
+    end
+
+    describe 'PUT custom colors' do
+      it "should not allow creating entries for entities that do not exist" do
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/colors/course_999",
+          { controller: 'users', action: 'set_custom_color', format: 'json',
+            id: @user.to_param, asset_string: "course_999", hexcode: 'ababab'
+          },
+          {},
+          {},
+          {:expected_status => 404}
+        )
+      end
+
+      it "should not allow creating entries for entities the user doesn't have read access to" do
+        course_with_teacher
+
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+          { controller: 'users', action: 'set_custom_color', format: 'json',
+            id: @user.to_param, asset_string: "course_#{@course.id}", hexcode: 'ababab'
+          },
+          {},
+          {},
+          {:expected_status => 401}
+        )
+      end
+
+      it "should throw a bad request if a color isn't provided" do
+        course_with_student(active_all: true)
+        @user = @student
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+          { controller: 'users', action: 'set_custom_color', format: 'json',
+            id: @user.to_param, asset_string: "course_#{@course.id}"
+          },
+          {},
+          {},
+          {:expected_status => 400}
+        )
+      end
+
+      it "should throw a bad request if an invalid hexcode is provided" do
+        course_with_student(active_all: true)
+        @user = @student
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+          { controller: 'users', action: 'set_custom_color', format: 'json',
+            id: @user.to_param, asset_string: "course_#{@course.id}", hexcode: 'yellow'
+          },
+          {},
+          {},
+          {:expected_status => 400}
+        )
+      end
+
+      it "should add an entry for entities the user has access to" do
+        course_with_student(active_all: true)
+        @user = @student
+        json = api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+          { controller: 'users', action: 'set_custom_color', format: 'json',
+            id: @user.to_param, asset_string: "course_#{@course.id}", hexcode: 'ababab'
+          },
+          {},
+          {},
+          {:expected_status => 200}
+        )
+        expect(json['hexcode']).to eq '#ababab'
+      end
+    end
+  end
 end
