@@ -280,7 +280,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @context.feature_enabled?(:differentiated_assignments)
-      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
+      scope = scope_for_differentiated_assignments(scope)
     end
 
     @topics = Api.paginate(scope, self, topic_pagination_url)
@@ -331,6 +331,23 @@ class DiscussionTopicsController < ApplicationController
       end
     end
   end
+
+  def scope_for_differentiated_assignments(scope)
+    return scope if @context.is_a?(Account)
+    return DifferentiableAssignment.scope_filter(scope, @current_user, @context) if @context.is_a?(Course)
+    return scope if @context.context.is_a?(Account)
+
+    # group context owned by a course
+    course = @context.context
+    course_scope = course.discussion_topics.active
+    course_level_topic_ids = DifferentiableAssignment.scope_filter(course_scope, @current_user, course).pluck(:id)
+    if course_level_topic_ids.any?
+      scope.where("root_topic_id IN (?) OR root_topic_id IS NULL OR id IN (?)", course_level_topic_ids, course_level_topic_ids)
+    else
+      scope.where(root_topic_id: nil)
+    end
+  end
+  private :scope_for_differentiated_assignments
 
   def is_child_topic?
     root_topic_id = params[:root_discussion_topic_id]
