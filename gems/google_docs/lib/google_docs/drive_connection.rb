@@ -169,7 +169,7 @@ module GoogleDocs
       folders = {nil => root}
 
       documents['items'].each do |doc_entry|
-        next unless doc_entry['exportLinks']
+        next unless doc_entry['downloadUrl'] || doc_entry['exportLinks']
         entry = GoogleDocs::DriveEntry.new(doc_entry, extensions)
         if folders.has_key?(entry.folder)
           folder = folders[entry.folder]
