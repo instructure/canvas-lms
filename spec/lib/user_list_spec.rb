@@ -342,6 +342,31 @@ describe UserList do
       expect(ul.errors).to eq []
     end
 
+    context 'when searching by sis id' do
+      it "should prefer a user from the current account instead of a trusted account" do
+        account1 = Account.create!
+        account2 = Account.create!
+        account1.stubs(:trusted_account_ids).returns([account2.id])
+        user_with_managed_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1, :sis_user_id => "SISID")
+        @user1 = @user
+        user_with_managed_pseudonym(:name => 'JT', :username => 'jt2@instructure.com', :active_all => true, :account => account2, :sis_user_id => "SISID")
+        ul = UserList.new 'SISID', :root_account => account1
+        expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
+        expect(ul.errors).to eq []
+      end
+
+      it "should prefer a user from the current account instead of a trusted account (reverse order)" do
+        account1 = Account.create!
+        account2 = Account.create!
+        account2.stubs(:trusted_account_ids).returns([account1.id])
+        user_with_managed_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1, :sis_user_id => "SISID")
+        user_with_managed_pseudonym(:name => 'JT', :username => 'jt2@instructure.com', :active_all => true, :account => account2, :sis_user_id => "SISID")
+        ul = UserList.new 'SISID', :root_account => account2
+        expect(ul.addresses).to eq [{:address => 'jt2@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
+        expect(ul.errors).to eq []
+      end
+    end
+
     it "should not find a user if there is a conflict of unique_ids from not-this-account" do
       account1 = Account.create!
       account2 = Account.create!
