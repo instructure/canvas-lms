@@ -20,29 +20,13 @@ define([
   'jquery' /* jQuery, $ */,
   'timezone',
   'str/htmlEscape',
+  'compiled/widget/DatetimeField',
   'jquery.keycodes' /* keycodes */,
   'vendor/date' /* Date.parse, Date.UTC, Date.today */,
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/widget' /* /\.widget/ */
-], function(I18n, $, tz, htmlEscape) {
-  // Create a function to pass to setTimeout
-var speakMessage = function ($this, message) {
-  if ($this.data('accessible-message-timeout')) {
-    // Clear any previously scheduled message from this field.
-    clearTimeout($this.data('accessible-message-timeout'));
-    $this.removeData('accessible-message-timeout');
-  }
-  if (!message) {
-    // No message? Do nothing when the timeout expires.
-    return function () {};
-  }
-  return function () {
-    $('#aria_alerts').text(message);
-    $this.removeData('accessible-message-timeout');
-  };
-};
-
+], function(I18n, $, tz, htmlEscape, DatetimeField) {
   $.parseDateTime = function(date, time) {
     var date = $.datepicker.parseDate('mm/dd/yy', date);
     if(time) {
@@ -374,107 +358,11 @@ var speakMessage = function ($this, message) {
   $.fn.datetime_field = function(options) {
     options = $.extend({}, options);
     this.each(function() {
-      var $field = $(this),
-          $thingToPutSuggestAfter = $field;
-      if ($field.hasClass('datetime_field_enabled')) return;
-
-      $field.addClass('datetime_field_enabled');
-      if (!options.timeOnly) {
-        $field.wrap('<div class="input-append" />');
-        $thingToPutSuggestAfter = $field.parent('.input-append');
-
-        var datepickerOptions = {
-          timePicker: (!options.dateOnly),
-          constrainInput: false,
-          dateFormat: 'M d, yy',
-          showOn: 'button',
-          buttonText: '<i class="icon-calendar-month"></i>',
-          buttonImageOnly: false
-        };
-        $field.datepicker($.extend(datepickerOptions, options.datepicker));
+      var $field = $(this);
+      if (!$field.hasClass('datetime_field_enabled')) {
+        $field.addClass('datetime_field_enabled');
+        new DatetimeField($field, options);
       }
-
-      var $suggest = $('<div class="datetime_suggest" />').insertAfter($thingToPutSuggestAfter);
-      if (ENV && ENV.CONTEXT_TIMEZONE && (ENV.TIMEZONE != ENV.CONTEXT_TIMEZONE)){
-        var $suggest2 = $('<div class="datetime_suggest" />').insertAfter($suggest);
-      }
-
-      if (options.addHiddenInput) {
-        var $hiddenInput = $('<input type="hidden">').insertAfter($field);
-        $hiddenInput.attr('name', $field.attr('name'));
-        $hiddenInput.val($field.val());
-        $field.removeAttr('name');
-        $field.data('hiddenInput', $hiddenInput);
-      }
-
-      $field.bind("change focus blur keyup", function() {
-        var $this = $(this),
-            val = $this.val();
-        if (options.timeOnly && val && parseInt(val, 10) == val) {
-          val += (val < 8) ? "pm" : "am";
-        }
-        var fudged_d = $.datetime.parse(val);
-        var d = $.unfudgeDateForProfileTimezone(fudged_d);
-        var parse_error_message = I18n.t('errors.not_a_date', "That's not a date!");
-        var text = parse_error_message;
-        var text2 = ""
-        if (!$this.val()) { text = ""; }
-        if (d != null) {
-          $this.data('date', fudged_d);
-          $this.data('unfudged-date', d);
-          if ($this.data('hiddenInput')) {
-            $this.data('hiddenInput').val(fudged_d);
-          }
-          if(!options.timeOnly && !options.dateOnly && (!$.midnight(d) || options.alwaysShowTime)) {
-            text = tz.format(d, "%a %b %-d, %Y %-l:%M%P");
-            if($suggest2) {
-              text2 = tz.format(d,"%a %b %-d, %Y %-l:%M%P", ENV.CONTEXT_TIMEZONE);
-            }
-            $this
-              .data('time-hour', tz.format(d, "%-l"))
-              .data('time-minute', tz.format(d, "%M"))
-              .data('time-ampm', tz.format(d, "%P"));
-          } else if(!options.timeOnly) {
-            text = tz.format(d, "%a %b %-d, %Y");
-          } else {
-            text = tz.format(d, "%-l:%M%P");
-            if($suggest2) {
-              text2 = tz.format(d,"%-l:%M%P", ENV.CONTEXT_TIMEZONE);
-            }
-          }
-
-          if($suggest2) {
-            if(text2.length > 0){
-              text2 = I18n.t('#helpers.course', 'Course') + ": " + text2;
-              $suggest2.text(text2);
-            } else {
-              $suggest2.text("");
-            }
-          }
-        }
-
-        if(text.length > 0 && $suggest2) {
-          text = I18n.t('#helpers.local', 'Local') + ": " + text;
-        }
-
-        $suggest
-          .toggleClass('invalid_datetime', text == parse_error_message)
-          .text(text);
-
-        if (text == parse_error_message ) {
-          $this.data(
-            'accessible-message-timeout',
-            setTimeout(speakMessage($this, text), 2000)
-          );
-        } else if ($this.data('accessible-message-timeout')) {
-          // Error resolved, cancel the alert.
-          clearTimeout($this.data('accessible-message-timeout'));
-          $this.removeData('accessible-message-timeout');
-        }
-      }).triggerHandler('change');
-      // TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.
-      $field.next().attr('aria-hidden', 'true');
-      $field.next().attr('tabindex', '-1');
     });
     return this;
   };

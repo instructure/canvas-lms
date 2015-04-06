@@ -56,8 +56,9 @@ describe "scheduler" do
       f('.splitter a').click
       start_fields = ff('.time-block-list .start_time')
       times = %W(2:00 2:30 3:00 3:30 4:00 4:30 5:00 5:30)
-      start_fields.each_with_index do |start_field, i|
-        expect(start_field.attribute(:value).strip).to eq times[i] + "pm" unless i == 8
+      times.each_with_index do |time, i|
+        field = start_fields[i]
+        expect(field.attribute(:value).strip).to eq time + "am"
       end
       f('.ag_contexts_selector').click
       f("#option_course_#{@course.id}").click
