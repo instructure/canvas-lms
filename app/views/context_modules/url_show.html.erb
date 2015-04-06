@@ -15,17 +15,17 @@
     <div>
       <a id="open_url_button" target="_blank" role="link" class="btn external"
          href="<%= @tag.url %>"
-         title="<%= t('open_url_button', "Open %{title} in a new window", :title => @tag.title) %>"
-         aria-label="<%= t('open_url_button', "Open %{title} in a new window", :title => @tag.title) %>">
-        <%= t('open_url_button', "Open %{title} in a new window", :title => @tag.title) %>
+         title="<%= t("Open %{title} in a new window", :title => @tag.title) %>"
+         aria-label="<%= t("Open %{title} in a new window", :title => @tag.title) %>">
+        <%= t("Open %{title} in a new window", :title => @tag.title) %>
       </a>
     </div>
   <% else %>
     <% if @tag.url.start_with?('http://') %>
       <div class="alert alert-error" id="insecure_content_msg">
         <p>
-          <%= t('tool_insecure_warning', 'You are trying to launch insecure content from within a
-            secure site (canvas).  Some internet browsers may prevent this content from loading.') %>
+          <%= t('You are trying to launch insecure content from within a secure site (canvas).
+            Some internet browsers may prevent this content from loading.') %>
         </p>
       </div>
     <% end %>
