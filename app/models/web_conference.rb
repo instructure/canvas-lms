@@ -166,10 +166,18 @@ class WebConference < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :web_conference_invitation
-    p.to { @new_participants.select { |p| context.membership_for_user(p).active? } }
-    p.whenever { |record|
-      @new_participants && !@new_participants.empty?
-    }
+    p.to do
+      @new_participants.select do |participant|
+        context.membership_for_user(participant).active?
+      end
+    end
+    p.whenever { @new_participants && !@new_participants.empty? }
+
+    p.dispatch :web_conference_recording_ready
+    p.to { user }
+    p.whenever do
+      recording_ready? && recording_ready_changed?
+    end
   end
 
   on_create_send_to_streams do
@@ -188,6 +196,15 @@ class WebConference < ActiveRecord::Base
       self.save
     end
     p.save
+  end
+
+  def recording_ready!
+    self.recording_ready = true
+    save!
+  end
+
+  def recording_ready?
+    !!recording_ready
   end
 
   def added_users

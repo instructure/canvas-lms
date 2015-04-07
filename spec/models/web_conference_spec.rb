@@ -89,7 +89,7 @@ describe WebConference do
       expect(conference.started_at).to be_nil
       expect(conference.ended_at).to be_nil
     end
-    
+
     it "should set start and end times when a paricipant is added" do
       conference.add_attendee(@user)
       expect(conference.start_at).not_to be_nil
@@ -97,7 +97,7 @@ describe WebConference do
       expect(conference.started_at).to eql(conference.start_at)
       expect(conference.ended_at).to be_nil
     end
-    
+
     it "should not set ended_at if the conference is still active" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
@@ -105,7 +105,7 @@ describe WebConference do
       expect(conference).to be_active
       expect(conference.ended_at).to be_nil
     end
-    
+
     it "should not set ended_at if the conference is no longer active but end_at has not passed" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
@@ -113,7 +113,7 @@ describe WebConference do
       expect(conference.active?(true)).to eql(false)
       expect(conference.ended_at).to be_nil
     end
-    
+
     it "should set ended_at if the conference is no longer active and end_at has passed" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
@@ -123,9 +123,9 @@ describe WebConference do
       expect(conference.ended_at).to be_nil
       expect(conference.active?(true)).to eql(false)
       expect(conference.ended_at).not_to be_nil
-      expect(conference.ended_at).to be < Time.now
+      expect(conference.ended_at).to be < Time.zone.now
     end
-    
+
     it "should set ended_at if it's more than 15 minutes past end_at" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
@@ -136,16 +136,16 @@ describe WebConference do
       expect(conference.active?(true)).to eql(false)
       expect(conference.conference_status).to eql(:active)
       expect(conference.ended_at).not_to be_nil
-      expect(conference.ended_at).to be < Time.now
+      expect(conference.ended_at).to be < Time.zone.now
     end
-    
+
     it "should be restartable if end_at has not passed" do
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       expect(conference).not_to be_finished
       expect(conference).to be_restartable
     end
-    
+
     it "should not be restartable if end_at has passed" do
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
@@ -169,19 +169,23 @@ describe WebConference do
 
   context "notifications" do
     before :once do
-      Notification.create!(:name => 'Web Conference Invitation', :category => "TestImmediately")
+      Notification.create!(:name => 'Web Conference Invitation',
+                           :category => "TestImmediately")
+      Notification.create!(:name => 'Web Conference Recording Ready',
+                           :category => "TestImmediately")
       course_with_student(:active_all => 1)
-      @student.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email").confirm
+      @student.communication_channels.create(:path => "test_channel_email_#{user.id}",
+                                             :path_type => "email").confirm
     end
 
-    it "should send notifications" do
+    it "should send invitation notifications" do
       conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
       conference.add_attendee(@student)
       conference.save!
       expect(conference.messages_sent['Web Conference Invitation']).not_to be_empty
     end
 
-    it "should not send notifications to inactive users" do
+    it "should not send invitation notifications to inactive users" do
       @course.restrict_enrollments_to_course_dates = true
       @course.start_at = 2.days.from_now
       @course.conclude_at = 4.days.from_now
@@ -190,6 +194,18 @@ describe WebConference do
       conference.add_attendee(@student)
       conference.save!
       expect(conference.messages_sent['Web Conference Invitation']).to be_blank
+    end
+
+    it "should send recording ready notifications, but only once" do
+      conference = WimbaConference.create!(:title => "my conference",
+                                           :user => @student,
+                                           :context => @course)
+      conference.recording_ready!
+      expect(conference.messages_sent['Web Conference Recording Ready'].length).to eq(2)
+
+      # check that it won't send the notification again when saved again.
+      conference.save!
+      expect(conference.messages_sent['Web Conference Recording Ready'].length).to eq(2)
     end
   end
 

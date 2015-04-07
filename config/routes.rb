@@ -1554,6 +1554,7 @@ CanvasRails::Application.routes.draw do
       %w(course group).each do |context|
         prefix = "#{context}s/:#{context}_id/conferences"
         get prefix, action: :index, as: "#{context}_conferences"
+        post "#{prefix}/:conference_id/recording_ready", action: :recording_ready, as: "#{context}_conferences_recording_ready"
       end
     end
 

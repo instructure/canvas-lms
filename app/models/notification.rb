@@ -60,7 +60,7 @@ class Notification < ActiveRecord::Base
     state :active do
       event :deactivate, :transitions_to => :inactive
     end
-    
+
     state :inactive do
       event :reactivate, :transitions_to => :active
     end
@@ -103,7 +103,7 @@ class Notification < ActiveRecord::Base
   def create_message(asset, to_list, options={})
     return NotificationMessageCreator.new(self, asset, options.merge(:to_list => to_list)).create_message
   end
- 
+
   def category_spaceless
     (self.category || "None").gsub(/\s/, "_")
   end
@@ -128,15 +128,15 @@ class Notification < ActiveRecord::Base
       9
     end
   end
-  
+
   def self.types_to_show_in_feed
      TYPES_TO_SHOW_IN_FEED
   end
-  
+
   def show_in_feed?
     self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
   end
-  
+
   def registration?
     return self.category == "Registration"
   end
@@ -144,19 +144,19 @@ class Notification < ActiveRecord::Base
   def migration?
     return self.category == "Migration"
   end
-  
+
   def summarizable?
     return !self.registration? && !self.migration?
   end
-  
+
   def dashboard?
     return ["Migration", "Registration", "Summaries", "Alert"].include?(self.category) == false
   end
-  
+
   def category_slug
     (self.category || "").gsub(/ /, "_").gsub(/[^\w]/, "").downcase
   end
-  
+
   # if user is given, categories that aren't relevant to that user will be
   # filtered out.
   def self.dashboard_categories(user = nil)
@@ -183,8 +183,8 @@ class Notification < ActiveRecord::Base
     setting[:id] = "cat_#{self.id}_option" if setting
     setting
   end
-  
-  def default_frequency(user = nil)
+
+  def default_frequency(_user = nil)
     # user arg is used in plugins
     case category
     when 'All Submissions'
@@ -249,11 +249,13 @@ class Notification < ActiveRecord::Base
       FREQ_IMMEDIATELY
     when 'Conversation Created'
       FREQ_NEVER
+    when 'Recording Ready'
+      FREQ_IMMEDIATELY
     else
       FREQ_DAILY
     end
   end
-  
+
   # TODO i18n: show the localized notification name in the dashboard (or
   # wherever), even if we continue to store the english string in the db
   # (it's actually just the titleized message template filename)
@@ -326,6 +328,7 @@ class Notification < ActiveRecord::Base
     t 'names.appointment_reserved_by_user', 'Appointment Reserved By User'
     t 'names.appointment_reserved_for_user', 'Appointment Reserved For User'
     t 'names.submission_needs_grading', 'Submission Needs Grading'
+    t 'names.web_conference_recording_ready', 'Web Conference Recording Ready'
   end
 
   # TODO: i18n ... show these anywhere we show the category today
@@ -352,6 +355,7 @@ class Notification < ActiveRecord::Base
     t 'categories.migration', 'Migration'
     t 'categories.reminder', 'Reminder'
     t 'categories.submission_comment', 'Submission Comment'
+    t 'categories.recording_ready', 'Recording Ready'
   end
 
   # Translatable display text to use when representing the category to the user.
@@ -359,56 +363,58 @@ class Notification < ActiveRecord::Base
   #       on notification preferences page. /app/coffeescripts/notifications/NotificationGroupMappings.coffee
   def category_display_name
     case category
-      when 'Announcement'
-        t(:announcement_display, 'Announcement')
-      when 'Announcement Created By You'
-        t(:announcement_created_by_you_display, 'Announcement Created By You')
-      when 'Course Content'
-        t(:course_content_display, 'Course Content')
-      when 'Files'
-        t(:files_display, 'Files')
-      when 'Discussion'
-        t(:discussion_display, 'Discussion')
-      when 'DiscussionEntry'
-        t(:discussion_post_display, 'Discussion Post')
-      when 'Due Date'
-        t(:due_date_display, 'Due Date')
-      when 'Grading'
-        t(:grading_display, 'Grading')
-      when 'Late Grading'
-        t(:late_grading_display, 'Late Grading')
-      when 'All Submissions'
-        t(:all_submissions_display, 'All Submissions')
-      when 'Submission Comment'
-        t(:submission_comment_display, 'Submission Comment')
-      when 'Grading Policies'
-        t(:grading_policies_display, 'Grading Policies')
-      when 'Invitation'
-        t(:invitation_display, 'Invitation')
-      when 'Other'
-        t(:other_display, 'Administrative Notifications')
-      when 'Calendar'
-        t(:calendar_display, 'Calendar')
-      when 'Student Appointment Signups'
-        t(:student_appointment_display, 'Student Appointment Signups')
-      when 'Appointment Availability'
-        t(:appointment_availability_display, 'Appointment Availability')
-      when 'Appointment Signups'
-        t(:appointment_signups_display, 'Appointment Signups')
-      when 'Appointment Cancelations'
-        t(:appointment_cancelations_display, 'Appointment Cancelations')
-      when 'Conversation Message'
-        t(:conversation_message_display, 'Conversation Message')
-      when 'Added To Conversation'
-        t(:added_to_conversation_display, 'Added To Conversation')
-      when 'Conversation Created'
-        t(:conversation_created_display, 'Conversations Created By Me')
-      when 'Membership Update'
-        t(:membership_update_display, 'Membership Update')
-      when 'Reminder'
-        t(:reminder_display, 'Reminder')
-      else
-        t(:missing_display_display, "For %{category} notifications", :category => category)
+    when 'Announcement'
+      t(:announcement_display, 'Announcement')
+    when 'Announcement Created By You'
+      t(:announcement_created_by_you_display, 'Announcement Created By You')
+    when 'Course Content'
+      t(:course_content_display, 'Course Content')
+    when 'Files'
+      t(:files_display, 'Files')
+    when 'Discussion'
+      t(:discussion_display, 'Discussion')
+    when 'DiscussionEntry'
+      t(:discussion_post_display, 'Discussion Post')
+    when 'Due Date'
+      t(:due_date_display, 'Due Date')
+    when 'Grading'
+      t(:grading_display, 'Grading')
+    when 'Late Grading'
+      t(:late_grading_display, 'Late Grading')
+    when 'All Submissions'
+      t(:all_submissions_display, 'All Submissions')
+    when 'Submission Comment'
+      t(:submission_comment_display, 'Submission Comment')
+    when 'Grading Policies'
+      t(:grading_policies_display, 'Grading Policies')
+    when 'Invitation'
+      t(:invitation_display, 'Invitation')
+    when 'Other'
+      t(:other_display, 'Administrative Notifications')
+    when 'Calendar'
+      t(:calendar_display, 'Calendar')
+    when 'Student Appointment Signups'
+      t(:student_appointment_display, 'Student Appointment Signups')
+    when 'Appointment Availability'
+      t(:appointment_availability_display, 'Appointment Availability')
+    when 'Appointment Signups'
+      t(:appointment_signups_display, 'Appointment Signups')
+    when 'Appointment Cancelations'
+      t(:appointment_cancelations_display, 'Appointment Cancelations')
+    when 'Conversation Message'
+      t(:conversation_message_display, 'Conversation Message')
+    when 'Added To Conversation'
+      t(:added_to_conversation_display, 'Added To Conversation')
+    when 'Conversation Created'
+      t(:conversation_created_display, 'Conversations Created By Me')
+    when 'Membership Update'
+      t(:membership_update_display, 'Membership Update')
+    when 'Reminder'
+      t(:reminder_display, 'Reminder')
+    when 'Recording Ready'
+      t(:recording_ready_display, 'Recording Ready')
+    else
+      t(:missing_display_display, "For %{category} notifications", :category => category)
     end
   end
 
@@ -511,6 +517,8 @@ EOS
       t(:added_to_conversation_description, 'You are added to a conversation')
     when 'Conversation Created'
       t(:conversation_created_description, 'You created a conversation')
+    when 'Recording Ready'
+      t(:web_conference_recording_ready, 'A conference recording is ready')
     when 'Membership Update'
       mt(:membership_update_description, <<-EOS)
 *Admin only: pending enrollment activated*

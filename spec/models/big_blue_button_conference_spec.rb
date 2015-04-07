@@ -26,7 +26,7 @@ describe BigBlueButtonConference do
     before do
       WebConference.stubs(:plugins).returns([
         web_conference_plugin_mock("big_blue_button", {
-          :domain => "bbb.instructure.com", 
+          :domain => "bbb.instructure.com",
           :secret_dec => "secret",
         })
       ])
@@ -34,7 +34,7 @@ describe BigBlueButtonConference do
       @conference = BigBlueButtonConference.create!(
         :title => "my conference",
         :user => @user,
-        :context => Account.default
+        :context => course
       )
     end
 
@@ -109,7 +109,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
       bbb.user = user
-      bbb.context = Account.default
+      bbb.context = course
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create
@@ -122,7 +122,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => false }
       bbb.user = user
-      bbb.context = Account.default
+      bbb.context = course
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create
@@ -136,7 +136,7 @@ describe BigBlueButtonConference do
       bbb.stubs(:conference_key).returns('12345')
       bbb.user_settings = { record: true }
       bbb.user = user
-      bbb.context = Account.default
+      bbb.context = course
       bbb.save!
       response = {returncode: 'SUCCESS', recordings: "\n  ",
                   messageKey: 'noRecordings', message: 'There are not
@@ -149,7 +149,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => false }
       bbb.user = user
-      bbb.context = Account.default
+      bbb.context = course
 
       # set some vars so it thinks it's been created and doesn't do an api call
       bbb.conference_key = 'test'
@@ -187,7 +187,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
       bbb.user = user
-      bbb.context = Account.default
+      bbb.context = course
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create
@@ -197,5 +197,4 @@ describe BigBlueButtonConference do
       expect(bbb.user_settings[:record]).to be_falsey
     end
   end
-
 end
