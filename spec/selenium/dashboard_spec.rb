@@ -274,6 +274,29 @@ describe "dashboard" do
       expect(f('.conference .message')).to include_text(@conference.title)
     end
 
+    it "should end conferences from stream" do
+      PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
+
+      course_with_teacher_logged_in
+
+      @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "Wimba", :duration => nil})
+      @conference.user = @user
+      @conference.save!
+      @conference.restart
+      @conference.add_initiator(@user)
+      @conference.add_invitee(@user)
+      @conference.save!
+
+      get "/courses/#{@course.to_param}"
+      f('.conference .close_conference_link').click
+      expect(alert_present?).to be_truthy
+      accept_alert
+      wait_for_ajaximations
+      expect(f('.conference')).to_not be_displayed
+      @conference.reload
+      expect(@conference).to be_finished
+    end
+
     it "should create an announcement for the first course that is not visible in the second course" do
       @context = @course
       announcement_model({:title => "hey all read this k", :message => "announcement"})

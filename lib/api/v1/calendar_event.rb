@@ -39,8 +39,12 @@ module Api::V1::CalendarEvent
     participant = nil
 
     hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state))
-    hash['title'] += " (#{context.name})" if event.context_type == "CourseSection"
-    hash['description'] = api_user_content(event.description, context)
+    if event.context_type == "CourseSection"
+      hash['title'] += " (#{context.name})"
+      hash['description'] = api_user_content(event.description, event.context.course)
+    else
+      hash['description'] = api_user_content(event.description, context)
+    end
 
     appointment_group = options[:appointment_group]
     appointment_group ||= AppointmentGroup.find(options[:appointment_group_id]) if options[:appointment_group_id]
@@ -186,4 +190,3 @@ module Api::V1::CalendarEvent
     @context = orig_context
   end
 end
-

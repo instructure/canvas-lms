@@ -88,6 +88,21 @@ context "threaded discussions" do
     expect(entry.message).to match 'New text 2'
   end
 
+  it "should re-render replies after editing" do
+    edit_text = 'edit message '
+    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    @last_entry = f("#entry-#{entry.id}")
+    reply_text = "this is a reply"
+    add_reply(reply_text)
+    subentry = DiscussionEntry.last
+
+    expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy, "precondition"
+    edit_entry(entry, edit_text)
+    expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy
+  end
+
   it "should display editor name and timestamp after delete" do
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"

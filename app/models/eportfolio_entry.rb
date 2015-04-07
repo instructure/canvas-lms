@@ -19,7 +19,7 @@
 class EportfolioEntry < ActiveRecord::Base
   attr_accessible :eportfolio, :eportfolio_category, :name, :artifact_type, :attachment, :allow_comments, :show_comments, :url
   attr_readonly :eportfolio_id, :eportfolio_category_id
-  belongs_to :eportfolio
+  belongs_to :eportfolio, touch: true
   belongs_to :eportfolio_category
 
   EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :eportfolio_category_id, :position, :name, :artifact_type, :attachment_id, :allow_comments, :show_comments, :slug, :url, :content, :created_at, :updated_at]

@@ -1,18 +1,18 @@
 define [
   'jquery'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
+  'react'
+  'react-router'
   'compiled/react_files/components/Toolbar'
   'compiled/react_files/routes'
 ], ($, React, Router, Toolbar, routes) ->
 
-  Simulate = React.addons.TestUtils.Simulate
+  # Simulate = React.addons.TestUtils.Simulate
 
   # module 'Toolbar',
   #   setup: ->
   #     @routes = React.addons.TestUtils.renderIntoDocument(routes)
   #     debugger
-  #     @toolbar = React.renderComponent(Toolbar({params: 'foo', query:'', selectedItems: '', contextId: "1", contextType: "courses"}), $('<div>').appendTo('body')[0])
+  #     @toolbar = React.render(Toolbar({params: 'foo', query:'', selectedItems: '', contextId: "1", contextType: "courses"}), $('<div>').appendTo('body')[0])
   #   teardown: ->
   #     React.unmountComponentAtNode(@toolbar.getDOMNode().parentNode)
 
@@ -30,7 +30,7 @@ define [
   # module 'Toolbar Rendering'
 
   # test 'renders multi select action items when there is more than one item selected', ->
-  #   toolbar = React.renderComponent(Toolbar({params: 'foo', query:'', selectedItems: ['foo'], contextId: "1", contextType: "courses"}), $('<div>').appendTo('body')[0])
+  #   toolbar = React.render(Toolbar({params: 'foo', query:'', selectedItems: ['foo'], contextId: "1", contextType: "courses"}), $('<div>').appendTo('body')[0])
   #   ok $(toolbar.getDOMNode()).find('.ui-buttonset .ui-button').length, 'shows multiple select action items'
   #   React.unmountComponentAtNode(toolbar.getDOMNode().parentNode)
 
@@ -70,9 +70,9 @@ define [
   #       ".btn-upload": true
 
   # test 'renders only view and download buttons for limited users', ->
-  #   toolbar = React.renderComponent(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @userFolder, contextId: "2", contextType: "users", userCanManageFilesForContext: false}), $('<div>').appendTo('body')[0])
+  #   toolbar = React.render(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @userFolder, contextId: "2", contextType: "users", userCanManageFilesForContext: false}), $('<div>').appendTo('body')[0])
   #   ok @buttonsEnabled($(toolbar.getDOMNode()), @readConfig), "only view and download buttons are shown"
 
   # test 'renders all buttons for users with manage_files permissions', ->
-  #   toolbar = React.renderComponent(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @courseFolder, contextId: "1", contextType: "courses", userCanManageFilesForContext: true}), $('<div>').appendTo('body')[0])
+  #   toolbar = React.render(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @courseFolder, contextId: "1", contextType: "courses", userCanManageFilesForContext: true}), $('<div>').appendTo('body')[0])
   #   ok @buttonsEnabled($(toolbar.getDOMNode()), @manageConfig), "move, restrict access, delete, add folder, and upload file buttons are additionally shown for users with manage_files permissions"

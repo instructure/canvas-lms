@@ -17,6 +17,7 @@ define [
     @optionProperty 'focusStyleClass'
     @optionProperty 'selectedStyleClass'
     @optionProperty 'autoFetch'
+    @optionProperty 'fetchItAll'
 
     # Handle keyboard events for accessibility.
     events:
@@ -62,6 +63,7 @@ define [
           href: @href
           selectedStyleClass: @selectedStyleClass
           autoFetch: @autoFetch
+          fetchItAll: @fetchItAll
         }).$el.appendTo(@$tree)
       super
 

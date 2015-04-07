@@ -74,12 +74,6 @@ class InfoController < ApplicationController
     end
   end
 
-  def record_js_error
-    ErrorReport.log_error('javascript', params[:error])
-    # Render a 0x0 gif
-    render  :content_type =>'image/gif', :text => "GIF89a\001\000\001\000\200\377\000\377\377\377\000\000\000,\000\000\000\000\001\000\001\000\000\002\002D\001\000;"
-  end
-
   def health_check
     # This action should perform checks on various subsystems, and raise an exception on failure.
     Account.connection.select_value("SELECT 1")

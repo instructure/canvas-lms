@@ -79,6 +79,16 @@ module ActiveRecord
           end
         end
 
+        it 'should not bomb when you try to force past the cursor option on selects with the primary key' do
+          selectors = ["*", "users.*", "users.id, users.updated_at"]
+          User.create!
+          selectors.each do |selector|
+            expect {
+              User.select(selector).find_in_batches(start: 0){|batch| }
+            }.not_to raise_error
+          end
+        end
+
       end
     end
 

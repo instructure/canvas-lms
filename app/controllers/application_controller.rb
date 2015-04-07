@@ -1496,8 +1496,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :page_views_enabled?
 
-  def verified_file_download_url(attachment, *opts)
-    file_download_url(attachment, { :verifier => attachment.uuid }, *opts)
+  def verified_file_download_url(attachment, context = nil, *opts)
+    verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user, context.try(:asset_string))
+    file_download_url(attachment, { :verifier => verifier }, *opts)
   end
   helper_method :verified_file_download_url
 
@@ -1531,7 +1532,7 @@ class ApplicationController < ActionController::Base
   end
 
   def in_app?
-    @pseudonym_session && !@pseudonym_session.used_basic_auth?
+    @pseudonym_session
   end
 
   def json_as_text?
@@ -1871,4 +1872,15 @@ class ApplicationController < ActionController::Base
   def self.region
     nil
   end
+
+  def show_request_delete_account
+    false
+  end
+  helper_method :show_request_delete_account
+
+  def request_delete_account_link
+    nil
+  end
+  helper_method :request_delete_account_link
 end
+

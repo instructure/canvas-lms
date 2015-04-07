@@ -11,7 +11,9 @@
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top" style="padding-bottom: 20px;">
     <a href="<%= context_url(@context, :context_groups_url) %>" class="btn button-sidebar-wide user_groups"><i class="icon-group"></i> <%= t('buttons.user_groups', 'View User Groups') %></a>
-    <a href="<%= context_url(@context, :context_avatars_url) %>" class="btn button-sidebar-wide manage_profile_pictures"><i class="icon-student-view"></i> <%= t('buttons.manage_profile_pictures', 'Manage Profile Pictures') %></a>
+    <% if service_enabled?(:avatars) %>
+      <a href="<%= context_url(@context, :context_avatars_url) %>" class="btn button-sidebar-wide manage_profile_pictures"><i class="icon-student-view"></i> <%= t('buttons.manage_profile_pictures', 'Manage Profile Pictures') %></a>
+    <% end %>
   </div>
 
   <% if @enrollment_terms.size > 1 %>

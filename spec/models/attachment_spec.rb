@@ -587,22 +587,38 @@ describe Attachment do
     it "should allow user access based on 'file_access_user_id' and 'file_access_expiration' in the session" do
       a = attachment
       expect(a.grants_right?(nil, :read)).to eql(false)
-      expect(a.grants_right?(nil, :read)).to eql(false)
+      expect(a.grants_right?(nil, :download)).to eql(false)
       expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(true)
       expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(true)
+    end
+
+    it "should allow user access to anyone if the course is public to auth users (with 'file_access_user_id' and 'file_access_expiration' in the session)" do
+      a = attachment_model(context: course)
+
+      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(false)
+      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(false)
+
+      course.is_public_to_auth_users = true
+      course.save!
+      a.reload
+
+      expect(a.grants_right?(nil, :read)).to eql(false)
+      expect(a.grants_right?(nil, :download)).to eql(false)
+      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(true)
+      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(true)
     end
 
     it "should not allow user access based on incorrect 'file_access_user_id' in the session" do
       a = attachment
       expect(a.grants_right?(nil, :read)).to eql(false)
-      expect(a.grants_right?(nil, :read)).to eql(false)
+      expect(a.grants_right?(nil, :download)).to eql(false)
       expect(a.grants_right?(nil, {'file_access_user_id' => 0, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(false)
     end
 
     it "should not allow user access based on incorrect 'file_access_expiration' in the session" do
       a = attachment
       expect(a.grants_right?(nil, :read)).to eql(false)
-      expect(a.grants_right?(nil, :read)).to eql(false)
+      expect(a.grants_right?(nil, :download)).to eql(false)
       expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.minute.ago.to_i}, :read)).to eql(false)
     end
   end
@@ -701,7 +717,7 @@ describe Attachment do
     end
   end
 
-  context "cacheable s3 urls" do
+  context "download/inline urls" do
     before :once do
       course_model
     end
@@ -710,23 +726,23 @@ describe Attachment do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
       attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="foo"; filename*=UTF-8''foo)))
+      attachment.download_url
       attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(inline; filename="foo"; filename*=UTF-8''foo)))
-      attachment.cacheable_s3_inline_url
-      attachment.cacheable_s3_download_url
+      attachment.inline_url
     end
 
     it "should use the display_name, not filename, in the response-content-disposition" do
       attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
       attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="foo"; filename*=UTF-8''foo)))
-      attachment.cacheable_s3_inline_url
+      attachment.download_url
     end
 
     it "should http quote the filename in the response-content-disposition if necessary" do
       attachment = attachment_with_context(@course, :display_name => 'fo"o')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
       attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="fo\\"o"; filename*=UTF-8''fo%22o)))
-      attachment.cacheable_s3_inline_url
+      attachment.download_url
     end
 
     it "should sanitize filename with iconv" do
@@ -734,14 +750,14 @@ describe Attachment do
       sanitized_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", a.display_name)
       a.expects(:authenticated_s3_url).at_least(0)
       a.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
-      a.cacheable_s3_inline_url
+      a.download_url
     end
 
     it "should escape all non-alphanumeric characters in the utf-8 filename" do
       attachment = attachment_with_context(@course, :display_name => '"This file[0] \'{has}\' \# awesome `^<> chars 100%,|<-pipe"')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
       attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="\\\"This file[0] '{has}' \\# awesome `^<> chars 100%,|<-pipe\\\""; filename*=UTF-8''%22This%20file%5B0%5D%20%27%7Bhas%7D%27%20%5C%23%20awesome%20%60%5E%3C%3E%20chars%20100%25%2C%7C%3C%2Dpipe%22)))
-      attachment.cacheable_s3_inline_url
+      attachment.download_url
     end
   end
 
@@ -980,6 +996,24 @@ describe Attachment do
 
     it 'returns false if the provided size is not in the configured dynamic sizes' do
       expect(Attachment.allows_thumbnails_of_size?('nonsense')).to be_falsey
+    end
+  end
+
+  describe "thumbnail source image size limitation" do
+    before(:once) do
+      local_storage! # s3 attachment data is stubbed out, so there is no image to identify the size of
+      course
+    end
+
+    it 'creates thumbnails for smaller images' do
+      att = @course.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'ok.jpg'
+      expect(att.thumbnail).not_to be_nil
+      expect(att.thumbnail.width).not_to be_nil
+    end
+
+    it 'does not create thumbnails for larger images' do
+      att = @course.attachments.create! :uploaded_data => one_hundred_megapixels_of_highly_compressed_png_data, :filename => '3vil.png'
+      expect(att.thumbnail).to be_nil
     end
   end
 

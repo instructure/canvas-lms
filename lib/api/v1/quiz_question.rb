@@ -98,7 +98,7 @@ module Api::V1::QuizQuestion
     # whitelist question details for students
     attr_whitelist = %w(
       id position quiz_group_id quiz_id assessment_question_id
-      assessment_question question_name question_type question_text answers
+      assessment_question question_name question_type question_text answers matches
     )
     question_data.keep_if {|k, v| attr_whitelist.include?(k.to_s) }
 
@@ -107,6 +107,7 @@ module Api::V1::QuizQuestion
       multiple_choice_question
       true_false_question
       multiple_answers_question
+      matching_question
     )
 
     unless allow_answer_whitelist.include?(question_data[:question_type])

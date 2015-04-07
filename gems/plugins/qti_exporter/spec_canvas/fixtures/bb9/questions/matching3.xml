@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _bb9_matching_
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Matching
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 25.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: minnumber attribute no no longer supported on render_*
+Warning: flow_label is no longer supported in version 2, ignoring
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="_bb9_matching_"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="max_score" value="25.0" />
+<instructureField name="bb_question_type" value="Matching" />
+</instructureMetadata>
+<responseDeclaration identifier="C9BD0900686B11DB8847860FA95E1F2B" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="C9BD0901686B11DB8847860FA95E1F2B" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="C9BD0902686B11DB8847860FA95E1F2B" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="C9BD0903686B11DB8847860FA95E1F2B" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+<defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="QUESTION_BLOCK">
+<p class="FORMATTED_TEXT_BLOCK">Match the correct satellite with the correct planet.</p></div>
+<div class="RESPONSE_BLOCK">
+<div class="flow_2"><p class="FORMATTED_TEXT_BLOCK">Mars</p></div>
+<choiceInteraction responseIdentifier="C9BD0900686B11DB8847860FA95E1F2B" shuffle="false" maxChoices="1">
+<simpleChoice identifier="C9BD3010686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD3014686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD3018686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD301C686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+</choiceInteraction>
+<div class="flow_2"><p class="FORMATTED_TEXT_BLOCK">Saturn</p></div>
+<choiceInteraction responseIdentifier="C9BD0901686B11DB8847860FA95E1F2B" shuffle="false" maxChoices="1">
+<simpleChoice identifier="C9BD3011686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD3015686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD3019686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD301D686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+</choiceInteraction>
+<div class="flow_2"><p class="FORMATTED_TEXT_BLOCK">Earth</p></div>
+<choiceInteraction responseIdentifier="C9BD0902686B11DB8847860FA95E1F2B" shuffle="false" maxChoices="1">
+<simpleChoice identifier="C9BD3012686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD3016686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD301A686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD301E686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+</choiceInteraction>
+<div class="flow_2"><p class="FORMATTED_TEXT_BLOCK">Jupiter</p></div>
+<choiceInteraction responseIdentifier="C9BD0903686B11DB8847860FA95E1F2B" shuffle="false" maxChoices="1">
+<simpleChoice identifier="C9BD3013686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD3017686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD301B686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+<simpleChoice identifier="C9BD301F686B11DB8847860FA95E1F2B" fixed="true"></simpleChoice>
+</choiceInteraction>
+</div>
+<div class="RIGHT_MATCH_BLOCK">
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">Mimas</p></div>
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">Phobos</p></div>
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">Luna</p></div>
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">Ganymede</p></div></div>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="C9BD0900686B11DB8847860FA95E1F2B"/><baseValue baseType="identifier">C9BD3014686B11DB8847860FA95E1F2B</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="C9BD0901686B11DB8847860FA95E1F2B"/><baseValue baseType="identifier">C9BD3011686B11DB8847860FA95E1F2B</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="C9BD0902686B11DB8847860FA95E1F2B"/><baseValue baseType="identifier">C9BD301A686B11DB8847860FA95E1F2B</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="C9BD0903686B11DB8847860FA95E1F2B"/><baseValue baseType="identifier">C9BD301F686B11DB8847860FA95E1F2B</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">25.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">25.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK"></p></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK"></p></div></modalFeedback>
+</assessmentItem>

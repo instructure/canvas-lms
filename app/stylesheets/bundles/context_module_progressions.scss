@@ -1,0 +1,102 @@
+@import "base/environment";
+
+#breadcrumbs {
+  border-bottom: solid 1px $ic-border-light;
+}
+
+#content {
+  padding: 0;
+}
+
+#progression_modules {
+  min-height: 450px;
+  .message, .student-header {
+    margin-left: 25px;
+  }
+  .collectionViewItems {
+    list-style-type: none;
+    li {
+      .progression-module {
+        background-color: $tableBackgroundAccent;
+        padding: 0;
+        .name, .status.no_subtitle {
+          padding: 12px 16px;
+        }
+        .status {
+          padding-right: 16px;
+          text-align: right;
+          .subtitle {
+            color: $ic-hint-text;
+            font-size: 12px;
+            font-weight: normal;
+          }
+        }
+        .completed {
+          color: $successText;
+        }
+        hr {
+          margin: 0;
+          border-top-color: $ic-border-light;
+        }
+        .items {
+          ul {
+            list-style-type: none;
+            padding: 6px 0px;
+            li {
+              padding: 6px 0px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#progression_students {
+  background-color: $tableBackgroundAccent;
+  border-left: solid 1px $ic-border-light;
+  height: 450px;
+  p {
+    padding: 8px;
+  }
+  .header {
+    border-bottom: solid 1px $ic-border-light;
+    h3 {
+      display: inline;
+      font-size: inherit;
+      font-weight: bold;
+      line-height: inherit;
+      text-transform: uppercase;
+    }
+    a {
+      float: right;
+    }
+  }
+  .header, li {
+    padding: 8px 16px;
+  }
+  .collectionViewItems {
+    list-style-type: none;
+    margin-left: 0;
+    overflow-y: auto;
+    .student {
+      cursor: pointer;
+      border-top: solid 1px transparent;
+      a {
+        color: $ic-font-color-dark;
+      }
+      &.active {
+        background-color: $btnBackground;
+        border-bottom: solid 1px $ic-border-light;
+        font-weight: bold;
+        margin-left: -1px;
+        a {
+          color: $ic-link-color;
+        }
+      }
+    }
+    .student + .student.active {
+      border-top-color: $ic-border-light;
+    }
+  }
+}

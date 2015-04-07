@@ -19,7 +19,6 @@ describe "calendar2" do
     describe "contexts list" do
       it "should not allow a student to create an assignment through the context list" do
         get "/calendar2"
-        wait_for_ajaximations
 
         # first context is the user's calendar
         driver.execute_script(%{$(".context_list_context:nth-child(2)").addClass('hovering')})
@@ -58,7 +57,6 @@ describe "calendar2" do
         e1.save!
 
         get "/calendar2"
-        wait_for_ajaximations
         events = ff('.fc-event')
         expect(events.size).to eq 1
         expect(events.first.text).to include "1p"
@@ -72,7 +70,6 @@ describe "calendar2" do
       it "should display title link and go to event details page" do
         make_event(:context => @course, :start => 0.days.from_now, :title => "future event")
         get "/calendar2"
-        wait_for_ajaximations
 
         # click the event in the calendar
         fj('.fc-event').click
@@ -110,7 +107,6 @@ describe "calendar2" do
         event = calendar_event_model(:title => 'Test Event', :start_at => date, :end_at => (date + 1.hour))
 
         get "/courses/#{@course.id}/calendar_events/#{event.id}?calendar=1"
-        wait_for_ajaximations
         expect(fj('.calendar_header .navigation_title').text).to eq 'Julio 2012'
         expect(fj('#calendar-app .fc-sun').text).to eq 'DOM'
         expect(fj('#calendar-app .fc-mon').text).to eq 'LUN'
@@ -127,7 +123,6 @@ describe "calendar2" do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         get "/calendar2"
-        wait_for_ajaximations
         # Get the spanish text for the current month/year
         expect_month_year = I18n.l(Date.today, :format => '%B %Y', :locale => 'es')
         expect(fj('#minical h2').text).to eq expect_month_year

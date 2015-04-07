@@ -25,7 +25,8 @@ define [
         wrappers[new Array(parseInt(key.replace('w', '')) + 2).join('*')] = value
         delete options[key]
       options.wrapper = wrappers if wrappers['*']
-      options[key] = this[key] for key in this
+      unless this instanceof Window
+        options[key] = this[key] for key in this
       new Handlebars.SafeString htmlEscape(I18n.t(args..., options))
 
     __i18nliner_escape: (val) ->
@@ -475,6 +476,16 @@ define [
     or: (args..., options) ->
       for arg in args when arg
         return arg
+
+    # Public: returns icon for outcome mastery level
+    #
+    addMasteryIcon: (status, options={}) ->
+      iconType = {
+        'exceeds': 'check-plus'
+        'mastery': 'check'
+        'near': 'plus'
+      }[status] or 'x'
+      new Handlebars.SafeString "<i aria-hidden='true' class='icon-#{htmlEscape iconType}'></i>"
 
   }
 

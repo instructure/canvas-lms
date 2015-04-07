@@ -36,11 +36,21 @@ class GradebookImporter
   end
 
   attr_reader :context, :contents, :assignments, :students, :submissions, :missing_assignments, :missing_students
-  def initialize(context=nil, contents=nil)
+
+  def self.create_from(progress, course, user, attachment)
+    uploaded_gradebook = new(course, attachment, user, progress)
+    uploaded_gradebook.parse!
+  end
+
+  def initialize(context=nil, csv=nil, user=nil, progress=nil)
     raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(context)
-    raise ArgumentError, "Must provide CSV contents." unless contents
+    raise ArgumentError, "Must provide CSV contents." unless csv
     @context = context
-    @contents = contents
+    @user = user
+    @contents = csv
+    @progress = progress
+
+    @upload = GradebookUpload.new course: @context, user: @user, progress: @progress
 
     if @context.feature_enabled?(:differentiated_assignments)
       @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @context.id, user_id: @context.all_students.pluck(:id))
@@ -52,7 +62,7 @@ class GradebookImporter
   def parse!
     @student_columns = 3 # name, user id, section
     # preload a ton of data that presumably we'll be querying
-    @all_assignments = @context.assignments.active.gradeable.select([:id, :title, :points_possible, :grading_type]).index_by(&:id)
+    @all_assignments = @context.assignments.published.gradeable.select([:id, :title, :points_possible, :grading_type]).index_by(&:id)
     @all_students = @context.all_students.select(['users.id', :name, :sortable_name]).index_by(&:id)
 
     csv = CSV.new(self.contents, :converters => :nil)
@@ -133,6 +143,9 @@ class GradebookImporter
     @students.delete_if { |s| prior_enrollment_ids.include? s.id }
 
     @original_submissions = [] unless @missing_student || @missing_assignment
+
+    @upload.gradebook = self.as_json
+    @upload.save!
   end
 
   def process_header(row)
@@ -203,12 +216,10 @@ class GradebookImporter
 
   def process_submissions(row, student)
     l = []
-    student_visibile_assignments = @visible_assignments[student.id] if @visible_assignments
-
     @assignments.each_with_index do |assignment, idx|
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       grade = row[idx + @student_columns]
-      grade = '' if @visible_assignments && !student_visibile_assignments.try(:include?, assignment_id)
+      grade = '' if !assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
       new_submission = {
         'grade' => grade,
         'assignment_id' => assignment_id
@@ -216,6 +227,14 @@ class GradebookImporter
       l << new_submission
     end
     student.gradebook_importer_submissions = l
+  end
+
+  def assignment_visible_to_student(student, assignment, assignment_id, visible_assignments)
+    return true if !visible_assignments # wont be set if DA is off
+    return true if assignment.new_record? || student.new_record?
+
+    assignments_visible_to_student = visible_assignments[student.id].to_set
+    assignments_visible_to_student.try(:include?, assignment_id)
   end
 
   def as_json(options={})

@@ -17,8 +17,6 @@ describe "quizzes attempts" do
     #
     quiz = @last_quiz
 
-    click_questions_tab
-
     create_multiple_choice_question     # 1x labelled <input /> here
 
     click_new_question_button

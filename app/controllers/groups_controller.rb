@@ -218,6 +218,9 @@ class GroupsController < ApplicationController
   #
   # Returns the list of active groups in the given context that are visible to user.
   #
+  # @argument only_own_groups [Boolean]
+  #  Will only include groups that the user belongs to if this is set
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/groups \
   #          -H 'Authorization: Bearer <token>'
@@ -228,8 +231,6 @@ class GroupsController < ApplicationController
     @groups      = all_groups = @context.groups.active
                                   .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                   .includes(:group_category)
-    @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name'))
-    @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
     unless api_request?
       if @context.is_a?(Account)
@@ -248,12 +249,11 @@ class GroupsController < ApplicationController
       add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
     end
 
-    unless @context.grants_right?(@current_user, session, :manage_groups)
-      @groups = @user_groups = @groups & (@user_groups || [])
-    end
-
     respond_to do |format|
       format.html do
+        @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name'))
+        @user_groups = @current_user.group_memberships_for(@context) if @current_user
+
         if @context.grants_right?(@current_user, session, :manage_groups)
           if @domain_root_account.enable_manage_groups2?
             categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
@@ -272,6 +272,7 @@ class GroupsController < ApplicationController
           end
           render :action => 'context_manage_groups'
         else
+          @groups = @user_groups = @groups & (@user_groups || [])
           @available_groups = (all_groups - @user_groups).select do |group|
             group.grants_right?(@current_user, :join)
           end
@@ -283,6 +284,11 @@ class GroupsController < ApplicationController
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
+
+        if value_to_boolean(params[:only_own_groups])
+          all_groups = all_groups.merge(@current_user.current_groups.scoped)
+        end
+
         @paginated_groups = Api.paginate(all_groups, self, path)
         render :json => @paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
       end

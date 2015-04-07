@@ -236,6 +236,41 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
+    it "should not add the wrong tags in a certain terrible cached edge case" do
+      # tl;dr - not including the updated_at when we instantiate the users
+      # can cause us to grab stale conversation_context_codes
+      # which screws everything up
+      enable_cache do
+        course1 = course(:active_all => true)
+
+        student1 = user(:active_user => true)
+        student2 = user(:active_user => true)
+
+        Timecop.freeze(5.seconds.ago) do
+          course1.enroll_user(student1, "StudentEnrollment").accept!
+          course1.enroll_user(student2, "StudentEnrollment").accept!
+
+          user_session(student1)
+          post 'create', :recipients => [student2.id.to_s], :body => "yo", :message => "you suck", :group_conversation => true,
+               :course => course1.asset_string, :context_code => course1.asset_string
+          expect(response).to be_success
+        end
+
+        course2 = course(:active_all => true)
+        course2.enroll_user(student2, "StudentEnrollment").accept!
+        course2.enroll_user(student1, "StudentEnrollment").accept!
+
+        post 'create', :recipients => [student2.id.to_s], :body => "yo again", :message => "you still suck", :group_conversation => true,
+             :course => course2.asset_string, :context_code => course2.asset_string
+        expect(response).to be_success
+
+        c = Conversation.where(:context_type => "Course", :context_id => course2).first
+        c.conversation_participants.each do |cp|
+          expect(cp.tags).to eq [course2.asset_string]
+        end
+      end
+    end
+
     it "should allow messages to be forwarded from the conversation" do
       user_session(@student)
       conversation.update_attribute(:workflow_state, "unread")

@@ -20,19 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/shared/_select_content_dialog" do
-  it "should alphabetize the file list" do
-    course_with_teacher
-    folder = @course.folders.create!(:name => 'test')
-    folder.attachments.create!(:context => @course, :uploaded_data => default_uploaded_data, :display_name => "b")
-    folder.attachments.create!(:context => @course, :uploaded_data => default_uploaded_data, :display_name => "a")
-    view_context
-    render :partial => "shared/select_content_dialog"
-    expect(response).not_to be_nil
-    page = Nokogiri(response.body)
-    options = page.css("#attachments_select .module_item_select option")
-    expect(options[1].text).to eq "a"
-    expect(options[2].text).to eq "b"
-  end
 
   it "should include unpublished wiki pages" do
     course_with_teacher

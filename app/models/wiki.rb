@@ -189,6 +189,9 @@ class Wiki < ActiveRecord::Base
   end
 
   def find_page(param)
+    if (match = param.match(/\Apage_id:(\d+)\z/))
+      return self.wiki_pages.where(id: match[1].to_i).first
+    end
     self.wiki_pages.not_deleted.where(url: param.to_s).first ||
       self.wiki_pages.not_deleted.where(url: param.to_url).first ||
       self.wiki_pages.not_deleted.where(id: param.to_i).first

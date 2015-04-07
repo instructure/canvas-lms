@@ -1,0 +1,257 @@
+// Shared between:
+// - compiler-login.scss
+// - otp_login.scss
+// must have @import base/environment and @import pages/shared/registration_dialog.scss
+// loaded within compiler for this to work
+
+$modal_box_width: 623px;
+$modal_box_padding: 20px;
+
+body.modal {
+  #footer {
+    display: block !important;
+    width: $modal_box_width + 20px;
+    margin: 20px auto;
+  }
+  #main {
+    background-color: transparent;
+    border: 0 none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+  #modal-box, #login-box {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 1);
+    margin: 75px auto 20px;
+    position: relative;
+    .icon_url {
+      width: 72px;
+      height: 72px;
+      float: left;
+      margin-right: 10px;
+      margin-bottom: 5px;
+    }
+    ul {
+      list-style-type: none;
+    }
+    .btn {
+      float: right;
+      padding: 10px 36px;
+      margin: 2px 7px 0 0;
+      font-size: 15px;
+    }
+    .button_box {
+      text-align: right;
+      margin-right: 7px;
+      width: 100%;
+      .btn {
+        float: none;
+      }
+    }
+  }
+  #modal-box {
+    border: 1px solid #888;
+    border-top-color: #ccc;
+    width: $modal_box_width - 2 * $modal_box_padding;
+    padding: 2 * $modal_box_padding;
+    @include vertical-gradient(#f4f4f4, #e2e2e2);
+    .bootstrap-form {
+      p.instructions {
+        font-weight: bold;
+        text-align: center;
+        margin: 1.5em 0;
+      }
+      margin: 0 20px 20px;
+      .btn-large {
+        float: none;
+        width: 220px;
+      }
+    }
+    h2, .h2 {
+      background: transparent url(/images/canvas-dark.png) right 6px no-repeat;
+      margin: 0 20px;
+      padding: 5px 230px 0 0;
+      min-height: 35px;
+      &:after {
+        content: " ";
+        display: block;
+        margin: 1em -250px 1em -20px;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #fff;
+        height: 0;
+      }
+    }
+    &.login-box {
+      background-color: #4b555d;
+      background: url("/images/Money_Noise_tm.png"), radial-gradient(ellipse farthest-corner at 50% -100px, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(to bottom, #59656e, #3e464c);
+      height: 331px;
+      width: $modal_box_width;
+      padding: $modal_box_padding;
+      color: #b3b3b3;
+      border: none;
+      h1, .h1 {
+        height: 107px;
+        margin: 0 0 50px;
+        @include bg-image(canvas, png, no-repeat, 68px, 46px, transparent, 136px, 33px);
+        text-indent: -999em;
+      }
+      a {
+        color: #64b9f9 !important;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      input.text {
+        background: url(/images/login-input-bg.png) no-repeat;
+        border: 0 none;
+        font-size: 13px;
+        padding: 19px 9px 18px 22px;
+        width: 204px;
+        color: #303030;
+        margin: 0 6px 6px 0;
+        @include transition(none);
+      }
+      .radio_spacer {
+        width: 25px;
+        display: inline-block;
+      }
+    }
+  }
+}
+
+// weird specificity here is to match the input.text above
+body.webkit #modal-box.login-box input.text {
+  background: #F6F6F6 none;
+  border: 6px solid rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
+  padding: 12px 9px 12px 17px;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4);
+  background-clip: padding-box;
+  width: 197px;
+}
+
+#login_form {
+  margin: 0 auto;
+  width: 487px;
+  .login-options {
+    input {
+      margin-left: 0;
+    }
+    float: left;
+    line-height: 1.75em;
+  }
+}
+
+body.modal {
+  #forgot_password_form {
+    margin: 0 auto;
+    width: 455px;
+    .btn {
+      margin: 7px 0;
+      float: none;
+      padding: 10px 24px;
+    }
+  }
+}
+
+span.field-with-fancyplaceholder {
+  display: block;
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  label {
+    display: none;
+    &.placeholder {
+      display: inline;
+      color: #999;
+      cursor: text;
+      pointer-events: none;
+      span {
+        position: absolute;
+        z-index: 2;
+        -webkit-user-select: none;
+        padding: 19px 22px 18px 24px;
+      }
+    }
+    &.focus {
+      color: #ccc;
+    }
+  }
+  // gets rid of yello autofill bg for safari but doesnt work in chrome :(
+  input:-webkit-autofill {
+    background-color: transparent !important;
+  }
+  input {
+    outline: none;
+    &.invalid {
+      background: #ffffc5;
+      color: #F30;
+    }
+    &.editing {
+      color: #000;
+      background: none repeat scroll 0 0 transparent;
+      overflow: hidden;
+    }
+  }
+}
+
+.register_banner {
+  position: absolute;
+  display: block;
+  background: url(/images/fft_ribbon.png) no-repeat;
+  padding-top: 10px;
+  width: 232px;
+  height: 52px;
+  right: -13px;
+  top: 56px;
+  text-align: center;
+  font-size: 1.1em;
+  line-height: 1.25;
+  i, b {
+    display: block;
+  }
+  i {
+    color: #444;
+    font-style: normal;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+  b {
+    font-weight: normal;
+    color: #fff;
+  }
+  &:hover {
+    background-position: 0 -63px;
+    text-decoration: none !important;
+  }
+}
+
+#unauthorized_holder {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 1);
+  margin: 30px auto 20px;
+  width: $modal_box_width + 2 * $modal_box_padding;
+  #modal-box.login-box {
+    margin: 0;
+    box-shadow: none;
+  }
+  #unauthorized_message {
+    margin: 0;
+    width: auto;
+    padding: 15px $modal_box_padding;
+    line-height: 1.2;
+    &.ui-state-error:before {
+      top: 15px;
+    }
+    h2, .h2 {
+      height: 41px;
+      margin: 0 0 -5px 0;
+      padding: 0 0 0 60px;
+      color: #000;
+    }
+    p {
+      padding: 0 0 0 60px;
+      margin: 0;
+      font-size: 1.25em;
+      font-weight: normal;
+    }
+  }
+}

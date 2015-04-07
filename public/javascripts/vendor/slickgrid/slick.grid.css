@@ -1,3 +1,4 @@
+$url-path-to-this-file: '/javascripts/vendor/slickgrid/';
 /*
 IMPORTANT:
 In order to preserve the uniform grid appearance, all cell styles need to have padding, margin and border sizes.
@@ -53,11 +54,11 @@ classes should alter those!
 }
 
 .slick-sort-indicator-desc {
-  background: url(images/sort-desc.gif);
+  background: url(#{$url-path-to-this-file}images/sort-desc.gif);
 }
 
 .slick-sort-indicator-asc {
-  background: url(images/sort-asc.gif);
+  background: url(#{$url-path-to-this-file}images/sort-asc.gif);
 }
 
 .slick-resizable-handle {

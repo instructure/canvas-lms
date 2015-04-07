@@ -20,7 +20,7 @@ define([
   'underscore',
   'compiled/models/ModuleFile',
   'compiled/react_files/components/PublishCloud',
-  'old_unsupported_dont_use_react',
+  'react',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
   'INST' /* INST */,
@@ -200,7 +200,7 @@ define([
           $this.attr('title', content_tag.title);
         });
       },
-      showMoveModuleItem: function ($item) {
+      showMoveModuleItem: function ($item, returnFocusTo) {
         var $currentModule = $item.closest(".context_module");
         var $form = $('#move_module_item_form');
         $form.data('current_module', $currentModule);
@@ -230,9 +230,10 @@ define([
           autoOpen: false,
           modal: true,
           width: 600,
-          height: 300,
+          height: 400,
           close: function () {
             modules.hideMoveModule(true);
+            returnFocusTo.focus()
           }
         }).dialog('open');
 
@@ -834,6 +835,7 @@ define([
     });
     $(".outdent_item_link,.indent_item_link").live('click', function(event) {
       event.preventDefault();
+      var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
       var do_indent = $(this).hasClass('indent_item_link');
       var $item = $(this).parents(".context_module_item");
       var indent = modules.currentIndent($item);
@@ -845,11 +847,13 @@ define([
         modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items.ui-sortable").sortable('refresh');
         modules.updateAssignmentData();
+        $cogLink.focus();
       }, function(data) {
       });
     });
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
+      var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
       var $item = $(this).parents(".context_module_item");
       var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab']});
       data.indent = modules.currentIndent($item);
@@ -860,6 +864,9 @@ define([
         title: I18n.t('titles.edit_item', "Edit Item Details"),
         open: function(){
           $(this).find('input[type=text],textarea,select').first().focus();
+        },
+        close: function () {
+          $cogLink.focus();
         },
         minWidth: 320
       }).fixDialogButtons();
@@ -889,6 +896,18 @@ define([
     });
     $(".delete_item_link").live('click', function(event) {
       event.preventDefault();
+      var $currentCogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
+      // Get the previous cog item to focus after delete
+      var $allInCurrentModule = $(this).parents('.context_module_items').children()
+      var curIndex = $allInCurrentModule.index($(this).parents('.context_module_item'));
+      var newIndex = curIndex - 1;
+      var $previousCogLink;
+      if (newIndex < 0) {
+        // Focus on the module cog since there are not more module item cogs
+        $previousCogLink = $(this).closest('.editable_context_module').find('button.al-trigger')
+      } else {
+        $previousCogLink = $($allInCurrentModule[newIndex]).find('.cog-menu-container .al-trigger');
+      }
       $(this).parents(".context_module_item").confirmDelete({
         url: $(this).attr('href'),
         message: I18n.t('confirm.delete_item', 'Are you sure you want to remove this item from the module?'),
@@ -896,7 +915,11 @@ define([
           $(this).slideUp(function() {
             $(this).remove();
             modules.updateTaggedItems();
+            $previousCogLink.focus();
           });
+        },
+        cancelled: function () {
+          $currentCogLink.focus();
         }
       });
     });
@@ -928,7 +951,8 @@ define([
 
     $('.move_module_item_link').on('click keyclick', function (event) {
       event.preventDefault();
-      modules.showMoveModuleItem($(this).parents(".context_module_item"));
+      var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
+      modules.showMoveModuleItem($(this).parents(".context_module_item"), $cogLink);
     });
 
     $('#move_module_item_form').on('submit', function (event) {
@@ -1187,7 +1211,7 @@ define([
           usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required
         }
 
-        React.renderComponent(PublishCloud(props), $el[0]);
+        React.render(PublishCloud(props), $el[0]);
         return {model: file} // Pretending this is a backbone view
       }
 

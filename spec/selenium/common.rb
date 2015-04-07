@@ -486,7 +486,6 @@ shared_examples_for "all selenium tests" do
     else
       PseudonymSession.any_instance.stubs(:session_credentials).returns([])
       PseudonymSession.any_instance.stubs(:record).returns { pseudonym.reload }
-      PseudonymSession.any_instance.stubs(:used_basic_auth?).returns(false)
       # PseudonymSession.stubs(:find).returns(@pseudonym_session)
     end
   end
@@ -505,7 +504,6 @@ shared_examples_for "all selenium tests" do
     else
       PseudonymSession.any_instance.unstub :session_credentials
       PseudonymSession.any_instance.unstub :record
-      PseudonymSession.any_instance.unstub :used_basic_auth?
     end
   end
 
@@ -1031,6 +1029,11 @@ shared_examples_for "all selenium tests" do
     temp_file
   end
 
+  def check_element_has_focus(element)
+    active_element = driver.execute_script('return document.activeElement')
+    expect(active_element).to eq(element)
+  end
+
   def flash_message_present?(type=:warning, message_regex=nil)
     messages = ff("#flash_message_holder .ic-flash-#{type.to_s}")
     return false if messages.length == 0
@@ -1258,7 +1261,7 @@ def alert_present?
 end
 
 def scroll_page_to_top
-  driver.execute_script("window.scrollTo(0, 0")
+  driver.execute_script("window.scrollTo(0, 0)")
 end
 
 def scroll_page_to_bottom

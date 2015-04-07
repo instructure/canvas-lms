@@ -362,12 +362,13 @@ class CoursesController < ApplicationController
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.each do |e|
-          if [:completed, :rejected].include?(e.state_based_on_date)
-            @past_enrollments << e unless e.workflow_state == "invited"
-          else
+          state = e.state_based_on_date
+          if [:completed, :rejected].include?(state)
+            @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
+          elsif state != :inactive
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
-              @future_enrollments << e unless %w(StudentEnrollment ObserverEnrollment).include?(e.type) && e.root_account.settings[:restrict_student_future_view]
+              @future_enrollments << e
             else
               @current_enrollments << e
             end
@@ -1036,6 +1037,12 @@ class CoursesController < ApplicationController
   # @argument lock_all_announcements [Boolean]
   #   Disable comments on announcements
   #
+  # @argument restrict_student_past_view [Boolean]
+  #   Restrict students from viewing courses after end date
+  #
+  # @argument restrict_student_future_view [Boolean]
+  #   Restrict students from viewing courses before start date
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1055,9 +1062,13 @@ class CoursesController < ApplicationController
       :allow_student_organized_groups,
       :hide_final_grades,
       :hide_distribution_graphs,
-      :lock_all_announcements
+      :lock_all_announcements,
+      :restrict_student_past_view,
+      :restrict_student_future_view
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
+    @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
+      { :priority => Delayed::LOW_PRIORITY }, changes)
 
     if @course.save
       Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
@@ -1566,8 +1577,7 @@ class CoursesController < ApplicationController
     can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_remove
       respond_to do |format|
-        @enrollment.workflow_state = 'active'
-        if @enrollment.save
+        if @enrollment.unconclude
           format.json { render :json => @enrollment }
         else
           format.json { render :json => @enrollment, :status => :bad_request }
@@ -1712,9 +1722,14 @@ class CoursesController < ApplicationController
 
   def copy
     get_context
-    authorized_action(@context, @current_user, :read) &&
-      authorized_action(@context, @current_user, :read_as_admin) &&
-      authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
+    return unless authorized_action(@context, @current_user, :read_as_admin)
+
+    account = @context.account
+    unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+      account = @domain_root_account.manually_created_courses_account
+    end
+    return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
+
     # For prepopulating the date fields
     js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
     js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
@@ -1884,6 +1899,7 @@ class CoursesController < ApplicationController
     logging_source = api_request? ? :api : :manual
 
     if authorized_action(@course, @current_user, :update)
+      return render_update_success if params[:for_reload]
       params[:course] ||= {}
       if params[:course].has_key?(:syllabus_body)
         params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
@@ -1976,32 +1992,40 @@ class CoursesController < ApplicationController
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
-      respond_to do |format|
-        @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
+      @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
 
-        @course.attributes = params[:course]
-        changes = changed_settings(@course.changes, @course.settings, old_settings)
+      @course.attributes = params[:course]
+      changes = changed_settings(@course.changes, @course.settings, old_settings)
+      @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
+        { :priority => Delayed::LOW_PRIORITY }, changes)
 
-        if params[:for_reload] || @course.save
-          Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
-          @current_user.touch
-          if params[:update_default_pages]
-            @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
-          end
-          format.html {
-            flash[:notice] = t('notices.updated', 'Course was successfully updated.')
-            redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to])
-          }
-          format.json do
-            if api_request?
-              render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
-            else
-             render :json => @course.as_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
-            end
-          end
-        else
+      if @course.save
+        Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
+        @current_user.touch
+        if params[:update_default_pages]
+          @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
+        end
+        render_update_success
+      else
+        respond_to do |format|
           format.html { render :action => "edit" }
           format.json { render :json => @course.errors, :status => :bad_request }
+        end
+      end
+    end
+  end
+
+  def render_update_success
+    respond_to do |format|
+      format.html {
+        flash[:notice] = t('notices.updated', 'Course was successfully updated.')
+        redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to])
+      }
+      format.json do
+        if api_request?
+          render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
+        else
+          render :json => @course.as_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
         end
       end
     end

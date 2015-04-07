@@ -1,28 +1,30 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'timezone'
   'underscore'
+  'compiled/react/shared/utils/withReactElement'
+  'compiled/object/assign'
   'jquery'
   'jquery.instructure_date_and_time'
-], (React, tz, _, $) ->
+], (React, tz, _, withReactElement, ObjectAssign, $) ->
 
 
-  slowRender = ->
+  slowRender = withReactElement ->
     datetime = @props.datetime
-    return React.DOM.time() unless datetime?
+    return time() unless datetime?
     datetime = tz.parse(datetime) unless _.isDate datetime
     fudged = $.fudgeDateForProfileTimezone(datetime)
 
-    @transferPropsTo React.DOM.time {
+    time ObjectAssign(@props, {
       title: $.datetimeString(datetime)
       dateTime: datetime.toISOString()
-    },
-      React.DOM.span className: 'visible-desktop',
+    }),
+      span className: 'visible-desktop',
         # something like: Mar 6, 2014
         $.friendlyDatetime(fudged)
 
 
-      React.DOM.span className: 'hidden-desktop',
+      span className: 'hidden-desktop',
         # something like: 3/3/2014
         fudged.toLocaleDateString()
 

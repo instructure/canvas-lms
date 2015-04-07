@@ -89,6 +89,13 @@ module Api::V1::User
         end
         json[:last_login] = last_login.try(:iso8601)
       end
+
+      if includes.include?('permissions')
+        json[:permissions] = {
+          :can_update_name => user.user_can_edit_name?,
+          :can_update_avatar => service_enabled?(:avatars)
+        }
+      end
     end
   end
 

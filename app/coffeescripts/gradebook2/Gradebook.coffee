@@ -1,6 +1,6 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'slickgrid.long_text_editor'
   'compiled/views/KeyboardNavDialog'
   'jst/KeyboardNavDialog'
@@ -24,7 +24,6 @@ define [
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
   'str/htmlEscape'
-  'compiled/gradebook2/UploadDialog'
   # 'compiled/gradebook2/PostGradesDialog'
   'jsx/gradebook/SISGradePassback/PostGradesStore'
   'jsx/gradebook/SISGradePassback/PostGradesApp'
@@ -48,7 +47,7 @@ define [
   'compiled/jquery/fixDialogButtons'
 ], (React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
   $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog,
-  SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesStore, PostGradesApp, columnHeaderTemplate,
+  SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, PostGradesStore, PostGradesApp, columnHeaderTemplate,
   groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav) ->
 
   class Gradebook
@@ -106,9 +105,9 @@ define [
       # this method should be removed after a month in production
       @alignCoursePreferencesWithLocalStorage()
 
-      assignmentGroupsParams = {}
+      assignmentGroupsParams = {exclude_descriptions: true}
       if @mgpEnabled && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
-        assignmentGroupsParams = {grading_period_id: @gradingPeriodToShow}
+        $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
       ajax_calls = [
         $.ajaxJSON(@options[enrollmentsUrl], "GET")
@@ -897,10 +896,6 @@ define [
       @arrangeColumnsBy(@getStoredSortOrder())
 
       $('#gradebook_settings').show().kyleMenu()
-
-      $('.gradebook_upload_link').click (event) =>
-        event.preventDefault()
-        new UploadDialog(@options.context_url)
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
 

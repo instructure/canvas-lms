@@ -46,6 +46,11 @@ define [
     # viewport. Defaults to false (i.e. just do one fetch per scroll)
     @optionProperty 'autoFetch'
 
+    ##
+    # Whether the collection should keep fetching pages until the last
+    # page is reached.  Defaults to false
+    @optionProperty 'fetchItAll'
+
     template: template
 
     ##
@@ -75,7 +80,7 @@ define [
       @listenTo @collection, 'reset', @attachScroll
       @listenTo @collection, 'fetched:last', @detachScroll
       @listenTo @collection, 'beforeFetch', @showLoadingIndicator
-      if @autoFetch
+      if @autoFetch or @fetchItAll
         @listenTo @collection, 'fetch', => setTimeout @checkScroll # next tick so events don't stomp on each other
       else
         @listenTo @collection, 'fetch', @hideLoadingIndicator
@@ -129,7 +134,7 @@ define [
       distanceToBottom = elementBottom -
         @scrollContainer.scrollTop() -
         @scrollContainer.height()
-      if (@autoFetch || distanceToBottom < @options.buffer) and @collection.canFetch('next')
+      if (@fetchItAll || distanceToBottom < @options.buffer) and @collection.canFetch('next')
         @collection.fetch page: 'next'
       else
         @hideLoadingIndicator()

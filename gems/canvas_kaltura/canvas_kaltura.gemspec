@@ -16,7 +16,6 @@ Gem::Specification.new do |spec|
 
 
   spec.add_dependency "nokogiri"
-  spec.add_dependency "libxml-ruby", "~> 2.7"
   spec.add_dependency "canvas_http"
   spec.add_dependency "canvas_sort"
   spec.add_dependency "multipart"

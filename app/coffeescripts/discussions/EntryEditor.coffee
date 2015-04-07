@@ -16,7 +16,6 @@ define [
   #   editor.display() # closes editor, saves model
   #
   class EntryEditor extends EditorToggle
-
     ##
     # @param {EntryView} view
     constructor: (@view) ->
@@ -33,10 +32,6 @@ define [
       super
       @cancelButton.detach()
       if opts?.cancel isnt true
-        # empty replies b/c (1) their references back to the parent create
-        # a circular JSON structure, and (2) we aren't saving them here
-        # anyway.
-        @view.model.set('replies', [])
         @view.model.set('updated_at', (new Date).toISOString())
         @view.model.set('editor', ENV.current_user)
         @view.model.save

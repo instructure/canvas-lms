@@ -79,6 +79,7 @@ module CC
         aq_mig_id = create_key("assessment_question_#{question['assessment_question_id']}")
         qq_mig_id = create_key("quiz_question_#{question['id']}")
         question['migration_id'] = question[:is_quiz_question] ? qq_mig_id : aq_mig_id
+        question['answers'] ||= []
 
         if question['question_type'] == 'missing_word_question'
           change_missing_word(question)
@@ -284,7 +285,7 @@ module CC
       
       def multiple_choice_resprocessing(node, question)
         correct_id = nil
-        correct_answer = question['answers'].find{|a|a['weight'] > 0}
+        correct_answer = question['answers'].find{|a|a['weight'].to_i > 0}
         correct_id = correct_answer['id'] if correct_answer
         node.respcondition(:continue=>'No') do |res_node|
           res_node.conditionvar do |c_node|
@@ -301,7 +302,7 @@ module CC
             c_node.and do |and_node|
               # The CC implementation guide says the 'and' isn't needed but it doesn't validate without it.
               question['answers'].each do |answer|
-                if answer['weight'] > 0
+                if answer['weight'].to_i > 0
                   and_node.varequal answer['id'], :respident=>"response1"
                 else
                   and_node.not do |not_node|
@@ -396,7 +397,7 @@ module CC
         correct_points = "%.2f" % correct_points
         
         groups.each_pair do |id, answers|
-          if answer = answers.find{|a| a['weight'] > 0}
+          if answer = answers.find{|a| a['weight'].to_i > 0}
             node.respcondition do |r_node|
               r_node.conditionvar do |c_node|
                 c_node.varequal(answer['id'], :respident=>"response_#{id}")

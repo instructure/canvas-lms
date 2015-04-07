@@ -81,8 +81,13 @@ def stub_png_data(filename = 'test my file? hai!&.png', data = nil)
 end
 
 def jpeg_data_frd
-  fixture_path = '/test_image.jpg'
+  fixture_path = 'test_image.jpg'
   fixture_file_upload(fixture_path, 'image/jpeg', true)
+end
+
+def one_hundred_megapixels_of_highly_compressed_png_data
+  fixture_path = '100mpx.png'
+  fixture_file_upload(fixture_path, 'image/png', true)
 end
 
 def crocodocable_attachment_model(opts={})

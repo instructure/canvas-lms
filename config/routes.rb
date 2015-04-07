@@ -96,7 +96,6 @@ CanvasRails::Application.routes.draw do
 
   concern :media do
     get 'media_download' => 'users#media_download'
-    get 'media_download.:type' => 'users#media_download', as: :typed_media_download
   end
 
   concern :users do
@@ -119,7 +118,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :pages do
-    resources :wiki_pages, path: :pages, except: [:update, :destroy] do
+    resources :wiki_pages, path: :pages, except: [:update, :destroy], constraints: { id: %r{[^\/]+} } do
       get 'revisions' => 'wiki_pages#revisions', as: :revisions
     end
 
@@ -205,7 +204,9 @@ CanvasRails::Application.routes.draw do
     get 'imports/list' => 'content_imports#index', as: :import_list
     # DEPRECATED
     get 'imports' => 'content_imports#intro'
-    resource :gradebook_upload
+    resource :gradebook_upload do
+      get 'data' => 'gradebook_uploads#data'
+    end
     get 'grades' => 'gradebooks#grade_summary', id: nil
     get 'grading_rubrics' => 'gradebooks#grading_rubrics'
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades
@@ -704,7 +705,6 @@ CanvasRails::Application.routes.draw do
   resources :appointment_groups, only: [:index, :show]
 
   post 'errors' => 'info#record_error'
-  get 'record_js_error' => 'info#record_js_error'
   resources :errors, only: [:show, :index], path: :error_reports
 
   get 'health_check' => 'info#health_check'
@@ -715,14 +715,6 @@ CanvasRails::Application.routes.draw do
   post 'facebook/message/:id' => 'facebook#hide_message', as: :facebook_hide_message
   get 'facebook/settings' => 'facebook#settings'
   post 'facebook/notification_preferences' => 'facebook#notification_preferences'
-
-  resources :interaction_tests do
-    collection do
-      get :next
-      get :register
-      post :groups
-    end
-  end
 
   post 'object_snippet' => 'context#object_snippet'
   post 'saml_consume' => 'pseudonym_sessions#saml_consume'
@@ -890,6 +882,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :submissions_api) do
       def submissions_api(context, path_prefix = context)
+        post "#{context.pluralize}/:#{context}_id/submissions/update_grades", action: :bulk_update
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :index, as: "#{path_prefix}_assignment_submissions"
@@ -1043,6 +1036,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/users', action: :create
       get 'accounts/:account_id/users', action: :index, as: 'account_users'
 
+      get 'users/:id', action: :api_show
       put 'users/:id', action: :update
       post 'users/:user_id/files', action: :create_file
 

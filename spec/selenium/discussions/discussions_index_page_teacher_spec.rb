@@ -31,6 +31,25 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      it "should display 100 discussions" do
+        #Setup: Creates 100 discussion topics
+        1.upto(100) do |n|
+          DiscussionTopic.create!(context: course, user: teacher,
+                                  title: "Discussion Topic #{n}")
+        end
+
+        get url
+
+        #Validate: Makes sure each topic is listed.
+        #Since topics are displayed in reverse order from creation (i.e. 100 is listed first), we use the topic index [100-n]
+        # to get the correct title
+        discussions_topics = ff('.title')
+        100.times do |n|
+          topic_index = 100-n
+          expect(discussions_topics[n]).to include_text("Discussion Topic #{topic_index}")
+        end
+      end
+
       it "should allow teachers to edit discussions settings" do
         get url
         f('#edit_discussions_settings').click
@@ -118,6 +137,8 @@ describe "discussions" do
           wait_for_ajaximations
           expect(topic.reload).to be_pinned
         end
+
+
 
         it "should allow locking a pinned topic" do
           topic.pinned = true

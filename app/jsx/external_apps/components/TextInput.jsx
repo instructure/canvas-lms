@@ -18,6 +18,7 @@ define([
       id:           React.PropTypes.string,
       required:     React.PropTypes.bool,
       hintText:     React.PropTypes.string,
+      placeholder:  React.PropTypes.string,
       errors:       React.PropTypes.object
     },
 
@@ -28,7 +29,7 @@ define([
             {this.props.label}
             <input ref="input" type="text" defaultValue={this.state.value}
               className="form-control input-block-level"
-              placeholder={this.props.label}
+              placeholder={this.props.placeholder || this.props.label}
               required={this.props.required ? "required" : null}
               onChange={this.handleChange}
               aria-invalid={!!this.getErrorMessage()} />

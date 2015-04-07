@@ -36,6 +36,21 @@ describe "dashboard" do
       end
     end
 
+    it "should not display assignment to grade in to do list for a designer" do
+      course_with_designer_logged_in(:active_all => true)
+      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
+      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+      assignment.reload
+      assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
+      assignment.reload
+      enable_cache do
+        get "/"
+
+        expect(f('.to-do-list')).to be_nil
+      end
+    end
+
     it "should show submitted essay quizzes in the todo list" do
       quiz_title = 'new quiz'
       student_in_course(:active_all => true)

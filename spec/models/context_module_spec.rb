@@ -750,6 +750,29 @@ describe ContextModule do
       expect(@module2.evaluate_for(@user)).to be_completed
     end
     
+    it "should update quiz progression status on assignment manual grading" do
+      course_module
+      @module.require_sequential_progress = true
+      @module.save!
+      @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
+      @quiz.workflow_state = 'available'
+      @quiz.save!
+
+      @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
+      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90}}
+      @module.save!
+
+      @teacher = User.create!(:name => "some teacher")
+      @course.enroll_teacher(@teacher)
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+
+      @quiz.assignment.grade_student(@user, :grade => 100)
+
+      @progression = @module.evaluate_for(@user)
+      expect(@progression).to be_completed
+    end
+
     it "should update progression status on grading and view events for quizzes too" do
       course_module
       @module.require_sequential_progress = true
@@ -758,24 +781,24 @@ describe ContextModule do
       @quiz.workflow_state = 'available'
       @quiz.save!
       @assignment = @course.assignments.create!(:title => "some assignment")
-      
+
       @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
       @tag2 = @module.add_item({:id => @assignment.id, :type => 'assignment'})
       @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
-      
+
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
-      
+
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_unlocked
       expect(@progression.current_position).to eql(@tag.position)
 
       expect(@quiz.reload.locked_for?(@user)).to be_falsey
       expect(@assignment.reload.locked_for?(@user)).to be_truthy
-      
+
       @submission = @quiz.generate_submission(@user)
       @submission.score = 100
       @submission.workflow_state = 'complete'

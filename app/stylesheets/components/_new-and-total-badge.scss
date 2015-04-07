@@ -43,16 +43,16 @@ $new-total-border-radius: 3px;
     color: white;
   }
   .new-items {    
-    background-color: $canvas-primary;    
+    background-color: $ic-brand-primary;    
     margin-right: -$new-total-border-radius;
     padding-right: $new-total-padding + $new-total-border-radius;
   }
   .total-items {
-    background-color: lighten($canvas-neutral, 6);
-    color: darken($canvas-neutral, 40);
+    background-color: lighten($ic-color-neutral, 6);
+    color: darken($ic-color-neutral, 40);
     @if $use_high_contrast {
-      background-color: $canvas-dark;
-      color: $canvas-light;
+      background-color: $ic-color-dark;
+      color: $ic-color-light;
     }
   }
 }

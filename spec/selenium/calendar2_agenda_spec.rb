@@ -25,7 +25,6 @@ describe "calendar2" do
 
       it "should create a new event" do
         load_agenda_view
-
         expect(fj('.agenda-wrapper:visible')).to be_present
         f('#create_new_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
@@ -111,16 +110,21 @@ describe "calendar2" do
         expect(f('.navigation_title')).not_to include_text('Invalid')
       end
 
-      it "should allow editing events" do
+      it "should allow deleting events", :priority => "1", :test_id => 138857 do
         tomorrow = 1.day.from_now
         event = make_event(start: tomorrow)
         load_agenda_view
 
+        # Verify the creation of the event
+        expect(ffj('.ig-row').length).to eq 1
+
+        # Delete the one event that was just created
         f('.ig-row').click
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
-
         wait_for_ajaximations
+
+        # Expect there to be no events
         expect(ffj('.ig-row').length).to eq 0
       end
 
@@ -182,6 +186,28 @@ describe "calendar2" do
         # Check various elements to verify that the calendar looks good
         expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
         expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+      end
+
+      it "should show the event in the mini calendar and agenda view", :priority => "1", :test_id => 138849 do
+        assignment_model(:course => @course,
+                         :title => "ricochet",
+                         :due_at => Time.zone.now - 1.month)
+        load_agenda_view
+
+        #Because it is in a past month, it should not be on the mini calendar
+        expect(f(".event")).to be_nil
+
+        #also check the agenda view
+        expect(ff('.ig-row').size).to eq 0
+
+        #Go back a month and look for the event on the mini calendar
+        f(".fc-button-prev").click
+        expect(f(".event")).not_to be_nil
+
+        #click the mini calendar and verify that the agenda view updates
+        f(".event").click
+        wait_for_animations
+        expect(ff('.ig-row').size).to eq 1
       end
     end
   end

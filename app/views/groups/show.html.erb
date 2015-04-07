@@ -23,7 +23,7 @@
   <% if can_do(@context.announcements.scoped.new, @current_user, :create) %>
     <div><a href="<%= group_announcements_path(@context) %>#new" class='add'><%= t 'new_announcement', "New Announcement" %></a></div>
   <% end %>
-  <% locals = {:title => t('coming_up', "Coming Up"), :display_count => 3, :period => t('next_week', "the next week"), :contexts_to_link_to => @context, :upcoming => true} %>
+  <% locals = {:title => t('coming_up', "Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
   <% if @current_user %>
     <% cache([@current_user, @context, 'group_upcoming_events' ]) do %>
       <%= render :partial => "shared/event_list", :object => @current_user.upcoming_events(:contexts => @context), :locals => locals %>

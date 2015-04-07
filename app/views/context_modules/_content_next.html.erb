@@ -187,7 +187,7 @@ input.move-module-label-spacer {
     <div class="header-bar-right">
       <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
       <button class="btn btn-primary add_module_link">
-        <i class="icon-plus" role="presentation"></i> 
+        <i class="icon-plus" role="presentation"></i>
         <span class="screenreader-only">Add</span>
         <%= t('#context_modules.buttons.add_module', 'Module') %>
       </button>
@@ -196,7 +196,7 @@ input.move-module-label-spacer {
 </div>
 
 <% if can_do(@context, @current_user, :manage_content) %>
-  <div class="hidden-readable screenreader-only" tabindex="0" aria-label="keyboard instructions">
+  <div class="hidden-readable screenreader-only" aria-label="keyboard instructions">
     <%= t('modules_keyboard_hint_updated',
           'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
   </div>

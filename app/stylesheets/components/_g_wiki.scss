@@ -1,0 +1,559 @@
+@import "pages/wiki_animations.scss";
+@import "pages/shared/menu_tools.scss";
+
+$subdued-text-color: #696969;
+$darkened-text-color: #4d4d4d;
+$published-text-color: #33802a;
+$unpublished-text-color: $subdued-text-color;
+
+$published-icon-color: #33802a;
+$unpublished-icon-color: #b4b7ba;
+
+$border-color: #c1c7cf;
+$border-radius: 3px;
+
+$pages-border: 1px solid #c1c7cf;
+$pages-dashed-border: 1px dashed #c1c7cf;
+$pages-inner-border: 1px solid #e1e3e4;
+
+$index-background: #e8ecef;
+$item-background: #ffffff;
+
+$shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+$table-shadow: 0 1px 0 #dde0e4;
+
+$revision-sidebar-width: 270px;
+$revision-sidebar-background-color: $ic-body-background-color;
+$revision-sidebar-selected-color: #ffffff;
+$revision-sidebar-hover-color: lighten($ic-color-neutral, 10);
+$revision-sidebar-dimmed-color: $ic-dim-helper-text;
+$revision-button-color: $ic-brand-secondary;
+$revision-button-hover-color: $ic-brand-primary;
+
+.pages .sticky-toolbar .sticky {
+  position: fixed;
+  z-index: 1000;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  margin-left: 1px;
+  background: white;
+  height: 33px;
+  max-width: $max_main_width;
+  border-color: darken($ic-border-color, 10);
+}
+
+.pages.with-left-side .sticky-toolbar .sticky {
+  margin-left: $left_side_width + 1px;
+}
+
+.pages.with-right-side .sticky-toolbar .sticky {
+  margin-right: $right_side_width + 1px;
+}
+
+.pages:not(.revisions) {
+  #breadcrumbs {
+    border-bottom: $pages-border;
+  }
+}
+
+.delete_criterion_link {
+  border: none;
+  background: none;
+  padding: 0px;
+}
+
+.add_prerequisite_link {
+  color: #0088cc;
+  border: none;
+  background: none;
+  padding: 0px;
+  &:hover {
+    color: #005580;
+    text-decoration: underline;
+  }
+}
+
+.pages {
+  .header-bar-outer-container {
+    min-height: 64px;
+    clear: right;
+    .header-bar-container {
+      min-width: $min_main_width - 2px;
+      min-height: 64px;
+      .page-changed-alert {
+        overflow: hidden;
+        height: 0;
+      }
+      .page-changed-alert .alert {
+        border-radius: 0;
+      }
+      .header-bar {
+        box-shadow: $shadow;
+      }
+      .header-left-flex {
+        flex: 1;
+        float: none;
+        white-space: nowrap;
+        overflow: hidden;
+        .course-title {
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+      .header-right-flex {
+        padding-left: $ic-sp;
+      }
+      .flex-container {
+        display: flex;
+        align-items:center {}
+      }
+    }
+  }
+  .header-bar-outer-container.page-changed {
+    height: 103px;
+    animation: page-changed-header-bar 1.15s;
+    .header-bar-container {
+      height: 103px;
+      animation: page-changed-header-bar 1.15s;
+      .page-changed-alert {
+        margin: (-1px) 0 0 0;
+        border-bottom: $pages-border;
+        box-shadow: $shadow;
+        height: 39px;
+        animation: page-changed-alert 1.15s;
+      }
+    }
+  }
+}
+
+.pages.index {
+  #main {
+    background: $index-background;
+  }
+  .index-content-container {
+    margin-top: 1px;
+  }
+  .page-edit-dialog .edit-content {
+    margin: 8px 5px;
+    .edit-label {
+      padding-top: 5px;
+      width: 75px;
+      float: left;
+      text-align: right;
+    }
+    .edit-controls {
+      margin-left: 85px;
+    }
+    .edit-control-text {
+      width: 270px;
+    }
+  }
+  .index-content {
+    padding: 0 1em 1em;
+    .table {
+      margin-bottom: 0;
+      border-collapse: separate;
+      border-spacing: 0;
+      td, th {
+        &:first-child {
+          padding-left: 12px;
+        }
+        &:last-child {
+          padding-right: 12px;
+        }
+      }
+      .header-row {
+        text-transform: uppercase;
+        a.sort-field {
+          cursor: pointer;
+          user-select: none;
+          color: inherit;
+          white-space: nowrap;
+          i {
+            color: #ccc;
+          }
+        }
+        a.sort-field:hover {
+          text-decoration: none;
+          i {
+            color: #0088cc;
+          }
+        }
+        a.sort-field-active {
+          i {
+            color: black;
+          }
+        }
+      }
+    }
+    .table thead {
+      background: $index-background;
+      tr {
+        height: 40px;
+      }
+      th {
+        vertical-align: middle;
+      }
+    }
+    .table tbody {
+      .page_title {
+        font-weight: bold;
+      }
+      .front-page {
+        margin: auto 0.5em;
+      }
+      .al-trigger {
+        color: $ic-icon-link-color;
+      }
+      tr {
+        background: $item-background;
+        text-decoration: inherit;
+        color: inherit;
+        &.clickable:hover {
+          background: $ic-list-item-background--hover;
+          text-decoration: inherit;
+          color: inherit;
+        }
+        td:first-child {
+          border-left: $pages-border;
+        }
+        td:last-child {
+          border-right: $pages-border;
+        }
+      }
+      tr:first-child {
+        td {
+          border-top: $pages-border;
+        }
+        td:first-child {
+          border-top-left-radius: $border-radius;
+        }
+        td:last-child {
+          border-top-right-radius: $border-radius;
+        }
+      }
+      tr:last-child {
+        td {
+          border-bottom: $pages-border;
+          box-shadow: $table-shadow;
+        }
+        td:first-child {
+          border-bottom-left-radius: $border-radius;
+        }
+        td:last-child {
+          border-bottom-right-radius: $border-radius;
+        }
+      }
+      td {
+        font-size: 11px;
+        color: $subdued-text-color;
+        border-top: $pages-inner-border;
+        .wiki-page-link {
+          font-size: 13px;
+          font-weight: bold;
+          color: $darkened-text-color;
+        }
+        .wiki-page-link.published {
+          color: $published-text-color;
+        }
+        .wiki-page-link.unpublished {
+          color: $unpublished-text-color;
+        }
+        .icon-publish {
+          color: $published-icon-color;
+        }
+        .icon-unpublished {
+          color: $ic-icon-link-color;
+        }
+      }
+    }
+    .table .no-pages .no-pages-cell {
+      border: $pages-dashed-border;
+    }
+    .loading {
+      text-align: center;
+      color: #8f9295;
+      img {
+        margin-top: -3px;
+        opacity: 0.75;
+      }
+      &.loading {
+        border: 1px solid transparent;
+      }
+      &.loading-more {
+        border: $pages-dashed-border;
+        border-top-width: 0;
+        border-bottom-left-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+        margin-top: 1px;
+        padding: 4px 12px;
+        background: #f4f6f8;
+      }
+    }
+  }
+}
+
+.pages.show {
+  .course-title {
+    display: none;
+    font-size: 1.8em;
+    font-weight: bold;
+    line-height: 30px;
+    margin: 0;
+    color: #666;
+  }
+  .page-title {
+    font-size: 2.5em;
+    font-weight: 200;
+    margin: 15px 0;
+    color: #666;
+  }
+  .header-bar {
+    .publish-button {
+      margin: 0 12px 0 0;
+    }
+    .front-page.label {
+      margin: 6px 12px 6px 0;
+    }
+    .published, .unpublished {
+      display: inline-block;
+      margin: 6px 8px 6px 5px;
+    }
+  }
+  .locked-alert ul {
+    margin: 4px 0 6px 25px;
+  }
+  .show-content {
+    padding: 15px 25px;
+  }
+  .floating_links {
+    margin-right: 15px;
+  }
+  .public-license {
+    margin-left: 15px;
+    margin-bottom: 15px;
+  }
+}
+
+.pages.show.home {
+  .course-title {
+    display: block;
+  }
+  .page-title {
+    display: none;
+  }
+  .show-content {
+    padding-top: 25px;
+  }
+}
+
+.pages.edit {
+  .form-actions {
+    padding-left: 1em;
+  }
+  .edit-form {
+    margin: 0;
+    .edit-content {
+      padding: 1em;
+      .edit-header {
+        position: relative;
+        margin-bottom: 1em;
+      }
+      .edit-header h2 {
+        margin: 0;
+      }
+      .switch_views_container {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .body {
+        width: 98.5%;
+      }
+      .mceLayout {
+        margin: 0;
+      }
+      .options {
+        margin-top: 1em;
+      }
+    }
+    .form-actions {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.pages.show.revisions {
+  #wiki_page_revisions {
+    position: relative;
+    min-height: 502px;
+  }
+  .show-content {
+    float: left;
+    margin-right: $revision-sidebar-width + 1px;
+  }
+  .show-revisions {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: $revision-sidebar-width;
+    background-color: $revision-sidebar-background-color;
+    aside {
+      width: $revision-sidebar-width;
+      position: fixed;
+    }
+    .revision-history {
+      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 40px;
+      padding: 4px 11px;
+      margin-top: -1px;
+      margin-left: -1px;
+      border-bottom: none;
+      color: $subdued-text-color;
+      position: relative;
+    }
+    .revision-history .close-button {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      right: 3px;
+      width: 42px;
+      text-align: center;
+      color: dimgrey;
+      &:hover {
+        color: $revision-button-hover-color;
+      }
+      i.icon-x {
+        position: absolute;
+        top: 50%;
+        margin-top: -8px;
+        right: 13px;
+      }
+    }
+    ul.revisions-list {
+      margin: 0 0 0 -1px;
+      height: 400px;
+    }
+  }
+  .revision {
+    list-style-type: none;
+    overflow: hidden;
+    width: $revision-sidebar-width + 1px;
+    margin-top: -1px;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    // height and transitions
+    height: 34px;
+    transition: height 400ms;
+    &.selected, &.latest {
+      height: 56px;
+      transition: height 400ms;
+    }
+    .revision-content {
+      margin-left: 1px;
+      padding: 7px 8px;
+      .revision-details {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    &:not(.selected):hover .revision-content {
+      background-color: $revision-sidebar-hover-color;
+      cursor: pointer;
+    }
+    .revision-actions {
+      margin-top: 2px;
+      font-style: italic;
+      color: $revision-sidebar-dimmed-color;
+    }
+    .revision-actions a.restore-link {
+      font-style: normal;
+      cursor: pointer;
+    }
+    &.selected {
+      background-color: $revision-sidebar-selected-color;
+    }
+  }
+  .revision-nav-buttons {
+    position: relative;
+    padding: 0;
+    height: 40px;
+    margin-top: 14px;
+    border-top: $pages-inner-border;
+    a {
+      user-select: none;
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+      padding: 10px 10px;
+      color: $revision-button-color;
+    }
+    a:hover {
+      text-decoration: none;
+      cursor: pointer;
+      color: $revision-button-hover-color;
+      border-radius: 3px;
+    }
+    .prev-button {
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      padding: 7px 10px 7px 5px;
+    }
+    .next-button {
+      position: absolute;
+      right: 3px;
+      top: 3px;
+      padding: 7px 5px 7px 10px;
+    }
+  }
+}
+
+@media print {
+  #breadcrumbs, .header-bar-outer-container {
+    display: none;
+  }
+  .pages.show.revisions {
+    .show-revisions {
+      display: none;
+    }
+    .show-content {
+      margin-right: 0;
+    }
+  }
+}
+
+#wiki_show_view_main {
+  overflow: auto;
+}
+
+#last_edited_by {
+  border: solid #eee;
+  border-width: 0 0 1px 0;
+  font-size: 0.8em;
+  margin-bottom: 10px;
+  margin-right: 2px;
+  h3, .h3 {
+    margin: 0px 20px 10px;
+    font-size: 1.5em;
+    color: #444;
+  }
+}
+
+#page_history {
+  float: right;
+}
+
+// this is to fix a bug that was reported that if you shrink your browser window width to something small
+// that it would just cut off the right side of the tiny WYSIWYG editor box and make it dissapear beind the right side.
+#wiki_page_body_parent.mceEditor {
+  display: block;
+  overflow: auto;
+}

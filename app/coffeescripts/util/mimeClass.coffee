@@ -9,7 +9,7 @@ define [
   # if there is a file format that is common enough, go ahead and add an entry to one of these:
   # If you need to make a new class, make sure to also make an svg for it in public/images/mimeClassIcons/
   # and a class name in app/stylesheets/components/_MimeClassIcons.scss
-  # (and app/stylesheets/components/deprecated/_fancy_links.sass if it is still being used)
+  # (and app/stylesheets/components/deprecated/_fancy_links.scss if it is still being used)
   mimeClasses =
     audio:
       displayName: I18n.t('Audio')

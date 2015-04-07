@@ -1,0 +1,161 @@
+.lock_date {
+  color: #444;
+  padding-left: 20px;
+  font-weight: bold;
+}
+
+#submit_assignment {
+  .submission_comment_textarea {
+    width: 300px;
+    height: 20px;
+    padding: 4px 6px;
+    &.focus_or_content {
+      width: 100%;
+      height: 72px;
+    }
+  }
+}
+
+#edit_assignment_wrapper {
+  padding: 1em;
+}
+
+#point_change_warning {
+  margin-top: 15px;
+  margin-bottom: 0px;
+  display: none;
+}
+
+#edit_assignment_form {
+  margin: 0;
+  .advanced-togglable-true {
+    margin-top: 18px;
+    border-top: 1px solid #ccc;
+    padding-top: 18px;
+  }
+  .advanced-togglable-false {
+    margin-top: 18px;
+  }
+  #group_category_selector,
+  #assignment_peer_reviews_fields {
+    margin-bottom: 0;
+  }
+  .frozen-description {
+    padding: 15px;
+    overflow-y: auto;
+    height: 200px;
+    border: 1px solid #AAA;
+    resize: vertical;
+  }
+  .explanation {
+    font-size: 0.8em;
+    color: #888;
+  }
+}
+
+#assignment_turnitin_settings {
+  min-width: 400px;
+  label {
+    width: 100%;
+  }
+  .js-exclude-small-matches-options {
+    margin-left: 21px;
+    input[type="radio"] {
+      margin-top: 13px;
+    }
+  }
+}
+
+#assignment_show {
+  .assignment-title {
+    display: table-row;
+    width: 100%;
+  }
+  .title-content {
+    display: table-cell;
+    width: 100%;
+    vertical-align: bottom;
+  }
+  .edit-content {
+    display: table-cell;
+    vertical-align: bottom;
+    text-align: right;
+    min-width: 250px;
+    padding-bottom: 12px;
+  }
+  .undo-main-margins {
+    margin-left: -1em;
+    margin-right: -1em;
+    margin-bottom: -1em;
+  }
+  .student-assignment-overview {
+    list-style: none;
+    width: 100%;
+    border-top: 1px solid #BBB;
+    border-bottom: 1px solid #BBB;
+    font-size: 1.1em;
+    padding: 0.5em 0.25em;
+    margin: 0 0 1em 0;
+    li {
+      display: inline-block;
+    }
+    .title {
+      font-weight: bold;
+      padding-right: 0.5em;
+    }
+    .value {
+      padding-right: 2.5em;
+    }
+  }
+  .form-horizontal.display-only .control-group {
+    margin-bottom: 0;
+  }
+  .assignment_dates {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1em;
+    tr {
+      th {
+        font-weight: bold;
+        padding: 0.25em 0.5em;
+      }
+      td {
+        border-top: 1px solid #BBB;
+        border-bottom: 1px solid #BBB;
+        padding: 0.25em 0.5em;
+      }
+    }
+  }
+  .description.student-version {
+    min-height: 260px;
+  }
+  .description.teacher-version {
+    padding: 15px;
+    overflow-y: auto;
+    height: 200px;
+    border: 1px solid #AAA;
+    resize: vertical;
+  }
+  .control-group {
+    .control-label {
+      font-weight: bold;
+    }
+    .controls .value {
+      display: block;
+      padding-top: 5px;
+    }
+  }
+}
+
+#assignment-draft-state {
+  padding: 10px;
+  line-height: 33px;
+}
+
+#sequence_footer.module-sequence-footer {
+  padding-top: 0px;
+}
+
+#content {
+  padding-bottom: 110px;
+}

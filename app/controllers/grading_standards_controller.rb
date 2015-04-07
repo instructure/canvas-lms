@@ -21,17 +21,13 @@ class GradingStandardsController < ApplicationController
   add_crumb(proc { t '#crumbs.grading_standards', "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
   before_filter { |c| c.active_tab = "grading_standards" }
 
-  def default_data
-    GradingStandard.default_grading_standard
-  end
-
   def index
     if authorized_action(@context, @current_user, :manage_grades)
       js_env({
         :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
         :GRADING_PERIODS_URL => context_url(@context, :api_v1_context_grading_periods_url),
         :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
-        :DEFAULT_DATA => default_data
+        :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard
       })
       @standards = GradingStandard.standards_for(@context).sorted.limit(100)
       respond_to do |format|
@@ -49,7 +45,7 @@ class GradingStandardsController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :manage_grades)
       @standard = @context.grading_standards.build(params[:grading_standard])
-      @standard.data = default_data unless params[:grading_standard][:data]
+      @standard.data = params[:grading_standard][:data] || GradingStandard.default_grading_standard
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save

@@ -53,7 +53,7 @@
     <% end %>
   <% end %>
 
-  <% if can_do(@context, @current_user, :read) && show_user_create_course_button(@current_user) %>
+  <% if can_do(@context, @current_user, :read) && show_user_create_course_button(@current_user, @context.account) %>
     <%= link_to context_url(@context, :context_start_copy_url), :class => 'btn button-sidebar-wide copy_course_link' do %>
       <i class="icon-copy-course"></i>
       <%= t('links.copy', 'Copy this Course') %>

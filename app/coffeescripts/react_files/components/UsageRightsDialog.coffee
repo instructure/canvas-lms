@@ -1,7 +1,7 @@
 define [
   'jquery'
   'underscore'
-  'old_unsupported_dont_use_react'
+  'react'
   'i18n!usage_rights_modal'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
@@ -12,11 +12,14 @@ define [
   '../utils/updateModelsUsageRights'
   './FilesystemObjectThumbnail'
   './DialogPreview'
+  'compiled/react/shared/utils/withReactElement'
   'compiled/jquery.rails_flash_notifications'
   'jquery.instructure_forms'
-], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBox, filesEnv, setUsageRights, updateModelsUsageRights, FilesystemObjectThumbnail, DialogPreview) ->
+], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBoxComponent, filesEnv, setUsageRights, updateModelsUsageRights, FilesystemObjectThumbnailComponent, DialogPreviewComponent, withReactElement) ->
 
-  {div, button, span, ul, li, i, a, hr, h4} = React.DOM
+  UsageRightsSelectBox = React.createFactory UsageRightsSelectBoxComponent
+  FilesystemObjectThumbnail = React.createFactory FilesystemObjectThumbnailComponent
+  DialogPreview = React.createFactory DialogPreviewComponent
 
   MAX_THUMBNAILS_TO_SHOW = 5
   MAX_FOLDERS_TO_SHOW = 2
@@ -129,7 +132,7 @@ define [
         i {className: 'icon-warning UsageRightsDialog__warning'}
         I18n.t('Items selected have different usage rights.')
 
-    render: ->
+    render: withReactElement ->
       div {className: 'ReactModal__Layout'},
         div {className: 'ReactModal__InnerSection ReactModal__Header'},
           div {className: 'ReactModal__Header-Title'},

@@ -1,5 +1,5 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/FileRenameForm'
   'compiled/models/Folder'
@@ -15,7 +15,7 @@ define [
             id: 999
             name: 'original_name.txt'
           name: 'options_name.txt'
-      @form = React.renderComponent(FileRenameForm(props), $('<div>').appendTo('body')[0])
+      @form = React.render(React.createFactory(FileRenameForm)(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
       #TODO: oddness with the current modal implementation makes teardown not work
@@ -36,7 +36,15 @@ define [
     Simulate.click(@form.refs.renameBtn.getDOMNode())
     Simulate.click(@form.refs.clearNameFieldButton.getDOMNode())
     equal(@form.refs.newName.getDOMNode().value, '')
-    ok($(@form.refs.newName.getDOMNode()).is(':focus'))
+    # this has been failing intermittantly because sometimes the test
+    # finishes before focus is restored, so we're going to try many
+    # times before we really say it's failing.  So far, adding this
+    # retry loop has resulted in 10/10 passes when before it was failing
+    # 1/3 runs on a local machine ~EthanVizitei
+    unless $(@form.refs.newName.getDOMNode()).is(':focus')
+      gotFocus = false
+      gotFocus = true if $(@form.refs.newName.getDOMNode()).is(':focus') for [1..25]
+      equal(gotFocus, true)
 
   test 'isEditing displays file name when no options name exists', ->
     @form.setProps(fileOptions: {file: {name: 'file_name.md'}})
@@ -65,7 +73,7 @@ define [
     ok(@form.state.isEditing)
     Simulate.click(@form.refs.commitChangeBtn.getDOMNode())
 
-  test 'onNameConflicResolved preserves expandZip option when renaming', ->
+  test 'onNameConflictResolved preserves expandZip option when renaming', ->
     expect(2)
     @form.setProps(
       fileOptions:
@@ -79,7 +87,7 @@ define [
     ok(@form.state.isEditing)
     Simulate.click(@form.refs.commitChangeBtn.getDOMNode())
 
-  test 'onNameConflicResolved preserves expandZip option when replacing', ->
+  test 'onNameConflictResolved preserves expandZip option when replacing', ->
     expect(1)
     @form.setProps(
       fileOptions:

@@ -1,7 +1,7 @@
 define [
   'jquery'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   'i18n!restrict_student_access'
   'compiled/models/Folder'
   '../modules/customPropTypes'
@@ -11,7 +11,10 @@ define [
   './UsageRightsSelectBox'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], ($, React, withReactDOM, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights, DialogPreview, UsageRightsSelectBox) ->
+], ($, React, withReactElement, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights, DialogPreviewComponent, UsageRightsSelectBoxComponent) ->
+
+  DialogPreview = React.createFactory DialogPreviewComponent
+  UsageRightsSelectBox = React.createFactory UsageRightsSelectBoxComponent
 
   RestrictedDialogForm = React.createClass
 
@@ -194,7 +197,7 @@ define [
 
           div {
             style:
-              'margin-left': '20px',
+              marginLeft: '20px',
               display: (if  @state.selectedOption in ['link_only', 'date_range'] then 'block' else 'none')
             'aria-hidden': (if  @state.selectedOption in ['link_only', 'date_range'] then 'false' else 'true')
           },
@@ -236,7 +239,7 @@ define [
                 div className: 'controls dateSelectInputContainer',
                   input
                     ref: 'unlock_at'
-                    defaultValue: $.datetimeString(@state.unlock_at) if @state.unlock_at,
+                    defaultValue: $.datetimeString(@state.unlock_at) if @state.unlock_at
                     className: 'form-control dateSelectInput',
                     type: 'text',
                     'aria-label': I18n.t('Available From Date')
@@ -245,7 +248,7 @@ define [
                   div className: 'controls dateSelectInputContainer',
                   input
                     ref: 'lock_at'
-                    defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at,
+                    defaultValue: $.datetimeString(@state.lock_at) if @state.lock_at
                     className: 'form-control dateSelectInput',
                     type: 'text'
                     'aria-label': I18n.t('Available Until Date')
@@ -268,7 +271,7 @@ define [
 
 
 
-    render: withReactDOM ->
+    render: withReactElement ->
       # Doing this here to prevent possible repeat runs of @usageRightsOnAll and @allFolders
       showUsageRights = @props.usageRightsRequiredForContext && !@usageRightsOnAll() && !@allFolders()
       div {className: 'RestrictedDialogForm__container'},

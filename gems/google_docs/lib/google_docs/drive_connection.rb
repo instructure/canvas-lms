@@ -49,7 +49,7 @@ module GoogleDocs
 
         # hack to make it seem like the old object
         result.define_singleton_method(:content_type) do
-          result.headers['Content-Type']
+          result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
         end
 
         # TODO: get extension from response header
@@ -97,7 +97,7 @@ module GoogleDocs
     def acl_remove(document_id, users)
       api_client.authorization.update_token!
       users.each do |user_id|
-        next if user_id.blank?
+        next if user_id.blank? || /@/.match(user_id) # google drive ids are numeric, google docs are emails. if it is a google doc email just skip it
         result = api_client.execute(
           :api_method => drive.permissions.delete,
           :parameters => {
@@ -169,6 +169,7 @@ module GoogleDocs
       folders = {nil => root}
 
       documents['items'].each do |doc_entry|
+        next unless doc_entry['exportLinks']
         entry = GoogleDocs::DriveEntry.new(doc_entry, extensions)
         if folders.has_key?(entry.folder)
           folder = folders[entry.folder]
@@ -181,10 +182,10 @@ module GoogleDocs
       end
 
       if extensions && extensions.length > 0
-        root.select { |e| extensions.include?(e.extension) }
-      else
-        root
+        root = root.select { |e| extensions.include?(e.extension) }
       end
+
+      root.select { |e| !e.in_trash? }
     end
 
     def get_folder_name_by_id(entries, folder_id)

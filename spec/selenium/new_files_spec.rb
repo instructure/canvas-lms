@@ -34,28 +34,63 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       end
 
       it "should unpublish and publish a file from cog menu" do
-        permissions('rgba(128, 128, 128, 1)', 1, 0)
+        set_item_permissions(:unpublish)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        permissions('rgba(0, 173, 24, 1)', 0, 0)
+        expect(driver.find_element(:class => 'unpublished')).to be_displayed
+        set_item_permissions(:publish)
         expect(f('.btn-link.published-status.published')).to be_displayed
+        expect(driver.find_element(:class => 'published')).to be_displayed
       end
 
       it "should make file available to student with link" do
-        tooltip_text = "Hidden. Available with a link"
-        permissions('rgba(196, 133, 6, 1)', 2, 0)
+        set_item_permissions(:restricted_access, :available_with_link)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
+        expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
 
       it "should make file available to student within given timeframe" do
-        tooltip_text = "Hidden. Available with a link"
-        permissions('rgba(196, 133, 6, 1)', 2, 1)
+        set_item_permissions(:restricted_access, :available_with_timeline)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
+        expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
 
       it "should delete file from toolbar" do
-        file_name = "example.pdf"
         delete_from_toolbar
         expect(get_all_files_folders.count).to eq 0
+      end
+
+      context "preview" do
+        before do
+          fln("example.pdf").click
+        end
+
+        it "tabs through all buttons in the header button bar" do
+          buttons = ff('.ef-file-preview-header-buttons > *')
+          driver.execute_script("$('.ef-file-preview-header-buttons').children().first().focus()")
+          buttons.each do |button|
+            check_element_has_focus(button)
+            button.send_keys("\t")
+          end
+        end
+
+        it "returns focus to the link that was clicked when closing with the esc key" do
+          driver.execute_script('return document.activeElement').send_keys :escape
+          check_element_has_focus(fln("example.pdf"))
+        end
+
+        it "returns focus to the link when the close button is clicked" do
+          f('.ef-file-preview-header-close').click
+          check_element_has_focus(fln("example.pdf"))
+        end
+      end
+
+      context "Toolbar Previews" do
+        it "returns focus to the preview toolbar button when closed" do
+          ff('.ef-item-row')[0].click
+          f('.btn-view').click
+          f('.ef-file-preview-header-close').click
+          check_element_has_focus(f('.btn-view'))
+        end
       end
    end
 
@@ -76,7 +111,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       end
    end
 
-   context "Publish Cloud Dialog", :priority => '3' do
+   context "Publish Cloud Dialog", :priority => '2' do
     before (:each) do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:better_file_browsing)
@@ -86,10 +121,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
     end
 
     it "should validate that file is published by default" do
-        publish_background_color = 'rgba(0, 173, 24, 1)'
         icon_publish_color = ff('.icon-publish')[0].css_value('color')
         expect(f('.btn-link.published-status.published')).to be_displayed
-        expect(icon_publish_color).to eq publish_background_color
     end
 
     it "should set focus to the close button when opening the dialog" do
@@ -101,7 +134,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
     end
    end
 
-   context "Usage Rights Dialog", :priority => '3' do
+   context "Usage Rights Dialog", :priority => '2' do
     before :each do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:better_file_browsing)
@@ -129,29 +162,24 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       expect(f('.ReactModal__Content')).to eq(nil)
     end
 
-    def element_has_focus(element)
-      active_element = driver.execute_script('return document.activeElement')
-      expect(active_element).to eq(element)
-    end
-
     it "should set usage rights on a file via the modal by clicking the indicator" do
       f('.UsageRightsIndicator__openModal').click
       wait_for_ajaximations
       set_usage_rights_in_modal
       react_modal_hidden
       # a11y: focus should go back to the element that was clicked.
-      element_has_focus(f('.UsageRightsIndicator__openModal'))
+      check_element_has_focus(f('.UsageRightsIndicator__openModal'))
       verify_usage_rights_ui_updates
     end
 
     it "should set usage rights on a file via the cog menu" do
-      f('.ef-links-col button[aria-label="Settings"]').click
+      f('.ef-links-col .al-trigger').click
       f('.ItemCog__OpenUsageRights a').click
       wait_for_ajaximations
       set_usage_rights_in_modal
       react_modal_hidden
       # a11y: focus should go back to the element that was clicked.
-      element_has_focus(f('.ef-links-col button[aria-label="Settings"]'))
+      check_element_has_focus(f('.ef-links-col .al-trigger'))
       verify_usage_rights_ui_updates
     end
 
@@ -162,7 +190,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       set_usage_rights_in_modal
       react_modal_hidden
       # a11y: focus should go back to the element that was clicked.
-      element_has_focus(f('.Toolbar__ManageUsageRights'))
+      check_element_has_focus(f('.Toolbar__ManageUsageRights'))
       verify_usage_rights_ui_updates
     end
 

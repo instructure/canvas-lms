@@ -16,7 +16,7 @@ define [
   COURSE_SUBMISSIONS_URL = "/courses/1/submissions"
 
   createView = (varyDates=false) ->
-    ENV.PERMISSIONS = { manage: false }
+    ENV.PERMISSIONS = { manage: false, read_grades: true }
     course = new Course {id: 1}
     #the dates are in opposite order of what they will be sorted into
     assignments = [
@@ -43,7 +43,12 @@ define [
       {id: 2, assignment_id: 4},
       {id: 3, assignment_id: 5, submission_type: 'online'}
     ]
-    server.respondWith "GET", "#{COURSE_SUBMISSIONS_URL}?per_page=50", [
+    url = "#{COURSE_SUBMISSIONS_URL}?"
+    if ENV.observed_student_ids.length == 1
+      url = "#{url}student_ids[]=#{ENV.observed_student_ids[0]}&"
+    url = "#{url}per_page=50"
+
+    server.respondWith "GET", url, [
       200,
       { "Content-Type": "application/json" },
       JSON.stringify(submissions),
@@ -56,6 +61,7 @@ define [
     setup: ->
       @server = sinon.fakeServer.create()
       fakeENV.setup()
+      ENV.observed_student_ids = []
 
     teardown: ->
       fakeENV.teardown()

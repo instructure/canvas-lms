@@ -267,13 +267,14 @@ class Role < ActiveRecord::Base
     manageable = []
     if course.grants_right?(user, :manage_students)
       manageable += ['StudentEnrollment', 'ObserverEnrollment']
+      if course.teacherless?
+        manageable << 'TeacherEnrollment'
+      end
     end
     if course.grants_right?(user, :manage_admin_users)
-      manageable += ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
-    elsif course.teacherless?
-      manageable << 'TeacherEnrollment'
+      manageable += ['ObserverEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
     end
-    manageable.sort
+    manageable.uniq.sort
   end
 
   def self.role_data(course, user, include_inactive=false)
