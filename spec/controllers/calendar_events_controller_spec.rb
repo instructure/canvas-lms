@@ -64,6 +64,14 @@ describe CalendarEventsController do
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "doesn't create an event" do
+      initial_count = @course.calendar_events.count
+      user_session(@teacher)
+      get 'new', :course_id => @course.id
+      expect(@course.reload.calendar_events.count).to eq initial_count
+    end
+
   end
   
   describe "POST 'create'" do
