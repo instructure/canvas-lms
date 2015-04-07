@@ -72,11 +72,12 @@ class GradingPeriod < ActiveRecord::Base
     Time.now > end_date
   end
 
-  private
 
   def last?
-    grading_period_group.grading_periods.sort_by(&:end_date).last == self
+    grading_period_group.grading_periods.active.sort_by(&:end_date).last == self
   end
+
+  private
 
   def validate_dates
     if start_date && end_date && end_date < start_date

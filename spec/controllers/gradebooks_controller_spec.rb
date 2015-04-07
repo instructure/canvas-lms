@@ -516,6 +516,7 @@ describe GradebooksController do
           group_weight: 100,
           assignments: [
             {
+              due_at: nil,
               id: a.id,
               points_possible: 10,
               submission_types: ['online_upload'],
@@ -548,6 +549,7 @@ describe GradebooksController do
           assignments: [
             {
               id: a1.id,
+              due_at: nil,
               points_possible: 10,
               submission_types: ['online_upload'],
             }
