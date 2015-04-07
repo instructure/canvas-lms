@@ -96,14 +96,14 @@ module Autoextend
 
     def autoextend_singleton(method, feature)
       extension = autoextend_method(method, feature, singleton_autoextensions)
-      if singleton_class.method_defined?(method)
+      if singleton_class.method_defined?(method) && method(method).owner == singleton_class
         extension.extend(singleton_class)
       end
     end
 
     def autoextend(method, feature)
       extension = autoextend_method(method, feature, autoextensions)
-      if method_defined?(method)
+      if method_defined?(method) && instance_method(method).owner == self
         extension.extend(self)
       end
     end
