@@ -17,51 +17,41 @@
 #
 
 # These methods are mixed into the classes that can be considered a "context".
-# See Context::ContextTypes below.
+# See Context::CONTEXT_TYPES below.
 module Context
 
-  module ContextTypes
-    # These are all the classes that can be considered a "context":
-    Account = ::Account
-    Course = ::Course
-    User = ::User
-    Group = ::Group
-  end
+  CONTEXT_TYPES = [:Account, :Course, :User, :Group].freeze
 
-  module AssetTypes
-    Announcement = ::Announcement
-    AssessmentQuestion = ::AssessmentQuestion
-    AssessmentQuestionBank = ::AssessmentQuestionBank
-    Assignment = ::Assignment
-    AssignmentGroup = ::AssignmentGroup
-    Attachment = ::Attachment
-    CalendarEvent = ::CalendarEvent
-    Collaboration = ::Collaboration
-    ContentTag = ::ContentTag
-    ContextExternalTool = ::ContextExternalTool
-    ContextModule = ::ContextModule
-    DiscussionEntry = ::DiscussionEntry
-    DiscussionTopic = ::DiscussionTopic
-    Folder = ::Folder
-    LearningOutcome = ::LearningOutcome
-    LearningOutcomeGroup = ::LearningOutcomeGroup
-    MediaObject = ::MediaObject
-    Progress = ::Progress
-    Quiz = ::Quizzes::Quiz
-    QuizGroup = ::Quizzes::QuizGroup
-    QuizQuestion = ::Quizzes::QuizQuestion
-    QuizSubmission = ::Quizzes::QuizSubmission
-    Rubric = ::Rubric
-    RubricAssociation = ::RubricAssociation
-    Submission = ::Submission
-    WebConference = ::WebConference
-    Wiki = ::Wiki
-    WikiPage = ::WikiPage
-
-    def self.get_for_string(str)
-      self.const_defined?(str, false) ? self.const_get(str, false) : nil
-    end
-  end
+  ASSET_TYPES = {
+      Announcement: :Announcement,
+      AssessmentQuestion: :AssessmentQuestion,
+      AssessmentQuestionBank: :AssessmentQuestionBank,
+      Assignment: :Assignment,
+      AssignmentGroup: :AssignmentGroup,
+      Attachment: :Attachment,
+      CalendarEvent: :CalendarEvent,
+      Collaboration: :Collaboration,
+      ContentTag: :ContentTag,
+      ContextExternalTool: :ContextExternalTool,
+      ContextModule: :ContextModule,
+      DiscussionEntry: :DiscussionEntry,
+      DiscussionTopic: :DiscussionTopic,
+      Folder: :Folder,
+      LearningOutcome: :LearningOutcome,
+      LearningOutcomeGroup: :LearningOutcomeGroup,
+      MediaObject: :MediaObject,
+      Progress: :Progress,
+      Quiz: :"Quizzes::Quiz",
+      QuizGroup: :"Quizzes::QuizGroup",
+      QuizQuestion: :"Quizzes::QuizQuestion",
+      QuizSubmission: :"Quizzes::QuizSubmission",
+      Rubric: :Rubric,
+      RubricAssociation: :RubricAssociation,
+      Submission: :Submission,
+      WebConference: :WebConference,
+      Wiki: :Wiki,
+      WikiPage: :WikiPage
+  }.freeze
 
   def add_aggregate_entries(entries, feed)
     entries.each do |entry|
@@ -146,13 +136,13 @@ module Context
   def self.names_by_context_types_and_ids(context_types_and_ids)
     ids_by_type = Hash.new([])
     context_types_and_ids.each do |type, id|
-      next unless type && ContextTypes.const_defined?(type)
+      next unless type && CONTEXT_TYPES.include?(type.to_sym)
       ids_by_type[type] += [id]
     end
 
     result = Hash.new
     ids_by_type.each do |type, ids|
-      klass = ContextTypes.const_get(type)
+      klass = Object.const_get(type, false)
       klass.where(:id => ids).select([:id, :name]).map {|c| result[[type, c.id]] = c.name}
     end
     result
@@ -161,9 +151,10 @@ module Context
   def self.find_by_asset_string(string)
     opts = string.split("_", -1)
     id = opts.pop
-    if ContextTypes.const_defined?(opts.join('_').classify)
-      type = ContextTypes.const_get(opts.join('_').classify)
-      context = type.find(id)
+    klass_name = opts.join('_').classify.to_sym
+    if CONTEXT_TYPES.include?(klass_name)
+      type = Object.const_get(klass_name, false)
+      type.find(id)
     else
       nil
     end
@@ -171,14 +162,15 @@ module Context
     nil
   end
 
+  def self.asset_type_for_string(string)
+    ASSET_TYPES[string.to_sym].to_s.constantize if ASSET_TYPES.key?(string.to_sym)
+  end
+
   def self.find_asset_by_asset_string(string, context=nil, allowed_types=nil)
     opts = string.split("_")
     id = opts.pop
     type = opts.join('_').classify
-    klass = nil
-    if AssetTypes.const_defined?(type)
-      klass = AssetTypes.const_get(type)
-    end
+    klass = asset_type_for_string(type)
     klass = nil if allowed_types && !allowed_types.include?(klass.to_s.underscore.to_sym)
     return nil unless klass
     res = nil

@@ -93,23 +93,23 @@ module UserContent
 
   class HtmlRewriter
     AssetTypes = {
-      'assignments' => Assignment,
-      'announcements' => Announcement,
-      'calendar_events' => CalendarEvent,
-      'discussion_topics' => DiscussionTopic,
-      'collaborations' => Collaboration,
-      'files' => Attachment,
-      'conferences' => WebConference,
-      'quizzes' => Quizzes::Quiz,
-      'groups' => Group,
-      'wiki' => WikiPage,
-      'pages' => WikiPage,
+      'assignments' => :Assignment,
+      'announcements' => :Announcement,
+      'calendar_events' => :CalendarEvent,
+      'discussion_topics' => :DiscussionTopic,
+      'collaborations' => :Collaboration,
+      'files' => :Attachment,
+      'conferences' => :WebConference,
+      'quizzes' => :"Quizzes::Quiz",
+      'groups' => :Group,
+      'wiki' => :WikiPage,
+      'pages' => :WikiPage,
       'grades' => nil,
       'users' => nil,
       'external_tools' => nil,
       'file_contents' => nil,
-      'modules' => ContextModule,
-      'items' => ContentTag
+      'modules' => :ContextModule,
+      'items' => :ContentTag
     }
     DefaultAllowedTypes = AssetTypes.keys
 
@@ -170,7 +170,9 @@ module UserContent
         end
 
         if asset_types.key?(type)
-          match = UriMatch.new(relative_url, type, asset_types[type], obj_id, rest)
+          klass = asset_types[type]
+          klass = klass.to_s.constantize if klass
+          match = UriMatch.new(relative_url, type, klass, obj_id, rest)
           handler = @handlers[type] || @default_handler
           (handler && handler.call(match)) || relative_url
         else

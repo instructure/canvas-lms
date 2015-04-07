@@ -751,8 +751,8 @@ class ApplicationController < ActionController::Base
       @current_user = @membership.user unless @problem
     else
       @context_type = pieces[0].classify
-      if Context::ContextTypes.const_defined?(@context_type)
-        @context_class = Context::ContextTypes.const_get(@context_type)
+      if Context::CONTEXT_TYPES.include?(@context_type.to_sym)
+        @context_class = Object.const_get(@context_type, false)
         @context = @context_class.where(uuid: pieces[1]).first if pieces[1]
       end
       if !@context
