@@ -32,14 +32,42 @@ define([
   'media_comments' /* mediaComment, mediaCommentThumbnail */
 ], function(INST, I18n, $, _, GradeCalculator, round, htmlEscape) {
 
+  function removeAssignmentsNotInCurrentGradingPeriod() {
+    var gradingPeriod = ENV.grading_period;
+    var assignmentGroups = $.extend(true, [], ENV.assignment_groups);
+    var filteredAssignmentGroups;
+
+    if (gradingPeriod) {
+      _.each(assignmentGroups, function (assignmentGroup) {
+        var updatedAssignments = [];
+        _.each(assignmentGroup.assignments, function (assignment){
+          var gradingPeriodStartDate = new Date(gradingPeriod.start_date);
+          var gradingPeriodEndDate = new Date(gradingPeriod.end_date);
+          var assignmentDueDate = assignment.due_at ? new Date(assignment.due_at) : null;
+          var assignmentInGradingPeriod = gradingPeriodStartDate <= assignmentDueDate
+              && gradingPeriodEndDate >= assignmentDueDate
+
+          if(assignmentInGradingPeriod || (gradingPeriod.is_last && !assignmentDueDate)) {
+            updatedAssignments.push(assignment);
+          }
+        });
+        assignmentGroup.assignments = updatedAssignments;
+      });
+    }
+
+    return assignmentGroups;
+  }
+
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
     var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
     var groupWeightingScheme = ENV.group_weighting_scheme;
     var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
+    var assignmentGroups = removeAssignmentsNotInCurrentGradingPeriod(ENV.assignment_groups);
+
     var calculatedGrades = GradeCalculator.calculate(
       ENV.submissions,
-      ENV.assignment_groups,
+      assignmentGroups,
       groupWeightingScheme
     );
 

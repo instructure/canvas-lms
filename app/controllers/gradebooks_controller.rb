@@ -76,6 +76,7 @@ class GradebooksController < ApplicationController
                group_weighting_scheme: @context.group_weighting_scheme,
                show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
                grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard,
+               grading_period: @grading_periods && @grading_periods.find {|grading_period| grading_period[:id].to_s == gp_id},
                student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
                student_id: @presenter.student_id
       else
@@ -91,6 +92,7 @@ class GradebooksController < ApplicationController
           :id => a.id,
           :submission_types => a.submission_types_array,
           :points_possible => a.points_possible,
+          :due_at => a.due_at
         }
       end
       {
@@ -196,6 +198,7 @@ class GradebooksController < ApplicationController
   def get_active_grading_periods
     GradingPeriod.for(@context).map do |gp|
       json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: @current_user})
+      json[:grading_period][:is_last] = gp.last?
       json[:grading_period]
     end
   end
