@@ -539,7 +539,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     it "should correctly copy matching question fields with html-lookalike text" do
-      skip("qti tool update")
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = {:question_type => "matching_question",
               :points_possible => 10,
