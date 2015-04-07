@@ -213,7 +213,7 @@ module AttachmentFu # :nodoc:
 
     # Copies the given file path to a new tempfile, returning the closed tempfile.
     def copy_to_temp_file(file, temp_base_name)
-      Tempfile.new([nil,temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(['',temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.close
         FileUtils.cp file, tmp.path
       end
@@ -221,7 +221,7 @@ module AttachmentFu # :nodoc:
 
     # Writes the given data to a new tempfile, returning the closed tempfile.
     def write_to_temp_file(data, temp_base_name)
-      Tempfile.new([nil,temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(['',temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.binmode
         tmp.write data
         tmp.close
