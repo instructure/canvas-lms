@@ -13,7 +13,7 @@ require [
     el: $('#tab-navigation')
 
   featureFlagView = new FeatureFlagAdminView(el: '#tab-features')
-  featureFlagView.collection.fetch()
+  featureFlagView.collection.fetchAll()
 
   $ ->
     nav_view.render()
