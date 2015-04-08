@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe "syllabus" do
   def anonymous_syllabus_access_allowed(property, value=true)
     course_with_teacher(:course => @course, :active_all => true)

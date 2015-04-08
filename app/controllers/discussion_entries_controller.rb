@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
   before_filter :require_context_and_read_access, :except => :public_feed

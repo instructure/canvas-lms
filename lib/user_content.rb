@@ -1,8 +1,12 @@
+require 'nokogiri'
+require 'ritex'
+require 'securerandom'
+
 module UserContent
   def self.escape(str, current_host = nil)
     html = Nokogiri::HTML::DocumentFragment.parse(str)
     find_user_content(html) do |obj, uc|
-      uuid = CanvasUUID.generate
+      uuid = SecureRandom.uuid
       child = Nokogiri::XML::Node.new("iframe", html)
       child['class'] = 'user_content_iframe'
       child['name'] = uuid

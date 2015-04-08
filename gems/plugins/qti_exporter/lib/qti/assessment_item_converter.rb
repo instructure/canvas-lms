@@ -1,3 +1,6 @@
+require 'nokogiri'
+require 'sanitize'
+
 module Qti
 class AssessmentItemConverter
   include Canvas::Migration::XMLHelper

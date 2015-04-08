@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class ExternalFeedAggregator
   SUCCESS_WAIT_SECONDS = 1.hour     # time to refresh on a successful feed load with new entries
   NO_ENTRIES_WAIT_SECONDS = 2.hours # time to refresh on a successful feed load with NO new entries

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'oauth'
+
 module Twitter
   class Connection
     def initialize(oauth_access_token, oauth_access_token_secret)

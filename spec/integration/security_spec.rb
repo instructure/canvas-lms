@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
+require 'nokogiri'
+
 describe "security" do
 
   describe "session fixation" do

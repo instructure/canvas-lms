@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'casclient'
+
 module AuthenticationMethods
 
   def authorized(*groups)

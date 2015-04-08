@@ -19,47 +19,45 @@ gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'dynamic_form', '1.1.4'
+gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
 gem 'switchman', '1.2.29'
 gem 'folio-pagination', '0.0.7', require: 'folio/rails'
 gem 'will_paginate', '3.0.4', require: false
 
 gem "after_transaction_commit", '1.0.1'
-gem "aws-sdk", '1.63.0'
-  gem 'uuidtools', '2.1.4'
-gem 'barby', '0.5.0'
+gem "aws-sdk", '1.63.0', require: false
+  gem 'uuidtools', '2.1.4', require: false
+gem 'barby', '0.5.0', require: false
+  gem 'rqrcode', '0.4.2', require: false
   gem 'chunky_png', '1.3.0', require: false
 gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.7'
   gem 'adobe_connect', '1.0.2', require: false
 gem 'canvas_webex', '0.15'
 gem 'canvas-jobs', '0.9.11'
-gem 'daemons', '1.1.0'
-gem 'diff-lcs', '1.2.5', require: 'diff/lcs'
 
-gem 'ffi', '1.1.5'
+gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.12'
   gem 'ruby2ruby', '2.0.8', require: false
   gem 'ruby_parser', '3.6.1', require: false
-gem 'hashery', '1.3.0', require: 'hashery/dictionary'
-gem 'highline', '1.6.1'
+gem 'hashery', '1.3.0', require: false
+gem 'highline', '1.6.1', require: false
 gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.9'
 gem 'i18nema', '0.0.8', platforms: [:ruby_20, :ruby_21, :ruby_22]
 gem 'i18nema19', '0.0.8', platform: :ruby_19
 gem 'i18nliner', '0.0.11'
-gem 'icalendar', '1.5.4'
-gem 'ims-lti', '2.0.0.beta.18'
+gem 'icalendar', '1.5.4', require: false
+gem 'ims-lti', '2.0.0.beta.18', require: false
 gem 'jammit', github: 'documentcloud/jammit', ref: '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3', require: false
   gem 'jsmin', '1.0.1', require: false
 gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
-gem 'jwt', '1.2.1'
+gem 'jwt', '1.2.1', require: false
 
-gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
-gem 'mail', '2.5.4'
+gem 'mail', '2.5.4', require: false
   gem 'treetop', '1.4.15', require: false
     gem 'polyglot', '0.3.5', require: false
 gem 'marginalia', '1.3.0', require: false
@@ -69,38 +67,35 @@ gem 'mime-types', '1.17.2', require: 'mime/types'
 gem 'mini_magick', '1.3.2'
   gem 'subexec', '0.0.4', require: false
 gem 'multi_json', '1.10.1'
-gem 'netaddr', '1.5.0'
-gem 'nokogiri', '1.6.6.2'
+gem 'netaddr', '1.5.0', require: false
+gem 'nokogiri', '1.6.6.2', require: false
 # oauth gem, with rails3 fixes rolled in
-gem 'oauth-instructure', '0.4.10', require: 'oauth'
+gem 'oauth-instructure', '0.4.10', require: false
 gem 'rack-mini-profiler', '0.9.1', require: false
 gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
-gem 'ratom', '0.9.0', require: "atom"
-gem 'rdiscount', '1.6.8'
-gem 'ritex', '1.0.1'
+gem 'ratom', '0.9.0', require: false
+gem 'rdiscount', '1.6.8', require: false
+gem 'ritex', '1.0.1', require: false
 
-gem 'rotp', '1.6.1'
-gem 'rqrcode', '0.4.2'
-gem 'net-ldap', '0.10.1'
-gem 'ruby-duration', '3.2.0'
+gem 'rotp', '1.6.1', require: false
+gem 'net-ldap', '0.10.1', require: false
+gem 'ruby-duration', '3.2.0', require: false
 gem 'ruby-saml-mod', '0.2.4'
-gem 'rubycas-client', '2.3.9'
+gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', require: false
 gem 'safe_yaml-instructure', '0.8.0', require: false
   gem 'hashie', '2.0.5', require: false
-gem 'sanitize', '2.0.6'
+gem 'sanitize', '2.0.6', require: false
 gem 'shackles', '1.0.7'
 
-gem 'useragent', '0.10.0'
-gem 'uuid', '2.3.2'
+gem 'useragent', '0.10.0', require: false
 
-gem 'xml-simple', '1.0.12', require: 'xmlsimple'
 gem 'foreigner', '0.9.2'
-gem 'crocodoc-ruby', '0.0.1', require: 'crocodoc'
-gem 'hey', '1.3.0'
+gem 'crocodoc-ruby', '0.0.1', require: false
+gem 'hey', '1.3.0', require: false
 gem 'aroi', '0.0.2'
 
 gem 'active_polymorph', path: 'gems/active_polymorph'
@@ -129,7 +124,6 @@ gem 'canvas_stringex', path: 'gems/canvas_stringex'
 gem 'canvas_text_helper', path: 'gems/canvas_text_helper'
 gem 'canvas_time', path: 'gems/canvas_time'
 gem 'canvas_unzip', path: 'gems/canvas_unzip'
-gem 'canvas_uuid', path: 'gems/canvas_uuid'
 gem 'csv_diff', path: 'gems/csv_diff'
 gem 'google_docs', path: 'gems/google_docs'
 gem 'google_drive', path: 'gems/google_drive'

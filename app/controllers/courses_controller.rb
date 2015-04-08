@@ -16,7 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'set'
+require 'securerandom'
 
 # @API Courses
 # API for accessing course information.
@@ -1174,7 +1176,7 @@ class CoursesController < ApplicationController
     end
 
     session.delete(:enrollment_uuid)
-    session[:permissions_key] = CanvasUUID.generate
+    session[:permissions_key] = SecureRandom.uuid
 
     redirect_to(@current_user ? dashboard_url : root_url)
   end
@@ -1218,7 +1220,7 @@ class CoursesController < ApplicationController
 
       session[:enrollment_uuid] = enrollment.uuid
       session[:enrollment_uuid_course_id] = enrollment.course_id
-      session[:permissions_key] = CanvasUUID.generate
+      session[:permissions_key] = SecureRandom.uuid
 
       @pending_enrollment = enrollment
 
@@ -1243,7 +1245,7 @@ class CoursesController < ApplicationController
 
       if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
         session.delete(:enrollment_uuid)
-        session[:permissions_key] = CanvasUUID.generate
+        session[:permissions_key] = SecureRandom.uuid
       end
       session.delete(:accepted_enrollment_uuid)
       session.delete(:enrollment_uuid_course_id)

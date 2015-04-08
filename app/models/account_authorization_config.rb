@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'net-ldap'
+require 'net_ldap_extensions'
+
 class AccountAuthorizationConfig < ActiveRecord::Base
   cattr_accessor :saml_enabled
   begin

@@ -16,13 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'securerandom'
+
 class RequestContextGenerator
   def initialize(app)
     @app = app
   end
 
   def call(env)
-    request_id = CanvasUUID.generate
+    request_id = SecureRandom.uuid
     session_id = (env['rack.session.options'] || {})[:id]
     meta_headers = ""
     Thread.current[:context] = {

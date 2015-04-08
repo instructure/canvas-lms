@@ -17,6 +17,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class DiscussionTopic < ActiveRecord::Base
 
   include Workflow

@@ -21,6 +21,8 @@ begin
 rescue LoadError
 end
 
+require 'securerandom'
+
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
   c.color = true
@@ -1458,7 +1460,7 @@ RSpec.configure do |config|
 
     @request_id = opts[:request_id] || RequestContextGenerator.request_id
     unless @request_id
-      @request_id = CanvasUUID.generate
+      @request_id = SecureRandom.uuid
       RequestContextGenerator.stubs(:request_id => @request_id)
     end
 

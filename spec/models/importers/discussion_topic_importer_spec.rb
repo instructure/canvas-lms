@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
+require 'nokogiri'
+
 describe Importers::DiscussionTopicImporter do
 
   SYSTEMS.each do |system|

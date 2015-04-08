@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+
 class ImportedHtmlConverter
   include TextHelper
   include HtmlTextHelper

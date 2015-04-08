@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 class CourseLinkValidator
 
   TAG = "link_validation"

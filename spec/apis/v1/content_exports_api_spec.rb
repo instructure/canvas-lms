@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+require 'nokogiri'
+
 describe ContentExportsApiController, type: :request do
   let_once(:t_teacher) do
     user(active_all: true)

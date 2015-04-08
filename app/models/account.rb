@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class Account < ActiveRecord::Base
   include Context
   attr_accessible :name, :turnitin_account_id, :turnitin_shared_secret,

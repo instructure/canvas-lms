@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
+require 'nokogiri'
+
 describe UsersController do
   describe "#teacher_activity" do
     before do

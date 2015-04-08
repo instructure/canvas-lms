@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class Submission < ActiveRecord::Base
   include SendToStream
   attr_protected :submitted_at

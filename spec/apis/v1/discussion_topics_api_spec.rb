@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
+require 'nokogiri'
+
 class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics

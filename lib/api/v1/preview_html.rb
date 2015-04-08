@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'sanitize'
+
 module Api::V1::PreviewHtml
   def render_preview_html
     html = params[:html]

@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'oauth'
+
 module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,

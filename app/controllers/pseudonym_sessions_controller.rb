@@ -16,6 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'barby'
+require 'barby/barcode/qr_code'
+require 'barby/outputter/png_outputter'
+require 'casclient'
+require 'rotp'
+require 'securerandom'
+
 class PseudonymSessionsController < ApplicationController
   protect_from_forgery :except => [:create, :saml_logout, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
@@ -312,7 +319,7 @@ class PseudonymSessionsController < ApplicationController
   def clear_file_session
     session.delete('file_access_user_id')
     session.delete('file_access_expiration')
-    session[:permissions_key] = CanvasUUID.generate
+    session[:permissions_key] = SecureRandom.uuid
 
     render :text => "ok"
   end

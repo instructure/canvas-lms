@@ -16,7 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'date'
+require 'icalendar'
+
+Icalendar::Event.ical_property  :x_alt_desc
 
 class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks

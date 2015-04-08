@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module Qti
 class Converter < Canvas::Migration::Migrator
 

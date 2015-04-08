@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module Qti
 class ExtendedTextInteraction < AssessmentItemConverter
   include Canvas::Migration::XMLHelper

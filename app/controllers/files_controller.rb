@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'dynamic_form'
+require 'securerandom'
+
 # @API Files
 # An API for managing files and folders
 # See the File Upload Documentation for details on the file upload workflow.
@@ -152,14 +155,14 @@ class FilesController < ApplicationController
         # permission checks
         session['file_access_user_id'] = user.id
         session['file_access_expiration'] = 1.hour.from_now.to_i
-        session[:permissions_key] = CanvasUUID.generate
+        session[:permissions_key] = SecureRandom.uuid
       end
     end
     # These sessions won't get deleted when the user logs out since this
     # is on a separate domain, so we've added our own (stricter) timeout.
     if session && session['file_access_user_id'] && session['file_access_expiration'].to_i > Time.now.to_i
       session['file_access_expiration'] = 1.hour.from_now.to_i
-      session[:permissions_key] = CanvasUUID.generate
+      session[:permissions_key] = SecureRandom.uuid
     end
     true
   end

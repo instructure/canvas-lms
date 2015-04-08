@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class WikiPage < ActiveRecord::Base
   attr_accessible :title, :body, :url, :user_id, :editing_roles, :notify_of_update
   attr_readonly :wiki_id

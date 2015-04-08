@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'nokogiri'
+
 describe UserContent do
   describe "find_user_content" do
     it "should not yield non-string width/height fields" do

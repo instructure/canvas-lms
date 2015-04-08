@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
   def self.display_name_order_by_clause(table = nil)

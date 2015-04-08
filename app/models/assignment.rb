@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'set'
 require 'canvas/draft_state_validations'
 require 'bigdecimal'
