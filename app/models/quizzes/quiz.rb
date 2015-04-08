@@ -1108,6 +1108,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def can_unpublish?
+    return true if new_record?
     !has_student_submissions? &&
       (assignment.blank? || assignment.can_unpublish?)
   end

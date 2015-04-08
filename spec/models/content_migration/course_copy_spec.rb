@@ -306,7 +306,7 @@ describe ContentMigration do
       expect(rub2.workflow_state).to eq 'active'
       expect(rub2.rubric_associations.first.bookmarked).to eq true
       expect(@copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.workflow_state).to eq 'active'
-      expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state).to eq 'created' if Qti.qti_enabled?
+      expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state).to eq 'unpublished' if Qti.qti_enabled?
       expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.workflow_state).to eq 'public'
       expect(@copy_to.assignment_groups.where(migration_id: mig_id(ag)).first.workflow_state).to eq 'available'
       expect(@copy_to.assignments.where(migration_id: mig_id(asmnt)).first.workflow_state).to eq asmnt.workflow_state

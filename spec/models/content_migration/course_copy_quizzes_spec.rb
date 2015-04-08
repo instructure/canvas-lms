@@ -807,5 +807,36 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         expect(qq.assessment_question_id).to_not be_nil
       end
     end
+
+    it "should not try to restore deleted quizzes to an unpublished state if unable to" do
+      quiz_from = @copy_from.quizzes.create!(:title => "ruhroh")
+      quiz_from.did_edit
+      quiz_from.offer!
+      a_from = quiz_from.assignment
+
+      run_course_copy
+
+      a_from.unpublish!
+      quiz_from.unpublish!
+
+      @copy_to.offer!
+      student_in_course(:course => @copy_to, :active_user => true)
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz_from)).first
+      Quizzes::QuizSubmission.create!(:quiz => quiz_to, :user => @student)
+      expect(quiz_to.can_unpublish?).to be_falsey
+
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a_from)).first
+      a_to.destroy
+      quiz_to.destroy
+
+      run_course_copy
+
+      quiz_to.reload
+      a_to.reload
+      expect(quiz_to).to be_published
+      expect(quiz_to.assignment).to eq a_to
+      expect(a_to).to be_published
+    end
   end
 end

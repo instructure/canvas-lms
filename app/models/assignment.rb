@@ -1923,6 +1923,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def can_unpublish?
+    return true if new_record?
     !has_student_submissions?
   end
 
