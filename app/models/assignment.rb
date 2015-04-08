@@ -1390,7 +1390,7 @@ class Assignment < ActiveRecord::Base
                                .map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
-                                   .where("turnitin_data IS NOT NULL")
+                                   .where("turnitin_data IS NOT NULL AND turnitin_data <> ?", {}.to_yaml)
                                    .map(&:user)
                                  else
                                    []
