@@ -219,14 +219,20 @@ def truncate_table(model)
 end
 
 def truncate_all_tables
-  models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
-  models_by_connection.each do |connection, models|
+  model_connections = ActiveRecord::Base.descendants.map(&:connection).uniq
+  model_connections.each do |connection|
     if connection.adapter_name == "PostgreSQL"
-      table_names = connection.tables & models.map(&:table_name)
+      # use custom SQL to exclude tables from extensions
+      table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
+         SELECT tablename
+         FROM pg_tables
+         WHERE schemaname = ANY (current_schemas(false)) AND NOT tablename IN (
+           SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
+         )
+      SQL
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
-      table_names = connection.tables
-      models.each { |model| truncate_table(model) if table_names.include?(model.table_name) }
+      connection.tables.each { |model| truncate_table(model) }
     end
   end
 end
