@@ -467,4 +467,15 @@ describe "admin settings tab" do
       expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq ''
     end
   end
+
+  it "should show all the feature flags" do
+    course_with_admin_logged_in(:account => Account.site_admin)
+    get "/accounts/#{Account.site_admin.id}/settings"
+    f("#tab-features-link").click
+    wait_for_ajaximations
+    
+    Feature.applicable_features(Account.site_admin).each do |feature|
+      expect(f(".feature.#{feature.feature}")).to be_displayed
+    end
+  end
 end

@@ -34,7 +34,7 @@ define [
       @attachEvents()
 
     attachEvents: ->
-      @collection.on('sync', @onSync)
+      @collection.on('finish', @onSync)
 
     onSync: (collection, response, xhr) =>
       # only listen for the first sync event; others are updates to existing flags
