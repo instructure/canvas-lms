@@ -350,6 +350,15 @@ class CalendarEventsApiController < ApplicationController
   #   Section-level end time(s) if this is a course event.
   # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
+  # @argument calendar_event[duplicate][count] [Number]
+  #   Number of times to copy/duplicate the event.
+  # @argument calendar_event[duplicate][interval] [Number]
+  #   Defaults to 1 if duplicate `count` is set.  The interval between the duplicated events.
+  # @argument calendar_event[duplicate][frequency] [String, "daily"|"weekly"|"monthly"]
+  #   Defaults to "weekly".  The frequency at which to duplicate the event
+  # @argument calendar_event[duplicate][append_iterator] [Boolean]
+  #   Defaults to false.  If set to `true`, an increasing counter number will be appended to the event title
+  #   when the event is duplicated.  (e.g. Event 1, Event 2, Event 3, etc)
   #
   # @example_request
   #
@@ -364,14 +373,50 @@ class CalendarEventsApiController < ApplicationController
     if params[:calendar_event][:description].present?
       params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
     end
+
     @event = @context.calendar_events.build(params[:calendar_event])
+    @event.updating_user = @current_user
+    @event.validate_context! if @context.is_a?(AppointmentGroup)
+
     if authorized_action(@event, @current_user, :create)
-      @event.validate_context! if @context.is_a?(AppointmentGroup)
-      @event.updating_user = @current_user
-      if @event.save
-        render :json => event_json(@event, @current_user, session), :status => :created
+      # Create duplicates if necessary
+      events = []
+      dup_options = get_duplicate_params(params[:calendar_event])
+      title = dup_options[:title]
+
+      if dup_options[:count] > 0
+        section_events = params[:calendar_event].delete(:child_event_data)
+        # handles multiple section repeast
+        section_events.each do |event|
+          event[:title] = title
+          section_dup_options = get_duplicate_params(event)
+          events += create_event_and_duplicates(section_dup_options)
+        end if section_events.present?
+
+        events += create_event_and_duplicates(dup_options) unless section_events.present?
       else
-        render :json => @event.errors, :status => :bad_request
+        events = [@event]
+      end
+
+      if dup_options[:count] > 100
+        return render :json => {
+                        message: t("only a maximum of 100 events can be created")
+                      }, :status => :bad_request
+      end
+
+      CalendarEvent.transaction do
+        error = events.detect { |event| !event.save }
+
+        if error
+          render :json => error.errors, :status => :bad_request
+          raise ActiveRecord::Rollback
+        else
+          original_event = events.shift
+          render :json => event_json(
+            original_event,
+            @current_user,
+            session, { :duplicates => events }), :status => :created
+        end
       end
     end
   end
@@ -379,6 +424,7 @@ class CalendarEventsApiController < ApplicationController
   # @API Get a single calendar event or assignment
   #
   # @returns CalendarEvent
+
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)
@@ -848,6 +894,59 @@ class CalendarEventsApiController < ApplicationController
       map(&:asset_string)
   end
 
-  def select_public_codes(codes)
+  def duplicate(options = {})
+    @context ||= @current_user
+
+    if @current_user
+      get_all_pertinent_contexts(include_groups: true)
+    end
+
+    options[:iterator] ||= 0
+    params = set_duplicate_params(options)
+    event = @context.calendar_events.build(params[:calendar_event])
+    event.validate_context! if @context.is_a?(AppointmentGroup)
+    event.updating_user = @current_user
+    event
+  end
+
+  def create_event_and_duplicates(options = {})
+    events = []
+    total_count = options[:count] + 1
+    total_count.times do |i|
+      events << duplicate({iterator: i}.merge!(options))
+    end
+    events
+  end
+
+  def get_duplicate_params(event_data = {})
+    duplicate_data = params[:calendar_event][:duplicate]
+    duplicate_data ||= {}
+
+    {
+        title:     event_data[:title],
+        start_at:  event_data[:start_at],
+        end_at:    event_data[:end_at],
+        count:     duplicate_data.fetch(:count, 0).to_i,
+        interval:  duplicate_data.fetch(:interval, 1).to_i,
+        add_count: value_to_boolean(duplicate_data[:append_iterator]),
+        frequency: duplicate_data.fetch(:frequency, "weekly")
+    }
+  end
+
+  def set_duplicate_params(options = {})
+    options[:iterator] ||= 0
+    offset_interval = options[:interval] * options[:iterator]
+    offset = if options[:frequency] == "monthly"
+               offset_interval.months
+             elsif options[:frequency] == "daily"
+               offset_interval.days
+             else
+               offset_interval.weeks
+             end
+
+    params[:calendar_event][:title] = "#{options[:title]} #{options[:iterator] + 1}" if options[:add_count]
+    params[:calendar_event][:start_at] = Time.iso8601(options[:start_at]) + offset unless options[:start_at].blank?
+    params[:calendar_event][:end_at] = Time.iso8601(options[:end_at]) + offset unless options[:end_at].blank?
+    params
   end
 end

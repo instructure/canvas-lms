@@ -200,6 +200,14 @@ END
       root_opt_in: true,
       beta: true
     },
+    'recurring_calendar_events' =>
+    {
+      display_name: -> { I18n.t('Recurring Calendar Events') },
+      description: -> { I18n.t("Allows the scheduling of recurring calendar events") },
+      applies_to: 'Course',
+      state: 'allowed',
+      beta: true
+    },
     'student_groups_next' =>
     {
       display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },
