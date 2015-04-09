@@ -48,12 +48,12 @@ module HandlebarsTasks
         dir      = File.dirname(path)
         source   = File.read(file)
         plugin ||= compiled_path =~ /vendor\/plugins\/([^\/]*)\// ? $1 : nil
-        js       = compile_template(source, id, plugin)
+        js       = compile_template(source, file, id, plugin)
         FileUtils.mkdir_p(dir) unless File.exists?(dir)
         File.open(path, 'w') { |file| file.write(js) }
       end
 
-      def compile_template(source, id, plugin=nil)
+      def compile_template(source, path, id, plugin=nil)
         # if the first letter of the template name is "_", register it as a partial
         # ex: _foobar.handlebars or subfolder/_something.handlebars
         filename = File.basename(id)
@@ -80,7 +80,7 @@ module HandlebarsTasks
           dependencies << "jst/#{require_path}"
         end
 
-        data = precompile_template(id, source)
+        data = precompile_template(path, source)
         dependencies << "i18n!#{data["scope"]}" if data["translationCount"] > 0
 
         <<-JS

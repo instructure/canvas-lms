@@ -9,7 +9,7 @@ describe "handlebars" do
   end
 
   def run_template(template, context, locale = 'en')
-    compiled = HandlebarsTasks::Handlebars.compile_template(template, 'test')
+    compiled = HandlebarsTasks::Handlebars.compile_template(template, 'test', 'test')
     driver.execute_script compiled
     require_exec 'jst/test', <<-CS
       I18n.locale = '#{locale}'
@@ -65,8 +65,8 @@ describe "handlebars" do
   end
 
   it "should require partials used within template" do
-    driver.execute_script HandlebarsTasks::Handlebars.compile_template("hi from inside partial", "_test_partial")
-    driver.execute_script HandlebarsTasks::Handlebars.compile_template("outside partial {{>test_partial}}", "test_template")
+    driver.execute_script HandlebarsTasks::Handlebars.compile_template("hi from inside partial", "_test_partial", '_test_partial')
+    driver.execute_script HandlebarsTasks::Handlebars.compile_template("outside partial {{>test_partial}}", "test_template", 'test_template')
 
     result = require_exec "jst/test_template", "test_template()"
     expect(result).to eq "outside partial hi from inside partial"
