@@ -40,23 +40,30 @@ def git_diff(env_sha)
   `git show #{sha}`
 end
 
-require 'rubocop_canvas'
-
-env_sha = ENV['SHA']
-ruby_files = pick_ruby_files(env_sha)
-cli = RuboCop::CLI.new
-if ENV['GERRIT_REPO']
-  # we're on a jenkins box, lets send diff info via gergich
-  require 'rubocop_canvas/helpers/comments'
-  require 'shellwords'
+def get_offenses_json(cli, env_sha)
+  ruby_files = pick_ruby_files(env_sha)
   cli.run(ruby_files + ["--format", "json", "--out", "rubocop.json"])
   results_json = JSON.parse(File.read("rubocop.json"))
-  diff = git_diff(env_sha)
-  comments = RuboCop::Canvas::Comments.build(diff, results_json)
-  comments.each do |comment|
-    `gergich comment #{Shellwords.escape(comment.to_json)}`
+end
+
+require 'rubocop_canvas'
+
+cli = RuboCop::CLI.new
+if ENV['GERRIT_REFSPEC']
+  if ENV['GERRIT_PROJECT'] == 'canvas-lms' # only really want this on canvas atm
+    require 'rubocop_canvas/helpers/comments'
+    require 'shellwords'
+    rev = ENV['GERRIT_REFSPEC']
+    env_sha = `git fetch origin $GERRIT_REFSPEC && git rev-parse FETCH_HEAD`
+    results_json = get_offenses_json(cli, env_sha)
+    diff = git_diff(env_sha)
+    RuboCop::Canvas::Comments.build(diff, results_json).each do |comment|
+      `gergich comment #{Shellwords.escape(comment.to_json)}`
+    end
   end
 else
   #local run, just spit out everything wrong with these files to output
+  env_sha = ENV['SHA']
+  ruby_files = pick_ruby_files(env_sha)
   cli.run(ruby_files)
 end

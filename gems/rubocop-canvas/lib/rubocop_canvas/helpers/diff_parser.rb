@@ -15,8 +15,8 @@ module RuboCop::Canvas
     private
 
     def parse_raw_diff(raw_diff)
-      parsed = {}
-      key = ""
+      key = "GLOBAL"
+      parsed = {key => []}
       raw_diff.each_line.map(&:strip).each do |line|
         if file_line?(line)
           key = path_from_file_line(line)
