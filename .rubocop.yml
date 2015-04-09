@@ -46,6 +46,8 @@ Style/EmptyLinesAroundClassBody:
   Enabled: false
 Style/EmptyLinesAroundModuleBody:
   Enabled: false
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
 Style/GuardClause:
   Enabled: false
 Style/RedundantSelf:
@@ -66,3 +68,20 @@ Style/PercentQLiterals:
   Enabled: false
 Style/IndentHash:
   Enabled: false
+Style/DoubleNegation:
+  Enabled: false
+Style/TrailingComma:
+  Enabled: false
+Style/MethodCallParentheses:
+  Enabled: false
+
+# these don't make sense pre-Rails 4
+
+Rails/FindBy:
+  Enabled: false
+
+# Things we may want to tighten down later
+Metrics/LineLength:
+  Max: 110
+Metrics/MethodLength:
+  Max: 14
