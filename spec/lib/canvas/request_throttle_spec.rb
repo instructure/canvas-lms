@@ -126,7 +126,7 @@ describe 'Canvas::RequestThrottle' do
       if Canvas.redis_enabled?
         Redis::Scripting::Module.any_instance.expects(:run).never
       end
-      expect(strip_variable_headers(throttler.call(request_no_session))).to eq response
+      expect(throttler.call(request_no_session)).to eq response
     end
 
     def throttled_request

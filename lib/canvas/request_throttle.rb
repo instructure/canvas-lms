@@ -74,8 +74,10 @@ class RequestThrottle
       cost = user_cpu + db_runtime
       cost
     end
-    headers['X-Request-Cost'] = cost.to_s unless throttled
-    headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s if subject_to_throttling?(request)
+    if client_identifier(request) && !client_identifier(request).starts_with?('session')
+      headers['X-Request-Cost'] = cost.to_s unless throttled
+      headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s if subject_to_throttling?(request)
+    end
 
     [status, headers, response]
   end
