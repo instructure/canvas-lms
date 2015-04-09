@@ -259,17 +259,19 @@ describe Account do
 
     describe "services_exposed_to_ui_hash" do
       it "should return all ui services by default" do
-        expect(Account.services_exposed_to_ui_hash.keys).to eq Account.allowable_services.reject { |h,k| !k[:expose_to_ui] || (k[:expose_to_ui_proc] && !k[:expose_to_ui_proc].call(nil)) }.keys
+        expected_services = AccountServices.allowable_services.reject { |_, k| !k[:expose_to_ui] || (k[:expose_to_ui_proc] && !k[:expose_to_ui_proc].call(nil)) }.keys
+        expect(Account.services_exposed_to_ui_hash.keys).to eq expected_services
       end
 
       it "should return services of a type if specified" do
-        expect(Account.services_exposed_to_ui_hash(:setting).keys).to eq Account.allowable_services.reject { |h,k| k[:expose_to_ui] != :setting || (k[:expose_to_ui_proc] && !k[:expose_to_ui_proc].call(nil)) }.keys
+        expected_services = AccountServices.allowable_services.reject { |_, k| k[:expose_to_ui] != :setting || (k[:expose_to_ui_proc] && !k[:expose_to_ui_proc].call(nil)) }.keys
+        expect(Account.services_exposed_to_ui_hash(:setting).keys).to eq expected_services
       end
 
       it "should filter based on user and account if a proc is specified" do
         user1 = User.create!
         user2 = User.create!
-        Account.register_service(:myservice, {
+        AccountServices.register_service(:myservice, {
           name: "My Test Service",
           description: "Nope",
           expose_to_ui: :setting,
@@ -284,11 +286,11 @@ describe Account do
 
     describe "plugin services" do
       before do
-        Account.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
+        AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
       end
 
       it "should return the service" do
-        expect(Account.allowable_services.keys).to be_include(:myplugin)
+        expect(AccountServices.allowable_services.keys).to be_include(:myplugin)
       end
 
       it "should allow setting the service" do

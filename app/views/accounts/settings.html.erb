@@ -934,7 +934,7 @@ acknowledge that you have read and agreed to the
             </div>
             <% if announcement.required_account_service %>
               <div>
-                <%= Account.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
+                <%= AccountServices.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
               </div>
             <% end %>
             <% unless announcement.account_notification_roles.empty? %>

@@ -364,11 +364,14 @@ describe AccountsController do
     end
 
     it "should allow updating services that appear in the ui for the current user" do
-      Account.register_service(:test1, { name: 'test1', description: '', expose_to_ui: :setting, default: false })
-      Account.register_service(:test2, { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| false } })
+      AccountServices.register_service(:test1,
+                                       { name: 'test1', description: '', expose_to_ui: :setting, default: false })
+      AccountServices.register_service(:test2,
+                                       { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { false } })
       user_session(user)
       @account = Account.create!
-      Account.register_service(:test3, { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| account == @account } })
+      AccountServices.register_service(:test3,
+                                       { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |_, account| account == @account } })
       Account.site_admin.account_users.create!(user: @user)
       post 'update', id: @account.id, account: {
         services: {

@@ -312,14 +312,14 @@ describe "admin settings tab" do
     end
 
     it "should enable and disable a plugin service (setting)" do
-      Account.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false})
+      AccountServices.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false})
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)
     end
 
     it "should enable and disable a plugin service (service)" do
-      Account.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false})
+      AccountServices.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false})
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)
