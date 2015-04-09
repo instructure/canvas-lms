@@ -18,7 +18,7 @@ define [
     courseLabel: I18n.t('#helpers.course', 'Course') + ": "
     localLabel: I18n.t('#helpers.local', 'Local') + ": "
 
-    constructor: (@$field, options) ->
+    constructor: (@$field, options={}) ->
       @$field.data(instance: this)
 
       @processTimeOptions(options)
@@ -77,6 +77,16 @@ define [
       @$field.removeAttr('name')
       @$field.data('hiddenInput', @$hiddenInput)
 
+    # public API
+    setDate: (date) =>
+      @setFormattedDatetime(date, 'MMM d, yyyy')
+
+    setTime: (date) =>
+      @setFormattedDatetime(date, 'h:mmtt')
+
+    setDatetime: (date) =>
+      @setFormattedDatetime(date, 'MMM d, yyyy h:mmtt')
+
     # private API
     setFromValue: =>
       @parseValue()
@@ -117,6 +127,20 @@ define [
       @showTime = @alwaysShowTime or (@allowTime and not $.midnight(@datetime))
       @blank = not value
       @invalid = not @blank and @datetime == null
+
+    setFormattedDatetime: (datetime, format) ->
+      if datetime
+        @datetime = datetime
+        @fudged = $.fudgeDateForProfileTimezone(@datetime)
+        @$field.val(@fudged.toString(format))
+      else
+        @datetime = null
+        @fudged = null
+        @$field.val("")
+      @blank = @datetime is null
+      @invalid = false
+      @showTime = @alwaysShowTime or (@allowTime and not $.midnight(@datetime))
+      @update()
 
     update: (updates) ->
       @updateData()

@@ -506,3 +506,57 @@ define [
     equal @field.normalizeValue("24"), "24"
     equal @field.normalizeValue("25"), "25"
     equal @field.normalizeValue("99"), "99"
+
+  module 'setFormattedDatetime',
+    setup: ->
+      @snapshot = tz.snapshot()
+      tz.changeZone(detroit, 'America/Detroit')
+      @$field = $('<input type="text" name="due_at">')
+      @field = new DatetimeField(@$field, {})
+
+    teardown: ->
+      tz.restore(@snapshot)
+
+  test 'sets to blank with null value', ->
+    @field.setFormattedDatetime(null, 'any')
+    equal @field.datetime, null
+    equal @field.fudged, null
+    equal @field.blank, true
+    equal @field.invalid, false
+    equal @$field.val(), ''
+
+  test 'treats value as unfudged', ->
+    @field.setFormattedDatetime(moonwalk, 'MMM d, yyyy h:mmtt')
+    equal +@field.datetime, +moonwalk
+    equal +@field.fudged, +$.fudgeDateForProfileTimezone(moonwalk)
+    equal @field.blank, false
+    equal @field.invalid, false
+    equal @$field.val(), 'Jul 20, 1969 9:56PM'
+
+  test 'formats value into val() according to format parameter', ->
+    @field.setFormattedDatetime(moonwalk, 'MMM d, yyyy')
+    equal @$field.val(), 'Jul 20, 1969'
+    @field.setFormattedDatetime(moonwalk, 'h:mmtt')
+    equal @$field.val(), '9:56PM'
+
+  module 'setDate/setTime/setDatetime',
+    setup: ->
+      @snapshot = tz.snapshot()
+      tz.changeZone(detroit, 'America/Detroit')
+      @$field = $('<input type="text" name="due_at">')
+      @field = new DatetimeField(@$field, {})
+
+    teardown: ->
+      tz.restore(@snapshot)
+
+  test 'setDate formats into val() with just date', ->
+    @field.setDate(moonwalk)
+    equal @$field.val(), 'Jul 20, 1969'
+
+  test 'setTime formats into val() with just time', ->
+    @field.setTime(moonwalk)
+    equal @$field.val(), '9:56PM'
+
+  test 'setDatetime formats into val() with full date and time', ->
+    @field.setDatetime(moonwalk)
+    equal @$field.val(), 'Jul 20, 1969 9:56PM'

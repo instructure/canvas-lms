@@ -5,11 +5,12 @@ define [
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editCalendarEvent'
+  'compiled/util/coupleTimeFields'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
   'vendor/date'
-], ($, _, tz, commonEventFactory, TimeBlockList, editCalendarEventTemplate) ->
+], ($, _, tz, commonEventFactory, TimeBlockList, editCalendarEventTemplate, coupleTimeFields) ->
 
   class EditCalendarEventDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -105,45 +106,26 @@ define [
       @$form.find(".more_options_link").attr 'href', moreOptionsHref
 
     setupTimeAndDatePickers: () =>
-      @$form.find(".date_field").date_field()
-      # TODO: Refactor this logic that forms a relationship between two time fields into a module
-      @$form.find(".time_field").time_field().
-        blur (jsEvent) =>
-          start_time = @$form.find(".time_field.start_time").next(".datetime_suggest").text()
-          if @$form.find(".time_field.start_time").next(".datetime_suggest").hasClass('invalid_datetime')
-            start_time = null
-          start_time ?= @$form.find(".time_field.start_time").val()
-          end_time = @$form.find(".time_field.end_time").next(".datetime_suggest").text()
-          if @$form.find(".time_field.end_time").next(".datetime_suggest").hasClass('invalid_datetime')
-            end_time = null
-          end_time ?= @$form.find(".time_field.end_time").val()
+      # select the appropriate fields
+      $date = @$form.find(".date_field")
+      $start = @$form.find(".time_field.start_time")
+      $end = @$form.find(".time_field.end_time")
 
-          startDate = Date.parse(start_time)
-          endDate = Date.parse(end_time)
+      # set them up as appropriate variants of datetime_field
+      $date.date_field()
+      $start.time_field()
+      $end.time_field()
 
-          startDate = startDate || endDate
-          endDate = endDate || startDate
+      # fill initial values of each field according to @event
+      start = $.unfudgeDateForProfileTimezone(@event.startDate())
+      end = $.unfudgeDateForProfileTimezone(@event.endDate())
 
-          if $(jsEvent.target).hasClass('end_time')
-            if startDate > endDate then startDate = endDate
-          else
-            if endDate < startDate then endDate = startDate
-          if startDate
-            @$form.find(".time_field.start_time").val(startDate.toString('h:mmtt').toLowerCase())
-          if endDate
-            @$form.find(".time_field.end_time").val(endDate.toString('h:mmtt').toLowerCase())
+      $date.data('instance').setDate(start)
+      $start.data('instance').setTime(if @event.allDay then null else start)
+      $end.data('instance').setTime(if @event.allDay then null else end)
 
-      startDate = @event.startDate()
-      endDate = @event.endDate()
-
-      if !@event.allDay
-        if startDate
-          @$form.find(".time_field.start_time").val(startDate.toString('h:mmtt')).change().blur()
-        if endDate
-          @$form.find(".time_field.end_time").val(endDate.toString('h:mmtt')).change().blur()
-
-      if startDate
-        @$form.find(".date_field").val(startDate.toString('MMM d, yyyy')).change()
+      # couple start and end times so that end time will never precede start
+      coupleTimeFields($start, $end)
 
     formSubmit: (jsEvent) =>
       jsEvent.preventDefault()
