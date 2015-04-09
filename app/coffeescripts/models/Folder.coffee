@@ -91,6 +91,11 @@ define [
     filesEnv = null
     urlPath: ->
       relativePath = (@get('full_name') or '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
+
+      relativePath = relativePath.split('/').map((component) ->
+        encodeURIComponent(component)
+      ).join('/')
+
       filesEnv ||= require('compiled/react_files/modules/filesEnv') # circular dep
 
       # when we are viewing all files we need to pad the context_asset_string on the front of the url
