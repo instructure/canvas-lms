@@ -19,6 +19,8 @@
 require 'nokogiri'
 
 class BigBlueButtonConference < WebConference
+  after_destroy :end_meeting
+  after_destroy :delete_all_recordings
 
   user_setting_field :record, {
     name: ->{ t('recording_setting', 'Recording') },
@@ -49,7 +51,7 @@ class BigBlueButtonConference < WebConference
       :moderatorPW => settings[:admin_key],
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t(:conference_is_recorded, "This conference is being recorded.") : ""
+      :welcome => settings[:record] ? t("This conference may be recorded.") : ""
     }) or return nil
     @conference_active = true
     save
@@ -83,6 +85,17 @@ class BigBlueButtonConference < WebConference
     end
   end
 
+  def delete_all_recordings
+    fetch_recordings.map do |recording|
+      delete_recording recording[:recordID]
+    end
+  end
+
+  def close
+    end_meeting
+    super
+  end
+
   private
 
   def retouch?
@@ -105,6 +118,14 @@ class BigBlueButtonConference < WebConference
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
       :userID => user.id
+  end
+
+  def end_meeting
+    response = send_request(:end, {
+      :meetingID => conference_key,
+      :password => settings[(type == :user ? :user_key : :admin_key)],
+      })
+    response[:ended] if response
   end
 
   def fetch_recordings
