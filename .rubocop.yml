@@ -82,6 +82,12 @@ Rails/FindBy:
 
 # Things we may want to tighten down later
 Metrics/LineLength:
-  Max: 110
+  Max: 120
 Metrics/MethodLength:
-  Max: 14
+  Max: 16
+RSpec/InstanceVariable:
+  Enabled: false
+RSpec/ExampleWording:
+  Enabled: false
+RSpec/DescribedClass:
+  Enabled: false
